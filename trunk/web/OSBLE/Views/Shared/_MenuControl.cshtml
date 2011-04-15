@@ -1,0 +1,4 @@
+﻿<div id="tabs">
+    @Html.ActionLink("Dashboard", "Index", "Home", null, new { Class = ViewBag.currentTab == "Dashboard" ? "tab_current" : "" })
+    @Html.ActionLink("About", "About", "Home", null, new { Class = ViewBag.currentTab == "About" ? "tab_current" : "" })
+</div>
