@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models
 {
@@ -16,19 +12,39 @@ namespace OSBLE.Models
         public string Name { get; set; }
 
         [Required]
-        [Display(Name="Can modify a course")]
-        public bool CanModify;
+        [Display(Name = "Can modify a course")]
+        public bool CanModify { get; set; }
+
+        [Required]
+        [Display(Name = "Can see all course content")]
+        public bool CanSeeAll { get; set; }
+
         [Required]
         [Display(Name = "Can grade a course")]
-        public bool CanGrade;
-        [Required]
-        [Display(Name = "Can moderate reviews in a course")]
-        public bool CanModerate;
+        public bool CanGrade { get; set; }
+
         [Required]
         [Display(Name = "Can submit assignments in a course")]
-        public bool CanSubmit;
+        public bool CanSubmit { get; set; }
+
         [Required]
         [Display(Name = "All users in the course will appear anonymous to this user")]
-        public bool Anonymized;
+        public bool Anonymized { get; set; }
+
+        public CourseRole()
+            : base()
+        {
+        }
+
+        public CourseRole(string Name, bool CanModify, bool CanSeeAll, bool CanGrade, bool CanSubmit, bool Anonymized)
+            : base()
+        {
+            this.Name = Name;
+            this.CanModify = CanModify;
+            this.CanSeeAll = CanSeeAll;
+            this.CanGrade = CanGrade;
+            this.CanSubmit = CanSubmit;
+            this.Anonymized = Anonymized;
+        }
     }
 }

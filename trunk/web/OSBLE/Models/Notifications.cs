@@ -16,10 +16,20 @@ namespace OSBLE.Models
 
         public bool Read { get; set; }
 
+        [Required]
         public DateTime Posted { get; set; }
 
-        public string TableName { get; set; }
+        // Multiple items can be used in a notification, including Assignments, Grades, etc.
+        public string ItemType { get; set; }
 
-        public int TableID { get; set; }
+        public int ItemID { get; set; }
+
+        public string Message { get; set; }
+
+        public Notifications()
+            : base()
+        {
+            Posted = DateTime.Now;
+        }
     }
 }

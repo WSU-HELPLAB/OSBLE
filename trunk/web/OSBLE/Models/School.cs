@@ -17,5 +17,11 @@ namespace OSBLE.Models
         public string Name { get; set; }
 
         public ICollection<UserProfile> UserProfiles;
+
+        public School() : base() { }
+
+        public School(string Name) : base() {
+            this.Name = Name;
+        }
     }
 }

@@ -80,6 +80,8 @@
     <Compile Include="Models\Course.cs" />
     <Compile Include="Models\CourseRole.cs" />
     <Compile Include="Models\CoursesUsers.cs" />
+    <Compile Include="Models\DashboardPosts.cs" />
+    <Compile Include="Models\Notifications.cs" />
     <Compile Include="Models\OSBLEContext.cs" />
     <Compile Include="Models\Profile.cs" />
     <Compile Include="Models\School.cs" />

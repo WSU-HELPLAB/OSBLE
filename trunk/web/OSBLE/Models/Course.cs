@@ -33,8 +33,6 @@ namespace OSBLE.Models
         [Required]
         [Display(Name = "Number of Sections")]
         public int NumberOfSections { get; set; }
-
-        public ICollection<CoursesUsers> CourseUsers { get; set; }
-
+    
     }
 }
