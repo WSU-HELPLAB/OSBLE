@@ -111,7 +111,7 @@ namespace OSBLE.Controllers
                     {
                         FormsAuthentication.SignOut();
                         Membership.DeleteUser(model.Email);
-
+                        
                         ModelState.AddModelError("", e.Message);
 
                         return Register();

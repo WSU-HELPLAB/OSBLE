@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using System.Web.Mvc;
-using System.Web.Security;
 
 namespace OSBLE.Models
 {
@@ -20,7 +16,9 @@ namespace OSBLE.Models
 
         public School() : base() { }
 
-        public School(string Name) : base() {
+        public School(string Name)
+            : base()
+        {
             this.Name = Name;
         }
     }

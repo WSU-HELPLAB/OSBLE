@@ -27,7 +27,7 @@ namespace OSBLE.Models
 
         public DbSet<Course> Courses { get; set; }
     }
-    
+
     public class OSBLEContextInitializer : DropCreateDatabaseIfModelChanges<OSBLEContext>
     {
         protected override void Seed(OSBLEContext context)
@@ -42,10 +42,44 @@ namespace OSBLE.Models
             context.CourseRoles.Add(new CourseRole("TA", false, true, true, false, false));
             // Student: Can Submit Assignments, All Anonymized
             context.CourseRoles.Add(new CourseRole("Student", false, false, false, true, true));
-            // Moderator: No Special Privileges 
+            // Moderator: No Special Privileges
             context.CourseRoles.Add(new CourseRole("Moderator", false, false, false, false, false));
             // Observer: Can See All, All Anonymized
             context.CourseRoles.Add(new CourseRole("Observer", false, true, false, false, true));
+
+            #region TestData
+
+            // Sample Schools
+            School s1 = new School();
+            s1.Name = "Washington State University";
+
+            School s2 = new School();
+            s2.Name = "Somewhere Else University";
+
+            context.Schools.Add(s1);
+            context.Schools.Add(s2);
+
+            // Sample Courses
+            Course c1 = new Course();
+            c1.Prefix = "Cpt S";
+            c1.Number = "111";
+            c1.NumberOfSections = 1;
+            c1.Semester = "Spring";
+            c1.Year = "2011";
+            c1.Name = "Introduction to Programming";
+
+            Course c2 = new Course();
+            c2.Prefix = "Art E";
+            c2.Number = "345";
+            c2.NumberOfSections = 2;
+            c2.Semester = "Fall";
+            c2.Year = "2011";
+            c2.Name = "Underwater Basketweaving";
+
+            context.Courses.Add(c1);
+            context.Courses.Add(c2);
+
+            #endregion TestData
         }
     }
 }

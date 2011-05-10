@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models
@@ -12,13 +13,18 @@ namespace OSBLE.Models
         [Required]
         public DateTime Posted { get; set; }
 
+        [Required]
+        public int CourseID { get; set; }
+
+        public virtual Course Course { get; set; }
+
         public int UserProfileID { get; set; }
 
-        public UserProfile UserProfile { get; set; }
+        public virtual UserProfile UserProfile { get; set; }
 
         public int ParentID { get; set; }
 
-        public DashboardPosts Parent { get; set; }
+        public virtual ICollection<DashboardPosts> Replies { get; set; }
 
         public DashboardPosts()
             : base()
