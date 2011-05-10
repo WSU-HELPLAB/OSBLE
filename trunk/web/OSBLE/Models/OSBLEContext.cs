@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity;
+using System.Web.Security;
 
 namespace OSBLE.Models
 {
@@ -78,6 +79,15 @@ namespace OSBLE.Models
 
             context.Courses.Add(c1);
             context.Courses.Add(c2);
+
+            Membership.DeleteUser("me@me.com");
+            RegisterModel rm = new RegisterModel();
+            rm.FirstName = "Joe";
+            rm.LastName = "Student";
+            rm.Password = "123123";
+            rm.ConfirmPassword = "123123";
+            rm.Identification = "12345";
+            rm.ConfirmIdentification = "12345";
 
             #endregion TestData
         }

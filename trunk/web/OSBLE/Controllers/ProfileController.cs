@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.Entity;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using OSBLE.Models;
 
 namespace OSBLE.Controllers
-{ 
+{
     public class ProfileController : OSBLEController
     {
-        private OSBLEContext db = new OSBLEContext();
-
         //
         // GET: /Profile/
 
@@ -39,7 +34,7 @@ namespace OSBLE.Controllers
         {
             ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name");
             return View();
-        } 
+        }
 
         //
         // POST: /Profile/Create
@@ -51,16 +46,16 @@ namespace OSBLE.Controllers
             {
                 db.UserProfiles.Add(userprofile);
                 db.SaveChanges();
-                return RedirectToAction("Index");  
+                return RedirectToAction("Index");
             }
 
             ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name", userprofile.SchoolID);
             return View(userprofile);
         }
-        
+
         //
         // GET: /Profile/Edit/5
- 
+
         public ActionResult Edit(int id)
         {
             UserProfile userprofile = db.UserProfiles.Find(id);
@@ -86,7 +81,7 @@ namespace OSBLE.Controllers
 
         //
         // GET: /Profile/Delete/5
- 
+
         public ActionResult Delete(int id)
         {
             UserProfile userprofile = db.UserProfiles.Find(id);
@@ -98,7 +93,7 @@ namespace OSBLE.Controllers
 
         [HttpPost, ActionName("Delete")]
         public ActionResult DeleteConfirmed(int id)
-        {            
+        {
             UserProfile userprofile = db.UserProfiles.Find(id);
             Membership.DeleteUser(userprofile.UserName); // Also delete the user from the ASP.NET database.
 

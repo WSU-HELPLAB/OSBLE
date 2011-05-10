@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using System.Web.Routing;
 using System.Web.Security;
 using OSBLE.Models;
 
 namespace OSBLE.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : OSBLEController
     {
-        private OSBLEContext db = new OSBLEContext();
         //
         // GET: /Account/LogOn
 
@@ -105,13 +101,12 @@ namespace OSBLE.Controllers
 
                         db.UserProfiles.Add(profile);
                         db.SaveChanges();
-                        
                     }
                     catch (Exception e)
                     {
                         FormsAuthentication.SignOut();
                         Membership.DeleteUser(model.Email);
-                        
+
                         ModelState.AddModelError("", e.Message);
 
                         return Register();
@@ -149,7 +144,6 @@ namespace OSBLE.Controllers
         {
             if (ModelState.IsValid)
             {
-
                 // ChangePassword will throw an exception rather
                 // than return false in certain failure scenarios.
                 bool changePasswordSucceeded;
@@ -186,6 +180,7 @@ namespace OSBLE.Controllers
         }
 
         #region Status Codes
+
         private static string ErrorCodeToString(MembershipCreateStatus createStatus)
         {
             // See http://go.microsoft.com/fwlink/?LinkID=177550 for
@@ -223,6 +218,7 @@ namespace OSBLE.Controllers
                     return "An unknown error occurred. Please verify your entry and try again. If the problem persists, please contact your system administrator.";
             }
         }
-        #endregion
+
+        #endregion Status Codes
     }
 }

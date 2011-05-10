@@ -1,65 +1,72 @@
-﻿* {
-	font-family: arial, sans-serif;
+﻿*
+{
+    font-family: arial, sans-serif;
 }
 
-body {
-	background-color: #fff;
+body
+{
+    background-color: #fff;
 }
 
-a {
-	color: #094749;
+a
+{
+    color: #094749;
 }
 
-a:hover {
-	color: #ff0000;
+a:hover
+{
+    color: #ff0000;
 }
 
-a {
-	
+a
+{
 }
 
 /* Common layout elements */
-#header {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	margin: 0;
-	height: 90px;
-	background-color: #dfdfdf;
-	border-bottom: 1px solid #074974;
+#header
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin: 0;
+    height: 90px;
+    background-color: #dfdfdf;
+    border-bottom: 1px solid #074974;
 }
 
-#top_bar {
-	background-color: #074974;
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	margin: 0;
-	height: 30px;
+#top_bar
+{
+    background-color: #074974;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin: 0;
+    height: 30px;
 }
 
-#top_content {
-	position: absolute;
-	right: 0px;
-	padding-right: 15px;
-	color: #fff;
-	font-size: 12pt;
+#top_content
+{
+    position: absolute;
+    right: 0px;
+    padding-right: 15px;
+    color: #fff;
+    font-size: 12pt;
 }
 
-#top_content .top_item 
+#top_content .top_item
 {
     float: left;
 }
 
-#top_content span 
+#top_content span
 {
     padding-top: 7px;
-    padding-right: 15px;    
+    padding-right: 15px;
 }
 
-#top_content a 
+#top_content a
 {
     display: block;
     padding-top: 7px;
@@ -70,124 +77,146 @@ a {
     background-color: transparent;
 }
 
-#top_content a:hover 
+#top_content a:hover
 {
     background-color: #2288aa;
 }
 
-#logo {
-	position: absolute;
-	top: 10px;
-	left: 10px;
+#logo
+{
+    position: absolute;
+    top: 10px;
+    left: 10px;
 }
 
-#logo_text {
-	position: absolute;
-	top: 34px;
-	left: 100px;
+#logo_text
+{
+    position: absolute;
+    top: 34px;
+    left: 100px;
 }
 
-#courses {
-	position: absolute;
-	top: 35px;
-	right: 0px;
-	padding-right: 15px;
-	color: #074974;
+#courses
+{
+    position: absolute;
+    top: 35px;
+    right: 0px;
+    padding-right: 15px;
+    color: #074974;
 }
 
-#tabs {
-	position: absolute;
-	top: 70px;
-	left: 10px;
+#course_select
+{
+    width: auto;
+    min-width: 250px;
 }
 
-#tabs a {
-	display: block;
-	float: left;
-	font-size: 12pt;
-	color: #074974;	
-	background-color: #f5f5f5;
-	height: 18px;
-	border: 1px solid #074974;
-	border-bottom: 1px solid #074974;
-	text-decoration: none;
-	padding-left: 6px;
-	padding-right: 6px;
-	padding-top: 1px;
-	padding-bottom: 0px;
-	margin-right: 2px;
+#tabs
+{
+    position: absolute;
+    top: 70px;
+    left: 10px;
 }
 
-#tabs a.tab_current {
-	color: #074974;
-	background-color: #fff;
-	border-bottom: 1px solid #fff;	
+#tabs a
+{
+    display: block;
+    float: left;
+    font-size: 12pt;
+    color: #074974;
+    background-color: #f5f5f5;
+    height: 18px;
+    border: 1px solid #074974;
+    border-bottom: 1px solid #074974;
+    text-decoration: none;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 1px;
+    padding-bottom: 0px;
+    margin-right: 2px;
 }
 
-#tabs a:hover {
-	border-bottom: 1px solid #074974;
-	background-color: #074974;
-	color: #fff;
+#tabs a.tab_current
+{
+    color: #074974;
+    background-color: #fff;
+    border-bottom: 1px solid #fff;
 }
 
-#content {
-	position: absolute;
-	top: 100px;
-	left: 0;
-	width: 98%;
-	margin-left: 1%;
-	margin-right: 1%;
+#tabs a:hover
+{
+    border-bottom: 1px solid #074974;
+    background-color: #074974;
+    color: #fff;
+}
+
+#content
+{
+    position: absolute;
+    top: 100px;
+    left: 0;
+    width: 98%;
+    margin-left: 1%;
+    margin-right: 1%;
 }
 
 /* Users Page */
 
-ul.user_list {
-	padding-left: 0;
-	margin-left: 0;
+ul.user_list
+{
+    padding-left: 0;
+    margin-left: 0;
 }
-.user_list li {
-	list-style: none;
-	
-	width: 230px;
-	border-bottom: 1px solid #aaccff;
-	min-height: 20px;
-	padding-top: 4px;
-	margin-bottom: 7px;
-	font-size: 10pt;
-}
-
-.user_list li img {
-	vertical-align: middle;
+.user_list li
+{
+    list-style: none;
+    width: 230px;
+    border-bottom: 1px solid #aaccff;
+    min-height: 20px;
+    padding-top: 4px;
+    margin-bottom: 7px;
+    font-size: 10pt;
 }
 
-.user_list li:hover {
-	background-color: #aaccff;
-	border-bottom: 1px solid #074974;
+.user_list li img
+{
+    vertical-align: middle;
 }
 
-.user_list li:hover div.user_controls {
-	display: block;
+.user_list li:hover
+{
+    background-color: #aaccff;
+    border-bottom: 1px solid #074974;
 }
 
-.user_list li div.user_controls {
-	display: none;
-	float: right;
+.user_list li:hover div.user_controls
+{
+    display: block;
 }
 
-#users_table td {
-	width: 250px;
-	vertical-align: top;
+.user_list li div.user_controls
+{
+    display: none;
+    float: right;
 }
 
-.user_controls img:hover {
-	cursor: pointer;
+#users_table td
+{
+    width: 250px;
+    vertical-align: top;
 }
 
-.add img:hover {
-	cursor: pointer;
+.user_controls img:hover
+{
+    cursor: pointer;
 }
 
-/* MISC  
+.add img:hover
+{
+    cursor: pointer;
+}
+
+/* MISC
 ----------------------------------------------------------*/
 .clear
 {
@@ -196,7 +225,7 @@ ul.user_list {
 
 .error
 {
-    color:Red;
+    color: Red;
 }
 
 /* Styles for validation helpers
@@ -223,7 +252,6 @@ ul.user_list {
     color: #ff0000;
 }
 
-
 .validation-summary-valid
 {
     display: none;
@@ -231,10 +259,7 @@ ul.user_list {
 
 /* Styles for editor and display helpers
 ----------------------------------------------------------*/
-.display-label,
-.editor-label,
-.display-field,
-.editor-field
+.display-label, .editor-label, .display-field, .editor-field
 {
     margin: 0.5em 0;
 }
@@ -256,7 +281,7 @@ ul.user_list {
 
 /* LogOn/Register Screens */
 
-body#layoutLogOn 
+body#layoutLogOn
 {
     background-color: #074974;
     color: #eee;
@@ -275,12 +300,12 @@ body#layoutLogOn
     color: #ff3333;
 }
 
-#contentLogOn li 
+#contentLogOn li
 {
     list-style-type: none;
 }
 
-#contentLogOn 
+#contentLogOn
 {
     position: absolute;
     text-align: center;

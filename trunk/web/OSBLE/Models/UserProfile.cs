@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using System.Web.Mvc;
-using System.Web.Security;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models
 {
@@ -16,11 +11,17 @@ namespace OSBLE.Models
         public string UserName { get; set; }
 
         public int SchoolID { get; set; }
+
         public virtual School School { get; set; }
 
         public string FirstName { get; set; }
+
         public string LastName { get; set; }
 
         public string Identification { get; set; }
+
+        public bool IsAdmin { get; set; }
+
+        public bool CanCreateCourses { get; set; }
     }
 }

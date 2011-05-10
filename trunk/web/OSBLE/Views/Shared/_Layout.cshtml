@@ -21,26 +21,22 @@
                             <text> &mdash; </text>
                             <em>@ViewBag.UserProfile.School.Name</em>
                         }</span>
-                        <a href="@Url.Action("Profile", "Account")" class="top_item"><img src="../../Content/images/account.png" alt="Account" /></a>
+                        <a href="@Url.Action("ChangePassword", "Account")" class="top_item"><img src="../../Content/images/account.png" alt="Account" /></a>
                     <a href="@Url.Action("LogOff", "Account")" class="top_item"><img src="../../Content/images/logoff.png" alt="Logoff" /></a>
 			    </div>
 		    </div>
 		    <div id="logo">
-                <img src="../../Content/images/logo.png" alt="OSBLE Logo" />
+                <a href="/"><img src="../../Content/images/logo.png" alt="OSBLE Logo" /></a>
 		    </div>
 		    <div id="logo_text">
-    			<img src="../../Content/images/logo_text.png" alt="OSBLE" />
+    			<a href="/"><img src="../../Content/images/logo_text.png" alt="OSBLE" /></a>
 		    </div>
 		    <div id="courses">
-    			Course:
-			    <select id="course_select">
-    				<option>All Courses</option>
-				    <option>CptS 121 Introduction to Programming</option>
-			    </select>
+                @Html.Partial("_CourseList")
+
 		    </div>
         </div>
     </header>
-
     <nav>
         @Html.Partial("_MenuControl")
     </nav>
@@ -49,9 +45,7 @@
             @RenderBody()
         </div>
     </section>
-    
     <footer>
     </footer>
-
 </body>
 </html>

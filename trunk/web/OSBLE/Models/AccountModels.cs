@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
-using System.Web.Security;
 
 namespace OSBLE.Models
 {
-
     public class ChangePasswordModel
     {
         [Required]
@@ -76,7 +71,7 @@ namespace OSBLE.Models
 
         [Display(Name = "School")]
         public School School { get; set; }
-        
+
         [Required]
         [StringLength(50)]
         [Display(Name = "School ID number")]

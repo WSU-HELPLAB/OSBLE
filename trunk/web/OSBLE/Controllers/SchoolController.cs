@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
+﻿using System.Data;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models;
 
 namespace OSBLE.Controllers
-{ 
+{
     public class SchoolController : OSBLEController
     {
-        private OSBLEContext db = new OSBLEContext();
-
         //
         // GET: /School/
 
@@ -36,7 +30,7 @@ namespace OSBLE.Controllers
         public ActionResult Create()
         {
             return View();
-        } 
+        }
 
         //
         // POST: /School/Create
@@ -48,15 +42,15 @@ namespace OSBLE.Controllers
             {
                 db.Schools.Add(school);
                 db.SaveChanges();
-                return RedirectToAction("Index");  
+                return RedirectToAction("Index");
             }
 
             return View(school);
         }
-        
+
         //
         // GET: /School/Edit/5
- 
+
         public ActionResult Edit(int id)
         {
             School school = db.Schools.Find(id);
@@ -80,7 +74,7 @@ namespace OSBLE.Controllers
 
         //
         // GET: /School/Delete/5
- 
+
         public ActionResult Delete(int id)
         {
             School school = db.Schools.Find(id);
@@ -92,7 +86,7 @@ namespace OSBLE.Controllers
 
         [HttpPost, ActionName("Delete")]
         public ActionResult DeleteConfirmed(int id)
-        {            
+        {
             School school = db.Schools.Find(id);
             db.Schools.Remove(school);
             db.SaveChanges();

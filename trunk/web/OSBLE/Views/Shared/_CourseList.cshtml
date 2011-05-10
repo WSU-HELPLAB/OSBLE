@@ -1,0 +1,7 @@
+﻿Course:
+<select id="course_select">
+    @foreach (OSBLE.Models.CoursesUsers cu in ViewBag.CurrentCourses)
+    {
+        <option>@cu.Course.Prefix @cu.Course.Number &mdash; @cu.Course.Name (@cu.CourseRole.Name)</option>
+    }
+</select>

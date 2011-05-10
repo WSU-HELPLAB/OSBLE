@@ -82,7 +82,7 @@
     <Compile Include="Models\DashboardPosts.cs" />
     <Compile Include="Models\Notifications.cs" />
     <Compile Include="Models\OSBLEContext.cs" />
-    <Compile Include="Models\Profile.cs" />
+    <Compile Include="Models\UserProfile.cs" />
     <Compile Include="Models\School.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -285,6 +285,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\CourseRoles\Delete.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_CourseList.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
