@@ -89,6 +89,7 @@
   <ItemGroup>
     <Content Include="Content\images\account.png" />
     <Content Include="Content\images\add_up.png" />
+    <Content Include="Content\images\ajax-loader.gif" />
     <Content Include="Content\images\arrow_down.png" />
     <Content Include="Content\images\arrow_right.png" />
     <Content Include="Content\images\delete_up.png" />

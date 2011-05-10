@@ -13,7 +13,7 @@ namespace OSBLE.Controllers
         protected OSBLEContext db = new OSBLEContext();
         protected UserProfile currentUser = null;
         protected CoursesUsers activeCourse = null;
-
+        protected HttpContext context = System.Web.HttpContext.Current;
         protected List<CoursesUsers> currentCourses = new List<CoursesUsers>();
 
         /// <summary>
@@ -22,7 +22,6 @@ namespace OSBLE.Controllers
         public OSBLEController()
         {
             // If logged in, feed user profile to view.
-            HttpContext context = System.Web.HttpContext.Current;
 
             if (context.User.Identity.IsAuthenticated)
             {
@@ -35,8 +34,16 @@ namespace OSBLE.Controllers
                 // Get list of enrolled courses.
                 ViewBag.CurrentCourses = currentCourses = db.CoursesUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
 
-                // Load currently selected course.
-                // Ensure user is actually a member of that course.
+                // First we need to validate that the Active Course session variable is actually an integer.
+                // We could just cast it, but the only place this gets assigned is here and in the Home/SetCourse action,
+                // And they should only set it to be an integer. So, if it's anything else, it was probably unauthorized and
+                // we should null the value.
+                if (context.Session["ActiveCourse"] != null && context.Session["ActiveCourse"].GetType() != typeof(int))
+                {
+                    context.Session["ActiveCourse"] = 0;
+                }
+
+                // Load currently selected course. Ensure user is actually a member of that course.
                 if ((context.Session["ActiveCourse"] != null) && (currentCourses.Where(cu => cu.CourseID == (int)context.Session["ActiveCourse"]).Count() > 0))
                 {
                     activeCourse = currentCourses.Where(cu => cu.CourseID == (int)context.Session["ActiveCourse"]).First();

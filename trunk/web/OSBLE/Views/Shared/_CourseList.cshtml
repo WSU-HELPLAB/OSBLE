@@ -1,7 +1,32 @@
-﻿Course:
-<select id="course_select">
-    @foreach (OSBLE.Models.CoursesUsers cu in ViewBag.CurrentCourses)
-    {
-        <option>@cu.Course.Prefix @cu.Course.Number &mdash; @cu.Course.Name (@cu.CourseRole.Name)</option>
-    }
-</select>
+﻿@using OSBLE.Models
+Course: @*
+    List each enrolled course in the upper right hand corner of the layout.
+*@
+@using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_course" }))
+{
+    <select name="course" id="course_select">
+        @foreach (OSBLE.Models.CoursesUsers cu in ViewBag.CurrentCourses)
+        {
+            string courseDisplay = cu.Course.Prefix + " " + cu.Course.Number + " - " + cu.Course.Name + " (" + cu.CourseRole.Name + ")";
+            CoursesUsers ac = ViewBag.ActiveCourse as CoursesUsers;
+
+            if ((ac != null) && (ac.CourseID == cu.CourseID))
+            {
+            <option value=@cu.CourseID selected>@courseDisplay</option>
+            }
+            else
+            {
+            <option value=@cu.CourseID>@courseDisplay</option>
+            }
+        }
+    </select>
+    <input type="hidden" name="redirect" value="@Request.Path" />
+}
+@*
+    When select box changes, change our active course.
+*@
+<script>
+    $('#course_select').change(function () {
+        $('#set_course').submit();
+    });
+</script>
