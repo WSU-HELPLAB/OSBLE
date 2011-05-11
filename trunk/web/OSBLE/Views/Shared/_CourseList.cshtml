@@ -1,6 +1,6 @@
 ﻿@using OSBLE.Models
 @if (ViewBag.CurrentCourses != null) {
-<text>Course: </text>
+<text>Course: </text><br />
 using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_course" }))
 {
     <select name="course" id="course_select">
@@ -31,4 +31,8 @@ using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_cour
 </script>
     } else {
      <text>No Courses!</text>
+    }
+    @if (ViewBag.UserProfile.CanCreateCourses)
+    {
+    <a href="/Course/Create" id="course_create_button"><img src="../../Content/images/add_up.png" /></a>
     }
