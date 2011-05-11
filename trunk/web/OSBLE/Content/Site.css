@@ -13,6 +13,11 @@ a
     color: #094749;
 }
 
+h1, h2, h3, h4, h5, h6 
+{
+    color: #094749;
+}
+
 a:hover
 {
     color: #ff0000;
@@ -352,4 +357,39 @@ body#layoutLogOn
 #contentLogOn table td
 {
     padding: 5px;
+}
+
+/* Dashboard */
+
+#dashboard_left, #dashboard_middle, #dashboard_right 
+{
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+#dashboard_left h4, #dashboard_middle h4, #dashboard_right h4 
+{
+    margin-top: 0.5em;
+    margin-bottom: 0.25em;
+}
+
+#dashboard_left 
+{
+    width: 24%;
+    float: left;
+    padding-right: 1%;
+}
+
+#dashboard_middle
+{
+    width: 54%;
+    float: left;
+}
+
+#dashboard_right
+{
+    padding-left: 1%;
+    width: 20%;
+    float: right;
 }
