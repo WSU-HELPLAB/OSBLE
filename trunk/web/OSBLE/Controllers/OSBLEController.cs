@@ -23,17 +23,35 @@ namespace OSBLE.Controllers
         public class MenuItem
         {
             public string Name { get; set; }
-
             public string Controller { get; set; }
-
             public string Action { get; set; }
+
+            public bool ModifierOnly { get; set; }
+            public bool ViewerOnly { get; set; }
+            public bool AdminOnly { get; set; }
 
             public MenuItem(string name, string controller, string action)
             {
                 this.Name = name;
                 this.Controller = controller;
                 this.Action = action;
+
+                this.ModifierOnly = false;
+                this.ViewerOnly = false;
+                this.AdminOnly = false;
             }
+
+            public MenuItem(string name, string controller, string action, bool modifierOnly, bool viewerOnly, bool adminOnly)
+            {
+                this.Name = name;
+                this.Controller = controller;
+                this.Action = action;
+
+                this.ModifierOnly = modifierOnly;
+                this.ViewerOnly = viewerOnly;
+                this.AdminOnly = adminOnly;
+            }
+
         }
 
         /// <summary>
