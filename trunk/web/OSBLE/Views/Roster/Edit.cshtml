@@ -14,22 +14,14 @@
     <fieldset>
         <legend>CoursesUsers</legend>
 
-        @Html.HiddenFor(model => model.ID)
+        @Html.HiddenFor(model => model.UserProfileID)
+        @Html.HiddenFor(model => model.CourseID)
 
         <div class="editor-label">
             @Html.LabelFor(model => model.UserProfileID, "UserProfile")
         </div>
-        <div class="editor-field">
-            @Html.DropDownList("UserProfileID", String.Empty)
-            @Html.ValidationMessageFor(model => model.UserProfileID)
-        </div>
-
         <div class="editor-label">
-            @Html.LabelFor(model => model.CourseID, "Course")
-        </div>
-        <div class="editor-field">
-            @Html.DropDownList("CourseID", String.Empty)
-            @Html.ValidationMessageFor(model => model.CourseID)
+        @Model.UserProfile.UserName
         </div>
 
         <div class="editor-label">

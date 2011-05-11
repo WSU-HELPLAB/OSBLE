@@ -9,28 +9,63 @@ using OSBLE.Models;
 
 namespace OSBLE.Controllers
 { 
-    public class RosterController : Controller
-    {
-        private OSBLEContext db = new OSBLEContext();
 
+    
+
+    public class RosterController : OSBLEController
+    {
+        
+
+        public class UsersByRole
+        {
+            public string RoleName
+            {
+                get;
+                set;
+            }
+
+            public List<UserProfile> Users
+            {
+                get;
+                set;
+            }
+
+            public int Count
+            {
+                get;
+                set;
+            }
+        }
         //
         // GET: /Roster/
 
         public ViewResult Index()
         {
-            var coursesusers = db.CoursesUsers.Include(c => c.UserProfile).Include(c => c.Course).Include(c => c.CourseRole);
-            return View(coursesusers.ToList());
+            var users = (from c in db.CoursesUsers
+                         where c.CourseID == activeCourse.CourseID
+                         select c);
+
+            List<UsersByRole> usersbyRoles = new List<UsersByRole>();
+
+            //Since we are using the db above we need a new one for the below operation
+            OSBLEContext db2 = new OSBLEContext();
+
+            foreach (CourseRole role in db2.CourseRoles)
+            {
+                UsersByRole usersByRole = new UsersByRole();
+                usersByRole.RoleName = role.Name;
+                usersByRole.Users = new List<UserProfile>(from c in users 
+                                                          where role.ID == c.CourseRole.ID
+                                                          select c.UserProfile);
+                usersByRole.Count = usersByRole.Users.Count;
+
+                usersbyRoles.Add(usersByRole);
+            }
+
+            ViewBag.UsersByRoles = usersbyRoles;
+
+            return View();
         }
-
-        //
-        // GET: /Roster/Details/5
-
-        public ViewResult Details(int id)
-        {
-            CoursesUsers coursesusers = db.CoursesUsers.Find(id);
-            return View(coursesusers);
-        }
-
         //
         // GET: /Roster/Create
 
@@ -63,10 +98,10 @@ namespace OSBLE.Controllers
         
         //
         // GET: /Roster/Edit/5
- 
-        public ActionResult Edit(int id)
+
+        public ActionResult Edit(int userProfileID)
         {
-            CoursesUsers coursesusers = db.CoursesUsers.Find(id);
+            CoursesUsers coursesusers = getCoursesUsers(userProfileID);
             ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", coursesusers.UserProfileID);
             ViewBag.CourseID = new SelectList(db.Courses, "ID", "Prefix", coursesusers.CourseID);
             ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name", coursesusers.CourseRoleID);
@@ -93,10 +128,10 @@ namespace OSBLE.Controllers
 
         //
         // GET: /Roster/Delete/5
- 
-        public ActionResult Delete(int id)
+
+        public ActionResult Delete(int userProfileID)
         {
-            CoursesUsers coursesusers = db.CoursesUsers.Find(id);
+            CoursesUsers coursesusers = getCoursesUsers(userProfileID);
             return View(coursesusers);
         }
 
@@ -104,9 +139,9 @@ namespace OSBLE.Controllers
         // POST: /Roster/Delete/5
 
         [HttpPost, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
-        {            
-            CoursesUsers coursesusers = db.CoursesUsers.Find(id);
+        public ActionResult DeleteConfirmed(int userProfileID)
+        {
+            CoursesUsers coursesusers = getCoursesUsers(userProfileID);
             db.CoursesUsers.Remove(coursesusers);
             db.SaveChanges();
             return RedirectToAction("Index");
@@ -117,5 +152,14 @@ namespace OSBLE.Controllers
             db.Dispose();
             base.Dispose(disposing);
         }
+
+        private CoursesUsers getCoursesUsers(int userProfileId)
+        {
+            return (from c in db.CoursesUsers
+                    where c.CourseID == activeCourse.CourseID
+                    && c.UserProfileID == userProfileId
+                    select c).FirstOrDefault();
+        }
+
     }
 }

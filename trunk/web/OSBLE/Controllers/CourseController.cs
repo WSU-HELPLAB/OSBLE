@@ -7,8 +7,6 @@ namespace OSBLE.Controllers
 {
     public class CourseController : OSBLEController
     {
-        private OSBLEContext db = new OSBLEContext();
-
         //
         // GET: /Course/
 

@@ -1,5 +1,7 @@
 ﻿@model IEnumerable<OSBLE.Models.CoursesUsers>
 
+
+
 @{
     ViewBag.Title = "Index";
 }
@@ -9,43 +11,34 @@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
+@foreach (OSBLE.Controllers.RosterController.UsersByRole userByRole in ViewBag.UsersByRoles)
+{ 
+    if (userByRole.Count > 0)
+    { 
+    @userByRole.RoleName;
 <table>
     <tr>
         <th>
             UserProfile
         </th>
-        <th>
-            Course
-        </th>
-        <th>
-            CourseRole
-        </th>
-        <th>
-            Section
-        </th>
         <th></th>
     </tr>
-
-@foreach (var item in Model) {
+    @foreach (OSBLE.Models.UserProfile user in userByRole.Users)
+    { 
     <tr>
         <td>
-            @Html.DisplayFor(modelItem => item.UserProfile.UserName)
+            @user.UserName
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.Course.Prefix)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.CourseRole.Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Section)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
+        @if (ViewBag.ActiveCourse.CourseRole.CanModify)
+        { 
+            @Html.ActionLink("Edit", "Edit", new { userProfileID = user.ID }) <text>|</text>
+            @Html.ActionLink("Details", "Details", new { userProfileID = user.ID }) <text>|</text>
+            @Html.ActionLink("Delete", "Delete", new { userProfileID = user.ID })
+        }
         </td>
     </tr>
-}
-
+    }
 </table>
+    }
+}
