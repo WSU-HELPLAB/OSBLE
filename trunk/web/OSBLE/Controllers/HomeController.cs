@@ -19,7 +19,7 @@ namespace OSBLE.Controllers
             }
 
             // Validate dashboard display mode setting.
-            if ((context.Session["DashboardSingleCourseMode"] == null) || (context.Session["DashboardMode"].GetType() != typeof(Boolean)))
+            if ((context.Session["DashboardSingleCourseMode"] == null) || (context.Session["DashboardSingleCourseMode"].GetType() != typeof(Boolean)))
             {
                 context.Session["DashboardSingleCourseMode"] = false;
             }
