@@ -14,8 +14,6 @@ namespace OSBLE.Controllers
 
         public ViewResult Index()
         {
-            ViewBag.CurrentUser = currentUser;
-
             ViewBag.Courses = from d in currentCourses select d.Course;
 
             return View(db.Courses.ToList());
