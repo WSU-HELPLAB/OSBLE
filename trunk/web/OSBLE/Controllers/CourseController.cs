@@ -5,7 +5,7 @@ using OSBLE.Models;
 
 namespace OSBLE.Controllers
 {
-    public class CourseController : Controller
+    public class CourseController : OSBLEController
     {
         private OSBLEContext db = new OSBLEContext();
 
@@ -14,16 +14,11 @@ namespace OSBLE.Controllers
 
         public ViewResult Index()
         {
+            ViewBag.CurrentUser = currentUser;
+
+            ViewBag.Courses = from d in currentCourses select d.Course;
+
             return View(db.Courses.ToList());
-        }
-
-        //
-        // GET: /Course/Details/5
-
-        public ViewResult Details(int id)
-        {
-            Course course = db.Courses.Find(id);
-            return View(course);
         }
 
         //
@@ -31,7 +26,14 @@ namespace OSBLE.Controllers
 
         public ActionResult Create()
         {
-            return View();
+            if (currentUser.CanCreateCourses)
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Index");
+            }
         }
 
         //
@@ -40,10 +42,22 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Create(Course course)
         {
-            if (ModelState.IsValid)
+            if (currentUser.CanCreateCourses)
             {
-                db.Courses.Add(course);
-                db.SaveChanges();
+                if (ModelState.IsValid)
+                {
+                    CoursesUsers courseUser = new CoursesUsers();
+                    courseUser.CourseRoleID = 1;
+                    courseUser.UserProfileID = currentUser.ID;
+                    courseUser.CourseID = course.ID;
+                    db.Courses.Add(course);
+                    db.CoursesUsers.Add(courseUser);
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+            }
+            else
+            {
                 return RedirectToAction("Index");
             }
 
@@ -55,8 +69,12 @@ namespace OSBLE.Controllers
 
         public ActionResult Edit(int id)
         {
-            Course course = db.Courses.Find(id);
-            return View(course);
+            if (canModifyCourse(id))
+            {
+                Course course = db.Courses.Find(id);
+                return View(course);
+            }
+            return RedirectToAction("Index");
         }
 
         //
@@ -65,10 +83,17 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Edit(Course course)
         {
-            if (ModelState.IsValid)
+            if (canModifyCourse(course.ID))
             {
-                db.Entry(course).State = EntityState.Modified;
-                db.SaveChanges();
+                if (ModelState.IsValid)
+                {
+                    db.Entry(course).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+            }
+            else
+            {
                 return RedirectToAction("Index");
             }
             return View(course);
@@ -79,8 +104,12 @@ namespace OSBLE.Controllers
 
         public ActionResult Delete(int id)
         {
-            Course course = db.Courses.Find(id);
-            return View(course);
+            if (canModifyCourse(id))
+            {
+                Course course = db.Courses.Find(id);
+                return View(course);
+            }
+            return RedirectToAction("Index");
         }
 
         //
@@ -89,9 +118,13 @@ namespace OSBLE.Controllers
         [HttpPost, ActionName("Delete")]
         public ActionResult DeleteConfirmed(int id)
         {
-            Course course = db.Courses.Find(id);
-            db.Courses.Remove(course);
-            db.SaveChanges();
+            if (canModifyCourse(id))
+            {
+                Course course = db.Courses.Find(id);
+                db.Courses.Remove(course);
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
             return RedirectToAction("Index");
         }
 
@@ -99,6 +132,19 @@ namespace OSBLE.Controllers
         {
             db.Dispose();
             base.Dispose(disposing);
+        }
+
+        protected bool canModifyCourse(int courseID)
+        {
+            var courseUsers = (from c in currentCourses where c.CourseID == courseID select c).FirstOrDefault();
+            if (courseUsers == null)
+            {
+                return false;
+            }
+            else
+            {
+                return courseUsers.CourseRole.CanModify;
+            }
         }
     }
 }

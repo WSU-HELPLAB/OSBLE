@@ -1,13 +1,14 @@
 ﻿@model IEnumerable<OSBLE.Models.Course>
-
 @{
     ViewBag.Title = "Index";
 }
-
-<h2>Index</h2>
-
+<h2>
+    Index</h2>
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @if (ViewBag.CurrentUser.CanCreateCourses)
+    {
+        @Html.ActionLink("Create New", "Create")
+    }
 </p>
 <table>
     <tr>
@@ -29,35 +30,38 @@
         <th>
             NumberOfSections
         </th>
-        <th></th>
+        <th>
+        </th>
     </tr>
-
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Prefix)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Number)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Semester)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Year)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.NumberOfSections)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
-        </td>
-    </tr>
-}
-
+    @foreach (OSBLE.Models.CoursesUsers item in ViewBag.CurrentCourses)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Course.Prefix)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Course.Number)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Course.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Course.Semester)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Course.Year)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Course.NumberOfSections)
+            </td>
+            <td>
+                @if (item.CourseRole.CanModify)
+                {
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Course.ID });
+                    <text> | </text>
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Course.ID });
+                }
+            </td>
+        </tr>
+    }
 </table>
