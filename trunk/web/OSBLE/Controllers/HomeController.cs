@@ -5,18 +5,48 @@ namespace OSBLE.Controllers
 {
     public class HomeController : OSBLEController
     {
+        /// <summary>
+        /// Main action for the OSBLE Dashboard
+        /// </summary>
+        /// <returns></returns>
         [Authorize]
         public ActionResult Index()
         {
             ViewBag.CurrentTab = "Dashboard";
-            ViewBag.Message = "Welcome to ASP.NET MVC!";
+
+            if(activeCourse == null) {
+                return RedirectToAction("NoCourses");
+            }
+
+            // Validate dashboard display mode setting.
+            if ((context.Session["DashboardSingleCourseMode"] == null) || (context.Session["DashboardMode"].GetType() != typeof(Boolean)))
+            {
+                context.Session["DashboardSingleCourseMode"] = false;
+            }
+
+            ViewBag.DashboardSingleCourseMode = context.Session["DashboardSingleCourseMode"];
 
             return View();
         }
 
         [Authorize]
+        public ActionResult NoCourses()
+        {
+            if (activeCourse != null)
+            {
+                return RedirectToAction("Index");           
+            }
+
+            ViewBag.CurrentTab = "Dashboard";
+
+            return View(); 
+        }
+
+        [Authorize]
         public ActionResult About()
         {
+            ViewBag.CurrentTab = "About";
+
             return View();
         }
 
@@ -49,6 +79,31 @@ namespace OSBLE.Controllers
             {
                 return Redirect("/");
             }
+        }
+
+        /// <summary>
+        /// Sets "All courses" or "Active course" setting
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        public ActionResult SetDashboardMode()
+        {
+            if (Request.Form["mode"] != null)
+            {
+                try
+                {
+                    context.Session["DashboardSingleCourseMode"] = Convert.ToBoolean(Request.Form["mode"]);
+                }
+                catch (System.FormatException)
+                {
+                    // Non-integer input. Default to false.
+                    context.Session["DashboardSingleCourseMode"] = false;
+                }
+
+            }
+
+            // Return to Dashboard.
+            return Redirect("/");
         }
     }
 }

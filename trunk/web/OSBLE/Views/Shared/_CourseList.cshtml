@@ -1,8 +1,7 @@
 ﻿@using OSBLE.Models
-Course: @*
-    List each enrolled course in the upper right hand corner of the layout.
-*@
-@using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_course" }))
+@if (ViewBag.CurrentCourses != null) {
+<text>Course: </text>
+using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_course" }))
 {
     <select name="course" id="course_select">
         @foreach (OSBLE.Models.CoursesUsers cu in ViewBag.CurrentCourses)
@@ -25,8 +24,11 @@ Course: @*
 @*
     When select box changes, change our active course.
 *@
-<script>
+<script type="text/javascript">
     $('#course_select').change(function () {
         $('#set_course').submit();
     });
 </script>
+    } else {
+     <text>No Courses!</text>
+    }

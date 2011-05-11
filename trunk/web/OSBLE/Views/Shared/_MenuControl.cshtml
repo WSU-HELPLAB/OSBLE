@@ -2,11 +2,12 @@
     @using OSBLE.Controllers
     @foreach (OSBLEController.MenuItem m in ViewBag.Menu)
     {
-        if ((ViewBag.UserProfile != null) && (ViewBag.ActiveCourse != null) &&            
-            (!m.AdminOnly || ViewBag.UserProfile.IsAdmin) &&
-           (!m.ModifierOnly || ViewBag.ActiveCourse.CourseRole.CanModify) &&
-            (!m.ViewerOnly || ViewBag.ActiveCourse.CourseRole.CanSeeAll) 
-            )
+        if ( ((ViewBag.UserProfile != null) && (!m.AdminOnly || ViewBag.UserProfile.IsAdmin))
+           &&
+           (!m.ModifierOnly || ((ViewBag.ActiveCourse != null) && ViewBag.ActiveCourse.CourseRole.CanModify))
+           &&
+           (!m.ViewerOnly || ((ViewBag.ActiveCourse != null) && ViewBag.ActiveCourse.CourseRole.CanSeeAll))
+          ) 
         {
         @Html.ActionLink(@m.Name, @m.Action, @m.Controller, null, new { Class = ViewBag.CurrentTab == @m.Name ? "tab_current" : "" })
         }

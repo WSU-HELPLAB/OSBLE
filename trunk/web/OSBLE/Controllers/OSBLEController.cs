@@ -15,7 +15,7 @@ namespace OSBLE.Controllers
         protected UserProfile currentUser = null;
         protected CoursesUsers activeCourse = null;
         protected HttpContext context = System.Web.HttpContext.Current;
-        protected List<CoursesUsers> currentCourses = new List<CoursesUsers>();
+        protected List<CoursesUsers> currentCourses = null;
 
         /// <summary>
         /// Defines a menu item tab
@@ -29,7 +29,13 @@ namespace OSBLE.Controllers
             public bool ModifierOnly { get; set; }
             public bool ViewerOnly { get; set; }
             public bool AdminOnly { get; set; }
-
+            
+            /// <summary>
+            /// Creates a menu item that everyone can access.
+            /// </summary>
+            /// <param name="name"></param>
+            /// <param name="controller"></param>
+            /// <param name="action"></param>
             public MenuItem(string name, string controller, string action)
             {
                 this.Name = name;
@@ -41,6 +47,16 @@ namespace OSBLE.Controllers
                 this.AdminOnly = false;
             }
 
+            /// <summary>
+            /// Creates a menu item with particular privileges set for its display.
+            /// NOTE: This only affects the display of the menu item. You still need to use attributes to validate pages!
+            /// </summary>
+            /// <param name="name"></param>
+            /// <param name="controller"></param>
+            /// <param name="action"></param>
+            /// <param name="modifierOnly"></param>
+            /// <param name="viewerOnly"></param>
+            /// <param name="adminOnly"></param>
             public MenuItem(string name, string controller, string action, bool modifierOnly, bool viewerOnly, bool adminOnly)
             {
                 this.Name = name;
@@ -68,6 +84,7 @@ namespace OSBLE.Controllers
                 List<MenuItem> menu = new List<MenuItem>();
 
                 menu.Add(new MenuItem("Dashboard", "Home", "Index"));
+                menu.Add(new MenuItem("About", "Home", "About"));
 
                 ViewBag.Menu = menu;
 
@@ -82,7 +99,15 @@ namespace OSBLE.Controllers
                 // Get list of enrolled courses.
                 if (currentUser != null)
                 {
-                    currentCourses = db.CoursesUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
+                    IQueryable<CoursesUsers> cus = db.CoursesUsers.Where(cu => cu.UserProfileID == currentUser.ID);
+                    if (cus.Count() > 0)
+                    {
+                        currentCourses = cus.ToList();
+                    }
+                    else
+                    {
+                        currentCourses = null;
+                    }
 
                     // First we need to validate that the Active Course session variable is actually an integer.
                     // We could just cast it, but the only place this gets assigned is here and in the Home/SetCourse action,
@@ -90,21 +115,23 @@ namespace OSBLE.Controllers
                     // we should null the value.
                     if (context.Session["ActiveCourse"] != null && context.Session["ActiveCourse"].GetType() != typeof(int))
                     {
-                        context.Session["ActiveCourse"] = 0;
+                        context.Session["ActiveCourse"] = null;
                     }
 
                     // Load currently selected course. Ensure user is actually a member of that course.
                     if ((context.Session["ActiveCourse"] != null) && (currentCourses.Where(cu => cu.CourseID == (int)context.Session["ActiveCourse"]).Count() > 0))
                     {
                         activeCourse = currentCourses.Where(cu => cu.CourseID == (int)context.Session["ActiveCourse"]).First();
+                        context.Session["ActiveCourse"] = activeCourse.CourseID;
                     }
-                    else if (currentCourses.Count() > 0) // If no active course, assign to first in courses list.
+                    else if (currentCourses != null && currentCourses.Count() > 0) // If no active course, assign to first in courses list.
                     {
                         activeCourse = currentCourses.First();
                         context.Session["ActiveCourse"] = activeCourse.CourseID;
                     }
                     else // No courses!
                     {
+                        activeCourse = null;
                         context.Session["ActiveCourse"] = null;
                     }
 
