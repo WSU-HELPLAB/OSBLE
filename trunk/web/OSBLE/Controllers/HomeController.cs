@@ -8,6 +8,7 @@ namespace OSBLE.Controllers
         [Authorize]
         public ActionResult Index()
         {
+            ViewBag.CurrentTab = "Dashboard";
             ViewBag.Message = "Welcome to ASP.NET MVC!";
 
             return View();

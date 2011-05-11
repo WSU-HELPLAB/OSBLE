@@ -10,9 +10,18 @@ namespace OSBLE.Models
         public int ID { get; set; }
 
         [Required]
-        public int UserProfileID { get; set; }
+        public int RecipientID { get; set; }
 
-        public UserProfile UserProfile { get; set; }
+        public UserProfile Recipient { get; set; }
+
+        public int SenderID { get; set; }
+
+        public UserProfile Sender { get; set; }
+
+        [Required]
+        public int CourseID { get; set; }
+
+        public Course Course { get; set; }
 
         public bool Read { get; set; }
 

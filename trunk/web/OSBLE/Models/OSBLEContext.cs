@@ -27,6 +27,18 @@ namespace OSBLE.Models
         public DbSet<UserProfile> UserProfiles { get; set; }
 
         public DbSet<Course> Courses { get; set; }
+
+        public DbSet<Notifications> Notifications { get; set; }
+
+        public DbSet<DashboardPosts> DashboardPosts { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Allows Notifications table to build without cascade/cycle errors.
+            modelBuilder.Entity<Notifications>().HasRequired(n => n.Sender).WithOptional().WillCascadeOnDelete(false);
+        }
     }
 
     public class OSBLEContextInitializer : DropCreateDatabaseIfModelChanges<OSBLEContext>
@@ -34,6 +46,8 @@ namespace OSBLE.Models
         protected override void Seed(OSBLEContext context)
         {
             base.Seed(context);
+
+            #region Course Roles
 
             // Set up "static" values for Course Roles.
 
@@ -48,7 +62,9 @@ namespace OSBLE.Models
             // Observer: Can See All, All Anonymized
             context.CourseRoles.Add(new CourseRole("Observer", false, true, false, false, true));
 
-            #region TestData
+            #endregion Course Roles
+
+            #region Test Data
 
             // Sample Schools
             School s1 = new School();
@@ -80,16 +96,13 @@ namespace OSBLE.Models
             context.Courses.Add(c1);
             context.Courses.Add(c2);
 
-            Membership.DeleteUser("me@me.com");
-            RegisterModel rm = new RegisterModel();
-            rm.FirstName = "Joe";
-            rm.LastName = "Student";
-            rm.Password = "123123";
-            rm.ConfirmPassword = "123123";
-            rm.Identification = "12345";
-            rm.ConfirmIdentification = "12345";
+            MembershipUserCollection muc = Membership.GetAllUsers();
+            foreach (MembershipUser mu in muc)
+            {
+                Membership.DeleteUser(mu.UserName);
+            }
 
-            #endregion TestData
+            #endregion Test Data
         }
     }
 }

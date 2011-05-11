@@ -30,7 +30,6 @@ namespace OSBLE
 
             // This should be removed after the database is created.
             System.Data.Entity.Database.SetInitializer(new OSBLE.Models.OSBLEContextInitializer());
-
             AreaRegistration.RegisterAllAreas();
 
             RegisterGlobalFilters(GlobalFilters.Filters);

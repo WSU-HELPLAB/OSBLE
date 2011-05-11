@@ -22,6 +22,11 @@ a
 {
 }
 
+a img
+{
+    border: none;
+}
+
 /* Common layout elements */
 #header
 {

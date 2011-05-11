@@ -22,7 +22,7 @@ namespace OSBLE.Models
 
         public virtual UserProfile UserProfile { get; set; }
 
-        public int ParentID { get; set; }
+        public string Content { get; set; }
 
         public virtual ICollection<DashboardPosts> Replies { get; set; }
 
