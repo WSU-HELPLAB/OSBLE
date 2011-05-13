@@ -5,7 +5,7 @@
 <h2>
     Index</h2>
 <p>
-    @if (ViewBag.UserProfile.CanCreateCourses)
+    @if (ViewBag.CurrentUser.CanCreateCourses)
     {
         @Html.ActionLink("Create New", "Create")
     }

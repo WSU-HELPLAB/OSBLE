@@ -32,7 +32,7 @@ using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_cour
     } else {
      <text>No Courses!</text>
     }
-    @if (ViewBag.UserProfile.CanCreateCourses)
+    @if (ViewBag.CurrentUser.CanCreateCourses)
     {
     <a href="/Course/Create" id="course_create_button"><img src="../../Content/images/add_up.png" /></a>
     }

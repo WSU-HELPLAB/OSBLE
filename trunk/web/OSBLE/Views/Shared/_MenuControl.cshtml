@@ -2,7 +2,7 @@
     @using OSBLE.Controllers
     @foreach (OSBLEController.MenuItem m in ViewBag.Menu)
     {
-        if ( ((ViewBag.UserProfile != null) && (!m.AdminOnly || ViewBag.UserProfile.IsAdmin))
+        if ( ((ViewBag.CurrentUser != null) && (!m.AdminOnly || ViewBag.CurrentUser.IsAdmin))
            &&
            (!m.ModifierOnly || ((ViewBag.ActiveCourse != null) && ViewBag.ActiveCourse.CourseRole.CanModify))
            &&

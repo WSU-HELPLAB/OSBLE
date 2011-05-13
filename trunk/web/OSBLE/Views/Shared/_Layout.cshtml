@@ -13,13 +13,13 @@
 		    <div id="top_bar">
     			<div id="top_content">
 				        <span class="top_item">
-                        @if (ViewBag.UserProfile != null)
+                        @if (ViewBag.CurrentUser != null)
                         {
-                            @ViewBag.UserProfile.FirstName
+                            @ViewBag.CurrentUser.FirstName
                             <text> </text>
-                            @ViewBag.UserProfile.LastName
+                            @ViewBag.CurrentUser.LastName
                             <text> &mdash; </text>
-                            <em>@ViewBag.UserProfile.School.Name</em>
+                            <em>@ViewBag.CurrentUser.School.Name</em>
                         }</span>
                         <a href="@Url.Action("ChangePassword", "Account")" class="top_item"><img src="../../Content/images/account.png" alt="Account" /></a>
                     <a href="@Url.Action("LogOff", "Account")" class="top_item"><img src="../../Content/images/logoff.png" alt="Logoff" /></a>

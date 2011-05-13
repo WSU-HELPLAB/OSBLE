@@ -106,7 +106,7 @@ namespace OSBLE.Controllers
 
                 // Set current User Profile.
                 string userName = context.User.Identity.Name;
-                ViewBag.UserProfile = currentUser = db.UserProfiles.Where(u => u.UserName == userName).FirstOrDefault();
+                ViewBag.CurrentUser = currentUser = db.UserProfiles.Where(u => u.UserName == userName).FirstOrDefault();
 
                 // Get list of enrolled courses.
                 if (currentUser != null)
