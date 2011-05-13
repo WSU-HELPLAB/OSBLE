@@ -6,10 +6,12 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models;
+using OSBLE.Attributes;
 
 namespace OSBLE.Controllers
 {
     [Authorize]
+    [RequireActiveCourse]
     public class RosterController : OSBLEController
     {
         public RosterController()
@@ -39,10 +41,10 @@ namespace OSBLE.Controllers
         }
         //
         // GET: /Roster/
-        public ViewResult Index()
+        public ActionResult Index()
         {
             var users = (from c in db.CoursesUsers
-                         where c.CourseID == ActiveCourse.CourseID
+                         where c.CourseID == activeCourse.CourseID
                          select c);
 
             List<UsersByRole> usersbyRoles = new List<UsersByRole>();
@@ -67,7 +69,7 @@ namespace OSBLE.Controllers
 
             ViewBag.UsersByRoles = usersbyRoles;
 
-            ViewBag.CanEditSelf = CanModifyLink(ActiveCourse);
+            ViewBag.CanEditSelf = CanModifyOwnLink(activeCourse);
 
             return View();
         }
@@ -114,12 +116,13 @@ namespace OSBLE.Controllers
                         //Set the UserProfileID to point to our new student
                         coursesusers.UserProfile = null;
                         coursesusers.UserProfileID = up.ID;
-                        coursesusers.CourseID = ActiveCourse.CourseID;
+                        coursesusers.CourseID = activeCourse.CourseID;
                     }
                     else
                     {
                         coursesusers.UserProfile = user;
                     }
+                    coursesusers.CourseID = activeCourse.CourseID;
                     db.CoursesUsers.Add(coursesusers);
                     db.SaveChanges();
                     return RedirectToAction("Index");
@@ -138,7 +141,7 @@ namespace OSBLE.Controllers
         public ActionResult Edit(int userProfileID)
         {
             CoursesUsers coursesusers = getCoursesUsers(userProfileID);
-            if (CanModifyCourse() && CanModifyLink(coursesusers))
+            if (CanModifyCourse() && CanModifyOwnLink(coursesusers))
             {
                 ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", coursesusers.UserProfileID);
                 ViewBag.CourseID = new SelectList(db.Courses, "ID", "Prefix", coursesusers.CourseID);
@@ -154,7 +157,7 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Edit(CoursesUsers coursesusers)
         {
-            if (CanModifyCourse() && CanModifyLink(coursesusers))
+            if (CanModifyCourse() && CanModifyOwnLink(coursesusers))
             {
                 if (ModelState.IsValid)
                 {
@@ -189,7 +192,7 @@ namespace OSBLE.Controllers
         public ActionResult DeleteConfirmed(int userProfileID)
         {
             CoursesUsers coursesusers = getCoursesUsers(userProfileID);
-            if(CanModifyCourse() && CanModifyLink(coursesusers))
+            if(CanModifyCourse() && CanModifyOwnLink(coursesusers))
             {
                 db.CoursesUsers.Remove(coursesusers);
                 db.SaveChanges();
@@ -207,23 +210,39 @@ namespace OSBLE.Controllers
         private CoursesUsers getCoursesUsers(int userProfileId)
         {
             return (from c in db.CoursesUsers
-                    where c.CourseID == ActiveCourse.CourseID
+                    where c.CourseID == activeCourse.CourseID
                     && c.UserProfileID == userProfileId
                     select c).FirstOrDefault();
         }
 
         private bool CanModifyCourse()
         {
-            return ActiveCourse.CourseRole.CanModify;
+            return activeCourse.CourseRole.CanModify;
         }
 
-        private bool CanModifyLink(CoursesUsers courseUser)
+        /// <summary>
+        /// This says can the passed courseUser Modify the course and if so is there another teacher
+        /// that can also modify this course if so it returns true else returns false
+        /// </summary>
+        /// <param name="courseUser"></param>
+        /// <returns></returns>
+        private bool CanModifyOwnLink(CoursesUsers courseUser)
         {
-            return (courseUser.CourseRole.CanModify != true ||
-            (from c in db.CoursesUsers
-             where c.CourseID == courseUser.CourseID
-             && c.CourseRole.CanModify == true
-             select c).FirstOrDefault() != null);
+            var diffTeacher = (from c in db.CoursesUsers
+                               where (c.CourseID == courseUser.CourseID
+                               && c.CourseRole.CanModify == true
+                               && c.UserProfileID != courseUser.UserProfileID)
+                               select c);
+
+            if (diffTeacher.Count() > 0)
+            {
+                return courseUser.CourseRole.CanModify;
+            }
+            else
+            {
+                return false;
+            }
+
         }
     }
 }

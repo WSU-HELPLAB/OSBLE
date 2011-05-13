@@ -19,18 +19,18 @@
                 <ul class="user_list">
                     @foreach (OSBLE.Models.UserProfile user in userByRole.Users)
                     {
-                        if(user != ViewBag.CurrentUser || ViewBag.CanEditSelf == true)
-                        {
                         <li>
+                        @if(user != ViewBag.CurrentUser || ViewBag.CanEditSelf == true)
+                        {
                             <div class="user_controls">
                             <a href="mailto:@user.UserName"><img src="../../Content/images/mail_up.png" /></a>
                             <a href="@Url.Action("Edit","Roster",new{userProfileID=user.ID})"><img src="../../Content/images/edit_up.png" alt="Edit Button"/></a>
                             <a href="@Url.Action("Delete","Roster",new{userProfileID=user.ID})"><img src="../../Content/images/delete_up.png" alt="Delete Button"/></a>
                             
                             </div>
+                        }
                             @(user.FirstName + " " + user.LastName)
                         </li>
-                        }
                     }
                 </ul>
             </td>
