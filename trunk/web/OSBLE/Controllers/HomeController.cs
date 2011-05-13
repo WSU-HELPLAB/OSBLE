@@ -3,13 +3,13 @@ using System.Web.Mvc;
 
 namespace OSBLE.Controllers
 {
+    [Authorize]
     public class HomeController : OSBLEController
     {
         /// <summary>
         /// Main action for the OSBLE Dashboard
         /// </summary>
         /// <returns></returns>
-        [Authorize]
         public ActionResult Index()
         {
             ViewBag.CurrentTab = "Dashboard";
@@ -29,7 +29,6 @@ namespace OSBLE.Controllers
             return View();
         }
 
-        [Authorize]
         public ActionResult NoCourses()
         {
             if (activeCourse != null)
@@ -42,7 +41,6 @@ namespace OSBLE.Controllers
             return View(); 
         }
 
-        [Authorize]
         public ActionResult About()
         {
             ViewBag.CurrentTab = "About";
@@ -54,7 +52,6 @@ namespace OSBLE.Controllers
         /// Sets active course and redirects back to where we came from.
         /// </summary>
         /// <returns></returns>
-        [Authorize]
         public ActionResult SetCourse()
         {
             // Sets active course and redirects back to where we came from.
@@ -85,7 +82,6 @@ namespace OSBLE.Controllers
         /// Sets "All courses" or "Active course" setting
         /// </summary>
         /// <returns></returns>
-        [Authorize]
         public ActionResult SetDashboardMode()
         {
             if (Request.Form["mode"] != null)

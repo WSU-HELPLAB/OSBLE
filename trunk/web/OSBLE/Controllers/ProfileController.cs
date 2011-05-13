@@ -7,6 +7,7 @@ using OSBLE.Models;
 
 namespace OSBLE.Controllers
 {
+    [Authorize]
     public class ProfileController : OSBLEController
     {
         //
