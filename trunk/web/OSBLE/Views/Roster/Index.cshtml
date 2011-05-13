@@ -1,44 +1,37 @@
 ﻿@model IEnumerable<OSBLE.Models.CoursesUsers>
-
-
-
 @{
     ViewBag.Title = "Index";
 }
-
-<h2>Index</h2>
-
+<h2>
+    Roster</h2>
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
-@foreach (OSBLE.Controllers.RosterController.UsersByRole userByRole in ViewBag.UsersByRoles)
-{ 
-    if (userByRole.Count > 0)
-    { 
-    @userByRole.RoleName;
-<table>
+<table class="roster_table">
     <tr>
-        <th>
-            UserProfile
-        </th>
-        <th></th>
-    </tr>
-    @foreach (OSBLE.Models.UserProfile user in userByRole.Users)
-    { 
-    <tr>
-        <td>
-            @user.UserName
-        </td>
-        <td>
-        @if (ViewBag.ActiveCourse.CourseRole.CanModify)
-        { 
-            @Html.ActionLink("Edit", "Edit", new { userProfileID = user.ID }) <text>|</text>
-            @Html.ActionLink("Details", "Details", new { userProfileID = user.ID }) <text>|</text>
-            @Html.ActionLink("Delete", "Delete", new { userProfileID = user.ID })
+        @foreach (OSBLE.Controllers.RosterController.UsersByRole userByRole in ViewBag.UsersByRoles)
+        {
+            if (userByRole.Count > 0)
+            { 
+            <td>
+                <h3>@(userByRole.RoleName + " (" + userByRole.Count.ToString() + ")")
+                </h3>
+                <ul class="user_list">
+                    @foreach (OSBLE.Models.UserProfile user in userByRole.Users)
+                    {
+                        <li>
+                            <div class="user_controls">
+                            <a href="mailto:@user.UserName" id="mail_button"><img src="../../Content/images/mail_up.png" /></a>
+                            <a href="Roster/Edit?userProfileID=@user.ID" id="edit_button"><img src="../../Content/images/edit_up.png" alt="Edit Button"/></a>
+                            <a href="Roster/Delete?userProfileID=@user.ID" id="delete_button"><img src="../../Content/images/delete_up.png" alt="Delete Button"/></a>
+                            
+                            </div>
+                            @(user.FirstName + " " + user.LastName)
+                        </li>
+                    }
+                </ul>
+            </td>
+            }
         }
-        </td>
     </tr>
-    }
 </table>
-    }
-}

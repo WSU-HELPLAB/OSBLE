@@ -393,3 +393,8 @@ body#layoutLogOn
     width: 20%;
     float: right;
 }
+
+.roster_table tr td
+{
+    padding-right: 10px;
+}

@@ -62,6 +62,9 @@ namespace OSBLE.Controllers
                 usersbyRoles.Add(usersByRole);
             }
 
+            //reverse it so the least important people are first
+            usersbyRoles.Reverse();
+
             ViewBag.UsersByRoles = usersbyRoles;
 
             return View();
