@@ -19,6 +19,8 @@
                 <ul class="user_list">
                     @foreach (OSBLE.Models.UserProfile user in userByRole.Users)
                     {
+                        if(user != ViewBag.CurrentUser || ViewBag.CanEditSelf == true)
+                        {
                         <li>
                             <div class="user_controls">
                             <a href="mailto:@user.UserName"><img src="../../Content/images/mail_up.png" /></a>
@@ -28,6 +30,7 @@
                             </div>
                             @(user.FirstName + " " + user.LastName)
                         </li>
+                        }
                     }
                 </ul>
             </td>

@@ -12,7 +12,7 @@ namespace OSBLE.Controllers
     [Authorize]
     public class RosterController : OSBLEController
     {
-        
+
 
         public class UsersByRole
         {
@@ -51,7 +51,7 @@ namespace OSBLE.Controllers
             {
                 UsersByRole usersByRole = new UsersByRole();
                 usersByRole.RoleName = role.Name;
-                usersByRole.Users = new List<UserProfile>(from c in users 
+                usersByRole.Users = new List<UserProfile>(from c in users
                                                           where role.ID == c.CourseRole.ID
                                                           select c.UserProfile);
                 usersByRole.Count = usersByRole.Users.Count;
@@ -63,6 +63,8 @@ namespace OSBLE.Controllers
             usersbyRoles.Reverse();
 
             ViewBag.UsersByRoles = usersbyRoles;
+
+            ViewBag.CanEditSelf = CanModifyLink(activeCourse);
 
             return View();
         }
@@ -78,7 +80,7 @@ namespace OSBLE.Controllers
                 return View();
             }
             return RedirectToAction("Index");
-        } 
+        }
 
         //
         // POST: /Roster/Create
@@ -91,8 +93,8 @@ namespace OSBLE.Controllers
                 if (ModelState.IsValid)
                 {
                     //This MUST return one given our DB requirements
-                    var user = (from c in db.UserProfiles 
-                                where c.Identification == coursesusers.UserProfile.Identification 
+                    var user = (from c in db.UserProfiles
+                                where c.Identification == coursesusers.UserProfile.Identification
                                 select c).FirstOrDefault();
                     if (user == null)
                     {
@@ -114,9 +116,9 @@ namespace OSBLE.Controllers
                     {
                         coursesusers.UserProfile = user;
                     }
-                        db.CoursesUsers.Add(coursesusers);
-                        db.SaveChanges();
-                        return RedirectToAction("Index");
+                    db.CoursesUsers.Add(coursesusers);
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
                 }
 
                 ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", coursesusers.UserProfileID);
@@ -126,18 +128,18 @@ namespace OSBLE.Controllers
             }
             return RedirectToAction("Index");
         }
-        
+
         //
         // GET: /Roster/Edit/5
         public ActionResult Edit(int userProfileID)
         {
-            if(CanModifyCourse())
-            {
             CoursesUsers coursesusers = getCoursesUsers(userProfileID);
-            ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", coursesusers.UserProfileID);
-            ViewBag.CourseID = new SelectList(db.Courses, "ID", "Prefix", coursesusers.CourseID);
-            ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name", coursesusers.CourseRoleID);
-            return View(coursesusers);
+            if (CanModifyCourse() && CanModifyLink(coursesusers))
+            {
+                ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", coursesusers.UserProfileID);
+                ViewBag.CourseID = new SelectList(db.Courses, "ID", "Prefix", coursesusers.CourseID);
+                ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name", coursesusers.CourseRoleID);
+                return View(coursesusers);
             }
             return RedirectToAction("Index");
         }
@@ -148,7 +150,7 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Edit(CoursesUsers coursesusers)
         {
-            if (CanModifyCourse())
+            if (CanModifyCourse() && CanModifyLink(coursesusers))
             {
                 if (ModelState.IsValid)
                 {
@@ -183,8 +185,12 @@ namespace OSBLE.Controllers
         public ActionResult DeleteConfirmed(int userProfileID)
         {
             CoursesUsers coursesusers = getCoursesUsers(userProfileID);
-            db.CoursesUsers.Remove(coursesusers);
-            db.SaveChanges();
+            if(CanModifyCourse() && CanModifyLink(coursesusers))
+            {
+                db.CoursesUsers.Remove(coursesusers);
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
             return RedirectToAction("Index");
         }
 
@@ -204,7 +210,16 @@ namespace OSBLE.Controllers
 
         private bool CanModifyCourse()
         {
-            return currentUser.CanCreateCourses;
+            return activeCourse.CourseRole.CanModify;
+        }
+
+        private bool CanModifyLink(CoursesUsers courseUser)
+        {
+            return (courseUser.CourseRole.CanModify != true ||
+            (from c in db.CoursesUsers
+             where c.CourseID == courseUser.CourseID
+             && c.CourseRole.CanModify == true
+             select c).FirstOrDefault() != null);
         }
     }
 }
