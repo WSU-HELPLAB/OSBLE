@@ -88,6 +88,7 @@ namespace OSBLE.Controllers
         {
             if (ModelState.IsValid)
             {
+                coursesusers.CourseID = activeCourse.Course.ID;
                 db.CoursesUsers.Add(coursesusers);
                 db.SaveChanges();
                 return RedirectToAction("Index");  

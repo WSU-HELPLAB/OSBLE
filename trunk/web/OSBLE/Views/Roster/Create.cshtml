@@ -15,23 +15,16 @@
         <legend>CoursesUsers</legend>
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.UserProfileID, "UserProfile")
+            @Html.LabelFor(model => model.UserProfileID, "User")
         </div>
         <div class="editor-field">
             @Html.DropDownList("UserProfileID", String.Empty)
             @Html.ValidationMessageFor(model => model.UserProfileID)
         </div>
 
-        <div class="editor-label">
-            @Html.LabelFor(model => model.CourseID, "Course")
-        </div>
-        <div class="editor-field">
-            @Html.DropDownList("CourseID", String.Empty)
-            @Html.ValidationMessageFor(model => model.CourseID)
-        </div>
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.CourseRoleID, "CourseRole")
+            @Html.LabelFor(model => model.CourseRoleID, "Course Role")
         </div>
         <div class="editor-field">
             @Html.DropDownList("CourseRoleID", String.Empty)

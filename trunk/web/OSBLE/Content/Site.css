@@ -402,4 +402,5 @@ body#layoutLogOn
 .roster_table tr td
 {
     padding-right: 10px;
+    vertical-align: top;
 }
