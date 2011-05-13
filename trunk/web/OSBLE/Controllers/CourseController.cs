@@ -5,6 +5,7 @@ using OSBLE.Models;
 
 namespace OSBLE.Controllers
 {
+    [Authorize]
     public class CourseController : OSBLEController
     {
         //
