@@ -3,6 +3,7 @@ using System.Linq;
 using System.Web.Mvc;
 using System.Web.Security;
 using OSBLE.Models;
+using System.Data;
 
 namespace OSBLE.Controllers
 {
@@ -94,12 +95,27 @@ namespace OSBLE.Controllers
                         profile.SchoolID = model.SchoolID;
                         profile.School = db.Schools.Find(model.SchoolID);
 
-                        if (db.UserProfiles.Where(c => c.SchoolID == profile.SchoolID && c.Identification == profile.Identification).FirstOrDefault() != null)
+                        UserProfile up = db.UserProfiles.Where(c => c.SchoolID == profile.SchoolID && c.Identification == profile.Identification).FirstOrDefault();
+
+                        if (up != null) // User profile exists. Is it a stub?
                         {
-                            throw new Exception("You have entered an ID number that is already in use for your school.");
+                            if (up.UserName == null) // Stub. Register to the account.
+                            {
+                                up.UserName = model.Email;
+                                up.FirstName = model.FirstName;
+                                up.LastName = model.LastName;
+                                db.Entry(up).State = EntityState.Modified;
+                            }
+                            else // Existing Account. Throw validation error.
+                            {
+                                throw new Exception("You have entered an ID number that is already in use for your school.");
+                            }
+                        }
+                        else // Profile does not exist.
+                        {
+                            db.UserProfiles.Add(profile);
                         }
 
-                        db.UserProfiles.Add(profile);
                         db.SaveChanges();
                     }
                     catch (Exception e)

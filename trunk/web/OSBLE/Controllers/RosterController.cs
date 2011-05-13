@@ -12,7 +12,10 @@ namespace OSBLE.Controllers
     [Authorize]
     public class RosterController : OSBLEController
     {
-
+        public RosterController()
+        {
+            ViewBag.CurrentTab = "Users";
+        }
 
         public class UsersByRole
         {
