@@ -312,7 +312,7 @@ body#layoutLogOn
     background-position: center top;
 }
 
-#layoutLogOn h1, h2, h3, h4, h5, h6
+#layoutLogOn h1, #layoutLogOn h2, #layoutLogOn h3, #layoutLogOn h4, #layoutLogOn h5, #layoutLogOn h6
 {
     color: #eee;
 }
