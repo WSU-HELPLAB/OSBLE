@@ -8,10 +8,8 @@ using System.Web.Mvc;
 using OSBLE.Models;
 
 namespace OSBLE.Controllers
-{ 
-
-    
-
+{
+    [Authorize]
     public class RosterController : OSBLEController
     {
         
@@ -38,7 +36,6 @@ namespace OSBLE.Controllers
         }
         //
         // GET: /Roster/
-
         public ViewResult Index()
         {
             var users = (from c in db.CoursesUsers
@@ -71,13 +68,16 @@ namespace OSBLE.Controllers
         }
         //
         // GET: /Roster/Create
-
         public ActionResult Create()
         {
-            ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName");
-            ViewBag.CourseID = new SelectList(db.Courses, "ID", "Prefix");
-            ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
-            return View();
+            if (CanModifyCourse())
+            {
+                //ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName");
+                ViewBag.CourseID = new SelectList(db.Courses, "ID", "Name");
+                ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
+                return View();
+            }
+            return RedirectToAction("Index");
         } 
 
         //
@@ -86,30 +86,60 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Create(CoursesUsers coursesusers)
         {
-            if (ModelState.IsValid)
+            if (CanModifyCourse())
             {
-                coursesusers.CourseID = activeCourse.Course.ID;
-                db.CoursesUsers.Add(coursesusers);
-                db.SaveChanges();
-                return RedirectToAction("Index");  
-            }
+                if (ModelState.IsValid)
+                {
+                    //This MUST return one given our DB requirements
+                    var user = (from c in db.UserProfiles 
+                                where c.Identification == coursesusers.UserProfile.Identification 
+                                select c).FirstOrDefault();
+                    if (user == null)
+                    {
+                        //user doesn't exist so we got to make a new one
+                        //Create userProfile with the new ID
+                        UserProfile up = new UserProfile();
+                        up.CanCreateCourses = false;
+                        up.IsAdmin = false;
+                        up.SchoolID = currentUser.SchoolID;
+                        up.Identification = coursesusers.UserProfile.Identification;
+                        db.UserProfiles.Add(up);
+                        db.SaveChanges();
 
-            ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", coursesusers.UserProfileID);
-            ViewBag.CourseID = new SelectList(db.Courses, "ID", "Prefix", coursesusers.CourseID);
-            ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name", coursesusers.CourseRoleID);
-            return View(coursesusers);
+                        //Set the UserProfileID to point to our new student
+                        coursesusers.UserProfile = null;
+                        coursesusers.UserProfileID = up.ID;
+                    }
+                    else
+                    {
+                        coursesusers.UserProfile = user;
+                    }
+                        db.CoursesUsers.Add(coursesusers);
+                        db.SaveChanges();
+                        return RedirectToAction("Index");
+                }
+
+                ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", coursesusers.UserProfileID);
+                ViewBag.CourseID = new SelectList(db.Courses, "ID", "Prefix", coursesusers.CourseID);
+                ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name", coursesusers.CourseRoleID);
+                return View(coursesusers);
+            }
+            return RedirectToAction("Index");
         }
         
         //
         // GET: /Roster/Edit/5
-
         public ActionResult Edit(int userProfileID)
         {
+            if(CanModifyCourse())
+            {
             CoursesUsers coursesusers = getCoursesUsers(userProfileID);
             ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", coursesusers.UserProfileID);
             ViewBag.CourseID = new SelectList(db.Courses, "ID", "Prefix", coursesusers.CourseID);
             ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name", coursesusers.CourseRoleID);
             return View(coursesusers);
+            }
+            return RedirectToAction("Index");
         }
 
         //
@@ -118,25 +148,32 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Edit(CoursesUsers coursesusers)
         {
-            if (ModelState.IsValid)
+            if (CanModifyCourse())
             {
-                db.Entry(coursesusers).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    db.Entry(coursesusers).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", coursesusers.UserProfileID);
+                ViewBag.CourseID = new SelectList(db.Courses, "ID", "Prefix", coursesusers.CourseID);
+                ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name", coursesusers.CourseRoleID);
+                return View(coursesusers);
             }
-            ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", coursesusers.UserProfileID);
-            ViewBag.CourseID = new SelectList(db.Courses, "ID", "Prefix", coursesusers.CourseID);
-            ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name", coursesusers.CourseRoleID);
-            return View(coursesusers);
+            return RedirectToAction("Index");
         }
 
         //
         // GET: /Roster/Delete/5
-
         public ActionResult Delete(int userProfileID)
         {
-            CoursesUsers coursesusers = getCoursesUsers(userProfileID);
-            return View(coursesusers);
+            if (CanModifyCourse())
+            {
+                CoursesUsers coursesusers = getCoursesUsers(userProfileID);
+                return View(coursesusers);
+            }
+            return RedirectToAction("Index");
         }
 
         //
@@ -165,5 +202,9 @@ namespace OSBLE.Controllers
                     select c).FirstOrDefault();
         }
 
+        private bool CanModifyCourse()
+        {
+            return currentUser.CanCreateCourses;
+        }
     }
 }
