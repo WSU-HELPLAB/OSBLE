@@ -21,9 +21,9 @@
                     {
                         <li>
                             <div class="user_controls">
-                            <a href="mailto:@user.UserName" id="mail_button"><img src="../../Content/images/mail_up.png" /></a>
-                            <a href="Roster/Edit?userProfileID=@user.ID" id="edit_button"><img src="../../Content/images/edit_up.png" alt="Edit Button"/></a>
-                            <a href="Roster/Delete?userProfileID=@user.ID" id="delete_button"><img src="../../Content/images/delete_up.png" alt="Delete Button"/></a>
+                            <a href="mailto:@user.UserName"><img src="../../Content/images/mail_up.png" /></a>
+                            <a href="@Url.Action("Edit","Roster",new{userProfileID=user.ID})"><img src="../../Content/images/edit_up.png" alt="Edit Button"/></a>
+                            <a href="@Url.Action("Delete","Roster",new{userProfileID=user.ID})"><img src="../../Content/images/delete_up.png" alt="Delete Button"/></a>
                             
                             </div>
                             @(user.FirstName + " " + user.LastName)
