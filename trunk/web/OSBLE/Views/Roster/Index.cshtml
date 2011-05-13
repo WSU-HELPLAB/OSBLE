@@ -14,13 +14,13 @@
             if (userByRole.Count > 0)
             { 
             <td>
-                <h3>@(userByRole.RoleName + " (" + userByRole.Count.ToString() + ")")
+                <h3>@userByRole.RoleName (@userByRole.Count.ToString())
                 </h3>
                 <ul class="user_list">
                     @foreach (OSBLE.Models.UserProfile user in userByRole.Users)
                     {
                         <li>
-                        @if(user != ViewBag.CurrentUser || ViewBag.CanEditSelf == true)
+                        @if((user != ViewBag.CurrentUser) || ViewBag.CanEditSelf == true)
                         {
                             <div class="user_controls">
                             <a href="mailto:@user.UserName"><img src="../../Content/images/mail_up.png" /></a>
@@ -29,7 +29,13 @@
                             
                             </div>
                         }
-                            @(user.FirstName + " " + user.LastName)
+                        
+                        @if(user.UserName != null) {
+                            <text>@user.FirstName @user.LastName</text>
+                        } else {
+                            <text><em>Pending (@user.Identification.Substring(Math.Max(user.Identification.Length - 4, 0), Math.Min(user.Identification.Length,4)))</em></text>
+                        }
+                        
                         </li>
                     }
                 </ul>
