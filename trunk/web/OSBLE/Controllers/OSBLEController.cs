@@ -13,6 +13,12 @@ namespace OSBLE.Controllers
     {
         protected OSBLEContext db = new OSBLEContext();
         protected UserProfile currentUser = null;
+
+        public UserProfile CurrentUser
+        {
+            get { return currentUser; }
+        }
+
         protected CoursesUsers activeCourse = null;
 
         public CoursesUsers ActiveCourse

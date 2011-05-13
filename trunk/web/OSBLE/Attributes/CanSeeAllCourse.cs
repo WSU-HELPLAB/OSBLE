@@ -9,7 +9,7 @@ using OSBLE.Controllers;
 namespace OSBLE.Attributes
 {
     /// <summary>
-    /// Redirects to index if no active course is present.
+    /// Redirects to index if user has no 'see all' permissions for current course
     /// </summary>
     /// 
     [RequireActiveCourse]

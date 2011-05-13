@@ -9,11 +9,11 @@ using OSBLE.Controllers;
 namespace OSBLE.Attributes
 {
     /// <summary>
-    /// Redirects to index if user has no grading privileges for active course
+    /// Redirects to index if user is not an admin
     /// </summary>
     /// 
-    [RequireActiveCourse]
-    public class CanGradeCourse : ActionFilterAttribute
+    [Authorize]
+    public class IsAdmin : ActionFilterAttribute
     {
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
@@ -21,11 +21,10 @@ namespace OSBLE.Attributes
             {
                 OSBLEController controller = filterContext.Controller as OSBLEController;
 
-                if (!controller.ActiveCourse.CourseRole.CanGrade)
+                if ((controller.CurrentUser == null) || (!controller.CurrentUser.IsAdmin))
                 {
                     filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
                 }
-                
             }
         }
     }

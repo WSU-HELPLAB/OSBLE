@@ -11,6 +11,8 @@ namespace OSBLE.Attributes
     /// <summary>
     /// Redirects to index if no active course is present.
     /// </summary>
+    /// 
+    [Authorize]
     public class RequireActiveCourse : ActionFilterAttribute
     {
         public override void OnActionExecuted(ActionExecutedContext filterContext)
