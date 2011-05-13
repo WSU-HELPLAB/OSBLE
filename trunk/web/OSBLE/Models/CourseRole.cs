@@ -2,6 +2,15 @@
 
 namespace OSBLE.Models
 {
+    public enum OSBLERoles : int
+    {
+        Instructor = 1,
+        TA,
+        Student,
+        Moderator,
+        Observer
+    }
+
     public class CourseRole
     {
         [Required]
