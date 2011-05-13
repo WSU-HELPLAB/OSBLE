@@ -4,9 +4,10 @@ using System.Linq;
 using System.Web.Mvc;
 using System.Web.Security;
 using OSBLE.Models;
+using OSBLE.Attributes;
 
 namespace OSBLE.Controllers
-{
+{    
     [Authorize]
     public class ProfileController : OSBLEController
     {

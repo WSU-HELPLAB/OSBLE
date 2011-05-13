@@ -147,5 +147,10 @@ namespace OSBLE.Controllers
                 #endregion User And Course Setup
             }
         }
+
+        public bool HasActiveCourse()
+        {
+            return activeCourse != null;
+        }
     }
 }
