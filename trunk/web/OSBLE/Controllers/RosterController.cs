@@ -111,6 +111,7 @@ namespace OSBLE.Controllers
                         //Set the UserProfileID to point to our new student
                         coursesusers.UserProfile = null;
                         coursesusers.UserProfileID = up.ID;
+                        coursesusers.CourseID = activeCourse.CourseID;
                     }
                     else
                     {
