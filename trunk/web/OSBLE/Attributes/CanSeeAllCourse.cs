@@ -11,7 +11,9 @@ namespace OSBLE.Attributes
     /// <summary>
     /// Redirects to index if no active course is present.
     /// </summary>
-    public class RequireActiveCourse : ActionFilterAttribute
+    /// 
+    [RequireActiveCourse]
+    public class CanSeeAllCourse : ActionFilterAttribute
     {
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
@@ -19,10 +21,11 @@ namespace OSBLE.Attributes
             {
                 OSBLEController controller = filterContext.Controller as OSBLEController;
 
-                if (controller.ActiveCourse == null)
+                if (!controller.ActiveCourse.CourseRole.CanSeeAll)
                 {
                     filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
                 }
+                
             }
         }
     }

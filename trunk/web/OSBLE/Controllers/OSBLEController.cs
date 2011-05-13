@@ -14,6 +14,12 @@ namespace OSBLE.Controllers
         protected OSBLEContext db = new OSBLEContext();
         protected UserProfile currentUser = null;
         protected CoursesUsers activeCourse = null;
+
+        public CoursesUsers ActiveCourse
+        {
+            get { return activeCourse; }
+        }
+
         protected HttpContext context = System.Web.HttpContext.Current;
         protected List<CoursesUsers> currentCourses = null;
 
@@ -146,11 +152,6 @@ namespace OSBLE.Controllers
 
                 #endregion User And Course Setup
             }
-        }
-
-        public bool HasActiveCourse()
-        {
-            return activeCourse != null;
         }
     }
 }

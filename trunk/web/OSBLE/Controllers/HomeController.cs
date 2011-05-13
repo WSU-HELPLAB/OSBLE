@@ -14,7 +14,7 @@ namespace OSBLE.Controllers
         {
             ViewBag.CurrentTab = "Dashboard";
 
-            if(activeCourse == null) {
+            if(ActiveCourse == null) {
                 return RedirectToAction("NoCourses");
             }
 
@@ -31,7 +31,7 @@ namespace OSBLE.Controllers
 
         public ActionResult NoCourses()
         {
-            if (activeCourse != null)
+            if (ActiveCourse != null)
             {
                 return RedirectToAction("Index");           
             }

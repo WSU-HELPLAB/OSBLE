@@ -66,6 +66,10 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\CanModifyCourse.cs" />
+    <Compile Include="Attributes\CanSeeAllCourse.cs" />
+    <Compile Include="Attributes\CanGradeCourse.cs" />
+    <Compile Include="Attributes\CanSubmitAssignments.cs" />
     <Compile Include="Attributes\RequireActiveCourse.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CourseController.cs" />

@@ -42,7 +42,7 @@ namespace OSBLE.Controllers
         public ViewResult Index()
         {
             var users = (from c in db.CoursesUsers
-                         where c.CourseID == activeCourse.CourseID
+                         where c.CourseID == ActiveCourse.CourseID
                          select c);
 
             List<UsersByRole> usersbyRoles = new List<UsersByRole>();
@@ -67,7 +67,7 @@ namespace OSBLE.Controllers
 
             ViewBag.UsersByRoles = usersbyRoles;
 
-            ViewBag.CanEditSelf = CanModifyLink(activeCourse);
+            ViewBag.CanEditSelf = CanModifyLink(ActiveCourse);
 
             return View();
         }
@@ -114,7 +114,7 @@ namespace OSBLE.Controllers
                         //Set the UserProfileID to point to our new student
                         coursesusers.UserProfile = null;
                         coursesusers.UserProfileID = up.ID;
-                        coursesusers.CourseID = activeCourse.CourseID;
+                        coursesusers.CourseID = ActiveCourse.CourseID;
                     }
                     else
                     {
@@ -207,14 +207,14 @@ namespace OSBLE.Controllers
         private CoursesUsers getCoursesUsers(int userProfileId)
         {
             return (from c in db.CoursesUsers
-                    where c.CourseID == activeCourse.CourseID
+                    where c.CourseID == ActiveCourse.CourseID
                     && c.UserProfileID == userProfileId
                     select c).FirstOrDefault();
         }
 
         private bool CanModifyCourse()
         {
-            return activeCourse.CourseRole.CanModify;
+            return ActiveCourse.CourseRole.CanModify;
         }
 
         private bool CanModifyLink(CoursesUsers courseUser)
