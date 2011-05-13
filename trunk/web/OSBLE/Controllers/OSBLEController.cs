@@ -151,6 +151,7 @@ namespace OSBLE.Controllers
                 }
                 else // User invalid. Logout.
                 {
+                    context.Session.Clear(); // Clear session
                     FormsAuthentication.SignOut();
                 }
 
