@@ -86,7 +86,6 @@ namespace OSBLE.Controllers
                 menu.Add(new MenuItem("Dashboard", "Home", "Index"));
                 menu.Add(new MenuItem("About", "Home", "About"));
                 menu.Add(new MenuItem("Users", "Roster", "Index", true, true, false));
-
                 ViewBag.Menu = menu;
 
                 #endregion Menu Setup

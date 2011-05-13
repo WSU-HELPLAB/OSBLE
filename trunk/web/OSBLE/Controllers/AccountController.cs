@@ -27,6 +27,7 @@ namespace OSBLE.Controllers
             {
                 if (Membership.ValidateUser(model.UserName, model.Password))
                 {
+                    context.Session.Clear(); // Clear session variables.
                     FormsAuthentication.SetAuthCookie(model.UserName, model.RememberMe);
                     if (Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
                         && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
@@ -94,7 +95,7 @@ namespace OSBLE.Controllers
                         profile.Identification = model.Identification;
                         profile.SchoolID = model.SchoolID;
                         profile.School = db.Schools.Find(model.SchoolID);
-
+                        
                         UserProfile up = db.UserProfiles.Where(c => c.SchoolID == profile.SchoolID && c.Identification == profile.Identification).FirstOrDefault();
 
                         if (up != null) // User profile exists. Is it a stub?
