@@ -55,6 +55,7 @@ namespace OSBLE.Controllers
         public ActionResult LogOff()
         {
             FormsAuthentication.SignOut();
+            context.Session.Clear(); // Clear session on signout.
 
             return RedirectToAction("Index", "Home");
         }
