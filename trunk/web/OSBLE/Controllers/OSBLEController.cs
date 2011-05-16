@@ -111,6 +111,7 @@ namespace OSBLE.Controllers
                 // Get list of enrolled courses.
                 if (currentUser != null)
                 {
+                    // Get list of courses this user is connected to.
                     currentCourses = db.CoursesUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
 
                     // First we need to validate that the Active Course session variable is actually an integer.
