@@ -10,7 +10,7 @@
 </p>
 @foreach (RosterController.UsersBySection usersBySection in ViewBag.UsersBySections)
 { 
-  <h3>Section @usersBySection.SectionNumber </h3>  
+  <h3>@Helpers.DisplaySection(usersBySection.SectionNumber) </h3>  
 <table class="roster_table">
     <tr>
         @foreach (RosterController.UsersByRole userByRole in usersBySection.UsersByRole)

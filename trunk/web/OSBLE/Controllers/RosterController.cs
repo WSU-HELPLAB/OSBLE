@@ -175,6 +175,10 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index");
         }
 
+
+        //Students
+        //
+
         //
         // GET: /Roster/Edit/5
         [CanModifyCourse]
