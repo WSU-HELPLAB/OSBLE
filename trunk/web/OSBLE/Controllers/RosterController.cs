@@ -19,6 +19,21 @@ namespace OSBLE.Controllers
             ViewBag.CurrentTab = "Users";
         }
 
+        public class UsersBySection
+        {
+            public string SectionNumber
+            {
+                get;
+                set;
+            }
+
+            public List<UsersByRole> UsersByRole
+            {
+                get;
+                set;
+            }
+        }
+
         public class UsersByRole
         {
             public string RoleName
@@ -43,31 +58,50 @@ namespace OSBLE.Controllers
         // GET: /Roster/
         public ActionResult Index()
         {
+            //Get all users for the current class
             var users = (from c in db.CoursesUsers
                          where c.CourseID == activeCourse.CourseID
                          select c);
 
-            List<UsersByRole> usersbyRoles = new List<UsersByRole>();
+            var usersGroupedBySection = users.GroupBy(CoursesUsers => CoursesUsers.Section).OrderBy(CoursesUsers => CoursesUsers.Key).ToList();
 
-            //Since we are using the db above we need a new one for the below operation
-            OSBLEContext db2 = new OSBLEContext();
+            List<UsersBySection> usersBySections = new List<UsersBySection>();
 
-            foreach (CourseRole role in db2.CourseRoles)
+            foreach (var section in usersGroupedBySection)
             {
-                UsersByRole usersByRole = new UsersByRole();
-                usersByRole.RoleName = role.Name;
-                usersByRole.Users = new List<UserProfile>(from c in users
-                                                          where role.ID == c.CourseRole.ID
-                                                          select c.UserProfile);
-                usersByRole.Count = usersByRole.Users.Count;
+                UsersBySection userBySection = new UsersBySection();
+                userBySection.SectionNumber = section.Key.ToString();
+                List<UsersByRole> usersByRoles = new List<UsersByRole>();
 
-                usersbyRoles.Add(usersByRole);
+                //Since we are using the db above we need a new one for the below operation
+                using (OSBLEContext db2 = new OSBLEContext())
+                {
+                    //Get all the users for each role
+                    foreach (CourseRole role in db2.CourseRoles)
+                    {
+                        UsersByRole usersByRole = new UsersByRole();
+                        usersByRole.RoleName = role.Name;
+                        usersByRole.Users = new List<UserProfile>(from c in section
+                                                                  where role.ID == c.CourseRole.ID
+                                                                  select c.UserProfile);
+                        usersByRole.Count = usersByRole.Users.Count;
+
+                        usersByRoles.Add(usersByRole);
+                    }
+                }
+
+
+                //reverse it so the least important people are first
+                usersByRoles.Reverse();
+
+                userBySection.UsersByRole = usersByRoles;
+
+                usersBySections.Add(userBySection);
             }
 
-            //reverse it so the least important people are first
-            usersbyRoles.Reverse();
 
-            ViewBag.UsersByRoles = usersbyRoles;
+
+            ViewBag.UsersBySections = usersBySections;
 
             ViewBag.CanEditSelf = CanModifyOwnLink(activeCourse);
 
@@ -89,13 +123,14 @@ namespace OSBLE.Controllers
 
         [HttpPost]
         [CanModifyCourse]
-        public ActionResult Create(CoursesUsers coursesusers)
+        public ActionResult Create(CoursesUsers courseuser)
         {
-                if (ModelState.IsValid)
+            //if modelState isValid
+                if (ModelState.IsValid && courseuser.CourseRoleID != 0)
                 {
-                    //This MUST return one given our DB requirements
+                    //This will return one if they exist already or null if they don't
                     var user = (from c in db.UserProfiles
-                                where c.Identification == coursesusers.UserProfile.Identification
+                                where c.Identification == courseuser.UserProfile.Identification
                                 select c).FirstOrDefault();
                     if (user == null)
                     {
@@ -105,23 +140,37 @@ namespace OSBLE.Controllers
                         up.CanCreateCourses = false;
                         up.IsAdmin = false;
                         up.SchoolID = currentUser.SchoolID;
-                        up.Identification = coursesusers.UserProfile.Identification;
+                        up.Identification = courseuser.UserProfile.Identification;
                         db.UserProfiles.Add(up);
                         db.SaveChanges();
 
                         //Set the UserProfileID to point to our new student
-                        coursesusers.UserProfile = null;
-                        coursesusers.UserProfileID = up.ID;
-                        coursesusers.CourseID = activeCourse.CourseID;
+                        courseuser.UserProfile = null;
+                        courseuser.UserProfileID = up.ID;
+                        courseuser.CourseID = activeCourse.CourseID;
                     }
                     else
                     {
-                        coursesusers.UserProfile = user;
+                        courseuser.UserProfile = user;
+                        courseuser.UserProfileID = user.ID;
                     }
-                    coursesusers.CourseID = activeCourse.CourseID;
-                    db.CoursesUsers.Add(coursesusers);
-                    db.SaveChanges();
-                    return RedirectToAction("Index");
+                    courseuser.CourseID = activeCourse.CourseID;
+
+                    //Check uniqueness
+                    if ((from c in db.CoursesUsers
+                         where c.CourseID == courseuser.CourseID && c.UserProfileID == courseuser.UserProfileID
+                         select c).Count() == 0)
+                    {
+                        db.CoursesUsers.Add(courseuser);
+                        db.SaveChanges();
+                        return RedirectToAction("Index");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "This ID Number already exists in this class");
+                        ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
+                        return View();
+                    }
             }
             return RedirectToAction("Index");
         }
@@ -223,9 +272,9 @@ namespace OSBLE.Controllers
                                && c.UserProfileID != courseUser.UserProfileID)
                                select c);
 
-            if (diffTeacher.Count() > 0)
+            if (courseUser.UserProfile != currentUser || diffTeacher.Count() > 0)
             {
-                return courseUser.CourseRole.CanModify;
+                return true;
             }
             else
             {
