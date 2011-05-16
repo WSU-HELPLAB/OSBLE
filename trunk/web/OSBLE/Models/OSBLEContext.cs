@@ -40,9 +40,11 @@ namespace OSBLE.Models
             modelBuilder.Entity<Notifications>().HasRequired(n => n.Sender).WithOptional().WillCascadeOnDelete(false);
         }
 
+        /// <summary>
+        /// Creates sample data for OSBLE for development purposes.
+        /// </summary>
         public void SeedTestData()
         {
-
 
             #region Course Roles
 
@@ -106,7 +108,10 @@ namespace OSBLE.Models
 
     }
 
-
+    /// <summary>
+    /// Meant to be called everytime the database is accessed. By default OSBLEContextModelChangeInitializer is being used.
+    /// Change the SetInitializer entry in Global.asax to this if you want to force a database recreate.
+    /// </summary>
     public class OSBLEContextAlwaysCreateInitializer : DropCreateDatabaseAlways<OSBLEContext>
     {
         protected override void Seed(OSBLEContext context)
@@ -117,6 +122,10 @@ namespace OSBLE.Models
         }
     }
 
+    /// <summary>
+    /// Called when the model changes which causes the database to recreate. Can be disabled by commenting out the
+    /// SetInitializer call in Global.asax .
+    /// </summary>
     public class OSBLEContextModelChangeInitializer : DropCreateDatabaseIfModelChanges<OSBLEContext>
     {
         protected override void Seed(OSBLEContext context)
