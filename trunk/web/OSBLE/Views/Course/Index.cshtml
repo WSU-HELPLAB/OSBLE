@@ -28,9 +28,6 @@
             Year
         </th>
         <th>
-            NumberOfSections
-        </th>
-        <th>
         </th>
     </tr>
     @foreach (OSBLE.Models.CoursesUsers item in ViewBag.CurrentCourses)
@@ -50,9 +47,6 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Course.Year)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Course.NumberOfSections)
             </td>
             <td>
                 @if (item.CourseRole.CanModify)

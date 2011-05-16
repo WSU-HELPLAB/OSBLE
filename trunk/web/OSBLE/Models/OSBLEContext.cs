@@ -79,7 +79,6 @@ namespace OSBLE.Models
             Course c1 = new Course();
             c1.Prefix = "Cpt S";
             c1.Number = "111";
-            c1.NumberOfSections = 1;
             c1.Semester = "Spring";
             c1.Year = "2011";
             c1.Name = "Introduction to Programming";
@@ -87,7 +86,6 @@ namespace OSBLE.Models
             Course c2 = new Course();
             c2.Prefix = "Art E";
             c2.Number = "345";
-            c2.NumberOfSections = 2;
             c2.Semester = "Fall";
             c2.Year = "2011";
             c2.Name = "Underwater Basketweaving";

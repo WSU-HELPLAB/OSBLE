@@ -29,11 +29,6 @@ namespace OSBLE.Models
         [Required]
         [Display(Name = "Year")]
         public string Year { get; set; }
-
-        [Required]
-        [Display(Name = "Number of Sections")]
-        public int NumberOfSections { get; set; }
-
     
     }
 }

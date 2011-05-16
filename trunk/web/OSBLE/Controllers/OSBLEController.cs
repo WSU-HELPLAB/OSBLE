@@ -111,40 +111,31 @@ namespace OSBLE.Controllers
                 // Get list of enrolled courses.
                 if (currentUser != null)
                 {
-                    IQueryable<CoursesUsers> cus = db.CoursesUsers.Where(cu => cu.UserProfileID == currentUser.ID);
-                    if (cus.Count() > 0)
-                    {
-                        currentCourses = cus.ToList();
-                    }
-                    else
-                    {
-                        currentCourses = null;
-                    }
+                    currentCourses = db.CoursesUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
 
                     // First we need to validate that the Active Course session variable is actually an integer.
-                    // We could just cast it, but the only place this gets assigned is here and in the Home/SetCourse action,
-                    // And they should only set it to be an integer. So, if it's anything else, it was probably unauthorized and
-                    // we should null the value.
                     if (context.Session["ActiveCourse"] != null && context.Session["ActiveCourse"].GetType() != typeof(int))
                     {
                         context.Session["ActiveCourse"] = null;
                     }
 
-                    // Load currently selected course. Ensure user is actually a member of that course.
+                    // Load currently selected course, as long as user is actually a member of said course.
                     if ((context.Session["ActiveCourse"] != null) && (currentCourses.Where(cu => cu.CourseID == (int)context.Session["ActiveCourse"]).Count() > 0))
                     {
                         activeCourse = currentCourses.Where(cu => cu.CourseID == (int)context.Session["ActiveCourse"]).First();
                         context.Session["ActiveCourse"] = activeCourse.CourseID;
                     }
-                    else if (currentCourses != null && currentCourses.Count() > 0) // If no active course, assign to first in courses list.
+                    else // Assign first course if one exists.
                     {
-                        activeCourse = currentCourses.First();
-                        context.Session["ActiveCourse"] = activeCourse.CourseID;
-                    }
-                    else // No courses!
-                    {
-                        activeCourse = null;
-                        context.Session["ActiveCourse"] = null;
+                        activeCourse = currentCourses.FirstOrDefault();
+                        if (activeCourse != null)
+                        {
+                            context.Session["ActiveCourse"] = activeCourse.CourseID;
+                        }
+                        else
+                        {
+                            context.Session["ActiveCourse"] = null;
+                        }
                     }
 
                     ViewBag.ActiveCourse = activeCourse;
