@@ -1,5 +1,16 @@
-﻿@helper DisplaySection(int num) {
-    if (num != 0) {
-    <text>Section @num</text>   
+﻿@using OSBLE.Models
+
+@helper DisplaySection(string sectionNum) {
+    if (sectionNum != "0") {
+    <text>Section @sectionNum</text>   
+    }
+}
+
+@* Only use this helper in a place that requires an active course (uses [RequireActiveCourse] attribute) *@
+@helper DisplayName(UserProfile user, CoursesUsers current, bool show=false) {
+    if(!current.CourseRole.Anonymized && (current.CourseRole.CanGrade || (user.ID == current.UserProfileID) || show)) {
+        <text>@user.FirstName @user.LastName</text>
+    } else {
+        <text>Anonymous</text>   
     }
 }
