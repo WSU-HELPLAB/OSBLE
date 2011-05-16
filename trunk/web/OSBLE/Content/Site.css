@@ -404,3 +404,20 @@ body#layoutLogOn
     padding-right: 10px;
     vertical-align: top;
 }
+
+#activity_new_post 
+{
+    width: 100%;
+    text-align: left;
+    padding-right: 20%;
+    padding-left: 0%;
+}
+
+#activity_new_post textarea 
+{
+    width: 80%;
+    height: 80px;
+    margin-bottom: 0.5em;
+}
+
+

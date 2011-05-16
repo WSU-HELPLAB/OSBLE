@@ -1,1 +1,9 @@
-﻿Activity Feed
+﻿<div id="activity_new_post">
+@if (ViewBag.ActiveCourse.CourseRole.CanGrade == true)
+{
+    using(Html.BeginForm()) {
+        <textarea name="post_content" rows="5" cols="40" placeholder="Enter new feed post here..."></textarea><br />
+        <input type="submit" name="post_active" value="Post to @ViewBag.ActiveCourse.Course.Prefix @ViewBag.ActiveCourse.Course.Number" /> <input type="submit" name="post_all" value="Post to All Courses" />
+    }
+}
+</div>
