@@ -39,28 +39,25 @@ namespace OSBLE.Models
             // Allows Notifications table to build without cascade/cycle errors.
             modelBuilder.Entity<Notifications>().HasRequired(n => n.Sender).WithOptional().WillCascadeOnDelete(false);
         }
-    }
 
-    public class OSBLEContextInitializer : DropCreateDatabaseIfModelChanges<OSBLEContext>
-    {
-        protected override void Seed(OSBLEContext context)
+        public void SeedTestData()
         {
-            base.Seed(context);
+
 
             #region Course Roles
 
             // Set up "static" values for Course Roles.
 
             // Instructor: Can Modify Course, See All, Can Grade
-            context.CourseRoles.Add(new CourseRole("Instructor", true, true, true, false, false));
+            this.CourseRoles.Add(new CourseRole("Instructor", true, true, true, false, false));
             // TA: Can See All, Can Grade
-            context.CourseRoles.Add(new CourseRole("TA", false, true, true, false, false));
+            this.CourseRoles.Add(new CourseRole("TA", false, true, true, false, false));
             // Student: Can Submit Assignments, All Anonymized
-            context.CourseRoles.Add(new CourseRole("Student", false, false, false, true, true));
+            this.CourseRoles.Add(new CourseRole("Student", false, false, false, true, true));
             // Moderator: No Special Privileges
-            context.CourseRoles.Add(new CourseRole("Moderator", false, false, false, false, false));
+            this.CourseRoles.Add(new CourseRole("Moderator", false, false, false, false, false));
             // Observer: Can See All, All Anonymized
-            context.CourseRoles.Add(new CourseRole("Observer", false, true, false, false, true));
+            this.CourseRoles.Add(new CourseRole("Observer", false, true, false, false, true));
 
             #endregion Course Roles
 
@@ -73,8 +70,8 @@ namespace OSBLE.Models
             School s2 = new School();
             s2.Name = "Somewhere Else University";
 
-            context.Schools.Add(s1);
-            context.Schools.Add(s2);
+            this.Schools.Add(s1);
+            this.Schools.Add(s2);
 
             // Sample Courses
             Course c1 = new Course();
@@ -93,8 +90,8 @@ namespace OSBLE.Models
             c2.Year = "2011";
             c2.Name = "Underwater Basketweaving";
 
-            context.Courses.Add(c1);
-            context.Courses.Add(c2);
+            this.Courses.Add(c1);
+            this.Courses.Add(c2);
 
             MembershipUserCollection muc = Membership.GetAllUsers();
             foreach (MembershipUser mu in muc)
@@ -103,6 +100,30 @@ namespace OSBLE.Models
             }
 
             #endregion Test Data
+
+
+        }
+
+    }
+
+
+    public class OSBLEContextAlwaysCreateInitializer : DropCreateDatabaseAlways<OSBLEContext>
+    {
+        protected override void Seed(OSBLEContext context)
+        {
+            base.Seed(context);
+
+            context.SeedTestData();
+        }
+    }
+
+    public class OSBLEContextModelChangeInitializer : DropCreateDatabaseIfModelChanges<OSBLEContext>
+    {
+        protected override void Seed(OSBLEContext context)
+        {
+            base.Seed(context);
+
+            context.SeedTestData();
         }
     }
 }
