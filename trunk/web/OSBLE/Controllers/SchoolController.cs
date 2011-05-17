@@ -2,10 +2,12 @@
 using System.Linq;
 using System.Web.Mvc;
 using OSBLE.Models;
+using OSBLE.Attributes;
 
 namespace OSBLE.Controllers
 {
     [Authorize]
+    [IsAdmin]
     public class SchoolController : OSBLEController
     {
         //

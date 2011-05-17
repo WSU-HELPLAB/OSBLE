@@ -12,7 +12,6 @@ namespace OSBLE.Attributes
     /// Redirects to index if user has no grading privileges for active course
     /// </summary>
     /// 
-    [RequireActiveCourse]
     public class CanGradeCourse : ActionFilterAttribute
     {
         public override void OnActionExecuted(ActionExecutedContext filterContext)

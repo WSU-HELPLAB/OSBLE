@@ -12,7 +12,6 @@ namespace OSBLE.Attributes
     /// Redirects to index if user cannot submit assignments
     /// </summary>
     /// 
-    [RequireActiveCourse]
     public class CanSubmitAssignments : ActionFilterAttribute
     {
         public override void OnActionExecuted(ActionExecutedContext filterContext)

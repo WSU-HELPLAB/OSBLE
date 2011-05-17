@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web.Mvc;
 using OSBLE.Models;
+using OSBLE.Attributes;
 
 namespace OSBLE.Controllers
 {
@@ -21,26 +22,19 @@ namespace OSBLE.Controllers
         //
         // GET: /Course/Create
 
+        [CanCreateCourses]
         public ActionResult Create()
         {
-            if (currentUser.CanCreateCourses)
-            {
                 return View();
-            }
-            else
-            {
-                return RedirectToAction("Index");
-            }
         }
 
         //
         // POST: /Course/Create
 
         [HttpPost]
+        [CanCreateCourses]
         public ActionResult Create(Course course)
         {
-            if (currentUser.CanCreateCourses)
-            {
                 if (ModelState.IsValid)
                 {
                     CoursesUsers courseUser = new CoursesUsers();
@@ -52,11 +46,6 @@ namespace OSBLE.Controllers
                     db.SaveChanges();
                     return RedirectToAction("Index");
                 }
-            }
-            else
-            {
-                return RedirectToAction("Index");
-            }
 
             return View(course);
         }

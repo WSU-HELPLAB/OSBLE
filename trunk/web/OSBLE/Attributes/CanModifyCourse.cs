@@ -12,7 +12,6 @@ namespace OSBLE.Attributes
     /// Redirects to index if user has no modify permissions for current course.
     /// </summary>
     /// 
-    [RequireActiveCourse]
     public class CanModifyCourse : ActionFilterAttribute
     {
         public override void OnActionExecuted(ActionExecutedContext filterContext)

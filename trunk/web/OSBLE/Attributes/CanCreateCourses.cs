@@ -12,7 +12,6 @@ namespace OSBLE.Attributes
     /// Redirects to index if user cannot create courses
     /// </summary>
     /// 
-    [Authorize]
     public class CanCreateCourses : ActionFilterAttribute
     {
         public override void OnActionExecuted(ActionExecutedContext filterContext)

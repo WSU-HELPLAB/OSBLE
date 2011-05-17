@@ -10,6 +10,7 @@ using OSBLE.Attributes;
 
 namespace OSBLE.Controllers
 {
+    [Authorize]
     [IsAdmin]
     public class AdminController : OSBLEController
     {

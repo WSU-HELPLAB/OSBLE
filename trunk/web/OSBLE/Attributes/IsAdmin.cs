@@ -12,7 +12,6 @@ namespace OSBLE.Attributes
     /// Redirects to index if user is not an admin
     /// </summary>
     /// 
-    [Authorize]
     public class IsAdmin : ActionFilterAttribute
     {
         public override void OnActionExecuted(ActionExecutedContext filterContext)
