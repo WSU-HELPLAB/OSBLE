@@ -82,4 +82,12 @@ namespace OSBLE.Models
         [Display(Name = "Confirm school ID number")]
         public string ConfirmIdentification { get; set; }
     }
+
+    public class ResetPasswordModel
+    {
+        [Required]
+        [DataType(DataType.EmailAddress)]
+        [Display(Name = "Email address")]
+        public string EmailAddress{get; set;}
+    }
 }

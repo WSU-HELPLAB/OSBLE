@@ -4,6 +4,8 @@ using System.Web.Mvc;
 using System.Web.Security;
 using OSBLE.Models;
 using System.Data;
+using System.Net;
+using System.Net.Mail;
 
 namespace OSBLE.Controllers
 {
@@ -194,6 +196,28 @@ namespace OSBLE.Controllers
 
         public ActionResult ChangePasswordSuccess()
         {
+            return View();
+        }
+
+        public ActionResult ResetPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult ResetPassword(ResetPasswordModel model)
+        {
+            var user = Membership.GetUser(model.EmailAddress);
+
+            string newPass = user.ResetPassword();
+
+            MailMessage mm = new MailMessage("DoNotReply@Osble.org", model.EmailAddress, "PassordReset", newPass);
+
+            //This will need to fixed whenever we get a Server that can send mail
+            SmtpClient sc = new SmtpClient();
+            sc.Send(mm);
+            
+
             return View();
         }
 

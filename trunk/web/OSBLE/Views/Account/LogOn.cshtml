@@ -16,7 +16,7 @@
                 @Html.LabelFor(m => m.UserName)
             </div>
             <div class="editor-field">
-                @Html.TextBoxFor(m => m.UserName, new { tabindex = "1" })<br />
+                @Html.TextBoxFor(m => m.UserName, new { tabindex = "1" })
                 @Html.ValidationMessageFor(m => m.UserName)
             </div>
 
@@ -24,7 +24,7 @@
                 @Html.LabelFor(m => m.Password)
             </div>
             <div class="editor-field">
-                @Html.PasswordFor(m => m.Password, new { tabindex = "2" })<br />
+                @Html.PasswordFor(m => m.Password, new { tabindex = "2" })
                 @Html.ValidationMessageFor(m => m.Password)
             </div>
 
@@ -38,8 +38,12 @@
             </p>
     </div>
     
+    
     <p>
         Don't have an account? @Html.ActionLink("Sign Up", "Register", null, new { tabindex = "4" }).
+    </p>
+    <p>
+        Forgot your password? @Html.ActionLink("Click Here", "ResetPassword").
     </p>
     <p>
         Need help? <a href="#" tabindex="5">Click Here</a>.
