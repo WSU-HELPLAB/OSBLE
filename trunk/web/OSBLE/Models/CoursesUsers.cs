@@ -20,7 +20,7 @@ namespace OSBLE.Models
         public int CourseRoleID { get; set; }
         public virtual CourseRole CourseRole { get; set; }
 
-        [Required]
+        
         public int Section { get; set; }
     }
 }
