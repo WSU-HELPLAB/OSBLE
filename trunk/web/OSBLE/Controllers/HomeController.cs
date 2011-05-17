@@ -38,7 +38,7 @@ namespace OSBLE.Controllers
                 {
                     replyTo = Convert.ToInt32(Request.Form["reply_to"]);
                 }
-
+                
                 DashboardPost dp = new DashboardPost();
                 dp.Content = Request.Form["post_content"];
                 dp.UserProfile = currentUser;
