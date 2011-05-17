@@ -58,7 +58,7 @@ namespace OSBLE.Models
             // TA: Can See All, Can Grade
             this.CourseRoles.Add(new CourseRole("TA", false, true, true, false, false));
             // Student: Can Submit Assignments, All Anonymized
-            this.CourseRoles.Add(new CourseRole("Student", false, false, false, true, true));
+            this.CourseRoles.Add(new CourseRole("Student", false, false, false, true, false));
             // Moderator: No Special Privileges
             this.CourseRoles.Add(new CourseRole("Moderator", false, false, false, false, false));
             // Observer: Can See All, All Anonymized
