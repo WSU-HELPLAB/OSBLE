@@ -15,9 +15,15 @@
 {
     <div class="dp_post">
     @{
+        bool canDelete = false;
         bool show = true; // Should this post be anonymous?
         List<CoursesUsers> cus = ViewBag.CurrentCourses;
         CoursesUsers cu = cus.Where(c => c.CourseID == dp.CourseID && c.UserProfileID == ViewBag.CurrentUser.ID).FirstOrDefault();
+
+        if (cu != null && cu.CourseRole.CanGrade)
+        {
+            canDelete = true;
+        }
         
         if(cu == null || cu.CourseRole.Anonymized == true) {
             show = false;
@@ -29,7 +35,12 @@
         {
             <span class="dp_course">@dp.Course.Prefix @dp.Course.Number</span>
         }
-        @Helpers.DisplayNameForDashboard(dp.UserProfile, ViewBag.ActiveCourse, show)<br />
+        @Helpers.DisplayNameForDashboard(dp.UserProfile, ViewBag.ActiveCourse, show)
+        @if (canDelete || (dp.UserProfileID == ViewBag.CurrentUser.ID))
+        {
+            <span class="dp_delete"><a href="@Url.Action("DeletePost",new {ID=dp.ID})" onclick="return confirm('Delete this post and all its replies?');">@Helpers.DeleteButton()</a></span>
+        }
+        <br />
         <span class="dp_posted">@Helpers.DisplayDate(dp.Posted)</span>
         </div>
         <div class="dp_content">
@@ -41,7 +52,12 @@
             {
                  <div class="dp_post">
                     <div class="dp_post_header">
-                    @Helpers.DisplayNameForDashboard(dr.UserProfile, ViewBag.ActiveCourse, show)<br />
+                    @Helpers.DisplayNameForDashboard(dr.UserProfile, ViewBag.ActiveCourse, show)
+                    @if (canDelete || (dr.UserProfileID == ViewBag.CurrentUser.ID))
+                    {
+                        <span class="dp_delete"><a href="@Url.Action("DeleteReply",new {ID=dr.ID})" onclick="return confirm('Delete this reply post?');">@Helpers.DeleteButton()</a></span>
+                    }
+                    <br />
                     <span class="dp_posted">@Helpers.DisplayDate(dr.Posted)</span>
                     </div>
                     <div class="dp_content">

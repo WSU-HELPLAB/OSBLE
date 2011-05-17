@@ -180,7 +180,52 @@ namespace OSBLE.Controllers
             }
 
             // Return to Dashboard.
-            return Redirect("/");
+            return RedirectToAction("Index");
+        }
+
+        /// <summary>
+        /// Removes a Dashboard Post
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ActionResult DeletePost(int id)
+        {
+            DashboardPost dp = db.DashboardPosts.Find(id);
+
+            if (dp != null)
+            {
+                CoursesUsers cu = currentCourses.Where(c => c.Course == dp.Course).FirstOrDefault();
+                if ((dp.UserProfileID == currentUser.ID) || ((cu != null) && (cu.CourseRole.CanGrade)))
+                {
+                    dp.Replies.Clear();
+                    db.SaveChanges();
+                    db.DashboardPosts.Remove(dp);
+                    db.SaveChanges();
+                }
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        /// <summary>
+        /// Removes a Reply
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ActionResult DeleteReply(int id)
+        {
+            DashboardReply dr = db.DashboardReplies.Find(id);
+
+            if (dr != null)
+            {
+                CoursesUsers cu = currentCourses.Where(c => c.Course == dr.Parent.Course).FirstOrDefault();
+                if ((dr.UserProfileID == currentUser.ID) || ((cu != null) && (cu.CourseRole.CanGrade)))
+                {
+                    db.DashboardReplies.Remove(dr);
+                    db.SaveChanges();
+                }
+            }
+            return RedirectToAction("Index");
         }
     }
 }

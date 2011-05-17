@@ -12,8 +12,6 @@ namespace OSBLE.Models
         [StringLength(128)]
         public string Name { get; set; }
 
-        public ICollection<UserProfile> UserProfiles;
-
         public School() : base() { }
 
         public School(string Name)

@@ -488,4 +488,15 @@ body#layoutLogOn
     height: 50px;
 }
 
+.dp_post_header:hover .dp_delete
+{
+    display: inline;
+}
+
+.dp_post_header .dp_delete
+{
+    display: none;
+    float: right;
+}
+
 /* End Dashboard Posts */

@@ -39,8 +39,11 @@ namespace OSBLE.Models
         {
             base.OnModelCreating(modelBuilder);
 
-            // TODO: Investigate getting cascades to work properly.
-            modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
+            modelBuilder.Entity<Notifications>()
+                .HasRequired(n => n.Sender)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
         }
 
         /// <summary>
