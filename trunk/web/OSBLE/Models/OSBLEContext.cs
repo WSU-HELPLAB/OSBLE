@@ -30,7 +30,7 @@ namespace OSBLE.Models
 
         public DbSet<Notifications> Notifications { get; set; }
 
-        public DbSet<DashboardPosts> DashboardPosts { get; set; }
+        public DbSet<DashboardPost> DashboardPosts { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

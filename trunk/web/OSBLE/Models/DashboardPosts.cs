@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models
 {
-    public class DashboardPosts
+    public class DashboardPost
     {
         [Required]
         [Key]
@@ -24,9 +24,9 @@ namespace OSBLE.Models
 
         public string Content { get; set; }
 
-        public virtual ICollection<DashboardPosts> Replies { get; set; }
+        public virtual ICollection<DashboardPost> Replies { get; set; }
 
-        public DashboardPosts()
+        public DashboardPost()
             : base()
         {
             Posted = DateTime.Now;

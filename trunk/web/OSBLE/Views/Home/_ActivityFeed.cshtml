@@ -3,7 +3,8 @@
 {
     using(Html.BeginForm()) {
         <textarea name="post_content" rows="5" cols="40" placeholder="Enter new feed post here..."></textarea><br />
-        <input type="submit" name="post_active" value="Post to @ViewBag.ActiveCourse.Course.Prefix @ViewBag.ActiveCourse.Course.Number" /> <input type="submit" name="post_all" value="Post to All Courses" />
+        <input type="hidden" name="post_message" value="1" />
+        <input type="submit" name="post_active" value="Post to @ViewBag.ActiveCourse.Course.Prefix @ViewBag.ActiveCourse.Course.Number" /> <input type="submit" name="post_all" value="Post to All Courses" onclick="return confirm('Post this message to all your courses?');"/>
     }
 }
 </div>

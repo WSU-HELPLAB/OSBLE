@@ -14,8 +14,6 @@ namespace OSBLE.Controllers
     [IsAdmin]
     public class AdminController : OSBLEController
     {
-        private OSBLEContext db = new OSBLEContext();
-
         //
         // GET: /Admin/
 
