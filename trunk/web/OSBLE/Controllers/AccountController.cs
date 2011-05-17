@@ -150,7 +150,7 @@ namespace OSBLE.Controllers
         // GET: /Account/ChangePassword
 
         [Authorize]
-        public ActionResult ChangePassword()
+        public ActionResult Profile()
         {
             return View();
         }
@@ -160,7 +160,7 @@ namespace OSBLE.Controllers
 
         [Authorize]
         [HttpPost]
-        public ActionResult ChangePassword(ChangePasswordModel model)
+        public ActionResult Profile(ChangePasswordModel model)
         {
             if (ModelState.IsValid)
             {
