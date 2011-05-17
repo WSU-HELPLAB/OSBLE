@@ -7,16 +7,34 @@ using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models;
 using OSBLE.Attributes;
+using System.IO;
+using LumenWorks.Framework.IO.Csv;
 
 namespace OSBLE.Controllers
 {
     [Authorize]
     [RequireActiveCourse]
+    [CanModifyCourse]
     public class RosterController : OSBLEController
     {
         public RosterController()
         {
             ViewBag.CurrentTab = "Users";
+        }
+
+        public class RosterEntry
+        {
+            public string Identification
+            {
+                get;
+                set;
+            }
+
+            public int Section
+            {
+                get;
+                set;
+            }
         }
 
         public class UsersBySection
@@ -56,6 +74,7 @@ namespace OSBLE.Controllers
         }
         //
         // GET: /Roster/
+        [CanModifyCourse]
         public ActionResult Index()
         {
             //Get all users for the current class
@@ -107,9 +126,58 @@ namespace OSBLE.Controllers
 
             return View();
         }
+
+        public ActionResult ImportRoster()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult ImportRoster(HttpPostedFileBase file, string columnName)
+        {
+            if (file.ContentLength > 0)
+            {
+                //var fileName = Path.GetFileName(file.FileName);
+                //var path = Path.Combine(Server.MapPath("~/App_Data/uploads"), fileName);
+                //file.SaveAs(path);
+                Stream s = file.InputStream;
+                List<RosterEntry> rosterEntries = ParseRoster(s, columnName);
+
+                if (rosterEntries.Count > 0)
+                {
+                    var students = from c in db.CoursesUsers where c.CourseID == activeCourse.CourseID && c.CourseRoleID == (int)CourseRole.OSBLERoles.Student select c;
+                    foreach (CoursesUsers student in students)
+                    {
+                        db.CoursesUsers.Remove(student);
+                    }
+                    db.SaveChanges();
+                    
+                    foreach (RosterEntry entry in rosterEntries)
+                    {
+                        CoursesUsers courseUser = new CoursesUsers();
+                        courseUser.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+                        courseUser.Section = entry.Section;
+                        courseUser.UserProfile = new UserProfile();
+                        courseUser.UserProfile.Identification = entry.Identification;
+                        try
+                        {
+                            createCourseUser(courseUser);
+                        }
+                        catch
+                        {
+                            throw new Exception("There was an error importing the Roster");
+                        }
+                    }
+                    db.SaveChanges();
+                }
+
+            }
+
+            return RedirectToAction("Index");
+        }
+
         //
         // GET: /Roster/Create
-        [CanModifyCourse]
         public ActionResult Create()
         {
                 //ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName");
@@ -122,56 +190,23 @@ namespace OSBLE.Controllers
         // POST: /Roster/Create
 
         [HttpPost]
-        [CanModifyCourse]
         public ActionResult Create(CoursesUsers courseuser)
         {
             //if modelState isValid
                 if (ModelState.IsValid && courseuser.CourseRoleID != 0)
                 {
-                    //This will return one if they exist already or null if they don't
-                    var user = (from c in db.UserProfiles
-                                where c.Identification == courseuser.UserProfile.Identification
-                                select c).FirstOrDefault();
-                    if (user == null)
+                    try
                     {
-                        //user doesn't exist so we got to make a new one
-                        //Create userProfile with the new ID
-                        UserProfile up = new UserProfile();
-                        up.CanCreateCourses = false;
-                        up.IsAdmin = false;
-                        up.SchoolID = currentUser.SchoolID;
-                        up.Identification = courseuser.UserProfile.Identification;
-                        db.UserProfiles.Add(up);
+                        createCourseUser(courseuser);
                         db.SaveChanges();
-
-                        //Set the UserProfileID to point to our new student
-                        courseuser.UserProfile = null;
-                        courseuser.UserProfileID = up.ID;
-                        courseuser.CourseID = activeCourse.CourseID;
                     }
-                    else
+                    catch
                     {
-                        courseuser.UserProfile = user;
-                        courseuser.UserProfileID = user.ID;
-                    }
-                    courseuser.CourseID = activeCourse.CourseID;
-
-                    //Check uniqueness
-                    if ((from c in db.CoursesUsers
-                         where c.CourseID == courseuser.CourseID && c.UserProfileID == courseuser.UserProfileID
-                         select c).Count() == 0)
-                    {
-                        db.CoursesUsers.Add(courseuser);
-                        db.SaveChanges();
-                        return RedirectToAction("Index");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("", "This ID Number already exists in this class");
+                    	ModelState.AddModelError("", "This ID Number already exists in this class");
                         ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
                         return View();
                     }
-            }
+                }
             return RedirectToAction("Index");
         }
 
@@ -181,7 +216,6 @@ namespace OSBLE.Controllers
 
         //
         // GET: /Roster/Edit/5
-        [CanModifyCourse]
         public ActionResult Edit(int userProfileID)
         {
             CoursesUsers coursesusers = getCoursesUsers(userProfileID);
@@ -199,7 +233,6 @@ namespace OSBLE.Controllers
         // POST: /Roster/Edit/5
 
         [HttpPost]
-        [CanModifyCourse]
         public ActionResult Edit(CoursesUsers coursesusers)
         {
             if (CanModifyOwnLink(coursesusers))
@@ -220,7 +253,6 @@ namespace OSBLE.Controllers
 
         //
         // GET: /Roster/Delete/5
-        [CanModifyCourse]
         public ActionResult Delete(int userProfileID)
         {
             CoursesUsers coursesusers = getCoursesUsers(userProfileID);
@@ -235,7 +267,6 @@ namespace OSBLE.Controllers
         // POST: /Roster/Delete/5
 
         [HttpPost, ActionName("Delete")]
-        [CanModifyCourse]
         public ActionResult DeleteConfirmed(int userProfileID)
         {
             CoursesUsers coursesusers = getCoursesUsers(userProfileID);
@@ -286,5 +317,88 @@ namespace OSBLE.Controllers
             }
 
         }
+
+        private List<RosterEntry> ParseRoster(Stream roster, string idNumberColumnName)
+        {
+            StreamReader sr = new StreamReader(roster);
+            CachedCsvReader csvReader = new CachedCsvReader(sr, true);
+
+            List<RosterEntry> rosterData = new List<RosterEntry>();
+
+            string section = "Section";
+            bool hasSectionInfo = false;
+
+            hasSectionInfo = csvReader.GetFieldHeaders().Contains(section);
+
+            csvReader.MoveToStart();
+            while (csvReader.ReadNextRecord())
+            {
+                int sectionNum;
+                RosterEntry entry = new RosterEntry();
+                entry.Identification = csvReader[csvReader.GetFieldIndex(idNumberColumnName)];
+                if (hasSectionInfo)
+                {
+                    int.TryParse(csvReader[csvReader.GetFieldIndex(section)], out sectionNum);
+                    entry.Section = sectionNum;
+                }
+                else
+                {
+                    entry.Section = 0;
+                }
+
+                rosterData.Add(entry);
+            }
+
+            return rosterData;
+        }
+
+        /// <summary>
+        /// This sets up everything for the coruseUser and will create a new UserProfile if it doesn't not exist.
+        /// A db.SaveChanges() call needs to be made after this function preferably when everything is done being setup
+        /// </summary>
+        /// <param name="courseuser">It must have section, role set, and a reference to UserProfile with Identification set</param>
+        private void createCourseUser(CoursesUsers courseuser)
+        {
+                                //This will return one if they exist already or null if they don't
+                    var user = (from c in db.UserProfiles
+                                where c.Identification == courseuser.UserProfile.Identification
+                                select c).FirstOrDefault();
+                    if (user == null)
+                    {
+                        //user doesn't exist so we got to make a new one
+                        //Create userProfile with the new ID
+                        UserProfile up = new UserProfile();
+                        up.CanCreateCourses = false;
+                        up.IsAdmin = false;
+                        up.SchoolID = currentUser.SchoolID;
+                        up.Identification = courseuser.UserProfile.Identification;
+                        db.UserProfiles.Add(up);
+                        //db.SaveChanges();
+
+                        //Set the UserProfileID to point to our new student
+                        courseuser.UserProfile = null;
+                        courseuser.UserProfileID = up.ID;
+                        courseuser.CourseID = activeCourse.CourseID;
+                    }
+                    else
+                    {
+                        courseuser.UserProfile = user;
+                        courseuser.UserProfileID = user.ID;
+                    }
+                    courseuser.CourseID = activeCourse.CourseID;
+                    //Check uniqueness
+                    if ((from c in db.CoursesUsers
+                         where c.CourseID == courseuser.CourseID && c.UserProfileID == courseuser.UserProfileID
+                         select c).Count() == 0)
+                    {
+                        db.CoursesUsers.Add(courseuser);
+                        //db.SaveChanges();
+                    }
+                    else
+                    {
+                        throw new Exception("This courseUser would not be unique if added");
+                    }
+        }
+
     }
 }
