@@ -22,7 +22,7 @@ namespace OSBLE.Attributes
 
                 if (controller.ActiveCourse == null)
                 {
-                    filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
+                    filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "NoCourses" }));
                 }
             }
         }

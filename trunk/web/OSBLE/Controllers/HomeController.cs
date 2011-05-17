@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.Mvc;
+using OSBLE.Attributes;
 
 namespace OSBLE.Controllers
 {
@@ -10,13 +11,11 @@ namespace OSBLE.Controllers
         /// Main action for the OSBLE Dashboard
         /// </summary>
         /// <returns></returns>
+        /// 
+        [RequireActiveCourse]
         public ActionResult Index()
         {
             ViewBag.CurrentTab = "Dashboard";
-
-            if(ActiveCourse == null) {
-                return RedirectToAction("NoCourses");
-            }
 
             // Validate dashboard display mode setting.
             if ((context.Session["DashboardSingleCourseMode"] == null) || (context.Session["DashboardSingleCourseMode"].GetType() != typeof(Boolean)))
