@@ -1,4 +1,5 @@
-﻿<div id="activity_new_post">
+﻿@using OSBLE.Models
+<div id="activity_new_post">
 @if (ViewBag.ActiveCourse.CourseRole.CanGrade == true)
 {
     using(Html.BeginForm()) {
@@ -6,5 +7,81 @@
         <input type="hidden" name="post_message" value="1" />
         <input type="submit" name="post_active" value="Post to @ViewBag.ActiveCourse.Course.Prefix @ViewBag.ActiveCourse.Course.Number" /> <input type="submit" name="post_all" value="Post to All Courses" onclick="return confirm('Post this message to all your courses?');"/>
     }
+}
+</div>
+
+<div id="dp_posts">
+@foreach (DashboardPost dp in ViewBag.DashboardPosts)
+{
+    <div class="dp_post">
+    @{
+        bool show = true; // Should this post be anonymous?
+        List<CoursesUsers> cus = ViewBag.CurrentCourses;
+        CoursesUsers cu = cus.Where(c => c.CourseID == dp.CourseID && c.UserProfileID == ViewBag.CurrentUser.ID).FirstOrDefault();
+        
+        if(cu == null || cu.CourseRole.Anonymized == true) {
+            show = false;
+        }
+    }
+
+        <div class="dp_post_header">
+        @if (!ViewBag.DashboardSingleCourseMode)
+        {
+            <span class="dp_course">@dp.Course.Prefix @dp.Course.Number</span>
+        }
+        @Helpers.DisplayNameForDashboard(dp.UserProfile, ViewBag.ActiveCourse, show)<br />
+        <span class="dp_posted">@Helpers.DisplayDate(dp.Posted)</span>
+        </div>
+        <div class="dp_content">
+            @dp.Content
+        </div>
+
+        <div class="dp_replies">
+            @foreach (DashboardReply dr in dp.Replies)
+            {
+                 <div class="dp_post">
+                    <div class="dp_post_header">
+                    @Helpers.DisplayNameForDashboard(dr.UserProfile, ViewBag.ActiveCourse, show)<br />
+                    <span class="dp_posted">@Helpers.DisplayDate(dr.Posted)</span>
+                    </div>
+                    <div class="dp_content">
+                        @dr.Content
+                    </div>
+
+                 </div>   
+            }
+
+            <div class="dp_replylink">
+            <a href="#" id="reply_@(dp.ID)">Reply</a>
+            </div>
+            <div class="dp_replybox" id="replybox_@(dp.ID)">
+                @using(Html.BeginForm()) {
+                    <textarea name="post_content" rows="5" cols="40" placeholder="Enter reply here..."></textarea><br />
+                    <input type="hidden" name="post_message" value="1" />
+                    <input type="hidden" name="reply_to" value="@(dp.ID)" />
+                    <input type="submit" name="post_reply" value="Post Reply" />
+                }
+                <br />
+                <div class="dp_replylink">
+                    <a href="#" id="replycancel_@(dp.ID)">Cancel</a>
+                </div>
+
+            </div>
+            <script type="text/javascript">
+                $("#reply_@(dp.ID)").click(function () {
+                    $("#reply_@(dp.ID)").hide();
+                    $("#replybox_@(dp.ID)").show('blind');
+                    return false;
+                });
+
+            $("#replycancel_@(dp.ID)").click(function () {
+                $("#reply_@(dp.ID)").show('highlight');
+                $("#replybox_@(dp.ID)").hide('blind');
+                return false;
+            });
+
+            </script>
+        </div>
+    </div>
 }
 </div>

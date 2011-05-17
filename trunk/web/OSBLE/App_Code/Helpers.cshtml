@@ -11,10 +11,23 @@
 }
 
 @* Only use this helper in a place that requires an active course (uses [RequireActiveCourse] attribute) *@
-@helper DisplayName(UserProfile user, CoursesUsers current, bool show=false) {
-    if(!current.CourseRole.Anonymized && (current.CourseRole.CanGrade || (user.ID == current.UserProfileID) || show)) {
+@helper DisplayName(UserProfile user, CoursesUsers activeCourse, bool show=false) {
+    if (!activeCourse.CourseRole.Anonymized && (activeCourse.CourseRole.CanGrade || (user.ID == activeCourse.UserProfileID) || show))
+    {
         <text>@user.FirstName @user.LastName</text>
     } else {
         <text>Anonymous</text>   
     }
+}
+
+@helper DisplayNameForDashboard(UserProfile user, CoursesUsers activeCourse, bool show=false) {
+    if(show || (activeCourse.UserProfileID == user.ID)) {
+        <text>@user.FirstName @user.LastName</text>
+    } else {
+        <text>Anonymous</text>   
+    }
+}
+
+@helper DisplayDate(DateTime dt) {
+    @dt.ToLongDateString()<text> </text>@dt.ToShortTimeString()
 }

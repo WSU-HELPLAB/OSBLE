@@ -27,7 +27,7 @@ namespace OSBLE.Controllers
         }
 
         protected HttpContext context = System.Web.HttpContext.Current;
-        protected List<CoursesUsers> currentCourses = null;
+        protected List<CoursesUsers> currentCourses = new List<CoursesUsers>();
 
         /// <summary>
         /// Defines a menu item tab

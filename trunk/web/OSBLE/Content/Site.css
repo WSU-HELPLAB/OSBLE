@@ -10,12 +10,12 @@ body
 
 a
 {
-    color: #094749;
+    color: #074974;
 }
 
 h1, h2, h3, h4, h5, h6 
 {
-    color: #094749;
+    color: #074974;
 }
 
 a:hover
@@ -421,3 +421,71 @@ body#layoutLogOn
 }
 
 
+/* Dashboard Posts */
+
+.dp_course 
+{
+    font-size: 10pt;
+    font-variant: small-caps;
+    border-right: 1px #aaa solid;
+    padding: 1px;
+    padding-right: 3px;
+}
+
+.dp_posted
+{
+    font-size: 10pt;
+}
+
+.dp_post 
+{
+    width: 95%;
+    display: block;
+    margin-top: 0.2em;
+    padding-bottom: 0.5em;
+    margin-bottom: 0.5em;
+    border: 1px solid #eeeeff;
+    border-bottom: 5px solid #eeeeff;
+}
+
+.dp_post_header
+{
+    padding-top: 5px;
+    padding-left: 3px;
+    padding-right: 3px;
+    display: block;
+    color: #074974
+}
+
+.dp_content
+{
+    padding: 3px;
+    width: 100%;
+    margin-left: 20px;
+}
+
+.dp_replies
+{
+    display: block;
+    margin-left: 20px;
+    padding: 3px;
+}
+
+.dp_replylink 
+{    
+    font-size: 10pt;
+}
+
+.dp_replybox
+{
+    display: none;
+}
+
+
+.dp_replybox textarea 
+{
+    width: 100%;
+    height: 50px;
+}
+
+/* End Dashboard Posts */

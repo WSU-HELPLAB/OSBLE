@@ -1,5 +1,6 @@
 ﻿using System.Data.Entity;
 using System.Web.Security;
+using System.Data.Entity.ModelConfiguration.Conventions;
 
 namespace OSBLE.Models
 {
@@ -32,12 +33,14 @@ namespace OSBLE.Models
 
         public DbSet<DashboardPost> DashboardPosts { get; set; }
 
+        public DbSet<DashboardReply> DashboardReplies { get; set; }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Allows Notifications table to build without cascade/cycle errors.
-            modelBuilder.Entity<Notifications>().HasRequired(n => n.Sender).WithOptional().WillCascadeOnDelete(false);
+            // TODO: Investigate getting cascades to work properly.
+            modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
         }
 
         /// <summary>

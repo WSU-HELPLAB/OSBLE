@@ -26,7 +26,7 @@ namespace OSBLE.Controllers
                 context.Session["DashboardSingleCourseMode"] = false;
             }
 
-            ViewBag.DashboardSingleCourseMode = context.Session["DashboardSingleCourseMode"];
+            bool DashboardSingleCourseMode = ViewBag.DashboardSingleCourseMode = context.Session["DashboardSingleCourseMode"];
 
             #region Activity Feed Posting
             // Feed Post attempt
@@ -41,7 +41,7 @@ namespace OSBLE.Controllers
 
                 DashboardPost dp = new DashboardPost();
                 dp.Content = Request.Form["post_content"];
-                dp.UserProfileID = currentUser.ID;
+                dp.UserProfile = currentUser;
 
                 if(replyTo != 0) {
                     DashboardPost replyToPost = db.DashboardPosts.Find(replyTo); 
@@ -51,10 +51,12 @@ namespace OSBLE.Controllers
                                           where c.CourseID == replyToPost.CourseID
                                           select c).FirstOrDefault();
 
+                        DashboardReply dr = new DashboardReply();
+                        dr.Content = dp.Content;
+                        dr.UserProfile = dp.UserProfile;
+                        
                         if(cu != null) {
-                            dp.Course = replyToPost.Course;
-
-                            replyToPost.Replies.Add(dp);
+                            replyToPost.Replies.Add(dr);
                         }                               
                                                     
                     }
@@ -74,7 +76,7 @@ namespace OSBLE.Controllers
                             DashboardPost newDp = new DashboardPost();
                             newDp.Content = dp.Content;
                             newDp.Posted = dp.Posted;
-                            newDp.UserProfileID = dp.UserProfileID;
+                            newDp.UserProfile = dp.UserProfile;
                             newDp.Course = cu.Course;
 
                             db.DashboardPosts.Add(newDp);
@@ -83,13 +85,25 @@ namespace OSBLE.Controllers
                 }
 
                 db.SaveChanges();
+                return RedirectToAction("Index"); // Redirect so we don't have refresh data
             }
 
             #endregion
 
             #region Activity Feed View
 
+            List<int> ViewedCourses = new List<int>();
 
+            if(DashboardSingleCourseMode) {
+                ViewedCourses.Add(activeCourse.CourseID);
+            } else {
+                foreach(CoursesUsers cu in currentCourses) {
+                    ViewedCourses.Add(cu.CourseID);
+                }
+            }
+
+            // TODO: Add Pagination
+            ViewBag.DashboardPosts = db.DashboardPosts.Where(d => ViewedCourses.Contains(d.CourseID)).OrderByDescending(d => d.Posted).ToList();
 
             #endregion
 
