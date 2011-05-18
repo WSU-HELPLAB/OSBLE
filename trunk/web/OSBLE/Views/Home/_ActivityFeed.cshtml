@@ -18,6 +18,12 @@
 }
 </div>
 
+<script type="text/javascript">
+    $("input[name='mode']").change(function () {
+        $('#set_dashboard').submit();
+    });
+</script>
+
 <div id="dp_posts">
 @foreach (DashboardPost dp in ViewBag.DashboardPosts)
 {

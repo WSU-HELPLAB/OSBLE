@@ -122,6 +122,11 @@ namespace OSBLE.Controllers
             return View(); 
         }
 
+        public ActionResult NoAccess()
+        {
+            return RedirectToAction("Index");
+        }
+
         public ActionResult About()
         {
             ViewBag.CurrentTab = "About";

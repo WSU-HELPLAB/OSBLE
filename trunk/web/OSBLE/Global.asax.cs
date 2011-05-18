@@ -16,13 +16,20 @@ namespace OSBLE
         public static void RegisterRoutes(RouteCollection routes)
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
+            routes.RouteExistingFiles = true;
+            routes.IgnoreRoute("Content/{*pathInfo}");
+
+            routes.MapRoute(
+                "File System",
+                "FileSystem/{*pathInfo}",
+                new { controller = "Home", action = "NoAccess" }
+            );
 
             routes.MapRoute(
                 "Default", // Route name
                 "{controller}/{action}/{id}", // URL with parameters
                 new { controller = "Home", action = "Index", id = UrlParameter.Optional } // Parameter defaults
             );
-
 
         }
 
