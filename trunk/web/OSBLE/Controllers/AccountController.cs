@@ -6,6 +6,10 @@ using OSBLE.Models;
 using System.Data;
 using System.Net;
 using System.Net.Mail;
+using System.Drawing;
+using System.Web;
+using System.IO;
+using System.Drawing.Imaging;
 
 namespace OSBLE.Controllers
 {
@@ -221,6 +225,57 @@ namespace OSBLE.Controllers
             return View();
         }
 
+        [Authorize]
+        [HttpPost]
+        public ActionResult UploadPicture(HttpPostedFileBase file)
+        {
+            if (file != null)
+            {
+                Bitmap image;
+                try
+                {
+                    image = new Bitmap(file.InputStream);
+                }
+                catch
+                {
+                    image = null;
+                }
+
+                if (image != null)
+                {
+                    int thumbSize = 72;
+                                        
+                    // Crop image to a square.
+                    int square = Math.Min(image.Width,image.Height);
+                    Bitmap cropImage = new Bitmap(square, square);                 
+                    Graphics graphics = Graphics.FromImage(cropImage);
+
+                    // Center cropped image horizontally, leave at the top vertically. (better focus on subject)
+                    graphics.DrawImage(image,-(image.Width - cropImage.Width)/2,0);
+
+                    // Convert to thumbnail.
+                    cropImage = (System.Drawing.Bitmap)cropImage.GetThumbnailImage(thumbSize, thumbSize, new Image.GetThumbnailImageAbort(ThumbnailCallback), IntPtr.Zero);
+
+                    // Write image to memory stream.
+                    MemoryStream s = new MemoryStream();
+                    cropImage.Save(s, ImageFormat.Jpeg);
+                    
+                    // Back up to beginning of stream.
+                    s.Seek(0, 0);
+
+                    // TODO: Replace this with file system saving mechanism.
+                    FileResult outFile = new FileStreamResult(s, "image/jpeg");
+
+                    return outFile;
+                }
+            }
+            return RedirectToAction("Profile");
+        }
+
+        public bool ThumbnailCallback()
+        {
+            return false;
+        }
         #region Status Codes
 
         private static string ErrorCodeToString(MembershipCreateStatus createStatus)

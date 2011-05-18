@@ -1,7 +1,14 @@
 ﻿@model OSBLE.Models.ChangePasswordModel
 
 @{
-    ViewBag.Title = "Change Password";
+    ViewBag.Title = "Profile";
+}
+
+<h2>Upload Profile Picture</h2>
+@using (Html.BeginForm("UploadPicture", "Account", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <input type="file" name="file" />
+    <input type="submit" value="Upload Picture" />
 }
 
 <h2>Change Password</h2>
