@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2011 Ray Liang (http://www.dotnetage.com)
 // Dual licensed under the MIT and GPL licenses:
 // http://www.opensource.org/licenses/mit-license.php
-// http://www.gnu.org/licenses/gpl.html5:using System;
+// http://www.gnu.org/licenses/gpl.html
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;

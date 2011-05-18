@@ -18,6 +18,7 @@ namespace OSBLE
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             routes.RouteExistingFiles = true;
             routes.IgnoreRoute("Content/{*pathInfo}");
+            routes.IgnoreRoute("Scripts/{*pathInfo}");
 
             routes.MapRoute(
                 "File System",

@@ -233,7 +233,6 @@ namespace OSBLE.Controllers
         public FileStreamResult ProfilePictureForDashboardPost(int id)
         {
             DashboardPost dp = db.DashboardPosts.Find(id);
-            context.Response.StatusCode = 304;
 
             if (dp != null)
             {
@@ -247,11 +246,10 @@ namespace OSBLE.Controllers
             return new FileStreamResult(FileSystem.GetDefaultProfilePicture(), "image/jpeg");
         }
 
-        [HttpGet,FileCache(Duration=3600)]
+        [HttpGet,FileCache(Duration = 3600)]
         public FileStreamResult ProfilePictureForDashboardReply(int id)
         {
             DashboardReply dr = db.DashboardReplies.Find(id);
-            context.Response.StatusCode = 304;
 
             if (dr != null)
             {
