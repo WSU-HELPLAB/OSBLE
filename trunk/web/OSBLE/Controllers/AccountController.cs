@@ -280,6 +280,23 @@ namespace OSBLE.Controllers
             return RedirectToAction("Profile");
         }
 
+        public ActionResult ContactUs()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult ContactUs(ContactUsModel model)
+        {
+            ViewBag.ContactUsName = model.Name;
+            return RedirectToAction("ContactUsSuccess");
+        }
+
+        public ActionResult ContactUsSuccess()
+        {
+            return View();
+        }
+
         public bool ThumbnailCallback()
         {
             return false;

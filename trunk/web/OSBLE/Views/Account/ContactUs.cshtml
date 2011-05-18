@@ -1,0 +1,39 @@
+﻿@model OSBLE.Models.ContactUsModel
+
+@{
+    ViewBag.Title = "Contact Us";
+    Layout = "~/Views/Shared/_LogOn.cshtml";
+}
+
+<h2>Contact Us</h2>
+
+@using (Html.BeginForm("Contact Us", "AccountModels", FormMethod.Get))
+{
+    <div>
+        <div class="editor-label">
+            @Html.LabelFor(m => m.Name)
+        </div>
+        <div class="editor-field">
+            @Html.TextBoxFor(m => m.Name, new { tabindex = "1" })
+            @Html.ValidationMessageFor(m => m.Name)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(m => m.Email)
+        </div>
+        <div class="editor-field">
+            @Html.TextBoxFor(m => m.Email, new { tabindex = "2" })
+            @Html.ValidationMessageFor(m => m.Message)
+        </div>
+        <div class="editor-label">
+            @Html.LabelFor(m => m.Message)
+        </div>
+        <div class="editor-field">
+            @Html.TextAreaFor(m => m.Message, 10,50,new { tabindex = "3" })
+            @Html.ValidationMessageFor(m => m.Message)
+        </div>
+        <p>
+            <input type="submit" value="Submit" />
+        </p>
+    </div>
+}

@@ -90,4 +90,19 @@ namespace OSBLE.Models
         [Display(Name = "Email address")]
         public string EmailAddress{get; set;}
     }
+
+    public class ContactUsModel
+    {
+        [Required]
+        [Display(Name = "Name")]
+        public string Name { get; set; }
+
+        [Required]
+        [Display(Name = "Email")]
+        public string Email { get; set; }
+
+        [Required]
+        [Display(Name = "Briefly describe the problem you are having")]
+        public string Message { get; set; }
+    }
 }
