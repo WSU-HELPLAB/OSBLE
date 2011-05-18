@@ -4,6 +4,9 @@ using OSBLE.Attributes;
 using OSBLE.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.Caching;
+using System.Web.UI;
+using System.Web;
 
 namespace OSBLE.Controllers
 {
@@ -224,6 +227,42 @@ namespace OSBLE.Controllers
                 }
             }
             return RedirectToAction("Index");
+        }
+
+        [HttpGet, FileCache(Duration = 3600)]
+        public FileStreamResult ProfilePictureForDashboardPost(int id)
+        {
+            DashboardPost dp = db.DashboardPosts.Find(id);
+            context.Response.StatusCode = 304;
+
+            if (dp != null)
+            {
+                CoursesUsers cu = currentCourses.Where(c => c.CourseID == dp.CourseID).FirstOrDefault();
+                if ((dp.UserProfile == currentUser) || ((cu != null) && !(cu.CourseRole.Anonymized)))
+                {
+                    return new FileStreamResult(FileSystem.GetProfilePictureOrDefault(dp.UserProfile), "image/jpeg");
+                }
+            }
+
+            return new FileStreamResult(FileSystem.GetDefaultProfilePicture(), "image/jpeg");
+        }
+
+        [HttpGet,FileCache(Duration=3600)]
+        public FileStreamResult ProfilePictureForDashboardReply(int id)
+        {
+            DashboardReply dr = db.DashboardReplies.Find(id);
+            context.Response.StatusCode = 304;
+
+            if (dr != null)
+            {
+                CoursesUsers cu = currentCourses.Where(c => c.CourseID == dr.Parent.CourseID).FirstOrDefault();
+                if ((dr.UserProfile == currentUser) || ((cu != null) && !(cu.CourseRole.Anonymized)))
+                {
+                    return new FileStreamResult(FileSystem.GetProfilePictureOrDefault(dr.UserProfile), "image/jpeg");
+                }
+            }
+
+            return new FileStreamResult(FileSystem.GetDefaultProfilePicture(), "image/jpeg");
         }
     }
 }

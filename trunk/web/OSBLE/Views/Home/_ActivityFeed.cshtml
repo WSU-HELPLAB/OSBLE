@@ -45,6 +45,7 @@
     }
 
         <div class="dp_post_header">
+        @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboardPost",new { id=dp.ID }))
         @if (!ViewBag.DashboardSingleCourseMode)
         {
             <span class="dp_course">@dp.Course.Prefix @dp.Course.Number</span>
@@ -66,6 +67,7 @@
             {
                  <div class="dp_post">
                     <div class="dp_post_header">
+                    @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboardReply",new { id=dr.ID }))
                     @Helpers.DisplayNameForDashboard(dr.UserProfile, ViewBag.ActiveCourse, show)
                     @if (canDelete || (dr.UserProfileID == ViewBag.CurrentUser.ID))
                     {

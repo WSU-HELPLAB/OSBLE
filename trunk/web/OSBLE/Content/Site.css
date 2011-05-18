@@ -513,6 +513,8 @@ body#layoutLogOn
     float: left;
     margin: 3px;
     margin-right: 8px;
+    width: 64px;
+    height: 64px;
 }
 
 #picture_upload input 

@@ -31,13 +31,13 @@ namespace OSBLE
 
         public static FileStream GetDefaultProfilePicture()
         {
-            return new FileStream(HttpContext.Current.Server.MapPath("\\Content\\images\\default.jpg"), FileMode.Open);
+            return new FileStream(HttpContext.Current.Server.MapPath("\\Content\\images\\default.jpg"), FileMode.Open, FileAccess.Read);
         }
 
         public static FileStream GetProfilePictureOrDefault(UserProfile userProfile)
         {
             if (File.Exists(getProfilePicturePath(userProfile))) {
-                return new FileStream(getProfilePicturePath(userProfile), FileMode.Open);
+                return new FileStream(getProfilePicturePath(userProfile), FileMode.Open, FileAccess.Read);
             } else {
                 return GetDefaultProfilePicture();
             }
@@ -48,7 +48,7 @@ namespace OSBLE
             if(!Directory.Exists(getUserPath(userProfile))) {
                 Directory.CreateDirectory(getUserPath(userProfile));
             }
-            return new FileStream(getProfilePicturePath(userProfile), FileMode.Create);
+            return new FileStream(getProfilePicturePath(userProfile), FileMode.Create, FileAccess.Write);
         }
 
         public static void DeleteProfilePicture(UserProfile userProfile)
