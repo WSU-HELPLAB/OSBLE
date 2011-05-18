@@ -10,6 +10,14 @@
 }
 </div>
 
+<div class="dashboard_mode">
+@using (Html.BeginForm("SetDashboardMode", "Home", FormMethod.Post, new { id = "set_dashboard" }))
+{
+    <input type="radio" name="mode" value="false" @if(!ViewBag.DashboardSingleCourseMode){<text>checked</text>}/><text>Show all courses</text>
+    <input type="radio" name="mode" value="true" @if( ViewBag.DashboardSingleCourseMode){<text>checked</text>}/><text>Show only <em>@ViewBag.ActiveCourse.Course.Prefix @ViewBag.ActiveCourse.Course.Number</em></text>
+}
+</div>
+
 <div id="dp_posts">
 @foreach (DashboardPost dp in ViewBag.DashboardPosts)
 {

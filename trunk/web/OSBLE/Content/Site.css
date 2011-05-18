@@ -499,4 +499,9 @@ body#layoutLogOn
     float: right;
 }
 
+.dashboard_mode 
+{
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
 /* End Dashboard Posts */

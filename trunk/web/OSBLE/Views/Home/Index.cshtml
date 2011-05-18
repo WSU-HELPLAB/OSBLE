@@ -1,13 +1,6 @@
 ﻿@{
     ViewBag.Title = "Dashboard";
 }
-<div>
-@using (Html.BeginForm("SetDashboardMode", "Home", FormMethod.Post, new { id = "set_dashboard" }))
-{
-    <input type="radio" name="mode" value="false" @if(!ViewBag.DashboardSingleCourseMode){<text>checked</text>}/><text>Show all courses</text>
-    <input type="radio" name="mode" value="true" @if( ViewBag.DashboardSingleCourseMode){<text>checked</text>}/><text>Show only active course: <em>@ViewBag.ActiveCourse.Course.Prefix @ViewBag.ActiveCourse.Course.Number &mdash; @ViewBag.ActiveCourse.Course.Name</em></text>
-}
-</div>
 
 <script type="text/javascript">
     $("input[name='mode']").change(function () {
