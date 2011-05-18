@@ -77,11 +77,14 @@
     <Compile Include="Attributes\CanCreateCourses.cs" />
     <Compile Include="Attributes\EmailAttribute.cs" />
     <Compile Include="Attributes\IsAdmin.cs" />
+    <Compile Include="Attributes\IsNotAnonymized.cs" />
     <Compile Include="Attributes\RequireActiveCourse.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\ActiveCourse.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MailController.cs" />
     <Compile Include="Controllers\OSBLEController.cs" />
     <Compile Include="Controllers\RosterController.cs" />
     <Compile Include="Controllers\SchoolController.cs" />
@@ -89,6 +92,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountModels.cs" />
+    <Compile Include="Models\Mail.cs" />
     <Compile Include="Models\Course.cs" />
     <Compile Include="Models\CourseRole.cs" />
     <Compile Include="Models\CoursesUsers.cs" />
@@ -327,11 +331,23 @@
   <ItemGroup>
     <Content Include="Views\Account\ResetPassword.cshtml" />
   </ItemGroup>
-  <ItemGroup>
+<ItemGroup>
     <Content Include="Views\Account\ContactUs.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Account\ContactUsSuccess.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Mail\Index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Mail\View.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Mail\Create.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Mail\Edit.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

@@ -1,0 +1,29 @@
+﻿@model OSBLE.Models.Mail
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>@Html.DisplayFor(model => model.Subject)</h2>
+
+<fieldset>
+    <legend>Mail</legend>
+
+    <div class="display-label">FromUserProfile</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.FromUserProfile.FirstName )
+        @Html.DisplayFor(model =>  model.FromUserProfile.LastName )
+        <text> to </text>
+                @Html.DisplayFor(model => model.ToUserProfile.FirstName )
+        @Html.DisplayFor(model => model.ToUserProfile.LastName)
+    </div>
+
+    <div class="display-label">Message</div>
+    <div class="display-field">
+        @Html.DisplayTextFor(model => model.Message)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

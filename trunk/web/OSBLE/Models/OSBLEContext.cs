@@ -44,6 +44,10 @@ namespace OSBLE.Models
                 .WithMany()
                 .WillCascadeOnDelete(false);
 
+            modelBuilder.Entity<Mail>()
+                .HasRequired(n => n.ToUserProfile)
+                .WithMany()
+                .WillCascadeOnDelete(false);
         }
 
         /// <summary>
@@ -109,6 +113,8 @@ namespace OSBLE.Models
 
 
         }
+
+        public DbSet<Mail> Mails { get; set; }
 
     }
 
