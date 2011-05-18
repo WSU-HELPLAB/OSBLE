@@ -41,7 +41,8 @@
                         }
                         else
                         {
-                            <text><em>Pending (@user.Identification.Substring(Math.Max(user.Identification.Length - 4, 0), Math.Min(user.Identification.Length, 4)))</em></text>
+                            //<text><em>Pending (@user.Identification.Substring(Math.Max(user.Identification.Length - 4, 0), Math.Min(user.Identification.Length, 4)))</em></text>
+                           <text><em>Pending  @Helpers.DisplayLastFourID(user.Identification) </em></text>
                         }
                         
                         </li>
