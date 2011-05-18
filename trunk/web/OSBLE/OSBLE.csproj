@@ -70,6 +70,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Utility\FileSystem.cs" />
     <Compile Include="Attributes\CanModifyCourse.cs" />
     <Compile Include="Attributes\CanSeeAllCourse.cs" />
     <Compile Include="Attributes\CanGradeCourse.cs" />

@@ -11,7 +11,7 @@ using OSBLE.Attributes;
 namespace OSBLE.Controllers
 { 
     [Authorize]
-    [ActiveCourse]
+    [RequireActiveCourse]
     [IsNotAnonymized]
     public class MailController : OSBLEController
     {

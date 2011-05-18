@@ -14,7 +14,7 @@ namespace OSBLE.Attributes
     /// 
     public class CanSeeAllCourse : ActionFilterAttribute
     {
-        public override void OnActionExecuted(ActionExecutedContext filterContext)
+        public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             if (filterContext.Controller is OSBLEController)
             {
