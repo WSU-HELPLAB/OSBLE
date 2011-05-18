@@ -96,7 +96,8 @@ namespace OSBLE.Controllers
                 List<MenuItem> menu = new List<MenuItem>();
 
                 menu.Add(new MenuItem("Dashboard", "Home", "Index"));
-                menu.Add(new MenuItem("About", "Home", "About"));
+                menu.Add(new MenuItem("Assignments", "Assignment", "Index"));
+                menu.Add(new MenuItem("Grades", "Grade", "Index"));
                 menu.Add(new MenuItem("Users", "Roster", "Index", true, true, false));
                 ViewBag.Menu = menu;
 

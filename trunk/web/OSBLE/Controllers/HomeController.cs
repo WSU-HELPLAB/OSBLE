@@ -127,13 +127,6 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index");
         }
 
-        public ActionResult About()
-        {
-            ViewBag.CurrentTab = "About";
-
-            return View();
-        }
-
         /// <summary>
         /// Sets active course and redirects back to where we came from.
         /// </summary>
