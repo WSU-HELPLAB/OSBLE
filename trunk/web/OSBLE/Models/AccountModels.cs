@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
+using OSBLE.Attributes;
 
 namespace OSBLE.Models
 {
@@ -41,6 +42,7 @@ namespace OSBLE.Models
     {
         [Required]
         [StringLength(256)]
+        [Email(ErrorMessage = "Email Address is not valid!")]
         [DataType(DataType.EmailAddress)]
         [Display(Name = "Email address")]
         public string Email { get; set; }
@@ -86,6 +88,7 @@ namespace OSBLE.Models
     public class ResetPasswordModel
     {
         [Required]
+        [Email(ErrorMessage = "Email Address is not valid!")]
         [DataType(DataType.EmailAddress)]
         [Display(Name = "Email address")]
         public string EmailAddress{get; set;}
@@ -98,6 +101,7 @@ namespace OSBLE.Models
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Email Required")]
+        [Email(ErrorMessage = "Email Address is not valid!")]
         [DataType(DataType.EmailAddress)]
         [Display(Name = "Email")]
         public string Email { get; set; }
