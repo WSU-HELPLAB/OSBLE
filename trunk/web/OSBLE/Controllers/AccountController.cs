@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Web;
 using System.IO;
 using System.Drawing.Imaging;
+using System.Drawing.Drawing2D;
 
 namespace OSBLE.Controllers
 {
@@ -236,29 +237,36 @@ namespace OSBLE.Controllers
                 {
                     image = new Bitmap(file.InputStream);
                 }
-                catch
-                {
+                catch 
+                {   // If image format is invalid, discard it.
                     image = null;
                 }
 
                 if (image != null)
                 {
-                    int thumbSize = 72;
+                    int thumbSize = 64;
                                         
                     // Crop image to a square.
                     int square = Math.Min(image.Width,image.Height);
-                    Bitmap cropImage = new Bitmap(square, square);                 
-                    Graphics graphics = Graphics.FromImage(cropImage);
+                    Bitmap cropImage = new Bitmap(square, square);
+                    Bitmap finalImage = new Bitmap(thumbSize, thumbSize);
+                    Graphics cropGraphics = Graphics.FromImage(cropImage);
+                    Graphics finalGraphics = Graphics.FromImage(finalImage);
 
                     // Center cropped image horizontally, leave at the top vertically. (better focus on subject)
-                    graphics.DrawImage(image,-(image.Width - cropImage.Width)/2,0);
+                    cropGraphics.DrawImage(image,-(image.Width - cropImage.Width)/2,0);
 
                     // Convert to thumbnail.
-                    cropImage = (System.Drawing.Bitmap)cropImage.GetThumbnailImage(thumbSize, thumbSize, new Image.GetThumbnailImageAbort(ThumbnailCallback), IntPtr.Zero);
+                    finalGraphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+
+                    finalGraphics.DrawImage(cropImage,
+                                        new Rectangle(0, 0, thumbSize, thumbSize),
+                                        new Rectangle(0, 0, square, square),
+                                        GraphicsUnit.Pixel);
 
                     // Write image to memory stream.
                     MemoryStream s = new MemoryStream();
-                    cropImage.Save(s, ImageFormat.Jpeg);
+                    finalImage.Save(s, ImageFormat.Jpeg);
                     
                     // Back up to beginning of stream.
                     s.Seek(0, 0);
