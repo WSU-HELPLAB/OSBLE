@@ -227,10 +227,22 @@ namespace OSBLE.Controllers
         }
 
         [Authorize]
+        public ActionResult ProfilePicture()
+        {
+            return new FileStreamResult(FileSystem.GetProfilePictureOrDefault(currentUser),"image/jpeg");
+        }
+
+        [Authorize]
         [HttpPost]
         public ActionResult UploadPicture(HttpPostedFileBase file)
         {
-            if (file != null)
+            if (Request.Params["remove"] != null) // Delete Picture
+            {
+                FileSystem.DeleteProfilePicture(currentUser);
+                return RedirectToAction("Profile");
+            }
+
+            if (file != null) // Upload Picture
             {
                 Bitmap image;
                 try
@@ -265,16 +277,9 @@ namespace OSBLE.Controllers
                                         GraphicsUnit.Pixel);
 
                     // Write image to memory stream.
-                    MemoryStream s = new MemoryStream();
-                    finalImage.Save(s, ImageFormat.Jpeg);
-                    
-                    // Back up to beginning of stream.
-                    s.Seek(0, 0);
-
-                    // TODO: Replace this with file system saving mechanism.
-                    FileResult outFile = new FileStreamResult(s, "image/jpeg");
-
-                    return outFile;
+                    FileStream fs = FileSystem.GetProfilePictureForWrite(currentUser);
+                    finalImage.Save(fs, ImageFormat.Jpeg);
+                    fs.Close();
                 }
             }
             return RedirectToAction("Profile");

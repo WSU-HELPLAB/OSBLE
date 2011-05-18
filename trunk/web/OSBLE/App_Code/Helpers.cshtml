@@ -53,3 +53,7 @@
             <text><em>Pending @Helpers.DisplayLastFourID(user.Identification) </em></text>
         }
     }
+
+@helper ProfilePicture(string url) {
+    <img src="@url" alt="Profile Picture" class="profile_picture" />
+}

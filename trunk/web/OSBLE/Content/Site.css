@@ -469,6 +469,7 @@ body#layoutLogOn
     display: block;
     margin-left: 20px;
     padding: 3px;
+    clear: both;
 }
 
 .dp_replylink 
@@ -505,3 +506,16 @@ body#layoutLogOn
     margin-bottom: 0.5em;
 }
 /* End Dashboard Posts */
+
+.profile_picture
+{
+    border: 1px solid #074974;
+    float: left;
+    margin: 3px;
+    margin-right: 8px;
+}
+
+#picture_upload input 
+{
+    margin-right: 0.25em;
+}
