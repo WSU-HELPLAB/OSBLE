@@ -12,9 +12,9 @@ using System.Windows.Shapes;
 
 namespace ReviewInterfaceBase.View.Comment
 {
-    public partial class AbstractCommentView2 : UserControl
+    public partial class BaseCommentView : UserControl
     {
-        public AbstractCommentView2()
+        public BaseCommentView()
         {
             InitializeComponent();
         }

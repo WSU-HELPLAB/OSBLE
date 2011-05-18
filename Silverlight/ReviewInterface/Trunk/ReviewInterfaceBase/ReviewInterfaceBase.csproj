@@ -165,8 +165,8 @@
     <Compile Include="Model\Rubric\CriterionModel.cs" />
     <Compile Include="Model\Rubric\RubicModel.cs" />
     <Compile Include="Model\Rubric\RubricHeaderModel.cs" />
-    <Compile Include="View\Comment\AbstractCommentView2.xaml.cs">
-      <DependentUpon>AbstractCommentView2.xaml</DependentUpon>
+    <Compile Include="View\Comment\BaseCommentView.xaml.cs">
+      <DependentUpon>BaseCommentView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Comment\AuthorRebuttalCommentView.xaml.cs">
       <DependentUpon>AuthorRebuttalCommentView.xaml</DependentUpon>
@@ -240,7 +240,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
-    <Page Include="View\Comment\AbstractCommentView2.xaml">
+    <Page Include="View\Comment\BaseCommentView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
