@@ -1,83 +1,0 @@
-10
-
-dir
-942
-https://osble.svn.sourceforge.net/svnroot/osble/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/Model
-https://osble.svn.sourceforge.net/svnroot/osble
-
-
-
-2011-05-04T22:27:30.356692Z
-941
-nomis2005
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-283932c8-1ee0-4f80-a2fe-fde39bbc4179
-
-Comment
-dir
-
-Rubric
-dir
-
-FindWindow
-dir
-
-CategoryHolder
-dir
-
-Tag
-dir
-
-Category
-dir
-
-IModel.cs
-file
-
-
-
-
-2011-05-09T16:55:09.642362Z
-d5b9c91462bebc6f9dbf5662cd18f3cc
-2011-05-04T22:27:30.356692Z
-941
-nomis2005
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-87
-
-Document
-dir
-
