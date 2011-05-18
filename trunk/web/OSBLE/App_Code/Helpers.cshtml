@@ -42,3 +42,14 @@
 
 
 @helper DisplayLastFourID(string Identification) { <text>(@Identification.Substring(Math.Max(Identification.Length - 4, 0), Math.Min(Identification.Length, 4)))</text>}
+
+@helper DisplayFullNameOrPending(UserProfile user) {
+        if(user.UserName != null)
+        {
+            <text>@user.FirstName @user.LastName</text>
+        }
+        else
+        {
+            <text><em>Pending @Helpers.DisplayLastFourID(user.Identification) </em></text>
+        }
+    }

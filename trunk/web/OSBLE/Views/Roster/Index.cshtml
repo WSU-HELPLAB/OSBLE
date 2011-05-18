@@ -35,15 +35,7 @@
                             </div>
                         }
                         
-                        @if (user.UserName != null)
-                        {
-                            <text>@user.FirstName @user.LastName</text>
-                        }
-                        else
-                        {
-                            //<text><em>Pending (@user.Identification.Substring(Math.Max(user.Identification.Length - 4, 0), Math.Min(user.Identification.Length, 4)))</em></text>
-                           <text><em>Pending  @Helpers.DisplayLastFourID(user.Identification) </em></text>
-                        }
+                        @Helpers.DisplayFullNameOrPending(user)
                         
                         </li>
                     }
