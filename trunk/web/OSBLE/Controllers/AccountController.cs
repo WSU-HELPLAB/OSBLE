@@ -288,12 +288,21 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult ContactUs(ContactUsModel model)
         {
-            ViewBag.ContactUsName = model.Name;
-            return RedirectToAction("ContactUsSuccess");
+            if (ModelState.IsValid)
+            {
+                ViewBag.ContactUsName = model.Name;
+                return RedirectToAction("ContactUsSuccess");
+            }
+            return View(model);
         }
 
-        public ActionResult ContactUsSuccess()
+
+        [HttpPost]
+        public ActionResult ContactUsSuccess(ContactUsModel model)
         {
+            ViewBag.CUName = model.Name;
+            ViewBag.CUEmail = model.Email;
+            ViewBag.CUMsg = model.Message;
             return View();
         }
 

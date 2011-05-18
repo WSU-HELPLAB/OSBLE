@@ -93,15 +93,16 @@ namespace OSBLE.Models
 
     public class ContactUsModel
     {
-        [Required]
+        [Required(ErrorMessage = "Name Required")]
         [Display(Name = "Name")]
         public string Name { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Email Required")]
+        [DataType(DataType.EmailAddress)]
         [Display(Name = "Email")]
         public string Email { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Description Required")]
         [Display(Name = "Briefly describe the problem you are having")]
         public string Message { get; set; }
     }
