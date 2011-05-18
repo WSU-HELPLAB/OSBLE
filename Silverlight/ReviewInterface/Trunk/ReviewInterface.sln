@@ -27,6 +27,27 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthorRebuttal", "AuthorReb
 	EndProjectSection
 EndProject
 Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 6
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = PeerReview\\PeerReview.csproj
+		SccProjectName1 = PeerReview
+		SccLocalPath1 = PeerReview
+		SccProjectUniqueName2 = IssueVoting\\IssueVoting.csproj
+		SccProjectName2 = IssueVoting
+		SccLocalPath2 = IssueVoting
+		SccProjectUniqueName3 = ReviewInterfaceBase\\ReviewInterfaceBase.csproj
+		SccProjectName3 = ReviewInterfaceBase
+		SccLocalPath3 = ReviewInterfaceBase
+		SccProjectUniqueName4 = ReviewInterfaceBase.Web\\ReviewInterfaceBase.Web.csproj
+		SccProjectName4 = ReviewInterfaceBase.Web
+		SccLocalPath4 = ReviewInterfaceBase.Web
+		SccProjectUniqueName5 = AuthorRebuttal\\AuthorRebuttal.csproj
+		SccProjectName5 = AuthorRebuttal
+		SccLocalPath5 = AuthorRebuttal
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

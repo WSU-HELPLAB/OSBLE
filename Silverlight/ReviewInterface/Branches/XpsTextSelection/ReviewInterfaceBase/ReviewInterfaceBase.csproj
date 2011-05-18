@@ -32,6 +32,10 @@
     <LinkedServerProject>..\ReviewInterfaceBase.Web\ReviewInterfaceBase.Web.csproj</LinkedServerProject>
     <Utf8Output>true</Utf8Output>
     <ExpressionBlendVersion>4.0.20901.0</ExpressionBlendVersion>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <!-- This property group is only here to support building this project using the 
        MSBuild 3.5 toolset. In order to work correctly with this older toolset, it needs 
@@ -65,12 +69,15 @@
       <HintPath>..\Behaviors.dll</HintPath>
     </Reference>
     <Reference Include="ChemProV">
-      <HintPath>..\..\..\..\..\..\..\ChemProV\branches\OsbleVersion\ChemProV\Bin\Release\ChemProV.dll</HintPath>
+      <HintPath>..\ChemProV.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Expression.Interactions" />
     <Reference Include="mscorlib" />
     <Reference Include="Silverlight.Controls">
       <HintPath>..\Silverlight.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="SizeableBorder">
+      <HintPath>..\SizeableBorder.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations, Version=2.0.5.0, Culture=neutral, PublicKeyToken=ddd0da4d3e678217, processorArchitecture=MSIL" />
     <Reference Include="System.Runtime.Serialization" />
