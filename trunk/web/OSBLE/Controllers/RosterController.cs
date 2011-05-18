@@ -168,7 +168,6 @@ namespace OSBLE.Controllers
                             throw new Exception("There was an error importing the Roster");
                         }
                     }
-                    db.SaveChanges();
                 }
 
             }
@@ -198,7 +197,6 @@ namespace OSBLE.Controllers
                     try
                     {
                         createCourseUser(courseuser);
-                        db.SaveChanges();
                     }
                     catch
                     {
@@ -354,7 +352,6 @@ namespace OSBLE.Controllers
 
         /// <summary>
         /// This sets up everything for the coruseUser and will create a new UserProfile if it doesn't not exist.
-        /// A db.SaveChanges() call needs to be made after this function preferably when everything is done being setup
         /// </summary>
         /// <param name="courseuser">It must have section, role set, and a reference to UserProfile with Identification set</param>
         private void createCourseUser(CoursesUsers courseuser)
@@ -373,7 +370,7 @@ namespace OSBLE.Controllers
                         up.SchoolID = currentUser.SchoolID;
                         up.Identification = courseuser.UserProfile.Identification;
                         db.UserProfiles.Add(up);
-                        //db.SaveChanges();
+                        db.SaveChanges();
 
                         //Set the UserProfileID to point to our new student
                         courseuser.UserProfile = null;
@@ -392,7 +389,7 @@ namespace OSBLE.Controllers
                          select c).Count() == 0)
                     {
                         db.CoursesUsers.Add(courseuser);
-                        //db.SaveChanges();
+                        db.SaveChanges();
                     }
                     else
                     {
