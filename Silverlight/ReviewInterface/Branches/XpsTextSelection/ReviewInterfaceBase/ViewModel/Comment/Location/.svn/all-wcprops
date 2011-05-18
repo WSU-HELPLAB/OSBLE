@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 134
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Comment/Location
+END
+ChemProVLocation.cs
+K 25
+svn:wc:ra_dav:version-url
+V 154
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Comment/Location/ChemProVLocation.cs
+END
+TextLocation.cs
+K 25
+svn:wc:ra_dav:version-url
+V 150
+/svnroot/osble/!svn/ver/948/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Comment/Location/TextLocation.cs
+END
+ISpatialLocation.cs
+K 25
+svn:wc:ra_dav:version-url
+V 154
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Comment/Location/ISpatialLocation.cs
+END
+VideoLocation.cs
+K 25
+svn:wc:ra_dav:version-url
+V 151
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Comment/Location/VideoLocation.cs
+END
+ILocation.cs
+K 25
+svn:wc:ra_dav:version-url
+V 147
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Comment/Location/ILocation.cs
+END
+XpsLocation.cs
+K 25
+svn:wc:ra_dav:version-url
+V 149
+/svnroot/osble/!svn/ver/947/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Comment/Location/XpsLocation.cs
+END

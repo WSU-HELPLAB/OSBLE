@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 139
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Document/TextDocument
+END
+TextDocumentViewModel.cs
+K 25
+svn:wc:ra_dav:version-url
+V 164
+/svnroot/osble/!svn/ver/948/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Document/TextDocument/TextDocumentViewModel.cs
+END
+SyntaxHighlighter.cs
+K 25
+svn:wc:ra_dav:version-url
+V 160
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Document/TextDocument/SyntaxHighlighter.cs
+END
+HighlightingRichTextBox.cs
+K 25
+svn:wc:ra_dav:version-url
+V 166
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Document/TextDocument/HighlightingRichTextBox.cs
+END

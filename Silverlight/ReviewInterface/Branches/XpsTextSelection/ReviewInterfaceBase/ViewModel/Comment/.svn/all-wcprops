@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 125
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Comment
+END
+PeerReviewCommentViewModel.cs
+K 25
+svn:wc:ra_dav:version-url
+V 155
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Comment/PeerReviewCommentViewModel.cs
+END
+IssueVotingCommentViewModel.cs
+K 25
+svn:wc:ra_dav:version-url
+V 156
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Comment/IssueVotingCommentViewModel.cs
+END
+AbstractCommentViewModel.cs
+K 25
+svn:wc:ra_dav:version-url
+V 153
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Comment/AbstractCommentViewModel.cs
+END
+ICommentViewModel.cs
+K 25
+svn:wc:ra_dav:version-url
+V 146
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Comment/ICommentViewModel.cs
+END
+CommentFactory.cs
+K 25
+svn:wc:ra_dav:version-url
+V 143
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Comment/CommentFactory.cs
+END

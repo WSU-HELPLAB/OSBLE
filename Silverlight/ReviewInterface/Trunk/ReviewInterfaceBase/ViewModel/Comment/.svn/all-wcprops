@@ -1,0 +1,31 @@
+END
+PeerReviewCommentViewModel.cs
+K 25
+svn:wc:ra_dav:version-url
+V 135
+/svnroot/osble/!svn/ver/949/branches/Osble2.0/ReviewInterface/Trunk/ReviewInterfaceBase/ViewModel/Comment/PeerReviewCommentViewModel.cs
+END
+IssueVotingCommentViewModel.cs
+K 25
+svn:wc:ra_dav:version-url
+V 136
+/svnroot/osble/!svn/ver/949/branches/Osble2.0/ReviewInterface/Trunk/ReviewInterfaceBase/ViewModel/Comment/IssueVotingCommentViewModel.cs
+END
+AbstractCommentViewModel.cs
+K 25
+svn:wc:ra_dav:version-url
+V 133
+/svnroot/osble/!svn/ver/949/branches/Osble2.0/ReviewInterface/Trunk/ReviewInterfaceBase/ViewModel/Comment/AbstractCommentViewModel.cs
+END
+AuthorRebuttalCommentViewModel.cs
+K 25
+svn:wc:ra_dav:version-url
+V 139
+/svnroot/osble/!svn/ver/950/branches/Osble2.0/ReviewInterface/Trunk/ReviewInterfaceBase/ViewModel/Comment/AuthorRebuttalCommentViewModel.cs
+END
+ICommentViewModel.cs
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/svnroot/osble/!svn/ver/949/branches/Osble2.0/ReviewInterface/Trunk/ReviewInterfaceBase/ViewModel/Comment/ICommentViewModel.cs
+END

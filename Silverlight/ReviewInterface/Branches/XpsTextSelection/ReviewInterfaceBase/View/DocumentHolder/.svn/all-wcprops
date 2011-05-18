@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/DocumentHolder
+END
+VideoDocumentView.xaml
+K 25
+svn:wc:ra_dav:version-url
+V 150
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/DocumentHolder/VideoDocumentView.xaml
+END
+IDocumentHolderView.cs
+K 25
+svn:wc:ra_dav:version-url
+V 150
+/svnroot/osble/!svn/ver/947/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/DocumentHolder/IDocumentHolderView.cs
+END
+VideoDocumentView.xaml.cs
+K 25
+svn:wc:ra_dav:version-url
+V 153
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/DocumentHolder/VideoDocumentView.xaml.cs
+END
+SpatialDocumentHolderView.xaml
+K 25
+svn:wc:ra_dav:version-url
+V 158
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/DocumentHolder/SpatialDocumentHolderView.xaml
+END
+SpatialDocumentHolderView.xaml.cs
+K 25
+svn:wc:ra_dav:version-url
+V 161
+/svnroot/osble/!svn/ver/947/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/DocumentHolder/SpatialDocumentHolderView.xaml.cs
+END

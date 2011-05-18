@@ -1,0 +1,123 @@
+10
+
+dir
+942
+https://osble.svn.sourceforge.net/svnroot/osble/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel
+https://osble.svn.sourceforge.net/svnroot/osble
+
+
+
+2011-05-04T22:27:30.356692Z
+941
+nomis2005
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+283932c8-1ee0-4f80-a2fe-fde39bbc4179
+
+MainPageModelView.cs
+file
+947
+
+
+
+2011-05-09T16:56:39.094306Z
+c758e0a85499d3028567ad9544356847
+2011-05-10T17:12:35.431132Z
+947
+nomis2005
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+17735
+
+Behaviors
+dir
+
+Comment
+dir
+
+CustomTabControlViewModel.cs
+file
+
+
+
+
+2011-05-09T16:56:08.383235Z
+451e4137385395d844d9b036aac95d21
+2011-05-04T22:27:30.356692Z
+941
+nomis2005
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5629
+
+Rubric
+dir
+
+FindWindow
+dir
+
+CategoryHolder
+dir
+
+Tag
+dir
+
+DocumentHolder
+dir
+
+Category
+dir
+
+Document
+dir
+

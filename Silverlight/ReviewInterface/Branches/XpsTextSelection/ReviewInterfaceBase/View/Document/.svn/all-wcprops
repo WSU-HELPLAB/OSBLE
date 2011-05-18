@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/Document
+END
+VideoDocumentView.xaml
+K 25
+svn:wc:ra_dav:version-url
+V 144
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/Document/VideoDocumentView.xaml
+END
+ChemProVDocumentView.xaml.cs
+K 25
+svn:wc:ra_dav:version-url
+V 150
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/Document/ChemProVDocumentView.xaml.cs
+END
+TextAssestView.xaml
+K 25
+svn:wc:ra_dav:version-url
+V 141
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/Document/TextAssestView.xaml
+END
+TextDocumentView.xaml.cs
+K 25
+svn:wc:ra_dav:version-url
+V 146
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/Document/TextDocumentView.xaml.cs
+END
+VideoDocumentView.xaml.cs
+K 25
+svn:wc:ra_dav:version-url
+V 147
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/Document/VideoDocumentView.xaml.cs
+END
+XpsDocumentView.xaml
+K 25
+svn:wc:ra_dav:version-url
+V 142
+/svnroot/osble/!svn/ver/948/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/Document/XpsDocumentView.xaml
+END
+IDocumentView.cs
+K 25
+svn:wc:ra_dav:version-url
+V 138
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/Document/IDocumentView.cs
+END
+TextAssestView.xaml.cs
+K 25
+svn:wc:ra_dav:version-url
+V 144
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/Document/TextAssestView.xaml.cs
+END
+XpsDocumentView.xaml.cs
+K 25
+svn:wc:ra_dav:version-url
+V 145
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/Document/XpsDocumentView.xaml.cs
+END
+ChemProVDocumentView.xaml
+K 25
+svn:wc:ra_dav:version-url
+V 147
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/Document/ChemProVDocumentView.xaml
+END
+TextDocumentView.xaml
+K 25
+svn:wc:ra_dav:version-url
+V 143
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/Document/TextDocumentView.xaml
+END

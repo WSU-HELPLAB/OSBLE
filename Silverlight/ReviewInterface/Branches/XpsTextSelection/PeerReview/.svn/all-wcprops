@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/PeerReview
+END
+App.xaml
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/PeerReview/App.xaml
+END
+PeerReview.xaml.cs
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/PeerReview/PeerReview.xaml.cs
+END
+WebClientWrapper.cs
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/PeerReview/WebClientWrapper.cs
+END
+App.xaml.cs
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/PeerReview/App.xaml.cs
+END
+PeerReview.csproj
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/PeerReview/PeerReview.csproj
+END
+DocumentsLoadedEventArgs.cs
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/PeerReview/DocumentsLoadedEventArgs.cs
+END
+PeerReview.xaml
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/PeerReview/PeerReview.xaml
+END

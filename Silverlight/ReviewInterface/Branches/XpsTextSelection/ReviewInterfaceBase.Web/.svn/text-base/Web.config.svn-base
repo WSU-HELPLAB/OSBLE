@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  For more information on how to configure your ASP.NET application, please visit
+  http://go.microsoft.com/fwlink/?LinkId=169433
+  -->
+<configuration>
+  <configSections>
+    <sectionGroup name="system.serviceModel">
+      <section name="domainServices" type="System.ServiceModel.DomainServices.Hosting.DomainServicesSection, System.ServiceModel.DomainServices.Hosting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" allowDefinition="MachineToApplication" requirePermission="false" />
+    </sectionGroup>
+  </configSections>
+  <system.webServer>
+    <modules runAllManagedModulesForAllRequests="true">
+      <add name="DomainServiceModule" preCondition="managedHandler"
+        type="System.ServiceModel.DomainServices.Hosting.DomainServiceHttpModule, System.ServiceModel.DomainServices.Hosting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    </modules>
+    <validation validateIntegratedModeConfiguration="false" />
+  </system.webServer>
+  <system.web>
+    <httpModules>
+      <add name="DomainServiceModule" type="System.ServiceModel.DomainServices.Hosting.DomainServiceHttpModule, System.ServiceModel.DomainServices.Hosting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    </httpModules>
+    <compilation debug="true" targetFramework="4.0">
+      <assemblies>
+        <add assembly="System.Data.Entity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+      </assemblies>
+    </compilation>
+  </system.web>
+  <connectionStrings>
+    <add name="osbleEntities" connectionString="metadata=res://*/OsbleEntityDataModel.csdl|res://*/OsbleEntityDataModel.ssdl|res://*/OsbleEntityDataModel.msl;provider=System.Data.SqlClient;provider connection string=&quot;Data Source=eme228-veupl-06;Initial Catalog=osble;Persist Security Info=True;User ID=osble_user;Password=veupl09;MultipleActiveResultSets=True&quot;" providerName="System.Data.EntityClient" />
+  </connectionStrings>
+  <system.serviceModel>
+    <behaviors>
+      <serviceBehaviors>
+        <behavior name="">
+          <serviceMetadata httpGetEnabled="true" />
+          <serviceDebug includeExceptionDetailInFaults="false" />
+        </behavior>
+      </serviceBehaviors>
+    </behaviors>
+    <serviceHostingEnvironment aspNetCompatibilityEnabled="true"
+      multipleSiteBindingsEnabled="true" />
+  </system.serviceModel>
+</configuration>

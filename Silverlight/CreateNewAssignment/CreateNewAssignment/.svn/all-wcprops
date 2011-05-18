@@ -1,0 +1,89 @@
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svnroot/osble/!svn/ver/926/branches/Osble2.0/CMS/CreateNewAssignment/CreateNewAssignment
+END
+App.xaml
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svnroot/osble/!svn/ver/926/branches/Osble2.0/CMS/CreateNewAssignment/CreateNewAssignment/App.xaml
+END
+MonthView.xaml
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svnroot/osble/!svn/ver/926/branches/Osble2.0/CMS/CreateNewAssignment/CreateNewAssignment/MonthView.xaml
+END
+SortedList.cs
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svnroot/osble/!svn/ver/926/branches/Osble2.0/CMS/CreateNewAssignment/CreateNewAssignment/SortedList.cs
+END
+CalendarDayItemView.xaml
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svnroot/osble/!svn/ver/926/branches/Osble2.0/CMS/CreateNewAssignment/CreateNewAssignment/CalendarDayItemView.xaml
+END
+CreateNewAssignment.csproj.user
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/svnroot/osble/!svn/ver/926/branches/Osble2.0/CMS/CreateNewAssignment/CreateNewAssignment/CreateNewAssignment.csproj.user
+END
+AssignmentActivitiesCreaterView.xaml.cs
+K 25
+svn:wc:ra_dav:version-url
+V 129
+/svnroot/osble/!svn/ver/926/branches/Osble2.0/CMS/CreateNewAssignment/CreateNewAssignment/AssignmentActivitiesCreaterView.xaml.cs
+END
+AssignmentActivitiesCreaterViewModel.cs
+K 25
+svn:wc:ra_dav:version-url
+V 129
+/svnroot/osble/!svn/ver/926/branches/Osble2.0/CMS/CreateNewAssignment/CreateNewAssignment/AssignmentActivitiesCreaterViewModel.cs
+END
+App.xaml.cs
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svnroot/osble/!svn/ver/926/branches/Osble2.0/CMS/CreateNewAssignment/CreateNewAssignment/App.xaml.cs
+END
+MonthView.xaml.cs
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svnroot/osble/!svn/ver/926/branches/Osble2.0/CMS/CreateNewAssignment/CreateNewAssignment/MonthView.xaml.cs
+END
+CalendarDayItemView.xaml.cs
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/svnroot/osble/!svn/ver/926/branches/Osble2.0/CMS/CreateNewAssignment/CreateNewAssignment/CalendarDayItemView.xaml.cs
+END
+CreateNewAssignment.csproj
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svnroot/osble/!svn/ver/926/branches/Osble2.0/CMS/CreateNewAssignment/CreateNewAssignment/CreateNewAssignment.csproj
+END
+MonthViewModel.cs
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svnroot/osble/!svn/ver/926/branches/Osble2.0/CMS/CreateNewAssignment/CreateNewAssignment/MonthViewModel.cs
+END
+MonthModel.cs
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svnroot/osble/!svn/ver/926/branches/Osble2.0/CMS/CreateNewAssignment/CreateNewAssignment/MonthModel.cs
+END
+AssignmentActivitiesCreaterView.xaml
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/svnroot/osble/!svn/ver/926/branches/Osble2.0/CMS/CreateNewAssignment/CreateNewAssignment/AssignmentActivitiesCreaterView.xaml
+END

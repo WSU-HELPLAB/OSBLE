@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 148
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Document/TextDocument/Language
+END
+LanguageFactory.cs
+K 25
+svn:wc:ra_dav:version-url
+V 167
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Document/TextDocument/Language/LanguageFactory.cs
+END
+ILanguage.cs
+K 25
+svn:wc:ra_dav:version-url
+V 161
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Document/TextDocument/Language/ILanguage.cs
+END
+CPlusPlusLanguage.cs
+K 25
+svn:wc:ra_dav:version-url
+V 169
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Document/TextDocument/Language/CPlusPlusLanguage.cs
+END
+NullLanguage.cs
+K 25
+svn:wc:ra_dav:version-url
+V 164
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Document/TextDocument/Language/NullLanguage.cs
+END
+CSharpLanguage.cs
+K 25
+svn:wc:ra_dav:version-url
+V 166
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Document/TextDocument/Language/CSharpLanguage.cs
+END
+JavaLanguage.cs
+K 25
+svn:wc:ra_dav:version-url
+V 164
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Document/TextDocument/Language/JavaLanguage.cs
+END
+PythonLanguage.cs
+K 25
+svn:wc:ra_dav:version-url
+V 166
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Document/TextDocument/Language/PythonLanguage.cs
+END
+CLanguage.cs
+K 25
+svn:wc:ra_dav:version-url
+V 161
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/ViewModel/Document/TextDocument/Language/CLanguage.cs
+END

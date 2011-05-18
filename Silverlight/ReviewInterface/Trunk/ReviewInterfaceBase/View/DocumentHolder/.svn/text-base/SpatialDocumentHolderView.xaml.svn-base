@@ -1,0 +1,100 @@
+﻿<UserControl x:Class="ReviewInterfaceBase.View.DocumentHolder.SpatialDocumentHolderView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:toolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
+    xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
+    xmlns:System="clr-namespace:System;assembly=mscorlib"
+             xmlns:me="clr-namespace:ReviewInterfaceBase"
+    mc:Ignorable="d"
+    d:DesignHeight="300" d:DesignWidth="400">
+
+    <!--Top most is a grid we have a row for the toolbar and a row for everything else-->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="22"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!--StackPanel is used to hold the buttons-->
+        <StackPanel Grid.Row="0" x:Name="ButtonToolbar" Orientation="Horizontal" HorizontalAlignment="Left">
+            <ToggleButton x:Name="ToggleViewButton" ToolTipService.ToolTip="Toggle between views" Margin="0,0,2,0">
+                <Image Source="/Osble;component/View/Icons/toolbar_rightView.png"/>
+            </ToggleButton>
+            <Button x:Name="ShowAllCommentButton" ToolTipService.ToolTip="Show all comments" Margin="0,0,2,0">
+                <Image Source="/Osble;component/View/Icons/toolbar_showAllComments.png"/>
+            </Button>
+            <Button x:Name="HideAllCommentsButton" ToolTipService.ToolTip="Hide all comments" Margin="0,0,2,0">
+                <Image Source="/Osble;component/View/Icons/toolbar_hideAllComments.png"/>
+            </Button>
+            <Button x:Name="SearchButton" ToolTipService.ToolTip="Search     Shortcut Ctrl+F" Margin="0,0,2,0">
+                <Image Source="/Osble;component/View/Icons/toolbar_search.png"/>
+            </Button>
+            <!--<TextBox x:Name="SearchTextBox" MinWidth="50"/>-->
+        </StackPanel>
+
+        <Grid x:Name="MainGrid" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+
+                <!--This is how big a scroll bar is Auto gives it to much room-->
+                <RowDefinition Height="20"/>
+            </Grid.RowDefinitions>
+
+            <ScrollViewer x:Name="DocumentViewerScrollViewer"
+                              HorizontalScrollBarVisibility="Hidden"
+                              VerticalScrollBarVisibility="Hidden"
+                              Grid.Column="0" Grid.Row="0">
+                <Grid>
+                    <!--We give it three columns for now, 1 for the Document 1 for the splitter those not currently
+                used and 1 for the StackPanel the comments are sometimes in-->
+
+                    <!--This is for our Document-->
+                    <Grid x:Name="DocumentHolder">
+
+                    </Grid>
+                    <!--This is the layer the comments live on but it moves with the TextBox because they are under the same
+            ScrollViewer. Notice that the canvas and the RichTextBox are in the same Grid.Column this is so the canvas
+                will be on top of the RichTextBox-->
+                    <Canvas x:Name="CommentCanvasOverlay"/>
+                </Grid>
+
+            </ScrollViewer>
+            <controls:GridSplitter
+                    x:Name="MainGridSplitter"
+                    Grid.Column="1"
+                    Grid.RowSpan="2"
+			        VerticalAlignment="Stretch"
+			        Width="5"
+                    Cursor="SizeWE"
+			        Background="LightGray" />
+
+            <!--This is the stack panel on the right the Comments can be in-->
+            <ScrollViewer
+                    x:Name="CommentHolderScrollViewer"
+                    Grid.Column="2"
+                    HorizontalScrollBarVisibility="Hidden"
+                    VerticalScrollBarVisibility="Hidden">
+                <Grid x:Name="CommentStackPanelHolder" HorizontalAlignment="Right"/>
+            </ScrollViewer>
+            <ScrollViewer Margin="0" x:Name="MainVerticalScrollBar" Padding="0" HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Visible" Grid.Column="2" VerticalAlignment="Stretch">
+
+            </ScrollViewer>
+            <ScrollViewer x:Name="DocumentHorizontalScrollViewer" Grid.Column="0" Grid.Row="1" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible"/>
+            <ScrollViewer x:Name="CommentStackHorizontalScrollBar" Grid.Column="2" Grid.Row="1" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled"/>
+
+            <Grid x:Name="LineCanvasOverlayLeftSide" Grid.Column="0"/>
+            <Grid x:Name="LineCanvasOverlayMiddle" Grid.Column="1"/>
+            <Grid x:Name="LineCanvasOverlayRightSide" Grid.Column="2"/>
+
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 132
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/Document/FindWindow
+END
+FindWindowView.xaml
+K 25
+svn:wc:ra_dav:version-url
+V 152
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/Document/FindWindow/FindWindowView.xaml
+END
+FindWindowView.xaml.cs
+K 25
+svn:wc:ra_dav:version-url
+V 155
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/Document/FindWindow/FindWindowView.xaml.cs
+END
+HeaderControl.xaml
+K 25
+svn:wc:ra_dav:version-url
+V 151
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/Document/FindWindow/HeaderControl.xaml
+END
+HeaderControl.xaml.cs
+K 25
+svn:wc:ra_dav:version-url
+V 154
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase/View/Document/FindWindow/HeaderControl.xaml.cs
+END
