@@ -7,10 +7,24 @@
     <script src="@Url.Content("~/Scripts/jquery-1.6.1.min.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/modernizr-1.7.min.js")" type="text/javascript"></script>
     <script type="text/javascript">
+        var lastFocusedCell = null;
         function cellGainsFocus(someCell) {
-            var textValue = $(someCell).text();
-            var inputText = '<td><input class="cellInput" onblur="cellInputBlur(this)" type="text" value="' + textValue + '" /></td>';
-            $(someCell).replaceWith(inputText);
+
+            //do this once so we don't have to constantly do it later
+            someCell = $(someCell);
+
+            //if a prior cell has already received focus in the past, we need to turn it back into
+            //a normal table cell
+            if (lastFocusedCell != null) {
+                var cellValue = lastFocusedCell.children().val();
+                lastFocusedCell.html("");
+                lastFocusedCell.text(cellValue);
+            }
+            
+            var textValue = someCell.text();
+            var inputText = '<input class="cellInput" type="text" value="' + textValue + '" />';
+            someCell.html(inputText);
+            lastFocusedCell = someCell;
         }
 
         function cellInputBlur(someInput) {
