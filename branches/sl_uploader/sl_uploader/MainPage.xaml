@@ -7,6 +7,6 @@
     d:DesignHeight="300" d:DesignWidth="400">
 
     <Grid x:Name="LayoutRoot" Background="White">
-        <TextBlock Text="Hello, world!" />
+        <Button x:Name="openFileButton" IsEnabled="False" Click="openFileButton_Click" Content="Open file" Width="200" Height="50" />
     </Grid>
 </UserControl>

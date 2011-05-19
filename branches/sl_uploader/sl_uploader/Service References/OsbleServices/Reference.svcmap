@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="b3fb666e-e583-40b1-adbc-f82a368f7a38" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>true</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings>
+      <CollectionMapping TypeName="System.Collections.ObjectModel.ObservableCollection`1" Category="List" />
+    </CollectionMappings>
+    <GenerateSerializableTypes>false</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:1114/UploaderFileService.svc" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="UploaderFileService.xsd" MetadataType="Schema" ID="94da3e16-ef2c-4c3f-a681-1f290ee1072c" SourceId="1" SourceUrl="http://localhost:1114/UploaderFileService.svc?xsd=xsd2" />
+    <MetadataFile FileName="UploaderFileService.wsdl" MetadataType="Wsdl" ID="a7f15ffa-85bf-4a77-b859-daa07acc686f" SourceId="1" SourceUrl="http://localhost:1114/UploaderFileService.svc?wsdl" />
+    <MetadataFile FileName="UploaderFileService1.wsdl" MetadataType="Wsdl" ID="fca4b42c-8870-4c0e-b755-923a800b4595" SourceId="1" SourceUrl="http://localhost:1114/UploaderFileService.svc?wsdl=wsdl0" />
+    <MetadataFile FileName="UploaderFileService.disco" MetadataType="Disco" ID="20f2a696-2dd4-45e5-b913-520ca4fc276b" SourceId="1" SourceUrl="http://localhost:1114/UploaderFileService.svc?disco" />
+    <MetadataFile FileName="UploaderFileService1.xsd" MetadataType="Schema" ID="3f6941ce-2673-4ac1-b3d4-b3367b513871" SourceId="1" SourceUrl="http://localhost:1114/UploaderFileService.svc?xsd=xsd1" />
+    <MetadataFile FileName="UploaderFileService2.xsd" MetadataType="Schema" ID="710f8813-3b19-4258-876c-31a59e824560" SourceId="1" SourceUrl="http://localhost:1114/UploaderFileService.svc?xsd=xsd0" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

@@ -43,6 +43,8 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -73,18 +75,31 @@
   <ItemGroup>
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="DirectoryTest.aspx.cs">
+      <DependentUpon>DirectoryTest.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="DirectoryTest.aspx.designer.cs">
+      <DependentUpon>DirectoryTest.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SilverlightFaultBehavior.cs" />
+    <Compile Include="UploaderFileService.svc.cs">
+      <DependentUpon>UploaderFileService.svc</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="ClientBin\sl_uploader.xap" />
+    <Content Include="DirectoryTest.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Silverlight.js" />
     <Content Include="sl_uploaderTestPage.aspx" />
     <Content Include="sl_uploaderTestPage.html" />
+    <Content Include="UploaderFileService.svc" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
