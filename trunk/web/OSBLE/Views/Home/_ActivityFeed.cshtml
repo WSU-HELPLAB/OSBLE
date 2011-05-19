@@ -108,9 +108,7 @@
                             <br />
                             <span class="dp_posted">@Helpers.DisplayDate(dr.Posted)</span>
                         </div>
-                        <div class="dp_content">
-                            @Helpers.nl2br(dr.Content)
-                        </div>
+                        <div class="dp_content">@Helpers.Linkify(dr.Content)</div>
                     </div>
                 }
                 <div class="dp_replylink">

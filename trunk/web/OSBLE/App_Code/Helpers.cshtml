@@ -74,9 +74,8 @@
         foreach (string s in links)
         {
             if (isLink)
-            {
-    <a href="@s">@s</a>
-                isLink = !isLink;
+            {<a href="@s">@s</a>
+            isLink = !isLink;
             }
             else
             {
@@ -91,9 +90,12 @@
 }
 @helper nl2br(string content)
     {
-        foreach (string s in content.Split('\n'))
-        {
-    @s<text><br /></text>
+        string[] s = content.Split('\n');
+        for(int i=0; i < s.Length; i++) {
+            @s[i]
+            if(i != s.Length-1) {
+                <text><br /></text>
+            }
         }
 }
 @functions{
