@@ -70,6 +70,17 @@ a img
     float: left;
 }
 
+.top_item 
+{
+ text-decoration: none;   
+ color: #eee;
+}
+
+.top_item:hover
+{
+    color: #eee;
+}
+
 #top_content span
 {
     padding-top: 7px;
@@ -513,8 +524,8 @@ body#layoutLogOn
     float: left;
     margin: 3px;
     margin-right: 8px;
-    width: 64px;
-    height: 64px;
+    width: 50px;
+    height: 50px;
 }
 
 #picture_upload input 

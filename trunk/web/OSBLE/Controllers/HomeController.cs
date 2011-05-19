@@ -230,37 +230,35 @@ namespace OSBLE.Controllers
         }
 
         [HttpGet, FileCache(Duration = 3600)]
-        public FileStreamResult ProfilePictureForDashboardPost(int id)
+        public FileStreamResult ProfilePictureForDashboard(int course, int userProfile)
         {
-            DashboardPost dp = db.DashboardPosts.Find(id);
+            bool show = false;
+            UserProfile u = db.UserProfiles.Find(userProfile);
 
-            if (dp != null)
+            if (userProfile == currentUser.ID)
             {
-                CoursesUsers cu = currentCourses.Where(c => c.CourseID == dp.CourseID).FirstOrDefault();
-                if ((dp.UserProfile == currentUser) || ((cu != null) && !(cu.CourseRole.Anonymized)))
+                show = true;
+            }
+            else
+            {
+                CoursesUsers ourCu = currentCourses.Where(c => c.CourseID == course).FirstOrDefault();
+                CoursesUsers theirCu = db.CoursesUsers.Where(c => (c.CourseID == course) && (c.UserProfileID == u.ID)).FirstOrDefault();
+
+                if ((ourCu != null) && (theirCu != null) && !(ourCu.CourseRole.Anonymized))
                 {
-                    return new FileStreamResult(FileSystem.GetProfilePictureOrDefault(dp.UserProfile), "image/jpeg");
+                    show = true;
                 }
             }
 
-            return new FileStreamResult(FileSystem.GetDefaultProfilePicture(), "image/jpeg");
-        }
-
-        [HttpGet,FileCache(Duration = 3600)]
-        public FileStreamResult ProfilePictureForDashboardReply(int id)
-        {
-            DashboardReply dr = db.DashboardReplies.Find(id);
-
-            if (dr != null)
+            if (show == true)
             {
-                CoursesUsers cu = currentCourses.Where(c => c.CourseID == dr.Parent.CourseID).FirstOrDefault();
-                if ((dr.UserProfile == currentUser) || ((cu != null) && !(cu.CourseRole.Anonymized)))
-                {
-                    return new FileStreamResult(FileSystem.GetProfilePictureOrDefault(dr.UserProfile), "image/jpeg");
-                }
+                return new FileStreamResult(FileSystem.GetProfilePictureOrDefault(u), "image/jpeg");
             }
-
-            return new FileStreamResult(FileSystem.GetDefaultProfilePicture(), "image/jpeg");
+            else
+            {
+                return new FileStreamResult(FileSystem.GetDefaultProfilePicture(), "image/jpeg");
+            }
         }
+
     }
 }

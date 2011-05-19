@@ -256,7 +256,7 @@ namespace OSBLE.Controllers
 
                 if (image != null)
                 {
-                    int thumbSize = 64;
+                    int thumbSize = 50;
                                         
                     // Crop image to a square.
                     int square = Math.Min(image.Width,image.Height);
