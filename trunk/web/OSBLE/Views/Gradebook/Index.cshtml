@@ -14,11 +14,23 @@
         }
 
         function cellInputBlur(someInput) {
-            var cellValue = $(someInput).attr("value");
-            $(someInput).remove().replaceWith("<td>" + cellValue + "</td>");
+            //var cellValue = $(someInput).attr("value");
+            var cellValue = $(someInput).val();
+            $(this).remove().replaceWith("<td>" + cellValue + "</td>");
         }
 
-        function exchange(el) {
+        function calculate() {
+            var cells = new Array();
+            $("table tr td").each(function () {
+                cells.push($(this).html());
+            });
+            var total = 0;
+            $.each(cells, function () {
+                total = total + this;
+            });
+            alert(total);
+        }
+        /*function exchange(el) {
             var nodeI = el.parentNode, inputC = document.createElement('input'), text = el.innerHTML;
             with (inputC) {
                 setAttribute('value', text)
@@ -43,19 +55,19 @@
             style.width = document.all && !window.opera ? el.offsetWidth - 2 + 'px' : el.offsetWidth + 2 + 'px'
             setAttribute('type', 'text')
             setAttribute('id', el.id, 0)
-            }*/
+            }
             nodeI.replaceChild(inputC, el)
-        }
+        }*/
     </script>
     <style type="text/css">
         .cellInput
         {
             width:100%;
-            height100%;
             border:none;
         }
         .gradebook
         {
+            width:100%;
             border-collapse:collapse;
             border: 1px solid gray;
         }
@@ -69,13 +81,14 @@
         
         .gradebook td, .gradebook th, .gradebook tr
         {
+            width:20%;
             border:1px solid gray;
         }
 
 </style>
 </head>
 <body>
-    <table class="gradebook">
+    <table id="tbody" class="gradebook">
         @for (int i = 0; i < 10; i++)
         {
             <tr>
@@ -86,5 +99,6 @@
             </tr>
         }
     </table>
+    <input value="Calculate" type="button" onclick="calculate()" />
 </body>
 </html>
