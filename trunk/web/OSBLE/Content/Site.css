@@ -500,12 +500,12 @@ body#layoutLogOn
     height: 50px;
 }
 
-.dp_post_header:hover .dp_delete
+.dp_post_header:hover .dp_tools
 {
     display: inline;
 }
 
-.dp_post_header .dp_delete
+.dp_post_header .dp_tools
 {
     display: none;
     float: right;

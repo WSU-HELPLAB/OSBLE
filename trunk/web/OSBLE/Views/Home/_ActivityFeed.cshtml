@@ -65,10 +65,16 @@
                     <span class="dp_course">@dp.Course.Prefix @dp.Course.Number</span>
                 }
                 @Helpers.DisplayNameForDashboard(dp.UserProfile, ViewBag.ActiveCourse, show)
+                <span class="dp_tools">
+                @if (show && (dp.UserProfileID != ViewBag.CurrentUser.ID))
+                {
+                    <a href="@Url.Action("Create", "Mail", new { recipientID = dp.UserProfileID })">@Helpers.MailButton()</a>
+                }
                 @if (canDelete || (dp.UserProfileID == ViewBag.CurrentUser.ID))
                 {
-                    <span class="dp_delete"><a href="@Url.Action("DeletePost", new { ID = dp.ID })" onclick="return confirm('Delete this post and all its replies?');">@Helpers.DeleteButton()</a></span>
+                    <a href="@Url.Action("DeletePost", new { ID = dp.ID })" onclick="return confirm('Delete this post and all its replies?');">@Helpers.DeleteButton()</a>
                 }
+                </span>
                 <br />
                 <span class="dp_posted">@Helpers.DisplayDate(dp.Posted)</span>
             </div>
@@ -89,10 +95,16 @@
                                 @Helpers.DefaultProfilePicture();
                             }
                             @Helpers.DisplayNameForDashboard(dr.UserProfile, ViewBag.ActiveCourse, show)
+                            <span class="dp_tools">
+                            @if (show && (dr.UserProfileID != ViewBag.CurrentUser.ID))
+                            {
+                                <a href="@Url.Action("Create", "Mail", new { recipientID = dr.UserProfileID })">@Helpers.MailButton()</a>
+                            }
                             @if (canDelete || (dr.UserProfileID == ViewBag.CurrentUser.ID))
                             {
-                                <span class="dp_delete"><a href="@Url.Action("DeleteReply", new { ID = dr.ID })" onclick="return confirm('Delete this reply post?');">@Helpers.DeleteButton()</a></span>
+                                <a href="@Url.Action("DeleteReply", new { ID = dr.ID })" onclick="return confirm('Delete this reply post?');">@Helpers.DeleteButton()</a>
                             }
+                            </span>
                             <br />
                             <span class="dp_posted">@Helpers.DisplayDate(dr.Posted)</span>
                         </div>
