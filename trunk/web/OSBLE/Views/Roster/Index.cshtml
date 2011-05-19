@@ -28,7 +28,9 @@
                         @if ((user != ViewBag.CurrentUser) || ViewBag.CanEditSelf == true)
                         {
                             <div class="user_controls">
-                            <a href="mailto:@user.UserName">@Helpers.MailButton()</a>
+                            @if(user.UserName != null) {
+                            <a href="@Url.Action("Create", "Mail", new { recipientID = user.ID })">@Helpers.MailButton()</a>
+                            }
                             <a href="@Url.Action("Edit", "Roster", new { userProfileID = user.ID })">@Helpers.EditButton()</a>
                             <a href="@Url.Action("Delete", "Roster", new { userProfileID = user.ID })">@Helpers.DeleteButton()</a>
                             

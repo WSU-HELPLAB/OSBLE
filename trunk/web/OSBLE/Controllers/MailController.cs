@@ -2,6 +2,7 @@
 using System.Web.Mvc;
 using OSBLE.Attributes;
 using OSBLE.Models;
+using System;
 
 namespace OSBLE.Controllers
 {
@@ -39,8 +40,10 @@ namespace OSBLE.Controllers
 
         public ActionResult Create()
         {
-            ViewBag.FromUserProfileID = new SelectList(db.UserProfiles, "ID", "UserName");
-            ViewBag.ToUserProfileID = new SelectList(db.UserProfiles, "ID", "UserName");
+            int id = Convert.ToInt32(Request.Params["recipientID"]);
+
+//            ViewBag.FromUserProfileID = new SelectList(db.UserProfiles, "ID", "UserName");
+            ViewBag.ToUserProfileID = new SelectList(db.UserProfiles.Where(u=>u.UserName != null), "ID", "UserName", id);
             return View();
         }
 
