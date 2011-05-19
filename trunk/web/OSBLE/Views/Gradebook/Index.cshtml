@@ -143,6 +143,12 @@
 </head>
 <body>
     <table id="grades" class="gradebook">
+        <tr>
+        @for (int i = 0; i < 5; i++)
+        {
+            <th>Column @i</th>
+        }
+        </tr>
         @for (int i = 0; i < 10; i++)
         {
             <tr>
