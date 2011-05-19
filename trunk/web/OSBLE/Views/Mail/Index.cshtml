@@ -1,16 +1,17 @@
 ﻿@model IEnumerable<OSBLE.Models.Mail>
-
 @{
     ViewBag.Title = "Index";
 }
-
-<h2>Inbox</h2>
-
+<h2>
+    Inbox</h2>
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
 <table>
     <tr>
+        <th>
+            Read:
+        </th>
         <th>
             From:
         </th>
@@ -18,19 +19,21 @@
             Subject:
         </th>
     </tr>
-
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.FromUserProfile.UserName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Subject)
-        </td>
-        <td>
-            @Html.ActionLink("View", "View", new { id=item.ID })
-        </td>
-    </tr>
-}
-
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Read)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FromUserProfile.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Subject)
+            </td>
+            <td>
+                @Html.ActionLink("View", "View", new { id = item.ID })
+            </td>
+        </tr>
+    }
 </table>

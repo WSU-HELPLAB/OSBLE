@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
-using System.Web;
+﻿using System.Linq;
 using System.Web.Mvc;
-using OSBLE.Models;
 using OSBLE.Attributes;
+using OSBLE.Models;
 
 namespace OSBLE.Controllers
-{ 
+{
     [Authorize]
     [RequireActiveCourse]
     [IsNotAnonymized]
@@ -21,7 +16,7 @@ namespace OSBLE.Controllers
         public ViewResult Index()
         {
             var mails = from c in db.Mails where c.ToUserProfileID == CurrentUser.ID && c.CourseReferenceID == activeCourse.CourseID select c;
-                return View(mails.ToList());
+            return View(mails.ToList());
         }
 
         //
@@ -30,6 +25,8 @@ namespace OSBLE.Controllers
         public ViewResult View(int id)
         {
             Mail mail = db.Mails.Find(id);
+            mail.Read = true;
+            db.SaveChanges();
             return View(mail);
         }
 
@@ -41,7 +38,7 @@ namespace OSBLE.Controllers
             ViewBag.FromUserProfileID = new SelectList(db.UserProfiles, "ID", "UserName");
             ViewBag.ToUserProfileID = new SelectList(db.UserProfiles, "ID", "UserName");
             return View();
-        } 
+        }
 
         //
         // POST: /Mail/Create
@@ -51,13 +48,13 @@ namespace OSBLE.Controllers
         {
             if (ModelState.IsValid)
             {
-                mail.FromUserProfileID= CurrentUser.ID;
+                mail.FromUserProfileID = CurrentUser.ID;
                 mail.FromUserProfile = CurrentUser;
                 mail.CourseReferenceID = activeCourse.CourseID;
                 mail.Read = false;
                 db.Mails.Add(mail);
                 db.SaveChanges();
-                return RedirectToAction("Index");  
+                return RedirectToAction("Index");
             }
 
             ViewBag.FromUserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", mail.FromUserProfileID);
@@ -67,7 +64,7 @@ namespace OSBLE.Controllers
 
         //
         // GET: /Mail/Delete/5
- 
+
         public ActionResult Delete(int id)
         {
             Mail mail = db.Mails.Find(id);
@@ -79,7 +76,7 @@ namespace OSBLE.Controllers
 
         [HttpPost, ActionName("Delete")]
         public ActionResult DeleteConfirmed(int id)
-        {            
+        {
             Mail mail = db.Mails.Find(id);
             db.Mails.Remove(mail);
             db.SaveChanges();
