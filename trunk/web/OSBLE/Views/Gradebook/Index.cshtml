@@ -15,7 +15,7 @@
 
         function cellInputBlur(someInput) {
             var cellValue = $(someInput).attr("value");
-            //$(someInput).remove().replaceWith(
+            $(someInput).remove().replaceWith("<td>" + cellValue + "</td>");
         }
 
         function exchange(el) {
