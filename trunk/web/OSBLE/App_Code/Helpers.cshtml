@@ -1,73 +1,125 @@
 ﻿@using OSBLE.Models
-
-@helper DisplaySection(string sectionNum) {
-    if (sectionNum != "0") {
-    <text>Section @sectionNum</text>   
-    }
-    else
+@using System.Text.RegularExpressions
+@helper DisplaySection(string sectionNum)
     {
-        <text>All Sections</text>
-    }
-}
-
-@* Only use this helper in a place that requires an active course (uses [RequireActiveCourse] attribute) *@
-@helper DisplayName(UserProfile user, CoursesUsers activeCourse, bool show=false) {
-    if (!activeCourse.CourseRole.Anonymized && (activeCourse.CourseRole.CanGrade || (user.ID == activeCourse.UserProfileID) || show))
-    {
-        <text>@user.FirstName @user.LastName</text>
-    } else {
-        <text>Anonymous</text>   
-    }
-}
-
-@helper DisplayNameForDashboard(UserProfile user, CoursesUsers activeCourse, bool show=false) {
-    if(show || (activeCourse.UserProfileID == user.ID)) {
-        <text>@user.FirstName @user.LastName</text>
-    } else {
-        <text>Anonymous</text>   
-    }
-}
-
-@helper DisplayDate(DateTime dt) {
-    @dt.ToLongDateString()<text> </text>@dt.ToShortTimeString()
-}
-
-@helper MailButton() {<img src="../../Content/images/mail_up.png" />}
-
-@helper AddButton() {<img src="../../Content/images/add_up.png" alt="Add Button"/>}
-
-@helper EditButton() {<img src="../../Content/images/edit_up.png" alt="Edit Button"/>}
-
-@helper DeleteButton() {<img src="../../Content/images/delete_up.png" alt="Delete Button"/>}
-
-
-@helper DisplayLastFourID(string Identification) { <text>(@Identification.Substring(Math.Max(Identification.Length - 4, 0), Math.Min(Identification.Length, 4)))</text>}
-
-@helper DisplayFullNameOrPending(UserProfile user) {
-        if(user.UserName != null)
+        if (sectionNum != "0")
         {
-            <text>@user.FirstName @user.LastName</text>
+    <text>Section @sectionNum</text>
         }
         else
         {
-            <text><em>Pending @Helpers.DisplayLastFourID(user.Identification) </em></text>
+    <text>All Sections</text>
         }
-    }
-
-@helper ProfilePicture(string url) {
+}
+@* Only use this helper in a place that requires an active course (uses [RequireActiveCourse] attribute) *@
+@helper DisplayName(UserProfile user, CoursesUsers activeCourse, bool show = false)
+    {
+        if (!activeCourse.CourseRole.Anonymized && (activeCourse.CourseRole.CanGrade || (user.ID == activeCourse.UserProfileID) || show))
+        {
+    <text>@user.FirstName @user.LastName</text>
+        }
+        else
+        {
+    <text>Anonymous</text>
+        }
+}
+@helper DisplayNameForDashboard(UserProfile user, CoursesUsers activeCourse, bool show = false)
+    {
+        if (show || (activeCourse.UserProfileID == user.ID))
+        {
+    <text>@user.FirstName @user.LastName</text>
+        }
+        else
+        {
+    <text>Anonymous</text>
+        }
+}
+@helper DisplayDate(DateTime dt)
+    {
+    @dt.ToLongDateString()<text> </text>@dt.ToShortTimeString()
+}
+@helper MailButton()
+    {<img src="../../Content/images/mail_up.png" />}
+@helper AddButton()
+    {<img src="../../Content/images/add_up.png" alt="Add Button" />}
+@helper EditButton()
+    {<img src="../../Content/images/edit_up.png" alt="Edit Button" />}
+@helper DeleteButton()
+    {<img src="../../Content/images/delete_up.png" alt="Delete Button" />}
+@helper DisplayLastFourID(string Identification)
+    { <text>(@Identification.Substring(Math.Max(Identification.Length - 4, 0), Math.Min(Identification.Length, 4)))</text>}
+@helper DisplayFullNameOrPending(UserProfile user)
+    {
+        if (user.UserName != null)
+        {
+    <text>@user.FirstName @user.LastName</text>
+        }
+        else
+        {
+    <text><em>Pending @Helpers.DisplayLastFourID(user.Identification) </em></text>
+        }
+}
+@helper ProfilePicture(string url)
+    {
     <img src="@url" alt="Profile Picture" class="profile_picture" />
 }
-
-@helper SmallProfilePicture(string url) {
+@helper SmallProfilePicture(string url)
+    {
     <img src="@url" alt="Profile Picture" class="small_profile_picture" />
 }
-
-@helper DefaultProfilePicture() {
+@helper Linkify(string text)
+    {
+        List<string> links = LinkifyHelper(text);
+        bool isLink = false;
+        foreach (string s in links)
+        {
+            if (isLink)
+            {
+    <a href="@s">@s</a>
+                isLink = !isLink;
+            }
+            else
+            {
+    <text> @s </text>
+                isLink = !isLink;
+            }
+        }
+}
+@helper DefaultProfilePicture()
+    {
     <img src="/Content/images/default.jpg" alt="Profile Picture" class="profile_picture" />
 }
-
-@helper nl2br(string content) {
-    foreach(string s in content.Split('\n')) {
-           @s<text><br /></text>
-    }
+@helper nl2br(string content)
+    {
+        foreach (string s in content.Split('\n'))
+        {
+    @s<text><br /></text>
+        }
 }
+@functions{
+    #region C# functions
+
+    /// <summary>
+    /// This takes a string and splits it where a link is detected.
+    /// It will insert a blank string at the front
+    /// </summary>
+    /// <param name="text"></param>
+    /// <returns></returns>
+    static List<string> LinkifyHelper(string text)
+    {
+        int offset = 0;
+
+        Regex reg = new Regex(@"(https?://[\w\.]+[/.*]?.*)");
+
+        List<string> textSplit = reg.Split(text).ToList();
+
+        if (reg.IsMatch(textSplit[0]))
+        {
+            textSplit.Insert(0, "");
+        }
+
+        return textSplit;
+    }
+
+#endregion
+    }
