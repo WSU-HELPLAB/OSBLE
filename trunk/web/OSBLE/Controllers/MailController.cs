@@ -25,8 +25,12 @@ namespace OSBLE.Controllers
         public ViewResult View(int id)
         {
             Mail mail = db.Mails.Find(id);
-            mail.Read = true;
-            db.SaveChanges();
+            if (mail.Read == false)
+            {
+                mail.Read = true;
+                db.SaveChanges();
+                SetUnreadMessageCount();
+            }
             return View(mail);
         }
 

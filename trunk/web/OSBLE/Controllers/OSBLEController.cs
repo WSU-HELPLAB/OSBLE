@@ -109,6 +109,8 @@ namespace OSBLE.Controllers
                 string userName = context.User.Identity.Name;
                 ViewBag.CurrentUser = currentUser = db.UserProfiles.Where(u => u.UserName == userName).FirstOrDefault();
 
+                SetUnreadMessageCount();
+
                 // Get list of enrolled courses.
                 if (currentUser != null)
                 {
@@ -152,6 +154,10 @@ namespace OSBLE.Controllers
 
                 #endregion User And Course Setup
             }
+        }
+
+        public void SetUnreadMessageCount() {
+            ViewBag.UnreadMessageCount = (int)db.Mails.Where(m => (m.ToUserProfileID == currentUser.ID) && (m.Read == false)).Count();
         }
     }
 }

@@ -45,7 +45,12 @@
     }
 
         <div class="dp_post_header">
-        @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard",new { course=dp.CourseID, userprofile=dp.UserProfileID }))
+        @if (show || (dp.UserProfileID == ViewBag.CurrentUser.ID))
+        {
+            @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dp.CourseID, userprofile = dp.UserProfileID }));
+        } else {
+            @Helpers.DefaultProfilePicture();   
+        }
         @if (!ViewBag.DashboardSingleCourseMode)
         {
             <span class="dp_course">@dp.Course.Prefix @dp.Course.Number</span>
@@ -67,7 +72,12 @@
             {
                  <div class="dp_post">
                     <div class="dp_post_header">
-                    @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard",new { course=dp.CourseID, userprofile=dr.UserProfileID }))
+                    @if (show || (dr.UserProfileID == ViewBag.CurrentUser.ID))
+                    {
+                        @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dp.CourseID, userprofile = dr.UserProfileID }));
+                    } else {
+                        @Helpers.DefaultProfilePicture();
+                    }
                     @Helpers.DisplayNameForDashboard(dr.UserProfile, ViewBag.ActiveCourse, show)
                     @if (canDelete || (dr.UserProfileID == ViewBag.CurrentUser.ID))
                     {

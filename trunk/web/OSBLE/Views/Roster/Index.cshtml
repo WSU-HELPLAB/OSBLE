@@ -35,6 +35,7 @@
                             </div>
                         }
                         
+                        @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture",new {userProfile = user.ID}))
                         @Helpers.DisplayFullNameOrPending(user)
                         
                         </li>

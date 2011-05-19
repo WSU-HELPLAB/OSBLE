@@ -350,6 +350,36 @@ namespace OSBLE.Controllers
             return rosterData;
         }
 
+        [HttpGet, FileCache(Duration = 3600)]
+        public FileStreamResult ProfilePicture(int userProfile)
+        {
+            bool show = false;
+            UserProfile u = db.UserProfiles.Find(userProfile);
+
+            if (userProfile == currentUser.ID)
+            {
+                show = true;
+            }
+            else
+            {
+                CoursesUsers cu = db.CoursesUsers.Where(c => (c.CourseID == activeCourse.CourseID) && (c.UserProfileID == userProfile)).FirstOrDefault();
+
+                if (cu != null)
+                {
+                    show = true;
+                }
+            }
+
+            if (show == true)
+            {
+                return new FileStreamResult(FileSystem.GetProfilePictureOrDefault(u), "image/jpeg");
+            }
+            else
+            {
+                return new FileStreamResult(FileSystem.GetDefaultProfilePicture(), "image/jpeg");
+            }
+        }
+
         /// <summary>
         /// This sets up everything for the coruseUser and will create a new UserProfile if it doesn't not exist.
         /// </summary>

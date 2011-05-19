@@ -57,3 +57,11 @@
 @helper ProfilePicture(string url) {
     <img src="@url" alt="Profile Picture" class="profile_picture" />
 }
+
+@helper SmallProfilePicture(string url) {
+    <img src="@url" alt="Profile Picture" class="small_profile_picture" />
+}
+
+@helper DefaultProfilePicture() {
+    <img src="/Content/images/default.jpg" alt="Profile Picture" class="profile_picture" />
+}
