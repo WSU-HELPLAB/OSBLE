@@ -8,11 +8,36 @@
     <script src="@Url.Content("~/Scripts/modernizr-1.7.min.js")" type="text/javascript"></script>
     <script type="text/javascript">
         var lastFocusedCell = null;
+
+        function clearLastCellFocus() {
+            
+            //if a prior cell has already received focus in the past, we need to turn it back into
+            //a normal table cell
+            if (lastFocusedCell != null) {
+                var cellValue = lastFocusedCell.children().val();
+                lastFocusedCell.html("");
+                lastFocusedCell.text(cellValue);
+                lastFocusedCell.attr("onclick", 'cellGainsFocus(this)');
+            }
+        }
+
         function cellGainsFocus(someCell) {
 
             //do this once so we don't have to constantly do it later
             someCell = $(someCell);
 
+            //clear any previous focus
+            clearLastCellFocus();
+            
+            var textValue = someCell.text();
+            var inputText = $('<input class="cellInput" type="text" value="' + textValue + '" />');
+            someCell.removeAttr("onclick");
+            someCell.html(inputText);
+            inputText.focus();
+            lastFocusedCell = someCell;
+        }
+
+        function cellInputBlur(someInput) {
             //if a prior cell has already received focus in the past, we need to turn it back into
             //a normal table cell
             if (lastFocusedCell != null) {
@@ -20,20 +45,13 @@
                 lastFocusedCell.html("");
                 lastFocusedCell.text(cellValue);
             }
-            
-            var textValue = someCell.text();
-            var inputText = '<input class="cellInput" type="text" value="' + textValue + '" />';
-            someCell.html(inputText);
-            lastFocusedCell = someCell;
-        }
-
-        function cellInputBlur(someInput) {
-            //var cellValue = $(someInput).attr("value");
-            var cellValue = $(someInput).val();
-            $(this).remove().replaceWith("<td onclick='cellGainsFocus(this)'>" + cellValue + "</td>");
         }
 
         function calculateRows() {
+            
+            //clear any previous focus
+            clearLastCellFocus();
+
             $("#grades tr").each(function () {
                 var total = 0;
                 $(this).find('td').each(function () {
@@ -44,6 +62,10 @@
         }
 
         function calculateTotal() {
+            
+            //clear any previous focus
+            clearLastCellFocus();
+
             var final = 0;
             $("#grades tr td").each(function () {
                     final += parseInt($(this).text());
@@ -52,6 +74,10 @@
         }
 
         function calculateCols() {
+
+            //clear any previous focus
+            clearLastCellFocus();
+
             var col1 = 0;
             var col2 = 0;
             var col3 = 0;
