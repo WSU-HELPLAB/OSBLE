@@ -92,26 +92,41 @@ namespace OSBLE.Controllers
                 userBySection.SectionNumber = section.Key.ToString();
                 List<UsersByRole> usersByRoles = new List<UsersByRole>();
 
-                //Since we are using the db above we need a new one for the below operation
-                using (OSBLEContext db2 = new OSBLEContext())
-                {
-                    //Get all the users for each role
-                    foreach (CourseRole role in db2.CourseRoles)
-                    {
-                        UsersByRole usersByRole = new UsersByRole();
-                        usersByRole.RoleName = role.Name;
-                        usersByRole.Users = new List<UserProfile>(from c in section
-                                                                  where role.ID == c.CourseRole.ID
-                                                                  select c.UserProfile);
-                        usersByRole.Count = usersByRole.Users.Count;
+                //Get all the users for each role
+                List<CourseRole> roles = new List<CourseRole>();
 
-                        usersByRoles.Add(usersByRole);
-                    }
+                // Set custom role order for display
+                List<CourseRole.OSBLERoles> rolesOrder = new List<CourseRole.OSBLERoles>(new CourseRole.OSBLERoles[] { 
+                            CourseRole.OSBLERoles.Student,
+                            CourseRole.OSBLERoles.TA,
+                            CourseRole.OSBLERoles.Moderator,
+                            CourseRole.OSBLERoles.Observer,
+                            CourseRole.OSBLERoles.Instructor });
+
+                foreach (CourseRole.OSBLERoles r in rolesOrder)
+                {
+                    roles.Add(db.CourseRoles.Find((int)r));
+                }
+
+                foreach (CourseRole role in roles)
+                {
+                    UsersByRole usersByRole = new UsersByRole();
+                    usersByRole.RoleName = role.Name;
+                    usersByRole.Users = new List<UserProfile>(from c in section
+                                                              where role.ID == c.CourseRole.ID
+                                                              orderby c.UserProfile.LastName
+                                                              select c.UserProfile
+                                                              );
+                    usersByRole.Count = usersByRole.Users.Count;
+
+                    usersByRoles.Add(usersByRole);
                 }
 
 
+
                 //reverse it so the least important people are first
-                usersByRoles.Reverse();
+
+
 
                 userBySection.UsersByRole = usersByRoles;
 
