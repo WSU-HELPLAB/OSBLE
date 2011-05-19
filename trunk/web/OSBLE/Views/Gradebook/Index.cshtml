@@ -9,55 +9,69 @@
     <script type="text/javascript">
         function cellGainsFocus(someCell) {
             var textValue = $(someCell).text();
-            var inputText = '<input class="cellInput" onblur="cellInputBlur(this)" type="text" value="' + textValue + '" />';
+            var inputText = '<td><input class="cellInput" onblur="cellInputBlur(this)" type="text" value="' + textValue + '" /></td>';
             $(someCell).replaceWith(inputText);
         }
 
         function cellInputBlur(someInput) {
             //var cellValue = $(someInput).attr("value");
             var cellValue = $(someInput).val();
-            $(this).remove().replaceWith("<td>" + cellValue + "</td>");
+            $(this).remove().replaceWith("<td onclick='cellGainsFocus(this)'>" + cellValue + "</td>");
         }
 
-        function calculate() {
-            var cells = new Array();
-            $("table tr td").each(function () {
-                cells.push($(this).html());
+        function calculateRows() {
+            $("#grades tr").each(function () {
+                var total = 0;
+                $(this).find('td').each(function () {
+                    total += parseInt($(this).text());
+                });
+                alert("Row Total: " + total);
             });
-            var total = 0;
-            $.each(cells, function () {
-                total = total + this;
+        }
+
+        function calculateTotal() {
+            var final = 0;
+            $("#grades tr td").each(function () {
+                    final += parseInt($(this).text());
             });
-            alert(total);
+            alert("Total Table: " + final);
         }
-        /*function exchange(el) {
-            var nodeI = el.parentNode, inputC = document.createElement('input'), text = el.innerHTML;
-            with (inputC) {
-                setAttribute('value', text)
-                setAttribute('size', text.length - 1, 0)
-                style.width = "150"
-                setAttribute('type', 'text')
-                setAttribute('id', el.id, 0)
-                onblur = "changeback(this);"
-            }
-            nodeI.replaceChild(inputC, el)
+
+        function calculateCols() {
+            var col1 = 0;
+            var col2 = 0;
+            var col3 = 0;
+            var col4 = 0;
+            var col5 = 0;
+
+            //reference the rows you want to add
+            //this will not include the header row
+            var rows = $("#grades tr");
+            rows.children("td:nth-child(1)").each(function () {
+
+                //each time we add the cell to the total
+                col1 += parseInt($(this).html());
+            });
+            rows.children("td:nth-child(2)").each(function () {
+                col2 += parseInt($(this).html());
+            });
+            rows.children("td:nth-child(3)").each(function () {
+                col3 += parseInt($(this).html());
+            });
+            rows.children("td:nth-child(4)").each(function () {
+                col4 += parseInt($(this).html());
+            });
+            rows.children("td:nth-child(5)").each(function () {
+                col5 += parseInt($(this).html());
+            });
+
+            alert(col1);
+            alert(col2);
+            alert(col3);
+            alert(col4);
+            alert(col5);
         }
-        function changeback(el) {
-            var nodeI = el.parentNode, inputC = document.createElement('td'), text = el.innerHTML;
-            inputC.setAttribute('value', text)
-            inputC.setAttribute('size', text.length - 1, 0)
-            inputC.setAttribute('type', 'text')
-            inputC.setAttribute('id', el.id, 0)
-            /*el.innerHTML += '\x20'
-            with (inputC) {
-            setAttribute('value', text)
-            /*setAttribute('size', text.length - 1, 0)
-            style.width = document.all && !window.opera ? el.offsetWidth - 2 + 'px' : el.offsetWidth + 2 + 'px'
-            setAttribute('type', 'text')
-            setAttribute('id', el.id, 0)
-            }
-            nodeI.replaceChild(inputC, el)
-        }*/
+        
     </script>
     <style type="text/css">
         .cellInput
@@ -88,7 +102,7 @@
 </style>
 </head>
 <body>
-    <table id="tbody" class="gradebook">
+    <table id="grades" class="gradebook">
         @for (int i = 0; i < 10; i++)
         {
             <tr>
@@ -99,6 +113,8 @@
             </tr>
         }
     </table>
-    <input value="Calculate" type="button" onclick="calculate()" />
+    <input value="Calculate Rows" type="button" onclick="calculateRows()" />
+    <input value="Calculate Columns" type="button" onclick="calculateCols()" />
+    <input value="Calculate Total" type="button" onclick="calculateTotal()" />
 </body>
 </html>
