@@ -64,7 +64,7 @@
         <span class="dp_posted">@Helpers.DisplayDate(dp.Posted)</span>
         </div>
         <div class="dp_content">
-            @dp.Content
+            @Helpers.nl2br(dp.Content)
         </div>
 
         <div class="dp_replies">
@@ -87,7 +87,7 @@
                     <span class="dp_posted">@Helpers.DisplayDate(dr.Posted)</span>
                     </div>
                     <div class="dp_content">
-                        @dr.Content
+                        @Helpers.nl2br(dr.Content)
                     </div>
 
                  </div>   

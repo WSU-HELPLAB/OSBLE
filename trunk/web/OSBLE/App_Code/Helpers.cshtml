@@ -65,3 +65,9 @@
 @helper DefaultProfilePicture() {
     <img src="/Content/images/default.jpg" alt="Profile Picture" class="profile_picture" />
 }
+
+@helper nl2br(string content) {
+    foreach(string s in content.Split('\n')) {
+           @s<text><br /></text>
+    }
+}
