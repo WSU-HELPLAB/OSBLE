@@ -3,9 +3,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:me="clr-namespace:CreateNewAssignment"
-    mc:Ignorable="d"
-    d:DesignHeight="300" d:DesignWidth="400" xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+              xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+             xmlns:me="clr-namespace:CreateNewAssignment">
 
     <Grid x:Name="LayoutRoot" Background="White">
         <Grid.RowDefinitions>
@@ -13,12 +12,12 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        
+
         <!--First Row-->
         <sdk:Label Grid.Row="0" Grid.ColumnSpan="7" Content="{Binding Mode=OneWay, Path=MonthYearString}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalAlignment="Center" Background="#FF8888FF"/>
 
         <!--Second Row-->
-        
+
         <Grid Grid.Row="1" x:Name="MonthLayout">
             <Grid.RowDefinitions>
                 <RowDefinition/>
