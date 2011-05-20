@@ -16,7 +16,7 @@ namespace CreateNewAssignment
     {
         public AssignmentActivitiesCreaterView()
         {
-            InitializeComponent(); 
+            InitializeComponent();
         }
     }
 }

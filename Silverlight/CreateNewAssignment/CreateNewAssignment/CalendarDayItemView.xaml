@@ -19,6 +19,7 @@
         <Rectangle Grid.Row="1" Grid.Column="0" x:Name="LeftSideRectangle"  Fill="{Binding Mode=OneWay, Path=LeftSideColor}" HorizontalAlignment="Stretch" Height="10" VerticalAlignment="Center"/>
         <Rectangle Grid.Row="1" Grid.Column="1" x:Name="RightSideRectangle" Fill="{Binding Mode=OneWay, Path=RightSideColor}" HorizontalAlignment="Stretch" Height="10" VerticalAlignment="Center"/>
 
-        <ContentPresenter Grid.ColumnSpan="2" Grid.Row="1"  x:Name="AssignmentActivityIconHolder" VerticalAlignment="Center" HorizontalAlignment="Center" />
+
+ <ContentPresenter Grid.ColumnSpan="2" Grid.Row="1"  x:Name="AssignmentActivityIconHolder" VerticalAlignment="Center" HorizontalAlignment="Center" />
     </Grid>
 </UserControl>

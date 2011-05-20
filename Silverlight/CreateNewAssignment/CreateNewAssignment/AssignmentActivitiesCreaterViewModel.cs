@@ -13,6 +13,7 @@ using System.Linq;
 using System.Collections.Generic;
 
 using CreateNewAssignment.AssignmentActivities;
+using System.Windows.Media.Imaging;
 
 namespace CreateNewAssignment
 {
@@ -347,8 +348,6 @@ namespace CreateNewAssignment
         public void UpdateActivityDisplay()
         {
             newTest();
-
-
             //generateTimeLine();
             ClearColorOfDays();
 
@@ -427,6 +426,8 @@ namespace CreateNewAssignment
             UpdateCalanders();
         }
 
+
+        
         void newTest()
         {
             //collecting rectangles from Timeline and putting them in rects list
@@ -434,30 +435,38 @@ namespace CreateNewAssignment
             List<Rectangle> rects = b.ToList();
 
 
+
+
             //getting labels from stackpanels
             var L1 = from c in thisView.TimelineDates1.Children where c is Label select c as Label;
             var L2 = from c in thisView.TimelineDates2.Children where c is Label select c as Label;
 
+
+            //removing all images
+            for (int i = thisView.Test.Children.Count-1; i >= 0; i--)
+            {
+                thisView.Test.Children.RemoveAt(i);
+            }
+
             List<Label> Labels1 = L1.ToList();
             List<Label> Labels2 = L2.ToList();
             //clearing out labels
+            
+            
             for (int i = 0; i < Labels1.Count; i++)
             {
                 Labels1[i].Width = 0;
                 Labels1[i].Content = 0;
                 Labels1[i].Margin = new Thickness(0, 0, 0, 0);
+                Labels1[i].HorizontalContentAlignment = HorizontalAlignment.Left;
             }
             for (int i = 0; i < Labels2.Count; i++)
             {
                 Labels2[i].Width = 0;
                 Labels2[i].Content = 0;
                 Labels2[i].Margin = new Thickness(0, 0, 0, 0);
+                Labels2[i].HorizontalContentAlignment = HorizontalAlignment.Left;
             }
-
-
-
-
-
 
             double TotalTime = TotalEventTime();
             bool endsWithStop = CalenderEndsWithStop();
@@ -479,11 +488,12 @@ namespace CreateNewAssignment
                 Rectangle tempRect = new Rectangle();
                 tempRect.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
                 tempRect.Height = 20;
-             
 
                 switch (assignmentActivites[i].ActivityType) //assigning color
                 {
-                    case Activities.Submission: tempRect.Fill = new SolidColorBrush(Colors.Green);
+                    case Activities.Submission: 
+                        tempRect.Fill = new SolidColorBrush(Colors.Green);
+                       
                         break;
                     case Activities.PeerReview: tempRect.Fill = new SolidColorBrush(Colors.Blue);
                         break;
@@ -497,11 +507,11 @@ namespace CreateNewAssignment
                         break;
                 }
 
+
                 //setting width
                 if (assignmentActivites.Count == 1)
                     tempRect.Width = thisView.LayoutRoot.MinWidth;
-                else if (endsWithStop == false && i == (assignmentActivites.Count - 1))//last activity and is not a stop
-                    tempRect.Width = 10;
+                else if (i == (assignmentActivites.Count - 1)) tempRect.Width = 10;
                 else
                     tempRect.Width = ((TimeUntilNextEventInDays(assignmentActivites[i])) / TotalTime) * (thisView.LayoutRoot.MinWidth - 10);
 
@@ -518,88 +528,85 @@ namespace CreateNewAssignment
                     rects[i].Height = tempRect.Height;
                     rects[i].HorizontalAlignment = tempRect.HorizontalAlignment;
                 }
-                
-                
+
+                int roomForLastLabel = 80; //amount of pixels given for the last date
                 //setting up labels for timeline
                 if (Labels1.Count() - 1 < i)//need a new label added to stackpanel
                 {
+
+                   
+                    //displaying time in above stackpanel
                     Label newL = new Label();
                     newL.Width = tempRect.Width;
-                    newL.Content = assignmentActivites[i].StartDateTime.Month.ToString() + "/" + assignmentActivites[i].StartDateTime.Day.ToString();
+                    newL.Content = assignmentActivites[i].StartDateTime.Month.ToString() + "/" + assignmentActivites[i].StartDateTime.Day.ToString() + "\n11:59PM";
                     thisView.TimelineDates1.Children.Add(newL);
+                    Labels1.Add(newL);
+
+                    //Displaying type in below stackpanel
+                    Label newL2 = new Label();
+                    newL2.Width = tempRect.Width;
+                    newL2.Content = assignmentActivites[i].ActivityType.ToString();
+                    thisView.TimelineDates2.Children.Add(newL2);
+                    Labels2.Add(newL2);
+
+                    if (i == (assignmentActivites.Count - 1) && i>0)//final activity && ends with stop
+                    {
+                        Labels1[i - 1].Width -= roomForLastLabel - 10;
+                        Labels1[i].Width = roomForLastLabel;
+                        Labels1[i].HorizontalContentAlignment = HorizontalAlignment.Right;
+                        Labels2[i - 1].Width -= roomForLastLabel - 10;
+                        Labels2[i].Width = roomForLastLabel;
+                        Labels2[i].HorizontalContentAlignment = HorizontalAlignment.Right;
+                    }
+
                 }
-                else //use old
+                else //adjust Labels from what was already in the stackpanel (Rather than create new)
                 {
-                    Labels1[i].Content = assignmentActivites[i].StartDateTime.Month.ToString() + "/" + assignmentActivites[i].StartDateTime.Day.ToString();
-                    //Labels1[i].Content = assignmentActivites[i].StartDateTime.ToShortDateString();
+                    Labels1[i].Content = assignmentActivites[i].StartDateTime.Month.ToString() + "/" + assignmentActivites[i].StartDateTime.Day.ToString() + "\n11:59PM";
                     Labels1[i].Width = tempRect.Width;
-                }
-                
-                /*
-                if (i % 2 == 0)
-                {
-                    if (Labels1.Count() - 1 < (i / 2))//need a new label added to stackpanel
-                    {
-                        Label newL = new Label();
-                        newL.Width = tempRect.Width;
-                        if (i> 0)
-                            newL.Margin = new Thickness(rects[i - 1].Width, 0, 0, 0);
-                        newL.Content = assignmentActivites[i].StartDateTime.ToShortDateString();
-                        thisView.TimelineDates1.Children.Add(newL);
-                    }
-                    else //use old
-                    {
-                        Labels1[i / 2].Content = assignmentActivites[i].StartDateTime.ToShortDateString();
-                        Labels1[i / 2].Width = tempRect.Width;
-                    }
-                }
-                else
-                {
-                    if (Labels2.Count() - 1 < (i / 2))//need a new label added to stackpanel
-                    {
-                        Label newL = new Label();
-                        newL.Width = tempRect.Width;
-                        if (i  > 0)
-                            newL.Margin = new Thickness(rects[i-1].Width, 0, 0, 0);
-                        newL.Content = assignmentActivites[i].StartDateTime.ToShortDateString();
-                        thisView.TimelineDates2.Children.Add(newL);
-                    }
-                    else //use old
-                    {
-                        Labels2[i / 2].Content = assignmentActivites[i].StartDateTime.ToShortDateString();
-                        Labels2[i / 2].Width = tempRect.Width;
-                    }
-                }
-                */
 
-                /*old non-working
-                if (i % 2 == 0) //even
-                {
-                    if ((Labels2.Count()-1) < (i / 2)) //need another label
+                    Labels2[i].Content = assignmentActivites[i].ActivityType.ToString();
+                    Labels2[i].Width = tempRect.Width;
+
+                    //if (i == (assignmentActivites.Count - 1) && endsWithStop)//final activity && ends with stop
+                    if (i == (assignmentActivites.Count - 1) && i>0)//final activity && ends with stop
                     {
-                        //string showme = "Even: " + assignmentActivites[i].StartDateTime.ToString();
-                        //MessageBox.Show("Event box");
-                        
-                        Label newL = new Label();
-                        newL.Width = tempRect.Width;
-                        newL.Content = assignmentActivites[i].StartDateTime.ToShortDateString();
-                        thisView.TimelineDates2.Children.Add(newL);
-                         
-                    }
-                    else //can use current label
-                    {
-                        Labels2[i/2].Content = assignmentActivites[i].StartDateTime.ToString();
+                        Labels1[i - 1].Width -= roomForLastLabel - 10;
+                        Labels1[i].Width = roomForLastLabel;
+                        Labels1[i].HorizontalContentAlignment = HorizontalAlignment.Right;
+                        Labels2[i - 1].Width -= roomForLastLabel - 10;
+                        Labels2[i].Width = roomForLastLabel;
+                        Labels2[i].HorizontalContentAlignment = HorizontalAlignment.Right;
                     }
                 }
 
-                if(i%2==0)//even
-                {
-                }
-                else
-                {    
-                }*/
-                
 
+                //putting in images
+                Image pic = new Image();
+                switch (assignmentActivites[i].ActivityType)
+                {
+                    case Activities.Submission:
+                        pic.Source = new BitmapImage(new Uri("Icons/submit-01.png", UriKind.RelativeOrAbsolute));
+                        break;
+                    case Activities.PeerReview:
+                        pic.Source = new BitmapImage(new Uri("Icons/peer-01.png", UriKind.RelativeOrAbsolute));
+                        break;
+                    case Activities.IssueVoting:
+                        pic.Source = new BitmapImage(new Uri("Icons/voting-01.png", UriKind.RelativeOrAbsolute));
+                        break;
+                    case Activities.AuthorRebuttal:
+                        pic.Source = new BitmapImage(new Uri("Icons/rebuttal-01.png", UriKind.RelativeOrAbsolute));
+                        break;
+                    case Activities.Stop:
+                        pic.Source = new BitmapImage(new Uri("Icons/stop.png", UriKind.RelativeOrAbsolute));
+                        break;
+                    default: 
+                        break;
+                }
+                if(i>=1)
+                    pic.Margin = new Thickness(rects[i - 1].Width - 20, 0, 0, 0);
+                //pic.Width = rects[i].Width;
+                thisView.Test.Children.Add(pic);
             }
         }
 
@@ -734,6 +741,7 @@ namespace CreateNewAssignment
 
             temp = assignmentActivites.GetNextItem(temp);
 
+            if (temp == null) return 0;//no events
             long time1 = temp.StartDateTime.Ticks;
             long time2 = temp.StartDateTime.Ticks;
             long dTimeInDays = temp.StartDateTime.Ticks; 
