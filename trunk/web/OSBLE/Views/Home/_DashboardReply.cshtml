@@ -1,0 +1,33 @@
+﻿@using OSBLE.Models;
+@{
+    DashboardReply dr = ViewBag.dr;
+    DashboardPost dp = ViewBag.dp;
+    bool canDelete = ViewBag.canDelete;
+    bool show = ViewBag.show;
+}
+<div class="dp_post" id="dr_post_@(dr.ID)">
+                        <div class="dp_post_header">
+                            @if (show || (dr.UserProfileID == ViewBag.CurrentUser.ID))
+                            {
+                                @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dp.CourseID, userprofile = dr.UserProfileID }));
+                            }
+                            else
+                            {
+                                @Helpers.DefaultProfilePicture();
+                            }
+                            @Helpers.DisplayNameForDashboard(dr.UserProfile, dp.Course, ViewBag.ActiveCourse, ViewBag.AllCoursesUsers, show)
+                            <span class="dp_tools">
+                            @if (show && (dr.UserProfileID != ViewBag.CurrentUser.ID))
+                            {
+                                <a href="@Url.Action("Create", "Mail", new { recipientID = dr.UserProfileID })">@Helpers.MailButton()</a>
+                            }
+                            @if (canDelete || (dr.UserProfileID == ViewBag.CurrentUser.ID))
+                            {
+                                <a href="@Url.Action("DeleteReply", new { ID = dr.ID })" onclick="return confirm('Delete this reply post?');">@Helpers.DeleteButton()</a>
+                            }
+                            </span>
+                            <br />
+                            <span class="dp_posted">@Helpers.DisplayDate(dr.Posted)</span>
+                        </div>
+                        <div class="dp_content">@Helpers.Linkify(dr.Content)</div>
+                    </div>
