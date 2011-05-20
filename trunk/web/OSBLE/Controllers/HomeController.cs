@@ -127,8 +127,20 @@ namespace OSBLE.Controllers
                 }
             }
 
-            // TODO: Add Pagination
-            ViewBag.DashboardPosts = db.DashboardPosts.Where(d => ViewedCourses.Contains(d.CourseID)).OrderByDescending(d => d.Posted).ToList();
+            // Pagination
+            int startPost = 0;
+            int postsPerPage = 10;
+            if (Request.Params["startPost"] != null)
+            {
+                startPost = Convert.ToInt32(Request.Params["startPost"]);
+            }
+
+            IQueryable<DashboardPost> dashboardPosts = db.DashboardPosts.Where(d => ViewedCourses.Contains(d.CourseID)).OrderByDescending(d => d.Posted);
+            ViewBag.DashboardPostCount = dashboardPosts.Count();
+            ViewBag.DashboardPosts = dashboardPosts.Skip(startPost).Take(postsPerPage).ToList();
+            ViewBag.StartPost = startPost;
+            
+            ViewBag.PostsPerPage = postsPerPage;
 
             // Serve list of course roles to view so it can identify instructors/TAs as well as find positions in classes
             Hashtable AllCoursesUsers = new Hashtable();

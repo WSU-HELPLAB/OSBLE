@@ -145,3 +145,41 @@
         </div>
     }
 </div>
+
+
+@* TODO: Make this into a general purpose pagination helper? *@
+@if (ViewBag.StartPost > 0)
+{
+    int newStart = Math.Max(ViewBag.StartPost - ViewBag.PostsPerPage, 0);
+
+    @Html.ActionLink("<< Newest Posts", "Index", new { startPost = 0 })
+
+    if (newStart != 0)
+    {
+        <text>&nbsp;&nbsp;</text>
+        @Html.ActionLink("< Newer Posts", "Index", new { startPost = Math.Max(ViewBag.StartPost - ViewBag.PostsPerPage, 0) })
+    }
+}
+
+@if ((ViewBag.StartPost + ViewBag.PostsPerPage) < ViewBag.DashboardPostCount)
+{
+    int last;
+    if(ViewBag.DashboardPostCount % ViewBag.PostsPerPage == 0) {
+        last = ViewBag.DashboardPostCount - ViewBag.PostsPerPage;   
+    } else {
+        last = ViewBag.DashboardPostCount - ViewBag.DashboardPostCount % ViewBag.PostsPerPage;    
+    }
+    
+    int newEnd = Math.Max(last, ViewBag.StartPost + ViewBag.PostsPerPage);
+
+    int older = ViewBag.StartPost + ViewBag.PostsPerPage;
+    
+    if (older < newEnd)
+    {
+<text>&nbsp;&nbsp;</text>
+@Html.ActionLink("Older Posts >", "Index", new { startPost = older })
+    }
+<text>&nbsp;&nbsp;</text>
+@Html.ActionLink("Oldest Posts >>", "Index", new { startPost = newEnd })
+
+}
