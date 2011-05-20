@@ -10,6 +10,7 @@
         var lastFocusedCell = null;
         var showDropDown = false;
         var changedShow = false;
+        var currentCol = 0;
 
         $(document).click(function () {
             //clearLastCellFocus();
@@ -21,6 +22,7 @@
             }
             else {
                 hideDropDown();
+                showDropDown = false;
             }
         });
 
@@ -130,6 +132,7 @@
 
         function ShowHide(buttonClick) {
             var container = buttonClick.id;
+            currentCol = container;
             var y = $("#" + container).position().left;
             y += 3;
             $("#slidingDiv").css("left", y + "px");
@@ -149,11 +152,102 @@
             $("#slidingDiv").animate({ "height": "hide" }, { duration: 50 });
         }
 
+        function insertRight(button) {
+            colIndex = parseInt(currentCol);
+            colIndex += 1;
+
+            //shifting table ID's to the right
+            $("#grades tr td").each(function () {
+                var cellId = $(this).attr("id").split("-");
+                if (cellId[1] >= colIndex) {
+                    cellId[1] = parseInt(cellId[1]);
+                    cellId[1] += 1;
+                }
+                $(this).attr("id", "col-" + cellId[1]);
+                //alert($(this).attr("id"));
+                //alert(cellId[1]);
+            });
+
+            //Shifting table headers to the right and Renaming header names
+            $("#grades tr th").each(function () {
+                var cellId = $(this).attr("id").split("-");
+                var cellText = $(this).text().split(" ");
+                if (cellId[1] >= colIndex) {
+                    cellId[1] = parseInt(cellId[1]);
+                    cellId[1] += 1;
+                    cellText[1] = parseInt(cellText[1]);
+                    cellText[1] += 1;
+                }
+                $(this).attr("id", "th-" + cellId[1]);
+                $(this).attr("value", "Column " + cellText[1]);
+                //alert($(this).attr("id"));
+                //alert(cellId[1]);
+            });
+
+            //Setting the new ID's for the new columns table
+            $(document).ready(function () {
+                $("#grades").find("tr").each(function () {
+                    $(this).find("td").eq(currentCol).after('<td id="col-' + colIndex + '" onclick="cellGainsFocus(this)">0</td>');
+                });
+            });
+
+
+            /*$("#grades tr td").each(function () {
+                var cellId = $(this).attr("id")
+                //alert(cellId);
+            });*/           
+
+            //Setting the new ID's for the new columns header
+            $(document).ready(function () {
+                $("#grades").find("tr").each(function () {
+                    $(this).find("th").eq(currentCol).after('<th>Column ' + colIndex + '<div id="cntnr" align="right"><button class="dropdown" id=' + colIndex + 'onclick="ShowHide(this);"></button></div></th>');
+                });
+            });
+        }
+
+        function insertLeft(button) {
+            $(document).ready(function () {
+                $("#grades").find("tr").each(function () {
+                    $(this).find("td").eq(currentCol).before("<td onclick='cellGainsFocus(this)'>0</td>");
+                });
+            });
+
+            $(document).ready(function () {
+                $("#grades").find("tr").each(function () {
+                    $(this).find("th").eq(currentCol).before("<th>Column<div id='cntnr' align='right'><button class='dropdown' id='col' onblur='minMenu(this);' onclick='ShowHide(this);'></button></div></th>");
+                });
+            });
+        }
+
+        function clearCol(){
+            var rows = $("#grades tr");
+            currentCol = parseInt(currentCol);
+            currentCol+=1;
+            rows.children("td:nth-child(" + currentCol + ")").each(function () {
+                //each time we add the cell to the total
+                $(this).html(null);
+            });
+            currentCol -= 1;
+        }
+
+        function deleteCol() {
+            currentCol = parseInt(currentCol);
+            currentCol += 1;
+
+            $("#grades").each(function () {
+                $("tr td:nth-child(" + currentCol + ")").remove()
+            });
+            currentCol -= 1;
+            $("#th-" + currentCol).remove();
+            $("#" + currentCol).remove();
+
+        }
+
     </script>   
     <style type="text/css">
         .cellInput
         {
-            width:100%;
+            width:auto;
             border:none;
         }
         .gradebook
@@ -166,13 +260,13 @@
         .gradebook td
         {
             padding:3px;
-            width:100px;
+            width:auto;
             height:25px;
         }
         
         .gradebook td, .gradebook th, .gradebook tr
         {
-            width:20%;
+            width:auto;
             border:1px solid gray;
         }
         
@@ -203,17 +297,17 @@
         <tr>    
         @for (int i = 0; i < 5; i++)
         {            
-            <th>Column @i<div id="cntnr" align="right"><button class="dropdown" id="col-@i" onblur="minMenu(this);" onclick="ShowHide(this);"></button></div></th>
+            <th id="th-@i">Column @i<div id="cntnr" align="right"><button class="dropdown" id="@i" onblur="minMenu(this);" onclick="ShowHide(this);"></button></div></th>
         }
 
         </tr>
 
         @for (int i = 0; i < 10; i++)
         {
-            <tr>
+            <tr id="row-@i">
                 @for (int j = 0; j < 5; j++)
                 {
-                    <td onclick="cellGainsFocus(this)">@(i * j)</td>
+                    <td id="col-@j" onclick="cellGainsFocus(this)">@(i * j)</td>
                 }
             </tr>
         }
@@ -221,23 +315,12 @@
     
     <div class="slidingDiv"; id="slidingDiv" style="display: none; position:absolute; ">
 	    <table class="menu">
-		    <tr><td><a href="#">Insert 1 left</a></td></tr>
-		    <tr><td><a href="#">Insert 1 right</a></td></tr>
-		    <tr><td><a href="#">Delete column</a></td></tr>
-		    <tr><td><a href="#">Clear column</a></td></tr>
+		    <tr><td><a href="#" onclick="insertLeft(this);">Insert 1 left</a></td></tr>
+		    <tr><td><a href="#" onclick="insertRight(this);">Insert 1 right</a></td></tr>
+		    <tr><td><a href="#" onclick="deleteCol();">Delete column</a></td></tr>
+		    <tr><td><a href="#" onclick="clearCol();">Clear column</a></td></tr>
 	    </table>
     </div>
-
-    <script type="text/javascript">
-        /*function ShowHide(buttonClick) {
-            var container = buttonClick.id;
-            var y = $("#"+container).position().left;
-            y += 3;
-            $("#slidingDiv").css("left", y + "px");
-            $("#slidingDiv").animate({ "height": "show" }, { duration: 50 });
-        }*/
-       
-	</script>
 
     <input value="Calculate Rows" type="button" onclick="calculateRows()" />
     <input value="Calculate Columns" type="button" onclick="calculateCols()" />
