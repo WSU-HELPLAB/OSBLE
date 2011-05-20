@@ -17,14 +17,14 @@ jQuery.fn.jqcollapse = function(o) {
 	
   	 $('#'+e+' li > a').each(function(i) {
 		
-		alert($(this).attr("href"));
+		//alert($(this).attr("href"));
 		
 		// assigning the file name string to mainfile
 		var mainfile = $(this).attr("href");
 		// parsing for the file type
 		var ext = mainfile.match(/(.*)\.([^(\. | \/)]+)(\/?)/)[2].toLowerCase();
 		
-		alert(ext);
+		//alert(ext);
 		
 		//(/(.*)\.([^(\. | \/]+)(\/)$/)
 		

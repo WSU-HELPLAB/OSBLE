@@ -23,14 +23,6 @@ namespace OSBLE.Controllers
         {
             ViewBag.CurrentTab = "Dashboard";
 
-            // Validate dashboard display mode setting.
-            if ((context.Session["DashboardSingleCourseMode"] == null) || (context.Session["DashboardSingleCourseMode"].GetType() != typeof(Boolean)))
-            {
-                context.Session["DashboardSingleCourseMode"] = false;
-            }
-
-            bool DashboardSingleCourseMode = ViewBag.DashboardSingleCourseMode = context.Session["DashboardSingleCourseMode"];
-
             #region Activity Feed Posting
 
             // Feed Post attempt

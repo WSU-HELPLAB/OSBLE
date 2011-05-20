@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using System.Web.SessionState;
 using OSBLE.Models;
 using System.Web.Security;
+using System;
 
 namespace OSBLE.Controllers
 {
@@ -28,6 +29,8 @@ namespace OSBLE.Controllers
 
         protected HttpContext context = System.Web.HttpContext.Current;
         protected List<CoursesUsers> currentCourses = new List<CoursesUsers>();
+
+        protected bool DashboardSingleCourseMode;
 
         /// <summary>
         /// Defines a menu item tab
@@ -151,6 +154,15 @@ namespace OSBLE.Controllers
                 }
 
                 ViewBag.CurrentCourses = currentCourses;
+
+
+                // Validate dashboard display mode setting.
+                if ((context.Session["DashboardSingleCourseMode"] == null) || (context.Session["DashboardSingleCourseMode"].GetType() != typeof(Boolean)))
+                {
+                    context.Session["DashboardSingleCourseMode"] = false;
+                }
+
+                DashboardSingleCourseMode = ViewBag.DashboardSingleCourseMode = context.Session["DashboardSingleCourseMode"];
 
                 #endregion User And Course Setup
             }
