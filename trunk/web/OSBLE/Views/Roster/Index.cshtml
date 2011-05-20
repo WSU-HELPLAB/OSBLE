@@ -6,9 +6,31 @@
 <h2>
     Roster</h2>
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Add By ID", "Create")&nbsp;&nbsp;
     @Html.ActionLink("Import Roster", "ImportRoster")
 </p>
+<p>
+    Quick Filter By Name: <input type="text" id="roster_find" />
+</p>
+@* Hides anything that doesn't match search filter *@
+
+<script type="text/javascript">
+    if ("Cat".match(".*as")) alert('hi');
+    $('#roster_find').keyup(function () {
+        // Get search string and remove all non-alphanumeric characters (or dashes)
+        var search = $('#roster_find').val().toLowerCase().replace(/[^a-z0-9\-\ ]*/gi, "");
+
+        $('.roster_name').each(function () {
+            if ($(this).html().toLowerCase().match(search)) {
+                $(this).parent().show('highlight');
+            } else {
+                $(this).parent().hide('highlight');
+            }
+        });
+
+    });
+</script>
+
 @foreach (RosterController.UsersBySection usersBySection in ViewBag.UsersBySections)
 { 
   <h3>@Helpers.DisplaySection(usersBySection.SectionNumber) </h3>
@@ -38,7 +60,7 @@
                         }
                         
                         @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture",new {userProfile = user.ID}))
-                        @Helpers.DisplayFullNameOrPending(user)
+                        <span class="roster_name">@Helpers.DisplayFullNameOrPending(user)</span>
                         
                         </li>
                     }

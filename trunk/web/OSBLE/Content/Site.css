@@ -199,6 +199,7 @@ ul.user_list
 {
     padding-left: 0;
     margin-left: 0;
+    width: 230px;
 }
 .user_list li
 {
