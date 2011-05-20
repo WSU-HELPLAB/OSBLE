@@ -3,7 +3,6 @@
 @using System.Collections
 @using System.Web.Mvc
 
-
 @helper DisplaySection(string sectionNum)
     {
         if (sectionNum != "0")
@@ -15,6 +14,7 @@
     <text>All Sections</text>
         }
 }
+
 @* Only use this helper in a place that requires an active course (uses [RequireActiveCourse] attribute) *@
 @helper DisplayName(UserProfile user, CoursesUsers activeCourse, bool show = false)
     {
@@ -27,10 +27,11 @@
     <text>Anonymous</text>
         }
 }
+
 @helper DisplayNameForDashboard(UserProfile user, Course course, CoursesUsers activeCourse, Hashtable allCoursesUsers, bool show = false)
     {
-        @*
-        I need to simplify this. A lot.
+@*
+        TODO: I need to simplify this. A lot.
         Right now this will anonymize a user by their order in the students list.
         How anonymous this is depends. Some lists may be entered alphabetically 
         which wouldn't seen very anonymous. On the other hand, observers are supposed
@@ -67,11 +68,11 @@
     <text>@user.FirstName @user.LastName</text>
             if (instructor)
             {
-                <text> <small><em>(Instructor)</em></small></text>
+    <text> <small><em>(Instructor)</em></small></text>
             }
             else if (ta)
             {
-                <text> <small><em>(TA)</em></small></text>
+    <text> <small><em>(TA)</em></small></text>
             }
         }
         else
@@ -79,22 +80,30 @@
     <text>Anonymous @anonymous</text>
         }
 }
+
 @helper DisplayDate(DateTime dt)
     {
     @dt.ToLongDateString()<text> </text>@dt.ToShortTimeString()
 }
+
 @helper MailButton()
     {<img src="../../Content/images/mail_up.png" />}
+
 @helper AddButton()
     {<img src="../../Content/images/add_up.png" alt="Add Button" />}
+
 @helper EditButton()
     {<img src="../../Content/images/edit_up.png" alt="Edit Button" />}
+
 @helper DeleteButton()
     {<img src="../../Content/images/delete_up.png" alt="Delete Button" />}
+
 @helper DeleteSubmit()
     {<input type="image" src="../../Content/images/delete_up.png" alt="Delete Button" />}
+
 @helper DisplayLastFourID(string Identification)
     { <text>(@Identification.Substring(Math.Max(Identification.Length - 4, 0), Math.Min(Identification.Length, 4)))</text>}
+
 @helper DisplayFullNameOrPending(UserProfile user)
     {
         if (user.UserName != null)
@@ -106,14 +115,17 @@
     <text><em>Pending @Helpers.DisplayLastFourID(user.Identification) </em></text>
         }
 }
+
 @helper ProfilePicture(string url)
     {
     <img src="@url" alt="Profile Picture" class="profile_picture" />
 }
+
 @helper SmallProfilePicture(string url)
     {
     <img src="@url" alt="Profile Picture" class="small_profile_picture" />
 }
+
 @helper Linkify(string text)
     {
         List<string> links = LinkifyHelper(text);
@@ -131,19 +143,21 @@
             }
         }
 }
+
 @helper DefaultProfilePicture()
     {
     <img src="/Content/images/default.jpg" alt="Profile Picture" class="profile_picture" />
 }
+
 @helper nl2br(string content)
     {
         string[] s = content.Split('\n');
         for (int i = 0; i < s.Length; i++)
         {
-            @s[i]
+    @s[i]
             if (i != s.Length - 1)
             {
-                <text><br /></text>
+    <text><br /></text>
             }
         }
 }
