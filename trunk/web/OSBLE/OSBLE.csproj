@@ -116,6 +116,65 @@
     <Content Include="Content\images\arrow_right.png" />
     <Content Include="Content\images\delete_up.png" />
     <Content Include="Content\images\edit_up.png" />
+    <Content Include="Content\images\fileextimages\aac.png" />
+    <Content Include="Content\images\fileextimages\ai.png" />
+    <Content Include="Content\images\fileextimages\aiff.png" />
+    <Content Include="Content\images\fileextimages\avi.png" />
+    <Content Include="Content\images\fileextimages\bmp.png" />
+    <Content Include="Content\images\fileextimages\c.png" />
+    <Content Include="Content\images\fileextimages\cpp.png" />
+    <Content Include="Content\images\fileextimages\css.png" />
+    <Content Include="Content\images\fileextimages\dat.png" />
+    <Content Include="Content\images\fileextimages\dmg.png" />
+    <Content Include="Content\images\fileextimages\doc.png" />
+    <Content Include="Content\images\fileextimages\dotx.png" />
+    <Content Include="Content\images\fileextimages\dwg.png" />
+    <Content Include="Content\images\fileextimages\dxf.png" />
+    <Content Include="Content\images\fileextimages\eps.png" />
+    <Content Include="Content\images\fileextimages\exe.png" />
+    <Content Include="Content\images\fileextimages\flv.png" />
+    <Content Include="Content\images\fileextimages\gif.png" />
+    <Content Include="Content\images\fileextimages\h.png" />
+    <Content Include="Content\images\fileextimages\hpp.png" />
+    <Content Include="Content\images\fileextimages\html.png" />
+    <Content Include="Content\images\fileextimages\ics.png" />
+    <Content Include="Content\images\fileextimages\iso.png" />
+    <Content Include="Content\images\fileextimages\java.png" />
+    <Content Include="Content\images\fileextimages\jpg.png" />
+    <Content Include="Content\images\fileextimages\key.png" />
+    <Content Include="Content\images\fileextimages\mid.png" />
+    <Content Include="Content\images\fileextimages\mp3.png" />
+    <Content Include="Content\images\fileextimages\mp4.png" />
+    <Content Include="Content\images\fileextimages\mpg.png" />
+    <Content Include="Content\images\fileextimages\odf.png" />
+    <Content Include="Content\images\fileextimages\ods.png" />
+    <Content Include="Content\images\fileextimages\odt.png" />
+    <Content Include="Content\images\fileextimages\otp.png" />
+    <Content Include="Content\images\fileextimages\ots.png" />
+    <Content Include="Content\images\fileextimages\ott.png" />
+    <Content Include="Content\images\fileextimages\pdf.png" />
+    <Content Include="Content\images\fileextimages\php.png" />
+    <Content Include="Content\images\fileextimages\png.png" />
+    <Content Include="Content\images\fileextimages\ppt.png" />
+    <Content Include="Content\images\fileextimages\psd.png" />
+    <Content Include="Content\images\fileextimages\py.png" />
+    <Content Include="Content\images\fileextimages\qt.png" />
+    <Content Include="Content\images\fileextimages\rar.png" />
+    <Content Include="Content\images\fileextimages\rb.png" />
+    <Content Include="Content\images\fileextimages\rtf.png" />
+    <Content Include="Content\images\fileextimages\sql.png" />
+    <Content Include="Content\images\fileextimages\tga.png" />
+    <Content Include="Content\images\fileextimages\tgz.png" />
+    <Content Include="Content\images\fileextimages\tiff.png" />
+    <Content Include="Content\images\fileextimages\txt.png" />
+    <Content Include="Content\images\fileextimages\wav.png" />
+    <Content Include="Content\images\fileextimages\xls.png" />
+    <Content Include="Content\images\fileextimages\xlsx.png" />
+    <Content Include="Content\images\fileextimages\xml.png" />
+    <Content Include="Content\images\fileextimages\yml.png" />
+    <Content Include="Content\images\fileextimages\zip.png" />
+    <Content Include="Content\images\fileextimages\_blank.png" />
+    <Content Include="Content\images\fileextimages\_page.png" />
     <Content Include="Content\images\logo.png" />
     <Content Include="Content\images\logoff.png" />
     <Content Include="Content\images\logon_bg.jpg" />
@@ -161,6 +220,8 @@
     <Content Include="Scripts\jquery-1.6.1.min.js" />
     <Content Include="Scripts\jquery-ui-1.8.11.js" />
     <Content Include="Scripts\jquery-ui-1.8.11.min.js" />
+    <Content Include="Scripts\jquery.collapse.js" />
+    <Content Include="Scripts\jquery.easing.js" />
     <Content Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
@@ -360,6 +421,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Home\_AjaxEmpty.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Content\images\fileextimages\.DS_Store" />
+    <None Include="Content\images\fileextimages\Thumbs.db" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
