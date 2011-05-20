@@ -91,6 +91,8 @@
     {<img src="../../Content/images/edit_up.png" alt="Edit Button" />}
 @helper DeleteButton()
     {<img src="../../Content/images/delete_up.png" alt="Delete Button" />}
+@helper DeleteSubmit()
+    {<input type="image" src="../../Content/images/delete_up.png" alt="Delete Button" />}
 @helper DisplayLastFourID(string Identification)
     { <text>(@Identification.Substring(Math.Max(Identification.Length - 4, 0), Math.Min(Identification.Length, 4)))</text>}
 @helper DisplayFullNameOrPending(UserProfile user)
@@ -170,6 +172,7 @@
 
         return textSplit;
     }
+    
 
 #endregion
     }

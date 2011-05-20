@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using OSBLE.Attributes;
 using OSBLE.Models;
 using System.Collections;
+using System.Net;
 
 namespace OSBLE.Controllers
 {
@@ -227,10 +228,12 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// Removes a Dashboard Post
+        /// Removes a Dashboard Post, AJAX-style!
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        /// 
+        [HttpPost]
         public ActionResult DeletePost(int id)
         {
             DashboardPost dp = db.DashboardPosts.Find(id);
@@ -245,16 +248,25 @@ namespace OSBLE.Controllers
                     db.DashboardPosts.Remove(dp);
                     db.SaveChanges();
                 }
+                else
+                {
+                    Response.StatusCode = 403;
+                }
+            }
+            else
+            {
+                Response.StatusCode = 403;
             }
 
-            return RedirectToAction("Index");
+            return View("_AjaxEmpty");
         }
 
         /// <summary>
-        /// Removes a Reply
+        /// Removes a Reply, AJAX-style!
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [HttpPost]
         public ActionResult DeleteReply(int id)
         {
             DashboardReply dr = db.DashboardReplies.Find(id);
@@ -267,8 +279,16 @@ namespace OSBLE.Controllers
                     db.DashboardReplies.Remove(dr);
                     db.SaveChanges();
                 }
+                else
+                {
+                    Response.StatusCode = 403;
+                }
             }
-            return RedirectToAction("Index");
+            else
+            {
+                Response.StatusCode = 403;
+            }
+            return View("_AjaxEmpty");
         }
 
         [HttpGet, FileCache(Duration = 3600)]

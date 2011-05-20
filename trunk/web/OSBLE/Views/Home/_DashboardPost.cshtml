@@ -41,7 +41,15 @@
                 }
                 @if (canDelete || (dp.UserProfileID == ViewBag.CurrentUser.ID))
                 {
-                    <a href="@Url.Action("DeletePost", new { ID = dp.ID })" onclick="return confirm('Delete this post and all its replies?');">@Helpers.DeleteButton()</a>
+                    <form action="/Home/DeletePost"
+                        style="display: inline;"
+                        data-ajax="true"
+                        data-ajax-success="$('#dp_post_@(dp.ID)').hide('highlight')"
+                        data-ajax-confirm="Sure you want to delete this post and all its replies?"
+                        method="post">
+                        <input type="hidden" name="ID" value="@dp.ID" />
+                        @Helpers.DeleteSubmit()
+                    </form>
                 }
                 </span>
                 <br />
