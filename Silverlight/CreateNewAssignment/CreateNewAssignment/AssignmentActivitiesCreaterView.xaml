@@ -10,9 +10,16 @@
 
     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
         <Canvas x:Name="MouseLayer">
+            <!--Main Grid-->
             <Grid x:Name="LayoutRoot" Background="White" MinWidth="800">
                 <Grid.RowDefinitions>
+                    <!--This Row is for the Assignment Activities Button things-->
                     <RowDefinition Height="Auto"/>
+                    <!--This Row is for the calendar-->
+                    <RowDefinition Height="Auto"/>
+                    
+                    <RowDefinition/>
+                    <!--This Row is for the timeline-->
                     <RowDefinition Height="Auto"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
@@ -20,6 +27,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition MaxWidth="100" MinWidth="20"/>
+                    <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
@@ -47,8 +55,18 @@
                 </StackPanel>
                 <Button Grid.Row="1" Grid.Column="0" x:Name="LeftCalanderScrollButton" Content="&lt;" HorizontalAlignment="Left" />
                 <Button Grid.Row="1" Grid.Column="2" x:Name="RightCalanderScrollButton" Content="&gt;" HorizontalAlignment="Right" />
+               <!-- <Button Grid.Row="1" Content="Test" Grid.Column="1" x:Name="test" HorizontalAlignment="Center" /> -->
                 <toolkit:ListBoxDragDropTarget HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" Margin="0,0,0,-52" Grid.RowSpan="3" VerticalContentAlignment="Stretch" Width="100"/>
+
+                <StackPanel x:Name="EntireTimeline" Grid.Row="3" Grid.ColumnSpan="3" Orientation="Vertical">
+                    <StackPanel x:Name="TimelineDates1" Orientation="Horizontal"/>
+                    <StackPanel x:Name="Timeline"  Orientation="Horizontal"/>
+                    <StackPanel x:Name="TimelineDates2"  Orientation="Horizontal"/>
+                </StackPanel>
+                
+
             </Grid>
         </Canvas>
+        
     </ScrollViewer>
 </UserControl>

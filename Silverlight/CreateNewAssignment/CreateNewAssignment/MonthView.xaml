@@ -102,6 +102,5 @@
             <me:CalendarDayItemView Grid.Row="6" Grid.Column="6" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
             <Rectangle Grid.Row="6" Grid.ColumnSpan="7" Height="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Fill="LightSkyBlue"/>
         </Grid>
-        
     </Grid>
 </UserControl>

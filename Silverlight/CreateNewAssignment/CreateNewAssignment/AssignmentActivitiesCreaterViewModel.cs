@@ -46,6 +46,7 @@ namespace CreateNewAssignment
             thisView.MouseRightButtonDown += new MouseButtonEventHandler(thisView_MouseRightButtonDown);
             thisView.LeftCalanderScrollButton.Click += new RoutedEventHandler(LeftCalanderScrollButton_Click);
             thisView.RightCalanderScrollButton.Click += new RoutedEventHandler(RightCalanderScrollButton_Click);
+            //thisView.test.Click += new RoutedEventHandler(testBtn_click);
 
             thisView.SubmissionIcon.MouseLeftButtonDown += new MouseButtonEventHandler(AssignmentActivityIcon_MouseLeftButtonDown);
             thisView.PeerReviewIcon.MouseLeftButtonDown += new MouseButtonEventHandler(AssignmentActivityIcon_MouseLeftButtonDown);
@@ -292,6 +293,11 @@ namespace CreateNewAssignment
                 aaVM.MouseRightButtonDown += new MouseButtonEventHandler(AssignmentActivityViewModel_MouseRightButtonDown);
                 aaVM.RemoveRequested += new EventHandler(aaVM_RemoveRequested);
                 UpdateActivityDisplay();
+                /*
+                MessageBox.Show(aaVM.StartDateTime.ToString());
+                MessageBox.Show(aaVM.ActivityType.ToString());
+                */
+                
             }
             else
             {
@@ -340,6 +346,10 @@ namespace CreateNewAssignment
 
         public void UpdateActivityDisplay()
         {
+            newTest();
+
+
+            //generateTimeLine();
             ClearColorOfDays();
 
             
@@ -417,6 +427,348 @@ namespace CreateNewAssignment
             UpdateCalanders();
         }
 
+        void newTest()
+        {
+            //collecting rectangles from Timeline and putting them in rects list
+            var b = from c in thisView.Timeline.Children where c is Rectangle select c as Rectangle;
+            List<Rectangle> rects = b.ToList();
+
+
+            //getting labels from stackpanels
+            var L1 = from c in thisView.TimelineDates1.Children where c is Label select c as Label;
+            var L2 = from c in thisView.TimelineDates2.Children where c is Label select c as Label;
+
+            List<Label> Labels1 = L1.ToList();
+            List<Label> Labels2 = L2.ToList();
+            //clearing out labels
+            for (int i = 0; i < Labels1.Count; i++)
+            {
+                Labels1[i].Width = 0;
+                Labels1[i].Content = 0;
+                Labels1[i].Margin = new Thickness(0, 0, 0, 0);
+            }
+            for (int i = 0; i < Labels2.Count; i++)
+            {
+                Labels2[i].Width = 0;
+                Labels2[i].Content = 0;
+                Labels2[i].Margin = new Thickness(0, 0, 0, 0);
+            }
+
+
+
+
+
+
+            double TotalTime = TotalEventTime();
+            bool endsWithStop = CalenderEndsWithStop();
+
+            //if there was a delete that left more rectangles than activities, clear the rectangles
+            if (rects.Count > assignmentActivites.Count)
+            {
+                for (int i = 0; i < rects.Count; i++)
+                {
+                    rects[i].Width = 0;
+                    rects[i].Fill = new SolidColorBrush(Colors.Transparent);
+                    rects[i].Height = 0;
+                }
+            }
+
+            //setting attributes for each rectangle
+            for (int i = 0; i < assignmentActivites.Count; i++)
+            {
+                Rectangle tempRect = new Rectangle();
+                tempRect.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+                tempRect.Height = 20;
+             
+
+                switch (assignmentActivites[i].ActivityType) //assigning color
+                {
+                    case Activities.Submission: tempRect.Fill = new SolidColorBrush(Colors.Green);
+                        break;
+                    case Activities.PeerReview: tempRect.Fill = new SolidColorBrush(Colors.Blue);
+                        break;
+                    case Activities.IssueVoting: tempRect.Fill = new SolidColorBrush(Colors.Purple);
+                        break;
+                    case Activities.AuthorRebuttal: tempRect.Fill = new SolidColorBrush(Colors.Red);
+                        break;
+                    case Activities.Stop: tempRect.Fill = new SolidColorBrush(Colors.White);
+                        break;
+                    default: tempRect.Fill = new SolidColorBrush(Colors.Orange);
+                        break;
+                }
+
+                //setting width
+                if (assignmentActivites.Count == 1)
+                    tempRect.Width = thisView.LayoutRoot.MinWidth;
+                else if (endsWithStop == false && i == (assignmentActivites.Count - 1))//last activity and is not a stop
+                    tempRect.Width = 10;
+                else
+                    tempRect.Width = ((TimeUntilNextEventInDays(assignmentActivites[i])) / TotalTime) * (thisView.LayoutRoot.MinWidth - 10);
+
+                //use whats in rects before adding more children to Timeline
+                if (i > (rects.Count() - 1)) //avoiding assigning to null area
+                {
+                    thisView.Timeline.Children.Add(tempRect);
+                    rects.Add(tempRect);
+                }
+                else
+                {
+                    rects[i].Width = tempRect.Width;
+                    rects[i].Fill = tempRect.Fill;
+                    rects[i].Height = tempRect.Height;
+                    rects[i].HorizontalAlignment = tempRect.HorizontalAlignment;
+                }
+                
+                
+                //setting up labels for timeline
+                if (Labels1.Count() - 1 < i)//need a new label added to stackpanel
+                {
+                    Label newL = new Label();
+                    newL.Width = tempRect.Width;
+                    newL.Content = assignmentActivites[i].StartDateTime.Month.ToString() + "/" + assignmentActivites[i].StartDateTime.Day.ToString();
+                    thisView.TimelineDates1.Children.Add(newL);
+                }
+                else //use old
+                {
+                    Labels1[i].Content = assignmentActivites[i].StartDateTime.Month.ToString() + "/" + assignmentActivites[i].StartDateTime.Day.ToString();
+                    //Labels1[i].Content = assignmentActivites[i].StartDateTime.ToShortDateString();
+                    Labels1[i].Width = tempRect.Width;
+                }
+                
+                /*
+                if (i % 2 == 0)
+                {
+                    if (Labels1.Count() - 1 < (i / 2))//need a new label added to stackpanel
+                    {
+                        Label newL = new Label();
+                        newL.Width = tempRect.Width;
+                        if (i> 0)
+                            newL.Margin = new Thickness(rects[i - 1].Width, 0, 0, 0);
+                        newL.Content = assignmentActivites[i].StartDateTime.ToShortDateString();
+                        thisView.TimelineDates1.Children.Add(newL);
+                    }
+                    else //use old
+                    {
+                        Labels1[i / 2].Content = assignmentActivites[i].StartDateTime.ToShortDateString();
+                        Labels1[i / 2].Width = tempRect.Width;
+                    }
+                }
+                else
+                {
+                    if (Labels2.Count() - 1 < (i / 2))//need a new label added to stackpanel
+                    {
+                        Label newL = new Label();
+                        newL.Width = tempRect.Width;
+                        if (i  > 0)
+                            newL.Margin = new Thickness(rects[i-1].Width, 0, 0, 0);
+                        newL.Content = assignmentActivites[i].StartDateTime.ToShortDateString();
+                        thisView.TimelineDates2.Children.Add(newL);
+                    }
+                    else //use old
+                    {
+                        Labels2[i / 2].Content = assignmentActivites[i].StartDateTime.ToShortDateString();
+                        Labels2[i / 2].Width = tempRect.Width;
+                    }
+                }
+                */
+
+                /*old non-working
+                if (i % 2 == 0) //even
+                {
+                    if ((Labels2.Count()-1) < (i / 2)) //need another label
+                    {
+                        //string showme = "Even: " + assignmentActivites[i].StartDateTime.ToString();
+                        //MessageBox.Show("Event box");
+                        
+                        Label newL = new Label();
+                        newL.Width = tempRect.Width;
+                        newL.Content = assignmentActivites[i].StartDateTime.ToShortDateString();
+                        thisView.TimelineDates2.Children.Add(newL);
+                         
+                    }
+                    else //can use current label
+                    {
+                        Labels2[i/2].Content = assignmentActivites[i].StartDateTime.ToString();
+                    }
+                }
+
+                if(i%2==0)//even
+                {
+                }
+                else
+                {    
+                }*/
+                
+
+            }
+        }
+
+        void playingWithDates()
+        {
+            Label test = new Label();
+            test.Content = "1";
+            test.Width = 50;
+            thisView.TimelineDates1.Children.Add(test);
+            Label test2 = new Label();
+            test2.Margin = new Thickness(50-test.ActualWidth, 0, 0, 0);
+            test2.Content = "2";
+            thisView.TimelineDates1.Children.Add(test2);    
+        }
+
+        void testBtn_click(object sender, RoutedEventArgs e)
+        {
+            playingWithDates();
+            return;
+        }
+
+
+
+        // Currently only being used in UpdateActivityDisplay()
+        void generateTimeLine()
+        {
+            //collecting rectangles from Timeline and putting them in rects list
+            var b = from c in thisView.Timeline.Children where c is Rectangle select c as Rectangle;
+            List<Rectangle> rects = b.ToList();
+
+            double TotalTime = TotalEventTime();
+            bool endsWithStop = CalenderEndsWithStop();
+
+            //if there was a delete that left more rectangles than activities, clear the rectangles
+            
+            if (rects.Count > assignmentActivites.Count)
+            {
+                for (int i = 0; i < rects.Count; i++)
+                {
+                    rects[i].Width = 0;
+                    rects[i].Fill = new SolidColorBrush(Colors.Transparent);
+                    rects[i].Height = 0;
+                }
+            }
+
+            //setting attributes for each rectangle
+            for (int i = 0; i < assignmentActivites.Count; i++)
+            {
+                Rectangle tempRect = new Rectangle();
+                tempRect.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+                tempRect.Height = 20;
+
+                switch (assignmentActivites[i].ActivityType) //assigning color
+                {
+                    case Activities.Submission: tempRect.Fill = new SolidColorBrush(Colors.Green);
+                        break;
+                    case Activities.PeerReview: tempRect.Fill = new SolidColorBrush(Colors.Blue);
+                        break;
+                    case Activities.IssueVoting: tempRect.Fill = new SolidColorBrush(Colors.Purple);
+                        break;
+                    case Activities.AuthorRebuttal: tempRect.Fill = new SolidColorBrush(Colors.Red);
+                        break;
+                    case Activities.Stop: tempRect.Fill = new SolidColorBrush(Colors.White);
+                        break;
+                    default: tempRect.Fill = new SolidColorBrush(Colors.Orange);
+                        break;
+                }
+
+                //setting width
+                if (assignmentActivites.Count == 1)
+                    tempRect.Width = thisView.LayoutRoot.MinWidth;
+                else if (endsWithStop == false && i == (assignmentActivites.Count - 1))//last activity and is not a stop
+                    tempRect.Width = 10;
+                else
+                    tempRect.Width = ((TimeUntilNextEventInDays(assignmentActivites[i])) / TotalTime) * (thisView.LayoutRoot.MinWidth - 10);
+
+                //use whats in rects before adding more children to Timeline
+                if (i > (rects.Count() - 1)) //avoiding assigning to null area
+                {
+                    thisView.Timeline.Children.Add(tempRect);
+                }
+                else
+                {
+                    rects[i].Width = tempRect.Width;
+                    rects[i].Fill = tempRect.Fill;
+                    rects[i].Height = tempRect.Height;
+                    rects[i].HorizontalAlignment = tempRect.HorizontalAlignment;
+                }
+            }
+        }
+
+        //returns -1 if there is no next event
+        //returns the time (in days) until the next event
+        double TimeUntilNextEventInDays(AssignmentActivityViewModel temp_aaVM)
+        {
+            double returnVal = 0.0;
+            int index = 0;
+            AssignmentActivityViewModel temp2 = new AssignmentActivityViewModel(Activities.Null);
+            index = assignmentActivites.IndexOf(temp_aaVM);
+            temp_aaVM = assignmentActivites[index];
+
+            if (assignmentActivites.Count > (index+1)) //checking if there are enough activities to assign temp2
+            {
+                temp2 = assignmentActivites[index + 1];
+            }
+            else
+            {
+                temp2 = null;
+            }
+
+            if (temp_aaVM != null)
+            {
+                if (temp2 != null) //there is a following event
+                {
+                    returnVal = (temp2.StartDateTime.Ticks - temp_aaVM.StartDateTime.Ticks) / TimeSpan.TicksPerDay;
+                }
+                else                //no following event
+                {
+                    returnVal = 0.0;
+                }
+            }
+            return returnVal;
+        }
+
+        //returns the time (in days) from start of first event to end of last event
+        //returns the time from start of first event to start of last event if there is no end
+        //returns 0 if there is only 1 event or no events
+        double TotalEventTime()
+        {
+            double returnVal = 0.0;
+            AssignmentActivityViewModel temp = new AssignmentActivityViewModel(Activities.Null);
+
+            temp = assignmentActivites.GetNextItem(temp);
+
+            long time1 = temp.StartDateTime.Ticks;
+            long time2 = temp.StartDateTime.Ticks;
+            long dTimeInDays = temp.StartDateTime.Ticks; 
+
+            while (temp != null)
+            {
+                time2 = temp.StartDateTime.Ticks; //gets time of old event
+                temp = assignmentActivites.GetNextItem(temp);
+                if (temp != null)
+                {
+                    time1 = temp.StartDateTime.Ticks; //gets time of new event
+                    dTimeInDays = (time1 - time2) / TimeSpan.TicksPerDay;
+                    returnVal += dTimeInDays;
+                }
+            }
+            return returnVal;
+        }
+
+        //returns true if the last event is a stop, else false
+        bool CalenderEndsWithStop()
+        {
+            bool returnVal = false; 
+            AssignmentActivityViewModel temp = new AssignmentActivityViewModel(Activities.Null);
+            temp = assignmentActivites.GetNextItem(temp);
+            while (temp != null)
+            {
+                if (temp.ActivityType == Activities.Stop) returnVal = true;
+                else returnVal = false; 
+                temp = assignmentActivites.GetNextItem(temp);
+            }
+            
+            return returnVal;
+        }
+
+
         void LeftCalanderScrollButton_Click(object sender, RoutedEventArgs e)
         {
             calanderLeft.MonthYear = calanderLeft.MonthYear.AddMonths(-1);
@@ -426,6 +778,7 @@ namespace CreateNewAssignment
 
         private void UpdateCalanders()
         {
+            
             ClearCalanderMonth(calanderLeft);
             ClearCalanderMonth(calanderRight);
             ClearColorOfDays();
@@ -440,6 +793,7 @@ namespace CreateNewAssignment
             
 
             aavm = assignmentActivites.GetNextItem(aavm);
+      
             CalendarDayItemView day = null;
             if (aavm != null)
             {
@@ -512,5 +866,7 @@ namespace CreateNewAssignment
             return thisView;
         }
 
+
+        public RoutedEventHandler test_Click { get; set; }
     }
 }
