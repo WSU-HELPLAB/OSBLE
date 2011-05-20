@@ -70,33 +70,6 @@ namespace OSBLE.Controllers
                         }
                     }
                 }
-                else
-                {
-                    List<CoursesUsers> CoursesToPost = new List<CoursesUsers>();
-
-                    if (Request.Form["post_active"] != null)
-                    { // Post to active course only.
-                        CoursesToPost.Add(activeCourse);
-                    }
-                    else if (Request.Form["post_all"] != null)
-                    { // Post to all courses.
-                        CoursesToPost = currentCourses;
-                    }
-
-                    foreach (CoursesUsers cu in CoursesToPost)
-                    {
-                        if (cu.CourseRole.CanGrade) // TODO: Add course permissions for student posting
-                        {
-                            DashboardPost newDp = new DashboardPost();
-                            newDp.Content = dp.Content;
-                            newDp.Posted = dp.Posted;
-                            newDp.UserProfile = dp.UserProfile;
-                            newDp.Course = cu.Course;
-
-                            db.DashboardPosts.Add(newDp);
-                        }
-                    }
-                }
 
                 db.SaveChanges();
                 return RedirectToAction("Index"); // Redirect so we don't have refresh data
@@ -219,6 +192,40 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost]
+        public ActionResult NewPost(DashboardPost dp)
+        {
+            dp.UserProfile = currentUser;
+            dp.Posted = DateTime.Now;
+
+            List<CoursesUsers> CoursesToPost = new List<CoursesUsers>();
+
+            if (Request.Form["post_active"] != null)
+            { // Post to active course only.
+                CoursesToPost.Add(activeCourse);
+            }
+            else if (Request.Form["post_all"] != null)
+            { // Post to all courses.
+                CoursesToPost = currentCourses;
+            }
+
+            foreach (CoursesUsers cu in CoursesToPost)
+            {
+                if (cu.CourseRole.CanGrade) // TODO: Add course permissions for student posting
+                {
+                    DashboardPost newDp = new DashboardPost();
+                    newDp.Content = dp.Content;
+                    newDp.Posted = dp.Posted;
+                    newDp.UserProfile = dp.UserProfile;
+                    newDp.Course = cu.Course;
+
+                    db.DashboardPosts.Add(newDp);
+                }
+            }
+
+            db.SaveChanges();
+            return RedirectToAction("Index");
+        }
         /// <summary>
         /// Removes a Dashboard Post, AJAX-style!
         /// </summary>
