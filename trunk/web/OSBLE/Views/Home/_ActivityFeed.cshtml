@@ -64,7 +64,7 @@
                 {
                     <span class="dp_course">@dp.Course.Prefix @dp.Course.Number</span>
                 }
-                @Helpers.DisplayNameForDashboard(dp.UserProfile, ViewBag.ActiveCourse, show)
+                @Helpers.DisplayNameForDashboard(dp.UserProfile, dp.Course, ViewBag.ActiveCourse, ViewBag.AllCoursesUsers, show)
                 <span class="dp_tools">
                 @if (show && (dp.UserProfileID != ViewBag.CurrentUser.ID))
                 {
@@ -94,7 +94,7 @@
                             {
                                 @Helpers.DefaultProfilePicture();
                             }
-                            @Helpers.DisplayNameForDashboard(dr.UserProfile, ViewBag.ActiveCourse, show)
+                            @Helpers.DisplayNameForDashboard(dr.UserProfile, dp.Course, ViewBag.ActiveCourse, ViewBag.AllCoursesUsers, show)
                             <span class="dp_tools">
                             @if (show && (dr.UserProfileID != ViewBag.CurrentUser.ID))
                             {

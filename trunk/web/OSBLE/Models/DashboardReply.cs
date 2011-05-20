@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 namespace OSBLE.Models
 {
@@ -17,6 +18,7 @@ namespace OSBLE.Models
 
         public virtual UserProfile UserProfile { get; set; }
 
+        [AllowHtml]
         public string Content { get; set; }
 
         public virtual DashboardPost Parent { get; set; }

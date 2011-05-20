@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using OSBLE.Attributes;
 using OSBLE.Models;
+using System.Collections;
 
 namespace OSBLE.Controllers
 {
@@ -38,7 +39,7 @@ namespace OSBLE.Controllers
             {
                 content = Request.Form["post_content"];
             }
-            catch (HttpRequestValidationException e)
+            catch (HttpRequestValidationException)
             {
                 content = null;
             }
@@ -128,6 +129,15 @@ namespace OSBLE.Controllers
 
             // TODO: Add Pagination
             ViewBag.DashboardPosts = db.DashboardPosts.Where(d => ViewedCourses.Contains(d.CourseID)).OrderByDescending(d => d.Posted).ToList();
+
+            // Serve list of course roles to view so it can identify instructors/TAs as well as find positions in classes
+            Hashtable AllCoursesUsers = new Hashtable();
+            foreach (CoursesUsers cu in currentCourses)
+            {
+                AllCoursesUsers[cu.CourseID] = db.CoursesUsers.Where(c => c.CourseID == cu.CourseID).ToList();
+            }
+
+            ViewBag.AllCoursesUsers = AllCoursesUsers;
 
             #endregion Activity Feed View
 
@@ -264,7 +274,7 @@ namespace OSBLE.Controllers
                 CoursesUsers ourCu = currentCourses.Where(c => c.CourseID == course).FirstOrDefault();
                 CoursesUsers theirCu = db.CoursesUsers.Where(c => (c.CourseID == course) && (c.UserProfileID == u.ID)).FirstOrDefault();
 
-                if ((ourCu != null) && (theirCu != null) && !(ourCu.CourseRole.Anonymized))
+                if ((ourCu != null) && (theirCu != null) && (!(ourCu.CourseRole.Anonymized) || (theirCu.CourseRole.CanGrade==true)))
                 {
                     show = true;
                 }

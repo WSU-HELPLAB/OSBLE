@@ -2,7 +2,7 @@
 @{
     ViewBag.Title = "Details";
 }
-<h2>@Html.DisplayFor(model => model.Subject)</h2>
+<h2>@Model.Subject</h2>
 <fieldset>
     <legend>Mail</legend>
     <div class="display-label">
@@ -17,7 +17,7 @@
     <div class="display-label">
         Message</div>
     <div class="display-field">
-        @Html.DisplayTextFor(model => model.Message)
+        @Model.Message
     </div>
 </fieldset>
 <p>

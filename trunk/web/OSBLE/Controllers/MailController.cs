@@ -3,6 +3,7 @@ using System.Web.Mvc;
 using OSBLE.Attributes;
 using OSBLE.Models;
 using System;
+using System.Web;
 
 namespace OSBLE.Controllers
 {
@@ -53,18 +54,19 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Create(Mail mail)
         {
-            if (ModelState.IsValid)
-            {
-                mail.FromUserProfileID = CurrentUser.ID;
-                mail.FromUserProfile = CurrentUser;
-                mail.CourseReferenceID = activeCourse.CourseID;
-                mail.Read = false;
-                db.Mails.Add(mail);
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
+                if (ModelState.IsValid)
+                {
+                    mail.FromUserProfileID = CurrentUser.ID;
+                    mail.FromUserProfile = CurrentUser;
+                    mail.CourseReferenceID = activeCourse.CourseID;
+                    mail.Read = false;
 
-            ViewBag.FromUserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", mail.FromUserProfileID);
+                    db.Mails.Add(mail);
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+
+         //   ViewBag.FromUserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", mail.FromUserProfileID);
             ViewBag.ToUserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", mail.ToUserProfileID);
             return View(mail);
         }

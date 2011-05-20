@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 namespace OSBLE.Models
 {
@@ -27,9 +28,11 @@ namespace OSBLE.Models
         public int CourseReferenceID { get; set; }
 
         [Required]
+        [AllowHtml]
         public string Subject { get; set; }
 
         [Required]
+        [AllowHtml]
         public string Message { get; set; }
 
     }
