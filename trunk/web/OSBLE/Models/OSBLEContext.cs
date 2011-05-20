@@ -1,6 +1,5 @@
 ﻿using System.Data.Entity;
 using System.Web.Security;
-using System.Data.Entity.ModelConfiguration.Conventions;
 
 namespace OSBLE.Models
 {
@@ -35,6 +34,16 @@ namespace OSBLE.Models
 
         public DbSet<DashboardReply> DashboardReplies { get; set; }
 
+        public DbSet<Mail> Mails { get; set; }
+
+        public DbSet<SubmissionActivitySetting> SubmissionActivitySettings { get; set; }
+
+        public DbSet<Weight> Weights { get; set; }
+
+        public DbSet<Assignment> Assignments { get; set; }
+
+        public DbSet<AssignmentActivity> AssignmentActivities { get; set; }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -55,7 +64,6 @@ namespace OSBLE.Models
         /// </summary>
         public void SeedTestData()
         {
-
             #region Course Roles
 
             // Set up "static" values for Course Roles.
@@ -110,12 +118,7 @@ namespace OSBLE.Models
             }
 
             #endregion Test Data
-
-
         }
-
-        public DbSet<Mail> Mails { get; set; }
-
     }
 
     /// <summary>

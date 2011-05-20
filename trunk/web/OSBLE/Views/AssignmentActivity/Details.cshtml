@@ -1,0 +1,30 @@
+﻿@model OSBLE.Models.AssignmentActivity
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>AssignmentActivity</legend>
+
+    <div class="display-label">Points</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Points)
+    </div>
+
+    <div class="display-label">HasBeenGraded</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.HasBeenGraded)
+    </div>
+
+    <div class="display-label">Grade</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Grade)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.Name }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

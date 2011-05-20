@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using OSBLE.Models;
-using OSBLE.Attributes;
-using System.IO;
 using LumenWorks.Framework.IO.Csv;
+using OSBLE.Attributes;
+using OSBLE.Models;
 
 namespace OSBLE.Controllers
 {
@@ -72,6 +71,7 @@ namespace OSBLE.Controllers
                 set;
             }
         }
+
         //
         // GET: /Roster/
         [CanModifyCourse]
@@ -96,7 +96,7 @@ namespace OSBLE.Controllers
                 List<CourseRole> roles = new List<CourseRole>();
 
                 // Set custom role order for display
-                List<CourseRole.OSBLERoles> rolesOrder = new List<CourseRole.OSBLERoles>(new CourseRole.OSBLERoles[] { 
+                List<CourseRole.OSBLERoles> rolesOrder = new List<CourseRole.OSBLERoles>(new CourseRole.OSBLERoles[] {
                             CourseRole.OSBLERoles.Student,
                             CourseRole.OSBLERoles.TA,
                             CourseRole.OSBLERoles.Moderator,
@@ -122,18 +122,12 @@ namespace OSBLE.Controllers
                     usersByRoles.Add(usersByRole);
                 }
 
-
-
                 //reverse it so the least important people are first
-
-
 
                 userBySection.UsersByRole = usersByRoles;
 
                 usersBySections.Add(userBySection);
             }
-
-
 
             ViewBag.UsersBySections = usersBySections;
 
@@ -166,7 +160,7 @@ namespace OSBLE.Controllers
                         db.CoursesUsers.Remove(student);
                     }
                     db.SaveChanges();
-                    
+
                     foreach (RosterEntry entry in rosterEntries)
                     {
                         CoursesUsers courseUser = new CoursesUsers();
@@ -184,7 +178,6 @@ namespace OSBLE.Controllers
                         }
                     }
                 }
-
             }
 
             return RedirectToAction("Index");
@@ -194,10 +187,10 @@ namespace OSBLE.Controllers
         // GET: /Roster/Create
         public ActionResult Create()
         {
-                //ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName");
-                ViewBag.CourseID = new SelectList(db.Courses, "ID", "Name");
-                ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
-                return View();
+            //ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName");
+            ViewBag.CourseID = new SelectList(db.Courses, "ID", "Name");
+            ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
+            return View();
         }
 
         //
@@ -207,22 +200,21 @@ namespace OSBLE.Controllers
         public ActionResult Create(CoursesUsers courseuser)
         {
             //if modelState isValid
-                if (ModelState.IsValid && courseuser.CourseRoleID != 0)
+            if (ModelState.IsValid && courseuser.CourseRoleID != 0)
+            {
+                try
                 {
-                    try
-                    {
-                        createCourseUser(courseuser);
-                    }
-                    catch
-                    {
-                    	ModelState.AddModelError("", "This ID Number already exists in this class");
-                        ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
-                        return View();
-                    }
+                    createCourseUser(courseuser);
                 }
+                catch
+                {
+                    ModelState.AddModelError("", "This ID Number already exists in this class");
+                    ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
+                    return View();
+                }
+            }
             return RedirectToAction("Index");
         }
-
 
         //Students
         //
@@ -283,7 +275,7 @@ namespace OSBLE.Controllers
         public ActionResult DeleteConfirmed(int userProfileID)
         {
             CoursesUsers coursesusers = getCoursesUsers(userProfileID);
-            if(CanModifyOwnLink(coursesusers))
+            if (CanModifyOwnLink(coursesusers))
             {
                 db.CoursesUsers.Remove(coursesusers);
                 db.SaveChanges();
@@ -328,7 +320,6 @@ namespace OSBLE.Controllers
             {
                 return false;
             }
-
         }
 
         private List<RosterEntry> ParseRoster(Stream roster, string idNumberColumnName)
@@ -401,46 +392,45 @@ namespace OSBLE.Controllers
         /// <param name="courseuser">It must have section, role set, and a reference to UserProfile with Identification set</param>
         private void createCourseUser(CoursesUsers courseuser)
         {
-                                //This will return one if they exist already or null if they don't
-                    var user = (from c in db.UserProfiles
-                                where c.Identification == courseuser.UserProfile.Identification
-                                select c).FirstOrDefault();
-                    if (user == null)
-                    {
-                        //user doesn't exist so we got to make a new one
-                        //Create userProfile with the new ID
-                        UserProfile up = new UserProfile();
-                        up.CanCreateCourses = false;
-                        up.IsAdmin = false;
-                        up.SchoolID = currentUser.SchoolID;
-                        up.Identification = courseuser.UserProfile.Identification;
-                        db.UserProfiles.Add(up);
-                        db.SaveChanges();
+            //This will return one if they exist already or null if they don't
+            var user = (from c in db.UserProfiles
+                        where c.Identification == courseuser.UserProfile.Identification
+                        select c).FirstOrDefault();
+            if (user == null)
+            {
+                //user doesn't exist so we got to make a new one
+                //Create userProfile with the new ID
+                UserProfile up = new UserProfile();
+                up.CanCreateCourses = false;
+                up.IsAdmin = false;
+                up.SchoolID = currentUser.SchoolID;
+                up.Identification = courseuser.UserProfile.Identification;
+                db.UserProfiles.Add(up);
+                db.SaveChanges();
 
-                        //Set the UserProfileID to point to our new student
-                        courseuser.UserProfile = null;
-                        courseuser.UserProfileID = up.ID;
-                        courseuser.CourseID = activeCourse.CourseID;
-                    }
-                    else
-                    {
-                        courseuser.UserProfile = user;
-                        courseuser.UserProfileID = user.ID;
-                    }
-                    courseuser.CourseID = activeCourse.CourseID;
-                    //Check uniqueness
-                    if ((from c in db.CoursesUsers
-                         where c.CourseID == courseuser.CourseID && c.UserProfileID == courseuser.UserProfileID
-                         select c).Count() == 0)
-                    {
-                        db.CoursesUsers.Add(courseuser);
-                        db.SaveChanges();
-                    }
-                    else
-                    {
-                        throw new Exception("This courseUser would not be unique if added");
-                    }
+                //Set the UserProfileID to point to our new student
+                courseuser.UserProfile = null;
+                courseuser.UserProfileID = up.ID;
+                courseuser.CourseID = activeCourse.CourseID;
+            }
+            else
+            {
+                courseuser.UserProfile = user;
+                courseuser.UserProfileID = user.ID;
+            }
+            courseuser.CourseID = activeCourse.CourseID;
+            //Check uniqueness
+            if ((from c in db.CoursesUsers
+                 where c.CourseID == courseuser.CourseID && c.UserProfileID == courseuser.UserProfileID
+                 select c).Count() == 0)
+            {
+                db.CoursesUsers.Add(courseuser);
+                db.SaveChanges();
+            }
+            else
+            {
+                throw new Exception("This courseUser would not be unique if added");
+            }
         }
-
     }
 }

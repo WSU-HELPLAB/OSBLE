@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
 
 namespace OSBLE.Models
 {
@@ -13,11 +10,13 @@ namespace OSBLE.Models
         public int ID { get; set; }
 
         [Required]
-        [Display(Name="Course Prefix")]
+        [Display(Name = "Course Prefix")]
         public string Prefix { get; set; }
+
         [Required]
-        [Display(Name="Course Number")]
+        [Display(Name = "Course Number")]
         public string Number { get; set; }
+
         [Required]
         [Display(Name = "Course Name")]
         public string Name { get; set; }
@@ -29,6 +28,8 @@ namespace OSBLE.Models
         [Required]
         [Display(Name = "Year")]
         public string Year { get; set; }
-   
+
+        [Display(Name = "Course Weight")]
+        public ICollection<Weight> Weights { get; set; }
     }
 }

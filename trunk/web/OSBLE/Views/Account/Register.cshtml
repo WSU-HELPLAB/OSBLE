@@ -65,7 +65,14 @@
             @Html.LabelFor(model => model.SchoolID, "School")
         </div>
         <div class="editor-field">
+        @try
+        {
             @Html.DropDownList("SchoolID", String.Empty)<br />
+            }
+            catch(Exception e)
+            {
+                
+            }
             @Html.ValidationMessageFor(model => model.SchoolID, "You must select a school.")
         </div>
 
