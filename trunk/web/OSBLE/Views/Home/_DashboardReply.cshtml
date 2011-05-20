@@ -5,8 +5,13 @@
     bool canDelete = ViewBag.canDelete;
     bool show = ViewBag.show;
 }
-<div class="dp_post" id="dr_reply_@(dr.ID)">
+<div class="dp_post @if(ViewBag.hideReply != null) {<text>dp_new_post</text>}" id="dr_reply_@(dr.ID)" >
                         <div class="dp_post_header">
+                        <script>
+                        $(function() {
+                            $('#latest_reply_@(dp.ID)').val(Math.max($('#latest_reply_@(dp.ID)').val(),@(dr.ID)));
+                        });
+                        </script>
                             @if (show || (dr.UserProfileID == ViewBag.CurrentUser.ID))
                             {
                                 @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dp.CourseID, userprofile = dr.UserProfileID }));
@@ -26,7 +31,7 @@
                                 <form action="/Home/DeleteReply"
                                     style="display: inline;"
                                     data-ajax="true"
-                                    data-ajax-success="$('#dr_reply_@(dr.ID)').hide('highlight')"
+                                    data-ajax-success="$('#dr_reply_@(dr.ID)').hide('blind',{},'slow',function(){$(this).remove();})"
                                     data-ajax-confirm="Are you sure you want to delete this reply?"
                                     method="post">
                                     <input type="hidden" name="ID" value="@dr.ID" />

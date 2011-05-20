@@ -1,0 +1,36 @@
+﻿@using OSBLE.Models;
+
+@{
+    
+    Layout = null;
+    
+    DashboardPost dp = ViewBag.dp;
+
+    bool canDelete = false;
+    bool show = true; // Should this post be anonymous?
+    List<CoursesUsers> cus = ViewBag.CurrentCourses;
+    CoursesUsers cu = cus.Where(c => c.CourseID == dp.CourseID && c.UserProfileID == ViewBag.CurrentUser.ID).FirstOrDefault();
+
+    if (cu != null && cu.CourseRole.CanGrade)
+    {
+        canDelete = true;
+    }
+
+    if (cu == null || cu.CourseRole.Anonymized == true)
+    {
+        show = false;
+    }
+
+}
+
+@foreach (DashboardReply dr in ViewBag.DashboardReplies)
+{
+    ViewBag.hideReply = true;
+    ViewBag.dr = dr;
+    ViewBag.dp = dp;
+    ViewBag.canDelete = canDelete;
+    ViewBag.show = show;                                
+    @Html.Partial("_DashboardReply");
+                                    
+}
+

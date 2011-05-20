@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.WebPages;
 using System.Web.Mvc;
 using OSBLE.Attributes;
 using OSBLE.Models;
@@ -22,60 +23,6 @@ namespace OSBLE.Controllers
         public ActionResult Index()
         {
             ViewBag.CurrentTab = "Dashboard";
-
-            #region Activity Feed Posting
-
-            // Feed Post attempt
-
-            string content = null;
-            try
-            {
-                content = Request.Form["post_content"];
-            }
-            catch (HttpRequestValidationException)
-            {
-                content = null;
-            }
-
-            if (content != null)
-            {
-                // TODO: Allow courses to allow students to post to first level of feed.
-                int replyTo = 0;
-                if (Request.Form["reply_to"] != null)
-                {
-                    replyTo = Convert.ToInt32(Request.Form["reply_to"]);
-                }
-
-                DashboardPost dp = new DashboardPost();
-                dp.Content = content;
-                dp.UserProfile = currentUser;
-
-                if (replyTo != 0)
-                {
-                    DashboardPost replyToPost = db.DashboardPosts.Find(replyTo);
-                    if (replyToPost != null)
-                    { // Does the post we're replying to exist?
-                        // Are we a member of the course we're replying to?
-                        CoursesUsers cu = (from c in currentCourses
-                                           where c.CourseID == replyToPost.CourseID
-                                           select c).FirstOrDefault();
-
-                        DashboardReply dr = new DashboardReply();
-                        dr.Content = dp.Content;
-                        dr.UserProfile = dp.UserProfile;
-
-                        if (cu != null)
-                        {
-                            replyToPost.Replies.Add(dr);
-                        }
-                    }
-                }
-
-                db.SaveChanges();
-                return RedirectToAction("Index"); // Redirect so we don't have refresh data
-            }
-
-            #endregion Activity Feed Posting
 
             #region Activity Feed View
 
@@ -109,19 +56,24 @@ namespace OSBLE.Controllers
             ViewBag.PostsPerPage = postsPerPage;
 
             // Serve list of course roles to view so it can identify instructors/TAs as well as find positions in classes
-            Hashtable AllCoursesUsers = new Hashtable();
-            foreach (CoursesUsers cu in currentCourses)
-            {
-                AllCoursesUsers[cu.CourseID] = db.CoursesUsers.Where(c => c.CourseID == cu.CourseID).ToList();
-            }
-
-            ViewBag.AllCoursesUsers = AllCoursesUsers;
+            ViewBag.AllCoursesUsers = getAllCoursesUsers();
 
             #endregion Activity Feed View
 
             return View();
         }
 
+        private Hashtable getAllCoursesUsers()
+        {
+            Hashtable AllCoursesUsers = new Hashtable();
+            foreach (CoursesUsers cu in currentCourses)
+            {
+                AllCoursesUsers[cu.CourseID] = db.CoursesUsers.Where(c => c.CourseID == cu.CourseID).ToList();
+            }
+
+            return AllCoursesUsers;
+
+        }
         public ActionResult NoCourses()
         {
             if (ActiveCourse != null)
@@ -226,6 +178,55 @@ namespace OSBLE.Controllers
             db.SaveChanges();
             return RedirectToAction("Index");
         }
+
+        [HttpPost]
+        public ActionResult NewReply(DashboardReply dr)
+        {
+            dr.UserProfile = currentUser;
+            dr.Posted = DateTime.Now;
+
+            int replyTo = 0;
+            if (Request.Form["reply_to"] != null)
+            {
+                replyTo = Convert.ToInt32(Request.Form["reply_to"]);
+            }
+
+            int latestReply = 0;
+            if (Request.Form["latest_reply"] != null)
+            {
+                latestReply = Convert.ToInt32(Request.Form["latest_reply"]);
+            }
+
+            DashboardPost replyToPost = db.DashboardPosts.Find(replyTo);
+            if (replyToPost != null)
+            { // Does the post we're replying to exist?
+                // Are we a member of the course we're replying to?
+                CoursesUsers cu = (from c in currentCourses
+                                   where c.CourseID == replyToPost.CourseID
+                                   select c).FirstOrDefault();
+
+                if (cu != null)
+                {
+                    replyToPost.Replies.Add(dr);
+                    db.SaveChanges();
+                }
+                else
+                {
+                    Response.StatusCode = 403;
+                }
+
+                ViewBag.dp = replyToPost;
+                ViewBag.DashboardReplies = replyToPost.Replies.Where(r => r.ID > latestReply).ToList();
+                ViewBag.AllCoursesUsers = getAllCoursesUsers();
+            }
+            else
+            {
+                Response.StatusCode = 403;
+            }
+
+            return View("_SubDashboardReply");
+        }
+        
         /// <summary>
         /// Removes a Dashboard Post, AJAX-style!
         /// </summary>

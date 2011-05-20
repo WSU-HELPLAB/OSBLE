@@ -460,6 +460,11 @@ body#layoutLogOn
     border-bottom: 5px solid #eeeeff;
 }
 
+.dp_new_post
+{
+    display: none;
+}
+
 .dp_post_header
 {
     padding-top: 5px;
