@@ -2,11 +2,30 @@
 @{
     ViewBag.Title = "Index";
 }
-<h2>
+    <h2>New Message</h2>
+    Enter recipient's name to compose message:<br />
+
+
+        <input id="people_finder" />
+        <script type="text/javascript">
+
+            $("#people_finder").autocomplete({
+                source: "@(Url.Action("Search"))",
+                select: function(event, ui) {
+                    location.href="@Url.Action("Create")?recipientID=" + ui.item.value;
+                }
+            }).data("autocomplete")._renderItem = function( ul, item ) {
+                return $( "<li></li>" )
+                .data( "item.autocomplete", item )
+                .append( "<a>" + "<img src=\"@Url.Action("ProfilePicture")/" + item.value + "\" class=\"small_profile_picture\" alt=\"Profile Picture\" /> " + item.label+ "</a>" )
+                .appendTo( ul );
+            }
+
+        </script>
+
+    <h2>
     Inbox</h2>
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
+
 <table>
     <tr>
         <th>
@@ -26,7 +45,7 @@
                 @Html.DisplayFor(modelItem => item.Read)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.FromUserProfile.UserName)
+                @item.FromUserProfile.FirstName @item.FromUserProfile.LastName
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Subject)

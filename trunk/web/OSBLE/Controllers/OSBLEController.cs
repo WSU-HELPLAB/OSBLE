@@ -112,11 +112,11 @@ namespace OSBLE.Controllers
                 string userName = context.User.Identity.Name;
                 ViewBag.CurrentUser = currentUser = db.UserProfiles.Where(u => u.UserName == userName).FirstOrDefault();
 
-                SetUnreadMessageCount();
-
                 // Get list of enrolled courses.
                 if (currentUser != null)
                 {
+                    SetUnreadMessageCount();
+
                     // Get list of courses this user is connected to.
                     currentCourses = db.CoursesUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
 

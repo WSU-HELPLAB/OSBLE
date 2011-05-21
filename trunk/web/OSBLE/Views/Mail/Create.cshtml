@@ -18,7 +18,8 @@
             @Html.LabelFor(model => model.ToUserProfileID, "To:")
         </div>
         <div class="editor-field">
-            @Html.DropDownList("ToUserProfileID", String.Empty)
+            @Model.ToUserProfile.FirstName @Model.ToUserProfile.LastName
+            @Html.HiddenFor(model => model.ToUserProfileID)
             @Html.ValidationMessageFor(model => model.ToUserProfileID)
         </div>
 

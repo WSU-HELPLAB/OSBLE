@@ -25,7 +25,7 @@ namespace OSBLE.Models
         public bool Read { get; set; }
 
         [Required]
-        public int CourseReferenceID { get; set; }
+        public DateTime Posted { get; set; }
 
         [Required]
         [AllowHtml]
@@ -34,6 +34,12 @@ namespace OSBLE.Models
         [Required]
         [AllowHtml]
         public string Message { get; set; }
+
+        public Mail()
+            : base()
+        {
+            Posted = DateTime.Now;
+        }
 
     }
 }
