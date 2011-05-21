@@ -765,3 +765,63 @@ body#layoutLogOn
 {
     list-style-type: none;
 }
+
+#send_mail_textarea 
+{
+    width: 600px;
+    height: 250px;
+}
+
+.inbox_table 
+{
+    border-collapse: collapse;
+}
+
+.inbox_table td 
+{
+    text-align: left;
+}
+
+.inbox_table tr 
+{
+    background-color: #fafafa;
+    border-bottom: 2px solid #cacaca;
+}
+
+.inbox_table tr.inbox_alternate
+{
+    background-color: #eaeaff;
+    border-bottom: 2px solid #aaaaff;
+}
+
+.inbox_table tr:hover
+{
+    background-color: #fff;
+}
+
+.inbox_table tr.inbox_alternate:hover
+{
+    background-color: #f0f0ff;
+}
+
+.inbox_table tr.inbox_unread .inbox_subject
+{
+    font-weight: bold;
+}
+
+.inbox_time
+{
+    width: 130px;
+}
+
+.inbox_subject
+{
+    width: 600px;
+}
+
+.inbox_table td .inbox_tools
+{
+    width: 50px;
+    text-align: right;
+}
+

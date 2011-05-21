@@ -169,6 +169,8 @@ namespace OSBLE.Controllers
                 .Select(c => c.UserProfile)
                 .ToList();
 
+            authorizedUsers.Add(currentUser); // Add ourselves just in case we're not in a course.
+
             // If we are anonymous, limit search to ourselves plus instructors/TAs
             List<int> addedCourses = currentCourses
                 .Where(c => c.CourseRole.Anonymized==true)

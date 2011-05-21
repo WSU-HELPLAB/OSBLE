@@ -13,7 +13,8 @@
                 source: "@(Url.Action("Search"))",
                 select: function(event, ui) {
                     location.href="@Url.Action("Create")?recipientID=" + ui.item.value;
-                }
+                },
+                focus: function(event, ui) {return false;}
             }).data("autocomplete")._renderItem = function( ul, item ) {
                 return $( "<li></li>" )
                 .data( "item.autocomplete", item )
@@ -26,32 +27,24 @@
     <h2>
     Inbox</h2>
 
-<table>
-    <tr>
-        <th>
-            Read:
-        </th>
-        <th>
-            From:
-        </th>
-        <th>
-            Subject:
-        </th>
-    </tr>
+<table class="inbox_table">
+    @{
+        bool toggle = false;
+    }
     @foreach (var item in Model)
     {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Read)
+        toggle = !toggle;
+        
+        <tr class="@if(toggle){<text>inbox_alternate</text>}@{<text> </text>}@if(!item.Read){<text>inbox_unread</text>}">
+            <td class="inbox_time">
+                <small>@item.Posted.ToShortDateString() @item.Posted.ToShortTimeString()</small>
             </td>
-            <td>
-                @item.FromUserProfile.FirstName @item.FromUserProfile.LastName
+            <td class="inbox_subject">
+                <small>@item.FromUserProfile.FirstName @item.FromUserProfile.LastName</small>&nbsp;
+                @Html.ActionLink(item.Subject, "View", new { id = item.ID })
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Subject)
-            </td>
-            <td>
-                @Html.ActionLink("View", "View", new { id = item.ID })
+            <td class="inbox_tools">
+                @Helpers.DeleteButton()
             </td>
         </tr>
     }
