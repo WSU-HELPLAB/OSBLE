@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using System.Windows.Media.Imaging;
 using System.Reflection;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace CreateNewAssignment.AssignmentActivities
 {
@@ -53,7 +46,6 @@ namespace CreateNewAssignment.AssignmentActivities
         {
             location = imageLocation;
         }
-
     }
 
     public static class AssignmentActivitiesFactory
@@ -85,8 +77,7 @@ namespace CreateNewAssignment.AssignmentActivities
         {
             string imageSource = (image.Source as BitmapImage).UriSource.OriginalString;
 
-            
-            for(int i = 0; Enum.IsDefined(typeof(Activities), i); i++)
+            for (int i = 0; Enum.IsDefined(typeof(Activities), i); i++)
             {
                 Activities activity = (Activities)i;
 
@@ -96,17 +87,17 @@ namespace CreateNewAssignment.AssignmentActivities
 
                 ImageLocation[] attrs = (fi.GetCustomAttributes(typeof(ImageLocation), false) as ImageLocation[]);
 
-                    if(attrs.Length > 0 && attrs[0] is ImageLocation)
+                if (attrs.Length > 0 && attrs[0] is ImageLocation)
+                {
+                    if (imageSource == attrs[0].Location)
                     {
-                            if(imageSource == attrs[0].Location)
-                            {
-                                return activity;
-                            }
+                        return activity;
                     }
-                    else
-                    {
-                        throw new Exception("Activities must be decorated with an ImageLocation");
-                    }
+                }
+                else
+                {
+                    throw new Exception("Activities must be decorated with an ImageLocation");
+                }
             }
             return Activities.Null;
         }
@@ -117,8 +108,8 @@ namespace CreateNewAssignment.AssignmentActivities
             {
                 case Activities.Submission: return new SolidColorBrush(Colors.Green);
                 case Activities.PeerReview: return new SolidColorBrush(Colors.Blue);
-                case Activities.IssueVoting: return new SolidColorBrush(Colors.Purple);
-                case Activities.AuthorRebuttal: return new SolidColorBrush(Colors.Red);
+                case Activities.IssueVoting: return new SolidColorBrush(Color.FromArgb(255, 102, 204, 204));
+                case Activities.AuthorRebuttal: return new SolidColorBrush(Color.FromArgb(255, 255, 204, 51));
                 case Activities.Stop: return new SolidColorBrush(Colors.Transparent);
                 default: return new SolidColorBrush(Colors.Black);
             }
@@ -128,15 +119,13 @@ namespace CreateNewAssignment.AssignmentActivities
         {
             switch (activity)
             {
-                case Activities.Submission: return new Activities[] { Activities.Submission, Activities.PeerReview, Activities.IssueVoting, Activities.AuthorRebuttal, Activities.Stop,};
-                case Activities.PeerReview: return new Activities[] { Activities.Submission, Activities.PeerReview, Activities.AuthorRebuttal};
+                case Activities.Submission: return new Activities[] { Activities.Submission, Activities.PeerReview, Activities.IssueVoting, Activities.AuthorRebuttal, Activities.Stop, };
+                case Activities.PeerReview: return new Activities[] { Activities.Submission, Activities.PeerReview, Activities.AuthorRebuttal };
                 case Activities.IssueVoting: return new Activities[] { Activities.PeerReview };
-                case Activities.AuthorRebuttal: return new Activities[] {Activities.PeerReview, Activities.IssueVoting};
-                case Activities.Stop: return new Activities[] { Activities.Submission, Activities.PeerReview, Activities.IssueVoting, Activities.AuthorRebuttal, Activities.Stop};
+                case Activities.AuthorRebuttal: return new Activities[] { Activities.PeerReview, Activities.IssueVoting };
+                case Activities.Stop: return new Activities[] { Activities.Submission, Activities.PeerReview, Activities.IssueVoting, Activities.AuthorRebuttal, Activities.Stop };
                 default: return new Activities[] { Activities.Submission, Activities.PeerReview, Activities.IssueVoting, Activities.AuthorRebuttal, Activities.Stop, Activities.Null };
             }
-
         }
-
     }
 }

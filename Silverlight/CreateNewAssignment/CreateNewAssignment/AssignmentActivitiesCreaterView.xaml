@@ -4,7 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:cna="clr-namespace:CreateNewAssignment"
-    xmlns:toolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit" 
+    xmlns:toolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
     x:Class="CreateNewAssignment.AssignmentActivitiesCreaterView"
     >
 
@@ -17,7 +17,7 @@
                     <RowDefinition Height="Auto"/>
                     <!--This Row is for the calendar-->
                     <RowDefinition Height="Auto"/>
-                    
+
                     <RowDefinition/>
                     <!--This Row is for the timeline-->
                     <RowDefinition Height="Auto"/>
@@ -53,11 +53,10 @@
                     <TextBlock FontSize="14" Text="Stop" Margin="2,5,0,0"/>
                     <Image Source="Icons/tip.png" Margin="0,0,20,0"/>
                 </StackPanel>
-                <Button Grid.Row="1" Grid.Column="0" x:Name="LeftCalanderScrollButton" Content="&lt;" HorizontalAlignment="Left" />
-                <Button Grid.Row="1" Grid.Column="2" x:Name="RightCalanderScrollButton" Content="&gt;" HorizontalAlignment="Right" />
+                <Button Grid.Row="1" Grid.Column="0" x:Name="LeftCalendarScrollButton" Content="&lt;" HorizontalAlignment="Left" />
+                <Button Grid.Row="1" Grid.Column="2" x:Name="RightCalendarScrollButton" Content="&gt;" HorizontalAlignment="Right" />
                 <toolkit:ListBoxDragDropTarget HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" Margin="0,0,0,-52" Grid.RowSpan="3" VerticalContentAlignment="Stretch" Width="100"/>
 
-                
                 <StackPanel x:Name="EntireTimeline" Grid.Row="3" Grid.ColumnSpan="3" Orientation="Vertical">
                     <StackPanel x:Name="TimelineDates1" Orientation="Horizontal"/>
                     <StackPanel x:Name="TimelineTimes" Orientation="Horizontal"/>
@@ -65,10 +64,9 @@
                 </StackPanel>
                 <StackPanel x:Name="TimelineIcons" Grid.Row="3" Grid.ColumnSpan="3" Margin="0,0,0,0" Orientation="Horizontal"/>
                 <StackPanel x:Name="TimelineLines" Grid.Row="3" Grid.ColumnSpan="3" Margin="0,0,0,0" Orientation="Horizontal"/>
-                
 
             </Grid>
         </Canvas>
-        
+
     </ScrollViewer>
 </UserControl>
