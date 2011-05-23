@@ -435,7 +435,7 @@
   <ItemGroup>
     <Content Include="Views\Gradebook\Index.cshtml" />
   </ItemGroup>
-<ItemGroup>
+  <ItemGroup>
     <Content Include="Views\Home\_DashboardReply.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -448,6 +448,7 @@
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />
+    <Content Include="Views\Shared\_AjaxEmpty.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

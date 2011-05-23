@@ -775,6 +775,7 @@ body#layoutLogOn
 .inbox_table 
 {
     border-collapse: collapse;
+    width: 100%;
 }
 
 .inbox_table td 
@@ -816,12 +817,27 @@ body#layoutLogOn
 
 .inbox_subject
 {
-    width: 600px;
+
 }
 
-.inbox_table td .inbox_tools
+.inbox_table td.inbox_tools
 {
     width: 50px;
     text-align: right;
+    padding-right: 5px;
 }
 
+.mail_user 
+{
+    display: block;
+    float: left;
+    padding-right: 20px;
+    margin-bottom: 1em;
+}
+
+#mail_message
+{
+    border: 1px solid #aaa;
+    clear: both;
+    padding: 5px;
+}

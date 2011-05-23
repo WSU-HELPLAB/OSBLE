@@ -5,6 +5,7 @@ using OSBLE.Models;
 using System;
 using System.Web;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace OSBLE.Controllers
 {
@@ -16,17 +17,28 @@ namespace OSBLE.Controllers
 
         public ViewResult Index()
         {
+            ViewBag.BoxHeader = "Inbox";
             var mails = db.Mails.Where(m=>m.ToUserProfileID == CurrentUser.ID).OrderByDescending(m=>m.Posted);
             return View(mails.ToList());
+        }
+
+        public ViewResult Outbox()
+        {
+            ViewBag.BoxHeader = "Outbox";
+            var mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID).OrderByDescending(m => m.Posted);
+            return View("Index",mails.ToList());
         }
 
         //
         // GET: /Mail/Details/5
 
-        public ViewResult View(int id)
+        public ActionResult View(int id)
         {
             Mail mail = db.Mails.Find(id);
-            if (mail.Read == false)
+            // Unauthorized mail to view.
+            if ((mail.ToUserProfile != currentUser) && (mail.FromUserProfile != currentUser)) {
+                return RedirectToAction("Index");
+            } else if ((mail.ToUserProfile == currentUser) && (mail.Read == false))
             {
                 mail.Read = true;
                 db.SaveChanges();
@@ -79,6 +91,22 @@ namespace OSBLE.Controllers
 
             Mail mail = new Mail();
 
+            // Handle replies if necessary
+            if (Request.Params["replyTo"] != null)
+            {
+                int replyto = Convert.ToInt32(Request.Params["replyTo"]);
+                Mail reply = db.Mails.Find(replyto);
+                // Ensure valid reply user
+                if ((reply != null) && (reply.ToUserProfile == currentUser))
+                {
+                    mail.Subject = "Re: " + reply.Subject;
+                    // Prefix each line with a '> '
+                    mail.Message = "\n\nOriginal Message at " + reply.Posted.ToString() + ":\n" + 
+                        Regex.Replace(reply.Message,"^.*$","> $&",
+                        RegexOptions.Multiline);
+                }
+            }
+
             UserProfile u = db.UserProfiles.Find(id);
             mail.ToUserProfile = u;
             mail.ToUserProfileID = u.ID;
@@ -114,21 +142,22 @@ namespace OSBLE.Controllers
         //
         // GET: /Mail/Delete/5
 
+        [HttpPost]
         public ActionResult Delete(int id)
         {
             Mail mail = db.Mails.Find(id);
-            return View(mail);
-        }
 
-        //
-        // POST: /Mail/Delete/5
+            if (mail.ToUserProfile == currentUser)
+            {
+                db.Mails.Remove(mail);
+                db.SaveChanges();
+            }
+            else
+            {
+                Response.StatusCode = 403;
+                return View("_AjaxEmpty");
+            }
 
-        [HttpPost, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Mail mail = db.Mails.Find(id);
-            db.Mails.Remove(mail);
-            db.SaveChanges();
             return RedirectToAction("Index");
         }
 
