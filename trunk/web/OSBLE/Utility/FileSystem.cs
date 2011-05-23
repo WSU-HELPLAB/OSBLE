@@ -58,6 +58,31 @@ namespace OSBLE
                 File.Delete(getProfilePicturePath(userProfile));
             }
         }
-    
+
+        private static void emptyFolder(string path)
+        {
+            DirectoryInfo parent = new DirectoryInfo(path);
+
+            foreach (FileInfo fi in parent.GetFiles())
+            {
+                fi.Delete();
+            }
+
+            foreach (DirectoryInfo di in parent.GetDirectories())
+            {
+                emptyFolder(di.FullName);
+                di.Delete();
+            }
+        }
+
+        /// <summary>
+        /// Never, EVER use this function.
+        /// Unless you want to wipe out the filesystem. Then by all means use it.
+        /// (Used in Sample Data generation on model change.)
+        /// </summary>
+        public static void WipeOutFileSystem()
+        {
+            emptyFolder(getRootPath());
+        }
     }
 }
