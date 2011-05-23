@@ -63,9 +63,9 @@ namespace OSBLE.Controllers
             return View();
         }
 
-        private Hashtable getAllCoursesUsers()
+        private Dictionary<int,List<CoursesUsers>> getAllCoursesUsers()
         {
-            Hashtable AllCoursesUsers = new Hashtable();
+            Dictionary<int,List<CoursesUsers>> AllCoursesUsers = new Dictionary<int,List<CoursesUsers>>();
             foreach (CoursesUsers cu in currentCourses)
             {
                 AllCoursesUsers[cu.CourseID] = db.CoursesUsers.Where(c => c.CourseID == cu.CourseID).ToList();
@@ -171,7 +171,10 @@ namespace OSBLE.Controllers
                     newDp.UserProfile = dp.UserProfile;
                     newDp.Course = cu.Course;
 
-                    db.DashboardPosts.Add(newDp);
+                    if (ModelState.IsValid)
+                    {
+                        db.DashboardPosts.Add(newDp);
+                    }
                 }
             }
 
@@ -207,8 +210,11 @@ namespace OSBLE.Controllers
 
                 if (cu != null)
                 {
-                    replyToPost.Replies.Add(dr);
-                    db.SaveChanges();
+                    if (ModelState.IsValid)
+                    {
+                        replyToPost.Replies.Add(dr);
+                        db.SaveChanges();
+                    }
                 }
                 else
                 {

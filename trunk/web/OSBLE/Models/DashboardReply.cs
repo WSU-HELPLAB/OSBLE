@@ -19,6 +19,7 @@ namespace OSBLE.Models
         public virtual UserProfile UserProfile { get; set; }
 
         [AllowHtml]
+        [Required]
         public string Content { get; set; }
 
         public virtual DashboardPost Parent { get; set; }

@@ -28,7 +28,7 @@
         }
 }
 
-@helper DisplayNameForDashboard(UserProfile user, Course course, CoursesUsers activeCourse, Hashtable allCoursesUsers, bool show = false)
+@helper DisplayNameForDashboard(UserProfile user, Course course, CoursesUsers activeCourse, Dictionary<int,List<CoursesUsers>> allCoursesUsers, bool show = false)
     {
 @*
         TODO: I need to simplify this. A lot.
