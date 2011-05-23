@@ -100,7 +100,7 @@ namespace OSBLE.Controllers
 
                 menu.Add(new MenuItem("Dashboard", "Home", "Index"));
                 menu.Add(new MenuItem("Assignments", "Assignment", "Index"));
-                menu.Add(new MenuItem("Grades", "Grade", "Index"));
+                menu.Add(new MenuItem("Grades", "Gradebook", "Index"));
                 menu.Add(new MenuItem("Users", "Roster", "Index", true, true, false));
                 ViewBag.Menu = menu;
 
