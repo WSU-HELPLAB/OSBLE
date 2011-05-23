@@ -19,8 +19,10 @@ namespace FileUploader
     {
        string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
        string home = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        
-        
+
+       string lastTarget = "";
+       bool wasClicked = false;
+ 
         public MainPage()
         {
             InitializeComponent();
@@ -40,62 +42,83 @@ namespace FileUploader
 
             foreach (string folder in Directory.EnumerateDirectories(path))
             {
-                DirectoryLabel Folder = new DirectoryLabel();
-                Folder.DirName.Text = folder.Substring(folder.LastIndexOf('\\') + 1);
-                BitmapImage bmp = new BitmapImage();
-                bmp.UriSource = new Uri("/Images/folder.png", UriKind.Relative);
-                Folder.DirImage.Source = bmp;
-                filelist.Items.Add(Folder);
+                DirectoryLabel label = new DirectoryLabel();
+                label.DirName.Text = folder.Substring(folder.LastIndexOf('\\') + 1);
+                label.Image = LabelImage.Folder;
+                filelist.Items.Add(label);
             }
 
             foreach (string file in Directory.EnumerateFiles(path))
             {
-                DirectoryLabel File = new DirectoryLabel();
-                File.DirName.Text = file.Substring(file.LastIndexOf('\\') + 1);
-                //Folder.DirImage = 
-                filelist.Items.Add(Name);
+                DirectoryLabel label = new DirectoryLabel();
+                label.DirName.Text = file.Substring(file.LastIndexOf('\\') + 1);
+                label.Image = LabelImage.File;
+                filelist.Items.Add(label);
             }
 
             InitializeComponent();
         }
 
-        
-
         private void LocalDirSelect(object sender, MouseButtonEventArgs e)
         {
-            string selectedItem = this.LocalFileList.SelectedItem as string;
-     
-            if ( selectedItem == "...")
+            DirectoryLabel selected = this.LocalFileList.SelectedItem as DirectoryLabel;
+            if (selected != null && selected.Image != LabelImage.File)
+            {
+                if (wasClicked == true)
+                {
+                    if (selected.DirName.Text == lastTarget)
+                    {
+                        path += "\\" + selected.DirName.Text;
+                        dirList(path, LocalFileList);
+                    }
+                }
+                else
+                {
+                    wasClicked = true;
+                }
+                lastTarget = selected.DirName.Text;
+
+            }
+            else if (this.LocalFileList.SelectedItem.ToString() == "...")
             {
                 Stack<string> path_pieces = new Stack<string>(path.Split('\\'));
                 path_pieces.Pop();
                 path = String.Join("\\", path_pieces.ToArray().Reverse());
                 dirList(path, LocalFileList);
+                lastTarget = "";
+                wasClicked = false;
             }
-            else if (selectedItem[0] != '+')
+            else
             {
-                path += "\\" + selectedItem;
-                dirList(path, LocalFileList);
+                lastTarget = "";
+                wasClicked = false;
             }
+
+            
+          
             
         }
 
         private void RemoteDirSelect(object sender, MouseButtonEventArgs e)
         {
-            string selectedItem = this.RemoteFileList.SelectedItem as string;
-
-            if (selectedItem == "...")
+            DirectoryLabel selected = this.RemoteFileList.SelectedItem as DirectoryLabel;
+            if (selected != null && selected.Image != LabelImage.File)
+            {
+                path += "\\" + selected.DirName.Text;
+                dirList(path, RemoteFileList);
+            }
+            else if (this.RemoteFileList.SelectedItem.ToString() == "...")
             {
                 Stack<string> path_pieces = new Stack<string>(path.Split('\\'));
                 path_pieces.Pop();
                 path = String.Join("\\", path_pieces.ToArray().Reverse());
                 dirList(path, RemoteFileList);
             }
-            else if (selectedItem[0] != '+')
-            {
-                path += "\\" + selectedItem;
-                dirList(path, RemoteFileList);
-            }
+
+        }
+
+        private void Syncbtn_Click(object sender, RoutedEventArgs e)
+        {
 
         }
     }

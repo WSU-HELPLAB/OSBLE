@@ -112,6 +112,9 @@
     <None Include="Properties\OutOfBrowserSettings.xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Images\File.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\folder.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
