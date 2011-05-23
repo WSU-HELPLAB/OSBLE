@@ -5,7 +5,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using CreateNewAssignment.AssignmentActivities;
 
 namespace CreateNewAssignment
@@ -26,21 +25,23 @@ namespace CreateNewAssignment
 
         public AssignmentActivitiesCreaterViewModel()
         {
+            //adding the calendars
             calendarLeft.MonthYear = new DateTime(2011, 7, 1);
             calendarRight.MonthYear = new DateTime(2011, 8, 1);
             calendarLeft.GetView().SetValue(Grid.RowProperty, 2);
             calendarLeft.GetView().SetValue(Grid.ColumnProperty, 0);
             calendarRight.GetView().SetValue(Grid.RowProperty, 2);
             calendarRight.GetView().SetValue(Grid.ColumnProperty, 2);
+            //done adding the calendars
 
             thisView.LayoutRoot.Children.Add(calendarRight.GetView());
             thisView.LayoutRoot.Children.Add(calendarLeft.GetView());
 
-            //adding
+            //adding timeline
             timeline.GetView().SetValue(Grid.RowProperty, 3);
             timeline.GetView().SetValue(Grid.ColumnSpanProperty, 3);
             thisView.LayoutRoot.Children.Add(timeline.GetView());
-            //stopped adding
+            //done adding timeline
 
             calendarLeft.MouseRightButtonDown += new MouseButtonEventHandler(Calendar_MouseRightButtonDown);
             calendarRight.MouseRightButtonDown += new MouseButtonEventHandler(Calendar_MouseRightButtonDown);
@@ -414,7 +415,6 @@ namespace CreateNewAssignment
             calendarRight.MonthYear = calendarRight.MonthYear.AddMonths(1);
             UpdateCalendars();
         }
-
 
         private void LeftCalendarScrollButton_Click(object sender, RoutedEventArgs e)
         {
