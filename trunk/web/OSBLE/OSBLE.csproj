@@ -449,6 +449,7 @@
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />
     <Content Include="Views\Shared\_AjaxEmpty.cshtml" />
     <Content Include="Views\Roster\CreateByEmail.cshtml" />
+    <Content Include="Views\Roster\RosterError.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

@@ -849,3 +849,67 @@ body#layoutLogOn
     clear: both;
     padding: 5px;
 }
+
+#add_update_users
+{
+    border: 1px solid #074974;
+    border-bottom: 5px solid #074974;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-bottom: 8px;
+    width: 400px;
+    display: none;
+}
+
+#add_update_users h4 
+{
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.selector 
+{
+    clear: both;
+}
+
+div.selector 
+{
+    padding-bottom: 20px;
+}
+
+.selector h4 
+{
+    padding-top: 10px;
+}
+
+ul.selector
+{
+    display: block;
+    width: 600px;
+}
+
+.selector li 
+{
+    display: block;
+    float: left;
+    list-style-type: none;
+    padding: 5px;
+    margin: 2px;
+    border: 1px solid #074974;
+    border-bottom: 3px solid #074974;
+    cursor: pointer;
+}
+
+.selector li.selected
+{
+    background-color: #074974;
+    border: 1px solid #dfdfdf;
+    border-bottom: 3px solid #dfdfdf;
+    color: #eee;
+}
+
+#import_roster_tools
+{
+    clear: both;
+    padding-top: 2em;
+}

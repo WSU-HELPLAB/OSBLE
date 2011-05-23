@@ -8,6 +8,7 @@ using System.Web.Mvc;
 using LumenWorks.Framework.IO.Csv;
 using OSBLE.Attributes;
 using OSBLE.Models;
+using System.Text.RegularExpressions;
 
 namespace OSBLE.Controllers
 {
@@ -136,24 +137,77 @@ namespace OSBLE.Controllers
             return View();
         }
 
-        public ActionResult ImportRoster()
+        [HttpPost]
+        public ActionResult ImportRoster(HttpPostedFileBase file)
         {
-            return View();
+            if ((file != null) && (file.ContentLength > 0))
+            {
+                // Save file into session
+                Session["RosterFile"] = file;
+
+                Stream s = file.InputStream;
+                List<string> headers = getRosterHeaders(s);
+                file.InputStream.Seek(0, 0);
+
+                string guessedSection = null;
+                string guessedIdentification = null;
+
+                // Guess headers for section and identification
+                foreach (string header in headers)
+                {
+                    if (guessedSection == null)
+                    {
+                        if (Regex.IsMatch(header, "section", RegexOptions.IgnoreCase)) {
+                            guessedSection = header;
+                        }
+                    }
+
+                    if (guessedIdentification == null)
+                    {
+                        if (Regex.IsMatch(header, "\\bident", RegexOptions.IgnoreCase)
+                            || Regex.IsMatch(header, "\\bid\\b", RegexOptions.IgnoreCase)
+                            || Regex.IsMatch(header, "\\bnumber\\b", RegexOptions.IgnoreCase) 
+                            )
+                        {
+                            guessedIdentification = header;
+                        } 
+                    }
+                }
+
+                ViewBag.Headers = headers;
+                ViewBag.GuessedSection = guessedSection;
+                ViewBag.GuessedIdentification = guessedIdentification;
+
+                return View();
+            }
+
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
-        public ActionResult ImportRoster(HttpPostedFileBase file, string columnName)
-        {
-            if (file.ContentLength > 0)
+        public ActionResult ApplyRoster(string idColumn, string sectionColumn) {
+            HttpPostedFileBase file = Session["RosterFile"] as HttpPostedFileBase;
+
+            if ((file != null) && (idColumn != null))
             {
-                //var fileName = Path.GetFileName(file.FileName);
-                //var path = Path.Combine(Server.MapPath("~/App_Data/uploads"), fileName);
-                //file.SaveAs(path);
                 Stream s = file.InputStream;
-                List<RosterEntry> rosterEntries = ParseRoster(s, columnName);
+                List<RosterEntry> rosterEntries = parseRoster(s, idColumn, sectionColumn);
 
                 if (rosterEntries.Count > 0)
                 {
+
+                    // First check to make sure there are no duplicates in the ID table.
+                    List<string> usedIdentifications = new List<string>();
+                    foreach (RosterEntry entry in rosterEntries) {
+                        if(usedIdentifications.Contains(entry.Identification)) {
+                            ViewBag.Error = "There are duplicate Student IDs in your roster. Please ensure the proper Student ID header was selected and check your roster file.";
+                            return View("RosterError");
+                        } else {
+                            usedIdentifications.Add(entry.Identification);
+                        } 
+                    }
+
+                    // No duplicate IDs, so we can remove the current course links to add the new ones.
                     var students = from c in db.CoursesUsers where c.CourseID == activeCourse.CourseID && c.CourseRoleID == (int)CourseRole.OSBLERoles.Student select c;
                     foreach (CoursesUsers student in students)
                     {
@@ -161,6 +215,8 @@ namespace OSBLE.Controllers
                     }
                     db.SaveChanges();
 
+
+                    // Attach to users or add new user profile stubs.
                     foreach (RosterEntry entry in rosterEntries)
                     {
                         CoursesUsers courseUser = new CoursesUsers();
@@ -174,15 +230,25 @@ namespace OSBLE.Controllers
                         }
                         catch
                         {
-                            throw new Exception("There was an error importing the Roster");
+                            ViewBag.Error = "There was an error importing the class roster. Please check your roster file and try again.";
+                            return View("RosterError");
                         }
                     }
                 }
             }
-
+            else if ((idColumn == null))
+            {
+                ViewBag.Error = "You did not specify headers for Student ID. Please try again.";
+                return View("RosterError");
+            }
+            else
+            {
+                ViewBag.Error = "Your roster file was not properly loaded. Please try again.";
+                return View("RosterError");
+            }
+            
             return RedirectToAction("Index");
         }
-
         //
         // GET: /Roster/Create
         public ActionResult Create()
@@ -342,17 +408,27 @@ namespace OSBLE.Controllers
             }
         }
 
-        private List<RosterEntry> ParseRoster(Stream roster, string idNumberColumnName)
+        private List<string> getRosterHeaders(Stream roster)
+        {
+            StreamReader sr = new StreamReader(roster);
+            CachedCsvReader csvReader = new CachedCsvReader(sr, true);
+
+            return csvReader.GetFieldHeaders().ToList();
+        }
+
+        private List<RosterEntry> parseRoster(Stream roster, string idNumberColumnName, string sectionColumnName)
         {
             StreamReader sr = new StreamReader(roster);
             CachedCsvReader csvReader = new CachedCsvReader(sr, true);
 
             List<RosterEntry> rosterData = new List<RosterEntry>();
 
-            string section = "Section";
             bool hasSectionInfo = false;
 
-            hasSectionInfo = csvReader.GetFieldHeaders().Contains(section);
+            if (sectionColumnName != null)
+            {
+                hasSectionInfo = csvReader.GetFieldHeaders().Contains(sectionColumnName);
+            }
 
             csvReader.MoveToStart();
             while (csvReader.ReadNextRecord())
@@ -362,7 +438,7 @@ namespace OSBLE.Controllers
                 entry.Identification = csvReader[csvReader.GetFieldIndex(idNumberColumnName)];
                 if (hasSectionInfo)
                 {
-                    int.TryParse(csvReader[csvReader.GetFieldIndex(section)], out sectionNum);
+                    int.TryParse(csvReader[csvReader.GetFieldIndex(sectionColumnName)], out sectionNum);
                     entry.Section = sectionNum;
                 }
                 else
