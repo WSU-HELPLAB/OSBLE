@@ -22,6 +22,8 @@ namespace CreateNewAssignment
         private AddActivityMenu activityMenu = new AddActivityMenu();
         private CalendarDayItemView dayRightClickedOn;
 
+        private TimelineViewModel timeline = new TimelineViewModel();
+
         public AssignmentActivitiesCreaterViewModel()
         {
             calendarLeft.MonthYear = new DateTime(2011, 7, 1);
@@ -34,13 +36,18 @@ namespace CreateNewAssignment
             thisView.LayoutRoot.Children.Add(calendarRight.GetView());
             thisView.LayoutRoot.Children.Add(calendarLeft.GetView());
 
+            //adding
+            timeline.GetView().SetValue(Grid.RowProperty, 3);
+            timeline.GetView().SetValue(Grid.ColumnSpanProperty, 3);
+            thisView.LayoutRoot.Children.Add(timeline.GetView());
+            //stopped adding
+
             calendarLeft.MouseRightButtonDown += new MouseButtonEventHandler(Calendar_MouseRightButtonDown);
             calendarRight.MouseRightButtonDown += new MouseButtonEventHandler(Calendar_MouseRightButtonDown);
 
             thisView.MouseRightButtonDown += new MouseButtonEventHandler(thisView_MouseRightButtonDown);
             thisView.LeftCalendarScrollButton.Click += new RoutedEventHandler(LeftCalendarScrollButton_Click);
             thisView.RightCalendarScrollButton.Click += new RoutedEventHandler(RightCalendarScrollButton_Click);
-            //thisView.test.Click += new RoutedEventHandler(testBtn_click);
 
             thisView.SubmissionIcon.MouseLeftButtonDown += new MouseButtonEventHandler(AssignmentActivityIcon_MouseLeftButtonDown);
             thisView.PeerReviewIcon.MouseLeftButtonDown += new MouseButtonEventHandler(AssignmentActivityIcon_MouseLeftButtonDown);
@@ -331,7 +338,7 @@ namespace CreateNewAssignment
 
         public void UpdateActivityDisplay()
         {
-            displayTimeline();
+            timeline.displayTimeline(assignmentActivites);
             ClearColorOfDays();
 
             int index = assignmentActivites.FindInsertionSpot(new AssignmentActivityViewModel(Activities.Null, calendarLeft.MonthYear));
@@ -408,212 +415,6 @@ namespace CreateNewAssignment
             UpdateCalendars();
         }
 
-        //calendar
-
-        /// <summary>
-        /// removes the children from all the stack panels associated with timeline (labels for date, time, icons for event, and rects for event)
-        /// </summary>
-        private void clearTimeline()
-        {
-            for (int i = thisView.Timeline.Children.Count - 1; i >= 0; i--)
-            {
-                thisView.Timeline.Children.RemoveAt(i);
-            }
-            for (int i = thisView.TimelineDates1.Children.Count - 1; i >= 0; i--)
-            {
-                thisView.TimelineDates1.Children.RemoveAt(i);
-            }
-            for (int i = thisView.TimelineTimes.Children.Count - 1; i >= 0; i--)
-            {
-                thisView.TimelineTimes.Children.RemoveAt(i);
-            }
-            for (int i = thisView.TimelineIcons.Children.Count - 1; i >= 0; i--)
-            {
-                thisView.TimelineIcons.Children.RemoveAt(i);
-            }
-            for (int i = thisView.TimelineLines.Children.Count - 1; i >= 0; i--)
-            {
-                thisView.TimelineLines.Children.RemoveAt(i);
-            }
-        }
-
-        /// <summary>
-        /// returns a list of rectangles that are no smaller than minRectWidth, stretch timelineWidth, and each rectangles width corrisponds to how much time it takes
-        /// </summary>
-        private List<Rectangle> getRectangles(double minRectWidth, double rectHeight, double timelineWidth)
-        {
-            double TotalTime = TotalEventTime();
-            bool endsWithStop = CalendarEndsWithStop();
-            double minEventWidth = minRectWidth; //in pixels
-            int eventsWithMinWidth = 1; //starts at 1 because final event always has min width
-            double timeNotConsidered = 0;
-            double timelineHeight = rectHeight;
-
-            List<Rectangle> rectList = new List<Rectangle>();
-            List<int> dontCheck = new List<int>();
-
-            bool allValid;
-            do
-            {
-                allValid = true;
-
-                for (int i = 0; i < assignmentActivites.Count; i++)
-                {
-                    if (i >= rectList.Count)
-                        rectList.Add(new Rectangle());
-
-                    if (assignmentActivites.Count == 1) //only 1 activity, make it expand whole timeline
-                    {
-                        //rectList[i].Width = thisView.LayoutRoot.MinWidth;
-                        rectList[i].Width = timelineWidth;
-                    }
-                    else if (i == (assignmentActivites.Count - 1)) //last activity, make it expand exactly the min width
-                    {
-                        rectList[i].Width = minEventWidth;
-                    }
-                    else //normal activity, width it set on of timetaken / totaltime, with a minimum width of minEventWidth
-                    {
-                        if (!dontCheck.Contains(i)) //if it was determined that its width was less than minEventWidth previously, dont change it.
-                            // rectList[i].Width = ((TimeUntilNextEventInDays(assignmentActivites[i])) / (TotalTime - timeNotConsidered)) * (thisView.LayoutRoot.MinWidth - minEventWidth * eventsWithMinWidth);
-                            rectList[i].Width = ((TimeUntilNextEventInDays(assignmentActivites[i])) / (TotalTime - timeNotConsidered)) * (timelineWidth - minEventWidth * eventsWithMinWidth);
-
-                        if (rectList[i].Width < minEventWidth)//if any width is less than minEventWidth, must recalculate all widths
-                        {
-                            timeNotConsidered += TimeUntilNextEventInDays(assignmentActivites[i]);
-                            dontCheck.Add(i);
-                            rectList[i].Width = minEventWidth;
-                            eventsWithMinWidth += 1;
-                            allValid = false;
-                        }
-                    }
-                    //setting color & other attributes
-                    rectList[i].Height = timelineHeight;
-                    rectList[i].HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-                    rectList[i].Fill = AssignmentActivitiesFactory.GetColor(assignmentActivites[i].ActivityType);
-                }
-            } while (!allValid);
-            return rectList;
-        }
-
-        /// <summary>
-        /// Displays the timeline based off events on calendar
-        /// </summary>
-        private void displayTimeline()
-        {
-            clearTimeline();
-
-            double TotalTime = TotalEventTime();
-            bool endsWithStop = CalendarEndsWithStop();
-            double minEventWidth = 50; //in pixels
-            double timelineHeight = 20;
-            double timelineWidth = thisView.LayoutRoot.MinWidth;
-
-            List<Rectangle> rectList = getRectangles(minEventWidth, timelineHeight, timelineWidth);
-            if ((int)(timelineWidth / minEventWidth) >= (assignmentActivites.Count)) //
-                for (int i = 0; i < rectList.Count; i++) //add children into the view
-                {
-                    //adding rectangles
-                    thisView.Timeline.Children.Add(rectList[i]);
-
-                    //adding labels
-                    Label timeLabel = new Label();
-                    timeLabel.Width = rectList[i].Width;
-                    timeLabel.Content = assignmentActivites[i].StartDateTime.Month.ToString() + "/" + assignmentActivites[i].StartDateTime.Day.ToString() + "\n11:59PM";
-                    thisView.TimelineTimes.Children.Add(timeLabel);
-
-                    //adding images
-                    Image picToAdd = new Image() { Source = AssignmentActivitiesFactory.GetImageSourceFromActivities(assignmentActivites[i].ActivityType) };
-                    int offSetToAllign = 32;
-                    if (i >= 1)
-                        picToAdd.Margin = new Thickness(rectList[i - 1].Width - 20, offSetToAllign, 0, 0);
-                    else
-                        picToAdd.Margin = new Thickness(0, offSetToAllign, 0, 0);
-                    thisView.TimelineIcons.Children.Add(picToAdd);
-                }
-        }
-
-        /// <summary>
-        /// returns -1 if there is no next event
-        /// returns the time (in days) until the next event
-        /// </summary>
-        private double TimeUntilNextEventInDays(AssignmentActivityViewModel temp_aaVM)
-        {
-            double returnVal = 0.0;
-            int index = 0;
-            AssignmentActivityViewModel temp2 = new AssignmentActivityViewModel(Activities.Null);
-            index = assignmentActivites.IndexOf(temp_aaVM);
-            temp_aaVM = assignmentActivites[index];
-
-            if (assignmentActivites.Count > (index + 1)) //checking if there are enough activities to assign temp2
-            {
-                temp2 = assignmentActivites[index + 1];
-            }
-            else
-            {
-                temp2 = null;
-            }
-
-            if (temp_aaVM != null)
-            {
-                if (temp2 != null) //there is a following event
-                {
-                    returnVal = (temp2.StartDateTime.Ticks - temp_aaVM.StartDateTime.Ticks) / TimeSpan.TicksPerDay;
-                }
-                else                //no following event
-                {
-                    returnVal = 0.0;
-                }
-            }
-            return returnVal;
-        }
-
-        /// <summary>
-        ///returns the time (in days) from start of first event to end of last event
-        ///returns the time from start of first event to start of last event if there is no end
-        ///returns 0 if there is only 1 event or no events
-        /// </summary>
-        private double TotalEventTime()
-        {
-            double returnVal = 0.0;
-            AssignmentActivityViewModel temp = new AssignmentActivityViewModel(Activities.Null);
-
-            temp = assignmentActivites.GetNextItem(temp);
-
-            if (temp == null) return 0;//no events
-            long time1 = temp.StartDateTime.Ticks;
-            long time2 = temp.StartDateTime.Ticks;
-            long dTimeInDays = temp.StartDateTime.Ticks;
-
-            while (temp != null)
-            {
-                time2 = temp.StartDateTime.Ticks; //gets time of old event
-                temp = assignmentActivites.GetNextItem(temp);
-                if (temp != null)
-                {
-                    time1 = temp.StartDateTime.Ticks; //gets time of new event
-                    dTimeInDays = (time1 - time2) / TimeSpan.TicksPerDay;
-                    returnVal += dTimeInDays;
-                }
-            }
-            return returnVal;
-        }
-
-        /// <summary>
-        /// returns true if the last event is a stop, else false
-        /// </summary>
-        private bool CalendarEndsWithStop()
-        {
-            bool returnVal = false;
-            AssignmentActivityViewModel temp = new AssignmentActivityViewModel(Activities.Null);
-            temp = assignmentActivites.GetNextItem(temp);
-            while (temp != null)
-            {
-                if (temp.ActivityType == Activities.Stop) returnVal = true;
-                else returnVal = false;
-                temp = assignmentActivites.GetNextItem(temp);
-            }
-            return returnVal;
-        }
 
         private void LeftCalendarScrollButton_Click(object sender, RoutedEventArgs e)
         {
