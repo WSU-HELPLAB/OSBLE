@@ -59,13 +59,27 @@ namespace OSBLE.Models
                 .WillCascadeOnDelete(false);
         }
 
-        /// <summary>
-        /// Creates sample data for OSBLE for development purposes.
-        /// </summary>
-        public void SeedTestData()
+        private void createSampleUser(string username, string password, string firstname, string lastname, string ident, int school, bool isAdmin, bool canCreateCourses)
         {
-            #region Course Roles
+            Membership.CreateUser(username, password, username);
 
+            UserProfile up = new UserProfile();
+            up.FirstName = firstname;
+            up.LastName = lastname;
+            up.IsAdmin = isAdmin;
+            up.Identification = ident;
+            up.SchoolID = school;
+            up.UserName = username;
+            up.CanCreateCourses = canCreateCourses;
+
+            this.UserProfiles.Add(up);
+        }
+
+        /// <summary>
+        /// Adds course roles to db
+        /// </summary>
+        public void SeedRoles()
+        {
             // Set up "static" values for Course Roles.
 
             // Instructor: Can Modify Course, See All, Can Grade
@@ -78,10 +92,16 @@ namespace OSBLE.Models
             this.CourseRoles.Add(new CourseRole("Moderator", false, false, false, false, false));
             // Observer: Can See All, All Anonymized
             this.CourseRoles.Add(new CourseRole("Observer", false, true, false, false, true));
+        }
 
-            #endregion Course Roles
-
+        /// <summary>
+        /// Creates sample data for OSBLE for development purposes.
+        /// </summary>
+        public void SeedTestData()
+        {
             #region Test Data
+
+            FileSystem.WipeOutFileSystem();
 
             // Sample Schools
             School s1 = new School();
@@ -117,6 +137,50 @@ namespace OSBLE.Models
                 Membership.DeleteUser(mu.UserName);
             }
 
+            createSampleUser("bob@smith.com", "123123", "Bob", "Smith", "1", 1, false, true);
+            createSampleUser("stu@dent.com", "123123", "Stu", "Dent", "2", 1, false, false);
+            createSampleUser("me@me.com", "123123", "Ad", "Min", "3", 1, true, true);
+
+            this.SaveChanges();
+
+            CoursesUsers cu = new CoursesUsers();
+            cu.CourseID = 1;
+            cu.UserProfileID = 1;
+            cu.CourseRoleID = (int)CourseRole.OSBLERoles.Instructor;
+            cu.Section = 0;
+
+            CoursesUsers cu2 = new CoursesUsers();
+            cu2.CourseID = 2;
+            cu2.UserProfileID = 1;
+            cu2.CourseRoleID = (int)CourseRole.OSBLERoles.Observer;
+            cu2.Section = 0;
+
+            CoursesUsers cu3 = new CoursesUsers();
+            cu3.CourseID = 1;
+            cu3.UserProfileID = 2;
+            cu3.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu3.Section = 1;
+
+            CoursesUsers cu4 = new CoursesUsers();
+            cu4.CourseID = 2;
+            cu4.UserProfileID = 3;
+            cu4.CourseRoleID = (int)CourseRole.OSBLERoles.Instructor;
+            cu4.Section = 0;
+
+            CoursesUsers cu5 = new CoursesUsers();
+            cu5.CourseID = 2;
+            cu5.UserProfileID = 2;
+            cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu5.Section = 2;
+            
+            this.CoursesUsers.Add(cu);
+            this.CoursesUsers.Add(cu2);
+            this.CoursesUsers.Add(cu3);
+            this.CoursesUsers.Add(cu4);
+            this.CoursesUsers.Add(cu5);
+
+            this.SaveChanges();
+
             #endregion Test Data
         }
     }
@@ -131,6 +195,7 @@ namespace OSBLE.Models
         {
             base.Seed(context);
 
+            context.SeedRoles();
             context.SeedTestData();
         }
     }
