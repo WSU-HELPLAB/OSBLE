@@ -361,9 +361,6 @@
     <Content Include="Views\Roster\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Roster\Delete.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Views\CourseRoles\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -449,6 +446,7 @@
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />
     <Content Include="Views\Shared\_AjaxEmpty.cshtml" />
+    <Content Include="Views\Roster\CreateByEmail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

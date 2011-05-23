@@ -212,10 +212,17 @@ ul.user_list
     font-size: 10pt;
 }
 
-.user_list li img
+.user_list li form 
 {
-    vertical-align: middle;
+    display: none;
+    margin: 0; padding: 0;
 }
+
+.user_list input
+{
+    position: relative;
+}
+
 
 .user_list li:hover
 {
@@ -232,6 +239,7 @@ ul.user_list
 {
     display: none;
     float: right;
+    padding-right: 3px;
 }
 
 #users_table td

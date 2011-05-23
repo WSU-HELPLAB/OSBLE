@@ -7,6 +7,7 @@
     Roster</h2>
 <p>
     @Html.ActionLink("Add By School ID", "Create")&nbsp;&nbsp;
+    @Html.ActionLink("Add By Email", "CreateByEmail")&nbsp;&nbsp;
     @Html.ActionLink("Import Roster", "ImportRoster")
 </p>
 <p>
@@ -20,11 +21,18 @@
         // Get search string and remove all non-alphanumeric characters (or dashes)
         var search = $('#roster_find').val().toLowerCase().replace(/[^a-z0-9\-\ ]*/gi, "");
 
+        // Animation function. tries to avoid overlap.
         $('.roster_name').each(function () {
             if ($(this).html().toLowerCase().match(search)) {
-                $(this).parent().show('highlight');
+                if (($(this).parent().data("showing") != true) && ($(this).parent().css("display") == "none")) {
+                    $(this).parent().data("showing",true);
+                    $(this).parent().show('highlight', {}, "slow", function () { $(this).data("showing", false); });
+                }
             } else {
-                $(this).parent().hide('highlight');
+                if (($(this).parent().data("hiding") != true) && ($(this).parent().css("display") != "none")) {
+                    $(this).parent().data("hiding", true);
+                    $(this).parent().hide('highlight', {}, "slow", function () { $(this).data("hiding", false); });
+                }
             }
         });
 
@@ -46,7 +54,7 @@
                 <ul class="user_list">
                     @foreach (OSBLE.Models.UserProfile user in userByRole.Users)
                     {
-                        <li>
+                        <li id="user_item_@(user.ID)">
                         @if ((user != ViewBag.CurrentUser) || ViewBag.CanEditSelf == true)
                         {
                             <div class="user_controls">
@@ -54,7 +62,16 @@
                             <a href="@Url.Action("Create", "Mail", new { recipientID = user.ID })">@Helpers.MailButton()</a>
                             }
                             <a href="@Url.Action("Edit", "Roster", new { userProfileID = user.ID })">@Helpers.EditButton()</a>
-                            <a href="@Url.Action("Delete", "Roster", new { userProfileID = user.ID })">@Helpers.DeleteButton()</a>
+
+                            <form action="@Url.Action("Delete")"
+                                style="display: inline;"
+                                data-ajax="true"
+                                data-ajax-success="$('#user_item_@(user.ID)').hide('highlight',{},'slow',function(){$(this).remove();})"
+                                data-ajax-confirm="Are you sure you want to remove this user from the course?"
+                                method="post">
+                                <input type="hidden" name="userProfileID" value="@user.ID" />
+                                @Helpers.DeleteSubmit()
+                            </form>
                             
                             </div>
                         }

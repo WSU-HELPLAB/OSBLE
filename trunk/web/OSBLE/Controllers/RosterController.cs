@@ -187,8 +187,6 @@ namespace OSBLE.Controllers
         // GET: /Roster/Create
         public ActionResult Create()
         {
-            //ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName");
-            ViewBag.CourseID = new SelectList(db.Courses, "ID", "Name");
             ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
             return View();
         }
@@ -209,6 +207,37 @@ namespace OSBLE.Controllers
                 catch
                 {
                     ModelState.AddModelError("", "This ID Number already exists in this class");
+                    ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
+                    return View();
+                }
+            }
+            return RedirectToAction("Index");
+        }
+
+        //
+        // GET: /Roster/CreateByEmail
+        public ActionResult CreateByEmail()
+        {
+            ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
+            return View();
+        }
+
+        //
+        // POST: /Roster/CreateByEmail
+
+        [HttpPost]
+        public ActionResult CreateByEmail(CoursesUsers courseuser)
+        {
+            //if modelState isValid
+            if (ModelState.IsValid && courseuser.CourseRoleID != 0)
+            {
+                try
+                {
+                    attachCourseUserByEmail(courseuser);
+                }
+                catch(Exception e)
+                {
+                    ModelState.AddModelError("", e.Message);
                     ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
                     return View();
                 }
@@ -257,31 +286,22 @@ namespace OSBLE.Controllers
         }
 
         //
-        // GET: /Roster/Delete/5
+        // POST: /Roster/Delete/5
+
+        [HttpPost]
         public ActionResult Delete(int userProfileID)
         {
             CoursesUsers coursesusers = getCoursesUsers(userProfileID);
-            if (CanModifyOwnLink(coursesusers))
-            {
-                return View(coursesusers);
-            }
-            return RedirectToAction("Index");
-        }
-
-        //
-        // POST: /Roster/Delete/5
-
-        [HttpPost, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int userProfileID)
-        {
-            CoursesUsers coursesusers = getCoursesUsers(userProfileID);
-            if (CanModifyOwnLink(coursesusers))
+            if ((coursesusers != null) && CanModifyOwnLink(coursesusers))
             {
                 db.CoursesUsers.Remove(coursesusers);
                 db.SaveChanges();
-                return RedirectToAction("Index");
             }
-            return RedirectToAction("Index");
+            else
+            {
+                Response.StatusCode = 403;
+            }
+            return View("_AjaxEmpty");
         }
 
         protected override void Dispose(bool disposing)
@@ -387,7 +407,7 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// This sets up everything for the coruseUser and will create a new UserProfile if it doesn't not exist.
+        /// This sets up everything for the courseUser and will create a new UserProfile if it doesn't not exist.
         /// </summary>
         /// <param name="courseuser">It must have section, role set, and a reference to UserProfile with Identification set</param>
         private void createCourseUser(CoursesUsers courseuser)
@@ -430,6 +450,39 @@ namespace OSBLE.Controllers
             else
             {
                 throw new Exception("This courseUser would not be unique if added");
+            }
+        }
+
+        /// <summary>
+        /// Attempts to find an email address to match requested, and adds them to the course if it is found.
+        /// </summary>
+        /// <param name="courseUser"></param>
+        private void attachCourseUserByEmail(CoursesUsers courseuser)
+        {
+            UserProfile up = db.UserProfiles.Where(u => u.UserName == courseuser.UserProfile.UserName).FirstOrDefault();
+
+            if (up != null)
+            {
+                courseuser.UserProfile = up;
+                courseuser.UserProfileID = up.ID;
+            }
+            else
+            {
+                throw new Exception("No user exists with that email address!");
+            }
+
+            courseuser.CourseID = activeCourse.CourseID;
+
+            if ((from c in db.CoursesUsers
+                 where c.CourseID == courseuser.CourseID && c.UserProfileID == courseuser.UserProfileID
+                 select c).Count() == 0)
+            {
+                db.CoursesUsers.Add(courseuser);
+                db.SaveChanges();
+            }
+            else
+            {
+                throw new Exception("This user is already in the course!");
             }
         }
     }
