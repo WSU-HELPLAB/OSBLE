@@ -347,8 +347,7 @@ namespace CreateNewAssignment
 
         public void UpdateActivityDisplay()
         {
-            newTest();
-            //generateTimeLine();
+            displayTimeline();
             ClearColorOfDays();
 
             
@@ -426,280 +425,177 @@ namespace CreateNewAssignment
             UpdateCalanders();
         }
 
-
-        
-        void newTest()
+        /// <summary>
+        /// removes the children from all the stackpanels associated with timeline (labels for date, time, icons for event, and rects for event)
+        /// </summary>
+        void clearTimeline()
         {
-            //collecting rectangles from Timeline and putting them in rects list
-            var b = from c in thisView.Timeline.Children where c is Rectangle select c as Rectangle;
-            List<Rectangle> rects = b.ToList();
-
-
-
-
-            //getting labels from stackpanels
-            var L1 = from c in thisView.TimelineDates1.Children where c is Label select c as Label;
-            var L2 = from c in thisView.TimelineDates2.Children where c is Label select c as Label;
-
-
-            //removing all images
-            for (int i = thisView.Test.Children.Count-1; i >= 0; i--)
+            for (int i = thisView.Timeline.Children.Count - 1; i >= 0; i--)
             {
-                thisView.Test.Children.RemoveAt(i);
+                thisView.Timeline.Children.RemoveAt(i);
             }
+            for (int i = thisView.TimelineDates1.Children.Count - 1; i >= 0; i--)
+            {
+                thisView.TimelineDates1.Children.RemoveAt(i);
+            }
+            for (int i = thisView.TimelineTimes.Children.Count - 1; i >= 0; i--)
+            {
+                thisView.TimelineTimes.Children.RemoveAt(i);
+            }
+            for (int i = thisView.TimelineIcons.Children.Count - 1; i >= 0; i--)
+            {
+                thisView.TimelineIcons.Children.RemoveAt(i);
+            }
+            for (int i = thisView.TimelineLines.Children.Count - 1; i >= 0; i--)
+            {
+                thisView.TimelineLines.Children.RemoveAt(i);
+            }
+        }
 
-            List<Label> Labels1 = L1.ToList();
-            List<Label> Labels2 = L2.ToList();
-            //clearing out labels
-            
-            
-            for (int i = 0; i < Labels1.Count; i++)
+        /// <summary>
+        /// given an activity, returns the color associated with that activity
+        /// </summary>
+        Color getEventFillColor(Activities activity)
+        {
+            switch (activity) //assigning color
             {
-                Labels1[i].Width = 0;
-                Labels1[i].Content = 0;
-                Labels1[i].Margin = new Thickness(0, 0, 0, 0);
-                Labels1[i].HorizontalContentAlignment = HorizontalAlignment.Left;
-            }
-            for (int i = 0; i < Labels2.Count; i++)
+                case Activities.Submission: return Colors.Green;
+                case Activities.PeerReview: return Colors.Blue;
+                case Activities.IssueVoting: return Colors.Purple;
+                case Activities.AuthorRebuttal: return Colors.Red;
+                case Activities.Stop: return Colors.White;
+                default: return Colors.Orange;
+            }   
+        }
+
+        /// <summary>
+        /// returns a list of rectangles that are no smaller than minRectWidth, stretch timelineWidth, and each rectangles width corrisponds to how much time it takes
+        /// </summary>
+        List<Rectangle> getRectangles(double minRectWidth, double rectHeight, double timelineWidth)
+        {
+            double TotalTime = TotalEventTime();
+            bool endsWithStop = CalenderEndsWithStop();
+            double minEventWidth = minRectWidth; //in pixels
+            int eventsWithMinWidth = 1; //starts at 1 because final event always has min width
+            double timeNotConsidered = 0;
+            double timelineHeight = rectHeight;
+
+            List<Rectangle> rectList = new List<Rectangle>();
+            List<int> dontCheck = new List<int>();
+
+            bool allValid;
+            do
             {
-                Labels2[i].Width = 0;
-                Labels2[i].Content = 0;
-                Labels2[i].Margin = new Thickness(0, 0, 0, 0);
-                Labels2[i].HorizontalContentAlignment = HorizontalAlignment.Left;
-            }
+                allValid = true;
+
+                for (int i = 0; i < assignmentActivites.Count; i++)
+                {
+                    if (i >= rectList.Count)
+                        rectList.Add(new Rectangle());
+
+                    if (assignmentActivites.Count == 1) //only 1 activity, make it expand whole timeline
+                    {
+                        //rectList[i].Width = thisView.LayoutRoot.MinWidth;
+                        rectList[i].Width = timelineWidth;
+                    }
+                    else if (i == (assignmentActivites.Count - 1)) //last activity, make it expand exactly the min width
+                    {
+                        rectList[i].Width = minEventWidth;
+                    }
+                    else //normal activity, width it set on of timetaken / totaltime, with a minimum width of minEventWidth
+                    {
+                        if (!dontCheck.Contains(i)) //if it was determined that its width was less than minEventWidth previously, dont change it. 
+                           // rectList[i].Width = ((TimeUntilNextEventInDays(assignmentActivites[i])) / (TotalTime - timeNotConsidered)) * (thisView.LayoutRoot.MinWidth - minEventWidth * eventsWithMinWidth);
+                            rectList[i].Width = ((TimeUntilNextEventInDays(assignmentActivites[i])) / (TotalTime - timeNotConsidered)) * (timelineWidth - minEventWidth * eventsWithMinWidth);
+
+                        if (rectList[i].Width < minEventWidth)//if any width is less than minEventWidth, must recalculate all widths
+                        {
+                            timeNotConsidered += TimeUntilNextEventInDays(assignmentActivites[i]);
+                            dontCheck.Add(i);
+                            rectList[i].Width = minEventWidth;
+                            eventsWithMinWidth += 1;
+                            allValid = false;
+                        }
+                    }
+                    //setting color & other attributes
+                    rectList[i].Height = timelineHeight;
+                    rectList[i].HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+                    rectList[i].Fill = new SolidColorBrush(getEventFillColor(assignmentActivites[i].ActivityType));
+                }
+            } while (!allValid);
+            return rectList;
+        }
+
+        /// <summary>
+        /// Displays the timeline based off events on calender
+        /// </summary>
+        void displayTimeline()
+        {
+            clearTimeline();
 
             double TotalTime = TotalEventTime();
             bool endsWithStop = CalenderEndsWithStop();
+            double minEventWidth = 50; //in pixels
+            double timelineHeight = 20;
+            double timelineWidth = thisView.LayoutRoot.MinWidth;
 
-            //if there was a delete that left more rectangles than activities, clear the rectangles
-            if (rects.Count > assignmentActivites.Count)
-            {
-                for (int i = 0; i < rects.Count; i++)
+            List<Rectangle> rectList = getRectangles(minEventWidth, timelineHeight, timelineWidth);           
+            if((int)(timelineWidth / minEventWidth) >= (assignmentActivites.Count)) //
+                for (int i = 0; i < rectList.Count; i++) //add children into the view
                 {
-                    rects[i].Width = 0;
-                    rects[i].Fill = new SolidColorBrush(Colors.Transparent);
-                    rects[i].Height = 0;
+                    //adding rectangles
+                    thisView.Timeline.Children.Add(rectList[i]);
+
+                    //adding labels
+                    Label timeLabel = new Label();
+                    timeLabel.Width = rectList[i].Width;
+                    timeLabel.Content = assignmentActivites[i].StartDateTime.Month.ToString() + "/" + assignmentActivites[i].StartDateTime.Day.ToString() + "\n11:59PM";
+                    thisView.TimelineTimes.Children.Add(timeLabel);
+
+                    //adding images
+                    Image picToAdd = getEventImage(assignmentActivites[i].ActivityType);
+                    int offSetToAllign = 32;
+                    if (i >= 1)
+                        picToAdd.Margin = new Thickness(rectList[i - 1].Width - 20, offSetToAllign, 0, 0);
+                    else
+                        picToAdd.Margin = new Thickness(0, offSetToAllign, 0, 0);
+                    thisView.TimelineIcons.Children.Add(picToAdd);
                 }
-            }
-
-            //setting attributes for each rectangle
-            for (int i = 0; i < assignmentActivites.Count; i++)
-            {
-                Rectangle tempRect = new Rectangle();
-                tempRect.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-                tempRect.Height = 20;
-
-                switch (assignmentActivites[i].ActivityType) //assigning color
-                {
-                    case Activities.Submission: 
-                        tempRect.Fill = new SolidColorBrush(Colors.Green);
-                       
-                        break;
-                    case Activities.PeerReview: tempRect.Fill = new SolidColorBrush(Colors.Blue);
-                        break;
-                    case Activities.IssueVoting: tempRect.Fill = new SolidColorBrush(Colors.Purple);
-                        break;
-                    case Activities.AuthorRebuttal: tempRect.Fill = new SolidColorBrush(Colors.Red);
-                        break;
-                    case Activities.Stop: tempRect.Fill = new SolidColorBrush(Colors.White);
-                        break;
-                    default: tempRect.Fill = new SolidColorBrush(Colors.Orange);
-                        break;
-                }
-
-
-                //setting width
-                if (assignmentActivites.Count == 1)
-                    tempRect.Width = thisView.LayoutRoot.MinWidth;
-                else if (i == (assignmentActivites.Count - 1)) tempRect.Width = 10;
-                else
-                    tempRect.Width = ((TimeUntilNextEventInDays(assignmentActivites[i])) / TotalTime) * (thisView.LayoutRoot.MinWidth - 10);
-
-                //use whats in rects before adding more children to Timeline
-                if (i > (rects.Count() - 1)) //avoiding assigning to null area
-                {
-                    thisView.Timeline.Children.Add(tempRect);
-                    rects.Add(tempRect);
-                }
-                else
-                {
-                    rects[i].Width = tempRect.Width;
-                    rects[i].Fill = tempRect.Fill;
-                    rects[i].Height = tempRect.Height;
-                    rects[i].HorizontalAlignment = tempRect.HorizontalAlignment;
-                }
-
-                int roomForLastLabel = 80; //amount of pixels given for the last date
-                //setting up labels for timeline
-                if (Labels1.Count() - 1 < i)//need a new label added to stackpanel
-                {
-
-                   
-                    //displaying time in above stackpanel
-                    Label newL = new Label();
-                    newL.Width = tempRect.Width;
-                    newL.Content = assignmentActivites[i].StartDateTime.Month.ToString() + "/" + assignmentActivites[i].StartDateTime.Day.ToString() + "\n11:59PM";
-                    thisView.TimelineDates1.Children.Add(newL);
-                    Labels1.Add(newL);
-
-                    //Displaying type in below stackpanel
-                    Label newL2 = new Label();
-                    newL2.Width = tempRect.Width;
-                    newL2.Content = assignmentActivites[i].ActivityType.ToString();
-                    thisView.TimelineDates2.Children.Add(newL2);
-                    Labels2.Add(newL2);
-
-                    if (i == (assignmentActivites.Count - 1) && i>0)//final activity && ends with stop
-                    {
-                        Labels1[i - 1].Width -= roomForLastLabel - 10;
-                        Labels1[i].Width = roomForLastLabel;
-                        Labels1[i].HorizontalContentAlignment = HorizontalAlignment.Right;
-                        Labels2[i - 1].Width -= roomForLastLabel - 10;
-                        Labels2[i].Width = roomForLastLabel;
-                        Labels2[i].HorizontalContentAlignment = HorizontalAlignment.Right;
-                    }
-
-                }
-                else //adjust Labels from what was already in the stackpanel (Rather than create new)
-                {
-                    Labels1[i].Content = assignmentActivites[i].StartDateTime.Month.ToString() + "/" + assignmentActivites[i].StartDateTime.Day.ToString() + "\n11:59PM";
-                    Labels1[i].Width = tempRect.Width;
-
-                    Labels2[i].Content = assignmentActivites[i].ActivityType.ToString();
-                    Labels2[i].Width = tempRect.Width;
-
-                    //if (i == (assignmentActivites.Count - 1) && endsWithStop)//final activity && ends with stop
-                    if (i == (assignmentActivites.Count - 1) && i>0)//final activity && ends with stop
-                    {
-                        Labels1[i - 1].Width -= roomForLastLabel - 10;
-                        Labels1[i].Width = roomForLastLabel;
-                        Labels1[i].HorizontalContentAlignment = HorizontalAlignment.Right;
-                        Labels2[i - 1].Width -= roomForLastLabel - 10;
-                        Labels2[i].Width = roomForLastLabel;
-                        Labels2[i].HorizontalContentAlignment = HorizontalAlignment.Right;
-                    }
-                }
-
-
-                //putting in images
-                Image pic = new Image();
-                switch (assignmentActivites[i].ActivityType)
-                {
-                    case Activities.Submission:
-                        pic.Source = new BitmapImage(new Uri("Icons/submit-01.png", UriKind.RelativeOrAbsolute));
-                        break;
-                    case Activities.PeerReview:
-                        pic.Source = new BitmapImage(new Uri("Icons/peer-01.png", UriKind.RelativeOrAbsolute));
-                        break;
-                    case Activities.IssueVoting:
-                        pic.Source = new BitmapImage(new Uri("Icons/voting-01.png", UriKind.RelativeOrAbsolute));
-                        break;
-                    case Activities.AuthorRebuttal:
-                        pic.Source = new BitmapImage(new Uri("Icons/rebuttal-01.png", UriKind.RelativeOrAbsolute));
-                        break;
-                    case Activities.Stop:
-                        pic.Source = new BitmapImage(new Uri("Icons/stop.png", UriKind.RelativeOrAbsolute));
-                        break;
-                    default: 
-                        break;
-                }
-                if(i>=1)
-                    pic.Margin = new Thickness(rects[i - 1].Width - 20, 0, 0, 0);
-                //pic.Width = rects[i].Width;
-                thisView.Test.Children.Add(pic);
-            }
         }
 
-        void playingWithDates()
+        /// <summary>
+        /// returns an image corrisponding to the activity given
+        /// </summary>
+        Image getEventImage(Activities activity)
         {
-            Label test = new Label();
-            test.Content = "1";
-            test.Width = 50;
-            thisView.TimelineDates1.Children.Add(test);
-            Label test2 = new Label();
-            test2.Margin = new Thickness(50-test.ActualWidth, 0, 0, 0);
-            test2.Content = "2";
-            thisView.TimelineDates1.Children.Add(test2);    
-        }
-
-        void testBtn_click(object sender, RoutedEventArgs e)
-        {
-            playingWithDates();
-            return;
-        }
-
-
-
-        // Currently only being used in UpdateActivityDisplay()
-        void generateTimeLine()
-        {
-            //collecting rectangles from Timeline and putting them in rects list
-            var b = from c in thisView.Timeline.Children where c is Rectangle select c as Rectangle;
-            List<Rectangle> rects = b.ToList();
-
-            double TotalTime = TotalEventTime();
-            bool endsWithStop = CalenderEndsWithStop();
-
-            //if there was a delete that left more rectangles than activities, clear the rectangles
-            
-            if (rects.Count > assignmentActivites.Count)
+            Image returnPic = new Image();
+            switch (activity)
             {
-                for (int i = 0; i < rects.Count; i++)
-                {
-                    rects[i].Width = 0;
-                    rects[i].Fill = new SolidColorBrush(Colors.Transparent);
-                    rects[i].Height = 0;
-                }
+                case Activities.Submission:
+                    returnPic.Source = new BitmapImage(new Uri("Icons/submit-01.png", UriKind.RelativeOrAbsolute));
+                    break;
+                case Activities.PeerReview:
+                    returnPic.Source = new BitmapImage(new Uri("Icons/peer-01.png", UriKind.RelativeOrAbsolute));
+                    break;
+                case Activities.IssueVoting:
+                    returnPic.Source = new BitmapImage(new Uri("Icons/voting-01.png", UriKind.RelativeOrAbsolute));
+                    break;
+                case Activities.AuthorRebuttal:
+                    returnPic.Source = new BitmapImage(new Uri("Icons/rebuttal-01.png", UriKind.RelativeOrAbsolute));
+                    break;
+                case Activities.Stop:
+                    returnPic.Source = new BitmapImage(new Uri("Icons/stop.png", UriKind.RelativeOrAbsolute));
+                    break;
+                default:
+                    break;
             }
-
-            //setting attributes for each rectangle
-            for (int i = 0; i < assignmentActivites.Count; i++)
-            {
-                Rectangle tempRect = new Rectangle();
-                tempRect.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-                tempRect.Height = 20;
-
-                switch (assignmentActivites[i].ActivityType) //assigning color
-                {
-                    case Activities.Submission: tempRect.Fill = new SolidColorBrush(Colors.Green);
-                        break;
-                    case Activities.PeerReview: tempRect.Fill = new SolidColorBrush(Colors.Blue);
-                        break;
-                    case Activities.IssueVoting: tempRect.Fill = new SolidColorBrush(Colors.Purple);
-                        break;
-                    case Activities.AuthorRebuttal: tempRect.Fill = new SolidColorBrush(Colors.Red);
-                        break;
-                    case Activities.Stop: tempRect.Fill = new SolidColorBrush(Colors.White);
-                        break;
-                    default: tempRect.Fill = new SolidColorBrush(Colors.Orange);
-                        break;
-                }
-
-                //setting width
-                if (assignmentActivites.Count == 1)
-                    tempRect.Width = thisView.LayoutRoot.MinWidth;
-                else if (endsWithStop == false && i == (assignmentActivites.Count - 1))//last activity and is not a stop
-                    tempRect.Width = 10;
-                else
-                    tempRect.Width = ((TimeUntilNextEventInDays(assignmentActivites[i])) / TotalTime) * (thisView.LayoutRoot.MinWidth - 10);
-
-                //use whats in rects before adding more children to Timeline
-                if (i > (rects.Count() - 1)) //avoiding assigning to null area
-                {
-                    thisView.Timeline.Children.Add(tempRect);
-                }
-                else
-                {
-                    rects[i].Width = tempRect.Width;
-                    rects[i].Fill = tempRect.Fill;
-                    rects[i].Height = tempRect.Height;
-                    rects[i].HorizontalAlignment = tempRect.HorizontalAlignment;
-                }
-            }
+            return returnPic;
         }
 
-        //returns -1 if there is no next event
-        //returns the time (in days) until the next event
+        /// <summary>
+        /// returns -1 if there is no next event
+        /// returns the time (in days) until the next event
+        /// </summary>
         double TimeUntilNextEventInDays(AssignmentActivityViewModel temp_aaVM)
         {
             double returnVal = 0.0;
@@ -730,10 +626,12 @@ namespace CreateNewAssignment
             }
             return returnVal;
         }
-
-        //returns the time (in days) from start of first event to end of last event
-        //returns the time from start of first event to start of last event if there is no end
-        //returns 0 if there is only 1 event or no events
+        
+        /// <summary>
+        ///returns the time (in days) from start of first event to end of last event
+        ///returns the time from start of first event to start of last event if there is no end
+        ///returns 0 if there is only 1 event or no events
+        /// </summary>
         double TotalEventTime()
         {
             double returnVal = 0.0;
@@ -760,7 +658,9 @@ namespace CreateNewAssignment
             return returnVal;
         }
 
-        //returns true if the last event is a stop, else false
+        /// <summary>
+        /// returns true if the last event is a stop, else false
+        /// </summary>
         bool CalenderEndsWithStop()
         {
             bool returnVal = false; 
@@ -772,7 +672,6 @@ namespace CreateNewAssignment
                 else returnVal = false; 
                 temp = assignmentActivites.GetNextItem(temp);
             }
-            
             return returnVal;
         }
 

@@ -55,7 +55,6 @@
                 </StackPanel>
                 <Button Grid.Row="1" Grid.Column="0" x:Name="LeftCalanderScrollButton" Content="&lt;" HorizontalAlignment="Left" />
                 <Button Grid.Row="1" Grid.Column="2" x:Name="RightCalanderScrollButton" Content="&gt;" HorizontalAlignment="Right" />
-               <!-- <Button Grid.Row="1" Content="Test" Grid.Column="1" x:Name="test" HorizontalAlignment="Center" /> -->
                 <toolkit:ListBoxDragDropTarget HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" Margin="0,0,0,-52" Grid.RowSpan="3" VerticalContentAlignment="Stretch" Width="100"/>
 
                 
@@ -63,11 +62,9 @@
                     <StackPanel x:Name="TimelineDates1" Orientation="Horizontal"/>
                     <StackPanel x:Name="TimelineTimes" Orientation="Horizontal"/>
                     <StackPanel x:Name="Timeline"  Orientation="Horizontal"/>
-                    <StackPanel x:Name="TimelineDates2"  Orientation="Horizontal"/>
                 </StackPanel>
-                <StackPanel x:Name="Test" Grid.Row="3" Grid.ColumnSpan="3" Margin="0,16,0,0" Orientation="Horizontal">
-                    
-                </StackPanel>
+                <StackPanel x:Name="TimelineIcons" Grid.Row="3" Grid.ColumnSpan="3" Margin="0,0,0,0" Orientation="Horizontal"/>
+                <StackPanel x:Name="TimelineLines" Grid.Row="3" Grid.ColumnSpan="3" Margin="0,0,0,0" Orientation="Horizontal"/>
                 
 
             </Grid>
