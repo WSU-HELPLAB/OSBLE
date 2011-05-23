@@ -77,6 +77,7 @@
     <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="Models\AssignmentActivity.cs" />
     <Compile Include="Models\Assignment.cs" />
+    <Compile Include="Models\Submission.cs" />
     <Compile Include="Models\SubmissionActivitySetting.cs" />
     <Compile Include="Models\Weights.cs" />
     <Compile Include="Utility\FileSystem.cs" />
@@ -117,6 +118,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Code\Libraries\LumenWorks.Framework.IO.dll" />
+    <Content Include="App_Data\FirstNames.txt" />
+    <Content Include="App_Data\LastNames.txt" />
     <Content Include="Content\images\account.png" />
     <Content Include="Content\images\add_up.png" />
     <Content Include="Content\images\ajax-loader.gif" />
@@ -281,7 +284,6 @@
     <Content Include="Views\Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Folder Include="Validations\" />
   </ItemGroup>
   <ItemGroup>

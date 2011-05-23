@@ -12,9 +12,5 @@ namespace OSBLE.Models
         [Required]
         [Display(Name = "Weight")]
         public int Points { get; set; }
-
-        public bool HasBeenGraded { get; set; }
-
-        public int Grade { get; set; }
     }
 }
