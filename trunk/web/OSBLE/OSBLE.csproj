@@ -76,10 +76,13 @@
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\SubmissionAssignmentActivityController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
+    <Compile Include="Models\AbstractTask.cs" />
     <Compile Include="Models\AssignmentActivity.cs" />
     <Compile Include="Models\Assignment.cs" />
     <Compile Include="Models\Submission.cs" />
     <Compile Include="Models\SubmissionActivitySetting.cs" />
+    <Compile Include="Models\Task.cs" />
+    <Compile Include="Models\TaskScore.cs" />
     <Compile Include="Models\Weights.cs" />
     <Compile Include="Utility\FileSystem.cs" />
     <Compile Include="Attributes\CanModifyCourse.cs" />
