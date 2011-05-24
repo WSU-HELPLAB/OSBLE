@@ -206,6 +206,8 @@ ul.user_list
     list-style: none;
     width: 230px;
     border-bottom: 1px solid #aaccff;
+    border: 1px solid #eeeeff;
+    border-bottom: 3px solid #eeeeff;
     min-height: 43px;
     padding-top: 4px;
     margin-bottom: 7px;
@@ -226,8 +228,9 @@ ul.user_list
 
 .user_list li:hover
 {
-    background-color: #aaccff;
-    border-bottom: 1px solid #074974;
+    background-color: #fafaff;
+    border: 1px solid #aaaadd;
+    border-bottom: 3px solid #aaaadd;
 }
 
 .user_list li:hover div.user_controls
@@ -852,8 +855,8 @@ body#layoutLogOn
 
 #add_update_users
 {
-    border: 1px solid #074974;
-    border-bottom: 5px solid #074974;
+    border: 1px solid #eeeeff;
+    border-bottom: 5px solid #eeeeff;
     padding-left: 8px;
     padding-right: 8px;
     padding-bottom: 8px;
@@ -924,19 +927,16 @@ ul.selector
 
 #notifications_list li, #notifications_unread_legend, #notifications_read_legend
 {
-    border: 1px solid #074974;
-    border-bottom: 3px solid #074974;
+    border: 1px solid #eeeeff;
+    border-bottom: 3px solid #eeeeff;
     padding: 3px;
-}
-
-#notifications_list li:hover
-{
-    background-color: #fafafa;
 }
 
 #notifications_list li.read, #notifications_read_legend
 {
-    background-color: #eaeaea;
+    background-color: #eeeeee;
+    border: 1px solid #aaaadd;
+    border-bottom: 3px solid #aaaadd;
 }
 
 #notifications_read_legend 
