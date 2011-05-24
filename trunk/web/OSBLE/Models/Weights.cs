@@ -27,6 +27,6 @@ namespace OSBLE.Models
 
         [Required]
         [Display(Name = "Tasks")]
-        public ICollection<AbstractTask> Tasks { get; set; }
+        public ICollection<AbstractGradable> Tasks { get; set; }
     }
 }

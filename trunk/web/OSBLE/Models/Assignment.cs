@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models
 {
-    public class Assignment : AbstractTask
+    public class Assignment : AbstractGradable
     {
 
         [Required]

@@ -5,7 +5,7 @@ using System.Web;
 using System.ComponentModel.DataAnnotations;
 namespace OSBLE.Models
 {
-    public abstract class AbstractTask
+    public abstract class AbstractGradable
     {
         [Key]
         [Required]

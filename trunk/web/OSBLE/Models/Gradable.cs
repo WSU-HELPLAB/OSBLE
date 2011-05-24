@@ -6,10 +6,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models
 {
-    public class Task : AbstractTask
+    public class Gradable : AbstractGradable
     {
         [Required]
-        [Display(Name = "TaskScores")]
-        public ICollection<TaskScore> TaskScores { get; set; }
+        public ICollection<GradableScore> GradableScores { get; set; }
     }
 }

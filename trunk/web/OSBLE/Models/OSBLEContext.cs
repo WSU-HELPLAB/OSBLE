@@ -44,9 +44,9 @@ namespace OSBLE.Models
 
         public DbSet<AssignmentActivity> AssignmentActivities { get; set; }
 
-        public DbSet<TaskScore> TaskScores { get; set; }
+        public DbSet<GradableScore> TaskScores { get; set; }
 
-        public DbSet<AbstractTask> AbstractTasks { get; set; }
+        public DbSet<AbstractGradable> AbstractTasks { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

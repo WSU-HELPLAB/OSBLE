@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models
 {
-    public class TaskScore
+    public class GradableScore
     {
         [Key]
         [Required]
@@ -17,8 +17,8 @@ namespace OSBLE.Models
         [Key]
         [Required]
         [Column(Order = 1)]
-        public int TaskID { get; set; }
-        public virtual Task Task { get; set; }
+        public int GradableID { get; set; }
+        public virtual Gradable Gradable { get; set; }
 
         [Required]
         public int Score { get; set; }
