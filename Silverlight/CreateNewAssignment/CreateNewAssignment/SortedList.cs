@@ -1,15 +1,6 @@
 ﻿using System;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace CreateNewAssignment
 {
@@ -46,17 +37,22 @@ namespace CreateNewAssignment
             }
         }
 
+        /// <summary>
+        /// Gets the next item in the sorted list
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns>If item == null this returns the first item, otherwise if item is not in the list or at the end it returns default of T</returns>
         public T GetNextItem(T item)
         {
             try
             {
-                if(item == null)
+                if (item == null)
                 {
                     return list[0];
                 }
                 else
                 {
-                return list[IndexOf(item) + 1];
+                    return list[IndexOf(item) + 1];
                 }
             }
             catch
@@ -189,6 +185,6 @@ namespace CreateNewAssignment
             return list.GetEnumerator();
         }
 
-        #endregion
+        #endregion IEnumerable Members
     }
 }

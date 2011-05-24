@@ -106,8 +106,8 @@ namespace CreateNewAssignment.AssignmentActivities
         {
             switch (activity)
             {
-                case Activities.Submission: return new SolidColorBrush(Colors.Green);
-                case Activities.PeerReview: return new SolidColorBrush(Colors.Blue);
+                case Activities.Submission: return new SolidColorBrush(Color.FromArgb(255, 51, 153, 51));
+                case Activities.PeerReview: return new SolidColorBrush(Color.FromArgb(255, 51, 102, 204));
                 case Activities.IssueVoting: return new SolidColorBrush(Color.FromArgb(255, 102, 204, 204));
                 case Activities.AuthorRebuttal: return new SolidColorBrush(Color.FromArgb(255, 255, 204, 51));
                 case Activities.Stop: return new SolidColorBrush(Colors.Transparent);
@@ -123,7 +123,7 @@ namespace CreateNewAssignment.AssignmentActivities
                 case Activities.PeerReview: return new Activities[] { Activities.Submission, Activities.PeerReview, Activities.AuthorRebuttal };
                 case Activities.IssueVoting: return new Activities[] { Activities.PeerReview };
                 case Activities.AuthorRebuttal: return new Activities[] { Activities.PeerReview, Activities.IssueVoting };
-                case Activities.Stop: return new Activities[] { Activities.Submission, Activities.PeerReview, Activities.IssueVoting, Activities.AuthorRebuttal, Activities.Stop };
+                case Activities.Stop: return new Activities[] { Activities.Submission, Activities.PeerReview, Activities.IssueVoting, Activities.AuthorRebuttal };
                 default: return new Activities[] { Activities.Submission, Activities.PeerReview, Activities.IssueVoting, Activities.AuthorRebuttal, Activities.Stop, Activities.Null };
             }
         }

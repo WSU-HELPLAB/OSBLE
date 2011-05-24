@@ -15,11 +15,10 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" x:Name="Date" HorizontalAlignment="Left" Text="{Binding Mode=OneWay, Path=DateString}"/>
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" x:Name="Date" VerticalAlignment="Top"  HorizontalAlignment="Left" Text="{Binding Mode=OneWay, Path=DateString}"/>
         <Rectangle Grid.Row="1" Grid.Column="0" x:Name="LeftSideRectangle"  Fill="{Binding Mode=OneWay, Path=LeftSideColor}" HorizontalAlignment="Stretch" Height="10" VerticalAlignment="Center"/>
         <Rectangle Grid.Row="1" Grid.Column="1" x:Name="RightSideRectangle" Fill="{Binding Mode=OneWay, Path=RightSideColor}" HorizontalAlignment="Stretch" Height="10" VerticalAlignment="Center"/>
 
-
- <ContentPresenter Grid.ColumnSpan="2" Grid.Row="1"  x:Name="AssignmentActivityIconHolder" VerticalAlignment="Center" HorizontalAlignment="Center" />
+        <ContentPresenter Grid.ColumnSpan="2" Grid.Row="1"  x:Name="AssignmentActivityIconHolder" VerticalAlignment="Center" HorizontalAlignment="Center" Width="20" Height="20" />
     </Grid>
 </UserControl>

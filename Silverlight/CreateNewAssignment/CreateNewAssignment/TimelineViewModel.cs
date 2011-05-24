@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Net;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using System.Collections.Generic;
 using CreateNewAssignment.AssignmentActivities;
 
 namespace CreateNewAssignment
@@ -26,11 +20,13 @@ namespace CreateNewAssignment
             get { return minEventWidthInPixels; }
             set { minEventWidthInPixels = value; }
         }
+
         public double TimelineHeightInPixels
         {
             get { return timelineHeightInPixels; }
             set { timelineHeightInPixels = value; }
         }
+
         public double TimelineWidthInPixels
         {
             get { return timelineWidthInPixels; }
@@ -43,17 +39,18 @@ namespace CreateNewAssignment
             TimelineHeightInPixels = 20;
             TimelineWidthInPixels = thisView.ActualWidth;
         }
+
         public TimelineView GetView()
         {
             return thisView;
         }
+
         public void displayTimeline(SortedList<AssignmentActivityViewModel> aavm)
         {
             assignmentActivites = aavm;
             clearTimeline();
             TimelineWidthInPixels = thisView.ActualWidth;
 
-            
             if ((int)(TimelineWidthInPixels / MinEventWidthInPixels) >= (assignmentActivites.Count))
             {
                 List<Rectangle> rectList = getRectangles();
@@ -80,6 +77,7 @@ namespace CreateNewAssignment
                 }
             }
         }
+
         /// <summary>
         /// removes the children from all the stack panels associated with timeline (labels for date, time, icons for event, and rects for event)
         /// </summary>
@@ -143,8 +141,9 @@ namespace CreateNewAssignment
                         }
                     }
                     //setting color & other attributes
-                    rectList[i].Height = TimelineHeightInPixels;
-                    rectList[i].HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+                    rectList[i].Height = 10;
+                    rectList[i].HorizontalAlignment = HorizontalAlignment.Left;
+                    rectList[i].VerticalAlignment = VerticalAlignment.Center;
                     rectList[i].Fill = AssignmentActivitiesFactory.GetColor(assignmentActivites[i].ActivityType);
                 }
             } while (!allValid);
@@ -155,35 +154,20 @@ namespace CreateNewAssignment
         /// returns -1 if there is no next event
         /// returns the time (in days) until the next event
         /// </summary>
-        private double TimeUntilNextEventInDays(AssignmentActivityViewModel temp_aaVM)
+        private double TimeUntilNextEventInDays(AssignmentActivityViewModel activitiy)
         {
-            double returnVal = 0.0;
-            int index = 0;
-            AssignmentActivityViewModel temp2 = new AssignmentActivityViewModel(Activities.Null);
-            index = assignmentActivites.IndexOf(temp_aaVM);
-            temp_aaVM = assignmentActivites[index];
+            AssignmentActivityViewModel nextActivitiy = null;
 
-            if (assignmentActivites.Count > (index + 1)) //checking if there are enough activities to assign temp2
-            {
-                temp2 = assignmentActivites[index + 1];
-            }
-            else
-            {
-                temp2 = null;
-            }
+            nextActivitiy = assignmentActivites.GetNextItem(activitiy);
 
-            if (temp_aaVM != null)
+            if (activitiy != null && nextActivitiy != null)
             {
-                if (temp2 != null) //there is a following event
-                {
-                    returnVal = (temp2.StartDateTime.Ticks - temp_aaVM.StartDateTime.Ticks) / TimeSpan.TicksPerDay;
-                }
-                else                //no following event
-                {
-                    returnVal = 0.0;
-                }
+                return (nextActivitiy.StartDateTime.Ticks - activitiy.StartDateTime.Ticks) / TimeSpan.TicksPerDay;
             }
-            return returnVal;
+            else                // activity or no following activity
+            {
+                return 0.0;
+            }
         }
 
         /// <summary>
@@ -193,28 +177,17 @@ namespace CreateNewAssignment
         /// </summary>
         private double TotalEventTime()
         {
-            double returnVal = 0.0;
-            AssignmentActivityViewModel temp = new AssignmentActivityViewModel(Activities.Null);
-
-            temp = assignmentActivites.GetNextItem(temp);
-
-            if (temp == null) return 0;//no events
-            long time1 = temp.StartDateTime.Ticks;
-            long time2 = temp.StartDateTime.Ticks;
-            long dTimeInDays = temp.StartDateTime.Ticks;
-
-            while (temp != null)
+            //we need at least 2 events before we can find the time between them
+            if (assignmentActivites.Count >= 2)
             {
-                time2 = temp.StartDateTime.Ticks; //gets time of old event
-                temp = assignmentActivites.GetNextItem(temp);
-                if (temp != null)
-                {
-                    time1 = temp.StartDateTime.Ticks; //gets time of new event
-                    dTimeInDays = (time1 - time2) / TimeSpan.TicksPerDay;
-                    returnVal += dTimeInDays;
-                }
+                AssignmentActivityViewModel first = assignmentActivites[0];
+                AssignmentActivityViewModel last = assignmentActivites[assignmentActivites.Count - 1];
+                return (last.StartDateTime.Ticks - first.StartDateTime.Ticks) / TimeSpan.TicksPerDay;
             }
-            return returnVal;
+            else
+            {
+                return 0.0;
+            }
         }
     }
 }
