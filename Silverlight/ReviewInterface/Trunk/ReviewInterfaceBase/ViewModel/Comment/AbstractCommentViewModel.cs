@@ -51,7 +51,7 @@ namespace ReviewInterfaceBase.ViewModel.Comment
         private double height = 150;
 
         //this is a reference to the View
-        protected AbstractCommentView thisView = new AbstractCommentView();
+        protected CommentView thisView;
 
         protected CommentModel thisModel;
 

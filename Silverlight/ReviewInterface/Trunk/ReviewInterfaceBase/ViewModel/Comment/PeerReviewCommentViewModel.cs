@@ -11,7 +11,7 @@ namespace ReviewInterfaceBase.ViewModel.Comment
 {
     public class PeerReviewCommentViewModel : AbstractCommentViewModel
     {
-        private new PeerReviewCommentView thisView;
+        //private new PeerReviewCommentView thisView;
         CategoriesHolderViewModel categoriesHolderVM;
 
         /// <summary>
@@ -19,22 +19,22 @@ namespace ReviewInterfaceBase.ViewModel.Comment
         /// PeerReviewCommentView and CommentModel can be accessed by GetView or GetModel
         /// </summary>
         /// <param name="ReferenceLocation">A reference to the location that this noteText is commenting on</param>
-        public PeerReviewCommentViewModel(PeerReviewCommentView view, ILocation referenceLocation)
+        public PeerReviewCommentViewModel(CommentView view, ILocation referenceLocation)
         {
-            thisView = (view as PeerReviewCommentView);
-            base.Initilize(thisView, referenceLocation);
+            base.thisView = (view as CommentView);
+            //base.Initilize(thisView, referenceLocation);
         }
 
         public void Initialize(int documentID)
         {
             //setup listeners for thisView
-            thisView.Header.MouseLeftButtonDown += new MouseButtonEventHandler(Header_MouseLeftButtonDown);
+            //thisView.Header.MouseLeftButtonDown += new MouseButtonEventHandler(Header_MouseLeftButtonDown);
 
             //Set up the Title left click to act the same as the header as the user would except
-            thisView.Title.MouseLeftButtonDown += new MouseButtonEventHandler(Header_MouseLeftButtonDown);
+            /*thisView.Title.MouseLeftButtonDown += new MouseButtonEventHandler(Header_MouseLeftButtonDown);
             thisView.X_Label.MouseLeftButtonDown += new MouseButtonEventHandler(X_Label_MouseLeftButtonDown);
             thisView.Bottem_Right_Corner.MouseLeftButtonDown += new MouseButtonEventHandler(Bottom_Left_Corner_MouseLeftButtonDown);
-            thisView.Minimize_Label.MouseLeftButtonDown += new MouseButtonEventHandler(Minimize_Label_MouseLeftButtonDown);
+            thisView.Minimize_Label.MouseLeftButtonDown += new MouseButtonEventHandler(Minimize_Label_MouseLeftButtonDown);*/
             thisView.GotFocus += new RoutedEventHandler(thisView_GotFocus);
             thisView.LostFocus += new RoutedEventHandler(thisView_LostFocus);
 
@@ -44,7 +44,7 @@ namespace ReviewInterfaceBase.ViewModel.Comment
 
             categoriesHolderVM.LoadCategories(documentID);
 
-            thisView.LayoutRoot.Children.Insert(1, categoriesHolderVM.GetView());
+            //thisView.LayoutRoot.Children.Insert(1, categoriesHolderVM.GetView());
 
             categoriesHolderVM.SizeChanged += new SizeChangedEventHandler(categoriesHolderVM_SizeChanged);
         }
