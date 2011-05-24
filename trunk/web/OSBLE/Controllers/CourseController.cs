@@ -12,11 +12,9 @@ namespace OSBLE.Controllers
         //
         // GET: /Course/
 
-        public ViewResult Index()
+        public ActionResult Index()
         {
-            ViewBag.Courses = from d in currentCourses select d.Course;
-
-            return View(db.Courses.ToList());
+            return RedirectToAction("Edit");
         }
 
         //
@@ -53,33 +51,28 @@ namespace OSBLE.Controllers
         //
         // GET: /Course/Edit/5
 
-        public ActionResult Edit(int id)
+        [RequireActiveCourse]
+        [CanModifyCourse]
+        public ActionResult Edit()
         {
-            if (canModifyCourse(id))
-            {
-                Course course = db.Courses.Find(id);
-                return View(course);
-            }
-            return RedirectToAction("Index");
+            setTab();
+            Course course = db.Courses.Find(activeCourse.CourseID);
+            return View(course);
         }
 
         //
         // POST: /Course/Edit/5
 
         [HttpPost]
+        [RequireActiveCourse]
+        [CanModifyCourse]
         public ActionResult Edit(Course course)
         {
-            if (canModifyCourse(course.ID))
+            setTab();
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
-                {
-                    db.Entry(course).State = EntityState.Modified;
-                    db.SaveChanges();
-                    return RedirectToAction("Index");
-                }
-            }
-            else
-            {
+                db.Entry(course).State = EntityState.Modified;
+                db.SaveChanges();
                 return RedirectToAction("Index");
             }
             return View(course);
@@ -88,30 +81,40 @@ namespace OSBLE.Controllers
         //
         // GET: /Course/Delete/5
 
-        public ActionResult Delete(int id)
+        [RequireActiveCourse]
+        [CanModifyCourse]
+        public ActionResult Delete()
         {
-            if (canModifyCourse(id))
-            {
-                Course course = db.Courses.Find(id);
-                return View(course);
-            }
-            return RedirectToAction("Index");
+            setTab();
+            Course course = db.Courses.Find(ActiveCourse.CourseID);
+            return View(course);
         }
 
         //
         // POST: /Course/Delete/5
 
+        [RequireActiveCourse]
+        [CanModifyCourse]
         [HttpPost, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult DeleteConfirmed()
         {
-            if (canModifyCourse(id))
-            {
-                Course course = db.Courses.Find(id);
-                db.Courses.Remove(course);
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
+            setTab();
+            Course course = db.Courses.Find(ActiveCourse.CourseID);
+            db.Courses.Remove(course);
+            db.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        private void setTab()
+        {
+            if (ActiveCourse.Course.IsCommunity)
+            {
+                ViewBag.CurrentTab = "Community Settings";
+            }
+            else
+            {
+                ViewBag.CurrentTab = "Course Settings";
+            }
         }
 
         protected override void Dispose(bool disposing)
@@ -120,17 +123,5 @@ namespace OSBLE.Controllers
             base.Dispose(disposing);
         }
 
-        protected bool canModifyCourse(int courseID)
-        {
-            var courseUsers = (from c in currentCourses where c.CourseID == courseID select c).FirstOrDefault();
-            if (courseUsers == null)
-            {
-                return false;
-            }
-            else
-            {
-                return courseUsers.CourseRole.CanModify;
-            }
-        }
     }
 }

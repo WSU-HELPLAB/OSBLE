@@ -2,13 +2,19 @@
 using System.Linq;
 using System.Web.Mvc;
 using OSBLE.Models;
+using OSBLE.Attributes;
 
 namespace OSBLE.Controllers
 {
+    [NotForCommunity]
     public class AssignmentController : OSBLEController
     {
         //
         // GET: /Assignment/
+        public AssignmentController() : base()
+        {
+            ViewBag.CurrentTab = "Assignments";
+        }
 
         public ViewResult Index()
         {

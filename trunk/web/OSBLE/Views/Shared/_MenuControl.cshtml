@@ -7,6 +7,8 @@
            (!m.ModifierOnly || ((ViewBag.ActiveCourse != null) && ViewBag.ActiveCourse.CourseRole.CanModify))
            &&
            (!m.ViewerOnly || ((ViewBag.ActiveCourse != null) && ViewBag.ActiveCourse.CourseRole.CanSeeAll))
+           &&
+           ((!m.CommunityOnlyPage && !m.NotInCommunityPage) || (m.NotInCommunityPage && !ViewBag.ActiveCourse.Course.IsCommunity) || (m.CommunityOnlyPage && ViewBag.ActiveCourse.Course.IsCommunity))
           ) 
         {
         @Html.ActionLink(@m.Name, @m.Action, @m.Controller, null, new { Class = ViewBag.CurrentTab == @m.Name ? "tab_current" : "" })

@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\FileCacheAttribute.cs" />
+    <Compile Include="Attributes\NotForCommunity.cs" />
     <Compile Include="Controllers\AssignmentActivityController.cs" />
     <Compile Include="Controllers\AssignmentController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />

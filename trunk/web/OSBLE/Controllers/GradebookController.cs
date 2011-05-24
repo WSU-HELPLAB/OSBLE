@@ -10,10 +10,16 @@ namespace OSBLE.Controllers
 {
     [Authorize]
     [RequireActiveCourse]
+    [NotForCommunity]
     public class GradebookController : OSBLEController
     {
         //
         // GET: /Gradebook/
+        public GradebookController()
+            : base()
+        {
+            ViewBag.CurrentTab = "Grades";
+        }
 
         public ViewResult Index()
         {
