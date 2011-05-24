@@ -6,6 +6,13 @@ namespace OSBLE.Models
     {
         [Key]
         [Required]
+        public int ID { get; set; }
+
+        [Required]
+        public int AssignmentID { get; set; }
+        public virtual Assignment Assignment { get; set; }
+
+        [Required]
         [Display(Name = "Name")]
         public string Name { get; set; }
 
