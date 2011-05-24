@@ -61,10 +61,9 @@ namespace OSBLE
 
         private static void emptyFolder(string path)
         {
-            DirectoryInfo parent = new DirectoryInfo(path);
+            if(Directory.Exists(path)) {
+                DirectoryInfo parent = new DirectoryInfo(path);
 
-            if (parent != null)
-            {
                 foreach (FileInfo fi in parent.GetFiles())
                 {
                     fi.Delete();
