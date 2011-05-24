@@ -23,6 +23,8 @@ namespace FileUploader
        string home = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
         // Synced Directory path
+       private FileSyncServiceClient syncedFiles = new FileSyncServiceClient();
+       
 
         // Double Click variables
        string lastTarget = "";
@@ -122,7 +124,7 @@ namespace FileUploader
                         if (selected.DirName.Text == lastTarget)
                         {
                             path += "\\" + selected.DirName.Text;
-                            //dirList(path, SyncedFileList);
+                            dirList(path, SyncedFileList);
                         }
                     }
                     else
@@ -141,17 +143,12 @@ namespace FileUploader
                 Stack<string> path_pieces = new Stack<string>(path.Split('\\'));
                 path_pieces.Pop();
                 path = String.Join("\\", path_pieces.ToArray().Reverse());
-                //dirList(path, SyncedFileList);
+                dirList(path, SyncedFileList);
             }
 
             // If it wasn't a directory reset the click variables
             lastTarget = "";
             wasClicked = false;
-        }
-
-        private void Syncbtn_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void MoveUpbtn_Click(object sender, RoutedEventArgs e)
@@ -184,6 +181,72 @@ namespace FileUploader
                         this.SyncedFileList.SelectedItem = Swap;
                     }
                 }
+            }
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            syncedFiles.SyncFileCompleted += syncedFiles_SyncCompleted;
+
+            syncedFiles.GetFileListCompleted += syncedFiles_GetFileListCompleted;
+            syncedFiles.GetFileListAsync();
+        }
+
+        private void syncedFiles_GetFileListCompleted(object sender, GetFileListCompletedEventArgs e)
+        {
+            try
+            {
+                SyncedFileList.ItemsSource = e.Result;
+            }
+            catch
+            {
+                lblStatus.Text = "Error contacting web service.";
+            }
+        }
+
+        private void Syncbtn_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openDialog = new OpenFileDialog();
+            if (openDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    using (Stream stream = openDialog.File.OpenRead())
+                    {
+                        //dont all really big files (more than 5mb).
+                        if (stream.Length < 5120000)
+                        {
+                            byte[] data = new byte[stream.Length];
+                            stream.Read(data, 0, (int)stream.Length);
+
+                            syncedFiles.SyncFileAsync(openDialog.File.Name, data);
+                            lblStatus.Text = "Sync started";
+                        }
+                        else
+                        {
+                            lblStatus.Text = "Files must be less than 5mb.";
+                        }
+                    }
+                }
+                catch
+                {
+                    lblStatus.Text = "Error reading file.";
+                }
+            }
+        }
+
+        private void syncedFiles_SyncCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        {
+            if (e.Error == null)
+            {
+                lblStatus.Text = "Sync succeeded.";
+
+                // refresh the file list
+                syncedFiles.GetFileListAsync();
+           } 
+            else
+            {
+                lblStatus.Text = "Upload failed.";
             }
         }
     }

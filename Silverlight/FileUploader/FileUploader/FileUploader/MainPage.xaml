@@ -35,10 +35,11 @@
                     Click="MoveDownbtn_Click"/>
         </StackPanel>
         <ScrollViewer x:Name="VertScrollBarSynced" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch" 
-                      VerticalAlignment="Stretch">
+                        VerticalAlignment="Stretch">
             <ListBox Name="SyncedFileList" HorizontalAlignment="Stretch" MouseLeftButtonUp="SyncDirSelect"></ListBox>
         </ScrollViewer>
         <Button x:Name="Syncbtn" Content="Sync Visable Files" Grid.Column="0" Grid.Row="2" 
                 HorizontalAlignment="Center" VerticalAlignment="Center" Click="Syncbtn_Click"/>
+        <TextBlock x:Name="lblStatus"/>
     </Grid>
 </UserControl>
