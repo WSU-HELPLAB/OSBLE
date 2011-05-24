@@ -20,6 +20,10 @@ namespace OSBLE.Models
 
         public DbSet<CourseRole> CourseRoles { get; set; }
 
+        public DbSet<CourseMeeting> CourseMeetings { get; set; }
+
+        public DbSet<CourseBreak> CourseBreaks { get; set; }
+
         public DbSet<CoursesUsers> CoursesUsers { get; set; }
 
         public DbSet<School> Schools { get; set; }
@@ -121,6 +125,8 @@ namespace OSBLE.Models
             this.Schools.Add(s1);
             this.Schools.Add(s2);
 
+            this.SaveChanges();
+
             // Sample Courses
             Course c1 = new Course();
             c1.Prefix = "Cpt S";
@@ -128,6 +134,7 @@ namespace OSBLE.Models
             c1.Semester = "Spring";
             c1.Year = "2011";
             c1.Name = "Introduction to Programming";
+            c1.CommunityDescription = "";
 
             Course c2 = new Course();
             c2.Prefix = "Art E";
@@ -135,9 +142,12 @@ namespace OSBLE.Models
             c2.Semester = "Fall";
             c2.Year = "2011";
             c2.Name = "Underwater Basketweaving";
-
+            c2.CommunityDescription = "";
+            
             this.Courses.Add(c1);
             this.Courses.Add(c2);
+
+            this.SaveChanges();
 
             MembershipUserCollection muc = Membership.GetAllUsers();
             foreach (MembershipUser mu in muc)
@@ -152,7 +162,7 @@ namespace OSBLE.Models
             createSampleUser("me@me.com", "123123", "Ad", "Min", "3", 1, true, true);
 
             this.SaveChanges();
-
+            
             CoursesUsers cu = new CoursesUsers();
             cu.CourseID = 1;
             cu.UserProfileID = 1;
@@ -188,7 +198,7 @@ namespace OSBLE.Models
             this.CoursesUsers.Add(cu3);
             this.CoursesUsers.Add(cu4);
             this.CoursesUsers.Add(cu5);
-
+            
             this.SaveChanges();
         }
     }

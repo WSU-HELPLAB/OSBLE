@@ -80,6 +80,8 @@
     <Compile Include="Models\AbstractGradable.cs" />
     <Compile Include="Models\AssignmentActivity.cs" />
     <Compile Include="Models\Assignment.cs" />
+    <Compile Include="Models\CourseBreak.cs" />
+    <Compile Include="Models\CourseMeeting.cs" />
     <Compile Include="Models\Submission.cs" />
     <Compile Include="Models\SubmissionActivitySetting.cs" />
     <Compile Include="Models\Gradable.cs" />
