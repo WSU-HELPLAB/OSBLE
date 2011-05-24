@@ -482,19 +482,19 @@
     <Content Include="Views\Assignment\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\SubbmissionAssignmentActivity\Index.cshtml" />
+    <Content Include="Views\SubmissionAssignmentActivity\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\SubbmissionAssignmentActivity\Details.cshtml" />
+    <Content Include="Views\SubmissionAssignmentActivity\Details.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\SubbmissionAssignmentActivity\Create.cshtml" />
+    <Content Include="Views\SubmissionAssignmentActivity\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\SubbmissionAssignmentActivity\Edit.cshtml" />
+    <Content Include="Views\SubmissionAssignmentActivity\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\SubbmissionAssignmentActivity\Delete.cshtml" />
+    <Content Include="Views\SubmissionAssignmentActivity\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\AssignmentActivity\Index.cshtml" />
