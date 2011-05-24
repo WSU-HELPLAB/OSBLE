@@ -134,6 +134,11 @@ namespace OSBLE.Controllers
 
             ViewBag.CanEditSelf = CanModifyOwnLink(activeCourse);
 
+            if (Request.Params["notice"] != null)
+            {
+                ViewBag.Notice = Request.Params["notice"];
+            }
+
             return View();
         }
 
@@ -188,6 +193,8 @@ namespace OSBLE.Controllers
         public ActionResult ApplyRoster(string idColumn, string sectionColumn) {
             HttpPostedFileBase file = Session["RosterFile"] as HttpPostedFileBase;
 
+            int rosterCount = 0;
+
             if ((file != null) && (idColumn != null))
             {
                 Stream s = file.InputStream;
@@ -195,6 +202,7 @@ namespace OSBLE.Controllers
 
                 if (rosterEntries.Count > 0)
                 {
+                    rosterCount = rosterEntries.Count;
 
                     // First check to make sure there are no duplicates in the ID table.
                     List<string> usedIdentifications = new List<string>();
@@ -205,6 +213,17 @@ namespace OSBLE.Controllers
                         } else {
                             usedIdentifications.Add(entry.Identification);
                         } 
+                    }
+
+                    // Make sure no student has the same ID as existing non-student members.
+                    List<CoursesUsers> otherMembers = db.CoursesUsers.Where(c => c.CourseID == activeCourse.CourseID && c.CourseRoleID != (int)CourseRole.OSBLERoles.Student).ToList();
+                    foreach (CoursesUsers member in otherMembers)
+                    {
+                        if (usedIdentifications.Contains(member.UserProfile.Identification))
+                        {
+                            ViewBag.Error = "There is a non-student (" + member.UserProfile.FirstName + " " + member.UserProfile.LastName + ") in the course with the same School ID as a student on the roster. Please check your roster and try again.";
+                            return View("RosterError");
+                        }
                     }
 
                     // No duplicate IDs, so we can remove the current course links to add the new ones.
@@ -228,9 +247,9 @@ namespace OSBLE.Controllers
                         {
                             createCourseUser(courseUser);
                         }
-                        catch
+                        catch(Exception e)
                         {
-                            ViewBag.Error = "There was an error importing the class roster. Please check your roster file and try again.";
+                            ViewBag.Error = e.Message;
                             return View("RosterError");
                         }
                     }
@@ -246,8 +265,8 @@ namespace OSBLE.Controllers
                 ViewBag.Error = "Your roster file was not properly loaded. Please try again.";
                 return View("RosterError");
             }
-            
-            return RedirectToAction("Index");
+
+            return RedirectToAction("Index", new { notice = "Roster imported with " + rosterCount.ToString() + " students." });
         }
         //
         // GET: /Roster/Create
@@ -525,7 +544,7 @@ namespace OSBLE.Controllers
             }
             else
             {
-                throw new Exception("This courseUser would not be unique if added");
+                throw new Exception("Attempted to add a student with the same School ID as a non-student (Instructor, TA, etc.) already in the class. Please check your roster and try again.");
             }
         }
 
