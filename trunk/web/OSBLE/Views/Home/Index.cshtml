@@ -6,7 +6,15 @@
 <h4>Notifications</h4>
 
 <div id="notifications">
+@if (ViewBag.Notifications.Count == 0)
+{
+    <p>No Unread Notifications!</p>
+}
+
+@{ViewBag.ShowNotificationDelete = true;}
 @Html.Partial("_Notifications")
+
+<p>@Html.ActionLink("Show All Notifications", "Index", "Notification")</p>
 </div>
 
 <h4>Events &amp; Deadlines</h4>

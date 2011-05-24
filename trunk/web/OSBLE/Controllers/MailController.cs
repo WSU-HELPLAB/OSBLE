@@ -135,8 +135,8 @@ namespace OSBLE.Controllers
                     db.SaveChanges();
 
                     // Send notification to recipient about new message.
-                    Notifications n = new Notifications();
-                    n.ItemType = Notifications.Types.Mail;
+                    Notification n = new Notification();
+                    n.ItemType = Notification.Types.Mail;
                     n.ItemID = mail.ID;
                     n.RecipientID = mail.ToUserProfileID;
                     n.SenderID = mail.FromUserProfileID;

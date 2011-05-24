@@ -1,19 +1,43 @@
 ﻿@using OSBLE.Models
-<ul>
 
-@foreach (Notifications n in ViewBag.Notifications)
+
+<ul id="notifications_list">
+
+@foreach (Notification n in ViewBag.Notifications)
 {
-    <li><small>@n.Posted.ToShortDateString() @n.Posted.ToShortTimeString()</small>&nbsp;
+    
+    <li id="notification_@(n.ID)" @if (n.Read)
+                                      {<text>class="read"</text>}><small>@n.Posted.ToShortDateString() @n.Posted.ToShortTimeString()</small>&nbsp;
+
+    @if (ViewBag.ShowNotificationDelete == true)
+    {
+        <div class="notification_tools">
+        
+                            <form action="@Url.Action("MarkAsRead", "Notification", new { ID = @n.ID })"
+                                style="display: inline;"
+                                data-ajax="true"
+                                data-ajax-success="$('#notification_@(n.ID)').hide('highlight',{},'slow',function(){
+                                        $(this).remove();
+                                    });"
+                                data-ajax-confirm="Are you sure you want to mark this notification as read without viewing it?"
+                                method="post">
+                                @Helpers.DeleteSubmit()
+                            </form>
+        </div>
+    }
+
     @switch (n.ItemType)
     {
-        case Notifications.Types.Mail:
-            <text><em>@n.Sender.FirstName @n.Sender.LastName</em> sent you a @NotificationLink(n.ID,"message")</text>
-            break;
+        case Notification.Types.Mail:
+            <text><em>@n.Sender.FirstName @n.Sender.LastName</em> sent you a @NotificationLink(n.ID, "message")</text>
+                                                                        break;
     }
+
     </li>
 }
 </ul>
 
-@helper NotificationLink(int id, string name) {
+@helper NotificationLink(int id, string name)
+    {
     @Html.ActionLink(name, "Dispatch", "Notification", new { ID = id }, new { });
 }

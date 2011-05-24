@@ -28,7 +28,7 @@ namespace OSBLE.Models
 
         public DbSet<Course> Courses { get; set; }
 
-        public DbSet<Notifications> Notifications { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         public DbSet<DashboardPost> DashboardPosts { get; set; }
 
@@ -48,7 +48,7 @@ namespace OSBLE.Models
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Notifications>()
+            modelBuilder.Entity<Notification>()
                 .HasRequired(n => n.Sender)
                 .WithMany()
                 .WillCascadeOnDelete(false);

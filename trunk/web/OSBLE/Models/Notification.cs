@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models
 {
-    public class Notifications
+    public class Notification
     {
         [Required]
         [Key]
@@ -36,7 +36,7 @@ namespace OSBLE.Models
         [NotMapped]
         public string Message { get; set; }
 
-        public Notifications()
+        public Notification()
             : base()
         {
             Posted = DateTime.Now;

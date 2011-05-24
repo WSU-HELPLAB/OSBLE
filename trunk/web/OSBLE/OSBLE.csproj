@@ -73,7 +73,8 @@
     <Compile Include="Attributes\FileCacheAttribute.cs" />
     <Compile Include="Controllers\AssignmentActivityController.cs" />
     <Compile Include="Controllers\AssignmentController.cs" />
-    <Compile Include="Controllers\SubbmissionAssignmentActivityController.cs" />
+    <Compile Include="Controllers\NotificationController.cs" />
+    <Compile Include="Controllers\SubmissionAssignmentActivityController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="Models\AssignmentActivity.cs" />
     <Compile Include="Models\Assignment.cs" />
@@ -110,7 +111,7 @@
     <Compile Include="Models\CoursesUsers.cs" />
     <Compile Include="Models\DashboardPost.cs" />
     <Compile Include="Models\DashboardReply.cs" />
-    <Compile Include="Models\Notifications.cs" />
+    <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\OSBLEContext.cs" />
     <Compile Include="Models\UserProfile.cs" />
     <Compile Include="Models\School.cs" />
@@ -450,6 +451,7 @@
     <Content Include="Views\Shared\_AjaxEmpty.cshtml" />
     <Content Include="Views\Roster\CreateByEmail.cshtml" />
     <Content Include="Views\Roster\RosterError.cshtml" />
+    <Content Include="Views\Notification\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

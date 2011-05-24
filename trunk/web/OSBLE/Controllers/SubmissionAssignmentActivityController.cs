@@ -5,7 +5,7 @@ using OSBLE.Models;
 
 namespace OSBLE.Controllers
 {
-    public class SubbmissionAssignmentActivityController : OSBLEController
+    public class SubmissionAssignmentActivityController : OSBLEController
     {
         //
         // GET: /SubbmissionAssignmentActivity/

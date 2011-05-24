@@ -914,7 +914,7 @@ ul.selector
     padding-top: 2em;
 }
 
-#notifications ul 
+#notifications_list
 {
     list-style-type: none;
     margin-left: 0;
@@ -922,14 +922,43 @@ ul.selector
 
 }
 
-#notifications li
+#notifications_list li, #notifications_unread_legend, #notifications_read_legend
 {
     border: 1px solid #074974;
     border-bottom: 3px solid #074974;
     padding: 3px;
 }
 
-#notifications li:hover
+#notifications_list li:hover
 {
     background-color: #fafafa;
+}
+
+#notifications_list li.read, #notifications_read_legend
+{
+    background-color: #eaeaea;
+}
+
+#notifications_read_legend 
+{
+    width: 80px;
+    margin-bottom: 5px;
+}
+
+#notifications_unread_legend
+{
+    width: 80px;
+}
+
+#notifications_list li .notification_tools
+{
+    display: none;
+    float: right;
+    padding-top: 5px;
+    padding-right: 5px;
+}
+
+#notifications_list li:hover .notification_tools
+{
+    display: block;
 }
