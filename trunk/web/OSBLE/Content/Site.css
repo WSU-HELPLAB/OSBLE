@@ -913,3 +913,23 @@ ul.selector
     clear: both;
     padding-top: 2em;
 }
+
+#notifications ul 
+{
+    list-style-type: none;
+    margin-left: 0;
+    padding-left: 0;
+
+}
+
+#notifications li
+{
+    border: 1px solid #074974;
+    border-bottom: 3px solid #074974;
+    padding: 3px;
+}
+
+#notifications li:hover
+{
+    background-color: #fafafa;
+}

@@ -1,0 +1,19 @@
+﻿@using OSBLE.Models
+<ul>
+
+@foreach (Notifications n in ViewBag.Notifications)
+{
+    <li><small>@n.Posted.ToShortDateString() @n.Posted.ToShortTimeString()</small>&nbsp;
+    @switch (n.ItemType)
+    {
+        case Notifications.Types.Mail:
+            <text><em>@n.Sender.FirstName @n.Sender.LastName</em> sent you a @NotificationLink(n.ID,"message")</text>
+            break;
+    }
+    </li>
+}
+</ul>
+
+@helper NotificationLink(int id, string name) {
+    @Html.ActionLink(name, "Dispatch", "Notification", new { ID = id }, new { });
+}

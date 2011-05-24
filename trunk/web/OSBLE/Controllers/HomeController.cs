@@ -60,6 +60,12 @@ namespace OSBLE.Controllers
 
             #endregion Activity Feed View
 
+            #region Notifications
+
+            ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == currentUser.ID) && (n.Read == false)).OrderByDescending(n => n.Posted).ToList();
+
+            #endregion
+
             return View();
         }
 

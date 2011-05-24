@@ -57,6 +57,17 @@ namespace OSBLE.Models
                 .HasRequired(n => n.ToUserProfile)
                 .WithMany()
                 .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Notifications>()
+                .HasOptional(n => n.Course)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Notifications>()
+                .HasOptional(n => n.Sender)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
         }
 
         private void createSampleUser(string username, string password, string firstname, string lastname, string ident, int school, bool isAdmin, bool canCreateCourses)
@@ -99,7 +110,7 @@ namespace OSBLE.Models
         /// </summary>
         public void SeedTestData()
         {
-            #region Test Data
+            FormsAuthentication.SignOut();
 
             FileSystem.WipeOutFileSystem();
 
@@ -136,6 +147,8 @@ namespace OSBLE.Models
             {
                 Membership.DeleteUser(mu.UserName);
             }
+
+            this.SaveChanges();
 
             createSampleUser("bob@smith.com", "123123", "Bob", "Smith", "1", 1, false, true);
             createSampleUser("stu@dent.com", "123123", "Stu", "Dent", "2", 1, false, false);
@@ -180,8 +193,6 @@ namespace OSBLE.Models
             this.CoursesUsers.Add(cu5);
 
             this.SaveChanges();
-
-            #endregion Test Data
         }
     }
 
@@ -210,6 +221,7 @@ namespace OSBLE.Models
         {
             base.Seed(context);
 
+            context.SeedRoles();
             context.SeedTestData();
         }
     }

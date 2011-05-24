@@ -384,7 +384,7 @@
     <Content Include="Views\Home\NoCourses.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Home\_Notifications.cshtml" />
+    <Content Include="Views\Shared\_Notifications.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Home\_ImportantDates.cshtml" />
