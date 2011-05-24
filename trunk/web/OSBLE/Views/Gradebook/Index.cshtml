@@ -1,4 +1,5 @@
-﻿@{
+﻿@model IEnumerable<OSBLE.Models.Weight>
+@{
     ViewBag.Title = "Index";
 }
 
@@ -96,36 +97,34 @@
 
 <div id="tabHeader"> 
 
-<h3>Gradebook</h3>
-<ul>
-	<li id="selected"><a href="#" onclick="switchTab(this)">Homeworks</a></li>
-	<li><a href="#" onclick="switchTab(this)">Projects</a></li>
-	<li><a href="#" onclick="switchTab(this)">Quizzes</a></li>
-	<li><a href="#" onclick="switchTab(this)">Exams</a></li>
-</ul>
+    <h3>Gradebook</h3>
+
+    <ul>
+        @foreach(OSBLE.Models.Weight item in ViewBag.Tabs)
+        {
+	        <li><a href="#" onclick="switchTab(this)">@Html.DisplayFor(modelItem => item.Name)</a></li>  
+        }
+    </ul>
 
 </div>
 
 <div id="tableContent">
 
+
 <table id="grades" class="gradebook">
-<tr>    
-@for (int i = 0; i < 5; i++)
-{            
-    <th id="th-@i" onclick="changeHeaderName(this)">Column @i<div id="cntnr" class="thButton"><button class="dropdown" id="@i" onclick="ShowHide(this);"></button></div></th>
-}
-
-</tr>
-
-@for (int i = 0; i < 10; i++)
-{
-    <tr id="row-@i">
-        @for (int j = 0; j < 5; j++)
+    <tr> 
+        @foreach (OSBLE.Models.Gradable item in ViewBag.Assignments)
         {
-            <td id="col-@j" onclick="cellGainsFocus(this)">@(i * j)</td>
+            <th id="@Html.DisplayFor(modelItem => item.ID)" onclick="changeHeaderName(this)">@Html.DisplayFor(modelItem => item.Name)<div id="cntnr" class="thButton"><button class="dropdown" id="1" onclick="ShowHide(this);"></button></div></th>
         }
     </tr>
-}
+
+    @foreach (OSBLE.Models.AbstractGradable item in ViewBag.Grades)
+    {
+        <tr>
+            <td id="@Html.DisplayFor(modelItem => item.WeightID)" onclick="cellGainsFocus(this)">@Html.DisplayFor(modelItem => item.Points)</td>       
+        </tr>
+    }
 </table>
     
 <div class="slidingDiv"; id="slidingDivID" style="display: none; position:absolute; ">

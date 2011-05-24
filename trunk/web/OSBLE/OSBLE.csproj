@@ -455,7 +455,7 @@
     <Content Include="Views\Shared\_AjaxEmpty.cshtml" />
     <Content Include="Views\Roster\CreateByEmail.cshtml" />
     <Content Include="Views\Roster\RosterError.cshtml" />
-    <Content Include="Views\Notification\Index.cshtml" />
+    <Content Include="Utility\Notification\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />
