@@ -63,15 +63,18 @@ namespace OSBLE
         {
             DirectoryInfo parent = new DirectoryInfo(path);
 
-            foreach (FileInfo fi in parent.GetFiles())
+            if (parent != null)
             {
-                fi.Delete();
-            }
+                foreach (FileInfo fi in parent.GetFiles())
+                {
+                    fi.Delete();
+                }
 
-            foreach (DirectoryInfo di in parent.GetDirectories())
-            {
-                emptyFolder(di.FullName);
-                di.Delete();
+                foreach (DirectoryInfo di in parent.GetDirectories())
+                {
+                    emptyFolder(di.FullName);
+                    di.Delete();
+                }
             }
         }
 
