@@ -74,7 +74,6 @@
     <Compile Include="Attributes\IsCommunity.cs" />
     <Compile Include="Attributes\NotForCommunity.cs" />
     <Compile Include="Controllers\AssignmentActivityController.cs" />
-    <Compile Include="Controllers\AssignmentController.cs" />
     <Compile Include="Controllers\CommunityController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
