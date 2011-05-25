@@ -19,8 +19,8 @@ namespace FileUploader
     public partial class MainPage : UserControl
     {
         // Local Directory path
-       string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-       string home = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+       string localpath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+       string localhome = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
         // Synced Directory path
        private FileSyncServiceClient syncedFiles = new FileSyncServiceClient();
@@ -37,7 +37,7 @@ namespace FileUploader
             InitializeComponent();
          
             // Populate the ListBox's LocalFileList and SyncedFileList with the contents of the directory path
-            dirList(path, LocalFileList);
+            dirList(localpath, LocalFileList);
             dirList(syncpath, SyncedFileList);
         
         }
@@ -46,7 +46,7 @@ namespace FileUploader
         {
             filelist.Items.Clear();
             //If you have entered a subdirectory of home (Back button so to speak)
-            if (path != home)
+            if ((path != localhome && path == localpath)  || (path != syncpathhome && path == syncpath))
             {
                 filelist.Items.Add("..");
             }
@@ -87,8 +87,8 @@ namespace FileUploader
                         if (selected.DirName.Text == lastTarget)
                         {
                             // appends the selected directory to the current path to open directory
-                            path += "\\" + selected.DirName.Text;
-                            dirList(path, LocalFileList);
+                            localpath += "\\" + selected.DirName.Text;
+                            dirList(localpath, LocalFileList);
                         }
                     }
                     else
@@ -106,10 +106,10 @@ namespace FileUploader
                 string selected = this.LocalFileList.SelectedItem.ToString();
                 if (selected == "..")
                 {
-                    Stack<string> path_pieces = new Stack<string>(path.Split('\\'));
+                    Stack<string> path_pieces = new Stack<string>(localpath.Split('\\'));
                     path_pieces.Pop();
-                    path = String.Join("\\", path_pieces.ToArray().Reverse());
-                    dirList(path, LocalFileList);
+                    localpath = String.Join("\\", path_pieces.ToArray().Reverse());
+                    dirList(localpath, LocalFileList);
                 }
             }
           
