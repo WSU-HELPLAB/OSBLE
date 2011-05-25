@@ -24,6 +24,7 @@ namespace FileUploader
 
         // Synced Directory path
        private FileSyncServiceClient syncedFiles = new FileSyncServiceClient();
+       //string syncpath = syncedFiles.GetFileUrlAsync;
        
 
         // Double Click variables
@@ -138,11 +139,18 @@ namespace FileUploader
                 return;
                 
             }
-            else if (this.SyncedFileList.SelectedItem.ToString() == "..")
+            /*else if (this.SyncedFileList.SelectedItem.ToString() != null)
             {
-                Stack<string> path_pieces = new Stack<string>(path.Split('\\'));
-                path_pieces.Pop();
-                path = String.Join("\\", path_pieces.ToArray().Reverse());
+                if (this.SyncedFileList.SelectedItem.ToString() == "..")
+                {
+                    Stack<string> path_pieces = new Stack<string>(path.Split('\\'));
+                    path_pieces.Pop();
+                    path = String.Join("\\", path_pieces.ToArray().Reverse());
+                    dirList(path, SyncedFileList);
+                }
+            }*/
+            else
+            {
                 dirList(path, SyncedFileList);
             }
 
