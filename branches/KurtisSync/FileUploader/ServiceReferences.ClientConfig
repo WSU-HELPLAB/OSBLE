@@ -1,16 +1,14 @@
 ﻿<configuration>
     <system.serviceModel>
         <bindings>
-            <customBinding>
-                <binding name="CustomBinding_FileSyncService">
-                    <binaryMessageEncoding />
-                    <httpTransport maxReceivedMessageSize="2147483647" maxBufferSize="2147483647" />
+          <basicHttpBinding>
+                <binding name="CustomBinding_FileSyncService" maxReceivedMessageSize="2147483647" maxBufferSize="2147483647">
                 </binding>
-            </customBinding>
+            </basicHttpBinding>
         </bindings>
         <client>
             <endpoint address="http://localhost:49409/FileSyncService.svc"
-                binding="customBinding" bindingConfiguration="CustomBinding_FileSyncService"
+                binding="basicHttpBinding" bindingConfiguration="CustomBinding_FileSyncService"
                 contract="OsbleServices.FileSyncService" name="CustomBinding_FileSyncService" />
         </client>
     </system.serviceModel>
