@@ -37,7 +37,7 @@ namespace OSBLE.Models
         public bool AllowDashboardReplies { get; set; }
 
         [Display(Name = "Allow students to post events in course calendar")]
-        public bool AllowEventPosting { get; set; }
+        public override bool AllowEventPosting { get; set; }
 
         [Display(Name = "Require instructor to approve student calendar items to appear in the calendar")]
         public bool RequireInstructorApprovalForEventPosting { get; set; }

@@ -109,7 +109,7 @@ namespace OSBLE.Controllers
                 menu.Add(new MenuItem("Grades", "Gradebook", "Index",false,true,false,true,false));
                 menu.Add(new MenuItem("Users", "Roster", "Index", true, true, false, false, false));
                 menu.Add(new MenuItem("Course Settings", "Course", "Index", true, true, false, true, false));
-                menu.Add(new MenuItem("Community Settings", "Course", "Index", true, true, false, false, true));
+                menu.Add(new MenuItem("Community Settings", "Community", "Index", true, true, false, false, true));
                 ViewBag.Menu = menu;
 
                 #endregion Menu Setup

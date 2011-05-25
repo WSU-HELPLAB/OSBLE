@@ -16,5 +16,6 @@ namespace OSBLE.Models
         [Display(Name = "Course Name")]
         public string Name { get; set; }
 
+        public virtual bool AllowEventPosting { get; set; }
     }
 }
