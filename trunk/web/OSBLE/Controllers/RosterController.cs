@@ -14,7 +14,7 @@ namespace OSBLE.Controllers
 {
     [Authorize]
     [RequireActiveCourse]
-    [CanModifyCourse]
+    [CanGradeCourse]
     public class RosterController : OSBLEController
     {
         public RosterController()
@@ -75,7 +75,6 @@ namespace OSBLE.Controllers
 
         //
         // GET: /Roster/
-        [CanModifyCourse]
         public ActionResult Index()
         {
             //Get all users for the current class
@@ -159,6 +158,8 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
+        [CanModifyCourse]
+        [NotForCommunity]
         public ActionResult ImportRoster(HttpPostedFileBase file)
         {
             if ((file != null) && (file.ContentLength > 0))
@@ -206,6 +207,8 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
+        [CanModifyCourse]
+        [NotForCommunity]
         public ActionResult ApplyRoster(string idColumn, string sectionColumn) {
             HttpPostedFileBase file = Session["RosterFile"] as HttpPostedFileBase;
 
@@ -286,6 +289,8 @@ namespace OSBLE.Controllers
         }
         //
         // GET: /Roster/Create
+        [CanModifyCourse]
+        [NotForCommunity]
         public ActionResult Create()
         {
             ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
@@ -294,7 +299,8 @@ namespace OSBLE.Controllers
 
         //
         // POST: /Roster/Create
-
+        [CanModifyCourse]
+        [NotForCommunity]
         [HttpPost]
         public ActionResult Create(CoursesUsers courseuser)
         {
@@ -317,9 +323,17 @@ namespace OSBLE.Controllers
 
         //
         // GET: /Roster/CreateByEmail
+        [CanModifyCourse]
         public ActionResult CreateByEmail()
         {
-            ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
+            if (!(ViewBag.ActiveCourse.Course is Community))
+            {
+                ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
+            }
+            else // Community Roles
+            {
+                ViewBag.CourseRoleID = new SelectList(db.CommunityRoles, "ID", "Name");
+            }
             return View();
         }
 
@@ -327,6 +341,7 @@ namespace OSBLE.Controllers
         // POST: /Roster/CreateByEmail
 
         [HttpPost]
+        [CanModifyCourse]
         public ActionResult CreateByEmail(CoursesUsers courseuser)
         {
             //if modelState isValid
@@ -351,13 +366,13 @@ namespace OSBLE.Controllers
 
         //
         // GET: /Roster/Edit/5
+        [CanModifyCourse]
         public ActionResult Edit(int userProfileID)
         {
             CoursesUsers coursesusers = getCoursesUsers(userProfileID);
             if (CanModifyOwnLink(coursesusers))
             {
                 ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", coursesusers.UserProfileID);
-                //ViewBag.CourseID = new SelectList(db.Courses, "ID", "Prefix", coursesusers.CourseID);
                 ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name", coursesusers.CourseRoleID);
                 return View(coursesusers);
             }
@@ -368,6 +383,7 @@ namespace OSBLE.Controllers
         // POST: /Roster/Edit/5
 
         [HttpPost]
+        [CanModifyCourse]
         public ActionResult Edit(CoursesUsers coursesusers)
         {
             if (CanModifyOwnLink(coursesusers))
@@ -390,6 +406,7 @@ namespace OSBLE.Controllers
         // POST: /Roster/Delete/5
 
         [HttpPost]
+        [CanModifyCourse]
         public ActionResult Delete(int userProfileID)
         {
             CoursesUsers coursesusers = getCoursesUsers(userProfileID);

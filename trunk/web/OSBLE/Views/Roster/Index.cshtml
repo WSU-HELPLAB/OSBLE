@@ -1,4 +1,5 @@
 ﻿@using OSBLE.Controllers;
+@using OSBLE.Models;
 @model IEnumerable<OSBLE.Models.CoursesUsers>
 @{
     ViewBag.Title = "Index";
@@ -8,6 +9,10 @@
 
 <h4>@ViewBag.Notice</h4>
 
+@if (ViewBag.ActiveCourse.CourseRole.CanModify)
+{
+if (!(ViewBag.ActiveCourse.Course is Community))
+{
 <div><a href="#" onclick="$('#add_update_users').toggle('blind'); return false;">Add/Update Users</a></div>
 <div id="add_update_users">
     <h4>Add Single User</h4>
@@ -27,7 +32,14 @@
     }
     </div>
 </div>
-
+}
+else
+{
+<div>
+@Html.ActionLink("Add By Email", "CreateByEmail")&nbsp;&nbsp;
+</div>
+}
+}
 <div>
 <br />
     Quick Filter By Name: <input type="text" id="roster_find" />
@@ -80,6 +92,8 @@
                             @if(user.UserName != null) {
                             <a href="@Url.Action("Create", "Mail", new { recipientID = user.ID })">@Helpers.MailButton()</a>
                             }
+                            
+                            @if(ViewBag.ActiveCourse.CourseRole.CanModify) {
                             <a href="@Url.Action("Edit", "Roster", new { userProfileID = user.ID })">@Helpers.EditButton()</a>
 
                             <form action="@Url.Action("Delete")"
@@ -98,6 +112,7 @@
                                 <input type="hidden" name="userProfileID" value="@user.ID" />
                                 @Helpers.DeleteSubmit()
                             </form>
+                                }
                             
                             </div>
                         }
