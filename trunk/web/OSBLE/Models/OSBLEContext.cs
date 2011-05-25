@@ -30,7 +30,11 @@ namespace OSBLE.Models
 
         public DbSet<UserProfile> UserProfiles { get; set; }
 
+        public DbSet<AbstractCourse> AbstractCourses { get; set; }
+
         public DbSet<Course> Courses { get; set; }
+
+        public DbSet<Community> Communities { get; set; }
 
         public DbSet<Notification> Notifications { get; set; }
 
@@ -134,7 +138,6 @@ namespace OSBLE.Models
             c1.Semester = "Spring";
             c1.Year = "2011";
             c1.Name = "Introduction to Programming";
-            c1.CommunityDescription = "";
 
             Course c2 = new Course();
             c2.Prefix = "Art E";
@@ -142,20 +145,15 @@ namespace OSBLE.Models
             c2.Semester = "Fall";
             c2.Year = "2011";
             c2.Name = "Underwater Basketweaving";
-            c2.CommunityDescription = "";
 
-            Course c3 = new Course();
-            c3.Prefix = "";
-            c3.Number = "";
-            c3.Semester = "";
-            c3.Year = "";
+            Community c3 = new Community();
+            c3.Nickname = "Comm";
             c3.Name = "A Community";
-            c3.CommunityDescription = "This is a course community.";
-            c3.IsCommunity = true;
+            c3.Description = "This is a course community.";
             
             this.Courses.Add(c1);
             this.Courses.Add(c2);
-            this.Courses.Add(c3);
+            this.Communities.Add(c3);
 
             this.SaveChanges();
 

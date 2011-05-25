@@ -20,7 +20,7 @@ namespace OSBLE.Models
 
         public int? CourseID { get; set; }
 
-        public virtual Course Course { get; set; }
+        public virtual AbstractCourse Course { get; set; }
 
         public bool Read { get; set; }
 

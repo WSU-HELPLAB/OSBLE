@@ -13,7 +13,7 @@ namespace OSBLE.Attributes
     /// Redirects to index if user has no modify permissions for current course.
     /// </summary>
     /// 
-    public class NotForCommunity : ActionFilterAttribute
+    public class IsCommunity : ActionFilterAttribute
     {
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
@@ -21,7 +21,7 @@ namespace OSBLE.Attributes
             {
                 OSBLEController controller = filterContext.Controller as OSBLEController;
 
-                if (controller.ActiveCourse.Course is Community)
+                if (!(controller.ActiveCourse.Course is Community))
                 {
                     filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
                 }

@@ -1,4 +1,5 @@
-﻿<div id="tabs">
+﻿@using OSBLE.Models
+<div id="tabs">
     @using OSBLE.Controllers
     @foreach (OSBLEController.MenuItem m in ViewBag.Menu)
     {
@@ -8,7 +9,7 @@
            &&
            (!m.ViewerOnly || ((ViewBag.ActiveCourse != null) && ViewBag.ActiveCourse.CourseRole.CanSeeAll))
            &&
-           ((!m.CommunityOnlyPage && !m.NotInCommunityPage) || (m.NotInCommunityPage && !ViewBag.ActiveCourse.Course.IsCommunity) || (m.CommunityOnlyPage && ViewBag.ActiveCourse.Course.IsCommunity))
+           ((!m.CommunityOnlyPage && !m.NotInCommunityPage) || (m.NotInCommunityPage && !(ViewBag.ActiveCourse.Course is Community) || (m.CommunityOnlyPage && ViewBag.ActiveCourse.Course is Community)))
           ) 
         {
         @Html.ActionLink(@m.Name, @m.Action, @m.Controller, null, new { Class = ViewBag.CurrentTab == @m.Name ? "tab_current" : "" })

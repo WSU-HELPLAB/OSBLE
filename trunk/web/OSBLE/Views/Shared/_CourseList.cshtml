@@ -6,12 +6,12 @@ using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_cour
     <select name="course" id="course_select">
         @foreach (OSBLE.Models.CoursesUsers cu in ViewBag.CurrentCourses)
         {
-            string courseDisplay = cu.Course.Prefix + " " + cu.Course.Number + " - " + cu.Course.Name + " (" + cu.CourseRole.Name + ")";
+            string courseDisplay = @Helpers.CourseTag(cu.Course) + " - " + cu.Course.Name + " (" + cu.CourseRole.Name + ")";
             CoursesUsers ac = ViewBag.ActiveCourse as CoursesUsers;
 
             if ((ac != null) && (ac.CourseID == cu.CourseID))
             {
-            <option value=@cu.CourseID selected>@courseDisplay</option>
+            <option value=@cu.CourseID selected="selected">@courseDisplay</option>
             }
             else
             {

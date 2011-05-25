@@ -31,7 +31,7 @@
                 }
                 @if (!ViewBag.DashboardSingleCourseMode)
                 {
-                    <span class="dp_course">@dp.Course.Prefix @dp.Course.Number</span>
+                    <span class="dp_course">@Helpers.CourseTag(ViewBag.ActiveCourse.Course)</span>
                 }
                 @Helpers.DisplayNameForDashboard(dp.UserProfile, dp.Course, ViewBag.ActiveCourse, ViewBag.AllCoursesUsers, show)
                 <span class="dp_tools">

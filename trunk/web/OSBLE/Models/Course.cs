@@ -4,42 +4,31 @@ using System;
 
 namespace OSBLE.Models
 {
-    public class Course
+    public class Course : AbstractCourse
     {
-        [Required]
-        [Key]
-        public int ID { get; set; }
-
         // Basic Course Info
 
-        [Required(AllowEmptyStrings=true)]
+        [Required]
         [MaxLength(8)]
-        [Display(Name = "Course Prefix")]
+        [Display(Name = "Course Prefix (e.g. CptS)")]
         public string Prefix { get; set; }
 
-        [Required(AllowEmptyStrings = true)]
+        [Required]
         [MaxLength(8)]
-        [Display(Name = "Course Number")]
+        [Display(Name = "Course Number (e.g. 111)")]
         public string Number { get; set; }
 
         [Required]
-        [Display(Name = "Course Name")]
-        public string Name { get; set; }
-
-        [Required(AllowEmptyStrings = true)]
         [MaxLength(8)]
         [Display(Name = "Semester")]
         public string Semester { get; set; }
 
-        [Required(AllowEmptyStrings = true)]
+        [Required]
         [MaxLength(4)]
         [Display(Name = "Year")]
         public string Year { get; set; }
 
         // Course Options
-
-        [Display(Name = "This course is a community page. (No Assignments or Grades)")]
-        public bool IsCommunity { get; set; }
 
         [Display(Name = "Allow students to post new threads in activity feed")]
         public bool AllowDashboardPosts { get; set; }
@@ -59,12 +48,6 @@ namespace OSBLE.Models
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        // Community Options
-
-        [Display(Name = "Community Description")]
-        [Required(AllowEmptyStrings=true)]
-        public string CommunityDescription { get; set; }
-
         // References
 
         [Display(Name = "Course Weight")]
@@ -79,7 +62,6 @@ namespace OSBLE.Models
         public Course() : base()
         {
             // Set default values for course settings.
-            IsCommunity = false;
             AllowDashboardPosts = true;
             AllowDashboardReplies = true;
             AllowEventPosting = true;

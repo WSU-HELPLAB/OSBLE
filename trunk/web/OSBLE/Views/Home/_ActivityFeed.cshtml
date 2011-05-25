@@ -9,7 +9,7 @@
         using (Html.BeginForm("NewPost","Home",FormMethod.Post))
         {
         <textarea name="Content" rows="5" cols="40" placeholder="Enter new feed post here..."></textarea><br />
-        <input type="submit" name="post_active" value="Post to @ViewBag.ActiveCourse.Course.Prefix @ViewBag.ActiveCourse.Course.Number" /> <input
+        <input type="submit" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.Course)" /> <input
             type="submit" name="post_all" value="Post to All Courses" onclick="return confirm('Post this message to all your courses?');" />
         }
     }
@@ -22,7 +22,7 @@
         all courses</text>
         <input type="radio" name="mode" value="true" @if (ViewBag.DashboardSingleCourseMode)
                                                      {<text>checked</text>}/><text>Show
-        only <em>@ViewBag.ActiveCourse.Course.Prefix @ViewBag.ActiveCourse.Course.Number</em></text>
+        only <em>@Helpers.CourseTag(ViewBag.ActiveCourse.Course)</em></text>
     }
 </div>
 <script type="text/javascript">
@@ -56,16 +56,19 @@
 @if ((ViewBag.StartPost + ViewBag.PostsPerPage) < ViewBag.DashboardPostCount)
 {
     int last;
-    if(ViewBag.DashboardPostCount % ViewBag.PostsPerPage == 0) {
-        last = ViewBag.DashboardPostCount - ViewBag.PostsPerPage;   
-    } else {
-        last = ViewBag.DashboardPostCount - ViewBag.DashboardPostCount % ViewBag.PostsPerPage;    
+    if (ViewBag.DashboardPostCount % ViewBag.PostsPerPage == 0)
+    {
+        last = ViewBag.DashboardPostCount - ViewBag.PostsPerPage;
     }
-    
+    else
+    {
+        last = ViewBag.DashboardPostCount - ViewBag.DashboardPostCount % ViewBag.PostsPerPage;
+    }
+
     int newEnd = Math.Max(last, ViewBag.StartPost + ViewBag.PostsPerPage);
 
     int older = ViewBag.StartPost + ViewBag.PostsPerPage;
-    
+
     if (older < newEnd)
     {
 <text>&nbsp;&nbsp;</text>

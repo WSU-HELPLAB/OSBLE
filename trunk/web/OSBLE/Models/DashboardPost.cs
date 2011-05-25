@@ -17,7 +17,7 @@ namespace OSBLE.Models
         [Required]
         public int CourseID { get; set; }
 
-        public virtual Course Course { get; set; }
+        public virtual AbstractCourse Course { get; set; }
 
         public int UserProfileID { get; set; }
 

@@ -14,7 +14,7 @@ namespace OSBLE.Models
         [Key]
         [Column(Order = 1)]
         public int CourseID { get; set; }
-        public virtual Course Course { get; set; }
+        public virtual AbstractCourse Course { get; set; }
 
         [Required]
         public int CourseRoleID { get; set; }
