@@ -161,10 +161,18 @@ namespace OSBLE.Models
             c3.Nickname = "Comm";
             c3.Name = "A Community";
             c3.Description = "This is a course community.";
+
+            Course c4 = new Course();
+            c4.Prefix = "OSBLE";
+            c4.Number = "101";
+            c4.Semester = "Fall";
+            c4.Year = "2011";
+            c4.Name = "Intro to OSBLE";
             
             this.Courses.Add(c1);
             this.Courses.Add(c2);
             this.Communities.Add(c3);
+            this.Courses.Add(c4);
 
             this.SaveChanges();
 
@@ -176,12 +184,27 @@ namespace OSBLE.Models
 
             this.SaveChanges();
 
+
             createSampleUser("bob@smith.com", "123123", "Bob", "Smith", "1", 1, false, true);
             createSampleUser("stu@dent.com", "123123", "Stu", "Dent", "2", 1, false, false);
             createSampleUser("me@me.com", "123123", "Ad", "Min", "3", 1, true, true);
+            createSampleUser("John@Morgan.com", "123123", "John", "Morgan", "4", 1, false, false);
+            createSampleUser("Margaret@Bailey.com", "123123", "Margaret", "Bailey", "5", 1, false, false);
+            createSampleUser("Carol@Jackson.com", "123123", "Carol", "Jackson", "6", 1, false, false);
+            createSampleUser("Donald@Robinson.com", "123123", "Donald", "Robinson", "7", 1, false, false);
+            createSampleUser("Paul@Sanders.com", "123123", "Paul", "Sanders", "8", 1, false, false);
+            createSampleUser("Anthony@Stewart.com", "123123", "Anthony", "Stewart", "9", 1, false, false);
+            createSampleUser("Paul@Harris.com", "123123", "Paul", "Harris", "10", 1, false, false);
+            createSampleUser("Donald@White.com", "123123", "Donald", "White", "12", 1, false, false);
+            createSampleUser("Christopher@Sanders.com", "123123", "Christopher", "Sanders", "13", 1, false, false);
+            createSampleUser("Robert@Wright.com", "123123", "Robert", "Wright", "14", 1, false, false);
+            createSampleUser("Betty@Rogers.com", "123123", "Betty", "Rogers", "15", 1, false, false);
+            createSampleUser("Nancy@Russell.com", "123123", "Nancy", "Russell", "16", 1, false, false);
+            createSampleUser("Jason@Robinson.com", "123123", "Jason", "Robinson", "17", 1, false, false);
 
             this.SaveChanges();
-            
+
+            #region add course users
             CoursesUsers cu = new CoursesUsers();
             cu.CourseID = 1;
             cu.UserProfileID = 1;
@@ -223,6 +246,112 @@ namespace OSBLE.Models
             cu7.UserProfileID = 2;
             cu7.CourseRoleID = (int)CommunityRole.OSBLERoles.Participant;
             cu7.Section = 0;
+
+            CoursesUsers cu8 = new CoursesUsers();
+            cu5.CourseID = 4;
+            cu5.UserProfileID = 4;
+            cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu5.Section = 0;
+            this.CoursesUsers.Add(cu);
+
+            cu8 = new CoursesUsers();
+            cu5.CourseID = 4;
+            cu5.UserProfileID = 5;
+            cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu5.Section = 0;
+            this.CoursesUsers.Add(cu);
+
+            cu8 = new CoursesUsers();
+            cu5.CourseID = 4;
+            cu5.UserProfileID = 6;
+            cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu5.Section = 0;
+            this.CoursesUsers.Add(cu);
+
+            cu8 = new CoursesUsers();
+            cu5.CourseID = 4;
+            cu5.UserProfileID = 7;
+            cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu5.Section = 0;
+            this.CoursesUsers.Add(cu);
+
+            cu8 = new CoursesUsers();
+            cu5.CourseID = 4;
+            cu5.UserProfileID = 8;
+            cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu5.Section = 0;
+            this.CoursesUsers.Add(cu);
+
+            cu8 = new CoursesUsers();
+            cu5.CourseID = 4;
+            cu5.UserProfileID = 9;
+            cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu5.Section = 0;
+            this.CoursesUsers.Add(cu);
+
+            cu8 = new CoursesUsers();
+            cu5.CourseID = 4;
+            cu5.UserProfileID = 10;
+            cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu5.Section = 0;
+            this.CoursesUsers.Add(cu);
+
+            cu8 = new CoursesUsers();
+            cu5.CourseID = 4;
+            cu5.UserProfileID = 11;
+            cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu5.Section = 0;
+            this.CoursesUsers.Add(cu);
+
+            cu8 = new CoursesUsers();
+            cu5.CourseID = 4;
+            cu5.UserProfileID = 12;
+            cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu5.Section = 0;
+            this.CoursesUsers.Add(cu);
+
+            cu8 = new CoursesUsers();
+            cu5.CourseID = 4;
+            cu5.UserProfileID = 13;
+            cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu5.Section = 0;
+            this.CoursesUsers.Add(cu);
+
+            cu8 = new CoursesUsers();
+            cu5.CourseID = 4;
+            cu5.UserProfileID = 14;
+            cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu5.Section = 0;
+            this.CoursesUsers.Add(cu);
+
+            cu8 = new CoursesUsers();
+            cu5.CourseID = 4;
+            cu5.UserProfileID = 15;
+            cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu5.Section = 0;
+            this.CoursesUsers.Add(cu);
+
+            cu8 = new CoursesUsers();
+            cu5.CourseID = 4;
+            cu5.UserProfileID = 16;
+            cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu5.Section = 0;
+            this.CoursesUsers.Add(cu);
+
+            cu8 = new CoursesUsers();
+            cu5.CourseID = 4;
+            cu5.UserProfileID = 17;
+            cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu5.Section = 0;
+            this.CoursesUsers.Add(cu);
+
+            cu8 = new CoursesUsers();
+            cu5.CourseID = 4;
+            cu5.UserProfileID = 5;
+            cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu5.Section = 0;
+            this.CoursesUsers.Add(cu);
+
             
             this.CoursesUsers.Add(cu);
             this.CoursesUsers.Add(cu2);
@@ -233,6 +362,7 @@ namespace OSBLE.Models
             this.CoursesUsers.Add(cu7);
             
             this.SaveChanges();
+            #endregion
         }
     }
 
