@@ -69,6 +69,8 @@
                     @Html.Partial("_DashboardReply");
                 }
                 </div>
+                @if ((cu.CourseRole.CanGrade == true) || ((dp.Course is Course) && (dp.Course as Course).AllowDashboardReplies == true))
+                {
                 <div class="dp_replylink">
                     <a href="#" id="reply_@(dp.ID)">Reply</a>
                 </div>
@@ -104,6 +106,7 @@
                     });
 
                 </script>
+                }
                 <div id="after_replies_@(dp.ID)"></div>
             </div>
         </div>

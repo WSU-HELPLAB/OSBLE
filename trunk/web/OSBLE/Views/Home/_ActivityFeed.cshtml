@@ -1,6 +1,6 @@
 ﻿@using OSBLE.Models
 <div id="activity_new_post">
-    @if (ViewBag.ActiveCourse.CourseRole.CanGrade == true)
+    @if ((ViewBag.ActiveCourse.CourseRole.CanGrade == true) || ((ViewBag.ActiveCourse.Course is Course)&&(ViewBag.ActiveCourse.Course.AllowDashboardPosts) == true))
     {
         if (ViewBag.Error != null)
         {

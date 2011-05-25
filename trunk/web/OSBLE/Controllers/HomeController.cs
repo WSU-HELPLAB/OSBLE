@@ -169,7 +169,12 @@ namespace OSBLE.Controllers
 
             foreach (CoursesUsers cu in CoursesToPost)
             {
-                if (cu.CourseRole.CanGrade) // TODO: Add course permissions for student posting
+                Course c = null;
+                if (cu.Course is Course)
+                {
+                    c = (Course)cu.Course;
+                }
+                if (cu.CourseRole.CanGrade || ((c != null) && (c.AllowDashboardPosts)))
                 {
                     DashboardPost newDp = new DashboardPost();
                     newDp.Content = dp.Content;
@@ -214,7 +219,11 @@ namespace OSBLE.Controllers
                                    where c.CourseID == replyToPost.CourseID
                                    select c).FirstOrDefault();
 
-                if (cu != null)
+                Course course = null;
+                if(cu.Course is Course) {
+                    course = (Course)cu.Course;
+                }
+                if ((cu != null) && (cu.CourseRole.CanGrade || ((course != null) && (course.AllowDashboardReplies))))
                 {
                     if (ModelState.IsValid)
                     {
