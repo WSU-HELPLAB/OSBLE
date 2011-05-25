@@ -74,20 +74,15 @@ namespace FileUploader.OsbleServices {
         
         string EndGetFileUrl(System.IAsyncResult result);
         
-        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:FileSyncService/GetFile", ReplyAction="urn:FileSyncService/GetFileResponse")]
-        System.IAsyncResult BeginGetFile(string fileName, System.AsyncCallback callback, object asyncState);
-        
-        byte[] EndGetFile(System.IAsyncResult result);
-        
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:FileSyncService/SyncFile", ReplyAction="urn:FileSyncService/SyncFileResponse")]
         System.IAsyncResult BeginSyncFile(string fileName, byte[] data, System.AsyncCallback callback, object asyncState);
         
         void EndSyncFile(System.IAsyncResult result);
         
-        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:FileSyncService/DoWork", ReplyAction="urn:FileSyncService/DoWorkResponse")]
-        System.IAsyncResult BeginDoWork(System.AsyncCallback callback, object asyncState);
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:FileSyncService/createDir", ReplyAction="urn:FileSyncService/createDirResponse")]
+        System.IAsyncResult BegincreateDir(string folderName, System.AsyncCallback callback, object asyncState);
         
-        void EndDoWork(System.IAsyncResult result);
+        void EndcreateDir(System.IAsyncResult result);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -134,25 +129,6 @@ namespace FileUploader.OsbleServices {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public partial class GetFileCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        public GetFileCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        public byte[] Result {
-            get {
-                base.RaiseExceptionIfNecessary();
-                return ((byte[])(this.results[0]));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public partial class FileSyncServiceClient : System.ServiceModel.ClientBase<FileUploader.OsbleServices.FileSyncService>, FileUploader.OsbleServices.FileSyncService {
         
         private BeginOperationDelegate onBeginGetFileListDelegate;
@@ -167,23 +143,17 @@ namespace FileUploader.OsbleServices {
         
         private System.Threading.SendOrPostCallback onGetFileUrlCompletedDelegate;
         
-        private BeginOperationDelegate onBeginGetFileDelegate;
-        
-        private EndOperationDelegate onEndGetFileDelegate;
-        
-        private System.Threading.SendOrPostCallback onGetFileCompletedDelegate;
-        
         private BeginOperationDelegate onBeginSyncFileDelegate;
         
         private EndOperationDelegate onEndSyncFileDelegate;
         
         private System.Threading.SendOrPostCallback onSyncFileCompletedDelegate;
         
-        private BeginOperationDelegate onBeginDoWorkDelegate;
+        private BeginOperationDelegate onBegincreateDirDelegate;
         
-        private EndOperationDelegate onEndDoWorkDelegate;
+        private EndOperationDelegate onEndcreateDirDelegate;
         
-        private System.Threading.SendOrPostCallback onDoWorkCompletedDelegate;
+        private System.Threading.SendOrPostCallback oncreateDirCompletedDelegate;
         
         private BeginOperationDelegate onBeginOpenDelegate;
         
@@ -242,11 +212,9 @@ namespace FileUploader.OsbleServices {
         
         public event System.EventHandler<GetFileUrlCompletedEventArgs> GetFileUrlCompleted;
         
-        public event System.EventHandler<GetFileCompletedEventArgs> GetFileCompleted;
-        
         public event System.EventHandler<System.ComponentModel.AsyncCompletedEventArgs> SyncFileCompleted;
         
-        public event System.EventHandler<System.ComponentModel.AsyncCompletedEventArgs> DoWorkCompleted;
+        public event System.EventHandler<System.ComponentModel.AsyncCompletedEventArgs> createDirCompleted;
         
         public event System.EventHandler<System.ComponentModel.AsyncCompletedEventArgs> OpenCompleted;
         
@@ -343,52 +311,6 @@ namespace FileUploader.OsbleServices {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.IAsyncResult FileUploader.OsbleServices.FileSyncService.BeginGetFile(string fileName, System.AsyncCallback callback, object asyncState) {
-            return base.Channel.BeginGetFile(fileName, callback, asyncState);
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        byte[] FileUploader.OsbleServices.FileSyncService.EndGetFile(System.IAsyncResult result) {
-            return base.Channel.EndGetFile(result);
-        }
-        
-        private System.IAsyncResult OnBeginGetFile(object[] inValues, System.AsyncCallback callback, object asyncState) {
-            string fileName = ((string)(inValues[0]));
-            return ((FileUploader.OsbleServices.FileSyncService)(this)).BeginGetFile(fileName, callback, asyncState);
-        }
-        
-        private object[] OnEndGetFile(System.IAsyncResult result) {
-            byte[] retVal = ((FileUploader.OsbleServices.FileSyncService)(this)).EndGetFile(result);
-            return new object[] {
-                    retVal};
-        }
-        
-        private void OnGetFileCompleted(object state) {
-            if ((this.GetFileCompleted != null)) {
-                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
-                this.GetFileCompleted(this, new GetFileCompletedEventArgs(e.Results, e.Error, e.Cancelled, e.UserState));
-            }
-        }
-        
-        public void GetFileAsync(string fileName) {
-            this.GetFileAsync(fileName, null);
-        }
-        
-        public void GetFileAsync(string fileName, object userState) {
-            if ((this.onBeginGetFileDelegate == null)) {
-                this.onBeginGetFileDelegate = new BeginOperationDelegate(this.OnBeginGetFile);
-            }
-            if ((this.onEndGetFileDelegate == null)) {
-                this.onEndGetFileDelegate = new EndOperationDelegate(this.OnEndGetFile);
-            }
-            if ((this.onGetFileCompletedDelegate == null)) {
-                this.onGetFileCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnGetFileCompleted);
-            }
-            base.InvokeAsync(this.onBeginGetFileDelegate, new object[] {
-                        fileName}, this.onEndGetFileDelegate, this.onGetFileCompletedDelegate, userState);
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         System.IAsyncResult FileUploader.OsbleServices.FileSyncService.BeginSyncFile(string fileName, byte[] data, System.AsyncCallback callback, object asyncState) {
             return base.Channel.BeginSyncFile(fileName, data, callback, asyncState);
         }
@@ -436,46 +358,48 @@ namespace FileUploader.OsbleServices {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.IAsyncResult FileUploader.OsbleServices.FileSyncService.BeginDoWork(System.AsyncCallback callback, object asyncState) {
-            return base.Channel.BeginDoWork(callback, asyncState);
+        System.IAsyncResult FileUploader.OsbleServices.FileSyncService.BegincreateDir(string folderName, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BegincreateDir(folderName, callback, asyncState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        void FileUploader.OsbleServices.FileSyncService.EndDoWork(System.IAsyncResult result) {
-            base.Channel.EndDoWork(result);
+        void FileUploader.OsbleServices.FileSyncService.EndcreateDir(System.IAsyncResult result) {
+            base.Channel.EndcreateDir(result);
         }
         
-        private System.IAsyncResult OnBeginDoWork(object[] inValues, System.AsyncCallback callback, object asyncState) {
-            return ((FileUploader.OsbleServices.FileSyncService)(this)).BeginDoWork(callback, asyncState);
+        private System.IAsyncResult OnBegincreateDir(object[] inValues, System.AsyncCallback callback, object asyncState) {
+            string folderName = ((string)(inValues[0]));
+            return ((FileUploader.OsbleServices.FileSyncService)(this)).BegincreateDir(folderName, callback, asyncState);
         }
         
-        private object[] OnEndDoWork(System.IAsyncResult result) {
-            ((FileUploader.OsbleServices.FileSyncService)(this)).EndDoWork(result);
+        private object[] OnEndcreateDir(System.IAsyncResult result) {
+            ((FileUploader.OsbleServices.FileSyncService)(this)).EndcreateDir(result);
             return null;
         }
         
-        private void OnDoWorkCompleted(object state) {
-            if ((this.DoWorkCompleted != null)) {
+        private void OncreateDirCompleted(object state) {
+            if ((this.createDirCompleted != null)) {
                 InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
-                this.DoWorkCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(e.Error, e.Cancelled, e.UserState));
+                this.createDirCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(e.Error, e.Cancelled, e.UserState));
             }
         }
         
-        public void DoWorkAsync() {
-            this.DoWorkAsync(null);
+        public void createDirAsync(string folderName) {
+            this.createDirAsync(folderName, null);
         }
         
-        public void DoWorkAsync(object userState) {
-            if ((this.onBeginDoWorkDelegate == null)) {
-                this.onBeginDoWorkDelegate = new BeginOperationDelegate(this.OnBeginDoWork);
+        public void createDirAsync(string folderName, object userState) {
+            if ((this.onBegincreateDirDelegate == null)) {
+                this.onBegincreateDirDelegate = new BeginOperationDelegate(this.OnBegincreateDir);
             }
-            if ((this.onEndDoWorkDelegate == null)) {
-                this.onEndDoWorkDelegate = new EndOperationDelegate(this.OnEndDoWork);
+            if ((this.onEndcreateDirDelegate == null)) {
+                this.onEndcreateDirDelegate = new EndOperationDelegate(this.OnEndcreateDir);
             }
-            if ((this.onDoWorkCompletedDelegate == null)) {
-                this.onDoWorkCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnDoWorkCompleted);
+            if ((this.oncreateDirCompletedDelegate == null)) {
+                this.oncreateDirCompletedDelegate = new System.Threading.SendOrPostCallback(this.OncreateDirCompleted);
             }
-            base.InvokeAsync(this.onBeginDoWorkDelegate, null, this.onEndDoWorkDelegate, this.onDoWorkCompletedDelegate, userState);
+            base.InvokeAsync(this.onBegincreateDirDelegate, new object[] {
+                        folderName}, this.onEndcreateDirDelegate, this.oncreateDirCompletedDelegate, userState);
         }
         
         private System.IAsyncResult OnBeginOpen(object[] inValues, System.AsyncCallback callback, object asyncState) {
@@ -579,19 +503,6 @@ namespace FileUploader.OsbleServices {
                 return _result;
             }
             
-            public System.IAsyncResult BeginGetFile(string fileName, System.AsyncCallback callback, object asyncState) {
-                object[] _args = new object[1];
-                _args[0] = fileName;
-                System.IAsyncResult _result = base.BeginInvoke("GetFile", _args, callback, asyncState);
-                return _result;
-            }
-            
-            public byte[] EndGetFile(System.IAsyncResult result) {
-                object[] _args = new object[0];
-                byte[] _result = ((byte[])(base.EndInvoke("GetFile", _args, result)));
-                return _result;
-            }
-            
             public System.IAsyncResult BeginSyncFile(string fileName, byte[] data, System.AsyncCallback callback, object asyncState) {
                 object[] _args = new object[2];
                 _args[0] = fileName;
@@ -605,15 +516,16 @@ namespace FileUploader.OsbleServices {
                 base.EndInvoke("SyncFile", _args, result);
             }
             
-            public System.IAsyncResult BeginDoWork(System.AsyncCallback callback, object asyncState) {
-                object[] _args = new object[0];
-                System.IAsyncResult _result = base.BeginInvoke("DoWork", _args, callback, asyncState);
+            public System.IAsyncResult BegincreateDir(string folderName, System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[1];
+                _args[0] = folderName;
+                System.IAsyncResult _result = base.BeginInvoke("createDir", _args, callback, asyncState);
                 return _result;
             }
             
-            public void EndDoWork(System.IAsyncResult result) {
+            public void EndcreateDir(System.IAsyncResult result) {
                 object[] _args = new object[0];
-                base.EndInvoke("DoWork", _args, result);
+                base.EndInvoke("createDir", _args, result);
             }
         }
     }

@@ -112,12 +112,28 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AppManifest.xml" />
+    <None Include="Service References\OsbleServices\FileSyncService.disco" />
+    <None Include="Service References\OsbleServices\configuration91.svcinfo" />
+    <None Include="Service References\OsbleServices\configuration.svcinfo" />
+    <None Include="Service References\OsbleServices\FileUploader.OsbleServices.OsbleSyncInfo.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OsbleServices\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <Content Include="ServiceReferences.ClientConfig" />
     <None Include="Service References\OsbleServices\FileSyncService.wsdl" />
     <None Include="Service References\OsbleServices\FileSyncService.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\OsbleServices\FileSyncService1.wsdl" />
-    <Content Include="ServiceReferences.ClientConfig" />
+    <None Include="Service References\OsbleServices\FileSyncService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleServices\FileSyncService2.xsd">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\OutOfBrowserSettings.xml" />
@@ -129,22 +145,6 @@
     <Content Include="Images\folder.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="Service References\OsbleServices\FileSyncService1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleServices\FileSyncService11.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleServices\FileUploader.OsbleServices.OsbleSyncInfo.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\OsbleServices\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
-    <None Include="Service References\OsbleServices\configuration.svcinfo" />
-    <None Include="Service References\OsbleServices\configuration91.svcinfo" />
-    <None Include="Service References\OsbleServices\FileSyncService.disco" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

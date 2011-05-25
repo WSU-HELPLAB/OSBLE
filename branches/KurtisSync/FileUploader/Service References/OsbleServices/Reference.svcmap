@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="36d8c9f5-59de-4cea-8eab-7d2891cda2f8" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="5c761aab-198c-4bc3-9722-860492294f94" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
   <ClientOptions>
     <GenerateAsynchronousMethods>true</GenerateAsynchronousMethods>
     <EnableDataBinding>true</EnableDataBinding>
@@ -23,12 +23,12 @@
     <MetadataSource Address="http://localhost:49409/FileSyncService.svc" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="FileSyncService1.xsd" MetadataType="Schema" ID="2bdbc91a-3032-4334-a82d-f09c92668968" SourceId="1" SourceUrl="http://localhost:49409/FileSyncService.svc?xsd=xsd1" />
-    <MetadataFile FileName="FileSyncService.wsdl" MetadataType="Wsdl" ID="118cb541-649d-4e2b-ad31-db046dbcdc59" SourceId="1" SourceUrl="http://localhost:49409/FileSyncService.svc?wsdl=wsdl0" />
-    <MetadataFile FileName="FileSyncService11.xsd" MetadataType="Schema" ID="cef66d78-c09d-4c5e-9d3a-e75dd2401e01" SourceId="1" SourceUrl="http://localhost:49409/FileSyncService.svc?xsd=xsd2" />
-    <MetadataFile FileName="FileSyncService1.wsdl" MetadataType="Wsdl" ID="8eee7e70-c4d8-483c-ada9-65cf55d1ac81" SourceId="1" SourceUrl="http://localhost:49409/FileSyncService.svc?wsdl" />
-    <MetadataFile FileName="FileSyncService.xsd" MetadataType="Schema" ID="2f6c96cb-69d0-4fed-a62e-9d699304ab8f" SourceId="1" SourceUrl="http://localhost:49409/FileSyncService.svc?xsd=xsd0" />
-    <MetadataFile FileName="FileSyncService.disco" MetadataType="Disco" ID="87623572-9c49-46ec-9b31-8e6871e15723" SourceId="1" SourceUrl="http://localhost:49409/FileSyncService.svc?disco" />
+    <MetadataFile FileName="FileSyncService.xsd" MetadataType="Schema" ID="d195df1d-0972-4b70-9c9a-78a342f7fdf7" SourceId="1" SourceUrl="http://localhost:49409/FileSyncService.svc?xsd=xsd1" />
+    <MetadataFile FileName="FileSyncService.wsdl" MetadataType="Wsdl" ID="b3dd16b9-2a1b-405a-a4c7-ae7da417014e" SourceId="1" SourceUrl="http://localhost:49409/FileSyncService.svc?wsdl=wsdl0" />
+    <MetadataFile FileName="FileSyncService1.xsd" MetadataType="Schema" ID="f755ed3a-5aa6-4ade-8b1f-7ff009b585f9" SourceId="1" SourceUrl="http://localhost:49409/FileSyncService.svc?xsd=xsd2" />
+    <MetadataFile FileName="FileSyncService1.wsdl" MetadataType="Wsdl" ID="daf51597-af2e-4c41-b0d6-d724fc701860" SourceId="1" SourceUrl="http://localhost:49409/FileSyncService.svc?wsdl" />
+    <MetadataFile FileName="FileSyncService2.xsd" MetadataType="Schema" ID="3b88172e-de71-454c-afe8-a68c8b2fd50c" SourceId="1" SourceUrl="http://localhost:49409/FileSyncService.svc?xsd=xsd0" />
+    <MetadataFile FileName="FileSyncService.disco" MetadataType="Disco" ID="f73a45ca-48d6-44a1-894c-8e8f1dc56c62" SourceId="1" SourceUrl="http://localhost:49409/FileSyncService.svc?disco" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

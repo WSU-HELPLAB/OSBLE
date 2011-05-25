@@ -105,13 +105,16 @@ namespace FileUploader
             }
             else
             {
-                string selected = this.LocalFileList.SelectedItem.ToString();
-                if (selected == "..")
+                if (this.LocalFileList.SelectedItem != null)
                 {
-                    Stack<string> path_pieces = new Stack<string>(localpath.Split('\\'));
-                    path_pieces.Pop();
-                    localpath = String.Join("\\", path_pieces.ToArray().Reverse());
-                    dirList(localpath, LocalFileList);
+                    string selected = this.LocalFileList.SelectedItem.ToString();
+                    if (selected == "..")
+                    {
+                        Stack<string> path_pieces = new Stack<string>(localpath.Split('\\'));
+                        path_pieces.Pop();
+                        localpath = String.Join("\\", path_pieces.ToArray().Reverse());
+                        dirList(localpath, LocalFileList);
+                    }
                 }
             }
           
@@ -147,13 +150,16 @@ namespace FileUploader
             }
             else
             {
-                string selected = this.SyncedFileList.SelectedItem.ToString();
-                if (selected == "..")
+                if (this.SyncedFileList.SelectedItem != null)
                 {
-                    Stack<string> path_pieces = new Stack<string>(syncpath.Split('\\'));
-                    path_pieces.Pop();
-                    syncpath = String.Join("\\", path_pieces.ToArray().Reverse());
-                    dirList(syncpath, SyncedFileList);
+                    string selected = this.SyncedFileList.SelectedItem.ToString();
+                    if (selected == "..")
+                    {
+                        Stack<string> path_pieces = new Stack<string>(syncpath.Split('\\'));
+                        path_pieces.Pop();
+                        syncpath = String.Join("\\", path_pieces.ToArray().Reverse());
+                        dirList(syncpath, SyncedFileList);
+                    }
                 }
             }
             
@@ -221,9 +227,8 @@ namespace FileUploader
             {
                 // does directory exist in sync already
                 // 
-                string f = folder.Substring(folder.LastIndexOf('\\') + 1);
-
-                Directory.CreateDirectory(folder);
+               
+                syncedFiles.createDirAsync(folder);
                 traveseDirectories(folder);
 
             }
@@ -252,7 +257,6 @@ namespace FileUploader
                 {
                     lblStatus.Text = "Error reading file.";
                 }
-
             }
 
         }
@@ -261,39 +265,9 @@ namespace FileUploader
         private void Syncbtn_Click(object sender, RoutedEventArgs e)
         {
             string path = localpath;
+            
             traveseDirectories(path);
 
-            
-
-           /* OpenFileDialog openDialog = new OpenFileDialog();
-            
-            if (openDialog.ShowDialog() == true)
-            {
-                
-                try
-                {
-                    using (Stream stream = openDialog.File.OpenRead())
-                    {
-                        //dont all really big files (more than 5mb).
-                        if (stream.Length < 5120000)
-                        {
-                            byte[] data = new byte[stream.Length];
-                            stream.Read(data, 0, (int)stream.Length);
-
-                            syncedFiles.SyncFileAsync(openDialog.File.Name, data);
-                            lblStatus.Text = "Sync started";
-                        }
-                        else
-                        {
-                            lblStatus.Text = "Files must be less than 5mb.";
-                        }
-                    }
-                }
-                catch
-                {
-                    lblStatus.Text = "Error reading file.";
-                }
-            }*/
         }
 
         private void syncedFiles_SyncCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
