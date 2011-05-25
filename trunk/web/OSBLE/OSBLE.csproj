@@ -74,7 +74,6 @@
     <Compile Include="Attributes\IsCommunity.cs" />
     <Compile Include="Attributes\NotForCommunity.cs" />
     <Compile Include="Controllers\AssignmentActivityController.cs" />
-    <Compile Include="Controllers\AssignmentController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\SubmissionAssignmentActivityController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
@@ -449,22 +448,7 @@
     <Content Include="Views\Weight\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Assignment\Index.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Assignment\Details.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Assignment\Create.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Assignment\Edit.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Assignment\Delete.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\SubmissionAssignmentActivity\Index.cshtml" />
+    <Content Include="Views\SubbmissionAssignmentActivity\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\SubmissionAssignmentActivity\Details.cshtml" />
