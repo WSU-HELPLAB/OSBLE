@@ -89,6 +89,22 @@ if (!Model.IsCommunity)
 else
 {
 
+        <div class="editor-label">
+            Community Name
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Name)
+            @Html.ValidationMessageFor(model => model.Name)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.CommunityDescription)
+        </div>
+        <div class="editor-field">
+            @Html.TextAreaFor(model => model.CommunityDescription, new { rows = 8, cols = 40 })
+            @Html.ValidationMessageFor(model => model.CommunityDescription)
+        </div>
+
 }
         <p>
             <input type="submit" value="Save" />
