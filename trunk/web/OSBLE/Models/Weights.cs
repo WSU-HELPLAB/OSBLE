@@ -26,7 +26,7 @@ namespace OSBLE.Models
         public int Points { get; set; }
 
         [Required]
-        [Display(Name = "Tasks")]
-        public ICollection<AbstractGradable> Tasks { get; set; }
+        [Display(Name = "Gradables")]
+        public ICollection<AbstractGradable> Gradables { get; set; }
     }
 }
