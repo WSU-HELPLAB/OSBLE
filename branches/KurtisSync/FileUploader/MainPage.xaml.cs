@@ -24,7 +24,8 @@ namespace FileUploader
 
         // Synced Directory path
        private FileSyncServiceClient syncedFiles = new FileSyncServiceClient();
-       //string syncpath = syncedFiles.GetFileUrlAsync;
+       string syncpath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+       string syncpathhome = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
        
 
         // Double Click variables
@@ -37,7 +38,7 @@ namespace FileUploader
          
             // Populate the ListBox's LocalFileList and SyncedFileList with the contents of the directory path
             dirList(path, LocalFileList);
-            dirList(path, SyncedFileList);
+            dirList(syncpath, SyncedFileList);
         
         }
 
@@ -75,7 +76,7 @@ namespace FileUploader
         private void LocalDirSelect(object sender, MouseButtonEventArgs e)
         {
             //If selected is a file or directory
-            if ( this.LocalFileList.SelectedItem is DirectoryLabel)
+            if (this.LocalFileList.SelectedItem is DirectoryLabel)
             {
                 DirectoryLabel selected = this.LocalFileList.SelectedItem as DirectoryLabel;
                 // if selected is a directory
@@ -100,12 +101,16 @@ namespace FileUploader
                 // If it was a directory return out
                 return;
             }
-            else if (this.LocalFileList.SelectedItem.ToString() == "..")
+            else
             {
-                Stack<string> path_pieces = new Stack<string>(path.Split('\\'));
-                path_pieces.Pop();
-                path = String.Join("\\", path_pieces.ToArray().Reverse());
-                dirList(path, LocalFileList);
+                string selected = this.LocalFileList.SelectedItem.ToString();
+                if (selected == "..")
+                {
+                    Stack<string> path_pieces = new Stack<string>(path.Split('\\'));
+                    path_pieces.Pop();
+                    path = String.Join("\\", path_pieces.ToArray().Reverse());
+                    dirList(path, LocalFileList);
+                }
             }
           
             // If it wasn't a directory reset the click variables
@@ -124,8 +129,8 @@ namespace FileUploader
                     {
                         if (selected.DirName.Text == lastTarget)
                         {
-                            path += "\\" + selected.DirName.Text;
-                            dirList(path, SyncedFileList);
+                            syncpath += "\\" + selected.DirName.Text;
+                            dirList(syncpath, SyncedFileList);
                         }
                     }
                     else
@@ -137,23 +142,19 @@ namespace FileUploader
 
                 // If it was a directory return out
                 return;
-                
             }
-            /*else if (this.SyncedFileList.SelectedItem.ToString() != null)
-            {
-                if (this.SyncedFileList.SelectedItem.ToString() == "..")
-                {
-                    Stack<string> path_pieces = new Stack<string>(path.Split('\\'));
-                    path_pieces.Pop();
-                    path = String.Join("\\", path_pieces.ToArray().Reverse());
-                    dirList(path, SyncedFileList);
-                }
-            }*/
             else
             {
-                dirList(path, SyncedFileList);
+                string selected = this.SyncedFileList.SelectedItem.ToString();
+                if (selected == "..")
+                {
+                    Stack<string> path_pieces = new Stack<string>(syncpath.Split('\\'));
+                    path_pieces.Pop();
+                    syncpath = String.Join("\\", path_pieces.ToArray().Reverse());
+                    dirList(syncpath, SyncedFileList);
+                }
             }
-
+            
             // If it wasn't a directory reset the click variables
             lastTarget = "";
             wasClicked = false;
@@ -215,8 +216,10 @@ namespace FileUploader
         private void Syncbtn_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openDialog = new OpenFileDialog();
+            
             if (openDialog.ShowDialog() == true)
             {
+                
                 try
                 {
                     using (Stream stream = openDialog.File.OpenRead())
