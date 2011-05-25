@@ -60,9 +60,9 @@
             @Html.ValidationMessageFor(m => m.LastName)
         </div>
         <h3>
-            School</h3>
+            School/Organization</h3>
         <div class="editor-label">
-            @Html.LabelFor(model => model.SchoolID, "School")
+            @Html.LabelFor(model => model.SchoolID, "School/Organization")
         </div>
         <div class="editor-field">
         @try
@@ -77,14 +77,14 @@
         </div>
 
         <div class="editor-label">
-            @Html.LabelFor(m => m.Identification)
+            @Html.LabelFor(m => m.Identification, "ID Number")
         </div>
         <div class="editor-field">
             @Html.TextBoxFor(m => m.Identification)<br />
             @Html.ValidationMessageFor(m => m.Identification)
         </div>
         <div class="editor-label">
-            @Html.LabelFor(m => m.ConfirmIdentification)
+            @Html.LabelFor(m => m.ConfirmIdentification, "Confirm ID Number")
         </div>
         <div class="editor-field">
             @Html.TextBoxFor(m => m.ConfirmIdentification)<br />

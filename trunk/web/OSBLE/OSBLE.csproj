@@ -74,6 +74,9 @@
     <Compile Include="Attributes\IsCommunity.cs" />
     <Compile Include="Attributes\NotForCommunity.cs" />
     <Compile Include="Controllers\AssignmentActivityController.cs" />
+    <Compile Include="Controllers\AssignmentController.cs" />
+    <Compile Include="Controllers\CommunityController.cs" />
+    <Compile Include="Controllers\CourseController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\SubmissionAssignmentActivityController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
@@ -218,6 +221,8 @@
     <Content Include="Content\images\ui-icons_454545_256x240.png" />
     <Content Include="Content\images\ui-icons_888888_256x240.png" />
     <Content Include="Content\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\images\ui-icons_eee_256x240.png" />
+    <Content Include="Content\images\ui-icons_ffffff_256x240.png" />
     <Content Include="Content\jquery-ui-1.8.13.custom.css" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
@@ -431,6 +436,16 @@
     <Content Include="Views\Roster\CreateByEmail.cshtml" />
     <Content Include="Views\Roster\RosterError.cshtml" />
     <Content Include="Utility\Notification\Index.cshtml" />
+    <Content Include="Views\Course\Details.cshtml" />
+    <Content Include="Views\Course\Create.cshtml" />
+    <Content Include="Views\Course\Edit.cshtml" />
+    <Content Include="Views\Course\Delete.cshtml" />
+    <Content Include="Views\Community\Index.cshtml" />
+    <Content Include="Views\Community\Details.cshtml" />
+    <Content Include="Views\Community\Create.cshtml" />
+    <Content Include="Views\Community\Edit.cshtml" />
+    <Content Include="Views\Community\Delete.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Date.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

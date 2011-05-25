@@ -15,7 +15,7 @@ namespace OSBLE.Controllers
 
         public ViewResult Index()
         {
-            return View(db.Schools.ToList());
+            return View(db.Schools.ToList().OrderBy(s=>s.Name));
         }
 
         //

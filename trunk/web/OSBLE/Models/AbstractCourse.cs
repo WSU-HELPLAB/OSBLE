@@ -13,7 +13,7 @@ namespace OSBLE.Models
         public int ID { get; set; }
 
         [Required]
-        [Display(Name = "Course Name")]
+        [Display(Name = "Name")]
         public string Name { get; set; }
 
         public virtual bool AllowEventPosting { get; set; }

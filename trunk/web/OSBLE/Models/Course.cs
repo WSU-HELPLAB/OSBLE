@@ -10,12 +10,12 @@ namespace OSBLE.Models
 
         [Required]
         [MaxLength(8)]
-        [Display(Name = "Course Prefix (e.g. CptS)")]
+        [Display(Name = "Prefix")]
         public string Prefix { get; set; }
 
         [Required]
         [MaxLength(8)]
-        [Display(Name = "Course Number (e.g. 111)")]
+        [Display(Name = "Number")]
         public string Number { get; set; }
 
         [Required]
@@ -45,7 +45,10 @@ namespace OSBLE.Models
         [Display(Name = "Amount of weeks into the future to show events in course calendar")]
         public int CourseCalendarWindowOfTime { get; set; }
 
+        [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
+
+        [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
 
         // References

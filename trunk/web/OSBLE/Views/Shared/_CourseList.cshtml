@@ -34,5 +34,22 @@ using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_cour
     }
     @if (ViewBag.CurrentUser.CanCreateCourses)
     {
-    <a href="/Course/Create" id="course_create_button">@Helpers.AddButton()</a>
+    <a href="#" onclick="$('#course_create_dialog').dialog('open'); return false;" id="course_create_button">@Helpers.AddButton()</a>
+        
+    <script type="text/javascript">
+        $(function () {
+            $('#course_create_dialog').dialog({ 
+                modal: true,
+                autoOpen: false,
+                resizable: false,
+                width: "350",
+                height: "200"
+                });
+        });
+    </script>
+        
+    <div id="course_create_dialog" title="Create Course">
+        <p>Would you like to create a Course or a Community?</p>
+        @Html.ActionLink("Create Course","Create","Course") | @Html.ActionLink("Create Community","Create","Community")
+    </div>
     }
