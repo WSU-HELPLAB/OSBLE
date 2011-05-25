@@ -6,6 +6,7 @@ namespace OSBLE.Models
     {
         public class Submission
         {
+            /*
             private string fileName;
             private SubmissionType submissionType;
 
@@ -29,7 +30,7 @@ namespace OSBLE.Models
             {
                 this.fileName = fileName;
                 this.submissionType = submissionType;
-            }
+            }*/
         }
 
         public ICollection<string> RequiredSubbmisions { get; set; }
