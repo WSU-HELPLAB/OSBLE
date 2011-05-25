@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -13,20 +14,21 @@ using System.IO;
 using System.Windows.Media.Imaging;
 using FileUploader.OsbleServices;
 
+
 namespace FileUploader
 {
     
     public partial class MainPage : UserControl
     {
         // Local Directory path
-       string localpath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-       string localhome = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+       string localpath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+       string localhome = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
 
         // Synced Directory path
-       private FileSyncServiceClient syncedFiles = new FileSyncServiceClient();
+       FileSyncServiceClient syncedFiles = new FileSyncServiceClient();
+
        string syncpath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
        string syncpathhome = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-       
 
         // Double Click variables
        string lastTarget = "";
@@ -213,9 +215,57 @@ namespace FileUploader
             }
         }
 
+        private void traveseDirectories(string path)
+        {
+            foreach (string folder in Directory.EnumerateDirectories(path))
+            {
+                // does directory exist in sync already
+                // 
+                string f = folder.Substring(folder.LastIndexOf('\\') + 1);
+
+                Directory.CreateDirectory(folder);
+                traveseDirectories(folder);
+
+            }
+
+            foreach (string file in Directory.EnumerateFiles(path))
+            {
+                try
+                {
+                    MemoryStream s = new MemoryStream();
+                    StreamWriter writer = new StreamWriter(s);
+                    writer.Write(file);
+                    writer.Flush();
+
+                    //byte[] byteArray = Encoding.ASCII.GetBytes(file);
+                    //Stream filestream = new Stream(byteArray);
+                    using (Stream stream = s)
+                    {
+                        byte[] data = new byte[stream.Length];
+                        stream.Read(data, 0, (int)stream.Length);
+
+                        syncedFiles.SyncFileAsync(file, data);
+                        lblStatus.Text = "Sync started";
+                    }
+                }
+                catch
+                {
+                    lblStatus.Text = "Error reading file.";
+                }
+
+            }
+
+        }
+
+
         private void Syncbtn_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openDialog = new OpenFileDialog();
+            string path = localpath;
+            traveseDirectories(path);
+
+            
+
+           /* OpenFileDialog openDialog = new OpenFileDialog();
             
             if (openDialog.ShowDialog() == true)
             {
@@ -243,7 +293,7 @@ namespace FileUploader
                 {
                     lblStatus.Text = "Error reading file.";
                 }
-            }
+            }*/
         }
 
         private void syncedFiles_SyncCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
