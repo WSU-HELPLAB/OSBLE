@@ -42,6 +42,7 @@ namespace OSBLE.Controllers
             public string Action { get; set; }
 
             public bool ModifierOnly { get; set; }
+            public bool GraderOnly { get; set; }
             public bool ViewerOnly { get; set; }
             public bool AdminOnly { get; set; }
             public bool NotInCommunityPage { get; set; }
@@ -76,13 +77,14 @@ namespace OSBLE.Controllers
             /// <param name="modifierOnly"></param>
             /// <param name="viewerOnly"></param>
             /// <param name="adminOnly"></param>
-            public MenuItem(string name, string controller, string action, bool modifierOnly, bool viewerOnly, bool adminOnly, bool notInCommunityPage, bool communityOnlyPage)
+            public MenuItem(string name, string controller, string action, bool modifierOnly, bool graderOnly, bool viewerOnly, bool adminOnly, bool notInCommunityPage, bool communityOnlyPage)
             {
                 this.Name = name;
                 this.Controller = controller;
                 this.Action = action;
 
                 this.ModifierOnly = modifierOnly;
+                this.GraderOnly = graderOnly;
                 this.ViewerOnly = viewerOnly;
                 this.AdminOnly = adminOnly;
                 this.NotInCommunityPage = notInCommunityPage;
@@ -105,11 +107,11 @@ namespace OSBLE.Controllers
                 List<MenuItem> menu = new List<MenuItem>();
 
                 menu.Add(new MenuItem("Dashboard", "Home", "Index"));
-                menu.Add(new MenuItem("Assignments", "Assignment", "Index",false,true,false,true,false));
-                menu.Add(new MenuItem("Grades", "Gradebook", "Index",false,true,false,true,false));
-                menu.Add(new MenuItem("Users", "Roster", "Index", true, true, false, false, false));
-                menu.Add(new MenuItem("Course Settings", "Course", "Index", true, true, false, true, false));
-                menu.Add(new MenuItem("Community Settings", "Community", "Index", true, true, false, false, true));
+                menu.Add(new MenuItem("Assignments", "Assignment", "Index",false,false,true,false,true,false));
+                menu.Add(new MenuItem("Grades", "Gradebook", "Index",false,true,true,false,true,false));
+                menu.Add(new MenuItem("Users", "Roster", "Index", false, true, true, false, false, false));
+                menu.Add(new MenuItem("Course Settings", "Course", "Index", true, true, true, false, true, false));
+                menu.Add(new MenuItem("Community Settings", "Community", "Index", true, true, true, false, false, true));
                 ViewBag.Menu = menu;
 
                 #endregion Menu Setup

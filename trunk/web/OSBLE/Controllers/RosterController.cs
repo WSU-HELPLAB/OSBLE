@@ -94,22 +94,38 @@ namespace OSBLE.Controllers
                 List<UsersByRole> usersByRoles = new List<UsersByRole>();
 
                 //Get all the users for each role
-                List<CourseRole> roles = new List<CourseRole>();
+                List<AbstractRole> roles = new List<AbstractRole>();
 
-                // Set custom role order for display
-                List<CourseRole.OSBLERoles> rolesOrder = new List<CourseRole.OSBLERoles>(new CourseRole.OSBLERoles[] {
-                            CourseRole.OSBLERoles.Student,
-                            CourseRole.OSBLERoles.TA,
-                            CourseRole.OSBLERoles.Moderator,
-                            CourseRole.OSBLERoles.Observer,
-                            CourseRole.OSBLERoles.Instructor });
-
-                foreach (CourseRole.OSBLERoles r in rolesOrder)
+                if (ActiveCourse.Course is Course)
                 {
-                    roles.Add(db.CourseRoles.Find((int)r));
+                    // Set custom role order for display
+                    List<CourseRole.OSBLERoles> rolesOrder = new List<CourseRole.OSBLERoles>(new CourseRole.OSBLERoles[] {
+                                CourseRole.OSBLERoles.Student,
+                                CourseRole.OSBLERoles.TA,
+                                CourseRole.OSBLERoles.Moderator,
+                                CourseRole.OSBLERoles.Observer,
+                                CourseRole.OSBLERoles.Instructor });
+
+                    foreach (CourseRole.OSBLERoles r in rolesOrder)
+                    {
+                        roles.Add(db.CourseRoles.Find((int)r));
+                    }
+                }
+                else
+                { // Community
+                    // Set custom role order for display
+                    List<CommunityRole.OSBLERoles> rolesOrder = new List<CommunityRole.OSBLERoles>(new CommunityRole.OSBLERoles[] {
+                                CommunityRole.OSBLERoles.Leader,
+                                CommunityRole.OSBLERoles.Participant });
+
+                    foreach (CommunityRole.OSBLERoles r in rolesOrder)
+                    {
+                        roles.Add(db.CommunityRoles.Find((int)r));
+                    }
+
                 }
 
-                foreach (CourseRole role in roles)
+                foreach (AbstractRole role in roles)
                 {
                     UsersByRole usersByRole = new UsersByRole();
                     usersByRole.RoleName = role.Name;

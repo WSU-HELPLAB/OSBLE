@@ -3,31 +3,29 @@
 namespace OSBLE.Models
 {
 
-    public class CourseRole : AbstractRole
+    public class CommunityRole : AbstractRole
     {
-        public CourseRole()
+        public CommunityRole()
             : base()
         {
         }
 
-        public CourseRole(string Name, bool CanModify, bool CanSeeAll, bool CanGrade, bool CanSubmit, bool Anonymized)
+        public CommunityRole(string Name, bool CanModify, bool CanSeeAll, bool CanGrade)
             : base()
         {
             this.Name = Name;
             this.CanModify = CanModify;
             this.CanSeeAll = CanSeeAll;
             this.CanGrade = CanGrade;
-            this.CanSubmit = CanSubmit;
-            this.Anonymized = Anonymized;
+            this.CanSubmit = false;
+            this.Anonymized = false;
         }
+
 
         public enum OSBLERoles : int
         {
-            Instructor = 1,
-            TA,
-            Student,
-            Moderator,
-            Observer
+            Leader = 6,
+            Participant
         }
 
     }

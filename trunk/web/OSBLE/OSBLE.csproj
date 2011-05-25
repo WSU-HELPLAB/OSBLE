@@ -80,9 +80,11 @@
     <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="Models\AbstractCourse.cs" />
     <Compile Include="Models\AbstractGradable.cs" />
+    <Compile Include="Models\AbstractRole.cs" />
     <Compile Include="Models\AssignmentActivity.cs" />
     <Compile Include="Models\Assignment.cs" />
     <Compile Include="Models\Community.cs" />
+    <Compile Include="Models\CommunityRole.cs" />
     <Compile Include="Models\CourseBreak.cs" />
     <Compile Include="Models\CourseMeeting.cs" />
     <Compile Include="Models\Submission.cs" />
@@ -355,21 +357,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Roster\Edit.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\CourseRoles\Index.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\CourseRoles\Details.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\CourseRoles\Create.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\CourseRoles\Edit.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\CourseRoles\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_CourseList.cshtml" />

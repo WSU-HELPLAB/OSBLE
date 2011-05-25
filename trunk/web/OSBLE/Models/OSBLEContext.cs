@@ -18,7 +18,11 @@ namespace OSBLE.Models
             : base("OSBLEData")
         { }
 
+        public DbSet<AbstractRole> AbstractRoles { get; set; }
+
         public DbSet<CourseRole> CourseRoles { get; set; }
+
+        public DbSet<CommunityRole> CommunityRoles { get; set; }
 
         public DbSet<CourseMeeting> CourseMeetings { get; set; }
 
@@ -108,6 +112,13 @@ namespace OSBLE.Models
             this.CourseRoles.Add(new CourseRole("Moderator", false, false, false, false, false));
             // Observer: Can See All, All Anonymized
             this.CourseRoles.Add(new CourseRole("Observer", false, true, false, false, true));
+
+            // Community Roles
+
+            // Leader: Can Modify Community
+            this.CommunityRoles.Add(new CommunityRole("Leader",true, true, true));
+            // Participant: Cannot Modify Community
+            this.CommunityRoles.Add(new CommunityRole("Participant", false, true, true));
         }
 
         /// <summary>
@@ -204,13 +215,13 @@ namespace OSBLE.Models
             CoursesUsers cu6 = new CoursesUsers();
             cu6.CourseID = 3;
             cu6.UserProfileID = 1;
-            cu6.CourseRoleID = (int)CourseRole.OSBLERoles.Instructor;
+            cu6.CourseRoleID = (int)CommunityRole.OSBLERoles.Leader;
             cu6.Section = 0;
 
             CoursesUsers cu7 = new CoursesUsers();
             cu7.CourseID = 3;
             cu7.UserProfileID = 2;
-            cu7.CourseRoleID = (int)CourseRole.OSBLERoles.TA;
+            cu7.CourseRoleID = (int)CommunityRole.OSBLERoles.Participant;
             cu7.Section = 0;
             
             this.CoursesUsers.Add(cu);

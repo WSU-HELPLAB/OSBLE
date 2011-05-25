@@ -66,11 +66,13 @@
         if (show || (activeCourse.UserProfileID == user.ID))
         {
     <text>@user.FirstName @user.LastName</text>
-            if (instructor)
+            if (instructor && !(course is Community))
             {
     <text> <small><em>(Instructor)</em></small></text>
+            } else if (instructor && (course is Community)) {
+    <text> <small><em>(Leader)</em></small></text>                
             }
-            else if (ta)
+            else if (ta && !(course is Community))
             {
     <text> <small><em>(TA)</em></small></text>
             }
@@ -162,11 +164,15 @@
         }
 }
 
-@helper CourseTag (AbstractCourse ac) {
-    if(ac is Community) {
+@helper CourseTag(AbstractCourse ac)
+    {
+    if (ac is Community)
+    {
         Community c = (Community)ac;
         @c.Nickname
-    } else if(ac is Course) {
+    }
+    else if (ac is Course)
+    {
         Course c = (Course)ac;
         @c.Prefix<text> </text>@c.Number
     }
