@@ -21,32 +21,68 @@ namespace OSBLE.Controllers
             ViewBag.CurrentTab = "Grades";
         }
 
-        public ViewResult Index()
+        public ActionResult Index()
         {
-            int currentCourseId = ViewBag.ActiveCourse.CourseID;
+            int currentCourseId = ActiveCourse.CourseID;
 
             //we need the current weights (tabs) for the current course
             var result = from weight in db.Weights
                     where weight.CourseID == currentCourseId
                     select weight;
-            IEnumerable<Weight> tabs = result.ToList();
+          
+            //If no tabs exist, we need to create an untitled tab
+            if (result.Count() == 0)
+            {
+                Weight newWeight = new Weight()
+                {
+                    Name = "Untitled",
+                    CourseID = currentCourseId,
+                    Course = ViewBag.ActiveCourse.Course,
+                    Points = 0,
+                    Gradables = new List<AbstractGradable>()
+                };
+
+                db.Weights.Add(newWeight);
+                db.SaveChanges();
+
+                result = from weight in db.Weights
+                         where weight.CourseID == currentCourseId
+                         select weight;
+            }
+
+            List<Weight> tabs = result.ToList();
+            int gradableId = tabs.ElementAt(0).ID;
+
+            //get course users
+            var userResults = from users in db.CoursesUsers
+                              where users.CourseID == currentCourseId 
+                              && users.CourseRoleID == (int)CourseRole.OSBLERoles.Student
+                              select users;
+            List<CoursesUsers> user = userResults.ToList();
 
             //same thing for getting columns for the current tab (AbstractGradable)
-            var assignmentResults = from gradable in db.Gradables
-                     where gradable.WeightID == tabs.ElementAt(0).ID
-                     select gradable;
-            IEnumerable<Gradable> assignments = assignmentResults.ToList();
+            var assignmentResults = from gradable in db.AbstractGradables
+                                    where gradable.WeightID == gradableId
+                                    select gradable;
+
+            List<AbstractGradable> assignments = assignmentResults.ToList();
 
             //Getting the current grades
-            var gradeResults = from gradable in db.Gradables
-                               where gradable.WeightID == tabs.ElementAt(0).ID
+            var gradeResults = from gradable in db.GradableScores
+                               where gradable.Gradable.WeightID == gradableId 
                                select gradable;
-            IEnumerable<AbstractGradable> grades = gradeResults.ToList();
+            List<GradableScore> grades = gradeResults.ToList();
 
             //save everything that we need to the viewebag
             ViewBag.Tabs = tabs;
             ViewBag.Assignments = assignments;
             ViewBag.Grades = grades;
+            ViewBag.Users = user;
+            return View();
+        }
+
+        public ActionResult Create()
+        {
             return View();
         }
 
