@@ -143,9 +143,19 @@ namespace OSBLE.Models
             c2.Year = "2011";
             c2.Name = "Underwater Basketweaving";
             c2.CommunityDescription = "";
+
+            Course c3 = new Course();
+            c3.Prefix = "";
+            c3.Number = "";
+            c3.Semester = "";
+            c3.Year = "";
+            c3.Name = "A Community";
+            c3.CommunityDescription = "This is a course community.";
+            c3.IsCommunity = true;
             
             this.Courses.Add(c1);
             this.Courses.Add(c2);
+            this.Courses.Add(c3);
 
             this.SaveChanges();
 
@@ -192,12 +202,26 @@ namespace OSBLE.Models
             cu5.UserProfileID = 2;
             cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
             cu5.Section = 2;
+
+            CoursesUsers cu6 = new CoursesUsers();
+            cu6.CourseID = 3;
+            cu6.UserProfileID = 1;
+            cu6.CourseRoleID = (int)CourseRole.OSBLERoles.Instructor;
+            cu6.Section = 0;
+
+            CoursesUsers cu7 = new CoursesUsers();
+            cu7.CourseID = 3;
+            cu7.UserProfileID = 2;
+            cu7.CourseRoleID = (int)CourseRole.OSBLERoles.TA;
+            cu7.Section = 0;
             
             this.CoursesUsers.Add(cu);
             this.CoursesUsers.Add(cu2);
             this.CoursesUsers.Add(cu3);
             this.CoursesUsers.Add(cu4);
             this.CoursesUsers.Add(cu5);
+            this.CoursesUsers.Add(cu6);
+            this.CoursesUsers.Add(cu7);
             
             this.SaveChanges();
         }
