@@ -263,6 +263,13 @@ namespace OSBLE.Models
 
             cu8 = new CoursesUsers();
             cu5.CourseID = 4;
+            cu5.UserProfileID = 1;
+            cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Instructor;
+            cu5.Section = 0;
+            this.CoursesUsers.Add(cu);
+
+            cu8 = new CoursesUsers();
+            cu5.CourseID = 4;
             cu5.UserProfileID = 6;
             cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
             cu5.Section = 0;
