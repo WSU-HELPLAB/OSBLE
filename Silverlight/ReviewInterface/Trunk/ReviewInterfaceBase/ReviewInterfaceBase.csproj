@@ -107,7 +107,9 @@
     <Compile Include="HelperClasses\NoteAuthor.cs" />
     <Compile Include="HelperClasses\SwitchedTabEventArgs.cs" />
     <Compile Include="HelperClasses\DocumentInfo.cs" />
+    <Compile Include="ViewModel\Behaviors\ResizeUserControlBorder.cs" />
     <Compile Include="ViewModel\Comment\AuthorRebuttalCommentViewModel.cs" />
+    <Compile Include="ViewModel\Comment\CommentViewModel.cs" />
     <Compile Include="ViewModel\Comment\Location\ISpatialLocation.cs" />
     <Compile Include="ViewModel\Comment\Location\TextLocation.cs" />
     <Compile Include="ViewModel\Comment\Location\XpsLocation.cs" />
@@ -165,7 +167,6 @@
     <Compile Include="Model\Rubric\CriterionModel.cs" />
     <Compile Include="Model\Rubric\RubicModel.cs" />
     <Compile Include="Model\Rubric\RubricHeaderModel.cs" />
-    <Compile Include="View\Comment\CommentFactory.cs" />
     <Compile Include="View\Comment\CommentView.xaml.cs">
       <DependentUpon>CommentView.xaml</DependentUpon>
     </Compile>
@@ -232,8 +233,8 @@
     <Compile Include="View\Document\TextDocumentView.xaml.cs">
       <DependentUpon>TextDocumentView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Comment\PeerReviewCommentView.xaml.cs">
-      <DependentUpon>PeerReviewCommentView.xaml</DependentUpon>
+    <Compile Include="View\Comment\PeerReviewCommentPartialView.xaml.cs">
+      <DependentUpon>PeerReviewCommentPartialView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -313,7 +314,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\Comment\PeerReviewCommentView.xaml">
+    <Page Include="View\Comment\PeerReviewCommentPartialView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

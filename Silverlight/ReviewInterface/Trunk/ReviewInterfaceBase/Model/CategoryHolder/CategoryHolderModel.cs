@@ -34,6 +34,17 @@ namespace ReviewInterfaceBase.Model.CatergoryHolder
             set { categories = value; }
         }
 
+        public CategoryHolderModel Clone()
+        {
+            CategoryHolderModel chm = new CategoryHolderModel();
+            chm.DocumentID = this.DocumentID;
+            foreach (CategoryViewModel cvm in this.Categories)
+            {
+                CategoryViewModel newCvm = cvm.Clone();
+            }
+            return chm;
+        }
+
         public CategoryHolderModel(int documentID)
         {
             this.documentID = documentID;

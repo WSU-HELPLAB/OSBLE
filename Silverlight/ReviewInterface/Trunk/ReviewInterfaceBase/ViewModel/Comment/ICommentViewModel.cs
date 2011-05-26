@@ -59,7 +59,7 @@ namespace ReviewInterfaceBase.ViewModel.Comment
 
         Label GetToolTipView();
 
-        AbstractCommentView GetView();
+        CommentView GetView();
 
         bool Focus();
 

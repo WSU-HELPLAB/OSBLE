@@ -68,7 +68,7 @@ namespace ReviewInterfaceBase.ViewModel.Comment
         /// PeerReviewCommentView and CommentModel can be accessed by GetView or GetModel
         /// </summary>
         /// <param name="ReferenceLocation">A reference to the location that this noteText is commenting on</param>
-        protected void Initilize(AbstractCommentView view, ILocation referenceLocation)
+        protected void Initilize(CommentView view, ILocation referenceLocation)
         {
             this.thisView = view;
             this.thisModel = new CommentModel(referenceLocation);
@@ -282,7 +282,7 @@ namespace ReviewInterfaceBase.ViewModel.Comment
         /// This returns the associated PeerReviewCommentView
         /// </summary>
         /// <returns>PeerReviewCommentView</returns>
-        public AbstractCommentView GetView()
+        public CommentView GetView()
         {
             return thisView;
         }

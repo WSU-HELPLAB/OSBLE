@@ -28,7 +28,7 @@ namespace ReviewInterfaceBase.ViewModel.Comment2
             NoteBrush = author.NoteBrush;
             TextBrush = author.TextBrush;
 
-            base.Initilize(thisView, location);
+            //base.Initilize(thisView, location);
 
             thisView.DataContext = this;
 

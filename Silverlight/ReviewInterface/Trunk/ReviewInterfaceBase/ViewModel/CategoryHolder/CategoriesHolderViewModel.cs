@@ -83,6 +83,19 @@ namespace ReviewInterfaceBase.ViewModel.CategoryHolder
             thisView = new CategoriesHolderView();
         }
 
+        private CategoriesHolderViewModel(CategoriesHolderViewModel chvm)
+        {
+            thisView = new CategoriesHolderView();
+            thisModel = chvm.thisModel.Clone();
+        }
+
+        public CategoriesHolderViewModel Clone()
+        {
+            CategoriesHolderViewModel chvm = new CategoriesHolderViewModel(this);
+
+            return chvm;
+        }
+
         public void LoadIssueVotingCategories()
         {
             thisModel = new CategoryHolderModel();

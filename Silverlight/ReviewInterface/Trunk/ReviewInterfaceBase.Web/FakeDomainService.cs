@@ -125,7 +125,7 @@
         //This needs to get the document locations and return their real location that the client side can open
         public IQueryable<DocumentLocation> GetDocumentLocations()
         {
-            return (new List<DocumentLocation>() { /*new DocumentLocation("SortedList.cp", 6, "bob", AuthorClassification.Student),/*new DocumentLocation("ProtoWalk-ICER2011-SUBMITTED.xps", 5, "bob", AuthorClassification.Student), new DocumentLocation("ShapeImageTest.xps", 4, "bob", AuthorClassification.Student)/*, new DocumentLocation("hello.txt", 0), new DocumentLocation("hello2.txt", 1), new DocumentLocation("testReadOnly.cpml", 2, "bob", AuthorClassification.Student)/*,*/ new DocumentLocation("Butterfly.wmv", 3, "bob", AuthorClassification.Student) }).ToArray().AsQueryable();
+            return (new List<DocumentLocation>() { new DocumentLocation("SortedList.txt", 6, "bob", AuthorClassification.Student)/*,new DocumentLocation("ProtoWalk-ICER2011-SUBMITTED.xps", 5, "bob", AuthorClassification.Student), new DocumentLocation("ShapeImageTest.xps", 4, "bob", AuthorClassification.Student)/*, new DocumentLocation("hello.txt", 0), new DocumentLocation("hello2.txt", 1), new DocumentLocation("testReadOnly.cpml", 2, "bob", AuthorClassification.Student)/*, new DocumentLocation("Butterfly.wmv", 3, "bob", AuthorClassification.Student)*/ }).ToArray().AsQueryable();
         }
 
         public IQueryable<DocumentLocation> GetPeerReviewAndIssueVotingDocuments()

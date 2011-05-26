@@ -1,25 +1,19 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Data;
-using ReviewInterfaceBase.ViewModel.Comment;
-using ReviewInterfaceBase.ViewModel.Comment.Location;
 
 namespace ReviewInterfaceBase.View.Comment
 {
     public partial class PeerReviewCommentPartialView : UserControl
     {
-        public PeerReviewCommentViewModel ViewModel
-        {
-            get;
-            set;
-        }
-
         /// <summary>
         /// This creates a new PeerReviewCommentView, NOTE: only to be used by PeerReviewCommentViewModel if you need a noteText
         /// create a PeerReviewCommentViewModel and it will create a View for you.  This is the same for ALL Views and ViewModels
         /// </summary>
-        public PeerReviewCommentPartialView(int documentID, ILocation referenceLocation)
+        public PeerReviewCommentPartialView(bool isReadOnly)
         {
             InitializeComponent();
+
+            Note.IsReadOnly = isReadOnly;
         }
 
         /// <summary>

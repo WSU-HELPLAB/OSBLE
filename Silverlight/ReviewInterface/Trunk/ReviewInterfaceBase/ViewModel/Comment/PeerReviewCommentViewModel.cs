@@ -1,14 +1,6 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Xml;
-using ReviewInterfaceBase.View.Comment;
-using ReviewInterfaceBase.ViewModel.CategoryHolder;
-using ReviewInterfaceBase.ViewModel.Comment.Location;
-
-namespace ReviewInterfaceBase.ViewModel.Comment
+﻿namespace ReviewInterfaceBase.ViewModel.Comment
 {
+    /*
     public class PeerReviewCommentViewModel : AbstractCommentViewModel
     {
         //private new PeerReviewCommentView thisView;
@@ -31,12 +23,12 @@ namespace ReviewInterfaceBase.ViewModel.Comment
             //thisView.Header.MouseLeftButtonDown += new MouseButtonEventHandler(Header_MouseLeftButtonDown);
 
             //Set up the Title left click to act the same as the header as the user would except
-            /*thisView.Title.MouseLeftButtonDown += new MouseButtonEventHandler(Header_MouseLeftButtonDown);
-            thisView.X_Label.MouseLeftButtonDown += new MouseButtonEventHandler(X_Label_MouseLeftButtonDown);
-            thisView.Bottem_Right_Corner.MouseLeftButtonDown += new MouseButtonEventHandler(Bottom_Left_Corner_MouseLeftButtonDown);
-            thisView.Minimize_Label.MouseLeftButtonDown += new MouseButtonEventHandler(Minimize_Label_MouseLeftButtonDown);*/
-            thisView.GotFocus += new RoutedEventHandler(thisView_GotFocus);
-            thisView.LostFocus += new RoutedEventHandler(thisView_LostFocus);
+            //thisView.Title.MouseLeftButtonDown += new MouseButtonEventHandler(Header_MouseLeftButtonDown);
+            //thisView.X_Label.MouseLeftButtonDown += new MouseButtonEventHandler(X_Label_MouseLeftButtonDown);
+            //thisView.Bottem_Right_Corner.MouseLeftButtonDown += new MouseButtonEventHandler(Bottom_Left_Corner_MouseLeftButtonDown);
+            //thisView.Minimize_Label.MouseLeftButtonDown += new MouseButtonEventHandler(Minimize_Label_MouseLeftButtonDown);
+            //thisView.GotFocus += new RoutedEventHandler(thisView_GotFocus);
+            //thisView.LostFocus += new RoutedEventHandler(thisView_LostFocus);
 
             thisView.Note.TextChanged += new TextChangedEventHandler(base.Note_TextChanged);
 
@@ -132,5 +124,5 @@ namespace ReviewInterfaceBase.ViewModel.Comment
             categoriesHolderVM.WriteXml(writer);
             writer.WriteEndElement();
         }
-    }
+    }*/
 }

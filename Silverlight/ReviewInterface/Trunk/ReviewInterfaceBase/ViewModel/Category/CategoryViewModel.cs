@@ -61,6 +61,21 @@ namespace ReviewInterfaceBase.ViewModel.Category
         {
         }
 
+        private CategoryViewModel(CategoryViewModel cvm)
+        {
+            thisModel = new CategoryModel(cvm.thisModel.ID, cvm.Name);
+            foreach (TagViewModel tagVM in cvm.TagList)
+            {
+                TagViewModel newTagVM = new TagViewModel(tagVM.Text);
+                this.TagList.Add(newTagVM);
+            }
+        }
+
+        public CategoryViewModel Clone()
+        {
+            return new CategoryViewModel(this);
+        }
+
         public void LoadTags(string header, int id)
         {
             thisModel = new CategoryModel(id, header);

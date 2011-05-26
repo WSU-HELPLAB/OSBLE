@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Xml;
@@ -27,11 +26,11 @@ namespace ReviewInterfaceBase.ViewModel.Comment
             NoteBrush = author.NoteBrush;
             TextBrush = author.TextBrush;
 
-            base.Initilize(thisView, location);
+            //base.Initilize(thisView, location);
 
             thisView.DataContext = this;
 
-            initlizeCommentFromXmlComment(xmlComment, author, peerReviewID);
+            //initlizeCommentFromXmlComment(xmlComment, author, peerReviewID);
 
             //setup listeners for thisView
             thisView.Header.MouseLeftButtonDown += new MouseButtonEventHandler(Header_MouseLeftButtonDown);
@@ -49,29 +48,6 @@ namespace ReviewInterfaceBase.ViewModel.Comment
         private void thisView_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             UpdateLayout();
-        }
-
-        private void initlizeCommentFromXmlComment(XElement xmlComment, NoteAuthor author, int peerReviewID)
-        {
-            string authorName = author.Name;
-            if (authorName == "Anonymous")
-            {
-                authorName = author.Role.ToString() + author.AuthorsSoFar;
-            }
-
-            thisModel.ID = peerReviewID.ToString() + "." + xmlComment.Attribute("ID").Value;
-            thisView.Note.Text = "Author: " + authorName + "\n" + xmlComment.Attribute("NoteText").Value;
-            peerReviewCategories = new CategoriesHolderViewModel();
-            peerReviewCategories.SizeChanged += new SizeChangedEventHandler(thisView_SizeChanged);
-            XElement categories = xmlComment.Descendants("Categories").ElementAt(0);
-            peerReviewCategories.ReadXml(categories);
-
-            thisView.LayoutRoot.Children.Insert(1, peerReviewCategories.GetView());
-
-            issueVotingCategories = new CategoriesHolderViewModel();
-            issueVotingCategories.SizeChanged += new SizeChangedEventHandler(thisView_SizeChanged);
-            issueVotingCategories.LoadIssueVotingCategories();
-            thisView.LayoutRoot.Children.Insert(2, issueVotingCategories.GetView());
         }
 
         public override bool Focus()

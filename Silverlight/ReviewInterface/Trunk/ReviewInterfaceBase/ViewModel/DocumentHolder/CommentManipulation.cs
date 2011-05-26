@@ -353,7 +353,7 @@ namespace ReviewInterfaceBase.ViewModel.DocumentHolder
         public void addNewPeerReviewComment(VideoLocation location)
         {
             //create ViewModel (this in turn makes the View)
-            ICommentViewModel commentViewModel = new PeerReviewCommentView(documentID, location).ViewModel;
+            ICommentViewModel commentViewModel = CommentFactory.CreateComment(CommentType.PeerReview, false, documentID, location);
 
             initilizeVideoComment(commentViewModel, location);
         }
@@ -380,7 +380,7 @@ namespace ReviewInterfaceBase.ViewModel.DocumentHolder
         public void addNewPeerReviewComment(ISpatialLocation location, Size documentSize)
         {
             //create ViewModel (this in turn makes the View)
-            ICommentViewModel commentViewModel = new PeerReviewCommentView(documentID, location).ViewModel;
+            ICommentViewModel commentViewModel = CommentFactory.CreateComment(CommentType.PeerReview, false, documentID, location);
 
             initializeSpatialComment(commentViewModel, documentSize);
         }
@@ -1443,7 +1443,7 @@ namespace ReviewInterfaceBase.ViewModel.DocumentHolder
             {
                 if (commentViewModel.UsingView)
                 {
-                    AbstractCommentView view = (commentViewModel).GetView();
+                    CommentView view = (commentViewModel).GetView();
                     StackPanel stackPanel = (view.Parent as StackPanel);
 
                     //get the index of the coallapsedView
