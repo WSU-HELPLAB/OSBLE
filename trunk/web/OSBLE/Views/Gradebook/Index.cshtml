@@ -103,30 +103,28 @@
     <ul>
         @foreach(OSBLE.Models.Weight item in ViewBag.Tabs)
         {
-	        <li><a href="#" onclick="switchTab(this)">@item.Name</a></li>  
+	        <li id="selected"><a href="#" onclick="switchTab(this)">@item.Name</a></li>
         }
+        <li><a href="#" onclick="newTab()">+</a></li>
     </ul>
 
 </div>
 
 <div id="tableContent">
 
-
 <table id="grades" class="gradebook">
     <tr> 
         <th id="th-1" onclick="changeHeaderName(this)">Students<div id="cntnr0" class="thButton"><button class="dropdown" id="0" onclick="ShowHide(this);"></button></div></th>
-        <th id="th-2" onclick="changeHeaderName(this)">Assignment 1<div id="cntnr1" class="thButton"><button class="dropdown" id="1" onclick="ShowHide(this);"></button></div></th>
-        @foreach (OSBLE.Models.AbstractGradable item in ViewBag.Assignments)
+        @foreach (OSBLE.Models.Gradable item in ViewBag.Gradables)
         {
-            <th id="th-3" onclick="changeHeaderName(this)">Untitled<div id="cntnr2" class="thButton"><button class="dropdown" id="2" onclick="ShowHide(this);"></button></div></th>
-            <th id="@Html.DisplayFor(modelItem => item.ID)" onclick="changeHeaderName(this)">@Html.DisplayFor(modelItem => item.Name)<div id="cntnr" class="thButton"><button class="dropdown" id="1" onclick="ShowHide(this);"></button></div></th>
+            <th id="@item.ID" onclick="changeHeaderName(this)">@item.Name<div id="cntnr" class="thButton"><button class="dropdown" id="1" onclick="ShowHide(this);"></button></div></th>
         }
     </tr>
     @foreach (OSBLE.Models.CoursesUsers user in ViewBag.Users) 
     {
         <tr>
             <td id="@user.UserProfile.ID" onclick="cellGainsFocus(this)">@user.UserProfile.FirstName</td>    
-            <td onclick="cellGainsFocus(this)">&nbsp</td>   
+            <td onclick="cellGainsFocus(this)">0</td>   
         </tr>
     }
 
@@ -170,6 +168,9 @@ var header = false;
 
 //bool stating if previous cell clicked on is a data cell
 var isDataCell = false;
+
+//Keeps track of the total number of weights
+var tabCount = 1;
 
 $(document).click(function () {
 
@@ -543,6 +544,12 @@ function deleteCol() {
 function switchTab(newTab) {
     $("#selected").removeAttr("id");
     $(newTab).attr("id", "selected");
+}
+
+function newTab() {
+    $("#selected").removeAttr("id");
+    $('ul li:nth-child(' + tabCount + ')').after('<li id="selected"><a href="#" onclick="switchTab(this)">Untitled(' + tabCount + ')</a></li>');
+    tabCount += 1;
 }
 
 </script>   

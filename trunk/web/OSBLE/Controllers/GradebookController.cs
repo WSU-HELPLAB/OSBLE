@@ -61,11 +61,27 @@ namespace OSBLE.Controllers
             List<CoursesUsers> user = userResults.ToList();
 
             //same thing for getting columns for the current tab (AbstractGradable)
-            var assignmentResults = from gradable in db.AbstractGradables
+            var assignmentResults = from gradable in db.Gradables
                                     where gradable.WeightID == gradableId
                                     select gradable;
 
-            List<AbstractGradable> assignments = assignmentResults.ToList();
+            if (assignmentResults.Count() == 0)
+            {
+                Gradable newGradable = new Gradable()
+                {
+                    Name = "Gradable",
+                    PossiblePoints = 0
+                };
+                db.Gradables.Add(newGradable);
+                db.SaveChanges();
+
+                assignmentResults = from gradable in db.Gradables
+                                    where gradable.WeightID == gradableId
+                                    select gradable;
+
+            }
+
+            List<Gradable> assignments = assignmentResults.ToList();
 
             //Getting the current grades
             var gradeResults = from gradable in db.GradableScores
@@ -75,16 +91,10 @@ namespace OSBLE.Controllers
 
             //save everything that we need to the viewebag
             ViewBag.Tabs = tabs;
-            ViewBag.Assignments = assignments;
+            ViewBag.Gradables = assignments;
             ViewBag.Grades = grades;
             ViewBag.Users = user;
             return View();
         }
-
-        public ActionResult Create()
-        {
-            return View();
-        }
-
     }
 }

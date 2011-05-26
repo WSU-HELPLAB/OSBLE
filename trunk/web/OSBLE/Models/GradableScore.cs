@@ -14,7 +14,7 @@ namespace OSBLE.Models
         public int UserProfileID { get; set; }
         public virtual UserProfile UserProfile { get; set; }
 
-       // [Key]
+        [Key]
         [Required]
         [Column(Order = 1)]
         public int GradableID { get; set; }
