@@ -22,6 +22,8 @@ namespace FileUploader.OsbleServices {
         
         private string FileNameField;
         
+        private int ImageField;
+        
         private System.DateTime LastModifiedField;
         
         [System.Runtime.Serialization.DataMemberAttribute()]
@@ -33,6 +35,19 @@ namespace FileUploader.OsbleServices {
                 if ((object.ReferenceEquals(this.FileNameField, value) != true)) {
                     this.FileNameField = value;
                     this.RaisePropertyChanged("FileName");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int Image {
+            get {
+                return this.ImageField;
+            }
+            set {
+                if ((this.ImageField.Equals(value) != true)) {
+                    this.ImageField = value;
+                    this.RaisePropertyChanged("Image");
                 }
             }
         }
@@ -65,7 +80,7 @@ namespace FileUploader.OsbleServices {
     public interface FileSyncService {
         
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:FileSyncService/GetFileList", ReplyAction="urn:FileSyncService/GetFileListResponse")]
-        System.IAsyncResult BeginGetFileList(System.AsyncCallback callback, object asyncState);
+        System.IAsyncResult BeginGetFileList(string relativepath, System.AsyncCallback callback, object asyncState);
         
         System.Collections.ObjectModel.ObservableCollection<FileUploader.OsbleServices.OsbleSyncInfo> EndGetFileList(System.IAsyncResult result);
         
@@ -221,8 +236,8 @@ namespace FileUploader.OsbleServices {
         public event System.EventHandler<System.ComponentModel.AsyncCompletedEventArgs> CloseCompleted;
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.IAsyncResult FileUploader.OsbleServices.FileSyncService.BeginGetFileList(System.AsyncCallback callback, object asyncState) {
-            return base.Channel.BeginGetFileList(callback, asyncState);
+        System.IAsyncResult FileUploader.OsbleServices.FileSyncService.BeginGetFileList(string relativepath, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginGetFileList(relativepath, callback, asyncState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -231,7 +246,8 @@ namespace FileUploader.OsbleServices {
         }
         
         private System.IAsyncResult OnBeginGetFileList(object[] inValues, System.AsyncCallback callback, object asyncState) {
-            return ((FileUploader.OsbleServices.FileSyncService)(this)).BeginGetFileList(callback, asyncState);
+            string relativepath = ((string)(inValues[0]));
+            return ((FileUploader.OsbleServices.FileSyncService)(this)).BeginGetFileList(relativepath, callback, asyncState);
         }
         
         private object[] OnEndGetFileList(System.IAsyncResult result) {
@@ -247,11 +263,11 @@ namespace FileUploader.OsbleServices {
             }
         }
         
-        public void GetFileListAsync() {
-            this.GetFileListAsync(null);
+        public void GetFileListAsync(string relativepath) {
+            this.GetFileListAsync(relativepath, null);
         }
         
-        public void GetFileListAsync(object userState) {
+        public void GetFileListAsync(string relativepath, object userState) {
             if ((this.onBeginGetFileListDelegate == null)) {
                 this.onBeginGetFileListDelegate = new BeginOperationDelegate(this.OnBeginGetFileList);
             }
@@ -261,7 +277,8 @@ namespace FileUploader.OsbleServices {
             if ((this.onGetFileListCompletedDelegate == null)) {
                 this.onGetFileListCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnGetFileListCompleted);
             }
-            base.InvokeAsync(this.onBeginGetFileListDelegate, null, this.onEndGetFileListDelegate, this.onGetFileListCompletedDelegate, userState);
+            base.InvokeAsync(this.onBeginGetFileListDelegate, new object[] {
+                        relativepath}, this.onEndGetFileListDelegate, this.onGetFileListCompletedDelegate, userState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -478,8 +495,9 @@ namespace FileUploader.OsbleServices {
                     base(client) {
             }
             
-            public System.IAsyncResult BeginGetFileList(System.AsyncCallback callback, object asyncState) {
-                object[] _args = new object[0];
+            public System.IAsyncResult BeginGetFileList(string relativepath, System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[1];
+                _args[0] = relativepath;
                 System.IAsyncResult _result = base.BeginInvoke("GetFileList", _args, callback, asyncState);
                 return _result;
             }

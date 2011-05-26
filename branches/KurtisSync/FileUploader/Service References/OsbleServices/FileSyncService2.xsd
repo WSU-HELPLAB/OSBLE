@@ -3,7 +3,9 @@
   <xs:import schemaLocation="http://localhost:49409/FileSyncService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/FileUploader.Web" />
   <xs:element name="GetFileList">
     <xs:complexType>
-      <xs:sequence />
+      <xs:sequence>
+        <xs:element minOccurs="0" name="relativepath" nillable="true" type="xs:string" />
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="GetFileListResponse">

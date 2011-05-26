@@ -15,11 +15,29 @@ namespace FileUploader
 {
     public enum LabelImage { File, Folder };
     
-    public partial class DirectoryLabel : ListBoxItem
+    public partial class DirectoryLabel : ListBoxItem, IComparable
     {
         public DirectoryLabel()
         {
             InitializeComponent();
+        }
+
+        public string FileName
+        {
+            get
+            {
+                return this.DirName.Text;
+            }
+            set
+            {
+                this.DirName.Text = value;
+            }
+        }
+
+        public DateTime LastModified
+        {
+            get;
+            set;
         }
 
         private LabelImage image = new LabelImage();
@@ -48,6 +66,19 @@ namespace FileUploader
                 BitmapImage bmp = new BitmapImage();
                 bmp.UriSource = new Uri(imagePath, UriKind.Relative);
                 this.DirImage.Source = bmp;
+            }
+        }
+
+        public int CompareTo(object obj)
+        {
+            if (obj is DirectoryLabel)
+            {
+                DirectoryLabel other = obj as DirectoryLabel;
+                return FileName.CompareTo(other.FileName);
+            }
+            else
+            {
+                return -1;
             }
         }
     }

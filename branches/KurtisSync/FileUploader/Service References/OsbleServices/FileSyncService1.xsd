@@ -9,6 +9,7 @@
   <xs:complexType name="OsbleSyncInfo">
     <xs:sequence>
       <xs:element minOccurs="0" name="FileName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Image" type="xs:int" />
       <xs:element minOccurs="0" name="LastModified" type="xs:dateTime" />
     </xs:sequence>
   </xs:complexType>

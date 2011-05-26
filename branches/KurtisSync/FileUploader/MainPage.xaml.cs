@@ -27,9 +27,6 @@ namespace FileUploader
         // Synced Directory path
        FileSyncServiceClient syncedFiles = new FileSyncServiceClient();
 
-       string syncpath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-       string syncpathhome = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-
         // Double Click variables
        string lastTarget = "";
        bool wasClicked = false;
@@ -37,43 +34,57 @@ namespace FileUploader
         public MainPage()
         {
             InitializeComponent();
+
+            syncedFiles.GetFileListCompleted += syncedFiles_GetFileListCompleted;
+            //syncedFiles.GetFileListAsync("");
          
-            // Populate the ListBox's LocalFileList and SyncedFileList with the contents of the directory path
-            dirList(localpath, LocalFileList);
-            dirList(syncpath, SyncedFileList);
-        
+            // Populate the ListBox with the contents of the directory path
+            dirList(localpath);
+            
         }
 
-        private void dirList(string path, ListBox filelist)
+        private void dirList(string path)
         {
-            filelist.Items.Clear();
+            
+            LocalFileList.Items.Clear();
+            SyncedFileList.Items.Clear();
             //If you have entered a subdirectory of home (Back button so to speak)
-            if ((path != localhome && path == localpath)  || (path != syncpathhome && path == syncpath))
+            if ((path != localhome && path == localpath))
             {
-                filelist.Items.Add("..");
+                LocalFileList.Items.Add("..");
             }
 
             // Assigns all the directories to the ListBox
             foreach (string folder in Directory.EnumerateDirectories(path))
             {
                 DirectoryLabel label = new DirectoryLabel();
-                label.DirName.Text = folder.Substring(folder.LastIndexOf('\\') + 1);
+                label.FileName = folder.Substring(folder.LastIndexOf('\\') + 1);
                 label.Image = LabelImage.Folder;
-                filelist.Items.Add(label);
+                label.LastModified = File.GetLastWriteTime(folder);
+                LocalFileList.Items.Add(label);
             }
              
             // Assigns all the files to the ListBox
             foreach (string file in Directory.EnumerateFiles(path))
             {
                 DirectoryLabel label = new DirectoryLabel();
-                label.DirName.Text = file.Substring(file.LastIndexOf('\\') + 1);
+                label.FileName = file.Substring(file.LastIndexOf('\\') + 1);
                 label.Image = LabelImage.File;
-                filelist.Items.Add(label);
+                label.LastModified = File.GetLastWriteTime(file);
+                LocalFileList.Items.Add(label);
             }
 
-            InitializeComponent();
+            // synced directory
+            if (localpath == localhome)
+            {
+                syncedFiles.GetFileListAsync("");
+            }
+            else
+            {
+                string d = localpath.Substring(localhome.Length + 1);
+                syncedFiles.GetFileListAsync(d);
+            } 
         }
-
 
         private void LocalDirSelect(object sender, MouseButtonEventArgs e)
         {
@@ -86,11 +97,11 @@ namespace FileUploader
                 {
                     if (wasClicked == true)
                     {
-                        if (selected.DirName.Text == lastTarget)
+                        if (selected.FileName == lastTarget)
                         {
                             // appends the selected directory to the current path to open directory
-                            localpath += "\\" + selected.DirName.Text;
-                            dirList(localpath, LocalFileList);
+                            localpath += "\\" + selected.FileName;
+                            dirList(localpath);
                         }
                     }
                     else
@@ -98,7 +109,7 @@ namespace FileUploader
                         wasClicked = true;
                     }
                 }
-                lastTarget = selected.DirName.Text;
+                lastTarget = selected.FileName;
 
                 // If it was a directory return out
                 return;
@@ -113,7 +124,7 @@ namespace FileUploader
                         Stack<string> path_pieces = new Stack<string>(localpath.Split('\\'));
                         path_pieces.Pop();
                         localpath = String.Join("\\", path_pieces.ToArray().Reverse());
-                        dirList(localpath, LocalFileList);
+                        dirList(localpath);
                     }
                 }
             }
@@ -125,44 +136,38 @@ namespace FileUploader
 
         private void SyncDirSelect(object sender, MouseButtonEventArgs e)
         {
-            if(this.SyncedFileList.SelectedItem is DirectoryLabel)
+            if (this.SyncedFileList.SelectedItem is DirectoryLabel)
             {
                 DirectoryLabel selected = this.SyncedFileList.SelectedItem as DirectoryLabel;
-                if (selected.Image != LabelImage.File)
+                if (selected.FileName == "..")
                 {
-                    if (wasClicked == true)
+                    Stack<string> path_pieces = new Stack<string>(localpath.Split('\\'));
+                    path_pieces.Pop();
+                    localpath = String.Join("\\", path_pieces.ToArray().Reverse());
+                    dirList(localpath);
+                }
+                else
+                    if (selected.Image != LabelImage.File)
                     {
-                        if (selected.DirName.Text == lastTarget)
+                        if (wasClicked == true)
                         {
-                            syncpath += "\\" + selected.DirName.Text;
-                            dirList(syncpath, SyncedFileList);
+                            if (selected.DirName.Text == lastTarget)
+                            {
+
+                                dirList(localpath);
+                            }
+                        }
+                        else
+                        {
+                            wasClicked = true;
                         }
                     }
-                    else
-                    {
-                        wasClicked = true;
-                    }
-                }
                 lastTarget = selected.DirName.Text;
 
                 // If it was a directory return out
                 return;
             }
-            else
-            {
-                if (this.SyncedFileList.SelectedItem != null)
-                {
-                    string selected = this.SyncedFileList.SelectedItem.ToString();
-                    if (selected == "..")
-                    {
-                        Stack<string> path_pieces = new Stack<string>(syncpath.Split('\\'));
-                        path_pieces.Pop();
-                        syncpath = String.Join("\\", path_pieces.ToArray().Reverse());
-                        dirList(syncpath, SyncedFileList);
-                    }
-                }
-            }
-            
+
             // If it wasn't a directory reset the click variables
             lastTarget = "";
             wasClicked = false;
@@ -205,17 +210,28 @@ namespace FileUploader
         {
             syncedFiles.SyncFileCompleted += syncedFiles_SyncCompleted;
 
-            syncedFiles.GetFileListCompleted += syncedFiles_GetFileListCompleted;
-            syncedFiles.GetFileListAsync();
         }
 
         private void syncedFiles_GetFileListCompleted(object sender, GetFileListCompletedEventArgs e)
         {
-            try
+            if (e.Error == null)
             {
-                SyncedFileList.ItemsSource = e.Result;
+                for (int i = 0; i < e.Result.Count; ++i)
+                {
+                    DirectoryLabel temp = new DirectoryLabel();
+                    temp.FileName = e.Result[i].FileName;
+                    if (e.Result[i].Image == 0)
+                        temp.Image = LabelImage.File;
+                    else
+                        temp.Image = LabelImage.Folder;
+                    temp.LastModified = e.Result[i].LastModified;
+
+                    SyncedFileList.Items.Add(temp);
+                }
+
+
             }
-            catch
+            else 
             {
                 lblStatus.Text = "Error contacting web service.";
             }
@@ -228,10 +244,7 @@ namespace FileUploader
                 dir = folder.Substring(localpath.Length + 1);
                 
                 // does directory exist in sync already
-                // 
-
-                //string p = Path.Combine(localpath, dir);
-
+                
                 syncedFiles.createDirAsync(dir);
 
                 foreach (string file in Directory.EnumerateFiles(folder))
@@ -244,8 +257,7 @@ namespace FileUploader
                         writer.Flush();
 
                         string filepath = file.Substring(localpath.Length + 1);
-                        //byte[] byteArray = Encoding.ASCII.GetBytes(file);
-                        //Stream filestream = new Stream(byteArray);
+                       
                         using (Stream stream = s)
                         {
                             byte[] data = new byte[stream.Length];
@@ -281,8 +293,6 @@ namespace FileUploader
 
                     string filepath = file.Substring(localpath.Length + 1);
 
-                    //byte[] byteArray = Encoding.ASCII.GetBytes(file);
-                    //Stream filestream = new Stream(byteArray);
                     using (Stream stream = s)
                     {
                         byte[] data = new byte[stream.Length];
@@ -307,7 +317,7 @@ namespace FileUploader
                 lblStatus.Text = "Sync succeeded.";
 
                 // refresh the file list
-                syncedFiles.GetFileListAsync();
+                
            } 
             else
             {

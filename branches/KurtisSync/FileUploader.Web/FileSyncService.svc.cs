@@ -24,6 +24,20 @@ namespace FileUploader.Web
             set;
         }
 
+        //public enum LabelImage { File, Folder };
+
+        private int image;
+        public int Image
+        {
+            get
+            {
+                return image;
+            }
+            set
+            {
+                image = value;
+            }
+        }
 
         public int CompareTo(object obj)
         {
@@ -42,24 +56,45 @@ namespace FileUploader.Web
     [ServiceContract(Namespace = "")]
     [SilverlightFaultBehavior]
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
-    public class FileSyncService
+    public class FileSyncService 
     {
         public string filePath;
+        public string currentpath;
 
         public FileSyncService()
         {
             filePath = HttpContext.Current.Server.MapPath("Files");
+            currentpath = filePath;
         }
-
+        
         [OperationContract]
-        public IEnumerable<OsbleSyncInfo> GetFileList()
+        public IEnumerable<OsbleSyncInfo> GetFileList(string relativepath)
         {
             List<OsbleSyncInfo> files = new List<OsbleSyncInfo>();
-            foreach (string item in Directory.GetFiles(filePath))
+            string currentpath = Path.Combine(filePath, relativepath);
+            if (filePath != currentpath)
+            {
+                OsbleSyncInfo b = new OsbleSyncInfo();
+                b.FileName = "..";
+                files.Add(b);
+            }
+
+            // Assigns all the directories to the ListBox
+            foreach (string folder in Directory.EnumerateDirectories(currentpath))
+            {
+                OsbleSyncInfo d  = new OsbleSyncInfo();
+                d.FileName = folder.Substring(folder.LastIndexOf('\\') + 1);
+                d.Image = 1;
+                d.LastModified = File.GetLastWriteTime(folder);
+                files.Add(d);
+            }
+
+            foreach (string file in Directory.GetFiles(currentpath))
             {
                 OsbleSyncInfo f = new OsbleSyncInfo();
-                f.FileName = Path.GetFileName(item);
-                f.LastModified = File.GetLastWriteTimeUtc(item);
+                f.FileName = Path.GetFileName(file);
+                f.Image = 0;
+                f.LastModified = File.GetLastWriteTime(file);
                 files.Add(f);
             }
             return files;
@@ -73,38 +108,24 @@ namespace FileUploader.Web
             return file;
         }
 
-        //[OperationContract]
-        //public byte[] GetFile(string fileName)
-        //{
-        //    //make sure the file has no path information
-        //    string file = Path.Combine(filePath, Path.GetFileName(fileName));
-        //    using (FileStream fs = new FileStream(file, FileMode.Open))
-        //    {
-        //        byte[] data = new byte[fs.Length];
-        //        fs.Read(data, 0, (int)fs.Length);
-        //        return data;
-        //    }
-        //}
-
         [OperationContract]
         public void SyncFile(string fileName, byte[] data)
         {
-            string file = Path.Combine(filePath, Path.GetFileName(fileName));
+            string file = Path.Combine(filePath, fileName);
             using (FileStream fs = new FileStream(file, FileMode.Create))
             {
                 fs.Write(data, 0, (int)data.Length);
             }
         }
 
-
-
         [OperationContract]
-        public void DoWork()
+        public void createDir(string folderName)
         {
-            // Add your operation implementation here
-            return;
-        }
+            string file = Path.Combine(filePath, folderName);
+            Directory.CreateDirectory(file);
 
-        // Add more operations here and mark them with [OperationContract]
+            
+           
+        }
     }
 }
