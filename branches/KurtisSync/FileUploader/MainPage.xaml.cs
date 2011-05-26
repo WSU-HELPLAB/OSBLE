@@ -9,7 +9,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Shapes;
+//using System.Windows.Shapes;
 using System.IO;
 using System.Windows.Media.Imaging;
 using FileUploader.OsbleServices;
@@ -221,17 +221,54 @@ namespace FileUploader
             }
         }
 
-        private void traveseDirectories(string path)
+        private void traveseDirectories(string path, string dir)
         {
             foreach (string folder in Directory.EnumerateDirectories(path))
             {
+                dir = folder.Substring(localpath.Length + 1);
+                
                 // does directory exist in sync already
                 // 
-               
-                syncedFiles.createDirAsync(folder);
-                traveseDirectories(folder);
 
+                //string p = Path.Combine(localpath, dir);
+
+                syncedFiles.createDirAsync(dir);
+
+                foreach (string file in Directory.EnumerateFiles(folder))
+                {
+                    try
+                    {
+                        MemoryStream s = new MemoryStream();
+                        StreamWriter writer = new StreamWriter(s);
+                        writer.Write(file);
+                        writer.Flush();
+
+                        string filepath = file.Substring(localpath.Length + 1);
+                        //byte[] byteArray = Encoding.ASCII.GetBytes(file);
+                        //Stream filestream = new Stream(byteArray);
+                        using (Stream stream = s)
+                        {
+                            byte[] data = new byte[stream.Length];
+                            stream.Read(data, 0, (int)stream.Length);
+
+                            syncedFiles.SyncFileAsync(filepath, data);
+                            lblStatus.Text = "Sync started";
+                        }
+                    }
+                    catch
+                    {
+                        lblStatus.Text = "Error reading file.";
+                    }
+                }
+                traveseDirectories(folder, dir);
             }
+        }
+
+
+        private void Syncbtn_Click(object sender, RoutedEventArgs e)
+        {
+            string path = localpath;
+            traveseDirectories(path, "");
 
             foreach (string file in Directory.EnumerateFiles(path))
             {
@@ -242,6 +279,8 @@ namespace FileUploader
                     writer.Write(file);
                     writer.Flush();
 
+                    string filepath = file.Substring(localpath.Length + 1);
+
                     //byte[] byteArray = Encoding.ASCII.GetBytes(file);
                     //Stream filestream = new Stream(byteArray);
                     using (Stream stream = s)
@@ -249,7 +288,7 @@ namespace FileUploader
                         byte[] data = new byte[stream.Length];
                         stream.Read(data, 0, (int)stream.Length);
 
-                        syncedFiles.SyncFileAsync(file, data);
+                        syncedFiles.SyncFileAsync(filepath, data);
                         lblStatus.Text = "Sync started";
                     }
                 }
@@ -258,15 +297,6 @@ namespace FileUploader
                     lblStatus.Text = "Error reading file.";
                 }
             }
-
-        }
-
-
-        private void Syncbtn_Click(object sender, RoutedEventArgs e)
-        {
-            string path = localpath;
-            
-            traveseDirectories(path);
 
         }
 

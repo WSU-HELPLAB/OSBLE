@@ -11,6 +11,7 @@
     <StackPanel Orientation="Horizontal">
         <Image x:Name="DirImage" Source="/Images/folder.png" Stretch="None"></Image>
         <TextBlock x:Name="DirName" Text="test" ></TextBlock>
+        <TextBlock x:Name="Modified" ></TextBlock>
     </StackPanel>
     
 </controls:ListBoxItem>
