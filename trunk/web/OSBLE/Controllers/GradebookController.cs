@@ -124,20 +124,19 @@ namespace OSBLE.Controllers
             //pull the students in the course.  Each student is a row.
             List<UserProfile> students = (from up in db.UserProfiles
                                          join cu in db.CoursesUsers on up.ID equals cu.UserProfileID
-                                         where cu.CourseID == currentCourseId
+                                         where cu.CourseID == currentCourseId && cu.CourseRoleID == (int)CourseRole.OSBLERoles.Student
                                          select up).ToList();
 
             //Finally the scores for each student.
             List<GradableScore> scores = (from gs in db.GradableScores
                                           where gs.Gradable.WeightID == currentTab.ID
                                           select gs).ToList();
-
+            
             //save everything that we need to the viewebag
             ViewBag.Tabs = allWeights;
             ViewBag.Gradables = gradables;
             ViewBag.Grades = scores;
             ViewBag.Users = students;
-
             return View();
         }
 
@@ -181,7 +180,7 @@ namespace OSBLE.Controllers
 
                 Gradable newGradable = new Gradable()
                 {
-                    Name = "Gradable",
+                    Name = "Untitled",
                     PossiblePoints = 0,
                     GradableScores = new List<GradableScore>(),
                     WeightID = newWeight.ID,

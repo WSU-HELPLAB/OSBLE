@@ -129,7 +129,7 @@
         <th id="th-2">Points Possible</th>
         @foreach (OSBLE.Models.Gradable item in ViewBag.Gradables)
         {
-            <td onclick="cellGainsFocus(this)">0</td>   
+            <td onclick="cellGainsFocus(this)">@item.PossiblePoints</td>   
         }
     </tr>
     <tr>
@@ -139,11 +139,32 @@
             <td>&nbsp</td>   
         }
     </tr>
-    @foreach (OSBLE.Models.CoursesUsers user in ViewBag.Users)
-    {
+    <!--loop through all users -->
+    @foreach (OSBLE.Models.UserProfile user in ViewBag.Users)
+    {        
         <tr>
-            <td id="@user.UserProfile.ID" >@user.FirstName</td>    
-            <td onclick="cellGainsFocus(this)">0</td>   
+            <td id="@user.ID" >@user.LastName, @user.FirstName</td> 
+            @foreach (Gradable gradable in ViewBag.Gradables)
+            {
+                <!--TODO: Add unique identifiers for use in AJAX calls to each table cell -->
+                
+                <td onclick="cellGainsFocus(this)">
+                @{var gradableQuery = from g in ViewBag.Grades as IEnumerable<GradableScore>
+                                      where g.GradableID == gradable.ID && g.UserProfileID == user.ID
+                                      select g;
+                  //use the stored score if possible.  Otherwise, just use a "0"
+                  if (gradableQuery.Count() > 0)
+                  {
+                      @gradableQuery.First().Score
+                  }
+                  else
+                  {
+                      //Razor didn't like me using just a "0" so I had to wrap it inside String.Format
+                      @String.Format("{0}", 0)
+                  }
+                }
+                </td> 
+            }
         </tr>
     }
 
