@@ -70,7 +70,9 @@ namespace OSBLE.Controllers
                 Gradable newGradable = new Gradable()
                 {
                     Name = "Gradable",
-                    PossiblePoints = 0
+                    PossiblePoints = 0,
+                    GradableScores = new List<GradableScore>(),
+                    WeightID = tabs.ElementAt(0).ID,
                 };
                 db.Gradables.Add(newGradable);
                 db.SaveChanges();
