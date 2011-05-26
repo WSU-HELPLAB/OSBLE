@@ -72,6 +72,8 @@ namespace FileUploader.Web
         {
             List<OsbleSyncInfo> files = new List<OsbleSyncInfo>();
             string currentpath = Path.Combine(filePath, relativepath);
+            
+            //Back up a level
             if (filePath != currentpath)
             {
                 OsbleSyncInfo b = new OsbleSyncInfo();
@@ -79,7 +81,7 @@ namespace FileUploader.Web
                 files.Add(b);
             }
 
-            // Assigns all the directories to the ListBox
+            // Assigns all the directories to a list
             foreach (string folder in Directory.EnumerateDirectories(currentpath))
             {
                 OsbleSyncInfo d  = new OsbleSyncInfo();
@@ -89,6 +91,7 @@ namespace FileUploader.Web
                 files.Add(d);
             }
 
+            // assigns all files to a list
             foreach (string file in Directory.GetFiles(currentpath))
             {
                 OsbleSyncInfo f = new OsbleSyncInfo();
@@ -111,6 +114,7 @@ namespace FileUploader.Web
         [OperationContract]
         public void SyncFile(string fileName, byte[] data)
         {
+            //uploads need to handle a check for lastmodified date
             string file = Path.Combine(filePath, fileName);
             using (FileStream fs = new FileStream(file, FileMode.Create))
             {
@@ -121,11 +125,9 @@ namespace FileUploader.Web
         [OperationContract]
         public void createDir(string folderName)
         {
+            // might need to check if the directory already exists
             string file = Path.Combine(filePath, folderName);
-            Directory.CreateDirectory(file);
-
-            
-           
+            Directory.CreateDirectory(file); 
         }
     }
 }

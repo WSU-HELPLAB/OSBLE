@@ -24,7 +24,7 @@ namespace FileUploader
        string localpath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
        string localhome = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
 
-        // Synced Directory path
+        // Synced Proxy
        FileSyncServiceClient syncedFiles = new FileSyncServiceClient();
 
         // Double Click variables
@@ -36,8 +36,7 @@ namespace FileUploader
             InitializeComponent();
 
             syncedFiles.GetFileListCompleted += syncedFiles_GetFileListCompleted;
-            //syncedFiles.GetFileListAsync("");
-         
+                     
             // Populate the ListBox with the contents of the directory path
             dirList(localpath);
             
@@ -74,7 +73,7 @@ namespace FileUploader
                 LocalFileList.Items.Add(label);
             }
 
-            // synced directory
+            // gets the synced directories contents
             if (localpath == localhome)
             {
                 syncedFiles.GetFileListAsync("");
@@ -146,22 +145,21 @@ namespace FileUploader
                     localpath = String.Join("\\", path_pieces.ToArray().Reverse());
                     dirList(localpath);
                 }
-                else
-                    if (selected.Image != LabelImage.File)
+                else if (selected.Image != LabelImage.File)
+                {
+                    if (wasClicked == true)
                     {
-                        if (wasClicked == true)
+                        if (selected.DirName.Text == lastTarget)
                         {
-                            if (selected.DirName.Text == lastTarget)
-                            {
 
-                                dirList(localpath);
-                            }
-                        }
-                        else
-                        {
-                            wasClicked = true;
+                            dirList(localpath);
                         }
                     }
+                    else
+                    {
+                        wasClicked = true;
+                    }
+                }
                 lastTarget = selected.DirName.Text;
 
                 // If it was a directory return out
@@ -177,6 +175,8 @@ namespace FileUploader
         {
             if (this.SyncedFileList.SelectedItem is ListBoxItem)
             {
+                //Swaps the listbox items based on their index's
+
                 int index = this.SyncedFileList.SelectedIndex;
                 object Swap = this.SyncedFileList.SelectedItem;
                 if (index > 0)
@@ -192,6 +192,8 @@ namespace FileUploader
         {
             if (this.SyncedFileList.SelectedItem is ListBoxItem)
             {
+                //Swaps the listbox items based on their index's
+
                 if (this.SyncedFileList.SelectedItem is ListBoxItem)
                 {
                     int index = this.SyncedFileList.SelectedIndex;
@@ -216,6 +218,7 @@ namespace FileUploader
         {
             if (e.Error == null)
             {
+                // Assigning the list generated from the server's folder to a listbox for display
                 for (int i = 0; i < e.Result.Count; ++i)
                 {
                     DirectoryLabel temp = new DirectoryLabel();
@@ -237,6 +240,8 @@ namespace FileUploader
             }
         }
 
+        // recursive function called from Syncbtn_Click it will recursivly go through all the directories and popluate the 
+        // contained directories and files
         private void traveseDirectories(string path, string dir)
         {
             foreach (string folder in Directory.EnumerateDirectories(path))
@@ -282,6 +287,7 @@ namespace FileUploader
             string path = localpath;
             traveseDirectories(path, "");
 
+            // Populates the files in the home directory after all the directories have been created
             foreach (string file in Directory.EnumerateFiles(path))
             {
                 try
@@ -315,8 +321,6 @@ namespace FileUploader
             if (e.Error == null)
             {
                 lblStatus.Text = "Sync succeeded.";
-
-                // refresh the file list
                 
            } 
             else
