@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models
@@ -31,11 +30,14 @@ namespace OSBLE.Models
         Other
     }
 
+    /// <summary>
+    /// This Attribute is meant to hold a list of file extensions
+    /// </summary>
     public class FileExtensions : Attribute
     {
-        private List<string> extensions;
+        private string[] extensions;
 
-        public List<string> Extensions
+        public string[] Extensions
         {
             get
             {
@@ -45,7 +47,7 @@ namespace OSBLE.Models
 
         public FileExtensions(string[] fileExtensions)
         {
-            this.extensions = new List<string>(fileExtensions);
+            this.extensions = fileExtensions;
         }
     }
 

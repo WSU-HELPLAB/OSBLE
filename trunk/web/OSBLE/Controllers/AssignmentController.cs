@@ -3,10 +3,14 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Web.Mvc;
+using OSBLE.Attributes;
 using OSBLE.Models;
 
 namespace OSBLE.Controllers
 {
+    [Authorize]
+    [ActiveCourseAttribute]
+    [NotForCommunity]
     public class AssignmentController : OSBLEController
     {
         //
@@ -33,6 +37,7 @@ namespace OSBLE.Controllers
         public ActionResult Create()
         {
             ViewBag.WeightID = new SelectList(db.Weights, "ID", "Name");
+            ViewBag.bobby = new SelectList(db.Deliverables, "ID", "Name");
             return View();
         }
 

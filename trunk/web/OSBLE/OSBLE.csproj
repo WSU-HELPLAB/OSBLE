@@ -77,6 +77,7 @@
     <Compile Include="Controllers\AssignmentController.cs" />
     <Compile Include="Controllers\CommunityController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
+    <Compile Include="Controllers\DeliverableController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\SubmissionAssignmentActivityController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
@@ -452,6 +453,11 @@
     <Content Include="Views\Community\Edit.cshtml" />
     <Content Include="Views\Community\Delete.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\Date.cshtml" />
+    <Content Include="Views\Deliverable\Index.cshtml" />
+    <Content Include="Views\Deliverable\Details.cshtml" />
+    <Content Include="Views\Deliverable\Create.cshtml" />
+    <Content Include="Views\Deliverable\Edit.cshtml" />
+    <Content Include="Views\Deliverable\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />
@@ -467,9 +473,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Delete.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\SubbmissionAssignmentActivity\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\SubmissionAssignmentActivity\Details.cshtml" />

@@ -79,6 +79,14 @@
         </div>
 
         <div class="editor-label">
+            @Html.LabelFor(model => (model as OSBLE.Models.Assignment).WeightID, "Deliverable")
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("hello", ViewBag.bobby as SelectList)
+            @Html.ValidationMessageFor(model => (model as OSBLE.Models.Assignment).Deliverables)
+        </div>
+
+        <div class="editor-label">
             @Html.LabelFor(model => (model as OSBLE.Models.Assignment).PossiblePoints)
         </div>
         <div class="editor-field">
