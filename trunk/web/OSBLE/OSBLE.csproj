@@ -74,6 +74,7 @@
     <Compile Include="Attributes\IsCommunity.cs" />
     <Compile Include="Attributes\NotForCommunity.cs" />
     <Compile Include="Controllers\AssignmentActivityController.cs" />
+    <Compile Include="Controllers\AssignmentController.cs" />
     <Compile Include="Controllers\CommunityController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="Models\CommunityRole.cs" />
     <Compile Include="Models\CourseBreak.cs" />
     <Compile Include="Models\CourseMeeting.cs" />
+    <Compile Include="Models\Deliverable.cs" />
     <Compile Include="Models\Submission.cs" />
     <Compile Include="Models\SubmissionActivitySetting.cs" />
     <Compile Include="Models\Gradable.cs" />
@@ -435,6 +437,11 @@
     <Content Include="Views\Roster\CreateByEmail.cshtml" />
     <Content Include="Views\Roster\RosterError.cshtml" />
     <Content Include="Utility\Notification\Index.cshtml" />
+    <Content Include="Views\Assignment\Index.cshtml" />
+    <Content Include="Views\Assignment\Details.cshtml" />
+    <Content Include="Views\Assignment\Create.cshtml" />
+    <Content Include="Views\Assignment\Edit.cshtml" />
+    <Content Include="Views\Assignment\Delete.cshtml" />
     <Content Include="Views\Course\Details.cshtml" />
     <Content Include="Views\Course\Create.cshtml" />
     <Content Include="Views\Course\Edit.cshtml" />

@@ -62,6 +62,7 @@ namespace OSBLE.Models
 
         public DbSet<Gradable> Gradables { get; set; }
 
+        public DbSet<Deliverable> Deliverables { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -76,7 +77,6 @@ namespace OSBLE.Models
                 .HasRequired(n => n.ToUserProfile)
                 .WithMany()
                 .WillCascadeOnDelete(false);
-
         }
 
         private void createSampleUser(string username, string password, string firstname, string lastname, string ident, int school, bool isAdmin, bool canCreateCourses)
@@ -116,7 +116,7 @@ namespace OSBLE.Models
             // Community Roles
 
             // Leader: Can Modify Community
-            this.CommunityRoles.Add(new CommunityRole("Leader",true, true, true));
+            this.CommunityRoles.Add(new CommunityRole("Leader", true, true, true));
             // Participant: Cannot Modify Community
             this.CommunityRoles.Add(new CommunityRole("Participant", false, true, true));
         }
@@ -168,7 +168,7 @@ namespace OSBLE.Models
             c4.Semester = "Fall";
             c4.Year = "2011";
             c4.Name = "Intro to OSBLE";
-            
+
             this.Courses.Add(c1);
             this.Courses.Add(c2);
             this.Communities.Add(c3);
@@ -183,7 +183,6 @@ namespace OSBLE.Models
             }
 
             this.SaveChanges();
-
 
             createSampleUser("bob@smith.com", "123123", "Bob", "Smith", "1", 1, false, true);
             createSampleUser("stu@dent.com", "123123", "Stu", "Dent", "2", 1, false, false);
@@ -205,6 +204,7 @@ namespace OSBLE.Models
             this.SaveChanges();
 
             #region add course users
+
             CoursesUsers cu = new CoursesUsers();
             cu.CourseID = 1;
             cu.UserProfileID = 1;
@@ -358,7 +358,7 @@ namespace OSBLE.Models
             cu8.Section = 0;
             this.CoursesUsers.Add(cu8);
             this.SaveChanges();
-            
+
             this.CoursesUsers.Add(cu);
             this.CoursesUsers.Add(cu2);
             this.CoursesUsers.Add(cu3);
@@ -366,9 +366,10 @@ namespace OSBLE.Models
             this.CoursesUsers.Add(cu5);
             this.CoursesUsers.Add(cu6);
             this.CoursesUsers.Add(cu7);
-            
+
             this.SaveChanges();
-            #endregion
+
+            #endregion add course users
         }
     }
 
