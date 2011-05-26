@@ -21,7 +21,10 @@ namespace OSBLE.Models
         public bool Friday { get; set; }
         public bool Saturday { get; set; }
 
+        [DataType(DataType.Time)]
         public DateTime StartTime { get; set; }
+
+        [DataType(DataType.Time)]
         public DateTime EndTime { get; set; }
 
         public string Location { get; set; }

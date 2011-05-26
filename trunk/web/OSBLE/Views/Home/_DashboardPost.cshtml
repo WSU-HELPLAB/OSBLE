@@ -41,7 +41,7 @@
                 }
                 @if (canDelete || (dp.UserProfileID == ViewBag.CurrentUser.ID))
                 {
-                    <form action="/Home/DeletePost"
+                    <form action="@Url.Action("DeletePost")"
                         style="display: inline;"
                         data-ajax="true"
                         data-ajax-success="$('#dp_post_@(dp.ID)').hide('blind',{},'slow',function(){$(this).remove();})"
@@ -75,7 +75,7 @@
                     <a href="#" id="reply_@(dp.ID)">Reply</a>
                 </div>
                 <div class="dp_replybox" id="replybox_@(dp.ID)">
-                    <form action="/Home/NewReply"
+                    <form action="@Url.Action("NewReply")"
                         data-ajax="true"
                         data-ajax-update="#dp_replies_for_@(dp.ID)"
                         data-ajax-success="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');}); $('#dp_replybox_content_@(dp.ID)').val('')"

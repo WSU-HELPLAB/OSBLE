@@ -14,8 +14,6 @@ namespace OSBLE.Controllers
     [NotForCommunity]
     public class DeliverableController : OSBLEController
     {
-        private OSBLEContext db = new OSBLEContext();
-
         //
         // GET: /Deliverable/
 

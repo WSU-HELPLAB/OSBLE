@@ -45,9 +45,11 @@ namespace OSBLE.Models
         [Display(Name = "Amount of weeks into the future to show events in course calendar")]
         public int CourseCalendarWindowOfTime { get; set; }
 
+        [Display(Name = "Start Date")]
         [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
 
+        [Display(Name = "End Date")]
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
 

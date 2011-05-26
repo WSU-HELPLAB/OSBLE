@@ -28,7 +28,7 @@
                             }
                             @if (canDelete || (dr.UserProfileID == ViewBag.CurrentUser.ID))
                             {
-                                <form action="/Home/DeleteReply"
+                                <form action="@Url.Action("DeleteReply")"
                                     style="display: inline;"
                                     data-ajax="true"
                                     data-ajax-success="$('#dr_reply_@(dr.ID)').hide('blind',{},'slow',function(){$(this).remove();})"
