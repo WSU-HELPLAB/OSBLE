@@ -4,6 +4,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Collections;
+using System.Collections.Generic;
+using System.Windows.Documents;
 
 namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
 {
@@ -17,11 +20,13 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
 
         #region Fields
 
+        private GlyphSelection glyphSelection = new GlyphSelection();
         private Point selectionAnchorPoint;
         private Rectangle selectionRectangle;
         private Canvas displayCanvas;
         private Canvas hitCanvas;
         private bool isSelecting = false;
+        private bool isSelectingGlyphs = false;
 
         #endregion Fields
 
@@ -43,6 +48,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
                     rect.SetValue(Canvas.TopProperty, selectionRectangle.GetValue(Canvas.TopProperty));
                     rect.Width = selectionRectangle.Width;
                     rect.Height = selectionRectangle.Height;
+                    (selectionRectangle.Parent as Panel).Children.Add(rect);
                     return rect;
                 }
                 else
@@ -56,8 +62,9 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
 
         #region Constructor
 
-        public RectangleSelectionHighlighting(Canvas canvas, Canvas hitCanvas)
+        public RectangleSelectionHighlighting(Canvas canvas, Canvas hitCanvas, GlyphSelection glyphSelect)
         {
+            this.glyphSelection = glyphSelect;
             this.displayCanvas = canvas;
             this.hitCanvas = hitCanvas;
             hitCanvas.Background = new SolidColorBrush(Color.FromArgb(100, 0, 0, 128));
@@ -116,60 +123,112 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
             throw new NotImplementedException();
         }
 
+        
         private void canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (isSelecting)
+            if(isSelectingGlyphs == true)
             {
-                Point mouseLocation = e.GetPosition(displayCanvas);
+                Glyphs tempGlyph = isOverGlyphs(e);
+                if (tempGlyph != null)
+                    glyphSelection.MoveGlyphSelection(tempGlyph, e);
+                
+            }
+            else
+            {
+                if (isSelecting)
+                {
+                    Point mouseLocation = e.GetPosition(displayCanvas);
 
-                //got to be a point because size cant be negative
-                Point size = new Point();
-                size.X = mouseLocation.X - selectionAnchorPoint.X;
-                size.Y = mouseLocation.Y - selectionAnchorPoint.Y;
+                    //got to be a point because size cant be negative
+                    Point size = new Point();
+                    size.X = mouseLocation.X - selectionAnchorPoint.X;
+                    size.Y = mouseLocation.Y - selectionAnchorPoint.Y;
 
-                if (size.X < 0)
-                {
-                    selectionRectangle.SetValue(Canvas.LeftProperty, mouseLocation.X);
-                    selectionRectangle.Width = size.X * -1;
-                }
-                else
-                {
-                    selectionRectangle.SetValue(Canvas.LeftProperty, selectionAnchorPoint.X);
-                    selectionRectangle.Width = size.X;
-                }
+                    if (size.X < 0)
+                    {
+                        selectionRectangle.SetValue(Canvas.LeftProperty, mouseLocation.X);
+                        selectionRectangle.Width = size.X * -1;
+                    }
+                    else
+                    {
+                        selectionRectangle.SetValue(Canvas.LeftProperty, selectionAnchorPoint.X);
+                        selectionRectangle.Width = size.X;
+                    }
 
-                if (size.Y < 0)
-                {
-                    selectionRectangle.SetValue(Canvas.TopProperty, mouseLocation.Y);
-                    selectionRectangle.Height = size.Y * -1;
-                }
-                else
-                {
-                    selectionRectangle.SetValue(Canvas.TopProperty, selectionAnchorPoint.Y);
-                    selectionRectangle.Height = size.Y;
+                    if (size.Y < 0)
+                    {
+                        selectionRectangle.SetValue(Canvas.TopProperty, mouseLocation.Y);
+                        selectionRectangle.Height = size.Y * -1;
+                    }
+                    else
+                    {
+                        selectionRectangle.SetValue(Canvas.TopProperty, selectionAnchorPoint.Y);
+                        selectionRectangle.Height = size.Y;
+                    }
                 }
             }
+            
         }
 
         private void canvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            hitCanvas.ReleaseMouseCapture();
-            isSelecting = false;
-            SelectionChanged(this, EventArgs.Empty);
-            e.Handled = true;
-        }
+            
 
+            if (isSelectingGlyphs)
+            {
+                glyphSelection.EndGlyphSelection(isOverGlyphs(e), e);
+                isSelectingGlyphs = false;
+            }
+            else if(isSelecting)
+            {
+                hitCanvas.ReleaseMouseCapture();
+                isSelecting = false;
+                SelectionChanged(this, EventArgs.Empty);
+                e.Handled = true;
+            }
+        }
         private void canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            selectionAnchorPoint = e.GetPosition(displayCanvas);
-            hitCanvas.CaptureMouse();
-            selectionRectangle.SetValue(Canvas.LeftProperty, selectionAnchorPoint.X);
-            selectionRectangle.SetValue(Canvas.TopProperty, selectionAnchorPoint.Y);
-            selectionRectangle.Width = 0;
-            selectionRectangle.Height = 0;
-            isSelecting = true;
-            selectionRectangle.Visibility = Visibility.Visible;
-            e.Handled = true;
+            //removing any existing highlights
+            glyphSelection.ClearSelection();
+            this.ClearSelection();
+
+            if (isOverGlyphs(e)!=null) //mouse click on a glyph, reroute event to GlyphSelection
+            {
+
+                glyphSelection.StartGlyphSelection(isOverGlyphs(e), e);
+                isSelectingGlyphs = true;
+            }
+            else //mouse click on empty area for rectangle
+            {
+                selectionAnchorPoint = e.GetPosition(displayCanvas);
+                hitCanvas.CaptureMouse();
+                selectionRectangle.SetValue(Canvas.LeftProperty, selectionAnchorPoint.X);
+                selectionRectangle.SetValue(Canvas.TopProperty, selectionAnchorPoint.Y);
+                selectionRectangle.Width = 0;
+                selectionRectangle.Height = 0;
+                isSelecting = true;
+                selectionRectangle.Visibility = Visibility.Visible;
+                e.Handled = true;
+            }
+             
+        }
+        /// <summary>
+        /// returns null if not over a Glyphs, else returns the Glyphs
+        /// </summary>
+        private Glyphs isOverGlyphs(MouseEventArgs e)
+        {
+            IEnumerable<UIElement> elemList = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(Application.Current.RootVisual), hitCanvas.Parent as Grid);
+            elemList.GetEnumerator();
+
+            foreach (UIElement i in elemList)
+            {
+                if (i is Glyphs)
+                {
+                    return (i as Glyphs); //found the glyph (should only be 1 glyph, no need to continue foreach)
+                }
+            }
+            return null;
         }
 
         #endregion HelperFunctions

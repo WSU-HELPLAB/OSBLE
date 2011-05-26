@@ -319,6 +319,20 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
             }
         }
 
+
+        public void MoveGlyphSelection(object sender, MouseEventArgs e)
+        {
+            glyph_MouseMove(sender, e);
+        }
+        public void EndGlyphSelection(Glyphs glyph, MouseButtonEventArgs e)
+        {
+            glyph_MouseLeftButtonUp(glyph, e);
+        }
+        public void StartGlyphSelection(Glyphs glyph, MouseButtonEventArgs e)
+        {
+            glyph_MouseLeftButtonDown(glyph, e);
+        }
+
         private void glyph_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             indexOfLastGlyph = -1;

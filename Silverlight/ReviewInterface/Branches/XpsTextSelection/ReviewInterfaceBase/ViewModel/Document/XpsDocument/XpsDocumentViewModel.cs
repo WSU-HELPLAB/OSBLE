@@ -120,7 +120,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
 
                 pagesHolder.SizeChanged += new SizeChangedEventHandler(pagesHolder_SizeChanged);
 
-                rectangleSelection = new RectangleSelectionHighlighting(thisView.CommentReferenceCanvas, thisView.HitCanvas);
+                rectangleSelection = new RectangleSelectionHighlighting(thisView.CommentReferenceCanvas, thisView.HitCanvas, glyphSelection);
                 rectangleSelection.SelectionChanged += new EventHandler(xpsSelection_SelectionChanged);
 
                 ContentUpdated(this, EventArgs.Empty);
