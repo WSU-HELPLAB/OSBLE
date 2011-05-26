@@ -142,7 +142,7 @@
     @foreach (OSBLE.Models.CoursesUsers user in ViewBag.Users)
     {
         <tr>
-            <td id="@user.UserProfile.ID" onclick="cellGainsFocus(this)">@user.UserProfile.FirstName</td>    
+            <td id="@user.UserProfile.ID" >@user.FirstName</td>    
             <td onclick="cellGainsFocus(this)">0</td>   
         </tr>
     }
@@ -166,9 +166,7 @@
 
 </div>
 
-<script src="@Url.Content("~/Scripts/jquery-1.6.1.min.js")" type="text/javascript"></script>
-<script src="@Url.Content("~/Scripts/modernizr-1.7.min.js")" type="text/javascript"></script>
-<script type="text/javascript">
+<script type="text/jscript">
 var lastFocusedCell = null;
 var showDropDown = false;
 var changedShow = false;

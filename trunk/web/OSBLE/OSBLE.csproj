@@ -78,6 +78,7 @@
     <Compile Include="Controllers\CommunityController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
     <Compile Include="Controllers\DeliverableController.cs" />
+    <Compile Include="Controllers\DummyGradableController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\SubmissionAssignmentActivityController.cs" />
     <Compile Include="Controllers\WeightController.cs" />

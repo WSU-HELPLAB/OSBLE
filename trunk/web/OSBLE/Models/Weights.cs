@@ -8,6 +8,14 @@ namespace OSBLE.Models
     /// </summary>
     public class Weight
     {
+        /// <summary>
+        /// Constructor method.  Will set the position to 0.
+        /// </summary>
+        public Weight()
+        {
+            Position = 0;
+        }
+
         [Key]
         public int ID { get; set; }
 
@@ -24,6 +32,12 @@ namespace OSBLE.Models
         [Required]
         [Display(Name = "Weight")]
         public int Points { get; set; }
+
+        /// <summary>
+        /// Used for visual ordering of various weights (tabs in the gradebook).  Defaults to a value of 0.
+        /// </summary>
+        [Required]
+        public int Position { get; set; }
 
         [Required]
         [Display(Name = "Gradables")]
