@@ -5,6 +5,36 @@ using System.Web;
 using OSBLE.Models;
 using System.IO;
 
+//the folllowing is a diagram of our file system.  Items in brackes [] indicate 
+//using a key of sorts (e.g. the user id).  Items in curly braces {} indicate
+//the intended use of the folder
+/*
+ * 
+ *                   root
+ *                  /    \
+ *                 /      \
+ *              Courses   Users 
+ *               /          \ 
+ *         [courseID]     [userId]
+ *           /     \          \  
+ *          /       \   {global user content}
+ *     CourseDocs    \
+ *         |          Assignments
+ * {course docs go here}   |               
+ *                         |
+ *                   [GradableId]   
+ *                         |
+ *               [AssignmentActivityId]
+ *                       /   \
+ *                      /     \
+ *                  AADocs   Submissions         
+ *                     |             \
+ *       {assignment activity docs}   \
+ *                                   [TeamId]
+ *                                        |
+ *                                {team submissions}   
+ * */
+
 namespace OSBLE
 {
     public static class FileSystem
