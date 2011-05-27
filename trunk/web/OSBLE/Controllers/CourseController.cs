@@ -61,6 +61,36 @@ namespace OSBLE.Controllers
             }
             db.SaveChanges();
         }
+
+        private void createBreaks(Course course)
+        {
+            int count = Convert.ToInt32(Request.Params["breaks_max"]);
+            if (course.CourseBreaks == null)
+            {
+                course.CourseBreaks = new List<CourseBreak>();
+            }
+            else
+            {
+                course.CourseBreaks.Clear();
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                if (Request.Params["break_name_" + i.ToString()] != null)
+                {
+                    CourseBreak cb = new CourseBreak();
+
+                    cb.Name = Request.Params["break_name_" + i.ToString()];
+                    cb.StartDate = DateTime.Parse(Request.Params["break_start_" + i.ToString()]);
+                    cb.EndDate = DateTime.Parse(Request.Params["break_end_" + i.ToString()]);
+
+                    course.CourseBreaks.Add(cb);
+                }
+            }
+            db.SaveChanges();
+        }
+        
+        
         //
         // POST: /Course/Create
 
@@ -74,6 +104,7 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
 
                 createMeetingTimes(course);
+                createBreaks(course);
 
                 // Make current user an instructor on new course.
                 CoursesUsers cu = new CoursesUsers();
@@ -139,6 +170,7 @@ namespace OSBLE.Controllers
             updateCourse.Year = course.Year;
 
             createMeetingTimes(updateCourse);
+            createBreaks(updateCourse);
 
             if (ModelState.IsValid)
             {

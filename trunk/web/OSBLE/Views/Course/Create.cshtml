@@ -107,7 +107,7 @@
 
     </div>
     
-    <div>
+    <div id="meetings_after">
     <a href="#" onclick="addMeetingTime(); return false;">@Helpers.AddButton()</a>
     </div>
   
@@ -116,6 +116,16 @@
     
     <h4>Breaks/Holidays</h4>
 
+        <div id="breaks">
+    </div>
+    
+    <div id="breaks_after">
+    <a href="#" onclick="addBreak(); return false;">@Helpers.AddButton()</a>
+    </div>
+        
+    <input type="hidden" id="breaks_max" name="breaks_max" value="0" />
+    
+    
         <h3>Course Settings</h3>
         <div class="editor-field">
             @Html.CheckBoxFor(model => model.AllowDashboardPosts) @Html.LabelFor(model => model.AllowDashboardPosts) <br />

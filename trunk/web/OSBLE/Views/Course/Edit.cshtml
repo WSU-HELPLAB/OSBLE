@@ -110,7 +110,7 @@
 
     </div>
     
-    <div id="meeting_after">
+    <div id="meetings_after">
     <a href="#" onclick="addMeetingTime(); return false;">@Helpers.AddButton()</a>
     </div>
     
@@ -127,9 +127,8 @@
                 fri_check: "@cm.Friday",
                 sat_check: "@cm.Saturday",
                 location: "@cm.Location",
-                start: "@cm.StartTime.TimeOfDay",
-                end: "@cm.EndTime.TimeOfDay"
-
+                start: "@cm.StartTime.ToString("h:mm tt")",
+                end: "@cm.EndTime.ToString("h:mm tt")"
             });</text>
         }
     });
@@ -138,6 +137,29 @@
     <input type="hidden" id="meetings_max" name="meetings_max" value="0" />
     
     <h4>Breaks/Holidays</h4>
+    
+    
+    <div id="breaks">
+    </div>
+    
+    <div id="breaks_after">
+    <a href="#" onclick="addBreak(); return false;">@Helpers.AddButton()</a>
+    </div>
+    
+    <script type="text/javascript">
+    $(function(){
+        @foreach (CourseBreak cb in Model.CourseBreaks)
+        {
+            <text>addBreak({
+                name: "@cb.Name",
+                start: "@cb.StartDate.ToString("MM/dd/yyy")",
+                end: "@cb.EndDate.ToString("MM/dd/yyyy")"
+            });</text>
+        }
+    });
+    </script>
+    
+    <input type="hidden" id="breaks_max" name="breaks_max" value="0" />
     
         <h3>Course Settings</h3>
         <div class="editor-field">

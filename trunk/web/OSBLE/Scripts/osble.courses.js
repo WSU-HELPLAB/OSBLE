@@ -67,6 +67,42 @@
         </div>\
         ';
 
+
+var breakTemplate = '\
+        <div class="break" id="break_${count}">\
+            <div class="break_tools">\
+                <a href="#" onclick="$(this).parent().parent().hide(\'highlight\',function(){$(this).remove()}); return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a>\
+            </div>\
+            <table>\
+            <tr>\
+                <td>Name</td>\
+                <td>\
+                <input type="text" size="10" name="break_name_${count}" value="${name}" data-val="true" data-val-required="Name Required" />\
+                <br />\
+                <span class="field-validation-valid" data-valmsg-for="break_name_${count}" data-valmsg-replace="true"></span>\
+                </td>\
+            </tr>\
+            <tr>\
+                <td>Start</td>\
+                <td>\
+                <input type="text" class="date_picker" size="10" name="break_start_${count}" value="${start}" data-val="true" data-val-required="Start Date Required" />\
+                <br />\
+                <span class="field-validation-valid" data-valmsg-for="break_start_${count}" data-valmsg-replace="true"></span>\
+                </td>\
+            </tr>\
+            <tr>\
+                <td>End</td>\
+                <td>\
+                <input type="text" class="date_picker" size="10" name="break_end_${count}" value="${end}" data-val="true" data-val-required="End Date Required" />\
+                <br />\
+                <span class="field-validation-valid" data-valmsg-for="break_end_${count}" data-valmsg-replace="true"></span>\
+                </td>\
+            </tr>\
+            \
+            </table>\
+        </div>\
+        ';
+
 function addMeetingTime(mt) {
     var count = parseInt($('#meetings_max').val());
 
@@ -96,4 +132,28 @@ function addMeetingTime(mt) {
     $.validator.unobtrusive.parse('form');
 
     $('#meetings_max').val(count + 1);
+}
+
+function addBreak(b) {
+    var count = parseInt($('#breaks_max').val());
+
+    if (b == undefined) {
+        b = Object();
+    }
+
+    $.tmpl(breakTemplate, {
+        count: count,
+        name: b.name,
+        start: b.start,
+        end: b.end
+
+    }).appendTo('#breaks');
+
+    setupDateTime();
+
+    $('form').removeData("validator");
+    $('form').removeData("unobtrusiveValidation");
+    $.validator.unobtrusive.parse('form');
+
+    $('#breaks_max').val(count + 1);
 }

@@ -12,7 +12,10 @@ namespace OSBLE.Models
         [Key]
         public int ID { get; set; }
 
+        [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
+
+        [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
 
         public string Name { get; set; }
