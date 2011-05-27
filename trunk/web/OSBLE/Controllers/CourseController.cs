@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models;
 using OSBLE.Attributes;
+using System.Collections.Specialized;
 
 namespace OSBLE.Controllers
 { 
@@ -27,6 +28,39 @@ namespace OSBLE.Controllers
             return View(new Course());
         } 
 
+        private void createMeetingTimes(Course course) {
+            int count = Convert.ToInt32(Request.Params["meetings_max"]);
+            if (course.CourseMeetings == null)
+            {
+                course.CourseMeetings = new List<CourseMeeting>();
+            }
+            else
+            {
+                course.CourseMeetings.Clear();
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                if(Request.Params["meeting_location_" + i.ToString()] != null) {
+                    CourseMeeting cm = new CourseMeeting();
+
+                    cm.Location = Request.Params["meeting_location_" + i.ToString()];
+                    cm.StartTime = DateTime.Parse(Request.Params["meeting_start_" + i.ToString()]);
+                    cm.EndTime = DateTime.Parse(Request.Params["meeting_end_" + i.ToString()]);
+
+                    cm.Sunday = Convert.ToBoolean(Request.Params["meeting_sunday_" + i.ToString()]);
+                    cm.Monday = Convert.ToBoolean(Request.Params["meeting_monday_" + i.ToString()]);
+                    cm.Tuesday = Convert.ToBoolean(Request.Params["meeting_tuesday_" + i.ToString()]);
+                    cm.Wednesday = Convert.ToBoolean(Request.Params["meeting_wednesday_" + i.ToString()]);
+                    cm.Thursday = Convert.ToBoolean(Request.Params["meeting_thursday_" + i.ToString()]);
+                    cm.Friday = Convert.ToBoolean(Request.Params["meeting_friday_" + i.ToString()]);
+                    cm.Saturday = Convert.ToBoolean(Request.Params["meeting_saturday_" + i.ToString()]);
+
+                    course.CourseMeetings.Add(cm);
+                }
+            }
+            db.SaveChanges();
+        }
         //
         // POST: /Course/Create
 
@@ -38,6 +72,8 @@ namespace OSBLE.Controllers
             {
                 db.Courses.Add(course);
                 db.SaveChanges();
+
+                createMeetingTimes(course);
 
                 // Make current user an instructor on new course.
                 CoursesUsers cu = new CoursesUsers();
@@ -85,6 +121,8 @@ namespace OSBLE.Controllers
                 return RedirectToAction("Home");
             }
 
+            NameValueCollection parameters = Request.Params;
+
             Course updateCourse = (Course)activeCourse.Course;
 
             updateCourse.AllowDashboardPosts = course.AllowDashboardPosts;
@@ -99,6 +137,8 @@ namespace OSBLE.Controllers
             updateCourse.Semester = course.Semester;
             updateCourse.StartDate = course.StartDate;
             updateCourse.Year = course.Year;
+
+            createMeetingTimes(updateCourse);
 
             if (ModelState.IsValid)
             {

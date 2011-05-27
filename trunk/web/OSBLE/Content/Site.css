@@ -962,3 +962,31 @@ ul.selector
 {
     display: block;
 }
+
+.meeting_time
+{
+    width: 200px;
+    border: 1px solid #eeeeff;
+    border-bottom: 3px solid #eeeeff;
+    padding: 3px;
+    margin-bottom: 1em;
+    margin-right: 1em;
+    float: left;
+}
+
+.meeting_time .meeting_time_tools 
+{
+    float: right;
+    display: none;
+    padding: 3px;
+}
+
+.meeting_time:hover .meeting_time_tools 
+{
+    display: block;
+}
+
+#meeting_after 
+{
+    clear:both;
+}
