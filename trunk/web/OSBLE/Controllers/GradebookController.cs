@@ -13,6 +13,7 @@ namespace OSBLE.Controllers
     [NotForCommunity]
     public class GradebookController : OSBLEController
     {
+        public enum ColumnAction { InsertLeft, InsertRight, Delete, Clear, NoAction };
         //
         // GET: /Gradebook/
         public GradebookController()
@@ -28,8 +29,7 @@ namespace OSBLE.Controllers
         /// <param name="pointsPossible">The number of points that this column is worth</param>
         /// <param name="position">The order in which this column should appear</param>
         /// <returns></returns>
-        [HttpPost]
-        public ActionResult AddColumn(string colunmName, int pointsPossible, int position)
+        private void AddColumn(string colunmName, int pointsPossible, int position)
         {
             int weightId = Convert.ToInt32(Session["CurrentWeightID"]);
             Gradable g = new Gradable()
@@ -38,10 +38,10 @@ namespace OSBLE.Controllers
                 PossiblePoints = pointsPossible,
                 WeightID = weightId,
                 Name = colunmName,
+                GradableScores = new List<GradableScore>()
             };
             db.Gradables.Add(g);
             db.SaveChanges();
-            return Json("complete");
         }
 
         /// <summary>
@@ -91,6 +91,57 @@ namespace OSBLE.Controllers
             return Json("complete");
         }
 
+        private ColumnAction StringToColumnAction(string action)
+        {
+            if (string.Compare(ColumnAction.InsertLeft.ToString(), action) == 0)
+            {
+                return ColumnAction.InsertLeft;
+            }
+            else if (string.Compare(ColumnAction.InsertRight.ToString(), action) == 0)
+            {
+                return ColumnAction.InsertRight;
+            }
+            else if (string.Compare(ColumnAction.Clear.ToString(), action) == 0)
+            {
+                return ColumnAction.Clear;
+            }
+            else if (string.Compare(ColumnAction.Delete.ToString(), action) == 0)
+            {
+                return ColumnAction.Delete;
+            }
+            return ColumnAction.NoAction;
+        }
+
+        [HttpPost]
+        public ActionResult ModifyColumn()
+        {
+            //convert POST params to variables
+            int gradableId = 0;
+            if (Request.Form["gradableId"] != null)
+            {
+                gradableId = Convert.ToInt32(Request.Form["gradableId"]);
+            }
+            ColumnAction action = StringToColumnAction(Request.Form["actionRequested"]);
+            
+            //only continue if we received a valid gradable id
+            if(gradableId != 0)
+            {
+                Gradable gradable = (from g in db.Gradables where g.ID == gradableId select g).First();
+                if (action == ColumnAction.InsertLeft)
+                {
+                    int position = (gradable.Position == 0) ? 0 : gradable.Position - 1;
+                    AddColumn("Untitled", 0, position);
+                }
+                else if (action == ColumnAction.InsertRight)
+                {
+                    AddColumn("Untitled", 0, gradable.Position + 1);
+                }
+            }
+            
+            BuildGradebook((int)Session["CurrentWeightID"]);
+            return View("_Gradebook");
+        }
+
         /// <summary>
         /// This will initialize the page using the supplied weightId (tab).
         /// </summary>
@@ -102,17 +153,35 @@ namespace OSBLE.Controllers
             {
                 weightId = GetDefaultWeightId();
             }
+            BuildGradebook((int)weightId);
+            return View();
+        }
 
+        /// <summary>
+        /// This function is responsible for making the various calls needed to build the gradebook.  
+        /// Originally, this code was in the Index() action, but it was moved into its own function
+        /// because I (AC) needed to rebuild the gradebook whenever a structural change (add/remove column, etc.)
+        /// was made.
+        /// 
+        /// After building the gradebook, this function makes the necessary components available to the
+        /// View via the ViewBag.  The components are:
+        ///  ViewBag.Tabs = All the tabs present in the gradebook
+        ///  ViewBag.Gradables = The columns for the current tab
+        ///  ViewBag.Grades = Student scores for each column
+        ///  ViewBag.Users = List of students in the course
+        /// </summary>
+        private void BuildGradebook(int weightId)
+        {
             //LINQ complains when we use this directly in our queries, so pull it beforehand
             int currentCourseId = ActiveCourse.CourseID;
 
             //pull all weights (tabs) for the current course
             var weights = from weight in db.Weights
-                         where weight.CourseID == currentCourseId && weight.ID == weightId
-                         select weight;
+                          where weight.CourseID == currentCourseId
+                          select weight;
             List<Weight> allWeights = weights.ToList();
             Weight currentTab = (from w in allWeights where w.ID == weightId select w).First();
-            
+
             //save to the session.  Needed later for AJAX-related updates.
             Session["CurrentWeightID"] = currentTab.ID;
 
@@ -123,21 +192,21 @@ namespace OSBLE.Controllers
 
             //pull the students in the course.  Each student is a row.
             List<UserProfile> students = (from up in db.UserProfiles
-                                         join cu in db.CoursesUsers on up.ID equals cu.UserProfileID
-                                         where cu.CourseID == currentCourseId && cu.CourseRoleID == (int)CourseRole.OSBLERoles.Student
-                                         select up).ToList();
+                                          join cu in db.CoursesUsers on up.ID equals cu.UserProfileID
+                                          where cu.CourseID == currentCourseId && cu.CourseRoleID == (int)CourseRole.OSBLERoles.Student
+                                          orderby up.LastName, up.FirstName
+                                          select up).ToList();
 
             //Finally the scores for each student.
             List<GradableScore> scores = (from gs in db.GradableScores
                                           where gs.Gradable.WeightID == currentTab.ID
                                           select gs).ToList();
-            
+
             //save everything that we need to the viewebag
             ViewBag.Tabs = allWeights;
             ViewBag.Gradables = gradables;
             ViewBag.Grades = scores;
             ViewBag.Users = students;
-            return View();
         }
 
         /// <summary>
@@ -145,7 +214,7 @@ namespace OSBLE.Controllers
         /// No weightId exists, a new one will be created
         /// </summary>
         /// <returns></returns>
-        public int GetDefaultWeightId()
+        private int GetDefaultWeightId()
         {
             //LINQ complains when we use this directly in our queries, so pull it beforehand
             int currentCourseId = ActiveCourse.CourseID;

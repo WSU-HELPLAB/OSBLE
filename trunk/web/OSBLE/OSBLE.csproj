@@ -468,6 +468,7 @@
     <Content Include="Views\Deliverable\Delete.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\Time.cshtml" />
     <Content Include="Views\Shared\_Events.cshtml" />
+    <Content Include="Views\Gradebook\_Gradebook.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />
