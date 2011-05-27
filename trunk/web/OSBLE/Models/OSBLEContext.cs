@@ -30,6 +30,8 @@ namespace OSBLE.Models
 
         public DbSet<CoursesUsers> CoursesUsers { get; set; }
 
+        public DbSet<Event> Events { get; set; }
+
         public DbSet<School> Schools { get; set; }
 
         public DbSet<UserProfile> UserProfiles { get; set; }
