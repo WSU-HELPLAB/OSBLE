@@ -3,7 +3,7 @@
 }
 
 <div id="dashboard_left">
-<h4>Notifications</h4>
+<h3>Notifications</h3>
 
 <div id="notifications">
 @if (ViewBag.Notifications.Count == 0)
@@ -17,7 +17,7 @@
 <p>@Html.ActionLink("Show All Notifications", "Index", "Notification")</p>
 </div>
 
-<h4>Events &amp; Deadlines</h4>
+<h3>Events &amp; Deadlines</h3>
 
 <div id="important_dates">
 <p>Next @ViewBag.ActiveCourse.Course.CalendarWindowOfTime Weeks</p>
@@ -28,7 +28,7 @@
 </div>
 
 <div id="dashboard_middle">
-<h4>Activity Feed</h4>
+<h3>Activity Feed</h3>
 
 <div id="activity_feed">
 @Html.Partial("_ActivityFeed")
@@ -37,7 +37,7 @@
 </div>
 
 <div id="dashboard_right">
-<h4>Course Links</h4>
+<h3>Course Links</h3>
 
 <div id="course_links">
 @Html.Partial("_CourseLinks")

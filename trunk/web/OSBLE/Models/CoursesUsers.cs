@@ -22,5 +22,13 @@ namespace OSBLE.Models
 
         [Required]
         public int Section { get; set; }
+
+        public bool Hidden { get; set; }
+
+        public CoursesUsers()
+            : base()
+        {
+            Hidden = false;
+        }
     }
 }
