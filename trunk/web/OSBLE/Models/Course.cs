@@ -42,8 +42,6 @@ namespace OSBLE.Models
         [Display(Name = "Require instructor to approve student calendar items to appear in the calendar")]
         public bool RequireInstructorApprovalForEventPosting { get; set; }
 
-        [Display(Name = "Amount of weeks into the future to show events in course calendar")]
-        public int CourseCalendarWindowOfTime { get; set; }
 
         [Display(Name = "Start Date")]
         [DataType(DataType.Date)]
@@ -71,8 +69,6 @@ namespace OSBLE.Models
             AllowDashboardReplies = true;
             AllowEventPosting = true;
             RequireInstructorApprovalForEventPosting = true;
-
-            CourseCalendarWindowOfTime = 2;
 
             StartDate = DateTime.Now.Date;
             EndDate = DateTime.Now.Date.AddDays(112); // Add 16 weeks.

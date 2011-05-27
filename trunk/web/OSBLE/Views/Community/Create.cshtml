@@ -43,6 +43,12 @@
             @Html.ValidationMessageFor(model => model.AllowEventPosting)
         </div>
 
+       <div class="editor-field">
+            @Html.LabelFor(model => model.CalendarWindowOfTime)
+        
+            @Html.TextBoxFor(model => model.CalendarWindowOfTime, new { size = 3 })
+        </div>
+        
         <p>
             <input type="submit" value="Create" />
         </p>

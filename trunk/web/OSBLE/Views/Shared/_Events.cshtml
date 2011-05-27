@@ -1,0 +1,32 @@
+﻿@using OSBLE.Models
+
+<ul id="event_list">
+@foreach (Event e in ViewBag.Events)
+{
+    <li>
+        <small>@ShowDateTime(e.StartDate,e)
+        @if (e.EndDate != null)
+        {
+            <text>&mdash; @ShowTime(e.EndDate,e)</text>
+        }
+        </small>
+        <br />
+        <span>@e.Title</span>
+            
+    </li>
+}
+</ul>
+
+@helper ShowTime (DateTime dt, Event e) {
+    @dt.ToString("h:mm tt");
+}
+
+@helper ShowDateTime(DateTime dt, Event e) {
+    if(!e.HideTime) {
+        @dt.ToString("ddd M/dd h:mm tt");
+    }
+    else
+    {
+        @dt.ToString("ddd M/dd");
+    }
+}

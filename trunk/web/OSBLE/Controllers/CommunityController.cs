@@ -91,6 +91,7 @@ namespace OSBLE.Controllers
             Community updateCommunity = (Community)activeCourse.Course;
 
             updateCommunity.AllowEventPosting = community.AllowEventPosting;
+            updateCommunity.CalendarWindowOfTime = community.CalendarWindowOfTime;
             updateCommunity.Name = community.Name;
             updateCommunity.Nickname = community.Nickname;
             updateCommunity.Description = community.Description;

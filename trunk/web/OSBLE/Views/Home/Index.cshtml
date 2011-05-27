@@ -20,7 +20,9 @@
 <h4>Events &amp; Deadlines</h4>
 
 <div id="important_dates">
-@Html.Partial("_ImportantDates")
+<p>Next @ViewBag.ActiveCourse.Course.CalendarWindowOfTime Weeks</p>
+@Html.Partial("_Events")
+<p>@Html.ActionLink("Show All Events", "Index", "Event")</p>
 </div>
 
 </div>

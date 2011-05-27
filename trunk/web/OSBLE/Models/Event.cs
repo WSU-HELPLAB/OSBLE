@@ -17,22 +17,37 @@ namespace OSBLE.Models
         public virtual AbstractCourse Course { get; set; }
 
         [Required]
-        public DateTime Posted { get; set; }
+        public DateTime StartDate { get; set; }
+
+        [NotMapped]
+        public DateTime EndDate { get; set; }
 
         [Required]
         public string Title { get; set; }
 
-        [Required]
         public string Description { get; set; }
 
         public string Link { get; set; }
 
         public bool Approved { get; set; }
 
+        [NotMapped]
+        public bool AllowLinking { get; set; }
+
+        [NotMapped]
+        public bool HideTime { get; set; }
+
+        [NotMapped]
+        public bool HideDelete { get; set; }
+
         public Event()
             : base()
         {
-            Posted = DateTime.Now;
+            StartDate = DateTime.Now;
+
+            HideDelete = false;
+            HideTime = false;
+            AllowLinking = false;
         }
     }
 }

@@ -159,7 +159,7 @@ namespace OSBLE.Controllers
             updateCourse.AllowDashboardPosts = course.AllowDashboardPosts;
             updateCourse.AllowDashboardReplies = course.AllowDashboardReplies;
             updateCourse.AllowEventPosting = course.AllowEventPosting;
-            updateCourse.CourseCalendarWindowOfTime = course.CourseCalendarWindowOfTime;
+            updateCourse.CalendarWindowOfTime = course.CalendarWindowOfTime;
             updateCourse.EndDate = course.EndDate;
             updateCourse.Name = course.Name;
             updateCourse.Number = course.Number;

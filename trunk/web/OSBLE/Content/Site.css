@@ -917,7 +917,7 @@ ul.selector
     padding-top: 2em;
 }
 
-#notifications_list
+#notifications_list, #event_list
 {
     list-style-type: none;
     margin-left: 0;
@@ -925,7 +925,7 @@ ul.selector
 
 }
 
-#notifications_list li, #notifications_unread_legend, #notifications_read_legend
+#notifications_list li, #notifications_unread_legend, #notifications_read_legend, #event_list li
 {
     border: 1px solid #eeeeff;
     border-bottom: 3px solid #eeeeff;
@@ -950,7 +950,7 @@ ul.selector
     width: 80px;
 }
 
-#notifications_list li .notification_tools
+#notifications_list li .notification_tools, #event_list li .event_tools
 {
     display: none;
     float: right;
@@ -958,7 +958,7 @@ ul.selector
     padding-right: 5px;
 }
 
-#notifications_list li:hover .notification_tools
+#notifications_list li:hover .notification_tools, #event_list li:hover .event_tools
 {
     display: block;
 }

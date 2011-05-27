@@ -66,6 +66,95 @@ namespace OSBLE.Controllers
 
             #endregion
 
+            #region Events
+
+            int eventDays = 7*ActiveCourse.Course.CalendarWindowOfTime;
+
+            DateTime today = DateTime.Now.Date;
+            DateTime upto = today.AddDays(eventDays);
+            
+            List<Event> events = ActiveCourse.Course.Events.Where(e => e.Approved && (e.StartDate >= today) && (e.StartDate <= upto)).ToList();
+
+            // Add course meeting times.
+            if (ActiveCourse.Course is Course)
+            {
+                Course course = (Course)ActiveCourse.Course;
+
+                // Add breaks within window to events
+                foreach (CourseBreak cb in course.CourseBreaks)
+                {
+                    // Start of break
+                    if ((cb.StartDate >= today) && (cb.StartDate <= upto))
+                    {
+                        Event e = new Event();
+
+                        e.Title = cb.Name;
+
+                        if (cb.StartDate.Date != cb.EndDate.Date)
+                        {
+                            e.Title += " Starts";
+                        }
+
+                        e.StartDate = cb.StartDate.Date;
+                        e.HideTime = true;
+                        e.HideDelete = true;
+
+                        events.Add(e);
+                    }
+
+                    // End of break (only if date is different than start)
+                    if ((cb.StartDate.Date != cb.EndDate.Date) && (cb.EndDate >= today) && (cb.EndDate <= upto))
+                    {
+                        Event e = new Event();
+
+                        e.Title = cb.Name + " Ends";
+                        e.StartDate = cb.EndDate.Date;
+                        e.HideTime = true;
+                        e.HideDelete = true;
+                        events.Add(e);
+                    }
+                }
+
+                for (int day = 0; day < eventDays; day++)
+                {
+                    foreach (CourseMeeting cm in course.CourseMeetings)
+                    {
+                        DateTime current = today.AddDays(day);
+
+                        // Wow, this is a big if statement.
+                        if (
+                            ((current.DayOfWeek == DayOfWeek.Sunday) && cm.Sunday) ||
+                            ((current.DayOfWeek == DayOfWeek.Monday) && cm.Monday) ||
+                            ((current.DayOfWeek == DayOfWeek.Tuesday) && cm.Tuesday) ||
+                            ((current.DayOfWeek == DayOfWeek.Wednesday) && cm.Wednesday) ||
+                            ((current.DayOfWeek == DayOfWeek.Thursday) && cm.Thursday) ||
+                            ((current.DayOfWeek == DayOfWeek.Friday) && cm.Friday) ||
+                            ((current.DayOfWeek == DayOfWeek.Saturday) && cm.Saturday)
+                            )
+                        {
+                            Event e = new Event();
+
+                            e.Title = "Course Meeting - " + cm.Location;
+                            e.StartDate = current.AddHours((double)cm.StartTime.Hour).AddMinutes((double)cm.StartTime.Minute);
+                            e.EndDate = current.AddHours((double)cm.EndTime.Hour).AddMinutes((double)cm.EndTime.Minute);
+                            e.AllowLinking = true;
+                            e.HideDelete = true;
+
+                            // Do not show Course meetings outside of course start/end date and breaks.
+                            if ((e.StartDate.Date >= course.StartDate.Date) && (e.StartDate.Date <= course.EndDate.Date) && (course.CourseBreaks.Where(b => (current >= b.StartDate) && (current <= b.EndDate)).Count() < 1))
+                            {
+                                events.Add(e);
+                            }
+
+                        }
+                    }
+                }
+            }
+
+            ViewBag.Events = events.OrderBy(e => e.StartDate);
+
+            #endregion
+
             return View();
         }
 
