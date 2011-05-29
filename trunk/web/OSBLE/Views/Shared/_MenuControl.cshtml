@@ -7,6 +7,8 @@
            &&
            (!m.ModifierOnly || ((ViewBag.ActiveCourse != null) && ViewBag.ActiveCourse.CourseRole.CanModify))
            &&
+		   (!m.GraderOnly || ((ViewBag.ActiveCourse != null) && ViewBag.ActiveCourse.CourseRole.CanGrade))
+           &&
            (!m.ViewerOnly || ((ViewBag.ActiveCourse != null) && ViewBag.ActiveCourse.CourseRole.CanSeeAll))
            &&
            ((!m.CommunityOnlyPage && !m.NotInCommunityPage) || (m.NotInCommunityPage && !(ViewBag.ActiveCourse.Course is Community) || (m.CommunityOnlyPage && ViewBag.ActiveCourse.Course is Community)))

@@ -36,7 +36,10 @@ namespace OSBLE.Controllers
             {
                 foreach (CoursesUsers cu in currentCourses)
                 {
-                    ViewedCourses.Add(cu.CourseID);
+                    if (!cu.Hidden)
+                    {
+                        ViewedCourses.Add(cu.CourseID);
+                    }
                 }
             }
 

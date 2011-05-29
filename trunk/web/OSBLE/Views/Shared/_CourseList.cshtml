@@ -6,6 +6,11 @@ using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_cour
     <select name="course" id="course_select">
         @foreach (OSBLE.Models.CoursesUsers cu in ViewBag.CurrentCourses)
         {
+			// Skip hidden courses
+			if(cu.Hidden) {
+				continue;
+			}
+
             string courseDisplay = @Helpers.CourseTag(cu.Course) + " - " + cu.Course.Name + " (" + cu.CourseRole.Name + ")";
 
 			if((cu.Course is Course) && (cu.Course as Course).Inactive) {

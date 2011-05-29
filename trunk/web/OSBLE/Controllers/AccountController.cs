@@ -67,6 +67,36 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [Authorize]
+        public ActionResult SetDefault(int id)
+        {
+            // Update the default course ID for log in.
+            currentUser.DefaultCourse = id;
+            db.Entry(currentUser).State = EntityState.Modified;
+            db.SaveChanges();
+
+            return RedirectToAction("Profile");
+        }
+
+        [Authorize]
+        [HttpPost]
+        public ActionResult UpdateMenu()
+        {
+            foreach (CoursesUsers cu in currentCourses)
+            {
+                bool newHidden = Convert.ToBoolean(Request.Params["cu_hidden_" + cu.CourseID]);
+                if (newHidden != cu.Hidden)
+                {
+                    cu.Hidden = newHidden;
+                    db.Entry(cu).State = EntityState.Modified;
+                }
+           }
+
+            db.SaveChanges();
+
+            return RedirectToAction("Profile");
+        }
+
         //
         // GET: /Account/Register
 

@@ -1,4 +1,6 @@
-﻿@model OSBLE.Models.ChangePasswordModel
+﻿@using OSBLE.Models
+
+@model OSBLE.Models.ChangePasswordModel
 
 @{
     ViewBag.Title = "Profile";
@@ -33,8 +35,6 @@
 {
     @Html.ValidationSummary(true, "Password change was unsuccessful. Please correct the errors and try again.")
     <div>
-        <fieldset>
-            <legend>Account Information</legend>
 
             <div class="editor-label">
                 @Html.LabelFor(m => m.OldPassword)
@@ -63,6 +63,52 @@
             <p>
                 <input type="submit" value="Change Password" />
             </p>
-        </fieldset>
     </div>
+}
+
+<h2>Course and Community Menu</h2>
+
+<p>Hidden courses/communities will not appear in your course list or your activity feed and must be unchecked to access again.</p>
+<p>Your default course will be the active course each time you log on to OSBLE.</p>
+
+@using (Html.BeginForm("UpdateMenu","Account"))
+{
+	@Html.ValidationSummary()
+<div>
+
+<table>
+	<tr>
+		<th>Hidden</th>
+		<th>Name</th>
+		<th></th>
+	</tr>
+	@foreach (CoursesUsers cu in ViewBag.CurrentCourses) {
+		<tr>
+			<td>
+			<input type="checkbox" value="True" name="cu_hidden_@(cu.CourseID)" @if(cu.Hidden) {<text>checked="checked"</text>} />
+			</td>
+			<td>
+				<small>
+				@if (cu.Course is Course) {
+					<text>Course</text>
+				} else {
+					<text>Community</text>
+				}
+				</small>
+				@Helpers.CourseTag(cu.Course) &mdash; @cu.Course.Name (@cu.CourseRole.Name)
+			</td>
+			<td>
+				@if (cu.CourseID == ViewBag.CurrentUser.DefaultCourse) {
+					<text>Default</text>
+				} else {
+					<text>@Html.ActionLink("Set As Default", "SetDefault", new { id=cu.CourseID })</text>
+				}
+			</td>
+		</tr>
+	}
+</table>
+<p>
+	<input type="submit" value="Update Menu" />
+</p>
+</div>
 }

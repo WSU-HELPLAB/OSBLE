@@ -23,5 +23,15 @@ namespace OSBLE.Models
         public bool IsAdmin { get; set; }
 
         public bool CanCreateCourses { get; set; }
+
+        public int DefaultCourse { get; set; }
+
+        public UserProfile()
+            : base()
+        {
+            IsAdmin = false;
+            CanCreateCourses = false;
+            DefaultCourse = 0;
+        }
     }
 }

@@ -71,12 +71,15 @@ namespace OSBLE.Controllers
             /// Creates a menu item with particular privileges set for its display.
             /// NOTE: This only affects the display of the menu item. You still need to use attributes to validate pages!
             /// </summary>
-            /// <param name="name"></param>
-            /// <param name="controller"></param>
-            /// <param name="action"></param>
-            /// <param name="modifierOnly"></param>
-            /// <param name="viewerOnly"></param>
-            /// <param name="adminOnly"></param>
+            /// <param name="name">Displayed name of menu item</param>
+            /// <param name="controller">Target controller</param>
+            /// <param name="action">Target Action</param>
+            /// <param name="modifierOnly">Only course modifiers (instructors) can see this tab</param>
+            /// <param name="graderOnly">Only course graders (instructors/TAs) can see this tab</param>
+            /// <param name="viewerOnly">Only course viewers can see this tab</param>
+            /// <param name="adminOnly">Only admins can see this tab</param>
+            /// <param name="notInCommunityPage">This tab should not appear in communities</param>
+            /// <param name="communityOnlyPage">This tab should only appear on communities</param>
             public MenuItem(string name, string controller, string action, bool modifierOnly, bool graderOnly, bool viewerOnly, bool adminOnly, bool notInCommunityPage, bool communityOnlyPage)
             {
                 this.Name = name;
@@ -108,8 +111,8 @@ namespace OSBLE.Controllers
 
                 menu.Add(new MenuItem("Dashboard", "Home", "Index"));
                 menu.Add(new MenuItem("Assignments", "Assignment", "Index",false,false,true,false,true,false));
-                menu.Add(new MenuItem("Grades", "Gradebook", "Index",false,true,true,false,true,false));
-                menu.Add(new MenuItem("Users", "Roster", "Index", false, true, true, false, false, false));
+                menu.Add(new MenuItem("Grades", "Gradebook", "Index",false,false,true,false,true,false));
+                menu.Add(new MenuItem("Users", "Roster", "Index", false, true, false, false, false, false));
                 menu.Add(new MenuItem("Course Settings", "Course", "Edit", true, true, true, false, true, false));
                 menu.Add(new MenuItem("Community Settings", "Community", "Edit", true, true, true, false, false, true));
                 ViewBag.Menu = menu;
@@ -146,10 +149,19 @@ namespace OSBLE.Controllers
                         context.Session["ActiveCourse"] = null;
                     }
 
-                    // Load currently selected course, as long as user is actually a member of said course.
-                    if ((context.Session["ActiveCourse"] != null) && (currentCourses.Where(cu => cu.CourseID == (int)context.Session["ActiveCourse"]).Count() > 0))
+                    // Only consider non-hidden courses as the active course.
+                    List<CoursesUsers> activeCoursePool = currentCourses.Where(cu => cu.Hidden == false).ToList();
+
+                    // On login, set to users default course.
+                    if (context.Session["ActiveCourse"] == null)
                     {
-                        activeCourse = currentCourses.Where(cu => cu.CourseID == (int)context.Session["ActiveCourse"]).First();
+                        context.Session["ActiveCourse"] = currentUser.DefaultCourse;
+                    }
+
+                    // Load currently selected course, as long as user is actually a member of said course.
+                    if ((context.Session["ActiveCourse"] != null) && (activeCoursePool.Where(cu => cu.CourseID == (int)context.Session["ActiveCourse"]).Count() > 0))
+                    {
+                        activeCourse = activeCoursePool.Where(cu => cu.CourseID == (int)context.Session["ActiveCourse"]).First();
                         context.Session["ActiveCourse"] = activeCourse.CourseID;
                     }
                     else // Assign first course if one exists.
