@@ -39,6 +39,14 @@
             </table>\
             <table>\
             <tr>\
+                <td>Name (Lecture, Lab, etc.)</td>\
+                <td>\
+                <input type="text" size="10" name="meeting_name_${count}" value="${name}" data-val="true" data-val-required="Name Required" />\
+                <br />\
+                <span class="field-validation-valid" data-valmsg-for="meeting_name_${count}" data-valmsg-replace="true"></span>\
+                </td>\
+            </tr>\
+            <tr>\
                 <td>Location</td>\
                 <td>\
                 <input type="text" size="10" name="meeting_location_${count}" value="${location}" data-val="true" data-val-required="Location Required" />\
@@ -119,6 +127,7 @@ function addMeetingTime(mt) {
         thu_check: mt.thu_check == "True" ? "checked='checked'" : "",
         fri_check: mt.fri_check == "True" ? "checked='checked'" : "",
         sat_check: mt.sat_check == "True" ? "checked='checked'" : "",
+        name: mt.name,
         location: mt.location,
         start: mt.start,
         end: mt.end

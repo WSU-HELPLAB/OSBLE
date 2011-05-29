@@ -44,6 +44,7 @@ namespace OSBLE.Controllers
                 if(Request.Params["meeting_location_" + i.ToString()] != null) {
                     CourseMeeting cm = new CourseMeeting();
 
+                    cm.Name = Request.Params["meeting_name_" + i.ToString()];
                     cm.Location = Request.Params["meeting_location_" + i.ToString()];
                     cm.StartTime = DateTime.Parse(Request.Params["meeting_start_" + i.ToString()]);
                     cm.EndTime = DateTime.Parse(Request.Params["meeting_end_" + i.ToString()]);

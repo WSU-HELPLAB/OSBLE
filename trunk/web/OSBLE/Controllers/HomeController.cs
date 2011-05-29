@@ -134,7 +134,7 @@ namespace OSBLE.Controllers
                         {
                             Event e = new Event();
 
-                            e.Title = "Course Meeting - " + cm.Location;
+                            e.Title = cm.Name + " - " + cm.Location;
                             e.StartDate = current.AddHours((double)cm.StartTime.Hour).AddMinutes((double)cm.StartTime.Minute);
                             e.EndDate = current.AddHours((double)cm.EndTime.Hour).AddMinutes((double)cm.EndTime.Minute);
                             e.AllowLinking = true;
