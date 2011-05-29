@@ -137,6 +137,7 @@
     <Content Include="App_Code\Libraries\LumenWorks.Framework.IO.dll" />
     <Content Include="App_Data\FirstNames.txt" />
     <Content Include="App_Data\LastNames.txt" />
+    <Content Include="Content\favicon.ico" />
     <Content Include="Content\images\account.png" />
     <Content Include="Content\images\add_up.png" />
     <Content Include="Content\images\ajax-loader.gif" />
