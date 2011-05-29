@@ -1,10 +1,10 @@
 ﻿@model OSBLE.Models.Course
 
 @{
-    ViewBag.Title = "Create";
+    ViewBag.Title = "Create Course";
 }
 
-<h2>Create</h2>
+<h2>Create Course</h2>
 
 <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
@@ -148,6 +148,13 @@
             @Html.CheckBoxFor(model => model.RequireInstructorApprovalForEventPosting) @Html.LabelFor(model => model.RequireInstructorApprovalForEventPosting) <br />
             @Html.ValidationMessageFor(model => model.RequireInstructorApprovalForEventPosting)
         </div>
+
+        <div class="editor-field">
+            @Html.CheckBoxFor(model => model.Inactive) @Html.LabelFor(model => model.Inactive) <br />
+            @Html.ValidationMessageFor(model => model.Inactive)
+        </div>
+
+
         <br />
         <div class="editor-field">
             @Html.LabelFor(model => model.CalendarWindowOfTime)

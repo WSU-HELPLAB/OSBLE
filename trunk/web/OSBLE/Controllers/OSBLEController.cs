@@ -127,8 +127,18 @@ namespace OSBLE.Controllers
                 {
                     SetUnreadMessageCount();
 
-                    // Get list of courses this user is connected to.
-                    currentCourses = db.CoursesUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
+                    List<CoursesUsers> allUsersCourses = db.CoursesUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
+
+                    // Get list of courses this user is connected to. Remove inactive (for students) or hidden (for all) courses.
+                    currentCourses = allUsersCourses.Where(cu => (cu.Course is Course) &&
+                        (((cu.Course as Course).Inactive == false) || (cu.CourseRole.CanModify)))
+                            // Order first by descending start date (newest first)
+                            .OrderByDescending(cu => (cu.Course as Course).StartDate)
+                            // Order next by whether the course is inactive, placing inactive courses underneath active.
+                            .OrderBy(cu=> (cu.Course as Course).Inactive).ToList();
+
+                    // Add communities under courses, ordered by name
+                    currentCourses = currentCourses.Concat(allUsersCourses.Where(cu => cu.Course is Community).OrderBy(cu => cu.Course.Name).ToList()).ToList();
 
                     // First we need to validate that the Active Course session variable is actually an integer.
                     if (context.Session["ActiveCourse"] != null && context.Session["ActiveCourse"].GetType() != typeof(int))

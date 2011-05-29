@@ -42,6 +42,8 @@ namespace OSBLE.Models
         [Display(Name = "Require instructor to approve student calendar items to appear in the calendar")]
         public bool RequireInstructorApprovalForEventPosting { get; set; }
 
+        [Display(Name = "Course is inactive (only instructors can log in)")]
+        public bool Inactive { get; set; }
 
         [Display(Name = "Start Date")]
         [DataType(DataType.Date)]
@@ -69,6 +71,7 @@ namespace OSBLE.Models
             AllowDashboardReplies = true;
             AllowEventPosting = true;
             RequireInstructorApprovalForEventPosting = true;
+            Inactive = false;
 
             StartDate = DateTime.Now.Date;
             EndDate = DateTime.Now.Date.AddDays(112); // Add 16 weeks.

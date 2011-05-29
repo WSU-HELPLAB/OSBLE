@@ -7,6 +7,11 @@ using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_cour
         @foreach (OSBLE.Models.CoursesUsers cu in ViewBag.CurrentCourses)
         {
             string courseDisplay = @Helpers.CourseTag(cu.Course) + " - " + cu.Course.Name + " (" + cu.CourseRole.Name + ")";
+
+			if((cu.Course is Course) && (cu.Course as Course).Inactive) {
+				courseDisplay += " [INACTIVE]";
+			}
+
             CoursesUsers ac = ViewBag.ActiveCourse as CoursesUsers;
 
             if ((ac != null) && (ac.CourseID == cu.CourseID))

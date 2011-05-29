@@ -157,6 +157,7 @@ namespace OSBLE.Controllers
 
             Course updateCourse = (Course)activeCourse.Course;
 
+            updateCourse.Inactive = course.Inactive;
             updateCourse.AllowDashboardPosts = course.AllowDashboardPosts;
             updateCourse.AllowDashboardReplies = course.AllowDashboardReplies;
             updateCourse.AllowEventPosting = course.AllowEventPosting;
