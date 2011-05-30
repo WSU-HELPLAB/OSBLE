@@ -185,6 +185,14 @@ namespace OSBLE.Controllers
                     FormsAuthentication.SignOut();
                 }
 
+                if (currentCourses.Where(c => c.Course is Community).Count() > 0)
+                {
+                    ViewBag.CourseListTitle = "Course/Community";
+                }
+                else
+                {
+                    ViewBag.CourseListTitle = "Course";
+                }
                 ViewBag.CurrentCourses = currentCourses;
 
 

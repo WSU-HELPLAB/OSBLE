@@ -1,6 +1,6 @@
 ﻿@using OSBLE.Models
 @if (ViewBag.CurrentCourses.Count > 0) {
-<text>Course: </text><br />
+<text>@(ViewBag.CourseListTitle): </text><br />
 using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_course" }))
 {
     <select name="course" id="course_select">
