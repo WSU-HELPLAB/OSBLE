@@ -83,6 +83,7 @@
     <Compile Include="Controllers\SubmissionAssignmentActivityController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="Models\AbstractCourse.cs" />
+    <Compile Include="Models\AbstractDashboard.cs" />
     <Compile Include="Models\AbstractGradable.cs" />
     <Compile Include="Models\AbstractRole.cs" />
     <Compile Include="Models\AssignmentActivity.cs" />
@@ -530,7 +531,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>25612</DevelopmentServerPort>
+          <DevelopmentServerPort>4414</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>

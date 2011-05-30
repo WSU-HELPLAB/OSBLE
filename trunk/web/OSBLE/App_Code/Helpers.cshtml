@@ -28,59 +28,13 @@
         }
 }
 
-@helper DisplayNameForDashboard(UserProfile user, AbstractCourse course, CoursesUsers activeCourse, Dictionary<int,List<CoursesUsers>> allCoursesUsers, bool show = false)
+@helper DisplayNameForDashboard(AbstractDashboard d)
     {
-@*
-        TODO: I need to simplify this. A lot.
-        Right now this will anonymize a user by their order in the students list.
-        How anonymous this is depends. Some lists may be entered alphabetically 
-        which wouldn't seen very anonymous. On the other hand, observers are supposed
-        to be trusted so this may be fine.            
-        *@
-        List<CoursesUsers> cus = (List<CoursesUsers>)allCoursesUsers[course.ID];
-        CoursesUsers thisUserCu = cus.Where(c => c.UserProfileID == user.ID).FirstOrDefault();
-
-        bool instructor = false, ta = false;
-        int anonymous = 0;
-
-        if (thisUserCu != null)
-        {
-            if (thisUserCu.CourseRole.CanModify == true)
+    <text>@d.DisplayName</text>
+            if (d.DisplayTitle != "")
             {
-                instructor = true;
-                show = true;
+    <text> <small><em>(@d.DisplayTitle)</em></small></text>
             }
-            else if (thisUserCu.CourseRole.CanGrade == true)
-            {
-                ta = true;
-                show = true;
-            }
-
-            anonymous = cus.IndexOf(thisUserCu);
-        }
-        else
-        {
-            show = false;
-        }
-
-        if (show || (activeCourse.UserProfileID == user.ID))
-        {
-    <text>@user.FirstName @user.LastName</text>
-            if (instructor && !(course is Community))
-            {
-    <text> <small><em>(Instructor)</em></small></text>
-            } else if (instructor && (course is Community)) {
-    <text> <small><em>(Leader)</em></small></text>                
-            }
-            else if (ta && !(course is Community))
-            {
-    <text> <small><em>(TA)</em></small></text>
-            }
-        }
-        else
-        {
-    <text>Anonymous @anonymous</text>
-        }
 }
 
 @helper DisplayDate(DateTime dt)

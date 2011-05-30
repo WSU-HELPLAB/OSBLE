@@ -1,51 +1,78 @@
 ﻿@using OSBLE.Models;
 @{
-    DashboardPost dp = ViewBag.dp;
+    AbstractDashboard dp = ViewBag.dp;
+    AbstractCourse course = new Course();
+    
+    if (dp is DashboardPost) {
+        course = (dp as DashboardPost).Course;
+    } else if (dp is DashboardReply) {
+        course = (dp as DashboardReply).Parent.Course;
+    }
+    
 }
 
         <div class="dp_post" id="dp_post_@(dp.ID)">
-            @{
-        bool canDelete = false;
-        bool show = true; // Should this post be anonymous?
-        List<CoursesUsers> cus = ViewBag.CurrentCourses;
-        CoursesUsers cu = cus.Where(c => c.CourseID == dp.CourseID && c.UserProfileID == ViewBag.CurrentUser.ID).FirstOrDefault();
-
-        if (cu != null && cu.CourseRole.CanGrade)
-        {
-            canDelete = true;
-        }
-
-        if (cu == null || cu.CourseRole.Anonymized == true)
-        {
-            show = false;
-        }
-            }
             <div class="dp_post_header">
-                @if (show || (dp.UserProfileID == ViewBag.CurrentUser.ID))
+                @* Reply Only *@
+                @if (dp is DashboardReply)
                 {
-                    @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dp.CourseID, userprofile = dp.UserProfileID }));
+                    <script>
+                        @* Updates maximum reply for this post so new replies can return any interim posts. *@
+                        $(function() {
+                            $('#latest_reply_@((dp as DashboardReply).Parent.ID)').val(Math.max($('#latest_reply_@((dp as DashboardReply).Parent.ID)').val(),@(dp.ID)));
+                        });
+                    </script>
+
+                }
+
+                @* Profile Picture *@
+
+                @if (dp.ShowProfilePicture)
+                {
+                    @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = course.ID, userprofile = dp.UserProfileID }));
                 }
                 else
                 {
                     @Helpers.DefaultProfilePicture();
                 }
+
+                @* Show course tag if viewing posts for all courses *@
+
                 @if (!ViewBag.DashboardSingleCourseMode)
                 {
-                    <span class="dp_course">@Helpers.CourseTag(dp.Course)</span>
+                    <span class="dp_course">@Helpers.CourseTag(course)</span>
                 }
-                @Helpers.DisplayNameForDashboard(dp.UserProfile, dp.Course, ViewBag.ActiveCourse, ViewBag.AllCoursesUsers, show)
+                
+                @* Poster's Name *@
+                
+                @Helpers.DisplayNameForDashboard(dp)
+
+                @* Mail and Delete Buttons *@
                 <span class="dp_tools">
-                @if (show && (dp.UserProfileID != ViewBag.CurrentUser.ID))
+                @if (dp.CanMail)
                 {
                     <a href="@Url.Action("Create", "Mail", new { recipientID = dp.UserProfileID })">@Helpers.MailButton()</a>
                 }
-                @if (canDelete || (dp.UserProfileID == ViewBag.CurrentUser.ID))
+                @if (dp.CanDelete)
                 {
-                    <form action="@Url.Action("DeletePost")"
+                    string deleteAction = "";
+                    string deleteConfirm = "";
+                    if (dp is DashboardPost)
+                    {
+                        deleteAction = "DeletePost";
+                        deleteConfirm = "Are you sure you want to delete this post and all its replies?";
+                    }
+                    else if (dp is DashboardReply)
+                    {
+                        deleteAction = "DeleteReply";
+                        deleteConfirm = "Are you sure you want to delete this reply?";
+                    }
+                        
+                    <form action="@Url.Action(deleteAction)"
                         style="display: inline;"
                         data-ajax="true"
                         data-ajax-success="$('#dp_post_@(dp.ID)').hide('blind',{},'slow',function(){$(this).remove();})"
-                        data-ajax-confirm="Are you sure you want to delete this post and all its replies?"
+                        data-ajax-confirm="@deleteConfirm"
                         method="post">
                         <input type="hidden" name="ID" value="@dp.ID" />
                         @Helpers.DeleteSubmit()
@@ -53,23 +80,31 @@
                 }
                 </span>
                 <br />
+                @* Posting Date *@
+
                 <span class="dp_posted">@Helpers.DisplayDate(dp.Posted)</span>
             </div>
+
+            @* Post Content *@
             <div class="dp_content">
                 @Helpers.Linkify(dp.Content)
             </div>
+
+            @if (dp is DashboardPost)
+            {
+            @* Post Replies *@
             <div class="dp_replies">
                 <div id="dp_replies_for_@(dp.ID)">
-                @foreach (DashboardReply dr in dp.Replies)
+                @foreach (DashboardReply dr in (dp as DashboardPost).Replies)
                 {
-                    ViewBag.dr = dr;
-                    ViewBag.dp = dp;
-                    ViewBag.canDelete = canDelete;
-                    ViewBag.show = show;                                
-                    @Html.Partial("_DashboardReply");
+                    ViewBag.dp = dr;
+                    @Html.Partial("_DashboardPost");
                 }
                 </div>
-                @if ((cu.CourseRole.CanGrade == true) || ((dp.Course is Course) && (dp.Course as Course).AllowDashboardReplies == true))
+
+                @* New Reply Box *@
+
+                @if ((dp as DashboardPost).CanReply)
                 {
                 <div class="dp_replylink">
                     <a href="#" id="reply_@(dp.ID)">Reply</a>
@@ -108,5 +143,7 @@
                 </script>
                 }
                 <div id="after_replies_@(dp.ID)"></div>
+            
             </div>
+            } @* End of Replies *@
         </div>

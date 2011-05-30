@@ -2,17 +2,19 @@
 @{
     DashboardReply dr = ViewBag.dr;
     DashboardPost dp = ViewBag.dp;
-    bool canDelete = ViewBag.canDelete;
-    bool show = ViewBag.show;
 }
 <div class="dp_post @if(ViewBag.hideReply != null) {<text>dp_new_post</text>}" id="dr_reply_@(dr.ID)" >
                         <div class="dp_post_header">
                         <script>
+                        @* Updates maximum reply for this post so new replies can return any interim posts. *@
                         $(function() {
                             $('#latest_reply_@(dp.ID)').val(Math.max($('#latest_reply_@(dp.ID)').val(),@(dr.ID)));
                         });
                         </script>
-                            @if (show || (dr.UserProfileID == ViewBag.CurrentUser.ID))
+
+                            @* Profile Picture *@
+
+                            @if (dr.ShowProfilePicture)
                             {
                                 @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dp.CourseID, userprofile = dr.UserProfileID }));
                             }
@@ -20,14 +22,22 @@
                             {
                                 @Helpers.DefaultProfilePicture();
                             }
-                            @Helpers.DisplayNameForDashboard(dr.UserProfile, dp.Course, ViewBag.ActiveCourse, ViewBag.AllCoursesUsers, show)
+
+
+                            @* Poster's Name *@
+
+                            @Helpers.DisplayNameForDashboard(dr)
+
+                            @* Mail and Delete Buttons *@
+
                             <span class="dp_tools">
-                            @if (show && (dr.UserProfileID != ViewBag.CurrentUser.ID))
+                            @if (dr.CanMail)
                             {
                                 <a href="@Url.Action("Create", "Mail", new { recipientID = dr.UserProfileID })">@Helpers.MailButton()</a>
                             }
-                            @if (canDelete || (dr.UserProfileID == ViewBag.CurrentUser.ID))
+                            @if (dr.CanDelete)
                             {
+                                @* AJAX Delete Call. On success, remove the reply from display. *@
                                 <form action="@Url.Action("DeleteReply")"
                                     style="display: inline;"
                                     data-ajax="true"
@@ -40,7 +50,13 @@
                             }
                             </span>
                             <br />
+
+                            @* Posting Date *@
+
                             <span class="dp_posted">@Helpers.DisplayDate(dr.Posted)</span>
                         </div>
+
+                        @* Reply Content *@
+
                         <div class="dp_content">@Helpers.Linkify(dr.Content)</div>
                     </div>

@@ -28,11 +28,12 @@ namespace OSBLE.Controllers
 
             List<int> ViewedCourses = new List<int>();
 
+            // Single course mode. Only display posts for the active course.
             if (DashboardSingleCourseMode)
             {
                 ViewedCourses.Add(activeCourse.CourseID);
             }
-            else
+            else // All course mode. Display posts for all non-hidden courses the user is attached to.
             {
                 foreach (CoursesUsers cu in currentCourses)
                 {
@@ -51,20 +52,27 @@ namespace OSBLE.Controllers
                 startPost = Convert.ToInt32(Request.Params["startPost"]);
             }
 
+            // First get all posts to do a count and do proper paging
             IQueryable<DashboardPost> dashboardPosts = db.DashboardPosts.Where(d => ViewedCourses.Contains(d.CourseID)).OrderByDescending(d => d.Posted);
             ViewBag.DashboardPostCount = dashboardPosts.Count();
+            
+            // Only send items in page to the dashboard.
             ViewBag.DashboardPosts = dashboardPosts.Skip(startPost).Take(postsPerPage).ToList();
             ViewBag.StartPost = startPost;
-            
-            ViewBag.PostsPerPage = postsPerPage;
 
-            // Serve list of course roles to view so it can identify instructors/TAs as well as find positions in classes
-            ViewBag.AllCoursesUsers = getAllCoursesUsers();
+            // Set up display settings for each post (recursively sets up replies.)
+            foreach (DashboardPost dp in ViewBag.DashboardPosts)
+            {
+                setupPostDisplay(dp);
+            }
+
+            ViewBag.PostsPerPage = postsPerPage;
 
             #endregion Activity Feed View
 
             #region Notifications
 
+            // Load all unread notifications for the current user to display on the dashboard.
             ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == currentUser.ID) && (n.Read == false)).OrderByDescending(n => n.Posted).ToList();
 
             #endregion
@@ -161,17 +169,115 @@ namespace OSBLE.Controllers
             return View();
         }
 
-        private Dictionary<int,List<CoursesUsers>> getAllCoursesUsers()
-        {
-            Dictionary<int,List<CoursesUsers>> AllCoursesUsers = new Dictionary<int,List<CoursesUsers>>();
-            foreach (CoursesUsers cu in currentCourses)
+        /// <summary>
+        /// Sets up display settings for dashboard posts and replies.  
+        /// </summary>
+        /// <param name="post">The post or reply to be set up</param>
+        /// <param name="courseList"></param>
+        private void setupPostDisplay(AbstractDashboard post) {
+            List<CoursesUsers> courseList = new List<CoursesUsers> ();
+
+            // Get list of users in course, either from the root post or its parent in the case of a reply.
+            if (post is DashboardPost)
             {
-                AllCoursesUsers[cu.CourseID] = db.CoursesUsers.Where(c => c.CourseID == cu.CourseID).ToList();
+                DashboardPost dp = post as DashboardPost;
+                courseList = db.CoursesUsers.Where(c => c.CourseID == dp.CourseID).ToList();
+            }
+            else if (post is DashboardReply)
+            {
+                DashboardReply dr = post as DashboardReply;
+                courseList = db.CoursesUsers.Where(c => c.CourseID == dr.Parent.CourseID).ToList();
             }
 
-            return AllCoursesUsers;
+            // Get Course/User link for current user.
+            CoursesUsers currentCu = courseList.Where(c => c.UserProfileID == currentUser.ID).FirstOrDefault();
+
+            // " " for poster of post/reply.
+            CoursesUsers posterCu = courseList.Where(c => c.UserProfileID == post.UserProfileID).FirstOrDefault();
+
+            // Setup Display Name/Display Title/Profile Picture/Mail Button/Delete Button
+
+            // If user is not anonymous, this post was written by current user, or the poster is an Instructor/TA, display name and picture.
+            if (!currentCu.CourseRole.Anonymized || (currentCu.UserProfileID == posterCu.UserProfileID) || posterCu.CourseRole.CanGrade)
+            {
+                // Display Name
+                post.DisplayName = posterCu.UserProfile.FirstName + " " + posterCu.UserProfile.LastName;
+                
+                // Display Titles for Instructors/TAs for Courses, or Leader of Communities.
+                if (posterCu.Course is Community)
+                {
+                    if (posterCu.CourseRoleID == (int)CommunityRole.OSBLERoles.Leader)
+                    {
+                        post.DisplayTitle = "Leader";
+                    }
+                }
+                else if (posterCu.Course is Course)
+                {
+                    if (posterCu.CourseRoleID == (int)CourseRole.OSBLERoles.Instructor)
+                    {
+                        post.DisplayTitle = "Instructor";
+                    }
+                    else if (posterCu.CourseRoleID == (int)CourseRole.OSBLERoles.TA)
+                    {
+                        post.DisplayTitle = "TA";
+                    }
+                }
+
+                // Allow deletion if current user is poster or is an instructor
+                if ((posterCu.UserProfileID == currentCu.UserProfileID) || currentCu.CourseRole.CanModify)
+                {
+                    post.CanDelete = true;
+                }
+
+                // If current user is not the poster, allow mailing
+                if (posterCu.UserProfileID != currentCu.UserProfileID)
+                {
+                    post.CanMail = true;
+                }
+
+                post.ShowProfilePicture = true;
+            }
+            else // Display anonymous name.
+            {
+                // Anonymous number is currently the number of the student in the course list.
+                // TODO: Investigate better anonymous numbering?
+                post.DisplayName = "Anonymous " + courseList.IndexOf(posterCu);
+
+                // Profile picture will display default picture.
+                post.ShowProfilePicture = false;
+                post.CanMail = false;
+                post.CanDelete = false;
+            }
+
+            // For posts, set reply box display if the course allows replies or if Instructor/TA.
+            if ( post is DashboardPost && 
+                (
+                (currentCu.Course is Course && 
+                    ((currentCu.Course as Course).AllowDashboardReplies)
+                     || (currentCu.CourseRole.CanGrade))
+                // For communities, always allow replies
+                || (currentCu.Course is Community)
+                )
+               )
+            {
+                (post as DashboardPost).CanReply = true;
+            }
+            else if (post is DashboardPost && currentCu.Course is Community) // Communities always allow replies.
+            {
+                (post as DashboardPost).CanReply = true;
+            }
+
+            // Also for posts only, recursively set the display for their replies.
+            if (post is DashboardPost)
+            {
+                foreach (DashboardReply dr in (post as DashboardPost).Replies)
+                {
+                    setupPostDisplay(dr);
+                }
+            }
 
         }
+
         public ActionResult NoCourses()
         {
             if (ActiveCourse != null)
@@ -329,8 +435,16 @@ namespace OSBLE.Controllers
                 }
 
                 ViewBag.dp = replyToPost;
-                ViewBag.DashboardReplies = replyToPost.Replies.Where(r => r.ID > latestReply).ToList();
-                ViewBag.AllCoursesUsers = getAllCoursesUsers();
+                List<DashboardReply> replys = replyToPost.Replies.Where(r => r.ID > latestReply).ToList();
+
+                foreach (DashboardReply r in replys)
+                {
+                    setupPostDisplay(r);
+                }
+
+                ViewBag.DashboardReplies = replys;
+
+                
             }
             else
             {
