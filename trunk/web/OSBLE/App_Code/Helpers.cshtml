@@ -3,6 +3,7 @@
 @using System.Collections
 @using System.Web.Mvc
 
+@* Section headers for user tabs. *@
 @helper DisplaySection(string sectionNum)
     {
         if (sectionNum != "0")
@@ -28,6 +29,7 @@
         }
 }
 
+@* For dashboard posts/replies, echos display name along with optional title. *@
 @helper DisplayNameForDashboard(AbstractDashboard d)
     {
     <text>@d.DisplayName</text>
@@ -37,10 +39,13 @@
             }
 }
 
+@* Formats date consistently for display *@
 @helper DisplayDate(DateTime dt)
     {
     @dt.ToLongDateString()<text> </text>@dt.ToShortTimeString()
 }
+
+@* Buttons for editing/submitting *@
 
 @helper MailButton()
     {<img src="../../Content/images/mail_up.png" />}
@@ -57,9 +62,11 @@
 @helper DeleteSubmit()
     {<input type="image" src="../../Content/images/delete_up.png" alt="Delete Button" />}
 
+@* Returns last 4 digits of student ID for pending students *@
 @helper DisplayLastFourID(string Identification)
     { <text>(@Identification.Substring(Math.Max(Identification.Length - 4, 0), Math.Min(Identification.Length, 4)))</text>}
 
+@* For Users tab, either shows user's name or 'Pending' plus the last 4 of their ID *@
 @helper DisplayFullNameOrPending(UserProfile user)
     {
         if (user.UserName != null)
@@ -72,16 +79,20 @@
         }
 }
 
+@* Standard wrapper for profile pic *@
 @helper ProfilePicture(string url)
     {
     <img src="@url" alt="Profile Picture" class="profile_picture" />
 }
 
+@* Smaller thumbnail for profile pic *@
 @helper SmallProfilePicture(string url)
     {
     <img src="@url" alt="Profile Picture" class="small_profile_picture" />
 }
 
+@* Finds http links in content and turns them into clickable links.
+Also runs content through nl2br to convert newlines to <br /> tags. *@
 @helper Linkify(string text)
     {
         List<string> links = LinkifyHelper(text);
@@ -100,11 +111,13 @@
         }
 }
 
+@* Returns default profile picture (saves lookups to the controller for profile pic) *@
 @helper DefaultProfilePicture()
     {
     <img src="/Content/images/default.jpg" alt="Profile Picture" class="profile_picture" />
 }
 
+@* Converts new lines to html <br /> tags in a content area. *@
 @helper nl2br(string content)
     {
         string[] s = content.Split('\n');
@@ -118,6 +131,7 @@
         }
 }
 
+@* Displays the tag for the course/community (e.g. CptS 121 or Comm) *@
 @helper CourseTag(AbstractCourse ac)
     {
     if (ac is Community)
