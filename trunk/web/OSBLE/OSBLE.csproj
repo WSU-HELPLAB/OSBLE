@@ -473,7 +473,9 @@
     <Content Include="Views\Event\Details.cshtml" />
     <Content Include="Views\Event\Create.cshtml" />
     <Content Include="Views\Event\Edit.cshtml" />
-    <Content Include="Views\Event\Delete.cshtml" />
+    <Content Include="Views\Event\NeedsApproval.cshtml" />
+    <Content Include="Views\Event\AlreadyApproved.cshtml" />
+    <Content Include="Views\Event\Approval.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

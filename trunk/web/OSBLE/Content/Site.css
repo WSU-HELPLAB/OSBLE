@@ -930,6 +930,7 @@ ul.selector
     border: 1px solid #eeeeff;
     border-bottom: 3px solid #eeeeff;
     padding: 3px;
+    margin-bottom: 5px;
 }
 
 #notifications_list li.read, #notifications_read_legend
@@ -990,3 +991,52 @@ ul.selector
 {
     clear:both;
 }
+
+#past_events 
+{
+    display: none;
+}
+
+.event_description 
+{
+    padding: 3px;
+
+    margin-top: 2px;
+    margin-bottom: 2px;    
+}
+
+.event_approval th, .event_approval td
+{
+    vertical-align: top;
+}
+
+.event_approval th 
+{
+    width: 100px;
+    text-align: left;
+}
+
+.event_approval td
+{
+    width: 300px;
+    border: 1px solid #eeeeff;
+}
+
+#event_list li.event_date
+{
+    border: none;
+    border-bottom: 1px solid #eeeeff;
+    font-variant: small-caps;
+    margin-left: 0;
+}
+
+#event_list li 
+{
+    margin-left: 15px;
+}
+
+.event_time 
+{
+    color: #074974;
+}
+

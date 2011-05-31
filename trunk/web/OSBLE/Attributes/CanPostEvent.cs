@@ -25,8 +25,8 @@ namespace OSBLE.Attributes
 
                 if (ac is Course)
                 {
-                    // Course allows Instructors or TAs to post events.
-                    if (!(controller.ActiveCourse.CourseRole.CanGrade || controller.ActiveCourse.Course.AllowEventPosting))
+                    // Course allows Instructors to post events.
+                    if (!(controller.ActiveCourse.CourseRole.CanModify || controller.ActiveCourse.Course.AllowEventPosting))
                     {
                         filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
                     }

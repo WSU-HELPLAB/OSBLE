@@ -1,32 +1,94 @@
 ﻿@using OSBLE.Models
 
+@{
+    DateTime lastDate = DateTime.Parse("1/1/1990");
+}
 <ul id="event_list">
 @foreach (Event e in ViewBag.Events)
 {
-    <li>
-        <small>@ShowDateTime(e.StartDate,e)
-        @if (e.EndDate != null)
+    if (lastDate.Date != e.StartDate.Date)
+    {
+        lastDate = e.StartDate.Date;   
+        <li class="event_date">
+            @ShowDate(lastDate)
+        </li>
+    }
+    <li id="event_@(e.ID)">
+
+
+        <div class="event_tools">
+            @if (ViewBag.ActiveCourse.Course.AllowEventPosting && e.AllowLinking)
+            {
+            <a href="@Url.Action("Create", "Event", new { start = e.StartDate })">@Helpers.AddButton()</a>
+            }
+
+            @if (ViewBag.ActiveCourse.CourseRole.CanModify && !e.HideDelete)
+            {
+            <a href="@Url.Action("Edit", "Event", new { ID = e.ID })">@Helpers.EditButton()</a>
+            }
+
+            @if (ViewBag.ActiveCourse.CourseRole.CanModify && !e.HideDelete)
+            {
+                    <form action="@Url.Action("Delete","Event")"
+                        style="display: inline;"
+                        data-ajax="true"
+                        data-ajax-success="$('#event_@(e.ID)').hide('blind',{},'slow',function(){$(this).remove();})"
+                        data-ajax-confirm="Are you sure you want to delete this event?"
+                        method="post">
+                        <input type="hidden" name="ID" value="@e.ID" />
+                        @Helpers.DeleteSubmit()
+                    </form>
+            }
+        </div>
+
+
+        @if (!e.NoDateTime)
         {
-            <text>&mdash; @ShowTime(e.EndDate,e)</text>
+        <div class="event_time">
+        <small>
+        
+        
+        @ShowEventTime(e.StartDate, e)
+        @if ((e.ID == 0) && (e.EndDate != null))
+        {
+            <text>&mdash; @ShowTime(e.EndDate, e)</text>
         }
         </small>
-        <br />
-        <span>@e.Title</span>
+        </div>
+        }
+        <div>
+        <small><b>@e.Title</b></small>
+        </div>
             
+        @if (e.Description != null)
+        {
+            <div class="event_description">
+            <small>@e.Description</small>
+            </div>
+        }
+        
+        @if ((e.LinkTitle != null) && (e.Link != null))
+        {
+            <small><a href="@e.Link">@e.LinkTitle</a></small>
+        }
     </li>
 }
 </ul>
 
-@helper ShowTime (DateTime dt, Event e) {
+@helper ShowTime(DateTime dt, Event e)
+    {
     @dt.ToString("h:mm tt");
 }
 
-@helper ShowDateTime(DateTime dt, Event e) {
-    if(!e.HideTime) {
-        @dt.ToString("ddd M/dd h:mm tt");
-    }
-    else
+@helper ShowEventTime(DateTime dt, Event e)
     {
-        @dt.ToString("ddd M/dd");
-    }
+        if (!e.HideTime)
+        {
+        @dt.ToString("h:mm tt");
+        }
+}
+
+@helper ShowDate(DateTime dt)
+    {
+    @dt.ToString("dddd, MMMMM d, yyyy");
 }

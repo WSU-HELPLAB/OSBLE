@@ -17,7 +17,12 @@
 <p>@Html.ActionLink("Show All Notifications", "Index", "Notification")</p>
 </div>
 
-<h3>Events &amp; Deadlines</h3>
+<h3>Events &amp; Deadlines 
+@if (@ViewBag.ActiveCourse.CourseRole.CanModify || @ViewBag.ActiveCourse.Course.AllowEventPosting)
+{
+<a href="@Url.Action("Create","Event")">@Helpers.AddButton()</a>
+}
+</h3>
 
 <div id="important_dates">
 <p>Next @ViewBag.ActiveCourse.Course.CalendarWindowOfTime Weeks</p>

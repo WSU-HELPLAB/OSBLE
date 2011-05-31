@@ -34,6 +34,8 @@ namespace OSBLE.Controllers
                 {
                     case Notification.Types.Mail:
                         return RedirectToAction("View", "Mail", new { ID = n.ItemID });
+                    case Notification.Types.EventApproval:
+                        return RedirectToAction("Approval", "Event", new { ID = n.ItemID });
                 }
             }
 
