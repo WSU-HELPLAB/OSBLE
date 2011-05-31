@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System;
 
 namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
 {
@@ -146,7 +147,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
                     else
                     {
                         //this is a bug fix until I learn how to get the position of LineBreaks
-                        index = (textStart.GetNextInsertionPosition(LogicalDirection.Forward));
+                        index = (textStart.GetNextInsertionPosition(LogicalDirection.Backward));
                     }
                     rect = MakeRectange(textStart, index);
                     if (rect != null)
@@ -156,11 +157,17 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
                     textStart = index.GetNextInsertionPosition(LogicalDirection.Forward);
                     start = textStart.GetCharacterRect(LogicalDirection.Forward);
                 }
+                
                 rect = MakeRectange(textStart, textEnd);
                 if (rect != null)
                 {
                     rectangles.Add(rect);
                 }
+            }
+
+            if (rectangles.Count == 0)
+            {
+                throw new Exception("Can't make comments on newlines");
             }
             return rectangles;
         }
@@ -201,8 +208,11 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
 
         #region HelperFunctions
 
+
+
         private Rectangle MakeRectange(TextPointer tpStart, TextPointer tpEnd)
         {
+
             //We get the rect for the first and last char
             if (tpStart == null || tpEnd == null)
             {

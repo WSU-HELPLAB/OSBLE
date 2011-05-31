@@ -305,11 +305,20 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
             selectionHighlighting.Canvas = HighlightOverlay;
             //selectionHighlighting.FillBrush = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
             selectionHighlighting.FillBrush = new SolidColorBrush(Color.FromArgb(100, 100, 175, 200));
+            
             selectionHighlighting.StrokeBrush = new SolidColorBrush(Colors.Transparent);
             selectionHighlighting.Opacity = 0;
-            currentSelection = selectionHighlighting.Update();
+            try
+            {
+                currentSelection = selectionHighlighting.Update();
+            }
+            catch
+            {
+                currentSelection = null;
+            }
+            
 
-            if (thisView.DocumentViewer.Selection.Text == null || thisView.DocumentViewer.Selection.Text == "")
+            if (currentSelection== null || currentSelection.Count == 0)
             {
                 reviewItemSelected = false;
             }
@@ -468,8 +477,17 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
         {
             var newLines = from c in ContentBlock.Inlines where c is LineBreak select c;
 
-            TextPointer tp = newLines.ElementAt(lineNumber).ElementEnd;
-            tp = tp.GetNextInsertionPosition(LogicalDirection.Forward);
+            TextPointer tp;
+            if (lineNumber == 0)
+            {
+                tp = ContentBlock.ContentStart;
+                tp = tp.GetNextInsertionPosition(LogicalDirection.Forward);
+            }
+            else
+            {
+                tp = newLines.ElementAt(lineNumber - 1).ElementEnd;
+                tp = tp.GetNextInsertionPosition(LogicalDirection.Forward);
+            }
 
             int count = 0;
             while (count < index)
