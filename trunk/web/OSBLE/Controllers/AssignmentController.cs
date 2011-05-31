@@ -10,7 +10,7 @@ using OSBLE.Models.Gradables.StudioAssignment;
 namespace OSBLE.Controllers
 {
     [Authorize]
-    [ActiveCourseAttribute]
+    [RequireActiveCourse]
     [NotForCommunity]
     public class AssignmentController : OSBLEController
     {

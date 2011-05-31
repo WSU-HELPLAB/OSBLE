@@ -119,7 +119,7 @@ namespace OSBLE.Controllers
                 List<MenuItem> menu = new List<MenuItem>();
 
                 menu.Add(new MenuItem("Dashboard", "Home", "Index"));
-                menu.Add(new MenuItem("Assignments", "Assignment", "Index", false, false, true, false, true, false));
+                menu.Add(new MenuItem("Assignments", "Assignment", "Index", false, false, false, false, true, false));
                 menu.Add(new MenuItem("Grades", "Gradebook", "Index", false, false, true, false, true, false));
                 menu.Add(new MenuItem("Users", "Roster", "Index", false, true, false, false, false, false));
                 menu.Add(new MenuItem("Course Settings", "Course", "Edit", true, true, true, false, true, false));
