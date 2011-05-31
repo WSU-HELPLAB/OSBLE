@@ -57,10 +57,10 @@ namespace OSBLE.Controllers
         {
             assignment.Deliverables = new List<Deliverable>();
 
-            if (assignment.ReleaseDate >= assignment.DueDate)
-            {
+            //if (assignment.ReleaseDate >= assignment.DueDate)
+            //{
                 ModelState.AddModelError("time", "The due date must come after the release date");
-            }
+            //}
 
             if (ModelState.IsValid)
             {
