@@ -42,7 +42,7 @@ namespace OSBLE.Models
         [Display(Name = "Require instructor to approve student calendar items to appear in the calendar")]
         public bool RequireInstructorApprovalForEventPosting { get; set; }
 
-        [Display(Name = "Course is inactive (only instructors can log in)")]
+        [Display(Name = "Course is inactive (only instructors/observers can log in)")]
         public bool Inactive { get; set; }
 
         [Display(Name = "Start Date")]
@@ -64,7 +64,7 @@ namespace OSBLE.Models
         [Display(Name = "Course Breaks")]
         public virtual ICollection<CourseBreak> CourseBreaks { get; set; }
 
-        [Display(Name = "Show course meetings and breaks in course calendar")]
+        [Display(Name = "Include course meetings and breaks in course calendar")]
         public bool ShowMeetings { get; set; }
 
         public Course() : base()
@@ -73,7 +73,7 @@ namespace OSBLE.Models
             AllowDashboardPosts = true;
             AllowDashboardReplies = true;
             AllowEventPosting = true;
-            RequireInstructorApprovalForEventPosting = true;
+            RequireInstructorApprovalForEventPosting = false;
             Inactive = false;
             ShowMeetings = true;
 
