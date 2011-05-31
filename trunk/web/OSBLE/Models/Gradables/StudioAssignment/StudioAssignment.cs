@@ -7,6 +7,6 @@ namespace OSBLE.Models.Gradables.StudioAssignment
 {
     public class StudioAssignment
     {
-        public virtual ICollection<AssignmentActivity> AssignmentActivities;
+        public virtual ICollection<AssignmentActivity> AssignmentActivities { get; set; }
     }
 }
