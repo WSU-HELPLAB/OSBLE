@@ -10,7 +10,7 @@ using OSBLE.Models.Gradables;
 namespace OSBLE.Controllers
 {
     [Authorize]
-    [ActiveCourseAttribute]
+    [RequireActiveCourse]
     [NotForCommunity]
     public class DeliverableController : OSBLEController
     {

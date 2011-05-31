@@ -14,6 +14,11 @@ namespace OSBLE.Controllers
     [NotForCommunity]
     public class AssignmentController : OSBLEController
     {
+        public AssignmentController()
+            : base()
+        {
+            ViewBag.CurrentTab = "Assignments";
+        }
         //
         // GET: /Assignment/
 
