@@ -53,7 +53,7 @@ namespace OSBLE.Controllers
         /// <param name="position">The relative position of the gradable with respect to other gradables for the current Weight</param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult EditColumn(int gradableId, string colunmName, int pointsPossible, int position)
+        public void EditColumn(int gradableId, string colunmName, int pointsPossible, int position)
         {
             if (ModelState.IsValid)
             {
@@ -67,14 +67,8 @@ namespace OSBLE.Controllers
                     gradable.PossiblePoints = pointsPossible;
                     gradable.Position = position;
                     db.SaveChanges();
-                    return Json("complete");
-                }
-                else
-                {
-                    return Json("error");
                 }
             }
-            return Json("error");
         }
 
         /// <summary>
@@ -83,12 +77,11 @@ namespace OSBLE.Controllers
         /// <param name="gradableId">The ID of the gradable to remove</param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult DeleteColumn(int gradableId)
+        public void DeleteColumn(int gradableId)
         {
             Gradable gradable = db.Gradables.Find(gradableId);
             db.AbstractGradables.Remove(gradable);
             db.SaveChanges();
-            return Json("complete");
         }
 
         private ColumnAction StringToColumnAction(string action)
@@ -127,14 +120,15 @@ namespace OSBLE.Controllers
             if(gradableId != 0)
             {
                 Gradable gradable = (from g in db.Gradables where g.ID == gradableId select g).First();
-                if (action == ColumnAction.InsertLeft)
+                switch (action)
                 {
-                    int position = (gradable.Position == 0) ? 0 : gradable.Position - 1;
-                    AddColumn("Untitled", 0, position);
-                }
-                else if (action == ColumnAction.InsertRight)
-                {
-                    AddColumn("Untitled", 0, gradable.Position + 1);
+                    case ColumnAction.InsertLeft:
+                        int position = (gradable.Position == 0) ? 0 : gradable.Position - 1;
+                        AddColumn("Untitled", 0, position);
+                        break;
+                    case ColumnAction.InsertRight:
+                        AddColumn("Untitled", 0, gradable.Position + 1);
+                        break;
                 }
             }
             
