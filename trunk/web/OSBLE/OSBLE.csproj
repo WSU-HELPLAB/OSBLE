@@ -470,6 +470,7 @@
     <Content Include="Views\Event\NeedsApproval.cshtml" />
     <Content Include="Views\Event\AlreadyApproved.cshtml" />
     <Content Include="Views\Event\Approval.cshtml" />
+    <Content Include="Views\Mail\NotFound.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

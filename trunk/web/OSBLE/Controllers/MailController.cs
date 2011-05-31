@@ -36,6 +36,12 @@ namespace OSBLE.Controllers
         public ActionResult View(int id)
         {
             Mail mail = db.Mails.Find(id);
+
+            // Mail not found
+            if (mail == null)
+            {
+                return View("NotFound");
+            }
             // Unauthorized mail to view.
             if ((mail.ToUserProfile != currentUser) && (mail.FromUserProfile != currentUser))
             {
