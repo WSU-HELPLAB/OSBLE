@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using OSBLE.Models;
+using OSBLE.Models.HomePage;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Controllers
 {
@@ -14,7 +14,7 @@ namespace OSBLE.Controllers
         // GET: /Notification/
         public ActionResult Index()
         {
-            ViewBag.Notifications = db.Notifications.Where(n => n.RecipientID == currentUser.ID).OrderByDescending(n=>n.Posted).ToList();
+            ViewBag.Notifications = db.Notifications.Where(n => n.RecipientID == currentUser.ID).OrderByDescending(n => n.Posted).ToList();
             return View();
         }
 
@@ -60,7 +60,7 @@ namespace OSBLE.Controllers
                 Response.StatusCode = 403;
             }
 
-            return View("_AjaxEmpty");            
+            return View("_AjaxEmpty");
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace OSBLE.Controllers
         public void SendEventApprovalNotification(Event e)
         {
             // Get all instructors in the course.
-            List <UserProfile> instructors = db.CoursesUsers.Where(c => (c.CourseID == e.CourseID)
+            List<UserProfile> instructors = db.CoursesUsers.Where(c => (c.CourseID == e.CourseID)
                 && (c.CourseRoleID == (int)CourseRole.OSBLERoles.Instructor))
                 .Select(c => c.UserProfile).ToList();
 
@@ -108,6 +108,5 @@ namespace OSBLE.Controllers
 
             db.SaveChanges();
         }
-
     }
 }

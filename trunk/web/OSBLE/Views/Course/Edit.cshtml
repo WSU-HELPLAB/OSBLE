@@ -1,6 +1,7 @@
-﻿@model OSBLE.Models.Course
+﻿
+@model OSBLE.Models.Courses.Course
 
-@using OSBLE.Models
+@using OSBLE.Models.Courses
 
 @{
     ViewBag.Title = "Modify Course";
@@ -126,7 +127,7 @@
                 thu_check: "@cm.Thursday",
                 fri_check: "@cm.Friday",
                 sat_check: "@cm.Saturday",
-				name: "@cm.Name",
+                name: "@cm.Name",
                 location: "@cm.Location",
                 start: "@cm.StartTime.ToString("h:mm tt")",
                 end: "@cm.EndTime.ToString("h:mm tt")"

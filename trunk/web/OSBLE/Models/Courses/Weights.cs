@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.Gradables;
 
-namespace OSBLE.Models
+namespace OSBLE.Models.Courses
 {
     /// <summary>
     /// This is the coursework weights
@@ -23,6 +24,7 @@ namespace OSBLE.Models
         //that this isn't possible in EF 4.1
         [Required]
         public int CourseID { get; set; }
+
         public virtual Course Course { get; set; }
 
         [Required]

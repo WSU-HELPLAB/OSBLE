@@ -74,32 +74,28 @@
     <Compile Include="Attributes\FileCacheAttribute.cs" />
     <Compile Include="Attributes\IsCommunity.cs" />
     <Compile Include="Attributes\NotForCommunity.cs" />
-    <Compile Include="Controllers\AssignmentActivityController.cs" />
     <Compile Include="Controllers\AssignmentController.cs" />
     <Compile Include="Controllers\CommunityController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
     <Compile Include="Controllers\DeliverableController.cs" />
     <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
-    <Compile Include="Controllers\SubmissionAssignmentActivityController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
-    <Compile Include="Models\AbstractCourse.cs" />
-    <Compile Include="Models\AbstractDashboard.cs" />
-    <Compile Include="Models\AbstractGradable.cs" />
-    <Compile Include="Models\AbstractRole.cs" />
-    <Compile Include="Models\AssignmentActivity.cs" />
-    <Compile Include="Models\Assignment.cs" />
-    <Compile Include="Models\Community.cs" />
-    <Compile Include="Models\CommunityRole.cs" />
-    <Compile Include="Models\CourseBreak.cs" />
-    <Compile Include="Models\CourseMeeting.cs" />
-    <Compile Include="Models\Deliverable.cs" />
-    <Compile Include="Models\Event.cs" />
-    <Compile Include="Models\Submission.cs" />
-    <Compile Include="Models\SubmissionActivitySetting.cs" />
-    <Compile Include="Models\Gradable.cs" />
-    <Compile Include="Models\GradableScore.cs" />
-    <Compile Include="Models\Weights.cs" />
+    <Compile Include="Models\Courses\AbstractCourse.cs" />
+    <Compile Include="Models\HomePage\AbstractDashboard.cs" />
+    <Compile Include="Models\Gradables\AbstractGradable.cs" />
+    <Compile Include="Models\Courses\AbstractRole.cs" />
+    <Compile Include="Models\Gradables\StudioAssignment\AssignmentActivity.cs" />
+    <Compile Include="Models\Gradables\StudioAssignment\SubmissionActivitySettings.cs" />
+    <Compile Include="Models\Courses\Community.cs" />
+    <Compile Include="Models\Courses\CommunityRole.cs" />
+    <Compile Include="Models\Courses\CourseBreak.cs" />
+    <Compile Include="Models\Courses\CourseMeeting.cs" />
+    <Compile Include="Models\Gradables\Deliverable.cs" />
+    <Compile Include="Models\HomePage\Event.cs" />
+    <Compile Include="Models\Gradables\Gradable.cs" />
+    <Compile Include="Models\Gradables\GradableScore.cs" />
+    <Compile Include="Models\Courses\Weights.cs" />
     <Compile Include="Utility\FileSystem.cs" />
     <Compile Include="Attributes\CanModifyCourse.cs" />
     <Compile Include="Attributes\CanSeeAllCourse.cs" />
@@ -123,15 +119,15 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountModels.cs" />
-    <Compile Include="Models\Mail.cs" />
-    <Compile Include="Models\Course.cs" />
-    <Compile Include="Models\CourseRole.cs" />
-    <Compile Include="Models\CoursesUsers.cs" />
-    <Compile Include="Models\DashboardPost.cs" />
-    <Compile Include="Models\DashboardReply.cs" />
-    <Compile Include="Models\Notification.cs" />
+    <Compile Include="Models\Users\Mail.cs" />
+    <Compile Include="Models\Courses\Course.cs" />
+    <Compile Include="Models\Courses\CourseRole.cs" />
+    <Compile Include="Models\Courses\CoursesUsers.cs" />
+    <Compile Include="Models\HomePage\DashboardPost.cs" />
+    <Compile Include="Models\HomePage\DashboardReply.cs" />
+    <Compile Include="Models\HomePage\Notification.cs" />
     <Compile Include="Models\OSBLEContext.cs" />
-    <Compile Include="Models\UserProfile.cs" />
+    <Compile Include="Models\Users\UserProfile.cs" />
     <Compile Include="Models\School.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -451,12 +447,10 @@
     <Content Include="Views\Assignment\Create.cshtml" />
     <Content Include="Views\Assignment\Edit.cshtml" />
     <Content Include="Views\Assignment\Delete.cshtml" />
-    <Content Include="Views\Course\Details.cshtml" />
     <Content Include="Views\Course\Create.cshtml" />
     <Content Include="Views\Course\Edit.cshtml" />
     <Content Include="Views\Course\Delete.cshtml" />
     <Content Include="Views\Community\Index.cshtml" />
-    <Content Include="Views\Community\Details.cshtml" />
     <Content Include="Views\Community\Create.cshtml" />
     <Content Include="Views\Community\Edit.cshtml" />
     <Content Include="Views\Community\Delete.cshtml" />
@@ -491,33 +485,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Delete.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\SubmissionAssignmentActivity\Details.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\SubmissionAssignmentActivity\Create.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\SubmissionAssignmentActivity\Edit.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\SubmissionAssignmentActivity\Delete.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\AssignmentActivity\Index.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\AssignmentActivity\Details.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\AssignmentActivity\Create.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\AssignmentActivity\Edit.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\AssignmentActivity\Delete.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

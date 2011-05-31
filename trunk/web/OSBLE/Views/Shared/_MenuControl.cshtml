@@ -1,4 +1,4 @@
-﻿@using OSBLE.Models
+﻿@using OSBLE.Models.Courses
 <div id="tabs">
     @using OSBLE.Controllers
     @foreach (OSBLEController.MenuItem m in ViewBag.Menu)
@@ -7,7 +7,7 @@
            &&
            (!m.ModifierOnly || ((ViewBag.ActiveCourse != null) && ViewBag.ActiveCourse.CourseRole.CanModify))
            &&
-		   (!m.GraderOnly || ((ViewBag.ActiveCourse != null) && ViewBag.ActiveCourse.CourseRole.CanGrade))
+           (!m.GraderOnly || ((ViewBag.ActiveCourse != null) && ViewBag.ActiveCourse.CourseRole.CanGrade))
            &&
            (!m.ViewerOnly || ((ViewBag.ActiveCourse != null) && ViewBag.ActiveCourse.CourseRole.CanSeeAll))
            &&

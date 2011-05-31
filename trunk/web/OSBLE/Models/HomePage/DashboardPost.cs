@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Web.Mvc;
+using OSBLE.Models.Courses;
 
-namespace OSBLE.Models
+namespace OSBLE.Models.HomePage
 {
     public class DashboardPost : AbstractDashboard
     {
@@ -19,7 +18,6 @@ namespace OSBLE.Models
         public DashboardPost()
             : base()
         {
-
         }
     }
 }

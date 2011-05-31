@@ -1,5 +1,13 @@
 ﻿using System.Data.Entity;
 using System.Web.Security;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Gradables;
+using OSBLE.Models.Gradables.StudioAssignment;
+using OSBLE.Models.HomePage;
+using OSBLE.Models.Users;
+using OSBLE.Models.Gradables;
+using OSBLE.Models.Gradables.StudioAssignment;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Models
 {
@@ -50,13 +58,9 @@ namespace OSBLE.Models
 
         public DbSet<Mail> Mails { get; set; }
 
-        public DbSet<SubmissionActivitySetting> SubmissionActivitySettings { get; set; }
+        public DbSet<SubmissionActivitySettings> SubmissionActivitySettings { get; set; }
 
         public DbSet<Weight> Weights { get; set; }
-
-        public DbSet<Assignment> Assignments { get; set; }
-
-        public DbSet<AssignmentActivity> AssignmentActivities { get; set; }
 
         public DbSet<GradableScore> GradableScores { get; set; }
 

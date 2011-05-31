@@ -1,4 +1,5 @@
-﻿@model IEnumerable<OSBLE.Models.AbstractGradable>
+﻿@using OSBLE.Models.Gradables.StudioAssignment
+@model List<OSBLE.Models.Gradables.AbstractGradable>
 
 @{
     ViewBag.Title = "Index";
@@ -42,9 +43,9 @@
     </tr>
 
 @foreach (var abstractItem in Model) {
-    if(abstractItem is OSBLE.Models.Assignment)
+    if(abstractItem is SubmissionActivitySettings)
     {
-        OSBLE.Models.Assignment item = abstractItem as OSBLE.Models.Assignment;
+        SubmissionActivitySettings item = abstractItem as SubmissionActivitySettings;
     <tr>
         <td>
             @Html.DisplayFor(modelItem => item.Name)

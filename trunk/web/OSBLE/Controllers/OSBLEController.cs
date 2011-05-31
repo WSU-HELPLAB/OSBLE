@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.SessionState;
-using OSBLE.Models;
 using System.Web.Security;
-using System;
+using System.Web.SessionState;
+using OSBLE.Models.HomePage;
+using OSBLE.Models;
+using OSBLE.Models.Users;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Controllers
 {
@@ -38,14 +41,21 @@ namespace OSBLE.Controllers
         public class MenuItem
         {
             public string Name { get; set; }
+
             public string Controller { get; set; }
+
             public string Action { get; set; }
 
             public bool ModifierOnly { get; set; }
+
             public bool GraderOnly { get; set; }
+
             public bool ViewerOnly { get; set; }
+
             public bool AdminOnly { get; set; }
+
             public bool NotInCommunityPage { get; set; }
+
             public bool CommunityOnlyPage { get; set; }
 
             /// <summary>
@@ -93,7 +103,6 @@ namespace OSBLE.Controllers
                 this.NotInCommunityPage = notInCommunityPage;
                 this.CommunityOnlyPage = communityOnlyPage;
             }
-
         }
 
         /// <summary>
@@ -110,8 +119,8 @@ namespace OSBLE.Controllers
                 List<MenuItem> menu = new List<MenuItem>();
 
                 menu.Add(new MenuItem("Dashboard", "Home", "Index"));
-                menu.Add(new MenuItem("Assignments", "Assignment", "Index",false,false,true,false,true,false));
-                menu.Add(new MenuItem("Grades", "Gradebook", "Index",false,false,true,false,true,false));
+                menu.Add(new MenuItem("Assignments", "Assignment", "Index", false, false, true, false, true, false));
+                menu.Add(new MenuItem("Grades", "Gradebook", "Index", false, false, true, false, true, false));
                 menu.Add(new MenuItem("Users", "Roster", "Index", false, true, false, false, false, false));
                 menu.Add(new MenuItem("Course Settings", "Course", "Edit", true, true, true, false, true, false));
                 menu.Add(new MenuItem("Community Settings", "Community", "Edit", true, true, true, false, false, true));
@@ -135,10 +144,10 @@ namespace OSBLE.Controllers
                     // Get list of courses this user is connected to. Remove inactive (for anyone other than instructors or observers) or hidden (for all) courses.
                     currentCourses = allUsersCourses.Where(cu => (cu.Course is Course) &&
                         (((cu.Course as Course).Inactive == false) || (cu.CourseRoleID == (int)CourseRole.OSBLERoles.Instructor) || (cu.CourseRoleID == (int)CourseRole.OSBLERoles.Observer)))
-                            // Order first by descending start date (newest first)
+                        // Order first by descending start date (newest first)
                             .OrderByDescending(cu => (cu.Course as Course).StartDate)
-                            // Order next by whether the course is inactive, placing inactive courses underneath active.
-                            .OrderBy(cu=> (cu.Course as Course).Inactive).ToList();
+                        // Order next by whether the course is inactive, placing inactive courses underneath active.
+                            .OrderBy(cu => (cu.Course as Course).Inactive).ToList();
 
                     // Add communities under courses, ordered by name
                     currentCourses = currentCourses.Concat(allUsersCourses.Where(cu => cu.Course is Community).OrderBy(cu => cu.Course.Name).ToList()).ToList();
@@ -195,7 +204,6 @@ namespace OSBLE.Controllers
                 }
                 ViewBag.CurrentCourses = currentCourses;
 
-
                 // Validate dashboard display mode setting.
                 if ((context.Session["DashboardSingleCourseMode"] == null) || (context.Session["DashboardSingleCourseMode"].GetType() != typeof(Boolean)))
                 {
@@ -208,7 +216,8 @@ namespace OSBLE.Controllers
             }
         }
 
-        public void SetUnreadMessageCount() {
+        public void SetUnreadMessageCount()
+        {
             ViewBag.UnreadMessageCount = (int)db.Mails.Where(m => (m.ToUserProfileID == currentUser.ID) && (m.Read == false)).Count();
         }
     }

@@ -1,38 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.IO;
 using System.Web;
-using OSBLE.Models;
-using System.IO;
+using OSBLE.Models.HomePage;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Users;
+using OSBLE.Models.Courses;
 
-//the folllowing is a diagram of our file system.  Items in brackes [] indicate 
+//the folllowing is a diagram of our file system.  Items in brackes [] indicate
 //using a key of sorts (e.g. the user id).  Items in curly braces {} indicate
 //the intended use of the folder
 /*
- * 
+ *
  *                   root
  *                  /    \
  *                 /      \
- *              Courses   Users 
- *               /          \ 
+ *              Courses   Users
+ *               /          \
  *         [courseID]     [userId]
- *           /     \          \  
+ *           /     \          \
  *          /       \   {global user content}
  *     CourseDocs    \
  *         |          Assignments
- * {course docs go here}   |               
+ * {course docs go here}   |
  *                         |
- *                   [GradableId]   
+ *                   [GradableId]
  *                         |
  *               [AssignmentActivityId]
  *                       /   \
  *                      /     \
- *                  AADocs   Submissions         
+ *                  AADocs   Submissions
  *                     |             \
  *       {assignment activity docs}   \
  *                                   [TeamId]
  *                                        |
- *                                {team submissions}   
+ *                                {team submissions}
  * */
 
 namespace OSBLE
@@ -66,16 +66,20 @@ namespace OSBLE
 
         public static FileStream GetProfilePictureOrDefault(UserProfile userProfile)
         {
-            if (File.Exists(getProfilePicturePath(userProfile))) {
+            if (File.Exists(getProfilePicturePath(userProfile)))
+            {
                 return new FileStream(getProfilePicturePath(userProfile), FileMode.Open, FileAccess.Read);
-            } else {
+            }
+            else
+            {
                 return GetDefaultProfilePicture();
             }
         }
 
         public static FileStream GetProfilePictureForWrite(UserProfile userProfile)
         {
-            if(!Directory.Exists(getUserPath(userProfile))) {
+            if (!Directory.Exists(getUserPath(userProfile)))
+            {
                 Directory.CreateDirectory(getUserPath(userProfile));
             }
             return new FileStream(getProfilePicturePath(userProfile), FileMode.Create, FileAccess.Write);
@@ -91,7 +95,8 @@ namespace OSBLE
 
         private static void emptyFolder(string path)
         {
-            if(Directory.Exists(path)) {
+            if (Directory.Exists(path))
+            {
                 DirectoryInfo parent = new DirectoryInfo(path);
 
                 foreach (FileInfo fi in parent.GetFiles())

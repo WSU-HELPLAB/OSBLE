@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 using LumenWorks.Framework.IO.Csv;
 using OSBLE.Attributes;
-using OSBLE.Models;
-using System.Text.RegularExpressions;
+using OSBLE.Models.HomePage;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Controllers
 {
@@ -121,7 +124,6 @@ namespace OSBLE.Controllers
                     {
                         roles.Add(db.CommunityRoles.Find((int)r));
                     }
-
                 }
 
                 foreach (AbstractRole role in roles)
@@ -179,7 +181,8 @@ namespace OSBLE.Controllers
                 {
                     if (guessedSection == null)
                     {
-                        if (Regex.IsMatch(header, "section", RegexOptions.IgnoreCase)) {
+                        if (Regex.IsMatch(header, "section", RegexOptions.IgnoreCase))
+                        {
                             guessedSection = header;
                         }
                     }
@@ -188,11 +191,11 @@ namespace OSBLE.Controllers
                     {
                         if (Regex.IsMatch(header, "\\bident", RegexOptions.IgnoreCase)
                             || Regex.IsMatch(header, "\\bid\\b", RegexOptions.IgnoreCase)
-                            || Regex.IsMatch(header, "\\bnumber\\b", RegexOptions.IgnoreCase) 
+                            || Regex.IsMatch(header, "\\bnumber\\b", RegexOptions.IgnoreCase)
                             )
                         {
                             guessedIdentification = header;
-                        } 
+                        }
                     }
                 }
 
@@ -209,7 +212,8 @@ namespace OSBLE.Controllers
         [HttpPost]
         [CanModifyCourse]
         [NotForCommunity]
-        public ActionResult ApplyRoster(string idColumn, string sectionColumn) {
+        public ActionResult ApplyRoster(string idColumn, string sectionColumn)
+        {
             HttpPostedFileBase file = Session["RosterFile"] as HttpPostedFileBase;
 
             int rosterCount = 0;
@@ -225,13 +229,17 @@ namespace OSBLE.Controllers
 
                     // First check to make sure there are no duplicates in the ID table.
                     List<string> usedIdentifications = new List<string>();
-                    foreach (RosterEntry entry in rosterEntries) {
-                        if(usedIdentifications.Contains(entry.Identification)) {
+                    foreach (RosterEntry entry in rosterEntries)
+                    {
+                        if (usedIdentifications.Contains(entry.Identification))
+                        {
                             ViewBag.Error = "There are duplicate Student IDs in your roster. Please ensure the proper Student ID header was selected and check your roster file.";
                             return View("RosterError");
-                        } else {
+                        }
+                        else
+                        {
                             usedIdentifications.Add(entry.Identification);
-                        } 
+                        }
                     }
 
                     // Make sure no student has the same ID as existing non-student members.
@@ -253,7 +261,6 @@ namespace OSBLE.Controllers
                     }
                     db.SaveChanges();
 
-
                     // Attach to users or add new user profile stubs.
                     foreach (RosterEntry entry in rosterEntries)
                     {
@@ -266,7 +273,7 @@ namespace OSBLE.Controllers
                         {
                             createCourseUser(courseUser);
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                             ViewBag.Error = e.Message;
                             return View("RosterError");
@@ -287,6 +294,7 @@ namespace OSBLE.Controllers
 
             return RedirectToAction("Index", new { notice = "Roster imported with " + rosterCount.ToString() + " students." });
         }
+
         //
         // GET: /Roster/Create
         [CanModifyCourse]
@@ -351,7 +359,7 @@ namespace OSBLE.Controllers
                 {
                     attachCourseUserByEmail(courseuser);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     ModelState.AddModelError("", e.Message);
                     ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");

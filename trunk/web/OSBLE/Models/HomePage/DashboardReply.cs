@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 
-namespace OSBLE.Models
+namespace OSBLE.Models.HomePage
 {
     public class DashboardReply : AbstractDashboard
     {

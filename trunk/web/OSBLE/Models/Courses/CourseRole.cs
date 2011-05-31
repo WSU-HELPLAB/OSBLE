@@ -1,8 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace OSBLE.Models
+﻿namespace OSBLE.Models.Courses
 {
-
     public class CourseRole : AbstractRole
     {
         public CourseRole()
@@ -29,6 +26,5 @@ namespace OSBLE.Models
             Moderator,
             Observer
         }
-
     }
 }

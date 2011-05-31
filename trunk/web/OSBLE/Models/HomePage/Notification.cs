@@ -1,7 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Users;
 
-namespace OSBLE.Models
+namespace OSBLE.Models.HomePage
 {
     public class Notification
     {
@@ -43,10 +45,10 @@ namespace OSBLE.Models
             Read = false;
         }
 
-        public static class Types {
+        public static class Types
+        {
             public const string Mail = "Mail";
             public const string EventApproval = "EventApproval";
         }
-
     }
 }

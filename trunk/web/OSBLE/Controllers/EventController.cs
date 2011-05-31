@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models;
 using OSBLE.Attributes;
+using OSBLE.Models.HomePage;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Controllers
 { 
@@ -315,7 +316,6 @@ namespace OSBLE.Controllers
 
                     foreach (CourseMeeting cm in course.CourseMeetings)
                     {
-
                         // Wow, this is a big if statement.
                         if (
                             ((current.DayOfWeek == DayOfWeek.Sunday) && cm.Sunday) ||
@@ -340,7 +340,6 @@ namespace OSBLE.Controllers
                             {
                                 events.Add(e);
                             }
-
                         }
                     }
                     day++; // Add one day

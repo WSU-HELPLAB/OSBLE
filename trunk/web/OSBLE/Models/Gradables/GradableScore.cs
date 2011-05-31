@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.Users;
 
-namespace OSBLE.Models
+namespace OSBLE.Models.Gradables
 {
     public class GradableScore
     {
@@ -12,12 +9,14 @@ namespace OSBLE.Models
         [Required]
         [Column(Order = 0)]
         public int UserProfileID { get; set; }
+
         public virtual UserProfile UserProfile { get; set; }
 
         [Key]
         [Required]
         [Column(Order = 1)]
         public int GradableID { get; set; }
+
         public virtual Gradable Gradable { get; set; }
 
         [Required]

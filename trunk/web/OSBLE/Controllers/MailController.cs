@@ -1,11 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using OSBLE.Attributes;
-using OSBLE.Models;
-using System;
-using System.Web;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
+using OSBLE.Models.HomePage;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Controllers
 {
@@ -18,7 +19,7 @@ namespace OSBLE.Controllers
         public ViewResult Index()
         {
             ViewBag.BoxHeader = "Inbox";
-            var mails = db.Mails.Where(m=>m.ToUserProfileID == CurrentUser.ID).OrderByDescending(m=>m.Posted);
+            var mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID).OrderByDescending(m => m.Posted);
             return View(mails.ToList());
         }
 
@@ -26,7 +27,7 @@ namespace OSBLE.Controllers
         {
             ViewBag.BoxHeader = "Outbox";
             var mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID).OrderByDescending(m => m.Posted);
-            return View("Index",mails.ToList());
+            return View("Index", mails.ToList());
         }
 
         //
@@ -36,9 +37,11 @@ namespace OSBLE.Controllers
         {
             Mail mail = db.Mails.Find(id);
             // Unauthorized mail to view.
-            if ((mail.ToUserProfile != currentUser) && (mail.FromUserProfile != currentUser)) {
+            if ((mail.ToUserProfile != currentUser) && (mail.FromUserProfile != currentUser))
+            {
                 return RedirectToAction("Index");
-            } else if ((mail.ToUserProfile == currentUser) && (mail.Read == false))
+            }
+            else if ((mail.ToUserProfile == currentUser) && (mail.Read == false))
             {
                 mail.Read = true;
                 db.SaveChanges();
@@ -101,8 +104,8 @@ namespace OSBLE.Controllers
                 {
                     mail.Subject = "Re: " + reply.Subject;
                     // Prefix each line with a '> '
-                    mail.Message = "\n\nOriginal Message at " + reply.Posted.ToString() + ":\n" + 
-                        Regex.Replace(reply.Message,"^.*$","> $&",
+                    mail.Message = "\n\nOriginal Message at " + reply.Posted.ToString() + ":\n" +
+                        Regex.Replace(reply.Message, "^.*$", "> $&",
                         RegexOptions.Multiline);
                 }
             }
@@ -125,20 +128,20 @@ namespace OSBLE.Controllers
                 return RedirectToAction("Index");
             }
 
-                if (ModelState.IsValid)
-                {
-                    mail.FromUserProfileID = CurrentUser.ID;
-                    mail.FromUserProfile = CurrentUser;
-                    mail.Read = false;
+            if (ModelState.IsValid)
+            {
+                mail.FromUserProfileID = CurrentUser.ID;
+                mail.FromUserProfile = CurrentUser;
+                mail.Read = false;
 
-                    db.Mails.Add(mail);
-                    db.SaveChanges();
+                db.Mails.Add(mail);
+                db.SaveChanges();
 
-                    NotificationController nc = new NotificationController();
-                    nc.SendMailNotification(mail);
+                NotificationController nc = new NotificationController();
+                nc.SendMailNotification(mail);
 
-                    return RedirectToAction("Index");
-                }
+                return RedirectToAction("Index");
+            }
 
             return View(mail);
         }
@@ -174,6 +177,7 @@ namespace OSBLE.Controllers
         private class AutocompleteObject
         {
             public int value { get; set; }
+
             public string label { get; set; }
 
             public AutocompleteObject(int value, string label)
@@ -193,8 +197,8 @@ namespace OSBLE.Controllers
 
             // If we are not anonymous in a course, allow search of all users.
             List<int> authorizedCourses = currentCourses
-                .Where(c=>c.CourseRole.Anonymized==false)
-                .Select(c=>c.CourseID)
+                .Where(c => c.CourseRole.Anonymized == false)
+                .Select(c => c.CourseID)
                 .ToList();
 
             List<UserProfile> authorizedUsers = db.CoursesUsers
@@ -206,7 +210,7 @@ namespace OSBLE.Controllers
 
             // If we are anonymous, limit search to ourselves plus instructors/TAs
             List<int> addedCourses = currentCourses
-                .Where(c => c.CourseRole.Anonymized==true)
+                .Where(c => c.CourseRole.Anonymized == true)
                 .Select(c => c.CourseID)
                 .ToList();
 
@@ -216,10 +220,10 @@ namespace OSBLE.Controllers
                 .ToList();
 
             // Combine lists into one distinct list of users, removing all pending users.
-            List<UserProfile> users = authorizedUsers.Union(addedUsers).Where(u=>u.UserName != null).OrderBy(u=>u.LastName).Distinct().ToList();
+            List<UserProfile> users = authorizedUsers.Union(addedUsers).Where(u => u.UserName != null).OrderBy(u => u.LastName).Distinct().ToList();
 
             // Search list for our search string
-            users = users.Where(u=>(u.FirstName + " " + u.LastName).ToLower().IndexOf(term) != -1).ToList();
+            users = users.Where(u => (u.FirstName + " " + u.LastName).ToLower().IndexOf(term) != -1).ToList();
 
             List<AutocompleteObject> outputList = new List<AutocompleteObject>();
 
@@ -246,6 +250,5 @@ namespace OSBLE.Controllers
                 return new FileStreamResult(FileSystem.GetDefaultProfilePicture(), "image/jpeg");
             }
         }
-
     }
 }

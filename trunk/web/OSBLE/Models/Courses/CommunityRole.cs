@@ -1,8 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace OSBLE.Models
+﻿namespace OSBLE.Models.Courses
 {
-
     public class CommunityRole : AbstractRole
     {
         public CommunityRole()
@@ -21,12 +18,10 @@ namespace OSBLE.Models
             this.Anonymized = false;
         }
 
-
         public enum OSBLERoles : int
         {
             Leader = 6,
             Participant
         }
-
     }
 }

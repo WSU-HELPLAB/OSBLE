@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Data;
-using System.Data.Entity;
 using System.Linq;
 using System.Web.Mvc;
 using OSBLE.Attributes;
-using OSBLE.Models;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Gradables;
+using OSBLE.Models.Gradables.StudioAssignment;
 
 namespace OSBLE.Controllers
 {
@@ -18,8 +19,10 @@ namespace OSBLE.Controllers
 
         public ViewResult Index()
         {
-            var abstractgradables = db.AbstractGradables.Include(a => a.Weight);
-            return View(abstractgradables.ToList());
+            //This is what it was but no longer works
+            var abstractgradables = db.AbstractGradables.ToList();
+            return View(abstractgradables);
+            //return View();
         }
 
         //
@@ -27,7 +30,7 @@ namespace OSBLE.Controllers
 
         public ViewResult Details(int id)
         {
-            Assignment assignment = db.AbstractGradables.Find(id) as Assignment;
+            SubmissionActivitySettings assignment = db.AbstractGradables.Find(id) as SubmissionActivitySettings;
             return View(assignment);
         }
 
@@ -38,14 +41,14 @@ namespace OSBLE.Controllers
         {
             ViewBag.WeightID = new SelectList(db.Weights, "ID", "Name");
             ViewBag.Deliverable = new SelectList(db.Deliverables, "ID", "Name");
-            return View(new Assignment());
+            return View(new SubmissionActivitySettings());
         }
 
         //
         // POST: /Assignment/Create
 
         [HttpPost]
-        public ActionResult Create(Assignment assignment)
+        public ActionResult Create(SubmissionActivitySettings assignment)
         {
             assignment.Deliverables = new List<Deliverable>();
 
@@ -71,7 +74,7 @@ namespace OSBLE.Controllers
 
         public ActionResult Edit(int id)
         {
-            Assignment assignment = db.AbstractGradables.Find(id) as Assignment;
+            SubmissionActivitySettings assignment = db.AbstractGradables.Find(id) as SubmissionActivitySettings;
             ViewBag.WeightID = new SelectList(db.Weights, "ID", "Name", assignment.WeightID);
             return View(assignment);
         }
@@ -80,7 +83,7 @@ namespace OSBLE.Controllers
         // POST: /Assignment/Edit/5
 
         [HttpPost]
-        public ActionResult Edit(Assignment assignment)
+        public ActionResult Edit(SubmissionActivitySettings assignment)
         {
             if (ModelState.IsValid)
             {
@@ -97,7 +100,7 @@ namespace OSBLE.Controllers
 
         public ActionResult Delete(int id)
         {
-            Assignment assignment = db.AbstractGradables.Find(id) as Assignment;
+            SubmissionActivitySettings assignment = db.AbstractGradables.Find(id) as SubmissionActivitySettings;
             return View(assignment);
         }
 
@@ -107,7 +110,7 @@ namespace OSBLE.Controllers
         [HttpPost, ActionName("Delete")]
         public ActionResult DeleteConfirmed(int id)
         {
-            Assignment assignment = db.AbstractGradables.Find(id) as Assignment;
+            SubmissionActivitySettings assignment = db.AbstractGradables.Find(id) as SubmissionActivitySettings;
             db.AbstractGradables.Remove(assignment);
             db.SaveChanges();
             return RedirectToAction("Index");

@@ -5,8 +5,9 @@ using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using OSBLE.Models;
+using OSBLE.Models.HomePage;
 using OSBLE.Attributes;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Controllers
 {

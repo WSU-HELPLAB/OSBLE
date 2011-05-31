@@ -1,4 +1,4 @@
-﻿@model OSBLE.Models.Assignment
+﻿@model OSBLE.Models.Gradables.StudioAssignment.SubmissionActivitySettings
 
 @{
     ViewBag.Title = "Edit";
@@ -81,11 +81,11 @@
         </div>
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.Points)
+            @Html.LabelFor(model => model.PossiblePoints)
         </div>
         <div class="editor-field">
-            @Html.EditorFor(model => model.Points)
-            @Html.ValidationMessageFor(model => model.Points)
+            @Html.EditorFor(model => model.PossiblePoints)
+            @Html.ValidationMessageFor(model => model.PossiblePoints)
         </div>
 
         <p>

@@ -1,6 +1,6 @@
 ﻿@using OSBLE.Controllers;
-@using OSBLE.Models;
-@model IEnumerable<OSBLE.Models.CoursesUsers>
+@using OSBLE.Models.Courses;
+@model IEnumerable<OSBLE.Models.Courses.CoursesUsers>
 @{
     ViewBag.Title = "Index";
 }
@@ -83,7 +83,7 @@ else
                 <h3>@userByRole.RoleName (<span id="roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)">@userByRole.Count.ToString()</span>)
                 </h3>
                 <ul class="user_list">
-                    @foreach (OSBLE.Models.UserProfile user in userByRole.Users)
+                    @foreach (OSBLE.Models.Users.UserProfile user in userByRole.Users)
                     {
                         <li id="user_item_@(user.ID)">
                         @if ((user != ViewBag.CurrentUser) || ViewBag.CanEditSelf == true)

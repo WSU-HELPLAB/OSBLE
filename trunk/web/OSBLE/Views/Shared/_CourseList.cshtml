@@ -1,21 +1,21 @@
-﻿@using OSBLE.Models
+﻿@using OSBLE.Models.Courses
 @if (ViewBag.CurrentCourses.Count > 0) {
 <text>@(ViewBag.CourseListTitle): </text><br />
 using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_course" }))
 {
     <select name="course" id="course_select">
-        @foreach (OSBLE.Models.CoursesUsers cu in ViewBag.CurrentCourses)
+        @foreach (OSBLE.Models.Courses.CoursesUsers cu in ViewBag.CurrentCourses)
         {
-			// Skip hidden courses
-			if(cu.Hidden) {
-				continue;
-			}
+            // Skip hidden courses
+            if(cu.Hidden) {
+                continue;
+            }
 
             string courseDisplay = @Helpers.CourseTag(cu.Course) + " - " + cu.Course.Name + " (" + cu.CourseRole.Name + ")";
 
-			if((cu.Course is Course) && (cu.Course as Course).Inactive) {
-				courseDisplay += " [INACTIVE]";
-			}
+            if((cu.Course is Course) && (cu.Course as Course).Inactive) {
+                courseDisplay += " [INACTIVE]";
+            }
 
             CoursesUsers ac = ViewBag.ActiveCourse as CoursesUsers;
 

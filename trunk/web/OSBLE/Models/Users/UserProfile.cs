@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models
+namespace OSBLE.Models.Users
 {
     public class UserProfile
     {

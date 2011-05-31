@@ -4,8 +4,9 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.Users;
 
-namespace OSBLE.Models
+namespace OSBLE.Models.HomePage
 {
     public abstract class AbstractDashboard
     {

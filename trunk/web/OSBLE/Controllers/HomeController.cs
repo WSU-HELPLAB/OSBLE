@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.WebPages;
 using System.Web.Mvc;
 using OSBLE.Attributes;
-using OSBLE.Models;
-using System.Collections;
-using System.Net;
+using OSBLE.Models.HomePage;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Controllers
 {
@@ -55,7 +53,7 @@ namespace OSBLE.Controllers
             // First get all posts to do a count and do proper paging
             IQueryable<DashboardPost> dashboardPosts = db.DashboardPosts.Where(d => ViewedCourses.Contains(d.CourseID)).OrderByDescending(d => d.Posted);
             ViewBag.DashboardPostCount = dashboardPosts.Count();
-            
+
             // Only send items in page to the dashboard.
             ViewBag.DashboardPosts = dashboardPosts.Skip(startPost).Take(postsPerPage).ToList();
             ViewBag.StartPost = startPost;
@@ -75,7 +73,7 @@ namespace OSBLE.Controllers
             // Load all unread notifications for the current user to display on the dashboard.
             ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == currentUser.ID) && (n.Read == false)).OrderByDescending(n => n.Posted).ToList();
 
-            #endregion
+            #endregion Notifications
 
             #region Events
 
@@ -87,19 +85,20 @@ namespace OSBLE.Controllers
 
             EventController ec = new EventController();
             ViewBag.Events = ec.GetActiveCourseEvents(today, upto);
-           
-            #endregion
+
+            #endregion Events
 
             return View();
         }
 
         /// <summary>
-        /// Sets up display settings for dashboard posts and replies.  
+        /// Sets up display settings for dashboard posts and replies.
         /// </summary>
         /// <param name="post">The post or reply to be set up</param>
         /// <param name="courseList"></param>
-        private void setupPostDisplay(AbstractDashboard post) {
-            List<CoursesUsers> courseList = new List<CoursesUsers> ();
+        private void setupPostDisplay(AbstractDashboard post)
+        {
+            List<CoursesUsers> courseList = new List<CoursesUsers>();
 
             // Get list of users in course, either from the root post or its parent in the case of a reply.
             if (post is DashboardPost)
@@ -126,7 +125,7 @@ namespace OSBLE.Controllers
             {
                 // Display Name
                 post.DisplayName = posterCu.UserProfile.FirstName + " " + posterCu.UserProfile.LastName;
-                
+
                 // Display Titles for Instructors/TAs for Courses, or Leader of Communities.
                 if (posterCu.Course is Community)
                 {
@@ -174,9 +173,9 @@ namespace OSBLE.Controllers
             }
 
             // For posts, set reply box display if the course allows replies or if Instructor/TA.
-            if ( post is DashboardPost && 
+            if (post is DashboardPost &&
                 (
-                (currentCu.Course is Course && 
+                (currentCu.Course is Course &&
                     ((currentCu.Course as Course).AllowDashboardReplies)
                      || (currentCu.CourseRole.CanGrade))
                 // For communities, always allow replies
@@ -199,7 +198,6 @@ namespace OSBLE.Controllers
                     setupPostDisplay(dr);
                 }
             }
-
         }
 
         public ActionResult NoCourses()
@@ -342,7 +340,8 @@ namespace OSBLE.Controllers
                                    select c).FirstOrDefault();
 
                 Course course = null;
-                if(cu.Course is Course) {
+                if (cu.Course is Course)
+                {
                     course = (Course)cu.Course;
                 }
                 if ((cu != null) && (cu.CourseRole.CanGrade || ((course != null) && (course.AllowDashboardReplies))))
@@ -367,8 +366,6 @@ namespace OSBLE.Controllers
                 }
 
                 ViewBag.DashboardReplies = replys;
-
-                
             }
             else
             {
@@ -383,7 +380,7 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        /// 
+        ///
         [HttpPost]
         public ActionResult DeletePost(int id)
         {
@@ -457,7 +454,7 @@ namespace OSBLE.Controllers
                 CoursesUsers ourCu = currentCourses.Where(c => c.CourseID == course).FirstOrDefault();
                 CoursesUsers theirCu = db.CoursesUsers.Where(c => (c.CourseID == course) && (c.UserProfileID == u.ID)).FirstOrDefault();
 
-                if ((ourCu != null) && (theirCu != null) && (!(ourCu.CourseRole.Anonymized) || (theirCu.CourseRole.CanGrade==true)))
+                if ((ourCu != null) && (theirCu != null) && (!(ourCu.CourseRole.Anonymized) || (theirCu.CourseRole.CanGrade == true)))
                 {
                     show = true;
                 }

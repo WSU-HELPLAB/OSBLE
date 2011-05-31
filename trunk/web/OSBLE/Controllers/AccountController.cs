@@ -1,16 +1,18 @@
 ﻿using System;
+using System.Data;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
+using System.Net.Mail;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
+using OSBLE.Models.HomePage;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Users;
 using OSBLE.Models;
-using System.Data;
-using System.Net;
-using System.Net.Mail;
-using System.Drawing;
-using System.Web;
-using System.IO;
-using System.Drawing.Imaging;
-using System.Drawing.Drawing2D;
 
 namespace OSBLE.Controllers
 {
@@ -90,7 +92,7 @@ namespace OSBLE.Controllers
                     cu.Hidden = newHidden;
                     db.Entry(cu).State = EntityState.Modified;
                 }
-           }
+            }
 
             db.SaveChanges();
 
@@ -133,7 +135,7 @@ namespace OSBLE.Controllers
                         profile.Identification = model.Identification;
                         profile.SchoolID = model.SchoolID;
                         profile.School = db.Schools.Find(model.SchoolID);
-                        
+
                         UserProfile up = db.UserProfiles.Where(c => c.SchoolID == profile.SchoolID && c.Identification == profile.Identification).FirstOrDefault();
 
                         if (up != null) // User profile exists. Is it a stub?
@@ -251,7 +253,6 @@ namespace OSBLE.Controllers
             //This will need to fixed whenever we get a Server that can send mail
             SmtpClient sc = new SmtpClient();
             sc.Send(mm);
-            
 
             return View();
         }
@@ -259,7 +260,7 @@ namespace OSBLE.Controllers
         [Authorize]
         public ActionResult ProfilePicture()
         {
-            return new FileStreamResult(FileSystem.GetProfilePictureOrDefault(currentUser),"image/jpeg");
+            return new FileStreamResult(FileSystem.GetProfilePictureOrDefault(currentUser), "image/jpeg");
         }
 
         [Authorize]
@@ -279,7 +280,7 @@ namespace OSBLE.Controllers
                 {
                     image = new Bitmap(file.InputStream);
                 }
-                catch 
+                catch
                 {   // If image format is invalid, discard it.
                     image = null;
                 }
@@ -287,16 +288,16 @@ namespace OSBLE.Controllers
                 if (image != null)
                 {
                     int thumbSize = 50;
-                                        
+
                     // Crop image to a square.
-                    int square = Math.Min(image.Width,image.Height);
+                    int square = Math.Min(image.Width, image.Height);
                     Bitmap cropImage = new Bitmap(square, square);
                     Bitmap finalImage = new Bitmap(thumbSize, thumbSize);
                     Graphics cropGraphics = Graphics.FromImage(cropImage);
                     Graphics finalGraphics = Graphics.FromImage(finalImage);
 
                     // Center cropped image horizontally, leave at the top vertically. (better focus on subject)
-                    cropGraphics.DrawImage(image,-(image.Width - cropImage.Width)/2,0);
+                    cropGraphics.DrawImage(image, -(image.Width - cropImage.Width) / 2, 0);
 
                     // Convert to thumbnail.
                     finalGraphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
@@ -320,7 +321,6 @@ namespace OSBLE.Controllers
             return View();
         }
 
-
         [HttpPost]
         public ActionResult ContactUs(ContactUsModel model)
         {
@@ -331,7 +331,6 @@ namespace OSBLE.Controllers
             }
             return View(model);
         }
-
 
         [HttpPost]
         public ActionResult ContactUsSuccess(ContactUsModel model)
@@ -346,6 +345,7 @@ namespace OSBLE.Controllers
         {
             return false;
         }
+
         #region Status Codes
 
         private static string ErrorCodeToString(MembershipCreateStatus createStatus)

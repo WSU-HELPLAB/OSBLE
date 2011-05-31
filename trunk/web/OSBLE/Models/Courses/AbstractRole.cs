@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models
+namespace OSBLE.Models.Courses
 {
     public abstract class AbstractRole
     {
@@ -34,6 +30,5 @@ namespace OSBLE.Models
         [Required]
         [Display(Name = "All users in the course will appear anonymous to this user")]
         public bool Anonymized { get; set; }
-
     }
 }

@@ -1,4 +1,5 @@
-﻿@using OSBLE.Models
+﻿@using OSBLE.Models.Users
+@using OSBLE.Models.Courses
 
 @model OSBLE.Models.ChangePasswordModel
 
@@ -73,42 +74,42 @@
 
 @using (Html.BeginForm("UpdateMenu","Account"))
 {
-	@Html.ValidationSummary()
+    @Html.ValidationSummary()
 <div>
 
 <table>
-	<tr>
-		<th>Hidden</th>
-		<th>Name</th>
-		<th></th>
-	</tr>
-	@foreach (CoursesUsers cu in ViewBag.CurrentCourses) {
-		<tr>
-			<td>
-			<input type="checkbox" value="True" name="cu_hidden_@(cu.CourseID)" @if(cu.Hidden) {<text>checked="checked"</text>} />
-			</td>
-			<td>
-				<small>
-				@if (cu.Course is Course) {
-					<text>Course</text>
-				} else {
-					<text>Community</text>
-				}
-				</small>
-				@Helpers.CourseTag(cu.Course) &mdash; @cu.Course.Name (@cu.CourseRole.Name)
-			</td>
-			<td>
-				@if (cu.CourseID == ViewBag.CurrentUser.DefaultCourse) {
-					<text>Default</text>
-				} else {
-					<text>@Html.ActionLink("Set As Default", "SetDefault", new { id=cu.CourseID })</text>
-				}
-			</td>
-		</tr>
-	}
+    <tr>
+        <th>Hidden</th>
+        <th>Name</th>
+        <th></th>
+    </tr>
+    @foreach (CoursesUsers cu in ViewBag.CurrentCourses) {
+        <tr>
+            <td>
+            <input type="checkbox" value="True" name="cu_hidden_@(cu.CourseID)" @if(cu.Hidden) {<text>checked="checked"</text>} />
+            </td>
+            <td>
+                <small>
+                @if (cu.Course is Course) {
+                    <text>Course</text>
+                } else {
+                    <text>Community</text>
+                }
+                </small>
+                @Helpers.CourseTag(cu.Course) &mdash; @cu.Course.Name (@cu.CourseRole.Name)
+            </td>
+            <td>
+                @if (cu.CourseID == ViewBag.CurrentUser.DefaultCourse) {
+                    <text>Default</text>
+                } else {
+                    <text>@Html.ActionLink("Set As Default", "SetDefault", new { id=cu.CourseID })</text>
+                }
+            </td>
+        </tr>
+    }
 </table>
 <p>
-	<input type="submit" value="Update Menu" />
+    <input type="submit" value="Update Menu" />
 </p>
 </div>
 }

@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models
+namespace OSBLE.Models.Courses
 {
     public class CourseBreak
     {

@@ -1,4 +1,4 @@
-﻿@model OSBLE.Models.Assignment
+﻿@model OSBLE.Models.Gradables.StudioAssignment.SubmissionActivitySettings
 
 @{
     ViewBag.Title = "Delete";
@@ -52,7 +52,7 @@
 
     <div class="display-label">Points</div>
     <div class="display-field">
-        @Html.DisplayFor(model => model.Points)
+        @Html.DisplayFor(model => model.PossiblePoints)
     </div>
 </fieldset>
 @using (Html.BeginForm()) {

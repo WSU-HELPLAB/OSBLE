@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using OSBLE.Models;
-using OSBLE.Attributes;
 using System.Collections.Specialized;
+using System.Data;
+using System.Web.Mvc;
+using OSBLE.Attributes;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Controllers
-{ 
+{
     [Authorize]
     public class CourseController : OSBLEController
     {
@@ -26,9 +24,10 @@ namespace OSBLE.Controllers
         public ActionResult Create()
         {
             return View(new Course());
-        } 
+        }
 
-        private void createMeetingTimes(Course course) {
+        private void createMeetingTimes(Course course)
+        {
             int count = Convert.ToInt32(Request.Params["meetings_max"]);
             if (course.CourseMeetings == null)
             {
@@ -41,7 +40,8 @@ namespace OSBLE.Controllers
 
             for (int i = 0; i < count; i++)
             {
-                if(Request.Params["meeting_location_" + i.ToString()] != null) {
+                if (Request.Params["meeting_location_" + i.ToString()] != null)
+                {
                     CourseMeeting cm = new CourseMeeting();
 
                     cm.Name = Request.Params["meeting_name_" + i.ToString()];
@@ -90,8 +90,7 @@ namespace OSBLE.Controllers
             }
             db.SaveChanges();
         }
-        
-        
+
         //
         // POST: /Course/Create
 
@@ -118,15 +117,15 @@ namespace OSBLE.Controllers
 
                 Session["ActiveCourse"] = course.ID;
 
-                return RedirectToAction("Index");  
+                return RedirectToAction("Index");
             }
 
             return View(course);
         }
-        
+
         //
         // GET: /Course/Edit/5
- 
+
         [RequireActiveCourse]
         [CanModifyCourse]
         [NotForCommunity]

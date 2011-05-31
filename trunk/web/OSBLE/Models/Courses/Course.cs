@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System;
 
-namespace OSBLE.Models
+namespace OSBLE.Models.Courses
 {
     public class Course : AbstractCourse
     {
@@ -67,7 +67,8 @@ namespace OSBLE.Models
         [Display(Name = "Include course meetings and breaks in course calendar")]
         public bool ShowMeetings { get; set; }
 
-        public Course() : base()
+        public Course()
+            : base()
         {
             // Set default values for course settings.
             AllowDashboardPosts = true;

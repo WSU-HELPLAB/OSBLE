@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Users;
 
-namespace OSBLE.Models
+namespace OSBLE.Models.HomePage
 {
     public class Event
     {
@@ -14,10 +14,12 @@ namespace OSBLE.Models
 
         [Required]
         public int CourseID { get; set; }
+
         public virtual AbstractCourse Course { get; set; }
 
         // User who created the event. Optional.
         public int PosterID { get; set; }
+
         public virtual UserProfile Poster { get; set; }
 
         [Required]

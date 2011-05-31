@@ -1,5 +1,5 @@
 ﻿@using OSBLE.Controllers;
-@using OSBLE.Models;
+@using OSBLE.Models.Gradables;
 @{
     Layout = null;
 }
@@ -8,7 +8,7 @@
             <th id="th-1">
                 &nbsp
             </th>
-            @foreach (OSBLE.Models.Gradable item in ViewBag.Gradables)
+            @foreach (Gradable item in ViewBag.Gradables)
             {
                 <th id="@item.ID" onclick="changeHeaderName(this)">@item.Name<div id="cntnr" class="thButton">
                     <button class="dropdown" id="1" onclick="ShowHide(this);">
@@ -21,7 +21,7 @@
             <th id="th-2">
                 Points Possible
             </th>
-            @foreach (OSBLE.Models.Gradable item in ViewBag.Gradables)
+            @foreach (Gradable item in ViewBag.Gradables)
             {
                 <td onclick="cellGainsFocus(this)">@item.PossiblePoints
                 </td>   
@@ -31,7 +31,7 @@
             <th id="th-3">
                 Students
             </th>
-            @foreach (OSBLE.Models.Gradable item in ViewBag.Gradables)
+            @foreach (Gradable item in ViewBag.Gradables)
             {
                 <td>
                     &nbsp
@@ -39,7 +39,7 @@
             }
         </tr>
         <!--loop through all users -->
-        @foreach (OSBLE.Models.UserProfile user in ViewBag.Users)
+        @foreach (OSBLE.Models.Users.UserProfile user in ViewBag.Users)
         {        
             <tr>
                 <td id="@user.ID" >@user.LastName, @user.FirstName

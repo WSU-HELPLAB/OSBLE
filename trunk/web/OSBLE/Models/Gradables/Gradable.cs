@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models
+namespace OSBLE.Models.Gradables
 {
     public class Gradable : AbstractGradable
     {

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models
+namespace OSBLE.Models.Gradables.StudioAssignment
 {
-    public class Assignment : AbstractGradable
+    public class SubmissionActivitySettings : AbstractGradable
     {
-        public Assignment()
+        public SubmissionActivitySettings()
             : base()
         {
             DateTime dateTimeNow = DateTime.Now;

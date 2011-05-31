@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
-using System.Web;
+﻿using System.Data;
 using System.Web.Mvc;
-using OSBLE.Models;
 using OSBLE.Attributes;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Controllers
-{ 
+{
     [Authorize]
     public class CommunityController : OSBLEController
     {
@@ -28,7 +23,7 @@ namespace OSBLE.Controllers
         public ActionResult Create()
         {
             return View(new Community());
-        } 
+        }
 
         //
         // POST: /Community/Create
@@ -53,15 +48,15 @@ namespace OSBLE.Controllers
 
                 Session["ActiveCourse"] = community.ID;
 
-                return RedirectToAction("Index");  
+                return RedirectToAction("Index");
             }
 
             return View(community);
         }
-        
+
         //
         // GET: /Community/Edit/5
- 
+
         [RequireActiveCourse]
         [CanModifyCourse]
         [IsCommunity]

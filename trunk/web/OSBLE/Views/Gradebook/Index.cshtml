@@ -1,5 +1,5 @@
 ﻿@using OSBLE.Controllers;
-@using OSBLE.Models;
+@using OSBLE.Models.Courses;
 @using OSBLE.Controllers;
 @{
     ViewBag.Title = "Index";
@@ -108,7 +108,7 @@
     <h3>
         Gradebook</h3>
     <ul>
-        @foreach (OSBLE.Models.Weight item in ViewBag.Tabs)
+        @foreach (Weight item in ViewBag.Tabs)
         {
             <li id="selected"><a href="#" onclick="switchTab(this)">@item.Name</a></li>
         }

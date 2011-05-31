@@ -1,8 +1,9 @@
 ﻿using System.Data;
 using System.Linq;
 using System.Web.Mvc;
-using OSBLE.Models;
+using OSBLE.Models.HomePage;
 using OSBLE.Attributes;
+using OSBLE.Models;
 
 namespace OSBLE.Controllers
 {

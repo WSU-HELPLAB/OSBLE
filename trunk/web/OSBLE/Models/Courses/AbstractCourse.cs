@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.HomePage;
 
-namespace OSBLE.Models
+namespace OSBLE.Models.Courses
 {
     public abstract class AbstractCourse
     {
@@ -23,7 +21,8 @@ namespace OSBLE.Models
         [Display(Name = "Amount of weeks into the future to show events in calendar")]
         public int CalendarWindowOfTime { get; set; }
 
-        public AbstractCourse() : base()
+        public AbstractCourse()
+            : base()
         {
             CalendarWindowOfTime = 2;
         }

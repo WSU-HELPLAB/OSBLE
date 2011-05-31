@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models
+namespace OSBLE.Models.Gradables.StudioAssignment
 {
     public abstract class AssignmentActivity
     {
@@ -10,7 +10,8 @@ namespace OSBLE.Models
 
         [Required]
         public int AssignmentID { get; set; }
-        public virtual Assignment Assignment { get; set; }
+
+        public virtual SubmissionActivitySettings Assignment { get; set; }
 
         [Required]
         [Display(Name = "Name")]

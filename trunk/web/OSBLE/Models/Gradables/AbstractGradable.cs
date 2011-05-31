@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.Courses;
 
-namespace OSBLE.Models
+namespace OSBLE.Models.Gradables
 {
     public abstract class AbstractGradable
     {
@@ -23,6 +24,7 @@ namespace OSBLE.Models
 
         [Required]
         public int WeightID { get; set; }
+
         public virtual Weight Weight { get; set; }
 
         /// <summary>

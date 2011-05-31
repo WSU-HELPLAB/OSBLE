@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using OSBLE.Models;
 using OSBLE.Attributes;
+using OSBLE.Models.HomePage;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Gradables;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Controllers
 {
@@ -14,6 +16,7 @@ namespace OSBLE.Controllers
     public class GradebookController : OSBLEController
     {
         public enum ColumnAction { InsertLeft, InsertRight, Delete, Clear, NoAction };
+
         //
         // GET: /Gradebook/
         public GradebookController()
@@ -23,7 +26,7 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// Adds a column (Gradable) to the current Tab (Weight).  
+        /// Adds a column (Gradable) to the current Tab (Weight).
         /// </summary>
         /// <param name="colunmName">The name of column</param>
         /// <param name="pointsPossible">The number of points that this column is worth</param>
@@ -115,9 +118,9 @@ namespace OSBLE.Controllers
                 gradableId = Convert.ToInt32(Request.Form["gradableId"]);
             }
             ColumnAction action = StringToColumnAction(Request.Form["actionRequested"]);
-            
+
             //only continue if we received a valid gradable id
-            if(gradableId != 0)
+            if (gradableId != 0)
             {
                 Gradable gradable = (from g in db.Gradables where g.ID == gradableId select g).First();
                 switch (action)
@@ -131,7 +134,7 @@ namespace OSBLE.Controllers
                         break;
                 }
             }
-            
+
             BuildGradebook((int)Session["CurrentWeightID"]);
             return View("_Gradebook");
         }
@@ -152,11 +155,11 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// This function is responsible for making the various calls needed to build the gradebook.  
+        /// This function is responsible for making the various calls needed to build the gradebook.
         /// Originally, this code was in the Index() action, but it was moved into its own function
         /// because I (AC) needed to rebuild the gradebook whenever a structural change (add/remove column, etc.)
         /// was made.
-        /// 
+        ///
         /// After building the gradebook, this function makes the necessary components available to the
         /// View via the ViewBag.  The components are:
         ///  ViewBag.Tabs = All the tabs present in the gradebook
@@ -218,7 +221,7 @@ namespace OSBLE.Controllers
                               where weight.CourseID == currentCourseId
                               orderby weight.Position ascending
                               select weight;
-            
+
             //if something was found, complete the query and get the first weight listed
             if (weightQuery.Count() > 0)
             {
@@ -228,7 +231,6 @@ namespace OSBLE.Controllers
             //ELSE: create a new tab and an anitial gradable
             else
             {
-
                 Weight newWeight = new Weight()
                 {
                     Name = "Untitled",
