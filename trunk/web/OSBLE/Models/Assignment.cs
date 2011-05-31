@@ -6,15 +6,34 @@ namespace OSBLE.Models
 {
     public class Assignment : AbstractGradable
     {
+        public Assignment()
+            : base()
+        {
+            DateTime dateTimeNow = DateTime.Now;
+
+            //The default is tomorrow at midnight
+            ReleaseDate = new DateTime(dateTimeNow.Year, dateTimeNow.Month, dateTimeNow.Day, 0, 0, 0);
+            ReleaseDate = ReleaseDate.AddDays(1);
+
+            //The default time is 1 week from the ReleaseDate and it is due time is right before the next day 11:59:59.999
+            DueDate = new DateTime(ReleaseDate.Year, ReleaseDate.Month, ReleaseDate.Day, 23, 59, 59);
+            DueDate = DueDate.AddDays(7);
+
+            isGradeable = true;
+        }
+
         [Required]
+        [DataType(DataType.DateTime)]
         [Display(Name = "Release Date")]
         public DateTime ReleaseDate { get; set; }
 
         [Required]
+        [DataType(DataType.DateTime)]
         [Display(Name = "Due Date")]
         public DateTime DueDate { get; set; }
 
         [Required]
+
         [Display(Name = "Description")]
         public string Description { get; set; }
 
