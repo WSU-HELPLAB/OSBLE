@@ -79,6 +79,7 @@
     <Compile Include="Controllers\CommunityController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
     <Compile Include="Controllers\DeliverableController.cs" />
+    <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\SubmissionAssignmentActivityController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
@@ -468,6 +469,11 @@
     <Content Include="Views\Shared\EditorTemplates\Time.cshtml" />
     <Content Include="Views\Shared\_Events.cshtml" />
     <Content Include="Views\Gradebook\_Gradebook.cshtml" />
+    <Content Include="Views\Event\Index.cshtml" />
+    <Content Include="Views\Event\Details.cshtml" />
+    <Content Include="Views\Event\Create.cshtml" />
+    <Content Include="Views\Event\Edit.cshtml" />
+    <Content Include="Views\Event\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

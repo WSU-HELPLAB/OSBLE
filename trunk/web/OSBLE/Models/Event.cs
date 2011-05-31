@@ -16,6 +16,10 @@ namespace OSBLE.Models
         public int CourseID { get; set; }
         public virtual AbstractCourse Course { get; set; }
 
+        // User who created the event. Optional.
+        public int PosterID { get; set; }
+        public virtual UserProfile Poster { get; set; }
+
         [Required]
         public DateTime StartDate { get; set; }
 

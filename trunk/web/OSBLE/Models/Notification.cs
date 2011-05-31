@@ -45,6 +45,7 @@ namespace OSBLE.Models
 
         public static class Types {
             public const string Mail = "Mail";
+            public const string EventApproval = "EventApproval";
         }
 
     }

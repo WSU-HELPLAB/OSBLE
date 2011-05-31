@@ -61,5 +61,51 @@ namespace OSBLE.Controllers
             return View("_AjaxEmpty");            
         }
 
+        /// <summary>
+        /// Creates and posts a new mail message notification to its recipient
+        /// </summary>
+        /// <param name="mail">The message that has been sent</param>
+        /// <param name="db">The current database context</param>
+        [NonAction]
+        public void SendMailNotification(Mail mail)
+        {
+            // Send notification to recipient about new message.
+            Notification n = new Notification();
+            n.ItemType = Notification.Types.Mail;
+            n.ItemID = mail.ID;
+            n.RecipientID = mail.ToUserProfileID;
+            n.SenderID = mail.FromUserProfileID;
+
+            db.Notifications.Add(n);
+            db.SaveChanges();
+        }
+
+        /// <summary>
+        /// Creates and posts a new request for approval on an event posting and sends to all instructors in a course
+        /// </summary>
+        /// <param name="e">The event that requires approval</param>
+        /// <param name="db">The current database context</param>
+        [NonAction]
+        public void SendEventApprovalNotification(Event e)
+        {
+            // Get all instructors in the course.
+            List <UserProfile> instructors = db.CoursesUsers.Where(c => (c.CourseID == e.CourseID)
+                && (c.CourseRoleID == (int)CourseRole.OSBLERoles.Instructor))
+                .Select(c => c.UserProfile).ToList();
+
+            foreach (UserProfile instructor in instructors)
+            {
+                Notification n = new Notification();
+                n.ItemType = Notification.Types.EventApproval;
+                n.ItemID = e.ID;
+                n.RecipientID = instructor.ID;
+                n.SenderID = e.PosterID;
+
+                db.Notifications.Add(n);
+            }
+
+            db.SaveChanges();
+        }
+
     }
 }
