@@ -346,7 +346,7 @@ namespace OSBLE.Controllers
                 }
             }
 
-            return events.OrderBy(e => e.StartDate).ToList();
+            return events.OrderBy(e=> e.ID).OrderBy(e => e.StartDate).ToList();
         }
 
         protected override void Dispose(bool disposing)
