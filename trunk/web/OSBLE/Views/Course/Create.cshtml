@@ -125,6 +125,10 @@
         
     <input type="hidden" id="breaks_max" name="breaks_max" value="0" />
     
+        <div class="editor-field">
+            @Html.CheckBoxFor(model => model.ShowMeetings) @Html.LabelFor(model => model.ShowMeetings) <br />
+            @Html.ValidationMessageFor(model => model.ShowMeetings)
+        </div>
     
         <h3>Course Settings</h3>
         <div class="editor-field">

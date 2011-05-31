@@ -86,8 +86,8 @@ namespace OSBLE.Controllers
             
             List<Event> events = ActiveCourse.Course.Events.Where(e => e.Approved && (e.StartDate >= today) && (e.StartDate <= upto)).ToList();
 
-            // Add course meeting times.
-            if (ActiveCourse.Course is Course)
+            // Add course meeting times and breaks.
+            if (ActiveCourse.Course is Course && ((ActiveCourse.Course as Course).ShowMeetings == true))
             {
                 Course course = (Course)ActiveCourse.Course;
 

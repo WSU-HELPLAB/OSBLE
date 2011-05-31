@@ -64,6 +64,9 @@ namespace OSBLE.Models
         [Display(Name = "Course Breaks")]
         public virtual ICollection<CourseBreak> CourseBreaks { get; set; }
 
+        [Display(Name = "Show course meetings and breaks in course calendar")]
+        public bool ShowMeetings { get; set; }
+
         public Course() : base()
         {
             // Set default values for course settings.
@@ -72,6 +75,7 @@ namespace OSBLE.Models
             AllowEventPosting = true;
             RequireInstructorApprovalForEventPosting = true;
             Inactive = false;
+            ShowMeetings = true;
 
             StartDate = DateTime.Now.Date;
             EndDate = DateTime.Now.Date.AddDays(112); // Add 16 weeks.

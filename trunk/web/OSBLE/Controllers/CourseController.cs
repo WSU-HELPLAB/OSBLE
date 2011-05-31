@@ -170,6 +170,7 @@ namespace OSBLE.Controllers
             updateCourse.Semester = course.Semester;
             updateCourse.StartDate = course.StartDate;
             updateCourse.Year = course.Year;
+            updateCourse.ShowMeetings = course.ShowMeetings;
 
             createMeetingTimes(updateCourse);
             createBreaks(updateCourse);
