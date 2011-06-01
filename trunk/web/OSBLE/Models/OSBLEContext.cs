@@ -5,9 +5,6 @@ using OSBLE.Models.Gradables;
 using OSBLE.Models.Gradables.StudioAssignment;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
-using OSBLE.Models.Gradables;
-using OSBLE.Models.Gradables.StudioAssignment;
-using OSBLE.Models.Courses;
 
 namespace OSBLE.Models
 {

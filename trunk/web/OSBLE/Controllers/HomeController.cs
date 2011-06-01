@@ -9,7 +9,7 @@ using OSBLE.Models.Users;
 
 namespace OSBLE.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class HomeController : OSBLEController
     {
         /// <summary>
@@ -88,6 +88,11 @@ namespace OSBLE.Controllers
 
             #endregion Events
 
+            return View();
+        }
+
+        public ViewResult SilverlightTest()
+        {
             return View();
         }
 

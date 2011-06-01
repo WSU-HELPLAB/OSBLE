@@ -19,8 +19,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <UseIISExpress>false</UseIISExpress>
-    <SilverlightApplicationList>
-    </SilverlightApplicationList>
+    <SilverlightApplicationList>{8C2CBBF3-5305-4942-9B1E-E3B8525441F0}|..\SilverlightApplication3\SilverlightApplication3.csproj|ClientBin|False</SilverlightApplicationList>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,6 +50,8 @@
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.DomainServices.Hosting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.ServiceModel.DomainServices.Server, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -104,6 +105,8 @@
     <Compile Include="Models\Services\Uploader\AbstractListing.cs" />
     <Compile Include="Models\Services\Uploader\DirectoryListing.cs" />
     <Compile Include="Models\Services\Uploader\FileListing.cs" />
+    <Compile Include="Services\AuthenticationDomainService.cs" />
+    <Compile Include="Services\DomainService1.cs" />
     <Compile Include="Services\SilverlightFaultBehavior.cs" />
     <Compile Include="Services\UploaderWebService.svc.cs">
       <DependentUpon>UploaderWebService.svc</DependentUpon>
@@ -147,6 +150,7 @@
     <Content Include="App_Data\FirstNames.txt" />
     <Content Include="App_Data\LastNames.txt" />
     <Content Include="ClientBin\FileUploader.xap" />
+    <Content Include="ClientBin\SilverlightApplication3.xap" />
     <Content Include="Content\favicon.ico" />
     <Content Include="Content\images\account.png" />
     <Content Include="Content\images\add_up.png" />
@@ -290,6 +294,7 @@
     <Content Include="Scripts\osble.js" />
     <Content Include="Scripts\Silverlight.js" />
     <Content Include="Services\UploaderWebService.svc" />
+    <Content Include="Views\Home\SilverlightTest.aspx" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
