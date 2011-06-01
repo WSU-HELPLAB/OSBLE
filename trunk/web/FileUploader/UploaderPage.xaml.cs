@@ -36,18 +36,18 @@ namespace FileUploader
             InitializeComponent();
 
             //listeners for our web service
-            syncedFiles.GetFileListCompleted += syncedFiles_GetFileListCompleted;
-            syncedFiles.SyncFileCompleted += syncedFiles_SyncCompleted;
+            //syncedFiles.GetFileListCompleted += syncedFiles_GetFileListCompleted;
+            //syncedFiles.SyncFileCompleted += syncedFiles_SyncCompleted;
 
             // Populate the ListBox with the contents of the directory path
-            dirList(localpath);
+            //dirList(localpath);
         }
 
         // Executes when the user navigates to this page.
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
         }
-
+        /*
         private void dirList(string path)
         {
 
@@ -64,8 +64,8 @@ namespace FileUploader
             foreach (string folder in Directory.EnumerateDirectories(path))
             {
                 FileListItem label = new FileListItem();
-                label.FileName = folder.Substring(folder.LastIndexOf('\\') + 1);
-                label.Image = LabelImage.Folder;
+                //label.FileName = folder.Substring(folder.LastIndexOf('\\') + 1);
+                //label.Image = LabelImage.Folder;
                 //label.LastModified = File.GetLastWriteTime(folder);
                 LocalFileList.Items.Add(label);
             }
@@ -74,8 +74,8 @@ namespace FileUploader
             foreach (string file in Directory.EnumerateFiles(path))
             {
                 FileListItem label = new FileListItem();
-                label.FileName = file.Substring(file.LastIndexOf('\\') + 1);
-                label.Image = LabelImage.File;
+                //label.FileName = file.Substring(file.LastIndexOf('\\') + 1);
+                //label.Image = LabelImage.File;
                 //label.LastModified = File.GetLastWriteTime(file);
                 LocalFileList.Items.Add(label);
             }
@@ -234,7 +234,7 @@ namespace FileUploader
                     SyncedFileList.Items.Add(temp);
                 }
 
-                */
+                
             }
             else
             {
@@ -330,6 +330,7 @@ namespace FileUploader
                 lblStatus.Text = "Upload failed.";
             }
         }
+         * */
 
     }
 }

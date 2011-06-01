@@ -22,7 +22,7 @@
                    VerticalAlignment="Center" HorizontalAlignment="Center"/>
         <ScrollViewer x:Name="VertScrollBarLocal" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" 
                       VerticalAlignment="Stretch">
-            <ListBox Name="LocalFileList" HorizontalAlignment="Stretch" MouseLeftButtonUp="LocalDirSelect"></ListBox>
+            <ListBox Name="LocalFileList" HorizontalAlignment="Stretch" ></ListBox>
         </ScrollViewer>
         <sdk:GridSplitter Grid.Row="0" Grid.Column="1" Grid.RowSpan="3" VerticalAlignment="Stretch" HorizontalAlignment="Center" 
                           Background="DarkSlateGray" Width="3" />
@@ -34,17 +34,17 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Button x:Name="Upbtn" Content="UP" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0" 
-                    Click="MoveUpbtn_Click" />
+                    />
                 <Button x:Name="Downbtn" Content="DOWN" HorizontalAlignment="Right" VerticalAlignment="Center" 
-                    Click="MoveDownbtn_Click"/>
+                    />
             </StackPanel>
         </StackPanel>
         <ScrollViewer x:Name="VertScrollBarSynced" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch" 
                         VerticalAlignment="Stretch">
-            <ListBox Name="SyncedFileList" HorizontalAlignment="Stretch" MouseLeftButtonUp="SyncDirSelect"></ListBox>
+            <ListBox Name="SyncedFileList" HorizontalAlignment="Stretch"></ListBox>
         </ScrollViewer>
         <Button x:Name="Syncbtn" Content="Sync Visable Files" Grid.Column="0" Grid.Row="2" 
-                HorizontalAlignment="Center" VerticalAlignment="Center" Click="Syncbtn_Click"/>
+                HorizontalAlignment="Center" VerticalAlignment="Center" />
         <TextBlock x:Name="lblStatus"/>
     </Grid>
 </navigation:Page>
