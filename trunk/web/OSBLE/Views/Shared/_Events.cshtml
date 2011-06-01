@@ -1,10 +1,11 @@
-﻿@using OSBLE.Models.HomePage
+﻿@model List<OSBLE.Models.HomePage.Event>
+@using OSBLE.Models.HomePage
 
 @{
     DateTime lastDate = DateTime.Parse("1/1/1990");
 }
 <ul id="event_list">
-@foreach (Event e in ViewBag.Events)
+@foreach (Event e in Model)
 {
     if (lastDate.Date != e.StartDate.Date)
     {

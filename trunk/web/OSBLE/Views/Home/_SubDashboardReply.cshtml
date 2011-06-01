@@ -6,8 +6,6 @@
 
 @foreach (DashboardReply dr in ViewBag.DashboardReplies)
 {
-    ViewBag.dp = dr;
-    @Html.Partial("_DashboardPost");
-                                    
+    @Html.Partial("_DashboardPost",dr);                                    
 }
 

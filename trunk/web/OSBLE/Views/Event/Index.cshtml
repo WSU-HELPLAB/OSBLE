@@ -26,10 +26,8 @@
     
 <h3><a href="#" onclick="$('#past_events').toggle('blind'); return false;">Past Events (@pastEvents.Count)</a></h3>
 
-    ViewBag.Events = pastEvents;    
-
     <div id="past_events">
-    @Html.Partial("_Events")
+    @Html.Partial("_Events",pastEvents)
     </div>
 }
 
@@ -38,10 +36,8 @@
     
 <h3><a href="#" onclick="$('#current_events').toggle('blind'); return false;">Current Events (@currentEvents.Count)</a></h3>
 
-    ViewBag.Events = currentEvents;
-    
     <div id="current_events">
-    @Html.Partial("_Events")
+    @Html.Partial("_Events",currentEvents)
     </div>
 
 }

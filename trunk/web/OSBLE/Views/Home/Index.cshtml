@@ -1,4 +1,6 @@
-﻿@{
+﻿@using OSBLE.Models.HomePage
+
+@{
     ViewBag.Title = "Dashboard";
 }
 
@@ -26,7 +28,7 @@
 
 <div id="important_dates">
 <p>Next @ViewBag.ActiveCourse.Course.CalendarWindowOfTime Weeks</p>
-@Html.Partial("_Events")
+@Html.Partial("_Events",(List<Event>)ViewBag.Events)
 <p>@Html.ActionLink("Show All Events", "Index", "Event")</p>
 </div>
 

@@ -34,8 +34,7 @@
 <div id="dp_posts">
     @foreach (DashboardPost dp in ViewBag.DashboardPosts)
     {
-        ViewBag.dp = dp;
-        @Html.Partial("_DashboardPost");
+        @Html.Partial("_DashboardPost",dp);
     }
 </div>
 
