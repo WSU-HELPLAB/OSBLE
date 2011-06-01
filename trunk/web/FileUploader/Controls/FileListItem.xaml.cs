@@ -18,27 +18,33 @@ namespace FileUploader.Controls
 
     public partial class FileListItem : ListBoxItem
     {
+        private AbstractListing dataContext;
         public AbstractListing DataContext
         {
-            get;
-            set;
+            get
+            {
+                return dataContext;
+            }
+            set
+            {
+                dataContext = value;
+                this.DirName.Text = dataContext.Name;
+                BitmapImage bmp;
+                if (dataContext is DirectoryListing)
+                {
+                    bmp = BitmapFromLabel(LabelImage.Folder);
+                }
+                else
+                {
+                    bmp = BitmapFromLabel(LabelImage.File);
+                }
+                this.DirImage.Source = bmp;
+            }
         }
 
         public FileListItem()
         {
             InitializeComponent();
-        }
-
-        public string FileName
-        {
-            get
-            {
-                return this.DirName.Text;
-            }
-            set
-            {
-                this.DirName.Text = value;
-            }
         }
 
         /// <summary>
@@ -67,34 +73,5 @@ namespace FileUploader.Controls
             bmp.UriSource = new Uri(imagePath, UriKind.Relative);
             return bmp;
         }
-
-        private LabelImage image = LabelImage.Folder;
-        public LabelImage Image
-        {
-            get
-            {
-                return image;
-            }
-            set
-            {
-                image = value;
-                this.DirImage.Source = BitmapFromLabel(image);
-            }
-        }
-
-        public int CompareTo(object obj)
-        {
-            if (obj is FileListItem)
-            {
-                FileListItem other = obj as FileListItem;
-                return FileName.CompareTo(other.FileName);
-            }
-            else
-            {
-                return -1;
-            }
-        }
-
-
     }
 }

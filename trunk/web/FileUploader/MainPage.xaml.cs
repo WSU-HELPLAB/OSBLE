@@ -21,7 +21,6 @@ namespace FileUploader
         public MainPage()
         {
             InitializeComponent();
-
         }
     }
 }
