@@ -19,6 +19,7 @@ namespace OSBLE
             routes.RouteExistingFiles = true;
             routes.IgnoreRoute("Content/{*pathInfo}");
             routes.IgnoreRoute("Scripts/{*pathInfo}");
+            routes.IgnoreRoute("ClientBin/{*pathInfo}");
 
             routes.MapRoute(
                 "File System",
