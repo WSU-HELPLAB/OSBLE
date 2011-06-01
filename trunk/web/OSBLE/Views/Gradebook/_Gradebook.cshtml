@@ -3,52 +3,66 @@
 @{
     Layout = null;
 }
+
 <table id="grades" class="gradebook">
+        <tr id="perfectScore">
+            <th id="th2">
+                Perfect Score
+            </th>
+            <td id="perfectTotal">
+                100%
+            </td>
+            @foreach (Gradable item in ViewBag.Gradables)
+            {
+                <td id="@item.ID" onclick="cellGainsFocus(this)">
+                    @item.PossiblePoints
+                </td>   
+            }
+        </tr>
         <tr>
-            <th id="th-1">
-                &nbsp
+            <th id="th3">
+                Averave Score
+            </th>
+            <td id="averageTotal">
+                0
+            </td>
+            @foreach (Gradable item in ViewBag.Gradables)
+            {
+                <td id="averageScore">
+                    0
+                </td>  
+            }
+        </tr>
+        <tr>
+            <th id="th4">
+                Name
+            </th>
+            <th id="th5">
+                Total [Customize...]
             </th>
             @foreach (Gradable item in ViewBag.Gradables)
             {
                 <th id="@item.ID" onclick="changeHeaderName(this)">@item.Name<div id="cntnr" class="thButton">
-                    <button class="dropdown" id="1" onclick="ShowHide(this);">
+                    <button class="dropdown" id="@item.ID" onclick="ShowHide(this);">
                     </button>
                 </div>
                 </th>
             }
-        </tr>
-        <tr>
-            <th id="th-2">
-                Points Possible
-            </th>
-            @foreach (Gradable item in ViewBag.Gradables)
-            {
-                <td onclick="cellGainsFocus(this)">@item.PossiblePoints
-                </td>   
-            }
-        </tr>
-        <tr>
-            <th id="th-3">
-                Students
-            </th>
-            @foreach (Gradable item in ViewBag.Gradables)
-            {
-                <td>
-                    &nbsp
-                </td>   
-            }
+            
         </tr>
         <!--loop through all users -->
         @foreach (OSBLE.Models.Users.UserProfile user in ViewBag.Users)
         {        
-            <tr>
+            <tr id="studentGrades">
                 <td id="@user.ID" >@user.LastName, @user.FirstName
+                </td>
+                <td id="total">
+                    0
                 </td>
                 @foreach (Gradable gradable in ViewBag.Gradables)
                 {
-                    <!--TODO: Add unique identifiers for use in AJAX calls to each table cell -->
-                
-                    <td onclick="cellGainsFocus(this)">
+
+                    <td id="@String.Format("{0}-{1}", user.ID, gradable.ID)" onclick="cellGainsFocus(this)">
                         @{var gradableQuery = from g in ViewBag.Grades as IEnumerable<GradableScore>
                                               where g.GradableID == gradable.ID && g.UserProfileID == user.ID
                                               select g;

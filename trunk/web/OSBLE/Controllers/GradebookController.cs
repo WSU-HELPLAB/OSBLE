@@ -36,7 +36,7 @@ namespace OSBLE.Controllers
         {
             int weightId = Convert.ToInt32(Session["CurrentWeightID"]);
             Gradable g = new Gradable()
-            {
+           { 
                 Position = position,
                 PossiblePoints = pointsPossible,
                 WeightID = weightId,
@@ -83,9 +83,30 @@ namespace OSBLE.Controllers
         public void DeleteColumn(int gradableId)
         {
             Gradable gradable = db.Gradables.Find(gradableId);
-            db.AbstractGradables.Remove(gradable);
+            db.Gradables.Remove(gradable);
             db.SaveChanges();
         }
+
+        /// <summary>
+        /// Clears a gradable (column) from the current table.
+        /// Changes all the numbers in the gradable to 0.
+        /// </summary>
+        /// <param name="gradableId">The ID of the gradable to clear</param>
+        [HttpPost]
+        public void ClearColumn(int gradableId)
+        {
+            var gradableQuery = from g in db.Gradables
+                                where g.ID == gradableId
+                                select g;
+            if (gradableQuery.Count() > 0)
+            {
+                foreach (Gradable item in gradableQuery)
+                {
+                    item.PossiblePoints = 0;
+                }
+                db.SaveChanges();
+            }
+        }       
 
         private ColumnAction StringToColumnAction(string action)
         {
@@ -109,6 +130,73 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
+        public ActionResult ModifyPossiblePoints(int value, int gradableId)
+        {
+            if (ModelState.IsValid)
+            {
+                if (gradableId != 0)
+                {
+                    Gradable gradableQuery = (from g in db.Gradables
+                                              where g.ID == gradableId
+                                              select g as Gradable).FirstOrDefault();
+                    if (gradableQuery != null)
+                    {
+                        gradableQuery.PossiblePoints = value;
+                        try
+                        {
+                            db.SaveChanges();
+                        }
+                        catch (Exception e)
+                        {
+                        }
+                        //                    return RedirectToAction("Index");
+                    }
+                }
+                else
+                {
+                    Json("failure");
+                }
+            }
+                return Json("success");
+            //return RedirectToAction("Index");
+        }
+        
+
+        [HttpPost]
+        public ActionResult ModifyCell(int value, int userId, int gradableId)
+        {
+            //Continue if we have a valid gradable ID
+            if (gradableId != 0)
+            {
+                var gradableQuery = from g in db.GradableScores
+                                    where g.UserProfileID == userId
+                                    && g.GradableID == gradableId
+                                    select g;
+                if (gradableQuery.Count() > 0)
+                {
+                    foreach (GradableScore item in gradableQuery)
+                    {
+                        item.Score = value;
+                    }
+                    db.SaveChanges();
+                }
+                else
+                {
+                    GradableScore gs = new GradableScore()
+                    {
+                        GradableID = gradableId,
+                        UserProfileID = userId,
+                        Score = value
+                    };
+                    db.GradableScores.Add(gs);
+                    db.SaveChanges();
+                }
+            }
+
+            return Json("success");
+        }
+
+        [HttpPost]
         public ActionResult ModifyColumn()
         {
             //convert POST params to variables
@@ -127,15 +215,26 @@ namespace OSBLE.Controllers
                 {
                     case ColumnAction.InsertLeft:
                         int position = (gradable.Position == 0) ? 0 : gradable.Position - 1;
-                        AddColumn("Untitled", 0, position);
+                        AddColumn("Untitled", 100, position);
                         break;
                     case ColumnAction.InsertRight:
-                        AddColumn("Untitled", 0, gradable.Position + 1);
+                        AddColumn("Untitled", 100, gradable.Position + 1);
+                        break;
+                    case ColumnAction.Delete:
+                        DeleteColumn(gradableId);
+                        break;
+                    case ColumnAction.Clear:
+                        ClearColumn(gradableId);
                         break;
                 }
             }
-
             BuildGradebook((int)Session["CurrentWeightID"]);
+            return View("_Gradebook");
+        }
+
+        [HttpPost]
+        public ActionResult UpdateCells()
+        {
             return View("_Gradebook");
         }
 
@@ -233,7 +332,7 @@ namespace OSBLE.Controllers
             {
                 Weight newWeight = new Weight()
                 {
-                    Name = "Untitled",
+                    Name = "Main",
                     CourseID = currentCourseId,
                     Course = ViewBag.ActiveCourse.Course,
                     Points = 0,
@@ -246,7 +345,7 @@ namespace OSBLE.Controllers
                 Gradable newGradable = new Gradable()
                 {
                     Name = "Untitled",
-                    PossiblePoints = 0,
+                    PossiblePoints = 100,
                     GradableScores = new List<GradableScore>(),
                     WeightID = newWeight.ID,
                     Position = 0

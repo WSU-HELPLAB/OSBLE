@@ -34,7 +34,7 @@ namespace OSBLE.Models.Gradables
         public int Position { get; set; }
 
         [Required]
-        [Display(Name = "PossiblePoints")]
+        [Display(Name = "Possible Points")]
         public int PossiblePoints { get; set; }
     }
 }

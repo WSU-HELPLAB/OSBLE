@@ -7,7 +7,7 @@
 <style type="text/css">
     .cellInput
     {
-        width: auto;
+        width: 75px;
         border: none;
     }
     .gradebook
@@ -92,6 +92,7 @@
     {
         float: left;
         border: 1px solid;
+        background-color: #f5f5f5;
         border-bottom-width: 0;
         margin: 0 0.5em 0 0;
         background: silver;
@@ -100,7 +101,8 @@
     #tabHeader #selected
     {
         position: relative;
-        top: 1px;
+        top:1px;
+        border-bottom:1px solid #fff;
         background: white;
     }
 </style>
@@ -155,6 +157,7 @@
             }
             $('#columnOptionsForm').submit(function () {
                 $('#gradableId').val(currentCol);
+                return;
             });
         </script>
     </div>
@@ -185,8 +188,12 @@
     //Keeps track of the total number of weights
     var tabCount = 1;
 
-    $(document).click(function () {
+    $(document).ready(function () {
+        calculateRows();
+        calculateCols();
+    });
 
+    $(document).click(function () {
         if (changedShow == true) {
             if (showDropDown == false) {
                 if (menuClicked == true) {
@@ -200,6 +207,41 @@
             hideDropDown();
             showDropDown = false;
 
+        }
+    });
+
+    $("#grades td").keydown(function (e) {
+        var cell = null;
+        if (e.keyCode == 13) {
+
+            var row = $(this).parent("tr").next("tr");
+            var colIndex = $(this).prevAll().length;
+            row.each(function () {
+                cell = $(this).find("td:eq(" + colIndex + ")");
+            });
+            cellGainsFocus(cell);
+        }
+        else if (e.keyCode == 9) {
+            e.preventDefault();
+            var row = $(this).parent("tr");
+            var colIndex = $(this).prevAll().length;
+            colIndex = parseInt(colIndex);
+            colIndex += 1;
+            row.each(function () {
+                cell = $(this).find("td:eq(" + colIndex + ")");
+            });
+            cellGainsFocus(cell);
+        }
+        else {
+        }
+    });
+
+    $("#grades th").keydown(function (e) {
+        if (e.keyCode == 13) {
+            clearLastHeaderFocus(lastId);
+        }
+        else if (e.keyCode == 9) {
+            clearLastHeaderFocus(lastId);
         }
     });
 
@@ -220,6 +262,7 @@
             clearLastHeaderFocus(lastId);
             header = false;
         }
+
         //If a cell has focus we want to clear it before we start to edit the header
         clearLastCellFocus();
 
@@ -263,11 +306,45 @@
         //if a prior cell has already received focus in the past, we need to turn it back into
         //a normal table cell
         if (lastFocusedCell != null) {
+
+            //The ID's will be stored in ajaxId's array.
+            //ajaxIDs[0] = userId
+            //ajaxIds[1] = gradableId
+            var ajaxIDs = lastFocusedCell.attr("id").split("-");
+
             var cellValue = lastFocusedCell.children().val();
             lastFocusedCell.html("");
             lastFocusedCell.text(cellValue);
             lastFocusedCell.attr("onclick", 'cellGainsFocus(this)');
             lastFocusedCell = null;
+
+
+            //AJAX call
+            //What we need:
+            //UserID
+            //GradableID
+            //and the value to modify (cellValue)
+
+            //if we are editing a gradebook cell then ajaxIDs[1] will contain a value
+            if (ajaxIDs[1] != null) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Gradebook/ModifyCell",
+                    data: { value: cellValue, userId: ajaxIDs[0], gradableId: ajaxIDs[1] }
+                });
+            }
+
+            //If there is no value in ajaxIDs[1] then we are editing the points possible
+            else {
+                $.ajax({
+                    type: "POST",
+                    url: "/Gradebook/ModifyPossiblePoints",
+                    data: { value: cellValue, gradableId: ajaxIDs[0] }
+                });
+            }
+
+            calculateRows();
+            calculateCols();
         }
     }
 
@@ -302,13 +379,32 @@
 
         //clear any previous focus
         clearLastCellFocus();
-
-        $("#grades tr").each(function () {
-            var total = 0;
-            $(this).find('td').each(function () {
-                total += parseInt($(this).text());
+        var totalPerfect = 0;
+        var totalAverage = 0;
+        $("#grades #perfectScore").each(function () {
+            $(this).find("td").each(function () {
+                
+                if ($(this).attr("id") != "perfectTotal") {
+                    totalPerfect += parseInt($(this).text());
+                }
             });
-            alert("Row Total: " + total);
+        });
+        $("#grades #studentGrades").each(function () {
+            var total = 0;
+            $(this).find("td").each(function () {
+                var checkId = $(this).attr("id").split("-")
+                if (checkId[1] != null) {
+                    total += parseInt($(this).text());
+                }
+                else {
+                }
+            });
+            total = parseInt((total / totalPerfect) * 100).toFixed(2);
+            $(this).find("td").each(function () {
+                if ($(this).attr("id") == "total") {
+                    $(this).text(total + "%");
+                }
+            });
         });
     }
 
@@ -331,38 +427,37 @@
         //clear any previous focus
         clearLastCellFocus();
 
-        var col1 = 0;
-        var col2 = 0;
-        var col3 = 0;
-        var col4 = 0;
-        var col5 = 0;
+        //We start at 3 because rows 1 and 2 are the student names and total
+        var colIndex = 2;
 
-        //reference the rows you want to add
-        //this will not include the header row
-        var rows = $("#grades tr");
-        rows.children("td:nth-child(1)").each(function () {
+        //Starting in the gradebook on the student grade rows
+        //This bypasses the headers so we don't look through them
+        $("#grades #studentGrades").each(function () {
+            $(this).find("td:nth-child(" + colIndex + ")").each(function () {
+                getSum(colIndex);
+            });
+            colIndex += 1;  
+        });
+    }
 
-            //each time we add the cell to the total
-            col1 += parseInt($(this).html());
+    function getSum(Index) {
+        var colTotal = 0;
+        var count = 0;
+        $("#grades #studentGrades").children("td:nth-child(" + Index + ")").each(function () {
+            colTotal += parseInt($(this).text());
+            count += 1;
         });
-        rows.children("td:nth-child(2)").each(function () {
-            col2 += parseInt($(this).html());
+        
+        $("#grades tr").children("td:nth-child(" + Index + ")").each(function () {
+            if ($(this).attr("id") == "averageTotal") {
+                colTotal = parseInt(colTotal / count).toFixed(2);
+                $(this).html(colTotal + "%");
+            }
+            if ($(this).attr("id") == "averageScore") {
+                colTotal = parseInt(colTotal / count).toFixed(0);
+                $(this).html(colTotal);
+            }
         });
-        rows.children("td:nth-child(3)").each(function () {
-            col3 += parseInt($(this).html());
-        });
-        rows.children("td:nth-child(4)").each(function () {
-            col4 += parseInt($(this).html());
-        });
-        rows.children("td:nth-child(5)").each(function () {
-            col5 += parseInt($(this).html());
-        });
-
-        alert(col1);
-        alert(col2);
-        alert(col3);
-        alert(col4);
-        alert(col5);
     }
 
     function ShowHide(buttonClick) {
@@ -380,8 +475,8 @@
         //aligning the menu under the buttons
         var y = $("#" + container).position().left;
         var x = $("#" + container).position().top;
-        y += 3;
-        x += 23;
+        y += 65;
+        x += 25;
 
         //Moving the menu to the button that clicked it
         $("#slidingDivID").css("left", y + "px");
