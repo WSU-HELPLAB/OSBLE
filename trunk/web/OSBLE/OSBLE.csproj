@@ -19,7 +19,8 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <UseIISExpress>false</UseIISExpress>
-    <SilverlightApplicationList>{79706350-C34D-4A51-B22F-273EC8289E5D}|..\FileUploader\FileUploader.csproj|ClientBin|False</SilverlightApplicationList>
+    <SilverlightApplicationList>
+    </SilverlightApplicationList>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
