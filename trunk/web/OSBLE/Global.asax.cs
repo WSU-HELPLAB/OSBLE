@@ -20,6 +20,7 @@ namespace OSBLE
             routes.IgnoreRoute("Content/{*pathInfo}");
             routes.IgnoreRoute("Scripts/{*pathInfo}");
             routes.IgnoreRoute("ClientBin/{*pathInfo}");
+            routes.IgnoreRoute("Services/{*pathInfo}");
 
             routes.MapRoute(
                 "File System",

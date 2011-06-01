@@ -19,8 +19,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <UseIISExpress>false</UseIISExpress>
-    <SilverlightApplicationList>
-    </SilverlightApplicationList>
+    <SilverlightApplicationList>{79706350-C34D-4A51-B22F-273EC8289E5D}|..\FileUploader\FileUploader.csproj|ClientBin|False</SilverlightApplicationList>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -49,6 +48,8 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.WebPages, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -99,6 +100,10 @@
     <Compile Include="Models\Gradables\Gradable.cs" />
     <Compile Include="Models\Gradables\GradableScore.cs" />
     <Compile Include="Models\Courses\Weights.cs" />
+    <Compile Include="Services\SilverlightFaultBehavior.cs" />
+    <Compile Include="Services\UploaderWebService.svc.cs">
+      <DependentUpon>UploaderWebService.svc</DependentUpon>
+    </Compile>
     <Compile Include="Utility\FileSystem.cs" />
     <Compile Include="Attributes\CanModifyCourse.cs" />
     <Compile Include="Attributes\CanSeeAllCourse.cs" />
@@ -137,6 +142,7 @@
     <Content Include="App_Code\Libraries\LumenWorks.Framework.IO.dll" />
     <Content Include="App_Data\FirstNames.txt" />
     <Content Include="App_Data\LastNames.txt" />
+    <Content Include="ClientBin\FileUploader.xap" />
     <Content Include="Content\favicon.ico" />
     <Content Include="Content\images\account.png" />
     <Content Include="Content\images\add_up.png" />
@@ -279,6 +285,7 @@
     <Content Include="Scripts\osble.courses.js" />
     <Content Include="Scripts\osble.js" />
     <Content Include="Scripts\Silverlight.js" />
+    <Content Include="Services\UploaderWebService.svc" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -311,7 +318,6 @@
     <Content Include="Views\Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ClientBin\" />
     <Folder Include="Validations\" />
   </ItemGroup>
   <ItemGroup>
@@ -507,8 +513,8 @@
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
-          <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>4414</DevelopmentServerPort>
+          <AutoAssignPort>False</AutoAssignPort>
+          <DevelopmentServerPort>17532</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>
