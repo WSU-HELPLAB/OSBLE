@@ -100,6 +100,9 @@
     <Compile Include="Models\Gradables\Gradable.cs" />
     <Compile Include="Models\Gradables\GradableScore.cs" />
     <Compile Include="Models\Courses\Weights.cs" />
+    <Compile Include="Models\Services\Uploader\AbstractListing.cs" />
+    <Compile Include="Models\Services\Uploader\DirectoryListing.cs" />
+    <Compile Include="Models\Services\Uploader\FileListing.cs" />
     <Compile Include="Services\SilverlightFaultBehavior.cs" />
     <Compile Include="Services\UploaderWebService.svc.cs">
       <DependentUpon>UploaderWebService.svc</DependentUpon>

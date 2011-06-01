@@ -4,8 +4,53 @@
   <wsdl:types />
   <wsdl:binding name="BasicHttpBinding_UploaderWebService" type="UploaderWebService">
     <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
-    <wsdl:operation name="DoWork">
-      <soap:operation soapAction="urn:UploaderWebService/DoWork" style="document" />
+    <wsdl:operation name="GetFakeFileListing">
+      <soap:operation soapAction="urn:UploaderWebService/GetFakeFileListing" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetFakeDirectoryListing">
+      <soap:operation soapAction="urn:UploaderWebService/GetFakeDirectoryListing" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetFileList">
+      <soap:operation soapAction="urn:UploaderWebService/GetFileList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetFileUrl">
+      <soap:operation soapAction="urn:UploaderWebService/GetFileUrl" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SyncFile">
+      <soap:operation soapAction="urn:UploaderWebService/SyncFile" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createDir">
+      <soap:operation soapAction="urn:UploaderWebService/createDir" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>

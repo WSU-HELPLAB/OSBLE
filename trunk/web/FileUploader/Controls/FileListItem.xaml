@@ -6,8 +6,9 @@
     xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows"
     mc:Ignorable="d"
     d:DesignHeight="300" d:DesignWidth="400">
-    
-    <Grid x:Name="LayoutRoot" Background="White">
 
-    </Grid>
+    <StackPanel Orientation="Horizontal">
+        <Image x:Name="DirImage" Source="/Images/folder.png" Stretch="None"></Image>
+        <TextBlock x:Name="DirName" Text="DirName" ></TextBlock>
+    </StackPanel>
 </controls:ListBoxItem>
