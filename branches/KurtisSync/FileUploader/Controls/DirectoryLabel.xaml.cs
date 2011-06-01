@@ -11,12 +11,19 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Windows.Media.Imaging;
 
-namespace FileUploader
+using FileUploader.OsbleServices;
+namespace FileUploader.Controls
 {
     public enum LabelImage { File, Folder };
     
     public partial class DirectoryLabel : ListBoxItem, IComparable
     {
+
+        public AbstractListing DataContext
+        {
+            get;
+            set;
+        }
         public DirectoryLabel()
         {
             InitializeComponent();
@@ -34,13 +41,34 @@ namespace FileUploader
             }
         }
 
-        public DateTime LastModified
+        /// <summary>
+        /// Converts from the LabelImage enum to an actual bitmap
+        /// </summary>
+        /// <param name="label"></param>
+        /// <returns></returns>
+        public BitmapImage BitmapFromLabel(LabelImage label)
         {
-            get;
-            set;
+            string imagePath = "";
+            switch (label)
+            {
+                case LabelImage.File:
+                    imagePath = "/Images/file.png";
+                    break;
+
+                case LabelImage.Folder:
+                    imagePath = "/Images/folder.png";
+                    break;
+
+                default:
+                    imagePath = "/Images/file.png";
+                    break;
+            }
+            BitmapImage bmp = new BitmapImage();
+            bmp.UriSource = new Uri(imagePath, UriKind.Relative);
+            return bmp;
         }
 
-        private LabelImage image = new LabelImage();
+        private LabelImage image = LabelImage.Folder;
         public LabelImage Image
         {
             get 
@@ -50,22 +78,7 @@ namespace FileUploader
             set
             {
                 image = value;
-                string imagePath = "/Images/file.png";
-
-                //figure out the correct image to use based on the supplied image parameter
-                if (value == LabelImage.File)
-                {
-                    imagePath = "/Images/file.png";
-                }
-                else if (value == LabelImage.Folder)
-                {
-                    imagePath = "/Images/folder.png";
-                }
-
-                //set the new image
-                BitmapImage bmp = new BitmapImage();
-                bmp.UriSource = new Uri(imagePath, UriKind.Relative);
-                this.DirImage.Source = bmp;
+                this.DirImage.Source = BitmapFromLabel(image);
             }
         }
 

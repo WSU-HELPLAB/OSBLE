@@ -17,40 +17,16 @@ namespace FileUploader.OsbleServices {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="OsbleSyncInfo", Namespace="http://schemas.datacontract.org/2004/07/FileUploader.Web")]
-    public partial class OsbleSyncInfo : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private string FileNameField;
-        
-        private int ImageField;
+    [System.Runtime.Serialization.DataContractAttribute(Name="AbstractListing", Namespace="http://schemas.datacontract.org/2004/07/UploaderWebService")]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(FileUploader.OsbleServices.DirectoryListing))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(FileUploader.OsbleServices.FileListing))]
+    public partial class AbstractListing : object, System.ComponentModel.INotifyPropertyChanged {
         
         private System.DateTime LastModifiedField;
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string FileName {
-            get {
-                return this.FileNameField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.FileNameField, value) != true)) {
-                    this.FileNameField = value;
-                    this.RaisePropertyChanged("FileName");
-                }
-            }
-        }
+        private string NameField;
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int Image {
-            get {
-                return this.ImageField;
-            }
-            set {
-                if ((this.ImageField.Equals(value) != true)) {
-                    this.ImageField = value;
-                    this.RaisePropertyChanged("Image");
-                }
-            }
-        }
+        private int SortOrderField;
         
         [System.Runtime.Serialization.DataMemberAttribute()]
         public System.DateTime LastModified {
@@ -65,6 +41,32 @@ namespace FileUploader.OsbleServices {
             }
         }
         
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Name {
+            get {
+                return this.NameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NameField, value) != true)) {
+                    this.NameField = value;
+                    this.RaisePropertyChanged("Name");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int SortOrder {
+            get {
+                return this.SortOrderField;
+            }
+            set {
+                if ((this.SortOrderField.Equals(value) != true)) {
+                    this.SortOrderField = value;
+                    this.RaisePropertyChanged("SortOrder");
+                }
+            }
+        }
+        
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         
         protected void RaisePropertyChanged(string propertyName) {
@@ -75,33 +77,123 @@ namespace FileUploader.OsbleServices {
         }
     }
     
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(Namespace="", ConfigurationName="OsbleServices.FileSyncService")]
-    public interface FileSyncService {
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="DirectoryListing", Namespace="http://schemas.datacontract.org/2004/07/UploaderWebService")]
+    public partial class DirectoryListing : FileUploader.OsbleServices.AbstractListing {
         
-        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:FileSyncService/GetFileList", ReplyAction="urn:FileSyncService/GetFileListResponse")]
+        private System.Collections.ObjectModel.ObservableCollection<FileUploader.OsbleServices.DirectoryListing> DirectoriesField;
+        
+        private System.Collections.ObjectModel.ObservableCollection<FileUploader.OsbleServices.FileListing> FilesField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Collections.ObjectModel.ObservableCollection<FileUploader.OsbleServices.DirectoryListing> Directories {
+            get {
+                return this.DirectoriesField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.DirectoriesField, value) != true)) {
+                    this.DirectoriesField = value;
+                    this.RaisePropertyChanged("Directories");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Collections.ObjectModel.ObservableCollection<FileUploader.OsbleServices.FileListing> Files {
+            get {
+                return this.FilesField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.FilesField, value) != true)) {
+                    this.FilesField = value;
+                    this.RaisePropertyChanged("Files");
+                }
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="FileListing", Namespace="http://schemas.datacontract.org/2004/07/UploaderWebService")]
+    public partial class FileListing : FileUploader.OsbleServices.AbstractListing {
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ServiceModel.ServiceContractAttribute(Namespace="", ConfigurationName="OsbleServices.UploaderWebService")]
+    public interface UploaderWebService {
+        
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/GetFakeFileListing", ReplyAction="urn:UploaderWebService/GetFakeFileListingResponse")]
+        System.IAsyncResult BeginGetFakeFileListing(System.AsyncCallback callback, object asyncState);
+        
+        FileUploader.OsbleServices.FileListing EndGetFakeFileListing(System.IAsyncResult result);
+        
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/GetFakeDirectoryListing", ReplyAction="urn:UploaderWebService/GetFakeDirectoryListingResponse")]
+        System.IAsyncResult BeginGetFakeDirectoryListing(System.AsyncCallback callback, object asyncState);
+        
+        FileUploader.OsbleServices.DirectoryListing EndGetFakeDirectoryListing(System.IAsyncResult result);
+        
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/GetFileList", ReplyAction="urn:UploaderWebService/GetFileListResponse")]
         System.IAsyncResult BeginGetFileList(string relativepath, System.AsyncCallback callback, object asyncState);
         
-        System.Collections.ObjectModel.ObservableCollection<FileUploader.OsbleServices.OsbleSyncInfo> EndGetFileList(System.IAsyncResult result);
+        FileUploader.OsbleServices.DirectoryListing EndGetFileList(System.IAsyncResult result);
         
-        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:FileSyncService/GetFileUrl", ReplyAction="urn:FileSyncService/GetFileUrlResponse")]
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/GetFileUrl", ReplyAction="urn:UploaderWebService/GetFileUrlResponse")]
         System.IAsyncResult BeginGetFileUrl(string fileName, System.AsyncCallback callback, object asyncState);
         
         string EndGetFileUrl(System.IAsyncResult result);
         
-        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:FileSyncService/SyncFile", ReplyAction="urn:FileSyncService/SyncFileResponse")]
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/SyncFile", ReplyAction="urn:UploaderWebService/SyncFileResponse")]
         System.IAsyncResult BeginSyncFile(string fileName, byte[] data, System.AsyncCallback callback, object asyncState);
         
         void EndSyncFile(System.IAsyncResult result);
         
-        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:FileSyncService/createDir", ReplyAction="urn:FileSyncService/createDirResponse")]
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/createDir", ReplyAction="urn:UploaderWebService/createDirResponse")]
         System.IAsyncResult BegincreateDir(string folderName, System.AsyncCallback callback, object asyncState);
         
         void EndcreateDir(System.IAsyncResult result);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public interface FileSyncServiceChannel : FileUploader.OsbleServices.FileSyncService, System.ServiceModel.IClientChannel {
+    public interface UploaderWebServiceChannel : FileUploader.OsbleServices.UploaderWebService, System.ServiceModel.IClientChannel {
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class GetFakeFileListingCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        public GetFakeFileListingCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        public FileUploader.OsbleServices.FileListing Result {
+            get {
+                base.RaiseExceptionIfNecessary();
+                return ((FileUploader.OsbleServices.FileListing)(this.results[0]));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class GetFakeDirectoryListingCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        public GetFakeDirectoryListingCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        public FileUploader.OsbleServices.DirectoryListing Result {
+            get {
+                base.RaiseExceptionIfNecessary();
+                return ((FileUploader.OsbleServices.DirectoryListing)(this.results[0]));
+            }
+        }
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -115,10 +207,10 @@ namespace FileUploader.OsbleServices {
             this.results = results;
         }
         
-        public System.Collections.ObjectModel.ObservableCollection<FileUploader.OsbleServices.OsbleSyncInfo> Result {
+        public FileUploader.OsbleServices.DirectoryListing Result {
             get {
                 base.RaiseExceptionIfNecessary();
-                return ((System.Collections.ObjectModel.ObservableCollection<FileUploader.OsbleServices.OsbleSyncInfo>)(this.results[0]));
+                return ((FileUploader.OsbleServices.DirectoryListing)(this.results[0]));
             }
         }
     }
@@ -144,7 +236,19 @@ namespace FileUploader.OsbleServices {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public partial class FileSyncServiceClient : System.ServiceModel.ClientBase<FileUploader.OsbleServices.FileSyncService>, FileUploader.OsbleServices.FileSyncService {
+    public partial class UploaderWebServiceClient : System.ServiceModel.ClientBase<FileUploader.OsbleServices.UploaderWebService>, FileUploader.OsbleServices.UploaderWebService {
+        
+        private BeginOperationDelegate onBeginGetFakeFileListingDelegate;
+        
+        private EndOperationDelegate onEndGetFakeFileListingDelegate;
+        
+        private System.Threading.SendOrPostCallback onGetFakeFileListingCompletedDelegate;
+        
+        private BeginOperationDelegate onBeginGetFakeDirectoryListingDelegate;
+        
+        private EndOperationDelegate onEndGetFakeDirectoryListingDelegate;
+        
+        private System.Threading.SendOrPostCallback onGetFakeDirectoryListingCompletedDelegate;
         
         private BeginOperationDelegate onBeginGetFileListDelegate;
         
@@ -182,22 +286,22 @@ namespace FileUploader.OsbleServices {
         
         private System.Threading.SendOrPostCallback onCloseCompletedDelegate;
         
-        public FileSyncServiceClient() {
+        public UploaderWebServiceClient() {
         }
         
-        public FileSyncServiceClient(string endpointConfigurationName) : 
+        public UploaderWebServiceClient(string endpointConfigurationName) : 
                 base(endpointConfigurationName) {
         }
         
-        public FileSyncServiceClient(string endpointConfigurationName, string remoteAddress) : 
+        public UploaderWebServiceClient(string endpointConfigurationName, string remoteAddress) : 
                 base(endpointConfigurationName, remoteAddress) {
         }
         
-        public FileSyncServiceClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
+        public UploaderWebServiceClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(endpointConfigurationName, remoteAddress) {
         }
         
-        public FileSyncServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
+        public UploaderWebServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress) {
         }
         
@@ -223,6 +327,10 @@ namespace FileUploader.OsbleServices {
             }
         }
         
+        public event System.EventHandler<GetFakeFileListingCompletedEventArgs> GetFakeFileListingCompleted;
+        
+        public event System.EventHandler<GetFakeDirectoryListingCompletedEventArgs> GetFakeDirectoryListingCompleted;
+        
         public event System.EventHandler<GetFileListCompletedEventArgs> GetFileListCompleted;
         
         public event System.EventHandler<GetFileUrlCompletedEventArgs> GetFileUrlCompleted;
@@ -236,22 +344,110 @@ namespace FileUploader.OsbleServices {
         public event System.EventHandler<System.ComponentModel.AsyncCompletedEventArgs> CloseCompleted;
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.IAsyncResult FileUploader.OsbleServices.FileSyncService.BeginGetFileList(string relativepath, System.AsyncCallback callback, object asyncState) {
+        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginGetFakeFileListing(System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginGetFakeFileListing(callback, asyncState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        FileUploader.OsbleServices.FileListing FileUploader.OsbleServices.UploaderWebService.EndGetFakeFileListing(System.IAsyncResult result) {
+            return base.Channel.EndGetFakeFileListing(result);
+        }
+        
+        private System.IAsyncResult OnBeginGetFakeFileListing(object[] inValues, System.AsyncCallback callback, object asyncState) {
+            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginGetFakeFileListing(callback, asyncState);
+        }
+        
+        private object[] OnEndGetFakeFileListing(System.IAsyncResult result) {
+            FileUploader.OsbleServices.FileListing retVal = ((FileUploader.OsbleServices.UploaderWebService)(this)).EndGetFakeFileListing(result);
+            return new object[] {
+                    retVal};
+        }
+        
+        private void OnGetFakeFileListingCompleted(object state) {
+            if ((this.GetFakeFileListingCompleted != null)) {
+                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
+                this.GetFakeFileListingCompleted(this, new GetFakeFileListingCompletedEventArgs(e.Results, e.Error, e.Cancelled, e.UserState));
+            }
+        }
+        
+        public void GetFakeFileListingAsync() {
+            this.GetFakeFileListingAsync(null);
+        }
+        
+        public void GetFakeFileListingAsync(object userState) {
+            if ((this.onBeginGetFakeFileListingDelegate == null)) {
+                this.onBeginGetFakeFileListingDelegate = new BeginOperationDelegate(this.OnBeginGetFakeFileListing);
+            }
+            if ((this.onEndGetFakeFileListingDelegate == null)) {
+                this.onEndGetFakeFileListingDelegate = new EndOperationDelegate(this.OnEndGetFakeFileListing);
+            }
+            if ((this.onGetFakeFileListingCompletedDelegate == null)) {
+                this.onGetFakeFileListingCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnGetFakeFileListingCompleted);
+            }
+            base.InvokeAsync(this.onBeginGetFakeFileListingDelegate, null, this.onEndGetFakeFileListingDelegate, this.onGetFakeFileListingCompletedDelegate, userState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginGetFakeDirectoryListing(System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginGetFakeDirectoryListing(callback, asyncState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        FileUploader.OsbleServices.DirectoryListing FileUploader.OsbleServices.UploaderWebService.EndGetFakeDirectoryListing(System.IAsyncResult result) {
+            return base.Channel.EndGetFakeDirectoryListing(result);
+        }
+        
+        private System.IAsyncResult OnBeginGetFakeDirectoryListing(object[] inValues, System.AsyncCallback callback, object asyncState) {
+            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginGetFakeDirectoryListing(callback, asyncState);
+        }
+        
+        private object[] OnEndGetFakeDirectoryListing(System.IAsyncResult result) {
+            FileUploader.OsbleServices.DirectoryListing retVal = ((FileUploader.OsbleServices.UploaderWebService)(this)).EndGetFakeDirectoryListing(result);
+            return new object[] {
+                    retVal};
+        }
+        
+        private void OnGetFakeDirectoryListingCompleted(object state) {
+            if ((this.GetFakeDirectoryListingCompleted != null)) {
+                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
+                this.GetFakeDirectoryListingCompleted(this, new GetFakeDirectoryListingCompletedEventArgs(e.Results, e.Error, e.Cancelled, e.UserState));
+            }
+        }
+        
+        public void GetFakeDirectoryListingAsync() {
+            this.GetFakeDirectoryListingAsync(null);
+        }
+        
+        public void GetFakeDirectoryListingAsync(object userState) {
+            if ((this.onBeginGetFakeDirectoryListingDelegate == null)) {
+                this.onBeginGetFakeDirectoryListingDelegate = new BeginOperationDelegate(this.OnBeginGetFakeDirectoryListing);
+            }
+            if ((this.onEndGetFakeDirectoryListingDelegate == null)) {
+                this.onEndGetFakeDirectoryListingDelegate = new EndOperationDelegate(this.OnEndGetFakeDirectoryListing);
+            }
+            if ((this.onGetFakeDirectoryListingCompletedDelegate == null)) {
+                this.onGetFakeDirectoryListingCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnGetFakeDirectoryListingCompleted);
+            }
+            base.InvokeAsync(this.onBeginGetFakeDirectoryListingDelegate, null, this.onEndGetFakeDirectoryListingDelegate, this.onGetFakeDirectoryListingCompletedDelegate, userState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginGetFileList(string relativepath, System.AsyncCallback callback, object asyncState) {
             return base.Channel.BeginGetFileList(relativepath, callback, asyncState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Collections.ObjectModel.ObservableCollection<FileUploader.OsbleServices.OsbleSyncInfo> FileUploader.OsbleServices.FileSyncService.EndGetFileList(System.IAsyncResult result) {
+        FileUploader.OsbleServices.DirectoryListing FileUploader.OsbleServices.UploaderWebService.EndGetFileList(System.IAsyncResult result) {
             return base.Channel.EndGetFileList(result);
         }
         
         private System.IAsyncResult OnBeginGetFileList(object[] inValues, System.AsyncCallback callback, object asyncState) {
             string relativepath = ((string)(inValues[0]));
-            return ((FileUploader.OsbleServices.FileSyncService)(this)).BeginGetFileList(relativepath, callback, asyncState);
+            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginGetFileList(relativepath, callback, asyncState);
         }
         
         private object[] OnEndGetFileList(System.IAsyncResult result) {
-            System.Collections.ObjectModel.ObservableCollection<FileUploader.OsbleServices.OsbleSyncInfo> retVal = ((FileUploader.OsbleServices.FileSyncService)(this)).EndGetFileList(result);
+            FileUploader.OsbleServices.DirectoryListing retVal = ((FileUploader.OsbleServices.UploaderWebService)(this)).EndGetFileList(result);
             return new object[] {
                     retVal};
         }
@@ -282,22 +478,22 @@ namespace FileUploader.OsbleServices {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.IAsyncResult FileUploader.OsbleServices.FileSyncService.BeginGetFileUrl(string fileName, System.AsyncCallback callback, object asyncState) {
+        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginGetFileUrl(string fileName, System.AsyncCallback callback, object asyncState) {
             return base.Channel.BeginGetFileUrl(fileName, callback, asyncState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        string FileUploader.OsbleServices.FileSyncService.EndGetFileUrl(System.IAsyncResult result) {
+        string FileUploader.OsbleServices.UploaderWebService.EndGetFileUrl(System.IAsyncResult result) {
             return base.Channel.EndGetFileUrl(result);
         }
         
         private System.IAsyncResult OnBeginGetFileUrl(object[] inValues, System.AsyncCallback callback, object asyncState) {
             string fileName = ((string)(inValues[0]));
-            return ((FileUploader.OsbleServices.FileSyncService)(this)).BeginGetFileUrl(fileName, callback, asyncState);
+            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginGetFileUrl(fileName, callback, asyncState);
         }
         
         private object[] OnEndGetFileUrl(System.IAsyncResult result) {
-            string retVal = ((FileUploader.OsbleServices.FileSyncService)(this)).EndGetFileUrl(result);
+            string retVal = ((FileUploader.OsbleServices.UploaderWebService)(this)).EndGetFileUrl(result);
             return new object[] {
                     retVal};
         }
@@ -328,23 +524,23 @@ namespace FileUploader.OsbleServices {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.IAsyncResult FileUploader.OsbleServices.FileSyncService.BeginSyncFile(string fileName, byte[] data, System.AsyncCallback callback, object asyncState) {
+        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginSyncFile(string fileName, byte[] data, System.AsyncCallback callback, object asyncState) {
             return base.Channel.BeginSyncFile(fileName, data, callback, asyncState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        void FileUploader.OsbleServices.FileSyncService.EndSyncFile(System.IAsyncResult result) {
+        void FileUploader.OsbleServices.UploaderWebService.EndSyncFile(System.IAsyncResult result) {
             base.Channel.EndSyncFile(result);
         }
         
         private System.IAsyncResult OnBeginSyncFile(object[] inValues, System.AsyncCallback callback, object asyncState) {
             string fileName = ((string)(inValues[0]));
             byte[] data = ((byte[])(inValues[1]));
-            return ((FileUploader.OsbleServices.FileSyncService)(this)).BeginSyncFile(fileName, data, callback, asyncState);
+            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginSyncFile(fileName, data, callback, asyncState);
         }
         
         private object[] OnEndSyncFile(System.IAsyncResult result) {
-            ((FileUploader.OsbleServices.FileSyncService)(this)).EndSyncFile(result);
+            ((FileUploader.OsbleServices.UploaderWebService)(this)).EndSyncFile(result);
             return null;
         }
         
@@ -375,22 +571,22 @@ namespace FileUploader.OsbleServices {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.IAsyncResult FileUploader.OsbleServices.FileSyncService.BegincreateDir(string folderName, System.AsyncCallback callback, object asyncState) {
+        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BegincreateDir(string folderName, System.AsyncCallback callback, object asyncState) {
             return base.Channel.BegincreateDir(folderName, callback, asyncState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        void FileUploader.OsbleServices.FileSyncService.EndcreateDir(System.IAsyncResult result) {
+        void FileUploader.OsbleServices.UploaderWebService.EndcreateDir(System.IAsyncResult result) {
             base.Channel.EndcreateDir(result);
         }
         
         private System.IAsyncResult OnBegincreateDir(object[] inValues, System.AsyncCallback callback, object asyncState) {
             string folderName = ((string)(inValues[0]));
-            return ((FileUploader.OsbleServices.FileSyncService)(this)).BegincreateDir(folderName, callback, asyncState);
+            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BegincreateDir(folderName, callback, asyncState);
         }
         
         private object[] OnEndcreateDir(System.IAsyncResult result) {
-            ((FileUploader.OsbleServices.FileSyncService)(this)).EndcreateDir(result);
+            ((FileUploader.OsbleServices.UploaderWebService)(this)).EndcreateDir(result);
             return null;
         }
         
@@ -485,14 +681,38 @@ namespace FileUploader.OsbleServices {
             base.InvokeAsync(this.onBeginCloseDelegate, null, this.onEndCloseDelegate, this.onCloseCompletedDelegate, userState);
         }
         
-        protected override FileUploader.OsbleServices.FileSyncService CreateChannel() {
-            return new FileSyncServiceClientChannel(this);
+        protected override FileUploader.OsbleServices.UploaderWebService CreateChannel() {
+            return new UploaderWebServiceClientChannel(this);
         }
         
-        private class FileSyncServiceClientChannel : ChannelBase<FileUploader.OsbleServices.FileSyncService>, FileUploader.OsbleServices.FileSyncService {
+        private class UploaderWebServiceClientChannel : ChannelBase<FileUploader.OsbleServices.UploaderWebService>, FileUploader.OsbleServices.UploaderWebService {
             
-            public FileSyncServiceClientChannel(System.ServiceModel.ClientBase<FileUploader.OsbleServices.FileSyncService> client) : 
+            public UploaderWebServiceClientChannel(System.ServiceModel.ClientBase<FileUploader.OsbleServices.UploaderWebService> client) : 
                     base(client) {
+            }
+            
+            public System.IAsyncResult BeginGetFakeFileListing(System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[0];
+                System.IAsyncResult _result = base.BeginInvoke("GetFakeFileListing", _args, callback, asyncState);
+                return _result;
+            }
+            
+            public FileUploader.OsbleServices.FileListing EndGetFakeFileListing(System.IAsyncResult result) {
+                object[] _args = new object[0];
+                FileUploader.OsbleServices.FileListing _result = ((FileUploader.OsbleServices.FileListing)(base.EndInvoke("GetFakeFileListing", _args, result)));
+                return _result;
+            }
+            
+            public System.IAsyncResult BeginGetFakeDirectoryListing(System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[0];
+                System.IAsyncResult _result = base.BeginInvoke("GetFakeDirectoryListing", _args, callback, asyncState);
+                return _result;
+            }
+            
+            public FileUploader.OsbleServices.DirectoryListing EndGetFakeDirectoryListing(System.IAsyncResult result) {
+                object[] _args = new object[0];
+                FileUploader.OsbleServices.DirectoryListing _result = ((FileUploader.OsbleServices.DirectoryListing)(base.EndInvoke("GetFakeDirectoryListing", _args, result)));
+                return _result;
             }
             
             public System.IAsyncResult BeginGetFileList(string relativepath, System.AsyncCallback callback, object asyncState) {
@@ -502,9 +722,9 @@ namespace FileUploader.OsbleServices {
                 return _result;
             }
             
-            public System.Collections.ObjectModel.ObservableCollection<FileUploader.OsbleServices.OsbleSyncInfo> EndGetFileList(System.IAsyncResult result) {
+            public FileUploader.OsbleServices.DirectoryListing EndGetFileList(System.IAsyncResult result) {
                 object[] _args = new object[0];
-                System.Collections.ObjectModel.ObservableCollection<FileUploader.OsbleServices.OsbleSyncInfo> _result = ((System.Collections.ObjectModel.ObservableCollection<FileUploader.OsbleServices.OsbleSyncInfo>)(base.EndInvoke("GetFileList", _args, result)));
+                FileUploader.OsbleServices.DirectoryListing _result = ((FileUploader.OsbleServices.DirectoryListing)(base.EndInvoke("GetFileList", _args, result)));
                 return _result;
             }
             

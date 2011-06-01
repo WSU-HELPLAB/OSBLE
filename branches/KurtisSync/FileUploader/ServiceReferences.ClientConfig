@@ -2,16 +2,16 @@
     <system.serviceModel>
         <bindings>
             <basicHttpBinding>
-                <binding name="BasicHttpBinding_FileSyncService" maxBufferSize="2147483647"
+                <binding name="BasicHttpBinding_UploaderWebService" maxBufferSize="2147483647"
                     maxReceivedMessageSize="2147483647">
                     <security mode="None" />
                 </binding>
             </basicHttpBinding>
         </bindings>
         <client>
-            <endpoint address="http://localhost:49409/FileSyncService.svc"
-                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_FileSyncService"
-                contract="OsbleServices.FileSyncService" name="BasicHttpBinding_FileSyncService" />
+            <endpoint address="http://localhost:1337/UploaderWebService.svc"
+                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_UploaderWebService"
+                contract="OsbleServices.UploaderWebService" name="BasicHttpBinding_UploaderWebService" />
         </client>
     </system.serviceModel>
 </configuration>

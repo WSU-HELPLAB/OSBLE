@@ -5,7 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DesignHeight="300" d:DesignWidth="400">
-    
+
     <Grid x:Name="LayoutRoot"  Background="White" >
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -25,14 +25,18 @@
         </ScrollViewer>
         <sdk:GridSplitter Grid.Row="0" Grid.Column="1" Grid.RowSpan="3" VerticalAlignment="Stretch" HorizontalAlignment="Center" 
                           Background="DarkSlateGray" Width="3" />
-        <sdk:Label  Content="Synced Files" Grid.Row="0" Grid.Column="2" FontWeight="Bold" FontSize="16" Margin="0,5,0,5" 
-                       VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="2"  HorizontalAlignment="Right" VerticalAlignment="Center" 
+        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="2"  HorizontalAlignment="Right" VerticalAlignment="Center" 
                     Margin="0,0,5,0">
-            <Button x:Name="Upbtn" Content="UP" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0" 
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="16" FontWeight="Bold" Text="Uploading To:" />
+                <ComboBox x:Name="UploadLocation" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="Upbtn" Content="UP" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0" 
                     Click="MoveUpbtn_Click" />
-            <Button x:Name="Downbtn" Content="DOWN" HorizontalAlignment="Right" VerticalAlignment="Center" 
+                <Button x:Name="Downbtn" Content="DOWN" HorizontalAlignment="Right" VerticalAlignment="Center" 
                     Click="MoveDownbtn_Click"/>
+            </StackPanel>
         </StackPanel>
         <ScrollViewer x:Name="VertScrollBarSynced" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch" 
                         VerticalAlignment="Stretch">

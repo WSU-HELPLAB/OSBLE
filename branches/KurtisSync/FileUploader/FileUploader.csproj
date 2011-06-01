@@ -29,7 +29,8 @@
     <OutOfBrowserSettingsFile>Properties\OutOfBrowserSettings.xml</OutOfBrowserSettingsFile>
     <UsePlatformExtensions>false</UsePlatformExtensions>
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
-    <LinkedServerProject>..\FileUploader.Web\FileUploader.Web.csproj</LinkedServerProject>
+    <LinkedServerProject>
+    </LinkedServerProject>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
@@ -83,7 +84,10 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DirectoryLabel.xaml.cs">
+    <Compile Include="Controls\FileBrowserControl.xaml.cs">
+      <DependentUpon>FileBrowserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DirectoryLabel.xaml.cs">
       <DependentUpon>DirectoryLabel.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainPage.xaml.cs">
@@ -101,7 +105,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
-    <Page Include="DirectoryLabel.xaml">
+    <Page Include="Controls\FileBrowserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\DirectoryLabel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -112,26 +120,33 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AppManifest.xml" />
-    <None Include="Service References\OsbleServices\FileSyncService.disco" />
-    <None Include="Service References\OsbleServices\configuration91.svcinfo" />
-    <None Include="Service References\OsbleServices\configuration.svcinfo" />
-    <None Include="Service References\OsbleServices\FileUploader.OsbleServices.OsbleSyncInfo.datasource">
+    <None Include="Service References\OsbleServices\FileUploader.OsbleServices.DirectoryListing.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Service References\OsbleServices\FileUploader.OsbleServices.FileListing.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OsbleServices\UploaderWebService.disco" />
+    <None Include="Service References\OsbleServices\configuration91.svcinfo" />
+    <None Include="Service References\OsbleServices\configuration.svcinfo" />
     <None Include="Service References\OsbleServices\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
-    <Content Include="ServiceReferences.ClientConfig" />
-    <None Include="Service References\OsbleServices\FileSyncService.wsdl" />
-    <None Include="Service References\OsbleServices\FileSyncService.xsd">
+    <Content Include="ServiceReferences.ClientConfig">
+      <SubType>Designer</SubType>
+    </Content>
+    <None Include="Service References\OsbleServices\UploaderWebService.wsdl">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OsbleServices\FileSyncService1.wsdl" />
-    <None Include="Service References\OsbleServices\FileSyncService1.xsd">
+    <None Include="Service References\OsbleServices\UploaderWebService.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OsbleServices\FileSyncService2.xsd">
+    <None Include="Service References\OsbleServices\UploaderWebService1.wsdl" />
+    <None Include="Service References\OsbleServices\UploaderWebService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleServices\UploaderWebService2.xsd">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
