@@ -21,6 +21,33 @@ namespace FileUploader
         public MainPage()
         {
             InitializeComponent();
+
+            if (Application.Current.InstallState == InstallState.NotInstalled)
+            {
+                InstallBtn.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                InstallBtn.Visibility = Visibility.Collapsed;
+                // apparently, you can't make a button to launch the already installed application
+                InstallText.Text = "This application is already installed on your computer.";
+            }
+
+            if (Application.Current.IsRunningOutOfBrowser)
+            {
+                // go to UploaderPage
+                this.Content = new FileUploader();
+            }
+
+        }
+
+
+        private void InstallBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (Application.Current.InstallState == InstallState.NotInstalled)
+            {
+                Application.Current.Install();
+            }
         }
     }
 }
