@@ -25,6 +25,18 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="GetFakeParentDirectoryListing">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetFakeParentDirectoryListingResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Uploader" minOccurs="0" name="GetFakeParentDirectoryListingResult" nillable="true" type="q3:ParentDirectoryListing" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="GetFileList">
     <xs:complexType>
       <xs:sequence>
@@ -35,7 +47,7 @@
   <xs:element name="GetFileListResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Uploader" minOccurs="0" name="GetFileListResult" nillable="true" type="q3:DirectoryListing" />
+        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Uploader" minOccurs="0" name="GetFileListResult" nillable="true" type="q4:DirectoryListing" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

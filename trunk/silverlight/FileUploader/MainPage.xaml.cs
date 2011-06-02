@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 
 using FileUploader.OsbleServices;
 using FileUploader.Controls;
+using System.Windows.Navigation;
 namespace FileUploader
 {
     public partial class MainPage : UserControl

@@ -105,6 +105,7 @@
     <Compile Include="Models\Gradables\Gradable.cs" />
     <Compile Include="Models\Gradables\GradableScore.cs" />
     <Compile Include="Models\Courses\Weights.cs" />
+    <Compile Include="Models\Services\Uploader\ParentDirectoryListing.cs" />
     <Compile Include="Models\ViewModels\BasicAssignmentViewModel.cs" />
     <Compile Include="Models\Services\Uploader\AbstractListing.cs" />
     <Compile Include="Models\Services\Uploader\DirectoryListing.cs" />

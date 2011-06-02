@@ -1,4 +1,4 @@
-﻿<navigation:Page xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"  x:Class="FileUploader.UploaderPage" 
+﻿<navigation:Page xmlns:my="clr-namespace:FileUploader.Controls"  xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"  x:Class="FileUploader.UploaderPage" 
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,8 +7,9 @@
            xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation"
            d:DesignWidth="640" d:DesignHeight="480"
            Title="UploaderPage Page">
-    <Grid x:Name="LayoutRoot"  Background="White" >
+    <Grid x:Name="LayoutRoot"  Background="White" ShowGridLines="True" >
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -18,33 +19,61 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" MinWidth="120"/>
         </Grid.ColumnDefinitions>
+
+        <!--Controls are organized by column-->
+        
+        <!-- column 0 -->
         <sdk:Label Grid.Row="0" Grid.Column="0" Content="Local Files" FontWeight="Bold" FontSize="16" Margin="0,5,0,5" 
                    VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <ScrollViewer x:Name="VertScrollBarLocal" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" 
-                      VerticalAlignment="Stretch">
-            <ListBox Name="LocalFileList" HorizontalAlignment="Stretch" ></ListBox>
-        </ScrollViewer>
+        <Grid Grid.Row="1" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Path: " VerticalAlignment="Bottom" />
+            <TextBox x:Name="LocalFileTextBox" Grid.Row="0" Grid.Column="1" />
+        </Grid>
+        <my:FileList x:Name="LocalFileList" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="SyncButton" 
+                    Content="Sync View" 
+                    Margin="0,0,5,0"
+                    />
+            <Button x:Name="SendFileButton"
+                    Content="Send Selected File"
+                    />
+        </StackPanel>
+
+        <!--column 1-->
         <sdk:GridSplitter Grid.Row="0" Grid.Column="1" Grid.RowSpan="3" VerticalAlignment="Stretch" HorizontalAlignment="Center" 
                           Background="DarkSlateGray" Width="3" />
+
+        <!-- column 2 -->
         <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="2"  HorizontalAlignment="Right" VerticalAlignment="Center" 
                     Margin="0,0,5,0">
             <StackPanel Orientation="Horizontal">
                 <TextBlock FontSize="16" FontWeight="Bold" Text="Uploading To:" />
                 <ComboBox x:Name="UploadLocation" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Button x:Name="Upbtn" Content="UP" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0" 
-                    />
-                <Button x:Name="Downbtn" Content="DOWN" HorizontalAlignment="Right" VerticalAlignment="Center" 
-                    />
-            </StackPanel>
         </StackPanel>
-        <ScrollViewer x:Name="VertScrollBarSynced" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch" 
-                        VerticalAlignment="Stretch">
-            <ListBox Name="SyncedFileList" HorizontalAlignment="Stretch"></ListBox>
-        </ScrollViewer>
-        <Button x:Name="Syncbtn" Content="Sync Visable Files" Grid.Column="0" Grid.Row="2" 
-                HorizontalAlignment="Center" VerticalAlignment="Center" />
-        <TextBlock x:Name="lblStatus"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2">
+            <Button 
+                x:Name="UpButton" 
+                Content="UP" 
+                HorizontalAlignment="Right" 
+                VerticalAlignment="Center" 
+                Margin="0,0,5,0" 
+                    />
+            <Button 
+                x:Name="DownButton" 
+                Content="DOWN" 
+                HorizontalAlignment="Right" 
+                VerticalAlignment="Center" 
+                    />
+        </StackPanel>
+        <my:FileList x:Name="RemoteFileList" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Stretch" />
+        
+        
+        <TextBlock x:Name="statusLabel"/>
     </Grid>
 </navigation:Page>

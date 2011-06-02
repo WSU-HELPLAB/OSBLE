@@ -8,6 +8,7 @@ using System.ServiceModel;
 using System.ServiceModel.Activation;
 using System.Web;
 
+using OSBLE;
 using OSBLE.Models.Services.Uploader;
 
 namespace OSBLE.Services
@@ -22,7 +23,7 @@ namespace OSBLE.Services
 
         public UploaderWebService()
         {
-            filePath = HttpContext.Current.Server.MapPath("Files");
+            filePath = FileSystem.RootPath;
             currentpath = filePath;
         }
 
@@ -44,6 +45,16 @@ namespace OSBLE.Services
         public DirectoryListing GetFakeDirectoryListing()
         {
             return new DirectoryListing();
+        }
+
+        /// <summary>
+        /// A hack-ish way to get clients to recognize the ParentDirectoryListing class
+        /// </summary>
+        /// <returns></returns>
+        [OperationContract]
+        public ParentDirectoryListing GetFakeParentDirectoryListing()
+        {
+            return new ParentDirectoryListing();
         }
 
         /// <summary>
@@ -69,6 +80,9 @@ namespace OSBLE.Services
                 fList.LastModified = File.GetLastWriteTime(file);
                 listing.Files.Add(fList);
             }
+
+            //Add a parent directory "..." at the top of every directory listing
+            listing.Directories.Add(new ParentDirectoryListing());
 
             //handle other directories
             foreach (string folder in Directory.EnumerateDirectories(currentpath))

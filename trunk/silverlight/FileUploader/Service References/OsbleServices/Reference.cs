@@ -19,6 +19,7 @@ namespace FileUploader.OsbleServices {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="AbstractListing", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Uploader")]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(FileUploader.OsbleServices.DirectoryListing))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(FileUploader.OsbleServices.ParentDirectoryListing))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(FileUploader.OsbleServices.FileListing))]
     public partial class AbstractListing : object, System.ComponentModel.INotifyPropertyChanged {
         
@@ -80,6 +81,7 @@ namespace FileUploader.OsbleServices {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="DirectoryListing", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Uploader")]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(FileUploader.OsbleServices.ParentDirectoryListing))]
     public partial class DirectoryListing : FileUploader.OsbleServices.AbstractListing {
         
         private System.Collections.ObjectModel.ObservableCollection<FileUploader.OsbleServices.DirectoryListing> DirectoriesField;
@@ -115,6 +117,12 @@ namespace FileUploader.OsbleServices {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ParentDirectoryListing", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Uploader")]
+    public partial class ParentDirectoryListing : FileUploader.OsbleServices.DirectoryListing {
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="FileListing", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Uploader")]
     public partial class FileListing : FileUploader.OsbleServices.AbstractListing {
     }
@@ -132,6 +140,11 @@ namespace FileUploader.OsbleServices {
         System.IAsyncResult BeginGetFakeDirectoryListing(System.AsyncCallback callback, object asyncState);
         
         FileUploader.OsbleServices.DirectoryListing EndGetFakeDirectoryListing(System.IAsyncResult result);
+        
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/GetFakeParentDirectoryListing", ReplyAction="urn:UploaderWebService/GetFakeParentDirectoryListingResponse")]
+        System.IAsyncResult BeginGetFakeParentDirectoryListing(System.AsyncCallback callback, object asyncState);
+        
+        FileUploader.OsbleServices.ParentDirectoryListing EndGetFakeParentDirectoryListing(System.IAsyncResult result);
         
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/GetFileList", ReplyAction="urn:UploaderWebService/GetFileListResponse")]
         System.IAsyncResult BeginGetFileList(string relativepath, System.AsyncCallback callback, object asyncState);
@@ -198,6 +211,25 @@ namespace FileUploader.OsbleServices {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class GetFakeParentDirectoryListingCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        public GetFakeParentDirectoryListingCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        public FileUploader.OsbleServices.ParentDirectoryListing Result {
+            get {
+                base.RaiseExceptionIfNecessary();
+                return ((FileUploader.OsbleServices.ParentDirectoryListing)(this.results[0]));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public partial class GetFileListCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
         
         private object[] results;
@@ -249,6 +281,12 @@ namespace FileUploader.OsbleServices {
         private EndOperationDelegate onEndGetFakeDirectoryListingDelegate;
         
         private System.Threading.SendOrPostCallback onGetFakeDirectoryListingCompletedDelegate;
+        
+        private BeginOperationDelegate onBeginGetFakeParentDirectoryListingDelegate;
+        
+        private EndOperationDelegate onEndGetFakeParentDirectoryListingDelegate;
+        
+        private System.Threading.SendOrPostCallback onGetFakeParentDirectoryListingCompletedDelegate;
         
         private BeginOperationDelegate onBeginGetFileListDelegate;
         
@@ -330,6 +368,8 @@ namespace FileUploader.OsbleServices {
         public event System.EventHandler<GetFakeFileListingCompletedEventArgs> GetFakeFileListingCompleted;
         
         public event System.EventHandler<GetFakeDirectoryListingCompletedEventArgs> GetFakeDirectoryListingCompleted;
+        
+        public event System.EventHandler<GetFakeParentDirectoryListingCompletedEventArgs> GetFakeParentDirectoryListingCompleted;
         
         public event System.EventHandler<GetFileListCompletedEventArgs> GetFileListCompleted;
         
@@ -429,6 +469,50 @@ namespace FileUploader.OsbleServices {
                 this.onGetFakeDirectoryListingCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnGetFakeDirectoryListingCompleted);
             }
             base.InvokeAsync(this.onBeginGetFakeDirectoryListingDelegate, null, this.onEndGetFakeDirectoryListingDelegate, this.onGetFakeDirectoryListingCompletedDelegate, userState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginGetFakeParentDirectoryListing(System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginGetFakeParentDirectoryListing(callback, asyncState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        FileUploader.OsbleServices.ParentDirectoryListing FileUploader.OsbleServices.UploaderWebService.EndGetFakeParentDirectoryListing(System.IAsyncResult result) {
+            return base.Channel.EndGetFakeParentDirectoryListing(result);
+        }
+        
+        private System.IAsyncResult OnBeginGetFakeParentDirectoryListing(object[] inValues, System.AsyncCallback callback, object asyncState) {
+            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginGetFakeParentDirectoryListing(callback, asyncState);
+        }
+        
+        private object[] OnEndGetFakeParentDirectoryListing(System.IAsyncResult result) {
+            FileUploader.OsbleServices.ParentDirectoryListing retVal = ((FileUploader.OsbleServices.UploaderWebService)(this)).EndGetFakeParentDirectoryListing(result);
+            return new object[] {
+                    retVal};
+        }
+        
+        private void OnGetFakeParentDirectoryListingCompleted(object state) {
+            if ((this.GetFakeParentDirectoryListingCompleted != null)) {
+                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
+                this.GetFakeParentDirectoryListingCompleted(this, new GetFakeParentDirectoryListingCompletedEventArgs(e.Results, e.Error, e.Cancelled, e.UserState));
+            }
+        }
+        
+        public void GetFakeParentDirectoryListingAsync() {
+            this.GetFakeParentDirectoryListingAsync(null);
+        }
+        
+        public void GetFakeParentDirectoryListingAsync(object userState) {
+            if ((this.onBeginGetFakeParentDirectoryListingDelegate == null)) {
+                this.onBeginGetFakeParentDirectoryListingDelegate = new BeginOperationDelegate(this.OnBeginGetFakeParentDirectoryListing);
+            }
+            if ((this.onEndGetFakeParentDirectoryListingDelegate == null)) {
+                this.onEndGetFakeParentDirectoryListingDelegate = new EndOperationDelegate(this.OnEndGetFakeParentDirectoryListing);
+            }
+            if ((this.onGetFakeParentDirectoryListingCompletedDelegate == null)) {
+                this.onGetFakeParentDirectoryListingCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnGetFakeParentDirectoryListingCompleted);
+            }
+            base.InvokeAsync(this.onBeginGetFakeParentDirectoryListingDelegate, null, this.onEndGetFakeParentDirectoryListingDelegate, this.onGetFakeParentDirectoryListingCompletedDelegate, userState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -712,6 +796,18 @@ namespace FileUploader.OsbleServices {
             public FileUploader.OsbleServices.DirectoryListing EndGetFakeDirectoryListing(System.IAsyncResult result) {
                 object[] _args = new object[0];
                 FileUploader.OsbleServices.DirectoryListing _result = ((FileUploader.OsbleServices.DirectoryListing)(base.EndInvoke("GetFakeDirectoryListing", _args, result)));
+                return _result;
+            }
+            
+            public System.IAsyncResult BeginGetFakeParentDirectoryListing(System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[0];
+                System.IAsyncResult _result = base.BeginInvoke("GetFakeParentDirectoryListing", _args, callback, asyncState);
+                return _result;
+            }
+            
+            public FileUploader.OsbleServices.ParentDirectoryListing EndGetFakeParentDirectoryListing(System.IAsyncResult result) {
+                object[] _args = new object[0];
+                FileUploader.OsbleServices.ParentDirectoryListing _result = ((FileUploader.OsbleServices.ParentDirectoryListing)(base.EndInvoke("GetFakeParentDirectoryListing", _args, result)));
                 return _result;
             }
             

@@ -13,8 +13,10 @@ namespace OSBLE.Models.Services.Uploader
     [ServiceContract]
     [ServiceKnownType(typeof(FileListing))]
     [ServiceKnownType(typeof(DirectoryListing))]
+    [ServiceKnownType(typeof(ParentDirectoryListing))]
     [KnownType(typeof(FileListing))]
     [KnownType(typeof(DirectoryListing))]
+    [KnownType(typeof(ParentDirectoryListing))]
     public abstract class AbstractListing
     {
         /// <summary>

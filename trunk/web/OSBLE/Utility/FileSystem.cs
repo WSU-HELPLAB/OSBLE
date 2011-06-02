@@ -59,6 +59,14 @@ namespace OSBLE
             return getUserPath(userProfile) + "profile.jpg";
         }
 
+        public static string RootPath
+        {
+            get
+            {
+                return getRootPath();
+            }
+        }
+
         public static FileStream GetDefaultProfilePicture()
         {
             return new FileStream(HttpContext.Current.Server.MapPath("\\Content\\images\\default.jpg"), FileMode.Open, FileAccess.Read);

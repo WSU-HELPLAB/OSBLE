@@ -24,9 +24,18 @@ namespace FileUploader
             InitializeComponent();
         }
 
+        public static void Navigate(UserControl newPage)
+        {
+            App currentApp = (App)Application.Current;
+            currentApp.rootGrid.Children.Clear();
+            currentApp.rootGrid.Children.Add(newPage);
+        }
+
+        private Grid rootGrid = new Grid();
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            this.RootVisual = new MainPage();
+            this.RootVisual = rootGrid;
+            rootGrid.Children.Add(new MainPage());
         }
 
         private void Application_Exit(object sender, EventArgs e)
