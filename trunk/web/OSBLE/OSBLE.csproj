@@ -19,7 +19,8 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <UseIISExpress>false</UseIISExpress>
-    <SilverlightApplicationList>{8C2CBBF3-5305-4942-9B1E-E3B8525441F0}|..\SilverlightApplication3\SilverlightApplication3.csproj|ClientBin|False</SilverlightApplicationList>
+    <SilverlightApplicationList>
+    </SilverlightApplicationList>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -110,7 +111,7 @@
     <Compile Include="Models\Services\Uploader\FileListing.cs" />
     <Compile Include="Models\SilverlightObject.cs" />
     <Compile Include="Services\AuthenticationDomainService.cs" />
-    <Compile Include="Services\DomainService1.cs" />
+    <Compile Include="Services\OSBLEService.cs" />
     <Compile Include="Services\SilverlightFaultBehavior.cs" />
     <Compile Include="Services\UploaderWebService.svc.cs">
       <DependentUpon>UploaderWebService.svc</DependentUpon>
