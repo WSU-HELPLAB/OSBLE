@@ -97,6 +97,7 @@ namespace OSBLE.Controllers
         {
 
             SilverlightObject TestControl = new SilverlightObject {
+                CSSId = "bob_the_silverlight_control",
                 XapName = "SilverlightApplication3",
                 Width = "90%",
                 Height = "90%"

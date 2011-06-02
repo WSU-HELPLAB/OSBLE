@@ -133,6 +133,25 @@
             @Html.EditorFor(model => submission.PossiblePoints)
             @Html.ValidationMessageFor(model => submission.PossiblePoints)
         </div>
+
+    <h3>Late Policy</h3>
+    
+    <p>
+        Students may submit assignments up to @Html.TextBoxFor(model => model.Submission.MinutesLateWithNoPenalty, new {size = 3 })
+        minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.Submission.PercentPenalty, new { size = 3 })
+        percent per @Html.TextBoxFor(model => model.Submission.HoursLatePerPercentPenalty, new { size = 3 })
+        hours late will be applied.<br />
+        @Html.ValidationMessageFor(model => model.Submission.MinutesLateWithNoPenalty)
+        @Html.ValidationMessageFor(model => model.Submission.PercentPenalty)
+        @Html.ValidationMessageFor(model => model.Submission.HoursLatePerPercentPenalty)
+    </p>
+    
+    
+    <p>
+        Assignments that are submitted more than @Html.TextBoxFor(model => model.Submission.HoursLateUntilZero, new { size = 3 })
+        hours after the due date and time will receive an automatic 0.<br />
+        @Html.ValidationMessageFor(model => model.Submission.HoursLateUntilZero)
+    </p>
         <p>
             <input type="submit" value="Create" id="submitButton"/>
         </p>

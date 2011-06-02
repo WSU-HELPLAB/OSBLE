@@ -12,6 +12,7 @@ namespace OSBLE.Models
     public class SilverlightObject
     {
         public string XapName { get; set; }
+        public string CSSId { get; set; }
         public string Width { get; set; }
         public string Height { get; set; }
         public string OnSilverlightError { get; set; }
@@ -39,6 +40,7 @@ namespace OSBLE.Models
 
         public SilverlightObject()
         {
+            CSSId = "silverlight";
             OnSilverlightError = "onSilverlightError";
             BackgroundColor = Color.White;
             MinimumRuntimeVersion = "4.0.50524.0";

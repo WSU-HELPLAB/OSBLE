@@ -14,8 +14,6 @@ namespace OSBLE.Models.Gradables.StudioAssignment.Activities
             ReleaseDate = ReleaseDate.AddDays(1);
         }
 
-        public int AssignmentID { get; set; }
-
         [Required]
         [Display(Name = "Will Be Graded?")]
         public bool isGradeable { get; set; }
@@ -28,5 +26,9 @@ namespace OSBLE.Models.Gradables.StudioAssignment.Activities
             get;
             set;
         }
+
+        [Required]
+        public int AssignmentID { get; set; }
+
     }
 }

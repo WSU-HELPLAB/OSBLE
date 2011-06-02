@@ -12,5 +12,9 @@ namespace OSBLE.Models.Gradables.StudioAssignment.Activities
         [DataType(DataType.DateTime)]
         [Display(Name = "Release Date")]
         DateTime ReleaseDate { get; set; }
+
+        [Required]
+        int AssignmentID { get; set; }
+        
     }
 }

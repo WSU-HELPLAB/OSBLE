@@ -8,6 +8,7 @@ using OSBLE.Attributes;
 using OSBLE.Models.Gradables;
 using OSBLE.Models.Gradables.StudioAssignment.Activities;
 using OSBLE.Models.ViewModels;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Controllers
 {
@@ -44,11 +45,19 @@ namespace OSBLE.Controllers
         //
         // GET: /Assignment/Create
 
+        [CanModifyCourse]
         public ActionResult Create()
         {
             //we create a basic assignment that is a StudioAssignment with a submission and a stop
             List<Deliverable> Deliverables = new List<Deliverable>();
             BasicAssignmentViewModel basic = new BasicAssignmentViewModel();
+
+            // Copy default Late Policy settings
+            Course active = activeCourse.Course as Course;
+            basic.Submission.HoursLatePerPercentPenalty = active.HoursLatePerPercentPenalty;
+            basic.Submission.HoursLateUntilZero = active.HoursLateUntilZero;
+            basic.Submission.PercentPenalty = active.PercentPenalty;
+            basic.Submission.MinutesLateWithNoPenalty = active.MinutesLateWithNoPenalty;
 
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes());
             ViewBag.Weights = new SelectList(db.Weights, "ID", "Name");
@@ -69,8 +78,10 @@ namespace OSBLE.Controllers
             if (ModelState.IsValid)
             {
                 db.StudioAssignments.Add(basic.StudioAssignment);
-                db.SubmissionActivities.Add(basic.Submission);
-                db.StopActivities.Add(basic.Stop);
+                db.SaveChanges();
+
+                basic.StudioAssignment.AssignmentActivities.Add(basic.Submission);
+                basic.StudioAssignment.AssignmentActivities.Add(basic.Stop);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }

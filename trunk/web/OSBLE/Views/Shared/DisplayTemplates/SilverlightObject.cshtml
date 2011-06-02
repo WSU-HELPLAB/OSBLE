@@ -1,7 +1,9 @@
 ﻿@model OSBLE.Models.SilverlightObject
            
 <div id="silverlightControlHost">
-    <object data="data:application/x-silverlight-2,"
+    <object 
+        id="@Model.CSSId"
+        data="data:application/x-silverlight-2,"
         type="application/x-silverlight-2"
         width="@Model.Width"
         height="@Model.Height"
