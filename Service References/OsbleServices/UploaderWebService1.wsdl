@@ -19,6 +19,12 @@
   <wsdl:message name="UploaderWebService_GetFakeDirectoryListing_OutputMessage">
     <wsdl:part name="parameters" element="GetFakeDirectoryListingResponse" />
   </wsdl:message>
+  <wsdl:message name="UploaderWebService_GetFakeParentDirectoryListing_InputMessage">
+    <wsdl:part name="parameters" element="GetFakeParentDirectoryListing" />
+  </wsdl:message>
+  <wsdl:message name="UploaderWebService_GetFakeParentDirectoryListing_OutputMessage">
+    <wsdl:part name="parameters" element="GetFakeParentDirectoryListingResponse" />
+  </wsdl:message>
   <wsdl:message name="UploaderWebService_GetFileList_InputMessage">
     <wsdl:part name="parameters" element="GetFileList" />
   </wsdl:message>
@@ -51,6 +57,10 @@
     <wsdl:operation name="GetFakeDirectoryListing">
       <wsdl:input wsaw:Action="urn:UploaderWebService/GetFakeDirectoryListing" message="UploaderWebService_GetFakeDirectoryListing_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/GetFakeDirectoryListingResponse" message="UploaderWebService_GetFakeDirectoryListing_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetFakeParentDirectoryListing">
+      <wsdl:input wsaw:Action="urn:UploaderWebService/GetFakeParentDirectoryListing" message="UploaderWebService_GetFakeParentDirectoryListing_InputMessage" />
+      <wsdl:output wsaw:Action="urn:UploaderWebService/GetFakeParentDirectoryListingResponse" message="UploaderWebService_GetFakeParentDirectoryListing_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetFileList">
       <wsdl:input wsaw:Action="urn:UploaderWebService/GetFileList" message="UploaderWebService_GetFileList_InputMessage" />
