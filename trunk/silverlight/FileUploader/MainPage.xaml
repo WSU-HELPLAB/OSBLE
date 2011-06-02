@@ -7,5 +7,9 @@
     mc:Ignorable="d"
     d:DesignHeight="300" d:DesignWidth="400">
 
+    <Grid x:Name="LayoutRoot" Background="White">
+        <TextBlock  x:Name="InstallText" HorizontalAlignment="Center" VerticalAlignment="Center" ></TextBlock>
+        <Button x:Name="InstallBtn" Content="Install File Manager" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="8" Click="InstallBtn_Click" />
+    </Grid>
     
 </UserControl>
