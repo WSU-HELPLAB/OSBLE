@@ -15,6 +15,7 @@ namespace OSBLE.Models.Courses
         public Weight()
         {
             Position = 0;
+            Gradables = new List<AbstractGradable>();
         }
 
         [Key]

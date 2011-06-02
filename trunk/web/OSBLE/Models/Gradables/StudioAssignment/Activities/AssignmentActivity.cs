@@ -1,9 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models.Gradables.StudioAssignment
+namespace OSBLE.Models.Gradables.StudioAssignment.Activities
 {
-    public abstract class AssignmentActivity : AbstractGradable
+    public abstract class AssignmentActivity : AbstractGradable, IAssignmentActivity
     {
         public AssignmentActivity()
         {
@@ -14,17 +14,19 @@ namespace OSBLE.Models.Gradables.StudioAssignment
             ReleaseDate = ReleaseDate.AddDays(1);
         }
 
-        [Required]
         public int AssignmentID { get; set; }
-
-
-        [Required]
-        [DataType(DataType.DateTime)]
-        [Display(Name = "Release Date")]
-        public DateTime ReleaseDate { get; set; }
 
         [Required]
         [Display(Name = "Will Be Graded?")]
         public bool isGradeable { get; set; }
+
+        [Required]
+        [DataType(DataType.DateTime)]
+        [Display(Name = "Release Date")]
+        public DateTime ReleaseDate
+        {
+            get;
+            set;
+        }
     }
 }

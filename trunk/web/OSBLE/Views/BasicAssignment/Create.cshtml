@@ -1,0 +1,201 @@
+﻿@using OSBLE.Models.Gradables
+@using OSBLE.Models.Gradables.StudioAssignment.Activities
+@model OSBLE.Models.ViewModels.BasicAssignmentViewModel
+@{
+    ViewBag.Title = "Create";
+}
+<h2>
+    Create</h2>
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<script type="text/javascript">
+
+    $(function () {
+        $('form').submit(function () {
+            updateDueDate();
+            updateReleaseDate();
+            updateSubmissionName();
+            return true;
+        });
+    });
+
+    function updateReleaseDate() {
+        $('#ReleaseDate').val($('#ReleaseDate_Date').val() + ' ' + $('#ReleaseDate_Time').val());
+    }
+
+    function updateDueDate() {
+        $('#DueDate').val($('#DueDate_Date').val() + ' ' + $('#DueDate_Time').val());
+    }
+    function updateSubmissionName() {
+        $('#SubmissionName').val($('#StudioAssignment_Name').val() + ' Submission');
+    }
+
+</script>
+@{
+    
+    SubmissionActivity submission = Model.Submission;
+    StopActivity stop = Model.Stop;
+
+
+@Html.ValidationSummary(true, "The due date must come after the release date")
+    using (Html.BeginForm())
+    {
+        Html.ValidationSummary(true);
+    <fieldset>
+        <legend>Assignment</legend>
+        @Html.HiddenFor(model => submission.ReleaseDate, new { @id = "ReleaseDate" })
+        @Html.HiddenFor(model => stop.ReleaseDate, new { @id = "DueDate" })
+        @Html.HiddenFor(model => submission.Name, new { @id = "SubmissionName" })
+        <div class="editor-label">
+            @Html.LabelFor(model => model.StudioAssignment.Name)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.StudioAssignment.Name)
+            @Html.ValidationMessageFor(model => model.StudioAssignment.Name)
+        </div>
+        <div class="editor-label">
+            @Html.LabelFor(model => submission.Description)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => submission.Description)
+            @Html.ValidationMessageFor(model => submission.Description)
+        </div>
+        <div class="editor-label">
+            @Html.LabelFor(model => submission.ReleaseDate)
+        </div>
+        <div class="editor-label">
+            @Html.TextBox("ReleaseDate_Date", convertToMonthDayYearFormat(submission.ReleaseDate), new { @id = "ReleaseDate_Date", @class = "date_picker", size = 9 })
+        </div>
+        <div class="editor-label">
+            @Html.TextBox("ReleaseDate_Time", convertTime(submission.ReleaseDate), new { @id = "ReleaseDate_Time", @class = "time_picker", size = 9 })
+        </div>
+        <!--Stop date-->
+        <div class="editor-label">
+            @Html.Label("Due Date")
+        </div>
+        <div class="editor-label">
+            @Html.TextBox("DueDate_Date", convertToMonthDayYearFormat(stop.ReleaseDate), new { @id = "DueDate_Date", @class = "date_picker", size = 9 })
+        </div>
+        <div class="editor-label">
+            @Html.TextBox("DueDate_Time", convertTime(stop.ReleaseDate), new { @id = "DueDate_Time", @class = "time_picker", size = 9 })
+        </div>
+        <div class="editor-label">
+            @Html.LabelFor(model => submission.isGradeable)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => submission.isGradeable)
+            @Html.ValidationMessageFor(model => submission.isGradeable)
+        </div>
+        <div class="editor-label">
+            @Html.LabelFor(model => submission.isTeam)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => submission.isTeam)
+            @Html.ValidationMessageFor(model => submission.isTeam)
+        </div>
+        <div class="editor-label">
+            @Html.LabelFor(model => submission.InstructorCanReview)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => submission.InstructorCanReview)
+            @Html.ValidationMessageFor(model => submission.InstructorCanReview)
+        </div>
+        <div class="editor-label">
+            @Html.LabelFor(model => submission.Weight, "Weight")
+        </div>
+        <div class="editor-field">
+            @Html.DropDownListFor(model => model.Submission.WeightID, ViewBag.Weights as SelectList)
+            @Html.ValidationMessageFor(model => submission.Weight)
+        </div>
+        @{
+        Deliverable deliverable = new Deliverable();
+        submission.Deliverables.Add(deliverable);
+                <div class="editor-label">
+            @Html.LabelFor(model => deliverable.Name)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => deliverable.Name)
+            @Html.ValidationMessageFor(model => deliverable.Name)
+        </div>
+
+                <div class="editor-label">
+            @Html.LabelFor(model => deliverable.Type)
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("Deliverable Type", ViewBag.DeliverableTypes as SelectList)
+            @Html.ValidationMessageFor(model => deliverable.Type)
+        </div>
+        }
+        <div class="editor-label">
+            @Html.LabelFor(model => submission.PossiblePoints)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => submission.PossiblePoints)
+            @Html.ValidationMessageFor(model => submission.PossiblePoints)
+        </div>
+        <p>
+            <input type="submit" value="Create" id="submitButton"/>
+        </p>
+    </fieldset>
+    }
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+    }
+@functions
+{
+    public string convertToMonthDayYearFormat(DateTime date)
+    {
+        return addLostZeros(date.Month.ToString(), 2, true) + "/" + addLostZeros(date.Day.ToString(), 2, true) + "/" + addLostZeros(date.Year.ToString(), 4, true);
+    }
+
+    public string convertTime(DateTime time)
+    {
+        string timeStr;
+        bool isAM = true;
+        string hr;
+        string min;
+        if (time.Hour > 12)
+        {
+            isAM = false;
+            hr = (time.Hour - 12).ToString();
+        }
+        else
+        {
+            hr = time.Hour.ToString();
+        }
+        min = time.Minute.ToString();
+
+        hr = addLostZeros(hr, 2, true);
+        min = addLostZeros(min, 2, true);
+
+        timeStr = hr + ":" + min;
+        if (isAM)
+        {
+            timeStr += " AM";
+        }
+        else
+        {
+            timeStr += " PM";
+        }
+        return timeStr;
+    }
+
+    public string addLostZeros(string s, int desiredDigits, bool addToFront)
+    {
+        int i = desiredDigits - s.Count();
+        while (i > 0)
+        {
+            if (addToFront)
+            {
+                s = s.Insert(0, "0");
+            }
+            else
+            {
+                s += "0";
+            }
+            i--;
+        }
+        return s;
+    }
+}

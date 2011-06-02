@@ -1,10 +1,13 @@
 ﻿using System.Data;
 using System.Linq;
 using System.Web.Mvc;
+using OSBLE.Attributes;
 using OSBLE.Models.Courses;
 
 namespace OSBLE.Controllers
 {
+    [Authorize]
+    [RequireActiveCourse]
     public class WeightController : OSBLEController
     {
         //
@@ -40,6 +43,7 @@ namespace OSBLE.Controllers
         {
             if (ModelState.IsValid)
             {
+                weight.CourseID = ActiveCourse.CourseID;
                 db.Weights.Add(weight);
                 db.SaveChanges();
                 return RedirectToAction("Index");

@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models.Gradables.StudioAssignment
+namespace OSBLE.Models.Gradables.StudioAssignment.Activities
 {
-    public class SubmissionActivitySettings : AssignmentActivity
+    public class SubmissionActivity : AssignmentActivity
     {
-        public SubmissionActivitySettings()
+        public SubmissionActivity()
             : base()
         {
             isGradeable = true;
+            Deliverables = new List<Deliverable>();
         }
 
         [Required]

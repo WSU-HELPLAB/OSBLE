@@ -3,6 +3,7 @@ using System.Web.Security;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Gradables;
 using OSBLE.Models.Gradables.StudioAssignment;
+using OSBLE.Models.Gradables.StudioAssignment.Activities;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
 
@@ -55,7 +56,11 @@ namespace OSBLE.Models
 
         public DbSet<Mail> Mails { get; set; }
 
-        public DbSet<SubmissionActivitySettings> SubmissionActivitySettings { get; set; }
+        public DbSet<StudioAssignment> StudioAssignments { get; set; }
+
+        public DbSet<SubmissionActivity> SubmissionActivities { get; set; }
+
+        public DbSet<StopActivity> StopActivities { get; set; }
 
         public DbSet<Weight> Weights { get; set; }
 
