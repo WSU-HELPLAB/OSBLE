@@ -165,6 +165,26 @@
         
             @Html.TextBoxFor(model => model.CalendarWindowOfTime, new { size = 3 })
         </div>
+
+    <h3>Default Late Policy</h3>
+    
+    <p>
+        Students may submit assignments up to @Html.TextBoxFor(model => model.MinutesLateWithNoPenalty, new {size = 3 })
+        minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.PercentPenalty, new {size = 3 })
+        percent per @Html.TextBoxFor(model => model.HoursLatePerPercentPenalty, new {size = 3})
+        hours late will be applied.<br />
+        @Html.ValidationMessageFor(model=>model.MinutesLateWithNoPenalty)
+        @Html.ValidationMessageFor(model=>model.PercentPenalty)
+        @Html.ValidationMessageFor(model=>model.HoursLatePerPercentPenalty)
+    </p>
+    
+    
+    <p>
+        Assignments that are submitted more than @Html.TextBoxFor(model => model.HoursLateUntilZero, new {size = 3})
+        hours after the due date and time will receive an automatic 0.<br />
+        @Html.ValidationMessageFor(model=>model.HoursLateUntilZero)
+    </p>
+  
         <br />
         <p>
             <input type="submit" id="course_submit" value="Create Course" />

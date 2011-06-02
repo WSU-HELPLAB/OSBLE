@@ -53,6 +53,26 @@ namespace OSBLE.Models.Courses
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
 
+        // Default Late Policy
+
+        [Required]
+        [Display(Name = "Minutes Late With No Penalty")]
+        public int MinutesLateWithNoPenalty { get; set;}
+
+        [Required]
+        [Range(0,100)]
+        [Display(Name = "Percent Penalty")]
+        public int PercentPenalty { get; set; }
+
+        [Required]
+        [Display(Name = "Hours Late Per Percent Penalty")]
+        public int HoursLatePerPercentPenalty { get; set; }
+
+        [Required]
+        [Display(Name = "Hours Late Until Zero")]
+        public int HoursLateUntilZero { get; set; }
+
+
         // References
 
         [Display(Name = "Course Weight")]
@@ -77,6 +97,11 @@ namespace OSBLE.Models.Courses
             RequireInstructorApprovalForEventPosting = false;
             Inactive = false;
             ShowMeetings = true;
+
+            MinutesLateWithNoPenalty = 5;
+            PercentPenalty = 10;
+            HoursLatePerPercentPenalty = 24;
+            HoursLateUntilZero = 48;
 
             StartDate = DateTime.Now.Date;
             EndDate = DateTime.Now.Date.AddDays(112); // Add 16 weeks.

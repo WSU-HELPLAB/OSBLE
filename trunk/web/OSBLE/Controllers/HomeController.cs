@@ -6,10 +6,12 @@ using OSBLE.Attributes;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
+using OSBLE.Models;
+using System.Drawing;
 
 namespace OSBLE.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class HomeController : OSBLEController
     {
         /// <summary>
@@ -93,7 +95,14 @@ namespace OSBLE.Controllers
 
         public ViewResult SilverlightTest()
         {
-            return View();
+
+            SilverlightObject TestControl = new SilverlightObject {
+                XapName = "SilverlightApplication3",
+                Width = "90%",
+                Height = "90%"
+            };
+
+            return View(TestControl);
         }
 
         /// <summary>

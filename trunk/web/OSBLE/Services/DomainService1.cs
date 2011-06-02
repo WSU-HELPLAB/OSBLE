@@ -11,6 +11,8 @@ namespace OSBLE.Services
     using OSBLE.Models;
     using OSBLE.Models.Courses;
     using System.Runtime.Serialization;
+    using System.Web.Configuration;
+    using System.Web;
 
 
     // TODO: Create methods containing your application logic.
@@ -22,7 +24,11 @@ namespace OSBLE.Services
 
         public IEnumerable<Course> GetCourses()
         {
-            return this.context.Courses;
+            HttpContext httpContext = (HttpContext)ServiceContext.GetService(typeof(HttpContext));
+
+            int activeCourse = (int)httpContext.Session["ActiveCourse"];
+
+            return context.Courses.Where(c => c.ID == activeCourse);
         }
     }
 }

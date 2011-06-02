@@ -108,6 +108,7 @@
     <Compile Include="Models\Services\Uploader\AbstractListing.cs" />
     <Compile Include="Models\Services\Uploader\DirectoryListing.cs" />
     <Compile Include="Models\Services\Uploader\FileListing.cs" />
+    <Compile Include="Models\SilverlightObject.cs" />
     <Compile Include="Services\AuthenticationDomainService.cs" />
     <Compile Include="Services\DomainService1.cs" />
     <Compile Include="Services\SilverlightFaultBehavior.cs" />
@@ -297,7 +298,6 @@
     <Content Include="Scripts\osble.js" />
     <Content Include="Scripts\Silverlight.js" />
     <Content Include="Services\UploaderWebService.svc" />
-    <Content Include="Views\Home\SilverlightTest.aspx" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -493,6 +493,8 @@
     <Content Include="Views\Event\AlreadyApproved.cshtml" />
     <Content Include="Views\Event\Approval.cshtml" />
     <Content Include="Views\Mail\NotFound.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\SilverlightObject.cshtml" />
+    <Content Include="Views\Home\SilverlightTest.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

@@ -171,6 +171,12 @@ namespace OSBLE.Controllers
             updateCourse.Year = course.Year;
             updateCourse.ShowMeetings = course.ShowMeetings;
 
+            // Default Late Policy
+            updateCourse.MinutesLateWithNoPenalty = course.MinutesLateWithNoPenalty;
+            updateCourse.HoursLatePerPercentPenalty = course.HoursLatePerPercentPenalty;
+            updateCourse.HoursLateUntilZero = course.HoursLateUntilZero;
+            updateCourse.PercentPenalty = course.PercentPenalty;
+
             createMeetingTimes(updateCourse);
             createBreaks(updateCourse);
 
