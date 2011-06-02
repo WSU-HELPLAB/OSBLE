@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Windows;
@@ -15,27 +16,57 @@ using System.Windows.Navigation;
 
 using FileUploader.OsbleServices;
 using FileUploader.Controls;
+using System.IO.IsolatedStorage;
 
 namespace FileUploader
 {
     public partial class UploaderPage : Page
     {
-        // Local Directory path
-        string localpath = @"C:\Users\acarter\Dropbox\AdamCarter"; //Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-        string localhome = @"C:\Users\acarter\Dropbox\AdamCarter"; //Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+        public string LocalPath
+        {
+            get
+            {
+                return LocalFileTextBox.Text;
+            }
+            set
+            {
+                LocalFileTextBox.Text = value;
 
-        // Synced Proxy
+                //catch root folder issues on windows systems
+                if (LocalPath.Length > 0 && LocalPath.Substring(LocalPath.Length - 1) == ":")
+                {
+                    LocalPath += "\\";
+                }
+                
+            }
+        }
+
+        //reference to our web service
         UploaderWebServiceClient syncedFiles = new UploaderWebServiceClient();
-
-        // Double Click variables
-        string lastTarget = "";
-        bool wasClicked = false;
 
         public UploaderPage()
         {
             InitializeComponent();
 
+            //get our local path
+            LocalPath = GetLastLocalPath();
+
             //listeners for our web service
+            syncedFiles.GetFileListCompleted += new EventHandler<GetFileListCompletedEventArgs>(syncedFiles_GetFileListCompleted);
+            
+            //local event listeners
+            SyncButton.Click += new RoutedEventHandler(SyncButton_Click);
+            LocalFileList.EmptyDirectoryEncountered += new EventHandler(LocalFileList_EmptyDirectoryEncountered);
+            LocalFileList.ParentDirectoryRequest += new EventHandler(LocalFileList_ParentDirectoryRequest);
+            LocalFileTextBox.KeyUp += new KeyEventHandler(LocalFileTextBox_KeyUp);
+
+            //get the remote server file list
+            syncedFiles.GetFileListAsync("");
+            
+            //get the local files
+            LocalFileList.DataContext = BuildLocalDirectoryListing(LocalPath);
+            
+
             //syncedFiles.GetFileListCompleted += syncedFiles_GetFileListCompleted;
             //syncedFiles.SyncFileCompleted += syncedFiles_SyncCompleted;
 
@@ -43,10 +74,143 @@ namespace FileUploader
             //dirList(localpath);
         }
 
+        //allows the user to quick navigate to a desired location
+        void LocalFileTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                LocalPath = (sender as TextBox).Text;
+                //LocalFileList_EmptyDirectoryEncountered(new FileList { DataContext = new DirectoryListing() { Name = "" } }, EventArgs.Empty);
+            }
+        }
+
+        /// <summary>
+        /// Moves up one directory on the local machine
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LocalFileList_ParentDirectoryRequest(object sender, EventArgs e)
+        {
+            FileList list = sender as FileList;
+            list.ClearPreviousDirectories();
+            DirectoryListing listing = list.DataContext;
+            LocalPath = listing.Name.Substring(0, listing.Name.LastIndexOf('\\'));
+            LocalFileList.DataContext = BuildLocalDirectoryListing(LocalPath);
+        }
+
+        /// <summary>
+        /// Moves down into the selected directory on the local machine
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LocalFileList_EmptyDirectoryEncountered(object sender, EventArgs e)
+        {
+            FileList list = sender as FileList;
+            list.ClearPreviousDirectories();
+            DirectoryListing listing = list.DataContext;
+            LocalPath = Path.Combine(LocalPath, listing.Name);
+            LocalFileList.DataContext = BuildLocalDirectoryListing(LocalPath);
+        }
+
+        void SyncButton_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        public DirectoryListing BuildLocalDirectoryListing(string path)
+        {
+            DirectoryListing listing = new DirectoryListing();
+            listing.Directories = new ObservableCollection<DirectoryListing>();
+            listing.Files = new ObservableCollection<FileListing>();
+            listing.Name = path;
+
+            //The "..." always goes on top
+            listing.Directories.Add(new ParentDirectoryListing() { Name = "..." });
+
+            //apparently, some folders are restricted.  Use a try block to catch
+            //write exceptions
+            try
+            {
+                //add files first
+                foreach (string file in Directory.EnumerateFiles(path))
+                {
+                    FileListing fileListing = new FileListing();
+                    fileListing.LastModified = File.GetLastWriteTime(file);
+                    fileListing.Name = Path.GetFileName(file);
+                    listing.Files.Add(fileListing);
+                }
+
+                //add other directories
+                foreach (string folder in Directory.EnumerateDirectories(path))
+                {
+                    DirectoryListing dList = new DirectoryListing();
+                    dList.Files = new ObservableCollection<FileListing>();
+                    dList.Directories = new ObservableCollection<DirectoryListing>();
+                    dList.LastModified = Directory.GetLastWriteTime(folder);
+                    dList.Name = folder.Substring(folder.LastIndexOf('\\') + 1);
+                    listing.Directories.Add(dList);
+                }
+            }
+            catch (Exception ex)
+            {
+                //something went wrong, oh well (for now)
+            }
+            return listing;
+        }
+
+        /// <summary>
+        /// Saves the last location synced to the server
+        /// </summary>
+        /// <param name="path"></param>
+        private void SavelastLocalPath(string path)
+        {
+            using (IsolatedStorageFile store = IsolatedStorageFile.GetUserStoreForApplication())
+            {
+                using (IsolatedStorageFileStream stream = store.OpenFile("localpath.txt", FileMode.Create))
+                {
+                    StreamWriter writer = new StreamWriter(stream);
+                    writer.Write(path);
+                    writer.Close();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the path of the last path on this machine that was synced with the server
+        /// </summary>
+        /// <returns></returns>
+        private string GetLastLocalPath()
+        {
+            using (IsolatedStorageFile store = IsolatedStorageFile.GetUserStoreForApplication())
+            {
+                if (store.FileExists("localpath.txt"))
+                {
+                    using (IsolatedStorageFileStream stream = store.OpenFile("localpath.txt", FileMode.Open))
+                    {
+                        StreamReader reader = new StreamReader(stream);
+                        string path = reader.ReadLine().Trim();
+                        reader.Close();
+                        return path;
+                    }
+                }
+                else
+                {
+                    return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                }
+            }
+        }
+
+        void syncedFiles_GetFileListCompleted(object sender, GetFileListCompletedEventArgs e)
+        {
+            RemoteFileList.DataContext = e.Result;
+        }
+
         // Executes when the user navigates to this page.
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
         }
+
+
         /*
         private void dirList(string path)
         {

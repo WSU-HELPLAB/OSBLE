@@ -14,12 +14,13 @@ using System.Windows.Media.Imaging;
 using FileUploader.OsbleServices;
 namespace FileUploader.Controls
 {
-    public enum LabelImage { File, Folder };
+    public enum LabelImage { File, Folder, FolderUp };
 
-    public partial class FileListItem : ListBoxItem
+    public partial class FileListItem : ListBoxItem, IComparable
     {
         private AbstractListing dataContext;
-        public AbstractListing DataContext
+        
+        public new AbstractListing DataContext
         {
             get
             {
@@ -30,7 +31,11 @@ namespace FileUploader.Controls
                 dataContext = value;
                 this.DirName.Text = dataContext.Name;
                 BitmapImage bmp;
-                if (dataContext is DirectoryListing)
+                if(DataContext is ParentDirectoryListing)
+                {
+                    bmp = BitmapFromLabel(LabelImage.FolderUp);
+                }
+                else if (dataContext is DirectoryListing)
                 {
                     bmp = BitmapFromLabel(LabelImage.Folder);
                 }
@@ -64,6 +69,10 @@ namespace FileUploader.Controls
                 case LabelImage.Folder:
                     imagePath = "/Images/folder.png";
                     break;
+                
+                case LabelImage.FolderUp:
+                    imagePath = "/Images/folder_up.png";
+                    break;
 
                 default:
                     imagePath = "/Images/file.png";
@@ -72,6 +81,15 @@ namespace FileUploader.Controls
             BitmapImage bmp = new BitmapImage();
             bmp.UriSource = new Uri(imagePath, UriKind.Relative);
             return bmp;
+        }
+
+        public int CompareTo(object obj)
+        {
+            if (obj is FileListItem)
+            {
+                return this.DataContext.Name.CompareTo((obj as FileListItem).DataContext.Name);
+            }
+            return -1;
         }
     }
 }
