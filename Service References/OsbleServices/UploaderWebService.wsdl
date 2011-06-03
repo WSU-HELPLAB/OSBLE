@@ -49,8 +49,8 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="SyncFile">
-      <soap:operation soapAction="urn:UploaderWebService/SyncFile" style="document" />
+    <wsdl:operation name="ValidateUser">
+      <soap:operation soapAction="urn:UploaderWebService/ValidateUser" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -58,8 +58,8 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="createDir">
-      <soap:operation soapAction="urn:UploaderWebService/createDir" style="document" />
+    <wsdl:operation name="SyncFile">
+      <soap:operation soapAction="urn:UploaderWebService/SyncFile" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>

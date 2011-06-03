@@ -30,6 +30,7 @@ namespace FileUploader
             else
             {
                 InstallBtn.Visibility = Visibility.Collapsed;
+
                 // apparently, you can't make a button to launch the already installed application
                 InstallText.Text = "This application is already installed on your computer.";
             }
@@ -37,7 +38,7 @@ namespace FileUploader
             if (Application.Current.IsRunningOutOfBrowser)
             {
                 // go to UploaderPage
-                this.Content = new FileUploader();
+                this.Content = new UploaderPage();
             }
 
         }
