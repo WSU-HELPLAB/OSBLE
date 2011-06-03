@@ -64,5 +64,10 @@ namespace OSBLE.Models.Assignments.Activities
         [Required]
         [Display(Name = "File Name")]
         public string Name { get; set; }
+
+        [Required]
+        public int AssignmentActivityID { get; set; }
+
+        public AssignmentActivity AssignmentActivity { get; set; }
     }
 }

@@ -91,6 +91,7 @@
     <Compile Include="Models\Assignments\Activities\GradeActivity.cs" />
     <Compile Include="Models\Assignments\Activities\Scores\RubricScore.cs" />
     <Compile Include="Models\Assignments\Activities\Scores\Score.cs" />
+    <Compile Include="Models\Assignments\BasicAssignment.cs" />
     <Compile Include="Models\Courses\AbstractCourse.cs" />
     <Compile Include="Models\Assignments\Activities\StopActivity.cs" />
     <Compile Include="Models\Assignments\StudioAssignment.cs" />
@@ -332,7 +333,6 @@
     <Content Include="Views\Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\Gradables\StudioAssignment\Activities\" />
     <Folder Include="Validations\" />
   </ItemGroup>
   <ItemGroup>

@@ -26,6 +26,16 @@ namespace OSBLE.Models.Assignments.Activities.Scores
         [Required]
         public double Multiplier { get; set; }
 
+        [Required]
+        public int UserProfileID { get; set; }
+
+        public virtual UserProfile UserProfile { get; set; }
+
+        [Required]
+        public int AssignmentActivityID { get; set; }
+
+        public virtual AssignmentActivity AssignmentActivity { get; set; }
+
         public Score() {
             Published = false;
             Points = 0;

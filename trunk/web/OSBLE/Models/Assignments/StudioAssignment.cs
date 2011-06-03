@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using OSBLE.Models.Assignments.Activities;
+using System;
 
 namespace OSBLE.Models.Assignments
 {
@@ -8,10 +10,8 @@ namespace OSBLE.Models.Assignments
     {
         public StudioAssignment()
         {
-            AssignmentActivities = new List<AssignmentActivity>();
+
         }
 
-        [Required]
-        public virtual ICollection<AssignmentActivity> AssignmentActivities { get; set; }
     }
 }

@@ -104,6 +104,7 @@ namespace OSBLE.Models
                 .HasRequired(n => n.ToUserProfile)
                 .WithMany()
                 .WillCascadeOnDelete(false);
+
         }
 
         private void createSampleUser(string username, string password, string firstname, string lastname, string ident, int school, bool isAdmin, bool canCreateCourses)

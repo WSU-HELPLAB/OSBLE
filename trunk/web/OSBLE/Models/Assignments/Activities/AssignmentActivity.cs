@@ -33,6 +33,11 @@ namespace OSBLE.Models.Assignments.Activities
             set;
         }
 
+        [Required]
+        public int AbstractAssignmentID { get; set; }
+
+        public AbstractAssignment AbstractAssignment { get; set; }
+
         public List<Score> Scores { get; set; }
 
     }
