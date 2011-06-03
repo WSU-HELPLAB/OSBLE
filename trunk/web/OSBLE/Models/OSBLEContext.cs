@@ -93,6 +93,16 @@ namespace OSBLE.Models
 
         public DbSet<Notification> Notifications { get; set; }
 
+        // Rubrics
+
+        public DbSet<Rubric> Rubrics { get; set; }
+
+        public DbSet<Level> Levels { get; set; }
+
+        public DbSet<Criteria> Criteria { get; set; }
+
+        public DbSet<LevelDescription> LevelDescriptions { get; set; }
+
         // Users
 
         public DbSet<Mail> Mails { get; set; }
