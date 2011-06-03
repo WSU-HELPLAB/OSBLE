@@ -28,6 +28,16 @@ namespace OSBLE.Models.Assignments
         [Display(Name = "Hours Late Until Zero")]
         public int HoursLateUntilZero { get; set; }
 
+        public SubmissionActivity GetSubmissionActivity()
+        {
+            return (SubmissionActivity)AssignmentActivities.Where(aa => aa is SubmissionActivity).FirstOrDefault();
+        }
+
+        public StopActivity GetStopActivity()
+        {
+            return (StopActivity)AssignmentActivities.Where(aa => aa is StopActivity).FirstOrDefault();
+        }
+
         public BasicAssignment() : base() { 
 
             // Check for Submission Activity and Stop Activity and create them if they don't exist.

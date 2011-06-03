@@ -7,6 +7,7 @@ using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments.Activities.Scores;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Services.Uploader;
+using System.Collections.Generic;
 
 namespace OSBLE.Models
 {
@@ -210,6 +211,20 @@ namespace OSBLE.Models
             this.Courses.Add(c4);
 
             this.SaveChanges();
+
+            Category w1 = new Category();
+            w1.Name = "Homework";
+            w1.PointsPossible = 40;
+
+            Category w2 = new Category();
+            w2.Name = "Exams";
+            w2.PointsPossible = 60;
+
+            c1.Categories = new List<Category>();
+            c2.Categories = new List<Category>();
+
+            c1.Categories.Add(w1);
+            c1.Categories.Add(w2);
 
             MembershipUserCollection muc = Membership.GetAllUsers();
             foreach (MembershipUser mu in muc)

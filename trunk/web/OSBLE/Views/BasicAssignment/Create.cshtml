@@ -1,6 +1,7 @@
-﻿@using OSBLE.Models.Gradables
-@using OSBLE.Models.Gradables.StudioAssignment.Activities
-@model OSBLE.Models.ViewModels.BasicAssignmentViewModel
+﻿@model OSBLE.Models.ViewModels.BasicAssignmentViewModel
+           
+@using OSBLE.Models.Assignments.Activities
+
 @{
     ViewBag.Title = "Create";
 }
@@ -11,12 +12,30 @@
 <script type="text/javascript">
 
     $(function () {
-        $('form').submit(function () {
-            updateDueDate();
+        $('#ReleaseDate_Date').change(function () {
             updateReleaseDate();
-            updateSubmissionName();
-            return true;
         });
+
+        $('#ReleaseDate_Time').change(function () {
+            updateReleaseDate();
+        });
+
+        $('#DueDate_Date').change(function () {
+            updateDueDate();
+        });
+
+        $('#DueDate_Time').change(function () {
+            updateDueDate();
+        });
+
+        $('#StudioAssignment_Name').change(function () {
+            updateDueDate();
+        });
+
+        $('#DueDate_Time').change(function () {
+            updateSubmissionName();
+        });
+
     });
 
     function updateReleaseDate() {
@@ -47,11 +66,11 @@
         @Html.HiddenFor(model => stop.ReleaseDate, new { @id = "DueDate" })
         @Html.HiddenFor(model => submission.Name, new { @id = "SubmissionName" })
         <div class="editor-label">
-            @Html.LabelFor(model => model.StudioAssignment.Name)
+            @Html.LabelFor(model => model.BasicAssignment.Name)
         </div>
         <div class="editor-field">
-            @Html.EditorFor(model => model.StudioAssignment.Name)
-            @Html.ValidationMessageFor(model => model.StudioAssignment.Name)
+            @Html.EditorFor(model => model.BasicAssignment.Name)
+            @Html.ValidationMessageFor(model => model.BasicAssignment.Name)
         </div>
         <div class="editor-label">
             @Html.LabelFor(model => submission.Description)
@@ -80,13 +99,6 @@
             @Html.TextBox("DueDate_Time", convertTime(stop.ReleaseDate), new { @id = "DueDate_Time", @class = "time_picker", size = 9 })
         </div>
         <div class="editor-label">
-            @Html.LabelFor(model => submission.isGradeable)
-        </div>
-        <div class="editor-field">
-            @Html.EditorFor(model => submission.isGradeable)
-            @Html.ValidationMessageFor(model => submission.isGradeable)
-        </div>
-        <div class="editor-label">
             @Html.LabelFor(model => submission.isTeam)
         </div>
         <div class="editor-field">
@@ -101,11 +113,11 @@
             @Html.ValidationMessageFor(model => submission.InstructorCanReview)
         </div>
         <div class="editor-label">
-            @Html.LabelFor(model => submission.Weight, "Weight")
+            @Html.LabelFor(model => model.BasicAssignment.Category, "Category")
         </div>
         <div class="editor-field">
-            @Html.DropDownListFor(model => model.Submission.WeightID, ViewBag.Weights as SelectList)
-            @Html.ValidationMessageFor(model => submission.Weight)
+            @Html.DropDownListFor(model => model.BasicAssignment.CategoryID, ViewBag.Categories as SelectList)
+            @Html.ValidationMessageFor(model => model.BasicAssignment.Category)
         </div>
         @{
         Deliverable deliverable = new Deliverable();
@@ -127,30 +139,30 @@
         </div>
         }
         <div class="editor-label">
-            @Html.LabelFor(model => submission.PossiblePoints)
+            @Html.LabelFor(model => model.BasicAssignment.PointsPossible)
         </div>
         <div class="editor-field">
-            @Html.EditorFor(model => submission.PossiblePoints)
-            @Html.ValidationMessageFor(model => submission.PossiblePoints)
+            @Html.EditorFor(model => model.BasicAssignment.PointsPossible)
+            @Html.ValidationMessageFor(model => model.BasicAssignment.PointsPossible)
         </div>
 
     <h3>Late Policy</h3>
     
     <p>
-        Students may submit assignments up to @Html.TextBoxFor(model => model.Submission.MinutesLateWithNoPenalty, new {size = 3 })
-        minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.Submission.PercentPenalty, new { size = 3 })
-        percent per @Html.TextBoxFor(model => model.Submission.HoursLatePerPercentPenalty, new { size = 3 })
+        Students may submit assignments up to @Html.TextBoxFor(model => model.BasicAssignment.MinutesLateWithNoPenalty, new { size = 3 })
+        minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.BasicAssignment.PercentPenalty, new { size = 3 })
+        percent per @Html.TextBoxFor(model => model.BasicAssignment.HoursLatePerPercentPenalty, new { size = 3 })
         hours late will be applied.<br />
-        @Html.ValidationMessageFor(model => model.Submission.MinutesLateWithNoPenalty)
-        @Html.ValidationMessageFor(model => model.Submission.PercentPenalty)
-        @Html.ValidationMessageFor(model => model.Submission.HoursLatePerPercentPenalty)
+        @Html.ValidationMessageFor(model => model.BasicAssignment.MinutesLateWithNoPenalty)
+        @Html.ValidationMessageFor(model => model.BasicAssignment.PercentPenalty)
+        @Html.ValidationMessageFor(model => model.BasicAssignment.HoursLatePerPercentPenalty)
     </p>
     
     
     <p>
-        Assignments that are submitted more than @Html.TextBoxFor(model => model.Submission.HoursLateUntilZero, new { size = 3 })
+        Assignments that are submitted more than @Html.TextBoxFor(model => model.BasicAssignment.HoursLateUntilZero, new { size = 3 })
         hours after the due date and time will receive an automatic 0.<br />
-        @Html.ValidationMessageFor(model => model.Submission.HoursLateUntilZero)
+        @Html.ValidationMessageFor(model => model.BasicAssignment.HoursLateUntilZero)
     </p>
         <p>
             <input type="submit" value="Create" id="submitButton"/>

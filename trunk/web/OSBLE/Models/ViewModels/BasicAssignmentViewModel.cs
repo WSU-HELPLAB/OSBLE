@@ -1,25 +1,21 @@
-﻿//using OSBLE.Models.Gradables.StudioAssignment;
-//using OSBLE.Models.Gradables.StudioAssignment.Activities;
-
+﻿using OSBLE.Models.Assignments.Activities;
+using OSBLE.Models.Assignments;
 namespace OSBLE.Models.ViewModels
 {
     public class BasicAssignmentViewModel
     {
-        /*
+
         public BasicAssignmentViewModel()
         {
             Submission = new SubmissionActivity();
             Stop = new StopActivity();
-            StudioAssignment = new StudioAssignment();
-            StudioAssignment.AssignmentActivities.Add(Submission);
-            StudioAssignment.AssignmentActivities.Add(Stop);
+            BasicAssignment = new BasicAssignment();
         }
 
         public SubmissionActivity Submission { get; set; }
 
         public StopActivity Stop { get; set; }
 
-        public StudioAssignment StudioAssignment { get; set; }
-         */
+        public BasicAssignment BasicAssignment { get; set; }
     }
 }

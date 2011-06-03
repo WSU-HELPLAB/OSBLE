@@ -7,8 +7,9 @@ using System.Web.Mvc;
 using OSBLE.Attributes;
 using OSBLE.Models.ViewModels;
 using OSBLE.Models.Courses;
+using OSBLE.Models.Assignments.Activities;
 
-/*
+
 namespace OSBLE.Controllers
 {
     [Authorize]
@@ -24,23 +25,28 @@ namespace OSBLE.Controllers
 
         //
         // GET: /Assignment/
+        
+        /*
         public ViewResult Index()
         {
             //This is what it was but no longer works
             var abstractgradables = db.AbstractGradables.ToList();
             return View(abstractgradables);
             //return View();
-        }
+        }*/
 
         //
         // GET: /Assignment/Details/5
 
+        /*
         public ViewResult Details(int id)
         {
+            
             SubmissionActivity assignment = db.AbstractGradables.Find(id) as SubmissionActivity;
             return View(assignment);
+            
         }
-
+        */
         //
         // GET: /Assignment/Create
 
@@ -53,13 +59,13 @@ namespace OSBLE.Controllers
 
             // Copy default Late Policy settings
             Course active = activeCourse.Course as Course;
-            basic.Submission.HoursLatePerPercentPenalty = active.HoursLatePerPercentPenalty;
-            basic.Submission.HoursLateUntilZero = active.HoursLateUntilZero;
-            basic.Submission.PercentPenalty = active.PercentPenalty;
-            basic.Submission.MinutesLateWithNoPenalty = active.MinutesLateWithNoPenalty;
+            basic.BasicAssignment.HoursLatePerPercentPenalty = active.HoursLatePerPercentPenalty;
+            basic.BasicAssignment.HoursLateUntilZero = active.HoursLateUntilZero;
+            basic.BasicAssignment.PercentPenalty = active.PercentPenalty;
+            basic.BasicAssignment.MinutesLateWithNoPenalty = active.MinutesLateWithNoPenalty;
 
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes());
-            ViewBag.Weights = new SelectList(db.Weights, "ID", "Name");
+            ViewBag.Categories = new SelectList(db.Categories, "ID", "Name");
             ViewBag.Deliverables = Deliverables;
             return View(basic);
         }
@@ -76,16 +82,16 @@ namespace OSBLE.Controllers
             }
             if (ModelState.IsValid)
             {
-                db.StudioAssignments.Add(basic.StudioAssignment);
+                db.BasicAssignments.Add(basic.BasicAssignment);
                 db.SaveChanges();
 
-                basic.StudioAssignment.AssignmentActivities.Add(basic.Submission);
-                basic.StudioAssignment.AssignmentActivities.Add(basic.Stop);
+                basic.BasicAssignment.AssignmentActivities.Add(basic.Submission);
+                basic.BasicAssignment.AssignmentActivities.Add(basic.Stop);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
 
-            ViewBag.Weights = new SelectList(db.Weights, "ID", "Name", basic.Submission.Weight);
+            ViewBag.Categories = new SelectList(db.Categories, "ID", "Name", basic.BasicAssignment.CategoryID);
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes());
             ViewBag.Deliverable = new SelectList(db.Deliverables, "ID", "Name");
             return View(basic);
@@ -94,16 +100,19 @@ namespace OSBLE.Controllers
         //
         // GET: /Assignment/Edit/5
 
+        /*
         public ActionResult Edit(int id)
         {
-            SubmissionActivity assignment = db.AbstractGradables.Find(id) as SubmissionActivity;
-            ViewBag.WeightID = new SelectList(db.Weights, "ID", "Name", assignment.WeightID);
+            SubmissionActivity assignment = db.Categories.Find(id) as SubmissionActivity;
+            ViewBag.WeightID = new SelectList(db.Categories, "ID", "Name", assignment.WeightID);
             return View(assignment);
         }
+        */
 
         //
         // POST: /Assignment/Edit/5
 
+        /*
         [HttpPost]
         public ActionResult Edit(SubmissionActivity assignment)
         {
@@ -113,22 +122,26 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.WeightID = new SelectList(db.Weights, "ID", "Name", assignment.WeightID);
+            ViewBag.WeightID = new SelectList(db.Categories, "ID", "Name", assignment.CategoryID);
             return View(assignment);
         }
+        */
 
         //
         // GET: /Assignment/Delete/5
 
+        /*
         public ActionResult Delete(int id)
         {
             SubmissionActivity assignment = db.AbstractGradables.Find(id) as SubmissionActivity;
             return View(assignment);
         }
+        */
 
         //
         // POST: /Assignment/Delete/5
 
+        /*
         [HttpPost, ActionName("Delete")]
         public ActionResult DeleteConfirmed(int id)
         {
@@ -137,6 +150,7 @@ namespace OSBLE.Controllers
             db.SaveChanges();
             return RedirectToAction("Index");
         }
+         */
 
         protected override void Dispose(bool disposing)
         {
@@ -182,4 +196,3 @@ namespace OSBLE.Controllers
         }
     }
 }
-*/

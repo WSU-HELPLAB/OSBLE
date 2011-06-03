@@ -11,6 +11,8 @@ namespace OSBLE.Models.Assignments.Activities
         [Key]
         public int ID { get; set; }
 
+        public string Name { get; set; }
+
         public AssignmentActivity()
         {
             DateTime dateTimeNow = DateTime.Now;
