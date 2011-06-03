@@ -30,8 +30,13 @@ namespace OSBLE.Models
         // Assignments
 
         public DbSet<AbstractAssignment> AbstractAssignments { get; set; }
-        
+
+        public DbSet<BasicAssignment> BasicAssignments { get; set; }
+
+        public DbSet<GradeAssignment> GradeAssignments { get; set; }
+
         public DbSet<StudioAssignment> StudioAssignments { get; set; }
+
 
         // Assignments.Activities
 
@@ -40,6 +45,8 @@ namespace OSBLE.Models
         public DbSet<Deliverable> Deliverables { get; set; }
 
         public DbSet<GradeActivity> GradeActivities { get; set; }
+
+        public DbSet<SingleSubmissionActivity> SingleSubmissionActivities { get; set; }
 
         public DbSet<StopActivity> StopActivities { get; set; }
 
