@@ -3,10 +3,14 @@
 @using OSBLE.Models.HomePage
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Events";
 }
 
-<h2>Index</h2>
+<h2>Events &amp; Deadlines</h2>
+
+<p>
+    @Html.ActionLink("Back to Dashboard", "Index", "Home")
+</p>
 
 <p>
     @if(ViewBag.ActiveCourse.CourseRole.CanModify || ViewBag.ActiveCourse.Course.AllowEventPosting) {

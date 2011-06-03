@@ -91,7 +91,7 @@ namespace OSBLE.Models
         [Email(ErrorMessage = "Email Address is not valid!")]
         [DataType(DataType.EmailAddress)]
         [Display(Name = "Email address")]
-        public string EmailAddress{get; set;}
+        public string EmailAddress{ get; set; }
     }
 
     public class ContactUsModel

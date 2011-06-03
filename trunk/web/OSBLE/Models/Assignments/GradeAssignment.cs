@@ -17,6 +17,5 @@ namespace OSBLE.Models.Assignments
         {
             get { return null; }
         }
-
     }
 }

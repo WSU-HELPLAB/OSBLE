@@ -95,6 +95,7 @@
     <Compile Include="Models\Assignments\Activities\SingleSubmissionActivity.cs" />
     <Compile Include="Models\Assignments\BasicAssignment.cs" />
     <Compile Include="Models\Assignments\GradeAssignment.cs" />
+    <Compile Include="Models\Assignments\ILatePolicy.cs" />
     <Compile Include="Models\Courses\AbstractCourse.cs" />
     <Compile Include="Models\Assignments\Activities\StopActivity.cs" />
     <Compile Include="Models\Assignments\StudioAssignment.cs" />

@@ -15,7 +15,7 @@ namespace OSBLE.Models.Assignments
         public int ID { get; set; }
 
         [Required]
-        [Display(Name = "Assignment Name")]
+        [Display(Name = "Name")]
         public string Name { get; set; }
 
         [Required]
