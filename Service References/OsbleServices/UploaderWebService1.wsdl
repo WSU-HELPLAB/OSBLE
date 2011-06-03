@@ -37,17 +37,17 @@
   <wsdl:message name="UploaderWebService_GetFileUrl_OutputMessage">
     <wsdl:part name="parameters" element="GetFileUrlResponse" />
   </wsdl:message>
+  <wsdl:message name="UploaderWebService_ValidateUser_InputMessage">
+    <wsdl:part name="parameters" element="ValidateUser" />
+  </wsdl:message>
+  <wsdl:message name="UploaderWebService_ValidateUser_OutputMessage">
+    <wsdl:part name="parameters" element="ValidateUserResponse" />
+  </wsdl:message>
   <wsdl:message name="UploaderWebService_SyncFile_InputMessage">
     <wsdl:part name="parameters" element="SyncFile" />
   </wsdl:message>
   <wsdl:message name="UploaderWebService_SyncFile_OutputMessage">
     <wsdl:part name="parameters" element="SyncFileResponse" />
-  </wsdl:message>
-  <wsdl:message name="UploaderWebService_createDir_InputMessage">
-    <wsdl:part name="parameters" element="createDir" />
-  </wsdl:message>
-  <wsdl:message name="UploaderWebService_createDir_OutputMessage">
-    <wsdl:part name="parameters" element="createDirResponse" />
   </wsdl:message>
   <wsdl:portType name="UploaderWebService">
     <wsdl:operation name="GetFakeFileListing">
@@ -70,13 +70,13 @@
       <wsdl:input wsaw:Action="urn:UploaderWebService/GetFileUrl" message="UploaderWebService_GetFileUrl_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/GetFileUrlResponse" message="UploaderWebService_GetFileUrl_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="ValidateUser">
+      <wsdl:input wsaw:Action="urn:UploaderWebService/ValidateUser" message="UploaderWebService_ValidateUser_InputMessage" />
+      <wsdl:output wsaw:Action="urn:UploaderWebService/ValidateUserResponse" message="UploaderWebService_ValidateUser_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="SyncFile">
       <wsdl:input wsaw:Action="urn:UploaderWebService/SyncFile" message="UploaderWebService_SyncFile_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/SyncFileResponse" message="UploaderWebService_SyncFile_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="createDir">
-      <wsdl:input wsaw:Action="urn:UploaderWebService/createDir" message="UploaderWebService_createDir_InputMessage" />
-      <wsdl:output wsaw:Action="urn:UploaderWebService/createDirResponse" message="UploaderWebService_createDir_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
 </wsdl:definitions>

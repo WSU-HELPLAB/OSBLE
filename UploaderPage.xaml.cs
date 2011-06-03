@@ -46,6 +46,9 @@ namespace FileUploader
 
         public UploaderPage()
         {
+            LoginWindow login = new LoginWindow();
+            login.Show();
+
             InitializeComponent();
 
             //get our local path
@@ -65,7 +68,6 @@ namespace FileUploader
             
             //get the local files
             LocalFileList.DataContext = BuildLocalDirectoryListing(LocalPath);
-            
 
             //syncedFiles.GetFileListCompleted += syncedFiles_GetFileListCompleted;
             //syncedFiles.SyncFileCompleted += syncedFiles_SyncCompleted;
