@@ -3,21 +3,20 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models.Assignments.Activities
 {
-    public class SubmissionActivity : AssignmentActivity
+    public class SubmissionActivity : AssignmentActivity, IHasDeliverables
     {
         public SubmissionActivity()
             : base()
         {
-            isGradeable = true;
             Deliverables = new List<Deliverable>();
         }
+
+        [Display(Name = "Deliverables")]
+        public virtual ICollection<Deliverable> Deliverables { get; set; }
 
         [Required]
         [Display(Name = "Description")]
         public string Description { get; set; }
-
-        [Display(Name = "Deliverables")]
-        public virtual ICollection<Deliverable> Deliverables { get; set; }
 
         [Required]
         [Display(Name = "Is Team")]

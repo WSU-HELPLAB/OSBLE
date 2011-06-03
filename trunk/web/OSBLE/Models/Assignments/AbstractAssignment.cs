@@ -24,12 +24,12 @@ namespace OSBLE.Models.Assignments
         public virtual Category Category { get; set; }
 
         [NotMapped]
-        public DateTime? StartDate { get { return _startDate; } }
-        private DateTime? _startDate;
+        public DateTime? StartDate { get { return startDate; } }
+        private DateTime? startDate;
 
         [NotMapped]
-        public DateTime? EndDate { get { return _endDate; } }
-        private DateTime? _endDate;
+        public DateTime? EndDate { get { return endDate; } }
+        private DateTime? endDate;
 
         [Required]
         public virtual ICollection<AssignmentActivity> AssignmentActivities { get; set; }
@@ -58,11 +58,23 @@ namespace OSBLE.Models.Assignments
             AssignmentActivity firstActivity = AssignmentActivities.Where(aa => !(aa is StopActivity)).OrderBy(aa => aa.ReleaseDate).FirstOrDefault();
             if (firstActivity != null)
             {
-                _startDate = firstActivity.ReleaseDate;
+                startDate = firstActivity.ReleaseDate;
             }
             else
             {
-                _startDate = null;
+                startDate = null;
+            }
+
+            // Find last activity of assignment. Sets end date if stop activity is the last activity. 
+            // If not a stop activity at the end, return null.
+            AssignmentActivity lastActivity = AssignmentActivities.OrderByDescending(aa => aa.ReleaseDate).FirstOrDefault();
+            if (firstActivity != null && firstActivity is StopActivity)
+            {
+                endDate = firstActivity.ReleaseDate;
+            }
+            else
+            {
+                endDate = null;
             }
 
 

@@ -5,7 +5,6 @@ using System.Data;
 using System.Web.Mvc;
 using OSBLE.Attributes;
 using OSBLE.Models.Courses;
-using OSBLE.Models.Courses;
 
 namespace OSBLE.Controllers
 {

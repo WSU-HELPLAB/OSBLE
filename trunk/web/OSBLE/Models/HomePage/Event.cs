@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Courses;
-using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 
 namespace OSBLE.Models.HomePage

@@ -89,9 +89,12 @@
     <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="Models\Assignments\AbstractAssignment.cs" />
     <Compile Include="Models\Assignments\Activities\GradeActivity.cs" />
+    <Compile Include="Models\Assignments\Activities\IHasDeliverables.cs" />
     <Compile Include="Models\Assignments\Activities\Scores\RubricScore.cs" />
     <Compile Include="Models\Assignments\Activities\Scores\Score.cs" />
+    <Compile Include="Models\Assignments\Activities\SingleSubmissionActivity.cs" />
     <Compile Include="Models\Assignments\BasicAssignment.cs" />
+    <Compile Include="Models\Assignments\GradeAssignment.cs" />
     <Compile Include="Models\Courses\AbstractCourse.cs" />
     <Compile Include="Models\Assignments\Activities\StopActivity.cs" />
     <Compile Include="Models\Assignments\StudioAssignment.cs" />

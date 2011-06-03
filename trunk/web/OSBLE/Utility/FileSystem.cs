@@ -3,7 +3,6 @@ using System.Web;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
-using OSBLE.Models.Courses;
 
 //the folllowing is a diagram of our file system.  Items in brackes [] indicate
 //using a key of sorts (e.g. the user id).  Items in curly braces {} indicate

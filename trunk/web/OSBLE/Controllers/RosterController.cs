@@ -10,7 +10,6 @@ using LumenWorks.Framework.IO.Csv;
 using OSBLE.Attributes;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Courses;
-using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 
 namespace OSBLE.Controllers

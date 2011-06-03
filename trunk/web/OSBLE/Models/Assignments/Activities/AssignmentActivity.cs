@@ -23,10 +23,6 @@ namespace OSBLE.Models.Assignments.Activities
         }
 
         [Required]
-        [Display(Name = "Will Be Graded?")]
-        public bool isGradeable { get; set; }
-
-        [Required]
         [DataType(DataType.DateTime)]
         [Display(Name = "Release Date")]
         public DateTime ReleaseDate
@@ -50,7 +46,7 @@ namespace OSBLE.Models.Assignments.Activities
         /// </summary>
         public int ColumnOrder { get; set; }
 
-        public List<Score> Scores { get; set; }
+        public virtual ICollection<Score> Scores { get; set; }
 
     }
 }

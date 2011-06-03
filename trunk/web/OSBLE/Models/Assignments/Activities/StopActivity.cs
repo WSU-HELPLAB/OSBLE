@@ -1,10 +1,22 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using OSBLE.Models.Assignments.Activities.Scores;
 
 namespace OSBLE.Models.Assignments.Activities
 {
+    /// <summary>
+    /// This activity marks the end of another activity (due date)
+    /// There should be one of these at the end of every Assignment 
+    /// (except GradeAssignment, which only returns a StartDate)
+    /// </summary>
     public class StopActivity : AssignmentActivity
     {
+        public new int PointsPossible
+        {
+            get { return 0; }
+        }
+
         public StopActivity()
         {
             DateTime dateTimeNow = DateTime.Now;
@@ -14,16 +26,9 @@ namespace OSBLE.Models.Assignments.Activities
             ReleaseDate = ReleaseDate.AddDays(7);
         }
 
-        [Key]
-        [Required]
-        public int ID { get; set; }
-
-        [Required]
-        [DataType(DataType.DateTime)]
-        [Display(Name = "Release Date")]
-        public DateTime ReleaseDate { get; set; }
-
-        [Required]
-        public int AssignmentID { get; set; }
+        public override ICollection<Score> Scores
+        {
+            get { return new List<Score>(); }
+        }
     }
 }

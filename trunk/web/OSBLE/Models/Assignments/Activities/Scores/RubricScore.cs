@@ -10,7 +10,7 @@ namespace OSBLE.Models.Assignments.Activities.Scores
         // public Rubric Rubric { get; set; }
         // public int RubricID { get; set; }
 
-        public double Points
+        public new double Points
         {
             get
             {
