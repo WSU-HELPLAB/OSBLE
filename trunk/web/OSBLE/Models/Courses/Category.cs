@@ -7,14 +7,14 @@ namespace OSBLE.Models.Courses
     /// <summary>
     /// This is the coursework weights
     /// </summary>
-    public class Weight
+    public class Category
     {
         /// <summary>
         /// Constructor method.  Will set the position to 0.
         /// </summary>
-        public Weight()
+        public Category()
         {
-            Position = 0;
+            ColumnOrder = 0;
             Assignments = new List<AbstractAssignment>();
         }
 
@@ -37,13 +37,13 @@ namespace OSBLE.Models.Courses
         public int Points { get; set; }
 
         /// <summary>
-        /// Used for visual ordering of various weights (tabs in the gradebook).  Defaults to a value of 0.
+        /// Used for visual ordering of various categories (tabs in the gradebook).  Defaults to a value of 0.
         /// </summary>
-        [Required]
-        public int Position { get; set; }
+        public int ColumnOrder { get; set; }
 
         [Required]
         [Display(Name = "Gradables")]
         public ICollection<AbstractAssignment> Assignments { get; set; }
+
     }
 }

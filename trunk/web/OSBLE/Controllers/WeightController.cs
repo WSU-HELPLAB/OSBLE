@@ -15,7 +15,7 @@ namespace OSBLE.Controllers
 
         public ViewResult Index()
         {
-            return View(db.Weights.ToList());
+            return View(db.Categories.ToList());
         }
 
         //
@@ -23,7 +23,7 @@ namespace OSBLE.Controllers
 
         public ViewResult Details(string id)
         {
-            Weight weight = db.Weights.Find(id);
+            Category weight = db.Categories.Find(id);
             return View(weight);
         }
 
@@ -39,12 +39,12 @@ namespace OSBLE.Controllers
         // POST: /Weight/Create
 
         [HttpPost]
-        public ActionResult Create(Weight weight)
+        public ActionResult Create(Category weight)
         {
             if (ModelState.IsValid)
             {
                 weight.CourseID = ActiveCourse.CourseID;
-                db.Weights.Add(weight);
+                db.Categories.Add(weight);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
@@ -57,7 +57,7 @@ namespace OSBLE.Controllers
 
         public ActionResult Edit(string id)
         {
-            Weight weight = db.Weights.Find(id);
+            Category weight = db.Categories.Find(id);
             return View(weight);
         }
 
@@ -65,7 +65,7 @@ namespace OSBLE.Controllers
         // POST: /Weight/Edit/5
 
         [HttpPost]
-        public ActionResult Edit(Weight weight)
+        public ActionResult Edit(Category weight)
         {
             if (ModelState.IsValid)
             {
@@ -81,7 +81,7 @@ namespace OSBLE.Controllers
 
         public ActionResult Delete(string id)
         {
-            Weight weight = db.Weights.Find(id);
+            Category weight = db.Categories.Find(id);
             return View(weight);
         }
 
@@ -91,8 +91,8 @@ namespace OSBLE.Controllers
         [HttpPost, ActionName("Delete")]
         public ActionResult DeleteConfirmed(string id)
         {
-            Weight weight = db.Weights.Find(id);
-            db.Weights.Remove(weight);
+            Category weight = db.Categories.Find(id);
+            db.Categories.Remove(weight);
             db.SaveChanges();
             return RedirectToAction("Index");
         }

@@ -15,6 +15,8 @@ namespace OSBLE.Models.Assignments.Activities
         {
             DateTime dateTimeNow = DateTime.Now;
 
+            ColumnOrder = 0;
+
             //The default is tomorrow at midnight
             ReleaseDate = new DateTime(dateTimeNow.Year, dateTimeNow.Month, dateTimeNow.Day, 0, 0, 0);
             ReleaseDate = ReleaseDate.AddDays(1);
@@ -37,6 +39,11 @@ namespace OSBLE.Models.Assignments.Activities
         public int AbstractAssignmentID { get; set; }
 
         public AbstractAssignment AbstractAssignment { get; set; }
+
+        /// <summary>
+        /// Used for visual ordering of assignment activities in the gradebook.  Defaults to a value of 0.
+        /// </summary>
+        public int ColumnOrder { get; set; }
 
         public List<Score> Scores { get; set; }
 

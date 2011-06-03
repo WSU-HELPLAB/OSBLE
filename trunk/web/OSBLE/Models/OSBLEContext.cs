@@ -71,7 +71,7 @@ namespace OSBLE.Models
 
         public DbSet<CoursesUsers> CoursesUsers { get; set; }
 
-        public DbSet<Weight> Weights { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
         // HomePage
 

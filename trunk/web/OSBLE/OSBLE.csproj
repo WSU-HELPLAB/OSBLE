@@ -105,7 +105,7 @@
     <Compile Include="Models\Courses\CourseMeeting.cs" />
     <Compile Include="Models\Assignments\Activities\Deliverable.cs" />
     <Compile Include="Models\HomePage\Event.cs" />
-    <Compile Include="Models\Courses\Weights.cs" />
+    <Compile Include="Models\Courses\Category.cs" />
     <Compile Include="Models\Services\Uploader\ParentDirectoryListing.cs" />
     <Compile Include="Models\ViewModels\BasicAssignmentViewModel.cs" />
     <Compile Include="Models\Services\Uploader\AbstractListing.cs" />

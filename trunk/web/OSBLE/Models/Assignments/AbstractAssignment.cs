@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Assignments.Activities;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Models.Assignments
 {
@@ -17,6 +18,10 @@ namespace OSBLE.Models.Assignments
         [Display(Name = "Assignment Name")]
         public string Name { get; set; }
 
+        [Required]
+        public int CategoryID { get; set; }
+
+        public virtual Category Category { get; set; }
 
         [NotMapped]
         public DateTime? StartDate { get { return _startDate; } }
@@ -29,7 +34,16 @@ namespace OSBLE.Models.Assignments
         [Required]
         public virtual ICollection<AssignmentActivity> AssignmentActivities { get; set; }
 
+        /// <summary>
+        /// Used for visual ordering of assignments in the gradebook.  Defaults to a value of 0.
+        /// </summary>
+
+        public int ColumnOrder { get; set; }
+
         public AbstractAssignment() {
+            
+            ColumnOrder = 0;
+
             // Create Activities Collection if none exists
             if (AssignmentActivities == null)
             {
