@@ -87,23 +87,23 @@
     <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
+    <Compile Include="Models\Assignments\AbstractAssignment.cs" />
+    <Compile Include="Models\Assignments\Activities\GradeActivity.cs" />
+    <Compile Include="Models\Assignments\Activities\Scores\RubricScore.cs" />
+    <Compile Include="Models\Assignments\Activities\Scores\Score.cs" />
     <Compile Include="Models\Courses\AbstractCourse.cs" />
-    <Compile Include="Models\Gradables\StudioAssignment\Activities\IAssignmentActivity.cs" />
-    <Compile Include="Models\Gradables\StudioAssignment\Activities\StopActivity.cs" />
-    <Compile Include="Models\Gradables\StudioAssignment\StudioAssignment.cs" />
+    <Compile Include="Models\Assignments\Activities\StopActivity.cs" />
+    <Compile Include="Models\Assignments\StudioAssignment.cs" />
     <Compile Include="Models\HomePage\AbstractDashboard.cs" />
-    <Compile Include="Models\Gradables\AbstractGradable.cs" />
     <Compile Include="Models\Courses\AbstractRole.cs" />
-    <Compile Include="Models\Gradables\StudioAssignment\Activities\AssignmentActivity.cs" />
-    <Compile Include="Models\Gradables\StudioAssignment\Activities\SubmissionActivity.cs" />
+    <Compile Include="Models\Assignments\Activities\AssignmentActivity.cs" />
+    <Compile Include="Models\Assignments\Activities\SubmissionActivity.cs" />
     <Compile Include="Models\Courses\Community.cs" />
     <Compile Include="Models\Courses\CommunityRole.cs" />
     <Compile Include="Models\Courses\CourseBreak.cs" />
     <Compile Include="Models\Courses\CourseMeeting.cs" />
-    <Compile Include="Models\Gradables\Deliverable.cs" />
+    <Compile Include="Models\Assignments\Activities\Deliverable.cs" />
     <Compile Include="Models\HomePage\Event.cs" />
-    <Compile Include="Models\Gradables\Gradable.cs" />
-    <Compile Include="Models\Gradables\GradableScore.cs" />
     <Compile Include="Models\Courses\Weights.cs" />
     <Compile Include="Models\Services\Uploader\ParentDirectoryListing.cs" />
     <Compile Include="Models\ViewModels\BasicAssignmentViewModel.cs" />
@@ -332,6 +332,7 @@
     <Content Include="Views\Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Models\Gradables\StudioAssignment\Activities\" />
     <Folder Include="Validations\" />
   </ItemGroup>
   <ItemGroup>

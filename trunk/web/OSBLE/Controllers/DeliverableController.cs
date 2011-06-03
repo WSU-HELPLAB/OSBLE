@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Web.Mvc;
 using OSBLE.Attributes;
-using OSBLE.Models.Gradables;
+using OSBLE.Models.Assignments.Activities;
 
 namespace OSBLE.Controllers
 {

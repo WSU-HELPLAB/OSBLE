@@ -1,4 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.Assignments.Activities;
+using System.Collections.Generic;
+using OSBLE.Models.Assignments.Activities.Scores;
 
 namespace OSBLE.Models.Users
 {
@@ -25,6 +28,8 @@ namespace OSBLE.Models.Users
         public bool CanCreateCourses { get; set; }
 
         public int DefaultCourse { get; set; }
+
+        public ICollection<Score> Scores { get; set; }
 
         public UserProfile()
             : base()

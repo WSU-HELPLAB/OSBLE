@@ -1,11 +1,12 @@
 ﻿using System.Data.Entity;
 using System.Web.Security;
 using OSBLE.Models.Courses;
-using OSBLE.Models.Gradables;
-using OSBLE.Models.Gradables.StudioAssignment;
-using OSBLE.Models.Gradables.StudioAssignment.Activities;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
+using OSBLE.Models.Assignments.Activities;
+using OSBLE.Models.Assignments.Activities.Scores;
+using OSBLE.Models.Assignments;
+using OSBLE.Models.Services.Uploader;
 
 namespace OSBLE.Models
 {
@@ -24,53 +25,71 @@ namespace OSBLE.Models
             : base("OSBLEData")
         { }
 
-        public DbSet<AbstractRole> AbstractRoles { get; set; }
-
-        public DbSet<CourseRole> CourseRoles { get; set; }
-
-        public DbSet<CommunityRole> CommunityRoles { get; set; }
-
-        public DbSet<CourseMeeting> CourseMeetings { get; set; }
-
-        public DbSet<CourseBreak> CourseBreaks { get; set; }
-
-        public DbSet<CoursesUsers> CoursesUsers { get; set; }
-
-        public DbSet<Event> Events { get; set; }
-
         public DbSet<School> Schools { get; set; }
 
-        public DbSet<UserProfile> UserProfiles { get; set; }
+        // Assignments
+
+        public DbSet<AbstractAssignment> AbstractAssignments { get; set; }
+        
+        public DbSet<StudioAssignment> StudioAssignments { get; set; }
+
+        // Assignments.Activities
+
+        public DbSet<AssignmentActivity> AssignmentActivities { get; set; }
+        
+        public DbSet<Deliverable> Deliverables { get; set; }
+
+        public DbSet<GradeActivity> GradeActivities { get; set; }
+
+        public DbSet<StopActivity> StopActivities { get; set; }
+
+        public DbSet<SubmissionActivity> SubmissionActivities { get; set; }
+
+        // Assignments.Activities.Scores
+
+        public DbSet<Score> Scores { get; set; }
+
+        public DbSet<RubricScore> RubricScores { get; set; }
+
+        // Courses
 
         public DbSet<AbstractCourse> AbstractCourses { get; set; }
 
-        public DbSet<Course> Courses { get; set; }
+        public DbSet<AbstractRole> AbstractRoles { get; set; }
 
         public DbSet<Community> Communities { get; set; }
 
-        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<CommunityRole> CommunityRoles { get; set; }
+
+        public DbSet<Course> Courses { get; set; }
+
+        public DbSet<CourseBreak> CourseBreaks { get; set; }
+
+        public DbSet<CourseMeeting> CourseMeetings { get; set; }
+
+        public DbSet<CourseRole> CourseRoles { get; set; }
+
+        public DbSet<CoursesUsers> CoursesUsers { get; set; }
+
+        public DbSet<Weight> Weights { get; set; }
+
+        // HomePage
+
+        public DbSet<AbstractDashboard> AbstractDashboards { get; set; }
 
         public DbSet<DashboardPost> DashboardPosts { get; set; }
 
         public DbSet<DashboardReply> DashboardReplies { get; set; }
 
+        public DbSet<Event> Events { get; set; }
+
+        public DbSet<Notification> Notifications { get; set; }
+
+        // Users
+
         public DbSet<Mail> Mails { get; set; }
 
-        public DbSet<StudioAssignment> StudioAssignments { get; set; }
-
-        public DbSet<SubmissionActivity> SubmissionActivities { get; set; }
-
-        public DbSet<StopActivity> StopActivities { get; set; }
-
-        public DbSet<Weight> Weights { get; set; }
-
-        public DbSet<GradableScore> GradableScores { get; set; }
-
-        public DbSet<AbstractGradable> AbstractGradables { get; set; }
-
-        public DbSet<Gradable> Gradables { get; set; }
-
-        public DbSet<Deliverable> Deliverables { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

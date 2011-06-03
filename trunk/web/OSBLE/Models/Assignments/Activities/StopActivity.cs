@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models.Gradables.StudioAssignment.Activities
+namespace OSBLE.Models.Assignments.Activities
 {
-    public class StopActivity : IAssignmentActivity
+    public class StopActivity : AssignmentActivity
     {
         public StopActivity()
         {

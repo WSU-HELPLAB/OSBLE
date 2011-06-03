@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models.Gradables
+namespace OSBLE.Models.Assignments.Activities
 {
     public enum DeliverableType
     {

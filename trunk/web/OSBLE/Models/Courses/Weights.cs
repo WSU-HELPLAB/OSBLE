@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using OSBLE.Models.Gradables;
+using OSBLE.Models.Assignments;
 
 namespace OSBLE.Models.Courses
 {
@@ -15,7 +15,7 @@ namespace OSBLE.Models.Courses
         public Weight()
         {
             Position = 0;
-            Gradables = new List<AbstractGradable>();
+            Assignments = new List<AbstractAssignment>();
         }
 
         [Key]
@@ -44,6 +44,6 @@ namespace OSBLE.Models.Courses
 
         [Required]
         [Display(Name = "Gradables")]
-        public ICollection<AbstractGradable> Gradables { get; set; }
+        public ICollection<AbstractAssignment> Assignments { get; set; }
     }
 }

@@ -1,10 +1,11 @@
-﻿using OSBLE.Models.Gradables.StudioAssignment;
-using OSBLE.Models.Gradables.StudioAssignment.Activities;
+﻿//using OSBLE.Models.Gradables.StudioAssignment;
+//using OSBLE.Models.Gradables.StudioAssignment.Activities;
 
 namespace OSBLE.Models.ViewModels
 {
     public class BasicAssignmentViewModel
     {
+        /*
         public BasicAssignmentViewModel()
         {
             Submission = new SubmissionActivity();
@@ -19,5 +20,6 @@ namespace OSBLE.Models.ViewModels
         public StopActivity Stop { get; set; }
 
         public StudioAssignment StudioAssignment { get; set; }
+         */
     }
 }

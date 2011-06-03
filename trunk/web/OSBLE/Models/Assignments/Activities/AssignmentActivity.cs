@@ -1,10 +1,16 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using OSBLE.Models.Assignments.Activities.Scores;
 
-namespace OSBLE.Models.Gradables.StudioAssignment.Activities
+namespace OSBLE.Models.Assignments.Activities
 {
-    public abstract class AssignmentActivity : AbstractGradable, IAssignmentActivity
+    public abstract class AssignmentActivity
     {
+        [Required]
+        [Key]
+        public int ID { get; set; }
+
         public AssignmentActivity()
         {
             DateTime dateTimeNow = DateTime.Now;
@@ -27,8 +33,7 @@ namespace OSBLE.Models.Gradables.StudioAssignment.Activities
             set;
         }
 
-        [Required]
-        public int AssignmentID { get; set; }
+        public List<Score> Scores { get; set; }
 
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models.Gradables.StudioAssignment.Activities
+namespace OSBLE.Models.Assignments.Activities
 {
     public class SubmissionActivity : AssignmentActivity
     {
