@@ -37,6 +37,11 @@ namespace OSBLE.Models.Courses
         public int Points { get; set; }
 
         /// <summary>
+        /// Grading points possible relative to sibling categories in the parent course.
+        /// </summary>
+        public int PointsPossible { get; set; }
+
+        /// <summary>
         /// Used for visual ordering of various categories (tabs in the gradebook).  Defaults to a value of 0.
         /// </summary>
         public int ColumnOrder { get; set; }

@@ -41,6 +41,11 @@ namespace OSBLE.Models.Assignments.Activities
         public AbstractAssignment AbstractAssignment { get; set; }
 
         /// <summary>
+        /// Grading points possible relative to sibling assignment activities in the parent assignment.
+        /// </summary>
+        public int PointsPossible { get; set; }
+
+        /// <summary>
         /// Used for visual ordering of assignment activities in the gradebook.  Defaults to a value of 0.
         /// </summary>
         public int ColumnOrder { get; set; }

@@ -75,7 +75,7 @@ namespace OSBLE.Models.Courses
 
         // References
 
-        [Display(Name = "Course Weight")]
+        [Display(Name = "Course Categories")]
         public virtual ICollection<Category> Categories { get; set; }
 
         [Display(Name = "Course Meeting Times")]

@@ -35,9 +35,13 @@ namespace OSBLE.Models.Assignments
         public virtual ICollection<AssignmentActivity> AssignmentActivities { get; set; }
 
         /// <summary>
+        /// Grading points possible relative to sibling assignments in the parent category.
+        /// </summary>
+        public int PointsPossible { get; set; }
+
+        /// <summary>
         /// Used for visual ordering of assignments in the gradebook.  Defaults to a value of 0.
         /// </summary>
-
         public int ColumnOrder { get; set; }
 
         public AbstractAssignment() {
