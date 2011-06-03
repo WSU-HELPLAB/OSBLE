@@ -86,6 +86,7 @@
     <Compile Include="Controllers\DeliverableController.cs" />
     <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
+    <Compile Include="Controllers\RubricController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="Models\Assignments\AbstractAssignment.cs" />
     <Compile Include="Models\Assignments\Activities\GradeActivity.cs" />
@@ -96,7 +97,10 @@
     <Compile Include="Models\Assignments\BasicAssignment.cs" />
     <Compile Include="Models\Assignments\GradeAssignment.cs" />
     <Compile Include="Models\Assignments\ILatePolicy.cs" />
-    <Compile Include="Models\Assignments\Rubric.cs" />
+    <Compile Include="Models\RubricModel\Criteria.cs" />
+    <Compile Include="Models\RubricModel\Level.cs" />
+    <Compile Include="Models\RubricModel\LevelDescription.cs" />
+    <Compile Include="Models\RubricModel\Rubric.cs" />
     <Compile Include="Models\Courses\AbstractCourse.cs" />
     <Compile Include="Models\Assignments\Activities\StopActivity.cs" />
     <Compile Include="Models\Assignments\StudioAssignment.cs" />
@@ -504,6 +508,11 @@
     <Content Include="Views\Mail\NotFound.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\SilverlightObject.cshtml" />
     <Content Include="Views\Home\SilverlightTest.cshtml" />
+    <Content Include="Views\Rubric\Index.cshtml" />
+    <Content Include="Views\Rubric\Details.cshtml" />
+    <Content Include="Views\Rubric\Create.cshtml" />
+    <Content Include="Views\Rubric\Edit.cshtml" />
+    <Content Include="Views\Rubric\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />
