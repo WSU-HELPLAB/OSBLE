@@ -27,6 +27,7 @@ namespace OSBLE.Services
     {
         protected OSBLEContext db = new OSBLEContext();
         protected CoursesUsers CurrentCourseUser = null;
+        protected UserProfile currentUserProfile = null;
 
         protected HttpContext Context = System.Web.HttpContext.Current;
                 
@@ -36,6 +37,7 @@ namespace OSBLE.Services
             string userName = Context.User.Identity.Name;
 
             UserProfile userProfile = db.UserProfiles.Where(u => u.UserName == userName).FirstOrDefault();
+            currentUserProfile = userProfile;
 
             if (Context.Session["ActiveCourse"] != null && (Context.Session["ActiveCourse"] is int))
             {

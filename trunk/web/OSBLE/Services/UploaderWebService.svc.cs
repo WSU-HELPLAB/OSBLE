@@ -7,9 +7,12 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Activation;
 using System.Web;
+using System.Web.Security;
 
 using OSBLE;
+using OSBLE.Models;
 using OSBLE.Models.Services.Uploader;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Services
 {
@@ -20,6 +23,7 @@ namespace OSBLE.Services
     {
         public string filePath;
         public string currentpath;
+        OSBLEContext db = new OSBLEContext();
 
         public UploaderWebService()
         {
@@ -105,7 +109,20 @@ namespace OSBLE.Services
         }
 
         [OperationContract]
-        public void SyncFile(string fileName, byte[] data)
+        public string ValidateUser(string userName, string password)
+        {
+            if (Membership.ValidateUser(userName, password))
+            {
+                UserProfile profile = (from p in db.UserProfiles
+                                       where p.UserName == userName
+                                       select p).First();
+                return profile.FirstName;
+            }
+            return "";
+        }
+
+        [OperationContract]
+        public bool SyncFile(string fileName, byte[] data)
         {
             //uploads need to handle a check for lastmodified date
             string file = Path.Combine(filePath, fileName);
@@ -113,14 +130,7 @@ namespace OSBLE.Services
             {
                 fs.Write(data, 0, (int)data.Length);
             }
-        }
-
-        [OperationContract]
-        public void createDir(string folderName)
-        {
-            // might need to check if the directory already exists
-            string file = Path.Combine(filePath, folderName);
-            Directory.CreateDirectory(file);
+            return true;
         }
     }
 }

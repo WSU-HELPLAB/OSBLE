@@ -156,15 +156,15 @@ namespace FileUploader.OsbleServices {
         
         string EndGetFileUrl(System.IAsyncResult result);
         
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/ValidateUser", ReplyAction="urn:UploaderWebService/ValidateUserResponse")]
+        System.IAsyncResult BeginValidateUser(string userName, string password, System.AsyncCallback callback, object asyncState);
+        
+        string EndValidateUser(System.IAsyncResult result);
+        
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/SyncFile", ReplyAction="urn:UploaderWebService/SyncFileResponse")]
         System.IAsyncResult BeginSyncFile(string fileName, byte[] data, System.AsyncCallback callback, object asyncState);
         
-        void EndSyncFile(System.IAsyncResult result);
-        
-        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/createDir", ReplyAction="urn:UploaderWebService/createDirResponse")]
-        System.IAsyncResult BegincreateDir(string folderName, System.AsyncCallback callback, object asyncState);
-        
-        void EndcreateDir(System.IAsyncResult result);
+        bool EndSyncFile(System.IAsyncResult result);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -268,6 +268,44 @@ namespace FileUploader.OsbleServices {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class ValidateUserCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        public ValidateUserCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        public string Result {
+            get {
+                base.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class SyncFileCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        public SyncFileCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        public bool Result {
+            get {
+                base.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public partial class UploaderWebServiceClient : System.ServiceModel.ClientBase<FileUploader.OsbleServices.UploaderWebService>, FileUploader.OsbleServices.UploaderWebService {
         
         private BeginOperationDelegate onBeginGetFakeFileListingDelegate;
@@ -300,17 +338,17 @@ namespace FileUploader.OsbleServices {
         
         private System.Threading.SendOrPostCallback onGetFileUrlCompletedDelegate;
         
+        private BeginOperationDelegate onBeginValidateUserDelegate;
+        
+        private EndOperationDelegate onEndValidateUserDelegate;
+        
+        private System.Threading.SendOrPostCallback onValidateUserCompletedDelegate;
+        
         private BeginOperationDelegate onBeginSyncFileDelegate;
         
         private EndOperationDelegate onEndSyncFileDelegate;
         
         private System.Threading.SendOrPostCallback onSyncFileCompletedDelegate;
-        
-        private BeginOperationDelegate onBegincreateDirDelegate;
-        
-        private EndOperationDelegate onEndcreateDirDelegate;
-        
-        private System.Threading.SendOrPostCallback oncreateDirCompletedDelegate;
         
         private BeginOperationDelegate onBeginOpenDelegate;
         
@@ -375,9 +413,9 @@ namespace FileUploader.OsbleServices {
         
         public event System.EventHandler<GetFileUrlCompletedEventArgs> GetFileUrlCompleted;
         
-        public event System.EventHandler<System.ComponentModel.AsyncCompletedEventArgs> SyncFileCompleted;
+        public event System.EventHandler<ValidateUserCompletedEventArgs> ValidateUserCompleted;
         
-        public event System.EventHandler<System.ComponentModel.AsyncCompletedEventArgs> createDirCompleted;
+        public event System.EventHandler<SyncFileCompletedEventArgs> SyncFileCompleted;
         
         public event System.EventHandler<System.ComponentModel.AsyncCompletedEventArgs> OpenCompleted;
         
@@ -608,13 +646,61 @@ namespace FileUploader.OsbleServices {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginValidateUser(string userName, string password, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginValidateUser(userName, password, callback, asyncState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        string FileUploader.OsbleServices.UploaderWebService.EndValidateUser(System.IAsyncResult result) {
+            return base.Channel.EndValidateUser(result);
+        }
+        
+        private System.IAsyncResult OnBeginValidateUser(object[] inValues, System.AsyncCallback callback, object asyncState) {
+            string userName = ((string)(inValues[0]));
+            string password = ((string)(inValues[1]));
+            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginValidateUser(userName, password, callback, asyncState);
+        }
+        
+        private object[] OnEndValidateUser(System.IAsyncResult result) {
+            string retVal = ((FileUploader.OsbleServices.UploaderWebService)(this)).EndValidateUser(result);
+            return new object[] {
+                    retVal};
+        }
+        
+        private void OnValidateUserCompleted(object state) {
+            if ((this.ValidateUserCompleted != null)) {
+                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
+                this.ValidateUserCompleted(this, new ValidateUserCompletedEventArgs(e.Results, e.Error, e.Cancelled, e.UserState));
+            }
+        }
+        
+        public void ValidateUserAsync(string userName, string password) {
+            this.ValidateUserAsync(userName, password, null);
+        }
+        
+        public void ValidateUserAsync(string userName, string password, object userState) {
+            if ((this.onBeginValidateUserDelegate == null)) {
+                this.onBeginValidateUserDelegate = new BeginOperationDelegate(this.OnBeginValidateUser);
+            }
+            if ((this.onEndValidateUserDelegate == null)) {
+                this.onEndValidateUserDelegate = new EndOperationDelegate(this.OnEndValidateUser);
+            }
+            if ((this.onValidateUserCompletedDelegate == null)) {
+                this.onValidateUserCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnValidateUserCompleted);
+            }
+            base.InvokeAsync(this.onBeginValidateUserDelegate, new object[] {
+                        userName,
+                        password}, this.onEndValidateUserDelegate, this.onValidateUserCompletedDelegate, userState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginSyncFile(string fileName, byte[] data, System.AsyncCallback callback, object asyncState) {
             return base.Channel.BeginSyncFile(fileName, data, callback, asyncState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        void FileUploader.OsbleServices.UploaderWebService.EndSyncFile(System.IAsyncResult result) {
-            base.Channel.EndSyncFile(result);
+        bool FileUploader.OsbleServices.UploaderWebService.EndSyncFile(System.IAsyncResult result) {
+            return base.Channel.EndSyncFile(result);
         }
         
         private System.IAsyncResult OnBeginSyncFile(object[] inValues, System.AsyncCallback callback, object asyncState) {
@@ -624,14 +710,15 @@ namespace FileUploader.OsbleServices {
         }
         
         private object[] OnEndSyncFile(System.IAsyncResult result) {
-            ((FileUploader.OsbleServices.UploaderWebService)(this)).EndSyncFile(result);
-            return null;
+            bool retVal = ((FileUploader.OsbleServices.UploaderWebService)(this)).EndSyncFile(result);
+            return new object[] {
+                    retVal};
         }
         
         private void OnSyncFileCompleted(object state) {
             if ((this.SyncFileCompleted != null)) {
                 InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
-                this.SyncFileCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(e.Error, e.Cancelled, e.UserState));
+                this.SyncFileCompleted(this, new SyncFileCompletedEventArgs(e.Results, e.Error, e.Cancelled, e.UserState));
             }
         }
         
@@ -652,51 +739,6 @@ namespace FileUploader.OsbleServices {
             base.InvokeAsync(this.onBeginSyncFileDelegate, new object[] {
                         fileName,
                         data}, this.onEndSyncFileDelegate, this.onSyncFileCompletedDelegate, userState);
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BegincreateDir(string folderName, System.AsyncCallback callback, object asyncState) {
-            return base.Channel.BegincreateDir(folderName, callback, asyncState);
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        void FileUploader.OsbleServices.UploaderWebService.EndcreateDir(System.IAsyncResult result) {
-            base.Channel.EndcreateDir(result);
-        }
-        
-        private System.IAsyncResult OnBegincreateDir(object[] inValues, System.AsyncCallback callback, object asyncState) {
-            string folderName = ((string)(inValues[0]));
-            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BegincreateDir(folderName, callback, asyncState);
-        }
-        
-        private object[] OnEndcreateDir(System.IAsyncResult result) {
-            ((FileUploader.OsbleServices.UploaderWebService)(this)).EndcreateDir(result);
-            return null;
-        }
-        
-        private void OncreateDirCompleted(object state) {
-            if ((this.createDirCompleted != null)) {
-                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
-                this.createDirCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(e.Error, e.Cancelled, e.UserState));
-            }
-        }
-        
-        public void createDirAsync(string folderName) {
-            this.createDirAsync(folderName, null);
-        }
-        
-        public void createDirAsync(string folderName, object userState) {
-            if ((this.onBegincreateDirDelegate == null)) {
-                this.onBegincreateDirDelegate = new BeginOperationDelegate(this.OnBegincreateDir);
-            }
-            if ((this.onEndcreateDirDelegate == null)) {
-                this.onEndcreateDirDelegate = new EndOperationDelegate(this.OnEndcreateDir);
-            }
-            if ((this.oncreateDirCompletedDelegate == null)) {
-                this.oncreateDirCompletedDelegate = new System.Threading.SendOrPostCallback(this.OncreateDirCompleted);
-            }
-            base.InvokeAsync(this.onBegincreateDirDelegate, new object[] {
-                        folderName}, this.onEndcreateDirDelegate, this.oncreateDirCompletedDelegate, userState);
         }
         
         private System.IAsyncResult OnBeginOpen(object[] inValues, System.AsyncCallback callback, object asyncState) {
@@ -837,6 +879,20 @@ namespace FileUploader.OsbleServices {
                 return _result;
             }
             
+            public System.IAsyncResult BeginValidateUser(string userName, string password, System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[2];
+                _args[0] = userName;
+                _args[1] = password;
+                System.IAsyncResult _result = base.BeginInvoke("ValidateUser", _args, callback, asyncState);
+                return _result;
+            }
+            
+            public string EndValidateUser(System.IAsyncResult result) {
+                object[] _args = new object[0];
+                string _result = ((string)(base.EndInvoke("ValidateUser", _args, result)));
+                return _result;
+            }
+            
             public System.IAsyncResult BeginSyncFile(string fileName, byte[] data, System.AsyncCallback callback, object asyncState) {
                 object[] _args = new object[2];
                 _args[0] = fileName;
@@ -845,21 +901,10 @@ namespace FileUploader.OsbleServices {
                 return _result;
             }
             
-            public void EndSyncFile(System.IAsyncResult result) {
+            public bool EndSyncFile(System.IAsyncResult result) {
                 object[] _args = new object[0];
-                base.EndInvoke("SyncFile", _args, result);
-            }
-            
-            public System.IAsyncResult BegincreateDir(string folderName, System.AsyncCallback callback, object asyncState) {
-                object[] _args = new object[1];
-                _args[0] = folderName;
-                System.IAsyncResult _result = base.BeginInvoke("createDir", _args, callback, asyncState);
+                bool _result = ((bool)(base.EndInvoke("SyncFile", _args, result)));
                 return _result;
-            }
-            
-            public void EndcreateDir(System.IAsyncResult result) {
-                object[] _args = new object[0];
-                base.EndInvoke("createDir", _args, result);
             }
         }
     }
