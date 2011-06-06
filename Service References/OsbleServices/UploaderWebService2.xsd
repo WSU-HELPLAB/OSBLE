@@ -65,6 +65,21 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="ValidateUser">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="userName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="password" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ValidateUserResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ValidateUserResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="SyncFile">
     <xs:complexType>
       <xs:sequence>
@@ -80,18 +95,17 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="ValidateUser">
+  <xs:element name="PrepCurrentPath">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="userName" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="password" nillable="true" type="xs:string" />
+        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Uploader" minOccurs="0" name="fileList" nillable="true" type="q5:DirectoryListing" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="ValidateUserResponse">
+  <xs:element name="PrepCurrentPathResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="ValidateUserResult" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="PrepCurrentPathResult" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
