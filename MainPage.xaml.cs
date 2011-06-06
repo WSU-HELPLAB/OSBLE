@@ -37,6 +37,9 @@ namespace FileUploader
 
             if (Application.Current.IsRunningOutOfBrowser)
             {
+                LoginWindow login = new LoginWindow();
+                login.Show();
+
                 // go to UploaderPage
                 this.Content = new UploaderPage();
             }
