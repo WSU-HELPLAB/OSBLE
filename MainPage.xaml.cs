@@ -27,6 +27,7 @@ namespace FileUploader
             //event handlers
             login.ValidTokenReceived += new EventHandler(ValidTokenReceived);
 
+
             if (Application.Current.InstallState == InstallState.NotInstalled)
             {
                 InstallBtn.Visibility = Visibility.Visible;

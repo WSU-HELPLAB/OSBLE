@@ -37,17 +37,23 @@
   <wsdl:message name="UploaderWebService_GetFileUrl_OutputMessage">
     <wsdl:part name="parameters" element="GetFileUrlResponse" />
   </wsdl:message>
+  <wsdl:message name="UploaderWebService_ValidateUser_InputMessage">
+    <wsdl:part name="parameters" element="ValidateUser" />
+  </wsdl:message>
+  <wsdl:message name="UploaderWebService_ValidateUser_OutputMessage">
+    <wsdl:part name="parameters" element="ValidateUserResponse" />
+  </wsdl:message>
   <wsdl:message name="UploaderWebService_SyncFile_InputMessage">
     <wsdl:part name="parameters" element="SyncFile" />
   </wsdl:message>
   <wsdl:message name="UploaderWebService_SyncFile_OutputMessage">
     <wsdl:part name="parameters" element="SyncFileResponse" />
   </wsdl:message>
-  <wsdl:message name="UploaderWebService_ValidateUser_InputMessage">
-    <wsdl:part name="parameters" element="ValidateUser" />
+  <wsdl:message name="UploaderWebService_PrepCurrentPath_InputMessage">
+    <wsdl:part name="parameters" element="PrepCurrentPath" />
   </wsdl:message>
-  <wsdl:message name="UploaderWebService_ValidateUser_OutputMessage">
-    <wsdl:part name="parameters" element="ValidateUserResponse" />
+  <wsdl:message name="UploaderWebService_PrepCurrentPath_OutputMessage">
+    <wsdl:part name="parameters" element="PrepCurrentPathResponse" />
   </wsdl:message>
   <wsdl:portType name="UploaderWebService">
     <wsdl:operation name="GetFakeFileListing">

@@ -54,7 +54,7 @@ namespace FileUploader
             authToken = authenticationToken;
 
             //get our local path
-            LocalPath = GetLastLocalPath();
+            LocalPath =  GetLastLocalPath();
 
             //listeners for our web service
             syncedFiles.GetFileListCompleted += new EventHandler<GetFileListCompletedEventArgs>(syncedFiles_GetFileListCompleted);
@@ -142,10 +142,43 @@ namespace FileUploader
             LocalFileList.DataContext = BuildLocalDirectoryListing(LocalPath);
         }
 
+
+
+
+
+
         void SyncButton_Click(object sender, RoutedEventArgs e)
         {
-            
+            UploadingModal uploading = new UploadingModal();
+            uploading.Show();
+
+            if(LocalFileList.DataContext.Directories.Count > 0)
+                syncedFiles.PrepCurrentPathAsync(this.LocalFileList.DataContext);
+
+            string path; 
+            for (int i = 0; i < this.LocalFileList.DataContext.Files.Count; ++i )
+            {
+                path = Path.Combine(LocalPath, this.LocalFileList.DataContext.Files[i].Name);
+                MemoryStream s = new MemoryStream();
+                StreamWriter writer = new StreamWriter(s);
+                writer.Write(path);
+                writer.Flush();
+
+                uploading.UploadingFile.Text = path;
+
+                using (Stream stream = s)
+                {
+                    byte[] data = new byte[stream.Length];
+                    stream.Read(data, 0, (int)stream.Length);
+
+                    syncedFiles.SyncFileAsync(path, data);
+                }
+            }
         }
+        
+
+
+
 
         public DirectoryListing BuildLocalDirectoryListing(string path)
         {
@@ -217,103 +250,14 @@ namespace FileUploader
 
         void syncedFiles_SyncFileCompleted(object sender, SyncFileCompletedEventArgs e)
         {
-            
+            //start the next file
+            //update progres bar (ie add a tick)
+            //update currently uploading
         }
 
 
 
         /*
-        private void dirList(string path)
-        {
-
-            LocalFileList.Items.Clear();
-            SyncedFileList.Items.Clear();
-
-            //If you have entered a subdirectory of home (Back button so to speak)
-            if ((path != localhome && path == localpath))
-            {
-                LocalFileList.Items.Add("..");
-            }
-
-            // Assigns all the directories to the ListBox
-            foreach (string folder in Directory.EnumerateDirectories(path))
-            {
-                FileListItem label = new FileListItem();
-                //label.FileName = folder.Substring(folder.LastIndexOf('\\') + 1);
-                //label.Image = LabelImage.Folder;
-                //label.LastModified = File.GetLastWriteTime(folder);
-                LocalFileList.Items.Add(label);
-            }
-
-            // Assigns all the files to the ListBox
-            foreach (string file in Directory.EnumerateFiles(path))
-            {
-                FileListItem label = new FileListItem();
-                //label.FileName = file.Substring(file.LastIndexOf('\\') + 1);
-                //label.Image = LabelImage.File;
-                //label.LastModified = File.GetLastWriteTime(file);
-                LocalFileList.Items.Add(label);
-            }
-
-            // gets the synced directories contents
-            if (localpath == localhome)
-            {
-                syncedFiles.GetFileListAsync("");
-            }
-            else
-            {
-                string d = localpath.Substring(localhome.Length + 1);
-                syncedFiles.GetFileListAsync(d);
-            }
-        }
-
-        private void LocalDirSelect(object sender, MouseButtonEventArgs e)
-        {
-            //If selected is a file or directory
-            if (this.LocalFileList.SelectedItem is FileListItem)
-            {
-                FileListItem selected = this.LocalFileList.SelectedItem as FileListItem;
-                // if selected is a directory
-                if (selected.Image != LabelImage.File)
-                {
-                    if (wasClicked == true)
-                    {
-                        if (selected.FileName == lastTarget)
-                        {
-                            // appends the selected directory to the current path to open directory
-                            localpath += "\\" + selected.FileName;
-                            dirList(localpath);
-                        }
-                    }
-                    else
-                    {
-                        wasClicked = true;
-                    }
-                }
-                lastTarget = selected.FileName;
-
-                // If it was a directory return out
-                return;
-            }
-            else
-            {
-                if (this.LocalFileList.SelectedItem != null)
-                {
-                    string selected = this.LocalFileList.SelectedItem.ToString();
-                    if (selected == "..")
-                    {
-                        Stack<string> path_pieces = new Stack<string>(localpath.Split('\\'));
-                        path_pieces.Pop();
-                        localpath = String.Join("\\", path_pieces.ToArray().Reverse());
-                        dirList(localpath);
-                    }
-                }
-            }
-
-            // If it wasn't a directory reset the click variables
-            lastTarget = "";
-            wasClicked = false;
-        }
 
         private void SyncDirSelect(object sender, MouseButtonEventArgs e)
         {
