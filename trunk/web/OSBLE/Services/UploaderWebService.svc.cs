@@ -201,5 +201,17 @@ namespace OSBLE.Services
             }
             return true;
         }
+
+        [OperationContract]
+        public bool PrepCurrentPath(DirectoryListing fileList)
+        {
+            for (int i = 1; i < fileList.Directories.Count; ++i)
+            {
+                string file = Path.Combine(filePath, fileList.Directories[i].Name);
+                Directory.CreateDirectory(file);
+
+            }
+            return true;
+        }
     }
 }
