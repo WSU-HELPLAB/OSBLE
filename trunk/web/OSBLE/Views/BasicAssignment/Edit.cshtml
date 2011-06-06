@@ -1,1 +1,277 @@
-﻿
+﻿@model OSBLE.Models.ViewModels.BasicAssignmentViewModel
+           
+@using OSBLE.Models.Assignments.Activities
+
+@{
+    ViewBag.Title = "Edit Basic Assignment";
+}
+<h2>
+    Edit Basic Assignment</h2>
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/osble.assignments.js")" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+    $(function () {
+        $('#ReleaseDate_Date').change(function () {
+            updateReleaseDate();
+        });
+
+        $('#ReleaseDate_Time').change(function () {
+            updateReleaseDate();
+        });
+
+        $('#DueDate_Date').change(function () {
+            updateDueDate();
+        });
+
+        $('#DueDate_Time').change(function () {
+            updateDueDate();
+        });
+
+        $('#StudioAssignment_Name').change(function () {
+            updateDueDate();
+        });
+
+        $('#DueDate_Time').change(function () {
+            updateSubmissionName();
+        });
+
+    });
+
+    function updateReleaseDate() {
+        $('#ReleaseDate').val($('#ReleaseDate_Date').val() + ' ' + $('#ReleaseDate_Time').val());
+    }
+
+    function updateDueDate() {
+        $('#DueDate').val($('#DueDate_Date').val() + ' ' + $('#DueDate_Time').val());
+    }
+    function updateSubmissionName() {
+        $('#SubmissionName').val($('#StudioAssignment_Name').val() + ' Submission');
+    }
+
+</script>
+@{
+    
+    SubmissionActivity submission = Model.Submission;
+    StopActivity stop = Model.Stop;
+
+
+@Html.ValidationSummary()
+    using (Html.BeginForm())
+    {
+        Html.ValidationSummary(true);
+        
+        @Html.HiddenFor(model => model.Assignment.ID)
+        @Html.HiddenFor(model => model.Submission.ID)
+        @Html.HiddenFor(model => model.Stop.ID)
+
+        @Html.HiddenFor(model => submission.ReleaseDate, new { @id = "ReleaseDate" })
+        @Html.HiddenFor(model => stop.ReleaseDate, new { @id = "DueDate" })
+        @Html.HiddenFor(model => submission.Name, new { @id = "SubmissionName" })
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Assignment.Name)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Assignment.Name)
+            @Html.ValidationMessageFor(model => model.Assignment.Name)
+        </div>
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Assignment.Description)
+        </div>
+        <div class="editor-field">
+            @Html.TextAreaFor(model => model.Assignment.Description, new { rows = 5, cols = 65 })
+            @Html.ValidationMessageFor(model => model.Assignment.Description)
+        </div>
+        <div class="editor-label">
+            @Html.LabelFor(model => submission.ReleaseDate)
+        </div>
+        <div class="editor-label">
+            @Html.TextBox("ReleaseDate_Date", convertToMonthDayYearFormat(submission.ReleaseDate), new { @id = "ReleaseDate_Date", @class = "date_picker", size = 9 })
+            @Html.TextBox("ReleaseDate_Time", convertTime(submission.ReleaseDate), new { @id = "ReleaseDate_Time", @class = "time_picker", size = 9 })
+        </div>
+        <!--Stop date-->
+        <div class="editor-label">
+            @Html.Label("Due Date")
+        </div>
+        <div class="editor-label">
+            @Html.TextBox("DueDate_Date", convertToMonthDayYearFormat(stop.ReleaseDate), new { @id = "DueDate_Date", @class = "date_picker", size = 9 })
+            @Html.TextBox("DueDate_Time", convertTime(stop.ReleaseDate), new { @id = "DueDate_Time", @class = "time_picker", size = 9 })
+        </div>
+        <div class="editor-label">
+            @Html.LabelFor(model => submission.isTeam)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => submission.isTeam)
+            @Html.ValidationMessageFor(model => submission.isTeam)
+        </div>
+        <div class="editor-label">
+            @Html.LabelFor(model => submission.InstructorCanReview)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => submission.InstructorCanReview)
+            @Html.ValidationMessageFor(model => submission.InstructorCanReview)
+        </div>
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Assignment.Category, "Category")
+        </div>
+        <div class="editor-field">
+            @Html.DropDownListFor(model => model.Assignment.CategoryID, ViewBag.Categories as SelectList)
+            @Html.ValidationMessageFor(model => model.Assignment.Category)
+        </div>
+
+
+        <h3>Deliverables</h3>
+
+    <table id="deliverables_table">
+    <tr>
+        <td>
+            <table>
+                <tr>
+                    <td>
+                        File Name
+                    </td>
+                    <td>
+                        <input type="text" id="new_deliverable_name" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Type
+                    </td>
+                    <td>
+                        <select id="new_deliverable_type">
+                        @foreach (SelectListItem dt in ViewBag.DeliverableTypes)
+                        {
+                            <option value="@dt.Value">@dt.Text</option>
+                        }
+                        </select>
+                    </td>
+                </tr>            
+            </table>
+        </td>
+        <td>
+            <select size="5" id="deliverable_list">
+                
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <input type="button" value="Add New Deliverable" id="add_new_deliverable" />       
+        </td>
+        <td>
+            <input type="button" value="Remove Selected Deliverable" id="remove_selected_deliverable" />       
+        </td>
+    </tr>
+    </table>
+    
+    <div id="deliverable_data">
+    
+    </div>
+
+    <script type="text/javascript">
+        $(function () {
+            @foreach (Deliverable d in Model.Assignment.Deliverables)
+            {
+                <text>
+                addNewDeliverable({ name: '@d.Name', fileType: @d.Type });
+                </text>
+            }
+        });       
+    </script>
+    
+        <h3>Grading</h3>
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Assignment.PointsPossible, "Points Possible")
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Assignment.PointsPossible)
+            @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)
+        </div>
+
+    <h3>Late Policy</h3>
+    
+    <p>
+        Students may submit assignments up to @Html.TextBoxFor(model => model.Submission.MinutesLateWithNoPenalty, new { size = 3 })
+        minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.Submission.PercentPenalty, new { size = 3 })
+        percent per @Html.TextBoxFor(model => model.Submission.HoursLatePerPercentPenalty, new { size = 3 })
+        hours late will be applied.<br />
+        @Html.ValidationMessageFor(model => model.Submission.MinutesLateWithNoPenalty)
+        @Html.ValidationMessageFor(model => model.Submission.PercentPenalty)
+        @Html.ValidationMessageFor(model => model.Submission.HoursLatePerPercentPenalty)
+    </p>
+    
+    
+    <p>
+        Assignments that are submitted more than @Html.TextBoxFor(model => model.Submission.HoursLateUntilZero, new { size = 3 })
+        hours after the due date and time will receive an automatic 0.<br />
+        @Html.ValidationMessageFor(model => model.Submission.HoursLateUntilZero)
+    </p>
+        <p>
+            <input type="submit" value="Save Changes" id="submitButton"/>
+        </p>
+    
+    }
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+    }
+@functions
+{
+    public string convertToMonthDayYearFormat(DateTime date)
+    {
+        return addLostZeros(date.Month.ToString(), 2, true) + "/" + addLostZeros(date.Day.ToString(), 2, true) + "/" + addLostZeros(date.Year.ToString(), 4, true);
+    }
+
+    public string convertTime(DateTime time)
+    {
+        string timeStr;
+        bool isAM = true;
+        string hr;
+        string min;
+        if (time.Hour > 12)
+        {
+            isAM = false;
+            hr = (time.Hour - 12).ToString();
+        }
+        else
+        {
+            hr = time.Hour.ToString();
+        }
+        min = time.Minute.ToString();
+
+        hr = addLostZeros(hr, 2, true);
+        min = addLostZeros(min, 2, true);
+
+        timeStr = hr + ":" + min;
+        if (isAM)
+        {
+            timeStr += " AM";
+        }
+        else
+        {
+            timeStr += " PM";
+        }
+        return timeStr;
+    }
+
+    public string addLostZeros(string s, int desiredDigits, bool addToFront)
+    {
+        int i = desiredDigits - s.Count();
+        while (i > 0)
+        {
+            if (addToFront)
+            {
+                s = s.Insert(0, "0");
+            }
+            else
+            {
+                s += "0";
+            }
+            i--;
+        }
+        return s;
+    }
+}

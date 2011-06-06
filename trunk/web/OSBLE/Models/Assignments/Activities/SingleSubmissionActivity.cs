@@ -12,7 +12,7 @@ namespace OSBLE.Models.Assignments.Activities
     /// Used for practice peer review assignments, where the instructor can submit a single set of deliverables
     /// for the entire class to review.
     /// </summary>
-    public class SingleSubmissionActivity : AssignmentActivity, IHasDeliverables
+    public class SingleSubmissionActivity : AssignmentActivity
     {
         public new int PointsPossible
         {
@@ -24,7 +24,5 @@ namespace OSBLE.Models.Assignments.Activities
             get { return new List<Score>(); }
         }
 
-        [Display(Name = "Deliverables")]
-        public virtual ICollection<Deliverable> Deliverables { get; set; }
     }
 }

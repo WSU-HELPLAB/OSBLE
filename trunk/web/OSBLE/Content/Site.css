@@ -1109,6 +1109,15 @@ ul.selector
     color: #074974;
 }
 
+#deliverables_table tr td
+{
+    vertical-align: top;
+}
+
+#deliverable_list 
+{
+    width: 250px;
+}
 .team_generation_options
 {
     list-style-type: none;

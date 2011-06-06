@@ -6,30 +6,22 @@ using System;
 
 namespace OSBLE.Models.Assignments
 {
-    public class StudioAssignment : AbstractAssignment, ILatePolicy
+    public class StudioAssignment : AbstractAssignment
     {
-        // Late Policy
+
+        public virtual ICollection<Deliverable> Deliverables { get; set; }
 
         [Required]
-        [Display(Name = "Minutes Late With No Penalty")]
-        public int MinutesLateWithNoPenalty { get; set; }
-
-        [Required]
-        [Range(0, 100)]
-        [Display(Name = "Percent Penalty")]
-        public int PercentPenalty { get; set; }
-
-        [Required]
-        [Display(Name = "Hours Late Per Percent Penalty")]
-        public int HoursLatePerPercentPenalty { get; set; }
-
-        [Required]
-        [Display(Name = "Hours Late Until Zero")]
-        public int HoursLateUntilZero { get; set; }
+        [Display(Name = "Description")]
+        public string Description { get; set; }
 
         public StudioAssignment()
+            : base()
         {
-
+            if (Deliverables == null)
+            {
+                Deliverables = new List<Deliverable>();
+            }
         }
 
     }

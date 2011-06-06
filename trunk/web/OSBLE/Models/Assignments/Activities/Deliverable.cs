@@ -59,15 +59,13 @@ namespace OSBLE.Models.Assignments.Activities
 
         [Required]
         [Display(Name = "Type")]
-        public DeliverableType Type { get; set; }
+        public int Type { get; set; }
 
         [Required]
         [Display(Name = "File Name")]
+        [RegularExpression(@"^[a-zA-Z0-9_\-]*$",
+            ErrorMessage="File names can only contain alphanumerics, '-', and '_'")]
         public string Name { get; set; }
 
-        [Required]
-        public int AssignmentActivityID { get; set; }
-
-        public AssignmentActivity AssignmentActivity { get; set; }
     }
 }

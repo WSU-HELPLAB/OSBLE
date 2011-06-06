@@ -91,13 +91,12 @@
     <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="Models\Assignments\AbstractAssignment.cs" />
     <Compile Include="Models\Assignments\Activities\GradeActivity.cs" />
-    <Compile Include="Models\Assignments\Activities\IHasDeliverables.cs" />
     <Compile Include="Models\Assignments\Activities\Scores\RubricScore.cs" />
     <Compile Include="Models\Assignments\Activities\Scores\Score.cs" />
     <Compile Include="Models\Assignments\Activities\SingleSubmissionActivity.cs" />
+    <Compile Include="Models\Assignments\Activities\StudioActivity.cs" />
     <Compile Include="Models\Assignments\BasicAssignment.cs" />
     <Compile Include="Models\Assignments\GradeAssignment.cs" />
-    <Compile Include="Models\Assignments\ILatePolicy.cs" />
     <Compile Include="Models\RubricModel\Criteria.cs" />
     <Compile Include="Models\RubricModel\Level.cs" />
     <Compile Include="Models\RubricModel\LevelDescription.cs" />
@@ -290,6 +289,8 @@
     <Content Include="Content\themes\base\jquery.ui.tabs.css" />
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
     <Content Include="Global.asax" />
+    <Content Include="Scripts\jquery.selectboxes.js" />
+    <Content Include="Scripts\osble.assignments.js" />
     <Content Include="Scripts\jquery.tmpl.min.js" />
     <Content Include="Scripts\jquery.ui.timepicker.js" />
     <Content Include="Scripts\jquery-1.5.1-vsdoc.js" />

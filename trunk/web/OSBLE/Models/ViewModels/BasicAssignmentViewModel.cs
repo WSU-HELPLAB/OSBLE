@@ -9,13 +9,13 @@ namespace OSBLE.Models.ViewModels
         {
             Submission = new SubmissionActivity();
             Stop = new StopActivity();
-            BasicAssignment = new BasicAssignment();
+            Assignment = new BasicAssignment();
         }
 
         public SubmissionActivity Submission { get; set; }
 
         public StopActivity Stop { get; set; }
 
-        public BasicAssignment BasicAssignment { get; set; }
+        public BasicAssignment Assignment { get; set; }
     }
 }
