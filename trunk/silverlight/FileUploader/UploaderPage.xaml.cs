@@ -46,9 +46,6 @@ namespace FileUploader
 
         public UploaderPage()
         {
-            LoginWindow login = new LoginWindow();
-            //login.Show();
-
             InitializeComponent();
 
             //get our local path
