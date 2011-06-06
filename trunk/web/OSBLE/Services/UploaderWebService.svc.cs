@@ -17,20 +17,66 @@ using OSBLE.Models.Users;
 
 namespace OSBLE.Services
 {
-    [ServiceContract(Namespace = "", SessionMode=SessionMode.Required)]
+    [ServiceContract(Namespace = "")]
     [SilverlightFaultBehavior]
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
     public class UploaderWebService
     {
         private string filePath;
         private string currentpath;
-        private string authKey;
+        private const double sessionTimeoutInMinutes = -15.0;
+        private static Dictionary<string, UserSession> activeSessions = new Dictionary<string,UserSession>();
+
         private OSBLEContext db = new OSBLEContext();
 
         public UploaderWebService()
         {
             filePath = FileSystem.RootPath;
             currentpath = filePath;
+        }
+
+        /// <summary>
+        /// Call this at the end of every request to remove expired sessions.  This
+        /// function will extend the keep alive timer on the supplied key.
+        /// </summary>
+        /// <param name="authKey">The key to extend.</param>
+        private void CleanActiveSessions(string authKey)
+        {
+
+            //update the current key
+            if (activeSessions.Keys.Contains(authKey))
+            {
+                activeSessions[authKey].LastAccessTime = DateTime.Now;
+            }
+
+            //call the normal clean function
+            CleanActiveSessions();
+        }
+
+        /// <summary>
+        /// Call this at the end of every request to remove expired sessions
+        /// </summary>
+        private void CleanActiveSessions()
+        {
+            //set an expiration time of 15 minutes ago
+            DateTime expirationDate = DateTime.Now.AddMinutes(sessionTimeoutInMinutes);
+            List<string> expiredKeys = new List<string>();
+            foreach (string key in activeSessions.Keys)
+            {
+                //log any expired keys
+                if (activeSessions[key].LastAccessTime < expirationDate)
+                {
+                    //note that we can't modify a collection that we are iterating through
+                    //so we must add to another collection first
+                    expiredKeys.Add(key);
+                }
+            }
+
+            //remove expired keys
+            foreach (string key in expiredKeys)
+            {
+                activeSessions.Remove(key);
+            }
         }
 
         /// <summary>
@@ -111,6 +157,40 @@ namespace OSBLE.Services
         }
 
         [OperationContract]
+        public void GetValidUploadLocations(string authKey)
+        {
+            //only continue if we have a valid authentication key
+            if (!IsValidKey(authKey))
+            {
+                return;
+            }
+
+        }
+
+        /// <summary>
+        /// Will tell you if the supplied key is valid
+        /// </summary>
+        /// <param name="authKey"></param>
+        /// <returns></returns>
+        private bool IsValidKey(string authKey)
+        {
+            //clean our session list
+            CleanActiveSessions();
+
+            //after cleaning, all remaining keys should be valid
+            if (activeSessions.Keys.Contains(authKey))
+            {
+                //if the key exists, might as well update it as well
+                activeSessions[authKey].LastAccessTime = DateTime.Now;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        [OperationContract]
         public bool SyncFile(string fileName, byte[] data)
         {
             //uploads need to handle a check for lastmodified date
@@ -125,23 +205,30 @@ namespace OSBLE.Services
         [OperationContract]
         public string ValidateUser(string userName, string password)
         {
+            //clean up the active sessions table
+            CleanActiveSessions();
+
             if (Membership.ValidateUser(userName, password))
             {
                 UserProfile profile = (from p in db.UserProfiles
                                        where p.UserName == userName
                                        select p).First();
                 
-                //return a hashed string to be used as a token
+                //build our string to hash
                 string email = profile.UserName;
                 string date = DateTime.Now.ToLongTimeString();
-                string preHash = email + date;
-                string hash = SHA1.Create(preHash).ToString();
+                string hashString = email + date;
+
+                //compute the hash
+                SHA1Managed sha1 = new SHA1Managed();
+                System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
+                string hash = encoding.GetString(sha1.ComputeHash(encoding.GetBytes(hashString)));
 
                 //save the hash for validating later calls
-                authKey = hash;
+                activeSessions.Add(hash, new UserSession(profile));
 
                 //return the hash to the caller
-                return hash;
+                return hash; 
             }
             return "";
         }
