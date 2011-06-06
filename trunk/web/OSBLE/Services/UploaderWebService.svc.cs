@@ -4,6 +4,7 @@ using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Security.Cryptography;
 using System.ServiceModel;
 using System.ServiceModel.Activation;
 using System.Web;
@@ -16,14 +17,15 @@ using OSBLE.Models.Users;
 
 namespace OSBLE.Services
 {
-    [ServiceContract(Namespace = "")]
+    [ServiceContract(Namespace = "", SessionMode=SessionMode.Required)]
     [SilverlightFaultBehavior]
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
     public class UploaderWebService
     {
-        public string filePath;
-        public string currentpath;
-        OSBLEContext db = new OSBLEContext();
+        private string filePath;
+        private string currentpath;
+        private string authKey;
+        private OSBLEContext db = new OSBLEContext();
 
         public UploaderWebService()
         {
@@ -109,19 +111,6 @@ namespace OSBLE.Services
         }
 
         [OperationContract]
-        public string ValidateUser(string userName, string password)
-        {
-            if (Membership.ValidateUser(userName, password))
-            {
-                UserProfile profile = (from p in db.UserProfiles
-                                       where p.UserName == userName
-                                       select p).First();
-                return profile.FirstName;
-            }
-            return "";
-        }
-
-        [OperationContract]
         public bool SyncFile(string fileName, byte[] data)
         {
             //uploads need to handle a check for lastmodified date
@@ -134,11 +123,27 @@ namespace OSBLE.Services
         }
 
         [OperationContract]
-        public void createDir(string folderName)
+        public string ValidateUser(string userName, string password)
         {
-            // might need to check if the directory already exists
-            string file = Path.Combine(filePath, folderName);
-            Directory.CreateDirectory(file);
+            if (Membership.ValidateUser(userName, password))
+            {
+                UserProfile profile = (from p in db.UserProfiles
+                                       where p.UserName == userName
+                                       select p).First();
+                
+                //return a hashed string to be used as a token
+                string email = profile.UserName;
+                string date = DateTime.Now.ToLongTimeString();
+                string preHash = email + date;
+                string hash = SHA1.Create(preHash).ToString();
+
+                //save the hash for validating later calls
+                authKey = hash;
+
+                //return the hash to the caller
+                return hash;
+            }
+            return "";
         }
     }
 }
