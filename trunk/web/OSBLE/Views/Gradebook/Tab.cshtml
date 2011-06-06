@@ -1,0 +1,683 @@
+﻿@using OSBLE.Controllers;
+@using OSBLE.Models.Courses;
+@using OSBLE.Controllers;
+@{
+    ViewBag.Title = "Tab";
+}
+<style type="text/css">
+    .cellInput
+    {
+        width: 75px;
+        border: none;
+    }
+    .gradebook
+    {
+        width: auto;
+        border-collapse: collapse;
+        border: 1px solid gray;
+    }
+    
+    .gradebook td
+    {
+        padding: 3px;
+        width: auto;
+        height: 25px;
+    }
+    
+    .gradebook td, .gradebook th, .gradebook tr
+    {
+        width: auto;
+        border: 1px solid gray;
+    }
+    
+    .gradebook th
+    {
+        text-align: left;
+    }
+    
+    .header
+    {
+        float: left;
+        left: 50%;
+    }
+    
+    .thButton
+    {
+        float: right;
+    }
+    
+    .menu
+    {
+        border: 1px solid gray;
+    }
+    
+    .slidingDiv
+    {
+        width: 107px;
+        height: 100px;
+        background-color: white;
+        top: 33px;
+        left: 400px;
+    }
+    
+    .dropdown
+    {
+        float: right;
+    }
+    
+    #tabHeader ul
+    {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    #tabHeader li a
+    {
+        padding: 0 1em;
+    }
+    
+    #tableContent
+    {
+        clear: both;
+    }
+    
+    #h3
+    {
+        margin: 0;
+        padding: 0 0 1em 0;
+    }
+    
+    #tabHeader li
+    {
+        float: left;
+        border: 1px solid;
+        background-color: #f5f5f5;
+        border-bottom-width: 0;
+        margin: 0 0.5em 0 0;
+        background: silver;
+    }
+    
+    #tabHeader #selected
+    {
+        position: relative;
+        top:1px;
+        border-bottom:1px solid #fff;
+        background: white;
+    }
+    
+    #newWeight 
+    {
+        width:500px;
+        height:500px;
+        border: 2px solid;
+        background: #f5f5f5;
+    }
+    
+    #newWeight li
+    {
+        float: left;
+        
+    }
+</style>
+<div id="tabHeader">
+    <h3>
+        Gradebook</h3>
+    <ul>
+        <li><a href="/Gradebook/Index" onclick="switchTab(this)">Main</a></li>
+        @foreach (Category item in ViewBag.Tabs)
+        {
+            <li><a href="/Gradebook/Tab/?categoryId=@item.ID" onclick="switchTab(this)">@item.Name</a></li>
+        }
+        <li><a href="#" onclick="newTab()">+</a></li>
+    </ul>
+</div>
+<div id="tableContent">
+    @Html.Partial("_Gradebook")
+    <div class="slidingDiv" id="slidingDivID" style="display: none; position: absolute;">
+        <form id="columnOptionsForm" method="post" action="/Gradebook/ModifyColumn" data-ajax="true"
+        data-ajax-success="" data-ajax-update="#grades">
+        <input id="actionRequested" name="actionRequested" type="hidden" value="null" />
+        <input id="gradableId" name="gradableId" type="hidden" value="null" />
+        <table class="menu" id="menuID">
+            <tr>
+                <td>
+                    <a href="#" onclick="setGradableAction('@GradebookController.ColumnAction.InsertLeft.ToString()'); $('#columnOptionsForm').submit();">
+                        Insert 1 left</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#" onclick="setGradableAction('@GradebookController.ColumnAction.InsertRight.ToString()'); $('#columnOptionsForm').submit();">
+                        Insert 1 right</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#" onclick="setGradableAction('@GradebookController.ColumnAction.Delete.ToString()'); $('#columnOptionsForm').submit();">
+                        Delete column</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#" onclick="setGradableAction('@GradebookController.ColumnAction.Clear.ToString()'); $('#columnOptionsForm').submit();">
+                        Clear column</a>
+                </td>
+            </tr>
+        </table>
+        </form>
+        <script type="text/javascript">
+            function setGradableAction(actionName) {
+                $('#actionRequested').val(actionName);
+            }
+            $('#columnOptionsForm').submit(function () {
+                $('#gradableId').val(currentCol);
+                return;
+            });
+        </script>
+    </div>
+    <input value="Calculate Rows" type="button" onclick="calculateRows()" />
+    <input value="Calculate Columns" type="button" onclick="calculateCols()" />
+    <input value="Calculate Total" type="button" onclick="calculateTotal()" />
+</div>
+<script type="text/jscript">
+    var lastFocusedCell = null;
+    var showDropDown = false;
+    var changedShow = false;
+
+    //displays current column
+    var currentCol = 0;
+
+    //bool stating if you clicked the menu button and not the cell
+    var menuClicked = false;
+
+    //stores the ID we will be using for the header
+    var lastId = null;
+
+    //bool stating if you clicked off a header or not
+    var header = false;
+
+    //bool stating if previous cell clicked on is a data cell
+    var isDataCell = false;
+
+    //Keeps track of the total number of weights
+    var tabCount = 1;
+
+    $(document).ready(function () {
+        calculateRows();
+        calculateCols();
+    });
+
+    $(document).click(function () {
+        if (changedShow == true) {
+            if (showDropDown == false) {
+                if (menuClicked == true) {
+                    hideDropDown();
+                }
+            }
+            changedShow = false;
+        }
+        else {
+
+            hideDropDown();
+            showDropDown = false;
+
+        }
+    });
+
+    $("#grades td").keydown(function (e) {
+        var cell = null;
+        if (e.keyCode == 13) {
+
+            var row = $(this).parent("tr").next("tr");
+            var colIndex = $(this).prevAll().length;
+            row.each(function () {
+                cell = $(this).find("td:eq(" + colIndex + ")");
+            });
+            cellGainsFocus(cell);
+        }
+        else if (e.keyCode == 9) {
+            e.preventDefault();
+            var row = $(this).parent("tr");
+            var colIndex = $(this).prevAll().length;
+            colIndex = parseInt(colIndex);
+            colIndex += 1;
+            row.each(function () {
+                cell = $(this).find("td:eq(" + colIndex + ")");
+            });
+            cellGainsFocus(cell);
+        }
+        else {
+        }
+    });
+
+    $("#grades th").keydown(function (e) {
+        if (e.keyCode == 13) {
+            clearLastHeaderFocus(lastId);
+        }
+        else if (e.keyCode == 9) {
+            clearLastHeaderFocus(lastId);
+        }
+    });
+
+    function clearLastHeaderFocus(id) {
+
+        //if a header already had focus then we need to change it back and display text
+        if (lastFocusedCell != null) {
+            var cellValue = lastFocusedCell.children().val();
+            lastFocusedCell.html(cellValue + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + id + ' onclick="ShowHide(this);"></button></div>');
+            lastFocusedCell.attr("onclick", 'changeHeaderName(this)');
+            lastFocusedCell = null;
+        }
+    }
+
+    function changeHeaderName(someHeader) {
+        //Header needs to lose focus
+        if (header == true) {
+            clearLastHeaderFocus(lastId);
+            header = false;
+        }
+
+        //If a cell has focus we want to clear it before we start to edit the header
+        clearLastCellFocus();
+
+        //If a part of the cell is clicked other than the button do this
+        if (menuClicked == false) {
+
+            //do this once so we don't have to constantly do it later
+            someHeader = $(someHeader);
+
+            //If this is the first time we are going into the function we need to get ID first
+            if (lastId == null) {
+                var cellId = someHeader.attr("id").split("-");
+                lastId = cellId[1];
+            }
+
+            //clear the last headers focus
+            clearLastHeaderFocus(lastId);
+
+            //split and get the column number from the id
+            var cellId = someHeader.attr("id").split("-");
+            lastId = cellId[1];
+
+            var textValue = someHeader.text();
+            var inputText = $('<input class="cellInput" type="text" value="' + textValue + '" />');
+
+            someHeader.removeAttr("onclick");
+            someHeader.html(inputText);
+            inputText.focus();
+            lastFocusedCell = someHeader;
+            header = true;
+        }
+
+        //don't do anything because we will be displaying the menu
+        else {
+            menuClicked = false;
+        }
+    }
+
+    function clearLastCellFocus() {
+
+        //if a prior cell has already received focus in the past, we need to turn it back into
+        //a normal table cell
+        if (lastFocusedCell != null) {
+
+            //The ID's will be stored in ajaxId's array.
+            //ajaxIDs[0] = userId
+            //ajaxIds[1] = gradableId
+            var ajaxIDs = lastFocusedCell.attr("id").split("-");
+
+            var cellValue = lastFocusedCell.children().val();
+            lastFocusedCell.html("");
+            lastFocusedCell.text(cellValue);
+            lastFocusedCell.attr("onclick", 'cellGainsFocus(this)');
+            lastFocusedCell = null;
+
+
+            //AJAX call
+            //What we need:
+            //UserID
+            //GradableID
+            //and the value to modify (cellValue)
+
+            //if we are editing a gradebook cell then ajaxIDs[1] will contain a value
+            if (ajaxIDs[1] != null) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Gradebook/ModifyCell",
+                    data: { value: cellValue, userId: ajaxIDs[0], assignmentId: ajaxIDs[1] }
+                });
+            }
+
+            //If there is no value in ajaxIDs[1] then we are editing the points possible
+            else {
+                $.ajax({
+                    type: "POST",
+                    url: "/Gradebook/ModifyPossiblePoints",
+                    data: { value: cellValue, assignmentId: ajaxIDs[0] }
+                });
+            }
+
+            calculateRows();
+            calculateCols();
+        }
+    }
+
+    function cellGainsFocus(someCell) {
+
+        //we are in a data cell so we need to set isDataCell to true
+        isDataCell = true;
+
+        //Header needs to lose focus
+        if (header == true) {
+            clearLastHeaderFocus(lastId);
+            header = false;
+        }
+
+        else {
+            //do this once so we don't have to constantly do it later
+            someCell = $(someCell);
+
+            //clear any previous focus
+            clearLastCellFocus();
+
+            var textValue = someCell.text();
+            var inputText = $('<input class="cellInput" type="text" value="' + textValue + '" />');
+            someCell.removeAttr("onclick");
+            someCell.html(inputText);
+            inputText.focus();
+            lastFocusedCell = someCell;
+        }
+    }
+
+    function calculateRows() {
+
+        //clear any previous focus
+        clearLastCellFocus();
+        var totalPerfect = 0;
+        var totalAverage = 0;
+        $("#grades #perfectScore").each(function () {
+            $(this).find("td").each(function () {
+
+                if ($(this).attr("id") != "perfectTotal") {
+                    totalPerfect += parseFloat($(this).text());
+                }
+            });
+        });
+        $("#grades #studentGrades").each(function () {
+            var total = 0;
+            $(this).find("td").each(function () {
+                var checkId = $(this).attr("id").split("-")
+                if (checkId[1] != null) {
+                    total += parseFloat($(this).text());
+                }
+                else {
+                }
+            });
+            total = parseFloat((total / totalPerfect) * 100).toFixed(2);
+            $(this).find("td").each(function () {
+                if ($(this).attr("id") == "total") {
+                    $(this).text(total + "%");
+                }
+            });
+        });
+
+    }
+
+    function calculateTotal() {
+        if (header == true) {
+            clearLastHeaderFocus(lastId);
+        }
+        //clear any previous focus
+        clearLastCellFocus();
+
+        var final = 0;
+        $("#grades tr td").each(function () {
+            final += parseInt($(this).text());
+        });
+        alert("Total Table: " + final);
+    }
+
+    function calculateCols() {
+
+        //clear any previous focus
+        clearLastCellFocus();
+
+        //We start at 3 because rows 1 and 2 are the student names and total
+        var colIndex = 2;
+
+        //Starting in the gradebook on the student grade rows
+        //This bypasses the headers so we don't look through them
+        $("#grades #studentGrades").each(function () {
+            $(this).find("td:nth-child(" + colIndex + ")").each(function () {
+                getSum(colIndex);
+            });
+            colIndex += 1;
+        });
+    }
+
+    function getSum(Index) {
+        var colTotal = 0;
+        var count = 0;
+        $("#grades #studentGrades").children("td:nth-child(" + Index + ")").each(function () {
+            colTotal += parseFloat($(this).text());
+            count += 1;
+        });
+
+        $("#grades tr").children("td:nth-child(" + Index + ")").each(function () {
+            if ($(this).attr("id") == "averageTotal") {
+                colTotal = parseFloat(colTotal / count).toFixed(2);
+                $(this).html(colTotal + "%");
+            }
+            if ($(this).attr("id") == "averageScore") {
+                colTotal = parseFloat(colTotal / count).toFixed(2);
+                $(this).html(colTotal);
+            }
+        });
+    }
+
+    function ShowHide(buttonClick) {
+
+        //if you click a button in the header from a header already chosen
+        if (header == true) {
+            clearLastHeaderFocus(lastId);
+            header = false;
+        }
+
+        menuClicked = true;
+        var container = buttonClick.id;
+        currentCol = container;
+
+        //aligning the menu under the buttons
+        var y = $("#" + container).position().left;
+        var x = $("#" + container).position().top;
+        y += 65;
+        x += 25;
+
+        //Moving the menu to the button that clicked it
+        $("#slidingDivID").css("left", y + "px");
+        $("#slidingDivID").css("top", x + "px");
+
+        //Animation for menu
+        $("#slidingDivID").animate({ "height": "show" }, { duration: 75 });
+        if (showDropDown == true) {
+            showDropDown = false;
+            changedShow = true;
+        }
+
+        else {
+            showDropDown = true;
+            changedShow = true;
+        }
+    }
+
+    //Hiding the drop down menu when clicked off
+    function hideDropDown() {
+        $("#slidingDivID").animate({ "height": "hide" }, { duration: 75 });
+    }
+
+    function insertRight(button) {
+        colIndex = parseInt(currentCol);
+        colIndex += 1;
+
+        //Shifting table headers to the right and renaming header names
+        $("#grades tr th").each(function () {
+            var cellId = $(this).attr("id").split("-");
+            var cellText = $(this).html().split(" ");
+
+            if (cellText[0] == "Column" || cellText[0] == "" || cellText[0] == "&nbsp;") {
+                if (cellId[1] >= colIndex) {
+                    cellId[1] = parseInt(cellId[1]);
+                    cellId[1] += 1;
+                    cellText[1] = parseInt(cellText[1]);
+                    cellText[1] += 1;
+                }
+                $(this).attr("id", "th-" + cellId[1]);
+                $(this).html("Column " + cellText[1] + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + cellId[1] + ' onclick="ShowHide(this);"></button></div>');
+            }
+            else {
+                if (cellId[1] >= colIndex) {
+                    cellId[1] = parseInt(cellId[1]);
+                    cellId[1] += 1;
+                    cellText[1] = parseInt(cellText[1]);
+                    cellText[1] += 1;
+                }
+                $(this).attr("id", "th-" + cellId[1]);
+                $(this).html(cellText[0] + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + cellId[1] + ' onclick="ShowHide(this);"></button></div>');
+            }
+        });
+
+        //Setting the new ID's for the new column's table
+        $(document).ready(function () {
+            $("#grades").find("tr").each(function () {
+                $(this).find("td").eq(currentCol).after('<td onclick="cellGainsFocus(this)">0</td>');
+            });
+        });
+
+        //Setting up the new column header
+        $(document).ready(function () {
+            $("#grades").find("tr").each(function () {
+                $(this).find("th").eq(currentCol).after('<th id=th-' + colIndex + ' onclick="changeHeaderName(this)">Column ' + colIndex + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + colIndex + ' onclick="ShowHide(this);"></button></div></th>');
+            });
+        });
+    }
+
+    function insertLeft(button) {
+        colIndex = parseInt(currentCol);
+
+        //Shifting table headers to the right and renaming header names
+        $("#grades tr th").each(function () {
+            var cellId = $(this).attr("id").split("-");
+            var cellText = $(this).html().split(" ");
+
+            if (cellText[0] == "Column" || cellText[0] == "") {
+                if (cellId[1] >= colIndex) {
+                    cellId[1] = parseInt(cellId[1]);
+                    cellId[1] += 1;
+                    cellText[1] = parseInt(cellText[1]);
+                    cellText[1] += 1;
+                }
+                $(this).attr("id", "th-" + cellId[1]);
+                $(this).html("Column " + cellText[1] + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + cellId[1] + ' onclick="ShowHide(this);"></button></div>');
+            }
+            else {
+                if (cellId[1] >= colIndex) {
+                    cellId[1] = parseInt(cellId[1]);
+                    cellId[1] += 1;
+                    cellText[1] = parseInt(cellText[1]);
+                    cellText[1] += 1;
+                }
+                $(this).attr("id", "th-" + cellId[1]);
+                $(this).html(cellText[0] + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + cellId[1] + ' onclick="ShowHide(this);"></button></div>');
+            }
+        });
+
+        //Setting the new ID's for the new column's table
+        $(document).ready(function () {
+            $("#grades").find("tr").each(function () {
+                $(this).find("td").eq(currentCol).before('<td onclick="cellGainsFocus(this)">0</td>');
+            });
+        });
+
+        //Setting up the new column header
+        $(document).ready(function () {
+            $("#grades").find("tr").each(function () {
+                $(this).find("th").eq(currentCol).before('<th id=th-' + colIndex + ' onclick="changeHeaderName(this)">Column ' + colIndex + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + colIndex + ' onclick="ShowHide(this);"></button></div></th>');
+            });
+        });
+    }
+
+    function clearCol() {
+        var rows = $("#grades tr");
+        currentCol = parseInt(currentCol);
+        currentCol += 1;
+        rows.children("td:nth-child(" + currentCol + ")").each(function () {
+            //finding the column and deleting the information from the cells
+            $(this).html(null);
+        });
+        currentCol -= 1;
+    }
+
+    //Deleting the whole column
+    function deleteCol() {
+        colIndex = parseInt(currentCol);
+        colIndex += 1;
+
+        $("#grades tr").each(function () {
+            $(this).find("td:nth-child(" + colIndex + ")").each(function () {
+                $(this).remove();
+            });
+        });
+        colIndex -= 1;
+
+        $("#grades").each(function () {
+            $("#th-" + colIndex).remove();
+            $("#" + colIndex).remove();
+        });
+
+        //changing the column headers
+        $("#grades tr th").each(function () {
+            var cellId = $(this).attr("id").split("-");
+            var cellText = $(this).text().split(" ");
+
+            if (cellText[0] == "Column" || cellText[0] == "") {
+                if (cellId[1] >= colIndex) {
+                    cellId[1] = parseInt(cellId[1]);
+                    cellId[1] -= 1;
+                    cellText[1] = parseInt(cellText[1]);
+                    cellText[1] -= 1;
+                }
+                $(this).attr("id", "th-" + cellId[1]);
+                $(this).html("");
+                $(this).html("Column " + cellText[1] + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + cellId[1] + ' onclick="ShowHide(this);"></button></div>');
+            }
+            else {
+                if (cellId[1] >= colIndex) {
+                    cellId[1] = parseInt(cellId[1]);
+                    cellId[1] -= 1;
+                    cellText[1] = parseInt(cellText[1]);
+                    cellText[1] -= 1;
+                }
+                $(this).attr("id", "th-" + cellId[1]);
+                $(this).html("");
+                $(this).html(cellText[0] + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + cellId[1] + ' onclick="ShowHide(this);"></button></div>');
+            }
+        });
+    }
+
+    function switchTab(newTab) {
+        $("#selected").removeAttr("id");
+        $(newTab).attr("id", "selected");
+    }
+
+    function newTab() {
+        //$('ul li:nth-child(' + tabCount + ')').after('<li><a href="#" onclick="switchTab(this)"></a></li>');
+        //tabCount += 1;
+
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/AddWeight"
+        });
+    }
+
+</script>

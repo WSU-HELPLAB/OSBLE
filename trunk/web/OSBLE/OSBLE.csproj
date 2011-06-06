@@ -344,6 +344,7 @@
     <Content Include="Views\Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Models\Gradables\StudioAssignment\Activities\" />
     <Folder Include="Validations\" />
   </ItemGroup>
   <ItemGroup>
@@ -509,11 +510,6 @@
     <Content Include="Views\Mail\NotFound.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\SilverlightObject.cshtml" />
     <Content Include="Views\Home\SilverlightTest.cshtml" />
-    <Content Include="Views\Rubric\Index.cshtml" />
-    <Content Include="Views\Rubric\Details.cshtml" />
-    <Content Include="Views\Rubric\Create.cshtml" />
-    <Content Include="Views\Rubric\Edit.cshtml" />
-    <Content Include="Views\Rubric\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />
