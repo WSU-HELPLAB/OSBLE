@@ -49,32 +49,32 @@
   <wsdl:message name="UploaderWebService_ValidateUser_OutputMessage">
     <wsdl:part name="parameters" element="ValidateUserResponse" />
   </wsdl:message>
-  <wsdl:portType msc:usingSession="true" name="UploaderWebService">
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="GetFakeFileListing">
+  <wsdl:portType name="UploaderWebService">
+    <wsdl:operation name="GetFakeFileListing">
       <wsdl:input wsaw:Action="urn:UploaderWebService/GetFakeFileListing" message="UploaderWebService_GetFakeFileListing_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/GetFakeFileListingResponse" message="UploaderWebService_GetFakeFileListing_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="GetFakeDirectoryListing">
+    <wsdl:operation name="GetFakeDirectoryListing">
       <wsdl:input wsaw:Action="urn:UploaderWebService/GetFakeDirectoryListing" message="UploaderWebService_GetFakeDirectoryListing_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/GetFakeDirectoryListingResponse" message="UploaderWebService_GetFakeDirectoryListing_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="GetFakeParentDirectoryListing">
+    <wsdl:operation name="GetFakeParentDirectoryListing">
       <wsdl:input wsaw:Action="urn:UploaderWebService/GetFakeParentDirectoryListing" message="UploaderWebService_GetFakeParentDirectoryListing_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/GetFakeParentDirectoryListingResponse" message="UploaderWebService_GetFakeParentDirectoryListing_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="GetFileList">
+    <wsdl:operation name="GetFileList">
       <wsdl:input wsaw:Action="urn:UploaderWebService/GetFileList" message="UploaderWebService_GetFileList_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/GetFileListResponse" message="UploaderWebService_GetFileList_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="GetFileUrl">
+    <wsdl:operation name="GetFileUrl">
       <wsdl:input wsaw:Action="urn:UploaderWebService/GetFileUrl" message="UploaderWebService_GetFileUrl_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/GetFileUrlResponse" message="UploaderWebService_GetFileUrl_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="SyncFile">
+    <wsdl:operation name="SyncFile">
       <wsdl:input wsaw:Action="urn:UploaderWebService/SyncFile" message="UploaderWebService_SyncFile_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/SyncFileResponse" message="UploaderWebService_SyncFile_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="ValidateUser">
+    <wsdl:operation name="ValidateUser">
       <wsdl:input wsaw:Action="urn:UploaderWebService/ValidateUser" message="UploaderWebService_ValidateUser_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/ValidateUserResponse" message="UploaderWebService_ValidateUser_OutputMessage" />
     </wsdl:operation>

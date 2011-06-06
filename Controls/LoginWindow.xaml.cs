@@ -15,8 +15,13 @@ namespace FileUploader.Controls
 {
     public partial class LoginWindow : ChildWindow
     {
-        UploaderWebServiceClient client = new UploaderWebServiceClient();
-
+        private UploaderWebServiceClient client = new UploaderWebServiceClient();
+        public EventHandler ValidTokenReceived = delegate { };
+        public string Token
+        {
+            get;
+            set;
+        }
         public LoginWindow()
         {
             InitializeComponent();
@@ -25,9 +30,20 @@ namespace FileUploader.Controls
 
         void client_ValidateUserCompleted(object sender, ValidateUserCompletedEventArgs e)
         {
-            
-        }
+            Token = e.Result;
 
+            //if we received a valid token, tell the caller that we're good to continue
+            if (Token.Length > 0)
+            {
+                ErrorTextBlock.Visibility = System.Windows.Visibility.Collapsed;
+                ValidTokenReceived(this, EventArgs.Empty);
+                this.DialogResult = true;
+            }
+            else
+            {
+                ErrorTextBlock.Visibility = System.Windows.Visibility.Visible;
+            }
+        }
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
