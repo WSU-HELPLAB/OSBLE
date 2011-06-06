@@ -22,6 +22,8 @@ namespace FileUploader
 {
     public partial class UploaderPage : Page
     {
+        private string authToken = "";
+
         public string LocalPath
         {
             get
@@ -44,9 +46,12 @@ namespace FileUploader
         //reference to our web service
         UploaderWebServiceClient syncedFiles = new UploaderWebServiceClient();
 
-        public UploaderPage()
+        public UploaderPage(string authenticationToken)
         {
+
             InitializeComponent();
+
+            authToken = authenticationToken;
 
             //get our local path
             LocalPath = GetLastLocalPath();
