@@ -15,6 +15,10 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <UseIISExpress>false</UseIISExpress>
     <SilverlightApplicationList>{2372CAFE-0543-486E-9019-449DA2428B20}|..\OsbleRubric\OsbleRubric.csproj|ClientBin|False</SilverlightApplicationList>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -76,7 +80,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>2769</DevelopmentServerPort>
+          <DevelopmentServerPort>2023</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>
