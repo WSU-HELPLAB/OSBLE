@@ -1,27 +1,24 @@
 ﻿using System;
-using System.Net;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using ChemProV.PFD.Streams.PropertiesWindow;
 using System.Windows.Media.Imaging;
-using System.Collections.Generic;
+using ChemProV.PFD.Streams.PropertiesWindow;
 
 namespace OsbleRubric
 {
     public class RubricModel
     {
         #region Attributes
-        private CustomDataGrid myGrid = new CustomDataGrid();
+
+        private CustomDataGrid customDataGrid = new CustomDataGrid();
         private Rubric thisView = new Rubric();
-        #endregion
+
+        #endregion Attributes
 
         #region constants
+
         const double Col0Width = 180;
         const double Row0Height = 100;
         const double ColWidth = 250;
@@ -30,8 +27,8 @@ namespace OsbleRubric
         const int GlobalFontSize = 12;
         private ImageSource helpIconSource = new BitmapImage(new Uri("Icons/help.png", UriKind.Relative));
         private ImageSource deleteIconSource = new BitmapImage(new Uri("Icons/delete.png", UriKind.Relative));
-        #endregion
 
+        #endregion constants
 
         public RubricModel()
         {
@@ -40,47 +37,42 @@ namespace OsbleRubric
 
         private void initialize()
         {
-
             //adding grid to the view
-            thisView.LayoutRoot.Children.Add(myGrid.BaseGrid);
+            thisView.LayoutRoot.Children.Add(customDataGrid.BaseGrid);
 
             //setting color for grid
-            myGrid.BaseGrid.Background = new SolidColorBrush(Colors.LightGray);
+            customDataGrid.BaseGrid.Background = new SolidColorBrush(Colors.LightGray);
 
             //setting borders for grid
-            myGrid.HideBordersForLastRow = false;
-            myGrid.HideBordersForLastTwoColumns = false;
-            myGrid.BorderBrush = new SolidColorBrush(Colors.Black);
-            myGrid.BorderThickness = 1.0;
-
+            customDataGrid.HideBordersForLastRow = false;
+            customDataGrid.HideBordersForLastTwoColumns = false;
+            customDataGrid.BorderBrush = new SolidColorBrush(Colors.Black);
+            customDataGrid.BorderThickness = 1.0;
 
             //adding initial columns & rows
-            myGrid.PlaceUIElement(createCol0Row0(), 0, 0);
-            myGrid.PlaceUIElement(createCol1Row0(), 1, 0);
-            myGrid.PlaceUIElement(createLevelTitleCell(), 2, 0);
+            customDataGrid.PlaceUIElement(createCol0Row0(), 0, 0);
+            customDataGrid.PlaceUIElement(createCol1Row0(), 1, 0);
+            customDataGrid.PlaceUIElement(createLevelTitleCell(), 2, 0);
             createCriterionRow();
 
             //setting widths/heights for the table - possibly best to set width/height somewhere else
-            myGrid.BaseGrid.RowDefinitions[0].Height = new GridLength(Row0Height);
-            for (int i = 1; i < myGrid.BaseGrid.RowDefinitions.Count; ++i)
+            customDataGrid.BaseGrid.RowDefinitions[0].Height = new GridLength(Row0Height);
+            for (int i = 1; i < customDataGrid.BaseGrid.RowDefinitions.Count; ++i)
             {
-                myGrid.BaseGrid.RowDefinitions[i].Height = new GridLength(RowHeight);
+                customDataGrid.BaseGrid.RowDefinitions[i].Height = new GridLength(RowHeight);
             }
-            myGrid.BaseGrid.ColumnDefinitions[0].Width = new GridLength(Col0Width);
-            myGrid.BaseGrid.ColumnDefinitions[1].Width = new GridLength(Col1Width);
-            for (int i = 2; i < myGrid.BaseGrid.ColumnDefinitions.Count; ++i)
+            customDataGrid.BaseGrid.ColumnDefinitions[0].Width = new GridLength(Col0Width);
+            customDataGrid.BaseGrid.ColumnDefinitions[1].Width = new GridLength(Col1Width);
+            for (int i = 2; i < customDataGrid.BaseGrid.ColumnDefinitions.Count; ++i)
             {
-                myGrid.BaseGrid.ColumnDefinitions[i].Width = new GridLength(ColWidth);
+                customDataGrid.BaseGrid.ColumnDefinitions[i].Width = new GridLength(ColWidth);
             }
-
-
-
         }
-
-
 
         private void removeRow()
         {
+            customDataGrid.RemoveRow(2);
+            /*
             int toRemove = 2;
             //for this, look at the row deleting, all rows before that (lower index) dont change, all rows after, reduce index by 1 (to account for the delete) and then delete the last row (might not be last, probably second to last because of bottom row)
             //problems might be hooking up to DB
@@ -90,9 +82,8 @@ namespace OsbleRubric
             /*
             for(int i = 0; i < myGrid.BaseGrid.ColumnDefinitions.Count; ++i)
             {
-
-            }*/
-            List<FrameworkElement> elementsToRemove= new List<FrameworkElement>();
+            }
+            List<FrameworkElement> elementsToRemove = new List<FrameworkElement>();
 
             foreach (FrameworkElement element in myGrid.BaseGrid.Children)
             {
@@ -103,31 +94,31 @@ namespace OsbleRubric
             }
             foreach (FrameworkElement element in elementsToRemove)
             {
-               // myGrid.BaseGrid.Children.Remove(element);
+                // myGrid.BaseGrid.Children.Remove(element);
             }
 
-          //myGrid.BaseGrid.RowDefinitions.RemoveAt(toRemove-1);
-
-
+            //myGrid.BaseGrid.RowDefinitions.RemoveAt(toRemove-1);
+             * */
         }
+
         private void removeCol()
         {
-            
+            customDataGrid.RemoveColumn(2);
+            /*
             //do combo of this plus remove the last. then change all row definitions. ugh.
             int toRemove = 2;
-            
+
             //removes UI elements
-            
+
             for (int i = myGrid.BaseGrid.RowDefinitions.Count-1 ; i >=0 ; --i)
             {
                 myGrid.RemoveUIElementAt(toRemove, i);
             }
 
             //myGrid.UpdateGridSize();
-            //Tries to remove the column...not working correctly 
+            //Tries to remove the column...not working correctly
            // myGrid.BaseGrid.ColumnDefinitions.RemoveAt(toRemove);
-
-
+            */
         }
 
         //This method creates and correctly populates an entire column
@@ -135,26 +126,25 @@ namespace OsbleRubric
         {
             //create a column, must go from 0 to max-1 (handle the latter later)
             //in 0 put createLevelTitleCell, in rest, they need createLevelCell()
-            int colIndexToInsert = myGrid.BaseGrid.ColumnDefinitions.Count;
-            myGrid.PlaceUIElement(createLevelTitleCell(), colIndexToInsert, 0);
-            for (int i = 1; i < myGrid.BaseGrid.RowDefinitions.Count; i++)
+            int colIndexToInsert = customDataGrid.BaseGrid.ColumnDefinitions.Count;
+            customDataGrid.PlaceUIElement(createLevelTitleCell(), colIndexToInsert, 0);
+            for (int i = 1; i < customDataGrid.BaseGrid.RowDefinitions.Count; i++)
             {
-                myGrid.PlaceUIElement(createLevelCell(), colIndexToInsert, i);
+                customDataGrid.PlaceUIElement(createLevelCell(), colIndexToInsert, i);
             }
         }
 
         //This method creates and correctly populates an entire row
         private void createCriterionRow()
         {
-            int rowPlacement = myGrid.BaseGrid.RowDefinitions.Count;
-            myGrid.PlaceUIElement(createPerformanceCritCell(), 0, rowPlacement);
-            myGrid.PlaceUIElement(createCritWeightCell(), 1, rowPlacement);
+            int rowPlacement = customDataGrid.BaseGrid.RowDefinitions.Count;
+            customDataGrid.PlaceUIElement(createPerformanceCritCell(), 0, rowPlacement);
+            customDataGrid.PlaceUIElement(createCritWeightCell(), 1, rowPlacement);
 
-            for (int i = 2; i < myGrid.BaseGrid.ColumnDefinitions.Count; i++)
+            for (int i = 2; i < customDataGrid.BaseGrid.ColumnDefinitions.Count; i++)
             {
-                myGrid.PlaceUIElement(createLevelCell(), i, rowPlacement);
+                customDataGrid.PlaceUIElement(createLevelCell(), i, rowPlacement);
             }
-            
         }
 
         //This method creates the cells used for a Level column (With the exception of the first row)
@@ -167,7 +157,7 @@ namespace OsbleRubric
 
             TextBox textbox = new TextBox()
             {
-                Height = RowHeight-12,
+                Height = RowHeight - 12,
                 Width = returnVal.Width,
                 TextWrapping = TextWrapping.Wrap
             };
@@ -193,7 +183,7 @@ namespace OsbleRubric
                 Width = 70,
                 Height = 22
             };
-            TextBlock textBlock = new TextBlock() {Text = "Points", Margin = new Thickness(5,0,0,0), VerticalAlignment = VerticalAlignment.Center};
+            TextBlock textBlock = new TextBlock() { Text = "Points", Margin = new Thickness(5, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
 
             returnVal.Children.Add(textbox);
             returnVal.Children.Add(textBlock);
@@ -206,7 +196,7 @@ namespace OsbleRubric
         {
             StackPanel returnVal = new StackPanel()
             {
-                Margin = new Thickness(5,5,5,5)
+                Margin = new Thickness(5, 5, 5, 5)
             };
 
             TextBox textbox = new TextBox()
@@ -215,7 +205,7 @@ namespace OsbleRubric
                 Width = returnVal.Width,
                 TextWrapping = TextWrapping.Wrap
             };
-            Image deleteIcon = new Image { Source = deleteIconSource, Height = 32, Width = 32, Margin = new Thickness(0,3,0,0) };
+            Image deleteIcon = new Image { Source = deleteIconSource, Height = 32, Width = 32, Margin = new Thickness(0, 3, 0, 0) };
             deleteIcon.MouseLeftButtonDown += new MouseButtonEventHandler(Delete_MouseLeftButtonDown);
 
             returnVal.Children.Add(textbox);
@@ -237,7 +227,6 @@ namespace OsbleRubric
             /*DELETE ME SOON*/
             Img1.MouseLeftButtonDown += new MouseButtonEventHandler(Img1_MouseLeftButtonDown);
             TBlock1.MouseLeftButtonDown += new MouseButtonEventHandler(TBlock1_MouseLeftButtonDown);
-
 
             //adding children to returnVal
             returnVal.Children.Add(TBlock1);
@@ -292,14 +281,13 @@ namespace OsbleRubric
             TBox1.Width = 100;
             TBox1.Height = 22;
 
-            Image Img1 = new Image() { Source = deleteIconSource, Height=32, Width=32 };
-            Img1.MouseLeftButtonDown +=new MouseButtonEventHandler(DeleteCol_MouseLeftButtonDown);
+            Image Img1 = new Image() { Source = deleteIconSource, Height = 32, Width = 32 };
+            Img1.MouseLeftButtonDown += new MouseButtonEventHandler(DeleteCol_MouseLeftButtonDown);
 
             //margins
             TBlock1.Margin = generalMargin;
             TBox1.Margin = generalMargin;
             Img1.Margin = generalMargin;
-
 
             //adding children to SP1
             SP1.Children.Add(TBlock1);
@@ -324,9 +312,9 @@ namespace OsbleRubric
             TextBlock ToolTipTB = new TextBlock();
             ToolTipTB.Text = "The point spread determines the minimum and\n maximum point range for a quality level.\n The system starts at 1 in the first column\n and determines the starting point of other\n columns based on your previous input.";
             ToolTipService.SetToolTip(Img2, ToolTipTB);
-            
+
             //margins
-            
+
             TBlock2.Margin = generalMargin;
             CB1.Margin = generalMargin;
 
@@ -351,6 +339,7 @@ namespace OsbleRubric
         {
             removeRow();
         }
+
         private void DeleteCol_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             removeCol();
@@ -366,6 +355,7 @@ namespace OsbleRubric
         {
             createLevelColumn();
         }
+
         private void Img2_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             removeCol();
@@ -381,13 +371,14 @@ namespace OsbleRubric
             }
             */
             //VisualTreeHelper.
+        }
 
-        }
-        void TBlock2_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void TBlock2_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            myGrid.BaseGrid.ColumnDefinitions.RemoveAt(2);
-           // myGrid.BaseGrid.ColumnDefinitions.RemoveAt(myGrid.BaseGrid.ColumnDefinitions.Count - 1);
+            customDataGrid.BaseGrid.ColumnDefinitions.RemoveAt(2);
+            // myGrid.BaseGrid.ColumnDefinitions.RemoveAt(myGrid.BaseGrid.ColumnDefinitions.Count - 1);
         }
-        #endregion
+
+        #endregion Events
     }
 }

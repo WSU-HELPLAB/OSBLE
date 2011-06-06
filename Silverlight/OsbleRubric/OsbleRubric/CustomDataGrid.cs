@@ -7,6 +7,7 @@ ChemProV is distributed under the Open Software License ("OSL") v3.0.
 Consult "LICENSE.txt" included in this package for the complete OSL license.
 */
 
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -86,6 +87,42 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
         private void my_Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             baseGrid.CaptureMouse();
+        }
+
+        public void RemoveRow(int index)
+        {
+            List<Border> bordersToBeRemoved = new List<Border>();
+            foreach (Border br in baseGrid.Children)
+            {
+                if (index == (int)br.GetValue(Grid.RowProperty))
+                {
+                    bordersToBeRemoved.Add(br);
+                }
+            }
+            foreach (Border br in bordersToBeRemoved)
+            {
+                baseGrid.Children.Remove(br);
+            }
+
+            baseGrid.RowDefinitions.RemoveAt(index);
+        }
+
+        public void RemoveColumn(int index)
+        {
+            List<Border> bordersToBeRemoved = new List<Border>();
+            foreach (Border br in baseGrid.Children)
+            {
+                if (index == (int)br.GetValue(Grid.ColumnProperty))
+                {
+                    bordersToBeRemoved.Add(br);
+                }
+            }
+            foreach (Border br in bordersToBeRemoved)
+            {
+                baseGrid.Children.Remove(br);
+            }
+
+            baseGrid.ColumnDefinitions.RemoveAt(index);
         }
 
         public void ClearAll()

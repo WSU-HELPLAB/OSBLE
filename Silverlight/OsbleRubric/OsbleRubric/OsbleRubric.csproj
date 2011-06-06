@@ -30,6 +30,10 @@
     <UsePlatformExtensions>false</UsePlatformExtensions>
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
     <LinkedServerProject>..\OsbleRubric.Web\OsbleRubric.Web.csproj</LinkedServerProject>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <!-- This property group is only here to support building this project using the 
        MSBuild 3.5 toolset. In order to work correctly with this older toolset, it needs 
@@ -81,7 +85,7 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PropertiesWindowGrid.cs" />
+    <Compile Include="CustomDataGrid.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rubric.xaml.cs">
       <DependentUpon>Rubric.xaml</DependentUpon>
