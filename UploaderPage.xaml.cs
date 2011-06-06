@@ -47,7 +47,7 @@ namespace FileUploader
         public UploaderPage()
         {
             LoginWindow login = new LoginWindow();
-            login.Show();
+            //login.Show();
 
             InitializeComponent();
 
@@ -56,7 +56,8 @@ namespace FileUploader
 
             //listeners for our web service
             syncedFiles.GetFileListCompleted += new EventHandler<GetFileListCompletedEventArgs>(syncedFiles_GetFileListCompleted);
-            
+            syncedFiles.SyncFileCompleted += new EventHandler<SyncFileCompletedEventArgs>(syncedFiles_SyncFileCompleted);
+
             //local event listeners
             SyncButton.Click += new RoutedEventHandler(SyncButton_Click);
             LocalFileList.EmptyDirectoryEncountered += new EventHandler(LocalFileList_EmptyDirectoryEncountered);
@@ -74,6 +75,31 @@ namespace FileUploader
 
             // Populate the ListBox with the contents of the directory path
             //dirList(localpath);
+        }
+
+        /// <summary>
+        /// Returns the path of the last path on this machine that was synced with the server
+        /// </summary>
+        /// <returns></returns>
+        private string GetLastLocalPath()
+        {
+            using (IsolatedStorageFile store = IsolatedStorageFile.GetUserStoreForApplication())
+            {
+                if (store.FileExists("localpath.txt"))
+                {
+                    using (IsolatedStorageFileStream stream = store.OpenFile("localpath.txt", FileMode.Open))
+                    {
+                        StreamReader reader = new StreamReader(stream);
+                        string path = reader.ReadLine().Trim();
+                        reader.Close();
+                        return path;
+                    }
+                }
+                else
+                {
+                    return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                }
+            }
         }
 
         //allows the user to quick navigate to a desired location
@@ -177,29 +203,9 @@ namespace FileUploader
             }
         }
 
-        /// <summary>
-        /// Returns the path of the last path on this machine that was synced with the server
-        /// </summary>
-        /// <returns></returns>
-        private string GetLastLocalPath()
+        // Executes when the user navigates to this page.
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            using (IsolatedStorageFile store = IsolatedStorageFile.GetUserStoreForApplication())
-            {
-                if (store.FileExists("localpath.txt"))
-                {
-                    using (IsolatedStorageFileStream stream = store.OpenFile("localpath.txt", FileMode.Open))
-                    {
-                        StreamReader reader = new StreamReader(stream);
-                        string path = reader.ReadLine().Trim();
-                        reader.Close();
-                        return path;
-                    }
-                }
-                else
-                {
-                    return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                }
-            }
         }
 
         void syncedFiles_GetFileListCompleted(object sender, GetFileListCompletedEventArgs e)
@@ -207,10 +213,11 @@ namespace FileUploader
             RemoteFileList.DataContext = e.Result;
         }
 
-        // Executes when the user navigates to this page.
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        void syncedFiles_SyncFileCompleted(object sender, SyncFileCompletedEventArgs e)
         {
+            
         }
+
 
 
         /*
