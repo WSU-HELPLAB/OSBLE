@@ -12,7 +12,7 @@ namespace OSBLE.Models.Assignments.Activities
         }
 
         [Required]
-        [Display(Name = "Is Team")]
+        [Display(Name = "This is a team assignment")]
         public bool isTeam { get; set; }
 
         [Required]

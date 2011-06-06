@@ -510,6 +510,7 @@
     <Content Include="Views\Mail\NotFound.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\SilverlightObject.cshtml" />
     <Content Include="Views\Home\SilverlightTest.cshtml" />
+    <Content Include="Views\BasicAssignment\TeamCreation.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

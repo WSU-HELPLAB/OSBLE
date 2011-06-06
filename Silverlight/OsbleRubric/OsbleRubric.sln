@@ -9,6 +9,18 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsbleRubric.Web", "OsbleRubric.Web\OsbleRubric.Web.csproj", "{BA1F18B4-B559-49C9-9731-A43133E74E17}"
 EndProject
 Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = OsbleRubric\\OsbleRubric.csproj
+		SccProjectName1 = OsbleRubric
+		SccLocalPath1 = OsbleRubric
+		SccProjectUniqueName2 = OsbleRubric.Web\\OsbleRubric.Web.csproj
+		SccProjectName2 = OsbleRubric.Web
+		SccLocalPath2 = OsbleRubric.Web
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

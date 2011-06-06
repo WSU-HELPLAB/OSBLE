@@ -1,7 +1,5 @@
 ﻿@model OSBLE.Models.ViewModels.BasicAssignmentViewModel
-           
 @using OSBLE.Models.Assignments.Activities
-
 @{
     ViewBag.Title = "Create";
 }
@@ -12,6 +10,8 @@
 <script type="text/javascript">
 
     $(function () {
+        //set up event listeners 
+
         $('#ReleaseDate_Date').change(function () {
             updateReleaseDate();
         });
@@ -36,7 +36,91 @@
             updateSubmissionName();
         });
 
+        $('#isTeam').change(function () {
+            if ($(this).attr('checked')) {
+
+                DisplayTeamOptions();
+            }
+            else {
+
+                HideTeamOptions();
+            }
+        });
+
+        $("input[name='team_generation_options']").change(function () {
+            if ($("input[name='team_generation_options']:checked").val() == 'PreviousAssignment') {
+                DisplayPreviousAssignment();
+            }
+            else if ($("input[name='team_generation_options']:checked").val() == 'RandomTeams') {
+                DisplayRandomTeams();
+            }
+            else if ($("input[name='team_generation_options']:checked").val() == 'ManualTeams') {
+                DisplayManualTeams();
+            }
+            else {
+                throw "Unknown Radio Button Checked: team_generation_options"
+            }
+        });
+
+        $('#total_teams').focus(function () {
+            //Uncheck everything that is checked
+            $("input[name='team_or_people']:checked").removeAttr('checked');
+            //Check the first radio button with the name team_or_people aka the one associated with total teams
+            $("input[name='team_or_people']:eq(0)").attr('checked', 'checked');
+        });
+
+        $('#people_per_team').focus(function () {
+            //Uncheck everything that is checked
+            $("input[name='team_or_people']:checked").removeAttr('checked');
+            //Check the second radio button with the name team_or_people aka the one associated with people_per_team
+            $("input[name='team_or_people']:eq(1)").attr('checked', 'checked');
+        });
+
+        //set up default radio buttons
+
+        //Uncheck everything that is checked
+        $("input[name='team_generation_options']:checked").removeAttr('checked');
+        //Check the first radio button with the name team_generation_options
+        $("input[name='team_generation_options']:eq(0)").attr('checked', 'checked');
+
+        //Uncheck everything that is checked
+        $("input[name='team_or_people']:checked").removeAttr('checked');
+        //Check the first radio button with the name team_or_people aka the one associated with total teams
+        $("input[name='team_or_people']:eq(0)").attr('checked', 'checked');
+
+        $('#isTeam').removeAttr('checked');
+
+        //Call any needed functions (note events wont be called on this function so we got to call them manually
+
+        DisplayPreviousAssignment();
+
     });
+
+    function DisplayManualTeams() {
+        $('#RandomTeams').hide();
+        $('#PreviousAssignmentDiv').hide();
+        $('#ManualTeams').show('blind');
+    }
+
+    function DisplayRandomTeams() {
+        $('#PreviousAssignmentDiv').hide();
+        $('#ManualTeams').hide();
+        $('#RandomTeams').show('blind');
+    }
+
+    function DisplayPreviousAssignment() {
+        $('#RandomTeams').hide();
+        $('#ManualTeams').hide();
+        $('#PreviousAssignmentDiv').show('blind');
+    }
+
+    function DisplayTeamOptions() {
+        $('#Team_Options').show('blind');
+    }
+
+    function HideTeamOptions() {
+        $('#Team_Options').hide('blind');
+    }
 
     function updateReleaseDate() {
         $('#ReleaseDate').val($('#ReleaseDate_Date').val() + ' ' + $('#ReleaseDate_Time').val());
@@ -56,7 +140,7 @@
     StopActivity stop = Model.Stop;
 
 
-@Html.ValidationSummary(true, "The due date must come after the release date")
+    @Html.ValidationSummary(true, "The due date must come after the release date")
     using (Html.BeginForm())
     {
         Html.ValidationSummary(true);
@@ -102,8 +186,53 @@
             @Html.LabelFor(model => submission.isTeam)
         </div>
         <div class="editor-field">
-            @Html.EditorFor(model => submission.isTeam)
+            @Html.CheckBoxFor(model => submission.isTeam, new { id = "isTeam" })
             @Html.ValidationMessageFor(model => submission.isTeam)
+        </div>
+        <div id="Team_Options" style="display: none">
+            <input type="radio" name="team_generation_options" value="PreviousAssignment" />
+            Use teams defined in previous course assignment
+            <br />
+            <ul id="PreviousAssignmentDiv" style="display: none" class="team_generation_options">
+                <li>Select box goes here. </li>
+                <br />
+                <li>
+                    <button type="button">
+                        Generate Teams</button>
+                </li>
+            </ul>
+            <input type="radio" name="team_generation_options" value="RandomTeams" />
+            Generate teams randomly
+            <br />
+            <ul id="RandomTeams" style="display: none" class="team_generation_options">
+                <li>
+                    <input type="radio" name="team_or_people" value="Teams" />
+                    Specify the number of total teams
+                    <input type="text" id="total_teams" />
+
+                </li>
+                <br />
+                <li>
+                    <input type="radio" name="team_or_people" value="People"/>
+                    Specify the number of people per team 
+                    <input type="text" id="people_per_team"/>
+                </li>
+                <br />
+                <li>
+                    <button type="button">
+                        Generate Teams</button>
+                </li>
+            </ul>
+            <input type="radio" name="team_generation_options" value="ManualTeams" />
+            Specify teams manually
+            <ul id="ManualTeams" style="display: none" class="team_generation_options">
+                <li>
+                    <button type="button">
+                        Create Teams
+                    </button>
+                </li>
+            </ul>
+            <!-- in the future generate teams with mixed ability and Generate teams with same-ability will need to go here -->
         </div>
         <div class="editor-label">
             @Html.LabelFor(model => submission.InstructorCanReview)
@@ -122,21 +251,21 @@
         @{
         Deliverable deliverable = new Deliverable();
         submission.Deliverables.Add(deliverable);
-                <div class="editor-label">
-            @Html.LabelFor(model => deliverable.Name)
-        </div>
-        <div class="editor-field">
-            @Html.EditorFor(model => deliverable.Name)
-            @Html.ValidationMessageFor(model => deliverable.Name)
-        </div>
+            <div class="editor-label">
+                @Html.LabelFor(model => deliverable.Name)
+            </div>
+            <div class="editor-field">
+                @Html.EditorFor(model => deliverable.Name)
+                @Html.ValidationMessageFor(model => deliverable.Name)
+            </div>
 
-                <div class="editor-label">
-            @Html.LabelFor(model => deliverable.Type)
-        </div>
-        <div class="editor-field">
-            @Html.DropDownList("Deliverable Type", ViewBag.DeliverableTypes as SelectList)
-            @Html.ValidationMessageFor(model => deliverable.Type)
-        </div>
+            <div class="editor-label">
+                @Html.LabelFor(model => deliverable.Type)
+            </div>
+            <div class="editor-field">
+                @Html.DropDownList("Deliverable Type", ViewBag.DeliverableTypes as SelectList)
+                @Html.ValidationMessageFor(model => deliverable.Type)
+            </div>
         }
         <div class="editor-label">
             @Html.LabelFor(model => model.BasicAssignment.PointsPossible)
@@ -145,34 +274,31 @@
             @Html.EditorFor(model => model.BasicAssignment.PointsPossible)
             @Html.ValidationMessageFor(model => model.BasicAssignment.PointsPossible)
         </div>
-
-    <h3>Late Policy</h3>
-    
-    <p>
-        Students may submit assignments up to @Html.TextBoxFor(model => model.BasicAssignment.MinutesLateWithNoPenalty, new { size = 3 })
-        minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.BasicAssignment.PercentPenalty, new { size = 3 })
-        percent per @Html.TextBoxFor(model => model.BasicAssignment.HoursLatePerPercentPenalty, new { size = 3 })
-        hours late will be applied.<br />
-        @Html.ValidationMessageFor(model => model.BasicAssignment.MinutesLateWithNoPenalty)
-        @Html.ValidationMessageFor(model => model.BasicAssignment.PercentPenalty)
-        @Html.ValidationMessageFor(model => model.BasicAssignment.HoursLatePerPercentPenalty)
-    </p>
-    
-    
-    <p>
-        Assignments that are submitted more than @Html.TextBoxFor(model => model.BasicAssignment.HoursLateUntilZero, new { size = 3 })
-        hours after the due date and time will receive an automatic 0.<br />
-        @Html.ValidationMessageFor(model => model.BasicAssignment.HoursLateUntilZero)
-    </p>
+        <h3>
+            Late Policy</h3>
         <p>
-            <input type="submit" value="Create" id="submitButton"/>
+            Students may submit assignments up to @Html.TextBoxFor(model => model.BasicAssignment.MinutesLateWithNoPenalty, new { size = 3 })
+            minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.BasicAssignment.PercentPenalty, new { size = 3 })
+            percent per @Html.TextBoxFor(model => model.BasicAssignment.HoursLatePerPercentPenalty, new { size = 3 })
+            hours late will be applied.<br />
+            @Html.ValidationMessageFor(model => model.BasicAssignment.MinutesLateWithNoPenalty)
+            @Html.ValidationMessageFor(model => model.BasicAssignment.PercentPenalty)
+            @Html.ValidationMessageFor(model => model.BasicAssignment.HoursLatePerPercentPenalty)
+        </p>
+        <p>
+            Assignments that are submitted more than @Html.TextBoxFor(model => model.BasicAssignment.HoursLateUntilZero, new { size = 3 })
+            hours after the due date and time will receive an automatic 0.<br />
+            @Html.ValidationMessageFor(model => model.BasicAssignment.HoursLateUntilZero)
+        </p>
+        <p>
+            <input type="submit" value="Create" id="submitButton" />
         </p>
     </fieldset>
     }
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>
-    }
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+}
 @functions
 {
     public string convertToMonthDayYearFormat(DateTime date)

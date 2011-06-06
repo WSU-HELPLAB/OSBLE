@@ -13,7 +13,7 @@ a
     color: #074974;
 }
 
-h1, h2, h3, h4, h5, h6 
+h1, h2, h3, h4, h5, h6
 {
     color: #074974;
 }
@@ -70,10 +70,10 @@ a img
     float: left;
 }
 
-.top_item 
+.top_item
 {
- text-decoration: none;   
- color: #eee;
+    text-decoration: none;
+    color: #eee;
 }
 
 .top_item:hover
@@ -126,7 +126,7 @@ a img
     color: #074974;
 }
 
-#courses form 
+#courses form
 {
     display: inline;
 }
@@ -214,17 +214,17 @@ ul.user_list
     font-size: 10pt;
 }
 
-.user_list li form 
+.user_list li form
 {
     display: none;
-    margin: 0; padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
 .user_list input
 {
     position: relative;
 }
-
 
 .user_list li:hover
 {
@@ -389,20 +389,20 @@ body#layoutLogOn
 
 /* Dashboard */
 
-#dashboard_left, #dashboard_middle, #dashboard_right 
+#dashboard_left, #dashboard_middle, #dashboard_right
 {
     display: block;
     margin: 0;
     padding: 0;
 }
 
-#dashboard_left h4, #dashboard_middle h4, #dashboard_right h4 
+#dashboard_left h4, #dashboard_middle h4, #dashboard_right h4
 {
     margin-top: 0.5em;
     margin-bottom: 0.25em;
 }
 
-#dashboard_left 
+#dashboard_left
 {
     width: 24%;
     float: left;
@@ -428,7 +428,7 @@ body#layoutLogOn
     vertical-align: top;
 }
 
-#activity_new_post 
+#activity_new_post
 {
     width: 100%;
     text-align: left;
@@ -436,17 +436,16 @@ body#layoutLogOn
     padding-left: 0%;
 }
 
-#activity_new_post textarea 
+#activity_new_post textarea
 {
     width: 80%;
     height: 80px;
     margin-bottom: 0.5em;
 }
 
-
 /* Dashboard Posts */
 
-.dp_course 
+.dp_course
 {
     font-size: 10pt;
     font-variant: small-caps;
@@ -460,7 +459,7 @@ body#layoutLogOn
     font-size: 10pt;
 }
 
-.dp_post 
+.dp_post
 {
     width: 95%;
     display: block;
@@ -482,7 +481,7 @@ body#layoutLogOn
     padding-left: 3px;
     padding-right: 3px;
     display: block;
-    color: #074974
+    color: #074974;
 }
 
 .dp_content
@@ -500,8 +499,8 @@ body#layoutLogOn
     clear: both;
 }
 
-.dp_replylink 
-{    
+.dp_replylink
+{
     font-size: 10pt;
 }
 
@@ -510,8 +509,7 @@ body#layoutLogOn
     display: none;
 }
 
-
-.dp_replybox textarea 
+.dp_replybox textarea
 {
     width: 90%;
     height: 50px;
@@ -528,7 +526,7 @@ body#layoutLogOn
     float: right;
 }
 
-.dashboard_mode 
+.dashboard_mode
 {
     margin-top: 0.5em;
     margin-bottom: 0.5em;
@@ -551,250 +549,324 @@ body#layoutLogOn
     height: 32px;
 }
 
-#picture_upload input 
+#picture_upload input
 {
     margin-right: 0.25em;
 }
 
-#activity_feed 
+#activity_feed
 {
     margin-bottom: 1em;
 }
 
-#course_links ul { margin: 0; padding: 0; font-size: 12pt;}
-#course_links ul li { margin: 10px 0 10px 25px; padding: 0; list-style:none; }
-			
-#course_links ul li a {
-	position: relative;
-	left: -25px;
-	padding-left: 25px;
+#course_links ul
+{
+    margin: 0;
+    padding: 0;
+    font-size: 12pt;
 }
-			
-.jqcNode { font-weight: bold; color: #074974; }
-			
-#course_links .closedImageApply {
-	list-style-image: url("images/arrow_right.png");
-}
-#course_links .openImageApply {
-	list-style-image: url("images/arrow_down.png");
-}
-/* File type images */
-#course_links .aacImageApply {
-	list-style-image: url("images/fileextimages/aac.png");
-}
-#course_links .aiImageApply {
-	list-style-image: url("images/fileextimagesai.png");
-}
-#course_links .aiffImageApply {
-	list-style-image: url("images/fileextimages/aiff.png");
-}
-#course_links .aviImageApply {
-	list-style-image: url("images/fileextimages/avi.png");
-}
-#course_links .bmpImageApply {
-	list-style-image: url("images/fileextimages/bmp.png");
-}
-#course_links .cImageApply {
-	list-style-image: url("images/fileextimages/c.png");
-}
-#course_links .cppImageApply {
-	list-style-image: url("images/fileextimages/cpp.png");
-}
-#course_links .cssImageApply {
-	list-style-image: url("images/fileextimages/css.png");
-}
-#course_links .datImageApply {
-	list-style-image: url("images/fileextimages/dat.png");
-}
-#course_links .dmgImageApply {
-	list-style-image: url("images/fileextimages/dmg.png");
-}
-#course_links .docImageApply {
-	list-style-image: url("images/fileextimages/doc.png");
-}
-#course_links .dotxImageApply {
-	list-style-image: url("images/fileextimages/dotx.png");
-}
-#course_links .dwgImageApply {
-	list-style-image: url("images/fileextimages/dwg.png");
-}
-#course_links .dxfImageApply {
-	list-style-image: url("images/fileextimages/dxf.png");
-}
-#course_links .epsImageApply {
-	list-style-image: url("images/fileextimages/eps.png");
-}
-#course_links .exeImageApply {
-	list-style-image: url("images/fileextimages/exe.png");
-}
-#course_links .flvImageApply {
-	list-style-image: url("images/fileextimages/flv.png");
-}
-#course_links .hImageApply {
-	list-style-image: url("images/fileextimages/h.png");
-}
-#course_links .hppImageApply {
-	list-style-image: url("images/fileextimages/hpp.png");
-}
-#course_links .icsImageApply {
-	list-style-image: url("images/fileextimages/ics.png");
-}
-#course_links .isoImageApply {
-	list-style-image: url("images/fileextimages/iso.png");
-}
-#course_links .javaImageApply {
-	list-style-image: url("images/fileextimages/java.png");
-}
-#course_links .keyImageApply {
-	list-style-image: url("images/fileextimages/key.png");
-}
-#course_links .midImageApply {
-	list-style-image: url("images/fileextimages/mid.png");
-}
-#course_links .mp3ImageApply {
-	list-style-image: url("images/fileextimages/mp3.png");
-}
-#course_links .mp4ImageApply {
-	list-style-image: url("images/fileextimages/mp4.png");
-}
-#course_links .mpgImageApply {
-	list-style-image: url("images/fileextimages/mpg.png");
-}
-#course_links .odfImageApply {
-	list-style-image: url("images/fileextimages/odf.png");
-}
-#course_links .odsImageApply {
-	list-style-image: url("images/fileextimages/ods.png");
-}
-#course_links .odtImageApply {
-	list-style-image: url("images/fileextimages/odt.png");
-}
-#course_links .otpImageApply {
-	list-style-image: url("images/fileextimages/otp.png");
-}
-#course_links .otsImageApply {
-	list-style-image: url("images/fileextimages/ots.png");
-}
-#course_links .ottImageApply {
-	list-style-image: url("images/fileextimages/ott.png");
-}
-#course_links .phpImageApply {
-	list-style-image: url("images/fileextimages/php.png");
-}
-#course_links .pptImageApply {
-	list-style-image: url("images/fileextimages/ppt.png");
-}
-#course_links .psdImageApply {
-	list-style-image: url("images/fileextimages/psd.png");
-}
-#course_links .pyImageApply {
-	list-style-image: url("images/fileextimages/py.png");
-}
-#course_links .qtImageApply {
-	list-style-image: url("images/fileextimages/qt.png");
-}
-#course_links .rarImageApply {
-	list-style-image: url("images/fileextimages/rar.png");
-}
-#course_links .rbImageApply {
-	list-style-image: url("images/fileextimages/rb.png");
-}
-#course_links .rtfImageApply {
-	list-style-image: url("images/fileextimages/rtf.png");
-}
-#course_links .sqlImageApply {
-	list-style-image: url("images/fileextimages/sql.png");
-}
-#course_links .tgaImageApply {
-	list-style-image: url("images/fileextimages/tga.png");
-}
-#course_links .tgzImageApply {
-	list-style-image: url("images/fileextimages/tgz.png");
-}
-#course_links .tiffImageApply {
-	list-style-image: url("images/fileextimages/tiff.png");
-}
-#course_links .txtImageApply {
-	list-style-image: url("images/fileextimages/txt.png");
-}
-#course_links .wavImageApply {
-	list-style-image: url("images/fileextimages/wav.png");
-}
-#course_links .xlsImageApply {
-	list-style-image: url("images/fileextimages/xls.png");
-}
-#course_links .xlsxImageApply {
-	list-style-image: url("images/fileextimages/xlsx.png");
-}
-#course_links .xmlImageApply {
-	list-style-image: url("images/fileextimages/xml.png");
-}
-#course_links .ymlImageApply {
-	list-style-image: url("images/fileextimages/yml.png");
-}
-#course_links .zipImageApply {
-	list-style-image: url("images/fileextimages/zip.png");
-}
-#course_links .pdfImageApply {
-	list-style-image: url("images/fileextimages/pdf.png");
-}
-#course_links .jpgImageApply {
-	list-style-image: url("images/fileextimages/jpg.png");
-}
-#course_links .pngImageApply {
-	list-style-image: url("images/fileextimages/png.png");
-}
-#course_links .gifImageApply {
-	list-style-image: url("images/fileextimages/gif.png");
-}
-#course_links .webImageApply {
-	list-style-image: url("images/fileextimages/html.png");
-}
-#course_links ._pageImageApply {
-	list-style-image: url("images/fileextimages/html.png");
-}
-#course_links .defaultImageApply {
-	list-style-image: url("images/fileextimages/_blank.png");
+#course_links ul li
+{
+    margin: 10px 0 10px 25px;
+    padding: 0;
+    list-style: none;
 }
 
-#people_finder, .ui-autocomplete 
+#course_links ul li a
+{
+    position: relative;
+    left: -25px;
+    padding-left: 25px;
+}
+
+.jqcNode
+{
+    font-weight: bold;
+    color: #074974;
+}
+
+#course_links .closedImageApply
+{
+    list-style-image: url("images/arrow_right.png");
+}
+#course_links .openImageApply
+{
+    list-style-image: url("images/arrow_down.png");
+}
+/* File type images */
+#course_links .aacImageApply
+{
+    list-style-image: url("images/fileextimages/aac.png");
+}
+#course_links .aiImageApply
+{
+    list-style-image: url("images/fileextimagesai.png");
+}
+#course_links .aiffImageApply
+{
+    list-style-image: url("images/fileextimages/aiff.png");
+}
+#course_links .aviImageApply
+{
+    list-style-image: url("images/fileextimages/avi.png");
+}
+#course_links .bmpImageApply
+{
+    list-style-image: url("images/fileextimages/bmp.png");
+}
+#course_links .cImageApply
+{
+    list-style-image: url("images/fileextimages/c.png");
+}
+#course_links .cppImageApply
+{
+    list-style-image: url("images/fileextimages/cpp.png");
+}
+#course_links .cssImageApply
+{
+    list-style-image: url("images/fileextimages/css.png");
+}
+#course_links .datImageApply
+{
+    list-style-image: url("images/fileextimages/dat.png");
+}
+#course_links .dmgImageApply
+{
+    list-style-image: url("images/fileextimages/dmg.png");
+}
+#course_links .docImageApply
+{
+    list-style-image: url("images/fileextimages/doc.png");
+}
+#course_links .dotxImageApply
+{
+    list-style-image: url("images/fileextimages/dotx.png");
+}
+#course_links .dwgImageApply
+{
+    list-style-image: url("images/fileextimages/dwg.png");
+}
+#course_links .dxfImageApply
+{
+    list-style-image: url("images/fileextimages/dxf.png");
+}
+#course_links .epsImageApply
+{
+    list-style-image: url("images/fileextimages/eps.png");
+}
+#course_links .exeImageApply
+{
+    list-style-image: url("images/fileextimages/exe.png");
+}
+#course_links .flvImageApply
+{
+    list-style-image: url("images/fileextimages/flv.png");
+}
+#course_links .hImageApply
+{
+    list-style-image: url("images/fileextimages/h.png");
+}
+#course_links .hppImageApply
+{
+    list-style-image: url("images/fileextimages/hpp.png");
+}
+#course_links .icsImageApply
+{
+    list-style-image: url("images/fileextimages/ics.png");
+}
+#course_links .isoImageApply
+{
+    list-style-image: url("images/fileextimages/iso.png");
+}
+#course_links .javaImageApply
+{
+    list-style-image: url("images/fileextimages/java.png");
+}
+#course_links .keyImageApply
+{
+    list-style-image: url("images/fileextimages/key.png");
+}
+#course_links .midImageApply
+{
+    list-style-image: url("images/fileextimages/mid.png");
+}
+#course_links .mp3ImageApply
+{
+    list-style-image: url("images/fileextimages/mp3.png");
+}
+#course_links .mp4ImageApply
+{
+    list-style-image: url("images/fileextimages/mp4.png");
+}
+#course_links .mpgImageApply
+{
+    list-style-image: url("images/fileextimages/mpg.png");
+}
+#course_links .odfImageApply
+{
+    list-style-image: url("images/fileextimages/odf.png");
+}
+#course_links .odsImageApply
+{
+    list-style-image: url("images/fileextimages/ods.png");
+}
+#course_links .odtImageApply
+{
+    list-style-image: url("images/fileextimages/odt.png");
+}
+#course_links .otpImageApply
+{
+    list-style-image: url("images/fileextimages/otp.png");
+}
+#course_links .otsImageApply
+{
+    list-style-image: url("images/fileextimages/ots.png");
+}
+#course_links .ottImageApply
+{
+    list-style-image: url("images/fileextimages/ott.png");
+}
+#course_links .phpImageApply
+{
+    list-style-image: url("images/fileextimages/php.png");
+}
+#course_links .pptImageApply
+{
+    list-style-image: url("images/fileextimages/ppt.png");
+}
+#course_links .psdImageApply
+{
+    list-style-image: url("images/fileextimages/psd.png");
+}
+#course_links .pyImageApply
+{
+    list-style-image: url("images/fileextimages/py.png");
+}
+#course_links .qtImageApply
+{
+    list-style-image: url("images/fileextimages/qt.png");
+}
+#course_links .rarImageApply
+{
+    list-style-image: url("images/fileextimages/rar.png");
+}
+#course_links .rbImageApply
+{
+    list-style-image: url("images/fileextimages/rb.png");
+}
+#course_links .rtfImageApply
+{
+    list-style-image: url("images/fileextimages/rtf.png");
+}
+#course_links .sqlImageApply
+{
+    list-style-image: url("images/fileextimages/sql.png");
+}
+#course_links .tgaImageApply
+{
+    list-style-image: url("images/fileextimages/tga.png");
+}
+#course_links .tgzImageApply
+{
+    list-style-image: url("images/fileextimages/tgz.png");
+}
+#course_links .tiffImageApply
+{
+    list-style-image: url("images/fileextimages/tiff.png");
+}
+#course_links .txtImageApply
+{
+    list-style-image: url("images/fileextimages/txt.png");
+}
+#course_links .wavImageApply
+{
+    list-style-image: url("images/fileextimages/wav.png");
+}
+#course_links .xlsImageApply
+{
+    list-style-image: url("images/fileextimages/xls.png");
+}
+#course_links .xlsxImageApply
+{
+    list-style-image: url("images/fileextimages/xlsx.png");
+}
+#course_links .xmlImageApply
+{
+    list-style-image: url("images/fileextimages/xml.png");
+}
+#course_links .ymlImageApply
+{
+    list-style-image: url("images/fileextimages/yml.png");
+}
+#course_links .zipImageApply
+{
+    list-style-image: url("images/fileextimages/zip.png");
+}
+#course_links .pdfImageApply
+{
+    list-style-image: url("images/fileextimages/pdf.png");
+}
+#course_links .jpgImageApply
+{
+    list-style-image: url("images/fileextimages/jpg.png");
+}
+#course_links .pngImageApply
+{
+    list-style-image: url("images/fileextimages/png.png");
+}
+#course_links .gifImageApply
+{
+    list-style-image: url("images/fileextimages/gif.png");
+}
+#course_links .webImageApply
+{
+    list-style-image: url("images/fileextimages/html.png");
+}
+#course_links ._pageImageApply
+{
+    list-style-image: url("images/fileextimages/html.png");
+}
+#course_links .defaultImageApply
+{
+    list-style-image: url("images/fileextimages/_blank.png");
+}
+
+#people_finder, .ui-autocomplete
 {
     width: 300px;
 }
 
-.ui-autocomplete 
+.ui-autocomplete
 {
-	max-height: 400px;
-	overflow-y: auto;
-	/* prevent horizontal scrollbar */
-	overflow-x: hidden;
-	/* add padding to account for vertical scrollbar */
-	padding-right: 20px;
+    max-height: 400px;
+    overflow-y: auto; /* prevent horizontal scrollbar */
+    overflow-x: hidden; /* add padding to account for vertical scrollbar */
+    padding-right: 20px;
 }
 
-.ui-autocomplete ul 
+.ui-autocomplete ul
 {
     list-style-type: none;
 }
 
-#send_mail_textarea 
+#send_mail_textarea
 {
     width: 600px;
     height: 250px;
 }
 
-.inbox_table 
+.inbox_table
 {
     border-collapse: collapse;
     width: 100%;
 }
 
-.inbox_table td 
+.inbox_table td
 {
     text-align: left;
 }
 
-.inbox_table tr 
+.inbox_table tr
 {
     background-color: #fafafa;
     border-bottom: 2px solid #cacaca;
@@ -828,7 +900,6 @@ body#layoutLogOn
 
 .inbox_subject
 {
-
 }
 
 .inbox_table td.inbox_tools
@@ -838,7 +909,7 @@ body#layoutLogOn
     padding-right: 5px;
 }
 
-.mail_user 
+.mail_user
 {
     display: block;
     float: left;
@@ -864,23 +935,23 @@ body#layoutLogOn
     display: none;
 }
 
-#add_update_users h4 
+#add_update_users h4
 {
     margin-top: 0.5em;
     margin-bottom: 0.5em;
 }
 
-.selector 
+.selector
 {
     clear: both;
 }
 
-div.selector 
+div.selector
 {
     padding-bottom: 20px;
 }
 
-.selector h4 
+.selector h4
 {
     padding-top: 10px;
 }
@@ -891,7 +962,7 @@ ul.selector
     width: 600px;
 }
 
-.selector li 
+.selector li
 {
     display: block;
     float: left;
@@ -922,7 +993,6 @@ ul.selector
     list-style-type: none;
     margin-left: 0;
     padding-left: 0;
-
 }
 
 #notifications_list li, #notifications_unread_legend, #notifications_read_legend, #event_list li
@@ -940,7 +1010,7 @@ ul.selector
     border-bottom: 3px solid #aaaadd;
 }
 
-#notifications_read_legend 
+#notifications_read_legend
 {
     width: 80px;
     margin-bottom: 5px;
@@ -982,27 +1052,26 @@ ul.selector
     padding: 3px;
 }
 
-.meeting_time:hover .meeting_time_tools , .break:hover .break_tools
+.meeting_time:hover .meeting_time_tools, .break:hover .break_tools
 {
     display: block;
 }
 
 #meetings_after, #breaks_after
 {
-    clear:both;
+    clear: both;
 }
 
-#past_events 
+#past_events
 {
     display: none;
 }
 
-.event_description 
+.event_description
 {
     padding: 3px;
-
     margin-top: 2px;
-    margin-bottom: 2px;    
+    margin-bottom: 2px;
 }
 
 .event_approval th, .event_approval td
@@ -1010,7 +1079,7 @@ ul.selector
     vertical-align: top;
 }
 
-.event_approval th 
+.event_approval th
 {
     width: 100px;
     text-align: left;
@@ -1030,13 +1099,17 @@ ul.selector
     margin-left: 0;
 }
 
-#event_list li 
+#event_list li
 {
     margin-left: 15px;
 }
 
-.event_time 
+.event_time
 {
     color: #074974;
 }
 
+.team_generation_options
+{
+    list-style-type: none;
+}
