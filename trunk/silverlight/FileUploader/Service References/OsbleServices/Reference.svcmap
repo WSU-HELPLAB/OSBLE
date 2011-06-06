@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="06200475-5e44-4a4e-9a30-91ad5dc3c9f2" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>true</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings>
+      <CollectionMapping TypeName="System.Collections.ObjectModel.ObservableCollection`1" Category="List" />
+    </CollectionMappings>
+    <GenerateSerializableTypes>false</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:17532/Services/UploaderWebService.svc" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="UploaderWebService.xsd" MetadataType="Schema" ID="98849c8a-4a61-4703-a07b-99c1dfcf9dec" SourceId="1" SourceUrl="http://localhost:17532/Services/UploaderWebService.svc?xsd=xsd2" />
+    <MetadataFile FileName="UploaderWebService.wsdl" MetadataType="Wsdl" ID="3125e5a9-0337-4bdb-9c71-6f1572d4f576" SourceId="1" SourceUrl="http://localhost:17532/Services/UploaderWebService.svc?wsdl" />
+    <MetadataFile FileName="UploaderWebService1.xsd" MetadataType="Schema" ID="e73295e6-dcea-427d-bea2-3b22b612f2a6" SourceId="1" SourceUrl="http://localhost:17532/Services/UploaderWebService.svc?xsd=xsd1" />
+    <MetadataFile FileName="UploaderWebService2.xsd" MetadataType="Schema" ID="6430bf1d-2998-41c1-aa80-0655732c4e18" SourceId="1" SourceUrl="http://localhost:17532/Services/UploaderWebService.svc?xsd=xsd0" />
+    <MetadataFile FileName="UploaderWebService.disco" MetadataType="Disco" ID="7934cfb5-dc74-48ad-9b7c-df0e1493a156" SourceId="1" SourceUrl="http://localhost:17532/Services/UploaderWebService.svc?disco" />
+    <MetadataFile FileName="UploaderWebService1.wsdl" MetadataType="Wsdl" ID="bfc252af-e333-4070-9f20-639ee0abdbd3" SourceId="1" SourceUrl="http://localhost:17532/Services/UploaderWebService.svc?wsdl=wsdl0" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

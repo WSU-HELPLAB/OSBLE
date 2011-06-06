@@ -98,6 +98,11 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service References\OsbleServices\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="UploaderPage.xaml.cs">
       <DependentUpon>UploaderPage.xaml</DependentUpon>
     </Compile>
@@ -139,10 +144,40 @@
     <Content Include="Images\folder_up.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Service References\OsbleServices\FileUploader.OsbleServices.DirectoryListing.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OsbleServices\FileUploader.OsbleServices.FileListing.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OsbleServices\FileUploader.OsbleServices.ParentDirectoryListing.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OsbleServices\UploaderWebService.disco" />
+    <None Include="Service References\OsbleServices\configuration91.svcinfo" />
+    <None Include="Service References\OsbleServices\configuration.svcinfo" />
+    <None Include="Service References\OsbleServices\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
     <Content Include="ServiceReferences.ClientConfig" />
+    <None Include="Service References\OsbleServices\UploaderWebService.wsdl" />
+    <None Include="Service References\OsbleServices\UploaderWebService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleServices\UploaderWebService1.wsdl" />
+    <None Include="Service References\OsbleServices\UploaderWebService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleServices\UploaderWebService2.xsd">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\OsbleServices\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
