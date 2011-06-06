@@ -132,5 +132,13 @@ namespace OSBLE.Services
             }
             return true;
         }
+
+        [OperationContract]
+        public void createDir(string folderName)
+        {
+            // might need to check if the directory already exists
+            string file = Path.Combine(filePath, folderName);
+            Directory.CreateDirectory(file);
+        }
     }
 }
