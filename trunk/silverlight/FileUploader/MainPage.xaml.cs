@@ -19,9 +19,13 @@ namespace FileUploader
 {
     public partial class MainPage : UserControl
     {
+        private LoginWindow login = new LoginWindow();
         public MainPage()
         {
             InitializeComponent();
+            
+            //event handlers
+            login.ValidTokenReceived += new EventHandler(ValidTokenReceived);
 
             if (Application.Current.InstallState == InstallState.NotInstalled)
             {
@@ -37,15 +41,21 @@ namespace FileUploader
 
             if (Application.Current.IsRunningOutOfBrowser)
             {
-                LoginWindow login = new LoginWindow();
                 login.Show();
-
-                // go to UploaderPage
-                this.Content = new UploaderPage();
             }
 
         }
 
+
+        /// <summary>
+        /// Called once we receive a valid login token
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ValidTokenReceived(object sender, EventArgs e)
+        {
+            this.Content = new UploaderPage(login.Token);
+        }
 
         private void InstallBtn_Click(object sender, RoutedEventArgs e)
         {
