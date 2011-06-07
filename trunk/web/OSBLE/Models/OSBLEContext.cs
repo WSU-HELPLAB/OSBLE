@@ -125,7 +125,7 @@ namespace OSBLE.Models
                 .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Rubric>()
-                .HasMany(r=>r.Criteria)
+                .HasMany(r=>r.Levels)
                 .WithRequired(l=>l.Rubric)
                 .WillCascadeOnDelete(false);
                 
