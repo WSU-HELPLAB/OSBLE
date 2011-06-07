@@ -2,6 +2,7 @@
 <xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:import schemaLocation="http://localhost:17532/Services/UploaderWebService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Uploader" />
   <xs:import schemaLocation="http://localhost:17532/Services/UploaderWebService.svc?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:import schemaLocation="http://localhost:17532/Services/UploaderWebService.svc?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/System.Collections.Generic" />
   <xs:element name="GetFakeFileListing">
     <xs:complexType>
       <xs:sequence />
@@ -87,6 +88,8 @@
         <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="data" nillable="true" type="xs:base64Binary" />
         <xs:element minOccurs="0" name="count" type="xs:int" />
+        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/System.Collections.Generic" minOccurs="0" name="course" type="q6:KeyValuePairOfintstring" />
+        <xs:element minOccurs="0" name="authToken" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -100,7 +103,9 @@
   <xs:element name="PrepCurrentPath">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Uploader" minOccurs="0" name="dirList" nillable="true" type="q6:DirectoryListing" />
+        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Uploader" minOccurs="0" name="dirList" nillable="true" type="q7:DirectoryListing" />
+        <xs:element xmlns:q8="http://schemas.datacontract.org/2004/07/System.Collections.Generic" minOccurs="0" name="course" type="q8:KeyValuePairOfintstring" />
+        <xs:element minOccurs="0" name="authToken" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

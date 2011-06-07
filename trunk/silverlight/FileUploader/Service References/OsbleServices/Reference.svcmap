@@ -25,6 +25,7 @@
   <Metadata>
     <MetadataFile FileName="UploaderWebService.xsd" MetadataType="Schema" ID="f12c86ea-3263-48cf-9e33-9b0b3c6ae3ca" SourceId="1" SourceUrl="http://localhost:17532/Services/UploaderWebService.svc?xsd=xsd2" />
     <MetadataFile FileName="UploaderWebService.wsdl" MetadataType="Wsdl" ID="ff683ca7-d2be-4109-a304-f7b097bab85e" SourceId="1" SourceUrl="http://localhost:17532/Services/UploaderWebService.svc?wsdl" />
+    <MetadataFile FileName="UploaderWebService4.xsd" MetadataType="Schema" ID="a22eea55-7ec4-4fc3-b06a-d1f8ba595cb1" SourceId="1" SourceUrl="http://localhost:17532/Services/UploaderWebService.svc?xsd=xsd4" />
     <MetadataFile FileName="UploaderWebService1.xsd" MetadataType="Schema" ID="3c0e927a-73d8-49de-999b-632bf75638aa" SourceId="1" SourceUrl="http://localhost:17532/Services/UploaderWebService.svc?xsd=xsd1" />
     <MetadataFile FileName="UploaderWebService2.xsd" MetadataType="Schema" ID="9570d4de-19f8-4e58-9c1a-1b1cc5dffc1f" SourceId="1" SourceUrl="http://localhost:17532/Services/UploaderWebService.svc?xsd=xsd0" />
     <MetadataFile FileName="UploaderWebService.disco" MetadataType="Disco" ID="864bca6d-a3a0-488c-9514-7b3d394d273d" SourceId="1" SourceUrl="http://localhost:17532/Services/UploaderWebService.svc?disco" />
