@@ -76,13 +76,17 @@
       <wsdl:input wsaw:Action="urn:UploaderWebService/GetFileUrl" message="UploaderWebService_GetFileUrl_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/GetFileUrlResponse" message="UploaderWebService_GetFileUrl_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="GetValidUploadLocations">
+      <wsdl:input wsaw:Action="urn:UploaderWebService/GetValidUploadLocations" message="UploaderWebService_GetValidUploadLocations_InputMessage" />
+      <wsdl:output wsaw:Action="urn:UploaderWebService/GetValidUploadLocationsResponse" message="UploaderWebService_GetValidUploadLocations_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="SyncFile">
       <wsdl:input wsaw:Action="urn:UploaderWebService/SyncFile" message="UploaderWebService_SyncFile_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/SyncFileResponse" message="UploaderWebService_SyncFile_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="ValidateUser">
-      <wsdl:input wsaw:Action="urn:UploaderWebService/ValidateUser" message="UploaderWebService_ValidateUser_InputMessage" />
-      <wsdl:output wsaw:Action="urn:UploaderWebService/ValidateUserResponse" message="UploaderWebService_ValidateUser_OutputMessage" />
+    <wsdl:operation name="PrepCurrentPath">
+      <wsdl:input wsaw:Action="urn:UploaderWebService/PrepCurrentPath" message="UploaderWebService_PrepCurrentPath_InputMessage" />
+      <wsdl:output wsaw:Action="urn:UploaderWebService/PrepCurrentPathResponse" message="UploaderWebService_PrepCurrentPath_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
 </wsdl:definitions>
