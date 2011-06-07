@@ -76,6 +76,15 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="ValidateUser">
+      <soap:operation soapAction="urn:UploaderWebService/ValidateUser" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="UploaderWebService">
     <wsdl:port name="BasicHttpBinding_UploaderWebService" binding="tns:BasicHttpBinding_UploaderWebService">

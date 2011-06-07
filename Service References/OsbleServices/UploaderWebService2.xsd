@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:import schemaLocation="http://localhost:17532/Services/UploaderWebService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Uploader" />
+  <xs:import schemaLocation="http://localhost:17532/Services/UploaderWebService.svc?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
   <xs:element name="GetFakeFileListing">
     <xs:complexType>
       <xs:sequence />
@@ -40,7 +41,8 @@
   <xs:element name="GetFileList">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="relativepath" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="courseId" type="xs:int" />
+        <xs:element minOccurs="0" name="authKey" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -65,18 +67,17 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="ValidateUser">
+  <xs:element name="GetValidUploadLocations">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="userName" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="password" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="authKey" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="ValidateUserResponse">
+  <xs:element name="GetValidUploadLocationsResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="ValidateUserResult" nillable="true" type="xs:string" />
+        <xs:element xmlns:q5="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="GetValidUploadLocationsResult" nillable="true" type="q5:ArrayOfKeyValueOfintstring" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -98,7 +99,7 @@
   <xs:element name="PrepCurrentPath">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Uploader" minOccurs="0" name="fileList" nillable="true" type="q5:DirectoryListing" />
+        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Uploader" minOccurs="0" name="fileList" nillable="true" type="q6:DirectoryListing" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -106,6 +107,21 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="PrepCurrentPathResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ValidateUser">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="userName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="password" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ValidateUserResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ValidateUserResult" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
