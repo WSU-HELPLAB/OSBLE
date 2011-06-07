@@ -96,17 +96,16 @@ namespace OSBLE
         /// </summary>
         /// <param name="relativepath"></param>
         /// <returns></returns>
-        private static DirectoryListing BuildFileList(string relativepath, bool includeParentLink = true)
+        private static DirectoryListing BuildFileList(string path, bool includeParentLink = true)
         {
 
             //build a new listing, set some initial values
             DirectoryListing listing = new DirectoryListing();
-            string currentpath = Path.Combine(FileSystem.RootPath, relativepath);
-            listing.Name = relativepath;
-            listing.LastModified = File.GetLastWriteTime(currentpath);
+            listing.Name = path.Substring(path.LastIndexOf('\\') + 1);
+            listing.LastModified = File.GetLastWriteTime(path);
 
             //handle files
-            foreach (string file in Directory.GetFiles(currentpath))
+            foreach (string file in Directory.GetFiles(path))
             {
                 FileListing fList = new FileListing();
                 fList.Name = Path.GetFileName(file);
@@ -121,11 +120,11 @@ namespace OSBLE
             }
 
             //handle other directories
-            foreach (string folder in Directory.EnumerateDirectories(currentpath))
+            foreach (string folder in Directory.EnumerateDirectories(path))
             {
                 //recursively build the directory's subcontents.  Note that we have
                 //to pass only the folder's name and not the complete path
-                listing.Directories.Add(BuildFileList(folder.Substring(folder.LastIndexOf('\\') + 1)));
+                listing.Directories.Add(BuildFileList(folder, includeParentLink));
             }
 
             //return the completed listing

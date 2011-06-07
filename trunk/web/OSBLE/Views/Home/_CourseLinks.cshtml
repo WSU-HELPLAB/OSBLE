@@ -12,29 +12,32 @@
 		    });
 			
 		</script>
-		<ul id="collapser">
-		  <li>Item 1
-		    <ul>
-		      <li><a href="jQuery/asdf.Pdf/asdf">jQuery</a></li>
-		      <li>Item 1.2
-			 	<ul>
-			 		<li><a href="https://www.google.COM">Google</a></li>
-					<li><a href="http://stackoverflow.com/questions/4090014/parsing-a-string-with-jquery-or-javascript.pdf/asdf.html/asdf.swf">Apples are good</a></li>
-			 	</ul> 	
-			  </li>
-		      <li>Item 1.3</li>
-		    </ul>
-		  </li>
-		  <li>Item 2
-		    <ul>
-		      <li>Item 2.1
-		        <ul>
-		          <li><a href="something.doc">something.doc</a></li>
-		          <li>Item 2.2.2</li>
-		        </ul>
-		      </li>
-		    </ul>
-		  </li>
-		  <li>Item 3</li>
-		</ul>
-		
+<ul id="collapser">
+        @{
+            DirectoryListing root = ViewBag.CourseLinks as DirectoryListing;
+       }
+       @BuildDirectoryListing(root, true)
+</ul>
+
+@helper BuildDirectoryListing(DirectoryListing listing, bool isFirstRun = false)
+{
+    if(!isFirstRun)
+    {
+    @:<li>@listing.Name
+        @:<ul>
+    }
+        foreach(DirectoryListing subListing in listing.Directories)
+        {
+            @BuildDirectoryListing(subListing)
+        }
+        foreach(FileListing file in listing.Files)
+        {
+            <li>@file.Name</li>
+        }
+    if(!isFirstRun)
+    {
+        @:</ul>
+    @:</li>
+    }
+    
+}

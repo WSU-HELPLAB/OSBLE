@@ -93,7 +93,7 @@ namespace OSBLE.Controllers
 
             #region Course Links
             DirectoryListing listing = FileSystem.GetCourseDocumentsFileList(activeCourse.Course, false);
-            ViewBag.Links = listing;
+            ViewBag.CourseLinks = listing;
             #endregion
 
 
