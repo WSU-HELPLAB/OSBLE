@@ -106,8 +106,8 @@ namespace OSBLE.Controllers
             SilverlightObject TestControl = new SilverlightObject {
                 CSSId = "studio_timeline",
                 XapName = "StudioTimelineCreation",
-                Width = "90%",
-                Height = "90%"
+                Width = "820",
+                Height = "430"
             };
 
             return View(TestControl);

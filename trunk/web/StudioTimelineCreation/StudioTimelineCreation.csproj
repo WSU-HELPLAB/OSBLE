@@ -21,7 +21,7 @@
     <GenerateSilverlightManifest>true</GenerateSilverlightManifest>
     <XapFilename>StudioTimelineCreation.xap</XapFilename>
     <SilverlightManifestTemplate>Properties\AppManifest.xml</SilverlightManifestTemplate>
-    <SilverlightAppEntry>StudioTimelineCreation.App</SilverlightAppEntry>
+    <SilverlightAppEntry>CreateNewAssignment.App</SilverlightAppEntry>
     <TestPageFileName>StudioTimelineCreationTestPage.html</TestPageFileName>
     <CreateTestPage>true</CreateTestPage>
     <ValidateXaml>true</ValidateXaml>

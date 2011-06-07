@@ -8,7 +8,7 @@
     x:Class="CreateNewAssignment.AssignmentActivitiesCreaterView"
     >
 
-    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+
         <Canvas x:Name="MouseLayer">
             <!--Main Grid-->
             <Grid x:Name="LayoutRoot" Background="White" MinWidth="800">
@@ -68,5 +68,4 @@
             </Grid>
         </Canvas>
 
-    </ScrollViewer>
 </UserControl>
