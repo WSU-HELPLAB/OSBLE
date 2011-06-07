@@ -16,12 +16,21 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="AbstractListing" nillable="true" type="tns:AbstractListing" />
+  <xs:complexType name="ParentDirectoryListing">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:DirectoryListing">
+        <xs:sequence />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="ParentDirectoryListing" nillable="true" type="tns:ParentDirectoryListing" />
   <xs:complexType name="DirectoryListing">
     <xs:complexContent mixed="false">
       <xs:extension base="tns:AbstractListing">
         <xs:sequence>
           <xs:element minOccurs="0" name="Directories" nillable="true" type="tns:ArrayOfDirectoryListing" />
           <xs:element minOccurs="0" name="Files" nillable="true" type="tns:ArrayOfFileListing" />
+          <xs:element minOccurs="0" name="ParentDirectory" nillable="true" type="tns:DirectoryListing" />
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -39,12 +48,4 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ArrayOfFileListing" nillable="true" type="tns:ArrayOfFileListing" />
-  <xs:complexType name="ParentDirectoryListing">
-    <xs:complexContent mixed="false">
-      <xs:extension base="tns:DirectoryListing">
-        <xs:sequence />
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element name="ParentDirectoryListing" nillable="true" type="tns:ParentDirectoryListing" />
 </xs:schema>

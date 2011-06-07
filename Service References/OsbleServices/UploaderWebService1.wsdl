@@ -5,6 +5,7 @@
       <xsd:import schemaLocation="http://localhost:17532/Services/UploaderWebService.svc?xsd=xsd0" />
       <xsd:import schemaLocation="http://localhost:17532/Services/UploaderWebService.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
       <xsd:import schemaLocation="http://localhost:17532/Services/UploaderWebService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Uploader" />
+      <xsd:import schemaLocation="http://localhost:17532/Services/UploaderWebService.svc?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
     </xsd:schema>
   </wsdl:types>
   <wsdl:message name="UploaderWebService_GetFakeFileListing_InputMessage">
@@ -37,11 +38,11 @@
   <wsdl:message name="UploaderWebService_GetFileUrl_OutputMessage">
     <wsdl:part name="parameters" element="GetFileUrlResponse" />
   </wsdl:message>
-  <wsdl:message name="UploaderWebService_ValidateUser_InputMessage">
-    <wsdl:part name="parameters" element="ValidateUser" />
+  <wsdl:message name="UploaderWebService_GetValidUploadLocations_InputMessage">
+    <wsdl:part name="parameters" element="GetValidUploadLocations" />
   </wsdl:message>
-  <wsdl:message name="UploaderWebService_ValidateUser_OutputMessage">
-    <wsdl:part name="parameters" element="ValidateUserResponse" />
+  <wsdl:message name="UploaderWebService_GetValidUploadLocations_OutputMessage">
+    <wsdl:part name="parameters" element="GetValidUploadLocationsResponse" />
   </wsdl:message>
   <wsdl:message name="UploaderWebService_SyncFile_InputMessage">
     <wsdl:part name="parameters" element="SyncFile" />
@@ -54,6 +55,12 @@
   </wsdl:message>
   <wsdl:message name="UploaderWebService_PrepCurrentPath_OutputMessage">
     <wsdl:part name="parameters" element="PrepCurrentPathResponse" />
+  </wsdl:message>
+  <wsdl:message name="UploaderWebService_ValidateUser_InputMessage">
+    <wsdl:part name="parameters" element="ValidateUser" />
+  </wsdl:message>
+  <wsdl:message name="UploaderWebService_ValidateUser_OutputMessage">
+    <wsdl:part name="parameters" element="ValidateUserResponse" />
   </wsdl:message>
   <wsdl:portType name="UploaderWebService">
     <wsdl:operation name="GetFakeFileListing">
@@ -87,6 +94,10 @@
     <wsdl:operation name="PrepCurrentPath">
       <wsdl:input wsaw:Action="urn:UploaderWebService/PrepCurrentPath" message="UploaderWebService_PrepCurrentPath_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/PrepCurrentPathResponse" message="UploaderWebService_PrepCurrentPath_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ValidateUser">
+      <wsdl:input wsaw:Action="urn:UploaderWebService/ValidateUser" message="UploaderWebService_ValidateUser_InputMessage" />
+      <wsdl:output wsaw:Action="urn:UploaderWebService/ValidateUserResponse" message="UploaderWebService_ValidateUser_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
 </wsdl:definitions>
