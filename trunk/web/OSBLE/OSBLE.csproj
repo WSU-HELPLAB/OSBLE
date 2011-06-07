@@ -19,8 +19,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <UseIISExpress>false</UseIISExpress>
-    <SilverlightApplicationList>
-    </SilverlightApplicationList>
+    <SilverlightApplicationList>{AB420045-1365-43D9-A243-EB735E776BEC}|..\TeamCreation\TeamCreation.csproj|ClientBin|False</SilverlightApplicationList>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -169,6 +168,7 @@
     <Content Include="App_Data\LastNames.txt" />
     <Content Include="ClientBin\FileUploader.xap" />
     <Content Include="ClientBin\SilverlightApplication3.xap" />
+    <Content Include="ClientBin\TeamCreation.xap" />
     <Content Include="Content\favicon.ico" />
     <Content Include="Content\images\account.png" />
     <Content Include="Content\images\add_up.png" />
@@ -512,7 +512,6 @@
     <Content Include="Views\Mail\NotFound.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\SilverlightObject.cshtml" />
     <Content Include="Views\Home\SilverlightTest.cshtml" />
-    <Content Include="Views\BasicAssignment\TeamCreation.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

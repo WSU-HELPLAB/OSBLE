@@ -1,5 +1,6 @@
 ﻿@model OSBLE.Models.ViewModels.BasicAssignmentViewModel
 @using OSBLE.Models.Assignments.Activities
+@using OSBLE.Models
 @{
     ViewBag.Title = "Create Basic Assignment";
 }
@@ -78,6 +79,15 @@
             $("input[name='team_or_people']:eq(1)").attr('checked', 'checked');
         });
 
+        //Create the Silverlight dialog box
+        $('#team_generation_dialog').dialog({
+            modal: true,
+            autoOpen: false,
+            resizable: false,
+            width: "60%",
+            height: "60%"
+        });
+
         //set up default radio buttons
 
         //Uncheck everything that is checked
@@ -134,6 +144,11 @@
     function updateSubmissionName() {
         $('#SubmissionName').val($('#StudioAssignment_Name').val() + ' Submission');
     }
+
+    function OpenSL() {
+        $('#team_generation_dialog').dialog('open'); return false;
+    }
+
 
 </script>
 @{
@@ -194,8 +209,8 @@
                 <li>Select box goes here. </li>
                 <br />
                 <li>
-                    <button type="button">
-                        Generate Teams</button>
+                    <button type="button" onclick="OpenSL()">
+                        Generate Teams </button>
                 </li>
             </ul>
             <input type="radio" name="team_generation_options" value="RandomTeams" />
@@ -216,7 +231,7 @@
                 </li>
                 <br />
                 <li>
-                    <button type="button">
+                    <button type="button" onclick="OpenSL()">
                         Generate Teams</button>
                 </li>
             </ul>
@@ -224,7 +239,7 @@
             Specify teams manually
             <ul id="ManualTeams" style="display: none" class="team_generation_options">
                 <li>
-                    <button type="button">
+                    <button type="button" onclick="OpenSL()">
                         Create Teams
                     </button>
                 </li>
@@ -342,6 +357,10 @@
         @Html.ActionLink("Back to List", "Index")
     </div>
 }
+    <div id="team_generation_dialog" title="Edit Teams">
+        @Html.Partial("DisplayTemplates/SilverlightObject", ViewBag.SLObject as SilverlightObject)
+    </div>
+
 @functions
 {
     public string convertToMonthDayYearFormat(DateTime date)

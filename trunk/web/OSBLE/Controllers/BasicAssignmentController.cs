@@ -5,12 +5,11 @@ using System.Linq;
 using System.Reflection;
 using System.Web.Mvc;
 using OSBLE.Attributes;
-using OSBLE.Models.ViewModels;
-using OSBLE.Models.Courses;
-using OSBLE.Models.Assignments.Activities;
-using System.Data.Entity.Validation;
+using OSBLE.Models;
 using OSBLE.Models.Assignments;
-
+using OSBLE.Models.Assignments.Activities;
+using OSBLE.Models.Courses;
+using OSBLE.Models.ViewModels;
 
 namespace OSBLE.Controllers
 {
@@ -27,7 +26,7 @@ namespace OSBLE.Controllers
 
         //
         // GET: /Assignment/
-        
+
         /*
         public ViewResult Index()
         {
@@ -43,10 +42,8 @@ namespace OSBLE.Controllers
         /*
         public ViewResult Details(int id)
         {
-            
             SubmissionActivity assignment = db.AbstractGradables.Find(id) as SubmissionActivity;
             return View(assignment);
-            
         }
         */
         //
@@ -65,6 +62,14 @@ namespace OSBLE.Controllers
             basic.Submission.HoursLateUntilZero = active.HoursLateUntilZero;
             basic.Submission.PercentPenalty = active.PercentPenalty;
             basic.Submission.MinutesLateWithNoPenalty = active.MinutesLateWithNoPenalty;
+
+            ViewBag.SLObject = new SilverlightObject
+            {
+                CSSId = "team_creation_silverlight_control",
+                XapName = "TeamCreation",
+                Width = "60%",
+                Height = "60%"
+            };
 
             ViewBag.Categories = new SelectList(db.Categories, "ID", "Name");
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
@@ -201,7 +206,6 @@ namespace OSBLE.Controllers
                 db.Entry(stop).State = EntityState.Modified;
 
                 db.SaveChanges();
-
             }
 
             ViewBag.Categories = new SelectList(db.Categories, "ID", "Name", basic.Assignment.CategoryID);
@@ -209,7 +213,6 @@ namespace OSBLE.Controllers
 
             return View(basic);
         }
-
 
         //
         // GET: /Assignment/Delete/5

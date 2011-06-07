@@ -3,15 +3,20 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLE", "OSBLE\OSBLE.csproj", "{7297687F-BF8A-4195-8EA3-A05DA302B24E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamCreation", "TeamCreation\TeamCreation.csproj", "{AB420045-1365-43D9-A243-EB735E776BEC}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 2
+		SccNumberOfProjects = 3
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = OSBLE\\OSBLE.csproj
 		SccProjectName1 = OSBLE
 		SccLocalPath1 = OSBLE
+		SccProjectUniqueName2 = TeamCreation\\TeamCreation.csproj
+		SccProjectName2 = TeamCreation
+		SccLocalPath2 = TeamCreation
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,6 +27,10 @@ Global
 		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB420045-1365-43D9-A243-EB735E776BEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB420045-1365-43D9-A243-EB735E776BEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB420045-1365-43D9-A243-EB735E776BEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB420045-1365-43D9-A243-EB735E776BEC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
