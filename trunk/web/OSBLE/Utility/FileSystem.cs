@@ -66,6 +66,18 @@ namespace OSBLE
             }
         }
 
+        public static string GetCourseDocumentsPath(Course course)
+        {
+            string location = string.Format("{0}\\CourseDocs", getCoursePath(course));
+
+            //make sure that the directory exists
+            if (!Directory.Exists(location))
+            {
+                Directory.CreateDirectory(location);
+            }
+            return location;
+        }
+
         public static FileStream GetDefaultProfilePicture()
         {
             return new FileStream(HttpContext.Current.Server.MapPath("\\Content\\images\\default.jpg"), FileMode.Open, FileAccess.Read);

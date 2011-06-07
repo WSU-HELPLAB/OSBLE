@@ -14,6 +14,7 @@ using OSBLE;
 using OSBLE.Models;
 using OSBLE.Models.Services.Uploader;
 using OSBLE.Models.Users;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Services
 {
@@ -36,7 +37,7 @@ namespace OSBLE.Services
         }
 
         /// <summary>
-        /// Call this at the end of every request to remove expired sessions.  This
+        /// Call this to remove expired sessions.  This
         /// function will extend the keep alive timer on the supplied key.
         /// </summary>
         /// <param name="authKey">The key to extend.</param>
@@ -114,8 +115,7 @@ namespace OSBLE.Services
         /// </summary>
         /// <param name="relativepath"></param>
         /// <returns></returns>
-        [OperationContract]
-        public DirectoryListing GetFileList(string relativepath) //IEnumerable<AbstractListing> GetFileList(string relativepath)
+        private DirectoryListing BuildFileList(string relativepath)
         {
 
             //build a new listing, set some initial values
@@ -141,11 +141,37 @@ namespace OSBLE.Services
             {
                 //recursively build the directory's subcontents.  Note that we have
                 //to pass only the folder's name and not the complete path
-                listing.Directories.Add(GetFileList(folder.Substring(folder.LastIndexOf('\\') + 1)));
+                listing.Directories.Add(BuildFileList(folder.Substring(folder.LastIndexOf('\\') + 1)));
             }
 
             //return the completed listing
             return listing;
+        }
+
+        [OperationContract]
+        public DirectoryListing GetFileList(int courseId, string authKey)
+        {
+            //only continue if we have a valid authentication key
+            if (!IsValidKey(authKey))
+            { 
+                return new DirectoryListing();
+            }
+
+            //pull the current user for easier access
+            UserProfile currentUser = activeSessions[authKey].UserProfile;
+
+            //find the current course
+            CoursesUsers cu = (from c in db.CoursesUsers
+                               where c.CourseID == courseId && c.UserProfileID == currentUser.ID
+                               select c).FirstOrDefault();
+            if (cu != null)
+            {
+                if (cu.CourseRole.CanModify)
+                {
+                    return BuildFileList(FileSystem.GetCourseDocumentsPath(cu.Course as Course));
+                }
+            }
+            return new DirectoryListing();
         }
 
         [OperationContract]
@@ -156,15 +182,47 @@ namespace OSBLE.Services
             return file;
         }
 
+        /// <summary>
+        /// Returns a list locations that the current user can upload to.
+        /// </summary>
+        /// <param name="authKey"></param>
+        /// <returns></returns>
         [OperationContract]
-        public void GetValidUploadLocations(string authKey)
+        public Dictionary<int, string> GetValidUploadLocations(string authKey)
         {
+
             //only continue if we have a valid authentication key
             if (!IsValidKey(authKey))
             {
-                return;
+                return new Dictionary<int,string>();
             }
 
+            //stores the list of possible upload locations
+            Dictionary<int, string> uploadLocations = new Dictionary<int, string>();
+
+            //pull the current user for easier access
+            UserProfile currentUser = activeSessions[authKey].UserProfile;
+
+            //find all courses that the users is associated with
+            List<CoursesUsers> courses = (from course in db.Courses
+                                          join cu in db.CoursesUsers on course.ID equals cu.CourseID
+                                          where
+                                            course is Course
+                                            &&
+                                            course.Inactive == false
+                                            &&
+                                            cu.Hidden == false
+                                            &&
+                                            cu.UserProfileID == currentUser.ID
+                                          select cu).ToList();
+            foreach (CoursesUsers cu in courses)
+            {
+                if (cu.CourseRole.CanModify)
+                {
+                    uploadLocations.Add(cu.CourseID, String.Format("\"{0}\" Links", cu.Course.Name));
+                }
+            }
+            return uploadLocations;
         }
 
         /// <summary>
@@ -218,6 +276,12 @@ namespace OSBLE.Services
             return true;
         }
 
+        /// <summary>
+        /// Validates the supplied user/pass combination.  
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="password"></param>
+        /// <returns>A unique key needed to make most web service calls.</returns>
         [OperationContract]
         public string ValidateUser(string userName, string password)
         {
