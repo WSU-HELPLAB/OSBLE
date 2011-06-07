@@ -46,6 +46,12 @@ namespace FileUploader
         //reference to our web service
         UploaderWebServiceClient syncedFiles = new UploaderWebServiceClient();
 
+        // Modal upload progress window
+        UploadingModal uploading = new UploadingModal();
+
+        // Creating course key for upload location combo box
+        KeyValuePair<int, string> course;
+
         public UploaderPage(string authenticationToken)
         {
 
@@ -73,18 +79,12 @@ namespace FileUploader
             
             //get the local files
             LocalFileList.DataContext = BuildLocalDirectoryListing(LocalPath);
-
-            //syncedFiles.GetFileListCompleted += syncedFiles_GetFileListCompleted;
-            //syncedFiles.SyncFileCompleted += syncedFiles_SyncCompleted;
-
-            // Populate the ListBox with the contents of the directory path
-            //dirList(localpath);
         }
 
         void UploadLocation_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             //very hack-ish at the moment, may need to revise
-            KeyValuePair<int, string> course = (KeyValuePair<int, string>)UploadLocation.SelectedValue;
+            course = (KeyValuePair<int, string>)UploadLocation.SelectedValue;
             syncedFiles.GetFileListAsync(course.Key, authToken);
         }
 
@@ -159,43 +159,45 @@ namespace FileUploader
         }
 
 
-
-
-
-
         void SyncButton_Click(object sender, RoutedEventArgs e)
         {
-            UploadingModal uploading = new UploadingModal();
             uploading.Show();
 
-            if(LocalFileList.DataContext.Directories.Count > 0)
-                syncedFiles.PrepCurrentPathAsync(this.LocalFileList.DataContext);
+            SyncCurrentDirectories(this.LocalFileList.DataContext, course);
+            SyncCurrentFile(this.LocalFileList.DataContext, 0, course);
+        }
 
-            string path; 
-            for (int i = 0; i < this.LocalFileList.DataContext.Files.Count; ++i )
+        void SyncCurrentDirectories(DirectoryListing level, KeyValuePair<int, string> course)
+        {
+            if (level.Directories.Count > 0)
             {
-                path = Path.Combine(LocalPath, this.LocalFileList.DataContext.Files[i].Name);
-                MemoryStream s = new MemoryStream();
-                StreamWriter writer = new StreamWriter(s);
-                writer.Write(path);
-                writer.Flush();
+                syncedFiles.PrepCurrentPathAsync(level);
+            }
+        }
 
-                uploading.UploadingFile.Text = path;
+        void SyncCurrentFile(DirectoryListing level, int fileindex, KeyValuePair<int, string> course)
+        {
+            string newFilePath;
+            newFilePath = Path.Combine(LocalPath, level.Files[fileindex].Name);
+            // updating the textblock with current file uploading
+            uploading.UploadingFile.Text = newFilePath;
 
-                using (Stream stream = s)
-                {
-                    byte[] data = new byte[stream.Length];
-                    stream.Read(data, 0, (int)stream.Length);
+            //update progres bar (ie add a tick)
 
-                    syncedFiles.SyncFileAsync(path, data);
-                }
+            MemoryStream s = new MemoryStream();
+            StreamWriter writer = new StreamWriter(s);
+            writer.Write(newFilePath);
+            writer.Flush();
+
+            using (Stream stream = s)
+            {
+                byte[] data = new byte[stream.Length];
+                stream.Read(data, 0, (int)stream.Length);
+
+                syncedFiles.SyncFileAsync(newFilePath, data, fileindex);
             }
         }
         
-
-
-
-
         public DirectoryListing BuildLocalDirectoryListing(string path)
         {
             DirectoryListing listing = new DirectoryListing();
@@ -267,11 +269,9 @@ namespace FileUploader
         void syncedFiles_SyncFileCompleted(object sender, SyncFileCompletedEventArgs e)
         {
             //start the next file
-            //update progres bar (ie add a tick)
-            //update currently uploading
+
+            SyncCurrentFile(this.LocalFileList.DataContext, e.Result, course);
         }
-
-
 
         /*
 
