@@ -347,25 +347,25 @@ namespace OSBLE.Controllers
                                              orderby up.LastName, up.FirstName
                                              select up).ToList();
 
-            var mainScores =   from score in db.Scores
-                        join category in db.Categories on score.AssignmentActivity.AbstractAssignment.CategoryID equals category.ID
-                        where score.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId &&
-                        score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
-                        group score by score.AssignmentActivity.AbstractAssignment.CategoryID into assignmentScores
-                        select new
-                        {
-                            AssignmentId = assignmentScores.Key,
-                            StudentScores =
-                                            from stu in assignmentScores
-                                            group stu by stu.UserProfileID into students
-                                            select new
-                                            {
-                                                StudentId = students.Key,
-                                                Score = students.Sum(stu => stu.Points),
-                                                perfectScore = students.Sum(stu => stu.AssignmentActivity.AbstractAssignment.PointsPossible),
-                                                category = students.Select(stu => stu.AssignmentActivity.AbstractAssignment.Category)
-                                            }
-                        };
+            var mainScores =    from score in db.Scores
+                                join category in db.Categories on score.AssignmentActivity.AbstractAssignment.CategoryID equals category.ID
+                                where score.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId &&
+                                score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
+                                group score by score.AssignmentActivity.AbstractAssignment.CategoryID into assignmentScores
+                                select new
+                                {
+                                    AssignmentId = assignmentScores.Key,
+                                    StudentScores =
+                                                    from stu in assignmentScores
+                                                    group stu by stu.UserProfileID into students
+                                                    select new
+                                                    {
+                                                        StudentId = students.Key,
+                                                        Score = students.Sum(stu => stu.Points),
+                                                        perfectScore = students.Sum(stu => stu.AssignmentActivity.AbstractAssignment.PointsPossible),
+                                                        category = students.Select(stu => stu.AssignmentActivity.AbstractAssignment.Category)
+                                                    }
+                                };
 
             foreach (var item in mainScores)
             {

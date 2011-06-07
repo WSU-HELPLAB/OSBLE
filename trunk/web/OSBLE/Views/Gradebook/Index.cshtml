@@ -132,7 +132,7 @@
 	    top: 30%;
 	    left: 40%;
 	    display: inline;
-        background-color: white;
+        background-color: #f5f5f5;
 	}
 	
 	.letterGradesTable
@@ -233,15 +233,21 @@
             <th>
                 Weights [+]
             </th>
+            <td></td>
+            @foreach (Category item in ViewBag.Categories)
+            {
+                <td></td>
+            }
+            <td>&nbsp</td>
         </tr>
-        <tr>
-            <td onclick="cellGainsFocus(this);">Weight1</td>
+        <tr id="weights">
+            <td id="catScheme" onclick="cellGainsFocus(this);">Weight1</td>
             <td id="categoryTotal">1</td>
             @foreach (Category item in ViewBag.Categories)
             {
-                <td id="@item.ID" onclick="cellGainsFocus(this)">@item.Points</td>
+                <td id="weight-@item.ID" onclick="cellGainsFocus(this)">@item.Points</td>
             }
-            <td>
+            <td id="grade">
                 &nbsp
             </td>
         </tr>
@@ -297,21 +303,16 @@
                 <td id="@student.ID" >@student.LastName, @student.FirstName</td>
                 <td id="total">0</td>
                 @{
-                    //foreach (Category category in ViewBag.Categories)
+                    
+                    List<Score> scoreQuery = (from g in ViewBag.Scores as IEnumerable<Score>
+                                                where g.UserProfileID == student.ID
+                                                select g).ToList();
+                    if (scoreQuery.Count() > 0)
                     {
-                        double total = 0;
-                        double gradableTotal = 0;
-
-                        List<Score> scoreQuery = (from g in ViewBag.Scores as IEnumerable<Score>
-                                                  where g.UserProfileID == student.ID
-                                                  select g).ToList();
-                        if (scoreQuery.Count() > 0)
+                        for (int i = 0; i < scoreQuery.Count(); i++)
                         {
-                            for (int i = 0; i < scoreQuery.Count(); i++)
-                            {
                                 
-                                <td id="categoryGrade">@scoreQuery[i].Points.ToString(".##")%</td>
-                            }
+                            <td id="categoryGrade">@scoreQuery[i].Points.ToString(".##")%</td>
                         }
                     }
                     <td id="grade">&nbsp</td>
@@ -390,6 +391,7 @@
     });
 
     $("#grades").keydown(function (e) {
+        //13 means entered was clicked
         if (e.keyCode == 13) {
             clearLastAssignmentFocus();
         }
@@ -397,6 +399,7 @@
 
     $("#letterGradesID td").keydown(function (e) {
         var cell = null;
+        //13 means entered was clicked
         if (e.keyCode == 13) {
 
             var row = $(this).parent("tr").next("tr");
@@ -429,7 +432,7 @@
         //a normal table cell
         if (lastFocusedCell != null) {
 
-            var catId = lastFocusedCell.attr("id");
+            var catId = lastFocusedCell.attr("id").split("-");
             var cellValue = lastFocusedCell.children().val();
             lastFocusedCell.html("");
             lastFocusedCell.text(cellValue);
@@ -439,7 +442,7 @@
             $.ajax({
                 type: "POST",
                 url: "/Gradebook/ModifyCategoryPoints",
-                data: { value: cellValue, categoryId: catId }
+                data: { value: cellValue, categoryId: catId[1] }
             });
         }
     }
@@ -498,19 +501,48 @@
         var totalPerfect = 0;
         var totalAverage = 0;
         var total = 0;
+        var count = 0;
+        var counter = 0;
+        var a = [];
+
+        $("#grades #weights").each(function () {
+            $(this).find("td").each(function () {
+                var id = $(this).attr("id").split("-");
+                if (id[0] == "weight") {
+                    a.push(parseFloat($(this).text()));
+                    total += parseFloat($(this).text());
+                }
+            });
+            $(this).find("td").each(function () {
+                if ($(this).attr("id") == "categoryTotal") {
+                    $(this).text(total);
+                }
+                var id = $(this).attr("id").split("-");
+                if (id[0] == "weight") {
+                    a[count] = a[count] / total;
+                    count += 1;
+                }
+            });
+        });
+
 
         $("#grades #studentGrades").each(function () {
             total = 0;
             totalPerfect = 0;
+            counter = 0;
             $(this).find("td").each(function () {
                 if ($(this).attr("id") == "categoryGrade") {
-                    total += parseFloat($(this).text());
+                    var number = parseFloat($(this).text());
+                    total += number * a[counter];
                     totalPerfect += 1;
+                    counter += 1;
                 }
                 else {
                 }
+
             });
-            total = parseFloat((total / totalPerfect)).toFixed(2);
+            total = parseFloat((total)).toFixed(2);
+            alert(total);
             $(this).find("td").each(function () {
                 if ($(this).attr("id") == "total") {
                     $(this).text(total + "%");
@@ -529,9 +561,8 @@
 
         //Starting in the gradebook on the student grade rows
         //This bypasses the headers so we don't look through them
-        $("#grades #tr").each(function () {
+        $("#grades #studentGrades").each(function () {
             $(this).find("td:nth-child(" + colIndex + ")").each(function () {
-                if($(this).attr("id") == 
                 getSum(colIndex);
             });
             colIndex += 1;
@@ -542,17 +573,17 @@
         var colTotal = 0;
         var count = 0;
         $("#grades #studentGrades").children("td:nth-child(" + Index + ")").each(function () {
-            colTotal += parseFloat($(this).text());
+            colTotal += parseInt($(this).text());
             count += 1;
         });
 
         $("#grades tr").children("td:nth-child(" + Index + ")").each(function () {
             if ($(this).attr("id") == "averageTotal") {
-                colTotal = parseFloat(colTotal / count).toFixed(2);
+                colTotal = parseInt(colTotal / count).toFixed(2);
                 $(this).html(colTotal + "%");
             }
             if ($(this).attr("id") == "averageScore") {
-                colTotal = parseFloat(colTotal / count).toFixed(2);
+                colTotal = parseInt(colTotal / count).toFixed(2);
                 $(this).html(colTotal + "%");
             }
         });
