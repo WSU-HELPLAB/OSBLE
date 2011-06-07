@@ -432,16 +432,16 @@
     <Content Include="App_Code\Helpers.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\Account\Admin\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Admin\Details.cshtml" />
+    <Content Include="Views\Account\Admin\Details.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Admin\Edit.cshtml" />
+    <Content Include="Views\Account\Admin\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Admin\Delete.cshtml" />
+    <Content Include="Views\Account\Admin\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Roster\ImportRoster.cshtml" />
@@ -512,6 +512,7 @@
     <Content Include="Views\Mail\NotFound.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\SilverlightObject.cshtml" />
     <Content Include="Views\Home\SilverlightTest.cshtml" />
+    <Content Include="Views\BasicAssignment\TeamCreation.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

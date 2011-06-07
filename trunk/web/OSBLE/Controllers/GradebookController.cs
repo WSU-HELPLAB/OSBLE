@@ -87,7 +87,7 @@ namespace OSBLE.Controllers
                     db.SaveChanges();
                 }
             }
-        }
+        }*/
 
         /// <summary>
         /// Deletes a column (gradable) from the current table
@@ -95,13 +95,13 @@ namespace OSBLE.Controllers
         /// <param name="gradableId">The ID of the gradable to remove</param>
         /// <returns></returns>
         [HttpPost]
-        public void DeleteColumn(int gradableId)
+        public void DeleteColumn(int assignmentId)
         {
-            Gradable gradable = db.Gradables.Find(gradableId);
-            db.Gradables.Remove(gradable);
+            AbstractAssignment assignment = db.AbstractAssignments.Find(assignmentId);
+            db.AbstractAssignments.Remove(assignment);
             db.SaveChanges();
         }
-
+        /*
         /// <summary>
         /// Clears a gradable (column) from the current table.
         /// Changes all the numbers in the gradable to 0.
@@ -121,8 +121,8 @@ namespace OSBLE.Controllers
                 }
                 db.SaveChanges();
             }
-        }       
-        */
+        } */      
+        
         private ColumnAction StringToColumnAction(string action)
         {
             if (string.Compare(ColumnAction.InsertLeft.ToString(), action) == 0)
@@ -145,7 +145,7 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
-        public ActionResult ModifyCategoryPoints(int value, int categoryId)
+        public ActionResult ModifyCategoryPoints(double value, int categoryId)
         {
             if (ModelState.IsValid)
             {
@@ -190,6 +190,30 @@ namespace OSBLE.Controllers
                 }
             }
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public ActionResult ModifyAssignmentName(string value, int assignmentId)
+        {
+            if (ModelState.IsValid)
+            {
+                if (assignmentId != 0)
+                {
+                    var assignmentQuery = from a in db.AbstractAssignments
+                                          where a.ID == assignmentId
+                                          select a;
+
+                    if (assignmentQuery.Count() > 0)
+                    {
+                        foreach (AbstractAssignment item in assignmentQuery)
+                        {
+                            item.Name = value;
+                        }
+                        db.SaveChanges();
+                    }
+                }
+            }
+            return Json("success");
         }
 
         
@@ -240,7 +264,7 @@ namespace OSBLE.Controllers
             db.Categories.Add(newCategory);
             db.SaveChanges();
             BuildGradebook(newCategory.ID);
-            return View();
+            return View("_Tabs");
         }
         
 
@@ -283,24 +307,23 @@ namespace OSBLE.Controllers
 
             return View();
         }
-
         
 
         [HttpPost]
         public ActionResult ModifyColumn()
         {
             //convert POST params to variables
-            int gradableId = 0;
+            int assignmentId = 0;
             if (Request.Form["gradableId"] != null)
             {
-                gradableId = Convert.ToInt32(Request.Form["gradableId"]);
+                assignmentId = Convert.ToInt32(Request.Form["gradableId"]);
             }
             ColumnAction action = StringToColumnAction(Request.Form["actionRequested"]);
 
             //only continue if we received a valid gradable id
-            if (gradableId != 0)
+            if (assignmentId != 0)
             {
-                GradeAssignment assignments = (from g in db.GradeAssignments where g.ID == gradableId select g).First();
+                AbstractAssignment assignments = (from g in db.AbstractAssignments where g.ID == assignmentId select g).First();
                 switch (action)
                 {
                     case ColumnAction.InsertLeft:
@@ -310,9 +333,10 @@ namespace OSBLE.Controllers
                     case ColumnAction.InsertRight:
                         AddColumn("Untitled", 100, assignments.ColumnOrder + 1);
                         break;
-                    /*case ColumnAction.Delete:
-                        DeleteColumn(gradableId);
+                    case ColumnAction.Delete:
+                        DeleteColumn(assignmentId);
                         break;
+                    /*
                     case ColumnAction.Clear:
                         ClearColumn(gradableId);
                         break;*/
@@ -431,11 +455,11 @@ namespace OSBLE.Controllers
             int currentCourseId = ActiveCourse.CourseID;
 
             //pull all weights (tabs) for the current course
-            var categories = from category in db.Categories
+            var cats = from category in db.Categories
                              where category.CourseID == currentCourseId
                              select category;
 
-            List<Category> allCategories = categories.ToList();
+            List<Category> allCategories = cats.ToList();
 
             Category currentTab = (from c in allCategories where c.ID == categoryId select c).First();
 
@@ -489,7 +513,7 @@ namespace OSBLE.Controllers
                                   select score).ToList();
 
             //save everything that we need to the viewebag
-            ViewBag.Tabs = allCategories;
+            ViewBag.Categories = allCategories;
             ViewBag.Grades = scores;
             ViewBag.Assignments = assignments;
             ViewBag.GradeAssignments = gradeAssignments;

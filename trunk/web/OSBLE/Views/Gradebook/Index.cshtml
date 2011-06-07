@@ -161,18 +161,10 @@
 	
 	
 </style>
-<div id="tabHeader">
-    <h3>
-        Gradebook</h3>
-    <ul>
-        <li id="selected"><a href="/Gradebook/Index" onclick="switchTab(this)">Main</a></li>
-        @foreach (Category item in ViewBag.Categories)
-        {
-            <li><a href="/Gradebook/Tab/?categoryId=@item.ID" onclick="switchTab(this)">@item.Name</a></li>
-        }
-        <li><a href="#" onclick="newTab()">+</a></li>
-    </ul>
-</div>
+
+<h3>Gradebook</h3>
+
+@Html.Partial("_Tabs")
 
 <div class="letterGrades" id="letterGradesID" style="display: none; position: absolute;">
     <table class="letterGradesTable">
@@ -241,59 +233,55 @@
             <td>&nbsp</td>
         </tr>
         <tr id="weights">
+
             <td id="catScheme" onclick="cellGainsFocus(this);">Weight1</td>
-            <td id="categoryTotal">1</td>
+            <td id="grade"></td>
+            <td id="categoryTotal">&nbsp</td>
+            
             @foreach (Category item in ViewBag.Categories)
             {
                 <td id="weight-@item.ID" onclick="cellGainsFocus(this)">@item.Points</td>
             }
-            <td id="grade">
-                &nbsp
-            </td>
+
         </tr>
         <tr id="perfectScore">
-            <th id="th2">
-                Perfect Score
-            </th>
-            <td id="perfectTotal">
-                100%
-            </td>
+
+            <th id="th2">Perfect Score</th>
+            <td>A</td>
+            <td id="perfectTotal">100%</td>
+            
+
             @foreach (Category item in ViewBag.Categories)
             {
-                <td id="@item.ID" onclick="cellGainsFocus(this)">100%</td>   
+                <td id="@item.ID">100%</td>   
             }
-            <td>A</td>
+
         </tr>
         <tr>
             <th id="th3">
                 Averave Score
             </th>
-            <td id="averageTotal">
-                0
-            </td>
+            <td>&nbsp</td>
+            <td id="averageTotal">0</td>
+            
             @foreach (Category item in ViewBag.Categories)
             {
                 <td id="averageScore">
                     0
                 </td>  
             }
-            <td>
-                &nbsp
-            </td>
+            
         </tr>
         <tr>
-            <th id="th4">
-                Name
-            </th>
-            <th id="th5">
-                Total [Customize...]
-            </th>
+            <th id="th4">Name</th>
+            <th ondblclick="displayLetterGrades();">Grade</th>
+            <th id="th5">Total [Customize...]</th>
+            
             @foreach (Category item in ViewBag.Categories)
             {
                 <th id="@item.ID" onclick="changeAssignmentName(this);">@item.Name<div id="cntnr" class="thButton"><button class="dropdown" id="@item.ID" onclick="ShowHide(this);"></button></div></th>
             }
             
-            <th ondblclick="displayLetterGrades();">Grade</th>
 
         </tr>
         <!--loop through all users -->
@@ -301,7 +289,9 @@
         {        
             <tr id="studentGrades">
                 <td id="@student.ID" >@student.LastName, @student.FirstName</td>
+                <td id="grade">&nbsp</td>
                 <td id="total">0</td>
+                
                 @{
                     
                     List<Score> scoreQuery = (from g in ViewBag.Scores as IEnumerable<Score>
@@ -310,12 +300,10 @@
                     if (scoreQuery.Count() > 0)
                     {
                         for (int i = 0; i < scoreQuery.Count(); i++)
-                        {
-                                
+                        {    
                             <td id="categoryGrade">@scoreQuery[i].Points.ToString(".##")%</td>
                         }
                     }
-                    <td id="grade">&nbsp</td>
                 }
             </tr>
         }
@@ -362,9 +350,6 @@
             });
         </script>
     </div>
-    <input value="Calculate Rows" type="button" onclick="calculateRows()" />
-    <input value="Calculate Columns" type="button" onclick="calculateCols()" />
-    <input value="Calculate Total" type="button" onclick="calculateTotal()" />
 </div>
 
 
@@ -391,9 +376,43 @@
     });
 
     $("#grades").keydown(function (e) {
-        //13 means entered was clicked
+        
+        //This means enter was clicked when the header was highlighted
         if (e.keyCode == 13) {
+
             clearLastAssignmentFocus();
+            clearLastCellFocus();
+
+        }
+    });
+
+    $("#grades td").keydown(function (e) {
+
+        var cell = null;
+
+        //13 means enter was pressed
+        if (e.keyCode == 13) {
+
+            clearLastAssignmentFocus();
+            clearLastCellFocus();
+        }
+
+        //9 means tab was pressed
+        if (e.keyCode == 9) {
+
+            e.preventDefault();
+            var row = $(this).parent("tr");
+            var colIndex = $(this).prevAll().length;
+            colIndex = parseInt(colIndex);
+            colIndex += 1;
+            row.each(function () {
+
+                cell = $(this).find("td:eq(" + colIndex + ")");
+
+            });
+
+            cellGainsFocus(cell);
+
         }
     });
 
@@ -406,8 +425,11 @@
             var colIndex = $(this).prevAll().length;
             row.each(function () {
                 cell = $(this).find("td:eq(" + colIndex + ")");
+
             });
+
             cellGainsFocus(cell);
+
         }
     });
 
@@ -444,6 +466,9 @@
                 url: "/Gradebook/ModifyCategoryPoints",
                 data: { value: cellValue, categoryId: catId[1] }
             });
+
+            calculateRows();
+            calculateCols();
         }
     }
 
@@ -477,6 +502,7 @@
                 url: "/Gradebook/ModifyCategoryName",
                 data: { value: cellValue, categoryId: newCategoryId }
             });
+            
         }
     }
 
@@ -503,23 +529,34 @@
         var total = 0;
         var count = 0;
         var counter = 0;
+        var isTrue = false;
         var a = [];
 
         $("#grades #weights").each(function () {
             $(this).find("td").each(function () {
                 var id = $(this).attr("id").split("-");
                 if (id[0] == "weight") {
+
                     a.push(parseFloat($(this).text()));
                     total += parseFloat($(this).text());
+                    totalPerfect += 1;
+
                 }
             });
+
             $(this).find("td").each(function () {
                 if ($(this).attr("id") == "categoryTotal") {
                     $(this).text(total);
                 }
                 var id = $(this).attr("id").split("-");
                 if (id[0] == "weight") {
-                    a[count] = a[count] / total;
+                    if (a[count] > 0) {
+                        a[count] = a[count] / total;
+
+                    }
+                    else {
+                        counter += 1;
+                    }
                     count += 1;
                 }
             });
@@ -528,21 +565,29 @@
 
         $("#grades #studentGrades").each(function () {
             total = 0;
-            totalPerfect = 0;
-            counter = 0;
+            count = 0;
             $(this).find("td").each(function () {
                 if ($(this).attr("id") == "categoryGrade") {
                     var number = parseFloat($(this).text());
-                    total += number * a[counter];
-                    totalPerfect += 1;
-                    counter += 1;
+                    if (counter == a.length) {
+                        total += number;
+                    }
+                    else {
+                        total += number * a[count];
+                        isTrue = true;
+                    }
+                    count += 1;
                 }
                 else {
                 }
 
             });
-            total = parseFloat((total)).toFixed(2);
-            alert(total);
+            if (counter == a.length) {
+                total = parseFloat((total / counter));
+            }
+            else {
+                total = parseFloat((total)).toFixed(2);                
+            }
             $(this).find("td").each(function () {
                 if ($(this).attr("id") == "total") {
                     $(this).text(total + "%");
@@ -590,8 +635,6 @@
     }
 
     function newTab() {
-        //$('ul li:nth-child(' + tabCount + ')').after('<li><a href="#" onclick="switchTab(this)"></a></li>');
-        //tabCount += 1;
 
         $.ajax({
             type: "POST",
