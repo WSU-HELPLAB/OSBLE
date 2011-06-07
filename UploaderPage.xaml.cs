@@ -43,6 +43,8 @@ namespace FileUploader
             }
         }
 
+        private string RootPath; 
+
         //reference to our web service
         UploaderWebServiceClient syncedFiles = new UploaderWebServiceClient();
 
@@ -58,6 +60,7 @@ namespace FileUploader
             InitializeComponent();
 
             authToken = authenticationToken;
+            RootPath = LocalPath;
 
             //get our local path
             LocalPath =  GetLastLocalPath();
@@ -163,22 +166,22 @@ namespace FileUploader
         {
             uploading.Show();
 
-            SyncCurrentDirectories(this.LocalFileList.DataContext, course);
-            SyncCurrentFile(this.LocalFileList.DataContext, 0, course);
+            SyncCurrentDirectories(this.LocalFileList.DataContext);
+            SyncCurrentFile(this.LocalFileList.DataContext, 0);
         }
 
-        void SyncCurrentDirectories(DirectoryListing level, KeyValuePair<int, string> course)
+        void SyncCurrentDirectories(DirectoryListing level)
         {
             if (level.Directories.Count > 0)
             {
-                syncedFiles.PrepCurrentPathAsync(level);
+                syncedFiles.PrepCurrentPathAsync(level, course, authToken);
             }
         }
 
-        void SyncCurrentFile(DirectoryListing level, int fileindex, KeyValuePair<int, string> course)
+        void SyncCurrentFile(DirectoryListing level, int fileindex)
         {
             string newFilePath;
-            newFilePath = Path.Combine(LocalPath, level.Files[fileindex].Name);
+            newFilePath = level.Files[fileindex].Name;//Path.Combine(LocalPath, level.Files[fileindex].Name);
             // updating the textblock with current file uploading
             uploading.UploadingFile.Text = newFilePath;
 
@@ -194,7 +197,7 @@ namespace FileUploader
                 byte[] data = new byte[stream.Length];
                 stream.Read(data, 0, (int)stream.Length);
 
-                syncedFiles.SyncFileAsync(newFilePath, data, fileindex);
+                syncedFiles.SyncFileAsync(newFilePath, data, fileindex, course, authToken);
             }
         }
         
@@ -269,8 +272,8 @@ namespace FileUploader
         void syncedFiles_SyncFileCompleted(object sender, SyncFileCompletedEventArgs e)
         {
             //start the next file
-
-            SyncCurrentFile(this.LocalFileList.DataContext, e.Result, course);
+            if(this.LocalFileList.DataContext.Files.Count > e.Result)
+                SyncCurrentFile(this.LocalFileList.DataContext, e.Result);
         }
 
         /*
