@@ -1122,3 +1122,8 @@ ul.selector
 {
     list-style-type: none;
 }
+
+.indented_options
+{
+    margin-left: 2em;
+}

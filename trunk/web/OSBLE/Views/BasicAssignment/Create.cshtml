@@ -106,7 +106,40 @@
 
         DisplayPreviousAssignment();
 
+        // Set up add to gradebook checkbox
+
+        var oldPointsPossible = parseInt($('#points_possible').val());
+
+        if (parseInt($('#points_possible').val()) == 0) {
+            $('#add_to_gradebook').attr('checked', false);
+            $('#grade_options').css('display', 'none');
+        } else {
+            $('#add_to_gradebook').attr('checked', true);
+            $('#grade_options').css('display', 'block');
+        }
+
+        $('#add_to_gradebook').change(function () {
+            if ($('#add_to_gradebook').attr('checked')) {
+                $('#grade_options').show('blind');
+                $('#points_possible').val(oldPointsPossible.toString());
+            } else {
+                $('#grade_options').hide();
+                oldPointsPossible = parseInt($('#points_possible').val());
+                $('#points_possible').val('0');
+            }
+        });
+
+        UpdateGradeCategory();
+
+        $('#grade_category').change(function () {
+            UpdateGradeCategory();
+        });
+
     });
+
+    function UpdateGradeCategory() {
+        $('#grade_category_label').html($('#grade_category').selectedTexts()[0]);
+    }
 
     function DisplayManualTeams() {
         $('#RandomTeams').hide();
@@ -201,7 +234,7 @@
             @Html.CheckBoxFor(model => submission.isTeam, new { id = "isTeam" })
             @Html.ValidationMessageFor(model => submission.isTeam)
         </div>
-        <div id="Team_Options" style="display: none">
+        <div id="Team_Options"  class="indented_options" style="display: none">
             <input type="radio" name="team_generation_options" value="PreviousAssignment" />
             Use teams defined in previous course assignment
             <br />
@@ -253,13 +286,7 @@
             @Html.EditorFor(model => submission.InstructorCanReview)
             @Html.ValidationMessageFor(model => submission.InstructorCanReview)
         </div>
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Assignment.Category, "Category")
-        </div>
-        <div class="editor-field">
-            @Html.DropDownListFor(model => model.Assignment.CategoryID, ViewBag.Categories as SelectList)
-            @Html.ValidationMessageFor(model => model.Assignment.Category)
-        </div>
+
 
 
         <h3>Deliverables</h3>
@@ -313,7 +340,8 @@
 
     <script type="text/javascript">
         $(function () {
-            @foreach(Deliverable d in Model.Assignment.Deliverables) {
+            @foreach (Deliverable d in Model.Assignment.Deliverables)
+            {
                 <text>
                 addNewDeliverable({ name: '@d.Name', fileType: @d.Type });
                 </text>
@@ -321,33 +349,57 @@
         });       
     </script>
     
-        <h3>Grading</h3>
+    <h3>Grading</h3>
+    
+    
         <div class="editor-label">
-            @Html.LabelFor(model => model.Assignment.PointsPossible, "Points Possible")
+            @Html.LabelFor(model => model.Assignment.Category, "Category")
         </div>
         <div class="editor-field">
-            @Html.EditorFor(model => model.Assignment.PointsPossible)
-            @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)
+            @Html.DropDownListFor(model => model.Assignment.CategoryID, ViewBag.Categories as SelectList, new { id = "grade_category" })
+            @Html.ValidationMessageFor(model => model.Assignment.Category)
         </div>
+    
+    
+        
+        <div class="editor-label">
+            Add to Gradebook
+        </div>
+        <div class="editor-field">
+            <input type="checkbox" id="add_to_gradebook" checked="checked" />
+        </div>
+    
+        <div id="grade_options" class="indented_options">
+            <div class="editor-field">
+                Worth
+                @Html.TextBoxFor(model => model.Assignment.PointsPossible, new { id="points_possible", size = 3 })
+                Points in Category <span id="grade_category_label"></span>
 
-    <h3>Late Policy</h3>
+                @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)
+            </div>
+        
+
+            <h3>Late Policy</h3>
     
-    <p>
-        Students may submit assignments up to @Html.TextBoxFor(model => model.Submission.MinutesLateWithNoPenalty, new { size = 3 })
-        minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.Submission.PercentPenalty, new { size = 3 })
-        percent per @Html.TextBoxFor(model => model.Submission.HoursLatePerPercentPenalty, new { size = 3 })
-        hours late will be applied.<br />
-        @Html.ValidationMessageFor(model => model.Submission.MinutesLateWithNoPenalty)
-        @Html.ValidationMessageFor(model => model.Submission.PercentPenalty)
-        @Html.ValidationMessageFor(model => model.Submission.HoursLatePerPercentPenalty)
-    </p>
+            <p>
+                Students may submit assignments up to @Html.TextBoxFor(model => model.Submission.MinutesLateWithNoPenalty, new { size = 3 })
+                minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.Submission.PercentPenalty, new { size = 3 })
+                percent per @Html.TextBoxFor(model => model.Submission.HoursLatePerPercentPenalty, new { size = 3 })
+                hours late will be applied.<br />
+                @Html.ValidationMessageFor(model => model.Submission.MinutesLateWithNoPenalty)
+                @Html.ValidationMessageFor(model => model.Submission.PercentPenalty)
+                @Html.ValidationMessageFor(model => model.Submission.HoursLatePerPercentPenalty)
+            </p>
     
     
-    <p>
-        Assignments that are submitted more than @Html.TextBoxFor(model => model.Submission.HoursLateUntilZero, new { size = 3 })
-        hours after the due date and time will receive an automatic 0.<br />
-        @Html.ValidationMessageFor(model => model.Submission.HoursLateUntilZero)
-    </p>
+            <p>
+                Assignments that are submitted more than @Html.TextBoxFor(model => model.Submission.HoursLateUntilZero, new { size = 3 })
+                hours after the due date and time will receive an automatic 0.<br />
+                @Html.ValidationMessageFor(model => model.Submission.HoursLateUntilZero)
+            </p>
+
+        </div>
+    
         <p>
             <input type="submit" value="Create Basic Assignment" id="submitButton"/>
         </p>

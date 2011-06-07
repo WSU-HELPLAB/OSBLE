@@ -18,6 +18,8 @@ namespace OSBLE.Models.Assignments
         public StudioAssignment()
             : base()
         {
+            PointsPossible = 100;
+
             if (Deliverables == null)
             {
                 Deliverables = new List<Deliverable>();
