@@ -217,7 +217,7 @@ namespace OSBLE.Services
         }
 
         [OperationContract]
-        public bool SyncFile(string fileName, byte[] data)
+        public int SyncFile(string fileName, byte[] data, int count, KeyValuePair<int, string> course, string authToken)
         {
             //uploads need to handle a check for lastmodified date
             string file = Path.Combine(filePath, fileName);
@@ -225,20 +225,25 @@ namespace OSBLE.Services
             {
                 fs.Write(data, 0, (int)data.Length);
             }
-            return true;
+
+            return count++; 
         }
 
         [OperationContract]
-        public bool PrepCurrentPath(DirectoryListing fileList)
+        public bool PrepCurrentPath(DirectoryListing dirList, KeyValuePair<int, string> course, string authToken)
         {
             string directory;
-            for (int i = 0; i < fileList.Directories.Count; ++i)
+            //FileSystem Course = new FileSystem();
+            for (int i = 0; i < dirList.Directories.Count; ++i)
             {
                 // creates directory
-                if (fileList.Directories[i].Name != "...")
+                if (dirList.Directories[i].Name != "...")
                 {
-                    directory = Path.Combine(filePath, fileList.Directories[i].Name);
-                    Directory.CreateDirectory(directory);
+                    directory = Path.Combine(/*FileSystem.GetCourseDocumentsPath(course)*/ filePath, dirList.Directories[i].Name);
+                    if (!Directory.Exists(directory))
+                    {
+                        Directory.CreateDirectory(directory);
+                    }
                 }
             }
             return true;
