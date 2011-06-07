@@ -179,6 +179,9 @@
     <None Include="Service References\OsbleServices\UploaderWebService2.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\OsbleServices\UploaderWebService3.xsd">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

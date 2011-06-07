@@ -59,15 +59,17 @@ namespace FileUploader
             //listeners for our web service
             syncedFiles.GetFileListCompleted += new EventHandler<GetFileListCompletedEventArgs>(syncedFiles_GetFileListCompleted);
             syncedFiles.SyncFileCompleted += new EventHandler<SyncFileCompletedEventArgs>(syncedFiles_SyncFileCompleted);
+            syncedFiles.GetValidUploadLocationsCompleted += new EventHandler<GetValidUploadLocationsCompletedEventArgs>(syncedFiles_GetValidUploadLocationsCompleted);
 
             //local event listeners
             SyncButton.Click += new RoutedEventHandler(SyncButton_Click);
             LocalFileList.EmptyDirectoryEncountered += new EventHandler(LocalFileList_EmptyDirectoryEncountered);
             LocalFileList.ParentDirectoryRequest += new EventHandler(LocalFileList_ParentDirectoryRequest);
             LocalFileTextBox.KeyUp += new KeyEventHandler(LocalFileTextBox_KeyUp);
+            UploadLocation.SelectionChanged += new SelectionChangedEventHandler(UploadLocation_SelectionChanged);
 
             //get the remote server file list
-            syncedFiles.GetFileListAsync("");
+            syncedFiles.GetValidUploadLocationsAsync(authToken);
             
             //get the local files
             LocalFileList.DataContext = BuildLocalDirectoryListing(LocalPath);
@@ -77,6 +79,20 @@ namespace FileUploader
 
             // Populate the ListBox with the contents of the directory path
             //dirList(localpath);
+        }
+
+        void UploadLocation_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //very hack-ish at the moment, may need to revise
+            KeyValuePair<int, string> course = (KeyValuePair<int, string>)UploadLocation.SelectedValue;
+            syncedFiles.GetFileListAsync(course.Key, authToken);
+        }
+
+        void syncedFiles_GetValidUploadLocationsCompleted(object sender, GetValidUploadLocationsCompletedEventArgs e)
+        {
+            UploadLocation.Items.Clear();
+            UploadLocation.ItemsSource = e.Result;
+            UploadLocation.SelectedIndex = 0;
         }
 
         /// <summary>
