@@ -8,6 +8,7 @@ using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models;
 using System.Drawing;
+using OSBLE.Models.Services.Uploader;
 
 namespace OSBLE.Controllers
 {
@@ -89,6 +90,11 @@ namespace OSBLE.Controllers
             ViewBag.Events = ec.GetActiveCourseEvents(today, upto);
 
             #endregion Events
+
+            #region Course Links
+            DirectoryListing listing = FileSystem.GetCourseDocumentsFileList(activeCourse.Course, false);
+            ViewBag.Links = listing;
+            #endregion
 
 
             return View();

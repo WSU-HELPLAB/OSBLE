@@ -111,43 +111,11 @@ namespace OSBLE.Services
         }
 
         /// <summary>
-        /// Returns a list of files and directories for the given path
+        /// Returns a list of files for the current course
         /// </summary>
-        /// <param name="relativepath"></param>
+        /// <param name="courseId"></param>
+        /// <param name="authKey"></param>
         /// <returns></returns>
-        private DirectoryListing BuildFileList(string relativepath)
-        {
-
-            //build a new listing, set some initial values
-            DirectoryListing listing = new DirectoryListing();
-            string currentpath = Path.Combine(filePath, relativepath);
-            listing.Name = relativepath;
-            listing.LastModified = File.GetLastWriteTime(currentpath);
-
-            //handle files
-            foreach (string file in Directory.GetFiles(currentpath))
-            {
-                FileListing fList = new FileListing();
-                fList.Name = Path.GetFileName(file);
-                fList.LastModified = File.GetLastWriteTime(file);
-                listing.Files.Add(fList);
-            }
-
-            //Add a parent directory "..." at the top of every directory listing
-            listing.Directories.Add(new ParentDirectoryListing());
-
-            //handle other directories
-            foreach (string folder in Directory.EnumerateDirectories(currentpath))
-            {
-                //recursively build the directory's subcontents.  Note that we have
-                //to pass only the folder's name and not the complete path
-                listing.Directories.Add(BuildFileList(folder.Substring(folder.LastIndexOf('\\') + 1)));
-            }
-
-            //return the completed listing
-            return listing;
-        }
-
         [OperationContract]
         public DirectoryListing GetFileList(int courseId, string authKey)
         {
@@ -168,7 +136,7 @@ namespace OSBLE.Services
             {
                 if (cu.CourseRole.CanModify)
                 {
-                    return BuildFileList(FileSystem.GetCourseDocumentsPath(cu.Course as Course));
+                    return FileSystem.GetCourseDocumentsFileList(cu.Course as Course, true);
                 }
             }
             return new DirectoryListing();

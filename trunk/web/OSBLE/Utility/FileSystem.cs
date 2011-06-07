@@ -3,6 +3,7 @@ using System.Web;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
+using OSBLE.Models.Services.Uploader;
 
 //the folllowing is a diagram of our file system.  Items in brackes [] indicate
 //using a key of sorts (e.g. the user id).  Items in curly braces {} indicate
@@ -43,7 +44,7 @@ namespace OSBLE
             return HttpContext.Current.Server.MapPath("\\FileSystem\\");
         }
 
-        private static string getCoursePath(Course course)
+        private static string getCoursePath(AbstractCourse course)
         {
             return getRootPath() + "Courses\\" + course.ID + "\\";
         }
@@ -66,7 +67,7 @@ namespace OSBLE
             }
         }
 
-        public static string GetCourseDocumentsPath(Course course)
+        public static string GetCourseDocumentsPath(AbstractCourse course)
         {
             string location = string.Format("{0}\\CourseDocs", getCoursePath(course));
 
@@ -76,6 +77,59 @@ namespace OSBLE
                 Directory.CreateDirectory(location);
             }
             return location;
+        }
+
+        /// <summary>
+        /// Returns a list of course documents wrapped in a DirectoryListing object
+        /// </summary>
+        /// <param name="course"></param>
+        /// <param name="includeParentLink"></param>
+        /// <returns></returns>
+        public static DirectoryListing GetCourseDocumentsFileList(AbstractCourse course, bool includeParentLink = true)
+        {
+            string path = GetCourseDocumentsPath(course);
+            return BuildFileList(path, includeParentLink);
+        }
+
+        /// <summary>
+        /// Returns a list of files and directories for the given path
+        /// </summary>
+        /// <param name="relativepath"></param>
+        /// <returns></returns>
+        private static DirectoryListing BuildFileList(string relativepath, bool includeParentLink = true)
+        {
+
+            //build a new listing, set some initial values
+            DirectoryListing listing = new DirectoryListing();
+            string currentpath = Path.Combine(FileSystem.RootPath, relativepath);
+            listing.Name = relativepath;
+            listing.LastModified = File.GetLastWriteTime(currentpath);
+
+            //handle files
+            foreach (string file in Directory.GetFiles(currentpath))
+            {
+                FileListing fList = new FileListing();
+                fList.Name = Path.GetFileName(file);
+                fList.LastModified = File.GetLastWriteTime(file);
+                listing.Files.Add(fList);
+            }
+
+            //Add a parent directory "..." at the top of every directory listing if requested
+            if (includeParentLink)
+            {
+                listing.Directories.Add(new ParentDirectoryListing());
+            }
+
+            //handle other directories
+            foreach (string folder in Directory.EnumerateDirectories(currentpath))
+            {
+                //recursively build the directory's subcontents.  Note that we have
+                //to pass only the folder's name and not the complete path
+                listing.Directories.Add(BuildFileList(folder.Substring(folder.LastIndexOf('\\') + 1)));
+            }
+
+            //return the completed listing
+            return listing;
         }
 
         public static FileStream GetDefaultProfilePicture()
