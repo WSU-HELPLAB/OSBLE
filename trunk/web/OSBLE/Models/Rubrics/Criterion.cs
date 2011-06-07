@@ -4,26 +4,24 @@ using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models.RubricModel
+namespace OSBLE.Models.Rubrics
 {
-    public class Level
+    public class Criterion
     {
         [Required]
         [Key]
         public int ID { get; set; }
 
+        public virtual Criterion Criterion { get; set; }
+
         [Required]
         public int RubricID { get; set; }
 
         [Required]
-        public int RangeStart { get; set; }
+        public string Description { get; set; }
 
         [Required]
-        public int RangeEnd { get; set; }
-
-        [Required]
-        public string LevelTitle { get; set; }
+        public string CriterionTitle { get; set; }
 
     }
-
 }

@@ -6,7 +6,7 @@ using OSBLE.Models.Users;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments.Activities.Scores;
 using OSBLE.Models.Assignments;
-using OSBLE.Models.RubricModel;
+using OSBLE.Models.Rubrics;
 using OSBLE.Models.Services.Uploader;
 using System.Collections.Generic;
 
@@ -100,9 +100,9 @@ namespace OSBLE.Models
 
         public DbSet<Level> Levels { get; set; }
 
-        public DbSet<Criteria> Criteria { get; set; }
+        public DbSet<Criterion> Criteria { get; set; }
 
-        public DbSet<LevelDescription> LevelDescriptions { get; set; }
+        public DbSet<CellDescription> LevelDescriptions { get; set; }
 
         // Users
 

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models.RubricModel
+namespace OSBLE.Models.Rubrics
 {
-    public class LevelDescription
+    public class CellDescription
     {
         [Required]
         [Key]
@@ -17,6 +17,8 @@ namespace OSBLE.Models.RubricModel
         [Key]
         [Column(Order = 1)]
         public int LevelID { get; set; }
+
+        public virtual CellDescription CellDescription { get; set; }
 
         [Required]
         public string Description { get; set; }
