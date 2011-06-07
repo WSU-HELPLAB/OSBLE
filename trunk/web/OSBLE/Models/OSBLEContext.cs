@@ -124,6 +124,12 @@ namespace OSBLE.Models
                 .WithMany()
                 .WillCascadeOnDelete(false);
 
+            modelBuilder.Entity<Rubric>()
+                .HasMany(r=>r.Criteria)
+                .WithRequired(l=>l.Rubric)
+                .WillCascadeOnDelete(false);
+                
+
         }
 
         private void createSampleUser(string username, string password, string firstname, string lastname, string ident, int school, bool isAdmin, bool canCreateCourses)

@@ -12,10 +12,12 @@ namespace OSBLE.Models.Rubrics
         [Key]
         public int ID { get; set; }
 
-        public virtual Rubric Rubric { get; set; }
-
         [Required]
         public string Description { get; set; }
+
+        public virtual ICollection<Level> Levels { get; set; }
+
+        public virtual ICollection<Criterion> Criteria { get; set; }
 
     }
 
