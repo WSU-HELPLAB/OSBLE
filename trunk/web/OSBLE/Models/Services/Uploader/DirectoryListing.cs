@@ -24,14 +24,14 @@ namespace OSBLE.Models.Services.Uploader
             set;
         }
 
-        /*
+        
         [DataMember]
         public DirectoryListing ParentDirectory
         {
             get;
             set;
         }
-         * */
+         
 
         public DirectoryListing()
             : base()
