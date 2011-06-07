@@ -17,5 +17,7 @@ namespace OSBLE.Models.ViewModels
         public StopActivity Stop { get; set; }
 
         public BasicAssignment Assignment { get; set; }
+
+        public SilverlightObject TeamCreation { get; set; }
     }
 }

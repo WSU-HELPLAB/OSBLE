@@ -84,8 +84,9 @@
             modal: true,
             autoOpen: false,
             resizable: false,
-            width: "60%",
-            height: "60%"
+            draggable: false,
+            width: 850,
+            height: 650
         });
 
         //set up default radio buttons
@@ -410,7 +411,7 @@
     </div>
 }
     <div id="team_generation_dialog" title="Edit Teams">
-        @Html.Partial("DisplayTemplates/SilverlightObject", ViewBag.SLObject as SilverlightObject)
+        @Html.DisplayFor(m=>m.TeamCreation)
     </div>
 
 @functions

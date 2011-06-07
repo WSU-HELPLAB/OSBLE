@@ -5,9 +5,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLE", "OSBLE\OSBLE.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamCreation", "TeamCreation\TeamCreation.csproj", "{AB420045-1365-43D9-A243-EB735E776BEC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudioTimelineCreation", "StudioTimelineCreation\StudioTimelineCreation.csproj", "{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
+		SccNumberOfProjects = 4
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
 		SccLocalPath0 = .
@@ -17,6 +19,9 @@ Global
 		SccProjectUniqueName2 = TeamCreation\\TeamCreation.csproj
 		SccProjectName2 = TeamCreation
 		SccLocalPath2 = TeamCreation
+		SccProjectUniqueName3 = StudioTimelineCreation\\StudioTimelineCreation.csproj
+		SccProjectName3 = StudioTimelineCreation
+		SccLocalPath3 = StudioTimelineCreation
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +36,10 @@ Global
 		{AB420045-1365-43D9-A243-EB735E776BEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB420045-1365-43D9-A243-EB735E776BEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB420045-1365-43D9-A243-EB735E776BEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

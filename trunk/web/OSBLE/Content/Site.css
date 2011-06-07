@@ -1127,3 +1127,8 @@ ul.selector
 {
     margin-left: 2em;
 }
+
+.ui-dialog-content
+{
+    display: block;
+}

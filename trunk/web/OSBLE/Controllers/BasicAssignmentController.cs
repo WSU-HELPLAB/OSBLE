@@ -63,12 +63,12 @@ namespace OSBLE.Controllers
             basic.Submission.PercentPenalty = active.PercentPenalty;
             basic.Submission.MinutesLateWithNoPenalty = active.MinutesLateWithNoPenalty;
 
-            ViewBag.SLObject = new SilverlightObject
+            basic.TeamCreation = new SilverlightObject
             {
                 CSSId = "team_creation_silverlight_control",
                 XapName = "TeamCreation",
-                Width = "60%",
-                Height = "60%"
+                Width = "100%",
+                Height = "100%"
             };
 
             ViewBag.Categories = new SelectList(db.Categories, "ID", "Name");
