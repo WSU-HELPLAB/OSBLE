@@ -1,18 +1,8 @@
 ﻿using System;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Collections.Generic;
-
-
+using System.Windows.Input;
 
 namespace CreateNewAssignment
 {
@@ -22,7 +12,7 @@ namespace CreateNewAssignment
         public event EventHandler MonthChanged = delegate { };
         public event MouseButtonEventHandler MouseRightButtonDown = delegate { };
 
-        public static readonly string[] MonthNamesInOrder = new string[] 
+        public static readonly string[] MonthNamesInOrder = new string[]
         {
             "January",
             "February",
@@ -41,7 +31,6 @@ namespace CreateNewAssignment
         private List<CalendarDayItemView> calendarDays;
         MonthView thisView = new MonthView();
         MonthModel thisModel = new MonthModel();
-        
 
         public string MonthYearString
         {
@@ -78,9 +67,9 @@ namespace CreateNewAssignment
         {
             thisView.DataContext = this;
 
-            var days = from p 
-                       in thisView.MonthLayout.Children 
-                       where p is CalendarDayItemView 
+            var days = from p
+                       in thisView.MonthLayout.Children
+                       where p is CalendarDayItemView
                        select p as CalendarDayItemView;
 
             calendarDays = new List<CalendarDayItemView>(days);
@@ -97,7 +86,7 @@ namespace CreateNewAssignment
             if (MonthYear.Month == dateTime.Month && MonthYear.Year == dateTime.Year)
             {
                 //Make sure the the day we are looking for is a valid day i.e cant be Fed 30th (but based on month and year)
-                if(dateTime.Day < DateTime.DaysInMonth(MonthYear.Year, MonthYear.Month))
+                if (dateTime.Day <= DateTime.DaysInMonth(MonthYear.Year, MonthYear.Month))
                 {
                     //dateTime.Day will gives us an index lets 5 but we got to offset it by the number empty days in our calendar minus one to make it an index
                     return calendarDays[dateTime.Day + (int)(new DateTime(MonthYear.Year, MonthYear.Month, 1)).DayOfWeek - 1];
@@ -106,7 +95,7 @@ namespace CreateNewAssignment
             return null;
         }
 
-        void day_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        private void day_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             //just pass it up
             MouseRightButtonDown(sender, e);
@@ -123,9 +112,8 @@ namespace CreateNewAssignment
             //finds the first day of the month and the corresponding CalanderDayItemView
             DateTime dateTime = new DateTime(MonthYear.Year, MonthYear.Month, 1);
             int i = 0;
-            while( (int)dateTime.DayOfWeek != i)
+            while ((int)dateTime.DayOfWeek != i)
             {
-                
                 //clear out whatever might be there
                 calendarDays[i].ClearData();
 
@@ -135,7 +123,7 @@ namespace CreateNewAssignment
             }
 
             //sets the CalanderDayItemView text to the correct day
-            for(int j = 1; j <= DateTime.DaysInMonth(dateTime.Year, dateTime.Month); j++)
+            for (int j = 1; j <= DateTime.DaysInMonth(dateTime.Year, dateTime.Month); j++)
             {
                 //clear out whatever might be there
                 calendarDays[i].ClearData();
@@ -155,8 +143,6 @@ namespace CreateNewAssignment
                 calendarDays[i].IsEnabled = false;
                 i++;
             }
-
         }
-
     }
 }

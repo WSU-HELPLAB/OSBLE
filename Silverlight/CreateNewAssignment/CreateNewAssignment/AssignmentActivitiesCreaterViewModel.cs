@@ -11,8 +11,9 @@ namespace CreateNewAssignment
 {
     public class AssignmentActivitiesCreaterViewModel
     {
-        private AssignmentActivitiesCreaterView thisView = new AssignmentActivitiesCreaterView();
+        #region Fields
 
+        private AssignmentActivitiesCreaterView thisView = new AssignmentActivitiesCreaterView();
         private MonthViewModel calendarLeft = new MonthViewModel();
         private MonthViewModel calendarRight = new MonthViewModel();
         private List<CalendarDayItemView> listOfDays = new List<CalendarDayItemView>();
@@ -20,58 +21,11 @@ namespace CreateNewAssignment
         private AssignmentActivityViewModel aaVMDragging = null;
         private AddActivityMenu activityMenu = new AddActivityMenu();
         private CalendarDayItemView dayRightClickedOn;
-
         private TimelineViewModel timeline = new TimelineViewModel();
 
-        public AssignmentActivitiesCreaterViewModel()
-        {
-            //adding the calendars
-            calendarLeft.MonthYear = new DateTime(2011, 7, 1);
-            calendarRight.MonthYear = new DateTime(2011, 8, 1);
-            calendarLeft.GetView().SetValue(Grid.RowProperty, 2);
-            calendarLeft.GetView().SetValue(Grid.ColumnProperty, 0);
-            calendarRight.GetView().SetValue(Grid.RowProperty, 2);
-            calendarRight.GetView().SetValue(Grid.ColumnProperty, 2);
-            //done adding the calendars
+        #endregion Fields
 
-            thisView.LayoutRoot.Children.Add(calendarRight.GetView());
-            thisView.LayoutRoot.Children.Add(calendarLeft.GetView());
-
-            //adding timeline
-            timeline.GetView().SetValue(Grid.RowProperty, 3);
-            timeline.GetView().SetValue(Grid.ColumnSpanProperty, 3);
-            thisView.LayoutRoot.Children.Add(timeline.GetView());
-            //done adding timeline
-
-            calendarLeft.MouseRightButtonDown += new MouseButtonEventHandler(Calendar_MouseRightButtonDown);
-            calendarRight.MouseRightButtonDown += new MouseButtonEventHandler(Calendar_MouseRightButtonDown);
-
-            thisView.MouseRightButtonDown += new MouseButtonEventHandler(thisView_MouseRightButtonDown);
-            thisView.LeftCalendarScrollButton.Click += new RoutedEventHandler(LeftCalendarScrollButton_Click);
-            thisView.RightCalendarScrollButton.Click += new RoutedEventHandler(RightCalendarScrollButton_Click);
-
-            thisView.SubmissionIcon.MouseLeftButtonDown += new MouseButtonEventHandler(AssignmentActivityIcon_MouseLeftButtonDown);
-            thisView.PeerReviewIcon.MouseLeftButtonDown += new MouseButtonEventHandler(AssignmentActivityIcon_MouseLeftButtonDown);
-            thisView.IssueVotingIcon.MouseLeftButtonDown += new MouseButtonEventHandler(AssignmentActivityIcon_MouseLeftButtonDown);
-            thisView.AuthorRebuttalIcon.MouseLeftButtonDown += new MouseButtonEventHandler(AssignmentActivityIcon_MouseLeftButtonDown);
-            thisView.StopIcon.MouseLeftButtonDown += new MouseButtonEventHandler(AssignmentActivityIcon_MouseLeftButtonDown);
-
-            foreach (UIElement ui in calendarLeft.GetView().MonthLayout.Children)
-            {
-                if (ui is CalendarDayItemView)
-                {
-                    listOfDays.Add(ui as CalendarDayItemView);
-                }
-            }
-
-            foreach (UIElement ui in calendarRight.GetView().MonthLayout.Children)
-            {
-                if (ui is CalendarDayItemView)
-                {
-                    listOfDays.Add(ui as CalendarDayItemView);
-                }
-            }
-        }
+        #region Private Helpers
 
         private void thisView_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -337,29 +291,6 @@ namespace CreateNewAssignment
             }
         }
 
-        public void UpdateActivityDisplay()
-        {
-            timeline.displayTimeline(assignmentActivites);
-            ClearColorOfDays();
-
-            int index = assignmentActivites.FindInsertionSpot(new AssignmentActivityViewModel(Activities.Null, calendarLeft.MonthYear));
-            if (index > 0)
-            {
-                ChangeColorOfDaysToTheRight(calendarLeft.GetCalendarDayItemView(calendarLeft.MonthYear), assignmentActivites[index - 1].ActivityColor);
-            }
-
-            if (index < 0)
-            {
-                index = 0;
-            }
-            while (index < assignmentActivites.Count)
-            {
-                AssignmentActivityViewModel aavm = assignmentActivites[index];
-                ChangeColorOfDaysToTheRight(aavm.CalendarDay, aavm.ActivityColor);
-                index++;
-            }
-        }
-
         private void ClearColorOfDays()
         {
             Brush transparent = new SolidColorBrush(Colors.Transparent);
@@ -505,11 +436,88 @@ namespace CreateNewAssignment
             return assignmentActivites[index];
         }
 
+        #endregion Private Helpers
+
+        #region Public Methods
+
+        public void UpdateActivityDisplay()
+        {
+            timeline.displayTimeline(assignmentActivites);
+            ClearColorOfDays();
+
+            int index = assignmentActivites.FindInsertionSpot(new AssignmentActivityViewModel(Activities.Null, calendarLeft.MonthYear));
+            if (index > 0)
+            {
+                ChangeColorOfDaysToTheRight(calendarLeft.GetCalendarDayItemView(calendarLeft.MonthYear), assignmentActivites[index - 1].ActivityColor);
+            }
+
+            if (index < 0)
+            {
+                index = 0;
+            }
+            while (index < assignmentActivites.Count)
+            {
+                AssignmentActivityViewModel aavm = assignmentActivites[index];
+                ChangeColorOfDaysToTheRight(aavm.CalendarDay, aavm.ActivityColor);
+                index++;
+            }
+        }
+
+        public AssignmentActivitiesCreaterViewModel()
+        {
+            //adding the calendars
+            calendarLeft.MonthYear = new DateTime(2011, 7, 1);
+            calendarRight.MonthYear = new DateTime(2011, 8, 1);
+            calendarLeft.GetView().SetValue(Grid.RowProperty, 2);
+            calendarLeft.GetView().SetValue(Grid.ColumnProperty, 0);
+            calendarRight.GetView().SetValue(Grid.RowProperty, 2);
+            calendarRight.GetView().SetValue(Grid.ColumnProperty, 2);
+            //done adding the calendars
+
+            thisView.LayoutRoot.Children.Add(calendarRight.GetView());
+            thisView.LayoutRoot.Children.Add(calendarLeft.GetView());
+
+            //adding timeline
+            timeline.GetView().SetValue(Grid.RowProperty, 3);
+            timeline.GetView().SetValue(Grid.ColumnSpanProperty, 3);
+            thisView.LayoutRoot.Children.Add(timeline.GetView());
+            //done adding timeline
+
+            calendarLeft.MouseRightButtonDown += new MouseButtonEventHandler(Calendar_MouseRightButtonDown);
+            calendarRight.MouseRightButtonDown += new MouseButtonEventHandler(Calendar_MouseRightButtonDown);
+
+            thisView.MouseRightButtonDown += new MouseButtonEventHandler(thisView_MouseRightButtonDown);
+            thisView.LeftCalendarScrollButton.Click += new RoutedEventHandler(LeftCalendarScrollButton_Click);
+            thisView.RightCalendarScrollButton.Click += new RoutedEventHandler(RightCalendarScrollButton_Click);
+
+            thisView.SubmissionIcon.MouseLeftButtonDown += new MouseButtonEventHandler(AssignmentActivityIcon_MouseLeftButtonDown);
+            thisView.PeerReviewIcon.MouseLeftButtonDown += new MouseButtonEventHandler(AssignmentActivityIcon_MouseLeftButtonDown);
+            thisView.IssueVotingIcon.MouseLeftButtonDown += new MouseButtonEventHandler(AssignmentActivityIcon_MouseLeftButtonDown);
+            thisView.AuthorRebuttalIcon.MouseLeftButtonDown += new MouseButtonEventHandler(AssignmentActivityIcon_MouseLeftButtonDown);
+            thisView.StopIcon.MouseLeftButtonDown += new MouseButtonEventHandler(AssignmentActivityIcon_MouseLeftButtonDown);
+
+            foreach (UIElement ui in calendarLeft.GetView().MonthLayout.Children)
+            {
+                if (ui is CalendarDayItemView)
+                {
+                    listOfDays.Add(ui as CalendarDayItemView);
+                }
+            }
+
+            foreach (UIElement ui in calendarRight.GetView().MonthLayout.Children)
+            {
+                if (ui is CalendarDayItemView)
+                {
+                    listOfDays.Add(ui as CalendarDayItemView);
+                }
+            }
+        }
+
         public AssignmentActivitiesCreaterView GetView()
         {
             return thisView;
         }
 
-        public RoutedEventHandler test_Click { get; set; }
+        #endregion Public Methods
     }
 }
