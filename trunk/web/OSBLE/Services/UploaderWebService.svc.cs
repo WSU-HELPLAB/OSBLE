@@ -217,10 +217,16 @@ namespace OSBLE.Services
         }
 
         [OperationContract]
-        public int SyncFile(string fileName, byte[] data, int count, KeyValuePair<int, string> course, string authToken)
+        public int SyncFile(string fileName, byte[] data, int count, int courseId, string authToken)
         {
+            if (!IsValidKey(authToken))
+            {
+                return -1;
+            }
+
             //uploads need to handle a check for lastmodified date
-            string file = Path.Combine(filePath, fileName);
+            Course current = (from c in db.AbstractCourses where c.ID == courseId select c as Course).FirstOrDefault();
+            string file = Path.Combine(FileSystem.GetCourseDocumentsPath(current), fileName);
             using (FileStream fs = new FileStream(file, FileMode.Create))
             {
                 fs.Write(data, 0, (int)data.Length);
@@ -229,17 +235,24 @@ namespace OSBLE.Services
             return count++; 
         }
 
+
         [OperationContract]
-        public bool PrepCurrentPath(DirectoryListing dirList, KeyValuePair<int, string> course, string authToken)
+        public bool PrepCurrentPath(DirectoryListing dirList, int courseId, string authToken)
         {
+            if (!IsValidKey(authToken))
+            {
+               return false;
+            }
+
             string directory;
-            //FileSystem Course = new FileSystem();
+
             for (int i = 0; i < dirList.Directories.Count; ++i)
             {
                 // creates directory
                 if (dirList.Directories[i].Name != "...")
                 {
-                    directory = Path.Combine(/*FileSystem.GetCourseDocumentsPath(course)*/ filePath, dirList.Directories[i].Name);
+                    Course current = (from c in db.AbstractCourses where c.ID == courseId select c as Course).FirstOrDefault();
+                    directory = Path.Combine(FileSystem.GetCourseDocumentsPath(current), dirList.Directories[i].Name);
                     if (!Directory.Exists(directory))
                     {
                         Directory.CreateDirectory(directory);
