@@ -520,6 +520,8 @@
     <Content Include="Views\Shared\DisplayTemplates\SilverlightObject.cshtml" />
     <Content Include="Views\StudioAssignment\SilverlightTest.cshtml" />
     <Content Include="Views\BasicAssignment\TeamCreation.cshtml" />
+    <Content Include="Views\Gradebook\_Tabs.cshtml" />
+    <Content Include="Views\Gradebook\Tab.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

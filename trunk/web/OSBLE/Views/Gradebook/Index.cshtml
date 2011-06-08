@@ -221,19 +221,24 @@
 
 <div id="tableContent">
     <table id="grades" class="gradebook">
-        <tr>
-            <th>
-                Weights [+]
-            </th>
-            <td></td>
-            @foreach (Category item in ViewBag.Categories)
-            {
-                <td></td>
+        <tr class="colHeader">
+            <th></th>
+            <th>Weights [+]</th>
+            @{var j = 3;
+                <td id="@j" class="colHeader" style="border:outset; background:silver;" onclick="selectColumn(this);"></td>
+                j += 1;
+                <td id="@j" class="colHeader" style="border:outset; background:silver;" onclick="selectColumn(this);"></td>
+                j += 1;
+                foreach (Category item in ViewBag.Categories)
+                {
+                    <td id="@j" class="colHeader" style="border:outset; background:silver;"onclick="selectColumn(this);"></td>
+                    j += 1;
+                }
             }
-            <td>&nbsp</td>
+            
         </tr>
         <tr id="weights">
-
+            <td></td>
             <td id="catScheme" onclick="cellGainsFocus(this);">Weight1</td>
             <td id="grade"></td>
             <td id="categoryTotal">&nbsp</td>
@@ -245,7 +250,7 @@
 
         </tr>
         <tr id="perfectScore">
-
+            <th></th>
             <th id="th2">Perfect Score</th>
             <td>A</td>
             <td id="perfectTotal">100%</td>
@@ -258,6 +263,7 @@
 
         </tr>
         <tr>
+            <th></th>
             <th id="th3">
                 Averave Score
             </th>
@@ -273,13 +279,14 @@
             
         </tr>
         <tr>
+            <th>Section</th>
             <th id="th4">Name</th>
             <th ondblclick="displayLetterGrades();">Grade</th>
             <th id="th5">Total [Customize...]</th>
             
             @foreach (Category item in ViewBag.Categories)
             {
-                <th id="@item.ID" onclick="changeAssignmentName(this);">@item.Name<div id="cntnr" class="thButton"><button class="dropdown" id="@item.ID" onclick="ShowHide(this);"></button></div></th>
+                <th id="@item.ID" onclick="changeAssignmentName(this);" ondblclick="alert('double clicked');">@item.Name<div id="cntnr" class="thButton"><button class="dropdown" id="@item.ID" onclick="ShowHide(this);"></button></div></th>
             }
             
 
@@ -288,20 +295,39 @@
         @foreach (OSBLE.Models.Users.UserProfile student in ViewBag.Students)
         {        
             <tr id="studentGrades">
+
+                @{ 
+                    
+                    List<CoursesUsers> courseUser = (from course in ViewBag.CoursesUser as IEnumerable<CoursesUsers>
+                                                     where course.UserProfileID == student.ID
+                                                     select course).ToList();
+                    if(courseUser.Count() > 0)
+                    {
+                        foreach(CoursesUsers item in courseUser)
+                        {
+                           <td>@item.Section</td>
+                        }
+                    }                                                   
+                }
+
                 <td id="@student.ID" >@student.LastName, @student.FirstName</td>
                 <td id="grade">&nbsp</td>
                 <td id="total">0</td>
                 
+
                 @{
-                    
-                    List<Score> scoreQuery = (from g in ViewBag.Scores as IEnumerable<Score>
-                                                where g.UserProfileID == student.ID
-                                                select g).ToList();
-                    if (scoreQuery.Count() > 0)
+                    //foreach (AbstractAssignment gradeAssignment in ViewBag.GradeAssignments)
                     {
-                        for (int i = 0; i < scoreQuery.Count(); i++)
-                        {    
-                            <td id="categoryGrade">@scoreQuery[i].Points.ToString(".##")%</td>
+
+                        List<Score> scoreQuery = (from g in ViewBag.Scores as IEnumerable<Score>
+                                                    where g.UserProfileID == student.ID
+                                                    select g).ToList();
+                        if (scoreQuery.Count() > 0)
+                        {
+                            for (int i = 0; i < scoreQuery.Count(); i++)
+                            {    
+                                        <td id="categoryGrade">@scoreQuery[i].Points.ToString(".##")%</td>
+                            }
                         }
                     }
                 }
@@ -312,7 +338,7 @@
         <form id="columnOptionsForm" method="post" action="/Gradebook/ModifyColumn" data-ajax="true"
         data-ajax-success="" data-ajax-update="#grades">
         <input id="actionRequested" name="actionRequested" type="hidden" value="null" />
-        <input id="gradableId" name="gradableId" type="hidden" value="null" />
+        <input id="assignmentId" name="assignmentId" type="hidden" value="null" />
         <table class="menu" id="menuID">
             <tr>
                 <td>
@@ -345,7 +371,7 @@
                 $('#actionRequested').val(actionName);
             }
             $('#columnOptionsForm').submit(function () {
-                $('#gradableId').val(currentCol);
+                $('#assignmentId').val(currentCol);
                 return;
             });
         </script>
@@ -358,6 +384,7 @@
     var isShowing = false;
     var lastFocusedAssignment = null;
     var lastFocusedCell = null;
+    var isHighlighted = false;
 
     $(document).ready(function () {
         calculateRows();
@@ -372,6 +399,29 @@
         }
         else {
             isShowing = true;
+        }
+
+        if (isHighlighted == true) {
+            $("#grades tr").each(function () {
+                $(this).find("td").each(function () {
+                    if ($(this).attr("class") == "colHeader") {
+                    }
+                    else {
+                        $(this).css("background-color", "white");
+                    }
+                });
+                $(this).find("th").each(function () {
+                    if ($(this).attr("class") == "colHeader") {
+                    }
+                    else {
+                        $(this).css("background-color", "white");
+                    }
+                });
+            });
+            isHighlighted = false;
+        }
+        else {
+            isHighlighted = true;
         }
     });
 
@@ -441,6 +491,7 @@
         isShowing = false;
     });
 
+    
 
     function displayLetterGrades() {
         $("#letterGradesID").animate({ "height": "show" }, { duration: 300 });
@@ -612,6 +663,45 @@
             });
             colIndex += 1;
         });
+    }
+
+    function selectColumn(col) {
+        
+        $("#grades tr").each(function () {
+            $(this).find("td").each(function () {
+                if ($(this).attr("class") == "colHeader") {
+                }
+                else {
+                    $(this).css("background-color", "white");
+                }
+            });
+            $(this).find("th").each(function () {
+                if ($(this).attr("class") == "colHeader") {
+                }
+                else {
+                    $(this).css("background-color", "white");
+                }
+            });
+        });
+
+        $("#grades tr").each(function () {
+            $(this).find("td:nth-child(" + $(col).attr("id") + ")").each(function () {
+                if ($(this).attr("id") == $(col).attr("id")) {
+                }
+                else {
+                    $(this).css("background-color", "DeepSkyBlue ");
+                }
+            });
+            $(this).find("th:nth-child(" + $(col).attr("id") + ")").each(function () {
+                if ($(this).attr("class") == "colHeader") {
+                }
+                else {
+                    $(this).css("background-color", "DeepSkyBlue ");
+                }
+            });
+        });
+        isHighlighted = false;
+        
     }
 
     function getSum(Index) {

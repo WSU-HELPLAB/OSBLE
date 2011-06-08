@@ -117,20 +117,11 @@
     #newWeight li
     {
         float: left;
-        
     }
 </style>
 <div id="tabHeader">
-    <h3>
-        Gradebook</h3>
-    <ul>
-        <li><a href="/Gradebook/Index" onclick="switchTab(this)">Main</a></li>
-        @foreach (Category item in ViewBag.Tabs)
-        {
-            <li><a href="/Gradebook/Tab/?categoryId=@item.ID" onclick="switchTab(this)">@item.Name</a></li>
-        }
-        <li><a href="#" onclick="newTab()">+</a></li>
-    </ul>
+    <h3>Gradebook</h3>
+    @Html.Partial("_Tabs")
 </div>
 <div id="tableContent">
     @Html.Partial("_Gradebook")
@@ -138,7 +129,7 @@
         <form id="columnOptionsForm" method="post" action="/Gradebook/ModifyColumn" data-ajax="true"
         data-ajax-success="" data-ajax-update="#grades">
         <input id="actionRequested" name="actionRequested" type="hidden" value="null" />
-        <input id="gradableId" name="gradableId" type="hidden" value="null" />
+        <input id="assignmentId" name="assignmentId" type="hidden" value="null" />
         <table class="menu" id="menuID">
             <tr>
                 <td>
@@ -171,7 +162,7 @@
                 $('#actionRequested').val(actionName);
             }
             $('#columnOptionsForm').submit(function () {
-                $('#gradableId').val(currentCol);
+                $('#assignmentId').val(currentCol);
                 return;
             });
         </script>
@@ -202,6 +193,7 @@
 
     //Keeps track of the total number of weights
     var tabCount = 1;
+
 
     $(document).ready(function () {
         calculateRows();
@@ -240,6 +232,8 @@
             e.preventDefault();
             var row = $(this).parent("tr");
             var colIndex = $(this).prevAll().length;
+            alert(row);
+            alert(colIndex);
             colIndex = parseInt(colIndex);
             colIndex += 1;
             row.each(function () {
@@ -265,9 +259,16 @@
         //if a header already had focus then we need to change it back and display text
         if (lastFocusedCell != null) {
             var cellValue = lastFocusedCell.children().val();
+            var cellID = lastFocusedCell.attr("id")
             lastFocusedCell.html(cellValue + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + id + ' onclick="ShowHide(this);"></button></div>');
             lastFocusedCell.attr("onclick", 'changeHeaderName(this)');
             lastFocusedCell = null;
+
+            $.ajax({
+                type: "POST",
+                url: "/Gradebook/ModifyAssignmentName",
+                data: { value: cellValue, assignmentId: cellID }
+            });
         }
     }
 
@@ -665,16 +666,14 @@
         });
     }
 
-    function switchTab(newTab) {
+    function switchTab(newTab) {        
         $("#selected").removeAttr("id");
         $(newTab).attr("id", "selected");
     }
 
     function newTab() {
-        //$('ul li:nth-child(' + tabCount + ')').after('<li><a href="#" onclick="switchTab(this)"></a></li>');
-        //tabCount += 1;
-
         $.ajax({
+
             type: "POST",
             url: "/Gradebook/AddWeight"
         });

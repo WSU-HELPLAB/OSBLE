@@ -1,0 +1,21 @@
+﻿@using OSBLE.Models.Courses
+@{
+    Layout = null;
+}
+
+<div id="tabHeader">
+    <ul>
+        <li id="selected"><a href="/Gradebook/Index" onclick="switchTab(this)">Main</a></li>
+        @foreach (Category item in ViewBag.Categories)
+        {
+            <li><a href="/Gradebook/Tab/?categoryId=@item.ID" onclick="switchTab(this)">@item.Name</a></li>
+        }
+        <li><a href="#" onclick="newTab()">+</a></li>
+    </ul>
+</div> 
+
+<script type="text/jscript">
+
+    
+    
+</script>

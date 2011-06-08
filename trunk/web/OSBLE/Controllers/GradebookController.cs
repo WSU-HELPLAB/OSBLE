@@ -101,27 +101,41 @@ namespace OSBLE.Controllers
             db.AbstractAssignments.Remove(assignment);
             db.SaveChanges();
         }
-        /*
+        
         /// <summary>
         /// Clears a gradable (column) from the current table.
         /// Changes all the numbers in the gradable to 0.
         /// </summary>
         /// <param name="gradableId">The ID of the gradable to clear</param>
         [HttpPost]
-        public void ClearColumn(int gradableId)
+        public void ClearColumn(int assignmentId)
         {
-            var gradableQuery = from g in db.Gradables
-                                where g.ID == gradableId
-                                select g;
-            if (gradableQuery.Count() > 0)
+            var assignmentQuery = from s in db.Scores
+                                  where s.AssignmentActivity.AbstractAssignmentID == assignmentId
+                                  select s;
+
+            if (assignmentQuery.Count() > 0)
             {
-                foreach (Gradable item in gradableQuery)
+                foreach (Score item in assignmentQuery)
                 {
-                    item.PossiblePoints = 0;
+                    item.Points = 0;
                 }
                 db.SaveChanges();
             }
-        } */      
+
+            var assignmentPoints = from a in db.AbstractAssignments
+                                   where a.ID == assignmentId
+                                   select a;
+
+            if (assignmentPoints.Count() > 0)
+            {
+                foreach (AbstractAssignment item in assignmentPoints)
+                {
+                    item.PointsPossible = 0;
+                }
+                db.SaveChanges();
+            }
+        } 
         
         private ColumnAction StringToColumnAction(string action)
         {
@@ -314,9 +328,9 @@ namespace OSBLE.Controllers
         {
             //convert POST params to variables
             int assignmentId = 0;
-            if (Request.Form["gradableId"] != null)
+            if (Request.Form["assignmentId"] != null)
             {
-                assignmentId = Convert.ToInt32(Request.Form["gradableId"]);
+                assignmentId = Convert.ToInt32(Request.Form["assignmentId"]);
             }
             ColumnAction action = StringToColumnAction(Request.Form["actionRequested"]);
 
@@ -336,13 +350,13 @@ namespace OSBLE.Controllers
                     case ColumnAction.Delete:
                         DeleteColumn(assignmentId);
                         break;
-                    /*
+                    
                     case ColumnAction.Clear:
-                        ClearColumn(gradableId);
-                        break;*/
+                        ClearColumn(assignmentId);
+                        break;
                 }
             }
-            BuildGradebook((int)Session["CurrentWeightID"]);
+            BuildGradebook((int)Session["categoryId"]);
             return View("_Gradebook");
         }
 
@@ -405,18 +419,24 @@ namespace OSBLE.Controllers
                     percentList.Add(studentScore);
                 }
             }
+
+            List<CoursesUsers> courseUsers = (from users in db.CoursesUsers
+                                              where users.CourseID == currentCourseId
+                                              select users).ToList();
                       
             List<Category> categories = (from category in db.Categories
                                          where category.CourseID == currentCourseId
                                          select category).ToList();
 
-            List<Score> scoreList = (from scores in db.Scores
-                                    where scores.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId
-                                    select scores).ToList();
+            List<GradeAssignment> gradeAssignments = (from ga in db.GradeAssignments
+                                                      where ga.Category.CourseID == currentCourseId
+                                                      select ga).ToList();
 
             ViewBag.Students = studentList;
             ViewBag.Scores = percentList;
             ViewBag.Categories = categories;
+            ViewBag.CoursesUser = courseUsers;
+            ViewBag.GradeAssignments = gradeAssignments;
 
             return View();
         }
@@ -432,6 +452,7 @@ namespace OSBLE.Controllers
             {
                 categoryId = GetDefaultWeightId();
             }
+            Session["categoryId"] = categoryId;
             BuildGradebook((int)categoryId);
             return View();
         }
