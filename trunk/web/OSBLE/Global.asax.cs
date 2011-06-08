@@ -29,6 +29,12 @@ namespace OSBLE
             );
 
             routes.MapRoute(
+                "FileHandler-Course",
+                "FileHandler/CourseDocument/{courseId}/{filePath}",
+                new { controller = "FileHandler", action = "CourseDocument" }
+                );
+
+            routes.MapRoute(
                 "Default", // Route name
                 "{controller}/{action}/{id}", // URL with parameters
                 new { controller = "Home", action = "Index", id = UrlParameter.Optional } // Parameter defaults

@@ -4,13 +4,14 @@ using OSBLE.Models.HomePage;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.Services.Uploader;
+using System;
 
 //the folllowing is a diagram of our file system.  Items in brackes [] indicate
 //using a key of sorts (e.g. the user id).  Items in curly braces {} indicate
 //the intended use of the folder
 /*
  *
- *                   root
+ *                FileSystem
  *                  /    \
  *                 /      \
  *              Courses   Users
@@ -39,6 +40,7 @@ namespace OSBLE
 {
     public static class FileSystem
     {
+
         private static string getRootPath()
         {
             return HttpContext.Current.Server.MapPath("\\FileSystem\\");
@@ -79,6 +81,38 @@ namespace OSBLE
             return location;
         }
 
+
+        public static string GetCourseDocumentsPath(int courseId)
+        {
+            Course c = new Course() {ID = courseId };
+            return GetCourseDocumentsPath(c);
+        }
+
+        /// <summary>
+        /// Converts the supplied file path to a web-accessible URL
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static string CourseDocumentPathToWebUrl(string filePath)
+        {
+            int startOfWebPath = filePath.IndexOf("FileSystem");
+
+            //get the raw url (not web accessible due to MVC restrictions)
+            string rawUrl = VirtualPathUtility.ToAbsolute("~/" + filePath.Substring(startOfWebPath));
+
+            //I thought about using regex here, but this seemed easier
+            string[] rawPieces = rawUrl.Split('/');
+
+            //from the pieces, we need the course Id and the name of the document
+            int courseId = Convert.ToInt32(rawPieces[3]);
+            string[] docPath = new string[rawPieces.Length - 5];
+            Array.Copy(rawPieces, 5, docPath, 0, rawPieces.Length - 5);
+
+            //finally, we can build a web-accessible url
+            string url = String.Format("/FileHandler/CourseDocument/{0}/{1}", courseId, string.Join(",", docPath));
+            return url;
+        }
+
         /// <summary>
         /// Returns a list of course documents wrapped in a DirectoryListing object
         /// </summary>
@@ -110,6 +144,7 @@ namespace OSBLE
                 FileListing fList = new FileListing();
                 fList.Name = Path.GetFileName(file);
                 fList.LastModified = File.GetLastWriteTime(file);
+                fList.FileUrl = FileSystem.CourseDocumentPathToWebUrl(file);
                 listing.Files.Add(fList);
             }
 
@@ -129,6 +164,11 @@ namespace OSBLE
 
             //return the completed listing
             return listing;
+        }
+
+        public static FileStream GetDocumentForRead(string path)
+        {
+            return new FileStream(path, FileMode.Open, FileAccess.Read);
         }
 
         public static FileStream GetDefaultProfilePicture()

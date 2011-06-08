@@ -32,7 +32,7 @@
         }
         foreach(FileListing file in listing.Files)
         {
-            <li>@file.Name</li>
+            <li><a href="@file.FileUrl" title="Last uploaded on: @file.LastModified">@file.Name</a></li>
         }
     if(!isFirstRun)
     {

@@ -9,5 +9,10 @@ namespace OSBLE.Models.Services.Uploader
     [DataContract]
     public class FileListing : AbstractListing
     {
+        public string FileUrl
+        {
+            get;
+            set;
+        }
     }
 }
