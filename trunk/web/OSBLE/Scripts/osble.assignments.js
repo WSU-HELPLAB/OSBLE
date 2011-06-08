@@ -2,6 +2,7 @@
 
     $('#add_new_deliverable').click(function () {
         addNewDeliverable();
+        return false;
     });
 
     $('#new_deliverable_name').keypress(deliverableFormSubmit);
