@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using CreateNewAssignment.AssignmentActivities;
 using Newtonsoft.Json;
+using System.Windows.Browser;
 
 namespace CreateNewAssignment
 {
@@ -470,6 +471,48 @@ namespace CreateNewAssignment
                     index++;
                 }
             }
+
+            // Serialize activities and update html field
+            List<SerializableActivity> SerializableActivities = new List<SerializableActivity>();
+
+            foreach (AssignmentActivityViewModel aavm in assignmentActivites)
+            {
+                if (aavm.ActivityType == Activities.Null)
+                {
+                    // Nulls do  not return to HTML. Fall through
+                    continue;
+                }
+
+                SerializableActivity sa = new SerializableActivity();
+
+                sa.DateTime = aavm.StartDateTime;
+
+                switch(aavm.ActivityType) {
+                    case Activities.Submission:
+                        sa.ActivityType = ActivityTypes.Submission;
+                        break;
+                    case Activities.PeerReview:
+                        sa.ActivityType = ActivityTypes.PeerReview;
+                        break;
+                    case Activities.IssueVoting:
+                        sa.ActivityType = ActivityTypes.Voting;
+                        break;
+                    case Activities.AuthorRebuttal:
+                        sa.ActivityType = ActivityTypes.Rebuttal;
+                        break;
+                    default:
+                        sa.ActivityType = ActivityTypes.Stop;
+                        break;
+
+                } 
+                
+                SerializableActivities.Add(sa);
+            }
+
+            ScriptObject js = HtmlPage.Window.CreateInstance("$", new string[] { "#delicious_serial" });
+
+            js.Invoke("html", Uri.EscapeDataString(JsonConvert.SerializeObject(SerializableActivities)));
+
         }
 
         public AssignmentActivitiesCreatorViewModel(string SerializedActivitiesJSON)
