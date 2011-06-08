@@ -177,12 +177,12 @@ namespace FileUploader.OsbleServices {
         System.Collections.Generic.Dictionary<int, string> EndGetValidUploadLocations(System.IAsyncResult result);
         
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/SyncFile", ReplyAction="urn:UploaderWebService/SyncFileResponse")]
-        System.IAsyncResult BeginSyncFile(string fileName, byte[] data, int count, System.Collections.Generic.KeyValuePair<int, string> course, string authToken, System.AsyncCallback callback, object asyncState);
+        System.IAsyncResult BeginSyncFile(string fileName, byte[] data, int count, int courseId, string authToken, System.AsyncCallback callback, object asyncState);
         
         int EndSyncFile(System.IAsyncResult result);
         
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/PrepCurrentPath", ReplyAction="urn:UploaderWebService/PrepCurrentPathResponse")]
-        System.IAsyncResult BeginPrepCurrentPath(FileUploader.OsbleServices.DirectoryListing dirList, System.Collections.Generic.KeyValuePair<int, string> course, string authToken, System.AsyncCallback callback, object asyncState);
+        System.IAsyncResult BeginPrepCurrentPath(FileUploader.OsbleServices.DirectoryListing dirList, int courseId, string authToken, System.AsyncCallback callback, object asyncState);
         
         bool EndPrepCurrentPath(System.IAsyncResult result);
         
@@ -773,8 +773,8 @@ namespace FileUploader.OsbleServices {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginSyncFile(string fileName, byte[] data, int count, System.Collections.Generic.KeyValuePair<int, string> course, string authToken, System.AsyncCallback callback, object asyncState) {
-            return base.Channel.BeginSyncFile(fileName, data, count, course, authToken, callback, asyncState);
+        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginSyncFile(string fileName, byte[] data, int count, int courseId, string authToken, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginSyncFile(fileName, data, count, courseId, authToken, callback, asyncState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -786,9 +786,9 @@ namespace FileUploader.OsbleServices {
             string fileName = ((string)(inValues[0]));
             byte[] data = ((byte[])(inValues[1]));
             int count = ((int)(inValues[2]));
-            System.Collections.Generic.KeyValuePair<int, string> course = ((System.Collections.Generic.KeyValuePair<int, string>)(inValues[3]));
+            int courseId = ((int)(inValues[3]));
             string authToken = ((string)(inValues[4]));
-            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginSyncFile(fileName, data, count, course, authToken, callback, asyncState);
+            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginSyncFile(fileName, data, count, courseId, authToken, callback, asyncState);
         }
         
         private object[] OnEndSyncFile(System.IAsyncResult result) {
@@ -804,11 +804,11 @@ namespace FileUploader.OsbleServices {
             }
         }
         
-        public void SyncFileAsync(string fileName, byte[] data, int count, System.Collections.Generic.KeyValuePair<int, string> course, string authToken) {
-            this.SyncFileAsync(fileName, data, count, course, authToken, null);
+        public void SyncFileAsync(string fileName, byte[] data, int count, int courseId, string authToken) {
+            this.SyncFileAsync(fileName, data, count, courseId, authToken, null);
         }
         
-        public void SyncFileAsync(string fileName, byte[] data, int count, System.Collections.Generic.KeyValuePair<int, string> course, string authToken, object userState) {
+        public void SyncFileAsync(string fileName, byte[] data, int count, int courseId, string authToken, object userState) {
             if ((this.onBeginSyncFileDelegate == null)) {
                 this.onBeginSyncFileDelegate = new BeginOperationDelegate(this.OnBeginSyncFile);
             }
@@ -822,13 +822,13 @@ namespace FileUploader.OsbleServices {
                         fileName,
                         data,
                         count,
-                        course,
+                        courseId,
                         authToken}, this.onEndSyncFileDelegate, this.onSyncFileCompletedDelegate, userState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginPrepCurrentPath(FileUploader.OsbleServices.DirectoryListing dirList, System.Collections.Generic.KeyValuePair<int, string> course, string authToken, System.AsyncCallback callback, object asyncState) {
-            return base.Channel.BeginPrepCurrentPath(dirList, course, authToken, callback, asyncState);
+        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginPrepCurrentPath(FileUploader.OsbleServices.DirectoryListing dirList, int courseId, string authToken, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginPrepCurrentPath(dirList, courseId, authToken, callback, asyncState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -838,9 +838,9 @@ namespace FileUploader.OsbleServices {
         
         private System.IAsyncResult OnBeginPrepCurrentPath(object[] inValues, System.AsyncCallback callback, object asyncState) {
             FileUploader.OsbleServices.DirectoryListing dirList = ((FileUploader.OsbleServices.DirectoryListing)(inValues[0]));
-            System.Collections.Generic.KeyValuePair<int, string> course = ((System.Collections.Generic.KeyValuePair<int, string>)(inValues[1]));
+            int courseId = ((int)(inValues[1]));
             string authToken = ((string)(inValues[2]));
-            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginPrepCurrentPath(dirList, course, authToken, callback, asyncState);
+            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginPrepCurrentPath(dirList, courseId, authToken, callback, asyncState);
         }
         
         private object[] OnEndPrepCurrentPath(System.IAsyncResult result) {
@@ -856,11 +856,11 @@ namespace FileUploader.OsbleServices {
             }
         }
         
-        public void PrepCurrentPathAsync(FileUploader.OsbleServices.DirectoryListing dirList, System.Collections.Generic.KeyValuePair<int, string> course, string authToken) {
-            this.PrepCurrentPathAsync(dirList, course, authToken, null);
+        public void PrepCurrentPathAsync(FileUploader.OsbleServices.DirectoryListing dirList, int courseId, string authToken) {
+            this.PrepCurrentPathAsync(dirList, courseId, authToken, null);
         }
         
-        public void PrepCurrentPathAsync(FileUploader.OsbleServices.DirectoryListing dirList, System.Collections.Generic.KeyValuePair<int, string> course, string authToken, object userState) {
+        public void PrepCurrentPathAsync(FileUploader.OsbleServices.DirectoryListing dirList, int courseId, string authToken, object userState) {
             if ((this.onBeginPrepCurrentPathDelegate == null)) {
                 this.onBeginPrepCurrentPathDelegate = new BeginOperationDelegate(this.OnBeginPrepCurrentPath);
             }
@@ -872,7 +872,7 @@ namespace FileUploader.OsbleServices {
             }
             base.InvokeAsync(this.onBeginPrepCurrentPathDelegate, new object[] {
                         dirList,
-                        course,
+                        courseId,
                         authToken}, this.onEndPrepCurrentPathDelegate, this.onPrepCurrentPathCompletedDelegate, userState);
         }
         
@@ -1076,12 +1076,12 @@ namespace FileUploader.OsbleServices {
                 return _result;
             }
             
-            public System.IAsyncResult BeginSyncFile(string fileName, byte[] data, int count, System.Collections.Generic.KeyValuePair<int, string> course, string authToken, System.AsyncCallback callback, object asyncState) {
+            public System.IAsyncResult BeginSyncFile(string fileName, byte[] data, int count, int courseId, string authToken, System.AsyncCallback callback, object asyncState) {
                 object[] _args = new object[5];
                 _args[0] = fileName;
                 _args[1] = data;
                 _args[2] = count;
-                _args[3] = course;
+                _args[3] = courseId;
                 _args[4] = authToken;
                 System.IAsyncResult _result = base.BeginInvoke("SyncFile", _args, callback, asyncState);
                 return _result;
@@ -1093,10 +1093,10 @@ namespace FileUploader.OsbleServices {
                 return _result;
             }
             
-            public System.IAsyncResult BeginPrepCurrentPath(FileUploader.OsbleServices.DirectoryListing dirList, System.Collections.Generic.KeyValuePair<int, string> course, string authToken, System.AsyncCallback callback, object asyncState) {
+            public System.IAsyncResult BeginPrepCurrentPath(FileUploader.OsbleServices.DirectoryListing dirList, int courseId, string authToken, System.AsyncCallback callback, object asyncState) {
                 object[] _args = new object[3];
                 _args[0] = dirList;
-                _args[1] = course;
+                _args[1] = courseId;
                 _args[2] = authToken;
                 System.IAsyncResult _result = base.BeginInvoke("PrepCurrentPath", _args, callback, asyncState);
                 return _result;
