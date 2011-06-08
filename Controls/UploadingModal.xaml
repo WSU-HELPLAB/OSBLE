@@ -14,7 +14,7 @@
             <ProgressBar  x:Name="UploadProgressBar" Width="300" Height="20" Margin="0,40"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <TextBlock Text="Currently Uploading: "/>
-                <TextBlock x:Name="UploadingFile" Text="MyDocuments" Margin="15,0,0,0"/>
+                <TextBlock x:Name="UploadingFile" Text="MyDocuments" MaxWidth="200" Margin="15,0,0,0" />
             </StackPanel>
         </StackPanel>
         

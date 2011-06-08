@@ -2,15 +2,17 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+//using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.IO;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 
@@ -23,6 +25,8 @@ namespace FileUploader
     public partial class UploaderPage : Page
     {
         private string authToken = "";
+        private bool FileRecieved;
+        public string RootPath;
 
         public string LocalPath
         {
@@ -43,7 +47,7 @@ namespace FileUploader
             }
         }
 
-        private string RootPath; 
+         
 
         //reference to our web service
         UploaderWebServiceClient syncedFiles = new UploaderWebServiceClient();
@@ -56,14 +60,13 @@ namespace FileUploader
 
         public UploaderPage(string authenticationToken)
         {
-
             InitializeComponent();
-
+            
             authToken = authenticationToken;
-            RootPath = LocalPath;
 
             //get our local path
             LocalPath =  GetLastLocalPath();
+            RootPath = LocalPath;
 
             //listeners for our web service
             syncedFiles.GetFileListCompleted += new EventHandler<GetFileListCompletedEventArgs>(syncedFiles_GetFileListCompleted);
@@ -168,58 +171,71 @@ namespace FileUploader
             uploading.Show();
 
             int count = 1;
+            string relpath = "";
             DirectoryListing Listing = new DirectoryListing();
             Listing = this.LocalFileList.DataContext;
 
-            traveseDirectories(LocalPath, Listing, count);
+            traveseDirectories(LocalPath, relpath, Listing, count);
 
-            uploading.Close();
+            // update the synced files display
+            syncedFiles.GetFileListAsync(course.Key, authToken);
+            
+            //uploading.Close();
         }
 
         // solicites the server to create the directories and files in the tree
-        private void traveseDirectories(string path, DirectoryListing Listing, int count)
+        private void traveseDirectories(string path, string relative, DirectoryListing Listing, int count)
         {
-            int index = 0;
             // creates the directories
-            SyncCurrentDirectories(Listing);
-            foreach (string directory in Directory.EnumerateDirectories(Path.Combine(LocalPath, Listing.Directories[count].Name)))
+            SyncCurrentDirectories(Listing, relative);
+            foreach (string directory in Directory.EnumerateDirectories(path))
             {
-                // creates the files
-                SyncCurrentFile(Listing, ++index);
-                // drops down a level
-                Listing = BuildLocalDirectoryListing(Path.Combine(LocalPath, Listing.Directories[count].Name));
+                relative = directory.Substring(LocalPath.Length + 1);
                 
+                // drops down a level
+                Listing = BuildLocalDirectoryListing(Path.Combine(LocalPath, relative));
+
+                foreach (string file in Directory.EnumerateFiles(Path.Combine(path, relative)))
+                {
+                    FileRecieved = false;
+                    // tells server to create file
+                    SyncCurrentFile(file);
+                }
+
                 // recursive call
-                traveseDirectories(directory, Listing, count);
+                traveseDirectories(directory, relative, Listing, count);
+
                 ++count;
             }
             
         }
 
         // prompts server to create all directories on the current level
-        void SyncCurrentDirectories(DirectoryListing level)
+        void SyncCurrentDirectories(DirectoryListing level, string relative)
         {
             if (level.Directories.Count > 0)
             {
-                syncedFiles.PrepCurrentPathAsync(level, course.Key, authToken);
+                syncedFiles.PrepCurrentPathAsync(level, relative, course.Key, authToken);
             }
         }
 
         // Prompts the server to create the file
-        void SyncCurrentFile(DirectoryListing level, int fileindex)
+        void SyncCurrentFile(string file)
         {
-            string newFilePath;
-            newFilePath = Path.Combine(LocalPath, level.Files[fileindex].Name);
+            string relativepath = file.Substring(RootPath.Length + 1);
+            
+            
             // updating the textblock with current file uploading
-            uploading.UploadingFile.Text = level.Files[fileindex].Name;
-
+            uploading.UploadingFile.Text = relativepath;
+            //MessageBox.Show("lkasjdf");
+            //BindingExpression binding = uploading.UploadingFile.GetBindingExpression(TextBox.TextProperty);
+            //binding.UpdateSource();
+            
             //update progres bar (ie add a tick)
-
-            uploading.UpdateLayout();
 
             MemoryStream s = new MemoryStream();
             StreamWriter writer = new StreamWriter(s);
-            writer.Write(newFilePath);
+            writer.Write(file);
             writer.Flush();
 
             using (Stream stream = s)
@@ -227,16 +243,24 @@ namespace FileUploader
                 byte[] data = new byte[stream.Length];
                 stream.Read(data, 0, (int)stream.Length);
 
-                syncedFiles.SyncFileAsync(newFilePath, data, fileindex, course.Key, authToken);
+                syncedFiles.SyncFileAsync(relativepath, data, course.Key, authToken);
             }
+            // wait till the file is uploaded
+            //while (!FileRecieved)
+            //{
+            //    //sleep
+            //    TimeSpan waitTime = new TimeSpan(0, 0, 1);
+
+            //    Thread.Sleep(waitTime);
+            //}
         }
 
-        // when one file is done being created it will start the next one as long as there is one left
+        // when one file is done being created it will set the bool to true
         void syncedFiles_SyncFileCompleted(object sender, SyncFileCompletedEventArgs e)
         {
-            //start the next file
-            if (this.LocalFileList.DataContext.Files.Count > e.Result && e.Result != -1)
-                SyncCurrentFile(this.LocalFileList.DataContext, e.Result);
+            //boolean file sync complete
+            FileRecieved = true;
+            
         }
         
         public DirectoryListing BuildLocalDirectoryListing(string path)
@@ -305,6 +329,7 @@ namespace FileUploader
         void syncedFiles_GetFileListCompleted(object sender, GetFileListCompletedEventArgs e)
         {
             RemoteFileList.DataContext = e.Result;
+            uploading.Close();
         }
 
         /*
