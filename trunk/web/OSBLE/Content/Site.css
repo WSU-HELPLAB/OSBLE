@@ -1034,7 +1034,7 @@ ul.selector
     display: block;
 }
 
-.meeting_time, .break
+.meeting_time, .break, .deliverable
 {
     width: 200px;
     border: 1px solid #eeeeff;
@@ -1045,14 +1045,19 @@ ul.selector
     float: left;
 }
 
-.meeting_time .meeting_time_tools, .break .break_tools
+.deliverable 
+{
+    width: 380px;
+}
+
+.meeting_time .meeting_time_tools, .break .break_tools, .deliverable .deliverable_tools
 {
     float: right;
     display: none;
     padding: 3px;
 }
 
-.meeting_time:hover .meeting_time_tools, .break:hover .break_tools
+.meeting_time:hover .meeting_time_tools, .break:hover .break_tools, .deliverable:hover .deliverable_tools
 {
     display: block;
 }
@@ -1131,4 +1136,9 @@ ul.selector
 .ui-dialog-content
 {
     display: block;
+}
+
+#deliverables_after 
+{
+    clear: both;
 }

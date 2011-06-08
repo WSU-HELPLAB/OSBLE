@@ -55,8 +55,8 @@ function addNewDeliverable(d) {
 
     $('#deliverable_data').children().each(function () {
         if (
-            (d.name.toLowerCase() == $(this).children('.deliverable_name').first().val().toLowerCase()) &&
-            (d.fileType == parseInt($(this).children('.deliverable_type').first().val()))
+            (d.name.toLowerCase() == $(this).find('.deliverable_name').first().val().toLowerCase()) &&
+            (d.fileType == parseInt($(this).find('.deliverable_type').first().val()))
             ) {
 
             duplicateExists = true;
@@ -69,14 +69,25 @@ function addNewDeliverable(d) {
         return false;
     }
 
-    $('#deliverable_list').addOption(deliverableIndex, d.name + " - " + $('#new_deliverable_type').children('option').eq(d.fileType).html());
-
-    $('#deliverable_data').append('<div id="deliverable_' + deliverableIndex + '"/>');
+    $('#deliverable_data').append('<div id="deliverable_' + deliverableIndex + '" class="deliverable" />');
 
     var newDeliverable = $('#deliverable_' + deliverableIndex);
 
-    newDeliverable.append('<input type="hidden" class="deliverable_name" value="' + d.name + '" />');
-    newDeliverable.append('<input type="hidden" class="deliverable_type" value="' + $('#new_deliverable_type').children('option').eq(d.fileType).val() + '" />');
+    var typeVal = $('#new_deliverable_type').children('option').eq(d.fileType).val();
+    var typeName = $('#new_deliverable_type').children('option').eq(d.fileType).html();
+
+    newDeliverable.append('<div class="deliverable_tools"><a href="#" onclick="$(this).parent().parent().hide(\'highlight\',function(){$(this).remove()}); setDeliverableIndex(); return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');
+
+
+    newDeliverable.append('<table><tr>');
+    newDeliverable.append('<td>File Name</td><td><input type="text" class="deliverable_name" value="' + d.name + '" /></td>');
+    newDeliverable.append('</tr><tr>');
+    newDeliverable.append('<td>Type</td><td>' + typeName + '</td>');
+    newDeliverable.append('</tr></table>');
+
+
+    newDeliverable.append('<input type="hidden" class="deliverable_type" value="' + typeVal + '" />');
+
 
     deliverableIndex++;
 

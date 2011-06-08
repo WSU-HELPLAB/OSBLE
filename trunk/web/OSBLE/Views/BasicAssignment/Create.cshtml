@@ -289,9 +289,8 @@
         </div>
 
 
-
-        <h3>Deliverables</h3>
-
+    <h3>Deliverables</h3>
+   
     <table id="deliverables_table">
     <tr>
         <td>
@@ -319,18 +318,10 @@
                 </tr>            
             </table>
         </td>
-        <td>
-            <select size="5" id="deliverable_list">
-                
-            </select>
-        </td>
     </tr>
     <tr>
         <td>
             <input type="button" value="Add New Deliverable" id="add_new_deliverable" />       
-        </td>
-        <td>
-            <input type="button" value="Remove Selected Deliverable" id="remove_selected_deliverable" />       
         </td>
     </tr>
     </table>
@@ -338,6 +329,8 @@
     <div id="deliverable_data">
     
     </div>
+    
+    <div id="deliverables_after"></div>
 
     <script type="text/javascript">
         $(function () {
@@ -373,7 +366,7 @@
         <div id="grade_options" class="indented_options">
             <div class="editor-field">
                 Worth
-                @Html.TextBoxFor(model => model.Assignment.PointsPossible, new { id="points_possible", size = 3 })
+                @Html.TextBoxFor(model => model.Assignment.PointsPossible, new { id = "points_possible", size = 3 })
                 Points in Category <span id="grade_category_label"></span>
 
                 @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)
