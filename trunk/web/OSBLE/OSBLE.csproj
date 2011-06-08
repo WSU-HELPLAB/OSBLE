@@ -47,6 +47,9 @@
       <HintPath>App_Code\Libraries\LumenWorks.Framework.IO.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.4.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
@@ -87,6 +90,7 @@
     <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\RubricController.cs" />
+    <Compile Include="Controllers\StudioAssignmentController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="Models\Assignments\AbstractAssignment.cs" />
     <Compile Include="Models\Assignments\Activities\GradeActivity.cs" />
@@ -122,6 +126,7 @@
     <Compile Include="Models\Services\Uploader\DirectoryListing.cs" />
     <Compile Include="Models\Services\Uploader\FileListing.cs" />
     <Compile Include="Models\SilverlightObject.cs" />
+    <Compile Include="Models\ViewModels\StudioAssignmentViewModel.cs" />
     <Compile Include="Services\AuthenticationDomainService.cs" />
     <Compile Include="Services\OSBLEService.cs" />
     <Compile Include="Services\SilverlightFaultBehavior.cs" />
@@ -512,7 +517,7 @@
     <Content Include="Views\Event\Approval.cshtml" />
     <Content Include="Views\Mail\NotFound.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\SilverlightObject.cshtml" />
-    <Content Include="Views\Home\SilverlightTest.cshtml" />
+    <Content Include="Views\StudioAssignment\SilverlightTest.cshtml" />
     <Content Include="Views\BasicAssignment\TeamCreation.cshtml" />
   </ItemGroup>
   <ItemGroup>

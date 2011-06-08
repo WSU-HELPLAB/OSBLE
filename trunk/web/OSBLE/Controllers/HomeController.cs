@@ -100,19 +100,6 @@ namespace OSBLE.Controllers
             return View();
         }
 
-        public ViewResult SilverlightTest()
-        {
-
-            SilverlightObject TestControl = new SilverlightObject {
-                CSSId = "studio_timeline",
-                XapName = "StudioTimelineCreation",
-                Width = "820",
-                Height = "430"
-            };
-
-            return View(TestControl);
-        }
-
         /// <summary>
         /// Sets up display settings for dashboard posts and replies.
         /// </summary>
