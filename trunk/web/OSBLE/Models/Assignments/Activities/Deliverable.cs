@@ -67,5 +67,7 @@ namespace OSBLE.Models.Assignments.Activities
             ErrorMessage="File names can only contain alphanumerics, '-', and '_'")]
         public string Name { get; set; }
 
+        [Required]
+        public string CommentCategories { get; set; }
     }
 }
