@@ -216,12 +216,20 @@ namespace OSBLE.Services
             }
         }
 
+        /// <summary>
+        /// Synces one file to the server if the user is valid
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="data"></param>
+        /// <param name="courseId"></param>
+        /// <param name="authToken"></param>
+        /// <returns></returns>
         [OperationContract]
-        public int SyncFile(string fileName, byte[] data, int count, int courseId, string authToken)
+        public bool SyncFile(string fileName, byte[] data, int courseId, string authToken)
         {
             if (!IsValidKey(authToken))
             {
-                return -1;
+                return false;
             }
 
             //uploads need to handle a check for lastmodified date
@@ -232,12 +240,19 @@ namespace OSBLE.Services
                 fs.Write(data, 0, (int)data.Length);
             }
 
-            return count++; 
+            return true; 
         }
 
-
+        /// <summary>
+        /// Synces all the directories on the current level if the user is valid
+        /// </summary>
+        /// <param name="dirList"></param>
+        /// <param name="relative"></param>
+        /// <param name="courseId"></param>
+        /// <param name="authToken"></param>
+        /// <returns></returns>
         [OperationContract]
-        public bool PrepCurrentPath(DirectoryListing dirList, int courseId, string authToken)
+        public bool PrepCurrentPath(DirectoryListing dirList, string relative, int courseId, string authToken)
         {
             if (!IsValidKey(authToken))
             {
@@ -252,7 +267,8 @@ namespace OSBLE.Services
                 if (dirList.Directories[i].Name != "...")
                 {
                     Course current = (from c in db.AbstractCourses where c.ID == courseId select c as Course).FirstOrDefault();
-                    directory = Path.Combine(FileSystem.GetCourseDocumentsPath(current), dirList.Directories[i].Name);
+                    directory = Path.Combine(FileSystem.GetCourseDocumentsPath(current), relative);
+                    directory = Path.Combine(directory, dirList.Directories[i].Name);
                     if (!Directory.Exists(directory))
                     {
                         Directory.CreateDirectory(directory);
