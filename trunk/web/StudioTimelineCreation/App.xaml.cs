@@ -26,7 +26,15 @@ namespace CreateNewAssignment
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            AssignmentActivitiesCreatorViewModel mvm = new AssignmentActivitiesCreatorViewModel();
+            
+            // Get JSON string of activities or pass empty list if none passed in.
+            string SerializedActivitiesJSON = "[]";
+
+            if(e.InitParams.Keys.Contains("activities")) {
+                SerializedActivitiesJSON = Uri.UnescapeDataString(e.InitParams["activities"]);
+            }
+
+            AssignmentActivitiesCreatorViewModel mvm = new AssignmentActivitiesCreatorViewModel(SerializedActivitiesJSON);
             this.RootVisual = mvm.GetView();
         }
 

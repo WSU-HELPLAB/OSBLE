@@ -9,6 +9,7 @@ using OSBLE.Models.ViewModels;
 using System.Runtime.Serialization.Json;
 using System.IO;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace OSBLE.Controllers
 {
@@ -31,16 +32,27 @@ namespace OSBLE.Controllers
                 CSSId = "studio_timeline",
                 XapName = "StudioTimelineCreation",
                 Width = "820",
-                Height = "430"
+                Height = "430",
+                Parameters = new Dictionary<string,string>() { 
+                }
+
             };
 
             // Create sample activities
             List<SerializableActivity> activities = new List<SerializableActivity>();
 
-            activities.Add(new SerializableActivity() {
+            activities.Add(new SerializableActivity()
+            {
                 DateTime = DateTime.Now,
                 ActivityType = ActivityTypes.Submission
             });
+
+            activities.Add(new SerializableActivity()
+            {
+                DateTime = DateTime.Now.AddDays(3).AddHours(3),
+                ActivityType = ActivityTypes.Rebuttal
+            });
+
 
             activities.Add(new SerializableActivity()
             {
@@ -48,33 +60,30 @@ namespace OSBLE.Controllers
                 ActivityType = ActivityTypes.PeerReview
             });
 
-            //viewModel.SerializedActivitiesJSON = JsonSerializer.SerializeToString(activities);
+            activities.Add(new SerializableActivity()
+            {
+                DateTime = DateTime.Now.AddDays(11),
+                ActivityType = ActivityTypes.Stop
+            });
+
+            viewModel.SerializedActivitiesJSON = viewModel.StudioTimelineCreation.Parameters["activities"] = Uri.EscapeDataString(JsonConvert.SerializeObject(activities));
 
             return View(viewModel);
         }
 
-        [DataContract]
         private class SerializableActivity
         {
-            [DataMember]
             public DateTime DateTime { get; set; }
 
-            [DataMember]
             public ActivityTypes ActivityType { get; set; }
         }
 
-        [DataContract]
         private enum ActivityTypes
         {
-            [EnumMember]
             Submission,
-            [EnumMember]
             PeerReview,
-            [EnumMember]
             Voting,
-            [EnumMember]
             Rebuttal,
-            [EnumMember]
             Stop
         }
 

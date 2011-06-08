@@ -12,9 +12,9 @@ using System.Windows.Shapes;
 
 namespace CreateNewAssignment
 {
-    public partial class AssignmentActivitiesCreaterView : UserControl
+    public partial class AssignmentActivitiesCreatorView : UserControl
     {
-        public AssignmentActivitiesCreaterView()
+        public AssignmentActivitiesCreatorView()
         {
             InitializeComponent();
         }

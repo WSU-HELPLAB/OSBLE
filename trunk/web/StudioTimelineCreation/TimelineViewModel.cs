@@ -45,7 +45,7 @@ namespace CreateNewAssignment
             return thisView;
         }
 
-        public void displayTimeline(SortedList<AssignmentActivityViewModel> aavm)
+        public void UpdateTimeline(SortedList<AssignmentActivityViewModel> aavm)
         {
             assignmentActivites = aavm;
             clearTimeline();
@@ -63,16 +63,20 @@ namespace CreateNewAssignment
                     //adding labels
                     Label timeLabel = new Label();
                     timeLabel.Width = rectList[i].Width;
-                    timeLabel.Content = assignmentActivites[i].StartDateTime.Month.ToString() + "/" + assignmentActivites[i].StartDateTime.Day.ToString() + "\n11:59PM";
+                    timeLabel.Content = assignmentActivites[i].StartDateTime.Month.ToString() + "/" + assignmentActivites[i].StartDateTime.Day.ToString() + "\n" + assignmentActivites[i].StartDateTime.ToString("h:mm tt");
                     thisView.TimelineTimes.Children.Add(timeLabel);
 
                     //adding images
                     Image picToAdd = new Image() { Source = AssignmentActivitiesFactory.GetImageSourceFromActivities(assignmentActivites[i].ActivityType) };
                     int offSetToAllign = 32;
                     if (i >= 1)
+                    {
                         picToAdd.Margin = new Thickness(rectList[i - 1].Width - 20, offSetToAllign, 0, 0);
+                    }
                     else
+                    {
                         picToAdd.Margin = new Thickness(0, offSetToAllign, 0, 0);
+                    }
                     thisView.TimelineIcons.Children.Add(picToAdd);
                 }
             }

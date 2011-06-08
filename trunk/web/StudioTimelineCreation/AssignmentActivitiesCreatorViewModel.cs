@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using CreateNewAssignment.AssignmentActivities;
+using Newtonsoft.Json;
 
 namespace CreateNewAssignment
 {
@@ -13,7 +14,7 @@ namespace CreateNewAssignment
     {
         #region Fields
 
-        private AssignmentActivitiesCreaterView thisView = new AssignmentActivitiesCreaterView();
+        private AssignmentActivitiesCreatorView thisView = new AssignmentActivitiesCreatorView();
         private MonthViewModel calendarLeft = new MonthViewModel();
         private MonthViewModel calendarRight = new MonthViewModel();
         private List<CalendarDayItemView> listOfDays = new List<CalendarDayItemView>();
@@ -34,14 +35,14 @@ namespace CreateNewAssignment
 
         private void Calendar_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            activityMenu.AddNewActicity += new NewActivityEventHandler(activityMenu_AddNewActicity);
+            activityMenu.AddNewActivity += new NewActivityEventHandler(activityMenu_AddNewActivity);
             dayRightClickedOn = GetDayFromPoint(GetMouseLocation(e));
             activityMenu.Open();
         }
 
-        private void activityMenu_AddNewActicity(object sender, NewActivityEventArgs e)
+        private void activityMenu_AddNewActivity(object sender, NewActivityEventArgs e)
         {
-            activityMenu.AddNewActicity -= new NewActivityEventHandler(activityMenu_AddNewActicity);
+            activityMenu.AddNewActivity -= new NewActivityEventHandler(activityMenu_AddNewActivity);
 
             //we treat this as if they just dropped it onto that calendar day
             droppedAssignmentActivity(dayRightClickedOn, new AssignmentActivityViewModel(e.activity));
@@ -76,7 +77,7 @@ namespace CreateNewAssignment
                                 aaVM.CalendarDay = day;
                                 aaVM.StartDateTime = day.MyDate;
                                 assignmentActivites.Update(aaVM);
-                                UpdateActivityDisplay();
+                                UpdateActivities();
                             }
                         }
                     }
@@ -236,23 +237,29 @@ namespace CreateNewAssignment
 
             if (isValidAddition(aaVM, day.MyDate))
             {
-                aaVM.StartDateTime = day.MyDate;
-                aaVM.CalendarDay = day;
-                assignmentActivites.AddInOrder(aaVM);
-                aaVM.MouseLeftButtonDown += new MouseButtonEventHandler(AssignmentActivityViewModel_MouseLeftButtonDown);
-                aaVM.MouseRightButtonDown += new MouseButtonEventHandler(AssignmentActivityViewModel_MouseRightButtonDown);
-                aaVM.RemoveRequested += new EventHandler(aaVM_RemoveRequested);
-                UpdateActivityDisplay();
-                /*
-                MessageBox.Show(aaVM.StartDateTime.ToString());
-                MessageBox.Show(aaVM.ActivityType.ToString());
-                */
+                addAssignmentActivity(aaVM, day);
+
             }
             else
             {
                 Activities[] allowedActivites = AssignmentActivitiesFactory.AllowedPreceedActivities(aaVM.ActivityType);
                 MessageBox.Show(string.Join(" or ", allowedActivites) + " must proceed a(n) " + aaVM.ActivityType.ToString());
             }
+        }
+
+        private void addAssignmentActivity(AssignmentActivityViewModel aaVM, CalendarDayItemView day)
+        {
+            if (day != null)
+            {
+                aaVM.StartDateTime = day.MyDate;
+            }
+
+            aaVM.CalendarDay = day;
+            assignmentActivites.AddInOrder(aaVM);
+            aaVM.MouseLeftButtonDown += new MouseButtonEventHandler(AssignmentActivityViewModel_MouseLeftButtonDown);
+            aaVM.MouseRightButtonDown += new MouseButtonEventHandler(AssignmentActivityViewModel_MouseRightButtonDown);
+            aaVM.RemoveRequested += new EventHandler(aaVM_RemoveRequested);
+            UpdateActivities();
         }
 
         private void AssignmentActivityViewModel_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -283,7 +290,7 @@ namespace CreateNewAssignment
             {
                 aavm.Remove();
                 assignmentActivites.Remove(aavm);
-                UpdateActivityDisplay();
+                UpdateActivities();
             }
             else
             {
@@ -390,7 +397,7 @@ namespace CreateNewAssignment
                 }
             }
 
-            UpdateActivityDisplay();
+            UpdateActivities();
         }
 
         private CalendarDayItemView findCalendarDayItemView(DateTime dateTime)
@@ -440,34 +447,36 @@ namespace CreateNewAssignment
 
         #region Public Methods
 
-        public void UpdateActivityDisplay()
+        public void UpdateActivities()
         {
-            timeline.displayTimeline(assignmentActivites);
+            timeline.UpdateTimeline(assignmentActivites);
             ClearColorOfDays();
+            if (assignmentActivites.Count != 0)
+            {
+                int index = assignmentActivites.FindInsertionSpot(new AssignmentActivityViewModel(Activities.Null, calendarLeft.MonthYear));
+                if (index > 0)
+                {
+                    ChangeColorOfDaysToTheRight(calendarLeft.GetCalendarDayItemView(calendarLeft.MonthYear), assignmentActivites[index - 1].ActivityColor);
+                }
 
-            int index = assignmentActivites.FindInsertionSpot(new AssignmentActivityViewModel(Activities.Null, calendarLeft.MonthYear));
-            if (index > 0)
-            {
-                ChangeColorOfDaysToTheRight(calendarLeft.GetCalendarDayItemView(calendarLeft.MonthYear), assignmentActivites[index - 1].ActivityColor);
-            }
-
-            if (index < 0)
-            {
-                index = 0;
-            }
-            while (index < assignmentActivites.Count)
-            {
-                AssignmentActivityViewModel aavm = assignmentActivites[index];
-                ChangeColorOfDaysToTheRight(aavm.CalendarDay, aavm.ActivityColor);
-                index++;
+                if (index < 0)
+                {
+                    index = 0;
+                }
+                while (index < assignmentActivites.Count)
+                {
+                    AssignmentActivityViewModel aavm = assignmentActivites[index];
+                    ChangeColorOfDaysToTheRight(aavm.CalendarDay, aavm.ActivityColor);
+                    index++;
+                }
             }
         }
 
-        public AssignmentActivitiesCreatorViewModel()
+        public AssignmentActivitiesCreatorViewModel(string SerializedActivitiesJSON)
         {
             //adding the calendars
-            calendarLeft.MonthYear = new DateTime(2011, 7, 1);
-            calendarRight.MonthYear = new DateTime(2011, 8, 1);
+            calendarLeft.MonthYear = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            calendarRight.MonthYear = calendarLeft.MonthYear.AddMonths(1);
             calendarLeft.GetView().SetValue(Grid.RowProperty, 2);
             calendarLeft.GetView().SetValue(Grid.ColumnProperty, 0);
             calendarRight.GetView().SetValue(Grid.RowProperty, 2);
@@ -480,6 +489,7 @@ namespace CreateNewAssignment
             //adding timeline
             timeline.GetView().SetValue(Grid.RowProperty, 3);
             timeline.GetView().SetValue(Grid.ColumnSpanProperty, 3);
+            timeline.GetView().SizeChanged += new SizeChangedEventHandler(TimelineSizeChanged);
             thisView.LayoutRoot.Children.Add(timeline.GetView());
             //done adding timeline
 
@@ -511,13 +521,75 @@ namespace CreateNewAssignment
                     listOfDays.Add(ui as CalendarDayItemView);
                 }
             }
+
+            // Deserialize activities from init params string,
+            // and place them into calendar.
+
+            List<SerializableActivity> activities = JsonConvert.DeserializeObject<List<SerializableActivity>>(SerializedActivitiesJSON);
+
+            foreach(SerializableActivity sa in activities) {
+                CalendarDayItemView day = findCalendarDayItemView(sa.DateTime);
+
+                AssignmentActivityViewModel aaVM;
+
+                // Default is stop.
+                switch (sa.ActivityType)
+                {
+                    case ActivityTypes.Submission:
+                        aaVM = new AssignmentActivityViewModel(Activities.Submission);
+                        break;
+                    case ActivityTypes.PeerReview:
+                        aaVM = new AssignmentActivityViewModel(Activities.PeerReview);
+                        break;
+                    case ActivityTypes.Voting:
+                        aaVM = new AssignmentActivityViewModel(Activities.IssueVoting);
+                        break;
+                    case ActivityTypes.Rebuttal:
+                        aaVM = new AssignmentActivityViewModel(Activities.AuthorRebuttal);
+                        break;
+                    default:
+                        aaVM = new AssignmentActivityViewModel(Activities.Stop);
+                        break;
+                }
+
+                aaVM.StartDateTime = sa.DateTime;
+
+                if (isValidAddition(aaVM, aaVM.StartDateTime.Date))
+                {
+                    addAssignmentActivity(aaVM, day);
+                }
+            }
+
+            //UpdateActivityDisplay();
+
         }
 
-        public AssignmentActivitiesCreaterView GetView()
+        void TimelineSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            timeline.UpdateTimeline(assignmentActivites);
+        }
+
+        public AssignmentActivitiesCreatorView GetView()
         {
             return thisView;
         }
 
         #endregion Public Methods
+
+        public class SerializableActivity
+        {
+            public DateTime DateTime { get; set; }
+
+            public ActivityTypes ActivityType { get; set; }
+        }
+
+        public enum ActivityTypes
+        {
+            Submission,
+            PeerReview,
+            Voting,
+            Rebuttal,
+            Stop
+        }
     }
 }

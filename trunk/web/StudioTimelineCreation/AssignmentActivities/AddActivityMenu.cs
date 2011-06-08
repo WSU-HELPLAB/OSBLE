@@ -13,7 +13,7 @@ namespace CreateNewAssignment.AssignmentActivities
 {
     public class AddActivityMenu : ContextMenu
     {
-        public event NewActivityEventHandler AddNewActicity = delegate { };
+        public event NewActivityEventHandler AddNewActivity = delegate { };
 
         public AddActivityMenu()
         {
@@ -55,7 +55,7 @@ namespace CreateNewAssignment.AssignmentActivities
 
             Activities activity = AssignmentActivitiesFactory.GetActivitiesFromImage(menuItem.Icon as Image);
 
-            AddNewActicity(this, new NewActivityEventArgs(activity));
+            AddNewActivity(this, new NewActivityEventArgs(activity));
         }
 
         /// <summary>
