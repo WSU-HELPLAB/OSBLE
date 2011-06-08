@@ -69,6 +69,7 @@ namespace FileUploader
             syncedFiles.GetFileListCompleted += new EventHandler<GetFileListCompletedEventArgs>(syncedFiles_GetFileListCompleted);
             syncedFiles.SyncFileCompleted += new EventHandler<SyncFileCompletedEventArgs>(syncedFiles_SyncFileCompleted);
             syncedFiles.GetValidUploadLocationsCompleted += new EventHandler<GetValidUploadLocationsCompletedEventArgs>(syncedFiles_GetValidUploadLocationsCompleted);
+            //syncedFiles.PrepCurrentPathCompleted += new EventHandler<PrepCurrentPathCompletedEventArgs>(syncedFiles_PrepCurrentPathCompleted);
 
             //local event listeners
             SyncButton.Click += new RoutedEventHandler(SyncButton_Click);
@@ -166,26 +167,55 @@ namespace FileUploader
         {
             uploading.Show();
 
-            SyncCurrentDirectories(this.LocalFileList.DataContext);
-            SyncCurrentFile(this.LocalFileList.DataContext, 0);
+            int count = 1;
+            DirectoryListing Listing = new DirectoryListing();
+            Listing = this.LocalFileList.DataContext;
+
+            traveseDirectories(LocalPath, Listing, count);
+
+            uploading.Close();
         }
 
+        // solicites the server to create the directories and files in the tree
+        private void traveseDirectories(string path, DirectoryListing Listing, int count)
+        {
+            int index = 0;
+            // creates the directories
+            SyncCurrentDirectories(Listing);
+            foreach (string directory in Directory.EnumerateDirectories(Path.Combine(LocalPath, Listing.Directories[count].Name)))
+            {
+                // creates the files
+                SyncCurrentFile(Listing, ++index);
+                // drops down a level
+                Listing = BuildLocalDirectoryListing(Path.Combine(LocalPath, Listing.Directories[count].Name));
+                
+                // recursive call
+                traveseDirectories(directory, Listing, count);
+                ++count;
+            }
+            
+        }
+
+        // prompts server to create all directories on the current level
         void SyncCurrentDirectories(DirectoryListing level)
         {
             if (level.Directories.Count > 0)
             {
-                syncedFiles.PrepCurrentPathAsync(level, course, authToken);
+                syncedFiles.PrepCurrentPathAsync(level, course.Key, authToken);
             }
         }
 
+        // Prompts the server to create the file
         void SyncCurrentFile(DirectoryListing level, int fileindex)
         {
             string newFilePath;
-            newFilePath = level.Files[fileindex].Name;//Path.Combine(LocalPath, level.Files[fileindex].Name);
+            newFilePath = Path.Combine(LocalPath, level.Files[fileindex].Name);
             // updating the textblock with current file uploading
-            uploading.UploadingFile.Text = newFilePath;
+            uploading.UploadingFile.Text = level.Files[fileindex].Name;
 
             //update progres bar (ie add a tick)
+
+            uploading.UpdateLayout();
 
             MemoryStream s = new MemoryStream();
             StreamWriter writer = new StreamWriter(s);
@@ -197,8 +227,16 @@ namespace FileUploader
                 byte[] data = new byte[stream.Length];
                 stream.Read(data, 0, (int)stream.Length);
 
-                syncedFiles.SyncFileAsync(newFilePath, data, fileindex, course, authToken);
+                syncedFiles.SyncFileAsync(newFilePath, data, fileindex, course.Key, authToken);
             }
+        }
+
+        // when one file is done being created it will start the next one as long as there is one left
+        void syncedFiles_SyncFileCompleted(object sender, SyncFileCompletedEventArgs e)
+        {
+            //start the next file
+            if (this.LocalFileList.DataContext.Files.Count > e.Result && e.Result != -1)
+                SyncCurrentFile(this.LocalFileList.DataContext, e.Result);
         }
         
         public DirectoryListing BuildLocalDirectoryListing(string path)
@@ -267,13 +305,6 @@ namespace FileUploader
         void syncedFiles_GetFileListCompleted(object sender, GetFileListCompletedEventArgs e)
         {
             RemoteFileList.DataContext = e.Result;
-        }
-
-        void syncedFiles_SyncFileCompleted(object sender, SyncFileCompletedEventArgs e)
-        {
-            //start the next file
-            if(this.LocalFileList.DataContext.Files.Count > e.Result)
-                SyncCurrentFile(this.LocalFileList.DataContext, e.Result);
         }
 
         /*
