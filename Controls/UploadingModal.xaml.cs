@@ -29,6 +29,11 @@ namespace FileUploader.Controls
         {
             this.DialogResult = false;
         }
+
+        private void OKButton_Click_1(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
 
