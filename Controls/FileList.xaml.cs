@@ -77,7 +77,7 @@ namespace FileUploader.Controls
         void ListOfFiles_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             FileListItem selectedItem = (sender as ListBox).SelectedItem as FileListItem;
-            if (lastSelectedItem == selectedItem)
+            if (lastSelectedItem == selectedItem && selectedItem != null)
             {
                 //we only care about double clicks on directory listings
                 if (selectedItem.DataContext is DirectoryListing)
@@ -113,8 +113,6 @@ namespace FileUploader.Controls
             }
             lastSelectedItem = selectedItem;
         }
-
-        
 
         /// <summary>
         /// Updates the current list of files
