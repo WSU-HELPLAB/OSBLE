@@ -86,6 +86,7 @@
       <xs:sequence>
         <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="data" nillable="true" type="xs:base64Binary" />
+        <xs:element minOccurs="0" name="updated" type="xs:dateTime" />
         <xs:element minOccurs="0" name="courseId" type="xs:int" />
         <xs:element minOccurs="0" name="authToken" nillable="true" type="xs:string" />
       </xs:sequence>
