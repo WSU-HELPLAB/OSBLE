@@ -91,11 +91,13 @@ namespace FileUploader
         void DownButton_Click(object sender, RoutedEventArgs e)
         {
             RemoteFileList.MoveSelectionDown();
+            syncedFiles.UpdateListingOrderAsync(RemoteFileList.DataContext, course.Key, authToken);
         }
 
         void UpButton_Click(object sender, RoutedEventArgs e)
         {
             RemoteFileList.MoveSelectionUp();
+            syncedFiles.UpdateListingOrderAsync(RemoteFileList.DataContext, course.Key, authToken);
         }
 
         void UploadLocation_SelectionChanged(object sender, SelectionChangedEventArgs e)
