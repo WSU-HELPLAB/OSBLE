@@ -551,6 +551,10 @@
     <Content Include="Views\Gradebook\_Tabs.cshtml" />
     <Content Include="Views\Gradebook\Tab.cshtml" />
     <Content Include="Views\Account\ResetPasswordSuccess.cshtml" />
+    <Content Include="Views\Admin\Delete.cshtml" />
+    <Content Include="Views\Admin\Details.cshtml" />
+    <Content Include="Views\Admin\Edit.cshtml" />
+    <Content Include="Views\Admin\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

@@ -15,6 +15,11 @@ namespace OSBLE.Controllers
     [IsAdmin]
     public class AdminController : OSBLEController
     {
+        public AdminController()
+            : base()
+        {
+            ViewBag.CurrentTab = "Administration";
+        }
         //
         // GET: /Admin/
 

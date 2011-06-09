@@ -207,8 +207,10 @@ namespace OSBLE.Controllers
             menu.Add(new MenuItem("Users", "Roster", "Index", false, true, false, false, false, false));
             menu.Add(new MenuItem("Course Settings", "Course", "Edit", true, true, true, false, true, false));
             menu.Add(new MenuItem("Community Settings", "Community", "Edit", true, true, true, false, false, true));
+            menu.Add(new MenuItem("Administration", "Admin", "Index", false, false, false, true, false, false));
+
             ViewBag.Menu = menu;
-        }
+       } 
 
         /// <summary>
         /// Sets currentCourses for the current user, which is a list of
