@@ -19,14 +19,30 @@ namespace FileUploader.Controls
     {
         //I dislike using strings as keys.  Enums are nicer
         private enum IsolatedStorageKeys { SaveCredentials, UserName, Password };
+
+        //reference to our web service
         private UploaderWebServiceClient client = new UploaderWebServiceClient();
+
+        /// <summary>
+        /// Event handler that signals when the control received a valid login token
+        /// </summary>
         public EventHandler ValidTokenReceived = delegate { };
+
+        //connection timeout timer
         private DispatcherTimer timer;
+
+        /// <summary>
+        /// Gets or sets the authentication token sent by the server
+        /// </summary>
         public string Token
         {
             get;
             set;
         }
+
+        /// <summary>
+        /// Constructor method.  Nuff said
+        /// </summary>
         public LoginWindow()
         {
             InitializeComponent();
@@ -51,7 +67,8 @@ namespace FileUploader.Controls
             UserNameTextBox.KeyUp += new KeyEventHandler(TextBox_KeyUp);
             RememberCredentialsCheckBox.Checked += new RoutedEventHandler(RememberCredentialsCheckBox_Checked);
 
-            //set up our "connection timeout" timer
+            //set up our "connection timeout" timer.  Currently set to to a 10 second timeout.  May
+            //need to adjust.
             timer = new DispatcherTimer();
             timer.Interval = new TimeSpan(0, 0, 10);
             timer.Tick += new EventHandler(timer_Tick);
@@ -62,7 +79,7 @@ namespace FileUploader.Controls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void RememberCredentialsCheckBox_Checked(object sender, RoutedEventArgs e)
+        private void RememberCredentialsCheckBox_Checked(object sender, RoutedEventArgs e)
         {
             //code is more generic if we don't reference the checkbox by name
             CheckBox cb = sender as CheckBox;
@@ -79,14 +96,25 @@ namespace FileUploader.Controls
             }
         }
 
-        void timer_Tick(object sender, EventArgs e)
+        /// <summary>
+        /// Handles connection timeout issues
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void timer_Tick(object sender, EventArgs e)
         {
             OKButton.IsEnabled = true;
             MessageBox.Show("There was an error validating your credentials.  Please try again.  If the problem persists, please contact OSBLE support.");
             timer.Stop();
         }
 
-        void TextBox_KeyUp(object sender, KeyEventArgs e)
+        /// <summary>
+        /// Listens for keyup presses on our user name and password textbox.  Allows "enter" to trigger
+        /// authentication.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TextBox_KeyUp(object sender, KeyEventArgs e)
         {
             //shortcut for logon
             if (e.Key == Key.Enter)
@@ -95,7 +123,12 @@ namespace FileUploader.Controls
             }
         }
 
-        void client_ValidateUserCompleted(object sender, ValidateUserCompletedEventArgs e)
+        /// <summary>
+        /// Called when we receive a response from the validation server
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void client_ValidateUserCompleted(object sender, ValidateUserCompletedEventArgs e)
         {
             Token = e.Result;
             timer.Stop();
@@ -114,6 +147,11 @@ namespace FileUploader.Controls
             }
         }
 
+        /// <summary>
+        /// Handles the validation call to the server
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             OKButton.IsEnabled = false;
