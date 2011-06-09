@@ -47,8 +47,6 @@ namespace FileUploader
             }
         }
 
-         
-
         //reference to our web service
         UploaderWebServiceClient syncedFiles = new UploaderWebServiceClient();
 
