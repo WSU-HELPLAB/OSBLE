@@ -109,7 +109,9 @@
   <ItemGroup>
     <None Include="Properties\AppManifest.xml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Icons\swap.png" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\add.png" />
     <Resource Include="Icons\delete.png" />

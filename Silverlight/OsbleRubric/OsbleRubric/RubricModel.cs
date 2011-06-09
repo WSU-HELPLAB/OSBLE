@@ -43,6 +43,7 @@ namespace OsbleRubric
             initialize();
         }
 
+        //sets up all the default paramaters for the grid
         private void initialize()
         {
             //adding grid to the view
@@ -56,7 +57,7 @@ namespace OsbleRubric
             customDataGrid.HideBordersForLastTwoColumns = false;
             customDataGrid.LastRowAsTwoCells = true;
             customDataGrid.BorderBrush = new SolidColorBrush(Colors.Black);
-            customDataGrid.BorderThickness = 1.0;
+            customDataGrid.BorderThickness = 2.0;
 
             //adding initial columns & rows
             customDataGrid.PlaceUIElement(createCol0Row0(), 0, 0);
@@ -85,8 +86,10 @@ namespace OsbleRubric
             {
                 customDataGrid.BaseGrid.ColumnDefinitions[i].Width = new GridLength(ColWidth);
             }
-        }
 
+            //sets up initial tabIndexes
+            setTabIndex();
+        }
 
         //This method creates the comment column and adds it to the grid (last column)
         private void createCommentColumn()
@@ -104,6 +107,7 @@ namespace OsbleRubric
             {
                 IsChecked = true,
                 HorizontalAlignment = HorizontalAlignment.Center,
+                IsTabStop = true,
             };
             TextBlock commentsTB = new TextBlock()
             {
@@ -142,6 +146,7 @@ namespace OsbleRubric
                 Width = commentColumnWidth,
                 Margin = new Thickness(5, 5, 5, 5),
                 IsReadOnly = true,
+                IsTabStop = false,
             };
             return commentBox;
         }
@@ -204,11 +209,12 @@ namespace OsbleRubric
             //textblock for bottom row
             TextBlock pointsPossible_TextBlock = new TextBlock()
             {
-                Text = "Points Possible: ",
+                Text = ("Points Possible: " + calcTotalPoints().ToString()),
                 FontSize = GlobalFontSize,
                 FontWeight = FontWeights.Bold,
                 HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment = VerticalAlignment.Bottom
+                VerticalAlignment = VerticalAlignment.Bottom,
+                Margin = new Thickness(5,5,5,5)
             };
 
             //setting the textblock to span all remaining columns
@@ -254,8 +260,6 @@ namespace OsbleRubric
             customDataGrid.PlaceUIElement(createCommentCell(), customDataGrid.BaseGrid.ColumnDefinitions.Count - 1, rowPlacement);
         }
 
-
-
         //This method creates the cells used for a Level column (With the exception of the first row)
         private StackPanel createLevelCell()
         {
@@ -292,12 +296,20 @@ namespace OsbleRubric
                 Width = 70,
                 Height = 22
             };
+
+            textbox.LostFocus += new RoutedEventHandler(textbox_LostFocus);
+
             TextBlock textBlock = new TextBlock() { Text = "Points", Margin = new Thickness(5, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
 
             returnVal.Children.Add(textbox);
             returnVal.Children.Add(textBlock);
 
             return returnVal;
+        }
+
+        void textbox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            updateLastRow();
         }
 
         //This method creates the cells used for the Performance Criterion column (With the exception of the first row)
@@ -333,14 +345,72 @@ namespace OsbleRubric
             Image Img1 = new Image() { Source = helpIconSource, Width = 16, Height = 16, Margin = new Thickness(3, 0, 0, 0) };
             ToolTipService.SetToolTip(Img1, "Input your Performance Criterion in the text area.\nThe minus button is for removing a criterion row.");
 
-            /*DELETE ME SOON*/
-            Img1.MouseLeftButtonDown += new MouseButtonEventHandler(Img1_MouseLeftButtonDown);
             TBlock1.MouseLeftButtonDown += new MouseButtonEventHandler(TBlock1_MouseLeftButtonDown);
 
             //adding children to returnVal
             returnVal.Children.Add(TBlock1);
             returnVal.Children.Add(Img1);
             return returnVal;
+        }
+
+        void TBlock1_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            performSwap(2, 3);
+        }
+
+        struct postitionUIElement
+        {
+            UIElement uiele;
+            int row;
+            int col;
+        }
+        private void performSwap(int row1, int row2)
+        {
+            MessageBox.Show("IM IN");
+            List<UIElement> borderList1 = new List<UIElement>();
+            List<UIElement> borderList2 = new List<UIElement>();
+            foreach (Border br in customDataGrid.BaseGrid.Children) //removing any borders from the grid and putting them in a list
+            {
+                int row = (int)br.GetValue(Grid.RowProperty);
+                int col = (int)br.GetValue(Grid.ColumnProperty);
+                if (row == row1)
+                {
+                    if (br.Child != null)
+                    {
+                        (br.Child).SetValue(Grid.ColumnProperty, col);
+                        borderList1.Add(br.Child);
+                        customDataGrid.RemoveUIElement(br.Child);
+                    }
+                    
+                }
+                if (row == row2)
+                {
+                    if (br.Child != null)
+                    {
+                        (br.Child).SetValue(Grid.ColumnProperty, col);
+                        borderList2.Add(br.Child);
+                        customDataGrid.RemoveUIElement(br.Child);
+                    }
+                }
+            }
+
+            
+            foreach (UIElement br in borderList1)
+            {
+                if (br != null)
+                {
+                    br.SetValue(Grid.RowProperty, row2);
+                    customDataGrid.PlaceUIElement(br, (int)br.GetValue(Grid.ColumnProperty), row2);
+                }
+            }
+            foreach (UIElement br in borderList2)
+            {
+                if (br != null)
+                {
+                    br.SetValue(Grid.RowProperty, row1);
+                    customDataGrid.PlaceUIElement(br, (int)br.GetValue(Grid.ColumnProperty), row1);
+                }
+            }
         }
 
         //This method creates the top row for the Weight Criterion column
@@ -352,10 +422,6 @@ namespace OsbleRubric
             TextBlock TBlock2 = new TextBlock() { Text = "Criterion Weight", FontWeight = FontWeights.Bold, FontSize = GlobalFontSize, VerticalAlignment = VerticalAlignment.Center };
             Image Img2 = new Image() { Source = helpIconSource, Width = 16, Height = 16, Margin = new Thickness(3, 0, 0, 0) };
             ToolTipService.SetToolTip(Img2, "The criterion weight column is used to set the\nweights of each criterion row. By default the\nweight is evenly distrbuted among the criterion.\nTo set the weight simply input a number between\n1 and 100 in the column below. The weight is\nautomatically recalculated upon input.");
-
-            /*DELETE ME SOON*/
-            Img2.MouseLeftButtonDown += new MouseButtonEventHandler(Img2_MouseLeftButtonDown);
-            TBlock2.MouseLeftButtonDown += new MouseButtonEventHandler(TBlock2_MouseLeftButtonDown);
 
             //adding children to returnVal
             returnVal.Children.Add(TBlock2);
@@ -432,6 +498,10 @@ namespace OsbleRubric
             SP2.Children.Add(CB1);
             SP2.Children.Add(Img2);
 
+            //setting tabindex for controls
+            TBox1.TabIndex = 0;
+            CB1.TabIndex = 0;
+
             returnVal.Children.Add(SP1);
             returnVal.Children.Add(SP2);
             return returnVal;
@@ -467,7 +537,85 @@ namespace OsbleRubric
             return returnVal;
         }
 
+        //This method deletes the TextBlock in the last row and recreates it. This is the only way I could find to keep its position correct. (Adjusting its columnspan property did not work)
+        private void updateLastRow()
+        {
+            foreach (Border br in customDataGrid.BaseGrid.Children)
+            {
+                if (br.Child is TextBlock)
+                {
+                    int row = (int)br.GetValue(Grid.RowProperty);
+                    if (row == (customDataGrid.BaseGrid.RowDefinitions.Count - 1)) //last row && a textbox (only 1 textbox in last row)
+                    {
+                        TextBlock temp = new TextBlock()
+                        {
+                            Text = ("Points Possible: " + calcTotalPoints().ToString()),
+                            FontSize = (br.Child as TextBlock).FontSize,
+                            FontWeight = (br.Child as TextBlock).FontWeight,
+                            HorizontalAlignment = (br.Child as TextBlock).HorizontalAlignment,
+                            VerticalAlignment = (br.Child as TextBlock).VerticalAlignment,
+                            Margin = (br.Child as TextBlock).Margin
+                        };
+                        temp.SetValue(Grid.ColumnSpanProperty, customDataGrid.BaseGrid.ColumnDefinitions.Count - 1);
+                        customDataGrid.RemoveUIElement(br.Child as TextBlock);
+                        customDataGrid.PlaceUIElement(temp, 1, customDataGrid.BaseGrid.RowDefinitions.Count - 1);
+                    }
+                }
+            }
+        }
 
+        //This method sets the tab indexes for each cell (excluding the first row, which is already set up)
+        private void setTabIndex()
+        {
+            foreach (Border k in customDataGrid.BaseGrid.Children)
+            {
+                int row = (int)k.GetValue(Grid.RowProperty);
+                int col = (int)k.GetValue(Grid.ColumnProperty);
+                if (k.Child is StackPanel)
+                {
+                    foreach (UIElement tb in (k.Child as StackPanel).Children)
+                    {
+                        if (tb is Control)
+                        {
+                            //we want tabs to go from left to right, and then down. So to do this, we should make tab index:
+                            //row*10 + column. This will produce an effect of 0,1,2,3,4,5 for the first row, 10,11,12... for the second and so on
+                            (tb as Control).TabIndex = row * 100 + col;
+                            
+                        }
+                    }
+                }
+            }
+        }
+
+        /*This function calculates the total points by summing all the values from the point boxes (in the second column) 
+         *If the value is "" or contains non-number value, then it will not be included*/
+        private int calcTotalPoints()
+        {
+            int returnVal = 0;
+            foreach (Border br in customDataGrid.BaseGrid.Children) 
+            {
+                int col = (int)br.GetValue(Grid.ColumnProperty);
+                /*The textboxes are contained in a stackpanel in column 2 (1 when considering 0 offset),
+                 * so any Textboxes in this field are the ones we want to sum*/
+                if (br.Child is StackPanel && col == 1) 
+                {
+                    foreach (UIElement tb in (br.Child as StackPanel).Children)
+                    {
+                        if (tb is TextBox)
+                        {
+                            int temp;
+                            if (int.TryParse((tb as TextBox).Text, out temp))
+                            {
+                                returnVal += temp;
+                            }   
+                        }
+                    }
+                }
+            }
+            return returnVal;
+        }
+
+        //Returns the view
         public Rubric GetView()
         {
             return thisView;
@@ -477,49 +625,40 @@ namespace OsbleRubric
 
         private void DeleteRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            customDataGrid.RemoveRow(getRow(e));
+            if (customDataGrid.BaseGrid.RowDefinitions.Count != 3) //won't remove if its the only row
+            {
+                customDataGrid.RemoveRow(getRow(e));
+                updateLastRow();
+            }   
         }
-
         private void DeleteCol_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            customDataGrid.RemoveColumn(getColumn(e));
+            if (customDataGrid.BaseGrid.ColumnDefinitions.Count != 5) //won't remove if its the only column
+            {
+                customDataGrid.RemoveColumn(getColumn(e));
+            }
         }
-        void addCol_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void addCol_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            //removes last two columns (add button column & comment column), creates the new level column, and recreates the addbutton/comment column
+            
             customDataGrid.RemoveColumn(customDataGrid.BaseGrid.ColumnDefinitions.Count - 1);
             customDataGrid.RemoveColumn(customDataGrid.BaseGrid.ColumnDefinitions.Count - 1);
+
             createLevelColumn();
             createAddButtonColumn();
             createCommentColumn();
-            customDataGrid.updateBorders();
+            updateLastRow();
+            setTabIndex();
+            
         }
-        void addRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void addRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             //removes the last row (the add button), then adds the new criterion row, then adds the add button row back in
             customDataGrid.RemoveRow(customDataGrid.BaseGrid.RowDefinitions.Count - 1);
             createCriterionRow();
             createAddButtonRow();
-            customDataGrid.updateBorders();
-        }
-        //all the following are temporary events
-        private void TBlock1_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            createCriterionRow();
-        }
-
-        private void Img1_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            createLevelColumn();
-        }
-
-        private void Img2_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            MessageBox.Show("Columns: " + customDataGrid.BaseGrid.ColumnDefinitions.Count.ToString() + "Rows: " + customDataGrid.BaseGrid.RowDefinitions.Count.ToString());
-        }
-
-        private void TBlock2_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-           
+            setTabIndex();
         }
 
         #endregion Events

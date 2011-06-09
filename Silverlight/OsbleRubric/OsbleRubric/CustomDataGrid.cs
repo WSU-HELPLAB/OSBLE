@@ -185,17 +185,13 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
             }
         }
 
-        public void updateBorders()
-        {
-            changeBorderThickness();
-        }
         private void changeBorderThickness()
         {
             foreach (Border br in baseGrid.Children)
             {
                 int row = (int)br.GetValue(Grid.RowProperty);
                 int column = (int)br.GetValue(Grid.ColumnProperty);
-                if (hideBordersForLastRow != true || row != baseGrid.RowDefinitions.Count - 1)
+                if ((hideBordersForLastRow != true || row != baseGrid.RowDefinitions.Count - 1) && (row < baseGrid.RowDefinitions.Count && column < baseGrid.ColumnDefinitions.Count))
                 {
                     if (hideBordersForLastTwoColumns != true || column < baseGrid.ColumnDefinitions.Count - 2)
                     {
@@ -204,7 +200,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
                         //place that edge as well.
                         if (column != 0 && row != 0)
                         {
-                            if (lastRowAsTwoCells && (row == baseGrid.RowDefinitions.Count - 1) && (column != baseGrid.RowDefinitions.Count - 1)) //last row & not last column
+                            if (lastRowAsTwoCells && (row == baseGrid.RowDefinitions.Count - 1) && (column != baseGrid.ColumnDefinitions.Count - 1)) //last row & not last column
                             {
                                 br.BorderThickness = new Thickness(0, 0, 0, borderThickness);
                             }
