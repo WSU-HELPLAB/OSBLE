@@ -76,8 +76,7 @@ namespace FileUploader.Controls
             if (lastSelectedItem != null)
             {
                 lastSelectedItem.DataContext.SortOrder -= 1;
-                SwapLocations(ListOfFiles.SelectedIndex, ListOfFiles.SelectedIndex - 1, lastSelectedItem);
-                
+                MoveItem(ListOfFiles.SelectedIndex, ListOfFiles.SelectedIndex - 1);
             }
         }
 
@@ -89,14 +88,21 @@ namespace FileUploader.Controls
             if (lastSelectedItem != null)
             {
                 lastSelectedItem.DataContext.SortOrder += 1;
-                SwapLocations(ListOfFiles.SelectedIndex, ListOfFiles.SelectedIndex + 1, lastSelectedItem);
+                MoveItem(ListOfFiles.SelectedIndex, ListOfFiles.SelectedIndex + 1);
             }
         }
 
-        private void SwapLocations(int oldLocation, int newLocation, FileListItem listItem)
+        /// <summary>
+        /// Moves a list item to a new location
+        /// </summary>
+        /// <param name="oldLocation"></param>
+        /// <param name="newLocation"></param>
+        /// <param name="listItem"></param>
+        private void MoveItem(int oldLocation, int newLocation)
         {
             if (oldLocation > 0 && newLocation > 0)
             {
+                FileListItem listItem = ListOfFiles.Items[oldLocation] as FileListItem;
                 ListOfFiles.Items.RemoveAt(oldLocation);
                 ListOfFiles.Items.Insert(newLocation, listItem);
                 ListOfFiles.SelectedItem = listItem;
