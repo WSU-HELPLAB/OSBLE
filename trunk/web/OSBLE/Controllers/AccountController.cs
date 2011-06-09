@@ -248,13 +248,17 @@ namespace OSBLE.Controllers
 
             string newPass = user.ResetPassword();
 
-            MailMessage mm = new MailMessage("DoNotReply@Osble.org", model.EmailAddress, "PassordReset", newPass);
+            string body = "Your OSBLE password has been reset.\n Your new password is: " + newPass + "\n\nPlease change this password as soon as possible.";
+
+            MailMessage mm = new MailMessage("noreply@osble.org", model.EmailAddress, "[OSBLE] Password Reset Request", body);
 
             //This will need to fixed whenever we get a Server that can send mail
             SmtpClient sc = new SmtpClient();
+            sc.UseDefaultCredentials = true;
+
             sc.Send(mm);
 
-            return View();
+            return View("ResetPasswordSuccess");
         }
 
         [Authorize]
@@ -326,19 +330,25 @@ namespace OSBLE.Controllers
         {
             if (ModelState.IsValid)
             {
-                ViewBag.ContactUsName = model.Name;
-                return RedirectToAction("ContactUsSuccess");
+                //ViewBag.ContactUsName = model.Name;
+
+                SmtpClient mailClient = new SmtpClient();
+                mailClient.UseDefaultCredentials = true;
+
+                MailMessage message = new MailMessage("noreply@osble.org", "support@osble.org");
+
+                message.ReplyToList.Add(new MailAddress(model.Email));
+                message.Subject = "[OSBLE] Support Request from " + model.Name;
+                message.Body = model.Message;
+
+
+                mailClient.Send(message);
+
+                ViewBag.CUName = model.Name;
+
+                return View("ContactUsSuccess");
             }
             return View(model);
-        }
-
-        [HttpPost]
-        public ActionResult ContactUsSuccess(ContactUsModel model)
-        {
-            ViewBag.CUName = model.Name;
-            ViewBag.CUEmail = model.Email;
-            ViewBag.CUMsg = model.Message;
-            return View();
         }
 
         public bool ThumbnailCallback()
