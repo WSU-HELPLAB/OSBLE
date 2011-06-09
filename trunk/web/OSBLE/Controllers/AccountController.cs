@@ -244,7 +244,9 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult ResetPassword(ResetPasswordModel model)
         {
+#if !DEBUG
             var user = Membership.GetUser(model.EmailAddress);
+
 
             string newPass = user.ResetPassword();
 
@@ -257,6 +259,7 @@ namespace OSBLE.Controllers
             sc.UseDefaultCredentials = true;
 
             sc.Send(mm);
+#endif
 
             return View("ResetPasswordSuccess");
         }
@@ -341,9 +344,9 @@ namespace OSBLE.Controllers
                 message.Subject = "[OSBLE] Support Request from " + model.Name;
                 message.Body = model.Message;
 
-
+#if !DEBUG
                 mailClient.Send(message);
-
+#endif
                 ViewBag.CUName = model.Name;
 
                 return View("ContactUsSuccess");
