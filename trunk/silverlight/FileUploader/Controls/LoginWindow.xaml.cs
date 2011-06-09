@@ -11,11 +11,14 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using FileUploader.OsbleServices;
 using System.Windows.Threading;
+using System.IO.IsolatedStorage;
 
 namespace FileUploader.Controls
 {
     public partial class LoginWindow : ChildWindow
     {
+        //I dislike using strings as keys.  Enums are nicer
+        private enum IsolatedStorageKeys { SaveCredentials, UserName, Password };
         private UploaderWebServiceClient client = new UploaderWebServiceClient();
         public EventHandler ValidTokenReceived = delegate { };
         private DispatcherTimer timer;
@@ -27,12 +30,53 @@ namespace FileUploader.Controls
         public LoginWindow()
         {
             InitializeComponent();
-            client.ValidateUserCompleted += new EventHandler<ValidateUserCompletedEventArgs>(client_ValidateUserCompleted);
-            PasswordBox.KeyUp += new KeyEventHandler(PasswordBox_KeyUp);
 
+            //retrieve user / pass if it was previously saved
+            if (
+                IsolatedStorageSettings.ApplicationSettings.Contains(IsolatedStorageKeys.UserName.ToString())
+                &&
+                IsolatedStorageSettings.ApplicationSettings.Contains(IsolatedStorageKeys.Password.ToString())
+                &&
+                (bool)IsolatedStorageSettings.ApplicationSettings[IsolatedStorageKeys.SaveCredentials.ToString()]
+                )
+            {
+                UserNameTextBox.Text = IsolatedStorageSettings.ApplicationSettings[IsolatedStorageKeys.UserName.ToString()].ToString();
+                this.PasswordBox.Password = IsolatedStorageSettings.ApplicationSettings[IsolatedStorageKeys.Password.ToString()].ToString();
+                this.RememberCredentialsCheckBox.IsChecked = true;
+            }
+
+            //UI event listeners
+            client.ValidateUserCompleted += new EventHandler<ValidateUserCompletedEventArgs>(client_ValidateUserCompleted);
+            PasswordBox.KeyUp += new KeyEventHandler(TextBox_KeyUp);
+            UserNameTextBox.KeyUp += new KeyEventHandler(TextBox_KeyUp);
+            RememberCredentialsCheckBox.Checked += new RoutedEventHandler(RememberCredentialsCheckBox_Checked);
+
+            //set up our "connection timeout" timer
             timer = new DispatcherTimer();
             timer.Interval = new TimeSpan(0, 0, 10);
             timer.Tick += new EventHandler(timer_Tick);
+        }
+
+        /// <summary>
+        /// Toggles the remembering of user credentials
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void RememberCredentialsCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            //code is more generic if we don't reference the checkbox by name
+            CheckBox cb = sender as CheckBox;
+
+            if ((bool)cb.IsChecked)
+            {
+                //let the application know that it's okay to save user & pass
+                IsolatedStorageSettings.ApplicationSettings[IsolatedStorageKeys.SaveCredentials.ToString()] = true;
+            }
+            else
+            {
+                //let the application know that it's okay to save user & pass
+                IsolatedStorageSettings.ApplicationSettings[IsolatedStorageKeys.SaveCredentials.ToString()] = false;
+            }
         }
 
         void timer_Tick(object sender, EventArgs e)
@@ -42,7 +86,7 @@ namespace FileUploader.Controls
             timer.Stop();
         }
 
-        void PasswordBox_KeyUp(object sender, KeyEventArgs e)
+        void TextBox_KeyUp(object sender, KeyEventArgs e)
         {
             //shortcut for logon
             if (e.Key == Key.Enter)
@@ -73,6 +117,19 @@ namespace FileUploader.Controls
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             OKButton.IsEnabled = false;
+
+            //save credentials if desired
+            if ((bool)RememberCredentialsCheckBox.IsChecked)
+            {
+                IsolatedStorageSettings.ApplicationSettings[IsolatedStorageKeys.UserName.ToString()] = UserNameTextBox.Text;
+                IsolatedStorageSettings.ApplicationSettings[IsolatedStorageKeys.Password.ToString()] = this.PasswordBox.Password;
+            }
+            else
+            {
+                IsolatedStorageSettings.ApplicationSettings[IsolatedStorageKeys.UserName.ToString()] = "";
+                IsolatedStorageSettings.ApplicationSettings[IsolatedStorageKeys.Password.ToString()] = "";
+            }
+
             timer.Start();
             client.ValidateUserAsync(UserNameTextBox.Text, this.PasswordBox.Password);
         }
