@@ -8,6 +8,7 @@ using System.Web.Mvc;
 using OSBLE.Models.HomePage;
 using OSBLE.Attributes;
 using OSBLE.Models.Users;
+using System.Web.Security;
 
 namespace OSBLE.Controllers
 {
@@ -79,9 +80,16 @@ namespace OSBLE.Controllers
         [HttpPost, ActionName("Delete")]
         public ActionResult DeleteConfirmed(int id)
         {
+            
+            
             UserProfile userprofile = db.UserProfiles.Find(id);
-            db.UserProfiles.Remove(userprofile);
-            db.SaveChanges();
+            
+            if(userprofile != null) {
+                Membership.DeleteUser(userprofile.UserName);
+                db.UserProfiles.Remove(userprofile);
+                db.SaveChanges();
+            }
+
             return RedirectToAction("Index");
         }
 

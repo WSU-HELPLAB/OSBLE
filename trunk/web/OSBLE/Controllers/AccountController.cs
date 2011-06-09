@@ -247,21 +247,28 @@ namespace OSBLE.Controllers
 #if !DEBUG
             var user = Membership.GetUser(model.EmailAddress);
 
+            if (user != null)
+            {
 
-            string newPass = user.ResetPassword();
+                string newPass = user.ResetPassword();
 
-            string body = "Your OSBLE password has been reset.\n Your new password is: " + newPass + "\n\nPlease change this password as soon as possible.";
+                string body = "Your OSBLE password has been reset.\n Your new password is: " + newPass + "\n\nPlease change this password as soon as possible.";
 
-            MailMessage mm = new MailMessage("noreply@osble.org", model.EmailAddress, "[OSBLE] Password Reset Request", body);
+                MailMessage mm = new MailMessage("noreply@osble.org", model.EmailAddress, "[OSBLE] Password Reset Request", body);
 
-            //This will need to fixed whenever we get a Server that can send mail
-            SmtpClient sc = new SmtpClient();
-            sc.UseDefaultCredentials = true;
+                //This will need to fixed whenever we get a Server that can send mail
+                SmtpClient sc = new SmtpClient();
+                sc.UseDefaultCredentials = true;
 
-            sc.Send(mm);
+                sc.Send(mm);
 #endif
 
-            return View("ResetPasswordSuccess");
+                return View("ResetPasswordSuccess");
+            }
+            else
+            {
+                return View("ResetPasswordFailure");
+            }
         }
 
         [Authorize]
