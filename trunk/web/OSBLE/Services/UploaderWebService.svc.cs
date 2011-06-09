@@ -225,7 +225,7 @@ namespace OSBLE.Services
         /// <param name="authToken"></param>
         /// <returns></returns>
         [OperationContract]
-        public bool SyncFile(string fileName, byte[] data, int courseId, string authToken)
+        public bool SyncFile(string fileName, byte[] data, DateTime updated, int courseId, string authToken)
         {
             if (!IsValidKey(authToken))
             {
@@ -235,9 +235,13 @@ namespace OSBLE.Services
             //uploads need to handle a check for lastmodified date
             Course current = (from c in db.AbstractCourses where c.ID == courseId select c as Course).FirstOrDefault();
             string file = Path.Combine(FileSystem.GetCourseDocumentsPath(current), fileName);
-            using (FileStream fs = new FileStream(file, FileMode.Create))
+            // only creates file if doesn't already exist or it has been updated
+            if (!File.Exists(file) || File.GetLastWriteTime(file) < updated)
             {
-                fs.Write(data, 0, (int)data.Length);
+                using (FileStream fs = new FileStream(file, FileMode.Create))
+                {
+                    fs.Write(data, 0, (int)data.Length);
+                }
             }
 
             return true; 
