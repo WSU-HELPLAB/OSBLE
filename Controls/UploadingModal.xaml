@@ -11,10 +11,10 @@
         </Grid.RowDefinitions>
         <StackPanel Orientation="Vertical" >
             <TextBlock Text="Uploading..." FontSize="28" HorizontalAlignment="Center" Margin="0,15,0,0"/>
-            <ProgressBar  x:Name="UploadProgressBar" Width="300" Height="20" Margin="0,40"/>
+            <ProgressBar  x:Name="UploadProgressBar" Width="300" Height="20" Margin="0,40" Minimum="0" Maximum="10000" Value="0"/>
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                 <TextBlock Text="Currently Uploading: " HorizontalAlignment="Center"/>
-                <TextBlock x:Name="UploadingFile" Text="MyDocuments" MaxWidth="200" Margin="15,0,0,0" HorizontalAlignment="Right"/>
+                <TextBlock x:Name="UploadingFile" Text="MyDocuments" Margin="15,0,0,0" HorizontalAlignment="Right"/>
             </StackPanel>
         </StackPanel>
         

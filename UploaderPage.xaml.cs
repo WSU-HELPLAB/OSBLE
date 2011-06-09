@@ -70,7 +70,6 @@ namespace FileUploader
             syncedFiles.GetFileListCompleted += new EventHandler<GetFileListCompletedEventArgs>(syncedFiles_GetFileListCompleted);
             syncedFiles.SyncFileCompleted += new EventHandler<SyncFileCompletedEventArgs>(syncedFiles_SyncFileCompleted);
             syncedFiles.GetValidUploadLocationsCompleted += new EventHandler<GetValidUploadLocationsCompletedEventArgs>(syncedFiles_GetValidUploadLocationsCompleted);
-            //syncedFiles.PrepCurrentPathCompleted += new EventHandler<PrepCurrentPathCompletedEventArgs>(syncedFiles_PrepCurrentPathCompleted);
 
             //local event listeners
             SyncButton.Click += new RoutedEventHandler(SyncButton_Click);
@@ -180,7 +179,14 @@ namespace FileUploader
 
         void SyncButton_Click(object sender, RoutedEventArgs e)
         {
+            uploading.LayoutUpdated += new EventHandler(uploading_LayoutUpdated);
             uploading.Show();
+            
+        }
+
+        void uploading_LayoutUpdated(object sender, EventArgs e)
+        {
+            uploading.LayoutUpdated -= new EventHandler(uploading_LayoutUpdated);
             string relpath = "";
             DirectoryListing Listing = new DirectoryListing();
             Listing = this.LocalFileList.DataContext;
@@ -190,6 +196,8 @@ namespace FileUploader
             // update the synced files Window
             syncedFiles.GetFileListAsync(course.Key, authToken);
         }
+
+   
 
         // solicites the server to create the directories and files in the tree
         private void traveseDirectories(string path, string relative, DirectoryListing Listing)
@@ -229,12 +237,13 @@ namespace FileUploader
             
             // updating the textblock with current file uploading Local relative path
             uploading.UploadingFile.Text = file.Substring(RootPath.Length + 1);
-            //MessageBox.Show("lkasjdf");
-            BindingExpression binding = uploading.UploadingFile.GetBindingExpression(TextBox.TextProperty);
-            binding.UpdateSource();
-            
-            //update progres bar (ie add a tick)
+            uploading.UploadingFile.UpdateLayout();
 
+            //update progres bar (ie add a tick)
+            uploading.UploadProgressBar.Value++;
+            uploading.UploadProgressBar.UpdateLayout();
+            
+            
             MemoryStream s = new MemoryStream();
             StreamWriter writer = new StreamWriter(s);
             writer.Write(file);
