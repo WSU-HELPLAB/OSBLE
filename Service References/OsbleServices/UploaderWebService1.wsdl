@@ -56,6 +56,12 @@
   <wsdl:message name="UploaderWebService_PrepCurrentPath_OutputMessage">
     <wsdl:part name="parameters" element="PrepCurrentPathResponse" />
   </wsdl:message>
+  <wsdl:message name="UploaderWebService_UpdateListingOrder_InputMessage">
+    <wsdl:part name="parameters" element="UpdateListingOrder" />
+  </wsdl:message>
+  <wsdl:message name="UploaderWebService_UpdateListingOrder_OutputMessage">
+    <wsdl:part name="parameters" element="UpdateListingOrderResponse" />
+  </wsdl:message>
   <wsdl:message name="UploaderWebService_ValidateUser_InputMessage">
     <wsdl:part name="parameters" element="ValidateUser" />
   </wsdl:message>
@@ -94,6 +100,10 @@
     <wsdl:operation name="PrepCurrentPath">
       <wsdl:input wsaw:Action="urn:UploaderWebService/PrepCurrentPath" message="UploaderWebService_PrepCurrentPath_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/PrepCurrentPathResponse" message="UploaderWebService_PrepCurrentPath_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateListingOrder">
+      <wsdl:input wsaw:Action="urn:UploaderWebService/UpdateListingOrder" message="UploaderWebService_UpdateListingOrder_InputMessage" />
+      <wsdl:output wsaw:Action="urn:UploaderWebService/UpdateListingOrderResponse" message="UploaderWebService_UpdateListingOrder_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="ValidateUser">
       <wsdl:input wsaw:Action="urn:UploaderWebService/ValidateUser" message="UploaderWebService_ValidateUser_InputMessage" />

@@ -186,6 +186,11 @@ namespace FileUploader.OsbleServices {
         
         bool EndPrepCurrentPath(System.IAsyncResult result);
         
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/UpdateListingOrder", ReplyAction="urn:UploaderWebService/UpdateListingOrderResponse")]
+        System.IAsyncResult BeginUpdateListingOrder(FileUploader.OsbleServices.DirectoryListing listing, int courseId, string authToken, System.AsyncCallback callback, object asyncState);
+        
+        void EndUpdateListingOrder(System.IAsyncResult result);
+        
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/ValidateUser", ReplyAction="urn:UploaderWebService/ValidateUserResponse")]
         System.IAsyncResult BeginValidateUser(string userName, string password, System.AsyncCallback callback, object asyncState);
         
@@ -419,6 +424,12 @@ namespace FileUploader.OsbleServices {
         
         private System.Threading.SendOrPostCallback onPrepCurrentPathCompletedDelegate;
         
+        private BeginOperationDelegate onBeginUpdateListingOrderDelegate;
+        
+        private EndOperationDelegate onEndUpdateListingOrderDelegate;
+        
+        private System.Threading.SendOrPostCallback onUpdateListingOrderCompletedDelegate;
+        
         private BeginOperationDelegate onBeginValidateUserDelegate;
         
         private EndOperationDelegate onEndValidateUserDelegate;
@@ -493,6 +504,8 @@ namespace FileUploader.OsbleServices {
         public event System.EventHandler<SyncFileCompletedEventArgs> SyncFileCompleted;
         
         public event System.EventHandler<PrepCurrentPathCompletedEventArgs> PrepCurrentPathCompleted;
+        
+        public event System.EventHandler<System.ComponentModel.AsyncCompletedEventArgs> UpdateListingOrderCompleted;
         
         public event System.EventHandler<ValidateUserCompletedEventArgs> ValidateUserCompleted;
         
@@ -879,6 +892,55 @@ namespace FileUploader.OsbleServices {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginUpdateListingOrder(FileUploader.OsbleServices.DirectoryListing listing, int courseId, string authToken, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginUpdateListingOrder(listing, courseId, authToken, callback, asyncState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        void FileUploader.OsbleServices.UploaderWebService.EndUpdateListingOrder(System.IAsyncResult result) {
+            base.Channel.EndUpdateListingOrder(result);
+        }
+        
+        private System.IAsyncResult OnBeginUpdateListingOrder(object[] inValues, System.AsyncCallback callback, object asyncState) {
+            FileUploader.OsbleServices.DirectoryListing listing = ((FileUploader.OsbleServices.DirectoryListing)(inValues[0]));
+            int courseId = ((int)(inValues[1]));
+            string authToken = ((string)(inValues[2]));
+            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginUpdateListingOrder(listing, courseId, authToken, callback, asyncState);
+        }
+        
+        private object[] OnEndUpdateListingOrder(System.IAsyncResult result) {
+            ((FileUploader.OsbleServices.UploaderWebService)(this)).EndUpdateListingOrder(result);
+            return null;
+        }
+        
+        private void OnUpdateListingOrderCompleted(object state) {
+            if ((this.UpdateListingOrderCompleted != null)) {
+                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
+                this.UpdateListingOrderCompleted(this, new System.ComponentModel.AsyncCompletedEventArgs(e.Error, e.Cancelled, e.UserState));
+            }
+        }
+        
+        public void UpdateListingOrderAsync(FileUploader.OsbleServices.DirectoryListing listing, int courseId, string authToken) {
+            this.UpdateListingOrderAsync(listing, courseId, authToken, null);
+        }
+        
+        public void UpdateListingOrderAsync(FileUploader.OsbleServices.DirectoryListing listing, int courseId, string authToken, object userState) {
+            if ((this.onBeginUpdateListingOrderDelegate == null)) {
+                this.onBeginUpdateListingOrderDelegate = new BeginOperationDelegate(this.OnBeginUpdateListingOrder);
+            }
+            if ((this.onEndUpdateListingOrderDelegate == null)) {
+                this.onEndUpdateListingOrderDelegate = new EndOperationDelegate(this.OnEndUpdateListingOrder);
+            }
+            if ((this.onUpdateListingOrderCompletedDelegate == null)) {
+                this.onUpdateListingOrderCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnUpdateListingOrderCompleted);
+            }
+            base.InvokeAsync(this.onBeginUpdateListingOrderDelegate, new object[] {
+                        listing,
+                        courseId,
+                        authToken}, this.onEndUpdateListingOrderDelegate, this.onUpdateListingOrderCompletedDelegate, userState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginValidateUser(string userName, string password, System.AsyncCallback callback, object asyncState) {
             return base.Channel.BeginValidateUser(userName, password, callback, asyncState);
         }
@@ -1109,6 +1171,20 @@ namespace FileUploader.OsbleServices {
                 object[] _args = new object[0];
                 bool _result = ((bool)(base.EndInvoke("PrepCurrentPath", _args, result)));
                 return _result;
+            }
+            
+            public System.IAsyncResult BeginUpdateListingOrder(FileUploader.OsbleServices.DirectoryListing listing, int courseId, string authToken, System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[3];
+                _args[0] = listing;
+                _args[1] = courseId;
+                _args[2] = authToken;
+                System.IAsyncResult _result = base.BeginInvoke("UpdateListingOrder", _args, callback, asyncState);
+                return _result;
+            }
+            
+            public void EndUpdateListingOrder(System.IAsyncResult result) {
+                object[] _args = new object[0];
+                base.EndInvoke("UpdateListingOrder", _args, result);
             }
             
             public System.IAsyncResult BeginValidateUser(string userName, string password, System.AsyncCallback callback, object asyncState) {

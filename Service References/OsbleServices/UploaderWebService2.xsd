@@ -116,6 +116,20 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="UpdateListingOrder">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Uploader" minOccurs="0" name="listing" nillable="true" type="q7:DirectoryListing" />
+        <xs:element minOccurs="0" name="courseId" type="xs:int" />
+        <xs:element minOccurs="0" name="authToken" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateListingOrderResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
   <xs:element name="ValidateUser">
     <xs:complexType>
       <xs:sequence>
