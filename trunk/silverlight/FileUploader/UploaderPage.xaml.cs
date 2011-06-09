@@ -8,7 +8,7 @@ using System.Net;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-//using System.Windows.Data;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -179,45 +179,35 @@ namespace FileUploader
         void SyncButton_Click(object sender, RoutedEventArgs e)
         {
             uploading.Show();
-
-            int count = 1;
             string relpath = "";
             DirectoryListing Listing = new DirectoryListing();
             Listing = this.LocalFileList.DataContext;
 
-            traveseDirectories(LocalPath, relpath, Listing, count);
+            traveseDirectories(LocalPath, relpath, Listing);
 
-            // update the synced files display
+            // update the synced files Window
             syncedFiles.GetFileListAsync(course.Key, authToken);
-            
-            //uploading.Close();
         }
 
         // solicites the server to create the directories and files in the tree
-        private void traveseDirectories(string path, string relative, DirectoryListing Listing, int count)
+        private void traveseDirectories(string path, string relative, DirectoryListing Listing)
         {
-            // creates the directories
-            SyncCurrentDirectories(Listing, relative);
+            SyncCurrentDirectories(Listing, relative);                          // creates the directories
+            int fileindex = 0;
+            foreach (string file in Directory.EnumerateFiles(path))
+            {
+                FileRecieved = false;
+                DateTime updated = Listing.Files[fileindex].LastModified;
+                SyncCurrentFile(file, updated);                                 // tells server to create file
+                fileindex++;
+            }
+            
             foreach (string directory in Directory.EnumerateDirectories(path))
             {
                 relative = directory.Substring(LocalPath.Length + 1);
-                
-                // drops down a level
-                Listing = BuildLocalDirectoryListing(Path.Combine(LocalPath, relative));
-
-                foreach (string file in Directory.EnumerateFiles(Path.Combine(path, relative)))
-                {
-                    FileRecieved = false;
-                    // tells server to create file
-                    SyncCurrentFile(file);
-                }
-
-                // recursive call
-                traveseDirectories(directory, relative, Listing, count);
-
-                ++count;
-            }
-            
+                Listing = BuildLocalDirectoryListing(directory);  // drops down a level
+                traveseDirectories(directory, relative, Listing);               // recursive call
+            } 
         }
 
         // prompts server to create all directories on the current level
@@ -230,16 +220,16 @@ namespace FileUploader
         }
 
         // Prompts the server to create the file
-        void SyncCurrentFile(string file)
+        void SyncCurrentFile(string file, DateTime updated)
         {
-            string relativepath = file.Substring(RootPath.Length + 1);
+            //Server Relative path
+            string relativepath = file.Substring(LocalPath.Length + 1);
             
-            
-            // updating the textblock with current file uploading
-            uploading.UploadingFile.Text = relativepath;
+            // updating the textblock with current file uploading Local relative path
+            uploading.UploadingFile.Text = file.Substring(RootPath.Length + 1);
             //MessageBox.Show("lkasjdf");
-            //BindingExpression binding = uploading.UploadingFile.GetBindingExpression(TextBox.TextProperty);
-            //binding.UpdateSource();
+            BindingExpression binding = uploading.UploadingFile.GetBindingExpression(TextBox.TextProperty);
+            binding.UpdateSource();
             
             //update progres bar (ie add a tick)
 
@@ -253,7 +243,7 @@ namespace FileUploader
                 byte[] data = new byte[stream.Length];
                 stream.Read(data, 0, (int)stream.Length);
 
-                syncedFiles.SyncFileAsync(relativepath, data, course.Key, authToken);
+                syncedFiles.SyncFileAsync(relativepath, data, updated, course.Key, authToken);
             }
             // wait till the file is uploaded
             //while (!FileRecieved)
@@ -341,200 +331,5 @@ namespace FileUploader
             RemoteFileList.DataContext = e.Result;
             uploading.Close();
         }
-
-        /*
-
-        private void SyncDirSelect(object sender, MouseButtonEventArgs e)
-        {
-            if (this.SyncedFileList.SelectedItem is FileListItem)
-            {
-                FileListItem selected = this.SyncedFileList.SelectedItem as FileListItem;
-                if (selected.FileName == "..")
-                {
-                    Stack<string> path_pieces = new Stack<string>(localpath.Split('\\'));
-                    path_pieces.Pop();
-                    localpath = String.Join("\\", path_pieces.ToArray().Reverse());
-                    dirList(localpath);
-                }
-                else if (selected.Image != LabelImage.File)
-                {
-                    if (wasClicked == true)
-                    {
-                        if (selected.DirName.Text == lastTarget)
-                        {
-
-                            dirList(localpath);
-                        }
-                    }
-                    else
-                    {
-                        wasClicked = true;
-                    }
-                }
-                lastTarget = selected.DirName.Text;
-
-                // If it was a directory return out
-                return;
-            }
-
-            // If it wasn't a directory reset the click variables
-            lastTarget = "";
-            wasClicked = false;
-        }
-
-        private void MoveUpbtn_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.SyncedFileList.SelectedItem is ListBoxItem)
-            {
-                //Swaps the listbox items based on their index's
-
-                int index = this.SyncedFileList.SelectedIndex;
-                object Swap = this.SyncedFileList.SelectedItem;
-                if (index > 0)
-                {
-                    this.SyncedFileList.Items.RemoveAt(index);
-                    this.SyncedFileList.Items.Insert(index - 1, Swap);
-                    this.SyncedFileList.SelectedItem = Swap;
-                }
-            }
-        }
-
-        private void MoveDownbtn_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.SyncedFileList.SelectedItem is ListBoxItem)
-            {
-                //Swaps the listbox items based on their index's
-
-                if (this.SyncedFileList.SelectedItem is ListBoxItem)
-                {
-                    int index = this.SyncedFileList.SelectedIndex;
-                    object Swap = this.SyncedFileList.SelectedItem;
-                    if (index != -1 && index < this.SyncedFileList.Items.Count - 1)
-                    {
-                        this.SyncedFileList.Items.RemoveAt(index);
-                        this.SyncedFileList.Items.Insert(index + 1, Swap);
-                        this.SyncedFileList.SelectedItem = Swap;
-                    }
-                }
-            }
-        }
-
-        private void syncedFiles_GetFileListCompleted(object sender, GetFileListCompletedEventArgs e)
-        {
-            if (e.Error == null)
-            {
-                /*
-                // Assigning the list generated from the server's folder to a listbox for display
-                for (int i = 0; i < e.Result.Count; ++i)
-                {
-                    FileListItem temp = new FileListItem();
-                    temp.FileName = e.Result[i].Name;
-                    if (e.Result[i] is FileListing)
-                        temp.Image = LabelImage.File;
-                    else
-                        temp.Image = LabelImage.Folder;
-                    temp.LastModified = e.Result[i].LastModified;
-
-                    SyncedFileList.Items.Add(temp);
-                }
-
-                
-            }
-            else
-            {
-                lblStatus.Text = "Error contacting web service.";
-            }
-        }
-
-        // recursive function called from Syncbtn_Click it will recursivly go through all the directories and popluate the 
-        // contained directories and files
-        private void traveseDirectories(string path, string dir)
-        {
-            foreach (string folder in Directory.EnumerateDirectories(path))
-            {
-                dir = folder.Substring(localpath.Length + 1);
-
-                // does directory exist in sync already
-
-                syncedFiles.createDirAsync(dir);
-
-                foreach (string file in Directory.EnumerateFiles(folder))
-                {
-                    try
-                    {
-                        MemoryStream s = new MemoryStream();
-                        StreamWriter writer = new StreamWriter(s);
-                        writer.Write(file);
-                        writer.Flush();
-
-                        string filepath = file.Substring(localpath.Length + 1);
-
-                        using (Stream stream = s)
-                        {
-                            byte[] data = new byte[stream.Length];
-                            stream.Read(data, 0, (int)stream.Length);
-
-                            syncedFiles.SyncFileAsync(filepath, data);
-                            lblStatus.Text = "Sync started";
-                        }
-                    }
-                    catch
-                    {
-                        lblStatus.Text = "Error reading file.";
-                    }
-                }
-                traveseDirectories(folder, dir);
-            }
-        }
-
-
-        private void Syncbtn_Click(object sender, RoutedEventArgs e)
-        {
-            string path = localpath;
-            traveseDirectories(path, "");
-
-            // Populates the files in the home directory after all the directories have been created
-            foreach (string file in Directory.EnumerateFiles(path))
-            {
-                try
-                {
-                    MemoryStream s = new MemoryStream();
-                    StreamWriter writer = new StreamWriter(s);
-                    writer.Write(file);
-                    writer.Flush();
-
-                    string filepath = file.Substring(localpath.Length + 1);
-
-                    using (Stream stream = s)
-                    {
-                        byte[] data = new byte[stream.Length];
-                        stream.Read(data, 0, (int)stream.Length);
-
-                        syncedFiles.SyncFileAsync(filepath, data);
-                        lblStatus.Text = "Sync started";
-                    }
-                }
-                catch
-                {
-                    lblStatus.Text = "Error reading file.";
-                }
-            }
-
-        }
-
-        private void syncedFiles_SyncCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
-        {
-            if (e.Error == null)
-            {
-                lblStatus.Text = "Sync succeeded.";
-
-            }
-            else
-            {
-                lblStatus.Text = "Upload failed.";
-            }
-        }
-         * */
-
     }
 }
