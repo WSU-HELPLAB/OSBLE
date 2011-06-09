@@ -101,6 +101,73 @@ namespace OSBLE.Controllers
             db.AbstractAssignments.Remove(assignment);
             db.SaveChanges();
         }
+
+        [HttpPost]
+        public void ClearDropLowest(int categoryId)
+        {
+            if (ModelState.IsValid)
+            {
+                if (categoryId > 0)
+                {
+                    var studentScores = from scores in db.Scores
+                                        where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
+                                        && scores.isDropped == true
+                                        select scores;
+                    if (studentScores.Count() > 0)
+                    {
+                        foreach (Score score in studentScores)
+                        {
+                            score.isDropped = false;
+                        }
+                        db.SaveChanges();
+                    }
+                }
+            }
+        }
+
+        [HttpPost]
+        public void DropLowest(int categoryId)
+        {
+            if (ModelState.IsValid)
+            {
+                double lowest = 10000;
+                int id = 0;
+                if (categoryId > 0)
+                {
+                    var studentScores = from scores in db.Scores
+                                        join user in db.UserProfiles on scores.UserProfileID equals user.ID
+                                        where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
+                                        && scores.isDropped == false
+                                        group scores by scores.UserProfileID into userScores
+                                        select userScores;
+
+                    if (studentScores.Count() > 0)
+                    {
+                        for (int i = 0; i < studentScores.Count(); i++)
+                        {
+                            var item = studentScores.AsEnumerable().ElementAt(i);
+                            foreach (Score score in item)
+                            {
+                                if (score.Points < lowest)
+                                {
+                                    lowest = score.Points;
+                                    id = score.ID;
+                                }
+                            }
+                            foreach (Score score in item)
+                            {
+                                if (score.ID == id)
+                                {
+                                    score.isDropped = true;
+                                }
+                            }
+                            db.SaveChanges();
+                            lowest = 10000;
+                        }
+                    }
+                }
+            }
+        }
         
         /// <summary>
         /// Clears a gradable (column) from the current table.
@@ -311,7 +378,8 @@ namespace OSBLE.Controllers
                         UserProfileID = userId,
                         Points = value,
                         AssignmentActivityID = assignmentId,
-                        PublishedDate = DateTime.Now
+                        PublishedDate = DateTime.Now,
+                        isDropped = false
                     };
 
                     db.Scores.Add(newScore);
@@ -388,7 +456,8 @@ namespace OSBLE.Controllers
             var mainScores =    from score in db.Scores
                                 join category in db.Categories on score.AssignmentActivity.AbstractAssignment.CategoryID equals category.ID
                                 where score.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId &&
-                                score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
+                                score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID &&
+                                score.isDropped == false
                                 group score by score.AssignmentActivity.AbstractAssignment.CategoryID into assignmentScores
                                 select new
                                 {
@@ -401,7 +470,9 @@ namespace OSBLE.Controllers
                                                         StudentId = students.Key,
                                                         Score = students.Sum(stu => stu.Points),
                                                         perfectScore = students.Sum(stu => stu.AssignmentActivity.AbstractAssignment.PointsPossible),
-                                                        category = students.Select(stu => stu.AssignmentActivity.AbstractAssignment.Category)
+                                                        category = students.Select(stu => stu.AssignmentActivity.AbstractAssignment.Category),
+                                                        activityId = students.Select(stu => stu.AssignmentActivityID),
+                                                        assignmentId = students.Select(stu => stu.AssignmentActivity.AbstractAssignmentID)
                                                     }
                                 };
 
@@ -415,7 +486,15 @@ namespace OSBLE.Controllers
                     {
                         UserProfileID = scores.StudentId,
                         Points = ((scores.Score / scores.perfectScore)*100),
+                        isDropped = false
                     };
+                    //GradeActivity aa = new GradeActivity() 
+                    //{ 
+                    //    ID = scores.activityId.()
+                    //};
+                    //GradeAssignment ga = new GradeAssignment() { ID = item.AssignmentId };
+                    //aa.AbstractAssignment = ga;
+                    //studentScore.AssignmentActivity = aa;
                     percentList.Add(studentScore);
                 }
             }
@@ -475,6 +554,9 @@ namespace OSBLE.Controllers
             //LINQ complains when we use this directly in our queries, so pull it beforehand
             int currentCourseId = ActiveCourse.CourseID;
 
+            //List of students scores
+            List<Score> studentScores = new List<Score>();
+
             //pull all weights (tabs) for the current course
             var cats = from category in db.Categories
                              where category.CourseID == currentCourseId
@@ -529,16 +611,49 @@ namespace OSBLE.Controllers
                                           select up).ToList();
 
             //Finally the scores for each student.
-            List<Score> scores = (from score in db.Scores
+            List<Score> scor = (from score in db.Scores
                                   where score.AssignmentActivity.AbstractAssignment.CategoryID == currentTab.ID
                                   select score).ToList();
 
+            var userScore = from scores in db.Scores
+                            join user in db.UserProfiles on scores.UserProfileID equals user.ID
+                            where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
+                            && scores.isDropped == false
+                            group scores by scores.UserProfileID into userScores
+                            select userScores;
+
+            if (userScore.Count() > 0)
+            {
+                for (int i = 0; i < userScore.Count(); i++)
+                {
+                    double currentPoints = 0;
+                    double currentTotal = 0;
+                    int currentUser = 0;
+                    var item = userScore.AsEnumerable().ElementAt(i);
+                    foreach (Score a in item)
+                    {
+                        currentUser = a.UserProfileID;
+                        currentPoints += a.Points;
+                        currentTotal += a.AssignmentActivity.AbstractAssignment.PointsPossible;
+                    }
+                    Score newscore = new Score()
+                    {
+                        UserProfileID = currentUser,
+                        Points = ((currentPoints / currentTotal) * 100),
+                        isDropped = false
+                    };
+                    studentScores.Add(newscore);
+                }
+            }
+
+
             //save everything that we need to the viewebag
             ViewBag.Categories = allCategories;
-            ViewBag.Grades = scores;
+            ViewBag.Grades = scor;
             ViewBag.Assignments = assignments;
             ViewBag.GradeAssignments = gradeAssignments;
             ViewBag.Users = students;
+            ViewBag.Percents = studentScores;
         }
 
         /// <summary>

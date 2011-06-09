@@ -238,8 +238,8 @@
             
         </tr>
         <tr id="weights">
-            <td></td>
-            <td id="catScheme" onclick="cellGainsFocus(this);">Weight1</td>
+            <td id="sectionHolder"></td>
+            <td id="catScheme" onclick="cellGainsFocus(this);">&nbsp  Weight1</td>
             <td id="grade"></td>
             <td id="categoryTotal">&nbsp</td>
             
@@ -321,12 +321,13 @@
 
                         List<Score> scoreQuery = (from g in ViewBag.Scores as IEnumerable<Score>
                                                     where g.UserProfileID == student.ID
+                                                    && g.isDropped == false
                                                     select g).ToList();
                         if (scoreQuery.Count() > 0)
                         {
                             for (int i = 0; i < scoreQuery.Count(); i++)
                             {    
-                                        <td id="categoryGrade">@scoreQuery[i].Points.ToString(".##")%</td>
+                                <td id="categoryGrade">@scoreQuery[i].Points.ToString(".##")%</td>
                             }
                         }
                     }
@@ -634,7 +635,7 @@
 
             });
             if (counter == a.length) {
-                total = parseFloat((total / counter));
+                total = parseFloat((total / counter)).toFixed(2);
             }
             else {
                 total = parseFloat((total)).toFixed(2);                

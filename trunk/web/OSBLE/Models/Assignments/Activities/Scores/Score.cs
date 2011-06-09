@@ -34,6 +34,9 @@ namespace OSBLE.Models.Assignments.Activities.Scores
         [Required]
         public int AssignmentActivityID { get; set; }
 
+        [Required]
+        public bool isDropped { get; set; }
+
         public virtual AssignmentActivity AssignmentActivity { get; set; }
 
         public Score() {

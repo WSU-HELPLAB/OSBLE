@@ -60,6 +60,26 @@
         left: 400px;
     }
     
+    .customize
+    {
+        width: auto;
+        height: auto;
+        background-color: white;
+        top: 33px;
+        left: 400px;
+    }
+    
+    .customizeTable 
+    {
+    	border: 1px solid gray;
+    	color: black;
+    }
+    
+    .customizeTable input
+    {
+    	width: 50px;
+    }
+    
     .dropdown
     {
         float: right;
@@ -111,7 +131,7 @@
         width:500px;
         height:500px;
         border: 2px solid;
-        background: #f5f5f5;
+        background: #f5f5f5;        
     }
     
     #newWeight li
@@ -157,6 +177,26 @@
             </tr>
         </table>
         </form>
+
+</div>
+<div class="customize" id="customizeID" style="display: none; position: absolute;">
+	<form id="dropLowestSubmit" onsubmit="dropLowest(); return false;"  >
+        <table class="customizeTable">
+		    <tr>
+		        <th align="center" colspan="3">CUSTOMIZE</th>
+		    </tr>
+		    <tr>
+			    <td>Drop lowest</td>
+			    <td><input id="XtoDrop" value="0"/></td>
+		        <td>from category</td>
+		    </tr>
+		    <tr>
+		        <td align="right" colspan="3"><input id="dropLowestSubmit" type="submit" value="Apply"/></td>
+	        </tr>
+	    </table>
+    </form>
+</div>
+
         <script type="text/javascript">
             function setGradableAction(actionName) {
                 $('#actionRequested').val(actionName);
@@ -167,9 +207,6 @@
             });
         </script>
     </div>
-    <input value="Calculate Rows" type="button" onclick="calculateRows()" />
-    <input value="Calculate Columns" type="button" onclick="calculateCols()" />
-    <input value="Calculate Total" type="button" onclick="calculateTotal()" />
 </div>
 <script type="text/jscript">
     var lastFocusedCell = null;
@@ -196,7 +233,7 @@
 
 
     $(document).ready(function () {
-        calculateRows();
+        //calculateRows();
         calculateCols();
     });
 
@@ -253,6 +290,15 @@
             clearLastHeaderFocus(lastId);
         }
     });
+
+//    $("#dropLowestSubmit").submit(function () {
+//        alert("Apply was pressed!");
+//        alert($("#XtoDrop").val());
+//    });
+
+    function displayCustomizeGrades() {
+        $("#customizeID").animate({ "height": "show" }, { duration: 300 });
+    }
 
     function clearLastHeaderFocus(id) {
 
@@ -673,10 +719,67 @@
 
     function newTab() {
         $.ajax({
-
             type: "POST",
             url: "/Gradebook/AddWeight"
         });
+    }
+
+    function dropLowest() {
+
+        //get the pathname so we can use the categoryId
+        var pathname = window.location.toString();
+
+        //split the pathname at the "="
+        //catId[1] = categoryId
+        var catId = pathname.split("=");
+
+        if (catId[1] != null) {
+            var i = 0;
+            
+            //ajax call to remove the drop lowest
+            $.ajax({
+                type: "POST",
+                url: "/Gradebook/ClearDropLowest",
+                data: { categoryId: catId[1] }
+            });
+
+            for (i = 0; i < $("#XtoDrop").val(); i++) {
+                //ajax call to drop the lowest score
+                $.ajax({
+                    type: "POST",
+                    url: "/Gradebook/DropLowest",
+                    data: { categoryId: catId[1] }
+                });
+            }
+        }
+        if ($("#XtoDrop").val() == 0) {
+            $("#totalCustomize").text("Total [Customize...]");
+        }
+        else {
+            $("#totalCustomize").text("Total [Dropped " + $("#XtoDrop").val() + "]");
+        }
+        $("#customizeID").animate({ "height": "hide" }, { duration: 300 });
+    }
+
+    function clearDropLowest() {
+
+        //get the pathname so we can use the categoryId
+        var pathname = window.location.toString();
+
+        //split the pathname at the "="
+        //catId[1] = categoryId
+        var catId = pathname.split("=");
+
+        //make sure we are on a valid page
+        if (catId[1] != null) {
+
+            //ajax call to clear the drop lowest
+            $.ajax({
+                type: "POST",
+                url: "/Gradebook/ClearDropLowest",
+                data: { categoryId: catId[1] }
+            });
+        }
     }
 
 </script>
