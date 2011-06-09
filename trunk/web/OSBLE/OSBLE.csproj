@@ -554,9 +554,6 @@
     <Content Include="Views\BasicAssignment\TeamCreation.cshtml" />
     <Content Include="Views\Gradebook\_Tabs.cshtml" />
     <Content Include="Views\Gradebook\Tab.cshtml" />
-    <Content Include="Web.OSBLE Deployment.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />
