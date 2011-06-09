@@ -177,7 +177,7 @@ namespace FileUploader.OsbleServices {
         System.Collections.Generic.Dictionary<int, string> EndGetValidUploadLocations(System.IAsyncResult result);
         
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/SyncFile", ReplyAction="urn:UploaderWebService/SyncFileResponse")]
-        System.IAsyncResult BeginSyncFile(string fileName, byte[] data, int courseId, string authToken, System.AsyncCallback callback, object asyncState);
+        System.IAsyncResult BeginSyncFile(string fileName, byte[] data, System.DateTime updated, int courseId, string authToken, System.AsyncCallback callback, object asyncState);
         
         bool EndSyncFile(System.IAsyncResult result);
         
@@ -773,8 +773,8 @@ namespace FileUploader.OsbleServices {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginSyncFile(string fileName, byte[] data, int courseId, string authToken, System.AsyncCallback callback, object asyncState) {
-            return base.Channel.BeginSyncFile(fileName, data, courseId, authToken, callback, asyncState);
+        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginSyncFile(string fileName, byte[] data, System.DateTime updated, int courseId, string authToken, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginSyncFile(fileName, data, updated, courseId, authToken, callback, asyncState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -785,9 +785,10 @@ namespace FileUploader.OsbleServices {
         private System.IAsyncResult OnBeginSyncFile(object[] inValues, System.AsyncCallback callback, object asyncState) {
             string fileName = ((string)(inValues[0]));
             byte[] data = ((byte[])(inValues[1]));
-            int courseId = ((int)(inValues[2]));
-            string authToken = ((string)(inValues[3]));
-            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginSyncFile(fileName, data, courseId, authToken, callback, asyncState);
+            System.DateTime updated = ((System.DateTime)(inValues[2]));
+            int courseId = ((int)(inValues[3]));
+            string authToken = ((string)(inValues[4]));
+            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginSyncFile(fileName, data, updated, courseId, authToken, callback, asyncState);
         }
         
         private object[] OnEndSyncFile(System.IAsyncResult result) {
@@ -803,11 +804,11 @@ namespace FileUploader.OsbleServices {
             }
         }
         
-        public void SyncFileAsync(string fileName, byte[] data, int courseId, string authToken) {
-            this.SyncFileAsync(fileName, data, courseId, authToken, null);
+        public void SyncFileAsync(string fileName, byte[] data, System.DateTime updated, int courseId, string authToken) {
+            this.SyncFileAsync(fileName, data, updated, courseId, authToken, null);
         }
         
-        public void SyncFileAsync(string fileName, byte[] data, int courseId, string authToken, object userState) {
+        public void SyncFileAsync(string fileName, byte[] data, System.DateTime updated, int courseId, string authToken, object userState) {
             if ((this.onBeginSyncFileDelegate == null)) {
                 this.onBeginSyncFileDelegate = new BeginOperationDelegate(this.OnBeginSyncFile);
             }
@@ -820,6 +821,7 @@ namespace FileUploader.OsbleServices {
             base.InvokeAsync(this.onBeginSyncFileDelegate, new object[] {
                         fileName,
                         data,
+                        updated,
                         courseId,
                         authToken}, this.onEndSyncFileDelegate, this.onSyncFileCompletedDelegate, userState);
         }
@@ -1076,12 +1078,13 @@ namespace FileUploader.OsbleServices {
                 return _result;
             }
             
-            public System.IAsyncResult BeginSyncFile(string fileName, byte[] data, int courseId, string authToken, System.AsyncCallback callback, object asyncState) {
-                object[] _args = new object[4];
+            public System.IAsyncResult BeginSyncFile(string fileName, byte[] data, System.DateTime updated, int courseId, string authToken, System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[5];
                 _args[0] = fileName;
                 _args[1] = data;
-                _args[2] = courseId;
-                _args[3] = authToken;
+                _args[2] = updated;
+                _args[3] = courseId;
+                _args[4] = authToken;
                 System.IAsyncResult _result = base.BeginInvoke("SyncFile", _args, callback, asyncState);
                 return _result;
             }
