@@ -50,7 +50,9 @@ namespace FileUploader
         //reference to our web service
         UploaderWebServiceClient syncedFiles = new UploaderWebServiceClient();
 
-        // Modal upload progress window
+        // Modal Syncing progress window
+        UploadingModal syncing = new UploadingModal();
+        // Modal Uploading progress window
         UploadingModal uploading = new UploadingModal();
 
         // Creating course key for upload location combo box
@@ -73,6 +75,7 @@ namespace FileUploader
 
             //local event listeners
             SyncButton.Click += new RoutedEventHandler(SyncButton_Click);
+            SendFileButton.Click += new RoutedEventHandler(SendFileButton_Click);
             LocalFileList.EmptyDirectoryEncountered += new EventHandler(LocalFileList_EmptyDirectoryEncountered);
             LocalFileList.ParentDirectoryRequest += new EventHandler(LocalFileList_ParentDirectoryRequest);
             LocalFileTextBox.KeyUp += new KeyEventHandler(LocalFileTextBox_KeyUp);
@@ -176,29 +179,59 @@ namespace FileUploader
             LocalFileList.DataContext = BuildLocalDirectoryListing(LocalPath);
         }
 
-
-        void SyncButton_Click(object sender, RoutedEventArgs e)
+        void SendFileButton_Click(object sender, RoutedEventArgs e)
         {
             uploading.LayoutUpdated += new EventHandler(uploading_LayoutUpdated);
             uploading.Show();
-            
         }
 
         void uploading_LayoutUpdated(object sender, EventArgs e)
         {
             uploading.LayoutUpdated -= new EventHandler(uploading_LayoutUpdated);
             string relpath = "";
+            string selected = "";
+            DirectoryListing Listing = new DirectoryListing();
+            
+            /*****************************************************************
+            // needs to be set to the selected dir or file data context
+            Listing = this.LocalFileList.DataContext;
+
+            // need to assign selected file or dir to "selected"
+            selected = LocalPath;
+
+            //sets the amount of elements in the progress bar
+            uploading.UploadProgressBar.Maximum = 10000;
+            *****************************************************************/
+
+            traveseDirectories(selected, relpath, Listing);
+
+            // update the synced files Window
+            syncedFiles.GetFileListAsync(course.Key, authToken);
+        }
+
+        void SyncButton_Click(object sender, RoutedEventArgs e)
+        {
+            syncing.LayoutUpdated += new EventHandler(syncing_LayoutUpdated);
+            syncing.Show();
+            
+        }
+
+        void syncing_LayoutUpdated(object sender, EventArgs e)
+        {
+            syncing.LayoutUpdated -= new EventHandler(syncing_LayoutUpdated);
+            string relpath = "";
             DirectoryListing Listing = new DirectoryListing();
             Listing = this.LocalFileList.DataContext;
+
+            //sets the amount of elements in the progress bar
+            syncing.UploadProgressBar.Maximum = 10000;
 
             traveseDirectories(LocalPath, relpath, Listing);
 
             // update the synced files Window
             syncedFiles.GetFileListAsync(course.Key, authToken);
         }
-
-   
-
+                
         // solicites the server to create the directories and files in the tree
         private void traveseDirectories(string path, string relative, DirectoryListing Listing)
         {
@@ -236,12 +269,12 @@ namespace FileUploader
             string relativepath = file.Substring(LocalPath.Length + 1);
             
             // updating the textblock with current file uploading Local relative path
-            uploading.UploadingFile.Text = file.Substring(RootPath.Length + 1);
-            uploading.UploadingFile.UpdateLayout();
+            syncing.UploadingFile.Text = file.Substring(RootPath.Length + 1);
+            syncing.UploadingFile.UpdateLayout();
 
             //update progres bar (ie add a tick)
-            uploading.UploadProgressBar.Value++;
-            uploading.UploadProgressBar.UpdateLayout();
+            syncing.UploadProgressBar.Value++;
+            syncing.UploadProgressBar.UpdateLayout();
             
             
             MemoryStream s = new MemoryStream();
@@ -340,7 +373,7 @@ namespace FileUploader
         void syncedFiles_GetFileListCompleted(object sender, GetFileListCompletedEventArgs e)
         {
             RemoteFileList.DataContext = e.Result;
-            uploading.Close();
+            syncing.Close();
         }
     }
 }
