@@ -17,24 +17,14 @@ namespace OSBLE.Attributes
             {
                 OSBLEController controller = filterContext.Controller as OSBLEController;
 
-                AbstractCourse ac = controller.ActiveCourse.Course;
+                CoursesUsers cu = controller.ActiveCourse;
 
-                if (ac is Course)
+                // Course allows Instructors to post events, community allows Leaders to post events.
+                if (!(cu.CourseRole.CanModify || cu.Course.AllowEventPosting))
                 {
-                    // Course allows Instructors to post events.
-                    if (!(controller.ActiveCourse.CourseRole.CanModify || controller.ActiveCourse.Course.AllowEventPosting))
-                    {
-                        filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
-                    }
+                    filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
                 }
-                else
-                { // Community
-                    // Community allows only Leaders to post events.
-                    if (!(controller.ActiveCourse.CourseRole.CanModify || controller.ActiveCourse.Course.AllowEventPosting))
-                    {
-                        filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
-                    }
-                }
+    
             }
         }
     }

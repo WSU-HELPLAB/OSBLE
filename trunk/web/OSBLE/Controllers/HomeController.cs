@@ -9,6 +9,7 @@ using OSBLE.Models.Users;
 using OSBLE.Models;
 using System.Drawing;
 using OSBLE.Models.Services.Uploader;
+using System.IO;
 
 namespace OSBLE.Controllers
 {
@@ -25,61 +26,79 @@ namespace OSBLE.Controllers
         {
             ViewBag.CurrentTab = "Dashboard";
 
-            #region Activity Feed View
+            setupActivityFeed(); // Dashboard posts/replies
 
-            List<int> ViewedCourses = new List<int>();
+            setupNotifications(); // Individual notifications (mail, grades, etc.)
+
+            setupEvents(); // Events & Deadlines
+
+            setupCourseLinks(); // Quickly accessible course files
+
+            return View();
+        }
+
+        private void setupActivityFeed()
+        {
+            List<int> viewedCourses;
+            List<DashboardPost> dashboardPosts;
+            List<DashboardPost> pagedDashboardPosts;
+
+            // Pagination defaults
+            int startPost = 0;
+            int postsPerPage = 10;
 
             // Single course mode. Only display posts for the active course.
             if (DashboardSingleCourseMode)
             {
-                ViewedCourses.Add(activeCourse.CourseID);
+                viewedCourses = new List<int>();
+                viewedCourses.Add(activeCourse.CourseID);
             }
             else // All course mode. Display posts for all non-hidden courses the user is attached to.
             {
-                foreach (CoursesUsers cu in currentCourses)
-                {
-                    if (!cu.Hidden)
-                    {
-                        ViewedCourses.Add(cu.CourseID);
-                    }
-                }
+                viewedCourses = currentCourses.Where(cu => !cu.Hidden).Select(cu => cu.CourseID).ToList();
             }
 
-            // Pagination
-            int startPost = 0;
-            int postsPerPage = 10;
+            // Get optional start post from query for pagination
             if (Request.Params["startPost"] != null)
             {
                 startPost = Convert.ToInt32(Request.Params["startPost"]);
             }
 
-            // First get all posts to do a count and do proper paging
-            IQueryable<DashboardPost> dashboardPosts = db.DashboardPosts.Where(d => ViewedCourses.Contains(d.CourseID)).OrderByDescending(d => d.Posted);
-            ViewBag.DashboardPostCount = dashboardPosts.Count();
+            // First get all posts to do a count and then do proper paging
+            dashboardPosts = db.DashboardPosts.Where(d => viewedCourses.Contains(d.CourseID))
+                                                                        .OrderByDescending(d => d.Posted).ToList();
 
-            // Only send items in page to the dashboard.
-            ViewBag.DashboardPosts = dashboardPosts.Skip(startPost).Take(postsPerPage).ToList();
-            ViewBag.StartPost = startPost;
+            pagedDashboardPosts = dashboardPosts.Skip(startPost)
+                                                .Take(postsPerPage)
+                                                .ToList();
 
             // Set up display settings for each post (recursively sets up replies.)
-            foreach (DashboardPost dp in ViewBag.DashboardPosts)
+            foreach (DashboardPost dp in pagedDashboardPosts)
             {
                 setupPostDisplay(dp);
             }
 
+            // Only send items in page to the dashboard.
+            ViewBag.DashboardPostCount = dashboardPosts.Count();
+            ViewBag.DashboardPosts = pagedDashboardPosts;
+            ViewBag.StartPost = startPost;
             ViewBag.PostsPerPage = postsPerPage;
+        }
 
-            #endregion Activity Feed View
+        private void setupCourseLinks()
+        {
+            DirectoryListing listing = FileSystem.GetCourseDocumentsFileList(activeCourse.Course, false);
+            ViewBag.CourseLinks = listing;
+        }
 
-            #region Notifications
-
+        private void setupNotifications()
+        {
             // Load all unread notifications for the current user to display on the dashboard.
             ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == currentUser.ID) && (n.Read == false)).OrderByDescending(n => n.Posted).ToList();
+        }
 
-            #endregion Notifications
-
-            #region Events
-
+        private void setupEvents()
+        {
             // Set start and end dates of event viewing to current viewing settings for the course
             int eventDays = 7 * ActiveCourse.Course.CalendarWindowOfTime;
 
@@ -88,16 +107,6 @@ namespace OSBLE.Controllers
 
             EventController ec = new EventController();
             ViewBag.Events = ec.GetActiveCourseEvents(today, upto);
-
-            #endregion Events
-
-            #region Course Links
-            DirectoryListing listing = FileSystem.GetCourseDocumentsFileList(activeCourse.Course, false);
-            ViewBag.CourseLinks = listing;
-            #endregion
-
-
-            return View();
         }
 
         /// <summary>
@@ -136,24 +145,7 @@ namespace OSBLE.Controllers
                 post.DisplayName = posterCu.UserProfile.FirstName + " " + posterCu.UserProfile.LastName;
 
                 // Display Titles for Instructors/TAs for Courses, or Leader of Communities.
-                if (posterCu.Course is Community)
-                {
-                    if (posterCu.CourseRoleID == (int)CommunityRole.OSBLERoles.Leader)
-                    {
-                        post.DisplayTitle = "Leader";
-                    }
-                }
-                else if (posterCu.Course is Course)
-                {
-                    if (posterCu.CourseRoleID == (int)CourseRole.OSBLERoles.Instructor)
-                    {
-                        post.DisplayTitle = "Instructor";
-                    }
-                    else if (posterCu.CourseRoleID == (int)CourseRole.OSBLERoles.TA)
-                    {
-                        post.DisplayTitle = "TA";
-                    }
-                }
+                post.DisplayTitle = getRoleTitle(posterCu.CourseRoleID);
 
                 // Allow deletion if current user is poster or is an instructor
                 if ((posterCu.UserProfileID == currentCu.UserProfileID) || currentCu.CourseRole.CanModify)
@@ -181,31 +173,48 @@ namespace OSBLE.Controllers
                 post.CanDelete = false;
             }
 
-            // For posts, set reply box display if the course allows replies or if Instructor/TA.
-            if (post is DashboardPost &&
-                (
-                (currentCu.Course is Course &&
-                    ((currentCu.Course as Course).AllowDashboardReplies)
-                     || (currentCu.CourseRole.CanGrade))
-                // For communities, always allow replies
-                || (currentCu.Course is Community)
-                )
-               )
-            {
-                (post as DashboardPost).CanReply = true;
-            }
-            else if (post is DashboardPost && currentCu.Course is Community) // Communities always allow replies.
-            {
-                (post as DashboardPost).CanReply = true;
-            }
-
-            // Also for posts only, recursively set the display for their replies.
+            // For root posts only
             if (post is DashboardPost)
             {
-                foreach (DashboardReply dr in (post as DashboardPost).Replies)
+                DashboardPost thisDp = post as DashboardPost;
+
+                // For posts, set reply box display if the course allows replies or if Instructor/TA.
+                if ((currentCu.Course is Course &&
+                        ((currentCu.Course as Course).AllowDashboardReplies)
+                         || (currentCu.CourseRole.CanGrade))
+                    // For communities, always allow replies
+                    || (currentCu.Course is Community)
+                    )
+                {
+                    thisDp.CanReply = true;
+                }
+
+                // recursively set the display for post's replies.
+                foreach (DashboardReply dr in thisDp.Replies)
                 {
                     setupPostDisplay(dr);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets optional role title for certain roles in a course/community
+        /// (Instructors/TAs in courses, Leaders in communities)
+        /// </summary>
+        /// <param name="CourseRoleID">The Role ID of the user in question</param>
+        /// <returns>Returns a title for a user in a course if they are in a leadership role in that course</returns>
+        private string getRoleTitle(int CourseRoleID)
+        {
+            switch (CourseRoleID)
+            {
+                case (int)CommunityRole.OSBLERoles.Leader:
+                    return "Leader";
+                case (int)CourseRole.OSBLERoles.Instructor:
+                    return "Instructor";
+                case (int)CourseRole.OSBLERoles.TA:
+                    return "TA";
+                default:
+                    return "";
             }
         }
 
@@ -451,32 +460,36 @@ namespace OSBLE.Controllers
         [HttpGet, FileCache(Duration = 3600)]
         public FileStreamResult ProfilePictureForDashboard(int course, int userProfile)
         {
-            bool show = false;
+            // File Stream that will ultimately contain profile picture.
+            FileStream pictureStream;
+
+            // User Profile object of user we are trying to get a picture of
             UserProfile u = db.UserProfiles.Find(userProfile);
 
-            if (userProfile == currentUser.ID)
+            // A role for both our current user and 
+            // the one we're trying to see
+            AbstractRole ourRole = currentCourses.Where(c => c.CourseID == course).Select(c=>c.CourseRole).FirstOrDefault();
+            AbstractRole theirRole = db.CoursesUsers.Where(c => (c.CourseID == course) && (c.UserProfileID == userProfile)).Select(c=>c.CourseRole).FirstOrDefault();
+
+            // Show picture if user is requesting their own profile picture or they have the right to view the profile picture
+            if (userProfile == currentUser.ID ||
+                // Current user's CourseRole
+                ourRole != null &&
+                // Target user's CourseRole
+                theirRole != null &&
+                // If current user is not anonymous or other user is instructor/TA, show picture
+                (!(ourRole.Anonymized) || theirRole.CanGrade)
+               )
             {
-                show = true;
+                pictureStream = FileSystem.GetProfilePictureOrDefault(u);
             }
             else
             {
-                CoursesUsers ourCu = currentCourses.Where(c => c.CourseID == course).FirstOrDefault();
-                CoursesUsers theirCu = db.CoursesUsers.Where(c => (c.CourseID == course) && (c.UserProfileID == u.ID)).FirstOrDefault();
-
-                if ((ourCu != null) && (theirCu != null) && (!(ourCu.CourseRole.Anonymized) || (theirCu.CourseRole.CanGrade == true)))
-                {
-                    show = true;
-                }
+                // Default to blue OSBLE guy picture.
+                pictureStream = FileSystem.GetDefaultProfilePicture();
             }
 
-            if (show == true)
-            {
-                return new FileStreamResult(FileSystem.GetProfilePictureOrDefault(u), "image/jpeg");
-            }
-            else
-            {
-                return new FileStreamResult(FileSystem.GetDefaultProfilePicture(), "image/jpeg");
-            }
+            return new FileStreamResult(pictureStream, "image/jpeg");
         }
     }
 }

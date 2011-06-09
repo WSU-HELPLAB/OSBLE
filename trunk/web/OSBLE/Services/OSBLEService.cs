@@ -36,8 +36,7 @@ namespace OSBLE.Services
         {
             string userName = Context.User.Identity.Name;
 
-            UserProfile userProfile = db.UserProfiles.Where(u => u.UserName == userName).FirstOrDefault();
-            currentUserProfile = userProfile;
+            currentUserProfile = db.UserProfiles.Where(u => u.UserName == userName).FirstOrDefault();
 
             if (Context.Session["ActiveCourse"] != null && (Context.Session["ActiveCourse"] is int))
             {
@@ -45,7 +44,7 @@ namespace OSBLE.Services
 
 
                 CurrentCourseUser = db.CoursesUsers.Where(cu => cu.CourseID == activeCourse &&
-                                                    cu.UserProfileID == userProfile.ID &&
+                                                    cu.UserProfileID == currentUserProfile.ID &&
                                                     cu.Course is Course &&
                                                     (!(cu.Course as Course).Inactive ||
                                                         cu.CourseRoleID == (int)CourseRole.OSBLERoles.Instructor ||

@@ -114,106 +114,140 @@ namespace OSBLE.Controllers
 
             if (context.User.Identity.IsAuthenticated)
             {
-                #region Menu Setup
+                setupMenu();
 
-                List<MenuItem> menu = new List<MenuItem>();
+                setCurrentUserProfile();
 
-                menu.Add(new MenuItem("Dashboard", "Home", "Index"));
-                menu.Add(new MenuItem("Assignments", "Assignment", "Index", false, false, false, false, true, false));
-                menu.Add(new MenuItem("Grades", "Gradebook", "Index", false, false, true, false, true, false));
-                menu.Add(new MenuItem("Users", "Roster", "Index", false, true, false, false, false, false));
-                menu.Add(new MenuItem("Course Settings", "Course", "Edit", true, true, true, false, true, false));
-                menu.Add(new MenuItem("Community Settings", "Community", "Edit", true, true, true, false, false, true));
-                ViewBag.Menu = menu;
+                getEnrolledCourses();
 
-                #endregion Menu Setup
+                setCourseListTitle();
 
-                #region User And Course Setup
+                setDashboardDisplayMode();
 
-                // Set current User Profile.
-                string userName = context.User.Identity.Name;
-                ViewBag.CurrentUser = currentUser = db.UserProfiles.Where(u => u.UserName == userName).FirstOrDefault();
+            }
 
-                // Get list of enrolled courses.
-                if (currentUser != null)
+        }
+
+        /// <summary>
+        /// Sets title of course list title based on whether or not
+        /// user is in any communities. Will display "Course" for courses
+        /// or "Course/Community" if at least one community is present.
+        /// </summary>
+        private void setCourseListTitle()
+        {
+            if (currentCourses.Where(c => c.Course is Community).Count() > 0)
+            {
+                ViewBag.CourseListTitle = "Course/Community";
+            }
+            else
+            {
+                ViewBag.CourseListTitle = "Course";
+            }
+            ViewBag.CurrentCourses = currentCourses;
+        }
+
+        /// <summary>
+        /// Sets ViewBag flag for whether or not the current session
+        /// is displaying only the active course in the dashboard feed,
+        /// or displaying all courses.
+        /// </summary>
+        private void setDashboardDisplayMode()
+        {
+            // Validate dashboard display mode setting.
+            if ((context.Session["DashboardSingleCourseMode"] == null) || (context.Session["DashboardSingleCourseMode"].GetType() != typeof(Boolean)))
+            {
+                context.Session["DashboardSingleCourseMode"] = false;
+            }
+
+            DashboardSingleCourseMode = ViewBag.DashboardSingleCourseMode = context.Session["DashboardSingleCourseMode"];
+        }
+
+        /// <summary>
+        /// Creates menu items (with permissions) for tabbed main menu on most OSBLE screens.
+        /// </summary>
+        private void setupMenu()
+        {
+            List<MenuItem> menu = new List<MenuItem>();
+
+            menu.Add(new MenuItem("Dashboard", "Home", "Index"));
+            menu.Add(new MenuItem("Assignments", "Assignment", "Index", false, false, false, false, true, false));
+            menu.Add(new MenuItem("Grades", "Gradebook", "Index", false, false, true, false, true, false));
+            menu.Add(new MenuItem("Users", "Roster", "Index", false, true, false, false, false, false));
+            menu.Add(new MenuItem("Course Settings", "Course", "Edit", true, true, true, false, true, false));
+            menu.Add(new MenuItem("Community Settings", "Community", "Edit", true, true, true, false, false, true));
+            ViewBag.Menu = menu;
+        }
+
+        /// <summary>
+        /// Sets currentCourses for the current user, which is a list of
+        /// courses/communities they are enrolled in or have access to.
+        /// Also, if a user is invalid, it will clear their session and log them out.
+        /// </summary>
+        private void getEnrolledCourses()
+        {
+            // If current user is valid, get course list for user.
+            if (currentUser != null)
+            {
+                // Sends the ViewBag the amount of unread mail messages the user has.
+                SetUnreadMessageCount();
+
+                List<CoursesUsers> allUsersCourses = db.CoursesUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
+
+                // Get list of courses this user is connected to. Remove inactive (for anyone other than instructors or observers) or hidden (for all) courses.
+                currentCourses = allUsersCourses.Where(cu => (cu.Course is Course) &&
+                    (((cu.Course as Course).Inactive == false) || 
+                    (cu.CourseRoleID == (int)CourseRole.OSBLERoles.Instructor) || 
+                    (cu.CourseRoleID == (int)CourseRole.OSBLERoles.Observer)))
+                    // Order first by descending start date (newest first)
+                        .OrderByDescending(cu => (cu.Course as Course).StartDate)
+                    // Order next by whether the course is inactive, placing inactive courses underneath active.
+                        .OrderBy(cu => (cu.Course as Course).Inactive).ToList();
+
+                // Add communities under courses, ordered by name
+                currentCourses = currentCourses.Concat(allUsersCourses.Where(cu => cu.Course is Community).OrderBy(cu => cu.Course.Name).ToList()).ToList();
+
+                // Only consider non-hidden courses as the active course.
+                List<CoursesUsers> activeCoursePool = currentCourses.Where(cu => cu.Hidden == false).ToList();
+
+                int activeCourseID;
+
+                var sessionAc = context.Session["ActiveCourse"];
+
+                if (sessionAc == null || !(sessionAc is int))
                 {
-                    SetUnreadMessageCount();
-
-                    List<CoursesUsers> allUsersCourses = db.CoursesUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
-
-                    // Get list of courses this user is connected to. Remove inactive (for anyone other than instructors or observers) or hidden (for all) courses.
-                    currentCourses = allUsersCourses.Where(cu => (cu.Course is Course) &&
-                        (((cu.Course as Course).Inactive == false) || (cu.CourseRoleID == (int)CourseRole.OSBLERoles.Instructor) || (cu.CourseRoleID == (int)CourseRole.OSBLERoles.Observer)))
-                        // Order first by descending start date (newest first)
-                            .OrderByDescending(cu => (cu.Course as Course).StartDate)
-                        // Order next by whether the course is inactive, placing inactive courses underneath active.
-                            .OrderBy(cu => (cu.Course as Course).Inactive).ToList();
-
-                    // Add communities under courses, ordered by name
-                    currentCourses = currentCourses.Concat(allUsersCourses.Where(cu => cu.Course is Community).OrderBy(cu => cu.Course.Name).ToList()).ToList();
-
-                    // First we need to validate that the Active Course session variable is actually an integer.
-                    if (context.Session["ActiveCourse"] != null && context.Session["ActiveCourse"].GetType() != typeof(int))
-                    {
-                        context.Session["ActiveCourse"] = null;
-                    }
-
-                    // Only consider non-hidden courses as the active course.
-                    List<CoursesUsers> activeCoursePool = currentCourses.Where(cu => cu.Hidden == false).ToList();
-
-                    // On login, set to users default course.
-                    if (context.Session["ActiveCourse"] == null)
-                    {
-                        context.Session["ActiveCourse"] = currentUser.DefaultCourse;
-                    }
-
-                    // Load currently selected course, as long as user is actually a member of said course.
-                    if ((context.Session["ActiveCourse"] != null) && (activeCoursePool.Where(cu => cu.CourseID == (int)context.Session["ActiveCourse"]).Count() > 0))
-                    {
-                        activeCourse = activeCoursePool.Where(cu => cu.CourseID == (int)context.Session["ActiveCourse"]).First();
-                        context.Session["ActiveCourse"] = activeCourse.CourseID;
-                    }
-                    else // Assign first course if one exists.
-                    {
-                        activeCourse = currentCourses.FirstOrDefault();
-                        if (activeCourse != null)
-                        {
-                            context.Session["ActiveCourse"] = activeCourse.CourseID;
-                        }
-                        else
-                        {
-                            context.Session["ActiveCourse"] = null;
-                        }
-                    }
-
-                    ViewBag.ActiveCourse = activeCourse;
+                    // On login or invalid ActiveCourse, set to user's default course.
+                    activeCourseID = currentUser.DefaultCourse;
                 }
-                else // User invalid. Logout.
+                else if (sessionAc is int)
                 {
-                    context.Session.Clear(); // Clear session
-                    FormsAuthentication.SignOut();
-                }
-
-                if (currentCourses.Where(c => c.Course is Community).Count() > 0)
-                {
-                    ViewBag.CourseListTitle = "Course/Community";
+                    // If ActiveCourse is valid in session, try it for our active course.
+                    activeCourseID = (int)sessionAc;
                 }
                 else
                 {
-                    ViewBag.CourseListTitle = "Course";
+                    activeCourseID = 0;
                 }
-                ViewBag.CurrentCourses = currentCourses;
 
-                // Validate dashboard display mode setting.
-                if ((context.Session["DashboardSingleCourseMode"] == null) || (context.Session["DashboardSingleCourseMode"].GetType() != typeof(Boolean)))
+                // Load currently selected course, as long as user is actually a member of said course. 
+                // Otherwise, load first course.
+                if ((activeCourse = activeCoursePool.Where(cu => cu.CourseID == activeCourseID).FirstOrDefault()) == null)
                 {
-                    context.Session["DashboardSingleCourseMode"] = false;
+                    activeCourse = activeCoursePool.FirstOrDefault();
                 }
 
-                DashboardSingleCourseMode = ViewBag.DashboardSingleCourseMode = context.Session["DashboardSingleCourseMode"];
-
-                #endregion User And Course Setup
+                ViewBag.ActiveCourse = activeCourse;
             }
+            else // User invalid. Logout.
+            {
+                context.Session.Clear(); // Clear session
+                FormsAuthentication.SignOut();
+            }
+        }
+
+        private void setCurrentUserProfile()
+        {
+            string userName = context.User.Identity.Name;
+            ViewBag.CurrentUser = currentUser = db.UserProfiles.Where(u => u.UserName == userName).FirstOrDefault();
         }
 
         public void SetUnreadMessageCount()
