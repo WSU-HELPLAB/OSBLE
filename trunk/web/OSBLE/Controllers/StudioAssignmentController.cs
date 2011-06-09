@@ -9,7 +9,7 @@ using OSBLE.Models.ViewModels;
 using System.Runtime.Serialization.Json;
 using System.IO;
 using System.Text;
-using Newtonsoft.Json;
+//using Newtonsoft.Json;
 
 namespace OSBLE.Controllers
 {
@@ -66,7 +66,7 @@ namespace OSBLE.Controllers
                 ActivityType = ActivityTypes.Stop
             });
 
-            viewModel.SerializedActivitiesJSON = viewModel.StudioTimelineCreation.Parameters["activities"] = Uri.EscapeDataString(JsonConvert.SerializeObject(activities));
+            //viewModel.SerializedActivitiesJSON = viewModel.StudioTimelineCreation.Parameters["activities"] = Uri.EscapeDataString(JsonConvert.SerializeObject(activities));
 
             return View(viewModel);
         }
