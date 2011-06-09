@@ -283,6 +283,22 @@ namespace OSBLE.Services
         }
 
         /// <summary>
+        /// Updates the supplied directory listing's internal ordering
+        /// </summary>
+        /// <param name="listing"></param>
+        /// <param name="courseId"></param>
+        /// <param name="authToken"></param>
+        [OperationContract]
+        public void UpdateListingOrder(DirectoryListing listing, int courseId, string authToken)
+        {
+            if (!IsValidKey(authToken))
+            {
+                return;
+            }
+            FileSystem.UpdateFileOrdering(listing, courseId);
+        }
+
+        /// <summary>
         /// Validates the supplied user/pass combination.  
         /// </summary>
         /// <param name="userName"></param>

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Web;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Courses;
@@ -69,6 +70,92 @@ namespace OSBLE
             }
         }
 
+        private static string OrderingFileName
+        {
+            get
+            {
+                return ".ordering";
+            }
+        }
+
+        /// <summary>
+        /// Returns a list of files and directories for the given path
+        /// </summary>
+        /// <param name="relativepath"></param>
+        /// <returns></returns>
+        private static DirectoryListing BuildFileList(string path, bool includeParentLink = true)
+        {
+
+            //see if we have an ordering file for the supplied path
+            Dictionary<string, int> ordering = new Dictionary<string, int>();
+            string orderingPath = Path.Combine(path, OrderingFileName);
+            if (File.Exists(orderingPath))
+            {
+                ordering = GetFileOrdering(orderingPath);
+            }
+
+            //build a new listing, set some initial values
+            DirectoryListing listing = new DirectoryListing();
+            listing.Name = path.Substring(path.LastIndexOf('\\') + 1);
+            listing.LastModified = File.GetLastWriteTime(path);
+            
+            //handle files
+            foreach (string file in Directory.GetFiles(path))
+            {
+                //the ordering file is used to denote ordering of files and should not be
+                //displayed in the file list.
+                if (Path.GetFileName(file).CompareTo(OrderingFileName) == 0)
+                {
+                    continue;
+                }
+                FileListing fList = new FileListing();
+                fList.Name = Path.GetFileName(file);
+                fList.LastModified = File.GetLastWriteTime(file);
+                fList.FileUrl = FileSystem.CourseDocumentPathToWebUrl(file);
+
+                //set file ordering if it exists
+                if(ordering.ContainsKey(fList.Name))
+                {
+                    fList.SortOrder = ordering[fList.Name];
+                }
+                listing.Files.Add(fList);
+            }
+
+            //Add a parent directory "..." at the top of every directory listing if requested
+            if (includeParentLink)
+            {
+                listing.Directories.Add(new ParentDirectoryListing());
+            }
+
+            //handle other directories
+            foreach (string folder in Directory.EnumerateDirectories(path))
+            {
+                //recursively build the directory's subcontents.  Note that we have
+                //to pass only the folder's name and not the complete path
+                DirectoryListing dlisting = BuildFileList(folder, includeParentLink);
+                if (ordering.ContainsKey(dlisting.Name))
+                {
+                    dlisting.SortOrder = ordering[dlisting.Name];
+                }
+                listing.Directories.Add(dlisting);
+            }
+                
+            //return the completed listing
+            return listing;
+        }
+
+        /// <summary>
+        /// Returns a list of course documents wrapped in a DirectoryListing object
+        /// </summary>
+        /// <param name="course"></param>
+        /// <param name="includeParentLink"></param>
+        /// <returns></returns>
+        public static DirectoryListing GetCourseDocumentsFileList(AbstractCourse course, bool includeParentLink = true)
+        {
+            string path = GetCourseDocumentsPath(course);
+            return BuildFileList(path, includeParentLink);
+        }
+
         public static string GetCourseDocumentsPath(AbstractCourse course)
         {
             string location = string.Format("{0}\\CourseDocs", getCoursePath(course));
@@ -113,58 +200,6 @@ namespace OSBLE
             return url;
         }
 
-        /// <summary>
-        /// Returns a list of course documents wrapped in a DirectoryListing object
-        /// </summary>
-        /// <param name="course"></param>
-        /// <param name="includeParentLink"></param>
-        /// <returns></returns>
-        public static DirectoryListing GetCourseDocumentsFileList(AbstractCourse course, bool includeParentLink = true)
-        {
-            string path = GetCourseDocumentsPath(course);
-            return BuildFileList(path, includeParentLink);
-        }
-
-        /// <summary>
-        /// Returns a list of files and directories for the given path
-        /// </summary>
-        /// <param name="relativepath"></param>
-        /// <returns></returns>
-        private static DirectoryListing BuildFileList(string path, bool includeParentLink = true)
-        {
-
-            //build a new listing, set some initial values
-            DirectoryListing listing = new DirectoryListing();
-            listing.Name = path.Substring(path.LastIndexOf('\\') + 1);
-            listing.LastModified = File.GetLastWriteTime(path);
-
-            //handle files
-            foreach (string file in Directory.GetFiles(path))
-            {
-                FileListing fList = new FileListing();
-                fList.Name = Path.GetFileName(file);
-                fList.LastModified = File.GetLastWriteTime(file);
-                fList.FileUrl = FileSystem.CourseDocumentPathToWebUrl(file);
-                listing.Files.Add(fList);
-            }
-
-            //Add a parent directory "..." at the top of every directory listing if requested
-            if (includeParentLink)
-            {
-                listing.Directories.Add(new ParentDirectoryListing());
-            }
-
-            //handle other directories
-            foreach (string folder in Directory.EnumerateDirectories(path))
-            {
-                //recursively build the directory's subcontents.  Note that we have
-                //to pass only the folder's name and not the complete path
-                listing.Directories.Add(BuildFileList(folder, includeParentLink));
-            }
-
-            //return the completed listing
-            return listing;
-        }
 
         public static FileStream GetDocumentForRead(string path)
         {
@@ -174,6 +209,32 @@ namespace OSBLE
         public static FileStream GetDefaultProfilePicture()
         {
             return new FileStream(HttpContext.Current.Server.MapPath("\\Content\\images\\default.jpg"), FileMode.Open, FileAccess.Read);
+        }
+
+        /// <summary>
+        /// Gets the ordering scheme for the current directory
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        private static Dictionary<string, int> GetFileOrdering(string filePath)
+        {
+            Dictionary<string, int> ordering = new Dictionary<string, int>();
+            StreamReader reader = new StreamReader(filePath);
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                string[] pieces = line.Split(',');
+                try
+                {
+                    ordering.Add(pieces[0], Convert.ToInt32(pieces[1]));
+                }
+                catch (Exception ex)
+                {
+                    //lazy exception handling.
+                }
+            }
+            reader.Close();
+            return ordering;
         }
 
         public static FileStream GetProfilePictureOrDefault(UserProfile userProfile)
@@ -222,6 +283,30 @@ namespace OSBLE
                     di.Delete();
                 }
             }
+        }
+
+        public static void UpdateFileOrdering(DirectoryListing listing, int courseId)
+        {
+            string path = GetCourseDocumentsPath(courseId);
+            string orderingFile = Path.Combine(path, OrderingFileName);
+            StreamWriter writer = new StreamWriter(orderingFile);
+
+            //files first
+            foreach (FileListing flisting in listing.Files)
+            {
+                string line = string.Format("{0},{1}", flisting.Name, flisting.SortOrder);
+                writer.WriteLine(line);
+            }
+
+            //then directories
+            foreach (DirectoryListing dlisting in listing.Directories)
+            {
+                string line = string.Format("{0},{1}", dlisting.Name, dlisting.SortOrder);
+                writer.WriteLine(line);
+
+                //TODO: add recursive call
+            }
+            writer.Close();
         }
 
         /// <summary>
