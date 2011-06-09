@@ -16,6 +16,7 @@ namespace OSBLE.Controllers
     public abstract class OSBLEController : Controller
     {
         protected OSBLEContext db = new OSBLEContext();
+
         protected UserProfile currentUser = null;
 
         public UserProfile CurrentUser
@@ -114,6 +115,8 @@ namespace OSBLE.Controllers
 
             if (context.User.Identity.IsAuthenticated)
             {
+                setupInitialDatabaseData();
+
                 setupMenu();
 
                 setCurrentUserProfile();
@@ -124,6 +127,35 @@ namespace OSBLE.Controllers
 
                 setDashboardDisplayMode();
 
+            }
+
+        }
+
+        /// <summary>
+        /// Checks to see if the Course/Community roles have been populated. 
+        /// Also adds WSU to schools if none exist.
+        /// This is different from the sample data generation in OSBLEContext, which
+        /// is meant for development purposes only.
+        /// </summary>
+        private void setupInitialDatabaseData()
+        {
+
+            if (db.AbstractRoles.Count() == 0)
+            {
+                db.SeedRoles();
+                db.SaveChanges();
+            }
+
+            if (db.Schools.Count() == 0)
+            {
+                db.Schools.Add(
+                        new School()
+                        {
+                            Name = "Washington State University"
+                        }
+                    );
+
+                db.SaveChanges();
             }
 
         }

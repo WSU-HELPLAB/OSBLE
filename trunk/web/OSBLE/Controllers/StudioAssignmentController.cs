@@ -10,9 +10,13 @@ using System.Runtime.Serialization.Json;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
+using OSBLE.Attributes;
 
 namespace OSBLE.Controllers
 {
+    [Authorize]
+    [RequireActiveCourse]
+    [NotForCommunity]
     public class StudioAssignmentController : OSBLEController
     {
         //

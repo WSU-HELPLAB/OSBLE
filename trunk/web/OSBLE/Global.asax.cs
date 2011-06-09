@@ -43,9 +43,13 @@ namespace OSBLE
 
         protected void Application_Start()
         {
-            // This should be removed after the database is created.
-            //System.Data.Entity.Database.SetInitializer(new OSBLE.Models.OSBLEContextModelChangeInitializer());
+
+        #if DEBUG
+            // Development only.
+            System.Data.Entity.Database.SetInitializer(new OSBLE.Models.OSBLEContextModelChangeInitializer());
             //System.Data.Entity.Database.SetInitializer(new OSBLE.Models.OSBLEContextAlwaysCreateInitializer());
+        #endif
+
             AreaRegistration.RegisterAllAreas();
 
             RegisterGlobalFilters(GlobalFilters.Filters);
