@@ -78,12 +78,24 @@ namespace FileUploader
             LocalFileList.ParentDirectoryRequest += new EventHandler(LocalFileList_ParentDirectoryRequest);
             LocalFileTextBox.KeyUp += new KeyEventHandler(LocalFileTextBox_KeyUp);
             UploadLocation.SelectionChanged += new SelectionChangedEventHandler(UploadLocation_SelectionChanged);
+            UpButton.Click += new RoutedEventHandler(UpButton_Click);
+            DownButton.Click += new RoutedEventHandler(DownButton_Click);
 
             //get the remote server file list
             syncedFiles.GetValidUploadLocationsAsync(authToken);
             
             //get the local files
             LocalFileList.DataContext = BuildLocalDirectoryListing(LocalPath);
+        }
+
+        void DownButton_Click(object sender, RoutedEventArgs e)
+        {
+            RemoteFileList.MoveSelectionDown();
+        }
+
+        void UpButton_Click(object sender, RoutedEventArgs e)
+        {
+            RemoteFileList.MoveSelectionUp();
         }
 
         void UploadLocation_SelectionChanged(object sender, SelectionChangedEventArgs e)

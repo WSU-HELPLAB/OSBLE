@@ -69,6 +69,41 @@ namespace FileUploader.Controls
         }
 
         /// <summary>
+        /// Moves the selected item up in the list ordering
+        /// </summary>
+        public void MoveSelectionUp()
+        {
+            if (lastSelectedItem != null)
+            {
+                lastSelectedItem.DataContext.SortOrder -= 1;
+                SwapLocations(ListOfFiles.SelectedIndex, ListOfFiles.SelectedIndex - 1, lastSelectedItem);
+                
+            }
+        }
+
+        /// <summary>
+        /// Moves the selected item down in the list ordering
+        /// </summary>
+        public void MoveSelectionDown()
+        {
+            if (lastSelectedItem != null)
+            {
+                lastSelectedItem.DataContext.SortOrder += 1;
+                SwapLocations(ListOfFiles.SelectedIndex, ListOfFiles.SelectedIndex + 1, lastSelectedItem);
+            }
+        }
+
+        private void SwapLocations(int oldLocation, int newLocation, FileListItem listItem)
+        {
+            if (oldLocation > 0 && newLocation > 0)
+            {
+                ListOfFiles.Items.RemoveAt(oldLocation);
+                ListOfFiles.Items.Insert(newLocation, listItem);
+                ListOfFiles.SelectedItem = listItem;
+            }
+        }
+
+        /// <summary>
         /// We listen for left mouse button clicks to check for item selection and directory
         /// traversal.
         /// </summary>
@@ -122,7 +157,10 @@ namespace FileUploader.Controls
             ListOfFiles.Items.Clear();
 
             //add directories
-            foreach (DirectoryListing dl in DataContext.Directories)
+            List<DirectoryListing> directories = (from directory in DataContext.Directories
+                                                  orderby directory.SortOrder
+                                                  select directory).ToList();
+            foreach (DirectoryListing dl in directories)
             {
                 FileListItem item = new FileListItem();
                 item.DataContext = dl;
@@ -130,7 +168,10 @@ namespace FileUploader.Controls
             }
 
             //and then files
-            foreach (FileListing fl in DataContext.Files)
+            List<FileListing> files = (from file in DataContext.Files
+                                       orderby file.SortOrder
+                                       select file).ToList();
+            foreach (FileListing fl in files)
             {
                 FileListItem item = new FileListItem();
                 item.DataContext = fl;
