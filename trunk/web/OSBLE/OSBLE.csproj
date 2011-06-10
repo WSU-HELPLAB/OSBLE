@@ -469,16 +469,16 @@
     <Content Include="App_Code\Helpers.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Account\Admin\Index.cshtml" />
+    <Content Include="Views\Admin\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Account\Admin\Details.cshtml" />
+    <Content Include="Views\Admin\Details.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Account\Admin\Edit.cshtml" />
+    <Content Include="Views\Admin\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Account\Admin\Delete.cshtml" />
+    <Content Include="Views\Admin\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Roster\ImportRoster.cshtml" />
@@ -552,10 +552,6 @@
     <Content Include="Views\Gradebook\_Tabs.cshtml" />
     <Content Include="Views\Gradebook\Tab.cshtml" />
     <Content Include="Views\Account\ResetPasswordSuccess.cshtml" />
-    <Content Include="Views\Admin\Delete.cshtml" />
-    <Content Include="Views\Admin\Details.cshtml" />
-    <Content Include="Views\Admin\Edit.cshtml" />
-    <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Account\ResetPasswordFailure.cshtml" />
     <Content Include="Views\Notification\Index.cshtml" />
   </ItemGroup>
