@@ -267,7 +267,7 @@ namespace OSBLE.Controllers
 
                 string body = "Your OSBLE password has been reset.\n Your new password is: " + newPass + "\n\nPlease change this password as soon as possible.";
 
-                MailMessage mm = new MailMessage(new MailAddress(ConfigurationSettings.AppSettings["OSBLEFromEmail"],"OSBLE"), 
+                MailMessage mm = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"],"OSBLE"), 
                             new MailAddress(model.EmailAddress));
                             
                              
@@ -364,7 +364,7 @@ namespace OSBLE.Controllers
                 SmtpClient mailClient = new SmtpClient();
                 mailClient.UseDefaultCredentials = true;
 
-                MailMessage message = new MailMessage(new MailAddress(ConfigurationSettings.AppSettings["OSBLEFromEmail"], "OSBLE"), 
+                MailMessage message = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE"), 
                                                         new MailAddress("support@osble.org"));
 
                 message.ReplyToList.Add(new MailAddress(model.Email));
