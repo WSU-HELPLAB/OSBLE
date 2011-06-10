@@ -129,6 +129,10 @@ namespace OSBLE.Controllers
 
             }
 
+
+            ViewBag.tt = new ToolTips();
+
+
         }
 
         /// <summary>

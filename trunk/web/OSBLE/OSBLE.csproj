@@ -172,6 +172,7 @@
     <Compile Include="Models\List.cs" />
     <Compile Include="Models\Services\Uploader\ParentDirectoryListing.cs" />
     <Compile Include="Models\Services\Uploader\UserSession.cs" />
+    <Compile Include="Models\ToolTips.cs" />
     <Compile Include="Models\ViewModels\BasicAssignmentViewModel.cs" />
     <Compile Include="Models\Services\Uploader\AbstractListing.cs" />
     <Compile Include="Models\Services\Uploader\DirectoryListing.cs" />
@@ -226,6 +227,7 @@
     <Content Include="ClientBin\StudioTimelineCreation.xap" />
     <Content Include="ClientBin\TeamCreation.xap" />
     <Content Include="Content\favicon.ico" />
+    <Content Include="Content\images\tooltip\109_AllAnnotations_Help_16x16_72.png" />
     <Content Include="Content\images\account.png" />
     <Content Include="Content\images\add_up.png" />
     <Content Include="Content\images\ajax-loader.gif" />
@@ -301,6 +303,15 @@
     <Content Include="Content\images\mail.png" />
     <Content Include="Content\images\mail_up.png" />
     <Content Include="Content\images\default.jpg" />
+    <Content Include="Content\images\tooltip\bubble-1.png" />
+    <Content Include="Content\images\tooltip\bubble-2.png" />
+    <Content Include="Content\images\tooltip\bubble-3.png" />
+    <Content Include="Content\images\tooltip\bubble-4.png" />
+    <Content Include="Content\images\tooltip\bubble-5.png" />
+    <Content Include="Content\images\tooltip\bubble-6.png" />
+    <Content Include="Content\images\tooltip\bubble-7.png" />
+    <Content Include="Content\images\tooltip\bubble-8.png" />
+    <Content Include="Content\images\tooltip\bubble-tail2.png" />
     <Content Include="Content\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\images\ui-bg_flat_75_ffffff_40x100.png" />
     <Content Include="Content\images\ui-bg_glass_55_fbf9ee_1x400.png" />
@@ -318,6 +329,7 @@
     <Content Include="Content\images\ui-icons_ffffff_256x240.png" />
     <Content Include="Content\jquery-ui-1.8.13.custom.css" />
     <Content Include="Content\jquery-ui-timepicker.css" />
+    <Content Include="Content\jquery-tooltip.css" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
@@ -346,6 +358,7 @@
     <Content Include="Content\themes\base\jquery.ui.tabs.css" />
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
     <Content Include="Global.asax" />
+    <Content Include="Scripts\jquery-tooltip.js" />
     <Content Include="Scripts\jquery.selectboxes.js" />
     <Content Include="Scripts\osble.assignments.js" />
     <Content Include="Scripts\jquery.tmpl.min.js" />
