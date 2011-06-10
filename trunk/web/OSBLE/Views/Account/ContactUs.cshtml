@@ -38,6 +38,9 @@
             @Html.TextAreaFor(m => m.Message, 10,50,new { tabindex = "3" })<br />
             @Html.ValidationMessageFor(m => m.Message)
         </div>
+        <div>
+            @Html.Partial("_ReCaptcha")
+        </div>
         <p>
             <input type="submit" value="Submit" />
         </p>

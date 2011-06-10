@@ -19,7 +19,12 @@
             value="@Model.MinimumRuntimeVersion" />
         <param name="autoUpgrade"
             value="@Model.AutoUpgrade" />
-        
+            @{
+        if (Model.OnLoaded != null && Model.OnLoaded != "")
+        { 
+            <param name="OnLoaded" value="@Model.OnLoaded" />
+        }
+        }
         @if (Model.Parameters != null && Model.Parameters.Count > 0)
         {
             <param name="initParams" value="@Model.ParameterString" />

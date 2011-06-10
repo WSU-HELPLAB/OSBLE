@@ -1,9 +1,12 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows.Controls;
 
 namespace TeamCreation
 {
     public partial class AddButton : UserControl
     {
+        public event EventHandler AddTeamRequested = delegate { };
+
         public MainPage parent;
 
         public AddButton()
@@ -14,6 +17,7 @@ namespace TeamCreation
 
         private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
         {
+            AddTeamRequested(this, EventArgs.Empty);
         }
     }
 }

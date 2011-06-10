@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 
@@ -12,14 +9,25 @@ namespace OSBLE.Models
     public class SilverlightObject
     {
         public string XapName { get; set; }
+
         public string CSSId { get; set; }
+
         public string Width { get; set; }
+
         public string Height { get; set; }
+
         public string OnSilverlightError { get; set; }
+
         public Color BackgroundColor { get; set; }
+
         public string MinimumRuntimeVersion { get; set; }
+
         public bool AutoUpgrade { get; set; }
+
+        public string OnLoaded { get; set; }
+
         public IDictionary<string, string> Parameters { get; set; }
+
         public string ParameterString
         {
             get
@@ -42,7 +50,7 @@ namespace OSBLE.Models
         {
             CSSId = "silverlight";
             OnSilverlightError = "onSilverlightError";
-            BackgroundColor = Color.White;
+            BackgroundColor = Color.Blue;
             MinimumRuntimeVersion = "4.0.50524.0";
             AutoUpgrade = true;
         }

@@ -183,7 +183,38 @@
         $('#team_generation_dialog').dialog('open'); return false;
     }
 
+    function GenerateTeamsRandomly() {
+        if ($("input[name='team_or_people']:checked").val() == 'Teams') {
+            var teams = parseInt($('#total_teams').val());
+            if (isNaN(teams) || teams == 0) {
+                alert('der specify number of total teams');
+            }
+            else {
+                OpenSL();
+            }
+        }
+        else {
+            var teams = parseInt($('#people_per_team').val());
+            if (isNaN(teams) || teams == 0) {
+                alert('der specify number of people per team');
+            }
+            else {
+                OpenSL();
+            }
+        }
+    }
 
+    function SLReady() {
+
+        if ($("input[name='team_generation_options']:checked").val() == 'RandomTeams') {
+            if ($("input[name='#team_or_people']:checked").val() == 'Teams') {
+                document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfTeams(parseInt($('#total_teams').val()));
+            }
+            else {
+                document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfPeople(parseInt($('#people_per_team').val()));
+            }
+        }
+    }
 </script>
 @{
     
@@ -265,7 +296,7 @@
                 </li>
                 <br />
                 <li>
-                    <button type="button" onclick="OpenSL()">
+                    <button type="button" onclick="GenerateTeamsRandomly()">
                         Generate Teams</button>
                 </li>
             </ul>

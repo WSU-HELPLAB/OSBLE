@@ -1,0 +1,7 @@
+﻿@if(ViewBag.ReCaptchaPublicKey == null)
+{
+}
+else
+{
+    ReCaptcha.GetHtml(publicKey: ViewBag.ReCaptchaPublicKey, theme: "white");
+}

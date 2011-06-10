@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Web.Mvc;
+using Newtonsoft.Json;
 using OSBLE.Attributes;
 using OSBLE.Models;
 using OSBLE.Models.Assignments;
@@ -18,6 +19,25 @@ namespace OSBLE.Controllers
     [NotForCommunity]
     public class BasicAssignmentController : OSBLEController
     {
+        public class SerializableTeamMembers
+        {
+            public int UserID { get; set; }
+
+            public int TeamID { get; set; }
+
+            public string Name { get; set; }
+
+            public int Section { get; set; }
+
+            public bool IsModerator { get; set; }
+
+            public bool Subbmitted { get; set; }
+
+            public int InTeamID { get; set; }
+
+            public string InTeamName { get; set; }
+        }
+
         public BasicAssignmentController()
             : base()
         {
@@ -54,27 +74,60 @@ namespace OSBLE.Controllers
         {
             //we create a basic assignment that is a StudioAssignment with a submission and a stop
             List<Deliverable> Deliverables = new List<Deliverable>();
-            BasicAssignmentViewModel basic = new BasicAssignmentViewModel();
+            BasicAssignmentViewModel viewModel = new BasicAssignmentViewModel();
 
             // Copy default Late Policy settings
             Course active = activeCourse.Course as Course;
-            basic.Submission.HoursLatePerPercentPenalty = active.HoursLatePerPercentPenalty;
-            basic.Submission.HoursLateUntilZero = active.HoursLateUntilZero;
-            basic.Submission.PercentPenalty = active.PercentPenalty;
-            basic.Submission.MinutesLateWithNoPenalty = active.MinutesLateWithNoPenalty;
+            viewModel.Submission.HoursLatePerPercentPenalty = active.HoursLatePerPercentPenalty;
+            viewModel.Submission.HoursLateUntilZero = active.HoursLateUntilZero;
+            viewModel.Submission.PercentPenalty = active.PercentPenalty;
+            viewModel.Submission.MinutesLateWithNoPenalty = active.MinutesLateWithNoPenalty;
 
-            basic.TeamCreation = new SilverlightObject
+            viewModel.TeamCreation = new SilverlightObject
             {
-                CSSId = "team_creation_silverlight_control",
+                CSSId = "team_creation_silverlight",
                 XapName = "TeamCreation",
-                Width = "100%",
-                Height = "100%"
+                Width = "850",
+                Height = "610",
+                OnLoaded = "SLObjectLoaded",
+                Parameters = new Dictionary<string, string>()
+                {
+                }
             };
+
+            List<SerializableTeamMembers> teamMembmers = new List<SerializableTeamMembers>();
+
+            var couresesUsers = (from c in db.CoursesUsers
+                                 where c.CourseID == activeCourse.CourseID
+                                 && (c.CourseRole.ID == (int)CourseRole.OSBLERoles.Moderator
+                                 || c.CourseRole.ID == (int)CourseRole.OSBLERoles.Student)
+                                 select c).ToList();
+
+            int i = 0;
+            foreach (CoursesUsers cu in couresesUsers)
+            {
+                SerializableTeamMembers teamMember = new SerializableTeamMembers();
+                teamMember.IsModerator = cu.CourseRole.ID == (int)CourseRole.OSBLERoles.Moderator;
+                teamMember.Name = cu.UserProfile.FirstName + " " + cu.UserProfile.LastName;
+                teamMember.Section = cu.Section;
+
+                ///////////////////////TEST/////////////////////////
+                if (i % 2 == 0)
+                {
+                    teamMember.Subbmitted = true;
+                }
+                i++;
+                ///////////////////////////////////////////////////
+
+                teamMembmers.Add(teamMember);
+            }
+
+            viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"] = Uri.EscapeDataString(JsonConvert.SerializeObject(teamMembmers));
 
             ViewBag.Categories = new SelectList(db.Categories, "ID", "Name");
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
             ViewBag.Deliverables = Deliverables;
-            return View(basic);
+            return View(viewModel);
         }
 
         //

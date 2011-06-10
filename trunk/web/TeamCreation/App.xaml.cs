@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Browser;
 
 namespace TeamCreation
 {
@@ -10,14 +11,23 @@ namespace TeamCreation
             this.Startup += this.Application_Startup;
             this.Exit += this.Application_Exit;
             this.UnhandledException += this.Application_UnhandledException;
-
             InitializeComponent();
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            MainPage mp = new MainPage();
+            // Get JSON string of activities or pass empty list if none passed in.
+            string SerializedTeamMembersJSON = "[]";
+
+            if (e.InitParams.Keys.Contains("teamMembers"))
+            {
+                SerializedTeamMembersJSON = Uri.UnescapeDataString(e.InitParams["teamMembers"]);
+            }
+
+            MainPage mp = new MainPage(SerializedTeamMembersJSON);
             this.RootVisual = mp;
+
+            HtmlPage.RegisterScriptableObject("MainPage", mp);
         }
 
         private void Application_Exit(object sender, EventArgs e)

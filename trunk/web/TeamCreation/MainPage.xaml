@@ -11,19 +11,22 @@
 
     <toolkit:BusyIndicator x:Name="Busy">
 
-        <Grid x:Name="LayoutRoot" Background="White">
+        <Grid x:Name="LayoutRoot" Background="Gray">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button x:Name="PublishChanges" Content="Save Changes" Margin="0,0,20,0"  Click="PublishChanges_Click" Width="133" IsEnabled="{Binding pendingChanges}" Background="{Binding saveBackground}"  />
-                <Button x:Name="CancelChanges" Content="Cancel Changes" Width="133" IsEnabled="{Binding pendingChanges}" Click="CancelChanges_Click"  />
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <TextBlock Height="19" TextWrapping="Wrap" Text="Section:" VerticalAlignment="Top" Width="74" />
+                <ComboBox x:Name="comboSections" VerticalAlignment="Top" Width="76" SelectionChanged="combos_SelectionChanged"/>
+                <Button x:Name="GenerateTeams" Content="Generate Teams..." VerticalAlignment="Top" Width="164" Click="Generate_Click" />
+                <Button x:Name="ClearTeams" Content="Unassign All" VerticalAlignment="Top" Width="133" Click="ClearTeams_Click" />
             </StackPanel>
+
             <StackPanel Grid.Row="1" Orientation="Horizontal">
                 <ScrollViewer x:Name="leftScroll"  VerticalScrollBarVisibility="Auto" BorderThickness="0" HorizontalAlignment="Left">
-                    <local:StudentList x:Name="UnassignedList" HorizontalAlignment="Left" Width="210"/>
+                    <local:Team x:Name="UnassignedList" HorizontalAlignment="Left"/>
                 </ScrollViewer>
                 <Border BorderThickness="1">
                     <Border.BorderBrush>
@@ -33,18 +36,18 @@
                         </LinearGradientBrush>
                     </Border.BorderBrush>
                     <ScrollViewer x:Name="rightScroll" VerticalScrollBarVisibility="Auto" BorderThickness="0">
-                        <toolkit:WrapPanel x:Name="StudentWrap" ItemWidth="210" >
+                        <toolkit:WrapPanel x:Name="Teams" MaxWidth="500">
                             <local:AddButton x:Name="NewTeamBox"/>
                         </toolkit:WrapPanel>
                     </ScrollViewer>
                 </Border>
             </StackPanel>
-            <StackPanel Grid.Row="0" Orientation="Horizontal">
-                <TextBlock Height="19" TextWrapping="Wrap" Text="Section:" VerticalAlignment="Top" Width="74" />
-                <ComboBox x:Name="comboSections" VerticalAlignment="Top" Width="76" SelectionChanged="combos_SelectionChanged"/>
-                <Button x:Name="GenerateTeams" Content="Generate Teams..." VerticalAlignment="Top" Width="164" Click="Generate_Click" />
-                <Button x:Name="ClearTeams" Content="Unassign All" VerticalAlignment="Top" Width="133" Click="ClearTeams_Click" />
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="PublishChanges" Content="Save Changes" Margin="0,0,20,0"  Click="PublishChanges_Click" Width="133" IsEnabled="{Binding pendingChanges}" Background="{Binding saveBackground}"  />
+                <Button x:Name="CancelChanges" Content="Cancel Changes" Width="133" IsEnabled="{Binding pendingChanges}" Click="CancelChanges_Click"  />
             </StackPanel>
+
         </Grid>
     </toolkit:BusyIndicator>
 </UserControl>

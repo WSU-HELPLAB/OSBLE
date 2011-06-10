@@ -33,6 +33,13 @@
                 @Html.LabelFor(m => m.RememberMe)
             </div>
 
+            @if (ViewBag.Attempts < 3)
+            { 
+            <div>
+            @Html.Partial("_ReCaptcha")
+            </div>
+            }
+
             <p>
                 <input type="submit" value="Log On" />
             </p>
@@ -49,5 +56,8 @@
         <!--Need help? <a href="#" tabindex="5">Click Here</a>.-->
         Need help? @Html.ActionLink("Click Here", "ContactUs").
     </p>
-
+    <p>
+        <!--Need help? <a href="#" tabindex="5">Click Here</a>.-->
+        <a href="http://helplab.org/projects/osble" >About OSBLE</a>
+    </p>
 }

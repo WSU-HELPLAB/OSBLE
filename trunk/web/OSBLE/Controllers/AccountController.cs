@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -9,11 +10,10 @@ using System.Net.Mail;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
-using OSBLE.Models.HomePage;
+using Microsoft.Web.Helpers;
+using OSBLE.Models;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
-using OSBLE.Models;
-using System.Configuration;
 
 namespace OSBLE.Controllers
 {
@@ -24,6 +24,8 @@ namespace OSBLE.Controllers
 
         public ActionResult LogOn()
         {
+            ViewBag.ReCaptchaPublicKey = GetReCaptchaPublicKey();
+
             return View();
         }
 
@@ -117,6 +119,7 @@ namespace OSBLE.Controllers
 
         public ActionResult Register()
         {
+            ViewBag.ReCaptchaPublicKey = GetReCaptchaPublicKey();
             ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name");
 
             return View();
@@ -128,66 +131,76 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Register(RegisterModel model)
         {
-            if (ModelState.IsValid)
+            string privatekey = GetReCaptchaPrivateKey();
+
+            //Fall through if ReCaptcha is not set up correctly
+            if (privatekey == null || ReCaptcha.Validate(privateKey: privatekey))
             {
-                // Attempt to register the user
-                MembershipCreateStatus createStatus;
-                Membership.CreateUser(model.Email, model.Password, model.Email, null, null, true, null, out createStatus);
-
-                if (createStatus == MembershipCreateStatus.Success)
+                if (ModelState.IsValid)
                 {
-                    FormsAuthentication.SetAuthCookie(model.Email, false /* createPersistentCookie */);
+                    // Attempt to register the user
+                    MembershipCreateStatus createStatus;
+                    Membership.CreateUser(model.Email, model.Password, model.Email, null, null, true, null, out createStatus);
 
-                    try
+                    if (createStatus == MembershipCreateStatus.Success)
                     {
-                        UserProfile profile = new UserProfile();
+                        FormsAuthentication.SetAuthCookie(model.Email, false /* createPersistentCookie */);
 
-                        profile.UserName = model.Email;
-                        profile.FirstName = model.FirstName;
-                        profile.LastName = model.LastName;
-                        profile.Identification = model.Identification;
-                        profile.SchoolID = model.SchoolID;
-                        profile.School = db.Schools.Find(model.SchoolID);
-
-                        UserProfile up = db.UserProfiles.Where(c => c.SchoolID == profile.SchoolID && c.Identification == profile.Identification).FirstOrDefault();
-
-                        if (up != null) // User profile exists. Is it a stub?
+                        try
                         {
-                            if (up.UserName == null) // Stub. Register to the account.
+                            UserProfile profile = new UserProfile();
+
+                            profile.UserName = model.Email;
+                            profile.FirstName = model.FirstName;
+                            profile.LastName = model.LastName;
+                            profile.Identification = model.Identification;
+                            profile.SchoolID = model.SchoolID;
+                            profile.School = db.Schools.Find(model.SchoolID);
+
+                            UserProfile up = db.UserProfiles.Where(c => c.SchoolID == profile.SchoolID && c.Identification == profile.Identification).FirstOrDefault();
+
+                            if (up != null) // User profile exists. Is it a stub?
                             {
-                                up.UserName = model.Email;
-                                up.FirstName = model.FirstName;
-                                up.LastName = model.LastName;
-                                db.Entry(up).State = EntityState.Modified;
+                                if (up.UserName == null) // Stub. Register to the account.
+                                {
+                                    up.UserName = model.Email;
+                                    up.FirstName = model.FirstName;
+                                    up.LastName = model.LastName;
+                                    db.Entry(up).State = EntityState.Modified;
+                                }
+                                else // Existing Account. Throw validation error.
+                                {
+                                    throw new Exception("You have entered an ID number that is already in use for your school.");
+                                }
                             }
-                            else // Existing Account. Throw validation error.
+                            else // Profile does not exist.
                             {
-                                throw new Exception("You have entered an ID number that is already in use for your school.");
+                                db.UserProfiles.Add(profile);
                             }
+
+                            db.SaveChanges();
                         }
-                        else // Profile does not exist.
+                        catch (Exception e)
                         {
-                            db.UserProfiles.Add(profile);
+                            FormsAuthentication.SignOut();
+                            Membership.DeleteUser(model.Email);
+
+                            ModelState.AddModelError("", e.Message);
+
+                            return Register();
                         }
 
-                        db.SaveChanges();
+                        return RedirectToAction("Index", "Home");
                     }
-                    catch (Exception e)
+                    else
                     {
-                        FormsAuthentication.SignOut();
-                        Membership.DeleteUser(model.Email);
-
-                        ModelState.AddModelError("", e.Message);
-
-                        return Register();
+                        ModelState.AddModelError("", ErrorCodeToString(createStatus));
                     }
-
-                    return RedirectToAction("Index", "Home");
                 }
-                else
-                {
-                    ModelState.AddModelError("", ErrorCodeToString(createStatus));
-                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "The Captcha was incorrect try again.");
             }
 
             ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name");
@@ -251,29 +264,32 @@ namespace OSBLE.Controllers
 
         public ActionResult ResetPassword()
         {
+            ViewBag.ReCaptchaPublicKey = GetReCaptchaPublicKey();
             return View();
         }
 
         [HttpPost]
         public ActionResult ResetPassword(ResetPasswordModel model)
         {
-            var user = Membership.GetUser(model.EmailAddress);
+            string privatekey = GetReCaptchaPrivateKey();
 
-            if (user != null)
+            //Fall through if ReCaptcha is not set up correctly
+            if (privatekey == null || ReCaptcha.Validate(privateKey: privatekey))
             {
+                var user = Membership.GetUser(model.EmailAddress);
+                if (user != null)
+                {
 #if !DEBUG
 
                 string newPass = user.ResetPassword();
 
                 string body = "Your OSBLE password has been reset.\n Your new password is: " + newPass + "\n\nPlease change this password as soon as possible.";
 
-                MailMessage mm = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"],"OSBLE"), 
+                MailMessage mm = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"],"OSBLE"),
                             new MailAddress(model.EmailAddress));
-                            
-                             
+
                 mm.Subject = "[OSBLE] Password Reset Request";
                 mm.Body = body;
-
 
                 //This will need to fixed whenever we get a Server that can send mail
                 SmtpClient sc = new SmtpClient();
@@ -282,12 +298,10 @@ namespace OSBLE.Controllers
                 sc.Send(mm);
 #endif
 
-                return View("ResetPasswordSuccess");
+                    return View("ResetPasswordSuccess");
+                }
             }
-            else
-            {
-                return View("ResetPasswordFailure");
-            }
+            return View("ResetPasswordFailure");
         }
 
         [Authorize]
@@ -351,32 +365,43 @@ namespace OSBLE.Controllers
 
         public ActionResult ContactUs()
         {
+            ViewBag.ReCaptchaPublicKey = GetReCaptchaPublicKey();
             return View();
         }
 
         [HttpPost]
         public ActionResult ContactUs(ContactUsModel model)
         {
-            if (ModelState.IsValid)
+            string privatekey = GetReCaptchaPrivateKey();
+
+            //Fall through if ReCaptcha is not set up correctly
+            if (privatekey == null || ReCaptcha.Validate(privateKey: privatekey))
             {
-                //ViewBag.ContactUsName = model.Name;
+                if (ModelState.IsValid)
+                {
+                    //ViewBag.ContactUsName = model.Name;
 
-                SmtpClient mailClient = new SmtpClient();
-                mailClient.UseDefaultCredentials = true;
+                    SmtpClient mailClient = new SmtpClient();
+                    mailClient.UseDefaultCredentials = true;
 
-                MailMessage message = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE"), 
-                                                        new MailAddress("support@osble.org"));
+                    MailMessage message = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE"),
+                                                            new MailAddress("support@osble.org"));
 
-                message.ReplyToList.Add(new MailAddress(model.Email));
-                message.Subject = "[OSBLE] Support Request from " + model.Name;
-                message.Body = model.Message;
+                    message.ReplyToList.Add(new MailAddress(model.Email));
+                    message.Subject = "[OSBLE] Support Request from " + model.Name;
+                    message.Body = model.Message;
 
 #if !DEBUG
                 mailClient.Send(message);
 #endif
-                ViewBag.CUName = model.Name;
+                    ViewBag.CUName = model.Name;
 
-                return View("ContactUsSuccess");
+                    return View("ContactUsSuccess");
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "The Captcha was incorrect try again.");
             }
             return View(model);
         }
@@ -427,5 +452,25 @@ namespace OSBLE.Controllers
         }
 
         #endregion Status Codes
+
+        private string GetReCaptchaPublicKey()
+        {
+            string key = null;
+            if (ConfigurationManager.AppSettings.AllKeys.Contains("RecaptchaPublicKey"))
+            {
+                key = ConfigurationManager.AppSettings["RecaptchaPublicKey"];
+            }
+            return key;
+        }
+
+        private string GetReCaptchaPrivateKey()
+        {
+            string key = null;
+            if (ConfigurationManager.AppSettings.AllKeys.Contains("RecaptchaPrivateKey"))
+            {
+                key = ConfigurationManager.AppSettings["RecaptchaPrivateKey"];
+            }
+            return key;
+        }
     }
 }

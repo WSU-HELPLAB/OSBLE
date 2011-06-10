@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Browser;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using CreateNewAssignment.AssignmentActivities;
 using Newtonsoft.Json;
-using System.Windows.Browser;
 
 namespace CreateNewAssignment
 {
@@ -239,7 +239,6 @@ namespace CreateNewAssignment
             if (isValidAddition(aaVM, day.MyDate))
             {
                 addAssignmentActivity(aaVM, day);
-
             }
             else
             {
@@ -487,7 +486,8 @@ namespace CreateNewAssignment
 
                 sa.DateTime = aavm.StartDateTime;
 
-                switch(aavm.ActivityType) {
+                switch (aavm.ActivityType)
+                {
                     case Activities.Submission:
                         sa.ActivityType = ActivityTypes.Submission;
                         break;
@@ -503,16 +503,14 @@ namespace CreateNewAssignment
                     default:
                         sa.ActivityType = ActivityTypes.Stop;
                         break;
+                }
 
-                } 
-                
                 SerializableActivities.Add(sa);
             }
 
             ScriptObject js = HtmlPage.Window.CreateInstance("$", new string[] { "#delicious_serial" });
 
             js.Invoke("html", Uri.EscapeDataString(JsonConvert.SerializeObject(SerializableActivities)));
-
         }
 
         public AssignmentActivitiesCreatorViewModel(string SerializedActivitiesJSON)
@@ -570,7 +568,8 @@ namespace CreateNewAssignment
 
             List<SerializableActivity> activities = JsonConvert.DeserializeObject<List<SerializableActivity>>(SerializedActivitiesJSON);
 
-            foreach(SerializableActivity sa in activities) {
+            foreach (SerializableActivity sa in activities)
+            {
                 CalendarDayItemView day = findCalendarDayItemView(sa.DateTime);
 
                 AssignmentActivityViewModel aaVM;
@@ -604,10 +603,9 @@ namespace CreateNewAssignment
             }
 
             //UpdateActivityDisplay();
-
         }
 
-        void TimelineSizeChanged(object sender, SizeChangedEventArgs e)
+        private void TimelineSizeChanged(object sender, SizeChangedEventArgs e)
         {
             timeline.UpdateTimeline(assignmentActivites);
         }

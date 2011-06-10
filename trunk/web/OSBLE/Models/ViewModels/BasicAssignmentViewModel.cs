@@ -1,10 +1,10 @@
-﻿using OSBLE.Models.Assignments.Activities;
-using OSBLE.Models.Assignments;
+﻿using OSBLE.Models.Assignments;
+using OSBLE.Models.Assignments.Activities;
+
 namespace OSBLE.Models.ViewModels
 {
     public class BasicAssignmentViewModel
     {
-
         public BasicAssignmentViewModel()
         {
             Submission = new SubmissionActivity();
@@ -19,5 +19,7 @@ namespace OSBLE.Models.ViewModels
         public BasicAssignment Assignment { get; set; }
 
         public SilverlightObject TeamCreation { get; set; }
+
+        public string SerializedTeamMembersJSON { get; set; }
     }
 }

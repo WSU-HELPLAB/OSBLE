@@ -83,6 +83,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
+    <Reference Include="Newtonsoft.Json.Silverlight">
+      <HintPath>..\packages\Newtonsoft.Json.4.0.2\lib\sl4\Newtonsoft.Json.Silverlight.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
@@ -104,11 +107,12 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Student.xaml.cs">
-      <DependentUpon>Student.xaml</DependentUpon>
+    <Compile Include="SerializeableTeamMembers.cs" />
+    <Compile Include="Member.xaml.cs">
+      <DependentUpon>Member.xaml</DependentUpon>
     </Compile>
-    <Compile Include="StudentList.xaml.cs">
-      <DependentUpon>StudentList.xaml</DependentUpon>
+    <Compile Include="Team.xaml.cs">
+      <DependentUpon>Team.xaml</DependentUpon>
     </Compile>
     <Compile Include="TeamGenerationOptions.xaml.cs">
       <DependentUpon>TeamGenerationOptions.xaml</DependentUpon>
@@ -130,11 +134,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Student.xaml">
+    <Page Include="Member.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="StudentList.xaml">
+    <Page Include="Team.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

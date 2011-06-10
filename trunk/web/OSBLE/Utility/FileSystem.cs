@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Web;
-using OSBLE.Models.HomePage;
 using OSBLE.Models.Courses;
-using OSBLE.Models.Users;
 using OSBLE.Models.Services.Uploader;
-using System;
+using OSBLE.Models.Users;
 
 //the folllowing is a diagram of our file system.  Items in brackes [] indicate
 //using a key of sorts (e.g. the user id).  Items in curly braces {} indicate
@@ -13,12 +12,12 @@ using System;
 /*
  *
  *                FileSystem
- *                  /    \
- *                 /      \
- *              Courses   Users
- *               /          \
- *         [courseID]     [userId]
- *           /     \          \
+ *               /    \     \
+ *              /      \     \
+ *          Courses   Users  Recaptcha
+ *             /        \             \
+ *         [courseID]   [userId]     Keys.txt
+ *           /     \       \
  *          /       \   {global user content}
  *     CourseDocs    \
  *         |          Assignments
@@ -41,7 +40,6 @@ namespace OSBLE
 {
     public static class FileSystem
     {
-
         private static string getRootPath()
         {
             return HttpContext.Current.Server.MapPath("\\FileSystem\\");
@@ -85,7 +83,6 @@ namespace OSBLE
         /// <returns></returns>
         private static DirectoryListing BuildFileList(string path, bool includeParentLink = true)
         {
-
             //see if we have an ordering file for the supplied path
             Dictionary<string, int> ordering = new Dictionary<string, int>();
             string orderingPath = Path.Combine(path, OrderingFileName);
@@ -98,7 +95,7 @@ namespace OSBLE
             DirectoryListing listing = new DirectoryListing();
             listing.Name = path.Substring(path.LastIndexOf('\\') + 1);
             listing.LastModified = File.GetLastWriteTime(path);
-            
+
             //handle files
             foreach (string file in Directory.GetFiles(path))
             {
@@ -114,7 +111,7 @@ namespace OSBLE
                 fList.FileUrl = FileSystem.CourseDocumentPathToWebUrl(file);
 
                 //set file ordering if it exists
-                if(ordering.ContainsKey(fList.Name))
+                if (ordering.ContainsKey(fList.Name))
                 {
                     fList.SortOrder = ordering[fList.Name];
                 }
@@ -139,9 +136,51 @@ namespace OSBLE
                 }
                 listing.Directories.Add(dlisting);
             }
-                
+
             //return the completed listing
             return listing;
+        }
+
+        /// <summary>
+        /// This gets the ReCaptcha's public key using the file that is supposed to be in the file system
+        /// If it is not there it returns and null so this must be caught before passed into ReCaptcha
+        /// </summary>
+        /// <returns></returns>
+        public static string GetReCaptchaPrivateKey()
+        {
+            try
+            {
+                StreamReader sr = new StreamReader(getRootPath() + "ReCaptcha\\" + "Keys.txt");
+                //the first line is public key
+                sr.ReadLine();
+
+                //second line is private key
+                return sr.ReadLine();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// This gets the ReCaptcha's public key using the file that is supposed to be in the file system
+        /// If it is not there it returns and null
+        /// </summary>
+        /// <returns></returns>
+        public static string GetReCaptchaPublicKey()
+        {
+            try
+            {
+                StreamReader sr = new StreamReader(getRootPath() + "Recaptcha\\" + "Keys.txt");
+
+                //first line is public key
+                return sr.ReadLine();
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -168,10 +207,9 @@ namespace OSBLE
             return location;
         }
 
-
         public static string GetCourseDocumentsPath(int courseId)
         {
-            Course c = new Course() {ID = courseId };
+            Course c = new Course() { ID = courseId };
             return GetCourseDocumentsPath(c);
         }
 
@@ -199,7 +237,6 @@ namespace OSBLE
             string url = String.Format("/FileHandler/CourseDocument/{0}/{1}", courseId, string.Join(",", docPath));
             return url;
         }
-
 
         public static FileStream GetDocumentForRead(string path)
         {
