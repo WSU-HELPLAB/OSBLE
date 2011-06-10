@@ -151,27 +151,38 @@ namespace OSBLE.Controllers
             // Setup Display Name/Display Title/Profile Picture/Mail Button/Delete Button
 
             // If user is not anonymous, this post was written by current user, or the poster is an Instructor/TA, display name and picture.
-            if (!currentCu.CourseRole.Anonymized || (currentCu.UserProfileID == posterCu.UserProfileID) || posterCu.CourseRole.CanGrade)
+            if ((posterCu == null) || !currentCu.CourseRole.Anonymized || (currentCu.UserProfileID == posterCu.UserProfileID) || posterCu.CourseRole.CanGrade)
             {
                 // Display Name
-                post.DisplayName = posterCu.UserProfile.FirstName + " " + posterCu.UserProfile.LastName;
-
-                // Display Titles for Instructors/TAs for Courses, or Leader of Communities.
-                post.DisplayTitle = getRoleTitle(posterCu.CourseRoleID);
+                if (posterCu != null)
+                {
+                    post.DisplayName = posterCu.UserProfile.FirstName + " " + posterCu.UserProfile.LastName;
+                }
+                else
+                {
+                    post.DisplayName = "Deleted User";
+                }
 
                 // Allow deletion if current user is poster or is an instructor
-                if ((posterCu.UserProfileID == currentCu.UserProfileID) || currentCu.CourseRole.CanModify)
+                if (currentCu.CourseRole.CanModify || ((posterCu != null) && (posterCu.UserProfileID == currentCu.UserProfileID)))
                 {
                     post.CanDelete = true;
                 }
 
                 // If current user is not the poster, allow mailing
-                if (posterCu.UserProfileID != currentCu.UserProfileID)
+                if (posterCu != null && posterCu.UserProfileID != currentCu.UserProfileID)
                 {
                     post.CanMail = true;
                 }
 
-                post.ShowProfilePicture = true;
+                if (posterCu != null)
+                {
+                    // Display Titles for Instructors/TAs for Courses, or Leader of Communities.
+
+                    post.DisplayTitle = getRoleTitle(posterCu.CourseRoleID);
+
+                    post.ShowProfilePicture = true;
+                }
             }
             else // Display anonymous name.
             {
