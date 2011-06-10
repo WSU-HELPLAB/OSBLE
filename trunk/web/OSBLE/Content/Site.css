@@ -1142,3 +1142,10 @@ ul.selector
 {
     clear: both;
 }
+
+.recaptcha 
+{
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+    margin-left: 90px;   
+}

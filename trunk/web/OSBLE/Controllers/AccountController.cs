@@ -19,12 +19,16 @@ namespace OSBLE.Controllers
 {
     public class AccountController : OSBLEController
     {
+        public AccountController()
+        {
+            ViewBag.ReCaptchaPublicKey = getReCaptchaPublicKey();
+        }
         //
         // GET: /Account/LogOn
 
         public ActionResult LogOn()
         {
-            ViewBag.ReCaptchaPublicKey = GetReCaptchaPublicKey();
+            ViewBag.ReCaptchaPublicKey = getReCaptchaPublicKey();
 
             return View();
         }
@@ -119,7 +123,7 @@ namespace OSBLE.Controllers
 
         public ActionResult Register()
         {
-            ViewBag.ReCaptchaPublicKey = GetReCaptchaPublicKey();
+            ViewBag.ReCaptchaPublicKey = getReCaptchaPublicKey();
             ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name");
 
             return View();
@@ -264,7 +268,7 @@ namespace OSBLE.Controllers
 
         public ActionResult ResetPassword()
         {
-            ViewBag.ReCaptchaPublicKey = GetReCaptchaPublicKey();
+            ViewBag.ReCaptchaPublicKey = getReCaptchaPublicKey();
             return View();
         }
 
@@ -365,7 +369,6 @@ namespace OSBLE.Controllers
 
         public ActionResult ContactUs()
         {
-            ViewBag.ReCaptchaPublicKey = GetReCaptchaPublicKey();
             return View();
         }
 
@@ -453,7 +456,7 @@ namespace OSBLE.Controllers
 
         #endregion Status Codes
 
-        private string GetReCaptchaPublicKey()
+        private string getReCaptchaPublicKey()
         {
             string key = null;
             if (ConfigurationManager.AppSettings.AllKeys.Contains("RecaptchaPublicKey"))
