@@ -24,10 +24,10 @@
             LastName
         </th>
         <th>
-            IsAdmin
+            Admin
         </th>
         <th>
-            CanCreateCourses
+            Course Creator
         </th>
         <th></th>
     </tr>
@@ -66,7 +66,8 @@
         <td>
             @Html.ActionLink("Edit", "Edit", new { id = item.ID }) |
             @Html.ActionLink("Details", "Details", new { id = item.ID }) |
-            @Html.ActionLink("Delete", "Delete", new { id = item.ID })
+            @Html.ActionLink("Delete", "Delete", new { id = item.ID }) |
+            @Html.ActionLink("Impersonate", "Impersonate", new { id = item.ID }, new { onclick="return confirm('You are about to impersonate a user. You will need to sign back in with your account after completion.');" })
         </td>
     </tr>
 }

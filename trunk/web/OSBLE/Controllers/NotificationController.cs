@@ -176,7 +176,8 @@ namespace OSBLE.Controllers
             
             body += "\n\n---\nDo not reply to this email.\nVisit this link to " + action + ": " + getDispatchURL(n.ID);
 
-            MailMessage message = new MailMessage("noreply@osble.org", recipient.UserName);
+            MailMessage message = new MailMessage(new MailAddress("noreply@osble.org","OSBLE"), 
+                                new MailAddress(recipient.UserName,recipient.FirstName + " " + recipient.LastName));
 
             message.Subject = subject;
             message.Body = body;

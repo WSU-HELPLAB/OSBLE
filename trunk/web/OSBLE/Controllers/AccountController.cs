@@ -266,7 +266,13 @@ namespace OSBLE.Controllers
 
                 string body = "Your OSBLE password has been reset.\n Your new password is: " + newPass + "\n\nPlease change this password as soon as possible.";
 
-                MailMessage mm = new MailMessage("noreply@osble.org", model.EmailAddress, "[OSBLE] Password Reset Request", body);
+                MailMessage mm = new MailMessage(new MailAddress("noreply@osble.org","OSBLE"), 
+                            new MailAddress(model.EmailAddress));
+                            
+                             
+                mm.Subject = "[OSBLE] Password Reset Request";
+                mm.Body = body;
+
 
                 //This will need to fixed whenever we get a Server that can send mail
                 SmtpClient sc = new SmtpClient();
@@ -357,7 +363,8 @@ namespace OSBLE.Controllers
                 SmtpClient mailClient = new SmtpClient();
                 mailClient.UseDefaultCredentials = true;
 
-                MailMessage message = new MailMessage("noreply@osble.org", "support@osble.org");
+                MailMessage message = new MailMessage(new MailAddress("noreply@osble.org","OSBLE"), 
+                                                        new MailAddress("support@osble.org"));
 
                 message.ReplyToList.Add(new MailAddress(model.Email));
                 message.Subject = "[OSBLE] Support Request from " + model.Name;

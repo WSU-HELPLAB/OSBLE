@@ -39,6 +39,17 @@ namespace OSBLE.Controllers
             return View(userprofile);
         }
 
+        public ActionResult Impersonate(int id)
+        {
+            UserProfile u = db.UserProfiles.Find(id);
+
+            FormsAuthentication.SignOut();
+            context.Session.Clear();
+            FormsAuthentication.SetAuthCookie(u.UserName, false);
+
+            return RedirectToAction("Index", "Home");
+        }
+
         //
         // GET: /Admin/Edit/5
 
