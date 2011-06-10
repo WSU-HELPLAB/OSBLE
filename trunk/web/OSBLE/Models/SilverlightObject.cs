@@ -50,7 +50,7 @@ namespace OSBLE.Models
         {
             CSSId = "silverlight";
             OnSilverlightError = "onSilverlightError";
-            BackgroundColor = Color.Blue;
+            BackgroundColor = Color.White;
             MinimumRuntimeVersion = "4.0.50524.0";
             AutoUpgrade = true;
         }
