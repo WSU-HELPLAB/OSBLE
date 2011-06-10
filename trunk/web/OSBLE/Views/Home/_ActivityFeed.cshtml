@@ -7,11 +7,19 @@
         {
         <h3 class="error">@ViewBag.Error</h3>
         }
-        using (Html.BeginForm("NewPost","Home",FormMethod.Post))
+        using (Html.BeginForm("NewPost", "Home", FormMethod.Post))
         {
         <textarea name="Content" rows="5" cols="40" placeholder="Enter new feed post here..."></textarea><br />
-        <input type="submit" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.Course)" /> <input
-            type="submit" name="post_all" value="Post to All Taught Courses" onclick="return confirm('Post this message to all your courses?');" />
+        <input type="submit" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.Course)" /> 
+        
+            if (ViewBag.IsInstructor)
+            {
+        <input
+            type="submit" name="post_all" value="Post to All Taught Courses" onclick="return confirm('Post this message to all your taught courses?');" />
+        
+        <input type="checkbox" value="True" name="send_email" /> <text>Email to Class</text>
+        
+            }
         }
     }
 </div>

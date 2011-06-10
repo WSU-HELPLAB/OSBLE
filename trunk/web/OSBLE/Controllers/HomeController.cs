@@ -10,6 +10,8 @@ using OSBLE.Models;
 using System.Drawing;
 using OSBLE.Models.Services.Uploader;
 using System.IO;
+using System.Net.Mail;
+using System.Configuration;
 
 namespace OSBLE.Controllers
 {
@@ -56,6 +58,16 @@ namespace OSBLE.Controllers
             else // All course mode. Display posts for all non-hidden courses the user is attached to.
             {
                 viewedCourses = currentCourses.Where(cu => !cu.Hidden).Select(cu => cu.CourseID).ToList();
+            }
+
+            
+            if (activeCourse.Course is Course && activeCourse.CourseRole.CanModify)
+            {
+                ViewBag.IsInstructor = true;
+            }
+            else
+            {
+                ViewBag.IsInstructor = false;
             }
 
             // Get optional start post from query for pagination
@@ -296,13 +308,15 @@ namespace OSBLE.Controllers
 
             List<CoursesUsers> CoursesToPost = new List<CoursesUsers>();
 
+            bool sendEmail = Convert.ToBoolean(Request.Form["send_email"]);
+
             if (Request.Form["post_active"] != null)
             { // Post to active course only.
                 CoursesToPost.Add(activeCourse);
             }
             else if (Request.Form["post_all"] != null)
             { // Post to all courses.
-                CoursesToPost = currentCourses;
+                CoursesToPost = currentCourses.Where(cu=>cu.Course is Course && cu.CourseRole.CanModify && !cu.Hidden).ToList();
             }
 
             foreach (CoursesUsers cu in CoursesToPost)
@@ -323,6 +337,38 @@ namespace OSBLE.Controllers
                     if (ModelState.IsValid)
                     {
                         db.DashboardPosts.Add(newDp);
+
+#if !DEBUG
+                        // Instructor email to class
+                        if (c != null && sendEmail && cu.CourseRole.CanModify)
+                        {
+                            // Construct email
+                            SmtpClient mailClient = new SmtpClient();
+                            mailClient.UseDefaultCredentials = true;
+
+                            MailAddress toFrom = new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"],"OSBLE");
+                            MailMessage mm = new MailMessage();
+
+                            mm.From = toFrom;
+                            mm.To.Add(toFrom);
+
+                            mm.Subject = "[OSBLE " + c.Prefix + " " + c.Number + "] Notice from Instructor " + currentUser.FirstName + " " + currentUser.LastName;
+
+                            mm.Body = currentUser.FirstName + " " + currentUser.LastName + " sent the following message to the class at " + dp.Posted.ToString() + ":";
+                            mm.Body += "\n\n";
+                            mm.Body += dp.Content;
+
+                            foreach (CoursesUsers member in db.CoursesUsers.Where(coursesUsers => coursesUsers.CourseID == c.ID).ToList())
+                            {
+                                if (member.UserProfile.UserName != null) // Ignore pending users
+                                {
+                                    mm.Bcc.Add(new MailAddress(member.UserProfile.UserName, member.UserProfile.FirstName + " " + member.UserProfile.LastName));
+                                }
+                            }
+
+                            mailClient.Send(mm);
+                        }
+#endif
                     }
                 }
             }
