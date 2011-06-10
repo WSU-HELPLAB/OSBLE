@@ -5,6 +5,7 @@ using OSBLE.Models.HomePage;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using System.Net.Mail;
+using System.Configuration;
 
 namespace OSBLE.Controllers
 {
@@ -176,7 +177,7 @@ namespace OSBLE.Controllers
             
             body += "\n\n---\nDo not reply to this email.\nVisit this link to " + action + ": " + getDispatchURL(n.ID);
 
-            MailMessage message = new MailMessage(new MailAddress("noreply@osble.org","OSBLE"), 
+            MailMessage message = new MailMessage(new MailAddress(ConfigurationSettings.AppSettings["OSBLEFromEmail"], "OSBLE"), 
                                 new MailAddress(recipient.UserName,recipient.FirstName + " " + recipient.LastName));
 
             message.Subject = subject;

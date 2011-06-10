@@ -13,6 +13,7 @@ using OSBLE.Models.HomePage;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models;
+using System.Configuration;
 
 namespace OSBLE.Controllers
 {
@@ -256,17 +257,17 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult ResetPassword(ResetPasswordModel model)
         {
-#if !DEBUG
             var user = Membership.GetUser(model.EmailAddress);
 
             if (user != null)
             {
+#if !DEBUG
 
                 string newPass = user.ResetPassword();
 
                 string body = "Your OSBLE password has been reset.\n Your new password is: " + newPass + "\n\nPlease change this password as soon as possible.";
 
-                MailMessage mm = new MailMessage(new MailAddress("noreply@osble.org","OSBLE"), 
+                MailMessage mm = new MailMessage(new MailAddress(ConfigurationSettings.AppSettings["OSBLEFromEmail"],"OSBLE"), 
                             new MailAddress(model.EmailAddress));
                             
                              
@@ -363,7 +364,7 @@ namespace OSBLE.Controllers
                 SmtpClient mailClient = new SmtpClient();
                 mailClient.UseDefaultCredentials = true;
 
-                MailMessage message = new MailMessage(new MailAddress("noreply@osble.org","OSBLE"), 
+                MailMessage message = new MailMessage(new MailAddress(ConfigurationSettings.AppSettings["OSBLEFromEmail"], "OSBLE"), 
                                                         new MailAddress("support@osble.org"));
 
                 message.ReplyToList.Add(new MailAddress(model.Email));
