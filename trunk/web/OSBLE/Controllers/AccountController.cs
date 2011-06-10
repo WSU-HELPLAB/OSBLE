@@ -82,6 +82,18 @@ namespace OSBLE.Controllers
 
         [Authorize]
         [HttpPost]
+        public ActionResult UpdateEmailSettings()
+        {
+            currentUser.EmailAllNotifications = Convert.ToBoolean(Request.Params["EmailallNotifications"]);
+
+            db.Entry(currentUser).State = EntityState.Modified;
+            db.SaveChanges();
+
+            return RedirectToAction("Profile");
+        }
+
+        [Authorize]
+        [HttpPost]
         public ActionResult UpdateMenu()
         {
             foreach (CoursesUsers cu in currentCourses)

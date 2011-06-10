@@ -31,6 +31,10 @@ namespace OSBLE.Models.Users
 
         public ICollection<Score> Scores { get; set; }
 
+        // User E-mail Notification Settings
+
+        public bool EmailAllNotifications { get; set; }
+     
         public UserProfile()
             : base()
         {
