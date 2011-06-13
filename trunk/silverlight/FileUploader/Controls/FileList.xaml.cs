@@ -76,6 +76,7 @@ namespace FileUploader.Controls
             if (lastSelectedItem != null)
             {
                 lastSelectedItem.DataContext.SortOrder -= 1;
+                (ListOfFiles.Items[ListOfFiles.SelectedIndex - 1] as AbstractListing).SortOrder += 1;
                 MoveItem(ListOfFiles.SelectedIndex, ListOfFiles.SelectedIndex - 1);
             }
         }
@@ -88,6 +89,7 @@ namespace FileUploader.Controls
             if (lastSelectedItem != null)
             {
                 lastSelectedItem.DataContext.SortOrder += 1;
+                (ListOfFiles.Items[ListOfFiles.SelectedIndex + 1] as AbstractListing).SortOrder -= 1;
                 MoveItem(ListOfFiles.SelectedIndex, ListOfFiles.SelectedIndex + 1);
             }
         }
@@ -102,7 +104,7 @@ namespace FileUploader.Controls
         {
             if (oldLocation > 0 && newLocation > 0)
             {
-                FileListItem listItem = ListOfFiles.Items[oldLocation] as FileListItem;
+                AbstractListing listItem = ListOfFiles.Items[oldLocation] as AbstractListing;
                 ListOfFiles.Items.RemoveAt(oldLocation);
                 ListOfFiles.Items.Insert(newLocation, listItem);
                 ListOfFiles.SelectedItem = listItem;

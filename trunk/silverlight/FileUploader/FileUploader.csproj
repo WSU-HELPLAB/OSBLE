@@ -97,6 +97,7 @@
     <Compile Include="Controls\UploadingModal.xaml.cs">
       <DependentUpon>UploadingModal.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FileOperations.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -106,9 +107,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="ThreadWrapperBase.cs" />
     <Compile Include="UploaderPage.xaml.cs">
       <DependentUpon>UploaderPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UploaderThread.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
