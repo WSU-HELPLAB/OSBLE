@@ -11,15 +11,15 @@
         </Grid.RowDefinitions>
         <StackPanel Orientation="Vertical" >
             <TextBlock Text="Uploading..." FontSize="28" HorizontalAlignment="Center" Margin="0,15,0,0"/>
-            <ProgressBar  x:Name="UploadProgressBar" Width="300" Height="20" Margin="0,40" Minimum="0" Maximum="10000" Value="0"/>
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                <TextBlock Text="Currently Uploading: " HorizontalAlignment="Center"/>
-                <TextBlock x:Name="UploadingFile" Text="MyDocuments" Margin="15,0,0,0" HorizontalAlignment="Right"/>
+            <ProgressBar  x:Name="UploadProgressBar" Width="300" Height="20" Margin="0,40,0,0" Minimum="0" Maximum="10000" Value="0"/>
+            <StackPanel Orientation="Horizontal" Margin="40,5,5,5">
+                <TextBlock Text="Uploading:" Margin="0,0,5,0" />
+                <TextBlock x:Name="UploadingFile" Text="MyDocuments" />
             </StackPanel>
         </StackPanel>
-        
-
-        <Button x:Name="CancelButton" Content="Cancel" Click="CancelButton_Click" Width="75" Height="23" HorizontalAlignment="Right" Margin="0,12,0,0" Grid.Row="1" />
-        <Button x:Name="OKButton" Content="OK" Click="OKButton_Click" Width="75" Height="23" HorizontalAlignment="Right" Margin="0,12,79,0" Grid.Row="1" />
+        <StackPanel HorizontalAlignment="Right" Margin="0,12,0,0" Grid.Row="1" Orientation="Horizontal">
+            <Button x:Name="OkButton" Content="OK" Width="75" Height="23" Margin="0,0,7,0" />
+            <Button x:Name="CancelButton" Content="Cancel" Width="75" Height="23"  />
+        </StackPanel>
     </Grid>
 </controls:ChildWindow>
