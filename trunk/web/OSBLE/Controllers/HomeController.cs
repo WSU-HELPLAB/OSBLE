@@ -47,6 +47,7 @@ namespace OSBLE.Controllers
         public ActionResult ViewThread(int id)
         {
             DashboardPost dp = db.DashboardPosts.Find(id);
+            // Ensure post exists and that user is in the course.
             if (dp == null || (currentCourses.Where(cc => cc.CourseID == dp.CourseID).Count() < 1))
             {
                 return RedirectToAction("Index");
@@ -55,6 +56,8 @@ namespace OSBLE.Controllers
             setupPostDisplay(dp);
 
             ViewBag.DashboardPost = dp;
+
+            ViewBag.DashboardSingleCourseMode = false; // Force course/community prefixes to show when viewing thread.
 
             return View(dp);
         }
