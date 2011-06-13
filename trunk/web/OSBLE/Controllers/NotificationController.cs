@@ -38,6 +38,8 @@ namespace OSBLE.Controllers
                         return RedirectToAction("View", "Mail", new { ID = n.ItemID });
                     case Notification.Types.EventApproval:
                         return RedirectToAction("Approval", "Event", new { ID = n.ItemID });
+                    case Notification.Types.Dashboard:
+                        return RedirectToAction("ViewThread", "Home", new { ID = n.ItemID });
                 }
             }
 
@@ -93,13 +95,42 @@ namespace OSBLE.Controllers
         {
             List<int> sendToUsers = new List<int>();
 
-/*            Notification n = new Notification();
-            n.ItemType = Notification.Types.Dashboard;
-            n.ItemID = mail.ID;
-            n.RecipientID = mail.ToUserProfileID;
-            n.SenderID = mail.FromUserProfileID;
+            CoursesUsers dpPosterCu = db.CoursesUsers.Where(cu => cu.CourseID == dp.CourseID && cu.UserProfileID == dp.UserProfileID).FirstOrDefault();
 
-            addNotification(n);*/
+            // Send notification to original thread poster if poster is not anonymized, 
+            // are still in the course,
+            // and are not the poster of the new reply.
+            if (dpPosterCu != null && !dpPosterCu.CourseRole.Anonymized && dp.UserProfileID != poster.ID) { 
+                sendToUsers.Add(dp.UserProfileID);
+            }
+
+            foreach (DashboardReply dr in dp.Replies)
+            {
+                CoursesUsers drPosterCu = db.CoursesUsers.Where(cu => cu.CourseID == dp.CourseID && cu.UserProfileID == dr.UserProfileID).FirstOrDefault();
+                
+                // Send notifications to each participant as long as they are not anonymized, 
+                // are still in the course,
+                // and are not the poster of the new reply.
+                // Also checks to make sure a duplicate notification is not sent.
+                if (drPosterCu != null && !drPosterCu.CourseRole.Anonymized && dr.UserProfileID != poster.ID && !sendToUsers.Contains(dr.UserProfileID))
+                {
+                    sendToUsers.Add(dr.UserProfileID);
+                }
+            }
+
+            // Send notification to each valid user.
+            foreach (int UserProfileID in sendToUsers)
+            {
+                            Notification n = new Notification();
+                            n.ItemType = Notification.Types.Dashboard;
+                            n.ItemID = dp.ID;
+                            n.RecipientID = UserProfileID;
+                            n.SenderID = poster.ID;
+                            n.CourseID = dp.CourseID;
+
+                            addNotification(n);
+            }
+
         }
 
         /// <summary>
@@ -190,6 +221,14 @@ namespace OSBLE.Controllers
                     body = sender.FirstName + " " + sender.LastName + " is requesting a course event posting to be approved.";
 
                     action = "approve/reject this event.";
+
+                    break;
+                case Notification.Types.Dashboard:
+                    subject += "Dashboard Message Reply from " + sender.FirstName + " " + sender.LastName;
+
+                    body = sender.FirstName + " " + sender.LastName + " has posted in a dashboard thread that you have participated in.";
+
+                    action = "view this dashboard thread.";
 
                     break;
             }

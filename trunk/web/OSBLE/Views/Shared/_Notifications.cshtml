@@ -32,9 +32,12 @@
         case Notification.Types.Mail:
             <text><em>@n.Sender.FirstName @n.Sender.LastName</em> sent you a @NotificationLink(n.ID, "message")</text>
                                                                         break;
-       case Notification.Types.EventApproval:                                                                        
+        case Notification.Types.EventApproval:                                                                        
             <text><em>@n.Sender.FirstName @n.Sender.LastName</em> submitted an @NotificationLink(n.ID, "event for approval")</text>
                                                                      break;
+        case Notification.Types.Dashboard:
+            <text><em>@n.Sender.FirstName @n.Sender.LastName</em> posted in a @NotificationLink(n.ID, "dashboard thread") that you participated in</text>
+            break;                                                                                                                          
     }
     </div>
 

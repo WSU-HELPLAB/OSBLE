@@ -445,6 +445,10 @@ namespace OSBLE.Controllers
                     {
                         replyToPost.Replies.Add(dr);
                         db.SaveChanges();
+
+                        // Post notification to other thread participants
+                        NotificationController nc = new NotificationController();
+                        nc.SendDashboardNotification(dr.Parent, dr.UserProfile);
                     }
                 }
                 else

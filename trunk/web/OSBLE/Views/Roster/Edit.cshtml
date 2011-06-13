@@ -34,7 +34,7 @@
             @Html.LabelFor(model => model.Section) <em>(Enter 0 for all sections)</em>
         </div>
         <div class="editor-field">
-            @Html.EditorFor(model => model.Section)
+            @Html.TextBoxFor(model => model.Section, new { size = 3 })
             @Html.ValidationMessageFor(model => model.Section)
         </div>
 
