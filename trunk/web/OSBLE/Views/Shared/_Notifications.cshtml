@@ -26,6 +26,7 @@
         </div>
     }
 
+    <div class="notification_text">
     @switch (n.ItemType)
     {
         case Notification.Types.Mail:
@@ -35,6 +36,7 @@
             <text><em>@n.Sender.FirstName @n.Sender.LastName</em> submitted an @NotificationLink(n.ID, "event for approval")</text>
                                                                      break;
     }
+    </div>
 
     </li>
 }

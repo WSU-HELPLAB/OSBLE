@@ -1029,6 +1029,11 @@ ul.selector
     padding-right: 5px;
 }
 
+#notifications_list li div.notification_text 
+{
+    margin-right: 20px;
+}
+
 #notifications_list li:hover .notification_tools, #event_list li:hover .event_tools
 {
     display: block;
