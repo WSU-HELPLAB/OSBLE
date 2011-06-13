@@ -151,6 +151,32 @@ namespace OSBLE.Services
         }
 
         /// <summary>
+        /// Returns a datetime of when the file was last modified
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="courseId"></param>
+        /// <param name="authToken"></param>
+        /// <returns></returns>
+        [OperationContract]
+        public DateTime GetLastModifiedDate(string fileName, int courseId, string authToken)
+        {
+            if (!IsValidKey(authToken))
+            {
+                return DateTime.FromFileTime(0L);
+            }
+
+            string file = Path.Combine(FileSystem.GetCourseDocumentsPath(courseId), fileName);
+            if (File.Exists(file))
+            {
+                return File.GetLastWriteTime(file);
+            }
+            else
+            {
+                return DateTime.FromFileTime(0L);
+            }
+        }
+
+        /// <summary>
         /// Returns a list locations that the current user can upload to.
         /// </summary>
         /// <param name="authKey"></param>
@@ -198,7 +224,8 @@ namespace OSBLE.Services
         /// </summary>
         /// <param name="authKey"></param>
         /// <returns></returns>
-        private bool IsValidKey(string authKey)
+        [OperationContract]
+        public bool IsValidKey(string authKey)
         {
             //clean our session list
             CleanActiveSessions();
