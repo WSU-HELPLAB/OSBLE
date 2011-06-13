@@ -30,6 +30,16 @@ namespace OSBLE.Models.Services.Uploader
         }
 
         /// <summary>
+        /// The file's absolute path.  Dependent on the system on which the file was created
+        /// </summary>
+        [DataMember]
+        public string AbsolutePath
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// The last time that the file was modified
         /// </summary>
         [DataMember]

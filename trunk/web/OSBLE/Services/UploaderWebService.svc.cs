@@ -225,23 +225,18 @@ namespace OSBLE.Services
         /// <param name="authToken"></param>
         /// <returns></returns>
         [OperationContract]
-        public bool SyncFile(string fileName, byte[] data, DateTime updated, int courseId, string authToken)
+        public bool SyncFile(string fileName, byte[] data, int courseId, string authToken)
         {
             if (!IsValidKey(authToken))
             {
                 return false;
             }
 
-            //uploads need to handle a check for lastmodified date
-            Course current = (from c in db.AbstractCourses where c.ID == courseId select c as Course).FirstOrDefault();
-            string file = Path.Combine(FileSystem.GetCourseDocumentsPath(current), fileName);
-            // only creates file if doesn't already exist or it has been updated
-            if (!File.Exists(file) || File.GetLastWriteTime(file) < updated)
+            string file = Path.Combine(FileSystem.GetCourseDocumentsPath(courseId), fileName);
+
+            using (FileStream fs = new FileStream(file, FileMode.Create))
             {
-                using (FileStream fs = new FileStream(file, FileMode.Create))
-                {
-                    fs.Write(data, 0, (int)data.Length);
-                }
+                fs.Write(data, 0, (int)data.Length);
             }
 
             return true; 
@@ -256,29 +251,13 @@ namespace OSBLE.Services
         /// <param name="authToken"></param>
         /// <returns></returns>
         [OperationContract]
-        public bool PrepCurrentPath(DirectoryListing dirList, string relative, int courseId, string authToken)
+        public bool PrepCurrentPath(DirectoryListing dirList, int courseId, string authToken)
         {
             if (!IsValidKey(authToken))
             {
                return false;
             }
-
-            string directory;
-
-            for (int i = 0; i < dirList.Directories.Count; ++i)
-            {
-                // creates directory
-                if (dirList.Directories[i].Name != "...")
-                {
-                    Course current = (from c in db.AbstractCourses where c.ID == courseId select c as Course).FirstOrDefault();
-                    directory = Path.Combine(FileSystem.GetCourseDocumentsPath(current), relative);
-                    directory = Path.Combine(directory, dirList.Directories[i].Name);
-                    if (!Directory.Exists(directory))
-                    {
-                        Directory.CreateDirectory(directory);
-                    }
-                }
-            }
+            FileSystem.PrepCourseDocuments(dirList, courseId);
             return true;
         }
 

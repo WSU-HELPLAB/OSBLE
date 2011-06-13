@@ -322,6 +322,21 @@ namespace OSBLE
             }
         }
 
+        public static void PrepCourseDocuments(DirectoryListing listing, int courseId, string previousPath = "")
+        {
+            string coursePath = GetCourseDocumentsPath(courseId);
+            string rootPath = Path.Combine(coursePath, previousPath);
+            foreach (DirectoryListing dl in listing.Directories)
+            {
+                string directoryPath = Path.Combine(rootPath, dl.Name);
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+                PrepCourseDocuments(dl, courseId, previousPath + dl.Name + "\\");
+            }
+        }
+
         public static void UpdateFileOrdering(DirectoryListing listing, int courseId)
         {
             string path = GetCourseDocumentsPath(courseId);
