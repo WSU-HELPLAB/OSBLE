@@ -438,6 +438,12 @@ namespace OSBLE.Models
 
             #endregion add course users
         }
+
+        public DbSet<PeerReviewActivity> PeerReviewActivities { get; set; }
+
+        public DbSet<IssueVotingActivity> IssueVotingActivities { get; set; }
+
+        public DbSet<AuthorRebuttalActivity> AuthorRebuttalActivities { get; set; }
     }
 
     /// <summary>

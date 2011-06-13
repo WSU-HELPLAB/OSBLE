@@ -8,6 +8,8 @@ namespace OSBLE.Models.Assignments.Activities
     public class PeerReviewActivity : StudioActivity
     {
         // Need (Link) to previous Activity
+        // Requires a PeerReview
+        public virtual AssignmentActivity PreviousActivity { get; set; }
 
         public bool UseOnlySubmittedStudents { get; set; }
         public bool UseModerators { get; set; }

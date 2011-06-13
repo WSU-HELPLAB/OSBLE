@@ -47,6 +47,7 @@
         </ObjectGroup>
       </Objects>
     </PublishDatabaseSettings>
+    
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -134,13 +135,16 @@
     <Compile Include="Attributes\IsCommunity.cs" />
     <Compile Include="Attributes\NotForCommunity.cs" />
     <Compile Include="Controllers\AssignmentController.cs" />
+    <Compile Include="Controllers\AuthorRebuttalController.cs" />
     <Compile Include="Controllers\BasicAssignmentController.cs" />
     <Compile Include="Controllers\CommunityController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
     <Compile Include="Controllers\DeliverableController.cs" />
     <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\FileHandlerController.cs" />
+    <Compile Include="Controllers\IssueVotingController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
+    <Compile Include="Controllers\PeerReviewController.cs" />
     <Compile Include="Controllers\RubricController.cs" />
     <Compile Include="Controllers\StudioAssignmentController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
@@ -591,6 +595,9 @@
     <Content Include="Views\Notification\Index.cshtml" />
     <Content Include="Views\Home\ViewThread.cshtml" />
     <Content Include="Views\Assignment\Index.cshtml" />
+    <Content Include="Views\PeerReview\Create.cshtml" />
+    <Content Include="Views\IssueVoting\Create.cshtml" />
+    <Content Include="Views\AuthorRebuttal\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

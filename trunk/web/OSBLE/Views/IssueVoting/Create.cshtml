@@ -1,0 +1,123 @@
+﻿@model OSBLE.Models.Assignments.Activities.IssueVotingActivity
+@using OSBLE.Models.Assignments.Activities
+@using OSBLE.Models
+@{
+    ViewBag.Title = "Create Issue Voting";
+}
+<h2>Create Issue Voting</h2>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/osble.assignments.js")" type="text/javascript"></script>
+
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true)
+    <fieldset>
+        <legend>IssueVotingActivity</legend>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.SetGradePercentOfIssues)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.SetGradePercentOfIssues)
+            @Html.ValidationMessageFor(model => model.SetGradePercentOfIssues)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.SetGradePercentAgreementWMocerator)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.SetGradePercentAgreementWMocerator)
+            @Html.ValidationMessageFor(model => model.SetGradePercentAgreementWMocerator)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.SetGradeManually)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.SetGradeManually)
+            @Html.ValidationMessageFor(model => model.SetGradeManually)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.MinutesLateWithNoPenalty)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.MinutesLateWithNoPenalty)
+            @Html.ValidationMessageFor(model => model.MinutesLateWithNoPenalty)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.PercentPenalty)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.PercentPenalty)
+            @Html.ValidationMessageFor(model => model.PercentPenalty)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.HoursLatePerPercentPenalty)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.HoursLatePerPercentPenalty)
+            @Html.ValidationMessageFor(model => model.HoursLatePerPercentPenalty)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.HoursLateUntilZero)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.HoursLateUntilZero)
+            @Html.ValidationMessageFor(model => model.HoursLateUntilZero)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Name)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Name)
+            @Html.ValidationMessageFor(model => model.Name)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.ReleaseDate)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.ReleaseDate)
+            @Html.ValidationMessageFor(model => model.ReleaseDate)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.AbstractAssignmentID, "AbstractAssignment")
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("AbstractAssignmentID", String.Empty)
+            @Html.ValidationMessageFor(model => model.AbstractAssignmentID)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.PointsPossible)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.PointsPossible)
+            @Html.ValidationMessageFor(model => model.PointsPossible)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.ColumnOrder)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.ColumnOrder)
+            @Html.ValidationMessageFor(model => model.ColumnOrder)
+        </div>
+
+        <p>
+            <input type="submit" value="Create" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>

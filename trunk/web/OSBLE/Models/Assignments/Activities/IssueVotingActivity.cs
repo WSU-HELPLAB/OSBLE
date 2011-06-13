@@ -11,7 +11,7 @@ namespace OSBLE.Models.Assignments.Activities
         // Need reference to assignment activity
 
         // Requires a PeerReview
-        public virtual AssignmentActivity PreviousAssignment { get; set; }
+        public virtual AssignmentActivity PreviousActivity { get; set; }
      
         public bool SetGradePercentOfIssues { get; set; }
         public bool SetGradePercentAgreementWMocerator { get; set; }
