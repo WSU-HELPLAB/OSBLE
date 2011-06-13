@@ -67,10 +67,26 @@ namespace FileUploader.Controls
             uploader.UploadComplete += new EventHandler(UploadComplete);
             uploader.FileUploadBegin += new EventHandler<FileUploadBegineArgs>(FileUploadStart);
             uploader.Cancelled += new EventHandler(uploader_Cancelled);
+            uploader.Failed += new EventHandler(uploader_Failed);
             OkButton.Click += new RoutedEventHandler(OkButton_Click);
             CancelButton.Click += new RoutedEventHandler(CancelButton_Click);
+            this.Closed += new EventHandler(UploadingModal_Closed);
 
             UploadProgressBar.Maximum = uploader.NumberOfUploads;
+        }
+
+        void UploadingModal_Closed(object sender, EventArgs e)
+        {
+            //make sure that we stop uploading
+            uploader.RequestCancel();
+        }
+
+        void uploader_Failed(object sender, EventArgs e)
+        {
+            this.Dispatcher.BeginInvoke(delegate()
+            {
+                UploadingFile.Text = "An error was encountered.  Sync failed.";
+            });
         }
 
         void uploader_Cancelled(object sender, EventArgs e)
@@ -100,7 +116,16 @@ namespace FileUploader.Controls
         {
             this.Dispatcher.BeginInvoke(delegate()
             {
-                UploadingFile.Text = e.FileToUpload;
+                string uploadName = "";
+                if (e.FileToUpload.Length > 35)
+                {
+                    uploadName = "..." + e.FileToUpload.Substring(e.FileToUpload.Length - 35);
+                }
+                else
+                {
+                    uploadName = e.FileToUpload;
+                }
+                UploadingFile.Text = uploadName;
                 UploadProgressBar.Value = (sender as UploaderThread).NumberOfUploadsCompleted;
             }
             );
