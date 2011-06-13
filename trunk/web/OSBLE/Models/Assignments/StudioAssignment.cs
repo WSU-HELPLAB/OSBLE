@@ -25,6 +25,5 @@ namespace OSBLE.Models.Assignments
                 Deliverables = new List<Deliverable>();
             }
         }
-
     }
 }

@@ -145,6 +145,7 @@
     <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="Models\Assignments\AbstractAssignment.cs" />
     <Compile Include="Models\Assignments\Activities\GradeActivity.cs" />
+    <Compile Include="Models\Assignments\Activities\PeerReviewActivity.cs" />
     <Compile Include="Models\Assignments\Activities\Scores\RubricScore.cs" />
     <Compile Include="Models\Assignments\Activities\Scores\Score.cs" />
     <Compile Include="Models\Assignments\Activities\SingleSubmissionActivity.cs" />
