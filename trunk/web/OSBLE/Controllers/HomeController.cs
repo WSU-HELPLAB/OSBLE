@@ -39,6 +39,29 @@ namespace OSBLE.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Views a particular dashboard post thread by itself.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ActionResult ViewThread(int id)
+        {
+            DashboardPost dp = db.DashboardPosts.Where(d => (d.ID == id) && 
+                                                        (currentCourses.Where(cc => cc.CourseID == d.CourseID).Count() > 0)
+                                                        ).FirstOrDefault();
+
+            if (dp == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            setupPostDisplay(dp);
+
+            ViewBag.DashboardPost = dp;
+
+            return View();
+        }
+
         private void setupActivityFeed()
         {
             List<int> viewedCourses;
