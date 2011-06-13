@@ -849,6 +849,11 @@ body#layoutLogOn
     list-style-type: none;
 }
 
+.ui-autocomplete .ui-menu-item a
+{
+    height: 40px;
+}
+
 #send_mail_textarea
 {
     width: 600px;

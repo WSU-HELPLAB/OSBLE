@@ -34,6 +34,9 @@ namespace OSBLE.Models.Assignments
         [Required]
         public virtual ICollection<AssignmentActivity> AssignmentActivities { get; set; }
 
+        [NotMapped]
+        public abstract bool AppearsInAssignmentList { get; set; }
+
         /// <summary>
         /// Grading points possible relative to sibling assignments in the parent category.
         /// </summary>

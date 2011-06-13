@@ -17,5 +17,19 @@ namespace OSBLE.Models.Assignments
         {
             get { return null; }
         }
+
+        [NotMapped]
+        public override bool AppearsInAssignmentList
+        {
+            get
+            {
+                return true;
+            }
+
+            set
+            {
+
+            }
+        }
     }
 }

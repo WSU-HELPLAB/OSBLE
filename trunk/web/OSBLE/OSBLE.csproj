@@ -133,6 +133,7 @@
     <Compile Include="Attributes\FileCacheAttribute.cs" />
     <Compile Include="Attributes\IsCommunity.cs" />
     <Compile Include="Attributes\NotForCommunity.cs" />
+    <Compile Include="Controllers\AssignmentController.cs" />
     <Compile Include="Controllers\BasicAssignmentController.cs" />
     <Compile Include="Controllers\CommunityController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
@@ -177,6 +178,7 @@
     <Compile Include="Models\Services\Uploader\ParentDirectoryListing.cs" />
     <Compile Include="Models\Services\Uploader\UserSession.cs" />
     <Compile Include="Models\ToolTips.cs" />
+    <Compile Include="Models\ViewModels\AssignmentListViewModel.cs" />
     <Compile Include="Models\ViewModels\BasicAssignmentViewModel.cs" />
     <Compile Include="Models\Services\Uploader\AbstractListing.cs" />
     <Compile Include="Models\Services\Uploader\DirectoryListing.cs" />
@@ -317,6 +319,9 @@
     <Content Include="Content\images\tooltip\bubble-8.png" />
     <Content Include="Content\images\tooltip\bubble-tail2.png" />
     <Content Include="Content\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Content\images\ui-bg_flat_65_ffffff_40x100.png" />
+    <Content Include="Content\images\ui-bg_flat_75_074974_40x100.png" />
+    <Content Include="Content\images\ui-bg_flat_75_f0f0f0_40x100.png" />
     <Content Include="Content\images\ui-bg_flat_75_ffffff_40x100.png" />
     <Content Include="Content\images\ui-bg_glass_55_fbf9ee_1x400.png" />
     <Content Include="Content\images\ui-bg_glass_65_ffffff_1x400.png" />
@@ -329,6 +334,7 @@
     <Content Include="Content\images\ui-icons_454545_256x240.png" />
     <Content Include="Content\images\ui-icons_888888_256x240.png" />
     <Content Include="Content\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\images\ui-icons_eeeeee_256x240.png" />
     <Content Include="Content\images\ui-icons_eee_256x240.png" />
     <Content Include="Content\images\ui-icons_ffffff_256x240.png" />
     <Content Include="Content\jquery-ui-1.8.13.custom.css" />
@@ -383,6 +389,7 @@
     <Content Include="Scripts\json2.min.js" />
     <Content Include="Scripts\modernizr-1.7.js" />
     <Content Include="Scripts\modernizr-1.7.min.js" />
+    <Content Include="Scripts\osble.assignment_list.js" />
     <Content Include="Scripts\osble.courses.js" />
     <Content Include="Scripts\osble.js" />
     <Content Include="Scripts\Silverlight.js" />
@@ -583,6 +590,7 @@
     <Content Include="Views\Account\ResetPasswordFailure.cshtml" />
     <Content Include="Views\Notification\Index.cshtml" />
     <Content Include="Views\Home\ViewThread.cshtml" />
+    <Content Include="Views\Assignment\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

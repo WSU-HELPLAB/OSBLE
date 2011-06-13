@@ -15,6 +15,20 @@ namespace OSBLE.Models.Assignments
         [Display(Name = "Description")]
         public string Description { get; set; }
 
+        [NotMapped]
+        public override bool AppearsInAssignmentList
+        {
+            get
+            {
+                return true;
+            }
+
+            set
+            {
+
+            }
+        }
+
         public StudioAssignment()
             : base()
         {
