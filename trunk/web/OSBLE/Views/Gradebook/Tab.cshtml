@@ -151,7 +151,13 @@
         <input id="actionRequested" name="actionRequested" type="hidden" value="null" />
         <input id="assignmentId" name="assignmentId" type="hidden" value="null" />
         <table class="menu" id="menuID">
-            <tr>
+            <!--<tr>
+                <td>
+                    <a href="#" onclick="setGradableAction('GradebookController.ColumnAction.AddPoints.ToString()'); $('#columnOptionsForm').submit();">
+                        Add points</a>
+                </td>
+            </tr>
+            <tr>-->
                 <td>
                     <a href="#" onclick="setGradableAction('@GradebookController.ColumnAction.InsertLeft.ToString()'); $('#columnOptionsForm').submit();">
                         Insert 1 left</a>
@@ -180,14 +186,14 @@
 
 </div>
 <div class="customize" id="customizeID" style="display: none; position: absolute;">
-	<form id="dropLowestSubmit" onsubmit="dropLowest(); return false;"  >
+	<form id="dropLowestSubmit" onsubmit="dropAllLowest(); return false;"  >
         <table class="customizeTable">
 		    <tr>
 		        <th align="center" colspan="3">CUSTOMIZE</th>
 		    </tr>
 		    <tr>
 			    <td>Drop lowest</td>
-			    <td><input id="XtoDrop" value="0"/></td>
+			    <td><input id="XtoDrop"/></td>
 		        <td>from category</td>
 		    </tr>
 		    <tr>
@@ -208,6 +214,7 @@
         </script>
     </div>
 </div>
+
 <script type="text/jscript">
     var lastFocusedCell = null;
     var showDropDown = false;
@@ -230,6 +237,9 @@
 
     //Keeps track of the total number of weights
     var tabCount = 1;
+
+    //We need to keep track of how many to drop
+    
 
 
     $(document).ready(function () {
@@ -269,8 +279,6 @@
             e.preventDefault();
             var row = $(this).parent("tr");
             var colIndex = $(this).prevAll().length;
-            alert(row);
-            alert(colIndex);
             colIndex = parseInt(colIndex);
             colIndex += 1;
             row.each(function () {
@@ -374,6 +382,12 @@
             //ajaxIds[1] = gradableId
             var ajaxIDs = lastFocusedCell.attr("id").split("-");
 
+            var pathname = window.location.toString();
+
+            //split the pathname at the "="
+            //catId[1] = categoryId
+            var catId = pathname.split("=");
+
             var cellValue = lastFocusedCell.children().val();
             lastFocusedCell.html("");
             lastFocusedCell.text(cellValue);
@@ -390,6 +404,7 @@
             //if we are editing a gradebook cell then ajaxIDs[1] will contain a value
             if (ajaxIDs[1] != null) {
                 $.ajax({
+                    async: false,
                     type: "POST",
                     url: "/Gradebook/ModifyCell",
                     data: { value: cellValue, userId: ajaxIDs[0], assignmentId: ajaxIDs[1] }
@@ -399,13 +414,13 @@
             //If there is no value in ajaxIDs[1] then we are editing the points possible
             else {
                 $.ajax({
+                    async: false,
                     type: "POST",
                     url: "/Gradebook/ModifyPossiblePoints",
                     data: { value: cellValue, assignmentId: ajaxIDs[0] }
                 });
             }
 
-            calculateRows();
             calculateCols();
         }
     }
@@ -470,6 +485,7 @@
         });
 
     }
+
 
     function calculateTotal() {
         if (header == true) {
@@ -724,7 +740,7 @@
         });
     }
 
-    function dropLowest() {
+    function dropAllLowest() {
 
         //get the pathname so we can use the categoryId
         var pathname = window.location.toString();
@@ -732,22 +748,26 @@
         //split the pathname at the "="
         //catId[1] = categoryId
         var catId = pathname.split("=");
+        var num = $("#XtoDrop").val();
+        
+        $("#XtoDrop").data("num", num);
 
         if (catId[1] != null) {
             var i = 0;
-            
-            //ajax call to remove the drop lowest
+
             $.ajax({
+                async: false,
                 type: "POST",
-                url: "/Gradebook/ClearDropLowest",
+                url: "/Gradebook/ClearAllDropLowest",
                 data: { categoryId: catId[1] }
             });
 
-            for (i = 0; i < $("#XtoDrop").val(); i++) {
+            for (i = 0; i < $("#XtoDrop").data("num"); i++) {
                 //ajax call to drop the lowest score
                 $.ajax({
+                    async: false,
                     type: "POST",
-                    url: "/Gradebook/DropLowest",
+                    url: "/Gradebook/AllDropLowest",
                     data: { categoryId: catId[1] }
                 });
             }
@@ -761,7 +781,46 @@
         $("#customizeID").animate({ "height": "hide" }, { duration: 300 });
     }
 
-    function clearDropLowest() {
+    function dropAllLowest2() {
+
+        //get the pathname so we can use the categoryId
+        var pathname = window.location.toString();
+
+        //split the pathname at the "="
+        //catId[1] = categoryId
+        var catId = pathname.split("=");
+
+        alert($("#XtoDrop").data("num"));
+
+        if (catId[1] != null) {
+            var i = 0;
+
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: "/Gradebook/ClearAllDropLowest",
+                data: { categoryId: catId[1] }
+            });
+
+            for (i = 0; i < $("#XtoDrop").data("num"); i++) {
+                //ajax call to drop the lowest score
+                $.ajax({
+                    async: false,
+                    type: "POST",
+                    url: "/Gradebook/AllDropLowest",
+                    data: { categoryId: catId[1] }
+                });
+            }
+        }
+        if ($("#XtoDrop").val() == 0) {
+            $("#totalCustomize").text("Total [Customize...]");
+        }
+        else {
+            $("#totalCustomize").text("Total [Dropped " + $("#XtoDrop").val() + "]");
+        }
+    }
+
+    function clearDropLowest(id) {
 
         //get the pathname so we can use the categoryId
         var pathname = window.location.toString();
@@ -775,10 +834,56 @@
 
             //ajax call to clear the drop lowest
             $.ajax({
+                async: false,
                 type: "POST",
                 url: "/Gradebook/ClearDropLowest",
-                data: { categoryId: catId[1] }
+                data: { categoryId: catId[1], userId: id }
             });
+        }
+    }
+
+    function clearAllDropLowest() {
+
+        //get the pathname so we can use the categoryId
+        var pathname = window.location.toString();
+
+        //split the pathname at the "="
+        //catId[1] = categoryId
+        var catId = pathname.split("=");
+
+        //make sure we are on a valid page
+        if (catId[1] != null) {
+
+            //ajax call to clear the drop lowest
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: "/Gradebook/ClearDropLowest",
+                data: { categoryId: catId[1]}
+            });
+        }
+        dropAllLowest();
+    }
+
+    function DropLowest(id) {
+
+        //get the pathname so we can use the categoryId
+        var pathname = window.location.toString();
+
+        //split the pathname at the "="
+        //catId[1] = categoryId
+        var catId = pathname.split("=");
+
+        //make sure we are on a valid page
+        if (catId[1] != null) {
+
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: "/Gradebook/DropLowest",
+                data: { categoryId: catId[1], userId: id }
+            });
+
         }
     }
 

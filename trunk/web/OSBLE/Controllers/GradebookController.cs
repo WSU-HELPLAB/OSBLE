@@ -17,7 +17,7 @@ namespace OSBLE.Controllers
     [NotForCommunity]
     public class GradebookController : OSBLEController
     {
-        public enum ColumnAction { InsertLeft, InsertRight, Delete, Clear, NoAction };
+        public enum ColumnAction { AddPoints, InsertLeft, InsertRight, Delete, Clear, NoAction };
 
         //
         // GET: /Gradebook/
@@ -103,7 +103,30 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
-        public void ClearDropLowest(int categoryId)
+        public void ClearDropLowest(int categoryId, int userId)
+        {
+            if (ModelState.IsValid)
+            {
+                if (categoryId > 0)
+                {
+                    var studentScores = from scores in db.Scores
+                                        where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
+                                        && scores.UserProfileID == userId
+                                        && scores.isDropped == true
+                                        select scores;
+                    if (studentScores.Count() > 0)
+                    {
+                        foreach (Score score in studentScores)
+                        {
+                            score.isDropped = false;
+                        }
+                        db.SaveChanges();
+                    }
+                }
+            }
+        }
+
+        public void ClearAllDropLowest(int categoryId)
         {
             if (ModelState.IsValid)
             {
@@ -126,7 +149,53 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
-        public void DropLowest(int categoryId)
+        public void DropLowest(int categoryId, int userId)
+        {
+            if (ModelState.IsValid)
+            {
+                double lowest = 10000;
+                int id = 0;
+                if (categoryId > 0)
+                {
+                    var studentScores = from scores in db.Scores
+                                        join user in db.UserProfiles on scores.UserProfileID equals user.ID
+                                        where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
+                                        && scores.UserProfileID == userId
+                                        && scores.isDropped == false
+                                        group scores by scores.UserProfileID into userScores
+                                        select userScores;
+
+                    if (studentScores.Count() > 0)
+                    {
+                        for (int i = 0; i < studentScores.Count(); i++)
+                        {
+                            var item = studentScores.AsEnumerable().ElementAt(i);
+                            foreach (Score score in item)
+                            {
+                                if (score.Points < lowest)
+                                {
+                                    lowest = score.Points;
+                                    id = score.ID;
+                                }
+                            }
+                            foreach (Score score in item)
+                            {
+                                if (score.ID == id)
+                                {
+                                    score.isDropped = true;
+                                }
+                            }
+                            db.SaveChanges();
+                            lowest = 10000;
+                        }
+                    }
+                }
+            }
+        }
+
+
+        [HttpPost]
+        public ActionResult AllDropLowest(int categoryId)
         {
             if (ModelState.IsValid)
             {
@@ -167,7 +236,10 @@ namespace OSBLE.Controllers
                     }
                 }
             }
+            BuildGradebook(categoryId);
+            return View("_Gradebook");
         }
+
         
         /// <summary>
         /// Clears a gradable (column) from the current table.
@@ -221,6 +293,10 @@ namespace OSBLE.Controllers
             else if (string.Compare(ColumnAction.Delete.ToString(), action) == 0)
             {
                 return ColumnAction.Delete;
+            }
+            else if (string.Compare(ColumnAction.AddPoints.ToString(), action) == 0)
+            {
+                return ColumnAction.AddPoints;
             }
             return ColumnAction.NoAction;
         }
@@ -347,8 +423,13 @@ namespace OSBLE.Controllers
             BuildGradebook(newCategory.ID);
             return View("_Tabs");
         }
-        
 
+
+        [HttpPost]
+        public void AddPoints(double assignmentId)
+        {
+            
+        }
         
 
         [HttpPost]
@@ -418,10 +499,13 @@ namespace OSBLE.Controllers
                     case ColumnAction.Delete:
                         DeleteColumn(assignmentId);
                         break;
-                    
                     case ColumnAction.Clear:
                         ClearColumn(assignmentId);
                         break;
+                    case ColumnAction.AddPoints:
+                        AddPoints(assignmentId);
+                        break;
+                        
                 }
             }
             BuildGradebook((int)Session["categoryId"]);
@@ -488,13 +572,6 @@ namespace OSBLE.Controllers
                         Points = ((scores.Score / scores.perfectScore)*100),
                         isDropped = false
                     };
-                    //GradeActivity aa = new GradeActivity() 
-                    //{ 
-                    //    ID = scores.activityId.()
-                    //};
-                    //GradeAssignment ga = new GradeAssignment() { ID = item.AssignmentId };
-                    //aa.AbstractAssignment = ga;
-                    //studentScore.AssignmentActivity = aa;
                     percentList.Add(studentScore);
                 }
             }
