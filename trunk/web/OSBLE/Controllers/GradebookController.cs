@@ -554,9 +554,8 @@ namespace OSBLE.Controllers
                                                         StudentId = students.Key,
                                                         Score = students.Sum(stu => stu.Points),
                                                         perfectScore = students.Sum(stu => stu.AssignmentActivity.AbstractAssignment.PointsPossible),
-                                                        category = students.Select(stu => stu.AssignmentActivity.AbstractAssignment.Category),
-                                                        activityId = students.Select(stu => stu.AssignmentActivityID),
-                                                        assignmentId = students.Select(stu => stu.AssignmentActivity.AbstractAssignmentID)
+                                                        category = students.Select(stu => stu.AssignmentActivity.AbstractAssignment.Category).FirstOrDefault(),
+                                                        activity = students.Select(stu => stu.AssignmentActivity).FirstOrDefault()
                                                     }
                                 };
 
@@ -568,10 +567,21 @@ namespace OSBLE.Controllers
                 
                     Score studentScore = new Score()
                     {
+                        AssignmentActivity = scores.activity,
                         UserProfileID = scores.StudentId,
                         Points = ((scores.Score / scores.perfectScore)*100),
                         isDropped = false
                     };
+
+
+                    GradeAssignment newGA = new GradeAssignment()
+                    {
+                        ID = item.AssignmentId,
+                        Category = scores.category,
+                        CategoryID = scores.category.ID,
+                        PointsPossible = scores.perfectScore
+                    };
+                    studentScore.AssignmentActivity.AbstractAssignment = newGA;
                     percentList.Add(studentScore);
                 }
             }
@@ -689,8 +699,8 @@ namespace OSBLE.Controllers
 
             //Finally the scores for each student.
             List<Score> scor = (from score in db.Scores
-                                  where score.AssignmentActivity.AbstractAssignment.CategoryID == currentTab.ID
-                                  select score).ToList();
+                                where score.AssignmentActivity.AbstractAssignment.CategoryID == currentTab.ID
+                                select score).ToList();
 
             var userScore = from scores in db.Scores
                             join user in db.UserProfiles on scores.UserProfileID equals user.ID

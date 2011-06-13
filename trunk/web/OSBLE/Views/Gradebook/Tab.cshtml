@@ -156,8 +156,8 @@
                     <a href="#" onclick="setGradableAction('GradebookController.ColumnAction.AddPoints.ToString()'); $('#columnOptionsForm').submit();">
                         Add points</a>
                 </td>
-            </tr>
-            <tr>-->
+            </tr>-->
+            <tr>
                 <td>
                     <a href="#" onclick="setGradableAction('@GradebookController.ColumnAction.InsertLeft.ToString()'); $('#columnOptionsForm').submit();">
                         Insert 1 left</a>
@@ -404,11 +404,12 @@
             //if we are editing a gradebook cell then ajaxIDs[1] will contain a value
             if (ajaxIDs[1] != null) {
                 $.ajax({
-                    async: false,
                     type: "POST",
                     url: "/Gradebook/ModifyCell",
-                    data: { value: cellValue, userId: ajaxIDs[0], assignmentId: ajaxIDs[1] }
+                    data: { value: cellValue, userId: ajaxIDs[0], assignmentId: ajaxIDs[1] },
+                    success: clearDropLowest(ajaxIDs[0])
                 });
+
             }
 
             //If there is no value in ajaxIDs[1] then we are editing the points possible
@@ -834,10 +835,10 @@
 
             //ajax call to clear the drop lowest
             $.ajax({
-                async: false,
                 type: "POST",
                 url: "/Gradebook/ClearDropLowest",
-                data: { categoryId: catId[1], userId: id }
+                data: { categoryId: catId[1], userId: id },
+                success: DropLowest(id)
             });
         }
     }
@@ -859,7 +860,7 @@
                 async: false,
                 type: "POST",
                 url: "/Gradebook/ClearDropLowest",
-                data: { categoryId: catId[1]}
+                data: { categoryId: catId[1] },
             });
         }
         dropAllLowest();
@@ -878,7 +879,6 @@
         if (catId[1] != null) {
 
             $.ajax({
-                async: false,
                 type: "POST",
                 url: "/Gradebook/DropLowest",
                 data: { categoryId: catId[1], userId: id }

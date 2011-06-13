@@ -288,47 +288,79 @@
             {
                 <th id="@item.ID" onclick="changeAssignmentName(this);" ondblclick="alert('double clicked');">@item.Name<div id="cntnr" class="thButton"><button class="dropdown" id="@item.ID" onclick="ShowHide(this);"></button></div></th>
             }
-            
 
         </tr>
+
+        @{
+            List<Category> cats = (from cat in ViewBag.Categories as IEnumerable<Category>
+                                   select cat).ToList();
+            
+        }
         <!--loop through all users -->
         @foreach (OSBLE.Models.Users.UserProfile student in ViewBag.Students)
         {        
             <tr id="studentGrades">
 
-                @{ 
+            @{  
                     
-                    List<CoursesUsers> courseUser = (from course in ViewBag.CoursesUser as IEnumerable<CoursesUsers>
-                                                     where course.UserProfileID == student.ID
-                                                     select course).ToList();
-                    if(courseUser.Count() > 0)
+                List<CoursesUsers> courseUser = (from course in ViewBag.CoursesUser as IEnumerable<CoursesUsers>
+                                                 where course.UserProfileID == student.ID
+                                                 select course).ToList();
+                if (courseUser.Count() > 0)
+                {
+                    foreach (CoursesUsers item in courseUser)
                     {
-                        foreach(CoursesUsers item in courseUser)
-                        {
-                           <td>@item.Section</td>
-                        }
-                    }                                                   
-                }
+                               <td>@item.Section</td>
+                    }
+                }                                                   
+            }
 
                 <td id="@student.ID" >@student.LastName, @student.FirstName</td>
                 <td id="grade">&nbsp</td>
-                <td id="total">0</td>
+                
                 
 
                 @{
-                    //foreach (AbstractAssignment gradeAssignment in ViewBag.GradeAssignments)
-                    {
+                    double totalGrade = 0;
+                    double totalPossible = 0;
+                    List<Score> totalOfCats = (from total in ViewBag.Scores as IEnumerable<Score>
+                                               where total.UserProfileID == student.ID
+                                               select total).ToList();
 
+                    if (totalOfCats.Count() > 0)
+                    {
+                        for (int i = 0; i < totalOfCats.Count(); i++)
+                        {
+                            if (totalOfCats[i].AssignmentActivity.AbstractAssignment.Category.Points == 0)
+                            {
+                                totalGrade += totalOfCats[i].Points;
+                                
+                                //We always need to divide by 100%
+                                totalPossible += 100;
+                            }
+                            else
+                            {
+                                totalGrade += totalOfCats[i].Points * totalOfCats[i].AssignmentActivity.AbstractAssignment.Category.Points;
+                                totalPossible += 100 * totalOfCats[i].AssignmentActivity.AbstractAssignment.Category.Points;
+                            }
+                        }
+                    }
+                    var totalPercent = (totalGrade / totalPossible)*100;
+                    <td>@totalPercent.ToString(".##")%</td>
+                    foreach (Category cat in ViewBag.Categories)
+                    {
                         List<Score> scoreQuery = (from g in ViewBag.Scores as IEnumerable<Score>
-                                                    where g.UserProfileID == student.ID
-                                                    && g.isDropped == false
-                                                    select g).ToList();
+                                                  where g.UserProfileID == student.ID 
+                                                  && g.AssignmentActivity.AbstractAssignment.CategoryID == cat.ID
+                                                  select g).ToList();
+
                         if (scoreQuery.Count() > 0)
                         {
-                            for (int i = 0; i < scoreQuery.Count(); i++)
-                            {    
-                                <td id="categoryGrade">@scoreQuery[i].Points.ToString(".##")%</td>
-                            }
+                            <td id="categoryGrade">@scoreQuery.First().Points.ToString(".##")%</td>
+                        }
+                        else
+                        {
+                            <td id="categoryGrade">NG</td>
                         }
                     }
                 }
@@ -598,7 +630,7 @@
 
             $(this).find("td").each(function () {
                 if ($(this).attr("id") == "categoryTotal") {
-                    $(this).text(total);
+                    $(this).text((total).toFixed(2));
                 }
                 var id = $(this).attr("id").split("-");
                 if (id[0] == "weight") {

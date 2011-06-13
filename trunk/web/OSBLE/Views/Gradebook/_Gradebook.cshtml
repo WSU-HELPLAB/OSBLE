@@ -7,95 +7,93 @@
 }
 
 <table id="grades" class="gradebook">
-        <tr id="perfectScore">
-            <th id="th2">
-                Perfect Score
-            </th>
-            <td id="perfectTotal">
-                100%
-            </td>
-            @foreach (AbstractAssignment item in ViewBag.Assignments)
-            {
-                <td id="@item.ID" onclick="cellGainsFocus(this)">
-                    @item.PointsPossible
-                </td>   
-            }
-        </tr>
-        <tr>
-            <th id="th3">
-                Averave Score
-            </th>
-            <td id="averageTotal">
+    <tr id="perfectScore">
+        <th id="th2">
+            Perfect Score
+        </th>
+        <td id="perfectTotal">
+            100%
+        </td>
+        @foreach (AbstractAssignment item in ViewBag.Assignments)
+        {
+            <td id="@item.ID" onclick="cellGainsFocus(this)">
+                @item.PointsPossible
+            </td>   
+        }
+    </tr>
+    <tr>
+        <th id="th3">
+            Averave Score
+        </th>
+        <td id="averageTotal">
+            0
+        </td>
+        @foreach (AbstractAssignment item in ViewBag.Assignments)
+        {
+            <td id="averageScore">
                 0
-            </td>
-            @foreach (AbstractAssignment item in ViewBag.Assignments)
-            {
-                <td id="averageScore">
-                    0
-                </td>  
-            }
-        </tr>
-        <tr>
-            <th id="th4" ondblclick="clearDropLowest()">
-                Name
+            </td>  
+        }
+    </tr>
+    <tr>
+        <th id="th4" ondblclick="clearDropLowest()">
+            Name
+        </th>
+        <th id="totalCustomize" ondblclick="displayCustomizeGrades();">
+            Total [Customize...]
+        </th>
+        @foreach (AbstractAssignment item in ViewBag.Assignments)
+        {
+            <th id="@item.ID" onclick="changeHeaderName(this)">@item.Name<div id="cntnr" class="thButton">
+                <button class="dropdown" id="@item.ID" onclick="ShowHide(this);">
+                </button>
+            </div>
             </th>
-            <th id="totalCustomize" ondblclick="displayCustomizeGrades();">
-                Total [Customize...]
-            </th>
-            @foreach (AbstractAssignment item in ViewBag.Assignments)
-            {
-                <th id="@item.ID" onclick="changeHeaderName(this)">@item.Name<div id="cntnr" class="thButton">
-                    <button class="dropdown" id="@item.ID" onclick="ShowHide(this);">
-                    </button>
-                </div>
-                </th>
-            }
+        }
             
-        </tr>
-        <!--loop through all users -->
-        @foreach (OSBLE.Models.Users.UserProfile user in ViewBag.Users)
-        {        
-            <tr id="studentGrades">
-                <td id="@user.ID" >@user.LastName, @user.FirstName</td>
+    </tr>
+    <!--loop through all users -->
+    @foreach (OSBLE.Models.Users.UserProfile user in ViewBag.Users)
+    {        
+        <tr id="studentGrades">
+            <td id="@user.ID" >@user.LastName, @user.FirstName</td>
                     
-                @{
-                    var percent = from p in ViewBag.Percents as IEnumerable<Score>
-                                    where p.UserProfileID == user.ID
-                                    select p;  
-                    if (percent.Count() > 0)
-                    {
-                        <td id="total">@percent.First().Points.ToString(".##")%</td>
-                    }
-                    else
-                    {
-                        @String.Format("{0}", 0)
-                    }
+            @{
+                var percent = from p in ViewBag.Percents as IEnumerable<Score>
+                                where p.UserProfileID == user.ID
+                                select p;  
+                if (percent.Count() > 0)
+                {
+                    <td id="total">@percent.First().Points.ToString(".##")%</td>
                 }
+                else
+                {
+                    <td id="total">@String.Format("{0}", 0)</td>
+                }
+            }
 
                 
-                @foreach (AbstractAssignment gradeAssignment in ViewBag.GradeAssignments)
-                {   
-                    <td id="@String.Format("{0}-{1}", user.ID, gradeAssignment.ID)" onclick="cellGainsFocus(this)">
-                        @{var gradableQuery = from g in ViewBag.Grades as IEnumerable<Score>
-                                              where g.AssignmentActivity.AbstractAssignmentID == gradeAssignment.ID 
-                                              && g.UserProfileID == user.ID
-                                              select g;
-                          //use the stored score if possible.  Otherwise, just use a "0"
-                          if (gradableQuery.Count() > 0)
-                          {
-                            @gradableQuery.First().Points
-                          }
-                          else
-                          {
-                              //Razor didn't like me using just a "0" so I had to wrap it inside String.Format
-                            @String.Format("{0}", -1)
-                          }
-                        }
-                    </td> 
+            @foreach (AbstractAssignment gradeAssignment in ViewBag.GradeAssignments)
+            {
+
+                var gradableQuery = from g in ViewBag.Grades as IEnumerable<Score>
+                                    where g.AssignmentActivity.AbstractAssignmentID == gradeAssignment.ID
+                                    && g.UserProfileID == user.ID
+                                    select g;
+                //use the stored score if possible.  Otherwise, just use a "0"
+                if (gradableQuery.Count() > 0)
+                {
+                            <td id="@String.Format("{0}-{1}", user.ID, gradeAssignment.ID)" onclick="cellGainsFocus(this)">@gradableQuery.First().Points</td>
                 }
-            </tr>
-        }
-    </table>
+                else
+                {
+                    //Razor didn't like me using just a "0" so I had to wrap it inside String.Format
+                            <td id="@String.Format("{0}-{1}", user.ID, gradeAssignment.ID)" onclick="cellGainsFocus(this)">NG</td>
+                }
+            }
+        </tr>
+    }
+</table>
 
     <form id="saveSubmit" onsubmit="dropAllLowest2(); return false;">
         <input id="saveSubmit" type="submit" value="Save" />
