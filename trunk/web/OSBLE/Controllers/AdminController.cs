@@ -26,11 +26,11 @@ namespace OSBLE.Controllers
 
         public ViewResult Index()
         {
-            // Get list of users (other than current user) who are not pending, ordered by last name
-            var userprofiles = db.UserProfiles.Where(u => u.ID != currentUser.ID && u.UserName != null).OrderBy(u => u.LastName).Include(u=>u.School);
-            // Add pending users to the end of the list
-            userprofiles = userprofiles.Union(db.UserProfiles.Where(u => u.ID != currentUser.ID && u.UserName == null).Include(u => u.School));
-            return View(userprofiles.ToList());
+            // Get list of users (other than current user) ordered by last name, who are not pending
+            List<UserProfile> userprofiles = db.UserProfiles.Where(u => u.ID != currentUser.ID && u.UserName != null).OrderBy(u=>u.LastName).Include(u=>u.School).ToList();
+            // Add pending users to bottom of list.
+            userprofiles = userprofiles.Concat(db.UserProfiles.Where(u =>  u.ID != currentUser.ID && u.UserName == null).ToList()).ToList();
+            return View(userprofiles);
         }
 
         //

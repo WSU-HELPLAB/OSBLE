@@ -46,11 +46,8 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public ActionResult ViewThread(int id)
         {
-            DashboardPost dp = db.DashboardPosts.Where(d => (d.ID == id) && 
-                                                        (currentCourses.Where(cc => cc.CourseID == d.CourseID).Count() > 0)
-                                                        ).FirstOrDefault();
-
-            if (dp == null)
+            DashboardPost dp = db.DashboardPosts.Find(id);
+            if (dp == null || !(dp is DashboardPost) || (currentCourses.Where(cc => cc.CourseID == dp.CourseID).Count() < 1))
             {
                 return RedirectToAction("Index");
             }
@@ -59,7 +56,7 @@ namespace OSBLE.Controllers
 
             ViewBag.DashboardPost = dp;
 
-            return View();
+            return View("_DashboardPost",dp);
         }
 
         private void setupActivityFeed()
