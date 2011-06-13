@@ -144,7 +144,10 @@
     <Compile Include="Controllers\StudioAssignmentController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="Models\Assignments\AbstractAssignment.cs" />
+    <Compile Include="Models\Assignments\Activities\AsyncIssueVotingActivity.cs" />
+    <Compile Include="Models\Assignments\Activities\AuthorRebuttalActivity.cs" />
     <Compile Include="Models\Assignments\Activities\GradeActivity.cs" />
+    <Compile Include="Models\Assignments\Activities\IssueVotingActivity.cs" />
     <Compile Include="Models\Assignments\Activities\PeerReviewActivity.cs" />
     <Compile Include="Models\Assignments\Activities\Scores\RubricScore.cs" />
     <Compile Include="Models\Assignments\Activities\Scores\Score.cs" />

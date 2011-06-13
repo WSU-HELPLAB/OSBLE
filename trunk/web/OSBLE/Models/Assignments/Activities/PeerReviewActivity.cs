@@ -7,40 +7,51 @@ namespace OSBLE.Models.Assignments.Activities
 {
     public class PeerReviewActivity : StudioActivity
     {
-        // (Link) Associated submission name [assignment name] uneditable
+        // Need (Link) to previous Activity
 
-        public bool studentSubmitted;
-        public bool useModerators;
+        public bool UseOnlySubmittedStudents { get; set; }
+        public bool UseModerators { get; set; }
 
         //Anonymity of review
-        public bool authorAnonymous;
-        public bool reviewersAnonymous;
-        public bool reviewerRolesAnonymous;
+        public bool IsAuthorAnonymous { get; set; }
+        public bool IsReviewersAnonymous { get; set; }
+        public bool IsReviewersRoleAnonymous { get; set; }
 
         //basis of review
-        public bool inlineComments;
+        public bool UseInlineComments { get; set; }
             // if inline comments checked
-            public bool instructorDefinedGradingCommentCategories;
-            public bool newCommentCategories;
-        public bool Rubric;
+            
+            //Need reference to inline Comments
+
+        public bool UseRubric { get; set; }
             // if Rubric checked
-            public bool instructorDefinedGradingRubric;
-            public bool newRubric;
 
-        //Author access to completed reviews
-        public bool canStudentAccessReviews;
-            // if student can access reviews is checked
-            // and or if reviewerCanViewOthersReviews is true
-            public bool hasStudentsCompletedAssignedReviews;
+            //Need reference to rubric
 
-        // Reviewer access to completed reviews
-        public bool canReviewerViewOthersReviews;
+        /// <summary>
+        /// If true then student can view Peer Reviews done by others of their work.
+        /// </summary>
+        public bool CanStudentAccessReviews { get; set; }
 
-        //Add to gradebook (checked by default)
-        public bool addGradebook = true;
+            /// <summary>
+            /// If true then students will have access to the Peer Reviews (if allowed) after the Peer Review has ended.
+            /// If false the students will have access to the Peer Reviews (if allowed) after they have done their own Peer Reviews
+            /// even after the deadline passes.  If the student does not do their peer reviews they will never be able to look at others
+            /// reviews of their work.
+            /// </summary>
+            public bool HasStudentCompletedAssignedReviews { get; set; }
+
+        /// <summary>
+        /// If true then the reviewer can see what other reviewers have already said during their reviews.
+        /// </summary>
+        public bool CanReviewerViewOthersReviews { get; set; }
+
+        
+        
             // if use rubric is selected
-            public bool instructorCompletesRubricRandomReview = true; // default
-            public bool instructorCompletesRubricAllReviews;
+            public bool InstructorCompletesRubricRandomReview { get; set; }
+            public bool InstructorCompletesRubricAllReviews { get; set; }
+        
         
     }
 }
