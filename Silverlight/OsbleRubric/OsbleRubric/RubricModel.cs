@@ -15,6 +15,8 @@ namespace OsbleRubric
 
         private CustomDataGrid customDataGrid = new CustomDataGrid();
         private Rubric thisView = new Rubric();
+        private Canvas myCanvas = new Canvas();
+        private TextBox myDraggingLabel = new TextBox();
 
         #endregion Attributes
 
@@ -31,10 +33,16 @@ namespace OsbleRubric
         const double addColColumnWidth = 32;
         const double commentColumnWidth = 150;
 
+        private bool mouseButtonIsDown = false; //used for mouse button down events
+        private int rowToSwap = -1; 
 
         private ImageSource helpIconSource = new BitmapImage(new Uri("Icons/help.png", UriKind.Relative));
         private ImageSource deleteIconSource = new BitmapImage(new Uri("Icons/delete.png", UriKind.Relative));
         private ImageSource addIconSource = new BitmapImage(new Uri("Icons/add.png", UriKind.Relative));
+        private ImageSource swapIconSource = new BitmapImage(new Uri("Icons/swap3.png", UriKind.Relative));
+        private ImageSource mouseDown = new BitmapImage(new Uri("Icons/mouseOverSwap.png", UriKind.Relative));
+        private ImageSource downArrowIconSource = new BitmapImage(new Uri("Icons/downArrow.png", UriKind.Relative));
+        private ImageSource upArrowIconSource = new BitmapImage(new Uri("Icons/upArrow.png", UriKind.Relative));
 
         #endregion constants
 
@@ -49,6 +57,12 @@ namespace OsbleRubric
             //adding grid to the view
             thisView.LayoutRoot.Children.Add(customDataGrid.BaseGrid);
 
+            thisView.LayoutRoot.Children.Add(myCanvas);
+
+            //event for handling swapping
+            thisView.LayoutRoot.MouseLeftButtonUp += new MouseButtonEventHandler(LayoutRoot_MouseLeftButtonUp);
+            thisView.LayoutRoot.MouseMove += new MouseEventHandler(LayoutRoot_MouseMove);
+
             //setting color for grid
             customDataGrid.BaseGrid.Background = new SolidColorBrush(Colors.LightGray);
 
@@ -60,18 +74,19 @@ namespace OsbleRubric
             customDataGrid.BorderThickness = 2.0;
 
             //adding initial columns & rows
-            customDataGrid.PlaceUIElement(createCol0Row0(), 0, 0);
-            customDataGrid.PlaceUIElement(createCol1Row0(), 1, 0);
+            customDataGrid.PlaceUIElement(createPerformanceCritTitleCell(), 0, 0);
+            customDataGrid.PlaceUIElement(createWeightCritTitleCell(), 1, 0);
             customDataGrid.PlaceUIElement(createLevelTitleCell(), 2, 0);
-            //
+
             createAddButtonColumn();
             createCommentColumn();
             createCriterionRow();
             createAddButtonRow();
             
 
-            //setting widths/heights for the table - possibly best to set width/height somewhere else
+            //setting widths/heights for the table
             //setting heights for rows
+            
             customDataGrid.BaseGrid.RowDefinitions[0].Height = new GridLength(Row0Height);
             for (int i = 1; i < customDataGrid.BaseGrid.RowDefinitions.Count-1; ++i)
             {
@@ -297,7 +312,8 @@ namespace OsbleRubric
                 Height = 22
             };
 
-            textbox.LostFocus += new RoutedEventHandler(textbox_LostFocus);
+            //sets the event for each textbox to update the overall points
+            textbox.SelectionChanged += new RoutedEventHandler(textbox_SelectionChanged);
 
             TextBlock textBlock = new TextBlock() { Text = "Points", Margin = new Thickness(5, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
 
@@ -307,14 +323,11 @@ namespace OsbleRubric
             return returnVal;
         }
 
-        void textbox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            updateLastRow();
-        }
-
         //This method creates the cells used for the Performance Criterion column (With the exception of the first row)
         private StackPanel createPerformanceCritCell()
         {
+
+            //Overall StackPanel to return
             StackPanel returnVal = new StackPanel()
             {
                 Margin = new Thickness(5, 5, 5, 5)
@@ -326,17 +339,78 @@ namespace OsbleRubric
                 Width = returnVal.Width,
                 TextWrapping = TextWrapping.Wrap
             };
-            Image deleteIcon = new Image { Source = deleteIconSource, Height = 32, Width = 32, Margin = new Thickness(0, 3, 0, 0) };
-            deleteIcon.MouseLeftButtonDown += new MouseButtonEventHandler(DeleteRow_MouseLeftButtonDown);
 
+            //Horizontal Stackpanel for images
+            StackPanel SPImages = new StackPanel()
+            {
+                Orientation = Orientation.Horizontal,
+                HorizontalAlignment = HorizontalAlignment.Center,
+            };
+
+            //Images to add to stackpanel for bottom part of cell
+            Image deleteIcon = new Image { Source = deleteIconSource, Height = 32, Width = 32, Margin = new Thickness(0, 3, 0, 0), HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+            Image swapIcon = new Image {Source = swapIconSource, Height = 27, Width = 35, Margin = new Thickness(80, 3, 0, 0), HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Center };
+
+
+
+            //events for deleting and swapping
+            deleteIcon.MouseLeftButtonDown += new MouseButtonEventHandler(DeleteRow_MouseLeftButtonDown);
+            swapIcon.MouseLeftButtonDown += new MouseButtonEventHandler(swapIcon_MouseLeftButtonDown);
+
+            swapIcon.Cursor = Cursors.Hand;
+
+            //adding stuff to the stackpanels
+            SPImages.Children.Add(deleteIcon);
+            SPImages.Children.Add(swapIcon);
             returnVal.Children.Add(textbox);
-            returnVal.Children.Add(deleteIcon);
+            returnVal.Children.Add(SPImages);
 
             return returnVal;
         }
 
+        //changes the icon of changeFromSrc to changeToSrc. If changeCurrentRowIcon is false, it won't change the icon of the currentRow row
+        private void changeSwapIcon(ImageSource changeFromSrc, ImageSource changeToSrc, bool changeCurrentRowIcon, int currentRow)
+        {
+            //changing all icons
+            foreach (UIElement p in customDataGrid.BaseGrid.Children)
+            {
+                if(p is Border)
+                {
+                    if (Grid.GetColumn(p as Border) == 0) //if its first column
+                    {
+                        if ((p as Border).Child is StackPanel)
+                        {
+                            foreach (UIElement i in ((p as Border).Child as StackPanel).Children)
+                            {
+                                if (i is StackPanel)
+                                {
+                                    foreach (UIElement k in (i as StackPanel).Children)
+                                    {
+                                        if (k is Image)
+                                        {
+                                            if ((k as Image).Source == changeFromSrc) //Image we wanted
+                                            {
+                                                if (changeCurrentRowIcon == true)
+                                                {
+                                                    (k as Image).Source = changeToSrc; //changes icon
+                                                }
+                                                else if (Grid.GetRow(p as Border) != currentRow)
+                                                {
+                                                    (k as Image).Source = changeToSrc; //changes icon
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         //This method creates the top row for the Performance Criterion column
-        private StackPanel createCol0Row0()
+        private StackPanel createPerformanceCritTitleCell()
         {
             StackPanel returnVal = new StackPanel() { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(5, 0, 5, 0) };
 
@@ -345,28 +419,16 @@ namespace OsbleRubric
             Image Img1 = new Image() { Source = helpIconSource, Width = 16, Height = 16, Margin = new Thickness(3, 0, 0, 0) };
             ToolTipService.SetToolTip(Img1, "Input your Performance Criterion in the text area.\nThe minus button is for removing a criterion row.");
 
-            TBlock1.MouseLeftButtonDown += new MouseButtonEventHandler(TBlock1_MouseLeftButtonDown);
-
             //adding children to returnVal
             returnVal.Children.Add(TBlock1);
             returnVal.Children.Add(Img1);
             return returnVal;
         }
 
-        void TBlock1_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            performSwap(2, 3);
-        }
-
-        struct postitionUIElement
-        {
-            UIElement uiele;
-            int row;
-            int col;
-        }
+        //This method swaps row1 with row2 if its a valid swap
         private void performSwap(int row1, int row2)
         {
-            MessageBox.Show("IM IN");
+            
             List<UIElement> borderList1 = new List<UIElement>();
             List<UIElement> borderList2 = new List<UIElement>();
             foreach (Border br in customDataGrid.BaseGrid.Children) //removing any borders from the grid and putting them in a list
@@ -393,7 +455,6 @@ namespace OsbleRubric
                     }
                 }
             }
-
             
             foreach (UIElement br in borderList1)
             {
@@ -414,7 +475,7 @@ namespace OsbleRubric
         }
 
         //This method creates the top row for the Weight Criterion column
-        private StackPanel createCol1Row0()
+        private StackPanel createWeightCritTitleCell()
         {
             StackPanel returnVal = new StackPanel() { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(5, 0, 5, 0) };
 
@@ -511,12 +572,14 @@ namespace OsbleRubric
         private int getRow(MouseEventArgs e)
         {
             int returnVal = -1;
-            var eles = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(thisView), thisView.LayoutRoot);
+            //var eles = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(thisView), thisView.LayoutRoot);
+            var eles = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(Application.Current.RootVisual), thisView);
             foreach (FrameworkElement rd in eles)
             {
                 if (rd is Border)
                 {
-                    returnVal = Grid.GetRow(rd);
+                    //returnVal = Grid.GetRow(rd);
+                    return Grid.GetRow(rd);
                 }
             }
             return returnVal;
@@ -526,18 +589,20 @@ namespace OsbleRubric
         private int getColumn(MouseEventArgs e)
         {
             int returnVal = -1;
-            var eles = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(thisView), thisView.LayoutRoot);
+            
+            //1- var eles = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(thisView), customDataGrid.BaseGrid);
+            var eles = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(Application.Current.RootVisual), thisView);
             foreach (FrameworkElement rd in eles)
             {
-                if (rd is Border)
+                if (rd is Border) //Looking at the borders only, since all other elements are referenced by their borders index
                 {
-                    returnVal = Grid.GetColumn(rd);
+                    return Grid.GetColumn(rd);
                 }
             }
             return returnVal;
         }
 
-        //This method deletes the TextBlock in the last row and recreates it. This is the only way I could find to keep its position correct. (Adjusting its columnspan property did not work)
+        //This method deletes the TextBlock in the last row and recreates it. This is the only way I could find to keep its position correct. (Adjusting its columnspan property did not update instantly)
         private void updateLastRow()
         {
             foreach (Border br in customDataGrid.BaseGrid.Children)
@@ -589,9 +654,9 @@ namespace OsbleRubric
 
         /*This function calculates the total points by summing all the values from the point boxes (in the second column) 
          *If the value is "" or contains non-number value, then it will not be included*/
-        private int calcTotalPoints()
+        private double calcTotalPoints()
         {
-            int returnVal = 0;
+            double returnVal = 0;
             foreach (Border br in customDataGrid.BaseGrid.Children) 
             {
                 int col = (int)br.GetValue(Grid.ColumnProperty);
@@ -603,8 +668,8 @@ namespace OsbleRubric
                     {
                         if (tb is TextBox)
                         {
-                            int temp;
-                            if (int.TryParse((tb as TextBox).Text, out temp))
+                            double temp;
+                            if (double.TryParse((tb as TextBox).Text, out temp))
                             {
                                 returnVal += temp;
                             }   
@@ -615,14 +680,17 @@ namespace OsbleRubric
             return returnVal;
         }
 
-        //Returns the view
+        /// <summary>
+        /// returns the view for a rubric
+        /// </summary>
+        /// <returns></returns>
         public Rubric GetView()
         {
             return thisView;
         }
 
         #region Events
-
+        //event for the delete button(s) in the first column (deletes a row)
         private void DeleteRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (customDataGrid.BaseGrid.RowDefinitions.Count != 3) //won't remove if its the only row
@@ -631,6 +699,8 @@ namespace OsbleRubric
                 updateLastRow();
             }   
         }
+
+        //event for the delete button(s) in the first row (deletes a column)
         private void DeleteCol_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (customDataGrid.BaseGrid.ColumnDefinitions.Count != 5) //won't remove if its the only column
@@ -638,6 +708,8 @@ namespace OsbleRubric
                 customDataGrid.RemoveColumn(getColumn(e));
             }
         }
+
+        //event for button in first row (adds a column)
         private void addCol_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             //removes last two columns (add button column & comment column), creates the new level column, and recreates the addbutton/comment column
@@ -652,6 +724,8 @@ namespace OsbleRubric
             setTabIndex();
             
         }
+
+        //event for button in first column (adds a row)
         private void addRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             //removes the last row (the add button), then adds the new criterion row, then adds the add button row back in
@@ -661,6 +735,70 @@ namespace OsbleRubric
             setTabIndex();
         }
 
+        //This event is fired on any mouse button up, not only after swapIcon_MouseLeftButtonDown. The event will perform a swap if the user pushed and held the mouse button down over a swap icon
+        private void LayoutRoot_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+
+            if (mouseButtonIsDown) //Only attempt to perform a swap if user has the mouse button down
+            {
+                int row = getRow(e);
+                //checks to make sure theyre both valid rows to swap and they are not the same row
+                if ((row != rowToSwap) && (rowToSwap > 0) && (row > 0) && (row < customDataGrid.BaseGrid.RowDefinitions.Count - 1) && (rowToSwap < customDataGrid.BaseGrid.RowDefinitions.Count - 1))
+                {
+                    performSwap(rowToSwap, getRow(e));
+                }
+
+                //removing label from canvas
+                myCanvas.Children.Remove(myDraggingLabel);
+
+                //changing icons back to unclicked
+                changeSwapIcon(mouseDown, swapIconSource, false, row);
+            }
+            mouseButtonIsDown = false;
+        }
+
+        //This event begins the swap
+        private void swapIcon_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+
+            //setting globals for row swapping
+            mouseButtonIsDown = true;
+            rowToSwap = getRow(e);
+
+            //setting up and showing label
+            myDraggingLabel.Text = "Drag onto another row to swap Row: " + getRow(e);
+            myDraggingLabel.Width = Double.NaN;
+            myDraggingLabel.BorderThickness = new Thickness(2);
+            Canvas.SetLeft(myDraggingLabel, e.GetPosition(myCanvas).X + 10);
+            Canvas.SetTop(myDraggingLabel, e.GetPosition(myCanvas).Y - 10);
+            myCanvas.Children.Add(myDraggingLabel);
+
+            changeSwapIcon(swapIconSource, mouseDown, false, rowToSwap);
+
+        }
+
+        //This event updates the label to be moved with the mouse while attempting to perform a swap
+        private void LayoutRoot_MouseMove(object sender, MouseEventArgs e)
+        {
+
+            if (mouseButtonIsDown)
+            {
+                Canvas.SetLeft(myDraggingLabel, e.GetPosition(myCanvas).X + 10);
+                Canvas.SetTop(myDraggingLabel, e.GetPosition(myCanvas).Y - 10);
+            }
+        }
+
+        //this event updates the points by updating the last row each time the textbox loses focus
+        private void textbox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            updateLastRow();
+        }
+
+        //this event updates the points by updating the last row each time the textbox value is changed
+        private void textbox_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            updateLastRow();
+        }
         #endregion Events
     }
 }

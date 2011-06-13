@@ -110,12 +110,18 @@
     <None Include="Properties\AppManifest.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Icons\swap.png" />
+    <Resource Include="Icons\mouseOverSwap.png" />
+    <Resource Include="Icons\mouseOverSwapInvert.PNG" />
+    <Resource Include="Icons\swap3.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\add.png" />
     <Resource Include="Icons\delete.png" />
     <Resource Include="Icons\help.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\downArrow.png" />
+    <Resource Include="Icons\upArrow.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
