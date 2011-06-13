@@ -82,6 +82,8 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RubricCell.cs" />
+    <Compile Include="ICell.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -108,11 +110,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AppManifest.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icons\mouseOverSwap.png" />
-    <Resource Include="Icons\mouseOverSwapInvert.PNG" />
-    <Resource Include="Icons\swap3.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\add.png" />
