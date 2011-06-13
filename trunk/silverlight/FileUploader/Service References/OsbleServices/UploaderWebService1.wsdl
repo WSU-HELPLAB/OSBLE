@@ -38,11 +38,23 @@
   <wsdl:message name="UploaderWebService_GetFileUrl_OutputMessage">
     <wsdl:part name="parameters" element="GetFileUrlResponse" />
   </wsdl:message>
+  <wsdl:message name="UploaderWebService_GetLastModifiedDate_InputMessage">
+    <wsdl:part name="parameters" element="GetLastModifiedDate" />
+  </wsdl:message>
+  <wsdl:message name="UploaderWebService_GetLastModifiedDate_OutputMessage">
+    <wsdl:part name="parameters" element="GetLastModifiedDateResponse" />
+  </wsdl:message>
   <wsdl:message name="UploaderWebService_GetValidUploadLocations_InputMessage">
     <wsdl:part name="parameters" element="GetValidUploadLocations" />
   </wsdl:message>
   <wsdl:message name="UploaderWebService_GetValidUploadLocations_OutputMessage">
     <wsdl:part name="parameters" element="GetValidUploadLocationsResponse" />
+  </wsdl:message>
+  <wsdl:message name="UploaderWebService_IsValidKey_InputMessage">
+    <wsdl:part name="parameters" element="IsValidKey" />
+  </wsdl:message>
+  <wsdl:message name="UploaderWebService_IsValidKey_OutputMessage">
+    <wsdl:part name="parameters" element="IsValidKeyResponse" />
   </wsdl:message>
   <wsdl:message name="UploaderWebService_SyncFile_InputMessage">
     <wsdl:part name="parameters" element="SyncFile" />
@@ -89,9 +101,17 @@
       <wsdl:input wsaw:Action="urn:UploaderWebService/GetFileUrl" message="UploaderWebService_GetFileUrl_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/GetFileUrlResponse" message="UploaderWebService_GetFileUrl_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="GetLastModifiedDate">
+      <wsdl:input wsaw:Action="urn:UploaderWebService/GetLastModifiedDate" message="UploaderWebService_GetLastModifiedDate_InputMessage" />
+      <wsdl:output wsaw:Action="urn:UploaderWebService/GetLastModifiedDateResponse" message="UploaderWebService_GetLastModifiedDate_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="GetValidUploadLocations">
       <wsdl:input wsaw:Action="urn:UploaderWebService/GetValidUploadLocations" message="UploaderWebService_GetValidUploadLocations_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/GetValidUploadLocationsResponse" message="UploaderWebService_GetValidUploadLocations_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="IsValidKey">
+      <wsdl:input wsaw:Action="urn:UploaderWebService/IsValidKey" message="UploaderWebService_IsValidKey_InputMessage" />
+      <wsdl:output wsaw:Action="urn:UploaderWebService/IsValidKeyResponse" message="UploaderWebService_IsValidKey_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="SyncFile">
       <wsdl:input wsaw:Action="urn:UploaderWebService/SyncFile" message="UploaderWebService_SyncFile_InputMessage" />

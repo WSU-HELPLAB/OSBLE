@@ -49,8 +49,26 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="GetLastModifiedDate">
+      <soap:operation soapAction="urn:UploaderWebService/GetLastModifiedDate" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="GetValidUploadLocations">
       <soap:operation soapAction="urn:UploaderWebService/GetValidUploadLocations" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsValidKey">
+      <soap:operation soapAction="urn:UploaderWebService/IsValidKey" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>

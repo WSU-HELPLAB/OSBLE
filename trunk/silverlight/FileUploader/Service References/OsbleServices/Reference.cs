@@ -186,10 +186,20 @@ namespace FileUploader.OsbleServices {
         
         string EndGetFileUrl(System.IAsyncResult result);
         
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/GetLastModifiedDate", ReplyAction="urn:UploaderWebService/GetLastModifiedDateResponse")]
+        System.IAsyncResult BeginGetLastModifiedDate(string fileName, int courseId, string authToken, System.AsyncCallback callback, object asyncState);
+        
+        System.DateTime EndGetLastModifiedDate(System.IAsyncResult result);
+        
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/GetValidUploadLocations", ReplyAction="urn:UploaderWebService/GetValidUploadLocationsResponse")]
         System.IAsyncResult BeginGetValidUploadLocations(string authKey, System.AsyncCallback callback, object asyncState);
         
         System.Collections.Generic.Dictionary<int, string> EndGetValidUploadLocations(System.IAsyncResult result);
+        
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/IsValidKey", ReplyAction="urn:UploaderWebService/IsValidKeyResponse")]
+        System.IAsyncResult BeginIsValidKey(string authKey, System.AsyncCallback callback, object asyncState);
+        
+        bool EndIsValidKey(System.IAsyncResult result);
         
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/SyncFile", ReplyAction="urn:UploaderWebService/SyncFileResponse")]
         System.IAsyncResult BeginSyncFile(string fileName, byte[] data, int courseId, string authToken, System.AsyncCallback callback, object asyncState);
@@ -313,6 +323,25 @@ namespace FileUploader.OsbleServices {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class GetLastModifiedDateCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        public GetLastModifiedDateCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        public System.DateTime Result {
+            get {
+                base.RaiseExceptionIfNecessary();
+                return ((System.DateTime)(this.results[0]));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public partial class GetValidUploadLocationsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
         
         private object[] results;
@@ -326,6 +355,25 @@ namespace FileUploader.OsbleServices {
             get {
                 base.RaiseExceptionIfNecessary();
                 return ((System.Collections.Generic.Dictionary<int, string>)(this.results[0]));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class IsValidKeyCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        public IsValidKeyCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        public bool Result {
+            get {
+                base.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
             }
         }
     }
@@ -421,11 +469,23 @@ namespace FileUploader.OsbleServices {
         
         private System.Threading.SendOrPostCallback onGetFileUrlCompletedDelegate;
         
+        private BeginOperationDelegate onBeginGetLastModifiedDateDelegate;
+        
+        private EndOperationDelegate onEndGetLastModifiedDateDelegate;
+        
+        private System.Threading.SendOrPostCallback onGetLastModifiedDateCompletedDelegate;
+        
         private BeginOperationDelegate onBeginGetValidUploadLocationsDelegate;
         
         private EndOperationDelegate onEndGetValidUploadLocationsDelegate;
         
         private System.Threading.SendOrPostCallback onGetValidUploadLocationsCompletedDelegate;
+        
+        private BeginOperationDelegate onBeginIsValidKeyDelegate;
+        
+        private EndOperationDelegate onEndIsValidKeyDelegate;
+        
+        private System.Threading.SendOrPostCallback onIsValidKeyCompletedDelegate;
         
         private BeginOperationDelegate onBeginSyncFileDelegate;
         
@@ -514,7 +574,11 @@ namespace FileUploader.OsbleServices {
         
         public event System.EventHandler<GetFileUrlCompletedEventArgs> GetFileUrlCompleted;
         
+        public event System.EventHandler<GetLastModifiedDateCompletedEventArgs> GetLastModifiedDateCompleted;
+        
         public event System.EventHandler<GetValidUploadLocationsCompletedEventArgs> GetValidUploadLocationsCompleted;
+        
+        public event System.EventHandler<IsValidKeyCompletedEventArgs> IsValidKeyCompleted;
         
         public event System.EventHandler<SyncFileCompletedEventArgs> SyncFileCompleted;
         
@@ -755,6 +819,56 @@ namespace FileUploader.OsbleServices {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginGetLastModifiedDate(string fileName, int courseId, string authToken, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginGetLastModifiedDate(fileName, courseId, authToken, callback, asyncState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.DateTime FileUploader.OsbleServices.UploaderWebService.EndGetLastModifiedDate(System.IAsyncResult result) {
+            return base.Channel.EndGetLastModifiedDate(result);
+        }
+        
+        private System.IAsyncResult OnBeginGetLastModifiedDate(object[] inValues, System.AsyncCallback callback, object asyncState) {
+            string fileName = ((string)(inValues[0]));
+            int courseId = ((int)(inValues[1]));
+            string authToken = ((string)(inValues[2]));
+            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginGetLastModifiedDate(fileName, courseId, authToken, callback, asyncState);
+        }
+        
+        private object[] OnEndGetLastModifiedDate(System.IAsyncResult result) {
+            System.DateTime retVal = ((FileUploader.OsbleServices.UploaderWebService)(this)).EndGetLastModifiedDate(result);
+            return new object[] {
+                    retVal};
+        }
+        
+        private void OnGetLastModifiedDateCompleted(object state) {
+            if ((this.GetLastModifiedDateCompleted != null)) {
+                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
+                this.GetLastModifiedDateCompleted(this, new GetLastModifiedDateCompletedEventArgs(e.Results, e.Error, e.Cancelled, e.UserState));
+            }
+        }
+        
+        public void GetLastModifiedDateAsync(string fileName, int courseId, string authToken) {
+            this.GetLastModifiedDateAsync(fileName, courseId, authToken, null);
+        }
+        
+        public void GetLastModifiedDateAsync(string fileName, int courseId, string authToken, object userState) {
+            if ((this.onBeginGetLastModifiedDateDelegate == null)) {
+                this.onBeginGetLastModifiedDateDelegate = new BeginOperationDelegate(this.OnBeginGetLastModifiedDate);
+            }
+            if ((this.onEndGetLastModifiedDateDelegate == null)) {
+                this.onEndGetLastModifiedDateDelegate = new EndOperationDelegate(this.OnEndGetLastModifiedDate);
+            }
+            if ((this.onGetLastModifiedDateCompletedDelegate == null)) {
+                this.onGetLastModifiedDateCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnGetLastModifiedDateCompleted);
+            }
+            base.InvokeAsync(this.onBeginGetLastModifiedDateDelegate, new object[] {
+                        fileName,
+                        courseId,
+                        authToken}, this.onEndGetLastModifiedDateDelegate, this.onGetLastModifiedDateCompletedDelegate, userState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginGetValidUploadLocations(string authKey, System.AsyncCallback callback, object asyncState) {
             return base.Channel.BeginGetValidUploadLocations(authKey, callback, asyncState);
         }
@@ -798,6 +912,52 @@ namespace FileUploader.OsbleServices {
             }
             base.InvokeAsync(this.onBeginGetValidUploadLocationsDelegate, new object[] {
                         authKey}, this.onEndGetValidUploadLocationsDelegate, this.onGetValidUploadLocationsCompletedDelegate, userState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginIsValidKey(string authKey, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginIsValidKey(authKey, callback, asyncState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        bool FileUploader.OsbleServices.UploaderWebService.EndIsValidKey(System.IAsyncResult result) {
+            return base.Channel.EndIsValidKey(result);
+        }
+        
+        private System.IAsyncResult OnBeginIsValidKey(object[] inValues, System.AsyncCallback callback, object asyncState) {
+            string authKey = ((string)(inValues[0]));
+            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginIsValidKey(authKey, callback, asyncState);
+        }
+        
+        private object[] OnEndIsValidKey(System.IAsyncResult result) {
+            bool retVal = ((FileUploader.OsbleServices.UploaderWebService)(this)).EndIsValidKey(result);
+            return new object[] {
+                    retVal};
+        }
+        
+        private void OnIsValidKeyCompleted(object state) {
+            if ((this.IsValidKeyCompleted != null)) {
+                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
+                this.IsValidKeyCompleted(this, new IsValidKeyCompletedEventArgs(e.Results, e.Error, e.Cancelled, e.UserState));
+            }
+        }
+        
+        public void IsValidKeyAsync(string authKey) {
+            this.IsValidKeyAsync(authKey, null);
+        }
+        
+        public void IsValidKeyAsync(string authKey, object userState) {
+            if ((this.onBeginIsValidKeyDelegate == null)) {
+                this.onBeginIsValidKeyDelegate = new BeginOperationDelegate(this.OnBeginIsValidKey);
+            }
+            if ((this.onEndIsValidKeyDelegate == null)) {
+                this.onEndIsValidKeyDelegate = new EndOperationDelegate(this.OnEndIsValidKey);
+            }
+            if ((this.onIsValidKeyCompletedDelegate == null)) {
+                this.onIsValidKeyCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnIsValidKeyCompleted);
+            }
+            base.InvokeAsync(this.onBeginIsValidKeyDelegate, new object[] {
+                        authKey}, this.onEndIsValidKeyDelegate, this.onIsValidKeyCompletedDelegate, userState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -1138,6 +1298,21 @@ namespace FileUploader.OsbleServices {
                 return _result;
             }
             
+            public System.IAsyncResult BeginGetLastModifiedDate(string fileName, int courseId, string authToken, System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[3];
+                _args[0] = fileName;
+                _args[1] = courseId;
+                _args[2] = authToken;
+                System.IAsyncResult _result = base.BeginInvoke("GetLastModifiedDate", _args, callback, asyncState);
+                return _result;
+            }
+            
+            public System.DateTime EndGetLastModifiedDate(System.IAsyncResult result) {
+                object[] _args = new object[0];
+                System.DateTime _result = ((System.DateTime)(base.EndInvoke("GetLastModifiedDate", _args, result)));
+                return _result;
+            }
+            
             public System.IAsyncResult BeginGetValidUploadLocations(string authKey, System.AsyncCallback callback, object asyncState) {
                 object[] _args = new object[1];
                 _args[0] = authKey;
@@ -1148,6 +1323,19 @@ namespace FileUploader.OsbleServices {
             public System.Collections.Generic.Dictionary<int, string> EndGetValidUploadLocations(System.IAsyncResult result) {
                 object[] _args = new object[0];
                 System.Collections.Generic.Dictionary<int, string> _result = ((System.Collections.Generic.Dictionary<int, string>)(base.EndInvoke("GetValidUploadLocations", _args, result)));
+                return _result;
+            }
+            
+            public System.IAsyncResult BeginIsValidKey(string authKey, System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[1];
+                _args[0] = authKey;
+                System.IAsyncResult _result = base.BeginInvoke("IsValidKey", _args, callback, asyncState);
+                return _result;
+            }
+            
+            public bool EndIsValidKey(System.IAsyncResult result) {
+                object[] _args = new object[0];
+                bool _result = ((bool)(base.EndInvoke("IsValidKey", _args, result)));
                 return _result;
             }
             
