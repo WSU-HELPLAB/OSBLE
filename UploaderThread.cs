@@ -61,18 +61,49 @@ namespace FileUploader
         }
 
         private bool fileSyncCompleted = false;
+        private bool fileLastModifiedCompleted = false;
+        private DateTime fileLastModified;
 
         public UploaderThread()
         {
             client.PrepCurrentPathCompleted += new EventHandler<PrepCurrentPathCompletedEventArgs>(client_PrepCurrentPathCompleted);
             client.SyncFileCompleted += new EventHandler<SyncFileCompletedEventArgs>(client_SyncFileCompleted);
+            client.GetLastModifiedDateCompleted += new EventHandler<GetLastModifiedDateCompletedEventArgs>(client_GetLastModifiedDateCompleted);
+            client.IsValidKeyCompleted += new EventHandler<IsValidKeyCompletedEventArgs>(client_IsValidKeyCompleted);
         }
 
-        void client_SyncFileCompleted(object sender, SyncFileCompletedEventArgs e)
+        /// <summary>
+        /// Step 0: Start the process
+        /// </summary>
+        protected override void DoTask()
         {
-            fileSyncCompleted = true;
+            NumberOfUploadsCompleted = 0;
+            client.IsValidKeyAsync(AuthToken);
         }
 
+        /// <summary>
+        /// Step 1: Validate key
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void client_IsValidKeyCompleted(object sender, IsValidKeyCompletedEventArgs e)
+        {
+            //if we got a bad auth key, stop
+            if (!e.Result)
+            {
+                OnFailed();
+                return;
+            }
+
+            //give the web service a map of what we're planning to upload
+            client.PrepCurrentPathAsync(Listing, CourseId, AuthToken);
+        }
+
+        /// <summary>
+        /// Step 2: Prep file path
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void client_PrepCurrentPathCompleted(object sender, PrepCurrentPathCompletedEventArgs e)
         {
             //begin directory sync
@@ -80,18 +111,10 @@ namespace FileUploader
 
             //tell everyone that we're done
             OnCompleted();
-        }
-
-        protected override void DoTask()
-        {
-            NumberOfUploadsCompleted = 0;
-
-            //give the web service a map of what we're planning to upload
-            client.PrepCurrentPathAsync(Listing, CourseId, AuthToken);
-        }
+        }        
 
         /// <summary>
-        /// Responsible for the actual uploading of data to the web service
+        /// Step 3: Finally begin uploading files to the web service
         /// </summary>
         /// <param name="listing"></param>
         /// <param name="basePath"></param>
@@ -102,6 +125,7 @@ namespace FileUploader
             {
                 //reset our sync status
                 fileSyncCompleted = false;
+                fileLastModifiedCompleted = false;
 
                 //check for a cancel request
                 if (CancelRequested)
@@ -112,9 +136,29 @@ namespace FileUploader
                 //tell interested parties that we're about to upload
                 FileUploadBegin(this, new FileUploadBegineArgs(fl.AbsolutePath));
 
-                //build the file
+                //build the file name
                 Stream stream = File.OpenRead(fl.AbsolutePath);
                 string fileName = basePath + fl.Name;
+
+                //check to see if the file needs to be updated
+                client.GetLastModifiedDateAsync(fileName, CourseId, AuthToken);
+                
+                //wait for the call to complete
+                while (!fileLastModifiedCompleted)
+                {
+                    Thread.Sleep(33);
+                }
+
+                //only send if newer
+                if (fl.LastModified < fileLastModified)
+                {
+                    //update our status
+                    NumberOfUploadsCompleted++;
+                    continue;
+                }
+
+
+                //read into memory, prepare for sending
                 byte[] data = new byte[stream.Length];
                 stream.Read(data, 0, (int)stream.Length);
 
@@ -127,7 +171,7 @@ namespace FileUploader
                 //wait for the call to complete
                 while (!fileSyncCompleted)
                 {
-                    Thread.Sleep(100);
+                    Thread.Sleep(33);
                 }
 
                 //update our status
@@ -167,6 +211,17 @@ namespace FileUploader
                 // do nothing
             }
             return count;
+        }
+
+        void client_GetLastModifiedDateCompleted(object sender, GetLastModifiedDateCompletedEventArgs e)
+        {
+            fileLastModifiedCompleted = true;
+            fileLastModified = e.Result;
+        }
+
+        void client_SyncFileCompleted(object sender, SyncFileCompletedEventArgs e)
+        {
+            fileSyncCompleted = true;
         }
     }
 

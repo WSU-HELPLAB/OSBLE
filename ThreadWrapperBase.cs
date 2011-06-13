@@ -14,7 +14,7 @@ namespace FileUploader
 {
     public enum StatusState
     {
-        Unstarted, InProgress, Completed, Cancelled
+        Unstarted, InProgress, Completed, Cancelled, Failed
     }
 
     public abstract class ThreadWrapperBase
@@ -77,6 +77,16 @@ namespace FileUploader
         {
             if (Cancelled != null)
                 Cancelled(this, EventArgs.Empty);
+        }
+
+        public event EventHandler Failed = delegate { };
+        protected void OnFailed()
+        {
+            if (Failed != null)
+            {
+                status = StatusState.Failed;
+                Failed(this, EventArgs.Empty);
+            }
         }
 
         // Flag that indicates a stop is requested.
