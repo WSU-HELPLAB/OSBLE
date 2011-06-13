@@ -578,6 +578,7 @@
     <Content Include="Views\Account\ResetPasswordSuccess.cshtml" />
     <Content Include="Views\Account\ResetPasswordFailure.cshtml" />
     <Content Include="Views\Notification\Index.cshtml" />
+    <Content Include="Views\Home\ViewThread.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />
