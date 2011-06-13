@@ -17,7 +17,7 @@ namespace OSBLE.Controllers
     [NotForCommunity]
     public class GradebookController : OSBLEController
     {
-        public enum ColumnAction { AddPoints, InsertLeft, InsertRight, Delete, Clear, NoAction };
+        public enum ColumnAction { InsertLeft, InsertRight, Delete, Clear, NoAction };
 
         //
         // GET: /Gradebook/
@@ -294,10 +294,7 @@ namespace OSBLE.Controllers
             {
                 return ColumnAction.Delete;
             }
-            else if (string.Compare(ColumnAction.AddPoints.ToString(), action) == 0)
-            {
-                return ColumnAction.AddPoints;
-            }
+            
             return ColumnAction.NoAction;
         }
 
@@ -426,9 +423,28 @@ namespace OSBLE.Controllers
 
 
         [HttpPost]
-        public void AddPoints(double assignmentId)
+        public ActionResult AddPoints(int assignmentId, double number)
         {
-            
+            if (ModelState.IsValid)
+            {
+                if (assignmentId > 0)
+                {
+                    List<Score> grades = (from grade in db.Scores
+                                          where grade.AssignmentActivity.AbstractAssignmentID == assignmentId
+                                          select grade).ToList();
+
+                    if (grades.Count() > 0)
+                    {
+                        foreach (Score item in grades)
+                        {
+                            item.Points += number;
+                        }
+                        db.SaveChanges();
+                    }
+                }
+            }
+            BuildGradebook((int)Session["categoryId"]);
+            return View("_Gradebook");
         }
         
 
@@ -501,9 +517,6 @@ namespace OSBLE.Controllers
                         break;
                     case ColumnAction.Clear:
                         ClearColumn(assignmentId);
-                        break;
-                    case ColumnAction.AddPoints:
-                        AddPoints(assignmentId);
                         break;
                         
                 }

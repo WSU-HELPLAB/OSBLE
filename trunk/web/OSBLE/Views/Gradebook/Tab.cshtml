@@ -80,6 +80,27 @@
     	width: 50px;
     }
     
+    
+    .addPoints
+    {
+        width: auto;
+        height: auto;
+        background-color: white;
+        top: 33px;
+        left: 400px;
+    }
+    
+    .addPointsTable 
+    {
+    	border: 1px solid gray;
+    	color: black;
+    }
+    
+    .addPointsTable input
+    {
+    	width: 50px;
+    }
+    
     .dropdown
     {
         float: right;
@@ -150,13 +171,13 @@
         data-ajax-success="" data-ajax-update="#grades">
         <input id="actionRequested" name="actionRequested" type="hidden" value="null" />
         <input id="assignmentId" name="assignmentId" type="hidden" value="null" />
-        <table class="menu" id="menuID">
-            <!--<tr>
+        <table class="menu" id="menuID" onclick="setButtonId(this);">
+            <tr>
                 <td>
-                    <a href="#" onclick="setGradableAction('GradebookController.ColumnAction.AddPoints.ToString()'); $('#columnOptionsForm').submit();">
+                    <a href="#" onclick="displayAddPoints(this);">
                         Add points</a>
                 </td>
-            </tr>-->
+            </tr>
             <tr>
                 <td>
                     <a href="#" onclick="setGradableAction('@GradebookController.ColumnAction.InsertLeft.ToString()'); $('#columnOptionsForm').submit();">
@@ -203,6 +224,24 @@
     </form>
 </div>
 
+<div class="addPoints" id="addPointsID" style="display: none; position: absolute;">
+	<form id="addPointsSubmit" onsubmit="addPoints(this); return false;"  >
+        <table class="addPointsTable">
+		    <tr>
+		        <th align="center" colspan="3">CUSTOMIZE</th>
+		    </tr>
+		    <tr>
+			    <td>Add </td>
+			    <td><input id="XtoAdd"/></td>
+		        <td>points to each score</td>
+		    </tr>
+		    <tr>
+		        <td align="right" colspan="3"><input id="addPointsSubmit" type="submit" value="Apply"/></td>
+	        </tr>
+	    </table>
+    </form>
+</div>
+
         <script type="text/javascript">
             function setGradableAction(actionName) {
                 $('#actionRequested').val(actionName);
@@ -238,7 +277,8 @@
     //Keeps track of the total number of weights
     var tabCount = 1;
 
-    //We need to keep track of how many to drop
+    //Keeps track of the number for addPoints
+    var points = null;
     
 
 
@@ -306,6 +346,13 @@
 
     function displayCustomizeGrades() {
         $("#customizeID").animate({ "height": "show" }, { duration: 300 });
+    }
+
+    function displayAddPoints(button) {
+        $("#addPointsID").animate({ "height": "show" }, { duration: 300 });
+    }
+
+    function setButtonId(button) {
     }
 
     function clearLastHeaderFocus(id) {
@@ -541,7 +588,8 @@
     }
 
     function ShowHide(buttonClick) {
-
+        points = buttonClick
+        alert($(points).attr("id"));
         //if you click a button in the header from a header already chosen
         if (header == true) {
             clearLastHeaderFocus(lastId);
@@ -782,45 +830,6 @@
         $("#customizeID").animate({ "height": "hide" }, { duration: 300 });
     }
 
-    function dropAllLowest2() {
-
-        //get the pathname so we can use the categoryId
-        var pathname = window.location.toString();
-
-        //split the pathname at the "="
-        //catId[1] = categoryId
-        var catId = pathname.split("=");
-
-        alert($("#XtoDrop").data("num"));
-
-        if (catId[1] != null) {
-            var i = 0;
-
-            $.ajax({
-                async: false,
-                type: "POST",
-                url: "/Gradebook/ClearAllDropLowest",
-                data: { categoryId: catId[1] }
-            });
-
-            for (i = 0; i < $("#XtoDrop").data("num"); i++) {
-                //ajax call to drop the lowest score
-                $.ajax({
-                    async: false,
-                    type: "POST",
-                    url: "/Gradebook/AllDropLowest",
-                    data: { categoryId: catId[1] }
-                });
-            }
-        }
-        if ($("#XtoDrop").val() == 0) {
-            $("#totalCustomize").text("Total [Customize...]");
-        }
-        else {
-            $("#totalCustomize").text("Total [Dropped " + $("#XtoDrop").val() + "]");
-        }
-    }
-
     function clearDropLowest(id) {
 
         //get the pathname so we can use the categoryId
@@ -885,6 +894,17 @@
             });
 
         }
+    }
+
+    function addPoints() {
+        var num = $("#XtoAdd").val();
+        var id = $(points).attr("id");
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/AddPoints",
+            data: { assignmentId: id, number: num }
+        });
+        $("#addPointsID").animate({ "height": "hide" }, { duration: 300 });
     }
 
 </script>
