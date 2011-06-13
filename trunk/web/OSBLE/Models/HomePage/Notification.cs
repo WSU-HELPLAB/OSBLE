@@ -49,6 +49,7 @@ namespace OSBLE.Models.HomePage
         {
             public const string Mail = "Mail";
             public const string EventApproval = "EventApproval";
+            public const string Dashboard = "Dashboard";
         }
     }
 }

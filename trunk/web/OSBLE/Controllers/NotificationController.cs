@@ -84,6 +84,25 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
+        /// Posts a notification when others have participated in a dashboard thread which you have participated in
+        /// </summary>
+        /// <param name="dp">The parent dashboard post</param>
+        /// <param name="poster">The user profile of the user who posted the reply</param>
+        [NonAction]
+        public void SendDashboardNotification(DashboardPost dp, UserProfile poster)
+        {
+            List<int> sendToUsers = new List<int>();
+
+/*            Notification n = new Notification();
+            n.ItemType = Notification.Types.Dashboard;
+            n.ItemID = mail.ID;
+            n.RecipientID = mail.ToUserProfileID;
+            n.SenderID = mail.FromUserProfileID;
+
+            addNotification(n);*/
+        }
+
+        /// <summary>
         /// Creates and posts a new request for approval on an event posting and sends to all instructors in a course
         /// </summary>
         /// <param name="e">The event that requires approval</param>
