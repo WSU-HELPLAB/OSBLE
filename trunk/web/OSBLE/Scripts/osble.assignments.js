@@ -40,10 +40,10 @@ function addNewDeliverable(d) {
         return false;
     }
 
-    var validFileRegex = /^[a-z0-9\_\-]*$/i;
+    var validFileRegex = /^[a-z0-9\_\.\-]*$/i;
 
     if (!(validFileRegex.test(d.name))) {
-        alert("File names can only contain alphanumerics, '-', and '_'.");
+        alert("File names can only contain alphanumerics, '-', '_', and '.'");
         return false;
     }
 
@@ -81,12 +81,12 @@ function addNewDeliverable(d) {
 
 
     newDeliverable.append('<table><tr>');
-    newDeliverable.append('<td>File Name</td><td><input type="text" class="deliverable_name" value="' + d.name + '" /></td>');
+    newDeliverable.append('<td>File Name:</td><td>' + d.name + '</td>');
     newDeliverable.append('</tr><tr>');
-    newDeliverable.append('<td>Type</td><td>' + typeName + '</td>');
+    newDeliverable.append('<td>Type:</td><td>' + typeName + '</td>');
     newDeliverable.append('</tr></table>');
 
-
+    newDeliverable.append('<input type="hidden" class="deliverable_name" value="' + d.name + '" />');
     newDeliverable.append('<input type="hidden" class="deliverable_type" value="' + typeVal + '" />');
 
 
@@ -107,8 +107,8 @@ function removeSelectedDeliverable() {
 function setDeliverableIndex() {
     var i=0;
     $('#deliverable_data').children().each(function () {
-        $(this).children('.deliverable_name').first().attr('name','Assignment.Deliverables[' + i.toString() + '].Name');
-        $(this).children('.deliverable_type').first().attr('name', 'Assignment.Deliverables[' + i.toString() + '].Type');
+        $(this).find('.deliverable_name').first().attr('name','Assignment.Deliverables[' + i.toString() + '].Name');
+        $(this).find('.deliverable_type').first().attr('name', 'Assignment.Deliverables[' + i.toString() + '].Type');
 
         i++;
     });

@@ -10,8 +10,13 @@
 
 @Html.ValidationSummary(true, "Login was unsuccessful. Please correct the errors and try again.")
 
+<div>Online Studio Based Learning Environment</div>
+
 @using (Html.BeginForm()) {
     <div>
+    <table>
+        <tr>
+            <td>
             <div class="editor-label">
                 @Html.LabelFor(m => m.UserName)
             </div>
@@ -19,7 +24,8 @@
                 @Html.TextBoxFor(m => m.UserName, new { tabindex = "1" })<br />
                 @Html.ValidationMessageFor(m => m.UserName)
             </div>
-
+            </td>
+            <td>
             <div class="editor-label">
                 @Html.LabelFor(m => m.Password)
             </div>
@@ -27,7 +33,12 @@
                 @Html.PasswordFor(m => m.Password, new { tabindex = "2" })<br />
                 @Html.ValidationMessageFor(m => m.Password)
             </div>
-
+            </td>
+            <td>
+            
+            </td>
+        </tr>
+    </table>
             <div class="editor-label">
                 @Html.CheckBoxFor(m => m.RememberMe, new { tabindex = "3" })
                 @Html.LabelFor(m => m.RememberMe)
@@ -54,10 +65,45 @@
     </p>
     <p>
         <!--Need help? <a href="#" tabindex="5">Click Here</a>.-->
-        Need help? @Html.ActionLink("Click Here", "ContactUs").
+        @Html.ActionLink("Contact Us/Support", "ContactUs") &mdash; 
+        <a href="http://helplab.org/projects/osble" >About OSBLE</a> &mdash; 
+        <a href="#" id="privacy_click">Privacy Notice</a>
+
+        <script type="text/javascript">
+            $(function () {
+
+                $('#privacy_notice').dialog(
+                {
+                    autoOpen: false,
+                    modal: true,
+                    width: 550,
+                    height: 550,
+                    resizable: true,
+                    title: "OSBLE Privacy Policy"
+                }
+                );
+
+                $('#privacy_click').click(function () {
+                    $('#privacy_notice').dialog('open');
+                    return false;
+                });
+
+            });
+        </script>
     </p>
-    <p>
-        <!--Need help? <a href="#" tabindex="5">Click Here</a>.-->
-        <a href="http://helplab.org/projects/osble" >About OSBLE</a>
-    </p>
+    <table class="helplab_display">
+    <tr>
+    <td>
+        <a href="http://www.helplab.org/"><img src="@Url.Content("~/Content/images/helplab_logo.png")" alt="HELPLab Logo" /></a>
+    </td>
+    <td>
+        Developed by the <a href="http://www.helplab.org/">HELP Lab</a><br />
+        At <a href="http://www.wsu.edu/">Washington State University</a>
+    </td>
+    </tr>
+    </table>
 }
+
+    <div id="privacy_notice">
+        @Html.Partial("Privacy")
+    </div>

@@ -222,7 +222,7 @@
     StopActivity stop = Model.Stop;
 
 
-    @Html.ValidationSummary(true, "The due date must come after the release date")
+    @Html.ValidationSummary()
     using (Html.BeginForm())
     {
         Html.ValidationSummary(true);

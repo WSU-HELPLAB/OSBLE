@@ -83,17 +83,8 @@ namespace OSBLE.Controllers
             viewModel.Submission.PercentPenalty = active.PercentPenalty;
             viewModel.Submission.MinutesLateWithNoPenalty = active.MinutesLateWithNoPenalty;
 
-            viewModel.TeamCreation = new SilverlightObject
-            {
-                CSSId = "team_creation_silverlight",
-                XapName = "TeamCreation",
-                Width = "850",
-                Height = "610",
-                OnLoaded = "SLObjectLoaded",
-                Parameters = new Dictionary<string, string>()
-                {
-                }
-            };
+            viewModel.TeamCreation = getTeamCreationSilverlightObject();
+  
 
             List<SerializableTeamMembers> teamMembmers = new List<SerializableTeamMembers>();
 
@@ -163,8 +154,11 @@ namespace OSBLE.Controllers
                 basic.Assignment.AssignmentActivities.Add(stop);
 
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Index","Assignment");
             }
+
+            basic.TeamCreation = getTeamCreationSilverlightObject();
+
 
             ViewBag.Categories = new SelectList(db.Categories, "ID", "Name", basic.Assignment.CategoryID);
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
@@ -172,6 +166,20 @@ namespace OSBLE.Controllers
             return View(basic);
         }
 
+        private SilverlightObject getTeamCreationSilverlightObject() {
+            return new SilverlightObject
+            {
+                CSSId = "team_creation_silverlight",
+                XapName = "TeamCreation",
+                Width = "850",
+                Height = "610",
+                OnLoaded = "SLObjectLoaded",
+                Parameters = new Dictionary<string, string>()
+                {
+                }
+            };
+
+        }
         //
         // GET: /Assignment/Edit/5
 

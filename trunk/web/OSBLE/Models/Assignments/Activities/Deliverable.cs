@@ -63,11 +63,13 @@ namespace OSBLE.Models.Assignments.Activities
 
         [Required]
         [Display(Name = "File Name")]
-        [RegularExpression(@"^[a-zA-Z0-9_\-]*$",
-            ErrorMessage="File names can only contain alphanumerics, '-', and '_'")]
+        [RegularExpression(@"^[a-zA-Z0-9\._\-]*$",
+            ErrorMessage="File names can only contain alphanumerics, '-', '_', and '.'")]
         public string Name { get; set; }
 
-        [Required]
+        //TODO: Make required later.
+        //[Required]
+        [Display(Name = "Comment Categories")]
         public string CommentCategories { get; set; }
     }
 }

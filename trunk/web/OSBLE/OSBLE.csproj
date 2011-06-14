@@ -237,6 +237,7 @@
     <Content Include="ClientBin\StudioTimelineCreation.xap" />
     <Content Include="ClientBin\TeamCreation.xap" />
     <Content Include="Content\favicon.ico" />
+    <Content Include="Content\images\helplab_logo.png" />
     <Content Include="Content\images\tooltip\109_AllAnnotations_Help_16x16_72.png" />
     <Content Include="Content\images\account.png" />
     <Content Include="Content\images\add_up.png" />
@@ -595,6 +596,7 @@
     <Content Include="Views\Notification\Index.cshtml" />
     <Content Include="Views\Home\ViewThread.cshtml" />
     <Content Include="Views\Assignment\Index.cshtml" />
+    <Content Include="Views\Account\Privacy.cshtml" />
     <Content Include="Views\PeerReview\Create.cshtml" />
     <Content Include="Views\IssueVoting\Create.cshtml" />
     <Content Include="Views\AuthorRebuttal\Create.cshtml" />

@@ -1159,3 +1159,24 @@ ul.selector
     margin-bottom: 1.25em;
     margin-left: 90px;   
 }
+
+.helplab_display td
+{
+    text-align: left;
+}
+
+#privacy_notice 
+{
+    color: #111;
+}
+
+#privacy_notice h1, 
+#privacy_notice h2, 
+#privacy_notice h3, 
+#privacy_notice h4, 
+#privacy_notice h5, 
+#privacy_notice h6,
+#privacy_notice a
+{
+    color: #074974;
+}
