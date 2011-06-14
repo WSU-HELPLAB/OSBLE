@@ -1193,3 +1193,11 @@ ul.selector
 {
     text-decoration: none;
 }
+
+.assignment_title
+{
+    color: #074974;
+    font-weight: bold;
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+}

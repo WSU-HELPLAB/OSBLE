@@ -7,7 +7,26 @@
 {
     <div class="assignment_header"><a href="#">@sa.Name</a></div>
     <div>
-        <div class="assignment_description">@sa.Description</div>
+        <div class="assignment_title">Description</div>
+        <div class="assignment_description">@Helpers.Linkify(sa.Description)</div>
+
+        @if (sa.Deliverables.Count > 0)
+        {
+            
+        <div class="assignment_title">Deliverables</div>
+            
+        }
+
+        @if(sa.PointsPossible > 0) {
+
+        <div class="assignment_title">Grading</div>
+
+        <div class="assignment_grading">
+            <text>Worth @sa.PointsPossible points in <em>@sa.Category.Name</em> category</text>
+        </div>          
+
+        }
+
     </div>
 }
 </div>
