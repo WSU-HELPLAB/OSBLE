@@ -47,7 +47,6 @@
         </ObjectGroup>
       </Objects>
     </PublishDatabaseSettings>
-    
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -600,6 +599,7 @@
     <Content Include="Views\PeerReview\Create.cshtml" />
     <Content Include="Views\IssueVoting\Create.cshtml" />
     <Content Include="Views\AuthorRebuttal\Create.cshtml" />
+    <Content Include="Views\Assignment\_AssignmentList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

@@ -1,0 +1,14 @@
+﻿@using OSBLE.Models.Assignments
+
+@model List<StudioAssignment>
+
+<div class="assignment_accordion">
+@foreach (StudioAssignment sa in Model)
+{
+    <div class="assignment_header"><a href="#">@sa.Name</a></div>
+    <div>
+    
+        <div class="assignment_description">@sa.Description</div>
+    </div>
+}
+</div>

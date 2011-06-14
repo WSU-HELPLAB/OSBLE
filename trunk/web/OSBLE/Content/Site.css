@@ -1188,3 +1188,8 @@ ul.selector
 {
     text-align: center;   
 }
+
+.add_link
+{
+    text-decoration: none;
+}

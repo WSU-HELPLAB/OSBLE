@@ -7,36 +7,72 @@
 
 <script src="@Url.Content("~/Scripts/osble.assignment_list.js")" type="text/javascript"></script>
 
+<h2>Assignments</h2>
 
-<p>Past Assignments</p>
+@if (ViewBag.ActiveCourse.CourseRole.CanModify) {
 
-<div class="assignment_accordion">
-    <div class="assignment_header"><a href="#">hello</a></div>
-    <div>content</div>
-    <div class="assignment_header"><a href="#">hello</a></div>
-    <div>content 2</div>
-    <div class="assignment_header"><a href="#">hello</a></div>
-    <div>content 3</div>
-</div>
+    <a href="#" class="add_link" id="assignment_create_button">@Helpers.AddButton() Create New Assignment</a>
+        <script type="text/javascript">
+            $(function () {
+                $('#assignment_create_dialog').dialog({
+                    modal: true,
+                    autoOpen: false,
+                    resizable: false,
+                    width: 350,
+                    height: 200,
+                    closeOnEscape: false
+                });
 
-<p>Present Assignments</p>
+                $('#assignment_create_button').click(function () { $('#assignment_create_dialog').dialog('open'); });
+            });
+    </script>
+        
+    <div id="assignment_create_dialog" title="Create New Assignment">
+        <p>Select an assignment type to create:</p>
+        <p>@Html.ActionLink("Basic Assignment","Create","BasicAssignment")</p>
+    </div>
+}
 
-<div class="assignment_accordion">
-    <div class="assignment_header"><a href="#">hello</a></div>
-    <div>content</div>
-    <div class="assignment_header"><a href="#">hello</a></div>
-    <div>content 2</div>
-    <div class="assignment_header"><a href="#">hello</a></div>
-    <div>content 3</div>
-</div>
+@if (ViewBag.PastAssignments.Count == 0 &&
+     ViewBag.PresentAssignments.Count == 0 &&
+     ViewBag.FutureAssignments.Count == 0)
+{ 
+    <p>No Active Assignments</p>
+}
 
-<p>Future Assignments</p>
+@if (ViewBag.PastAssignments.Count > 0)
+{
+    
+<p>Past Assignments (@ViewBag.PastAssignments.Count)</p>
 
-<div class="assignment_accordion">
-    <div class="assignment_header"><a href="#">hello</a></div>
-    <div>content</div>
-    <div class="assignment_header"><a href="#">hello</a></div>
-    <div>content 2</div>
-    <div class="assignment_header"><a href="#">hello</a></div>
-    <div>content 3</div>
-</div>
+@Html.Partial("_AssignmentList",ViewBag.PastAssignments as List<StudioAssignment>)
+    
+}
+
+@if (ViewBag.PresentAssignments.Count > 0)
+{
+
+<p>Present Assignments (@ViewBag.PresentAssignments.Count)</p>
+
+@Html.Partial("_AssignmentList", ViewBag.PresentAssignments as List<StudioAssignment>)
+    
+}
+
+@if (ViewBag.FutureAssignments.Count > 0)
+{
+    
+<p>Future Assignments (@ViewBag.FutureAssignments.Count)</p>
+
+@Html.Partial("_AssignmentList", ViewBag.FutureAssignments as List<StudioAssignment>)
+    
+}
+
+
+@if (ViewBag.DraftAssignments.Count > 0)
+{
+
+<p>Draft Assignments (@ViewBag.DraftAssignments.Count)</p>    
+    
+@Html.Partial("_AssignmentList", ViewBag.DraftAssignments as List<StudioAssignment>)
+    
+}
