@@ -1,7 +1,7 @@
 ﻿var meetingTemplate= '\
         <div class="meeting_time" id="meeting_time_${count}">\
             <div class="meeting_time_tools">\
-                <a href="#" onclick="$(this).parent().parent().hide(\'highlight\',function(){$(this).remove()}); return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a>\
+                <a href="#" title="Delete This Meeting Time" onclick="$(this).parent().parent().hide(\'highlight\',function(){$(this).remove()}); return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a>\
             </div>\
             <table>\
             <tr>\
@@ -79,7 +79,7 @@
 var breakTemplate = '\
         <div class="break" id="break_${count}">\
             <div class="break_tools">\
-                <a href="#" onclick="$(this).parent().parent().hide(\'highlight\',function(){$(this).remove()}); return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a>\
+                <a href="#" title="Delete This Break Time" onclick="$(this).parent().parent().hide(\'highlight\',function(){$(this).remove()}); return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a>\
             </div>\
             <table>\
             <tr>\

@@ -77,7 +77,7 @@ function addNewDeliverable(d) {
     var typeVal = $('#new_deliverable_type').children('option').eq(d.fileType).val();
     var typeName = $('#new_deliverable_type').children('option').eq(d.fileType).html();
 
-    newDeliverable.append('<div class="deliverable_tools"><a href="#" onclick="$(this).parent().parent().hide(\'highlight\',function(){$(this).remove()}); setDeliverableIndex(); return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');
+    newDeliverable.append('<div class="deliverable_tools"><a href="#" title="Delete This Deliverable" onclick="$(this).parent().parent().hide(\'highlight\',function(){$(this).remove()}); setDeliverableIndex(); return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');
 
 
     newDeliverable.append('<table><tr>');

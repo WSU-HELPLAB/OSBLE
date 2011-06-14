@@ -70,7 +70,7 @@ else
 }
     @if (ViewBag.CurrentUser.CanCreateCourses)
     {
-    <a href="#" onclick="$('#course_create_dialog').dialog('open'); return false;" id="course_create_button">@Helpers.AddButton()</a>
+    <a href="#" onclick="$('#course_create_dialog').dialog('open'); return false;" title="Create Course or Community" id="course_create_button">@Helpers.AddButton()</a>
         
     <script type="text/javascript">
         $(function () {

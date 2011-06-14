@@ -90,11 +90,11 @@ else
                         {
                             <div class="user_controls">
                             @if(user.UserName != null) {
-                            <a href="@Url.Action("Create", "Mail", new { recipientID = user.ID })">@Helpers.MailButton()</a>
+                            <a title="Mail This User" href="@Url.Action("Create", "Mail", new { recipientID = user.ID })">@Helpers.MailButton()</a>
                             }
                             
                             @if(ViewBag.ActiveCourse.CourseRole.CanModify) {
-                            <a href="@Url.Action("Edit", "Roster", new { userProfileID = user.ID })">@Helpers.EditButton()</a>
+                            <a title="Modify This User" href="@Url.Action("Edit", "Roster", new { userProfileID = user.ID })">@Helpers.EditButton()</a>
 
                             <form action="@Url.Action("Delete")"
                                 style="display: inline;"
@@ -110,7 +110,7 @@ else
                                 data-ajax-confirm="Are you sure you want to remove this user from the course?"
                                 method="post">
                                 <input type="hidden" name="userProfileID" value="@user.ID" />
-                                @Helpers.DeleteSubmit()
+                                @Helpers.DeleteSubmit("Remove This User")
                             </form>
                                 }
                             

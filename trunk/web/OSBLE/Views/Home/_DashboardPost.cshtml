@@ -55,7 +55,7 @@
                 <span class="dp_tools">
                 @if (Model.CanMail)
                 {
-                    <a href="@Url.Action("Create", "Mail", new { recipientID = Model.UserProfileID })">@Helpers.MailButton()</a>
+                    <a title="Mail This User" href="@Url.Action("Create", "Mail", new { recipientID = Model.UserProfileID })">@Helpers.MailButton()</a>
                 }
                 @if (Model.CanDelete)
                 {
@@ -79,7 +79,7 @@
                         data-ajax-confirm="@deleteConfirm"
                         method="post">
                         <input type="hidden" name="ID" value="@Model.ID" />
-                        @Helpers.DeleteSubmit()
+                        @Helpers.DeleteSubmit("Delete This Dashboard Post")
                     </form>
                 }
                 </span>
