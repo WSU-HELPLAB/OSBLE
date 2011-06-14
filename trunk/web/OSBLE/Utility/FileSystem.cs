@@ -278,7 +278,7 @@ namespace OSBLE
                 {
                     ordering.Add(pieces[0], Convert.ToInt32(pieces[1]));
                 }
-                catch (Exception ex)
+                catch
                 {
                     //lazy exception handling.
                 }

@@ -31,6 +31,18 @@ namespace TeamCreation
             }
         }
 
+        public string InTeamName
+        {
+            get
+            {
+                return serializableMember.InTeamName;
+            }
+            set
+            {
+                serializableMember.InTeamName = value;
+            }
+        }
+
         public Member(SerializableTeamMembers serializableMember)
         {
             // Required to initialize variables

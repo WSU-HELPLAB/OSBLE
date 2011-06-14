@@ -24,6 +24,10 @@ namespace TeamCreation
                 SerializedTeamMembersJSON = Uri.UnescapeDataString(e.InitParams["teamMembers"]);
             }
 
+            ////////Test data////////
+            //SerializedTeamMembersJSON = Uri.UnescapeDataString("%5B%7B%22UserID%22%3A0%2C%22TeamID%22%3A0%2C%22Name%22%3A%22Stu%20Dent%22%2C%22Section%22%3A1%2C%22IsModerator%22%3Afalse%2C%22Subbmitted%22%3Atrue%2C%22InTeamID%22%3A0%2C%22InTeamName%22%3Anull%7D%2C%7B%22UserID%22%3A0%2C%22TeamID%22%3A0%2C%22Name%22%3A%22John%20Morgan%22%2C%22Section%22%3A0%2C%22IsModerator%22%3Afalse%2C%22Subbmitted%22%3Afalse%2C%22InTeamID%22%3A0%2C%22InTeamName%22%3Anull%7D%2C%7B%22UserID%22%3A0%2C%22TeamID%22%3A0%2C%22Name%22%3A%22Carol%20Jackson%22%2C%22Section%22%3A0%2C%22IsModerator%22%3Afalse%2C%22Subbmitted%22%3Atrue%2C%22InTeamID%22%3A0%2C%22InTeamName%22%3Anull%7D%2C%7B%22UserID%22%3A0%2C%22TeamID%22%3A0%2C%22Name%22%3A%22Donald%20Robinson%22%2C%22Section%22%3A0%2C%22IsModerator%22%3Afalse%2C%22Subbmitted%22%3Afalse%2C%22InTeamID%22%3A0%2C%22InTeamName%22%3Anull%7D%2C%7B%22UserID%22%3A0%2C%22TeamID%22%3A0%2C%22Name%22%3A%22Donald%20White%22%2C%22Section%22%3A0%2C%22IsModerator%22%3Afalse%2C%22Subbmitted%22%3Atrue%2C%22InTeamID%22%3A0%2C%22InTeamName%22%3Anull%7D%2C%7B%22UserID%22%3A0%2C%22TeamID%22%3A0%2C%22Name%22%3A%22Robert%20Wright%22%2C%22Section%22%3A0%2C%22IsModerator%22%3Afalse%2C%22Subbmitted%22%3Afalse%2C%22InTeamID%22%3A0%2C%22InTeamName%22%3Anull%7D%2C%7B%22UserID%22%3A0%2C%22TeamID%22%3A0%2C%22Name%22%3A%22Betty%20Rogers%22%2C%22Section%22%3A0%2C%22IsModerator%22%3Afalse%2C%22Subbmitted%22%3Atrue%2C%22InTeamID%22%3A0%2C%22InTeamName%22%3Anull%7D%2C%7B%22UserID%22%3A0%2C%22TeamID%22%3A0%2C%22Name%22%3A%22Jason%20Robinson%22%2C%22Section%22%3A0%2C%22IsModerator%22%3Afalse%2C%22Subbmitted%22%3Afalse%2C%22InTeamID%22%3A0%2C%22InTeamName%22%3Anull%7D%5D");
+            ////////////////////////
+
             MainPage mp = new MainPage(SerializedTeamMembersJSON);
             this.RootVisual = mp;
 

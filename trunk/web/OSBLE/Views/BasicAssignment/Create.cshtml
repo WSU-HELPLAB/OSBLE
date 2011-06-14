@@ -179,7 +179,7 @@
         $('#SubmissionName').val($('#StudioAssignment_Name').val() + ' Submission');
     }
 
-    function OpenSL() {
+    function OpenTeamGeneration() {
         $('#team_generation_dialog').dialog('open'); return false;
     }
 
@@ -187,31 +187,35 @@
         if ($("input[name='team_or_people']:checked").val() == 'Teams') {
             var teams = parseInt($('#total_teams').val());
             if (isNaN(teams) || teams == 0) {
-                alert('der specify number of total teams');
+                alert('Specify number of total teams, must be a number');
             }
             else {
-                OpenSL();
+                OpenTeamGeneration();
             }
         }
         else {
             var teams = parseInt($('#people_per_team').val());
             if (isNaN(teams) || teams == 0) {
-                alert('der specify number of people per team');
+                alert('Specify number of people per team, must be a number');
             }
             else {
-                OpenSL();
+                OpenTeamGeneration();
             }
         }
     }
 
-    function SLReady() {
+    function CloseTeamGenerationWindow() {
+        $('#team_generation_dialog').dialog('close'); return false;
+    }
+
+    function TeamGenerationReady() {
 
         if ($("input[name='team_generation_options']:checked").val() == 'RandomTeams') {
-            if ($("input[name='#team_or_people']:checked").val() == 'Teams') {
+            if ($("input[name='team_or_people']:checked").val() == 'Teams') {
                 document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfTeams(parseInt($('#total_teams').val()));
             }
             else {
-                document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfPeople(parseInt($('#people_per_team').val()));
+               document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfPeople(parseInt($('#people_per_team').val()));
             }
         }
     }
@@ -285,14 +289,14 @@
                 <li>
                     <input type="radio" name="team_or_people" value="Teams" />
                     Specify the number of total teams
-                    <input type="text" id="total_teams" />
+                    <input type="text" id="total_teams" size="3"/>
 
                 </li>
                 <br />
                 <li>
                     <input type="radio" name="team_or_people" value="People"/>
                     Specify the number of people per team 
-                    <input type="text" id="people_per_team"/>
+                    <input type="text" id="people_per_team" size="3"/>
                 </li>
                 <br />
                 <li>
@@ -431,7 +435,7 @@
     
     }
     <div>
-        @Html.ActionLink("Back to List", "Index")
+        @Html.ActionLink("Back to List", "Index", "Home")
     </div>
 }
     <div id="team_generation_dialog" title="Edit Teams">

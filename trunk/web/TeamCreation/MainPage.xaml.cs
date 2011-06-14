@@ -11,9 +11,12 @@ namespace TeamCreation
 {
     public partial class MainPage : UserControl, INotifyPropertyChanged
     {
+        private Dictionary<int, List<SerializableTeamMembers>> membersBySection = new Dictionary<int, List<SerializableTeamMembers>>();
+        private List<SerializableTeamMembers> moderators;
+
         #region INotifyPropertyChanged Members
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         #endregion INotifyPropertyChanged Members
 
@@ -35,12 +38,14 @@ namespace TeamCreation
 
         private void LayoutRoot_Loaded(object sender, RoutedEventArgs e)
         {
-            HtmlPage.Window.Invoke("SLReady", "");
+            HtmlPage.Window.Invoke("TeamGenerationReady", "");
         }
 
         private void NewTeamBox_AddTeamRequested(object sender, EventArgs e)
         {
-            this.Teams.Children.Insert(this.Teams.Children.Count - 1, new Team());
+            Team team = new Team();
+            team.NameChanged += new EventHandler(Team_NameChanged);
+            this.Teams.Children.Insert(this.Teams.Children.Count - 1, team);
         }
 
         private void InitilizeTeams(List<SerializableTeamMembers> teamMembers)
@@ -50,23 +55,76 @@ namespace TeamCreation
             //if teamNames.Count == 0 then no teams have been assigned
             if (teamNames.Count == 0)
             {
-                var moderators = from c in teamMembers where c.IsModerator == true orderby c.Name select c;
-                var students = from c in teamMembers where c.IsModerator == false orderby c.Name select c;
+                moderators = (from c in teamMembers where c.IsModerator == true orderby c.Name select c).ToList();
+                var members = from c in teamMembers where c.IsModerator == false select c;
 
-                //this.UnassignedList.MemberList.Clear();
-                foreach (SerializableTeamMembers member in students)
+                foreach (var memb in members)
                 {
-                    this.UnassignedList.MemberList.Add(new Member(member));
+                    if (membersBySection.Keys.Contains(memb.Section))
+                    {
+                        membersBySection[memb.Section].Add(memb);
+                    }
+                    else
+                    {
+                        membersBySection.Add(memb.Section, new List<SerializableTeamMembers>() { memb });
+                    }
                 }
 
-                foreach (SerializableTeamMembers member in moderators)
+                if (membersBySection.Count() == 1 || membersBySection.Count() == 0)
                 {
-                    this.UnassignedList.MemberList.Add(new Member(member));
+                    //remove the section combo box only one section
+                }
+                else
+                {
+                    foreach (var c in membersBySection)
+                    {
+                        ComboBoxItem cbi = new ComboBoxItem();
+                        cbi.Content = c.Key.ToString();
+                        comboSections.Items.Add(cbi);
+                    }
+                    comboSections.SelectionChanged += new SelectionChangedEventHandler(comboSections_SelectionChanged);
+                    comboSections.SelectedIndex = 0;
                 }
             }
             else
             {
             }
+        }
+
+        private void comboSections_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.UnassignedList.MemberList.Clear();
+            this.Teams.Children.Clear();
+            int sectionNum = int.Parse((comboSections.SelectedItem as ComboBoxItem).Content as string);
+            var members = membersBySection[sectionNum];
+            foreach (SerializableTeamMembers member in members)
+            {
+                if (member.InTeamName != null && member.InTeamName != "Unassigned Team")
+                {
+                    bool teamFound = false;
+                    foreach (Team team in Teams.Children)
+                    {
+                        if (team.TeamName.Text == member.InTeamName)
+                        {
+                            team.MemberList.Add(new Member(member));
+                            teamFound = true;
+                            break;
+                        }
+                    }
+                    if (teamFound == false)
+                    {
+                        CreateTeam(member, member.InTeamName);
+                    }
+                }
+                else
+                {
+                    this.UnassignedList.MemberList.Add(new Member(member));
+                }
+            }
+
+            AddButton addbutton = new AddButton();
+            addbutton.AddTeamRequested += new EventHandler(NewTeamBox_AddTeamRequested);
+            Teams.Children.Add(addbutton);
         }
 
         private List<string> findAllTeams(List<SerializableTeamMembers> teamMembers)
@@ -82,6 +140,32 @@ namespace TeamCreation
             }
 
             return teamNames;
+        }
+
+        private void CreateTeam(SerializableTeamMembers member, string teamName = null)
+        {
+            Team team = new Team();
+            if (teamName != null)
+            {
+                team.TeamName.Text = teamName;
+            }
+            team.NameChanged += new EventHandler(Team_NameChanged);
+            team.MemberList.Add(new Member(member));
+            Teams.Children.Add(team);
+        }
+
+        private void Team_NameChanged(object sender, EventArgs e)
+        {
+            string name = (sender as Team).TeamName.Text;
+            bool isValid = true;
+            foreach (var item in Teams.Children)
+            {
+                if (item is Team && ((sender != item && (item as Team).TeamName.Text == name) || name == "Unassigned Team"))
+                {
+                    isValid = false;
+                }
+            }
+            (sender as Team).NameChangedValid(isValid);
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -102,71 +186,71 @@ namespace TeamCreation
 
         private void PublishChanges_Click(object sender, RoutedEventArgs e)
         {
+            HtmlPage.Window.Invoke("CloseTeamGenerationWindow", "");
         }
 
         private void CancelChanges_Click(object sender, RoutedEventArgs e)
         {
-        }
-
-        [ScriptableMemberAttribute]
-        public void GenerateTeamsFromNumberOfTeams(int numberOfTeams)
-        {
-            Random rand = new Random();
-            this.Teams.Children.Clear();
-            int i = 0;
-            while (i < numberOfTeams)
+            MessageBoxResult r = MessageBox.Show("All changes will be lost", "Cancel Changes", MessageBoxButton.OKCancel);
+            if (r == MessageBoxResult.OK)
             {
-                this.Teams.Children.Add(new Team());
-                i++;
-            }
-
-            var students = (from c in UnassignedList.MemberList where c.IsModerator == false select c).ToList();
-            var moderators = (from c in UnassignedList.MemberList where c.IsModerator == true select c).ToList();
-
-            Team current = this.Teams.Children[0] as Team;
-
-            while (students.Count > 0)
-            {
-                int index = rand.Next(0, students.Count());
-                current.MemberList.Add(students[index]);
-                students.RemoveAt(index);
-                current = GetNextTeam(current);
-            }
-
-            current = this.Teams.Children[0] as Team;
-
-            while (moderators.Count > 0)
-            {
-                int index = rand.Next(0, moderators.Count());
-                current.MemberList.Add(moderators[index]);
-                moderators.RemoveAt(index);
-                current = GetNextTeam(current);
-            }
-        }
-
-        private Team GetNextTeam(Team currentTeam)
-        {
-            if (currentTeam == null)
-            {
-                return Teams.Children[0] as Team;
             }
             else
             {
-                int index = Teams.Children.IndexOf(currentTeam);
-                if (Teams.Children[index] is Team)
+                HtmlPage.Window.Invoke("CloseTeamGenerationWindow", "");
+            }
+        }
+
+        [ScriptableMemberAttribute]
+        public void GenerateTeamsFromNumberOfTeams(double numberOfTeams)
+        {
+            foreach (KeyValuePair<int, List<SerializableTeamMembers>> section in membersBySection)
+            {
+                GenerateSectionTeamsFromNumberOfTeams(section.Value, (int)numberOfTeams);
+            }
+            comboSections_SelectionChanged(comboSections, EventArgs.Empty as SelectionChangedEventArgs);
+        }
+
+        private void GenerateSectionTeamsFromNumberOfTeams(List<SerializableTeamMembers> members, int numberOfTeams)
+        {
+            foreach (SerializableTeamMembers member in members)
+            {
+                member.InTeamName = null;
+            }
+            Random rand = new Random();
+            int currentTeam = 1;
+            int peoplePlaced = 0;
+
+            while (peoplePlaced < members.Count)
+            {
+                int index = rand.Next(0, members.Count);
+                if (members[index].InTeamName == null)
                 {
-                    return Teams.Children[index] as Team;
-                }
-                else
-                {
-                    return Teams.Children[0] as Team;
+                    members[index].InTeamName = "Team " + currentTeam.ToString();
+                    currentTeam++;
+                    if (currentTeam > numberOfTeams)
+                    {
+                        currentTeam = 1;
+                    }
+                    peoplePlaced++;
                 }
             }
         }
 
         [ScriptableMemberAttribute]
-        public void GenerateTeamsFromNumberOfPeople(int peoplePerTeam)
+        public void GenerateTeamsFromNumberOfPeople(double studentsPerTeam)
         {
+            foreach (KeyValuePair<int, List<SerializableTeamMembers>> section in membersBySection)
+            {
+                //integer division on purpose
+                int numOfTeams = section.Value.Count() / (int)studentsPerTeam;
+                if (studentsPerTeam * numOfTeams != section.Value.Count())
+                {
+                    numOfTeams++;
+                }
+                GenerateSectionTeamsFromNumberOfTeams(section.Value, (int)numOfTeams);
+            }
+            comboSections_SelectionChanged(comboSections, EventArgs.Empty as SelectionChangedEventArgs);
         }
     }
 }

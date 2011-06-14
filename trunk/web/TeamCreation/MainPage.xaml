@@ -11,7 +11,7 @@
 
     <toolkit:BusyIndicator x:Name="Busy">
 
-        <Grid x:Name="LayoutRoot" Background="Gray">
+        <Grid x:Name="LayoutRoot" Background="White">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
