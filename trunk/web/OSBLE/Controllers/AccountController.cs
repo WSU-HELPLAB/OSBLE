@@ -77,17 +77,6 @@ namespace OSBLE.Controllers
         }
 
         [Authorize]
-        public ActionResult SetDefault(int id)
-        {
-            // Update the default course ID for log in.
-            currentUser.DefaultCourse = id;
-            db.Entry(currentUser).State = EntityState.Modified;
-            db.SaveChanges();
-
-            return RedirectToAction("Profile");
-        }
-
-        [Authorize]
         [HttpPost]
         public ActionResult UpdateEmailSettings()
         {
@@ -113,7 +102,11 @@ namespace OSBLE.Controllers
                 }
             }
 
+            // Update the default course ID for log in.
+            currentUser.DefaultCourse = Convert.ToInt32(Request.Params["defaultCourse"]);
+            db.Entry(currentUser).State = EntityState.Modified;
             db.SaveChanges();
+
 
             return RedirectToAction("Profile");
         }

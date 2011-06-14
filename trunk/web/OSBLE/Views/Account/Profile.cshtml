@@ -94,17 +94,24 @@
 
 <table>
     <tr>
-        <th>Hidden</th>
+        <th>Default</th>
         <th>Name</th>
-        <th></th>
+        <th>Hidden</th>
     </tr>
+    @{
+    bool firstCourse = true;
+    }
     @foreach (CoursesUsers cu in ViewBag.CurrentCourses)
     {
+        
         <tr>
-            <td>
-            <input type="checkbox" value="True" name="cu_hidden_@(cu.CourseID)" @if (cu.Hidden)
-                                                                                {<text>checked="checked"</text>} />
+            <td class="coursemenu_option">
+                <input type="radio" name="defaultCourse" value="@cu.CourseID" @if ((cu.CourseID == ViewBag.CurrentUser.DefaultCourse) || ((ViewBag.CurrentCourses as List<CoursesUsers>).Where(c => c.CourseID == ViewBag.CurrentUser.DefaultCourse).Count() == 0 && firstCourse))
+                {
+                    <text>checked="checked"</text>
+                } />
             </td>
+
             <td>
                 <small>
                 @if (cu.Course is Course)
@@ -118,17 +125,13 @@
                 </small>
                 @Helpers.CourseTag(cu.Course) &mdash; @cu.Course.Name (@cu.CourseRole.Name)
             </td>
-            <td>
-                @if (cu.CourseID == ViewBag.CurrentUser.DefaultCourse)
-                {
-                    <text>Default</text>
-                }
-                else
-                {
-                    <text>@Html.ActionLink("Set As Default", "SetDefault", new { id = cu.CourseID })</text>
-                }
+            <td class="coursemenu_option">
+            <input type="checkbox" value="True" name="cu_hidden_@(cu.CourseID)" @if (cu.Hidden)
+                                                                                {<text>checked="checked"</text>} />
             </td>
+
         </tr>
+        firstCourse = false;
     }
 </table>
 <p>
