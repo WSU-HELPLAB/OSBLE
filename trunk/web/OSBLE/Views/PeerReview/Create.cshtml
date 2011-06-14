@@ -11,49 +11,106 @@
 <script src="@Url.Content("~/Scripts/osble.assignments.js")" type="text/javascript"></script>
 
 <script type="text/javascript">
-    $('#CanStudentAccessReviews').change(function () {
-        if ($(this).attr('checked')) {
 
-            DisplayCanStudentAccessReviewsOptions();
-        }
-        else {
+    $(function () {
+        $('#CanStudentAccessReviews').change(function () {
+            if ($(this).attr('checked')) {
 
-            HideCanStudentAccessReviewsOptions();
-        }
-    });
+                DisplayCanStudentAccessReviewsOptions();
+            }
+            else {
 
-    $('#UseRubric').change(function () {
-        if ($(this).attr('checked')) {
+                HideCanStudentAccessReviewsOptions();
+            }
+        });
 
-            DisplayUseRubricOptions();
-        }
-        else {
+        $('#CanReviewerViewOthersReviews').change(function () {
+            if ($(this).attr('checked')) {
 
-            HideUseRubricOptions();
-        }
+                DisplayCanReviewerViewOthersReviewsOptions();
+            }
+            else {
+
+                HideCanReviewerViewOthersReviewsOptions();
+            }
+        });
+        
+
+        $('#UseRubric').change(function () {
+            if ($(this).attr('checked')) {
+
+                DisplayUseRubricOptions();
+            }
+            else {
+
+                HideUseRubricOptions();
+            }
+        });
+        // only all reviews or random reviews can be checked
+        $('#InstructorCompletesRubricAllReviews').change(function () {
+            if ($(this).attr('checked')) {
+              
+                $('#InstructorCompletesRubricRandomReview').removeAttr('checked');
+            }
+            else {
+
+                $('#InstructorCompletesRubricRandomReview').attr('checked', true);
+            }
+        });
+        // only all reviews or random reviews can be checked
+        $('#InstructorCompletesRubricRandomReview').change(function () {
+            if ($(this).attr('checked')) {
+
+                $('#InstructorCompletesRubricAllReviews').removeAttr('checked');
+            }
+            else {
+
+                $('#InstructorCompletesRubricAllReviews').attr('checked', true);
+            }
+        });
     });
 
     function DisplayCanStudentAccessReviewsOptions() {
         $('#CanStudentAccessReviews_options').show('highlight');
+        // default
+        $('#HasStudentCompletedAssignedReviews').attr('checked', true);
     }
 
     function HideCanStudentAccessReviewsOptions() {
         $('#CanStudentAccessReviews_options').hide('highlight');
-    }
-    function DisplayCanStudentAccessReviewsOptions() {
-        $('#UseRubric_options').show('highlight');
+        // unchecking default box
+        $('#HasStudentCompletedAssignedReviews').removeAttr('checked');
     }
 
-    function HideCanStudentAccessReviewsOptions() {
+    function DisplayCanReviewerViewOthersReviewsOptions() {
+        $('#CanReviewerAccessReviews_options').show('highlight');
+        // default
+        $('#HasReviewerCompletedAssignedReviews').attr('checked', true);
+    }
+
+    function HideCanReviewerViewOthersReviewsOptions() {
+        $('#CanReviewerAccessReviews_options').hide('highlight');
+        $('#HasReviewerCompletedAssignedReviews').removeAttr('checked');
+    }
+
+    function DisplayUseRubricOptions() {
+        $('#UseRubric_options').show('highlight');
+        //default
+        $('#InstructorCompletesRubricRandomReview').attr('checked', true);
+    }
+
+    function HideUseRubricOptions() {
         $('#UseRubric_options').hide('highlight');
+        // unchecking the children boxes
+        $('#InstructorCompletesRubricRandomReview').removeAttr('checked');
+        $('#InstructorCompletesRubricAllReviews').removeAttr('checked');
     }
 
 </script>
 
 @{
    
-
-    @using (Html.BeginForm())
+    using (Html.BeginForm())
     {
         @Html.ValidationSummary(true)
         <fieldset>
@@ -66,14 +123,14 @@
                 @Html.EditorFor(model => model.Name)
                 @Html.ValidationMessageFor(model => model.Name)
             </div>
-
-            <div class="editor-label">
-                @Html.LabelFor(model => model.ReleaseDate)
+            
+            @*<div class="editor-label">
+                @Html.LabelFor(model => model.PreviousActivity.ReleaseDate)
             </div>
             <div class="editor-label">
-                @Html.TextBox("ReleaseDate_Date", convertToMonthDayYearFormat(Model.ReleaseDate), new { @id = "ReleaseDate_Date", @class = "date_picker", size = 9 })
-                @Html.TextBox("ReleaseDate_Time", convertTime(Model.ReleaseDate), new { @id = "ReleaseDate_Time", @class = "time_picker", size = 9 })
-            </div>
+                @Html.TextBox("ReleaseDate_Date", convertToMonthDayYearFormat(Model.PreviousActivity.ReleaseDate), new { @id = "ReleaseDate_Date", @class = "date_picker", size = 9 })
+                @Html.TextBox("ReleaseDate_Time", convertTime(Model.PreviousActivity.ReleaseDate), new { @id = "ReleaseDate_Time", @class = "time_picker", size = 9 })
+            </div>*@
 
             <div class="editor-label">
                 @Html.LabelFor(model => model.AbstractAssignmentID, "AbstractAssignment")
@@ -180,47 +237,51 @@
                 @Html.CheckBoxFor(model => model.CanReviewerViewOthersReviews, new { id = "CanReviewerViewOthersReviews" })
                 @Html.ValidationMessageFor(model => model.CanReviewerViewOthersReviews)
             </div>
-
-           
-
-            <div class="editor-label">
-                @Html.LabelFor(model => model.MinutesLateWithNoPenalty)
-            </div>
-            <div class="editor-field">
-                @Html.EditorFor(model => model.MinutesLateWithNoPenalty)
-                @Html.ValidationMessageFor(model => model.MinutesLateWithNoPenalty)
-            </div>
-
-            <div class="editor-label">
-                @Html.LabelFor(model => model.PercentPenalty)
-            </div>
-            <div class="editor-field">
-                @Html.EditorFor(model => model.PercentPenalty)
-                @Html.ValidationMessageFor(model => model.PercentPenalty)
+            <div id="CanReviewerAccessReviews_options"  class="indented_options" style="display: none">
+                <div class="editor-label">
+                    @Html.LabelFor(model => model.HasReviewerCompletedAssignedReviews)
+                </div>
+                <div class="editor-field">
+                    @Html.CheckBoxFor(model => model.HasReviewerCompletedAssignedReviews, new { id = "HasReviewerCompletedAssignedReviews" })
+                    @Html.ValidationMessageFor(model => model.HasReviewerCompletedAssignedReviews)
+                </div>
             </div>
 
             <div class="editor-label">
-                @Html.LabelFor(model => model.HoursLatePerPercentPenalty)
+                Add to Gradebook
             </div>
             <div class="editor-field">
-                @Html.EditorFor(model => model.HoursLatePerPercentPenalty)
-                @Html.ValidationMessageFor(model => model.HoursLatePerPercentPenalty)
+                <input type="checkbox" id="add_to_gradebook" checked="checked" />
             </div>
+            <div id="grade_options" class="indented_options">
+                <div class="editor-field">
+                    Worth
+                    @Html.TextBoxFor(model => model.PointsPossible, new { id = "points_possible", size = 3 })
+                    Points in Category <span id="grade_category_label"></span>
 
-            <div class="editor-label">
-                @Html.LabelFor(model => model.HoursLateUntilZero)
-            </div>
-            <div class="editor-field">
-                @Html.EditorFor(model => model.HoursLateUntilZero)
-                @Html.ValidationMessageFor(model => model.HoursLateUntilZero)
-            </div>
+                    @Html.ValidationMessageFor(model => model.PointsPossible)
+                </div>
+        
 
-            <div class="editor-label">
-                @Html.LabelFor(model => model.PointsPossible)
-            </div>
-            <div class="editor-field">
-                @Html.EditorFor(model => model.PointsPossible)
-                @Html.ValidationMessageFor(model => model.PointsPossible)
+                <h3>Late Policy</h3>
+    
+                <p>
+                    Students may submit assignments up to @Html.TextBoxFor(model => model.MinutesLateWithNoPenalty, new { size = 3 })
+                    minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.PercentPenalty, new { size = 3 })
+                    percent per @Html.TextBoxFor(model => model.HoursLatePerPercentPenalty, new { size = 3 })
+                    hours late will be applied.<br />
+                    @Html.ValidationMessageFor(model => model.MinutesLateWithNoPenalty)
+                    @Html.ValidationMessageFor(model => model.PercentPenalty)
+                    @Html.ValidationMessageFor(model => model.HoursLatePerPercentPenalty)
+                </p>
+    
+    
+                <p>
+                    Assignments that are submitted more than @Html.TextBoxFor(model => model.HoursLateUntilZero, new { size = 3 })
+                    hours after the due date and time will receive an automatic 0.<br />
+                    @Html.ValidationMessageFor(model => model.HoursLateUntilZero)
+                </p>
+
             </div>
 
             <div class="editor-label">

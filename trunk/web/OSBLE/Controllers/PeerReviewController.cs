@@ -9,8 +9,8 @@ using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models;
 
 namespace OSBLE.Controllers
-{ 
-    public class PeerReviewController : Controller
+{
+    public class PeerReviewController : OSBLEController
     {
         private OSBLEContext db = new OSBLEContext();
 

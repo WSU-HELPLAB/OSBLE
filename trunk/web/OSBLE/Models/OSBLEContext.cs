@@ -444,6 +444,8 @@ namespace OSBLE.Models
         public DbSet<IssueVotingActivity> IssueVotingActivities { get; set; }
 
         public DbSet<AuthorRebuttalActivity> AuthorRebuttalActivities { get; set; }
+
+        public DbSet<AsyncIssueVotingActivity> AsyncIssueVotingActivities { get; set; }
     }
 
     /// <summary>

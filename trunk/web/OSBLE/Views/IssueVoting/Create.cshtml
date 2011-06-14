@@ -24,11 +24,11 @@
             @Html.ValidationMessageFor(model => model.SetGradePercentOfIssues)
         </div>
         <div class="editor-label">
-            @Html.LabelFor(model => model.SetGradePercentAgreementWMocerator)
+            @Html.LabelFor(model => model.SetGradePercentAgreementWModerator)
         </div>
         <div class="editor-field">
-            @Html.CheckBoxFor(model => model.SetGradePercentAgreementWMocerator, new { id = "SetGradePercentAgreementWModerator" })
-            @Html.ValidationMessageFor(model => model.SetGradePercentAgreementWMocerator)
+            @Html.CheckBoxFor(model => model.SetGradePercentAgreementWModerator, new { id = "SetGradePercentAgreementWModerator" })
+            @Html.ValidationMessageFor(model => model.SetGradePercentAgreementWModerator)
         </div>
         <div class="editor-label">
             @Html.LabelFor(model => model.SetGradeManually)
@@ -38,13 +38,6 @@
             @Html.ValidationMessageFor(model => model.SetGradeManually)
         </div>
 
-        <div class="editor-label">
-            @Html.LabelFor(model => model.)
-        </div>
-        <div class="editor-field">
-            @Html.CheckBoxFor(model => model.SetGradeManually, new { id = "SetGradeManually" })
-            @Html.ValidationMessageFor(model => model.SetGradeManually)
-        </div>
 
         <div class="editor-label">
             @Html.LabelFor(model => model.MinutesLateWithNoPenalty)
@@ -86,13 +79,13 @@
             @Html.ValidationMessageFor(model => model.Name)
         </div>
 
-        <div class="editor-label">
+        @*<div class="editor-label">
             @Html.LabelFor(model => model.ReleaseDate)
        </div>
        <div class="editor-label">
             @Html.TextBox("ReleaseDate_Date", convertToMonthDayYearFormat(Model.ReleaseDate), new { @id = "ReleaseDate_Date", @class = "date_picker", size = 9 })
             @Html.TextBox("ReleaseDate_Time", convertTime(Model.ReleaseDate), new { @id = "ReleaseDate_Time", @class = "time_picker", size = 9 })
-        </div>
+        </div>*@
 
         <div class="editor-label">
             @Html.LabelFor(model => model.AbstractAssignmentID, "AbstractAssignment")

@@ -9,8 +9,8 @@ using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models;
 
 namespace OSBLE.Controllers
-{ 
-    public class AuthorRebuttalController : Controller
+{
+    public class AuthorRebuttalController : OSBLEController
     {
         private OSBLEContext db = new OSBLEContext();
 

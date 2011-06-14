@@ -134,6 +134,7 @@
     <Compile Include="Attributes\IsCommunity.cs" />
     <Compile Include="Attributes\NotForCommunity.cs" />
     <Compile Include="Controllers\AssignmentController.cs" />
+    <Compile Include="Controllers\AsyncIssueVotingController.cs" />
     <Compile Include="Controllers\AuthorRebuttalController.cs" />
     <Compile Include="Controllers\BasicAssignmentController.cs" />
     <Compile Include="Controllers\CommunityController.cs" />
