@@ -19,20 +19,6 @@ namespace OSBLE.Models.Assignments
         [Display(Name="Draft Assignment")]
         public bool IsDraft { get; set; }
 
-        [NotMapped]
-        public override bool AppearsInAssignmentList
-        {
-            get
-            {
-                return true;
-            }
-
-            set
-            {
-
-            }
-        }
-
         public StudioAssignment()
             : base()
         {
