@@ -15,6 +15,7 @@ namespace OsbleRubric
     {
 
         private bool isComboBox;
+        private bool isCheckBox;
 
         public RubricCell(int row, int column, string description)
         {
@@ -28,6 +29,11 @@ namespace OsbleRubric
         {
             get { return isComboBox; }
             set { isComboBox = value; }
+        }
+        public bool IsCheckBox
+        {
+            get { return isCheckBox; }
+            set { isCheckBox = value; }
         }
 
 
