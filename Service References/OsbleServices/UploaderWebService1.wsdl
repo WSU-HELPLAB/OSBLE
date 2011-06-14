@@ -8,6 +8,12 @@
       <xsd:import schemaLocation="http://localhost:17532/Services/UploaderWebService.svc?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
     </xsd:schema>
   </wsdl:types>
+  <wsdl:message name="UploaderWebService_DeleteFile_InputMessage">
+    <wsdl:part name="parameters" element="DeleteFile" />
+  </wsdl:message>
+  <wsdl:message name="UploaderWebService_DeleteFile_OutputMessage">
+    <wsdl:part name="parameters" element="DeleteFileResponse" />
+  </wsdl:message>
   <wsdl:message name="UploaderWebService_GetFakeFileListing_InputMessage">
     <wsdl:part name="parameters" element="GetFakeFileListing" />
   </wsdl:message>
@@ -81,6 +87,10 @@
     <wsdl:part name="parameters" element="ValidateUserResponse" />
   </wsdl:message>
   <wsdl:portType name="UploaderWebService">
+    <wsdl:operation name="DeleteFile">
+      <wsdl:input wsaw:Action="urn:UploaderWebService/DeleteFile" message="UploaderWebService_DeleteFile_InputMessage" />
+      <wsdl:output wsaw:Action="urn:UploaderWebService/DeleteFileResponse" message="UploaderWebService_DeleteFile_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="GetFakeFileListing">
       <wsdl:input wsaw:Action="urn:UploaderWebService/GetFakeFileListing" message="UploaderWebService_GetFakeFileListing_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/GetFakeFileListingResponse" message="UploaderWebService_GetFakeFileListing_OutputMessage" />
