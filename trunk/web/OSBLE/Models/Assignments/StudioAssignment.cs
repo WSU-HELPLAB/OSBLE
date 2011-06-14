@@ -15,10 +15,6 @@ namespace OSBLE.Models.Assignments
         [Display(Name = "Description")]
         public string Description { get; set; }
 
-        [Required]
-        [Display(Name = "Draft Assignment")]
-        public bool IsDraft { get; set; }
-
         [NotMapped]
         public override bool AppearsInAssignmentList
         {
