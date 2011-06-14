@@ -14,9 +14,6 @@
 
 @using (Html.BeginForm()) {
     <div>
-    <table>
-        <tr>
-            <td>
             <div class="editor-label">
                 @Html.LabelFor(m => m.UserName)
             </div>
@@ -24,8 +21,6 @@
                 @Html.TextBoxFor(m => m.UserName, new { tabindex = "1" })<br />
                 @Html.ValidationMessageFor(m => m.UserName)
             </div>
-            </td>
-            <td>
             <div class="editor-label">
                 @Html.LabelFor(m => m.Password)
             </div>
@@ -33,12 +28,6 @@
                 @Html.PasswordFor(m => m.Password, new { tabindex = "2" })<br />
                 @Html.ValidationMessageFor(m => m.Password)
             </div>
-            </td>
-            <td>
-            
-            </td>
-        </tr>
-    </table>
             <div class="editor-label">
                 @Html.CheckBoxFor(m => m.RememberMe, new { tabindex = "3" })
                 @Html.LabelFor(m => m.RememberMe)
