@@ -396,15 +396,17 @@ namespace OSBLE.Services
                 string hashString = email + date;
 
                 //compute the hash
-                SHA1Managed sha1 = new SHA1Managed();
-                System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
-                string hash = encoding.GetString(sha1.ComputeHash(encoding.GetBytes(hashString)));
+                using (SHA1Managed sha1 = new SHA1Managed())
+                {
+                    System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
+                    string hash = encoding.GetString(sha1.ComputeHash(encoding.GetBytes(hashString)));
 
-                //save the hash for validating later calls
-                activeSessions.Add(hash, new UserSession(profile));
+                    //save the hash for validating later calls
+                    activeSessions.Add(hash, new UserSession(profile));
 
-                //return the hash to the caller
-                return hash;
+                    //return the hash to the caller
+                    return hash;
+                }
             }
             return "";
         }

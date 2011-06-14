@@ -12,11 +12,6 @@ namespace OSBLE.Models.Assignments
     /// </summary>
     public class GradeAssignment : AbstractAssignment
     {
-        [NotMapped]
-        public new DateTime? EndDate
-        {
-            get { return null; }
-        }
 
     }
 }

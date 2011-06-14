@@ -103,8 +103,9 @@ namespace OSBLE.Controllers
 
                 if (!e.Approved)
                 {
-                    NotificationController nc = new NotificationController();
-                    nc.SendEventApprovalNotification(e);
+                    using (NotificationController nc = new NotificationController()) {
+                        nc.SendEventApprovalNotification(e);
+                    }
 
                     return RedirectToAction("NeedsApproval");
                 }

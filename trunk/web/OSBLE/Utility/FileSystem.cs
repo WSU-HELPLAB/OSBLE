@@ -227,21 +227,23 @@ namespace OSBLE
         private static Dictionary<string, int> GetFileOrdering(string filePath)
         {
             Dictionary<string, int> ordering = new Dictionary<string, int>();
-            StreamReader reader = new StreamReader(filePath);
-            string line;
-            while ((line = reader.ReadLine()) != null)
+            using (StreamReader reader = new StreamReader(filePath))
             {
-                string[] pieces = line.Split(',');
-                try
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
-                    ordering.Add(pieces[0], Convert.ToInt32(pieces[1]));
-                }
-                catch
-                {
-                    //lazy exception handling.
+                    string[] pieces = line.Split(',');
+                    try
+                    {
+                        ordering.Add(pieces[0], Convert.ToInt32(pieces[1]));
+                    }
+                    catch
+                    {
+                        //lazy exception handling.
+                    }
                 }
             }
-            reader.Close();
+
             return ordering;
         }
 
@@ -311,28 +313,30 @@ namespace OSBLE
         public static void UpdateFileOrdering(DirectoryListing listing)
         {
             string orderingFile = Path.Combine(listing.AbsolutePath, OrderingFileName);
-            StreamWriter writer = new StreamWriter(orderingFile);
-
-            //files first
-            foreach (FileListing flisting in listing.Files)
+            using (StreamWriter writer = new StreamWriter(orderingFile))
             {
-                string line = string.Format("{0},{1}", flisting.Name, flisting.SortOrder);
-                writer.WriteLine(line);
-            }
 
-            //then directories
-            foreach (DirectoryListing dlisting in listing.Directories)
-            {
-                if (dlisting is ParentDirectoryListing)
+                //files first
+                foreach (FileListing flisting in listing.Files)
                 {
-                    continue;
+                    string line = string.Format("{0},{1}", flisting.Name, flisting.SortOrder);
+                    writer.WriteLine(line);
                 }
-                string line = string.Format("{0},{1}", dlisting.Name, dlisting.SortOrder);
-                writer.WriteLine(line);
 
-                UpdateFileOrdering(dlisting);
+                //then directories
+                foreach (DirectoryListing dlisting in listing.Directories)
+                {
+                    if (dlisting is ParentDirectoryListing)
+                    {
+                        continue;
+                    }
+                    string line = string.Format("{0},{1}", dlisting.Name, dlisting.SortOrder);
+                    writer.WriteLine(line);
+
+                    UpdateFileOrdering(dlisting);
+                }
             }
-            writer.Close();
+
         }
 
         /// <summary>

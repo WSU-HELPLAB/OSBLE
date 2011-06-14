@@ -1,5 +1,6 @@
 ﻿using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
+using System.Collections.Generic;
 
 namespace OSBLE.Models.ViewModels
 {

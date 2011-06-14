@@ -335,26 +335,31 @@ namespace OSBLE.Controllers
 
                     // Crop image to a square.
                     int square = Math.Min(image.Width, image.Height);
-                    Bitmap cropImage = new Bitmap(square, square);
-                    Bitmap finalImage = new Bitmap(thumbSize, thumbSize);
-                    Graphics cropGraphics = Graphics.FromImage(cropImage);
-                    Graphics finalGraphics = Graphics.FromImage(finalImage);
+                    using (Bitmap cropImage = new Bitmap(square, square))
+                    {
+                        using (Bitmap finalImage = new Bitmap(thumbSize, thumbSize))
+                        {
+                            Graphics cropGraphics = Graphics.FromImage(cropImage);
+                            Graphics finalGraphics = Graphics.FromImage(finalImage);
 
-                    // Center cropped image horizontally, leave at the top vertically. (better focus on subject)
-                    cropGraphics.DrawImage(image, -(image.Width - cropImage.Width) / 2, 0);
+                            // Center cropped image horizontally, leave at the top vertically. (better focus on subject)
+                            cropGraphics.DrawImage(image, -(image.Width - cropImage.Width) / 2, 0);
 
-                    // Convert to thumbnail.
-                    finalGraphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                            // Convert to thumbnail.
+                            finalGraphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
-                    finalGraphics.DrawImage(cropImage,
-                                        new Rectangle(0, 0, thumbSize, thumbSize),
-                                        new Rectangle(0, 0, square, square),
-                                        GraphicsUnit.Pixel);
+                            finalGraphics.DrawImage(cropImage,
+                                                new Rectangle(0, 0, thumbSize, thumbSize),
+                                                new Rectangle(0, 0, square, square),
+                                                GraphicsUnit.Pixel);
 
-                    // Write image to memory stream.
-                    FileStream fs = FileSystem.GetProfilePictureForWrite(currentUser);
-                    finalImage.Save(fs, ImageFormat.Jpeg);
-                    fs.Close();
+                            // Write image to memory stream.
+                            FileStream fs = FileSystem.GetProfilePictureForWrite(currentUser);
+                            finalImage.Save(fs, ImageFormat.Jpeg);
+                            fs.Close();
+
+                        }
+                    }
                 }
             }
             return RedirectToAction("Profile");
@@ -377,20 +382,25 @@ namespace OSBLE.Controllers
                 {
                     //ViewBag.ContactUsName = model.Name;
 
-                    SmtpClient mailClient = new SmtpClient();
-                    mailClient.UseDefaultCredentials = true;
+                    using (SmtpClient mailClient = new SmtpClient())
+                    {
+                        mailClient.UseDefaultCredentials = true;
 
-                    MailMessage message = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE"),
-                                                            new MailAddress("support@osble.org"));
+                        using (MailMessage message = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE"),
+                                                                new MailAddress("support@osble.org")))
+                        {
 
-                    message.ReplyToList.Add(new MailAddress(model.Email));
-                    message.Subject = "[OSBLE] Support Request from " + model.Name;
-                    message.Body = model.Message;
+                            message.ReplyToList.Add(new MailAddress(model.Email));
+                            message.Subject = "[OSBLE] Support Request from " + model.Name;
+                            message.Body = model.Message;
 
 #if !DEBUG
                 mailClient.Send(message);
 #endif
-                    ViewBag.CUName = model.Name;
+                            ViewBag.CUName = model.Name;
+                        }
+                    }
+
 
                     return View("ContactUsSuccess");
                 }

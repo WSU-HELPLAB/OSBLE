@@ -143,8 +143,10 @@ namespace OSBLE.Controllers
                 db.Mails.Add(mail);
                 db.SaveChanges();
 
-                NotificationController nc = new NotificationController();
-                nc.SendMailNotification(mail);
+                using (NotificationController nc = new NotificationController())
+                {
+                    nc.SendMailNotification(mail);
+                }
 
                 return RedirectToAction("Index");
             }

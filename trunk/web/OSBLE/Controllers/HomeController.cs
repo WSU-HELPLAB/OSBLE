@@ -140,8 +140,10 @@ namespace OSBLE.Controllers
             DateTime today = DateTime.Now.Date;
             DateTime upto = today.AddDays(eventDays);
 
-            EventController ec = new EventController();
-            ViewBag.Events = ec.GetActiveCourseEvents(today, upto);
+            using (EventController ec = new EventController())
+            {
+                ViewBag.Events = ec.GetActiveCourseEvents(today, upto);
+            }
         }
 
         /// <summary>
@@ -450,8 +452,10 @@ namespace OSBLE.Controllers
                         db.SaveChanges();
 
                         // Post notification to other thread participants
-                        NotificationController nc = new NotificationController();
-                        nc.SendDashboardNotification(dr.Parent, dr.UserProfile);
+                        using (NotificationController nc = new NotificationController())
+                        {
+                            nc.SendDashboardNotification(dr.Parent, dr.UserProfile);
+                        }
                     }
                 }
                 else

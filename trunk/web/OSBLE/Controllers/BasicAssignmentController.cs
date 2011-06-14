@@ -130,6 +130,7 @@ namespace OSBLE.Controllers
             {
                 ModelState.AddModelError("time", "The due date must come after the release date");
             }
+
             if (ModelState.IsValid)
             {
                 db.BasicAssignments.Add(basic.Assignment);
