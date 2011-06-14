@@ -1063,8 +1063,12 @@ ul.selector
 .meeting_time .meeting_time_tools, .break .break_tools, .deliverable .deliverable_tools
 {
     float: right;
+    padding: 3px;    
+}
+
+.deliverable .deliverable_tools
+{
     display: none;
-    padding: 3px;
 }
 
 .meeting_time:hover .meeting_time_tools, .break:hover .break_tools, .deliverable:hover .deliverable_tools
@@ -1110,7 +1114,6 @@ ul.selector
 {
     border: none;
     border-bottom: 1px solid #eeeeff;
-    font-variant: small-caps;
     margin-left: 0;
 }
 
