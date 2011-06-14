@@ -10,6 +10,45 @@
 <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/osble.assignments.js")" type="text/javascript"></script>
 
+<script type="text/javascript">
+    $('#AuthorMustAcceptorRefuteEachIssue').change(function () {
+        if ($(this).attr('checked')) {
+
+            DisplayAuthorMustAcceptorRefuteEachIssueOptions();
+        }
+        else {
+
+            HideAuthorMustAcceptorRefuteEachIssueOptions();
+        }
+    });
+    $('#AuthorMustProvideRationale').change(function () {
+        if ($(this).attr('checked')) {
+
+            DisplayAuthorMustProvideRationaleOptions();
+        }
+        else {
+
+            HideAuthorMustProvideRationaleOptions();
+        }
+    });
+
+    function DisplayAuthorMustAcceptorRefuteEachIssueOptions() {
+        $('#AuthorMustAcceptorRefuteEachIssue_options').show('highlight');
+    }
+
+    function HideAuthorMustAcceptorRefuteEachIssueOptions() {
+        $('#AuthorMustAcceptorRefuteEachIssue_options').hide('highlight');
+    }
+
+    function DisplayAuthorMustProvideRationaleOptions() {
+        $('#AuthorMustProvideRationale_options').show('highlight');
+    }
+
+    function HideAuthorMustProvideRationaleOptions() {
+        $('#AuthorMustProvideRationale_options').hide('highlight');
+    }
+</script>
+
 @using (Html.BeginForm()) {
     @Html.ValidationSummary(true)
     <fieldset>
@@ -55,12 +94,12 @@
             @Html.ValidationMessageFor(model => model.Name)
         </div>
 
-        <div class="editor-label">
+       <div class="editor-label">
             @Html.LabelFor(model => model.ReleaseDate)
-        </div>
-        <div class="editor-field">
-            @Html.EditorFor(model => model.ReleaseDate)
-            @Html.ValidationMessageFor(model => model.ReleaseDate)
+       </div>
+       <div class="editor-label">
+            @Html.TextBox("ReleaseDate_Date", convertToMonthDayYearFormat(Model.ReleaseDate), new { @id = "ReleaseDate_Date", @class = "date_picker", size = 9 })
+            @Html.TextBox("ReleaseDate_Time", convertTime(Model.ReleaseDate), new { @id = "ReleaseDate_Time", @class = "time_picker", size = 9 })
         </div>
 
         <div class="editor-label">
@@ -87,8 +126,42 @@
             @Html.ValidationMessageFor(model => model.ColumnOrder)
         </div>
 
+        <div class="editor-label">
+            @Html.LabelFor(model => model.AuthorMustAcceptorRefuteEachIssue)
+        </div>
+        <div class="editor-field">
+            @Html.CheckBoxFor(model => model.AuthorMustAcceptorRefuteEachIssue, new { id = "AuthorMustAcceptorRefuteEachIssue" })
+            @Html.ValidationMessageFor(model => model.AuthorMustAcceptorRefuteEachIssue)
+        </div>
+        <div id="AuthorMustAcceptorRefuteEachIssue_options" class="indented_options">
+            <div class="editor-label">
+                @Html.LabelFor(model => model.AuthorMustDescribeHowAddressed)
+            </div>
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.AuthorMustDescribeHowAddressed, new { id = "AuthorMustDescribeHowAddressed" })
+                @Html.ValidationMessageFor(model => model.AuthorMustDescribeHowAddressed)
+            </div>
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.AuthorMustProvideRationale)
+        </div>
+        <div class="editor-field">
+            @Html.CheckBoxFor(model => model.AuthorMustProvideRationale, new { id = "AuthorMustProvideRationale" })
+            @Html.ValidationMessageFor(model => model.AuthorMustProvideRationale)
+        </div>
+        <div id="AuthorMustProvideRationale_options" class="indented_options">
+            <div class="editor-label">
+                @Html.LabelFor(model => model.AuthorMustSayIfIssueWasAddressed)
+            </div>
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.AuthorMustSayIfIssueWasAddressed, new { id = "AuthorMustSayIfIssueWasAddressed" })
+                @Html.ValidationMessageFor(model => model.AuthorMustSayIfIssueWasAddressed)
+            </div>
+        </div>
+
         <p>
-            <input type="submit" value="Create" />
+            <input type="submit" value="Create Author Rebuttal" id="submitButton"/>
         </p>
     </fieldset>
 }
@@ -96,3 +169,61 @@
 <div>
     @Html.ActionLink("Back to List", "Index")
 </div>
+
+@functions
+{
+    public string convertToMonthDayYearFormat(DateTime date)
+    {
+        return addLostZeros(date.Month.ToString(), 2, true) + "/" + addLostZeros(date.Day.ToString(), 2, true) + "/" + addLostZeros(date.Year.ToString(), 4, true);
+    }
+
+    public string convertTime(DateTime time)
+    {
+        string timeStr;
+        bool isAM = true;
+        string hr;
+        string min;
+        if (time.Hour > 12)
+        {
+            isAM = false;
+            hr = (time.Hour - 12).ToString();
+        }
+        else
+        {
+            hr = time.Hour.ToString();
+        }
+        min = time.Minute.ToString();
+
+        hr = addLostZeros(hr, 2, true);
+        min = addLostZeros(min, 2, true);
+
+        timeStr = hr + ":" + min;
+        if (isAM)
+        {
+            timeStr += " AM";
+        }
+        else
+        {
+            timeStr += " PM";
+        }
+        return timeStr;
+    }
+
+    public string addLostZeros(string s, int desiredDigits, bool addToFront)
+    {
+        int i = desiredDigits - s.Count();
+        while (i > 0)
+        {
+            if (addToFront)
+            {
+                s = s.Insert(0, "0");
+            }
+            else
+            {
+                s += "0";
+            }
+            i--;
+        }
+        return s;
+    }
+}

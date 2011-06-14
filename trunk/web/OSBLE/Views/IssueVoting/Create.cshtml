@@ -20,23 +20,29 @@
             @Html.LabelFor(model => model.SetGradePercentOfIssues)
         </div>
         <div class="editor-field">
-            @Html.EditorFor(model => model.SetGradePercentOfIssues)
+            @Html.CheckBoxFor(model => model.SetGradePercentOfIssues, new { id = "SetGradePercentOfIssues" })
             @Html.ValidationMessageFor(model => model.SetGradePercentOfIssues)
         </div>
-
         <div class="editor-label">
             @Html.LabelFor(model => model.SetGradePercentAgreementWMocerator)
         </div>
         <div class="editor-field">
-            @Html.EditorFor(model => model.SetGradePercentAgreementWMocerator)
+            @Html.CheckBoxFor(model => model.SetGradePercentAgreementWMocerator, new { id = "SetGradePercentAgreementWModerator" })
             @Html.ValidationMessageFor(model => model.SetGradePercentAgreementWMocerator)
         </div>
-
         <div class="editor-label">
             @Html.LabelFor(model => model.SetGradeManually)
         </div>
         <div class="editor-field">
-            @Html.EditorFor(model => model.SetGradeManually)
+            @Html.CheckBoxFor(model => model.SetGradeManually, new { id = "SetGradeManually" })
+            @Html.ValidationMessageFor(model => model.SetGradeManually)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.)
+        </div>
+        <div class="editor-field">
+            @Html.CheckBoxFor(model => model.SetGradeManually, new { id = "SetGradeManually" })
             @Html.ValidationMessageFor(model => model.SetGradeManually)
         </div>
 
@@ -82,10 +88,10 @@
 
         <div class="editor-label">
             @Html.LabelFor(model => model.ReleaseDate)
-        </div>
-        <div class="editor-field">
-            @Html.EditorFor(model => model.ReleaseDate)
-            @Html.ValidationMessageFor(model => model.ReleaseDate)
+       </div>
+       <div class="editor-label">
+            @Html.TextBox("ReleaseDate_Date", convertToMonthDayYearFormat(Model.ReleaseDate), new { @id = "ReleaseDate_Date", @class = "date_picker", size = 9 })
+            @Html.TextBox("ReleaseDate_Time", convertTime(Model.ReleaseDate), new { @id = "ReleaseDate_Time", @class = "time_picker", size = 9 })
         </div>
 
         <div class="editor-label">
@@ -121,3 +127,61 @@
 <div>
     @Html.ActionLink("Back to List", "Index")
 </div>
+
+@functions
+{
+    public string convertToMonthDayYearFormat(DateTime date)
+    {
+        return addLostZeros(date.Month.ToString(), 2, true) + "/" + addLostZeros(date.Day.ToString(), 2, true) + "/" + addLostZeros(date.Year.ToString(), 4, true);
+    }
+
+    public string convertTime(DateTime time)
+    {
+        string timeStr;
+        bool isAM = true;
+        string hr;
+        string min;
+        if (time.Hour > 12)
+        {
+            isAM = false;
+            hr = (time.Hour - 12).ToString();
+        }
+        else
+        {
+            hr = time.Hour.ToString();
+        }
+        min = time.Minute.ToString();
+
+        hr = addLostZeros(hr, 2, true);
+        min = addLostZeros(min, 2, true);
+
+        timeStr = hr + ":" + min;
+        if (isAM)
+        {
+            timeStr += " AM";
+        }
+        else
+        {
+            timeStr += " PM";
+        }
+        return timeStr;
+    }
+
+    public string addLostZeros(string s, int desiredDigits, bool addToFront)
+    {
+        int i = desiredDigits - s.Count();
+        while (i > 0)
+        {
+            if (addToFront)
+            {
+                s = s.Insert(0, "0");
+            }
+            else
+            {
+                s += "0";
+            }
+            i--;
+        }
+        return s;
+    }
+}
