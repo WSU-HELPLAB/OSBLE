@@ -263,6 +263,14 @@
             @Html.TextBox("DueDate_Date", convertToMonthDayYearFormat(stop.ReleaseDate), new { @id = "DueDate_Date", @class = "date_picker", size = 9 })
             @Html.TextBox("DueDate_Time", convertTime(stop.ReleaseDate), new { @id = "DueDate_Time", @class = "time_picker", size = 9 })
         </div>
+            <div class="editor-label">
+            @Html.LabelFor(model => model.Assignment.IsDraft)
+        </div>
+        <div class="editor-field">
+            @Html.CheckBoxFor(model => model.Assignment.IsDraft)
+            @Html.ValidationMessageFor(model => model.Assignment.IsDraft)
+        </div>
+
         <div class="editor-label">
             @Html.LabelFor(model => submission.isTeam)
         </div>
