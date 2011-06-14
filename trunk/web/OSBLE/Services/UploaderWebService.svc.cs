@@ -40,14 +40,14 @@ namespace OSBLE.Services
         /// Call this to remove expired sessions.  This
         /// function will extend the keep alive timer on the supplied key.
         /// </summary>
-        /// <param name="authKey">The key to extend.</param>
-        private void CleanActiveSessions(string authKey)
+        /// <param name="authToken">The key to extend.</param>
+        private void CleanActiveSessions(string authToken)
         {
 
             //update the current key
-            if (activeSessions.Keys.Contains(authKey))
+            if (activeSessions.Keys.Contains(authToken))
             {
-                activeSessions[authKey].LastAccessTime = DateTime.Now;
+                activeSessions[authToken].LastAccessTime = DateTime.Now;
             }
 
             //call the normal clean function
@@ -78,6 +78,58 @@ namespace OSBLE.Services
             {
                 activeSessions.Remove(key);
             }
+        }
+
+        /// <summary>
+        /// Removes the supplied file from the selected course
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="courseId"></param>
+        /// <param name="authToken"></param>
+        /// <returns>True if a success.  False otherwise</returns>
+        [OperationContract]
+        public bool DeleteFile(string file, int courseId, string authToken)
+        {
+            if (!IsValidKey(authToken))
+            {
+                return false;
+            }
+
+            //pull the current user for easier access
+            UserProfile currentUser = activeSessions[authToken].UserProfile;
+
+            //make sure that the selected user has write privileges for the supplied course
+            CoursesUsers currentCourse = (from cu in db.CoursesUsers
+                                         where cu.CourseID == courseId && cu.UserProfileID == currentUser.ID
+                                         select cu).FirstOrDefault();
+            
+            //make sure that we got something back
+            if (currentCourse != null)
+            {
+                //only allow those that can modify the course (probably instructors) to remove
+                //files
+                if(currentCourse.CourseRole.CanModify == true)
+                {
+                    //do a simple pattern match to make sure that the file to be uploaded is in
+                    //the correct course folder
+                    string coursePath = FileSystem.GetCourseDocumentsPath(courseId);
+                    if (file.IndexOf(coursePath) > -1)
+                    {
+                        if (Directory.Exists(file))
+                        {
+                            FileSystem.EmptyFolder(file);
+                            Directory.Delete(file);
+                            return true;
+                        }
+                        else if (File.Exists(file))
+                        {
+                            File.Delete(file);
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         /// <summary>
@@ -114,19 +166,19 @@ namespace OSBLE.Services
         /// Returns a list of files for the current course
         /// </summary>
         /// <param name="courseId"></param>
-        /// <param name="authKey"></param>
+        /// <param name="authToken"></param>
         /// <returns></returns>
         [OperationContract]
-        public DirectoryListing GetFileList(int courseId, string authKey)
+        public DirectoryListing GetFileList(int courseId, string authToken)
         {
             //only continue if we have a valid authentication key
-            if (!IsValidKey(authKey))
+            if (!IsValidKey(authToken))
             { 
                 return new DirectoryListing();
             }
 
             //pull the current user for easier access
-            UserProfile currentUser = activeSessions[authKey].UserProfile;
+            UserProfile currentUser = activeSessions[authToken].UserProfile;
 
             //find the current course
             CoursesUsers cu = (from c in db.CoursesUsers
@@ -179,14 +231,14 @@ namespace OSBLE.Services
         /// <summary>
         /// Returns a list locations that the current user can upload to.
         /// </summary>
-        /// <param name="authKey"></param>
+        /// <param name="authToken"></param>
         /// <returns></returns>
         [OperationContract]
-        public Dictionary<int, string> GetValidUploadLocations(string authKey)
+        public Dictionary<int, string> GetValidUploadLocations(string authToken)
         {
 
             //only continue if we have a valid authentication key
-            if (!IsValidKey(authKey))
+            if (!IsValidKey(authToken))
             {
                 return new Dictionary<int,string>();
             }
@@ -195,7 +247,7 @@ namespace OSBLE.Services
             Dictionary<int, string> uploadLocations = new Dictionary<int, string>();
 
             //pull the current user for easier access
-            UserProfile currentUser = activeSessions[authKey].UserProfile;
+            UserProfile currentUser = activeSessions[authToken].UserProfile;
 
             //find all courses that the users is associated with
             List<CoursesUsers> courses = (from course in db.Courses
@@ -222,19 +274,19 @@ namespace OSBLE.Services
         /// <summary>
         /// Will tell you if the supplied key is valid
         /// </summary>
-        /// <param name="authKey"></param>
+        /// <param name="authToken"></param>
         /// <returns></returns>
         [OperationContract]
-        public bool IsValidKey(string authKey)
+        public bool IsValidKey(string authToken)
         {
             //clean our session list
             CleanActiveSessions();
 
             //after cleaning, all remaining keys should be valid
-            if (activeSessions.Keys.Contains(authKey))
+            if (activeSessions.Keys.Contains(authToken))
             {
                 //if the key exists, might as well update it as well
-                activeSessions[authKey].LastAccessTime = DateTime.Now;
+                activeSessions[authToken].LastAccessTime = DateTime.Now;
                 return true;
             }
             else
@@ -301,7 +353,23 @@ namespace OSBLE.Services
             {
                 return;
             }
-            FileSystem.UpdateFileOrdering(listing, courseId);
+
+            //pull the current user for easier access
+            UserProfile currentUser = activeSessions[authToken].UserProfile;
+
+            //make sure that the selected user has write privileges for the supplied course
+            CoursesUsers currentCourse = (from cu in db.CoursesUsers
+                                         where cu.CourseID == courseId && cu.UserProfileID == currentUser.ID
+                                         select cu).FirstOrDefault();
+            
+            //make sure that we got something back
+            if (currentCourse != null)
+            {
+                if (currentCourse.CourseRole.CanModify)
+                {
+                    FileSystem.UpdateFileOrdering(listing);
+                }
+            }
         }
 
         /// <summary>

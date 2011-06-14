@@ -93,10 +93,12 @@ namespace OSBLE
 
             //build a new listing, set some initial values
             DirectoryListing listing = new DirectoryListing();
+            listing.AbsolutePath = path;
             listing.Name = path.Substring(path.LastIndexOf('\\') + 1);
             listing.LastModified = File.GetLastWriteTime(path);
 
             //handle files
+            int defaultOrderingCount = 1000;
             foreach (string file in Directory.GetFiles(path))
             {
                 //the ordering file is used to denote ordering of files and should not be
@@ -106,6 +108,7 @@ namespace OSBLE
                     continue;
                 }
                 FileListing fList = new FileListing();
+                fList.AbsolutePath = file;
                 fList.Name = Path.GetFileName(file);
                 fList.LastModified = File.GetLastWriteTime(file);
                 fList.FileUrl = FileSystem.CourseDocumentPathToWebUrl(file);
@@ -114,6 +117,11 @@ namespace OSBLE
                 if (ordering.ContainsKey(fList.Name))
                 {
                     fList.SortOrder = ordering[fList.Name];
+                }
+                else
+                {
+                    fList.SortOrder = defaultOrderingCount;
+                    defaultOrderingCount++;
                 }
                 listing.Files.Add(fList);
             }
@@ -133,6 +141,11 @@ namespace OSBLE
                 if (ordering.ContainsKey(dlisting.Name))
                 {
                     dlisting.SortOrder = ordering[dlisting.Name];
+                }
+                else
+                {
+                    dlisting.SortOrder = defaultOrderingCount;
+                    defaultOrderingCount++;
                 }
                 listing.Directories.Add(dlisting);
             }
@@ -303,7 +316,7 @@ namespace OSBLE
             }
         }
 
-        private static void emptyFolder(string path)
+        public static void EmptyFolder(string path)
         {
             if (Directory.Exists(path))
             {
@@ -316,7 +329,7 @@ namespace OSBLE
 
                 foreach (DirectoryInfo di in parent.GetDirectories())
                 {
-                    emptyFolder(di.FullName);
+                    EmptyFolder(di.FullName);
                     di.Delete();
                 }
             }
@@ -337,10 +350,9 @@ namespace OSBLE
             }
         }
 
-        public static void UpdateFileOrdering(DirectoryListing listing, int courseId)
+        public static void UpdateFileOrdering(DirectoryListing listing)
         {
-            string path = GetCourseDocumentsPath(courseId);
-            string orderingFile = Path.Combine(path, OrderingFileName);
+            string orderingFile = Path.Combine(listing.AbsolutePath, OrderingFileName);
             StreamWriter writer = new StreamWriter(orderingFile);
 
             //files first
@@ -353,10 +365,14 @@ namespace OSBLE
             //then directories
             foreach (DirectoryListing dlisting in listing.Directories)
             {
+                if (dlisting is ParentDirectoryListing)
+                {
+                    continue;
+                }
                 string line = string.Format("{0},{1}", dlisting.Name, dlisting.SortOrder);
                 writer.WriteLine(line);
 
-                //TODO: add recursive call
+                UpdateFileOrdering(dlisting);
             }
             writer.Close();
         }
@@ -368,7 +384,7 @@ namespace OSBLE
         /// </summary>
         public static void WipeOutFileSystem()
         {
-            emptyFolder(getRootPath());
+            EmptyFolder(getRootPath());
         }
     }
 }
