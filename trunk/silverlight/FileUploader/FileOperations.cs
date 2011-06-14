@@ -52,6 +52,7 @@ namespace FileUploader
                         dList.Directories = new ObservableCollection<DirectoryListing>();
                         dList.LastModified = Directory.GetLastWriteTime(folder);
                         dList.Name = folder.Substring(folder.LastIndexOf('\\') + 1);
+                        dList.AbsolutePath = folder;
                         listing.Directories.Add(dList);
                     }
                     else
@@ -67,5 +68,6 @@ namespace FileUploader
             }
             return listing;
         }
+
     }
 }

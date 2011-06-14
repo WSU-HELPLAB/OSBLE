@@ -7,7 +7,7 @@
            xmlns:navigation="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Navigation"
            d:DesignWidth="640" d:DesignHeight="480"
            Title="UploaderPage Page">
-    <Grid x:Name="LayoutRoot"  Background="White" ShowGridLines="True" >
+    <Grid x:Name="LayoutRoot"  Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -31,16 +31,19 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Path: " VerticalAlignment="Bottom" />
-            <TextBox x:Name="LocalFileTextBox" Grid.Row="0" Grid.Column="1" />
+            <TextBox x:Name="LocalFileTextBox" IsEnabled="False"  Grid.Row="0" Grid.Column="1" />
         </Grid>
         <my:FileList x:Name="LocalFileList" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
         <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button x:Name="SyncButton" 
-                    Content="Sync View" 
-                    Margin="0,0,5,0"
-                    />
             <Button x:Name="SendFileButton"
-                    Content="Send Selected File"
+                    Content="Update Single File"
+                    Margin="0,0,9,0"
+                    Width="150"
+                    />
+            <Button x:Name="SyncButton" 
+                    Content="Update Directory" 
+                    Margin="0,0,9,0"
+                    Width="150"
                     />
         </StackPanel>
 
@@ -63,17 +66,21 @@
                 HorizontalAlignment="Right" 
                 VerticalAlignment="Center" 
                 Margin="0,0,5,0" 
+                Width="50"
                     />
             <Button 
                 x:Name="DownButton" 
                 Content="DOWN" 
                 HorizontalAlignment="Right" 
                 VerticalAlignment="Center" 
+                Width="50"
                     />
         </StackPanel>
         <my:FileList x:Name="RemoteFileList" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Stretch" />
+        <StackPanel Grid.Row="3" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="RemoveRemoteSelectionButton" Content="Delete Selection" Margin="0,0,9,0" Width="150"/>
+            <Button x:Name="DownloadRemoteFileButton" Content="Download Selected File" Width="150" />
+        </StackPanel>
         
-        
-        <TextBlock x:Name="statusLabel"/>
     </Grid>
 </navigation:Page>

@@ -155,11 +155,31 @@ namespace FileUploader.OsbleServices {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="FileListing", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Uploader")]
     public partial class FileListing : FileUploader.OsbleServices.AbstractListing {
+        
+        private string FileUrlField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string FileUrl {
+            get {
+                return this.FileUrlField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.FileUrlField, value) != true)) {
+                    this.FileUrlField = value;
+                    this.RaisePropertyChanged("FileUrl");
+                }
+            }
+        }
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(Namespace="", ConfigurationName="OsbleServices.UploaderWebService")]
     public interface UploaderWebService {
+        
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/DeleteFile", ReplyAction="urn:UploaderWebService/DeleteFileResponse")]
+        System.IAsyncResult BeginDeleteFile(string file, int courseId, string authToken, System.AsyncCallback callback, object asyncState);
+        
+        bool EndDeleteFile(System.IAsyncResult result);
         
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/GetFakeFileListing", ReplyAction="urn:UploaderWebService/GetFakeFileListingResponse")]
         System.IAsyncResult BeginGetFakeFileListing(System.AsyncCallback callback, object asyncState);
@@ -177,7 +197,7 @@ namespace FileUploader.OsbleServices {
         FileUploader.OsbleServices.ParentDirectoryListing EndGetFakeParentDirectoryListing(System.IAsyncResult result);
         
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/GetFileList", ReplyAction="urn:UploaderWebService/GetFileListResponse")]
-        System.IAsyncResult BeginGetFileList(int courseId, string authKey, System.AsyncCallback callback, object asyncState);
+        System.IAsyncResult BeginGetFileList(int courseId, string authToken, System.AsyncCallback callback, object asyncState);
         
         FileUploader.OsbleServices.DirectoryListing EndGetFileList(System.IAsyncResult result);
         
@@ -192,12 +212,12 @@ namespace FileUploader.OsbleServices {
         System.DateTime EndGetLastModifiedDate(System.IAsyncResult result);
         
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/GetValidUploadLocations", ReplyAction="urn:UploaderWebService/GetValidUploadLocationsResponse")]
-        System.IAsyncResult BeginGetValidUploadLocations(string authKey, System.AsyncCallback callback, object asyncState);
+        System.IAsyncResult BeginGetValidUploadLocations(string authToken, System.AsyncCallback callback, object asyncState);
         
         System.Collections.Generic.Dictionary<int, string> EndGetValidUploadLocations(System.IAsyncResult result);
         
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:UploaderWebService/IsValidKey", ReplyAction="urn:UploaderWebService/IsValidKeyResponse")]
-        System.IAsyncResult BeginIsValidKey(string authKey, System.AsyncCallback callback, object asyncState);
+        System.IAsyncResult BeginIsValidKey(string authToken, System.AsyncCallback callback, object asyncState);
         
         bool EndIsValidKey(System.IAsyncResult result);
         
@@ -224,6 +244,25 @@ namespace FileUploader.OsbleServices {
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public interface UploaderWebServiceChannel : FileUploader.OsbleServices.UploaderWebService, System.ServiceModel.IClientChannel {
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class DeleteFileCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        public DeleteFileCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        public bool Result {
+            get {
+                base.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
+            }
+        }
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -439,6 +478,12 @@ namespace FileUploader.OsbleServices {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public partial class UploaderWebServiceClient : System.ServiceModel.ClientBase<FileUploader.OsbleServices.UploaderWebService>, FileUploader.OsbleServices.UploaderWebService {
         
+        private BeginOperationDelegate onBeginDeleteFileDelegate;
+        
+        private EndOperationDelegate onEndDeleteFileDelegate;
+        
+        private System.Threading.SendOrPostCallback onDeleteFileCompletedDelegate;
+        
         private BeginOperationDelegate onBeginGetFakeFileListingDelegate;
         
         private EndOperationDelegate onEndGetFakeFileListingDelegate;
@@ -564,6 +609,8 @@ namespace FileUploader.OsbleServices {
             }
         }
         
+        public event System.EventHandler<DeleteFileCompletedEventArgs> DeleteFileCompleted;
+        
         public event System.EventHandler<GetFakeFileListingCompletedEventArgs> GetFakeFileListingCompleted;
         
         public event System.EventHandler<GetFakeDirectoryListingCompletedEventArgs> GetFakeDirectoryListingCompleted;
@@ -591,6 +638,56 @@ namespace FileUploader.OsbleServices {
         public event System.EventHandler<System.ComponentModel.AsyncCompletedEventArgs> OpenCompleted;
         
         public event System.EventHandler<System.ComponentModel.AsyncCompletedEventArgs> CloseCompleted;
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginDeleteFile(string file, int courseId, string authToken, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginDeleteFile(file, courseId, authToken, callback, asyncState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        bool FileUploader.OsbleServices.UploaderWebService.EndDeleteFile(System.IAsyncResult result) {
+            return base.Channel.EndDeleteFile(result);
+        }
+        
+        private System.IAsyncResult OnBeginDeleteFile(object[] inValues, System.AsyncCallback callback, object asyncState) {
+            string file = ((string)(inValues[0]));
+            int courseId = ((int)(inValues[1]));
+            string authToken = ((string)(inValues[2]));
+            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginDeleteFile(file, courseId, authToken, callback, asyncState);
+        }
+        
+        private object[] OnEndDeleteFile(System.IAsyncResult result) {
+            bool retVal = ((FileUploader.OsbleServices.UploaderWebService)(this)).EndDeleteFile(result);
+            return new object[] {
+                    retVal};
+        }
+        
+        private void OnDeleteFileCompleted(object state) {
+            if ((this.DeleteFileCompleted != null)) {
+                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
+                this.DeleteFileCompleted(this, new DeleteFileCompletedEventArgs(e.Results, e.Error, e.Cancelled, e.UserState));
+            }
+        }
+        
+        public void DeleteFileAsync(string file, int courseId, string authToken) {
+            this.DeleteFileAsync(file, courseId, authToken, null);
+        }
+        
+        public void DeleteFileAsync(string file, int courseId, string authToken, object userState) {
+            if ((this.onBeginDeleteFileDelegate == null)) {
+                this.onBeginDeleteFileDelegate = new BeginOperationDelegate(this.OnBeginDeleteFile);
+            }
+            if ((this.onEndDeleteFileDelegate == null)) {
+                this.onEndDeleteFileDelegate = new EndOperationDelegate(this.OnEndDeleteFile);
+            }
+            if ((this.onDeleteFileCompletedDelegate == null)) {
+                this.onDeleteFileCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnDeleteFileCompleted);
+            }
+            base.InvokeAsync(this.onBeginDeleteFileDelegate, new object[] {
+                        file,
+                        courseId,
+                        authToken}, this.onEndDeleteFileDelegate, this.onDeleteFileCompletedDelegate, userState);
+        }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginGetFakeFileListing(System.AsyncCallback callback, object asyncState) {
@@ -725,8 +822,8 @@ namespace FileUploader.OsbleServices {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginGetFileList(int courseId, string authKey, System.AsyncCallback callback, object asyncState) {
-            return base.Channel.BeginGetFileList(courseId, authKey, callback, asyncState);
+        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginGetFileList(int courseId, string authToken, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginGetFileList(courseId, authToken, callback, asyncState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -736,8 +833,8 @@ namespace FileUploader.OsbleServices {
         
         private System.IAsyncResult OnBeginGetFileList(object[] inValues, System.AsyncCallback callback, object asyncState) {
             int courseId = ((int)(inValues[0]));
-            string authKey = ((string)(inValues[1]));
-            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginGetFileList(courseId, authKey, callback, asyncState);
+            string authToken = ((string)(inValues[1]));
+            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginGetFileList(courseId, authToken, callback, asyncState);
         }
         
         private object[] OnEndGetFileList(System.IAsyncResult result) {
@@ -753,11 +850,11 @@ namespace FileUploader.OsbleServices {
             }
         }
         
-        public void GetFileListAsync(int courseId, string authKey) {
-            this.GetFileListAsync(courseId, authKey, null);
+        public void GetFileListAsync(int courseId, string authToken) {
+            this.GetFileListAsync(courseId, authToken, null);
         }
         
-        public void GetFileListAsync(int courseId, string authKey, object userState) {
+        public void GetFileListAsync(int courseId, string authToken, object userState) {
             if ((this.onBeginGetFileListDelegate == null)) {
                 this.onBeginGetFileListDelegate = new BeginOperationDelegate(this.OnBeginGetFileList);
             }
@@ -769,7 +866,7 @@ namespace FileUploader.OsbleServices {
             }
             base.InvokeAsync(this.onBeginGetFileListDelegate, new object[] {
                         courseId,
-                        authKey}, this.onEndGetFileListDelegate, this.onGetFileListCompletedDelegate, userState);
+                        authToken}, this.onEndGetFileListDelegate, this.onGetFileListCompletedDelegate, userState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -869,8 +966,8 @@ namespace FileUploader.OsbleServices {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginGetValidUploadLocations(string authKey, System.AsyncCallback callback, object asyncState) {
-            return base.Channel.BeginGetValidUploadLocations(authKey, callback, asyncState);
+        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginGetValidUploadLocations(string authToken, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginGetValidUploadLocations(authToken, callback, asyncState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -879,8 +976,8 @@ namespace FileUploader.OsbleServices {
         }
         
         private System.IAsyncResult OnBeginGetValidUploadLocations(object[] inValues, System.AsyncCallback callback, object asyncState) {
-            string authKey = ((string)(inValues[0]));
-            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginGetValidUploadLocations(authKey, callback, asyncState);
+            string authToken = ((string)(inValues[0]));
+            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginGetValidUploadLocations(authToken, callback, asyncState);
         }
         
         private object[] OnEndGetValidUploadLocations(System.IAsyncResult result) {
@@ -896,11 +993,11 @@ namespace FileUploader.OsbleServices {
             }
         }
         
-        public void GetValidUploadLocationsAsync(string authKey) {
-            this.GetValidUploadLocationsAsync(authKey, null);
+        public void GetValidUploadLocationsAsync(string authToken) {
+            this.GetValidUploadLocationsAsync(authToken, null);
         }
         
-        public void GetValidUploadLocationsAsync(string authKey, object userState) {
+        public void GetValidUploadLocationsAsync(string authToken, object userState) {
             if ((this.onBeginGetValidUploadLocationsDelegate == null)) {
                 this.onBeginGetValidUploadLocationsDelegate = new BeginOperationDelegate(this.OnBeginGetValidUploadLocations);
             }
@@ -911,12 +1008,12 @@ namespace FileUploader.OsbleServices {
                 this.onGetValidUploadLocationsCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnGetValidUploadLocationsCompleted);
             }
             base.InvokeAsync(this.onBeginGetValidUploadLocationsDelegate, new object[] {
-                        authKey}, this.onEndGetValidUploadLocationsDelegate, this.onGetValidUploadLocationsCompletedDelegate, userState);
+                        authToken}, this.onEndGetValidUploadLocationsDelegate, this.onGetValidUploadLocationsCompletedDelegate, userState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginIsValidKey(string authKey, System.AsyncCallback callback, object asyncState) {
-            return base.Channel.BeginIsValidKey(authKey, callback, asyncState);
+        System.IAsyncResult FileUploader.OsbleServices.UploaderWebService.BeginIsValidKey(string authToken, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginIsValidKey(authToken, callback, asyncState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -925,8 +1022,8 @@ namespace FileUploader.OsbleServices {
         }
         
         private System.IAsyncResult OnBeginIsValidKey(object[] inValues, System.AsyncCallback callback, object asyncState) {
-            string authKey = ((string)(inValues[0]));
-            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginIsValidKey(authKey, callback, asyncState);
+            string authToken = ((string)(inValues[0]));
+            return ((FileUploader.OsbleServices.UploaderWebService)(this)).BeginIsValidKey(authToken, callback, asyncState);
         }
         
         private object[] OnEndIsValidKey(System.IAsyncResult result) {
@@ -942,11 +1039,11 @@ namespace FileUploader.OsbleServices {
             }
         }
         
-        public void IsValidKeyAsync(string authKey) {
-            this.IsValidKeyAsync(authKey, null);
+        public void IsValidKeyAsync(string authToken) {
+            this.IsValidKeyAsync(authToken, null);
         }
         
-        public void IsValidKeyAsync(string authKey, object userState) {
+        public void IsValidKeyAsync(string authToken, object userState) {
             if ((this.onBeginIsValidKeyDelegate == null)) {
                 this.onBeginIsValidKeyDelegate = new BeginOperationDelegate(this.OnBeginIsValidKey);
             }
@@ -957,7 +1054,7 @@ namespace FileUploader.OsbleServices {
                 this.onIsValidKeyCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnIsValidKeyCompleted);
             }
             base.InvokeAsync(this.onBeginIsValidKeyDelegate, new object[] {
-                        authKey}, this.onEndIsValidKeyDelegate, this.onIsValidKeyCompletedDelegate, userState);
+                        authToken}, this.onEndIsValidKeyDelegate, this.onIsValidKeyCompletedDelegate, userState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -1235,6 +1332,21 @@ namespace FileUploader.OsbleServices {
                     base(client) {
             }
             
+            public System.IAsyncResult BeginDeleteFile(string file, int courseId, string authToken, System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[3];
+                _args[0] = file;
+                _args[1] = courseId;
+                _args[2] = authToken;
+                System.IAsyncResult _result = base.BeginInvoke("DeleteFile", _args, callback, asyncState);
+                return _result;
+            }
+            
+            public bool EndDeleteFile(System.IAsyncResult result) {
+                object[] _args = new object[0];
+                bool _result = ((bool)(base.EndInvoke("DeleteFile", _args, result)));
+                return _result;
+            }
+            
             public System.IAsyncResult BeginGetFakeFileListing(System.AsyncCallback callback, object asyncState) {
                 object[] _args = new object[0];
                 System.IAsyncResult _result = base.BeginInvoke("GetFakeFileListing", _args, callback, asyncState);
@@ -1271,10 +1383,10 @@ namespace FileUploader.OsbleServices {
                 return _result;
             }
             
-            public System.IAsyncResult BeginGetFileList(int courseId, string authKey, System.AsyncCallback callback, object asyncState) {
+            public System.IAsyncResult BeginGetFileList(int courseId, string authToken, System.AsyncCallback callback, object asyncState) {
                 object[] _args = new object[2];
                 _args[0] = courseId;
-                _args[1] = authKey;
+                _args[1] = authToken;
                 System.IAsyncResult _result = base.BeginInvoke("GetFileList", _args, callback, asyncState);
                 return _result;
             }
@@ -1313,9 +1425,9 @@ namespace FileUploader.OsbleServices {
                 return _result;
             }
             
-            public System.IAsyncResult BeginGetValidUploadLocations(string authKey, System.AsyncCallback callback, object asyncState) {
+            public System.IAsyncResult BeginGetValidUploadLocations(string authToken, System.AsyncCallback callback, object asyncState) {
                 object[] _args = new object[1];
-                _args[0] = authKey;
+                _args[0] = authToken;
                 System.IAsyncResult _result = base.BeginInvoke("GetValidUploadLocations", _args, callback, asyncState);
                 return _result;
             }
@@ -1326,9 +1438,9 @@ namespace FileUploader.OsbleServices {
                 return _result;
             }
             
-            public System.IAsyncResult BeginIsValidKey(string authKey, System.AsyncCallback callback, object asyncState) {
+            public System.IAsyncResult BeginIsValidKey(string authToken, System.AsyncCallback callback, object asyncState) {
                 object[] _args = new object[1];
-                _args[0] = authKey;
+                _args[0] = authToken;
                 System.IAsyncResult _result = base.BeginInvoke("IsValidKey", _args, callback, asyncState);
                 return _result;
             }

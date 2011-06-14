@@ -19,7 +19,26 @@ namespace FileUploader.Controls
         /// Used to track the last selected item in the list.  A hacky way to provide
         /// "double click" behavior.
         /// </summary>
-        private FileListItem lastSelectedItem = null;
+        public FileListItem LastSelectedItem
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Exposes the currently selected AbstractListing
+        /// </summary>
+        public AbstractListing SelectedItem
+        {
+            get
+            {
+                if (LastSelectedItem != null)
+                {
+                    return LastSelectedItem.DataContext as AbstractListing;
+                }
+                return null;
+            }
+        }
 
         //Event handlers used to inform consumers that we might need additional information.
         public EventHandler ParentDirectoryRequest = delegate { };
@@ -73,11 +92,17 @@ namespace FileUploader.Controls
         /// </summary>
         public void MoveSelectionUp()
         {
-            if (lastSelectedItem != null)
+            if (LastSelectedItem != null)
             {
-                lastSelectedItem.DataContext.SortOrder -= 1;
-                (ListOfFiles.Items[ListOfFiles.SelectedIndex - 1] as AbstractListing).SortOrder += 1;
-                MoveItem(ListOfFiles.SelectedIndex, ListOfFiles.SelectedIndex - 1);
+                if (ListOfFiles.SelectedIndex > 1)
+                {
+                    AbstractListing previousItem = (ListOfFiles.Items[ListOfFiles.SelectedIndex - 1] as FileListItem).DataContext;
+                    AbstractListing currentItem = LastSelectedItem.DataContext;
+                    int tmpOrder = previousItem.SortOrder;
+                    previousItem.SortOrder = currentItem.SortOrder;
+                    currentItem.SortOrder = tmpOrder;
+                    MoveItem(ListOfFiles.SelectedIndex, ListOfFiles.SelectedIndex - 1);
+                }
             }
         }
 
@@ -86,11 +111,17 @@ namespace FileUploader.Controls
         /// </summary>
         public void MoveSelectionDown()
         {
-            if (lastSelectedItem != null)
+            if (LastSelectedItem != null)
             {
-                lastSelectedItem.DataContext.SortOrder += 1;
-                (ListOfFiles.Items[ListOfFiles.SelectedIndex + 1] as AbstractListing).SortOrder -= 1;
-                MoveItem(ListOfFiles.SelectedIndex, ListOfFiles.SelectedIndex + 1);
+                if (ListOfFiles.SelectedIndex < ListOfFiles.Items.Count - 2)
+                {
+                    AbstractListing currentItem = LastSelectedItem.DataContext;
+                    AbstractListing nextItem = (ListOfFiles.Items[ListOfFiles.SelectedIndex + 1] as FileListItem).DataContext;
+                    int tmpOrder = nextItem.SortOrder;
+                    nextItem.SortOrder = currentItem.SortOrder;
+                    currentItem.SortOrder = tmpOrder;
+                    MoveItem(ListOfFiles.SelectedIndex, ListOfFiles.SelectedIndex + 1);
+                }
             }
         }
 
@@ -104,7 +135,7 @@ namespace FileUploader.Controls
         {
             if (oldLocation > 0 && newLocation > 0)
             {
-                AbstractListing listItem = ListOfFiles.Items[oldLocation] as AbstractListing;
+                FileListItem listItem = (ListOfFiles.Items[oldLocation] as FileListItem);
                 ListOfFiles.Items.RemoveAt(oldLocation);
                 ListOfFiles.Items.Insert(newLocation, listItem);
                 ListOfFiles.SelectedItem = listItem;
@@ -120,7 +151,7 @@ namespace FileUploader.Controls
         void ListOfFiles_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             FileListItem selectedItem = (sender as ListBox).SelectedItem as FileListItem;
-            if (lastSelectedItem == selectedItem && selectedItem != null)
+            if (LastSelectedItem == selectedItem && selectedItem != null)
             {
                 //we only care about double clicks on directory listings
                 if (selectedItem.DataContext is DirectoryListing)
@@ -154,7 +185,7 @@ namespace FileUploader.Controls
                     }
                 }
             }
-            lastSelectedItem = selectedItem;
+            LastSelectedItem = selectedItem;
         }
 
         /// <summary>

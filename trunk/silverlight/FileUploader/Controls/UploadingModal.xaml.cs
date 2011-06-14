@@ -19,6 +19,9 @@ namespace FileUploader.Controls
     {
         UploaderThread uploader = new UploaderThread();
 
+        /// <summary>
+        /// Gets or sets the listing of files to be uploaded
+        /// </summary>
         public DirectoryListing Listing
         {
             get
@@ -32,6 +35,9 @@ namespace FileUploader.Controls
             }
         }
 
+        /// <summary>
+        /// Gets or sets the token needed to make service requests
+        /// </summary>
         public string AuthToken
         {
             get
@@ -44,6 +50,9 @@ namespace FileUploader.Controls
             }
         }
 
+        /// <summary>
+        /// Gets or sets the ID of the course whose documents we're syncing
+        /// </summary>
         public int CourseId
         {
             get
@@ -56,6 +65,9 @@ namespace FileUploader.Controls
             }
         }
 
+        /// <summary>
+        /// Constructor method
+        /// </summary>
         public UploadingModal()
         {
             InitializeComponent();
@@ -75,12 +87,23 @@ namespace FileUploader.Controls
             UploadProgressBar.Maximum = uploader.NumberOfUploads;
         }
 
+        /// <summary>
+        /// Called automatically when the user tries to close the window.  In this case,
+        /// make sure that we stop uploading files.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void UploadingModal_Closed(object sender, EventArgs e)
         {
             //make sure that we stop uploading
             uploader.RequestCancel();
         }
 
+        /// <summary>
+        /// Handles error messages received from our uploader thread.  Right now, pretty basic.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void uploader_Failed(object sender, EventArgs e)
         {
             this.Dispatcher.BeginInvoke(delegate()
@@ -89,6 +112,11 @@ namespace FileUploader.Controls
             });
         }
 
+        /// <summary>
+        /// This event is raised when the uploader thread finishes its canceling process
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void uploader_Cancelled(object sender, EventArgs e)
         {
             this.Dispatcher.BeginInvoke(delegate()
@@ -100,6 +128,10 @@ namespace FileUploader.Controls
             );
         }
 
+        /// <summary>
+        /// Starts the uploading process.  Be sure to set Listing, AuthToken, and CourseId
+        /// before calling, or you'll have a very short upload!
+        /// </summary>
         public void BeginUpload()
         {
             OkButton.IsEnabled = false;
@@ -107,11 +139,22 @@ namespace FileUploader.Controls
             uploader.Start();
         }
 
+        /// <summary>
+        /// Called whenever the user clicks the "cancel" button.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             uploader.RequestCancel();
         }
 
+        /// <summary>
+        /// Listens for the beginning of a new file upload.  Used to update
+        /// the user on what file is being uploaded.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FileUploadStart(object sender, FileUploadBegineArgs e)
         {
             this.Dispatcher.BeginInvoke(delegate()
@@ -131,11 +174,21 @@ namespace FileUploader.Controls
             );
         }
 
+        /// <summary>
+        /// Call to close the window
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
             this.DialogResult = true;
         }
 
+        /// <summary>
+        /// Called when all files have been sent to the server.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void UploadComplete(object sender, EventArgs e)
         {
             this.Dispatcher.BeginInvoke(delegate()
