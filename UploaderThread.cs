@@ -16,12 +16,29 @@ namespace FileUploader
 {
     public class UploaderThread : ThreadWrapperBase
     {
+        /// <summary>
+        /// Raised whenever a new file upload is about to begin
+        /// </summary>
         public EventHandler<FileUploadBegineArgs> FileUploadBegin = delegate { };
+
+        /// <summary>
+        /// Raised when all files have been uploaded to the server
+        /// </summary>
         public EventHandler UploadComplete = delegate { };
 
+        /// <summary>
+        /// Reference to our web service
+        /// </summary>
         private UploaderWebServiceClient client = new UploaderWebServiceClient();
 
+        /// <summary>
+        /// Contains the files to be uploaded
+        /// </summary>
         private DirectoryListing uploadListing = new DirectoryListing() { Directories = new System.Collections.ObjectModel.ObservableCollection<DirectoryListing>(), Files = new System.Collections.ObjectModel.ObservableCollection<FileListing>()};
+
+        /// <summary>
+        /// Gets or sets the files to be uploaded to the server
+        /// </summary>
         public DirectoryListing Listing
         {
             get
@@ -34,24 +51,36 @@ namespace FileUploader
             }
         }
 
+        /// <summary>
+        /// The authentication token needed to authenticate server requests
+        /// </summary>
         public string AuthToken
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// The ID of the course that we will be uploading documents to
+        /// </summary>
         public int CourseId
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// Used to report upload progress
+        /// </summary>
         public int NumberOfUploadsCompleted
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// Returns the total number of items to be uploaded
+        /// </summary>
         public int NumberOfUploads
         {
             get
@@ -60,12 +89,29 @@ namespace FileUploader
             }
         }
 
+        /// <summary>
+        /// Using as a binary semaphore so that we are able to wait for the file sync to complete before
+        /// moving on.
+        /// </summary>
         private bool fileSyncCompleted = false;
+
+        /// <summary>
+        /// Used as a binary semaphore so that we are able to wait for the modification check
+        /// to complete
+        /// </summary>
         private bool fileLastModifiedCompleted = false;
+
+        /// <summary>
+        /// Used to store the last modify time retrieved from the server.
+        /// </summary>
         private DateTime fileLastModified;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public UploaderThread()
         {
+            //various event handlers
             client.PrepCurrentPathCompleted += new EventHandler<PrepCurrentPathCompletedEventArgs>(client_PrepCurrentPathCompleted);
             client.SyncFileCompleted += new EventHandler<SyncFileCompletedEventArgs>(client_SyncFileCompleted);
             client.GetLastModifiedDateCompleted += new EventHandler<GetLastModifiedDateCompletedEventArgs>(client_GetLastModifiedDateCompleted);
@@ -185,6 +231,9 @@ namespace FileUploader
             }
         }
 
+        /// <summary>
+        /// This gets called when we're done with our initial task
+        /// </summary>
         protected override void OnCompleted()
         {
             UploadComplete(this, EventArgs.Empty);
@@ -213,18 +262,32 @@ namespace FileUploader
             return count;
         }
 
+        /// <summary>
+        /// Event handler for receiving file information from the server
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void client_GetLastModifiedDateCompleted(object sender, GetLastModifiedDateCompletedEventArgs e)
         {
-            fileLastModifiedCompleted = true;
+            //very important to modify the result before releasing the lock!
             fileLastModified = e.Result;
+            fileLastModifiedCompleted = true;
         }
 
+        /// <summary>
+        /// Event handler for notifying that a file transfer was complete
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void client_SyncFileCompleted(object sender, SyncFileCompletedEventArgs e)
         {
             fileSyncCompleted = true;
         }
     }
 
+    /// <summary>
+    /// Event args for an event handler used by "FileUploadBegin"
+    /// </summary>
     public class FileUploadBegineArgs : EventArgs
     {
         public string FileToUpload

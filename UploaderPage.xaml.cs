@@ -25,10 +25,14 @@ namespace FileUploader
     public partial class UploaderPage : Page
     {
         private string authToken = "";
+        private string OsbleUrl = "http://localhost:17532";
         public string RootPath;
 
         //reference to our web service
         private UploaderWebServiceClient client = new UploaderWebServiceClient();
+
+        //used for pulling files from the server
+        private WebClient fileClient = new WebClient();
 
         // stores 
         private KeyValuePair<int, string> course;
@@ -65,6 +69,8 @@ namespace FileUploader
             //listeners for our web service
             client.GetFileListCompleted += new EventHandler<GetFileListCompletedEventArgs>(GetFileListCompleted);
             client.GetValidUploadLocationsCompleted += new EventHandler<GetValidUploadLocationsCompletedEventArgs>(GetValidUploadLocationsCompleted);
+            client.DeleteFileCompleted += new EventHandler<DeleteFileCompletedEventArgs>(SelectionChanged);
+            client.UpdateListingOrderCompleted += new EventHandler<System.ComponentModel.AsyncCompletedEventArgs>(client_UpdateListingOrderCompleted);
 
             //local event listeners
             SyncButton.Click += new RoutedEventHandler(SyncButton_Click);
@@ -72,9 +78,12 @@ namespace FileUploader
             LocalFileList.EmptyDirectoryEncountered += new EventHandler(LocalFileList_EmptyDirectoryEncountered);
             LocalFileList.ParentDirectoryRequest += new EventHandler(LocalFileList_ParentDirectoryRequest);
             LocalFileTextBox.KeyUp += new KeyEventHandler(LocalFileTextBox_KeyUp);
-            UploadLocation.SelectionChanged += new SelectionChangedEventHandler(UploadLocation_SelectionChanged);
+            UploadLocation.SelectionChanged += new SelectionChangedEventHandler(SelectionChanged);
             UpButton.Click += new RoutedEventHandler(UpButton_Click);
             DownButton.Click += new RoutedEventHandler(DownButton_Click);
+            RemoveRemoteSelectionButton.Click += new RoutedEventHandler(RemoveRemoteSelectionButton_Click);
+            DownloadRemoteFileButton.Click += new RoutedEventHandler(DownloadRemoteFileButton_Click);
+            fileClient.OpenReadCompleted += new OpenReadCompletedEventHandler(DownloadRemoteFileCompleted);
 
             //get the remote server file list
             client.GetValidUploadLocationsAsync(authToken);
@@ -83,10 +92,56 @@ namespace FileUploader
             LocalFileList.DataContext = FileOperations.BuildLocalDirectoryListing(LocalPath);
         }
 
+        void client_UpdateListingOrderCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        {
+            DownButton.IsEnabled = true;
+            UpButton.IsEnabled = true;
+        }
+
+
         void DownButton_Click(object sender, RoutedEventArgs e)
         {
+            DownButton.IsEnabled = false;
+            UpButton.IsEnabled = false;
             RemoteFileList.MoveSelectionDown();
             client.UpdateListingOrderAsync(RemoteFileList.DataContext, course.Key, authToken);
+        }
+
+        void DownloadRemoteFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (RemoteFileList.SelectedItem is FileListing)
+            {
+                //send a request to download the selected file
+                FileListing fi = RemoteFileList.SelectedItem as FileListing;
+                Uri uri = new Uri(OsbleUrl + fi.FileUrl);
+                RemoteFileList.IsEnabled = false;
+                DownloadRemoteFileButton.IsEnabled = false;
+                DownloadRemoteFileButton.Content = "Downloading...";
+                fileClient.OpenReadAsync(uri);
+            }
+        }
+
+        void DownloadRemoteFileCompleted(object sender, OpenReadCompletedEventArgs e)
+        {
+            Stream remoteStream = e.Result;
+            AbstractListing listing = RemoteFileList.SelectedItem;
+            
+            //write the file to the current local path, using the server file name
+            string writePath = Path.Combine(LocalPath, listing.Name);
+            FileStream localStream = new FileStream(writePath, FileMode.Create);
+            
+            //what a cool function!
+            remoteStream.CopyTo(localStream);
+
+            //close everything up, re-enable various buttons
+            remoteStream.Close();
+            localStream.Close();
+            RemoteFileList.IsEnabled = true;
+            DownloadRemoteFileButton.IsEnabled = true;
+            DownloadRemoteFileButton.Content = "Download Selected File";
+
+            //refresh the local data context
+            LocalFileList.DataContext = FileOperations.BuildLocalDirectoryListing(LocalPath);
         }
 
         void GetFileListCompleted(object sender, GetFileListCompletedEventArgs e)
@@ -164,8 +219,40 @@ namespace FileUploader
             LocalFileList.DataContext = FileOperations.BuildLocalDirectoryListing(LocalPath);
         }
 
+        /// <summary>
+        /// Will send the currently selected file to the server
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void SendFileButton_Click(object sender, RoutedEventArgs e)
         {
+            //as long as something was selected, we're good to go
+            if (LocalFileList.SelectedItem != null)
+            {
+                //two cases: if a FileListItem is selected, then we need to smash it
+                //into a DirectoryListing.  If it's a DirectoryListing, then we're good
+                //to go.
+                DirectoryListing dl = new DirectoryListing() { Files = new ObservableCollection<FileListing>(), Directories = new ObservableCollection<DirectoryListing>() };
+                if (LocalFileList.SelectedItem is FileListing)
+                {
+                    dl.Files.Add(LocalFileList.SelectedItem as FileListing);
+                }
+                else if(LocalFileList.SelectedItem is DirectoryListing)
+                {
+                    //if it's a directory listing, then we need to send the inner contents of the directory
+                    dl.Directories.Add(FileOperations.BuildLocalDirectoryListing(LocalFileList.SelectedItem.AbsolutePath, false, true));
+                }
+
+                //almost exaxtly the same code as in "SyncButton_Click".  Might want to refactor at
+                //some point
+                UploadingModal uploader = new UploadingModal();
+                uploader.Listing = dl;
+                uploader.CourseId = course.Key;
+                uploader.AuthToken = authToken;
+                uploader.BeginUpload();
+                uploader.Show();
+                uploader.Closed += new EventHandler(uploader_Closed);
+            }
         }
 
         /// <summary>
@@ -187,6 +274,9 @@ namespace FileUploader
 
         void SyncButton_Click(object sender, RoutedEventArgs e)
         {
+            //save the last local path
+            SavelastLocalPath(LocalPath);
+
             DirectoryListing listing = FileOperations.BuildLocalDirectoryListing(LocalPath, false, true);
             UploadingModal uploader = new UploadingModal();
             uploader.Listing = listing;
@@ -194,15 +284,33 @@ namespace FileUploader
             uploader.AuthToken = authToken;
             uploader.BeginUpload();
             uploader.Show();
+            uploader.Closed += new EventHandler(uploader_Closed);
+        }
+
+        /// <summary>
+        /// Call to remove the selected item from the server
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void RemoveRemoteSelectionButton_Click(object sender, RoutedEventArgs e)
+        {
+            client.DeleteFileAsync(RemoteFileList.SelectedItem.AbsolutePath, course.Key, authToken);
+        }
+
+        void uploader_Closed(object sender, EventArgs e)
+        {
+            SelectionChanged(this, null);
         }
 
         void UpButton_Click(object sender, RoutedEventArgs e)
         {
+            DownButton.IsEnabled = false;
+            UpButton.IsEnabled = false;
             RemoteFileList.MoveSelectionUp();
             client.UpdateListingOrderAsync(RemoteFileList.DataContext, course.Key, authToken);
         }
 
-        void UploadLocation_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        void SelectionChanged(object sender, EventArgs e)
         {
             //very hack-ish at the moment, may need to revise
             course = (KeyValuePair<int, string>)UploadLocation.SelectedValue;

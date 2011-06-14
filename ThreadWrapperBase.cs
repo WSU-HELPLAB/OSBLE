@@ -28,9 +28,7 @@ namespace FileUploader
         {
             get { return status; }
         }
-
-        // (You could add properties to return the thread ID and name here.)
-
+        
         // Start the new operation.
         public void Start()
         {
@@ -80,6 +78,10 @@ namespace FileUploader
         }
 
         public event EventHandler Failed = delegate { };
+
+        /// <summary>
+        /// Called whenever a task fails for some reason
+        /// </summary>
         protected void OnFailed()
         {
             if (Failed != null)
