@@ -1201,3 +1201,29 @@ ul.selector
     margin-top: 0.25em;
     margin-bottom: 0.25em;
 }
+
+ul.assignment_deliverables, .assignment_deliverables ul
+{
+    padding-left: 0;
+}
+
+.assignment_deliverables li 
+{
+    list-style-type: none;
+    padding: 5px;
+    border: 1px solid #eeeeff;
+    border-bottom: 5px solid #eeeeff;
+    margin-left: 0px;
+}
+
+.deliverables_table 
+{
+    width: 100%;
+}
+
+.deliverables_table th
+{
+    width: 100px;
+    text-align: left;
+    vertical-align: top;
+}

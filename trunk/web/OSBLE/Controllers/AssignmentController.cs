@@ -86,6 +86,8 @@ namespace OSBLE.Controllers
             ViewBag.FutureAssignments = futureAssignments;
             ViewBag.DraftAssignments = draftAssignments;
 
+            ViewBag.DeliverableTypes = GetListOfDeliverableTypes();
+
             return View();
         }
 

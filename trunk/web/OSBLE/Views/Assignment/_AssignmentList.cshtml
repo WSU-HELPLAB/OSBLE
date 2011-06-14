@@ -1,4 +1,5 @@
 ﻿@using OSBLE.Models.Assignments
+@using OSBLE.Models.Assignments.Activities
 
 @model List<StudioAssignment>
 
@@ -14,6 +15,59 @@
         {
             
         <div class="assignment_title">Deliverables</div>
+            
+        <ul class="assignment_deliverables">
+            @foreach(Deliverable d in sa.Deliverables) {
+                SelectListItem sli = ViewBag.DeliverableTypes[d.Type];
+                <li>
+                    <table class="deliverables_table">
+                        <tr>
+                            <th>Name</th>
+                            <td>@d.Name</td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td>@sli.Text</td>
+                        </tr>
+                        @if (sa.AssignmentActivities.Where(aa => aa is SubmissionActivity).Count() > 0)
+                        {
+                        <tr>
+                            <th>Submissions</th>
+                            <td>
+                            <ul>
+                            @{
+                                List<AssignmentActivity> assignmentActivities = sa.AssignmentActivities.OrderBy(aa=>aa.ReleaseDate).ToList();
+                                List<AssignmentActivity> submissionActivities = assignmentActivities.Where(aa => aa is SubmissionActivity).OrderBy(aa => aa.ReleaseDate).ToList();
+
+                                foreach (SubmissionActivity submission in submissionActivities) {
+                                   
+                                    DateTime startDate = submission.ReleaseDate;
+                                    DateTime endDate = assignmentActivities[assignmentActivities.IndexOf(submission) + 1].ReleaseDate;    
+                                        
+
+                                 <li>
+                                 <table>
+                                     <tr>
+                                        <th>Start Date</th>
+                                        <td>@startDate.ToString()</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Due Date</th>
+                                        <td>@endDate.ToString()</td>
+                                    </tr>
+                                </table>
+                                 </li>   
+                                }
+                                
+                            }
+                            </ul>
+                            </td>
+                        </tr>   
+                        }
+                    </table>
+                 </li>
+            }
+        </ul>
             
         }
 

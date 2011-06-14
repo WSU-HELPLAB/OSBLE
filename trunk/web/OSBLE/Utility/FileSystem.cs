@@ -155,48 +155,6 @@ namespace OSBLE
         }
 
         /// <summary>
-        /// This gets the ReCaptcha's public key using the file that is supposed to be in the file system
-        /// If it is not there it returns and null so this must be caught before passed into ReCaptcha
-        /// </summary>
-        /// <returns></returns>
-        public static string GetReCaptchaPrivateKey()
-        {
-            try
-            {
-                StreamReader sr = new StreamReader(getRootPath() + "ReCaptcha\\" + "Keys.txt");
-                //the first line is public key
-                sr.ReadLine();
-
-                //second line is private key
-                return sr.ReadLine();
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// This gets the ReCaptcha's public key using the file that is supposed to be in the file system
-        /// If it is not there it returns and null
-        /// </summary>
-        /// <returns></returns>
-        public static string GetReCaptchaPublicKey()
-        {
-            try
-            {
-                StreamReader sr = new StreamReader(getRootPath() + "Recaptcha\\" + "Keys.txt");
-
-                //first line is public key
-                return sr.ReadLine();
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
         /// Returns a list of course documents wrapped in a DirectoryListing object
         /// </summary>
         /// <param name="course"></param>

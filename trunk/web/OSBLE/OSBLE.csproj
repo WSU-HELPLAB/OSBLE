@@ -138,7 +138,6 @@
     <Compile Include="Controllers\BasicAssignmentController.cs" />
     <Compile Include="Controllers\CommunityController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
-    <Compile Include="Controllers\DeliverableController.cs" />
     <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\FileHandlerController.cs" />
     <Compile Include="Controllers\IssueVotingController.cs" />

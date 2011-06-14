@@ -9,6 +9,8 @@ using OSBLE.Models.HomePage;
 using OSBLE.Models;
 using OSBLE.Models.Users;
 using OSBLE.Models.Courses;
+using OSBLE.Models.Assignments.Activities;
+using System.Reflection;
 
 namespace OSBLE.Controllers
 {
@@ -291,6 +293,49 @@ namespace OSBLE.Controllers
         public void SetUnreadMessageCount()
         {
             ViewBag.UnreadMessageCount = (int)db.Mails.Where(m => (m.ToUserProfileID == currentUser.ID) && (m.Read == false)).Count();
+        }
+
+        protected List<SelectListItem> GetListOfDeliverableTypes()
+        {
+            List<SelectListItem> fileTypes = new List<SelectListItem>();
+            int i = 0;
+            DeliverableType deliverable = (DeliverableType)i;
+            while (Enum.IsDefined(typeof(DeliverableType), i))
+            {
+                Type type = deliverable.GetType();
+
+                FieldInfo fi = type.GetField(deliverable.ToString());
+
+                //we get the attributes of the selected language
+                FileExtensions[] attrs = (fi.GetCustomAttributes(typeof(FileExtensions), false) as FileExtensions[]);
+
+                //make sure we have more than (should be exactly 1)
+                if (attrs.Length > 0 && attrs[0] is FileExtensions)
+                {
+                    //we get the first attributes value which should be the fileExtension
+                    string s = deliverable.ToString();
+                    s += " (";
+                    s += string.Join(", ", attrs[0].Extensions);
+                    s += ")";
+
+                    SelectListItem sli = new SelectListItem();
+
+                    sli.Text = s;
+                    sli.Value = i.ToString();
+
+                    fileTypes.Add(sli);
+                }
+                else
+                {
+                    //throw and exception if not decorated with any attrs because it is a requirement
+                    throw new Exception("Languages must have be decorated with a FileExtensionAttribute");
+                }
+
+                i++;
+                deliverable = (DeliverableType)i;
+            }
+
+            return fileTypes;
         }
     }
 }
