@@ -1216,6 +1216,29 @@ ul.assignment_deliverables, .assignment_deliverables ul
     margin-left: 0px;
 }
 
+.submission_deliverable
+{
+    width: 250px;
+    padding: 5px;
+    float: left;
+    border: 1px solid #eeeeff;
+    border-bottom: 5px solid #eeeeff;
+    margin-left: 0px;
+    display: block;
+    margin-right: 10px;
+}
+
+.submission_deliverable th 
+{
+    text-align: left;
+    vertical-align: top;
+}
+
+.submission_deliverables_end 
+{
+    clear: both;
+}
+
 .deliverables_table 
 {
     width: 100%;

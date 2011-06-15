@@ -58,6 +58,41 @@
                                         </tr>
                                     </table>
 
+                                    <h4>Deliverables</h4>
+
+                                    <div>
+                                    @foreach (Deliverable d in sa.Deliverables)
+                                    {
+                                        SelectListItem sli = ViewBag.DeliverableTypes[d.Type];
+                                        <div class="submission_deliverable">
+                                            @* Get deliverable type string *@
+                                            <table>
+                                                <tr>
+                                                    <th>
+                                                        <span>Name</span>
+                                                    </th>
+                                                    <td>
+                                                        <span>@d.Name</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>
+                                                        <span>Type</span>
+                                                    </th>
+                                                    <td>
+                                                        <span>@sli.Text</span>
+                                                    </td>
+                                                </tr>
+                                                @*
+                                                TODO: This is where submission links/status should appear (for students)
+                                                and grading links should appear (for instructors)
+                                                *@
+                                            </table>
+                                        </div>
+
+                                    }
+                                    </div>
+                                    <div class="submission_deliverables_end"></div>
                                  </li>   
                             }
                                 
@@ -65,38 +100,6 @@
             </ul>
             }
     
-        <ul class="assignment_deliverables">
-            @foreach (Deliverable d in sa.Deliverables)
-            {
-                @* Get deliverable type string *@
-                SelectListItem sli = ViewBag.DeliverableTypes[d.Type];
-                <li>
-                    <table class="deliverables_table">
-                        <tr>
-                            <th>Name</th>
-                            <td>@d.Name</td>
-                        </tr>
-                        <tr>
-                            <th>Type</th>
-                            <td>@sli.Text</td>
-                        </tr>
-                        @* List submissions if any submission periods available *@
-                        @if (sa.AssignmentActivities.Where(aa => aa is SubmissionActivity).Count() > 0)
-                        {
-                        <tr>
-                            <th>Submissions</th>
-                            <td>
-                            <ul>
-                            
-                            </ul>
-                            </td>
-                        </tr>   
-
-                        }
-                    </table>
-                 </li>
-            }
-        </ul>
             
         }
         
