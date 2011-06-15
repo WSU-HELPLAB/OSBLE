@@ -19,6 +19,7 @@ using System.Windows.Navigation;
 using FileUploader.OsbleServices;
 using FileUploader.Controls;
 using System.IO.IsolatedStorage;
+using System.Windows.Threading;
 
 namespace FileUploader
 {
@@ -38,6 +39,8 @@ namespace FileUploader
 
         // stores 
         private KeyValuePair<int, string> course;
+
+        DispatcherTimer loginCheck = new DispatcherTimer();
 
         public string LocalPath
         {
@@ -81,6 +84,7 @@ namespace FileUploader
             client.GetValidUploadLocationsCompleted += new EventHandler<GetValidUploadLocationsCompletedEventArgs>(GetValidUploadLocationsCompleted);
             client.DeleteFileCompleted += new EventHandler<DeleteFileCompletedEventArgs>(SelectionChanged);
             client.UpdateListingOrderCompleted += new EventHandler<System.ComponentModel.AsyncCompletedEventArgs>(client_UpdateListingOrderCompleted);
+            client.IsValidKeyCompleted += new EventHandler<IsValidKeyCompletedEventArgs>(client_IsValidKeyCompleted);
 
             //local event listeners
             SyncButton.Click += new RoutedEventHandler(SyncButton_Click);
@@ -101,44 +105,36 @@ namespace FileUploader
             //get the local files
             LocalFileList.DataContext = FileOperations.BuildLocalDirectoryListing(LocalPath);
 
+            //periodically check login credentials
+            loginCheck.Interval = new TimeSpan(0, 0, 1, 0, 0);
+            loginCheck.Tick += new EventHandler(loginCheck_Tick);
+            loginCheck.Start();
+
         }
 
-        void localContextMenu_MenuItemSelected(object sender, LocalFileEventArgs e)
+        void client_IsValidKeyCompleted(object sender, IsValidKeyCompletedEventArgs e)
         {
-            switch (e.ActionRequested)
+            //if we lost authentication for some reason, we need to display the login
+            //box again
+            if (!e.Result)
             {
-                case LocalFileActions.SendSingleFile:
-                    SendSingleFile(this, new RoutedEventArgs());
-                    break;
+                loginCheck.Stop();
+                LoginWindow loginWindow = new LoginWindow();
+                loginWindow.ValidTokenReceived += new EventHandler(ValidTokenReceived);
+                loginWindow.Show();
             }
         }
 
-        void remoteContextMenu_MenuItemSelected(object sender, RemoteFileEventArgs e)
+        /// <summary>
+        /// Called once we receive a valid login token
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ValidTokenReceived(object sender, EventArgs e)
         {
-            switch (e.ActionRequested)
-            {
-                case RemoteFileActions.Delete:
-                    ConfirmDeleteButton confirm = new ConfirmDeleteButton();
-                    confirm.Show();
-                    confirm.OKButton.Click += new RoutedEventHandler(RemoveRemoteSelectionButton_Click);
-                    break;
-
-                case RemoteFileActions.Download:
-                    DownloadRemoteFile(this, new RoutedEventArgs());
-                    break;
-
-                case RemoteFileActions.MoveDown:
-                    MoveRemoteSelectionDown(this, new RoutedEventArgs());                    
-                    break;
-
-                case RemoteFileActions.MoveUp:
-                    MoveRemoteSelectionUp(this, new RoutedEventArgs());
-                    break;
-            }
-
-            //The remote file list's selection change event will fire through we're not technically clicking on
-            //a file list item.  To get around an accidental tree traversal, set the selected item to null
-            RemoteFileList.ClearSelection();
+            LoginWindow window = sender as LoginWindow;
+            this.authToken = window.Token;
+            loginCheck.Start();
         }
 
         void client_UpdateListingOrderCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
@@ -221,6 +217,21 @@ namespace FileUploader
             }
         }
 
+        /// <summary>
+        /// Called whenever we receive input from our local context menu
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void localContextMenu_MenuItemSelected(object sender, LocalFileEventArgs e)
+        {
+            switch (e.ActionRequested)
+            {
+                case LocalFileActions.SendSingleFile:
+                    SendSingleFile(this, new RoutedEventArgs());
+                    break;
+            }
+        }
+
         //allows the user to quick navigate to a desired location
         void LocalFileTextBox_KeyUp(object sender, KeyEventArgs e)
         {
@@ -243,6 +254,16 @@ namespace FileUploader
             DirectoryListing listing = list.DataContext;
             LocalPath = LocalPath.Substring(0, LocalPath.LastIndexOf('\\'));
             LocalFileList.DataContext = FileOperations.BuildLocalDirectoryListing(LocalPath);
+        }
+
+        /// <summary>
+        /// Called when our login timer fires
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void loginCheck_Tick(object sender, EventArgs e)
+        {
+            client.IsValidKeyAsync(authToken);
         }
 
         /// <summary>
@@ -273,6 +294,39 @@ namespace FileUploader
             UpButton.IsEnabled = false;
             RemoteFileList.MoveSelectionUp();
             client.UpdateListingOrderAsync(RemoteFileList.DataContext, course.Key, authToken);
+        }
+
+        /// <summary>
+        /// Called whenever we receive a message from our remote context menu
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void remoteContextMenu_MenuItemSelected(object sender, RemoteFileEventArgs e)
+        {
+            switch (e.ActionRequested)
+            {
+                case RemoteFileActions.Delete:
+                    ConfirmDeleteButton confirm = new ConfirmDeleteButton();
+                    confirm.Show();
+                    confirm.OKButton.Click += new RoutedEventHandler(RemoveRemoteSelectionButton_Click);
+                    break;
+
+                case RemoteFileActions.Download:
+                    DownloadRemoteFile(this, new RoutedEventArgs());
+                    break;
+
+                case RemoteFileActions.MoveDown:
+                    MoveRemoteSelectionDown(this, new RoutedEventArgs());
+                    break;
+
+                case RemoteFileActions.MoveUp:
+                    MoveRemoteSelectionUp(this, new RoutedEventArgs());
+                    break;
+            }
+
+            //The remote file list's selection change event will fire through we're not technically clicking on
+            //a file list item.  To get around an accidental tree traversal, set the selected item to null
+            RemoteFileList.ClearSelection();
         }
 
         /// <summary>
