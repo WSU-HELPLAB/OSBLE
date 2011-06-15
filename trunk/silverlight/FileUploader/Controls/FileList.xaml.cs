@@ -74,6 +74,15 @@ namespace FileUploader.Controls
         public void ClearPreviousDirectories()
         {
             previousDataContexts.Clear();
+
+        }
+
+        /// <summary>
+        /// Clears the currently selected item
+        /// </summary>
+        public void ClearSelection()
+        {
+            ListOfFiles.SelectedItem = null;
         }
 
         /// <summary>
@@ -113,7 +122,7 @@ namespace FileUploader.Controls
         {
             if (LastSelectedItem != null)
             {
-                if (ListOfFiles.SelectedIndex < ListOfFiles.Items.Count - 2)
+                if (ListOfFiles.SelectedIndex < ListOfFiles.Items.Count - 1)
                 {
                     AbstractListing currentItem = LastSelectedItem.DataContext;
                     AbstractListing nextItem = (ListOfFiles.Items[ListOfFiles.SelectedIndex + 1] as FileListItem).DataContext;
@@ -203,6 +212,7 @@ namespace FileUploader.Controls
             {
                 FileListItem item = new FileListItem();
                 item.DataContext = dl;
+                item.MouseRightButtonDown += new MouseButtonEventHandler(ListItem_MouseRightButtonDown);
                 ListOfFiles.Items.Add(item);
             }
 
@@ -214,8 +224,15 @@ namespace FileUploader.Controls
             {
                 FileListItem item = new FileListItem();
                 item.DataContext = fl;
+                item.MouseRightButtonDown += new MouseButtonEventHandler(ListItem_MouseRightButtonDown);
                 ListOfFiles.Items.Add(item);
             }
+        }
+
+        void ListItem_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            ListOfFiles.SelectedItem = sender;
+            this.LastSelectedItem = sender as FileListItem;
         }
     }
 }
