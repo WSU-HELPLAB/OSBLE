@@ -1,14 +1,14 @@
-﻿@model OSBLE.Models.Assignments.Activities.AsyncIssueVotingActivity
+﻿@model OSBLE.Models.Assignments.Activities.SyncIssueVotingActivity
 @using OSBLE.Models.Assignments.Activities
 @using OSBLE.Models
 @{
-    ViewBag.Title = "Create Async Issue Voting";
+    ViewBag.Title = "Create Sync Issue Voting";
 }
-
-<h2>Create</h2>
+<h2>Create Issue Voting</h2>
 
 <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/osble.assignments.js")" type="text/javascript"></script>
 
 <script type="text/javascript">
     $(function () {
@@ -22,15 +22,12 @@
     });
 
 </script>
-@{
-   
-    using (Html.BeginForm("Create","AsyncIssueVoting",FormMethod.Post,new { id="issue_voting_form" }))
-    {
-   
-        @Html.ValidationSummary(true)
-        <fieldset>
-            <legend>AsyncIssueVotingActivity</legend>
 
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true)
+    <fieldset>
+        <legend>SyncIssueVotingActivity</legend>
             <div class="editor-label">
                 @Html.LabelFor(model => model.Name)
             </div>
@@ -38,7 +35,7 @@
                 @Html.EditorFor(model => model.Name)
                 @Html.ValidationMessageFor(model => model.Name)
             </div>
-
+        
             <div class="editor-label">
                 @Html.LabelFor(model => model.AbstractAssignmentID, "AbstractAssignment")
             </div>
@@ -48,14 +45,6 @@
             </div>
 
             <h2>Settings</h2>
-
-            <div class="editor-label">
-                @Html.LabelFor(model => model.UseOnlyStudentsWhoCompletedPeerReview)
-            </div>
-            <div class="editor-field">
-                @Html.CheckBoxFor(model => model.UseOnlyStudentsWhoCompletedPeerReview, new { id = "UseOnlyStudentsWhoCompletedPeerReview" })
-                @Html.ValidationMessageFor(model => model.UseOnlyStudentsWhoCompletedPeerReview)
-            </div>
 
             <h3>Anonymity of Review</h3>
 
@@ -83,47 +72,30 @@
                 @Html.ValidationMessageFor(model => model.peerReviewActivity.IsReviewersRoleAnonymous)
             </div>
 
+            <h3>Grading</h3>
 
             <div class="editor-label">
-                @Html.LabelFor(model => model.EnableIssueVotingDiscussion)
+                @Html.LabelFor(model => model.SetGradePercentOfIssues)
             </div>
             <div class="editor-field">
-                @Html.CheckBoxFor(model => model.EnableIssueVotingDiscussion, new { id = "EnableIssueVotingDiscussion" })
-                @Html.ValidationMessageFor(model => model.EnableIssueVotingDiscussion)
-            </div>
-
-            <div class="editor-label">
-                @Html.LabelFor(model => model.ReviewerMustCompleteIssueVoting)
-            </div>
-            <div class="editor-field">
-                @Html.CheckBoxFor(model => model.ReviewerMustCompleteIssueVoting, new { id = "ReviewerMustCompleteIssueVoting" })
-                @Html.ValidationMessageFor(model => model.ReviewerMustCompleteIssueVoting)
-            </div>
-           
-           <div class="editor-label">
-                @Html.LabelFor(model => model.setgrade.PercentOfIssues)
-            </div>
-            <div class="editor-field">
-                @Html.RadioButtonFor(model => model.setgrade.PercentOfIssues, new { id = "SetGradePercentOfIssues" })
-                @Html.ValidationMessageFor(model => model.setgrade.PercentOfIssues)
+                @Html.CheckBoxFor(model => model.SetGradePercentOfIssues, new { id = "SetGradePercentOfIssues" })
+                @Html.ValidationMessageFor(model => model.SetGradePercentOfIssues)
             </div>
             <div class="editor-label">
-                @Html.LabelFor(model => model.setgrade.PercentAgreementWModerator)
+                @Html.LabelFor(model => model.SetGradePercentAgreementWModerator)
             </div>
             <div class="editor-field">
-                @Html.RadioButtonFor(model => model.setgrade.PercentAgreementWModerator, new { id = "SetGradePercentAgreementWModerator" })
-                @Html.ValidationMessageFor(model => model.setgrade.PercentAgreementWModerator)
+                @Html.CheckBoxFor(model => model.SetGradePercentAgreementWModerator, new { id = "SetGradePercentAgreementWModerator" })
+                @Html.ValidationMessageFor(model => model.SetGradePercentAgreementWModerator)
             </div>
             <div class="editor-label">
-                @Html.LabelFor(model => model.setgrade.Manually)
+                @Html.LabelFor(model => model.SetGradeManually)
             </div>
             <div class="editor-field">
-                @Html.RadioButtonFor(model => model.setgrade.Manually, new { id = "SetGradeManually" })
-                @Html.ValidationMessageFor(model => model.setgrade.Manually)
+                @Html.CheckBoxFor(model => model.SetGradeManually, new { id = "SetGradeManually" })
+                @Html.ValidationMessageFor(model => model.SetGradeManually)
             </div>
-
-
-           <div class="editor-label">.
+            <div class="editor-label">
                 Add to Gradebook
             </div>
             <div class="editor-field">
@@ -160,15 +132,13 @@
                 </p>
 
             </div>
-
-            <p>
-                <input type="submit" value="Create Async Issue Voting" id="Submit"/>
-            </p>
-        </fieldset>
-    }
-
-    <div>
-        @Html.ActionLink("Back to List", "Index")
-    </div>
-    
+        <p>
+            <input type="submit" value="Create" />
+        </p>
+    </fieldset>
 }
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+

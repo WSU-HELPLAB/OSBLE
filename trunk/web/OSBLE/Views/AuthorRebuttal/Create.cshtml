@@ -14,22 +14,66 @@
     $(function () {
         $('#AuthorMustAcceptorRefuteEachIssue').change(function () {
             if ($(this).attr('checked')) {
-
                 DisplayAuthorMustAcceptorRefuteEachIssueOptions();
             }
             else {
-
                 HideAuthorMustAcceptorRefuteEachIssueOptions();
             }
         });
         $('#AuthorMustProvideRationale').change(function () {
             if ($(this).attr('checked')) {
-
                 DisplayAuthorMustProvideRationaleOptions();
             }
             else {
-
                 HideAuthorMustProvideRationaleOptions();
+            }
+        });
+
+        $('#PresentAllIssuesLogged').change(function () {
+            if ($(this).attr('checked')) {
+                UncheckPresentIssuesXLogged();
+                HidePresentIssuesXLoggedOptions();
+                UncheckPresentIssuesXPercentLogged();
+                UncheckPresentOnlyIssuesModeratorVoted();
+            }
+            else { }
+        });
+
+        $('#PresentIssuesXLogged').change(function () {
+            if ($(this).attr('checked')) {
+                DisplayPresentIssuesXLoggedOptions();
+                UncheckPresentAllIssuesLogged();
+                UncheckPresentOnlyIssuesModeratorVoted();
+            }
+            else {
+                HidePresentIssuesXLoggedOptions();
+                UncheckPresentIssuesXPercentLogged();
+            }
+        });
+
+        $('#PresentIssuesXPercentLogged').change(function () {
+            if ($(this).attr('checked')) {
+                UncheckPresentAllIssuesLogged();
+                UncheckPresentOnlyIssuesModeratorVoted();
+            }
+            else { }
+        });
+
+        $('#PresentOnlyIssuesModeratorVoted').change(function () {
+            if ($(this).attr('checked')) {
+                UncheckPresentAllIssuesLogged();
+                UncheckPresentIssuesXLogged();
+                HidePresentIssuesXLoggedOptions();
+                UncheckPresentIssuesXPercentLogged();
+            }
+            else { }
+        });
+
+        $('#add_to_gradebook').change(function () {
+            if ($('#add_to_gradebook').attr('checked')) {
+                $('#grade_options').show('blind');
+            } else {
+                $('#grade_options').hide('bling');
             }
         });
     });
@@ -51,6 +95,31 @@
         $('#AuthorMustProvideRationale_options').hide('highlight');
         $('#AuthorMustSayIfIssueWasAddressed').removeAttr('checked');
     }
+
+    function DisplayPresentIssuesXLoggedOptions(){
+         $('#PresentIssuesXLogged_options').show('hightlight');
+    }
+    
+    function HidePresentIssuesXLoggedOptions(){
+        $('#PresentIssuesXLogged_options').hide('hightlight');
+    }
+
+    function UncheckPresentAllIssuesLogged(){
+           $('#PresentAllIssuesLogged').removeAttr('checked');
+    }
+
+    function UncheckPresentIssuesXLogged(){
+        $('#PresentIssuesXLogged').removeAttr('checked');
+    }
+
+    function UncheckPresentIssuesXPercentLogged(){
+        $('#PresentIssuesXPercentLogged').removeAttr('checked');
+    }
+
+    function UncheckPresentOnlyIssuesModeratorVoted(){
+         $('#PresentOnlyIssuesModeratorVoted').removeAttr('checked');
+    }
+
 </script>
 
 @using (Html.BeginForm()) {
@@ -73,6 +142,48 @@
             @Html.DropDownList("AbstractAssignmentID", String.Empty)
             @Html.ValidationMessageFor(model => model.AbstractAssignmentID)
         </div>
+
+        <h2>Settings</h2>
+
+        <h3>Issue Presentation</h3>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.PresentAllIssuesLogged)
+        </div>
+        <div class="editor-field">
+            @Html.CheckBoxFor(model => model.PresentAllIssuesLogged, new { id = "PresentAllIssuesLogged" })
+            @Html.ValidationMessageFor(model => model.PresentAllIssuesLogged)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.PresentIssuesXLogged)
+        </div>
+        <div class="editor-field">
+            @Html.CheckBoxFor(model => model.PresentIssuesXLogged, new { id = "PresentIssuesXLogged" })
+            @Html.ValidationMessageFor(model => model.PresentIssuesXLogged)
+        </div>
+        <div id="PresentIssuesXLogged_options" class="indented_options" style="display: none">
+            <div class="editor-label">
+                @Html.LabelFor(model => model.PresentIssuesXPercentLogged)
+            </div>
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.PresentIssuesXPercentLogged, new { id = "PresentIssuesXPercentLogged" })
+                @Html.ValidationMessageFor(model => model.PresentIssuesXPercentLogged)
+            </div>
+        </div>
+
+       @*Need to check whether team moderators are enabled*@
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.PresentOnlyIssuesModeratorVoted)
+        </div>
+        <div class="editor-field">
+            @Html.CheckBoxFor(model => model.PresentOnlyIssuesModeratorVoted, new { id = "PresentOnlyIssuesModeratorVoted" })
+            @Html.ValidationMessageFor(model => model.PresentOnlyIssuesModeratorVoted)
+        </div>
+
+
+        <h3>Author Response</h3>
 
         <div class="editor-label">
             @Html.LabelFor(model => model.AuthorMustAcceptorRefuteEachIssue)
@@ -115,7 +226,7 @@
             <input type="checkbox" id="add_to_gradebook" checked="checked" />
         </div>
     
-        <div id="grade_options" class="indented_options">
+        <div id="grade_options" class="indented_options" >
             <div class="editor-field">
                 Worth
                 @Html.TextBoxFor(model => model.PointsPossible, new { id = "points_possible", size = 3 })

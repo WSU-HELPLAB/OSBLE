@@ -10,7 +10,7 @@ using OSBLE.Models;
 
 namespace OSBLE.Controllers
 {
-    public class IssueVotingController : OSBLEController
+    public class SyncIssueVotingController : OSBLEController
     {
         //
         // GET: /IssueVoting/

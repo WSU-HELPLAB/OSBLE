@@ -8,8 +8,6 @@ namespace OSBLE.Models.Assignments.Activities
 {
     public class AsyncIssueVotingActivity : IssueVotingActivity
     {
-        [Display(Name = "Perform issue voting asynchronously online")]
-        public bool UseIssueVotingAsync { get; set; }
         /// <summary>
         /// if true student can particapate in Async issue voting
         /// if False student cannot participate in Async issue voting

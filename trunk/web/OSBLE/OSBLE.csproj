@@ -141,7 +141,7 @@
     <Compile Include="Controllers\CourseController.cs" />
     <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\FileHandlerController.cs" />
-    <Compile Include="Controllers\IssueVotingController.cs" />
+    <Compile Include="Controllers\SyncIssueVotingController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\PeerReviewController.cs" />
     <Compile Include="Controllers\RubricController.cs" />
@@ -157,6 +157,7 @@
     <Compile Include="Models\Assignments\Activities\Scores\Score.cs" />
     <Compile Include="Models\Assignments\Activities\SingleSubmissionActivity.cs" />
     <Compile Include="Models\Assignments\Activities\StudioActivity.cs" />
+    <Compile Include="Models\Assignments\Activities\SyncIssueVotingActivity.cs" />
     <Compile Include="Models\Assignments\BasicAssignment.cs" />
     <Compile Include="Models\Assignments\GradeAssignment.cs" />
     <Compile Include="Models\Rubrics\Criterion.cs" />
@@ -433,6 +434,7 @@
   <ItemGroup>
     <Folder Include="Models\Gradables\StudioAssignment\Activities\" />
     <Folder Include="Validations\" />
+    <Folder Include="Views\NewFolder1\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
@@ -596,9 +598,15 @@
     <Content Include="Views\Assignment\Index.cshtml" />
     <Content Include="Views\Account\Privacy.cshtml" />
     <Content Include="Views\PeerReview\Create.cshtml" />
-    <Content Include="Views\IssueVoting\Create.cshtml" />
+    <Content Include="Views\SyncIssueVoting\Create.cshtml" />
     <Content Include="Views\AuthorRebuttal\Create.cshtml" />
     <Content Include="Views\Assignment\_AssignmentList.cshtml" />
+    <Content Include="Views\AsyncIssueVoting\Create.cshtml" />
+    <Content Include="Views\Rubric\Create.cshtml" />
+    <Content Include="Views\Rubric\Delete.cshtml" />
+    <Content Include="Views\Rubric\Details.cshtml" />
+    <Content Include="Views\Rubric\Edit.cshtml" />
+    <Content Include="Views\Rubric\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />
