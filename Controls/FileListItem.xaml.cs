@@ -47,9 +47,27 @@ namespace FileUploader.Controls
             }
         }
 
+        public ContextMenu RightClickMenu
+        {
+            get
+            {
+                return this.GetValue(ContextMenuService.ContextMenuProperty) as ContextMenu;
+            }
+            set
+            {
+                this.SetValue(ContextMenuService.ContextMenuProperty, value);
+            }
+        }
+
         public FileListItem()
         {
             InitializeComponent();
+
+        }
+
+        void FileListContextMenu_MouseLeftButtonUp(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show(DataContext.Name);
         }
 
         /// <summary>
