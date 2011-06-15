@@ -12,8 +12,6 @@ namespace OSBLE.Controllers
 {
     public class PeerReviewController : OSBLEController
     {
-        private OSBLEContext db = new OSBLEContext();
-
         //
         // GET: /PeerReview/
 

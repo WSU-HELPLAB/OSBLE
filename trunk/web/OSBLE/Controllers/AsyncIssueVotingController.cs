@@ -12,8 +12,6 @@ namespace OSBLE.Controllers
 { 
     public class AsyncIssueVotingController : OSBLEController
     {
-        private OSBLEContext db = new OSBLEContext();
-
         //
         // GET: /AsyncIssueVoting/
 

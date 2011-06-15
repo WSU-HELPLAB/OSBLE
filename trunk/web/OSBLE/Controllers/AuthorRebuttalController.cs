@@ -12,8 +12,6 @@ namespace OSBLE.Controllers
 {
     public class AuthorRebuttalController : OSBLEController
     {
-        private OSBLEContext db = new OSBLEContext();
-
         //
         // GET: /AuthorRebuttal/
 
