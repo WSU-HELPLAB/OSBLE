@@ -120,8 +120,13 @@ namespace OSBLE
                 }
                 else
                 {
-                    fList.SortOrder = defaultOrderingCount;
                     defaultOrderingCount++;
+                    while (ordering.ContainsValue(defaultOrderingCount))
+                    {
+                        defaultOrderingCount++;
+                    }
+                    fList.SortOrder = defaultOrderingCount;
+                    
                 }
                 listing.Files.Add(fList);
             }
@@ -144,6 +149,11 @@ namespace OSBLE
                 }
                 else
                 {
+                    defaultOrderingCount++;
+                    while (ordering.ContainsValue(defaultOrderingCount))
+                    {
+                        defaultOrderingCount++;
+                    }
                     dlisting.SortOrder = defaultOrderingCount;
                     defaultOrderingCount++;
                 }
