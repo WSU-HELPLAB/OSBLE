@@ -14,11 +14,60 @@
 
         @if (sa.Deliverables.Count > 0)
         {
-            
-        <div class="assignment_title">Deliverables</div>
-            
+              
+            if (sa.AssignmentActivities.Where(aa => aa is SubmissionActivity).Count() > 0)
+            {
+            <div class="assignment_title">Submissions</div>
+
+            <ul class="assignment_deliverables">
+            @{
+                                @* First get full list of assignment activities. This is to later get the assignment activity
+                                Immediately following each submission activity. The controller's responsibility is to send
+                                this view only lists of assignment activities where there are at least 2 activities and the last
+                                is a stop, which guarantees that if there are submission activities, there will be an activity
+                                after it to define an end date. *@
+                            List<AssignmentActivity> assignmentActivities = sa.AssignmentActivities.OrderBy(aa => aa.ReleaseDate).ToList();
+                                @* Now get each submission activity. *@
+                            List<AssignmentActivity> submissionActivities = assignmentActivities.Where(aa => aa is SubmissionActivity).OrderBy(aa => aa.ReleaseDate).ToList();
+
+                            foreach (SubmissionActivity submission in submissionActivities)
+                            {
+                                   
+                                    @* Get submission's release date as start date *@
+                                DateTime startDate = submission.ReleaseDate;
+                                    @* Get the activity following the submission's release date as end date *@
+                                DateTime endDate = assignmentActivities[assignmentActivities.IndexOf(submission) + 1].ReleaseDate;    
+                                        
+                                 <li>
+                                    <table>
+                                        <tr>
+                                            <th>
+                                                <span>Start Date</span>
+                                            </th>
+                                            <td>
+                                                <span>@startDate.ToString()</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                <span>End Date</span>
+                                            </th>
+                                            <td>
+                                                <span>@endDate.ToString()</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                 </li>   
+                            }
+                                
+                            }
+            </ul>
+            }
+    
         <ul class="assignment_deliverables">
-            @foreach(Deliverable d in sa.Deliverables) {
+            @foreach (Deliverable d in sa.Deliverables)
+            {
                 @* Get deliverable type string *@
                 SelectListItem sli = ViewBag.DeliverableTypes[d.Type];
                 <li>
@@ -38,43 +87,11 @@
                             <th>Submissions</th>
                             <td>
                             <ul>
-                            @{
-                                @* First get full list of assignment activities. This is to later get the assignment activity
-                                Immediately following each submission activity. The controller's responsibility is to send
-                                this view only lists of assignment activities where there are at least 2 activities and the last
-                                is a stop, which guarantees that if there are submission activities, there will be an activity
-                                after it to define an end date. *@
-                                List<AssignmentActivity> assignmentActivities = sa.AssignmentActivities.OrderBy(aa=>aa.ReleaseDate).ToList();
-                                @* Now get each submission activity. *@
-                                List<AssignmentActivity> submissionActivities = assignmentActivities.Where(aa => aa is SubmissionActivity).OrderBy(aa => aa.ReleaseDate).ToList();
-
-                                foreach (SubmissionActivity submission in submissionActivities) {
-                                   
-                                    @* Get submission's release date as start date *@
-                                    DateTime startDate = submission.ReleaseDate;
-                                    @* Get the activity following the submission's release date as end date *@
-                                    DateTime endDate = assignmentActivities[assignmentActivities.IndexOf(submission) + 1].ReleaseDate;    
-                                        
-                                 <li>
-                                 @* TODO: In this list item (or somewhere in the table) is where the view of the actual file submission
-                                 mechanism should go. *@
-                                 <table>
-                                     <tr>
-                                        <th>Start Date</th>
-                                        <td>@startDate.ToString()</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Due Date</th>
-                                        <td>@endDate.ToString()</td>
-                                    </tr>
-                                </table>
-                                 </li>   
-                                }
-                                
-                            }
+                            
                             </ul>
                             </td>
                         </tr>   
+
                         }
                     </table>
                  </li>
@@ -84,12 +101,13 @@
         }
         
         @* Only show grading if points possible are greater than 0 *@
-        @if(sa.PointsPossible > 0) {
+        @if (sa.PointsPossible > 0)
+        {
 
         <div class="assignment_title">Grading</div>
 
         <div class="assignment_grading">
-            <text>Worth @sa.PointsPossible points in <em>@sa.Category.Name</em> category</text>
+            Worth @sa.PointsPossible points in <em>@sa.Category.Name</em> category
         </div>          
 
         }
