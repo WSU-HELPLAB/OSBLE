@@ -9,6 +9,7 @@
     <div class="assignment_header"><a href="#">@sa.Name</a></div>
     <div>
         <div class="assignment_title">Description</div>
+        @* Add links to assignment description *@
         <div class="assignment_description">@Helpers.Linkify(sa.Description)</div>
 
         @if (sa.Deliverables.Count > 0)
@@ -18,6 +19,7 @@
             
         <ul class="assignment_deliverables">
             @foreach(Deliverable d in sa.Deliverables) {
+                @* Get deliverable type string *@
                 SelectListItem sli = ViewBag.DeliverableTypes[d.Type];
                 <li>
                     <table class="deliverables_table">
@@ -29,6 +31,7 @@
                             <th>Type</th>
                             <td>@sli.Text</td>
                         </tr>
+                        @* List submissions if any submission periods available *@
                         @if (sa.AssignmentActivities.Where(aa => aa is SubmissionActivity).Count() > 0)
                         {
                         <tr>
@@ -36,16 +39,25 @@
                             <td>
                             <ul>
                             @{
+                                @* First get full list of assignment activities. This is to later get the assignment activity
+                                Immediately following each submission activity. The controller's responsibility is to send
+                                this view only lists of assignment activities where there are at least 2 activities and the last
+                                is a stop, which guarantees that if there are submission activities, there will be an activity
+                                after it to define an end date. *@
                                 List<AssignmentActivity> assignmentActivities = sa.AssignmentActivities.OrderBy(aa=>aa.ReleaseDate).ToList();
+                                @* Now get each submission activity. *@
                                 List<AssignmentActivity> submissionActivities = assignmentActivities.Where(aa => aa is SubmissionActivity).OrderBy(aa => aa.ReleaseDate).ToList();
 
                                 foreach (SubmissionActivity submission in submissionActivities) {
                                    
+                                    @* Get submission's release date as start date *@
                                     DateTime startDate = submission.ReleaseDate;
+                                    @* Get the activity following the submission's release date as end date *@
                                     DateTime endDate = assignmentActivities[assignmentActivities.IndexOf(submission) + 1].ReleaseDate;    
                                         
-
                                  <li>
+                                 @* TODO: In this list item (or somewhere in the table) is where the view of the actual file submission
+                                 mechanism should go. *@
                                  <table>
                                      <tr>
                                         <th>Start Date</th>
@@ -70,7 +82,8 @@
         </ul>
             
         }
-
+        
+        @* Only show grading if points possible are greater than 0 *@
         @if(sa.PointsPossible > 0) {
 
         <div class="assignment_title">Grading</div>
