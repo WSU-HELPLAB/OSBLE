@@ -1250,3 +1250,8 @@ ul.assignment_deliverables, .assignment_deliverables ul
     text-align: left;
     vertical-align: top;
 }
+
+#file_upload_silverlight_span
+{
+    float:right; width:33px; height:33px;
+}

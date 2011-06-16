@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using FileUploader.OsbleServices;
 using FileUploader.Controls;
 using System.Windows.Navigation;
+using System.Windows.Browser;
 namespace FileUploader
 {
     public partial class MainPage : UserControl
@@ -26,25 +27,25 @@ namespace FileUploader
             
             //event handlers
             login.ValidTokenReceived += new EventHandler(ValidTokenReceived);
-
-
-            if (Application.Current.InstallState == InstallState.NotInstalled)
-            {
-                InstallBtn.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                InstallBtn.Visibility = Visibility.Collapsed;
-
-                // apparently, you can't make a button to launch the already installed application
-                InstallText.Text = "This application is already installed on your computer.";
-            }
+            InstallButton.Click += new RoutedEventHandler(InstallButton_Click);
 
             if (Application.Current.IsRunningOutOfBrowser)
             {
                 login.Show();
             }
 
+        }
+
+        void InstallButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (Application.Current.InstallState == InstallState.NotInstalled)
+            {
+                Application.Current.Install();
+            }
+            else
+            {
+                HtmlPage.Window.Alert("The OSBLE File Uploader must be launched separately from your desktop.");
+            }
         }
 
 
@@ -56,14 +57,6 @@ namespace FileUploader
         private void ValidTokenReceived(object sender, EventArgs e)
         {
             this.Content = new UploaderPage(login.Token);
-        }
-
-        private void InstallBtn_Click(object sender, RoutedEventArgs e)
-        {
-            if (Application.Current.InstallState == InstallState.NotInstalled)
-            {
-                Application.Current.Install();
-            }
         }
     }
 }

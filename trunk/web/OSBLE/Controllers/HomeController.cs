@@ -123,7 +123,19 @@ namespace OSBLE.Controllers
         private void setupCourseLinks()
         {
             DirectoryListing listing = FileSystem.GetCourseDocumentsFileList(activeCourse.Course, false);
+            SilverlightObject fileUploader = new SilverlightObject
+            {
+                CSSId = "file_uploader",
+                XapName = "FileUploader",
+                Width = "33",
+                Height = "33",
+                OnLoaded = "SLObjectLoaded",
+                Parameters = new Dictionary<string, string>()
+                {
+                }
+            };
             ViewBag.CourseLinks = listing;
+            ViewBag.Uploader = fileUploader;
         }
 
         private void setupNotifications()

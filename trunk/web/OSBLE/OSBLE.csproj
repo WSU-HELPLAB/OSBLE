@@ -19,7 +19,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <UseIISExpress>false</UseIISExpress>
-    <SilverlightApplicationList>{AB420045-1365-43D9-A243-EB735E776BEC}|..\TeamCreation\TeamCreation.csproj|ClientBin|False,{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}|..\StudioTimelineCreation\StudioTimelineCreation.csproj|ClientBin|False</SilverlightApplicationList>
+    <SilverlightApplicationList>{AB420045-1365-43D9-A243-EB735E776BEC}|..\TeamCreation\TeamCreation.csproj|ClientBin|False,{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}|..\StudioTimelineCreation\StudioTimelineCreation.csproj|ClientBin|False,{79706350-C34D-4A51-B22F-273EC8289E5D}|..\..\silverlight\FileUploader\FileUploader.csproj|ClientBin|False</SilverlightApplicationList>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -236,6 +236,7 @@
     <Content Include="App_Code\Libraries\LumenWorks.Framework.IO.dll" />
     <Content Include="App_Data\FirstNames.txt" />
     <Content Include="App_Data\LastNames.txt" />
+    <Content Include="ClientBin\FileUploader.xap" />
     <Content Include="ClientBin\StudioTimelineCreation.xap" />
     <Content Include="ClientBin\TeamCreation.xap" />
     <Content Include="Content\favicon.ico" />
@@ -374,6 +375,8 @@
     <Content Include="Content\themes\base\jquery.ui.slider.css" />
     <Content Include="Content\themes\base\jquery.ui.tabs.css" />
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
+    <Content Include="FileUploaderTestPage.aspx" />
+    <Content Include="FileUploaderTestPage.html" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\jquery-tooltip.js" />
     <Content Include="Scripts\jquery.selectboxes.js" />
@@ -401,6 +404,7 @@
     <Content Include="Scripts\osble.js" />
     <Content Include="Scripts\Silverlight.js" />
     <Content Include="Services\UploaderWebService.svc" />
+    <Content Include="Silverlight.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
