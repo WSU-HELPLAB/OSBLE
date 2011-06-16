@@ -375,8 +375,6 @@
     <Content Include="Content\themes\base\jquery.ui.slider.css" />
     <Content Include="Content\themes\base\jquery.ui.tabs.css" />
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
-    <Content Include="FileUploaderTestPage.aspx" />
-    <Content Include="FileUploaderTestPage.html" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\jquery-tooltip.js" />
     <Content Include="Scripts\jquery.selectboxes.js" />

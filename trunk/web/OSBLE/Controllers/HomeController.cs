@@ -127,8 +127,8 @@ namespace OSBLE.Controllers
             {
                 CSSId = "file_uploader",
                 XapName = "FileUploader",
-                Width = "33",
-                Height = "33",
+                Width = "45",
+                Height = "25",
                 OnLoaded = "SLObjectLoaded",
                 Parameters = new Dictionary<string, string>()
                 {
