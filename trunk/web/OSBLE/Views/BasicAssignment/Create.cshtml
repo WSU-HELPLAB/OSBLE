@@ -12,6 +12,8 @@
 
 <script type="text/javascript">
 
+    var isTeamGenerationReady = false;
+
     $(function () {
         //set up event listeners 
 
@@ -31,12 +33,8 @@
             updateDueDate();
         });
 
-        $('#StudioAssignment_Name').change(function () {
-            updateDueDate();
-        });
-
-        $('#DueDate_Time').change(function () {
-            updateSubmissionName();
+        $('#Assignment_Name').change(function () {
+            updateActivitiesName();
         });
 
         $('#isTeam').change(function () {
@@ -175,8 +173,9 @@
     function updateDueDate() {
         $('#DueDate').val($('#DueDate_Date').val() + ' ' + $('#DueDate_Time').val());
     }
-    function updateSubmissionName() {
-        $('#SubmissionName').val($('#StudioAssignment_Name').val() + ' Submission');
+    function updateActivitiesName() {
+        $('#SubmissionName').val($('#Assignment_Name').val() + ' Submission');
+        $('#StopName').val($('#Assignment_Name').val() + ' Stop');
     }
 
     function OpenTeamGeneration() {
@@ -191,6 +190,9 @@
             }
             else {
                 OpenTeamGeneration();
+                if (TeamGenerationReady) {
+                    document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfTeams(parseInt($('#total_teams').val()));
+                }
             }
         }
         else {
@@ -200,6 +202,9 @@
             }
             else {
                 OpenTeamGeneration();
+                if (TeamGenerationReady) {
+                    document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfPeople(parseInt($('#people_per_team').val()));
+                }
             }
         }
     }
@@ -218,22 +223,27 @@
                document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfPeople(parseInt($('#people_per_team').val()));
             }
         }
-    }
+   }
 </script>
 @{
     
+    
     SubmissionActivity submission = Model.Submission;
     StopActivity stop = Model.Stop;
+    submission.isTeam = false;
 
-
-    @Html.ValidationSummary()
+    Html.ValidationSummary();
     using (Html.BeginForm())
     {
+
         Html.ValidationSummary(true);
 
+        @Html.Hidden("newTeams", "", new { id = "newTeams" })
         @Html.HiddenFor(model => submission.ReleaseDate, new { @id = "ReleaseDate" })
         @Html.HiddenFor(model => stop.ReleaseDate, new { @id = "DueDate" })
         @Html.HiddenFor(model => submission.Name, new { @id = "SubmissionName" })
+        @Html.HiddenFor(model => stop.Name, new { @id = "StopName" })
+        
         <div class="editor-label">
             @Html.LabelFor(model => model.Assignment.Name)
         </div>
@@ -248,6 +258,7 @@
             @Html.TextAreaFor(model => model.Assignment.Description, new { rows = 5, cols = 65 })
             @Html.ValidationMessageFor(model => model.Assignment.Description)
         </div>
+        
         <div class="editor-label">
             @Html.LabelFor(model => submission.ReleaseDate)
         </div>
@@ -286,7 +297,7 @@
                 <li>Select box goes here. </li>
                 <br />
                 <li>
-                    <button type="button" onclick="OpenSL()">
+                    <button type="button" onclick="OpenTeamGeneration()">
                         Generate Teams </button>
                 </li>
             </ul>
@@ -316,7 +327,7 @@
             Specify teams manually
             <ul id="ManualTeams" style="display: none" class="team_generation_options">
                 <li>
-                    <button type="button" onclick="OpenSL()">
+                    <button type="button" onclick="OpenTeamGeneration()">
                         Create Teams
                     </button>
                 </li>
@@ -438,7 +449,7 @@
         </div>
     
         <p>
-            <input type="submit" value="Create Basic Assignment" id="submitButton"/>
+            <input type="submit" value="Create Basic Assignment"/>
         </p>
     
     }

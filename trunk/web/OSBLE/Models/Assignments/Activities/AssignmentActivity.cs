@@ -1,6 +1,6 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Assignments.Activities.Scores;
 
 namespace OSBLE.Models.Assignments.Activities
@@ -11,6 +11,7 @@ namespace OSBLE.Models.Assignments.Activities
         [Key]
         public int ID { get; set; }
 
+        [Required]
         public string Name { get; set; }
 
         public AssignmentActivity()
@@ -49,6 +50,5 @@ namespace OSBLE.Models.Assignments.Activities
         public int ColumnOrder { get; set; }
 
         public virtual ICollection<Score> Scores { get; set; }
-
     }
 }

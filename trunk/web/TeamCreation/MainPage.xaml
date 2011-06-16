@@ -17,10 +17,9 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0" Orientation="Horizontal">
-                <TextBlock Height="19" TextWrapping="Wrap" Text="Section:" VerticalAlignment="Top" Width="74" />
-                <ComboBox x:Name="comboSections" VerticalAlignment="Top" Width="76" SelectionChanged="combos_SelectionChanged"/>
-                <Button x:Name="GenerateTeams" Content="Generate Teams..." VerticalAlignment="Top" Width="164" Click="Generate_Click" />
+            <StackPanel Grid.Row="0" x:Name="HeaderStackPanel" Orientation="Horizontal">
+                <TextBlock x:Name="SectionTextBlock" Height="19" TextWrapping="Wrap" Text="Section:" VerticalAlignment="Top" Width="74" />
+                <ComboBox x:Name="comboSections" VerticalAlignment="Top" Width="76"/>
                 <Button x:Name="ClearTeams" Content="Unassign All" VerticalAlignment="Top" Width="133" Click="ClearTeams_Click" />
             </StackPanel>
 
@@ -44,8 +43,8 @@
             </StackPanel>
 
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button x:Name="PublishChanges" Content="Save Changes" Margin="0,0,20,0"  Click="PublishChanges_Click" Width="133" IsEnabled="{Binding pendingChanges}" Background="{Binding saveBackground}"  />
-                <Button x:Name="CancelChanges" Content="Cancel Changes" Width="133" IsEnabled="{Binding pendingChanges}" Click="CancelChanges_Click"  />
+                <Button x:Name="PublishChanges" Content="Save Changes" Margin="0,0,20,0"  Click="PublishChanges_Click" Width="133" />
+                <Button x:Name="CancelChanges" Content="Close" Width="133" Click="CancelChanges_Click"  />
             </StackPanel>
 
         </Grid>

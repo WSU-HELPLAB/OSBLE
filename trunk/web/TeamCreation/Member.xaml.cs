@@ -5,7 +5,7 @@ namespace TeamCreation
 {
     public partial class Member : UserControl
     {
-        private SerializableTeamMembers serializableMember;
+        private SerializableTeamMember serializableMember;
 
         public string MembersName
         {
@@ -43,7 +43,7 @@ namespace TeamCreation
             }
         }
 
-        public Member(SerializableTeamMembers serializableMember)
+        public Member(SerializableTeamMember serializableMember)
         {
             // Required to initialize variables
             InitializeComponent();

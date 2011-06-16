@@ -11,7 +11,7 @@
     >
 
     <Grid x:Name="LayoutRoot">
-        <toolkit:ListBoxDragDropTarget AllowDrop="True" MinHeight="100" HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="200" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Margin="0" Width="210" ItemDroppedOnTarget="Dropped">
+        <toolkit:ListBoxDragDropTarget AllowDrop="True" MinHeight="100" HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="200" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Margin="0" Width="210">
             <ListBox x:Name="Members" BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="190"  MinHeight="25" Margin="8,26,8,8" ItemsSource="{Binding Path=MemberList, Mode=OneWay}">
                 <ListBox.Background>
                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">

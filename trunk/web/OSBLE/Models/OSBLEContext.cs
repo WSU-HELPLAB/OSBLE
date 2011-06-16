@@ -1,14 +1,13 @@
-﻿using System.Data.Entity;
+﻿using System.Collections.Generic;
+using System.Data.Entity;
 using System.Web.Security;
-using OSBLE.Models.Courses;
-using OSBLE.Models.HomePage;
-using OSBLE.Models.Users;
+using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments.Activities.Scores;
-using OSBLE.Models.Assignments;
+using OSBLE.Models.Courses;
+using OSBLE.Models.HomePage;
 using OSBLE.Models.Rubrics;
-using OSBLE.Models.Services.Uploader;
-using System.Collections.Generic;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Models
 {
@@ -39,11 +38,10 @@ namespace OSBLE.Models
 
         public DbSet<StudioAssignment> StudioAssignments { get; set; }
 
-
         // Assignments.Activities
 
         public DbSet<AssignmentActivity> AssignmentActivities { get; set; }
-        
+
         public DbSet<Deliverable> Deliverables { get; set; }
 
         public DbSet<GradeActivity> GradeActivities { get; set; }
@@ -106,6 +104,10 @@ namespace OSBLE.Models
 
         // Users
 
+        public DbSet<Team> Teams { get; set; }
+
+        public DbSet<TeamMember> TeamMembers { get; set; }
+
         public DbSet<Mail> Mails { get; set; }
 
         public DbSet<UserProfile> UserProfiles { get; set; }
@@ -125,11 +127,9 @@ namespace OSBLE.Models
                 .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Rubric>()
-                .HasMany(r=>r.Levels)
-                .WithRequired(l=>l.Rubric)
+                .HasMany(r => r.Levels)
+                .WithRequired(l => l.Rubric)
                 .WillCascadeOnDelete(false);
-                
-
         }
 
         private void createSampleUser(string username, string password, string firstname, string lastname, string ident, int school, bool isAdmin, bool canCreateCourses)

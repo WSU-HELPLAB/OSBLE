@@ -182,12 +182,15 @@
     <Compile Include="Models\Services\Uploader\ParentDirectoryListing.cs" />
     <Compile Include="Models\Services\Uploader\UserSession.cs" />
     <Compile Include="Models\ToolTips.cs" />
+    <Compile Include="Models\Users\TeamMembers.cs" />
+    <Compile Include="Models\Users\Team.cs" />
     <Compile Include="Models\ViewModels\AssignmentListViewModel.cs" />
     <Compile Include="Models\ViewModels\BasicAssignmentViewModel.cs" />
     <Compile Include="Models\Services\Uploader\AbstractListing.cs" />
     <Compile Include="Models\Services\Uploader\DirectoryListing.cs" />
     <Compile Include="Models\Services\Uploader\FileListing.cs" />
     <Compile Include="Models\SilverlightObject.cs" />
+    <Compile Include="Models\ViewModels\SerializableTeamMembers.cs" />
     <Compile Include="Models\ViewModels\StudioAssignmentViewModel.cs" />
     <Compile Include="Services\AuthenticationDomainService.cs" />
     <Compile Include="Services\OSBLEService.cs" />

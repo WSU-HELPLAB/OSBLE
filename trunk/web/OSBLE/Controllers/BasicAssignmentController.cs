@@ -10,6 +10,7 @@ using OSBLE.Models;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
+using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
 
 namespace OSBLE.Controllers
@@ -19,25 +20,6 @@ namespace OSBLE.Controllers
     [NotForCommunity]
     public class BasicAssignmentController : OSBLEController
     {
-        public class SerializableTeamMembers
-        {
-            public int UserID { get; set; }
-
-            public int TeamID { get; set; }
-
-            public string Name { get; set; }
-
-            public int Section { get; set; }
-
-            public bool IsModerator { get; set; }
-
-            public bool Subbmitted { get; set; }
-
-            public int InTeamID { get; set; }
-
-            public string InTeamName { get; set; }
-        }
-
         public BasicAssignmentController()
             : base()
         {
@@ -83,9 +65,9 @@ namespace OSBLE.Controllers
             viewModel.Submission.PercentPenalty = active.PercentPenalty;
             viewModel.Submission.MinutesLateWithNoPenalty = active.MinutesLateWithNoPenalty;
 
-            viewModel.TeamCreation = getTeamCreationSilverlightObject();
+            viewModel.TeamCreation = createTeamCreationSilverlightObject();
 
-            List<SerializableTeamMembers> teamMembers = new List<SerializableTeamMembers>();
+            List<SerializableTeamMember> teamMembmers = new List<SerializableTeamMember>();
 
             var couresesUsers = (from c in db.CoursesUsers
                                  where c.CourseID == activeCourse.CourseID
@@ -93,25 +75,35 @@ namespace OSBLE.Controllers
                                  select c).ToList();
 
             int i = 0;
-            foreach (CoursesUsers cu in couresesUsers)
+
+            if (couresesUsers.Count >= 2)
             {
-                SerializableTeamMembers teamMember = new SerializableTeamMembers();
-                teamMember.IsModerator = cu.CourseRole.ID == (int)CourseRole.OSBLERoles.Moderator;
-                teamMember.Name = cu.UserProfile.FirstName + " " + cu.UserProfile.LastName;
-                teamMember.Section = cu.Section;
-
-                ///////////////////////TEST/////////////////////////
-                if (i % 2 == 0)
+                foreach (CoursesUsers cu in couresesUsers)
                 {
-                    teamMember.Subbmitted = true;
+                    SerializableTeamMember teamMember = new SerializableTeamMember();
+                    teamMember.IsModerator = cu.CourseRole.ID == (int)CourseRole.OSBLERoles.Moderator;
+                    teamMember.Name = cu.UserProfile.FirstName + " " + cu.UserProfile.LastName;
+                    teamMember.Section = cu.Section;
+                    teamMember.UserID = cu.UserProfileID;
+                    teamMember.isUser = true;
+
+                    ///////////////////////TEST/////////////////////////
+                    if (i % 2 == 0)
+                    {
+                        teamMember.Subbmitted = true;
+                    }
+                    i++;
+                    ///////////////////////////////////////////////////
+
+                    teamMembmers.Add(teamMember);
                 }
-                i++;
-                ///////////////////////////////////////////////////
 
-                teamMembers.Add(teamMember);
+                viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"] = Uri.EscapeDataString(JsonConvert.SerializeObject(teamMembmers));
             }
-
-            viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"] = Uri.EscapeDataString(JsonConvert.SerializeObject(teamMembers));
+            else
+            {
+                viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"] = null;
+            }
 
             ViewBag.Categories = new SelectList(db.Categories, "ID", "Name");
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
@@ -126,6 +118,24 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult Create(BasicAssignmentViewModel basic)
         {
+            string serializedTeams = null;
+            try
+            {
+                serializedTeams = Uri.UnescapeDataString(Request.Params["newTeams"]);
+            }
+            catch
+            {
+                serializedTeams = null;
+            }
+
+            if (basic.Submission.isTeam)
+            {
+                if (serializedTeams == null || serializedTeams == "")
+                {
+                    ModelState.AddModelError("Team", "Using teams was selected but no teams were created, please create the teams");
+                }
+            }
+
             if (basic.Submission.ReleaseDate >= basic.Stop.ReleaseDate)
             {
                 ModelState.AddModelError("time", "The due date must come after the release date");
@@ -133,13 +143,12 @@ namespace OSBLE.Controllers
 
             if (ModelState.IsValid)
             {
-                db.BasicAssignments.Add(basic.Assignment);
-
                 SubmissionActivity submission = new SubmissionActivity();
                 StopActivity stop = new StopActivity();
 
                 submission.ReleaseDate = basic.Submission.ReleaseDate;
                 submission.Name = basic.Submission.Name;
+
                 submission.PointsPossible = basic.Submission.PointsPossible;
 
                 submission.HoursLatePerPercentPenalty = basic.Submission.HoursLatePerPercentPenalty;
@@ -147,24 +156,99 @@ namespace OSBLE.Controllers
                 submission.PercentPenalty = basic.Submission.PercentPenalty;
                 submission.MinutesLateWithNoPenalty = basic.Submission.MinutesLateWithNoPenalty;
 
+                submission.isTeam = basic.Submission.isTeam;
+
+                stop.Name = basic.Stop.Name;
                 stop.ReleaseDate = basic.Stop.ReleaseDate;
 
                 basic.Assignment.AssignmentActivities.Add(submission);
                 basic.Assignment.AssignmentActivities.Add(stop);
 
+                db.BasicAssignments.Add(basic.Assignment);
+
                 db.SaveChanges();
+
+                db.AssignmentActivities.Add(submission);
+                db.AssignmentActivities.Add(stop);
+
+                db.SaveChanges();
+
+                if (basic.Submission.isTeam)
+                {
+                    List<SerializableTeamMember> teamMembers = JsonConvert.DeserializeObject<List<SerializableTeamMember>>(serializedTeams);
+
+                    //(section, teams) : where teams is string and a list of members
+                    Dictionary<int, Dictionary<string, List<SerializableTeamMember>>> membersByTeamBySection = new Dictionary<int, Dictionary<string, List<SerializableTeamMember>>>();
+
+                    var teamMembersBySections = from c in teamMembers group c by c.Section;
+
+                    foreach (var section in teamMembersBySections)
+                    {
+                        Dictionary<string, List<SerializableTeamMember>> membersByTeams = new Dictionary<string, List<SerializableTeamMember>>();
+                        var teams = from c in section group c by c.InTeamName;
+
+                        foreach (var team in teams)
+                        {
+                            membersByTeams.Add(team.Key, team.ToList());
+                        }
+                        membersByTeamBySection.Add(section.Key, membersByTeams);
+                    }
+
+                    //for every section add every team
+                    foreach (var membersBySection in membersByTeamBySection)
+                    {
+                        //for every team create a new team and set the Team Name
+                        foreach (var team in membersBySection.Value)
+                        {
+                            Team team_db = new Team();
+                            team_db.Name = team.Key;
+
+                            //for every member of that team make a new TeamMember
+                            foreach (SerializableTeamMember serializeableMember in team.Value)
+                            {
+                                TeamMember teamMember_db = new TeamMember();
+                                if (serializeableMember.isUser)
+                                {
+                                    teamMember_db.TeamUser = TeamsOrUsers.User;
+                                    teamMember_db.UserProfileID = serializeableMember.UserID;
+                                    teamMember_db.TeamID = null;
+                                }
+                                else
+                                {
+                                    teamMember_db.TeamUser = TeamsOrUsers.Team;
+                                    teamMember_db.TeamID = serializeableMember.TeamID;
+                                    teamMember_db.UserProfileID = null;
+                                }
+                                team_db.Members.Add(teamMember_db);
+                            }
+
+                            submission.Teams.Add(team_db);
+
+                            db.Teams.Add(team_db);
+                        }
+                    }
+                    db.SaveChanges();
+                }
+                else
+                {
+                    submission.Teams = null;
+                    db.SaveChanges();
+                }
+
                 return RedirectToAction("Index", "Assignment");
             }
 
-            basic.TeamCreation = getTeamCreationSilverlightObject();
+            basic.TeamCreation = createTeamCreationSilverlightObject();
 
             ViewBag.Categories = new SelectList(db.Categories, "ID", "Name", basic.Assignment.CategoryID);
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
 
             return View(basic);
+
+            return RedirectToAction("Index", "Assignment");
         }
 
-        private SilverlightObject getTeamCreationSilverlightObject()
+        private SilverlightObject createTeamCreationSilverlightObject()
         {
             return new SilverlightObject
             {
