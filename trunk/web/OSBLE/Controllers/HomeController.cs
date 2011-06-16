@@ -134,6 +134,14 @@ namespace OSBLE.Controllers
                 {
                 }
             };
+
+            //AC: I don't think that this is the best way to restrict access.  Might be worth
+            //revisiting at a later date.
+            ViewBag.CanEditCourseLinks = false;
+            if (ActiveCourse.CourseRole.CanModify)
+            {
+                ViewBag.CanEditCourseLinks = true;
+            }
             ViewBag.CourseLinks = listing;
             ViewBag.Uploader = fileUploader;
         }

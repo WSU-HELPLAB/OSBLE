@@ -46,10 +46,14 @@
 
 <div id="dashboard_right">
 <h3>Course Links  
-<span id="file_upload_silverlight_span">
-@{ SilverlightObject so = ViewBag.Uploader as SilverlightObject; }
-@Html.DisplayFor(m => so, "SilverlightObject")
-</span>
+@{if(ViewBag.CanEditCourseLinks)
+  {
+      <span id="file_upload_silverlight_span">
+      @{ SilverlightObject so = ViewBag.Uploader as SilverlightObject; }
+      @Html.DisplayFor(m => so, "SilverlightObject")
+      </span>
+  }
+}
 </h3>
 <div id="course_links">
 @Html.Partial("_CourseLinks")
