@@ -12,6 +12,22 @@
 
 <script type="text/javascript">
     $(function () {
+        $("input[name='SetGrade']").change(function () {
+            if ($("input[name='SetGrade']:checked").val() == 'PrecentOfIssues') {
+                $('#set_grade').val("PercentOfIssues");
+            }
+            else if ($("input[name='SetGrade']:checked").val() == 'PercentAgreementWModerator') {
+                $('#set_grade').val("PercentAgreementWModerator");
+            }
+            else if ($("input[name='SetGrade']:checked").val() == 'Manually') {
+                $('#set_grade').val("Manually");
+                DisplayManuallyGrade();
+            }
+            else {
+                throw "Unknown Radio Button Checked: SetGrade"
+            }
+        });
+
         $('#add_to_gradebook').change(function () {
             if ($('#add_to_gradebook').attr('checked')) {
                 $('#grade_options').show('blind');
@@ -20,6 +36,9 @@
             }
         });
     });
+
+    function DisplayManuallyGrade() {
+    }
 
 </script>
 @{
@@ -31,6 +50,9 @@
         <fieldset>
             <legend>AsyncIssueVotingActivity</legend>
 
+            @Html.Hidden("setgrade", new { id="set_grade"})
+
+
             <div class="editor-label">
                 @Html.LabelFor(model => model.Name)
             </div>
@@ -40,7 +62,7 @@
             </div>
 
             <div class="editor-label">
-                @Html.LabelFor(model => model.AbstractAssignmentID, "AbstractAssignment")
+                @Html.LabelFor(model => model.AbstractAssignmentID, "Abstract Assignment")
             </div>
             <div class="editor-field">
                 @Html.DropDownList("AbstractAssignmentID", String.Empty)
@@ -49,81 +71,65 @@
 
             <h2>Settings</h2>
 
-            <div class="editor-label">
-                @Html.LabelFor(model => model.UseOnlyStudentsWhoCompletedPeerReview)
-            </div>
             <div class="editor-field">
-                @Html.CheckBoxFor(model => model.UseOnlyStudentsWhoCompletedPeerReview, new { id = "UseOnlyStudentsWhoCompletedPeerReview" })
+                @Html.CheckBoxFor(model => model.UseOnlyStudentsWhoCompletedPeerReview, new { id = "use_only_students_who_completed_peer_review" })
+                @Html.LabelFor(model => model.UseOnlyStudentsWhoCompletedPeerReview)
                 @Html.ValidationMessageFor(model => model.UseOnlyStudentsWhoCompletedPeerReview)
             </div>
 
             <h3>Anonymity of Review</h3>
 
-            <div class="editor-label">
-                @Html.LabelFor(model => model.peerReviewActivity.IsAuthorAnonymous)
-            </div>
             <div class="editor-field">
-                @Html.CheckBoxFor(model => model.peerReviewActivity.IsAuthorAnonymous, new { id = "IsAuthorAnonymous" })
+                @Html.CheckBoxFor(model => model.peerReviewActivity.IsAuthorAnonymous, new { id = "is_author_anonymous" })
+                @Html.LabelFor(model => model.peerReviewActivity.IsAuthorAnonymous)
                 @Html.ValidationMessageFor(model => model.peerReviewActivity.IsAuthorAnonymous)
             </div>
 
-            <div class="editor-label">
-                @Html.LabelFor(model => model.peerReviewActivity.IsReviewersAnonymous)
-            </div>
             <div class="editor-field">
-                @Html.CheckBoxFor(model => model.peerReviewActivity.IsReviewersAnonymous, new { id = "IsReviewerAnonymous" })
+                @Html.CheckBoxFor(model => model.peerReviewActivity.IsReviewersAnonymous, new { id = "is_reviewer_anonymous" })
+                @Html.LabelFor(model => model.peerReviewActivity.IsReviewersAnonymous)
                 @Html.ValidationMessageFor(model => model.peerReviewActivity.IsReviewersAnonymous)
             </div>
 
-            <div class="editor-label">
-                @Html.LabelFor(model => model.peerReviewActivity.IsReviewersRoleAnonymous)
-            </div>
             <div class="editor-field">
-                @Html.CheckBoxFor(model => model.peerReviewActivity.IsReviewersRoleAnonymous, new { id = "IsReviewersRoleAnonymous" })
+                @Html.CheckBoxFor(model => model.peerReviewActivity.IsReviewersRoleAnonymous, new { id = "is_reviewers_role_anonymous" })
+                @Html.LabelFor(model => model.peerReviewActivity.IsReviewersRoleAnonymous)
                 @Html.ValidationMessageFor(model => model.peerReviewActivity.IsReviewersRoleAnonymous)
             </div>
 
-
-            <div class="editor-label">
-                @Html.LabelFor(model => model.EnableIssueVotingDiscussion)
-            </div>
             <div class="editor-field">
-                @Html.CheckBoxFor(model => model.EnableIssueVotingDiscussion, new { id = "EnableIssueVotingDiscussion" })
+                @Html.CheckBoxFor(model => model.EnableIssueVotingDiscussion, new { id = "enable_issue_voting_discussion" })
+                @Html.LabelFor(model => model.EnableIssueVotingDiscussion)
                 @Html.ValidationMessageFor(model => model.EnableIssueVotingDiscussion)
             </div>
 
-            <div class="editor-label">
-                @Html.LabelFor(model => model.ReviewerMustCompleteIssueVoting)
-            </div>
             <div class="editor-field">
-                @Html.CheckBoxFor(model => model.ReviewerMustCompleteIssueVoting, new { id = "ReviewerMustCompleteIssueVoting" })
+                @Html.CheckBoxFor(model => model.ReviewerMustCompleteIssueVoting, new { id = "reviewer_must_complete_issue_voting" })
+                @Html.LabelFor(model => model.ReviewerMustCompleteIssueVoting)
                 @Html.ValidationMessageFor(model => model.ReviewerMustCompleteIssueVoting)
             </div>
-           
+
+            <div>
+                <input type="radio" name="SetGrade" value="PrecentOfIssues" />
+                Set Grade to percentage of issues voted on
+                <br />
+           </div>
+
+           <div>
+                <input type="radio" name="SetGrade" value="PercentAgreementWModerator" />
+                Set grade to percent in agreement with moderator
+                <br />
+           </div>
+
+           <div>
+                <input type="radio" name="SetGrade" value="Manually" />
+                Manually enter grade
+                <br />
+           </div>
+
+            <h4>Grading</h4>
+
            <div class="editor-label">
-                @Html.LabelFor(model => model.setgrade.PercentOfIssues)
-            </div>
-            <div class="editor-field">
-                @Html.RadioButtonFor(model => model.setgrade.PercentOfIssues, new { id = "SetGradePercentOfIssues" }, new { name = "SetGrade" })
-                @Html.ValidationMessageFor(model => model.setgrade.PercentOfIssues)
-            </div>
-            <div class="editor-label">
-                @Html.LabelFor(model => model.setgrade.PercentAgreementWModerator)
-            </div>
-            <div class="editor-field">
-                @Html.RadioButtonFor(model => model.setgrade.PercentAgreementWModerator, new { id = "SetGradePercentAgreementWModerator" }, new { name = "SetGrade" })
-                @Html.ValidationMessageFor(model => model.setgrade.PercentAgreementWModerator)
-            </div>
-            <div class="editor-label">
-                @Html.LabelFor(model => model.setgrade.Manually)
-            </div>
-            <div class="editor-field">
-                @Html.RadioButtonFor(model => model.setgrade.Manually, new { id = "SetGradeManually" }, new { name = "SetGrade" })
-                @Html.ValidationMessageFor(model => model.setgrade.Manually)
-            </div>
-
-
-           <div class="editor-label">.
                 Add to Gradebook
             </div>
             <div class="editor-field">

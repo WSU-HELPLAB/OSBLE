@@ -14,29 +14,25 @@
 
     $(function () {
 
-        $('#CanStudentAccessReviews').change(function () {
+        $('#can_student_access_reviews').change(function () {
             if ($(this).attr('checked')) {
-
                 DisplayCanStudentAccessReviewsOptions();
             }
             else {
-
                 HideCanStudentAccessReviewsOptions();
             }
         });
 
-        $('#CanReviewerViewOthersReviews').change(function () {
+        $('#can_reviewer_view_others_reviews').change(function () {
             if ($(this).attr('checked')) {
-
                 DisplayCanReviewerViewOthersReviewsOptions();
             }
             else {
-
                 HideCanReviewerViewOthersReviewsOptions();
             }
         });
 
-        $('#UseRubric').change(function () {
+        $('#use_rubric').change(function () {
             if ($(this).attr('checked')) {
                 DisplayUseRubricOptions();
             }
@@ -45,23 +41,21 @@
             }
         });
         // only all reviews or random reviews can be checked
-        $('#InstructorCompletesRubricAllReviews').change(function () {
+        $('#instructor_completes_rubric_all_reviews').change(function () {
             if ($(this).attr('checked')) {
-                $('#InstructorCompletesRubricRandomReview').removeAttr('checked');
+                $('#instructor_completes_rubric_random_review').removeAttr('checked');
             }
             else {
-                $('#InstructorCompletesRubricRandomReview').attr('checked', true);
+                $('#instructor_completes_rubric_random_review').attr('checked', true);
             }
         });
         // only all reviews or random reviews can be checked
-        $('#InstructorCompletesRubricRandomReview').change(function () {
+        $('#instructor_completes_rubric_random_review').change(function () {
             if ($(this).attr('checked')) {
-
-                $('#InstructorCompletesRubricAllReviews').removeAttr('checked');
+                $('#instructor_completes_rubric_all_reviews').removeAttr('checked');
             }
             else {
-
-                $('#InstructorCompletesRubricAllReviews').attr('checked', true);
+                $('#instructor_completes_rubric_all_reviews').attr('checked', true);
             }
         });
 
@@ -75,39 +69,39 @@
     });
 
     function DisplayCanStudentAccessReviewsOptions() {
-        $('#CanStudentAccessReviews_options').show('highlight');
+        $('#can_student_access_reviews_options').show('highlight');
         // default
-        $('#HasStudentCompletedAssignedReviews').attr('checked', true);
+        $('#has_student_completed_assigned_reviews').attr('checked', true);
     }
 
     function HideCanStudentAccessReviewsOptions() {
-        $('#CanStudentAccessReviews_options').hide('highlight');
+        $('#can_student_access_reviews_options').hide('highlight');
         // unchecking default box
-        $('#HasStudentCompletedAssignedReviews').removeAttr('checked');
+        $('#has_student_completed_assigned_reviews').removeAttr('checked');
     }
 
     function DisplayCanReviewerViewOthersReviewsOptions() {
-        $('#CanReviewerAccessReviews_options').show('highlight');
+        $('#can_reviewer_access_reviews_options').show('highlight');
         // default
-        $('#HasReviewerCompletedAssignedReviews').attr('checked', true);
+        $('#has_reviewer_completed_assigned_reviews').attr('checked', true);
     }
 
     function HideCanReviewerViewOthersReviewsOptions() {
-        $('#CanReviewerAccessReviews_options').hide('highlight');
-        $('#HasReviewerCompletedAssignedReviews').removeAttr('checked');
+        $('#can_reviewer_access_reviews_options').hide('highlight');
+        $('#has_reviewer_completed_assigned_reviews').removeAttr('checked');
     }
 
     function DisplayUseRubricOptions() {
-        $('#UseRubric_options').show('highlight');
+        $('#use_rubric_options').show('highlight');
         //default
-        $('#InstructorCompletesRubricRandomReview').attr('checked', true);
+        $('#instructor_completes_rubric_random_review').attr('checked', true);
     }
 
     function HideUseRubricOptions() {
-        $('#UseRubric_options').hide('highlight');
+        $('#use_rubric_options').hide('highlight');
         // unchecking the children boxes
-        $('#InstructorCompletesRubricRandomReview').removeAttr('checked');
-        $('#InstructorCompletesRubricAllReviews').removeAttr('checked');
+        $('#instructor_completes_rubric_random_review').removeAttr('checked');
+        $('#instructor_completes_rubric_all_reviews').removeAttr('checked');
     }
 
 </script>
@@ -129,7 +123,7 @@
             </div>
             
             <div class="editor-label">
-                @Html.LabelFor(model => model.AbstractAssignmentID, "AbstractAssignment")
+                @Html.LabelFor(model => model.AbstractAssignmentID, "Abstract Assignment")
             </div>
             <div class="editor-field">
                 @Html.DropDownList("AbstractAssignmentID", String.Empty)
@@ -138,88 +132,60 @@
 
             <h2>Settings</h2>
 
-            <div class="editor-label">
-                @*@Html.LabelFor(model => model.UseOnlySubmittedStudents)*@
-            </div>
             <div class="editor-field">
-                @Html.CheckBoxFor(model => model.UseOnlySubmittedStudents, new { id = "UseOnlySubmittedStudent" })
+                @Html.CheckBoxFor(model => model.UseOnlySubmittedStudents, new { id = "use_only_submitted_student" })
                 @Html.LabelFor(model => model.UseOnlySubmittedStudents)
                 @Html.ValidationMessageFor(model => model.UseOnlySubmittedStudents)
             </div>
 
-            <div class="editor-label">
-                @*@Html.LabelFor(model => model.UseModerators)*@
-            </div>
             <div class="editor-field">
-                @Html.CheckBoxFor(model => model.UseModerators, new { id = "UseModerators" })
+                @Html.CheckBoxFor(model => model.UseModerators, new { id = "use_moderators" })
                 @Html.LabelFor(model => model.UseModerators)
                 @Html.ValidationMessageFor(model => model.UseModerators)
             </div>
 
             <h4>Anonymity of Review</h4>
 
-            <div class="editor-label">
-                @*@Html.LabelFor(model => model.IsAuthorAnonymous)*@
-            </div>
             <div class="editor-field">
-                @Html.CheckBoxFor(model => model.IsAuthorAnonymous, new { id = "IsAuthorAnonymous" })
+                @Html.CheckBoxFor(model => model.IsAuthorAnonymous, new { id = "is_author_anonymous" })
                 @Html.LabelFor(model => model.IsAuthorAnonymous)
                 @Html.ValidationMessageFor(model => model.IsAuthorAnonymous)
             </div>
 
-            <div class="editor-label">
-                @*@Html.LabelFor(model => model.IsReviewersAnonymous)*@
-            </div>
             <div class="editor-field">
-                @Html.CheckBoxFor(model => model.IsReviewersAnonymous, new { id = "IsReviewerAnonymous" })
+                @Html.CheckBoxFor(model => model.IsReviewersAnonymous, new { id = "is_reviewer_anonymous" })
                 @Html.LabelFor(model => model.IsReviewersAnonymous)
                 @Html.ValidationMessageFor(model => model.IsReviewersAnonymous)
             </div>
 
-            <div class="editor-label">
-                @*@Html.LabelFor(model => model.IsReviewersRoleAnonymous)*@
-            </div>
             <div class="editor-field">
-                @Html.CheckBoxFor(model => model.IsReviewersRoleAnonymous, new { id = "IsReviewersRoleAnonymous" })
+                @Html.CheckBoxFor(model => model.IsReviewersRoleAnonymous, new { id = "is_reviewers_role_anonymous" })
                 @Html.LabelFor(model => model.IsReviewersRoleAnonymous)
                 @Html.ValidationMessageFor(model => model.IsReviewersRoleAnonymous)
             </div>
 
             <h4>Basis of Review (Must Check at least one)</h4>
 
-            <div class="editor-label">
-                @*@Html.LabelFor(model => model.UseInlineComments)*@
-            </div>
             <div class="editor-field">
-                @Html.CheckBoxFor(model => model.UseInlineComments, new { id = "UseInlineComments" })
+                @Html.CheckBoxFor(model => model.UseInlineComments, new { id = "use_inline_comments" })
                 @Html.LabelFor(model => model.UseInlineComments)
                 @Html.ValidationMessageFor(model => model.UseInlineComments)
             </div>
 
-            <div class="editor-label">
-                @*@Html.LabelFor(model => model.UseRubric)*@
-            </div>
             <div class="editor-field">
-                @Html.CheckBoxFor(model => model.UseRubric, new { id = "UseRubric" })
+                @Html.CheckBoxFor(model => model.UseRubric, new { id = "use_rubric" })
                 @Html.LabelFor(model => model.UseRubric)
                 @Html.ValidationMessageFor(model => model.UseRubric)
             </div>
-            <div id="UseRubric_options" class="indented_options" style="display: none">
-                      
-                 <div class="editor-label">
-                    @*@Html.LabelFor(model => model.InstructorCompletesRubricRandomReview)*@
-                </div>
+            <div id="use_rubric_options" class="indented_options" style="display: none">
                 <div class="editor-field">
-                    @Html.CheckBoxFor(model => model.InstructorCompletesRubricRandomReview, new { id = "InstructorCompletesRubricRandomReview" })
+                    @Html.CheckBoxFor(model => model.InstructorCompletesRubricRandomReview, new { id = "instructor_completes_rubric_random_review" })
                     @Html.LabelFor(model => model.InstructorCompletesRubricRandomReview)
                     @Html.ValidationMessageFor(model => model.InstructorCompletesRubricRandomReview)
                 </div>
 
-                <div class="editor-label">
-                    @*@Html.LabelFor(model => model.InstructorCompletesRubricAllReviews)*@
-                </div>
                 <div class="editor-field">
-                    @Html.CheckBoxFor(model => model.InstructorCompletesRubricAllReviews, new { id = "InstructorCompletesRubricAllReviews" })
+                    @Html.CheckBoxFor(model => model.InstructorCompletesRubricAllReviews, new { id = "instructor_completes_rubric_all_reviews" })
                     @Html.LabelFor(model => model.InstructorCompletesRubricAllReviews)
                     @Html.ValidationMessageFor(model => model.InstructorCompletesRubricAllReviews)
                 </div>
@@ -227,20 +193,14 @@
 
             <h4>Author access to completed reviews</h4>
 
-            <div class="editor-label">
-                @*@Html.LabelFor(model => model.CanStudentAccessReviews)*@
-            </div>
             <div class="editor-field">
-                @Html.CheckBoxFor(model => model.CanStudentAccessReviews, new { id = "CanStudentAccessReviews" })
+                @Html.CheckBoxFor(model => model.CanStudentAccessReviews, new { id = "can_student_access_reviews" })
                 @Html.LabelFor(model => model.CanStudentAccessReviews)
                 @Html.ValidationMessageFor(model => model.CanStudentAccessReviews)
             </div>
-            <div id="CanStudentAccessReviews_options"  class="indented_options" style="display: none">
-                <div class="editor-label">
-                    @*@Html.LabelFor(model => model.HasStudentCompletedAssignedReviews)*@
-                </div>
+            <div id="can_student_access_reviews_options"  class="indented_options" style="display: none">
                 <div class="editor-field">
-                    @Html.CheckBoxFor(model => model.HasStudentCompletedAssignedReviews, new { id = "HasStudentCompletedAssignedReviews" })
+                    @Html.CheckBoxFor(model => model.HasStudentCompletedAssignedReviews, new { id = "has_student_completed_assigned_reviews" })
                     @Html.LabelFor(model => model.HasStudentCompletedAssignedReviews)
                     @Html.ValidationMessageFor(model => model.HasStudentCompletedAssignedReviews)
                 </div>
@@ -248,20 +208,14 @@
 
             <h4>Reviewer access to completed reviews of other reviewers</h4>
 
-            <div class="editor-label">
-                @*@Html.LabelFor(model => model.CanReviewerViewOthersReviews)*@
-            </div>
             <div class="editor-field">
-                @Html.CheckBoxFor(model => model.CanReviewerViewOthersReviews, new { id = "CanReviewerViewOthersReviews" })
+                @Html.CheckBoxFor(model => model.CanReviewerViewOthersReviews, new { id = "can_reviewer_view_others_reviews" })
                 @Html.LabelFor(model => model.CanReviewerViewOthersReviews)
                 @Html.ValidationMessageFor(model => model.CanReviewerViewOthersReviews)
             </div>
-            <div id="CanReviewerAccessReviews_options"  class="indented_options" style="display: none">
-                <div class="editor-label">
-                    @*@Html.LabelFor(model => model.HasReviewerCompletedAssignedReviews)*@
-                </div>
+            <div id="can_reviewer_access_reviews_options"  class="indented_options" style="display: none">
                 <div class="editor-field">
-                    @Html.CheckBoxFor(model => model.HasReviewerCompletedAssignedReviews, new { id = "HasReviewerCompletedAssignedReviews" })
+                    @Html.CheckBoxFor(model => model.HasReviewerCompletedAssignedReviews, new { id = "has_reviewer_completed_assigned_reviews" })
                     @Html.LabelFor(model => model.HasReviewerCompletedAssignedReviews)
                     @Html.ValidationMessageFor(model => model.HasReviewerCompletedAssignedReviews)
                 </div>

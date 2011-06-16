@@ -45,6 +45,22 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Create(AsyncIssueVotingActivity asyncissuevotingactivity)
         {
+            string setgrade = Request.Params["SetGrade"];
+
+            // had to use hard coded strings because otherwise through an error about constant values.
+            switch(setgrade)
+            {
+                case "PercentOfIssues":
+                    asyncissuevotingactivity.setgrade = IssueVotingActivity.SetGrade.PercentOfIssues;
+                    break;
+                case "PercentAgreementWModerator":
+                    asyncissuevotingactivity.setgrade = IssueVotingActivity.SetGrade.PercentAgreementWModerator;
+                    break;
+                case "Manually":
+                    asyncissuevotingactivity.setgrade = IssueVotingActivity.SetGrade.Manually;
+                    break;
+            };
+
             if (ModelState.IsValid)
             {
                 db.AssignmentActivities.Add(asyncissuevotingactivity);
