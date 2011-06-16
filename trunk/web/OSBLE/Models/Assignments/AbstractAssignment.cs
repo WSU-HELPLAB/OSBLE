@@ -47,7 +47,7 @@ namespace OSBLE.Models.Assignments
 
         public bool IsDraft { get; set; }
 
-        public int RubricID { get; set; }
+        public int? RubricID { get; set; }
 
         public virtual Rubric Rubric { get; set; }
     }

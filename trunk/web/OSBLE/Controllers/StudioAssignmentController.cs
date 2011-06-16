@@ -1,16 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using OSBLE.Models;
-using System.Runtime.Serialization;
-using OSBLE.Models.ViewModels;
-using System.Runtime.Serialization.Json;
-using System.IO;
-using System.Text;
-using Newtonsoft.Json;
 using OSBLE.Attributes;
+using OSBLE.Models;
+using OSBLE.Models.ViewModels;
 
 namespace OSBLE.Controllers
 {
@@ -37,11 +30,12 @@ namespace OSBLE.Controllers
                 XapName = "StudioTimelineCreation",
                 Width = "820",
                 Height = "430",
-                Parameters = new Dictionary<string,string>() { 
+                Parameters = new Dictionary<string, string>()
+                {
                 }
-
             };
 
+            /*
             // Create sample activities
             List<SerializableActivity> activities = new List<SerializableActivity>();
 
@@ -57,7 +51,6 @@ namespace OSBLE.Controllers
                 ActivityType = ActivityTypes.Rebuttal
             });
 
-
             activities.Add(new SerializableActivity()
             {
                 DateTime = DateTime.Now.AddDays(7),
@@ -70,7 +63,9 @@ namespace OSBLE.Controllers
                 ActivityType = ActivityTypes.Stop
             });
 
+            //gives the sample data to the viewModel
             viewModel.SerializedActivitiesJSON = viewModel.StudioTimelineCreation.Parameters["activities"] = Uri.EscapeDataString(JsonConvert.SerializeObject(activities));
+            */
 
             return View(viewModel);
         }
@@ -90,6 +85,5 @@ namespace OSBLE.Controllers
             Rebuttal,
             Stop
         }
-
     }
 }
