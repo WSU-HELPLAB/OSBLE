@@ -51,33 +51,6 @@ namespace OsbleRubric
         }
 
         /// <summary>
-        ///  creates the StackPanel for the close & save changes buttons
-        /// </summary>
-        /// <returns></returns>
-        private StackPanel closeAndSaveButtons()
-        {
-            StackPanel returnVal = new StackPanel()
-            {
-                HorizontalAlignment = HorizontalAlignment.Right,
-            };
-
-            Button closeButton = new Button()
-            {
-                Content = "Close"
-            };
-            Button saveButton = new Button()
-            {
-                Content = "Save Changes"
-            };
-
-
-            returnVal.Children.Add(closeButton);
-            returnVal.Children.Add(saveButton);
-
-            return returnVal;
-        }
-
-        /// <summary>
         /// sets up all the default paramaters for the grid & adds the initial rows/columns
         /// </summary>
         private void initialize()
@@ -86,16 +59,11 @@ namespace OsbleRubric
             if (thisView.LayoutRoot.Children.Contains(customDataGrid.BaseGrid) == false) //won't try to add the grid if init is run again
             {
                 thisView.LayoutRoot.Children.Add(customDataGrid.BaseGrid);
-                thisView.MainStackPanel.Children.Add(closeAndSaveButtons());
             }
 
 
             //setting color for grid
             customDataGrid.BaseGrid.Background = new SolidColorBrush(Colors.LightGray);
-
-
-            //temp event for saving, to be removed later
-            thisView.LayoutRoot.MouseRightButtonDown += new MouseButtonEventHandler(LayoutRoot_MouseRightButtonDown);
 
             //setting borders for grid
             customDataGrid.HideBordersForLastRow = false;
@@ -138,19 +106,6 @@ namespace OsbleRubric
 
             //setting up the initial grayed arrows
             adjustArrowIcons();
-        }
-
-
-        //temporary events to test loading/saving data
-        void LayoutRoot_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            getData();
-        }
-
-
-        void Img1_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            buildGridFromData();
         }
 
 
@@ -757,15 +712,12 @@ namespace OsbleRubric
 
             //stuff for returnVal
             TextBlock TBlock1 = new TextBlock() { Text = "Performance Criterion", FontWeight = FontWeights.Bold, FontSize = GlobalFontSize, VerticalAlignment = VerticalAlignment.Center };
-            Image Img1 = new Image() { Source = helpIconSource, Width = 16, Height = 16, Margin = new Thickness(3, 0, 0, 0) };
-            ToolTipService.SetToolTip(Img1, "Input your Performance Criterion in the text area.\nThe minus button is for removing a criterion row.");
+            Image helpIconImg = new Image() { Source = helpIconSource, Width = 16, Height = 16, Margin = new Thickness(3, 0, 0, 0) };
+            ToolTipService.SetToolTip(helpIconImg, "Input your Performance Criterion in the text area.\nThe minus button is for removing a criterion row.");
 
-            Img1.MouseLeftButtonDown += new MouseButtonEventHandler(Img1_MouseLeftButtonDown);
-
-            
             //adding children to returnVal
             returnVal.Children.Add(TBlock1);
-            returnVal.Children.Add(Img1);
+            returnVal.Children.Add(helpIconImg);
             return returnVal;
         }
 
