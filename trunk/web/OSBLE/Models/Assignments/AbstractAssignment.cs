@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
+using OSBLE.Models.Rubrics;
 
 namespace OSBLE.Models.Assignments
 {
@@ -45,5 +46,9 @@ namespace OSBLE.Models.Assignments
         }
 
         public bool IsDraft { get; set; }
+
+        public int RubricID { get; set; }
+
+        public virtual Rubric Rubric { get; set; }
     }
 }

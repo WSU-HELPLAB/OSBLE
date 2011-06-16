@@ -9,7 +9,6 @@
 <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/osble.assignments.js")" type="text/javascript"></script>
-
 <script type="text/javascript">
 
     var isTeamGenerationReady = false;
@@ -35,6 +34,16 @@
 
         $('#Assignment_Name').change(function () {
             updateActivitiesName();
+        });
+
+        $('#use_rubric').change(function () {
+            if ($(this).attr('checked')) {
+                $('#edit_rubric_div').show('highlight');
+            }
+            else {
+                $('#edit_rubric_div').hide('blind');
+
+            }
         });
 
         $('#isTeam').change(function () {
@@ -79,6 +88,16 @@
 
         //Create the Silverlight dialog box
         $('#team_generation_dialog').dialog({
+            modal: true,
+            autoOpen: false,
+            resizable: false,
+            draggable: false,
+            width: 850,
+            height: 650
+        });
+
+        //Create the Silverlight dialog box
+        $('#rubric_dialog').dialog({
             modal: true,
             autoOpen: false,
             resizable: false,
@@ -182,6 +201,10 @@
         $('#team_generation_dialog').dialog('open'); return false;
     }
 
+    function OpenRubricDialog() {
+        $('#rubric_dialog').dialog('open'); return false;
+    }
+
     function GenerateTeamsRandomly() {
         if ($("input[name='team_or_people']:checked").val() == 'Teams') {
             var teams = parseInt($('#total_teams').val());
@@ -220,10 +243,15 @@
                 document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfTeams(parseInt($('#total_teams').val()));
             }
             else {
-               document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfPeople(parseInt($('#people_per_team').val()));
+                document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfPeople(parseInt($('#people_per_team').val()));
             }
         }
-   }
+    }
+
+    function CloseRubric() {
+        $('#rubric_dialog').dialog('close'); return false;
+    }
+
 </script>
 @{
     
@@ -238,153 +266,170 @@
 
         Html.ValidationSummary(true);
 
-        @Html.Hidden("newTeams", "", new { id = "newTeams" })
-        @Html.HiddenFor(model => submission.ReleaseDate, new { @id = "ReleaseDate" })
-        @Html.HiddenFor(model => stop.ReleaseDate, new { @id = "DueDate" })
-        @Html.HiddenFor(model => submission.Name, new { @id = "SubmissionName" })
-        @Html.HiddenFor(model => stop.Name, new { @id = "StopName" })
+    @Html.Hidden("newTeams", "", new { id = "newTeams" })
+    @Html.HiddenFor(model => submission.ReleaseDate, new { @id = "ReleaseDate" })
+    @Html.HiddenFor(model => stop.ReleaseDate, new { @id = "DueDate" })
+    @Html.HiddenFor(model => submission.Name, new { @id = "SubmissionName" })
+    @Html.HiddenFor(model => stop.Name, new { @id = "StopName" })
         
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Assignment.Name)
-        </div>
-        <div class="editor-field">
-            @Html.EditorFor(model => model.Assignment.Name)
-            @Html.ValidationMessageFor(model => model.Assignment.Name)
-        </div>
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Assignment.Description)
-        </div>
-        <div class="editor-field">
-            @Html.TextAreaFor(model => model.Assignment.Description, new { rows = 5, cols = 65 })
-            @Html.ValidationMessageFor(model => model.Assignment.Description)
-        </div>
+    <div class="editor-label">
+        @Html.LabelFor(model => model.Assignment.Name)
+    </div>
+    <div class="editor-field">
+        @Html.EditorFor(model => model.Assignment.Name)
+        @Html.ValidationMessageFor(model => model.Assignment.Name)
+    </div>
+    <div class="editor-label">
+        @Html.LabelFor(model => model.Assignment.Description)
+    </div>
+    <div class="editor-field">
+        @Html.TextAreaFor(model => model.Assignment.Description, new { rows = 5, cols = 65 })
+        @Html.ValidationMessageFor(model => model.Assignment.Description)
+    </div>
         
-        <div class="editor-label">
-            @Html.LabelFor(model => submission.ReleaseDate)
-        </div>
-        <div class="editor-label">
-            @Html.TextBox("ReleaseDate_Date", convertToMonthDayYearFormat(submission.ReleaseDate), new { @id = "ReleaseDate_Date", @class = "date_picker", size = 9 })
-            @Html.TextBox("ReleaseDate_Time", convertTime(submission.ReleaseDate), new { @id = "ReleaseDate_Time", @class = "time_picker", size = 9 })
-        </div>
-        <!--Stop date-->
-        <div class="editor-label">
-            @Html.Label("Due Date")
-        </div>
-        <div class="editor-label">
-            @Html.TextBox("DueDate_Date", convertToMonthDayYearFormat(stop.ReleaseDate), new { @id = "DueDate_Date", @class = "date_picker", size = 9 })
-            @Html.TextBox("DueDate_Time", convertTime(stop.ReleaseDate), new { @id = "DueDate_Time", @class = "time_picker", size = 9 })
-        </div>
-            <div class="editor-label">
-            @Html.LabelFor(model => model.Assignment.IsDraft)
-        </div>
-        <div class="editor-field">
-            @Html.CheckBoxFor(model => model.Assignment.IsDraft)
-            @Html.ValidationMessageFor(model => model.Assignment.IsDraft)
-        </div>
+    <div class="editor-label">
+        @Html.LabelFor(model => submission.ReleaseDate)
+    </div>
+    <div class="editor-label">
+        @Html.TextBox("ReleaseDate_Date", convertToMonthDayYearFormat(submission.ReleaseDate), new { @id = "ReleaseDate_Date", @class = "date_picker", size = 9 })
+        @Html.TextBox("ReleaseDate_Time", convertTime(submission.ReleaseDate), new { @id = "ReleaseDate_Time", @class = "time_picker", size = 9 })
+    </div>
+    <!--Stop date-->
+    <div class="editor-label">
+        @Html.Label("Due Date")
+    </div>
+    <div class="editor-label">
+        @Html.TextBox("DueDate_Date", convertToMonthDayYearFormat(stop.ReleaseDate), new { @id = "DueDate_Date", @class = "date_picker", size = 9 })
+        @Html.TextBox("DueDate_Time", convertTime(stop.ReleaseDate), new { @id = "DueDate_Time", @class = "time_picker", size = 9 })
+    </div>
+    <div class="editor-label">
+        @Html.LabelFor(model => model.Assignment.IsDraft)
+    </div>
+    <div class="editor-field">
+        @Html.CheckBoxFor(model => model.Assignment.IsDraft)
+        @Html.ValidationMessageFor(model => model.Assignment.IsDraft)
+    </div>
 
-        <div class="editor-label">
-            @Html.LabelFor(model => submission.isTeam)
-        </div>
-        <div class="editor-field">
-            @Html.CheckBoxFor(model => submission.isTeam, new { id = "isTeam" })
-            @Html.ValidationMessageFor(model => submission.isTeam)
-        </div>
-        <div id="Team_Options"  class="indented_options" style="display: none">
-            <input type="radio" name="team_generation_options" value="PreviousAssignment" />
-            Use teams defined in previous course assignment
+    <div class="editor-label">
+        @Html.LabelFor(model => submission.isTeam)
+    </div>
+    <div class="editor-field">
+        @Html.CheckBoxFor(model => submission.isTeam, new { id = "isTeam" })
+        @Html.ValidationMessageFor(model => submission.isTeam)
+    </div>
+    <div id="Team_Options" class="indented_options" style="display: none">
+        <input type="radio" name="team_generation_options" value="PreviousAssignment" />
+        Use teams defined in previous course assignment
+        <br />
+        <ul id="PreviousAssignmentDiv" style="display: none" class="team_generation_options">
+            <li>Select box goes here. </li>
             <br />
-            <ul id="PreviousAssignmentDiv" style="display: none" class="team_generation_options">
-                <li>Select box goes here. </li>
-                <br />
-                <li>
-                    <button type="button" onclick="OpenTeamGeneration()">
-                        Generate Teams </button>
-                </li>
-            </ul>
-            <input type="radio" name="team_generation_options" value="RandomTeams" />
-            Generate teams randomly
+            <li>
+                <button type="button" onclick="OpenTeamGeneration()">
+                    Generate Teams...</button>
+            </li>
+        </ul>
+        <input type="radio" name="team_generation_options" value="RandomTeams" />
+        Generate teams randomly
+        <br />
+        <ul id="RandomTeams" style="display: none" class="team_generation_options">
+            <li>
+                <input type="radio" name="team_or_people" value="Teams" />
+                Specify the number of total teams
+                <input type="text" id="total_teams" size="3" />
+            </li>
             <br />
-            <ul id="RandomTeams" style="display: none" class="team_generation_options">
-                <li>
-                    <input type="radio" name="team_or_people" value="Teams" />
-                    Specify the number of total teams
-                    <input type="text" id="total_teams" size="3"/>
+            <li>
+                <input type="radio" name="team_or_people" value="People" />
+                Specify the number of people per team
+                <input type="text" id="people_per_team" size="3" />
+            </li>
+            <br />
+            <li>
+                <button type="button" onclick="GenerateTeamsRandomly()">
+                    Generate Teams...
+                </button>
+            </li>
+        </ul>
+        <input type="radio" name="team_generation_options" value="ManualTeams" />
+        Specify teams manually
+        <ul id="ManualTeams" style="display: none" class="team_generation_options">
+            <li>
+                <button type="button" onclick="OpenTeamGeneration()">
+                    Create Teams...
+                </button>
+            </li>
+        </ul>
+        <!-- in the future generate teams with mixed ability and Generate teams with same-ability will need to go here -->
+    </div>
+    <div class="editor-label">
+        @Html.LabelFor(model => submission.InstructorCanReview)
+    </div>
+    <div class="editor-field">
+        @Html.EditorFor(model => submission.InstructorCanReview)
+        @Html.ValidationMessageFor(model => submission.InstructorCanReview)
+    </div>
 
-                </li>
-                <br />
-                <li>
-                    <input type="radio" name="team_or_people" value="People"/>
-                    Specify the number of people per team 
-                    <input type="text" id="people_per_team" size="3"/>
-                </li>
-                <br />
-                <li>
-                    <button type="button" onclick="GenerateTeamsRandomly()">
-                        Generate Teams</button>
-                </li>
-            </ul>
-            <input type="radio" name="team_generation_options" value="ManualTeams" />
-            Specify teams manually
-            <ul id="ManualTeams" style="display: none" class="team_generation_options">
-                <li>
-                    <button type="button" onclick="OpenTeamGeneration()">
-                        Create Teams
-                    </button>
-                </li>
-            </ul>
-            <!-- in the future generate teams with mixed ability and Generate teams with same-ability will need to go here -->
-        </div>
-        <div class="editor-label">
-            @Html.LabelFor(model => submission.InstructorCanReview)
-        </div>
-        <div class="editor-field">
-            @Html.EditorFor(model => submission.InstructorCanReview)
-            @Html.ValidationMessageFor(model => submission.InstructorCanReview)
-        </div>
+    <div class="editor-label">
+        @Html.Label("Use Rubric?")
+    </div>
+    <div class="editor-field">
+        @Html.CheckBox("use_rubric", false, new { id = "use_rubric" })
+    </div>
+    <div id="edit_rubric_div" style="display: none">
+        <ul id="rubic_ul" class="team_generation_options">
+            <li>
+                <button type="button" onclick="OpenRubricDialog()">
+                    Edit Rubric...
+                </button>
+            </li>
+        </ul>
+    </div>
 
-
-    <h3>Deliverables</h3>
+    <h3>
+        Deliverables</h3>
    
     <table id="deliverables_table">
-    <tr>
-        <td>
-            <table>
-                <tr>
-                    <td>
-                        File Name
-                    </td>
-                    <td>
-                        <input type="text" id="new_deliverable_name" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Type
-                    </td>
-                    <td>
-                        <select id="new_deliverable_type">
-                        @foreach (SelectListItem dt in ViewBag.DeliverableTypes)
-                        {
-                            <option value="@dt.Value">@dt.Text</option>
-                        }
-                        </select>
-                    </td>
-                </tr>            
-            </table>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <a href="#" id="add_new_deliverable" title="Add New Deliverable"><img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Deliverable" /></a>
-        </td>
-    </tr>
+        <tr>
+            <td>
+                <table>
+                    <tr>
+                        <td>
+                            File Name
+                        </td>
+                        <td>
+                            <input type="text" id="new_deliverable_name" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Type
+                        </td>
+                        <td>
+                            <select id="new_deliverable_type">
+                                @foreach (SelectListItem dt in ViewBag.DeliverableTypes)
+                                {
+                                    <option value="@dt.Value">@dt.Text</option>
+                                }
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="#" id="add_new_deliverable" title="Add New Deliverable">
+                    <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Deliverable" /></a>
+            </td>
+        </tr>
     </table>
     
     <div id="deliverable_data">
-    
     </div>
     
-    <div id="deliverables_after"></div>
+    <div id="deliverables_after">
+    </div>
 
     <script type="text/javascript">
         $(function () {
@@ -397,70 +442,67 @@
         });       
     </script>
     
-    <h3>Grading</h3>
+    <h3>
+        Grading</h3>
     
     
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Assignment.Category, "Category")
-        </div>
-        <div class="editor-field">
-            @Html.DropDownListFor(model => model.Assignment.CategoryID, ViewBag.Categories as SelectList, new { id = "grade_category" })
-            @Html.ValidationMessageFor(model => model.Assignment.Category)
-        </div>
+    <div class="editor-label">
+        @Html.LabelFor(model => model.Assignment.Category, "Category")
+    </div>
+    <div class="editor-field">
+        @Html.DropDownListFor(model => model.Assignment.CategoryID, ViewBag.Categories as SelectList, new { id = "grade_category" })
+        @Html.ValidationMessageFor(model => model.Assignment.Category)
+    </div>
     
     
         
-        <div class="editor-label">
-            Add to Gradebook
-        </div>
+    <div class="editor-label">
+        Add to Gradebook
+    </div>
+    <div class="editor-field">
+        <input type="checkbox" id="add_to_gradebook" checked="checked" />
+    </div>
+    
+    <div id="grade_options" class="indented_options">
         <div class="editor-field">
-            <input type="checkbox" id="add_to_gradebook" checked="checked" />
+            Worth
+            @Html.TextBoxFor(model => model.Assignment.PointsPossible, new { id = "points_possible", size = 3 })
+            Points in Category <span id="grade_category_label"></span>
+            @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)
         </div>
-    
-        <div id="grade_options" class="indented_options">
-            <div class="editor-field">
-                Worth
-                @Html.TextBoxFor(model => model.Assignment.PointsPossible, new { id = "points_possible", size = 3 })
-                Points in Category <span id="grade_category_label"></span>
-
-                @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)
-            </div>
-        
-
-            <h3>Late Policy</h3>
-    
-            <p>
-                Students may submit assignments up to @Html.TextBoxFor(model => model.Submission.MinutesLateWithNoPenalty, new { size = 3 })
-                minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.Submission.PercentPenalty, new { size = 3 })
-                percent per @Html.TextBoxFor(model => model.Submission.HoursLatePerPercentPenalty, new { size = 3 })
-                hours late will be applied.<br />
-                @Html.ValidationMessageFor(model => model.Submission.MinutesLateWithNoPenalty)
-                @Html.ValidationMessageFor(model => model.Submission.PercentPenalty)
-                @Html.ValidationMessageFor(model => model.Submission.HoursLatePerPercentPenalty)
-            </p>
-    
-    
-            <p>
-                Assignments that are submitted more than @Html.TextBoxFor(model => model.Submission.HoursLateUntilZero, new { size = 3 })
-                hours after the due date and time will receive an automatic 0.<br />
-                @Html.ValidationMessageFor(model => model.Submission.HoursLateUntilZero)
-            </p>
-
-        </div>
-    
+        <h3>
+            Late Policy</h3>
         <p>
-            <input type="submit" value="Create Basic Assignment"/>
+            Students may submit assignments up to @Html.TextBoxFor(model => model.Submission.MinutesLateWithNoPenalty, new { size = 3 })
+            minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.Submission.PercentPenalty, new { size = 3 })
+            percent per @Html.TextBoxFor(model => model.Submission.HoursLatePerPercentPenalty, new { size = 3 })
+            hours late will be applied.<br />
+            @Html.ValidationMessageFor(model => model.Submission.MinutesLateWithNoPenalty)
+            @Html.ValidationMessageFor(model => model.Submission.PercentPenalty)
+            @Html.ValidationMessageFor(model => model.Submission.HoursLatePerPercentPenalty)
         </p>
+        <p>
+            Assignments that are submitted more than @Html.TextBoxFor(model => model.Submission.HoursLateUntilZero, new { size = 3 })
+            hours after the due date and time will receive an automatic 0.<br />
+            @Html.ValidationMessageFor(model => model.Submission.HoursLateUntilZero)
+        </p>
+    </div>
+    
+    <p>
+        <input type="submit" value="Create Basic Assignment" />
+    </p>
     
     }
     <div>
         @Html.ActionLink("Back to List", "Index", "Home")
     </div>
 }
-    <div id="team_generation_dialog" title="Edit Teams">
-        @Html.DisplayFor(m=>m.TeamCreation)
-    </div>
-
+<div id="team_generation_dialog" title="Edit Teams">
+    @Html.DisplayFor(m => m.TeamCreation)
+</div>
+<div id="rubric_dialog" title="Edit Rubric">
+    @Html.DisplayFor(m => m.RubricCreation)
+</div>
 @functions
 {
     public string convertToMonthDayYearFormat(DateTime date)

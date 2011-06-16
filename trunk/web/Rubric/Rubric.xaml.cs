@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Windows;
+﻿using System.Windows;
+using System.Windows.Browser;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 
 namespace OsbleRubric
 {
@@ -17,6 +9,17 @@ namespace OsbleRubric
         public Rubric()
         {
             InitializeComponent();
+        }
+
+        private void PublishChanges_Click(object sender, RoutedEventArgs e)
+        {
+            //umm we should actually save the changes but until then tell the user they were saved :)
+            MessageBox.Show("Changes Saved");
+        }
+
+        private void CancelChanges_Click(object sender, RoutedEventArgs e)
+        {
+            HtmlPage.Window.Invoke("CloseRubric", "");
         }
     }
 }

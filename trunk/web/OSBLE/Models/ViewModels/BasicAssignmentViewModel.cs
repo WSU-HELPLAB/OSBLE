@@ -1,6 +1,5 @@
 ﻿using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
-using System.Collections.Generic;
 
 namespace OSBLE.Models.ViewModels
 {
@@ -20,6 +19,8 @@ namespace OSBLE.Models.ViewModels
         public BasicAssignment Assignment { get; set; }
 
         public SilverlightObject TeamCreation { get; set; }
+
+        public SilverlightObject RubricCreation { get; set; }
 
         public string SerializedTeamMembersJSON { get; set; }
     }

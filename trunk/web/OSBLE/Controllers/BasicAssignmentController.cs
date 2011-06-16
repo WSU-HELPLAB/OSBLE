@@ -66,44 +66,9 @@ namespace OSBLE.Controllers
             viewModel.Submission.MinutesLateWithNoPenalty = active.MinutesLateWithNoPenalty;
 
             viewModel.TeamCreation = createTeamCreationSilverlightObject();
+            viewModel.RubricCreation = createRubricCreationSilverlightObject();
 
-            List<SerializableTeamMember> teamMembmers = new List<SerializableTeamMember>();
-
-            var couresesUsers = (from c in db.CoursesUsers
-                                 where c.CourseID == activeCourse.CourseID
-                                 && (c.CourseRole.ID == (int)CourseRole.OSBLERoles.Student)
-                                 select c).ToList();
-
-            int i = 0;
-
-            if (couresesUsers.Count >= 2)
-            {
-                foreach (CoursesUsers cu in couresesUsers)
-                {
-                    SerializableTeamMember teamMember = new SerializableTeamMember();
-                    teamMember.IsModerator = cu.CourseRole.ID == (int)CourseRole.OSBLERoles.Moderator;
-                    teamMember.Name = cu.UserProfile.FirstName + " " + cu.UserProfile.LastName;
-                    teamMember.Section = cu.Section;
-                    teamMember.UserID = cu.UserProfileID;
-                    teamMember.isUser = true;
-
-                    ///////////////////////TEST/////////////////////////
-                    if (i % 2 == 0)
-                    {
-                        teamMember.Subbmitted = true;
-                    }
-                    i++;
-                    ///////////////////////////////////////////////////
-
-                    teamMembmers.Add(teamMember);
-                }
-
-                viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"] = Uri.EscapeDataString(JsonConvert.SerializeObject(teamMembmers));
-            }
-            else
-            {
-                viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"] = null;
-            }
+            viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"] = serializeTeamMemers(getTeamMembers());
 
             ViewBag.Categories = new SelectList(db.Categories, "ID", "Name");
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
@@ -239,13 +204,61 @@ namespace OSBLE.Controllers
             }
 
             basic.TeamCreation = createTeamCreationSilverlightObject();
-
+            basic.RubricCreation = createRubricCreationSilverlightObject();
             ViewBag.Categories = new SelectList(db.Categories, "ID", "Name", basic.Assignment.CategoryID);
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
 
-            return View(basic);
+            basic.SerializedTeamMembersJSON = basic.TeamCreation.Parameters["teamMembers"] = serializeTeamMemers(getTeamMembers());
 
-            return RedirectToAction("Index", "Assignment");
+            return View(basic);
+        }
+
+        private string serializeTeamMemers(List<SerializableTeamMember> members)
+        {
+            if (members.Count > 1)
+            {
+                return Uri.EscapeDataString(JsonConvert.SerializeObject(members));
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private List<SerializableTeamMember> getTeamMembers()
+        {
+            List<SerializableTeamMember> teamMembmers = new List<SerializableTeamMember>();
+
+            var couresesUsers = (from c in db.CoursesUsers
+                                 where c.CourseID == activeCourse.CourseID
+                                 && (c.CourseRole.ID == (int)CourseRole.OSBLERoles.Student)
+                                 select c).ToList();
+
+            int i = 0;
+
+            if (couresesUsers.Count >= 2)
+            {
+                foreach (CoursesUsers cu in couresesUsers)
+                {
+                    SerializableTeamMember teamMember = new SerializableTeamMember();
+                    teamMember.IsModerator = cu.CourseRole.ID == (int)CourseRole.OSBLERoles.Moderator;
+                    teamMember.Name = cu.UserProfile.FirstName + " " + cu.UserProfile.LastName;
+                    teamMember.Section = cu.Section;
+                    teamMember.UserID = cu.UserProfileID;
+                    teamMember.isUser = true;
+
+                    ///////////////////////TEST/////////////////////////
+                    if (i % 2 == 0)
+                    {
+                        teamMember.Subbmitted = true;
+                    }
+                    i++;
+                    ///////////////////////////////////////////////////
+
+                    teamMembmers.Add(teamMember);
+                }
+            }
+            return teamMembmers;
         }
 
         private SilverlightObject createTeamCreationSilverlightObject()
@@ -254,6 +267,21 @@ namespace OSBLE.Controllers
             {
                 CSSId = "team_creation_silverlight",
                 XapName = "TeamCreation",
+                Width = "800",
+                Height = "580",
+                OnLoaded = "SLObjectLoaded",
+                Parameters = new Dictionary<string, string>()
+                {
+                }
+            };
+        }
+
+        private SilverlightObject createRubricCreationSilverlightObject()
+        {
+            return new SilverlightObject
+            {
+                CSSId = "rubric_silverlight",
+                XapName = "Rubric",
                 Width = "800",
                 Height = "580",
                 OnLoaded = "SLObjectLoaded",
