@@ -160,6 +160,7 @@
     <Compile Include="Models\Assignments\Activities\SyncIssueVotingActivity.cs" />
     <Compile Include="Models\Assignments\BasicAssignment.cs" />
     <Compile Include="Models\Assignments\GradeAssignment.cs" />
+    <Compile Include="Models\Courses\LetterGrade.cs" />
     <Compile Include="Models\Rubrics\Criterion.cs" />
     <Compile Include="Models\Rubrics\Level.cs" />
     <Compile Include="Models\Rubrics\CellDescription.cs" />

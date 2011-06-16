@@ -53,8 +53,8 @@
     
     .slidingDiv
     {
-        width: 107px;
-        height: 100px;
+        width: auto;
+        height: auto;
         background-color: white;
         top: 33px;
         left: 400px;
@@ -132,17 +132,16 @@
     #tabHeader li
     {
         float: left;
-        border: 1px solid;
+        border: 1px solid gray;
         background-color: #f5f5f5;
         border-bottom-width: 0;
-        margin: 0 0.5em 0 0;
+        margin: 0 0.5em -0.1em 0;
         background: silver;
     }
     
     #tabHeader #selected
     {
         position: relative;
-        top:1px;
         border-bottom:1px solid #fff;
         background: white;
     }
@@ -168,7 +167,7 @@
     @Html.Partial("_Gradebook")
     <div class="slidingDiv" id="slidingDivID" style="display: none; position: absolute;">
         <form id="columnOptionsForm" method="post" action="/Gradebook/ModifyColumn" data-ajax="true"
-        data-ajax-success="" data-ajax-update="#grades">
+              data-ajax-success="" data-ajax-update="#grades">
         <input id="actionRequested" name="actionRequested" type="hidden" value="null" />
         <input id="assignmentId" name="assignmentId" type="hidden" value="null" />
         <table class="menu" id="menuID" onclick="setButtonId(this);">
@@ -205,7 +204,20 @@
         </table>
         </form>
 
-</div>
+    </div>
+
+
+        <script type="text/javascript">
+            function setGradableAction(actionName) {
+                $('#actionRequested').val(actionName);
+            }
+            $('#columnOptionsForm').submit(function () {
+                $('#assignmentId').val(currentCol);
+                return;
+            });
+        </script>
+    </div>
+
 <div class="customize" id="customizeID" style="display: none; position: absolute;">
 	<form id="dropLowestSubmit" onsubmit="dropAllLowest(); return false;"  >
         <table class="customizeTable">
@@ -240,18 +252,6 @@
 	        </tr>
 	    </table>
     </form>
-</div>
-
-        <script type="text/javascript">
-            function setGradableAction(actionName) {
-                $('#actionRequested').val(actionName);
-            }
-            $('#columnOptionsForm').submit(function () {
-                $('#assignmentId').val(currentCol);
-                return;
-            });
-        </script>
-    </div>
 </div>
 
 <script type="text/jscript">
@@ -313,7 +313,16 @@
             row.each(function () {
                 cell = $(this).find("td:eq(" + colIndex + ")");
             });
-            cellGainsFocus(cell);
+            if (cell != null){
+                cellGainsFocus(cell);
+            }
+            else{
+                row = $(this).parent("tr");
+                row.each(function () {
+                    cell = $(this).find("td:eq(" + colIndex + ")");
+                });
+                clearLastCellFocus(cell);
+            }
         }
         else if (e.keyCode == 9) {
             e.preventDefault();
@@ -323,8 +332,17 @@
             colIndex += 1;
             row.each(function () {
                 cell = $(this).find("td:eq(" + colIndex + ")");
-            });
-            cellGainsFocus(cell);
+            });            
+            if (cell != null){
+                cellGainsFocus(cell);
+            }
+            else{
+                colIndex -= 1;
+                row.each(function () {
+                    cell = $(this).find("td:eq(" + colIndex + ")");
+                });
+                clearLastCellFocus(cell);
+            }
         }
         else {
         }
@@ -339,10 +357,6 @@
         }
     });
 
-//    $("#dropLowestSubmit").submit(function () {
-//        alert("Apply was pressed!");
-//        alert($("#XtoDrop").val());
-//    });
 
     function displayCustomizeGrades() {
         $("#customizeID").animate({ "height": "show" }, { duration: 300 });
@@ -360,15 +374,19 @@
         //if a header already had focus then we need to change it back and display text
         if (lastFocusedCell != null) {
             var cellValue = lastFocusedCell.children().val();
-            var cellID = lastFocusedCell.attr("id")
+            var cellID = lastFocusedCell.attr("id").split("-");
             lastFocusedCell.html(cellValue + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + id + ' onclick="ShowHide(this);"></button></div>');
             lastFocusedCell.attr("onclick", 'changeHeaderName(this)');
             lastFocusedCell = null;
 
+
             $.ajax({
                 type: "POST",
                 url: "/Gradebook/ModifyAssignmentName",
-                data: { value: cellValue, assignmentId: cellID }
+                data: { value: cellValue, assignmentId: cellID[1] },
+                success: function (response) {
+                    $("#grades").html(response);
+                }
             });
         }
     }
@@ -448,27 +466,26 @@
             //GradableID
             //and the value to modify (cellValue)
 
+            if (ajaxIDs[0] == "pointsPossible"){
+                $.ajax({
+                    type: "POST",
+                    url: "/Gradebook/ModifyPossiblePoints",
+                    data: { value: cellValue, assignmentId: ajaxIDs[1] },
+                    success: function (response) {
+                        $("#grades").html(response);
+                    }
+                });
+            }
+
             //if we are editing a gradebook cell then ajaxIDs[1] will contain a value
-            if (ajaxIDs[1] != null) {
+            else {
                 $.ajax({
                     type: "POST",
                     url: "/Gradebook/ModifyCell",
                     data: { value: cellValue, userId: ajaxIDs[0], assignmentId: ajaxIDs[1] },
                     success: clearDropLowest(ajaxIDs[0])
                 });
-
             }
-
-            //If there is no value in ajaxIDs[1] then we are editing the points possible
-            else {
-                $.ajax({
-                    async: false,
-                    type: "POST",
-                    url: "/Gradebook/ModifyPossiblePoints",
-                    data: { value: cellValue, assignmentId: ajaxIDs[0] }
-                });
-            }
-
             calculateCols();
         }
     }
@@ -571,8 +588,13 @@
         var colTotal = 0;
         var count = 0;
         $("#grades #studentGrades").children("td:nth-child(" + Index + ")").each(function () {
-            colTotal += parseFloat($(this).text());
-            count += 1;
+            if ($(this).text() == "NG") {
+                
+            }
+            else {
+                colTotal += parseFloat($(this).text());
+                count += 1;
+            }
         });
 
         $("#grades tr").children("td:nth-child(" + Index + ")").each(function () {
@@ -588,8 +610,10 @@
     }
 
     function ShowHide(buttonClick) {
+        //Store which assignment button was clicked so we can use it with Add Points
         points = buttonClick
-        alert($(points).attr("id"));
+        var x = 0;
+        var y = 0;
         //if you click a button in the header from a header already chosen
         if (header == true) {
             clearLastHeaderFocus(lastId);
@@ -601,14 +625,12 @@
         currentCol = container;
 
         //aligning the menu under the buttons
-        var y = $("#" + container).position().left;
-        var x = $("#" + container).position().top;
-        y += 65;
-        x += 25;
+        x = $("#" + container).position().left;
+        y = $("#" + container).position().top;
 
         //Moving the menu to the button that clicked it
-        $("#slidingDivID").css("left", y + "px");
-        $("#slidingDivID").css("top", x + "px");
+        $("#slidingDivID").css("left", x + "px");
+        $("#slidingDivID").css("top", y + "px");
 
         //Animation for menu
         $("#slidingDivID").animate({ "height": "show" }, { duration: 75 });
@@ -777,15 +799,13 @@
         });
     }
 
-    function switchTab(newTab) {        
-        $("#selected").removeAttr("id");
-        $(newTab).attr("id", "selected");
-    }
-
     function newTab() {
         $.ajax({
             type: "POST",
-            url: "/Gradebook/AddWeight"
+            url: "/Gradebook/AddWeight",
+            success: function (response) {
+                $("#tabHeader").html(response);
+            }
         });
     }
 
@@ -808,7 +828,10 @@
                 async: false,
                 type: "POST",
                 url: "/Gradebook/ClearAllDropLowest",
-                data: { categoryId: catId[1] }
+                data: { categoryId: catId[1] },
+                success: function (response) {
+                    $("#grades").html(response);
+            }
             });
 
             for (i = 0; i < $("#XtoDrop").data("num"); i++) {
@@ -817,7 +840,10 @@
                     async: false,
                     type: "POST",
                     url: "/Gradebook/AllDropLowest",
-                    data: { categoryId: catId[1] }
+                    data: { categoryId: catId[1] },
+                    success: function (response) {
+                        $("#grades").html(response);
+                    }
                 });
             }
         }
@@ -870,6 +896,9 @@
                 type: "POST",
                 url: "/Gradebook/ClearDropLowest",
                 data: { categoryId: catId[1] },
+                success: function (response) {
+                    $("#grades").html(response);
+                }
             });
         }
         dropAllLowest();
@@ -890,7 +919,10 @@
             $.ajax({
                 type: "POST",
                 url: "/Gradebook/DropLowest",
-                data: { categoryId: catId[1], userId: id }
+                data: { categoryId: catId[1], userId: id },
+//                success: function (response) {
+//                    $("#grades").html(response);
+                //}
             });
 
         }
@@ -902,9 +934,23 @@
         $.ajax({
             type: "POST",
             url: "/Gradebook/AddPoints",
-            data: { assignmentId: id, number: num }
+            data: { assignmentId: id, number: num },
+            success: function (response) {
+                    $("#grades").html(response);
+            }
         });
         $("#addPointsID").animate({ "height": "hide" }, { duration: 300 });
+    }
+
+    function newTab() {
+
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/AddCategory",
+            success: function (response) {
+                $("#tabHeader").html(response);
+            }
+        });
     }
 
 </script>

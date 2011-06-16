@@ -162,27 +162,86 @@
         <br />
         <div class="editor-field">
             @Html.LabelFor(model => model.CalendarWindowOfTime)
-        
             @Html.TextBoxFor(model => model.CalendarWindowOfTime, new { size = 3 })
+        </div>
+    
+    <h3>Default Grading Scheme</h3>
+        <div class="letterGrades" id="letterGradesID">
+            <table class="letterGradesTable" id="letterGradesTableID">
+            @{
+                <input type="hidden" id="max_table" name="max_table" value="11" />
+
+                <tr>
+                    <th>Letter Grade</th>
+                    <th>Minimum % Required</th>
+                </tr>
+		        <tr id="values">
+			        <td><input name="letter-0" value="A" /></td>
+			        <td><input name="min-0" value="93" /></td>
+		        </tr>
+		        <tr id="values">
+			        <td><input name="letter-1" value="A-" /></td>
+			        <td><input name="min-1" value="90" /></td>
+		        </tr>
+		        <tr id="values">
+			        <td><input name="letter-2" value="B+" /></td>
+			        <td><input name="min-2" value="87" /></td>
+		        </tr>
+		        <tr id="values">
+			        <td><input name="letter-3" value="B" /></td>
+			        <td><input name="min-3" value="83" /></td>
+		        </tr>
+		        <tr id="values">
+			        <td><input name="letter-4" value="B-" /></td>
+			        <td><input name="min-4" value="80" /></td>
+		        </tr>
+		        <tr id="values">
+			        <td><input name="letter-5" value="C+" /></td>
+			        <td><input name="min-5" value="77" /></td>
+		        </tr>
+		        <tr id="values">
+			        <td><input name="letter-6" value="C" /></td>
+			        <td><input name="min-6" value="73" /></td>
+		        </tr>
+		        <tr id="values">
+			        <td><input name="letter-7" value="C-" /></td>
+			        <td><input name="min-7" value="70" /></td>
+		        </tr>
+		        <tr id="values">
+			        <td><input name="letter-8" value="D+" /></td>
+			        <td><input name="min-8" value="67" /></td>
+		        </tr>
+		        <tr id="values">
+			        <td><input name="letter-9" value="D" /></td>
+			        <td><input name="min-9" value="63" /></td>
+		        </tr>
+		        <tr id="values">
+			        <td><input name="letter-10" value="F" /></td>
+			        <td><input name="min-10" value="0" /></td>
+		        </tr>
+            }
+	        </table>
+            <a href="#" onclick="addTableRow(); return false;" title="Add New Letter Grade">@Helpers.AddButton()</a>
+            <a href="#" onclick="removeTableRow(); return false;" title="Remove Last Letter Grade">@Helpers.DeleteButton()</a>
         </div>
 
     <h3>Default Late Policy</h3>
     
     <p>
-        Students may submit assignments up to @Html.TextBoxFor(model => model.MinutesLateWithNoPenalty, new {size = 3 })
-        minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.PercentPenalty, new {size = 3 })
-        percent per @Html.TextBoxFor(model => model.HoursLatePerPercentPenalty, new {size = 3})
+        Students may submit assignments up to @Html.TextBoxFor(model => model.MinutesLateWithNoPenalty, new { size = 3 })
+        minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.PercentPenalty, new { size = 3 })
+        percent per @Html.TextBoxFor(model => model.HoursLatePerPercentPenalty, new { size = 3 })
         hours late will be applied.<br />
-        @Html.ValidationMessageFor(model=>model.MinutesLateWithNoPenalty)
-        @Html.ValidationMessageFor(model=>model.PercentPenalty)
-        @Html.ValidationMessageFor(model=>model.HoursLatePerPercentPenalty)
+        @Html.ValidationMessageFor(model => model.MinutesLateWithNoPenalty)
+        @Html.ValidationMessageFor(model => model.PercentPenalty)
+        @Html.ValidationMessageFor(model => model.HoursLatePerPercentPenalty)
     </p>
     
     
     <p>
-        Assignments that are submitted more than @Html.TextBoxFor(model => model.HoursLateUntilZero, new {size = 3})
+        Assignments that are submitted more than @Html.TextBoxFor(model => model.HoursLateUntilZero, new { size = 3 })
         hours after the due date and time will receive an automatic 0.<br />
-        @Html.ValidationMessageFor(model=>model.HoursLateUntilZero)
+        @Html.ValidationMessageFor(model => model.HoursLateUntilZero)
     </p>
   
         <br />

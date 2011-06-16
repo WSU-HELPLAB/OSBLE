@@ -9,6 +9,7 @@ using OSBLE.Models.Users;
 using OSBLE.Models.Assignments.Activities.Scores;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments;
+using System.IO;
 
 namespace OSBLE.Controllers
 {
@@ -126,7 +127,8 @@ namespace OSBLE.Controllers
             }
         }
 
-        public void ClearAllDropLowest(int categoryId)
+        [HttpPost]
+        public ActionResult ClearAllDropLowest(int categoryId)
         {
             if (ModelState.IsValid)
             {
@@ -146,10 +148,12 @@ namespace OSBLE.Controllers
                     }
                 }
             }
+            BuildGradebook((int)Session["categoryId"]);
+            return View("_Gradebook");
         }
 
         [HttpPost]
-        public void DropLowest(int categoryId, int userId)
+        public ActionResult DropLowest(int categoryId, int userId)
         {
             if (ModelState.IsValid)
             {
@@ -191,6 +195,8 @@ namespace OSBLE.Controllers
                     }
                 }
             }
+            BuildGradebook((int)Session["categoryId"]);
+            return View("_Gradebook");
         }
 
 
@@ -236,7 +242,7 @@ namespace OSBLE.Controllers
                     }
                 }
             }
-            BuildGradebook(categoryId);
+            BuildGradebook((int)Session["categoryId"]);
             return View("_Gradebook");
         }
 
@@ -257,7 +263,7 @@ namespace OSBLE.Controllers
             {
                 foreach (Score item in assignmentQuery)
                 {
-                    item.Points = 0;
+                    item.Points = -1;
                 }
                 db.SaveChanges();
             }
@@ -319,7 +325,7 @@ namespace OSBLE.Controllers
                     }
                 }
             }
-            return RedirectToAction("Index");
+            return View("Index");
         }
 
         [HttpPost]
@@ -343,7 +349,7 @@ namespace OSBLE.Controllers
                     }
                 }
             }
-            return RedirectToAction("Index");
+            return View("_Tabs");
         }
 
         [HttpPost]
@@ -367,7 +373,7 @@ namespace OSBLE.Controllers
                     }
                 }
             }
-            return Json("success");
+            return View("_Gradebook");
         }
 
         
@@ -397,7 +403,7 @@ namespace OSBLE.Controllers
                     Json("failure");
                 }
             }
-                return Json("success");
+                return View("_Gradebook");
             //return RedirectToAction("Index");
         }
         
@@ -413,12 +419,37 @@ namespace OSBLE.Controllers
                 Course = ViewBag.ActiveCourse.Course,
                 Points = 0,
                 ColumnOrder = 0,
-                Assignments = new List<AbstractAssignment>()
+                Assignments = new List<AbstractAssignment>(),
+                TabColor = "Silver"
             };
             db.Categories.Add(newCategory);
             db.SaveChanges();
-            BuildGradebook(newCategory.ID);
+            Tab(newCategory.ID);
+
+            Tab((int)Session["categoryId"]);
             return View("_Tabs");
+        }
+
+        [HttpPost]
+        public ActionResult ChangeTabColor(int categoryId, string value)
+        {
+            if (ModelState.IsValid)
+            {
+                if (categoryId > 0)
+                {
+                    var categoryTab = from tab in db.Categories
+                                      where tab.ID == categoryId
+                                      select tab;
+
+                    foreach (Category item in categoryTab)
+                    {
+                        item.TabColor = value;
+                    }
+                    db.SaveChanges();
+                }
+            }
+            Tab((int)Session["categoryId"]);
+            return View("Index");
         }
 
 
@@ -449,7 +480,7 @@ namespace OSBLE.Controllers
         
 
         [HttpPost]
-        public ActionResult ModifyCell(double value, int userId, int assignmentId)
+        public void ModifyCell(double value, int userId, int assignmentId)
         {
 
             //Continue if we have a valid gradable ID
@@ -484,7 +515,8 @@ namespace OSBLE.Controllers
                 }
             }
 
-            return View();
+            //BuildGradebook((int)Session["categoryId"]);
+            //return View("_Gradebook");
         }
         
 
@@ -530,6 +562,19 @@ namespace OSBLE.Controllers
         {
             return View("_Gradebook");
         }
+
+        [HttpPost]
+        public ActionResult ImportColumnsFromCSV()
+        {
+            int currentCourseId = ActiveCourse.CourseID;
+
+            var students = from student in db.CoursesUsers
+                           where student.CourseID == currentCourseId
+                           group student by student.UserProfile.ID into studentList
+                           select studentList;
+
+            return View();
+        }
          
 
         /// <summary>
@@ -542,6 +587,15 @@ namespace OSBLE.Controllers
             //LINQ complains when we use this directly in our queries, so pull it beforehand
             int currentCourseId = ActiveCourse.CourseID;
             List<Score> percentList = new List<Score>();
+
+            var letterGrades = from letters in db.Courses
+                               where letters.ID == currentCourseId
+                               select letters.LetterGrades;
+
+            if (letterGrades.Count() == 0)
+            {
+                SetUpDefaultLetterGrades();
+            }
 
             //pull the students in the course.  Each student is a row.
             List<UserProfile> studentList = (from up in db.UserProfiles
@@ -611,11 +665,14 @@ namespace OSBLE.Controllers
                                                       where ga.Category.CourseID == currentCourseId
                                                       select ga).ToList();
 
+            List<LetterGrade> letterGradeList = ((activeCourse.Course as Course).LetterGrades).ToList();
+
             ViewBag.Students = studentList;
             ViewBag.Scores = percentList;
             ViewBag.Categories = categories;
             ViewBag.CoursesUser = courseUsers;
             ViewBag.GradeAssignments = gradeAssignments;
+            ViewBag.LetterGrades = letterGradeList;
 
             return View();
         }
@@ -635,6 +692,28 @@ namespace OSBLE.Controllers
             BuildGradebook((int)categoryId);
             return View();
         }
+
+
+        public void SetUpDefaultLetterGrades()
+        {
+            AddLetterGrade("A", 93);
+            AddLetterGrade("A-", 90);
+        }
+
+        public void AddLetterGrade(string grade, int minReq)
+        {
+            int currentCourseId = ActiveCourse.CourseID;            
+
+            LetterGrade newLetterGrade = new LetterGrade()
+            {
+                Grade = grade,
+                MinimumRequired = minReq
+            };
+            
+        }
+
+
+
 
         /// <summary>
         /// This function is responsible for making the various calls needed to build the gradebook.
@@ -719,6 +798,7 @@ namespace OSBLE.Controllers
                             join user in db.UserProfiles on scores.UserProfileID equals user.ID
                             where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
                             && scores.isDropped == false
+                            && scores.Points >= 0
                             group scores by scores.UserProfileID into userScores
                             select userScores;
 

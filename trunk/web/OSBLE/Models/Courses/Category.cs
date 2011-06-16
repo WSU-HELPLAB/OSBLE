@@ -46,6 +46,11 @@ namespace OSBLE.Models.Courses
         /// </summary>
         public int ColumnOrder { get; set; }
 
+        /// <summary>
+        /// Used for coloring the tab. Default to White.
+        /// </summary>
+        public string TabColor { get; set; }
+
         [Required]
         [Display(Name = "Gradables")]
         public ICollection<AbstractAssignment> Assignments { get; set; }

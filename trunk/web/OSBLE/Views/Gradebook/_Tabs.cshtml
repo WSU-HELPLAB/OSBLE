@@ -5,10 +5,14 @@
 
 <div id="tabHeader">
     <ul>
-        <li id="selected"><a href="/Gradebook/Index" onclick="switchTab(this)">Main</a></li>
-        @foreach (Category item in ViewBag.Categories)
-        {
-            <li><a href="/Gradebook/Tab/?categoryId=@item.ID" onclick="switchTab(this)">@item.Name</a></li>
+        <li id="selected" class="main"><a href="/Gradebook/Index">Main</a></li>
+
+        @{
+            
+            foreach (Category item in ViewBag.Categories)
+            {
+                <li class="@item.ID" style="background:@item.TabColor;"><a href="/Gradebook/Tab/?categoryId=@item.ID">@item.Name</a></li>
+            }
         }
         <li><a href="#" onclick="newTab()">+</a></li>
     </ul>
@@ -16,6 +20,16 @@
 
 <script type="text/jscript">
 
-    
+    $(document).ready(function () {
+
+        var pathname = window.location.toString();
+        var id = pathname.split("=");
+
+        if (id[1] != null) {
+            $("#selected").removeAttr("id");
+            $("." + id[1]).attr("id", "selected");
+            $("." + id[1]).css("background", "white");
+        }
+    });
     
 </script>

@@ -8,31 +8,24 @@
 
 <table id="grades" class="gradebook">
     <tr id="perfectScore">
-        <th id="th2">
-            Perfect Score
-        </th>
-        <td id="perfectTotal">
-            100%
-        </td>
+        <th id="th2">Perfect Score</th>
+        <td id="perfectTotal">100%</td>
         @foreach (AbstractAssignment item in ViewBag.Assignments)
         {
-            <td id="@item.ID" onclick="cellGainsFocus(this)">
-                @item.PointsPossible
-            </td>   
+            <td id="pointsPossible-@item.ID" onclick="cellGainsFocus(this)">@item.PointsPossible</td>
         }
+        
     </tr>
     <tr>
         <th id="th3">
-            Average Score
+            Averave Score
         </th>
         <td id="averageTotal">
             0
         </td>
         @foreach (AbstractAssignment item in ViewBag.Assignments)
         {
-            <td id="averageScore">
-                0
-            </td>  
+            <td id="averageScore" >0</td>  
         }
     </tr>
     <tr>
@@ -42,13 +35,13 @@
         <th id="totalCustomize" ondblclick="displayCustomizeGrades();">
             Total [Customize...]
         </th>
-        @foreach (AbstractAssignment item in ViewBag.Assignments)
-        {
-            <th id="@item.ID" onclick="changeHeaderName(this)">@item.Name<div id="cntnr" class="thButton">
-                <button class="dropdown" id="@item.ID" onclick="ShowHide(this);">
-                </button>
-            </div>
-            </th>
+        @{
+            int i = 1;
+            foreach (AbstractAssignment item in ViewBag.Assignments)
+            {   
+                <th id="header-@item.ID" onclick="changeHeaderName(this)">@item.Name<div id="cntnr" class="thButton"><button class="dropdown" id="@item.ID" onclick="ShowHide(this);"></button></div></th>
+                i += 1;
+            }
         }
             
     </tr>
@@ -79,6 +72,7 @@
                 var gradableQuery = from g in ViewBag.Grades as IEnumerable<Score>
                                     where g.AssignmentActivity.AbstractAssignmentID == gradeAssignment.ID
                                     && g.UserProfileID == user.ID
+                                    && g.Points >= 0
                                     select g;
                 //use the stored score if possible.  Otherwise, just use a "0"
                 if (gradableQuery.Count() > 0)
