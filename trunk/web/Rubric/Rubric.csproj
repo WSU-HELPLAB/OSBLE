@@ -21,7 +21,7 @@
     <GenerateSilverlightManifest>true</GenerateSilverlightManifest>
     <XapFilename>Rubric.xap</XapFilename>
     <SilverlightManifestTemplate>Properties\AppManifest.xml</SilverlightManifestTemplate>
-    <SilverlightAppEntry>Rubric.App</SilverlightAppEntry>
+    <SilverlightAppEntry>OsbleRubric.App</SilverlightAppEntry>
     <TestPageFileName>RubricTestPage.html</TestPageFileName>
     <CreateTestPage>true</CreateTestPage>
     <ValidateXaml>true</ValidateXaml>
@@ -76,7 +76,10 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CheckBoxCell.cs" />
     <Compile Include="CustomDataGrid.cs" />
+    <Compile Include="HeaderCell.cs" />
+    <Compile Include="ICell.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -84,6 +87,7 @@
     <Compile Include="Rubric.xaml.cs">
       <DependentUpon>Rubric.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RubricCell.cs" />
     <Compile Include="RubricModel.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -109,6 +113,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\help.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\downArrow.png" />
+    <Resource Include="Icons\downArrowGrayedOut.png" />
+    <Resource Include="Icons\upArrow.png" />
+    <Resource Include="Icons\upArrowGrayedOut.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
