@@ -6,9 +6,12 @@
     mc:Ignorable="d" xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
     <!--d:DesignHeight="300" d:DesignWidth="400"-->
 
-    <ScrollViewer HorizontalScrollBarVisibility="Auto">
-        <Grid x:Name="LayoutRoot" Background="White" ShowGridLines="False">
-            
-        </Grid>
-    </ScrollViewer>
+    <Grid x:Name="MainLayoutRoot" ShowGridLines="False" Background="White">
+        <StackPanel x:Name="MainStackPanel">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" MaxHeight="600" MaxWidth="1000">
+                <Grid x:Name="LayoutRoot" Background="White" ShowGridLines="False">
+                </Grid>
+            </ScrollViewer>
+        </StackPanel>   
+    </Grid>
 </UserControl>
