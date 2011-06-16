@@ -29,7 +29,7 @@
             }
         });
 
-        $('#present_all_issues_logged').change(function () {
+        $('#PresentAllIssuesLogged').change(function () {
             if ($(this).attr('checked')) {
                 UncheckPresentIssuesXLogged();
                 HidePresentIssuesXLoggedOptions();
@@ -39,7 +39,7 @@
             else { }
         });
 
-        $('#present_issues_x_logged').change(function () {
+        $('#PresentIssuesXLogged').change(function () {
             if ($(this).attr('checked')) {
                 DisplayPresentIssuesXLoggedOptions();
                 UncheckPresentAllIssuesLogged();
@@ -59,7 +59,7 @@
             else { }
         });
 
-        $('#present_only_issues_moderator_voted').change(function () {
+        $('#PresentOnlyIssuesModeratorVoted').change(function () {
             if ($(this).attr('checked')) {
                 UncheckPresentAllIssuesLogged();
                 UncheckPresentIssuesXLogged();
@@ -95,21 +95,20 @@
         $('#author_must_provide_rationale_options').hide('highlight');
         $('#author_must_say_if_issue_was_addressed').removeAttr('checked');
     }
-
     function DisplayPresentIssuesXLoggedOptions(){
-        $('#present_issues_x_logged_options').show('hightlight');
+        $('#PresentIssuesXLogged_options').show('hightlight');
     }
     
     function HidePresentIssuesXLoggedOptions(){
-        $('#present_issues_x_logged_options').hide('hightlight');
+        $('#PresentIssuesXLogged_options').hide('hightlight');
     }
 
     function UncheckPresentAllIssuesLogged(){
-        $('#present_all_issues_logged').removeAttr('checked');
+        $('#PresentAllIssuesLogged').removeAttr('checked');
     }
 
     function UncheckPresentIssuesXLogged(){
-        $('#present_issues_x_logged').removeAttr('checked');
+        $('#PresentIssuesXLogged').removeAttr('checked');
     }
 
     function UncheckPresentIssuesXPercentLogged(){
@@ -117,7 +116,7 @@
     }
 
     function UncheckPresentOnlyIssuesModeratorVoted(){
-        $('#present_only_issues_moderator_voted').removeAttr('checked');
+        $('#PresentOnlyIssuesModeratorVoted').removeAttr('checked');
     }
 
 </script>
@@ -145,22 +144,22 @@
 
         <h2>Settings</h2>
 
-        <h3>Issue Presentation</h3>
+        <h4>Issue Presentation</h4>
 
         <div class="editor-field">
-            @Html.RadioButtonFor(model => model.PresentAllIssuesLogged, new { id = "present_all_issues_logged" }, new { name = "presentation" })
+            @Html.RadioButtonFor(model => model.PresentAllIssuesLogged, new { name = "presentation" })
             @Html.LabelFor(model => model.PresentAllIssuesLogged)
             @Html.ValidationMessageFor(model => model.PresentAllIssuesLogged)
         </div>
 
         <div class="editor-field">
             <p>
-                @Html.RadioButtonFor(model => model.PresentIssuesXLogged, new { id = "present_issues_x_logged" }, new { name = "presentation" })
+                @Html.RadioButtonFor(model => model.PresentIssuesXLogged, new { name = "presentation" })
                 Present only issues that recieved @Html.TextBoxFor(model => model.xlogged, new { size = 3 }) number of votes
             </p>
             @Html.ValidationMessageFor(model => model.PresentIssuesXLogged)
         </div>
-        <div id="present_issues_x_logged_options" class="indented_options" style="display: none">
+        <div id="PresentIssuesXLogged_options" class="indented_options" style="display: none">
             <div class="editor-field">
                 <p>
                     @Html.CheckBoxFor(model => model.PresentIssuesXPercentLogged, new { id = "present_issues_x_percent_logged" })
@@ -173,13 +172,13 @@
        @*Need to check whether team moderators are enabled*@
 
         <div class="editor-field">
-            @Html.RadioButtonFor(model => model.PresentOnlyIssuesModeratorVoted, new { id = "present_only_issues_moderator_voted" }, new { name = "presentation" })
+            @Html.RadioButtonFor(model => model.PresentOnlyIssuesModeratorVoted, new { name = "presentation" })
             @Html.LabelFor(model => model.PresentOnlyIssuesModeratorVoted)
             @Html.ValidationMessageFor(model => model.PresentOnlyIssuesModeratorVoted)
         </div>
 
 
-        <h3>Author Response</h3>
+        <h4>Author Response</h4>
 
         <div class="editor-field">
             @Html.CheckBoxFor(model => model.AuthorMustAcceptorRefuteEachIssue, new { id = "author_must_accept_or_refute_each_issue" })
@@ -207,6 +206,8 @@
             </div>
         </div>
 
+        <h4>Grades</h4>
+
         <div class="editor-label">
             Add to Gradebook
         </div>
@@ -224,7 +225,7 @@
             </div>
         
 
-            <h3>Late Policy</h3>
+            <h4>Late Policy</h4>
     
             <p>
                 Students may submit assignments up to @Html.TextBoxFor(model => model.MinutesLateWithNoPenalty, new { size = 3 })
