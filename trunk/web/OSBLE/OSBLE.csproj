@@ -19,7 +19,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <UseIISExpress>false</UseIISExpress>
-    <SilverlightApplicationList>{AB420045-1365-43D9-A243-EB735E776BEC}|..\TeamCreation\TeamCreation.csproj|ClientBin|False,{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}|..\StudioTimelineCreation\StudioTimelineCreation.csproj|ClientBin|False,{79706350-C34D-4A51-B22F-273EC8289E5D}|..\..\silverlight\FileUploader\FileUploader.csproj|ClientBin|False</SilverlightApplicationList>
+    <SilverlightApplicationList>{AB420045-1365-43D9-A243-EB735E776BEC}|..\TeamCreation\TeamCreation.csproj|ClientBin|False,{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}|..\StudioTimelineCreation\StudioTimelineCreation.csproj|ClientBin|False,{79706350-C34D-4A51-B22F-273EC8289E5D}|..\..\silverlight\FileUploader\FileUploader.csproj|ClientBin|False,{77BD61DF-7C05-468A-AA47-1050E674E12C}|..\Rubric\Rubric.csproj|ClientBin|False</SilverlightApplicationList>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -237,6 +237,7 @@
     <Content Include="App_Data\FirstNames.txt" />
     <Content Include="App_Data\LastNames.txt" />
     <Content Include="ClientBin\FileUploader.xap" />
+    <Content Include="ClientBin\Rubric.xap" />
     <Content Include="ClientBin\StudioTimelineCreation.xap" />
     <Content Include="ClientBin\TeamCreation.xap" />
     <Content Include="Content\favicon.ico" />

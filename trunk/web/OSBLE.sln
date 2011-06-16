@@ -13,9 +13,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudioTimelineCreation", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileUploader", "..\silverlight\FileUploader\FileUploader.csproj", "{79706350-C34D-4A51-B22F-273EC8289E5D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rubric", "Rubric\Rubric.csproj", "{77BD61DF-7C05-468A-AA47-1050E674E12C}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
+		SccNumberOfProjects = 6
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
 		SccLocalPath0 = .
@@ -31,6 +33,9 @@ Global
 		SccProjectUniqueName4 = ..\\silverlight\\FileUploader\\FileUploader.csproj
 		SccProjectName4 = ../silverlight/FileUploader
 		SccLocalPath4 = ..\\silverlight\\FileUploader
+		SccProjectUniqueName5 = Rubric\\Rubric.csproj
+		SccProjectName5 = Rubric
+		SccLocalPath5 = Rubric
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,6 +67,12 @@ Global
 		{79706350-C34D-4A51-B22F-273EC8289E5D}.OSBLE Deployment|Any CPU.Build.0 = Release|Any CPU
 		{79706350-C34D-4A51-B22F-273EC8289E5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79706350-C34D-4A51-B22F-273EC8289E5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77BD61DF-7C05-468A-AA47-1050E674E12C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77BD61DF-7C05-468A-AA47-1050E674E12C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77BD61DF-7C05-468A-AA47-1050E674E12C}.OSBLE Deployment|Any CPU.ActiveCfg = Release|Any CPU
+		{77BD61DF-7C05-468A-AA47-1050E674E12C}.OSBLE Deployment|Any CPU.Build.0 = Release|Any CPU
+		{77BD61DF-7C05-468A-AA47-1050E674E12C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77BD61DF-7C05-468A-AA47-1050E674E12C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
