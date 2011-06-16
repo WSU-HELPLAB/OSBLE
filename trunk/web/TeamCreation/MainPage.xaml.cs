@@ -33,6 +33,11 @@ namespace TeamCreation
             this.NewTeamBox.AddTeamRequested += new EventHandler(NewTeamBox_AddTeamRequested);
 
             List<SerializableTeamMember> teamMembers = JsonConvert.DeserializeObject<List<SerializableTeamMember>>(SerializedTeamMembersJSON);
+
+            if (teamMembers == null)
+            {
+                teamMembers = new List<SerializableTeamMember>();
+            }
             InitilizeTeams(teamMembers);
 
             this.LayoutRoot.Loaded += new RoutedEventHandler(LayoutRoot_Loaded);
@@ -243,10 +248,6 @@ namespace TeamCreation
                 }
             }
             (sender as Team).NameChangedValid(isValid);
-        }
-
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
         }
 
         private void ClearTeams_Click(object sender, RoutedEventArgs e)

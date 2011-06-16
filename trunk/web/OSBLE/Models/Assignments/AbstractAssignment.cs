@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
@@ -36,8 +33,8 @@ namespace OSBLE.Models.Assignments
         /// </summary>
         public int ColumnOrder { get; set; }
 
-        public AbstractAssignment() {
-            
+        public AbstractAssignment()
+        {
             ColumnOrder = 0;
 
             // Create Activities Collection if none exists
@@ -45,7 +42,8 @@ namespace OSBLE.Models.Assignments
             {
                 AssignmentActivities = new List<AssignmentActivity>();
             }
-
         }
+
+        public bool IsDraft { get; set; }
     }
 }

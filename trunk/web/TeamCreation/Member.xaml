@@ -10,8 +10,8 @@
         <Border x:Name="border"  Height="25" BorderBrush="Black" BorderThickness="1"  VerticalAlignment="Top">
             <Border.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="{Binding color1}" Offset="0"/>
-                    <GradientStop Color="{Binding color2}" Offset="1"/>
+                    <GradientStop Color="{Binding TopColor}" Offset="0"/>
+                    <GradientStop Color="{Binding BottemColor}" Offset="1"/>
                 </LinearGradientBrush>
             </Border.Background>
             <TextBlock TextWrapping="Wrap" Text="{Binding Path=MembersName, Mode=OneWay}" VerticalAlignment="Top" Margin="8,3,8,0" HorizontalAlignment="Left"  Width="160"/>

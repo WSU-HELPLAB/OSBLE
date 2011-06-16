@@ -6,12 +6,17 @@
     xmlns:local="clr-namespace:TeamCreation"
     xmlns:toolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
     xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
-    x:Class="TeamCreation.MainPage"
-    Loaded="UserControl_Loaded" x:Name="HostControl">
+    x:Class="TeamCreation.MainPage" x:Name="HostControl">
 
     <toolkit:BusyIndicator x:Name="Busy">
 
-        <Grid x:Name="LayoutRoot" Background="White">
+        <Grid x:Name="LayoutRoot" >
+            <Grid.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#FFC7C7C7" Offset="0" />
+                    <GradientStop Color="#FFECECF2" Offset="1" />
+                </LinearGradientBrush>
+            </Grid.Background>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
