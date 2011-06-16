@@ -21,16 +21,16 @@ namespace OsbleRubric
 
         #region constants
 
-        const double Col0Width = 180;
-        const double Row0Height = 100;
-        const double ColWidth = 250;
-        const double RowHeight = 138;
-        const double Col1Width = 150;
-        const int GlobalFontSize = 12;
-        const double finalRowHeight = 32;
+        const double Col0Width = 145;
+        const double Row0Height = 70;
+        const double ColWidth = 190;
+        const double RowHeight = 122;
+        const double Col1Width = 105;
+        const int GlobalFontSize = 11;
+        const double finalRowHeight = 22;
 
-        const double addColColumnWidth = 32;
-        const double commentColumnWidth = 150;
+        const double addColColumnWidth = 22;
+        const double commentColumnWidth = 120;
 
         private ImageSource helpIconSource = new BitmapImage(new Uri("Icons/help.png", UriKind.Relative));
         private ImageSource deleteIconSource = new BitmapImage(new Uri("Icons/delete.png", UriKind.Relative));
@@ -61,7 +61,6 @@ namespace OsbleRubric
                 thisView.LayoutRoot.Children.Add(customDataGrid.BaseGrid);
             }
 
-
             //setting color for grid
             customDataGrid.BaseGrid.Background = new SolidColorBrush(Colors.LightGray);
 
@@ -76,7 +75,6 @@ namespace OsbleRubric
             customDataGrid.PlaceUIElement(createPerformanceCritTitleCell(), 0, 0);
             customDataGrid.PlaceUIElement(createWeightCritTitleCell(), 1, 0);
             customDataGrid.PlaceUIElement(createLevelTitleCell(), 2, 0);
-
             createAddButtonColumn();
             createCommentColumn();
             createCriterionRow();
@@ -85,21 +83,16 @@ namespace OsbleRubric
 
             //setting widths/heights for the table
             //setting heights for rows
-            
             customDataGrid.BaseGrid.RowDefinitions[0].Height = new GridLength(Row0Height);
             for (int i = 1; i < customDataGrid.BaseGrid.RowDefinitions.Count-1; ++i)
             {
                 customDataGrid.BaseGrid.RowDefinitions[i].Height = new GridLength(RowHeight);
             }
-            //customDataGrid.BaseGrid.RowDefinitions[customDataGrid.BaseGrid.RowDefinitions.Count - 1].Height = new GridLength(finalRowHeight);
 
             //setting widths for columns
             customDataGrid.BaseGrid.ColumnDefinitions[0].Width = new GridLength(Col0Width);
             customDataGrid.BaseGrid.ColumnDefinitions[1].Width = new GridLength(Col1Width);
-            for (int i = 2; i < customDataGrid.BaseGrid.ColumnDefinitions.Count - 2; ++i)
-            {
-                customDataGrid.BaseGrid.ColumnDefinitions[i].Width = new GridLength(ColWidth);
-            }
+
 
             //sets up initial tabIndexes
             setTabIndex();
@@ -384,7 +377,7 @@ namespace OsbleRubric
                 Width = 16,
                 Margin = new Thickness(5, 0,0,0)
             };
-            ToolTipService.SetToolTip(helpIcon, "This checkbox determines if a column is included in the final table");
+            ToolTipService.SetToolTip(helpIcon, "This checkbox determines if a column for comments is included in the final table");
 
             stackPanel.Children.Add(commentsOnCheckBox);
             stackPanel.Children.Add(commentsTextBlock);
@@ -434,8 +427,8 @@ namespace OsbleRubric
                 Source = addIconSource,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                Height = 32,
-                Width = 32
+                Height = 22,
+                Width = 22
             };
 
             //setting tooltip for addIcon
@@ -469,8 +462,8 @@ namespace OsbleRubric
                 Source = addIconSource, 
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                Height = 32,
-                Width = 32 
+                Height = 22,
+                Width = 22 
             };
 
             //setting tooltip for addIcon
@@ -590,7 +583,8 @@ namespace OsbleRubric
         {
             StackPanel returnVal = new StackPanel()
             {
-                Margin = new Thickness(5, 5, 5, 5)
+                Margin = new Thickness(5, 5, 5, 5),
+                Width = ColWidth,
             };
 
             TextBox textbox = new TextBox()
@@ -621,7 +615,7 @@ namespace OsbleRubric
 
             TextBox textbox = new TextBox()
             {
-                Width = 70,
+                Width = 55,
                 Height = 22
             };
 
@@ -659,7 +653,7 @@ namespace OsbleRubric
                 VerticalAlignment = VerticalAlignment.Center
             };
             TextBox textbox = new TextBox() { Height = 85, Width = (Col0Width - 35), TextWrapping = TextWrapping.Wrap };
-            Image deleteIcon = new Image { Source = deleteIconSource, Height = 32, Width = 32, Margin = new Thickness(0, 3, 17, 0), HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+            Image deleteIcon = new Image { Source = deleteIconSource, Height = 22, Width = 22, Margin = new Thickness(0, 3, 17, 0), HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
 
             //tooltip for deleteIcon
             ToolTipService.SetToolTip(deleteIcon, "Click to delete the entire row");
@@ -711,7 +705,7 @@ namespace OsbleRubric
             StackPanel returnVal = new StackPanel() { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(5, 0, 5, 0) };
 
             //stuff for returnVal
-            TextBlock TBlock1 = new TextBlock() { Text = "Performance Criterion", FontWeight = FontWeights.Bold, FontSize = GlobalFontSize, VerticalAlignment = VerticalAlignment.Center };
+            TextBlock TBlock1 = new TextBlock() { Text = "Performance\n   Criterion", FontWeight = FontWeights.Bold, FontSize = GlobalFontSize, VerticalAlignment = VerticalAlignment.Center };
             Image helpIconImg = new Image() { Source = helpIconSource, Width = 16, Height = 16, Margin = new Thickness(3, 0, 0, 0) };
             ToolTipService.SetToolTip(helpIconImg, "Input your Performance Criterion in the text area.\nThe minus button is for removing a criterion row.");
 
@@ -783,7 +777,7 @@ namespace OsbleRubric
             StackPanel returnVal = new StackPanel() { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(5, 0, 5, 0) };
 
             //stuff for returnVal
-            TextBlock TBlock2 = new TextBlock() { Text = "Criterion Weight", FontWeight = FontWeights.Bold, FontSize = GlobalFontSize, VerticalAlignment = VerticalAlignment.Center };
+            TextBlock TBlock2 = new TextBlock() { Text = "Criterion\n Weight", FontWeight = FontWeights.Bold, FontSize = GlobalFontSize, VerticalAlignment = VerticalAlignment.Center };
             Image Img2 = new Image() { Source = helpIconSource, Width = 16, Height = 16, Margin = new Thickness(3, 0, 0, 0) };
             ToolTipService.SetToolTip(Img2, "The criterion weight column is used to set the\nweights of each criterion row. By default the\nweight is evenly distrbuted among the criterion.\nTo set the weight simply input a number between\n1 and 100 in the column below. The weight is\nautomatically recalculated upon input.");
 
@@ -831,7 +825,7 @@ namespace OsbleRubric
             //Textbox for user to enter level title
             TextBox levelTitleTextBox = new TextBox()
             {
-                Width = 100,
+                Width = 82,
                 Height = 22,
                 Margin = new Thickness(5, 0, 5, 0),
             };
@@ -840,8 +834,8 @@ namespace OsbleRubric
             Image deleteImage = new Image()
             { 
                 Source = deleteIconSource, 
-                Height = 32, 
-                Width = 32,
+                Height = 22, 
+                Width = 22,
                 Margin = new Thickness(5,0,5,0)
             };
             //setting tooltip and event for deleteImage
@@ -857,6 +851,7 @@ namespace OsbleRubric
             StackPanel bottomStackPanel = new StackPanel()
             {
                 Orientation = Orientation.Horizontal,
+                Margin = new Thickness(0,5,0,0),
             };
             
             //textblock to act as label for pointSpreadComboBox
