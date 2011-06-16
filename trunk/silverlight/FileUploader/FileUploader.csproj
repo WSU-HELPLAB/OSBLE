@@ -195,6 +195,7 @@
     <Content Include="Images\install.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Properties\OutOfBrowserSettings.xml" />
     <Content Include="ServiceReferences.ClientConfig" />
     <None Include="Service References\OsbleServices\UploaderWebService.wsdl" />
     <None Include="Service References\OsbleServices\UploaderWebService.xsd">
