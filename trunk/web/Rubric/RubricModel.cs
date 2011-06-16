@@ -246,14 +246,12 @@ namespace OsbleRubric
             changeDownArrow(1, downArrowIconSource);
             adjustArrowIcons();
 
+            //taking data from dataFromCells and inserting it into the datagrid
             foreach (ICell ic in dataFromCells)
             {
                 if (ic is HeaderCell || ic is CheckBoxCell || ic is RubricCell)
                 {
-                    if (!placeICell(ic))
-                    {
-                        MessageBox.Show("ERROR");
-                    }
+                    placeICell(ic);
                 }
             }
         }
