@@ -73,7 +73,7 @@ namespace OsbleRubric
 
             //adding initial columns & rows
             customDataGrid.PlaceUIElement(createPerformanceCritTitleCell(), 0, 0);
-            customDataGrid.PlaceUIElement(createWeightCritTitleCell(), 1, 0);
+            customDataGrid.PlaceUIElement(createCritWeightTitleCell(), 1, 0);
             customDataGrid.PlaceUIElement(createLevelTitleCell(), 2, 0);
             createAddButtonColumn();
             createCommentColumn();
@@ -377,7 +377,7 @@ namespace OsbleRubric
                 Width = 16,
                 Margin = new Thickness(5, 0,0,0)
             };
-            ToolTipService.SetToolTip(helpIcon, "This checkbox determines if a column for comments is included in the final table");
+            ToolTipService.SetToolTip(helpIcon, "This checkbox determines if a column for comments is included in the final rubric");
 
             stackPanel.Children.Add(commentsOnCheckBox);
             stackPanel.Children.Add(commentsTextBlock);
@@ -506,7 +506,7 @@ namespace OsbleRubric
                 Margin = new Thickness(5, 0, 0, 0),
                 VerticalAlignment = VerticalAlignment.Center,
             };
-            ToolTipService.SetToolTip(helpIcon, "Check to enable a comment block for the entire rubric");
+            ToolTipService.SetToolTip(helpIcon, "This checkbox determines if a comment block for the\nentire rubric will be included in the final rubric.");
 
 
             //addeding checkbox & textblock to checkBoxSP
@@ -707,7 +707,7 @@ namespace OsbleRubric
             //stuff for returnVal
             TextBlock TBlock1 = new TextBlock() { Text = "Performance\n   Criterion", FontWeight = FontWeights.Bold, FontSize = GlobalFontSize, VerticalAlignment = VerticalAlignment.Center };
             Image helpIconImg = new Image() { Source = helpIconSource, Width = 16, Height = 16, Margin = new Thickness(3, 0, 0, 0) };
-            ToolTipService.SetToolTip(helpIconImg, "Input your Performance Criterion in the text area.\nThe minus button is for removing a criterion row.");
+            ToolTipService.SetToolTip(helpIconImg, "Input your Performance Criterion in the text area.\nUse the plus and minus buttons to add and remove criterion rows.");
 
             //adding children to returnVal
             returnVal.Children.Add(TBlock1);
@@ -772,14 +772,16 @@ namespace OsbleRubric
         /// //This method creates the top row for the Weight Criterion column
         /// </summary>
         /// <returns></returns>
-        private StackPanel createWeightCritTitleCell()
+        private StackPanel createCritWeightTitleCell()
         {
             StackPanel returnVal = new StackPanel() { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(5, 0, 5, 0) };
 
             //stuff for returnVal
             TextBlock TBlock2 = new TextBlock() { Text = "Criterion\n Weight", FontWeight = FontWeights.Bold, FontSize = GlobalFontSize, VerticalAlignment = VerticalAlignment.Center };
             Image Img2 = new Image() { Source = helpIconSource, Width = 16, Height = 16, Margin = new Thickness(3, 0, 0, 0) };
-            ToolTipService.SetToolTip(Img2, "The criterion weight column is used to set the\nweights of each criterion row. By default the\nweight is evenly distrbuted among the criterion.\nTo set the weight simply input a number between\n1 and 100 in the column below. The weight is\nautomatically recalculated upon input.");
+            //ToolTipService.SetToolTip(Img2, "The criterion weight column is used to set the\nweights of each criterion row. By default the\nweight is evenly distrbuted among the criterion.\nTo set the weight simply input a number between\n1 and 100 in the column below. The weight is\nautomatically recalculated upon input.");
+            ToolTipService.SetToolTip(Img2, "The criterion weight column is used to set the weight\nof each criterion row. To set the weight input a number\ninto the column below. The weight of that row will then\nbe the rows point value divided by the overall points\npossible (Shown at the bottom right of the table)");
+
 
             //adding children to returnVal
             returnVal.Children.Add(TBlock2);
