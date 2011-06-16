@@ -31,6 +31,7 @@ namespace FileUploader
 
             if (Application.Current.IsRunningOutOfBrowser)
             {
+                InstallButton.Visibility = System.Windows.Visibility.Collapsed;
                 login.Show();
             }
 

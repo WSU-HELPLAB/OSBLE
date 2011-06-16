@@ -8,8 +8,8 @@
     d:DesignHeight="300" d:DesignWidth="400">
 
     <StackPanel>
-        <Button x:Name="InstallButton" Width="22" Height="22" HorizontalAlignment="Left">
-            <Image Source="/Images/install.png" />
+        <Button x:Name="InstallButton" Width="42" Height="22" HorizontalAlignment="Left">
+            Edit...
         </Button>
     </StackPanel>
 </UserControl>
