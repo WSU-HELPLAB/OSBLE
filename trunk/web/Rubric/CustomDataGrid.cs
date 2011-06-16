@@ -29,11 +29,19 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
         Brush borderBrush = new SolidColorBrush(Colors.Black);
 
         bool hideBordersForLastTwoColumns = true;
+        bool lastRowAsTwoCells = false;
 
         public bool HideBordersForLastTwoColumns
         {
             get { return hideBordersForLastTwoColumns; }
             set { hideBordersForLastTwoColumns = value; }
+        }
+
+
+        public bool LastRowAsTwoCells
+        {
+            get { return lastRowAsTwoCells; }
+            set { lastRowAsTwoCells = value; }
         }
 
         bool hideBordersForLastRow = false;
@@ -92,6 +100,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
         public void RemoveRow(int index)
         {
             List<Border> bordersToBeRemoved = new List<Border>();
+            //Putting all the Borders of the row at index into a list (to be deleted later)
             foreach (Border br in baseGrid.Children)
             {
                 if (index == (int)br.GetValue(Grid.RowProperty))
@@ -99,17 +108,35 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
                     bordersToBeRemoved.Add(br);
                 }
             }
+
+            //reducing the index(by 1) of all Borders with a larger index than the row to be deleted
+            foreach (Border br in baseGrid.Children)
+            {
+                if (index < (int)br.GetValue(Grid.RowProperty))
+                {
+                    br.SetValue(Grid.RowProperty, ((int)br.GetValue(Grid.RowProperty) - 1));
+                }
+            }
+
+            //deleting the elements that were set to delete
             foreach (Border br in bordersToBeRemoved)
             {
                 baseGrid.Children.Remove(br);
             }
 
-            baseGrid.RowDefinitions.RemoveAt(index);
+            //deleting last row (Should now be empty because of reduction of index of all row post index
+            baseGrid.RowDefinitions.RemoveAt(baseGrid.RowDefinitions.Count - 1);
         }
 
+
+        /// <summary>
+        /// Deletes the column at index
+        /// </summary>
+        /// <param name="index"></param>
         public void RemoveColumn(int index)
         {
             List<Border> bordersToBeRemoved = new List<Border>();
+            //Putting all the Borders of the column at index into a list (to be deleted later)
             foreach (Border br in baseGrid.Children)
             {
                 if (index == (int)br.GetValue(Grid.ColumnProperty))
@@ -117,12 +144,25 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
                     bordersToBeRemoved.Add(br);
                 }
             }
+
+            //reducing the index(by 1) of all Borders with a larger index than the column to be deleted
+            foreach (Border br in baseGrid.Children)
+            {
+                if (index < (int)br.GetValue(Grid.ColumnProperty))
+                {
+                    br.SetValue(Grid.ColumnProperty, ((int)br.GetValue(Grid.ColumnProperty) - 1));
+                }
+            }
+
+            //deleting the elements that were set to delete
             foreach (Border br in bordersToBeRemoved)
             {
                 baseGrid.Children.Remove(br);
             }
 
-            baseGrid.ColumnDefinitions.RemoveAt(index);
+            //deleting last column (Should now be empty because of reduction of index of all columns post index
+            baseGrid.ColumnDefinitions.RemoveAt(baseGrid.ColumnDefinitions.Count - 1);
+
         }
 
         public void ClearAll()
@@ -152,7 +192,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
             {
                 int row = (int)br.GetValue(Grid.RowProperty);
                 int column = (int)br.GetValue(Grid.ColumnProperty);
-                if (hideBordersForLastRow != true || row != baseGrid.RowDefinitions.Count - 1)
+                if ((hideBordersForLastRow != true || row != baseGrid.RowDefinitions.Count - 1) && (row < baseGrid.RowDefinitions.Count && column < baseGrid.ColumnDefinitions.Count))
                 {
                     if (hideBordersForLastTwoColumns != true || column < baseGrid.ColumnDefinitions.Count - 2)
                     {
@@ -161,7 +201,14 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
                         //place that edge as well.
                         if (column != 0 && row != 0)
                         {
-                            br.BorderThickness = new Thickness(0, 0, borderThickness, borderThickness);
+                            if (lastRowAsTwoCells && (row == baseGrid.RowDefinitions.Count - 1) && (column != baseGrid.ColumnDefinitions.Count - 1)) //last row & not last column
+                            {
+                                br.BorderThickness = new Thickness(0, 0, 0, borderThickness);
+                            }
+                            else
+                            {
+                                br.BorderThickness = new Thickness(0, 0, borderThickness, borderThickness);
+                            }
                         }
                         else if (column == 0 && row != 0)
                         {
