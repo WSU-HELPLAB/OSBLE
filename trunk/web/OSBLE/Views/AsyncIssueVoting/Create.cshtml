@@ -104,21 +104,21 @@
                 @Html.LabelFor(model => model.setgrade.PercentOfIssues)
             </div>
             <div class="editor-field">
-                @Html.RadioButtonFor(model => model.setgrade.PercentOfIssues, new { id = "SetGradePercentOfIssues" })
+                @Html.RadioButtonFor(model => model.setgrade.PercentOfIssues, new { id = "SetGradePercentOfIssues" }, new { name = "SetGrade" })
                 @Html.ValidationMessageFor(model => model.setgrade.PercentOfIssues)
             </div>
             <div class="editor-label">
                 @Html.LabelFor(model => model.setgrade.PercentAgreementWModerator)
             </div>
             <div class="editor-field">
-                @Html.RadioButtonFor(model => model.setgrade.PercentAgreementWModerator, new { id = "SetGradePercentAgreementWModerator" })
+                @Html.RadioButtonFor(model => model.setgrade.PercentAgreementWModerator, new { id = "SetGradePercentAgreementWModerator" }, new { name = "SetGrade" })
                 @Html.ValidationMessageFor(model => model.setgrade.PercentAgreementWModerator)
             </div>
             <div class="editor-label">
                 @Html.LabelFor(model => model.setgrade.Manually)
             </div>
             <div class="editor-field">
-                @Html.RadioButtonFor(model => model.setgrade.Manually, new { id = "SetGradeManually" })
+                @Html.RadioButtonFor(model => model.setgrade.Manually, new { id = "SetGradeManually" }, new { name = "SetGrade" })
                 @Html.ValidationMessageFor(model => model.setgrade.Manually)
             </div>
 

@@ -139,123 +139,136 @@
             <h2>Settings</h2>
 
             <div class="editor-label">
-                @Html.LabelFor(model => model.UseOnlySubmittedStudents)
+                @*@Html.LabelFor(model => model.UseOnlySubmittedStudents)*@
             </div>
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.UseOnlySubmittedStudents, new { id = "UseOnlySubmittedStudent" })
+                @Html.LabelFor(model => model.UseOnlySubmittedStudents)
                 @Html.ValidationMessageFor(model => model.UseOnlySubmittedStudents)
             </div>
 
             <div class="editor-label">
-                @Html.LabelFor(model => model.UseModerators)
+                @*@Html.LabelFor(model => model.UseModerators)*@
             </div>
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.UseModerators, new { id = "UseModerators" })
+                @Html.LabelFor(model => model.UseModerators)
                 @Html.ValidationMessageFor(model => model.UseModerators)
             </div>
 
-            <h3>Anonymity of Review</h3>
+            <h4>Anonymity of Review</h4>
 
             <div class="editor-label">
-                @Html.LabelFor(model => model.IsAuthorAnonymous)
+                @*@Html.LabelFor(model => model.IsAuthorAnonymous)*@
             </div>
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.IsAuthorAnonymous, new { id = "IsAuthorAnonymous" })
+                @Html.LabelFor(model => model.IsAuthorAnonymous)
                 @Html.ValidationMessageFor(model => model.IsAuthorAnonymous)
             </div>
 
             <div class="editor-label">
-                @Html.LabelFor(model => model.IsReviewersAnonymous)
+                @*@Html.LabelFor(model => model.IsReviewersAnonymous)*@
             </div>
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.IsReviewersAnonymous, new { id = "IsReviewerAnonymous" })
+                @Html.LabelFor(model => model.IsReviewersAnonymous)
                 @Html.ValidationMessageFor(model => model.IsReviewersAnonymous)
             </div>
 
             <div class="editor-label">
-                @Html.LabelFor(model => model.IsReviewersRoleAnonymous)
+                @*@Html.LabelFor(model => model.IsReviewersRoleAnonymous)*@
             </div>
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.IsReviewersRoleAnonymous, new { id = "IsReviewersRoleAnonymous" })
+                @Html.LabelFor(model => model.IsReviewersRoleAnonymous)
                 @Html.ValidationMessageFor(model => model.IsReviewersRoleAnonymous)
             </div>
 
-            <h3>Basis of Review</h3>
+            <h4>Basis of Review (Must Check at least one)</h4>
 
             <div class="editor-label">
-                @Html.LabelFor(model => model.UseInlineComments)
+                @*@Html.LabelFor(model => model.UseInlineComments)*@
             </div>
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.UseInlineComments, new { id = "UseInlineComments" })
+                @Html.LabelFor(model => model.UseInlineComments)
                 @Html.ValidationMessageFor(model => model.UseInlineComments)
             </div>
 
             <div class="editor-label">
-                @Html.LabelFor(model => model.UseRubric)
+                @*@Html.LabelFor(model => model.UseRubric)*@
             </div>
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.UseRubric, new { id = "UseRubric" })
+                @Html.LabelFor(model => model.UseRubric)
                 @Html.ValidationMessageFor(model => model.UseRubric)
             </div>
             <div id="UseRubric_options" class="indented_options" style="display: none">
                       
                  <div class="editor-label">
-                    @Html.LabelFor(model => model.InstructorCompletesRubricRandomReview)
+                    @*@Html.LabelFor(model => model.InstructorCompletesRubricRandomReview)*@
                 </div>
                 <div class="editor-field">
                     @Html.CheckBoxFor(model => model.InstructorCompletesRubricRandomReview, new { id = "InstructorCompletesRubricRandomReview" })
+                    @Html.LabelFor(model => model.InstructorCompletesRubricRandomReview)
                     @Html.ValidationMessageFor(model => model.InstructorCompletesRubricRandomReview)
                 </div>
 
                 <div class="editor-label">
-                    @Html.LabelFor(model => model.InstructorCompletesRubricAllReviews)
+                    @*@Html.LabelFor(model => model.InstructorCompletesRubricAllReviews)*@
                 </div>
                 <div class="editor-field">
                     @Html.CheckBoxFor(model => model.InstructorCompletesRubricAllReviews, new { id = "InstructorCompletesRubricAllReviews" })
+                    @Html.LabelFor(model => model.InstructorCompletesRubricAllReviews)
                     @Html.ValidationMessageFor(model => model.InstructorCompletesRubricAllReviews)
                 </div>
             </div>
 
-            <h3>Author access to completed reviews</h3>
+            <h4>Author access to completed reviews</h4>
 
             <div class="editor-label">
-                @Html.LabelFor(model => model.CanStudentAccessReviews)
+                @*@Html.LabelFor(model => model.CanStudentAccessReviews)*@
             </div>
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.CanStudentAccessReviews, new { id = "CanStudentAccessReviews" })
+                @Html.LabelFor(model => model.CanStudentAccessReviews)
                 @Html.ValidationMessageFor(model => model.CanStudentAccessReviews)
             </div>
             <div id="CanStudentAccessReviews_options"  class="indented_options" style="display: none">
                 <div class="editor-label">
-                    @Html.LabelFor(model => model.HasStudentCompletedAssignedReviews)
+                    @*@Html.LabelFor(model => model.HasStudentCompletedAssignedReviews)*@
                 </div>
                 <div class="editor-field">
                     @Html.CheckBoxFor(model => model.HasStudentCompletedAssignedReviews, new { id = "HasStudentCompletedAssignedReviews" })
+                    @Html.LabelFor(model => model.HasStudentCompletedAssignedReviews)
                     @Html.ValidationMessageFor(model => model.HasStudentCompletedAssignedReviews)
                 </div>
             </div>
 
-            <h3>Reviewer access to completed reviews of other reviewers</h3>
+            <h4>Reviewer access to completed reviews of other reviewers</h4>
 
             <div class="editor-label">
-                @Html.LabelFor(model => model.CanReviewerViewOthersReviews)
+                @*@Html.LabelFor(model => model.CanReviewerViewOthersReviews)*@
             </div>
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.CanReviewerViewOthersReviews, new { id = "CanReviewerViewOthersReviews" })
+                @Html.LabelFor(model => model.CanReviewerViewOthersReviews)
                 @Html.ValidationMessageFor(model => model.CanReviewerViewOthersReviews)
             </div>
             <div id="CanReviewerAccessReviews_options"  class="indented_options" style="display: none">
                 <div class="editor-label">
-                    @Html.LabelFor(model => model.HasReviewerCompletedAssignedReviews)
+                    @*@Html.LabelFor(model => model.HasReviewerCompletedAssignedReviews)*@
                 </div>
                 <div class="editor-field">
                     @Html.CheckBoxFor(model => model.HasReviewerCompletedAssignedReviews, new { id = "HasReviewerCompletedAssignedReviews" })
+                    @Html.LabelFor(model => model.HasReviewerCompletedAssignedReviews)
                     @Html.ValidationMessageFor(model => model.HasReviewerCompletedAssignedReviews)
                 </div>
             </div>
 
             <div class="editor-label">
-                Add to Gradebook
+                <h4>Add to Gradebook</h4>
             </div>
             <div class="editor-field">
                 <input type="checkbox" id="add_to_gradebook" checked="checked" />
@@ -270,7 +283,7 @@
                 </div>
         
 
-                <h3>Late Policy</h3>
+                <h4>Late Policy</h4>
     
                 <p>
                     Students may submit assignments up to @Html.TextBoxFor(model => model.MinutesLateWithNoPenalty, new { size = 3 })

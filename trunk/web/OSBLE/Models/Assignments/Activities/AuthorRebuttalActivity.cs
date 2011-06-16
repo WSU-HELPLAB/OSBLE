@@ -17,9 +17,11 @@ namespace OSBLE.Models.Assignments.Activities
 
         [Display(Name = "Present only issues that received at least X number of votes")]
         public bool PresentIssuesXLogged { get; set; }
+        public int xlogged { get; set; }
 
             [Display(Name = "Present only issues for which X percent of team members voted")]
             public bool PresentIssuesXPercentLogged { get; set; }
+            public int xpercent { get; set; }
 
         [Display(Name = "Present only issues for which team moderator voted")]
         public bool PresentOnlyIssuesModeratorVoted { get; set; }

@@ -148,26 +148,35 @@
         <h3>Issue Presentation</h3>
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.PresentAllIssuesLogged)
+            @*@Html.LabelFor(model => model.PresentAllIssuesLogged)*@
         </div>
         <div class="editor-field">
-            @Html.CheckBoxFor(model => model.PresentAllIssuesLogged, new { id = "PresentAllIssuesLogged" })
+            @Html.RadioButtonFor(model => model.PresentAllIssuesLogged, new { id = "PresentAllIssuesLogged" }, new { name = "presentation" })
+            @Html.LabelFor(model => model.PresentAllIssuesLogged)
             @Html.ValidationMessageFor(model => model.PresentAllIssuesLogged)
         </div>
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.PresentIssuesXLogged)
+            @*@Html.LabelFor(model => model.PresentIssuesXLogged)*@
         </div>
         <div class="editor-field">
-            @Html.CheckBoxFor(model => model.PresentIssuesXLogged, new { id = "PresentIssuesXLogged" })
+            <p>
+                @Html.RadioButtonFor(model => model.PresentIssuesXLogged, new { id = "PresentIssuesXLogged" }, new { name = "presentation" })
+                @*@Html.LabelFor(model => model.PresentIssuesXLogged)*@
+                Present only issues that recieved @Html.TextBoxFor(model => model.xlogged, new { size = 3 }) number of votes
+            </p>
             @Html.ValidationMessageFor(model => model.PresentIssuesXLogged)
         </div>
         <div id="PresentIssuesXLogged_options" class="indented_options" style="display: none">
             <div class="editor-label">
-                @Html.LabelFor(model => model.PresentIssuesXPercentLogged)
+                @*@Html.LabelFor(model => model.PresentIssuesXPercentLogged)*@
             </div>
             <div class="editor-field">
-                @Html.CheckBoxFor(model => model.PresentIssuesXPercentLogged, new { id = "PresentIssuesXPercentLogged" })
+                <p>
+                    @Html.CheckBoxFor(model => model.PresentIssuesXPercentLogged, new { id = "PresentIssuesXPercentLogged" })
+                    @*@Html.LabelFor(model => model.PresentIssuesXPercentLogged)*@
+                    Present only issues for which @Html.TextBoxFor(model => model.xpercent, new { size = 3 }) percent of team members voted.
+                </p>
                 @Html.ValidationMessageFor(model => model.PresentIssuesXPercentLogged)
             </div>
         </div>
@@ -175,10 +184,11 @@
        @*Need to check whether team moderators are enabled*@
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.PresentOnlyIssuesModeratorVoted)
+            @*@Html.LabelFor(model => model.PresentOnlyIssuesModeratorVoted)*@
         </div>
         <div class="editor-field">
-            @Html.CheckBoxFor(model => model.PresentOnlyIssuesModeratorVoted, new { id = "PresentOnlyIssuesModeratorVoted" })
+            @Html.RadioButtonFor(model => model.PresentOnlyIssuesModeratorVoted, new { id = "PresentOnlyIssuesModeratorVoted" }, new { name = "presentation" })
+            @Html.LabelFor(model => model.PresentOnlyIssuesModeratorVoted)
             @Html.ValidationMessageFor(model => model.PresentOnlyIssuesModeratorVoted)
         </div>
 
@@ -186,35 +196,39 @@
         <h3>Author Response</h3>
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.AuthorMustAcceptorRefuteEachIssue)
+            @*@Html.LabelFor(model => model.AuthorMustAcceptorRefuteEachIssue)*@
         </div>
         <div class="editor-field">
             @Html.CheckBoxFor(model => model.AuthorMustAcceptorRefuteEachIssue, new { id = "AuthorMustAcceptorRefuteEachIssue" })
+            @Html.LabelFor(model => model.AuthorMustAcceptorRefuteEachIssue)
             @Html.ValidationMessageFor(model => model.AuthorMustAcceptorRefuteEachIssue)
         </div>
         <div id="AuthorMustAcceptorRefuteEachIssue_options" class="indented_options" style="display: none">
             <div class="editor-label">
-                @Html.LabelFor(model => model.AuthorMustDescribeHowAddressed)
+                @*@Html.LabelFor(model => model.AuthorMustDescribeHowAddressed)*@
             </div>
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.AuthorMustDescribeHowAddressed, new { id = "AuthorMustDescribeHowAddressed" })
+                @Html.LabelFor(model => model.AuthorMustDescribeHowAddressed)
                 @Html.ValidationMessageFor(model => model.AuthorMustDescribeHowAddressed)
             </div>
         </div>
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.AuthorMustProvideRationale)
+            @*@Html.LabelFor(model => model.AuthorMustProvideRationale)*@
         </div>
         <div class="editor-field">
             @Html.CheckBoxFor(model => model.AuthorMustProvideRationale, new { id = "AuthorMustProvideRationale" })
+            @Html.LabelFor(model => model.AuthorMustProvideRationale)
             @Html.ValidationMessageFor(model => model.AuthorMustProvideRationale)
         </div>
         <div id="AuthorMustProvideRationale_options" class="indented_options" style="display: none">
             <div class="editor-label">
-                @Html.LabelFor(model => model.AuthorMustSayIfIssueWasAddressed)
+                @*@Html.LabelFor(model => model.AuthorMustSayIfIssueWasAddressed)*@
             </div>
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.AuthorMustSayIfIssueWasAddressed, new { id = "AuthorMustSayIfIssueWasAddressed" })
+                @Html.LabelFor(model => model.AuthorMustSayIfIssueWasAddressed)
                 @Html.ValidationMessageFor(model => model.AuthorMustSayIfIssueWasAddressed)
             </div>
         </div>

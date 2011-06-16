@@ -54,6 +54,7 @@ namespace OSBLE.Models.Assignments.Activities
 
         /// <summary>
         /// If true then the reviewer can see what other reviewers have already said during their reviews.
+        /// If false then the reviewer cannot access other reviews of the same submissions they reviewed.
         /// </summary>
         [Display(Name = "Reviewer can view others reviewers reviews of this submission")]
         public bool CanReviewerViewOthersReviews { get; set; }
