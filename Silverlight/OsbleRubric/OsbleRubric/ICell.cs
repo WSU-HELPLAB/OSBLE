@@ -11,7 +11,7 @@ using System.Windows.Shapes;
 
 namespace OsbleRubric
 {
-    public class ICell
+    public abstract class ICell
     {
         int row;
         int column;
@@ -28,6 +28,7 @@ namespace OsbleRubric
             get { return column; }
             set { column = value; }
         }
+
         public string Information
         {
             get { return information; }

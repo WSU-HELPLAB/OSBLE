@@ -8,17 +8,22 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using System.Collections.Generic;
 
 namespace OsbleRubric
 {
-    public class RubricCell : ICell
-    { 
-        public RubricCell(int row, int column, string description)
+    public class CheckBoxCell : ICell
+    {
+        bool checkBoxValue;
+
+        public CheckBoxCell(int row, int column, bool checkBoxValue)
         {
-            Row = row;
-            Column = column;
-            Information = description;
+            CheckBoxValue = checkBoxValue;
+        }
+
+        public bool CheckBoxValue
+        {
+            get { return checkBoxValue; }
+            set { checkBoxValue = value; }
         }
     }
 }

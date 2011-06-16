@@ -15,7 +15,7 @@ namespace OsbleRubric
 
         private CustomDataGrid customDataGrid = new CustomDataGrid();
         private Rubric thisView = new Rubric();
-        private TextBox myDraggingLabel = new TextBox();
+        private List<ICell> dataFromCells = new List<ICell>();
 
         #endregion Attributes
 
@@ -51,11 +51,17 @@ namespace OsbleRubric
         private void initialize()
         {
             //adding grid to the view
-            thisView.LayoutRoot.Children.Add(customDataGrid.BaseGrid);
+            if (thisView.LayoutRoot.Children.Contains(customDataGrid.BaseGrid) == false) //won't try to add the grid if init is run again
+            {
+                thisView.LayoutRoot.Children.Add(customDataGrid.BaseGrid);
+            }
+
 
             //setting color for grid
             customDataGrid.BaseGrid.Background = new SolidColorBrush(Colors.LightGray);
 
+
+            //temp event for saving, to be removed later
             thisView.LayoutRoot.MouseRightButtonDown += new MouseButtonEventHandler(LayoutRoot_MouseRightButtonDown);
 
             //setting borders for grid
@@ -101,6 +107,8 @@ namespace OsbleRubric
             adjustArrowIcons();
         }
 
+
+        //temporary events to test loading/saving data
         void LayoutRoot_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             getData();
@@ -110,70 +118,250 @@ namespace OsbleRubric
         void Img1_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             announceData();
+            //buildGridFromData();
         }
+
+        //temp method to do what i want 
         private void announceData()
         {
-            for (int i = 0; i < customDataGrid.BaseGrid.RowDefinitions.Count - 1; i++)
-                foreach (RubricCell c in cells)
-                {
-                    if (c.Row == i)
-                        if (c.IsCheckBox) MessageBox.Show("Row: " + c.Row + " / Col: " + c.Column + "\nCheckbox value: " + c.Information);
-                        else if (c.IsComboBox) MessageBox.Show("Row: " + c.Row + " / Col: " + c.Column + "\nCombobox value: " + c.Information);
-                        else MessageBox.Show("Row: " + c.Row + " / Col: " + c.Column + "\nTextbox value: " + c.Information);
-                }
-        }
-        private List<ICell> cells = new List<ICell>();
 
-        private void getData()
-        {
-            cells.Clear(); //clear the list before appending to it
-            foreach (Border k in customDataGrid.BaseGrid.Children)
+            int hcs = 0;
+            int cbcs = 0;
+            int rcs = 0;
+            foreach (ICell ic in dataFromCells)
             {
-                int row = (int)k.GetValue(Grid.RowProperty);
-                int col = (int)k.GetValue(Grid.ColumnProperty);
-                if (k.Child is StackPanel)
+                if (ic is HeaderCell) hcs++;
+                if (ic is CheckBoxCell) cbcs++;
+                if (ic is RubricCell) rcs++;
+            }
+            MessageBox.Show("rcs: " + rcs);
+            foreach (ICell rc in dataFromCells)
+            {
+                if(rc is RubricCell)
+                    MessageBox.Show("Info: " + rc.Information + "\nRow :" + rc.Row + " Col :" + rc.Column);
+                else if (rc is CheckBoxCell)
                 {
-                    foreach (UIElement tb in (k.Child as StackPanel).Children)
+                    MessageBox.Show("Checkbox Value: " + (rc as CheckBoxCell).CheckBoxValue + "\nRow :" + rc.Row + " Col :" + rc.Column);
+                }
+                else if (rc is HeaderCell)
+                {
+                    MessageBox.Show("Info: " + rc.Information + "\nvalue: " + (rc as HeaderCell).ComboBoxValue + "\nRow :" + rc.Row + " Col :" + rc.Column);
+                }
+            }
+        }
+        /// <summary>
+        /// attempts to place an ICell into the grid at the ICells given row/column/data
+        /// </summary>
+        /// <param name="cellToAdd"></param>
+        /// <returns></returns>
+        private bool placeICell(ICell cellToAdd)
+        {
+            bool returnVal = false;
+
+            UIElement firstSP = customDataGrid.GetUIElementAt(cellToAdd.Column, cellToAdd.Row);
+            if (firstSP is StackPanel) //all cells in the grid contain at least one stackpanel
+            {
+                if (cellToAdd is RubricCell) //addressing each type of cell individually
+                {
+                }
+                else if (cellToAdd is CheckBoxCell)
+                {
+                }
+                else if (cellToAdd is HeaderCell) //HeaderCells data will be placed into stackpanels nested within firstSP. The first stackpanel contains the textbox, the second stackpanel contains the combobox
+                {
+                    foreach (UIElement ui in (firstSP as StackPanel).Children) 
                     {
-                        if (tb is StackPanel) //checking for nested stackpanels
+                        if (ui is StackPanel) //looking for the nested stackpanels
                         {
-                            foreach (UIElement tb2 in (tb as StackPanel).Children)
+                            bool textBoxAdded = false;
+                            bool comboBoxAdded = false;
+                            foreach (UIElement ui2 in (ui as StackPanel).Children) //looking through the nested stackpanels for a combobox or textbox
                             {
-                                if (tb2 is TextBox)
+                                if (ui2 is TextBox)
                                 {
-                                    cells.Add(new RubricCell(row, col, (tb2 as TextBox).Text));
+                                    (ui2 as TextBox).Text = cellToAdd.Information;
+                                    textBoxAdded = true;
                                 }
-                                else if (tb2 is ComboBox)
+                                else if (ui2 is ComboBox)
                                 {
-                                    RubricCell rc = new RubricCell(row, col, (tb2 as ComboBox).SelectedItem.ToString());
-                                    rc.IsComboBox = true;
-                                    cells.Add(rc);
+                                    (ui2 as ComboBox).SelectedItem = (cellToAdd as HeaderCell).ComboBoxValue;
+                                    comboBoxAdded = true;
                                 }
                             }
+                            if (!(comboBoxAdded && textBoxAdded)) //if the textbox or combobox is not added, return false
+                            {
+                                returnVal = false;
+                            }
                         }
+                    }
+                }
+            }
 
-                        else if (tb is TextBox)
+
+            return returnVal;
+        }
+        /// <summary>
+        ///  /// returns the number of rows from dataFromCells list
+        /// </summary>
+        /// <returns></returns>
+        private int getRowCount()
+        {
+            int returnVal = 0;
+            foreach (ICell ic in dataFromCells)
+            {
+                if (ic.Row > returnVal) returnVal = ic.Row;
+            }
+            return returnVal;
+        }
+
+        /// <summary>
+        /// returns the number of columns from dataFromCells list
+        /// </summary>
+        /// <returns></returns>
+        private int getColumnCount()
+        {
+            int returnVal = 0;
+            foreach (ICell ic in dataFromCells)
+            {
+                if (ic.Column > returnVal) returnVal = ic.Column;
+            }
+            return returnVal;
+        }
+
+        /// <summary>
+        /// This method clears the grid and rebuilds it based off the data in dataFromCells
+        /// </summary>
+        private void buildGridFromData()
+        {
+            //getting the number of rows/columns
+            int numOfRows = getRowCount();
+            int numofCols = getColumnCount();
+
+            customDataGrid.ClearAll();
+            initialize();
+
+            //adding empty rows
+            customDataGrid.RemoveRow(customDataGrid.BaseGrid.RowDefinitions.Count - 1); //remove the add button row temporarily
+            while (numOfRows > (customDataGrid.BaseGrid.RowDefinitions.Count + 1))//+1 to account for last rows
+            {
+                createCriterionRow();
+            }
+            createAddButtonRow(); //adding add button row back in
+
+            //adding empty columns 
+            customDataGrid.RemoveColumn(customDataGrid.BaseGrid.ColumnDefinitions.Count - 1); //removing two last columns temporarily
+            customDataGrid.RemoveColumn(customDataGrid.BaseGrid.ColumnDefinitions.Count - 1);
+            while (numofCols > (customDataGrid.BaseGrid.ColumnDefinitions.Count + 2)) //+2 to account for last two rows
+            {
+                createLevelColumn();
+            }
+            createAddButtonColumn(); //adding last two columns back
+            createCommentColumn();
+
+            //setting tabs, updating last rows textblock position, fixing/adjusting arrow icons
+            setTabIndex();
+            updateLastRow();
+            changeDownArrow(1, downArrowIconSource);
+            adjustArrowIcons();
+
+            foreach (ICell ic in dataFromCells)
+            {
+                if (ic is HeaderCell) placeICell(ic);
+            }
+        }
+        
+
+
+        /// <summary>
+        /// this method saves all the data from the cells into a list. This method will most probably need changes as changes are made within the grid
+        /// </summary>
+        private void getData()
+        {
+            dataFromCells.Clear(); //clear the list before appending to it
+
+            //check which row its in, if first row, cut that off and have it handle all the headercells and then also the topright checkbox cell
+            //if its last, look only for checkbox for a checkboxcell
+            //if its not first or last, look through it and try to only get the info, save it into a rubric cell
+
+
+            foreach (Border br in customDataGrid.BaseGrid.Children)
+            {
+                int row = (int)br.GetValue(Grid.RowProperty);
+                int col = (int)br.GetValue(Grid.ColumnProperty);
+                if (row == 0) //All cells in row 0 are HeaderCells, except the one that is the last column, which is a CheckBoxCell
+                {
+                    if(br.Child is StackPanel) //if its child is not a stackpanel, don't bother looking at it
+                    {
+                        if (col != customDataGrid.BaseGrid.ColumnDefinitions.Count - 1) //if the column is not the last, must be a HeaderCell at this point
                         {
-                            cells.Add(new RubricCell(row, col, (tb as TextBox).Text));
+                            HeaderCell hc = new HeaderCell(row, col);
+                            foreach (UIElement ui in (br.Child as StackPanel).Children) //look through children for textbox and combobox to save into a HeaderCell
+                            {
+                                if (ui is StackPanel) //looking for the nested stackpanel
+                                {
+                                    foreach (UIElement ui2 in (ui as StackPanel).Children) //looking for a textbox/combobox in the nested stackpanel, then adjusting hc based on those values
+                                    {
+                                        if (ui2 is TextBox)
+                                        {
+                                            hc.Information = (ui2 as TextBox).Text;
+                                        }
+                                        else if (ui2 is ComboBox)
+                                        {
+                                            hc.ComboBoxValue = Convert.ToInt32((ui2 as ComboBox).SelectedItem);
+                                        }
+                                    }
+                                }
+                            }
+                            if (hc.ComboBoxValue != 0) //Only adding hc to dataFromCells if it got a valid combobox
+                            {
+                                dataFromCells.Add(hc);
+                            }
                         }
-                        else if (tb is ComboBox)
+                        else if (col == (customDataGrid.BaseGrid.ColumnDefinitions.Count - 1)) //if the column is the last column, must be CheckBoxCell
                         {
-                            RubricCell rc = new RubricCell(row, col, (tb as ComboBox).SelectedItem.ToString());
-                            rc.IsComboBox = true;
-                            cells.Add(rc);
+                            foreach (UIElement ui in (br.Child as StackPanel).Children) //look through the the stackpanel for a checkbox, add that to dataFromCells
+                            {
+                                if (ui is CheckBox) dataFromCells.Add(new CheckBoxCell(row, col, (bool)(ui as CheckBox).IsChecked));
+                            }
                         }
-                        else if (tb is CheckBox)
+                    }
+                }
+                else if (row == customDataGrid.BaseGrid.RowDefinitions.Count - 1) //Last row, should only have a single checkbox value
+                {
+                    if (br.Child is StackPanel && col == 1) //Only data(the checbox) is in a stackpanel in the first column
+                    {
+                        foreach (UIElement ui in (br.Child as StackPanel).Children)
                         {
-                            RubricCell rc = new RubricCell(row, col, (tb as CheckBox).IsChecked.ToString());
-                            rc.IsCheckBox = true;
-                            cells.Add(rc);
+                            if (ui is CheckBox) dataFromCells.Add(new CheckBoxCell(row, col, (bool)(ui as CheckBox).IsChecked));
+                        }
+                    }
+                }
+                else //The remaining cells will be between first and last row, all should be RubricCells 
+                {
+                    if (br.Child is StackPanel)//Only want to look through br.Child if its a stackpanel
+                    {
+                        foreach (UIElement ui in (br.Child as StackPanel).Children) //look through children
+                        {
+                            if (ui is TextBox) //if its a textbox, add to dataFromCells via a new RubricCell
+                            {
+                                dataFromCells.Add(new RubricCell(row, col, (ui as TextBox).Text));
+                            }
+                            else if (ui is StackPanel) //if its a stackpanel, look through the stackpanels children, add any new textboxes to dataFromCells via a new RubricCell
+                            {
+                                foreach (UIElement ui2 in (ui as StackPanel).Children)
+                                {
+                                    if (ui2 is TextBox) dataFromCells.Add(new RubricCell(row, col, (ui2 as TextBox).Text));
+                                }
+                            }
                         }
                     }
                 }
             }
         }
 
-        //This method creates the comment column and adds it to the grid (last column)
+        /// <summary>
+        /// This method creates the comment column and adds it to the grid (last column)
+        /// </summary>
         private void createCommentColumn()
         {
             StackPanel stackPanel = new StackPanel()
@@ -185,13 +373,13 @@ namespace OsbleRubric
                 
             };
 
-            CheckBox commentsOn = new CheckBox()
+            CheckBox commentsOnCheckBox = new CheckBox()
             {
                 IsChecked = true,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 IsTabStop = true,
             };
-            TextBlock commentsTB = new TextBlock()
+            TextBlock commentsTextBlock = new TextBlock()
             {
                 Text = "Comments",
                 FontWeight = FontWeights.Bold,
@@ -208,8 +396,8 @@ namespace OsbleRubric
             };
             ToolTipService.SetToolTip(helpIcon, "This checkbox determines if a column is included in the final table");
 
-            stackPanel.Children.Add(commentsOn);
-            stackPanel.Children.Add(commentsTB);
+            stackPanel.Children.Add(commentsOnCheckBox);
+            stackPanel.Children.Add(commentsTextBlock);
             stackPanel.Children.Add(helpIcon);
 
             int columnToPlace = customDataGrid.BaseGrid.ColumnDefinitions.Count;
@@ -221,7 +409,10 @@ namespace OsbleRubric
             }
         }
 
-        //This method creates the UI elements to be inserted into a comment cell
+        /// <summary>
+        /// This method creates the UI elements to be inserted into a comment cell
+        /// </summary>
+        /// <returns></returns>
         private TextBox createCommentCell()
         {
             TextBox commentBox = new TextBox()
@@ -234,7 +425,9 @@ namespace OsbleRubric
             return commentBox;
         }
 
-        //This method creates the add button column and adds it to the grid (second to last column)
+        /// <summary>
+        /// This method creates the add button column and adds it to the grid (second to last column)
+        /// </summary>
         private void createAddButtonColumn()
         {
             //stack Panel to be added
@@ -266,7 +459,9 @@ namespace OsbleRubric
             customDataGrid.PlaceUIElement(stackPanel, customDataGrid.BaseGrid.ColumnDefinitions.Count , 0);
         }
 
-        //This method creates the add button row and adds it to the bottom of the grid
+        /// <summary>
+        /// This method creates the add button row and adds it to the bottom of the grid
+        /// </summary>
         private void createAddButtonRow()
         {
             //stack Panel to be added to first column
@@ -298,7 +493,7 @@ namespace OsbleRubric
             //stackpanel for textblock/checkbox
             StackPanel checkBoxSP = new StackPanel()
             {
-                HorizontalAlignment = HorizontalAlignment.Stretch,
+                HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Bottom,
                 Margin = new Thickness(5,5,5,5),
                 Orientation = Orientation.Horizontal
@@ -306,11 +501,11 @@ namespace OsbleRubric
             //setting the stackpanel to stretch a specific gridlength
             checkBoxSP.SetValue(Grid.ColumnSpanProperty, 2);
 
+            //creating/formating checkbox & textblock to be added to checkBoxSP
             CheckBox globalComments = new CheckBox()
             {
                 IsChecked = false,
-                VerticalAlignment = VerticalAlignment.Bottom,
-                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
             };
 
             TextBlock globalCommentsTB = new TextBlock()
@@ -318,13 +513,23 @@ namespace OsbleRubric
                 Text = "Enable Global Comments",
                 FontSize = GlobalFontSize,
                 FontWeight = FontWeights.Bold,
-                VerticalAlignment = VerticalAlignment.Bottom,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                Margin = new Thickness(5,0,0,0)
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(1,0,0,0)
             };
+
+            Image helpIcon = new Image()
+            {
+                Source = helpIconSource,
+                Margin = new Thickness(5, 0, 0, 0),
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+            ToolTipService.SetToolTip(helpIcon, "Check to enable a comment block for the entire rubric");
+
+
+            //addeding checkbox & textblock to checkBoxSP
             checkBoxSP.Children.Add(globalComments);
             checkBoxSP.Children.Add(globalCommentsTB);
-
+            checkBoxSP.Children.Add(helpIcon);
 
             //textblock for points possible
             TextBlock pointsPossible_TextBlock = new TextBlock()
@@ -336,12 +541,9 @@ namespace OsbleRubric
                 VerticalAlignment = VerticalAlignment.Bottom,
                 Margin = new Thickness(5,5,5,5)
             };
-            //checkBoxSP.Children.Add(pointsPossible_TextBlock);
-
-            //setting the textblock to span all remaining columns
+            //setting the textblock to span two columns
             pointsPossible_TextBlock.SetValue(Grid.ColumnSpanProperty, 2);
 
-            
 
             //adding UIelements into the grid
             int rowToAdd = customDataGrid.BaseGrid.RowDefinitions.Count;
@@ -352,7 +554,9 @@ namespace OsbleRubric
             
         }
 
-        //This method creates and correctly populates an entire column, and then adds it to the grid
+        /// <summary>
+        /// This method creates and correctly populates an entire column, and then adds it to the grid
+        /// </summary>
         private void createLevelColumn()
         {
             int colIndexToInsert = customDataGrid.BaseGrid.ColumnDefinitions.Count;
@@ -367,7 +571,9 @@ namespace OsbleRubric
             }
         }
 
-        //This method creates and correctly populates an entire row, and then adds it to the grid
+        /// <summary>
+        /// This method creates and correctly populates an entire row, and then adds it to the grid
+        /// </summary>
         private void createCriterionRow()
         {
             int rowPlacement = customDataGrid.BaseGrid.RowDefinitions.Count;
@@ -386,7 +592,10 @@ namespace OsbleRubric
             customDataGrid.PlaceUIElement(createCommentCell(), customDataGrid.BaseGrid.ColumnDefinitions.Count - 1, rowPlacement);
         }
 
-        //This method creates the cells used for a Level column (With the exception of the first row)
+        /// <summary>
+        /// This method creates the cells used for a Level column (With the exception of the first row)
+        /// </summary>
+        /// <returns></returns>
         private StackPanel createLevelCell()
         {
             StackPanel returnVal = new StackPanel()
@@ -406,7 +615,10 @@ namespace OsbleRubric
             return returnVal;
         }
 
-        //This method creates the cells used for the Criterion Weight column (With the exception of the first row)
+        /// <summary>
+        /// This method creates the cells used for the Criterion Weight column (With the exception of the first row)
+        /// </summary>
+        /// <returns></returns>
         private StackPanel createCritWeightCell()
         {
             StackPanel returnVal = new StackPanel()
@@ -434,7 +646,10 @@ namespace OsbleRubric
             return returnVal;
         }
 
-        //This method creates the cells used for the Performance Criterion column (With the exception of the first row)
+        /// <summary>
+        /// This method creates the cells used for the Performance Criterion column (With the exception of the first row)
+        /// </summary>
+        /// <returns></returns>
         private StackPanel createPerformanceCritCell()
         {
 
@@ -467,13 +682,14 @@ namespace OsbleRubric
             textBoxAndDelete.Children.Add(deleteIcon);
 
             //Vert Stackpanel for up/down arrow images
-            StackPanel SPImages = new StackPanel()
+            StackPanel arrowsStackPanel = new StackPanel()
             {
                 Orientation = Orientation.Vertical,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(0,0,5,0),
             };
+            //up/down arrows to be added to arrowStackPanel
             Image upArrow = new Image { Source = upArrowIconSource, Width = 15, Height = 17, Margin = new Thickness(0, 0, 0, 5) };
             Image downArrow = new Image { Source = downArrowIconSource, Width = 15, Height = 17};
 
@@ -485,18 +701,21 @@ namespace OsbleRubric
             ToolTipService.SetToolTip(upArrow, "Click to move the row up a level");
             ToolTipService.SetToolTip(downArrow, "Click to move the row down a level");
 
-            //adding children to SPImages stackpanel
-            SPImages.Children.Add(upArrow);
-            SPImages.Children.Add(downArrow);
+            //adding children to arrowsStackPanel stackpanel
+            arrowsStackPanel.Children.Add(upArrow);
+            arrowsStackPanel.Children.Add(downArrow);
 
             //adding stackpanels to returnVal stackpanel
-            returnVal.Children.Add(SPImages);
+            returnVal.Children.Add(arrowsStackPanel);
             returnVal.Children.Add(textBoxAndDelete);
 
             return returnVal;
         }
 
-        //This method creates the top row for the Performance Criterion column
+        /// <summary>
+        /// This method creates the top row for the Performance Criterion column
+        /// </summary>
+        /// <returns></returns>
         private StackPanel createPerformanceCritTitleCell()
         {
             StackPanel returnVal = new StackPanel() { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(5, 0, 5, 0) };
@@ -515,7 +734,11 @@ namespace OsbleRubric
             return returnVal;
         }
 
-        //This method swaps row1 with row2 if its a valid swap
+        /// <summary>
+        /// This method swaps row1 with row2 if its a valid swap
+        /// </summary>
+        /// <param name="row1"></param>
+        /// <param name="row2"></param>
         private void performSwap(int row1, int row2)
         {
             
@@ -564,7 +787,10 @@ namespace OsbleRubric
             }
         }
 
-        //This method creates the top row for the Weight Criterion column
+        /// <summary>
+        /// //This method creates the top row for the Weight Criterion column
+        /// </summary>
+        /// <returns></returns>
         private StackPanel createWeightCritTitleCell()
         {
             StackPanel returnVal = new StackPanel() { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(5, 0, 5, 0) };
@@ -580,90 +806,124 @@ namespace OsbleRubric
             return returnVal;
         }
 
-        //This method is used to create the top row for a Level column. It adds and formats all the appropriate UIelements
+        /// <summary>
+        /// This method is used to create the top row for a Level column. It adds and formats all the appropriate UIelements
+        /// </summary>
+        /// <returns></returns>
         private StackPanel createLevelTitleCell()
         {
-            Thickness generalMargin = new Thickness(5, 0, 5, 0);
-            int comboBoxMin = 1;
+            Thickness generalMargin = new Thickness(5, 0, 5, 0); //marign used for most controls in the returned stackpanel for formatting
+
+            int comboBoxMin = 1; //range of values for combobox
             int comboBoxMax = 10;
-            StackPanel returnVal = new StackPanel();
-            returnVal.Orientation = Orientation.Vertical;
-            returnVal.HorizontalAlignment = HorizontalAlignment.Center;
-            returnVal.VerticalAlignment = VerticalAlignment.Center;
+
+            StackPanel returnVal = new StackPanel()
+            {
+                Orientation = Orientation.Vertical,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
 
             //first stackpanel
-            StackPanel SP1 = new StackPanel();
-            SP1.Orientation = Orientation.Horizontal;
-            SP1.HorizontalAlignment = HorizontalAlignment.Center;
-
+            StackPanel topStackPanel = new StackPanel()
+            {
+                Orientation = Orientation.Horizontal,
+                HorizontalAlignment = HorizontalAlignment.Center,
+            };
+            
             //Textblock to act as label
-            TextBlock TBlock1 = new TextBlock();
-            TBlock1.Text = "Level Title";
-            TBlock1.FontWeight = FontWeights.Bold;
-            TBlock1.FontSize = GlobalFontSize;
-            TBlock1.VerticalAlignment = VerticalAlignment.Center;
+            TextBlock levelTitleTextBlock = new TextBlock()
+            {
+                Text = "Level Title",
+                FontWeight = FontWeights.Bold,
+                FontSize = GlobalFontSize,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(5,0,5,0),
+            };
 
             //Textbox for user to enter level title
-            TextBox levelTitleTextBox = new TextBox();
-            levelTitleTextBox.Width = 100;
-            levelTitleTextBox.Height = 22;
-
-            Image deleteImage = new Image() { Source = deleteIconSource, Height = 32, Width = 32 };
-
+            TextBox levelTitleTextBox = new TextBox()
+            {
+                Width = 100,
+                Height = 22,
+                Margin = new Thickness(5, 0, 5, 0),
+            };
+            
+            //deleteImage to act as delete column button
+            Image deleteImage = new Image()
+            { 
+                Source = deleteIconSource, 
+                Height = 32, 
+                Width = 32,
+                Margin = new Thickness(5,0,5,0)
+            };
+            //setting tooltip and event for deleteImage
             ToolTipService.SetToolTip(deleteImage, "Click to delete the entire column");
-
-            //tying deleteImage to delete column event
             deleteImage.MouseLeftButtonDown += new MouseButtonEventHandler(DeleteCol_MouseLeftButtonDown);
 
-            //margins
-            TBlock1.Margin = generalMargin;
-            levelTitleTextBox.Margin = generalMargin;
-            deleteImage.Margin = generalMargin;
-
-            //adding children to SP1
-            SP1.Children.Add(TBlock1);
-            SP1.Children.Add(levelTitleTextBox);
-            SP1.Children.Add(deleteImage);
+            //adding children to topStackPanel
+            topStackPanel.Children.Add(levelTitleTextBlock);
+            topStackPanel.Children.Add(levelTitleTextBox);
+            topStackPanel.Children.Add(deleteImage);
 
             //second stackpanel
-            StackPanel SP2 = new StackPanel();
-            SP2.Orientation = Orientation.Horizontal;
-
-            //stuff for SP2 - Textblock for label, Combobox for ranges, Image for help icon, Tooltip for the image for the help icon
-            TextBlock TBlock2 = new TextBlock() { Text = "Level Point Spread", FontSize = GlobalFontSize, FontWeight = FontWeights.Bold, VerticalAlignment = VerticalAlignment.Center };
-
-            ComboBox CB1 = new ComboBox();
-            for (int i = comboBoxMin; i <= comboBoxMax; i++) //populating combobox
+            StackPanel bottomStackPanel = new StackPanel()
             {
-                CB1.Items.Add(i);
+                Orientation = Orientation.Horizontal,
+            };
+            
+            //textblock to act as label for pointSpreadComboBox
+            TextBlock pointSpreadTextBlock = new TextBlock() 
+            { 
+                Text = "Level Point Spread",
+                FontSize = GlobalFontSize, 
+                FontWeight = FontWeights.Bold, 
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(5,0,5,0),
+            };
+
+            //Created a combobox and populating it with a range of values
+            ComboBox pointSpreadComboBox = new ComboBox()
+            {
+                Margin = new Thickness(5, 0, 5, 0)
+            };
+            for (int i = comboBoxMin; i <= comboBoxMax; i++)
+            {
+                pointSpreadComboBox.Items.Add(i);
             }
-            CB1.SelectedItem = CB1.Items[0];
+            //setting initial selected item to first item added 
+            pointSpreadComboBox.SelectedItem = pointSpreadComboBox.Items[0];
 
-            Image Img2 = new Image() { Source = helpIconSource, Height = 16, Width = 16 };
-            TextBlock ToolTipTB = new TextBlock();
-            ToolTipTB.Text = "The point spread determines the minimum and\n maximum point range for a quality level.\n The system starts at 1 in the first column\n and determines the starting point of other\n columns based on your previous input.";
-            ToolTipService.SetToolTip(Img2, ToolTipTB);
+            //creating help icon and setting its tooltip
+            Image helpImage = new Image() 
+            { 
+                Source = helpIconSource, 
+                Height = 16, 
+                Width = 16 
+            };
+            ToolTipService.SetToolTip(helpImage, "The point spread determines the minimum and\n maximum point range for a quality level.\n The system starts at 1 in the first column\n and determines the starting point of other\n columns based on your previous input.");
 
-            //margins
 
-            TBlock2.Margin = generalMargin;
-            CB1.Margin = generalMargin;
-
-            //adding children to SP2
-            SP2.Children.Add(TBlock2);
-            SP2.Children.Add(CB1);
-            SP2.Children.Add(Img2);
+            //adding children to bottomStackPanel
+            bottomStackPanel.Children.Add(pointSpreadTextBlock);
+            bottomStackPanel.Children.Add(pointSpreadComboBox);
+            bottomStackPanel.Children.Add(helpImage);
 
             //setting tabindex for controls
             levelTitleTextBox.TabIndex = 0;
-            CB1.TabIndex = 0;
+            pointSpreadComboBox.TabIndex = 0;
 
-            returnVal.Children.Add(SP1);
-            returnVal.Children.Add(SP2);
+            //adding top and bottom stackpanels to overall stackpanel
+            returnVal.Children.Add(topStackPanel);
+            returnVal.Children.Add(bottomStackPanel);
             return returnVal;
         }
 
-        //returns the row of a MouseEventArgs. If there is no row -1
+        /// <summary>
+        /// returns the row of a MouseEventArgs. If there is no row -1
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
         private int getRow(MouseEventArgs e)
         {
             int returnVal = -1;
@@ -680,7 +940,11 @@ namespace OsbleRubric
             return returnVal;
         }
 
-        //returns the column of a MouseEventArgs. If there is no column -1
+        /// <summary>
+        /// returns the column of a MouseEventArgs. If there is no column -1
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
         private int getColumn(MouseEventArgs e)
         {
             int returnVal = -1;
@@ -697,16 +961,19 @@ namespace OsbleRubric
             return returnVal;
         }
 
-        //This method deletes the TextBlock in the last row and recreates it. This is the only way I could find to keep its position correct. (Adjusting its columnspan property did not update instantly)
+        /// <summary>
+        /// Updates the position and points for the "Points possible" textblock
+        /// </summary>
         private void updateLastRow()
         {
+            //checks for the old textblock for "Possible Points " textblock. If it exists, adjust its text, if it has been deleted during column deletion, recreate with same attributes and place it
             UIElement oldTB;
             oldTB = customDataGrid.GetUIElementAt(customDataGrid.BaseGrid.ColumnDefinitions.Count - 2, customDataGrid.BaseGrid.RowDefinitions.Count - 1);
             if (oldTB is TextBlock)
             {
                 (oldTB as TextBlock).Text = totalPointsToString();
             }
-            else
+            else //recreating textblock
             {
                 TextBlock pointsPossible_TextBlock = new TextBlock()
                 {
@@ -721,7 +988,9 @@ namespace OsbleRubric
             }
         }
 
-        //This method sets the tab indexes for each cell (excluding the first row, which is already set up)
+        /// <summary>
+        /// This method sets the tab indexes for each cell (excluding the first row, which is already set up)
+        /// </summary>
         private void setTabIndex()
         {
             foreach (Border k in customDataGrid.BaseGrid.Children)
@@ -754,7 +1023,10 @@ namespace OsbleRubric
             }
         }
 
-        //this function returns the string to be displayed for the points possible textbox
+        /// <summary>
+        /// this method returns the string to be displayed for the points possible textbox
+        /// </summary>
+        /// <returns></returns>
         private string totalPointsToString()
         {
             string returnVal;
@@ -762,8 +1034,10 @@ namespace OsbleRubric
             return returnVal;
         }
 
-        /*This function calculates the total points by summing all the values from the point boxes (in the second column) 
-         *If the value is "" or contains non-number value, then it will not be included*/
+        /// <summary>
+        /// This method calculates the total points by summing all the values from the point boxes (in the second column). If the value is "" or contains non-number value, then it will not be included
+        /// </summary>
+        /// <returns></returns>
         private double calcTotalPoints()
         {
             double returnVal = 0;
@@ -790,7 +1064,9 @@ namespace OsbleRubric
             return returnVal;
         }
 
-        //This method adjusts the imagesource for various arrows to keep the top rows up arrow gray, the bottom rows down arrow gray, and the remaining normal
+        /// <summary>
+        /// This method adjusts the imagesource for various arrows to keep the top rows up arrow gray, the bottom rows down arrow gray, and the remaining normal
+        /// </summary>
         private void adjustArrowIcons()
         {
             int firstrow = 1;
@@ -804,7 +1080,11 @@ namespace OsbleRubric
             
         }
 
-        //this method changes the imagesource of the downarrow of rowToChange to imgSource
+        /// <summary>
+        /// this method changes the imagesource of the downarrow of rowToChange to imgSource
+        /// </summary>
+        /// <param name="rowToChange"></param>
+        /// <param name="imgSource"></param>
         private void changeDownArrow(int rowToChange, ImageSource imgSource)
         {
             UIElement firstSP = customDataGrid.GetUIElementAt(0, rowToChange);
@@ -819,7 +1099,11 @@ namespace OsbleRubric
             }
         }
 
-        //this method changes the imagesource of the uparrow of rowToChange to imgSource
+        /// <summary>
+        /// this method changes the imagesource of the uparrow of rowToChange to imgSource
+        /// </summary>
+        /// <param name="rowToChange"></param>
+        /// <param name="imgSource"></param>
         private void changeUpArrow(int rowToChange, ImageSource imgSource)
         {
             UIElement firstSP = customDataGrid.GetUIElementAt(0, rowToChange);
@@ -843,7 +1127,12 @@ namespace OsbleRubric
         }
 
         #region Events
-        //event for the delete button(s) in the first column (deletes a row)
+
+        /// <summary>
+        /// event for the delete button(s) in the first column (deletes a row)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DeleteRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (customDataGrid.BaseGrid.RowDefinitions.Count != 3) //won't remove if its the only row
@@ -856,7 +1145,11 @@ namespace OsbleRubric
             }   
         }
 
-        //event for the delete button(s) in the first row (deletes a column)
+        /// <summary>
+        /// event for the delete button(s) in the first row (deletes a column)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DeleteCol_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (customDataGrid.BaseGrid.ColumnDefinitions.Count != 5) //won't remove if its the only column
@@ -865,7 +1158,11 @@ namespace OsbleRubric
             }
         }
 
-        //event for button in first row (adds a column)
+        /// <summary>
+        /// event for button in first row (adds a column)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void addCol_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             //getting the value of the checkbox(from the final column) before deleting it
@@ -900,7 +1197,11 @@ namespace OsbleRubric
             }
         }
 
-        //event for button in first column (adds a row)
+        /// <summary>
+        /// event for button in first column (adds a row)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void addRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             //getting the value of the checkbox(from the final row) before deleting it
@@ -934,19 +1235,31 @@ namespace OsbleRubric
             adjustArrowIcons();
         }
 
-        //this event updates the points by updating the last row each time the textbox loses focus
+        /// <summary>
+        /// this event updates the points by updating the last row each time the textbox loses focus
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void textbox_LostFocus(object sender, RoutedEventArgs e)
         {
             updateLastRow();
         }
 
-        //this event updates the points by updating the last row each time the textbox value is changed
+        /// <summary>
+        /// this event updates the points by updating the last row each time the textbox value is changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void textbox_SelectionChanged(object sender, RoutedEventArgs e)
         {
             updateLastRow();
         }
 
-        //This event is fired when a user clicks on the down arrow. The event attempts to perform a swap between the row below it and itself
+        /// <summary>
+        /// This event is fired when a user clicks on the down arrow. The event attempts to perform a swap between the row below it and itself
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void downArrow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             int initRow = getRow(e);
@@ -961,7 +1274,11 @@ namespace OsbleRubric
             adjustArrowIcons();
         }
 
-        //This event is fired when a user clicks on the up arrow. The event attempts to perform a swap between the row above it and itself
+        /// <summary>
+        /// This event is fired when a user clicks on the up arrow. The event attempts to perform a swap between the row above it and itself
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void upArrow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             int initRow = getRow(e);

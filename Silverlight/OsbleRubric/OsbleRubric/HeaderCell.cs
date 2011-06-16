@@ -8,17 +8,24 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using System.Collections.Generic;
 
 namespace OsbleRubric
 {
-    public class RubricCell : ICell
-    { 
-        public RubricCell(int row, int column, string description)
+    public class HeaderCell : ICell
+    {
+        int comboBoxValue;
+
+        public HeaderCell(int row, int column)
         {
             Row = row;
             Column = column;
-            Information = description;
         }
+
+        public int ComboBoxValue
+        {
+            get { return comboBoxValue; }
+            set { comboBoxValue = value; }
+        }
+
     }
 }

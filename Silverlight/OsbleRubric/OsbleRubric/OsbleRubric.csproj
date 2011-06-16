@@ -82,6 +82,8 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CheckBoxCell.cs" />
+    <Compile Include="HeaderCell.cs" />
     <Compile Include="RubricCell.cs" />
     <Compile Include="ICell.cs" />
     <Compile Include="MainPage.xaml.cs">
