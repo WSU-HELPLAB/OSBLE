@@ -17,6 +17,8 @@ namespace OsbleRubric
 
         public CheckBoxCell(int row, int column, bool checkBoxValue)
         {
+            Row = row;
+            Column = column;
             CheckBoxValue = checkBoxValue;
         }
 

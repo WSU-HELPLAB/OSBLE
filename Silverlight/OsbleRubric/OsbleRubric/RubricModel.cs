@@ -117,8 +117,8 @@ namespace OsbleRubric
 
         void Img1_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            announceData();
-            //buildGridFromData();
+            //announceData();
+            buildGridFromData();
         }
 
         //temp method to do what i want 
@@ -211,7 +211,7 @@ namespace OsbleRubric
             {
                 if (ic.Row > returnVal) returnVal = ic.Row;
             }
-            return returnVal;
+            return (returnVal+1); //+1 to account for the 0 offset
         }
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace OsbleRubric
             {
                 if (ic.Column > returnVal) returnVal = ic.Column;
             }
-            return returnVal;
+            return (returnVal + 1); //+1 to account for the 0 offset
         }
 
         /// <summary>
@@ -278,11 +278,6 @@ namespace OsbleRubric
         private void getData()
         {
             dataFromCells.Clear(); //clear the list before appending to it
-
-            //check which row its in, if first row, cut that off and have it handle all the headercells and then also the topright checkbox cell
-            //if its last, look only for checkbox for a checkboxcell
-            //if its not first or last, look through it and try to only get the info, save it into a rubric cell
-
 
             foreach (Border br in customDataGrid.BaseGrid.Children)
             {
