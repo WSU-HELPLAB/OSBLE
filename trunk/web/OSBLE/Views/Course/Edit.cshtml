@@ -25,7 +25,9 @@
         <td>
         <div class="editor-label">
             @Html.LabelFor(model => model.Prefix)
+            <!--
             @Html.Raw(ViewBag.tt.GetTip("qaz"))
+            -->
         </div>
         <div class="editor-field">
             @Html.TextBoxFor(model => model.Prefix, new { size = 6 })
@@ -35,7 +37,9 @@
         <td>
         <div class="editor-label">
             @Html.LabelFor(model => model.Number)
+            <!--
             @Html.Raw(ViewBag.tt.GetTip("qwerty"))
+            -->
         </div>
         <div class="editor-field">
             @Html.TextBoxFor(model => model.Number, new { size = 4 })
