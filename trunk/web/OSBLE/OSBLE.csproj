@@ -614,6 +614,7 @@
     <Content Include="Views\Rubric\Details.cshtml" />
     <Content Include="Views\Rubric\Edit.cshtml" />
     <Content Include="Views\Rubric\Index.cshtml" />
+    <Content Include="Views\Shared\_AddToGradebook.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

@@ -28,13 +28,13 @@
             }
         });
 
-        $('#add_to_gradebook').change(function () {
-            if ($('#add_to_gradebook').attr('checked')) {
-                $('#grade_options').show('blind');
-            } else {
-                $('#grade_options').hide('blind');
-            }
-        });
+//        $('#add_to_gradebook').change(function () {
+//            if ($('#add_to_gradebook').attr('checked')) {
+//                $('#grade_options').show('blind');
+//            } else {
+//                $('#grade_options').hide('blind');
+//            }
+//        });
     });
 
 </script>
@@ -102,7 +102,11 @@
                 <br />
             </div>
 
-            <div class="editor-label">
+            <div>
+                @Html.Partial("_AddToGradebook")
+            </div>
+
+            @*<div class="editor-label">
                 Add to Gradebook
             </div>
             <div class="editor-field">
@@ -138,7 +142,7 @@
                     @Html.ValidationMessageFor(model => model.HoursLateUntilZero)
                 </p>
 
-            </div>
+            </div>*@
         <p>
             <input type="submit" value="Create" />
         </p>
