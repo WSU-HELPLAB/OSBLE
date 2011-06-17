@@ -404,6 +404,9 @@
         @{
             List<Category> cats = (from cat in ViewBag.Categories as IEnumerable<Category>
                                    select cat).ToList();
+
+            List<LetterGrade> letterList = (from lg in ViewBag.LetterGrades as IEnumerable<LetterGrade>
+                                            select lg).ToList();
             
         }
         <!--loop through all users -->
@@ -456,8 +459,7 @@
                         }
                     }
                     
-                    List<LetterGrade> letterList = (from lg in ViewBag.LetterGrades as IEnumerable<LetterGrade>
-                                                     select lg).ToList();
+                    
                     
                     var totalPercent = (totalGrade / totalPossible)*100;
                     var letter = "";

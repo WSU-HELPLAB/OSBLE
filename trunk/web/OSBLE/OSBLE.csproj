@@ -439,9 +439,14 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="FileSystem\Courses\1\CourseDocs\" />
+    <Folder Include="FileSystem\Courses\4\CourseDocs\" />
     <Folder Include="Models\Gradables\StudioAssignment\Activities\" />
+    <Folder Include="Models\RubricModel\" />
     <Folder Include="Validations\" />
     <Folder Include="Views\NewFolder1\" />
+    <Folder Include="Views\SubbmissionAssignmentActivity\" />
+    <Folder Include="Views\SubmissionAssignmentActivity\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
@@ -615,6 +620,7 @@
     <Content Include="Views\Rubric\Edit.cshtml" />
     <Content Include="Views\Rubric\Index.cshtml" />
     <Content Include="Views\Shared\_AddToGradebook.cshtml" />
+    <Content Include="Views\IssueVoting\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

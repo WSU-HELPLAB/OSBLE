@@ -206,6 +206,7 @@
 
     </div>
 
+    <input type="hidden" id="isDropLowest" value="0" />
 
         <script type="text/javascript">
             function setGradableAction(actionName) {
@@ -483,7 +484,11 @@
                     type: "POST",
                     url: "/Gradebook/ModifyCell",
                     data: { value: cellValue, userId: ajaxIDs[0], assignmentId: ajaxIDs[1] },
-                    success: clearDropLowest(ajaxIDs[0])
+                    success: function (){
+                                if ($("#isDropLowest") == 1) {
+                                    clearDropLowest(ajaxIDs[0])
+                                }
+                            }
                 });
             }
             calculateCols();
@@ -810,6 +815,9 @@
     }
 
     function dropAllLowest() {
+        
+        //set isDropLowest to 1 meaning true.
+        $("#isDropLowest").val(1);
 
         //get the pathname so we can use the categoryId
         var pathname = window.location.toString();
@@ -819,7 +827,7 @@
         var catId = pathname.split("=");
         var num = $("#XtoDrop").val();
         
-        $("#XtoDrop").data("num", num);
+        $("#isDropLowest").val(num);
 
         if (catId[1] != null) {
             var i = 0;
@@ -834,7 +842,7 @@
             }
             });
 
-            for (i = 0; i < $("#XtoDrop").data("num"); i++) {
+            for (i = 0; i < $("#isDropLowest").val(); i++) {
                 //ajax call to drop the lowest score
                 $.ajax({
                     async: false,

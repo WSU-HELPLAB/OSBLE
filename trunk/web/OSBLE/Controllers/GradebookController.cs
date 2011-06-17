@@ -51,15 +51,6 @@ namespace OSBLE.Controllers
             };
             db.GradeAssignments.Add(newAssignment);
             db.SaveChanges();
-
-            AssignmentActivity newActivity = new GradeActivity()
-            {
-                AbstractAssignmentID = newAssignment.ID,
-                AbstractAssignment = newAssignment
-
-            };
-            db.AssignmentActivities.Add(newActivity);
-            db.SaveChanges();
         }
 
         /************
@@ -409,88 +400,15 @@ namespace OSBLE.Controllers
         
 
         [HttpPost]
-        public ActionResult AddCategory()
+        public ActionResult ModifyCell(int value, int userId, int gradableId)
         {
-            var currentCourseId = ActiveCourse.CourseID;
-            Category newCategory = new Category()
-            {
-                Name = "Untitled",
-                CourseID = currentCourseId,
-                Course = ViewBag.ActiveCourse.Course,
-                Points = 0,
-                ColumnOrder = 0,
-                Assignments = new List<AbstractAssignment>(),
-                TabColor = "Silver"
-            };
-            db.Categories.Add(newCategory);
-            db.SaveChanges();
-            Tab(newCategory.ID);
-
-            Tab((int)Session["categoryId"]);
-            return View("_Tabs");
-        }
-
-        [HttpPost]
-        public ActionResult ChangeTabColor(int categoryId, string value)
-        {
-            if (ModelState.IsValid)
-            {
-                if (categoryId > 0)
-                {
-                    var categoryTab = from tab in db.Categories
-                                      where tab.ID == categoryId
-                                      select tab;
-
-                    foreach (Category item in categoryTab)
-                    {
-                        item.TabColor = value;
-                    }
-                    db.SaveChanges();
-                }
-            }
-            Tab((int)Session["categoryId"]);
-            return View("Index");
-        }
-
-
-        [HttpPost]
-        public ActionResult AddPoints(int assignmentId, double number)
-        {
-            if (ModelState.IsValid)
-            {
-                if (assignmentId > 0)
-                {
-                    List<Score> grades = (from grade in db.Scores
-                                          where grade.AssignmentActivity.AbstractAssignmentID == assignmentId
-                                          select grade).ToList();
-
-                    if (grades.Count() > 0)
-                    {
-                        foreach (Score item in grades)
-                        {
-                            item.Points += number;
-                        }
-                        db.SaveChanges();
-                    }
-                }
-            }
-            BuildGradebook((int)Session["categoryId"]);
-            return View("_Gradebook");
-        }
-        
-
-        [HttpPost]
-        public void ModifyCell(double value, int userId, int assignmentId)
-        {
-
             //Continue if we have a valid gradable ID
             if (assignmentId != 0)
             {
-                var gradableQuery = from g in db.Scores
-                                    where g.UserProfileID == userId &&
-                                    g.AssignmentActivityID == assignmentId
+                var gradableQuery = from g in db.GradableScores
+                                    where g.UserProfileID == userId
+                                    && g.GradableID == gradableId
                                     select g;
-                
                 if (gradableQuery.Count() > 0)
                 {
                     foreach (Score item in gradableQuery)
@@ -504,10 +422,7 @@ namespace OSBLE.Controllers
                     Score newScore = new Score()
                     {
                         UserProfileID = userId,
-                        Points = value,
-                        AssignmentActivityID = assignmentId,
-                        PublishedDate = DateTime.Now,
-                        isDropped = false
+                        Score = value
                     };
 
                     db.Scores.Add(newScore);
@@ -582,107 +497,7 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="weightId">The weight to load</param>
         /// <returns></returns>
-        public ActionResult Index()
-        {
-            //LINQ complains when we use this directly in our queries, so pull it beforehand
-            int currentCourseId = ActiveCourse.CourseID;
-            List<Score> percentList = new List<Score>();
-
-            var letterGrades = from letters in db.Courses
-                               where letters.ID == currentCourseId
-                               select letters.LetterGrades;
-
-            if (letterGrades.Count() == 0)
-            {
-                SetUpDefaultLetterGrades();
-            }
-
-            //pull the students in the course.  Each student is a row.
-            List<UserProfile> studentList = (from up in db.UserProfiles
-                                             join cu in db.CoursesUsers on up.ID equals cu.UserProfileID
-                                             where cu.CourseID == currentCourseId && cu.CourseRoleID == (int)CourseRole.OSBLERoles.Student
-                                             orderby up.LastName, up.FirstName
-                                             select up).ToList();
-
-            var mainScores =    from score in db.Scores
-                                join category in db.Categories on score.AssignmentActivity.AbstractAssignment.CategoryID equals category.ID
-                                where score.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId &&
-                                score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID &&
-                                score.isDropped == false
-                                group score by score.AssignmentActivity.AbstractAssignment.CategoryID into assignmentScores
-                                select new
-                                {
-                                    AssignmentId = assignmentScores.Key,
-                                    StudentScores =
-                                                    from stu in assignmentScores
-                                                    group stu by stu.UserProfileID into students
-                                                    select new
-                                                    {
-                                                        StudentId = students.Key,
-                                                        Score = students.Sum(stu => stu.Points),
-                                                        perfectScore = students.Sum(stu => stu.AssignmentActivity.AbstractAssignment.PointsPossible),
-                                                        category = students.Select(stu => stu.AssignmentActivity.AbstractAssignment.Category).FirstOrDefault(),
-                                                        activity = students.Select(stu => stu.AssignmentActivity).FirstOrDefault()
-                                                    }
-                                };
-
-            foreach (var item in mainScores)
-            {
-                for (int i = 0; i < item.StudentScores.Count(); i++ )
-                {
-                    var scores = item.StudentScores.ElementAt(i);
-                
-                    Score studentScore = new Score()
-                    {
-                        AssignmentActivity = scores.activity,
-                        UserProfileID = scores.StudentId,
-                        Points = ((scores.Score / scores.perfectScore)*100),
-                        isDropped = false
-                    };
-
-
-                    GradeAssignment newGA = new GradeAssignment()
-                    {
-                        ID = item.AssignmentId,
-                        Category = scores.category,
-                        CategoryID = scores.category.ID,
-                        PointsPossible = scores.perfectScore
-                    };
-                    studentScore.AssignmentActivity.AbstractAssignment = newGA;
-                    percentList.Add(studentScore);
-                }
-            }
-
-            List<CoursesUsers> courseUsers = (from users in db.CoursesUsers
-                                              where users.CourseID == currentCourseId
-                                              select users).ToList();
-                      
-            List<Category> categories = (from category in db.Categories
-                                         where category.CourseID == currentCourseId
-                                         select category).ToList();
-
-            List<GradeAssignment> gradeAssignments = (from ga in db.GradeAssignments
-                                                      where ga.Category.CourseID == currentCourseId
-                                                      select ga).ToList();
-
-            List<LetterGrade> letterGradeList = ((activeCourse.Course as Course).LetterGrades).ToList();
-
-            ViewBag.Students = studentList;
-            ViewBag.Scores = percentList;
-            ViewBag.Categories = categories;
-            ViewBag.CoursesUser = courseUsers;
-            ViewBag.GradeAssignments = gradeAssignments;
-            ViewBag.LetterGrades = letterGradeList;
-
-            return View();
-        }
-
-        /// <summary>
-        /// Switches to one of the tabs (Categories) to display the assignments
-        /// </summary>
-        /// <param name="categoryId">We need to know which tab we are going too</param>
-        /// <returns></returns>
-        public ActionResult Tab(int? categoryId)
+        public ActionResult Index(int? weightId)
         {
             if (categoryId == null)
             {
@@ -692,28 +507,6 @@ namespace OSBLE.Controllers
             BuildGradebook((int)categoryId);
             return View();
         }
-
-
-        public void SetUpDefaultLetterGrades()
-        {
-            AddLetterGrade("A", 93);
-            AddLetterGrade("A-", 90);
-        }
-
-        public void AddLetterGrade(string grade, int minReq)
-        {
-            int currentCourseId = ActiveCourse.CourseID;            
-
-            LetterGrade newLetterGrade = new LetterGrade()
-            {
-                Grade = grade,
-                MinimumRequired = minReq
-            };
-            
-        }
-
-
-
 
         /// <summary>
         /// This function is responsible for making the various calls needed to build the gradebook.
@@ -737,9 +530,11 @@ namespace OSBLE.Controllers
             List<Score> studentScores = new List<Score>();
 
             //pull all weights (tabs) for the current course
-            var cats = from category in db.Categories
-                             where category.CourseID == currentCourseId
-                             select category;
+            var weights = from weight in db.Weights
+                          where weight.CourseID == currentCourseId
+                          select weight;
+            List<Weight> allWeights = weights.ToList();
+            Weight currentTab = (from w in allWeights where w.ID == weightId select w).First();
 
             List<Category> allCategories = cats.ToList();
 
@@ -749,38 +544,9 @@ namespace OSBLE.Controllers
             Session["CurrentCategoryId"] = currentTab.ID;
 
             //pull the gradables (columns) for the current weight (tab)
-            List<AbstractAssignment> assignments = (from a in db.AbstractAssignments
-                                                    where a.CategoryID == currentTab.ID
-                                                    select a).ToList();
-
-            if (assignments.Count() == 0)
-            {
-                GradeAssignment newAssignment = new GradeAssignment()
-                {
-                    Name = "Untitled",
-                    PointsPossible = 100,
-                    AssignmentActivities = new List<AssignmentActivity>(),
-                    CategoryID = categoryId,
-                    ColumnOrder = 0
-                };
-                db.GradeAssignments.Add(newAssignment);
-                db.SaveChanges();
-
-                AssignmentActivity newActivity = new GradeActivity()
-                {
-                    AbstractAssignmentID = newAssignment.ID,
-                    /*PointsPossible = newAssignment.PointsPossible,
-                    ColumnOrder = 0,
-                    Scores = new List<Score>()*/
-                };
-                db.AssignmentActivities.Add(newActivity);
-                db.SaveChanges();
-            }
-
-            //Pull the gradeAssignments
-            List<GradeAssignment> gradeAssignments = (from ga in db.GradeAssignments
-                                                      where ga.CategoryID == currentTab.ID
-                                                      select ga).ToList();
+            List<Gradable> gradables = (from g in db.Gradables
+                                        where g.WeightID == currentTab.ID
+                                        select g).ToList();
 
             //pull the students in the course.  Each student is a row.
             List<UserProfile> students = (from up in db.UserProfiles
@@ -876,20 +642,10 @@ namespace OSBLE.Controllers
                 GradeAssignment newAssignment = new GradeAssignment()
                 {
                     Name = "Untitled",
-                    PointsPossible = 100,
-                    AssignmentActivities = new List<AssignmentActivity>(),
-                    CategoryID = newCategory.ID,
-                    ColumnOrder = 0
-                };
-                db.GradeAssignments.Add(newAssignment);
-                db.SaveChanges();
-
-                AssignmentActivity newActivity = new GradeActivity()
-                {
-                    AbstractAssignmentID = newAssignment.ID
-                    /*PointsPossible = newAssignment.PointsPossible,
-                    ColumnOrder = 0,
-                    Scores = new List<Score>()*/
+                    PossiblePoints = 100,
+                    GradableScores = new List<GradableScore>(),
+                    WeightID = newWeight.ID,
+                    Position = 0
                 };
                 db.AssignmentActivities.Add(newActivity);
                 db.SaveChanges();
