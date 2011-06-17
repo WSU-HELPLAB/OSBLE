@@ -5,65 +5,42 @@ using System.Web;
 using System.Web.Security;
 
 /*
+ * JQUERY TOOL TIP
+ * 
+ * USAGE:
+ * place 
+ *   @Helpers.CreateToolTip(ToolTips.[variableName])
+ * wherever you want a tooltip icon. You must place
+ *   @using OSBLE.Models
+ * once in the cshtml file you are using to get access
+ * to this class and intellisense. HTML is supported.
+ * 
+ * 
  * jquery-tooltip.css and jquery-tooltip.js are included 
  *   in the /Views/Shared/_Layout.cshtml file
  * 
- * 
- * 
- * USE AS FOLLOWS:
- * @Html.Partial
- * 
- * See /Views/Shared/_Popup.cshtml for code
- * 
+ * See /App_Code/Helpers.cshtml for code
  * 
  * KNOWN BUGS:
- *   doesn't work in IE
- *   doesn't show sides when width is wider than declared
- *     (if width isn't declared, it is as close together as possible, even one word per line)
- *   location of the popup (last to change for debugging)
+ *   in IE, if an individual item is wider than 312 px (such as a string with no spaces), the sides are not visible 
  * 
  */
 
 namespace OSBLE.Models
 {
-    public class ToolTips
+    public static class ToolTips
     {
+
         #region CourseToolTips
 
-        private IDictionary<String,String> tips = new Dictionary<String,String>();
+        public static string abc = "<p>this is the first thing</p><p>this <a href='http://xkcd.com/627/'>is the</a> second thing</p> " +
+            "<p>kahdsfjjdaadsfdshskfjhksajhflkjsahlfdkjsahkjhdflfkjfads</p> abcdef ghijkl <em>m no p asdf</em> asdf asdf <strong>asdf " +
+            "</strong>asdf asdf asdf  asdf sadf <u>sadf <i>asdf <b>asdf</b> sadf</i> asd</u> fasdf <br />asdf asdf asdf asd fasdf asdf";
         
+        public static string asdf = " This is just a little bit of text, as a tool tip should be. ";
 
-        public static string abc = "qwertyuiop";
-        
         #endregion
 
-        public ToolTips(){
-            tips.Add("qaz", "<p>this is the first thing</p><p>this is the second thing</p><p>kahdsfjhdsakjfhlsakjdhfkljsahdflkjhadslkjfhlakjsdhflkjsahdflkjhsaldkjfhlsakjdhflkjashdflkjdsahlfkjfads</p>");
-            tips.Add("qwerty", "abcdef");
-        }
-
-
-        
-        public string GetTip(string id)
-        {
-            return "<div class='popup-bubbleInfo'>" +
-                "<img class='popup-trigger' src='../../Content/images/tooltip/109_AllAnnotations_Help_16x16_72.png' alt='(?)' height='16px' width='16px' />" +
-                "" +
-                    "<table class='popup'> <tbody> <tr>" +
-                    "<td class='topleft'> </td> <td class='top'> </td> <td class='topright'> </td>" +
-                    "</tr> <tr>" +
-                    "<td class='left'> </td> <td class='popup-contents'>" +
-                tips[id] +
-                    "</td> <td class='right'> </td> </tr> <tr>" +
-                    "<td class='bottomleft'> </td> <td class='bottom'>" +
-                    "<img src='../../Content/images/tooltip/bubble-tail2.png' width='30' height='29' alt='popup tail' /> </td>" +
-                    "<td class='bottomright' > </td> </tr> </tbody> </table>" + 
-                "" +
-                "</div>";
-
-
-
-        }
         
 
     }

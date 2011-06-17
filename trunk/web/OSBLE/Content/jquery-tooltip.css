@@ -31,10 +31,11 @@
     border-collapse: collapse;
     margin: 0px;
     padding: 0px;
-    overflow: visible;
+    width: 350px;
+    overflow: hidden;
 }
 
-.popup table {
+.popup table, .popup tbody, .popup tr, .popup td, .popup table.*, .popup tbody.*, .popup tr.*, .popup * {
     margin: 0px;
     padding: 0px;
 }
@@ -45,15 +46,21 @@
     margin: 0px;
     padding: 0px;
     background-repeat: no-repeat;
+    overflow: visible;
 }
 
 .popup td.top, .popup td.bottom {
     height: 15px;
-    margin: 0px -19px 0px -19px;
+    margin: 0px;
+    padding: 0px;
+    overflow: visible;
 }
 
 .popup td.right, .popup td.left {
     width: 19px;
+    margin: 0px;
+    padding: 0px;
+    overflow: visible;
 }
 
 .popup td.topleft { background-image: url("images/tooltip/bubble-1.png"); }
@@ -63,15 +70,19 @@
 .popup td.right { background-image: url("images/tooltip/bubble-5.png"); }
 .popup td.bottomleft { background-image: url("images/tooltip/bubble-6.png"); }
 .popup td.bottom { background-image: url("images/tooltip/bubble-7.png"); text-align: center;}
-.popup td.bottom img { display: block; margin: -1px auto 0 auto; }
+.popup td.bottom img { display: block; margin: 0px auto 0 auto; }
 .popup td.bottomright { background-image: url("images/tooltip/bubble-8.png"); }
 
-.popup table.popup-contents {
+.popup td.popup-contents {
     font-size: 12px;
     line-height: 1.2em;
     background-color: #fff;
     color: #666;
-    font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", sans-serif;
+    max-width: 312px; 
+    overflow: hidden;
+    word-wrap: break-word; /* CSS3 */
+    /* ie fix */
+    width: expression( 312px );
 }
 
         

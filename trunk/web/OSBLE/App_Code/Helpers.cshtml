@@ -1,6 +1,7 @@
 ﻿@using OSBLE.Models.HomePage
 @using OSBLE.Models.Courses
 @using OSBLE.Models.Users
+@using OSBLE.Models
 @using System.Text.RegularExpressions
 @using System.Collections
 @using System.Web.Mvc
@@ -35,10 +36,10 @@
 @helper DisplayNameForDashboard(AbstractDashboard d)
     {
     <text>@d.DisplayName</text>
-            if (d.DisplayTitle != "")
-            {
+        if (d.DisplayTitle != "")
+        {
     <text> <small><em>(@d.DisplayTitle)</em></small></text>
-            }
+        }
 }
 
 @* Formats date consistently for display *@
@@ -136,16 +137,47 @@ Also runs content through nl2br to convert newlines to <br /> tags. *@
 @* Displays the tag for the course/community (e.g. CptS 121 or Comm) *@
 @helper CourseTag(AbstractCourse ac)
     {
-    if (ac is Community)
-    {
-        Community c = (Community)ac;
+        if (ac is Community)
+        {
+            Community c = (Community)ac;
         @c.Nickname
-    }
-    else if (ac is Course)
-    {
-        Course c = (Course)ac;
+        }
+        else if (ac is Course)
+        {
+            Course c = (Course)ac;
         @c.Prefix<text> </text>@c.Number
-    }
+        }
+}
+
+@helper CreateToolTip(string tooltip)
+{
+    HtmlString output = new HtmlString(tooltip);
+    
+<div class='popup-bubbleInfo'>
+    <img class='popup-trigger' src='../../Content/images/tooltip/109_AllAnnotations_Help_16x16_72.png' alt='(?)' height='16px' width='16px' />
+    <div class='popup'>
+        <table cellpadding='0px' cellspacing='0px'> 
+            <tbody> 
+                <tr>
+                    <td class='topleft'> </td> 
+                    <td class='top'> </td> 
+                    <td class='topright'> </td>
+                </tr> 
+                <tr>
+                    <td class='left'> </td> 
+                    <td class='popup-contents'> @output </td>
+                    <td class='right'> </td> 
+                </tr>
+                <tr>
+                    <td class='bottomleft'> </td> 
+                    <td class='bottom'> </td>
+                    <td class='bottomright' > </td> 
+                </tr> 
+            </tbody> 
+        </table>
+    </div>
+</div>
+    
 }
 
 @functions{

@@ -211,7 +211,6 @@
     <Compile Include="Attributes\RequireActiveCourse.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
-    <Compile Include="Controllers\GradebookController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MailController.cs" />
     <Compile Include="Controllers\OSBLEController.cs" />
