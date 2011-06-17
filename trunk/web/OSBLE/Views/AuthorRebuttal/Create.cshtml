@@ -29,53 +29,25 @@
             }
         });
 
-        $('#PresentAllIssuesLogged').change(function () {
-            if ($(this).attr('checked')) {
-                UncheckPresentIssuesXLogged();
-                HidePresentIssuesXLoggedOptions();
-                UncheckPresentIssuesXPercentLogged();
-                UncheckPresentOnlyIssuesModeratorVoted();
-            }
-            else { }
-        });
-
-        $('#PresentIssuesXLogged').change(function () {
-            if ($(this).attr('checked')) {
+        $("input[name='Presentation']").change(function () {
+            if ($("input[name='Presentation']:checked").val() == 'PresentIssuesXLogged') {
                 DisplayPresentIssuesXLoggedOptions();
-                UncheckPresentAllIssuesLogged();
-                UncheckPresentOnlyIssuesModeratorVoted();
+            }
+            else if ($("input[name='Presentation']:checked").val() == 'PresentAllIssuesLogged') {
+                HidePresentIssuesXLoggedOptions();
+            }
+            else if ($("input[name='Presentation']:checked").val() == 'PresentOnlyIssuesModeratorVoted') {
+                HidePresentIssuesXLoggedOptions();
+            }
+            else if ($("input[name='Presentation']:checked").val() == 'PresentIssuesXPercentLogged') {
+                $('#x_logged').val(0);
+                $('#x_percent').val(null);
             }
             else {
-                HidePresentIssuesXLoggedOptions();
-                UncheckPresentIssuesXPercentLogged();
+                throw "Unknown Radio Button Checked: Presentation"
             }
         });
 
-        $('#present_issues_x_percent_logged').change(function () {
-            if ($(this).attr('checked')) {
-                UncheckPresentAllIssuesLogged();
-                UncheckPresentOnlyIssuesModeratorVoted();
-            }
-            else { }
-        });
-
-        $('#PresentOnlyIssuesModeratorVoted').change(function () {
-            if ($(this).attr('checked')) {
-                UncheckPresentAllIssuesLogged();
-                UncheckPresentIssuesXLogged();
-                HidePresentIssuesXLoggedOptions();
-                UncheckPresentIssuesXPercentLogged();
-            }
-            else { }
-        });
-
-        $('#add_to_gradebook').change(function () {
-            if ($('#add_to_gradebook').attr('checked')) {
-                $('#grade_options').show('blind');
-            } else {
-                $('#grade_options').hide('blind');
-            }
-        });
     });
 
     function DisplayAuthorMustAcceptorRefuteEachIssueOptions() {
@@ -93,32 +65,18 @@
 
     function HideAuthorMustProvideRationaleOptions() {
         $('#author_must_provide_rationale_options').hide('highlight');
-        $('#author_must_say_if_issue_was_addressed').removeAttr('checked');
     }
     function DisplayPresentIssuesXLoggedOptions(){
         $('#PresentIssuesXLogged_options').show('hightlight');
+        $('#x_logged').val(null);
+        $('#x_percent').val(0);
     }
     
     function HidePresentIssuesXLoggedOptions(){
         $('#PresentIssuesXLogged_options').hide('hightlight');
+        $('#x_logged').val(0);
+        $('#x_percent').val(0);
     }
-
-    function UncheckPresentAllIssuesLogged(){
-        $('#PresentAllIssuesLogged').removeAttr('checked');
-    }
-
-    function UncheckPresentIssuesXLogged(){
-        $('#PresentIssuesXLogged').removeAttr('checked');
-    }
-
-    function UncheckPresentIssuesXPercentLogged(){
-        $('#present_issues_x_percent_logged').removeAttr('checked');
-    }
-
-    function UncheckPresentOnlyIssuesModeratorVoted(){
-        $('#PresentOnlyIssuesModeratorVoted').removeAttr('checked');
-    }
-
 </script>
 
 @using (Html.BeginForm()) {
@@ -146,37 +104,32 @@
 
         <h4>Issue Presentation</h4>
 
-        <div class="editor-field">
-            @Html.RadioButtonFor(model => model.PresentAllIssuesLogged, new { name = "presentation" })
-            @Html.LabelFor(model => model.PresentAllIssuesLogged)
-            @Html.ValidationMessageFor(model => model.PresentAllIssuesLogged)
+       <div>
+            <input type="radio" name="Presentation" value="PresentAllIssuesLogged" />
+            Present all issues logged by team, members, irrespective of voting results
+            <br />
         </div>
 
-        <div class="editor-field">
-            <p>
-                @Html.RadioButtonFor(model => model.PresentIssuesXLogged, new { name = "presentation" })
-                Present only issues that recieved @Html.TextBoxFor(model => model.xlogged, new { size = 3 }) number of votes
-            </p>
-            @Html.ValidationMessageFor(model => model.PresentIssuesXLogged)
+        <div>
+            <input type="radio" name="Presentation" value="PresentIssuesXLogged" />
+            Present only issues that received at least @Html.TextBoxFor(model => model.xlogged, new { size = 3, id = "x_logged" }) number of votes
+            <br />
         </div>
         <div id="PresentIssuesXLogged_options" class="indented_options" style="display: none">
-            <div class="editor-field">
-                <p>
-                    @Html.CheckBoxFor(model => model.PresentIssuesXPercentLogged, new { id = "present_issues_x_percent_logged" })
-                    Present only issues for which @Html.TextBoxFor(model => model.xpercent, new { size = 3 }) percent of team members voted.
-                </p>
-                @Html.ValidationMessageFor(model => model.PresentIssuesXPercentLogged)
+            <div>
+                <input type="radio" name="Presentation" value="PresentIssuesXPercentLogged" />
+                Present only issues for which @Html.TextBoxFor(model => model.xpercent, new { size = 3, id = "x_percent" }) percent of team members voted
+                <br />
             </div>
         </div>
 
-       @*Need to check whether team moderators are enabled*@
+        @*Need to check whether team moderators are enabled*@
 
-        <div class="editor-field">
-            @Html.RadioButtonFor(model => model.PresentOnlyIssuesModeratorVoted, new { name = "presentation" })
-            @Html.LabelFor(model => model.PresentOnlyIssuesModeratorVoted)
-            @Html.ValidationMessageFor(model => model.PresentOnlyIssuesModeratorVoted)
+        <div>
+            <input type="radio" name="Presentation" value="PresentOnlyIssuesModeratorVoted" />
+            Present only issues for which team moderator voted
+            <br />
         </div>
-
 
         <h4>Author Response</h4>
 
@@ -208,50 +161,8 @@
 
         <h4>Grades</h4>
 
-        <div class="editor-label">
-            Add to Gradebook
-        </div>
-        <div class="editor-field">
-            <input type="checkbox" id="add_to_gradebook" checked="checked" />
-        </div>
-    
-        <div id="grade_options" class="indented_options" >
-            <div class="editor-field">
-                Worth
-                @Html.TextBoxFor(model => model.PointsPossible, new { id = "points_possible", size = 3 })
-                Points in Category <span id="grade_category_label"></span>
-
-                @Html.ValidationMessageFor(model => model.PointsPossible)
-            </div>
-        
-
-            <h4>Late Policy</h4>
-    
-            <p>
-                Students may submit assignments up to @Html.TextBoxFor(model => model.MinutesLateWithNoPenalty, new { size = 3 })
-                minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.PercentPenalty, new { size = 3 })
-                percent per @Html.TextBoxFor(model => model.HoursLatePerPercentPenalty, new { size = 3 })
-                hours late will be applied.<br />
-                @Html.ValidationMessageFor(model => model.MinutesLateWithNoPenalty)
-                @Html.ValidationMessageFor(model => model.PercentPenalty)
-                @Html.ValidationMessageFor(model => model.HoursLatePerPercentPenalty)
-            </p>
-    
-    
-            <p>
-                Assignments that are submitted more than @Html.TextBoxFor(model => model.HoursLateUntilZero, new { size = 3 })
-                hours after the due date and time will receive an automatic 0.<br />
-                @Html.ValidationMessageFor(model => model.HoursLateUntilZero)
-            </p>
-
-        </div>
-
-         <div class="editor-label">
-            @Html.LabelFor(model => model.ColumnOrder)
-        </div>
-        <div class="editor-field">
-            @Html.EditorFor(model => model.ColumnOrder)
-            @Html.ValidationMessageFor(model => model.ColumnOrder)
+        <div>
+            @Html.Partial("_AddToGradebook")
         </div>
 
         <p>

@@ -11,22 +11,21 @@ namespace OSBLE.Models.Assignments.Activities
         //Need Link to Previous activity
         // Requires a PeerReview
         public virtual AssignmentActivity PreviousActivity { get; set; }
+        public virtual PeerReviewActivity PeerReview { get; set; }
 
-        [Display(Name = "Present all issues logged by team, members, irrespective of voting results")]
-        public bool PresentAllIssuesLogged { get; set; }
+        public enum PresentationOptions
+        {
+            PresentAllIssuesLogged,
+            PresentIssuesXLogged,
+            PresentIssuesXPercentLogged,
+            PresentOnlyModeratorVoted
+        };
 
-        [Display(Name = "Present only issues that received at least X number of votes")]
-        public bool PresentIssuesXLogged { get; set; }
+        public PresentationOptions Presentation { get; set; }
+
         public int xlogged { get; set; }
 
-            [Display(Name = "Present only issues for which X percent of team members voted")]
-            public bool PresentIssuesXPercentLogged { get; set; }
-            public int xpercent { get; set; }
-
-        [Display(Name = "Present only issues for which team moderator voted")]
-        public bool PresentOnlyIssuesModeratorVoted { get; set; }
-
-
+        public int xpercent { get; set; }
 
         [Display(Name = "Author must accept or refute each issue")]
         public bool AuthorMustAcceptorRefuteEachIssue { get; set; }

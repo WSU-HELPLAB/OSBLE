@@ -26,7 +26,7 @@ namespace OSBLE.Controllers
 
         public ViewResult Details(int id)
         {
-            IssueVotingActivity syncissuevotingactivity = db.AssignmentActivities.Find(id) as IssueVotingActivity;
+            SyncIssueVotingActivity syncissuevotingactivity = db.AssignmentActivities.Find(id) as SyncIssueVotingActivity;
             return View(syncissuevotingactivity);
         }
 
@@ -43,7 +43,7 @@ namespace OSBLE.Controllers
         // POST: /IssueVoting/Create
 
         [HttpPost]
-        public ActionResult Create(IssueVotingActivity syncissuevotingactivity)
+        public ActionResult Create(SyncIssueVotingActivity syncissuevotingactivity)
         {
             string setgrade = Request.Params["SetGrade"];
 
@@ -51,15 +51,28 @@ namespace OSBLE.Controllers
             switch (setgrade)
             {
                 case "PercentOfIssues":
-                    syncissuevotingactivity.setgrade = IssueVotingActivity.SetGrade.PercentOfIssues;
+                    syncissuevotingactivity.Setgrade = SyncIssueVotingActivity.SetGrade.PercentOfIssues;
                     break;
                 case "PercentAgreementWModerator":
-                    syncissuevotingactivity.setgrade = IssueVotingActivity.SetGrade.PercentAgreementWModerator;
+                    syncissuevotingactivity.Setgrade = SyncIssueVotingActivity.SetGrade.PercentAgreementWModerator;
                     break;
                 case "Manually":
-                    syncissuevotingactivity.setgrade = IssueVotingActivity.SetGrade.Manually;
+                    syncissuevotingactivity.Setgrade = SyncIssueVotingActivity.SetGrade.Manually;
+                    break;
+                default:
                     break;
             };
+
+            foreach (var modelStateValue in ViewData.ModelState.Values)
+            {
+                foreach (var error in modelStateValue.Errors)
+                {
+                    // Do something useful with these properties
+                    var errorMessage = error.ErrorMessage;
+                    var exception = error.Exception;
+                }
+            }
+
 
             if (ModelState.IsValid)
             {
@@ -77,7 +90,7 @@ namespace OSBLE.Controllers
  
         public ActionResult Edit(int id)
         {
-            IssueVotingActivity syncissuevotingactivity = db.AssignmentActivities.Find(id) as IssueVotingActivity;
+            SyncIssueVotingActivity syncissuevotingactivity = db.AssignmentActivities.Find(id) as SyncIssueVotingActivity;
             ViewBag.AbstractAssignmentID = new SelectList(db.AbstractAssignments, "ID", "Name", syncissuevotingactivity.AbstractAssignmentID);
             return View(syncissuevotingactivity);
         }
@@ -86,7 +99,7 @@ namespace OSBLE.Controllers
         // POST: /IssueVoting/Edit/5
 
         [HttpPost]
-        public ActionResult Edit(IssueVotingActivity syncissuevotingactivity)
+        public ActionResult Edit(SyncIssueVotingActivity syncissuevotingactivity)
         {
             if (ModelState.IsValid)
             {
@@ -103,7 +116,7 @@ namespace OSBLE.Controllers
  
         public ActionResult Delete(int id)
         {
-            IssueVotingActivity syncissuevotingactivity = db.AssignmentActivities.Find(id) as IssueVotingActivity;
+            SyncIssueVotingActivity syncissuevotingactivity = db.AssignmentActivities.Find(id) as SyncIssueVotingActivity;
             return View(syncissuevotingactivity);
         }
 
@@ -112,8 +125,8 @@ namespace OSBLE.Controllers
 
         [HttpPost, ActionName("Delete")]
         public ActionResult DeleteConfirmed(int id)
-        {            
-            IssueVotingActivity syncissuevotingactivity = db.AssignmentActivities.Find(id) as IssueVotingActivity;
+        {
+            SyncIssueVotingActivity syncissuevotingactivity = db.AssignmentActivities.Find(id) as SyncIssueVotingActivity;
             db.AssignmentActivities.Remove(syncissuevotingactivity);
             db.SaveChanges();
             return RedirectToAction("Index");

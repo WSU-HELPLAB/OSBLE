@@ -58,14 +58,6 @@
                 $('#instructor_completes_rubric_all_reviews').attr('checked', true);
             }
         });
-
-        $('#add_to_gradebook').change(function () {
-            if ($('#add_to_gradebook').attr('checked')) {
-                $('#grade_options').show('blind');
-            } else {
-                $('#grade_options').hide();
-            }
-        });
     });
 
     function DisplayCanStudentAccessReviewsOptions() {
@@ -121,7 +113,7 @@
                 @Html.EditorFor(model => model.Name)
                 @Html.ValidationMessageFor(model => model.Name)
             </div>
-            
+
             <div class="editor-label">
                 @Html.LabelFor(model => model.AbstractAssignmentID, "Abstract Assignment")
             </div>
@@ -221,41 +213,10 @@
                 </div>
             </div>
 
-            <div class="editor-label">
-                <h4>Add to Gradebook</h4>
-            </div>
-            <div class="editor-field">
-                <input type="checkbox" id="add_to_gradebook" checked="checked" />
-            </div>
-            <div id="grade_options" class="indented_options">
-                <div class="editor-field">
-                    Worth
-                    @Html.TextBoxFor(model => model.PointsPossible, new { id = "points_possible", size = 3 })
-                    Points in Category <span id="grade_category_label"></span>
+            <h4>Grades</h4>
 
-                    @Html.ValidationMessageFor(model => model.PointsPossible)
-                </div>
-        
-
-                <h4>Late Policy</h4>
-    
-                <p>
-                    Students may submit assignments up to @Html.TextBoxFor(model => model.MinutesLateWithNoPenalty, new { size = 3 })
-                    minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.PercentPenalty, new { size = 3 })
-                    percent per @Html.TextBoxFor(model => model.HoursLatePerPercentPenalty, new { size = 3 })
-                    hours late will be applied.<br />
-                    @Html.ValidationMessageFor(model => model.MinutesLateWithNoPenalty)
-                    @Html.ValidationMessageFor(model => model.PercentPenalty)
-                    @Html.ValidationMessageFor(model => model.HoursLatePerPercentPenalty)
-                </p>
-    
-    
-                <p>
-                    Assignments that are submitted more than @Html.TextBoxFor(model => model.HoursLateUntilZero, new { size = 3 })
-                    hours after the due date and time will receive an automatic 0.<br />
-                    @Html.ValidationMessageFor(model => model.HoursLateUntilZero)
-                </p>
-
+            <div>
+                @Html.Partial("_AddToGradebook")
             </div>
 
             <p>
@@ -265,7 +226,7 @@
     }
 
     <div>
-        @Html.ActionLink("Back to List", "Index")
+        @Html.ActionLink("Back to List", "Index", "Home", "Create")
     </div>
 }
 

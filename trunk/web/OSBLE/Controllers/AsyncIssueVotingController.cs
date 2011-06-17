@@ -51,13 +51,15 @@ namespace OSBLE.Controllers
             switch(setgrade)
             {
                 case "PercentOfIssues":
-                    asyncissuevotingactivity.setgrade = IssueVotingActivity.SetGrade.PercentOfIssues;
+                    asyncissuevotingactivity.Setgrade = IssueVotingActivity.SetGrade.PercentOfIssues;
                     break;
                 case "PercentAgreementWModerator":
-                    asyncissuevotingactivity.setgrade = IssueVotingActivity.SetGrade.PercentAgreementWModerator;
+                    asyncissuevotingactivity.Setgrade = IssueVotingActivity.SetGrade.PercentAgreementWModerator;
                     break;
                 case "Manually":
-                    asyncissuevotingactivity.setgrade = IssueVotingActivity.SetGrade.Manually;
+                    asyncissuevotingactivity.Setgrade = IssueVotingActivity.SetGrade.Manually;
+                    break;
+                default:
                     break;
             };
 

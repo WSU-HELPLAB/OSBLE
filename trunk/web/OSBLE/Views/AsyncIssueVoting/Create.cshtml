@@ -20,29 +20,21 @@
             }
         });
 
-        $("input[name='SetGrade']").change(function () {
-            if ($("input[name='SetGrade']:checked").val() == 'PrecentOfIssues') {
-                $('#set_grade').val("PercentOfIssues");
-            }
-            else if ($("input[name='SetGrade']:checked").val() == 'PercentAgreementWModerator') {
-                $('#set_grade').val("PercentAgreementWModerator");
-            }
-            else if ($("input[name='SetGrade']:checked").val() == 'Manually') {
-                $('#set_grade').val("Manually");
-                DisplayManuallyGrade();
-            }
-            else {
-                throw "Unknown Radio Button Checked: SetGrade"
-            }
-        });
-
-        $('#add_to_gradebook').change(function () {
-            if ($('#add_to_gradebook').attr('checked')) {
-                $('#grade_options').show('blind');
-            } else {
-                $('#grade_options').hide();
-            }
-        });
+//        $("input[name='SetGrade']").change(function () {
+//            if ($("input[name='SetGrade']:checked").val() == 'PercentOfIssues') {
+//                $('#set_grade').val("PercentOfIssues");
+//            }
+//            else if ($("input[name='SetGrade']:checked").val() == 'PercentAgreementWModerator') {
+//                $('#set_grade').val("PercentAgreementWModerator");
+//            }
+//            else if ($("input[name='SetGrade']:checked").val() == 'Manually') {
+//                $('#set_grade').val("Manually");
+//                DisplayManuallyGrade();
+//            }
+//            else {
+//                throw "Unknown Radio Button Checked: SetGrade"
+//            }
+//        });
     });
 
     function DisplayReviewerMustCompleteIssueVotingOptions() {
@@ -73,6 +65,14 @@
             <div class="editor-field">
                 @Html.EditorFor(model => model.Name)
                 @Html.ValidationMessageFor(model => model.Name)
+            </div>
+
+            <div class="editor-label">
+                @Html.Label("Peer Review Activity Name")
+            </div>
+            <div class="editor-field">
+                @Html.EditorFor(model => model.peerReviewActivity.Name)
+                @Html.ValidationMessageFor(model => model.peerReviewActivity.Name)
             </div>
 
             <div class="editor-label">
@@ -129,7 +129,7 @@
             <h4>Grading</h4>
 
             <div>
-                <input type="radio" name="SetGrade" value="PrecentOfIssues" />
+                <input type="radio" name="SetGrade" value="PercentOfIssues" />
                 Set Grade to percentage of issues voted on
                 <br />
            </div>
@@ -146,42 +146,8 @@
                 <br />
            </div>
 
-           <div class="editor-label">
-                Add to Gradebook
-            </div>
-            <div class="editor-field">
-                <input type="checkbox" id="add_to_gradebook" checked="checked" />
-            </div>
-    
-            <div id="grade_options" class="indented_options">
-                <div class="editor-field">
-                    Worth
-                    @Html.TextBoxFor(model => model.PointsPossible, new { id = "points_possible", size = 3 })
-                    Points in Category <span id="grade_category_label"></span>
-
-                    @Html.ValidationMessageFor(model => model.PointsPossible)
-                </div>
-        
-
-                <h3>Late Policy</h3>
-    
-                <p>
-                    Students may submit assignments up to @Html.TextBoxFor(model => model.MinutesLateWithNoPenalty, new { size = 3 })
-                    minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.PercentPenalty, new { size = 3 })
-                    percent per @Html.TextBoxFor(model => model.HoursLatePerPercentPenalty, new { size = 3 })
-                    hours late will be applied.<br />
-                    @Html.ValidationMessageFor(model => model.MinutesLateWithNoPenalty)
-                    @Html.ValidationMessageFor(model => model.PercentPenalty)
-                    @Html.ValidationMessageFor(model => model.HoursLatePerPercentPenalty)
-                </p>
-    
-    
-                <p>
-                    Assignments that are submitted more than @Html.TextBoxFor(model => model.HoursLateUntilZero, new { size = 3 })
-                    hours after the due date and time will receive an automatic 0.<br />
-                    @Html.ValidationMessageFor(model => model.HoursLateUntilZero)
-                </p>
-
+           <div>
+                @Html.Partial("_AddToGradebook")
             </div>
 
             <p>

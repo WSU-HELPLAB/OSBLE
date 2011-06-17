@@ -45,6 +45,27 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Create(AuthorRebuttalActivity authorrebuttalactivity)
         {
+
+            string presentation = Request.Params["Presentation"];
+
+            // had to use hard coded strings because otherwise through an error about constant values.
+            switch (presentation)
+            {
+                case "PresentAllIssuesLogged":
+                    authorrebuttalactivity.Presentation = AuthorRebuttalActivity.PresentationOptions.PresentAllIssuesLogged;
+                    break;
+                case "PresentIssuesXLogged":
+                    authorrebuttalactivity.Presentation = AuthorRebuttalActivity.PresentationOptions.PresentIssuesXLogged;
+                    break;
+                case "PresentIssuesXPercentLogged":
+                    authorrebuttalactivity.Presentation = AuthorRebuttalActivity.PresentationOptions.PresentIssuesXPercentLogged;
+                    break;
+                case "PresentOnlyIssuesModeratorVoted":
+                    authorrebuttalactivity.Presentation = AuthorRebuttalActivity.PresentationOptions.PresentOnlyModeratorVoted;
+                    break;
+                default:
+                    break;
+            };
             if (ModelState.IsValid)
             {
                 db.AssignmentActivities.Add(authorrebuttalactivity);
