@@ -232,6 +232,7 @@
 		    </tr>
 		    <tr>
 		        <td align="right" colspan="3"><input id="dropLowestSubmit" type="submit" value="Apply"/></td>
+                <td align="right" colspan="3"><input id="dropLowestCancel" type="submit" onclick="hideDropLowest();" value="Cancel" /></td>
 	        </tr>
 	    </table>
     </form>
@@ -364,6 +365,10 @@
 
     function displayAddPoints(button) {
         $("#addPointsID").animate({ "height": "show" }, { duration: 300 });
+    }
+
+    function hideDropLowest() {
+        $("#customizeID").animate({ "height": "hide" }, { duration: 300 });
     }
 
     function setButtonId(button) {
