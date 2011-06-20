@@ -47,6 +47,9 @@ namespace OSBLE.Controllers
         {
             string setgrade = Request.Params["SetGrade"];
 
+            // the peer reveiw activity wasnt getting the right ID so we assigned it here
+            syncissuevotingactivity.peerReviewActivity.AbstractAssignmentID = syncissuevotingactivity.AbstractAssignmentID;
+
             // had to use hard coded strings because otherwise through an error about constant values.
             switch (setgrade)
             {
