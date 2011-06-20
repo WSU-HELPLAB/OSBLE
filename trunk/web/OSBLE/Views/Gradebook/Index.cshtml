@@ -435,7 +435,8 @@
                     double totalGrade = 0;
                     double totalPossible = 0;
                     List<Score> totalOfCats = (from total in ViewBag.Scores as IEnumerable<Score>
-                                               where total.UserProfileID == student.ID
+                                               where total.UserProfileID == student.ID && 
+                                               total.Points >= 0
                                                select total).ToList();
 
                     
@@ -476,8 +477,9 @@
                     foreach (Category cat in ViewBag.Categories)
                     {
                         List<Score> scoreQuery = (from g in ViewBag.Scores as IEnumerable<Score>
-                                                  where g.UserProfileID == student.ID 
-                                                  && g.AssignmentActivity.AbstractAssignment.CategoryID == cat.ID
+                                                  where g.UserProfileID == student.ID &&
+                                                  g.AssignmentActivity.AbstractAssignment.CategoryID == cat.ID && 
+                                                  g.Points >= 0
                                                   select g).ToList();
 
                         if (scoreQuery.Count() > 0)

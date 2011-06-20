@@ -70,7 +70,10 @@ namespace OSBLE.Controllers
 
             viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"] = serializeTeamMemers(getTeamMembers());
 
-            ViewBag.Categories = new SelectList(db.Categories, "ID", "Name");
+            var cat = from c in db.Categories
+                      where c.CourseID == active.ID
+                      select c;
+            ViewBag.Categories = new SelectList(cat, "ID", "Name");
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
             ViewBag.Deliverables = Deliverables;
             return View(viewModel);

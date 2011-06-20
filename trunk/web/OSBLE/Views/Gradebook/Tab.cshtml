@@ -206,7 +206,7 @@
 
     </div>
 
-    <input type="hidden" id="isDropLowest" value="0" />
+    <input type="hidden" id="isDropLowest" />
 
         <script type="text/javascript">
             function setGradableAction(actionName) {
@@ -301,7 +301,6 @@
 
             hideDropDown();
             showDropDown = false;
-
         }
     });
 
@@ -827,7 +826,8 @@
         var catId = pathname.split("=");
         var num = $("#XtoDrop").val();
         
-        $("#isDropLowest").val(num);
+        //$("div").body("test", {first:num});
+        //alert($("div").body("test").first);
 
         if (catId[1] != null) {
             var i = 0;
@@ -842,7 +842,7 @@
             }
             });
 
-            for (i = 0; i < $("#isDropLowest").val(); i++) {
+            for (i = 0; i < $("#XtoDrop").val(); i++) {
                 //ajax call to drop the lowest score
                 $.ajax({
                     async: false,
@@ -904,9 +904,9 @@
                 type: "POST",
                 url: "/Gradebook/ClearDropLowest",
                 data: { categoryId: catId[1] },
-                success: function (response) {
-                    $("#grades").html(response);
-                }
+                //success: function (response) {
+                //    $("#grades").html(response);
+                //}
             });
         }
         dropAllLowest();
@@ -928,9 +928,9 @@
                 type: "POST",
                 url: "/Gradebook/DropLowest",
                 data: { categoryId: catId[1], userId: id },
-//                success: function (response) {
-//                    $("#grades").html(response);
-                //}
+                success: function (response) {
+                    $("#grades").html(response);
+                }
             });
 
         }
