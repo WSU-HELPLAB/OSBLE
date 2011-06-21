@@ -88,7 +88,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
         private void highlightGlyph(Glyphs glyph, Point left, Point right)
         {
             Panel panel = getPanel(glyph);
-            Rectangle rect = new Rectangle() { IsHitTestVisible = false, Height = glyph.ActualHeight, Width = Math.Abs(right.X - left.X), Fill = new SolidColorBrush(Color.FromArgb(100, 0, 0, 128)) };
+            Rectangle rect = new Rectangle() { IsHitTestVisible = false, Height = glyph.ActualHeight, Width = Math.Abs(right.X - left.X), Fill = new SolidColorBrush(Color.FromArgb(255, 0, 147, 255)) };
             Point p = new Point(startPoint.X, glyph.OriginY - (glyph.ActualHeight - glyph.ActualHeight / 4));
 
             //If left is really right then we draw the rectangle starting at right and then use its width to get back to left
@@ -120,7 +120,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
                 size.X = Math.Abs(startPoint.X - glyph.OriginX);
             }
 
-            Rectangle rect = new Rectangle() { IsHitTestVisible = false, Height = size.Y, Width = size.X, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 0, 128)) };
+            Rectangle rect = new Rectangle() { IsHitTestVisible = false, Height = size.Y, Width = size.X, Fill = new SolidColorBrush(Color.FromArgb(255, 0, 147, 255)) };
             rect.SetValue(Canvas.TopProperty, topLeft.Y);
             rect.SetValue(Canvas.LeftProperty, topLeft.X);
             selection.Add(rect);
@@ -183,7 +183,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
             Panel panel;
             panel = getPanel(glyph);
             Point size = new Point(glyph.ActualWidth, glyph.ActualHeight);
-            Rectangle rect = new Rectangle() { IsHitTestVisible = false, Height = size.Y, Width = size.X, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 0, 128)) };
+            Rectangle rect = new Rectangle() { IsHitTestVisible = false, Height = size.Y, Width = size.X, Fill = new SolidColorBrush(Color.FromArgb(255, 0, 147, 255)) };
             Point topleft = new Point(glyph.OriginX, glyph.OriginY - (size.Y - size.Y / 4));
             rect.SetValue(Canvas.TopProperty, topleft.Y);
             rect.SetValue(Canvas.LeftProperty, topleft.X);
@@ -300,7 +300,19 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
                 glyph.MouseLeftButtonDown += new MouseButtonEventHandler(glyph_MouseLeftButtonDown);
                 glyph.MouseMove += new MouseEventHandler(glyph_MouseMove);
                 glyph.MouseLeftButtonUp += new MouseButtonEventHandler(glyph_MouseLeftButtonUp);
+                glyph.MouseEnter += new MouseEventHandler(glyph_MouseEnter);
+                glyph.MouseLeave += new MouseEventHandler(glyph_MouseLeave);
             }
+        }
+
+        private void glyph_MouseLeave(object sender, MouseEventArgs e)
+        {
+            //(sender as Glyphs).Cursor = Cursors.IBeam;
+        }
+
+        private void glyph_MouseEnter(object sender, MouseEventArgs e)
+        {
+            (sender as Glyphs).Cursor = Cursors.IBeam;
         }
 
         #endregion Public Methods
@@ -319,15 +331,16 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
             }
         }
 
-
         public void MoveGlyphSelection(object sender, MouseEventArgs e)
         {
             glyph_MouseMove(sender, e);
         }
+
         public void EndGlyphSelection(Glyphs glyph, MouseButtonEventArgs e)
         {
             glyph_MouseLeftButtonUp(glyph, e);
         }
+
         public void StartGlyphSelection(Glyphs glyph, MouseButtonEventArgs e)
         {
             glyph_MouseLeftButtonDown(glyph, e);

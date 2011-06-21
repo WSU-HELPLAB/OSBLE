@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using System.Collections;
-using System.Collections.Generic;
-using System.Windows.Documents;
 
 namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
 {
@@ -67,7 +67,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
             this.glyphSelection = glyphSelect;
             this.displayCanvas = canvas;
             this.hitCanvas = hitCanvas;
-            hitCanvas.Background = new SolidColorBrush(Color.FromArgb(100, 0, 0, 128));
+            hitCanvas.Background = new SolidColorBrush(Colors.Transparent);
             hitCanvas.MouseLeftButtonDown += new MouseButtonEventHandler(canvas_MouseLeftButtonDown);
             hitCanvas.MouseLeftButtonUp += new MouseButtonEventHandler(canvas_MouseLeftButtonUp);
             hitCanvas.MouseMove += new MouseEventHandler(canvas_MouseMove);
@@ -123,15 +123,13 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
             throw new NotImplementedException();
         }
 
-        
         private void canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if(isSelectingGlyphs == true)
+            if (isSelectingGlyphs == true)
             {
                 Glyphs tempGlyph = isOverGlyphs(e);
                 if (tempGlyph != null)
                     glyphSelection.MoveGlyphSelection(tempGlyph, e);
-                
             }
             else
             {
@@ -167,19 +165,16 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
                     }
                 }
             }
-            
         }
 
         private void canvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            
-
             if (isSelectingGlyphs)
             {
                 glyphSelection.EndGlyphSelection(isOverGlyphs(e), e);
                 isSelectingGlyphs = false;
             }
-            else if(isSelecting)
+            else if (isSelecting)
             {
                 hitCanvas.ReleaseMouseCapture();
                 isSelecting = false;
@@ -187,15 +182,15 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
                 e.Handled = true;
             }
         }
+
         private void canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             //removing any existing highlights
             glyphSelection.ClearSelection();
             this.ClearSelection();
 
-            if (isOverGlyphs(e)!=null) //mouse click on a glyph, reroute event to GlyphSelection
+            if (isOverGlyphs(e) != null) //mouse click on a glyph, reroute event to GlyphSelection
             {
-
                 glyphSelection.StartGlyphSelection(isOverGlyphs(e), e);
                 isSelectingGlyphs = true;
             }
@@ -211,8 +206,8 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
                 selectionRectangle.Visibility = Visibility.Visible;
                 e.Handled = true;
             }
-             
         }
+
         /// <summary>
         /// returns null if not over a Glyphs, else returns the Glyphs
         /// </summary>

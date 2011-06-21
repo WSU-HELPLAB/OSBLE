@@ -6,7 +6,7 @@
     >
 
     <!--We a need a grid to ensure a real height and width canvas aren't so good at that-->
-    <Grid Grid.Row="1" x:Name="LayoutRoot" Background="Transparent">
+    <Grid Grid.Row="1" x:Name="LayoutRoot" Background="LightGray">
         <Canvas x:Name="CommentReferenceCanvas" Canvas.ZIndex="255"/>
         <Canvas x:Name="HitCanvas" Canvas.ZIndex="255"/>
     </Grid>

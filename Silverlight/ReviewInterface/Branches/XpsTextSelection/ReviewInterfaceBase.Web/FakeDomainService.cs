@@ -152,7 +152,7 @@
 
         public void UploadFile(string str)
         {
-            StreamWriter sw = new StreamWriter("d:/sgordon/PeerReview.xml");
+            StreamWriter sw = new StreamWriter("c:/PeerReview.xml");
             sw.Write(str);
             sw.Close();
         }

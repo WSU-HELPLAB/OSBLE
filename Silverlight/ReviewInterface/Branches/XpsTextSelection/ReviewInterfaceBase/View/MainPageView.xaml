@@ -16,14 +16,8 @@
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
             <StackPanel x:Name="ButtonToolbar" Orientation="Horizontal" Margin="3" >
-                <Button x:Name="OpenFileButton" Margin="0,0,5,0" ToolTipService.ToolTip="Open a saved file" Height="16">
-                    <Image Source="/Osble;component/View/Icons/toolbar_open.png" />
-                </Button>
-                <Button x:Name="OpenFindWindow" Margin="0,0,5,0" ToolTipService.ToolTip="Open Find Window" Height="16">
-                    <Image Source="/Osble;component/View/Icons/toolbar_open.png" />
-                </Button>
                 <Button x:Name="Save" Margin="0,0,5,0" ToolTipService.ToolTip="Save This Review" Height="16">
-                    <Image Source="/Osble;component/View/Icons/toolbar_open.png" />
+                    <Image Source="/Osble;component/View/Icons/saveHS.png" />
                 </Button>
             </StackPanel>
             <ContentPresenter x:Name="CustomTabControlHolder" />

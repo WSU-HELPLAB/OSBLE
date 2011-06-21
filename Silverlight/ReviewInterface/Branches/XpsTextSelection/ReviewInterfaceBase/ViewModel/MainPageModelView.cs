@@ -105,7 +105,6 @@ namespace ReviewInterfaceBase.ViewModel
             thisView = new MainPageView();
 
             //This setups up all the events needed on the view directly
-            thisView.OpenFileButton.Click += new RoutedEventHandler(OpenFileButton_Click);
             thisView.Save.Click += new RoutedEventHandler(Save_Click);
             thisView.SizeChanged += new SizeChangedEventHandler(thisView_SizeChanged);
             thisView.MouseRightButtonDown += new MouseButtonEventHandler(thisView_MouseRightButtonDown);

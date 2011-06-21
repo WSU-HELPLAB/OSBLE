@@ -112,7 +112,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
 
                 getAllPages(xpsConverter);
 
-                pagesHolder.Background = new SolidColorBrush(Colors.Transparent);
+                pagesHolder.Background = new SolidColorBrush(Colors.Gray);
 
                 thisView.LayoutRoot.Children.Add(pagesHolder);
 
@@ -148,7 +148,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
                 //List<Panel> panels = getAllPanels(xpsPage);
                 glyphSelection.initilizeGlyph(xpsPage);
 
-                xpsPage.Background = new SolidColorBrush(Colors.Transparent);
+                xpsPage.Background = new SolidColorBrush(Colors.White);
                 xpsPage.Margin = new Thickness(0, 0, 0, 10);
                 pagesHolder.Children.Add(xpsPage);
                 currentPage++;
