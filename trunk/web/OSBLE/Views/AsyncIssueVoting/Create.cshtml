@@ -19,22 +19,6 @@
                 HideReviewerMustCompleteIssueVotingOptions();
             }
         });
-
-//        $("input[name='SetGrade']").change(function () {
-//            if ($("input[name='SetGrade']:checked").val() == 'PercentOfIssues') {
-//                $('#set_grade').val("PercentOfIssues");
-//            }
-//            else if ($("input[name='SetGrade']:checked").val() == 'PercentAgreementWModerator') {
-//                $('#set_grade').val("PercentAgreementWModerator");
-//            }
-//            else if ($("input[name='SetGrade']:checked").val() == 'Manually') {
-//                $('#set_grade').val("Manually");
-//                DisplayManuallyGrade();
-//            }
-//            else {
-//                throw "Unknown Radio Button Checked: SetGrade"
-//            }
-//        });
     });
 
     function DisplayReviewerMustCompleteIssueVotingOptions() {
@@ -56,23 +40,12 @@
         <fieldset>
             <legend>AsyncIssueVotingActivity</legend>
 
-            @Html.Hidden("setgrade", new { id="set_grade"})
-
-
             <div class="editor-label">
                 @Html.LabelFor(model => model.Name)
             </div>
             <div class="editor-field">
                 @Html.EditorFor(model => model.Name)
                 @Html.ValidationMessageFor(model => model.Name)
-            </div>
-
-            <div class="editor-label">
-                @Html.Label("Peer Review Activity Name")
-            </div>
-            <div class="editor-field">
-                @Html.EditorFor(model => model.peerReviewActivity.Name)
-                @Html.ValidationMessageFor(model => model.peerReviewActivity.Name)
             </div>
 
             <div class="editor-label">

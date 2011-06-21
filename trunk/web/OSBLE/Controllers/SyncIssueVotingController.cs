@@ -47,9 +47,6 @@ namespace OSBLE.Controllers
         {
             string setgrade = Request.Params["SetGrade"];
 
-            // the peer reveiw activity wasnt getting the right ID so we assigned it here
-            syncissuevotingactivity.peerReviewActivity.AbstractAssignmentID = syncissuevotingactivity.AbstractAssignmentID;
-
             // had to use hard coded strings because otherwise through an error about constant values.
             switch (setgrade)
             {
@@ -65,17 +62,6 @@ namespace OSBLE.Controllers
                 default:
                     break;
             };
-
-            foreach (var modelStateValue in ViewData.ModelState.Values)
-            {
-                foreach (var error in modelStateValue.Errors)
-                {
-                    // Do something useful with these properties
-                    var errorMessage = error.ErrorMessage;
-                    var exception = error.Exception;
-                }
-            }
-
 
             if (ModelState.IsValid)
             {

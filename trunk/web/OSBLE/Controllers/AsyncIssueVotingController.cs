@@ -47,9 +47,6 @@ namespace OSBLE.Controllers
         {
             string setgrade = Request.Params["SetGrade"];
 
-            // Peer review Id wasnt getting set and through an error, this fixes it.
-            asyncissuevotingactivity.peerReviewActivity.AbstractAssignmentID = asyncissuevotingactivity.AbstractAssignmentID;
-
             // had to use hard coded strings because otherwise through an error about constant values.
             switch(setgrade)
             {
