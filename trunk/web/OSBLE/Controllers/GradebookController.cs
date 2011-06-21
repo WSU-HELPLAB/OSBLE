@@ -425,10 +425,20 @@ namespace OSBLE.Controllers
            };
            db.Categories.Add(newCategory);
            db.SaveChanges();
-           //Tab(newCategory.ID);
+           Tab(newCategory.ID);
 
-           //Tab((int)Session["categoryId"]);
+           Tab((int)Session["categoryId"]);
            return View("_Tabs");
+       }
+
+       [HttpPost]
+       public ActionResult DeleteCategory(int categoryId)
+       {
+           Category category = db.Categories.Find(categoryId);
+           db.Categories.Remove(category);
+           db.SaveChanges();
+
+           return View();
        }
 
        [HttpPost]
@@ -763,7 +773,7 @@ namespace OSBLE.Controllers
 
            if (assignments.Count() == 0)
            {
-               GradeAssignment newAssignment = new GradeAssignment()
+               AbstractAssignment newAssignment = new GradeAssignment()
                {
                    Name = "Untitled",
                    PointsPossible = 100,
@@ -771,7 +781,7 @@ namespace OSBLE.Controllers
                    CategoryID = categoryId,
                    ColumnOrder = 0
                };
-               db.GradeAssignments.Add(newAssignment);
+               db.AbstractAssignments.Add(newAssignment);
                db.SaveChanges();
 
                AssignmentActivity newActivity = new GradeActivity()

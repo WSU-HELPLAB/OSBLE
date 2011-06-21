@@ -167,7 +167,7 @@
     @Html.Partial("_Gradebook")
     <div class="slidingDiv" id="slidingDivID" style="display: none; position: absolute;">
         <form id="columnOptionsForm" method="post" action="/Gradebook/ModifyColumn" data-ajax="true"
-              data-ajax-success="" data-ajax-update="#grades">
+              data-ajax-mode="replace" data-ajax-update="#grades">
         <input id="actionRequested" name="actionRequested" type="hidden" value="null" />
         <input id="assignmentId" name="assignmentId" type="hidden" value="null" />
         <table class="menu" id="menuID" onclick="setButtonId(this);">
@@ -850,10 +850,9 @@
                 type: "POST",
                 url: "/Gradebook/ClearAllDropLowest",
                 data: { categoryId: catId[1] },
-                success: window.location.reload(true) 
-                /*function (response) {
-                    $("#grades").html(response);
-            }*/
+                success: function (response) {
+                    $("#grades").replaceWith(response);
+                }
             });
 
             for (i = 0; i < $("#XtoDrop").val(); i++) {
@@ -863,10 +862,9 @@
                     type: "POST",
                     url: "/Gradebook/AllDropLowest",
                     data: { categoryId: catId[1] },
-                    success: window.location.reload(true)
-                    /*function (response) {
-                        $("#grades").html(response);
-                    }*/
+                    success: function (response) {
+                        $("#grades").replaceWith(response);
+                    }
                 });
             }
         }
@@ -919,12 +917,9 @@
                 type: "POST",
                 url: "/Gradebook/ClearDropLowest",
                 data: { categoryId: catId[1] },
-                //success: function (response) {
-                //    $("#grades").html(response);
-                //}
+                success: dropAllLowest()
             });
         }
-        dropAllLowest();
     }
 
     function DropLowest(id) {
@@ -944,7 +939,7 @@
                 url: "/Gradebook/DropLowest",
                 data: { categoryId: catId[1], userId: id },
                 success: function (response) {
-                    $("#grades").html(response);
+                    $("#grades").replaceWith(response);
                 }
             });
 
@@ -958,10 +953,9 @@
             type: "POST",
             url: "/Gradebook/AddPoints",
             data: { assignmentId: id, number: num },
-            success: location.reload()
-            /* function (response) {
-                    $("#grades").html(response);
-            }*/
+            success: function (response) {
+                    $("#grades").replaceWith(response);
+            }
         });
         $("#addPointsID").animate({ "height": "hide" }, { duration: 300 });
     }
@@ -971,9 +965,7 @@
         $.ajax({
             type: "POST",
             url: "/Gradebook/AddCategory",
-            success: function (response) {
-                $("#tabHeader").html(response);
-            }
+            success: window.location.reload(true)
         });
     }
 
