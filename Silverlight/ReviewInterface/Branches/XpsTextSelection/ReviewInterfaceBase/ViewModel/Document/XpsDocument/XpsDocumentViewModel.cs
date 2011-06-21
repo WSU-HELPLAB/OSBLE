@@ -204,7 +204,9 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
         {
             List<Rectangle> rectangles = new List<Rectangle>();
 
-            foreach (XElement xmlRectangle in xmlLocation.Descendants("Rectangles"))
+            int pageNumber = Int32.Parse(xmlLocation.Attribute("PageNumber").Value);
+
+            foreach (XElement xmlRectangle in xmlLocation.Descendants("Rectangle"))
             {
                 XElement xmlTopLeft = xmlRectangle.Descendants("TopLeft").ElementAt(0);
                 XElement xmlSize = xmlRectangle.Descendants("Size").ElementAt(0);
@@ -220,7 +222,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
                 rectangles.Add(rect);
             }
 
-            XpsLocation xpsLocation = new XpsLocation(rectangles);
+            XpsLocation xpsLocation = new XpsLocation(rectangles, pageNumber);
 
             return xpsLocation;
         }
@@ -239,7 +241,11 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
         {
             if (reviewItemSelected == true)
             {
-                return new XpsLocation(selectedReviewItem);
+                int pageNumber = -1;
+
+                pageNumber = pagesHolder.Children.IndexOf((selectedReviewItem[0].Parent as Canvas).Parent as UIElement);
+
+                return new XpsLocation(selectedReviewItem, pageNumber);
             }
             else
             {
@@ -257,6 +263,23 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
             List<FrameworkElement> frameworkElements = new List<FrameworkElement>();
 
             frameworkElements.AddRange(from c in rectangles where c is FrameworkElement select c as FrameworkElement);
+
+            foreach (FrameworkElement fe in frameworkElements)
+            {
+                if (fe.Parent == null)
+                {
+                    XpsLocation location = (referenceLocation as XpsLocation);
+
+                    if (location.PageNumber == -1)
+                    {
+                        thisView.CommentReferenceCanvas.Children.Add(fe);
+                    }
+                    else
+                    {
+                        (pagesHolder.Children[location.PageNumber] as Canvas).Children.Add(fe);
+                    }
+                }
+            }
 
             return (frameworkElements);
         }

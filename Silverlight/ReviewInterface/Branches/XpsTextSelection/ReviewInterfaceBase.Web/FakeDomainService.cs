@@ -125,12 +125,13 @@
         //This needs to get the document locations and return their real location that the client side can open
         public IQueryable<DocumentLocation> GetDocumentLocations()
         {
-            return (new List<DocumentLocation>() { new DocumentLocation("ProtoWalk-ICER2011-SUBMITTED.xps", 6, "bob", AuthorClassification.Student) }).ToArray().AsQueryable();
+            return (new List<DocumentLocation>() { new DocumentLocation("xpsDoc.xps", 6, "bob", AuthorClassification.Student) }).ToArray().AsQueryable();
+            //return (new List<DocumentLocation>() { new DocumentLocation("csFile.cp", 6, "bob", AuthorClassification.Student) }).ToArray().AsQueryable();
         }
 
         public IQueryable<DocumentLocation> GetPeerReviewLocations()
         {
-            return (new List<DocumentLocation>() { new DocumentLocation("PeerReview.xml", 100, "Anonymous", AuthorClassification.Student),
+            return (new List<DocumentLocation>() { new DocumentLocation("PeerReview2.xml", 100, "Anonymous", AuthorClassification.Student),
                 //new DocumentLocation("PeerReview2.xml", 1, "Anonymous", AuthorClassification.Student),
                 /*new DocumentLocation("PeerReview2 - Copy.xml", 2, "2", AuthorClassification.Student),
                 new DocumentLocation("PeerReview2 - Copy (2).xml", 3, "3", AuthorClassification.Student),
@@ -152,7 +153,7 @@
 
         public void UploadFile(string str)
         {
-            StreamWriter sw = new StreamWriter("c:/PeerReview.xml");
+            StreamWriter sw = new StreamWriter("C:/Users/sgordon/sgordon/OsbleCMS/Silverlight/ReviewInterface/Branches/XpsTextSelection/ReviewInterfaceBase.Web/ClientBin/PeerReview2.xml");
             sw.Write(str);
             sw.Close();
         }

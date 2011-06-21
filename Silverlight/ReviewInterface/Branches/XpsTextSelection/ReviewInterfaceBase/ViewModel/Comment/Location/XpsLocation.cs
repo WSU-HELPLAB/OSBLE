@@ -7,21 +7,31 @@ namespace ReviewInterfaceBase.ViewModel.Comment.Location
 {
     public class XpsLocation : ISpatialLocation
     {
-        List<Rectangle> rectangles;
+        private List<Rectangle> rectangles;
+
+        private int pageNumber;
+
+        public int PageNumber
+        {
+            get { return pageNumber; }
+        }
 
         public List<Rectangle> Rectangles
         {
             get { return rectangles; }
         }
 
-        public XpsLocation(List<Rectangle> rectangles)
+        public XpsLocation(List<Rectangle> rectangles, int pageNumber)
         {
             this.rectangles = rectangles;
+            this.pageNumber = pageNumber;
         }
 
         public void WriteXml(System.Xml.XmlWriter writer)
         {
             writer.WriteStartElement("Location");
+
+            writer.WriteAttributeString("PageNumber", pageNumber.ToString());
 
             foreach (Rectangle rectangle in rectangles)
             {
