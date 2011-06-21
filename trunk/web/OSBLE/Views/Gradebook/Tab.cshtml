@@ -223,7 +223,7 @@
 	<form id="dropLowestSubmit" onsubmit="dropAllLowest(); return false;"  >
         <table class="customizeTable">
 		    <tr>
-		        <th align="center" colspan="3">CUSTOMIZE</th>
+		        <th align="center" colspan="3">Drop Lowest</th>
 		    </tr>
 		    <tr>
 			    <td>Drop lowest</td>
@@ -232,7 +232,7 @@
 		    </tr>
 		    <tr>
 		        <td align="right" colspan="3"><input id="dropLowestSubmit" type="submit" value="Apply"/></td>
-                <td align="right" colspan="3"><input id="dropLowestCancel" type="submit" onclick="hideDropLowest();" value="Cancel" /></td>
+                <td align="right" colspan="3"><input id="dropLowestCancel" type="button" onclick="hideFunctions();" value="Cancel" /></td>
 	        </tr>
 	    </table>
     </form>
@@ -242,7 +242,7 @@
 	<form id="addPointsSubmit" onsubmit="addPoints(this); return false;"  >
         <table class="addPointsTable">
 		    <tr>
-		        <th align="center" colspan="3">CUSTOMIZE</th>
+		        <th align="center" colspan="3">Add Points</th>
 		    </tr>
 		    <tr>
 			    <td>Add </td>
@@ -251,6 +251,7 @@
 		    </tr>
 		    <tr>
 		        <td align="right" colspan="3"><input id="addPointsSubmit" type="submit" value="Apply"/></td>
+                <td align="right" colspan="3"><input id="addPointsCancel" type="button" onclick="hideFunctions();" value="Cancel" /></td>
 	        </tr>
 	    </table>
     </form>
@@ -287,6 +288,7 @@
     $(document).ready(function () {
         //calculateRows();
         calculateCols();
+
     });
 
     $(document).click(function () {
@@ -310,10 +312,15 @@
         if (e.keyCode == 13) {
 
             var row = $(this).parent("tr").next("tr");
-            var colIndex = $(this).prevAll().length;
-            row.each(function () {
-                cell = $(this).find("td:eq(" + colIndex + ")");
-            });
+            if (row.attr("id") == "averageRow"){
+                clearLastCellFocus();
+            }
+            else {
+                var colIndex = $(this).prevAll().length;
+                row.each(function () {
+                    cell = $(this).find("td:eq(" + colIndex + ")");
+                });
+            }
             if (cell != null){
                 cellGainsFocus(cell);
             }
@@ -367,8 +374,9 @@
         $("#addPointsID").animate({ "height": "show" }, { duration: 300 });
     }
 
-    function hideDropLowest() {
+    function hideFunctions() {
         $("#customizeID").animate({ "height": "hide" }, { duration: 300 });
+        $("#addPointsID").animate({ "height": "hide" }, { duration: 300 });
     }
 
     function setButtonId(button) {
@@ -842,9 +850,10 @@
                 type: "POST",
                 url: "/Gradebook/ClearAllDropLowest",
                 data: { categoryId: catId[1] },
-                success: function (response) {
+                success: window.location.reload(true) 
+                /*function (response) {
                     $("#grades").html(response);
-            }
+            }*/
             });
 
             for (i = 0; i < $("#XtoDrop").val(); i++) {
@@ -854,17 +863,18 @@
                     type: "POST",
                     url: "/Gradebook/AllDropLowest",
                     data: { categoryId: catId[1] },
-                    success: function (response) {
+                    success: window.location.reload(true)
+                    /*function (response) {
                         $("#grades").html(response);
-                    }
+                    }*/
                 });
             }
         }
         if ($("#XtoDrop").val() == 0) {
-            $("#totalCustomize").text("Total [Customize...]");
+            $("#dropLowestButton").val("Average");
         }
         else {
-            $("#totalCustomize").text("Total [Dropped " + $("#XtoDrop").val() + "]");
+            $("#dropLowestButton").val("Average [Dropped " + $("#XtoDrop").val() + "]");
         }
         $("#customizeID").animate({ "height": "hide" }, { duration: 300 });
     }
@@ -948,9 +958,10 @@
             type: "POST",
             url: "/Gradebook/AddPoints",
             data: { assignmentId: id, number: num },
-            success: function (response) {
+            success: location.reload()
+            /* function (response) {
                     $("#grades").html(response);
-            }
+            }*/
         });
         $("#addPointsID").animate({ "height": "hide" }, { duration: 300 });
     }

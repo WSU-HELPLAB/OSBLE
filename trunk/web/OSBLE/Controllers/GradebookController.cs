@@ -404,7 +404,7 @@ namespace OSBLE.Controllers
                    Json("failure");
                }
            }
-               return View("_Gradebook");
+           return View("_Gradebook");
            //return RedirectToAction("Index");
        }
 
@@ -425,9 +425,9 @@ namespace OSBLE.Controllers
            };
            db.Categories.Add(newCategory);
            db.SaveChanges();
-           Tab(newCategory.ID);
+           //Tab(newCategory.ID);
 
-           Tab((int)Session["categoryId"]);
+           //Tab((int)Session["categoryId"]);
            return View("_Tabs");
        }
 
@@ -449,7 +449,6 @@ namespace OSBLE.Controllers
                    db.SaveChanges();
                }
            }
-           Tab((int)Session["categoryId"]);
            return View("Index");
        }
 

@@ -16,7 +16,7 @@
         }
         
     </tr>
-    <tr>
+    <tr id="averageRow">
         <th id="th3">
             Averave Score
         </th>
@@ -33,7 +33,7 @@
             Name
         </th>
         <th id="totalCustomize" ondblclick="displayCustomizeGrades();">
-            Total [Customize...]
+            Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average" />
         </th>
         @{
             int i = 1;
