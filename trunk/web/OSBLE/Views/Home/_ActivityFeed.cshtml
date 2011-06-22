@@ -1,4 +1,5 @@
-﻿@using OSBLE.Models.Courses
+﻿@using OSBLE.Models
+@using OSBLE.Models.Courses
 @using OSBLE.Models.HomePage
 <div id="activity_new_post">
     @if ((ViewBag.ActiveCourse.CourseRole.CanGrade == true) || ((ViewBag.ActiveCourse.Course is Course)&&(ViewBag.ActiveCourse.Course.AllowDashboardPosts) == true))
@@ -11,13 +12,16 @@
         {
         <textarea name="Content" rows="5" cols="40" placeholder="Enter new feed post here..."></textarea><br />
         <input type="submit" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.Course)" /> 
+         @Helpers.CreateToolTip(ToolTips.HomePostActivity) 
         
             if (ViewBag.IsInstructor)
             {
         <input
             type="submit" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />
+         @Helpers.CreateToolTip(ToolTips.HomePostToAllCourses) 
         
         <input type="checkbox" value="True" name="send_email" /> <text>Email to Class</text>
+         @Helpers.CreateToolTip(ToolTips.HomeEmailToClass) 
         
             }
         }
@@ -28,10 +32,12 @@
     {
         <input type="radio" name="mode" value="false" @if (!ViewBag.DashboardSingleCourseMode)
                                                       {<text>checked</text>}/><text>Show
-        all courses</text>
+        all courses</text> 
+        @Helpers.CreateToolTip(ToolTips.HomeShowAll) 
         <input type="radio" name="mode" value="true" @if (ViewBag.DashboardSingleCourseMode)
                                                      {<text>checked</text>}/><text>Show
-        only <em>@Helpers.CourseTag(ViewBag.ActiveCourse.Course)</em></text>
+        only <em>@Helpers.CourseTag(ViewBag.ActiveCourse.Course)</em></text> 
+        @Helpers.CreateToolTip(ToolTips.HomeShowOnly) 
     }
 </div>
 <script type="text/javascript">
@@ -42,7 +48,7 @@
 <div id="dp_posts">
     @foreach (DashboardPost dp in ViewBag.DashboardPosts)
     {
-        @Html.Partial("_DashboardPost",dp);
+        @Html.Partial("_DashboardPost", dp);
     }
 </div>
 

@@ -1,4 +1,5 @@
-﻿@using OSBLE.Models.Assignments
+﻿@using OSBLE.Models
+@using OSBLE.Models.Assignments
 @model OSBLE.Models.ViewModels.AssignmentListViewModel
 
 @{
@@ -7,11 +8,12 @@
 
 <script src="@Url.Content("~/Scripts/osble.assignment_list.js")" type="text/javascript"></script>
 
-<h2>Assignments</h2>
+<h2>Assignments @Helpers.CreateToolTip(ToolTips.AssignmentTitle) </h2>
 
 @if (ViewBag.ActiveCourse.CourseRole.CanModify) {
 
     <a href="#" class="add_link" id="assignment_create_button">@Helpers.AddButton() Create New Assignment</a>
+    @Helpers.CreateToolTip(ToolTips.AssignmentCreate) 
         <script type="text/javascript">
             $(function () {
                 $('#assignment_create_dialog').dialog({
@@ -29,10 +31,14 @@
         
     <div id="assignment_create_dialog" title="Create New Assignment">
         <p>Select an assignment type to create:</p>
-        <p>@Html.ActionLink("Basic Assignment","Create","BasicAssignment")</p>
-        <p>@Html.ActionLink("Studio Assignment","SilverlightTest","StudioAssignment")</p>
+        <p>@Html.ActionLink("Basic Assignment", "Create", "BasicAssignment")</p>
+        <p>@Html.ActionLink("Studio Assignment", "SilverlightTest", "StudioAssignment")</p>
     </div>
 }
+
+<p>
+@Helpers.CreateToolTip(ToolTips.AssignmentCurrent) 
+</p>
 
 @if (ViewBag.PastAssignments.Count == 0 &&
      ViewBag.PresentAssignments.Count == 0 &&
@@ -46,7 +52,7 @@
     
 <p>Past Assignments (@ViewBag.PastAssignments.Count)</p>
 
-@Html.Partial("_AssignmentList",ViewBag.PastAssignments as List<StudioAssignment>)
+@Html.Partial("_AssignmentList", ViewBag.PastAssignments as List<StudioAssignment>)
     
 }
 

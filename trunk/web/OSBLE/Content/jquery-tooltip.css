@@ -73,7 +73,9 @@
 .popup td.bottom img { display: block; margin: 0px auto 0 auto; }
 .popup td.bottomright { background-image: url("images/tooltip/bubble-8.png"); }
 
-.popup td.popup-contents {
+.popup td.popup-contents 
+{
+    font-weight:normal;
     font-size: 12px;
     line-height: 1.2em;
     background-color: #fff;

@@ -4,13 +4,13 @@
 @{
     ViewBag.Title = "Create Basic Assignment";
 }
-<h2>
-    Create Basic Assignment</h2>
+<h2>Create Basic Assignment @Helpers.CreateToolTip(ToolTips.BasicAssignmentTitle) </h2>
+
 <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/osble.assignments.js")" type="text/javascript"></script>
 <script type="text/javascript">
-
+    
     var isTeamGenerationReady = false;
 
     $(function () {
@@ -274,6 +274,7 @@
         
     <div class="editor-label">
         @Html.LabelFor(model => model.Assignment.Name)
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentName)
     </div>
     <div class="editor-field">
         @Html.EditorFor(model => model.Assignment.Name)
@@ -281,6 +282,7 @@
     </div>
     <div class="editor-label">
         @Html.LabelFor(model => model.Assignment.Description)
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentDescription)
     </div>
     <div class="editor-field">
         @Html.TextAreaFor(model => model.Assignment.Description, new { rows = 5, cols = 65 })
@@ -289,6 +291,7 @@
         
     <div class="editor-label">
         @Html.LabelFor(model => submission.ReleaseDate)
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentReleaseDate)
     </div>
     <div class="editor-label">
         @Html.TextBox("ReleaseDate_Date", convertToMonthDayYearFormat(submission.ReleaseDate), new { @id = "ReleaseDate_Date", @class = "date_picker", size = 9 })
@@ -297,6 +300,7 @@
     <!--Stop date-->
     <div class="editor-label">
         @Html.Label("Due Date")
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentDueDate)
     </div>
     <div class="editor-label">
         @Html.TextBox("DueDate_Date", convertToMonthDayYearFormat(stop.ReleaseDate), new { @id = "DueDate_Date", @class = "date_picker", size = 9 })
@@ -304,6 +308,7 @@
     </div>
     <div class="editor-label">
         @Html.LabelFor(model => model.Assignment.IsDraft)
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentIsDraft)
     </div>
     <div class="editor-field">
         @Html.CheckBoxFor(model => model.Assignment.IsDraft)
@@ -312,6 +317,7 @@
 
     <div class="editor-label">
         @Html.LabelFor(model => submission.isTeam)
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentIsTeam)
     </div>
     <div class="editor-field">
         @Html.CheckBoxFor(model => submission.isTeam, new { id = "isTeam" })
@@ -320,6 +326,7 @@
     <div id="Team_Options" class="indented_options" style="display: none">
         <input type="radio" name="team_generation_options" value="PreviousAssignment" />
         Use teams defined in previous course assignment
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentTeamsPreviouslyDefined)
         <br />
         <ul id="PreviousAssignmentDiv" style="display: none" class="team_generation_options">
             <li>Select box goes here. </li>
@@ -331,6 +338,7 @@
         </ul>
         <input type="radio" name="team_generation_options" value="RandomTeams" />
         Generate teams randomly
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentTeamsRandom)
         <br />
         <ul id="RandomTeams" style="display: none" class="team_generation_options">
             <li>
@@ -353,6 +361,7 @@
         </ul>
         <input type="radio" name="team_generation_options" value="ManualTeams" />
         Specify teams manually
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentTeamsManual)
         <ul id="ManualTeams" style="display: none" class="team_generation_options">
             <li>
                 <button type="button" onclick="OpenTeamGeneration()">
@@ -364,6 +373,7 @@
     </div>
     <div class="editor-label">
         @Html.LabelFor(model => submission.InstructorCanReview)
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentInstructorLineReview)
     </div>
     <div class="editor-field">
         @Html.EditorFor(model => submission.InstructorCanReview)
@@ -372,6 +382,7 @@
 
     <div class="editor-label">
         @Html.Label("Use Rubric?")
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentUseRubric)
     </div>
     <div class="editor-field">
         @Html.CheckBox("use_rubric", false, new { id = "use_rubric" })
@@ -386,8 +397,7 @@
         </ul>
     </div>
 
-    <h3>
-        Deliverables</h3>
+    <h3>Deliverables @Helpers.CreateToolTip(ToolTips.BasicAssignmentDeliverables) </h3>
    
     <table id="deliverables_table">
         <tr>
@@ -396,6 +406,7 @@
                     <tr>
                         <td>
                             File Name
+                            @Helpers.CreateToolTip(ToolTips.BasicAssignmentDeliverableFileName)
                         </td>
                         <td>
                             <input type="text" id="new_deliverable_name" />
@@ -404,6 +415,7 @@
                     <tr>
                         <td>
                             Type
+                            @Helpers.CreateToolTip(ToolTips.BasicAssignmentDeliverableFileType)
                         </td>
                         <td>
                             <select id="new_deliverable_type">
@@ -421,6 +433,7 @@
             <td>
                 <a href="#" id="add_new_deliverable" title="Add New Deliverable">
                     <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Deliverable" /></a>
+                @Helpers.CreateToolTip(ToolTips.BasicAssignmentDeliverableAdd)
             </td>
         </tr>
     </table>
@@ -442,12 +455,12 @@
         });       
     </script>
     
-    <h3>
-        Grading</h3>
+    <h3>Grading @Helpers.CreateToolTip(ToolTips.BasicAssignmentGrading) </h3>
     
     
     <div class="editor-label">
         @Html.LabelFor(model => model.Assignment.Category, "Category")
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentGradingCategory)
     </div>
     <div class="editor-field">
         @Html.DropDownListFor(model => model.Assignment.CategoryID, ViewBag.Categories as SelectList, new { id = "grade_category" })
@@ -458,6 +471,7 @@
         
     <div class="editor-label">
         Add to Gradebook
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentAddToGradebook)
     </div>
     <div class="editor-field">
         <input type="checkbox" id="add_to_gradebook" checked="checked" />
@@ -468,10 +482,11 @@
             Worth
             @Html.TextBoxFor(model => model.Assignment.PointsPossible, new { id = "points_possible", size = 3 })
             Points in Category <span id="grade_category_label"></span>
+            @Helpers.CreateToolTip(ToolTips.BasicAssignmentGradingPoints)
             @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)
         </div>
-        <h3>
-            Late Policy</h3>
+
+    <h3>Late Policy @Helpers.CreateToolTip(ToolTips.BasicAssignmentLatePolicy) </h3>
         <p>
             Students may submit assignments up to @Html.TextBoxFor(model => model.Submission.MinutesLateWithNoPenalty, new { size = 3 })
             minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.Submission.PercentPenalty, new { size = 3 })
@@ -490,13 +505,15 @@
     
     <p>
         <input type="submit" value="Create Basic Assignment" />
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentSave)
     </p>
     
     }
     <div>
-        @Html.ActionLink("Back to List", "Index", "Home")
+        @Html.ActionLink("Back to List", "Index", "Home") <br />
     </div>
 }
+
 <div id="team_generation_dialog" title="Edit Teams">
     @Html.DisplayFor(m => m.TeamCreation)
 </div>
