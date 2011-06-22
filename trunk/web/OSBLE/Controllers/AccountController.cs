@@ -19,10 +19,21 @@ namespace OSBLE.Controllers
 {
     public class AccountController : OSBLEController
     {
+        public ActionResult ErrorPage()
+        {
+            return View();
+        }
+
+        public ActionResult ThrowError()
+        {
+            throw new Exception();
+        }
+
         public AccountController()
         {
             ViewBag.ReCaptchaPublicKey = getReCaptchaPublicKey();
         }
+
         //
         // GET: /Account/LogOn
 
@@ -106,7 +117,6 @@ namespace OSBLE.Controllers
             currentUser.DefaultCourse = Convert.ToInt32(Request.Params["defaultCourse"]);
             db.Entry(currentUser).State = EntityState.Modified;
             db.SaveChanges();
-
 
             return RedirectToAction("Profile");
         }
@@ -278,21 +288,21 @@ namespace OSBLE.Controllers
                 {
 #if !DEBUG
 
-                string newPass = user.ResetPassword();
+                    string newPass = user.ResetPassword();
 
-                string body = "Your OSBLE password has been reset.\n Your new password is: " + newPass + "\n\nPlease change this password as soon as possible.";
+                    string body = "Your OSBLE password has been reset.\n Your new password is: " + newPass + "\n\nPlease change this password as soon as possible.";
 
-                MailMessage mm = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"],"OSBLE"),
-                            new MailAddress(model.EmailAddress));
+                    MailMessage mm = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE"),
+                                new MailAddress(model.EmailAddress));
 
-                mm.Subject = "[OSBLE] Password Reset Request";
-                mm.Body = body;
+                    mm.Subject = "[OSBLE] Password Reset Request";
+                    mm.Body = body;
 
-                //This will need to fixed whenever we get a Server that can send mail
-                SmtpClient sc = new SmtpClient();
-                sc.UseDefaultCredentials = true;
+                    //This will need to fixed whenever we get a Server that can send mail
+                    SmtpClient sc = new SmtpClient();
+                    sc.UseDefaultCredentials = true;
 
-                sc.Send(mm);
+                    sc.Send(mm);
 #endif
 
                     return View("ResetPasswordSuccess");
@@ -357,7 +367,6 @@ namespace OSBLE.Controllers
                             FileStream fs = FileSystem.GetProfilePictureForWrite(currentUser);
                             finalImage.Save(fs, ImageFormat.Jpeg);
                             fs.Close();
-
                         }
                     }
                 }
@@ -389,18 +398,16 @@ namespace OSBLE.Controllers
                         using (MailMessage message = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE"),
                                                                 new MailAddress("support@osble.org")))
                         {
-
                             message.ReplyToList.Add(new MailAddress(model.Email));
                             message.Subject = "[OSBLE] Support Request from " + model.Name;
                             message.Body = model.Message;
 
 #if !DEBUG
-                mailClient.Send(message);
+                            mailClient.Send(message);
 #endif
                             ViewBag.CUName = model.Name;
                         }
                     }
-
 
                     return View("ContactUsSuccess");
                 }

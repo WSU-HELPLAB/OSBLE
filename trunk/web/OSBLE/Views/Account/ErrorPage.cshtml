@@ -1,0 +1,23 @@
+﻿@{
+    Layout = "~/Views/Shared/_LogOn.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Error</title>
+    <h2>Huston we have an error!</h2>
+</head>
+<body>
+    <div>
+        We have an encountered an error when trying to process your request. <br />
+    </div>
+    <div>
+    If you were in the middle of doing please check to see if that action was completed. If it was not please try again.<br />
+    </div>
+    <div>
+    If you keep getting this error when you try to perform the same action please @Html.ActionLink("contact us", "ContactUs", "Account")<br />
+    </div>
+</body>
+</html>

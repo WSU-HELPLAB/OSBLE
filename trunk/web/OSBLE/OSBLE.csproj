@@ -624,6 +624,7 @@
     <Content Include="Views\AsyncIssueVoting\Index.cshtml" />
     <Content Include="Views\PeerReview\Index.cshtml" />
     <Content Include="Views\SyncIssueVoting\Index.cshtml" />
+    <Content Include="Views\Account\ErrorPage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />
