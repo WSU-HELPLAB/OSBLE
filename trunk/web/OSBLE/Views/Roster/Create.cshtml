@@ -1,4 +1,5 @@
 ﻿@model OSBLE.Models.Courses.CoursesUsers
+@using OSBLE.Models
 
 @{
     ViewBag.Title = "Add User";
@@ -14,6 +15,7 @@
 
         <div class="editor-label">
             @Html.LabelFor(model => model.UserProfileID, "ID Number")
+            @Helpers.CreateToolTip(ToolTips.RosterSchoolID) 
         </div>
         <div class="editor-field">
             @Html.EditorFor(model => model.UserProfile.Identification)
@@ -22,6 +24,7 @@
 
         <div class="editor-label">
             @Html.LabelFor(model => model.CourseRoleID, "Course Role")
+            @Helpers.CreateToolTip(ToolTips.RosterRole) 
         </div>
         <div class="editor-field">
             @Html.DropDownList("CourseRoleID", String.Empty)
@@ -30,6 +33,7 @@
 
         <div class="editor-label">
             @Html.LabelFor(model => model.Section) <em>(Enter 0 for all sections)</em>
+            @Helpers.CreateToolTip(ToolTips.RosterSection) 
         </div>
         <div class="editor-field">
             @Html.EditorFor(model => model.Section, "0")
@@ -38,9 +42,11 @@
 
         <p>
             <input type="submit" value="Add User" />
+            @Helpers.CreateToolTip(ToolTips.RosterSave) 
         </p>
 }
 
 <div>
     @Html.ActionLink("Back to Users", "Index")
+    @Helpers.CreateToolTip(ToolTips.RosterBack) 
 </div>

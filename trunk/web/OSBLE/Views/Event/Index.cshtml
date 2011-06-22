@@ -1,5 +1,6 @@
 ﻿@model IEnumerable<OSBLE.Models.HomePage.Event>
 
+@using OSBLE.Models
 @using OSBLE.Models.HomePage
 
 @{
@@ -14,34 +15,42 @@
 
 <p>
     @if(ViewBag.ActiveCourse.CourseRole.CanModify || ViewBag.ActiveCourse.Course.AllowEventPosting) {
-    @Html.ActionLink("Create New Event", "Create")
+        @Html.ActionLink("Create New Event", "Create")
+        @Helpers.CreateToolTip(ToolTips.EventCreate ) 
     }
 </p>
 
 @{
     DateTime today = DateTime.Now.Date;
-    
+
     // First get events before today
-    List<Event> pastEvents = Model.Where(e=>e.StartDate < today).ToList();
+    List<Event> pastEvents = Model.Where(e => e.StartDate < today).ToList();
     List<Event> currentEvents = Model.Where(e => e.StartDate >= today).ToList();
 }
 
-@if(pastEvents.Count > 0) {
+@if (pastEvents.Count > 0)
+{
     
-<h3><a href="#" onclick="$('#past_events').toggle('blind'); return false;">Past Events (@pastEvents.Count)</a></h3>
+<h3>
+    <a href="#" onclick="$('#past_events').toggle('blind'); return false;">Past Events (@pastEvents.Count)</a>
+    @Helpers.CreateToolTip(ToolTips.EventPastEvents) 
+</h3>
 
     <div id="past_events">
-    @Html.Partial("_Events",pastEvents)
+    @Html.Partial("_Events", pastEvents)
     </div>
 }
 
 @if (currentEvents.Count > 0)
 {
     
-<h3><a href="#" onclick="$('#current_events').toggle('blind'); return false;">Current Events (@currentEvents.Count)</a></h3>
+<h3>
+    <a href="#" onclick="$('#current_events').toggle('blind'); return false;">Current Events (@currentEvents.Count)</a>
+    @Helpers.CreateToolTip(ToolTips.EventCurrentEvents) 
+</h3>
 
     <div id="current_events">
-    @Html.Partial("_Events",currentEvents)
+    @Html.Partial("_Events", currentEvents)
     </div>
 
 }

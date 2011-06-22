@@ -1,5 +1,7 @@
 ﻿@model OSBLE.Models.HomePage.Event
 
+@using OSBLE.Models
+
 @{
     ViewBag.Title = "Create Event";
 }
@@ -14,15 +16,16 @@
 
         <div class="editor-label">
             @Html.LabelFor(model => model.Title)
+            @Helpers.CreateToolTip(ToolTips.EventTitle) 
         </div>
         <div class="editor-field">
             @Html.EditorFor(model => model.Title)
             @Html.ValidationMessageFor(model => model.Title)
         </div>
 
-
         <div class="editor-label">
             @Html.LabelFor(model => model.StartDate)
+            @Helpers.CreateToolTip(ToolTips.EventDate) 
         </div>
         <div class="editor-field">
             @Html.EditorFor(model => model.StartDate)
@@ -31,6 +34,7 @@
 
         <div class="editor-label">
             @Html.LabelFor(model => model.StartTime)
+            @Helpers.CreateToolTip(ToolTips.EventTime) 
         </div>
         <div class="editor-field">
             @Html.EditorFor(model => model.StartTime)
@@ -39,6 +43,7 @@
 
         <div class="editor-label">
             @Html.LabelFor(model => model.Description)
+            @Helpers.CreateToolTip(ToolTips.EventDescription) 
         </div>
         <div class="editor-field">
             @Html.TextAreaFor(model => model.Description, new { rows = 5, cols = 50 })
@@ -47,6 +52,7 @@
 
         <div class="editor-label">
             @Html.LabelFor(model => model.LinkTitle)
+            @Helpers.CreateToolTip(ToolTips.EventLinkTitle) 
         </div>
         <div class="editor-field">
             @Html.EditorFor(model => model.LinkTitle)
@@ -55,17 +61,21 @@
     
         <div class="editor-label">
             @Html.LabelFor(model => model.Link)
+            @Helpers.CreateToolTip(ToolTips.EventLink) 
         </div>
         <div class="editor-field">
             @Html.EditorFor(model => model.Link)
             @Html.ValidationMessageFor(model => model.Link)
         </div>
 
+    
         <p>
             <input type="submit" value="Create Event" />
+            @Helpers.CreateToolTip(ToolTips.EventSave) 
         </p>
 }
 
 <div>
     @Html.ActionLink("Back to List", "Index")
+    @Helpers.CreateToolTip(ToolTips.EventBack) 
 </div>

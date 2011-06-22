@@ -20,7 +20,9 @@
 }
 
 /* USED BY jquery-tooltip.js */    
-.popup-trigger {
+.popup-trigger 
+{
+    display: inline;
 }
     
 /* USED BY jquery-tooltip.js */
@@ -55,6 +57,17 @@
     padding: 0px;
     overflow: visible;
 }
+
+/* visual fixes */
+.popup td.bottom, .popup td.bottomleft, .popup.bottomright 
+{
+    height: 19px;
+}
+.popup td.right, .popup td.topright, .popup.bottomright 
+{
+    width: 22px;
+}
+
 
 .popup td.right, .popup td.left {
     width: 19px;

@@ -1,9 +1,12 @@
 ﻿@model IEnumerable<OSBLE.Models.Users.Mail>
+@using OSBLE.Models
+
 @{
     ViewBag.Title = "Mail";
 }
-    <h2>New Message</h2>
-    Enter recipient's name to compose message:<br />
+    <h2>New Message @Helpers.CreateToolTip(ToolTips.MailNewMessage) </h2>
+    Enter recipient's name to compose message: 
+    @Helpers.CreateToolTip(ToolTips.MailRecipient) <br />
 
 
         <input id="people_finder" />
@@ -27,13 +30,13 @@
 
     @if (ViewBag.BoxHeader == "Inbox")
     {
-        <h2>Inbox</h2>
-        <p>@Html.ActionLink("Go to Outbox","Outbox")</p>
+        <h2>Inbox @Helpers.CreateToolTip(ToolTips.MailInbox) </h2>
+        <p>@Html.ActionLink("Go to Outbox","Outbox") @Helpers.CreateToolTip(ToolTips.MailOutbox) </p>
     }
     else
     {
-        <h2>Outbox</h2>
-        <p>@Html.ActionLink("Go to Inbox", "Index")</p>
+        <h2>Outbox @Helpers.CreateToolTip(ToolTips.MailOutbox) </h2>
+        <p>@Html.ActionLink("Go to Inbox", "Index") @Helpers.CreateToolTip(ToolTips.MailInbox) </p>
     }
 
     </h2>
@@ -46,7 +49,7 @@
     {
       
         <tr id="mail_item_@(item.ID)" class="@if (!item.Read)
-                                                                             {<text>inbox_unread</text>}">
+                                             {<text>inbox_unread</text>}">
             <td class="inbox_time">
                 <small>@item.Posted.ToShortDateString() @item.Posted.ToShortTimeString()</small>
             </td>

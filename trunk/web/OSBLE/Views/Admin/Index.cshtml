@@ -1,33 +1,45 @@
 ﻿@model IEnumerable<OSBLE.Models.Users.UserProfile>
 
+@using OSBLE.Models
+
 @{
     ViewBag.Title = "Administration";
 }
 
-<h2>User Administration</h2>
+<h2>
+    User Administration
+    @Helpers.CreateToolTip(ToolTips.AdminTitle) 
+</h2>
 
 <table>
     <tr>
         <th>
             UserName
+            @Helpers.CreateToolTip(ToolTips.AdminUserName) 
         </th>
         <th>
             School
+            @Helpers.CreateToolTip(ToolTips.AdminUserSchool) 
         </th>
         <th>
             ID
+            @Helpers.CreateToolTip(ToolTips.AdminUserID) 
         </th>
         <th>
             FirstName
+            @Helpers.CreateToolTip(ToolTips.AdminUserFirstName) 
         </th>
         <th>
             LastName
+            @Helpers.CreateToolTip(ToolTips.AdminUserLastName) 
         </th>
         <th>
             Admin
+            @Helpers.CreateToolTip(ToolTips.AdminUserIsAdmin) 
         </th>
         <th>
             Course Creator
+            @Helpers.CreateToolTip(ToolTips.AdminUserIsCourseCreator) 
         </th>
         <th></th>
     </tr>

@@ -1,5 +1,6 @@
 ﻿@using OSBLE.Controllers;
 @using OSBLE.Models.Courses;
+@using OSBLE.Models
 @model IEnumerable<OSBLE.Models.Courses.CoursesUsers>
 @{
     ViewBag.Title = "Index";
@@ -13,16 +14,19 @@
 {
 if (!(ViewBag.ActiveCourse.Course is Community))
 {
-<div><a href="#" onclick="$('#add_update_users').toggle('blind'); return false;">Add/Update Users</a></div>
+<div>
+    <a href="#" onclick="$('#add_update_users').toggle('blind'); return false;">Add/Update Users</a>
+    @Helpers.CreateToolTip(ToolTips.RosterAddUpdate) 
+</div>
 <div id="add_update_users">
-    <h4>Add Single User</h4>
+    <h4>Add Single User @Helpers.CreateToolTip(ToolTips.RosterSingleUser) </h4>
 
     <div>
         @Html.ActionLink("Add By School ID", "Create")&nbsp;&nbsp;
         @Html.ActionLink("Add By Email", "CreateByEmail")&nbsp;&nbsp;
     </div>
 
-    <h4>Import Roster</h4>
+    <h4>Import Roster @Helpers.CreateToolTip(ToolTips.RosterImport) </h4>
 
     <div>Upload a comma-separated (CSV) roster of students in this course:<br />
     @using (Html.BeginForm("ImportRoster", "Roster", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -36,13 +40,14 @@ if (!(ViewBag.ActiveCourse.Course is Community))
 else
 {
 <div>
-@Html.ActionLink("Add By Email", "CreateByEmail")&nbsp;&nbsp;
+    @Html.ActionLink("Add By Email", "CreateByEmail")&nbsp;&nbsp;
+    @Helpers.CreateToolTip(ToolTips.RosterCommunityUser) 
 </div>
 }
 }
 <div>
 <br />
-    Quick Filter By Name: <input type="text" id="roster_find" />
+    Quick Filter By Name: @Helpers.CreateToolTip(ToolTips.RosterQuickFilter)  <input type="text" id="roster_find" />
 </div>
 @* Hides anything that doesn't match search filter *@
 
@@ -80,7 +85,13 @@ else
             if (userByRole.Count > 0)
             { 
             <td>
-                <h3>@userByRole.RoleName (<span id="roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)">@userByRole.Count.ToString()</span>)
+                <h3>
+                    @userByRole.RoleName (<span id="roleheader_@(usersBySection.SectionNumber)_@(userByRole.RoleName)">@userByRole.Count.ToString()</span>)
+                    @try{
+                        @Helpers.CreateToolTip(ToolTips.RosterRolesDictionary[userByRole.RoleName]);
+                    } catch (KeyNotFoundException e) {
+                        @Helpers.CreateToolTip("Key not found: " + e);
+                    }
                 </h3>
                 <ul class="user_list">
                     @foreach (OSBLE.Models.Users.UserProfile user in userByRole.Users)
