@@ -100,6 +100,8 @@
     {
         float: left;
         border: 1px solid gray;
+        border-top-left-radius: 5px 10px;
+        border-top-right-radius: 5px 10px;
         background-color: #f5f5f5;
         border-bottom-width: 0;
         margin: 0 0.5em -0.1em 0;
@@ -231,7 +233,7 @@
 		    <th align="center">Options</th>
 		</tr>
 		<tr>
-			<td><a onmouseover="displayColors();">Change Tab Color</a></td>
+			<td><a onmouseover="displayColors();" >Change Tab Color</a></td>
 		</tr>
         <tr>
             <td><a onclick="deleteCategory();">Delete Category</a></td>
@@ -330,20 +332,33 @@
 <div id="tableContent">
     <table id="grades" class="gradebook">
         <tr class="colHeader">
-            <th></th>
-            <th>Weights [+]</th>
-            @{var j = 3;
-                <td id="@j" class="colHeader" style="background:silver;" onclick="selectColumn(this);"></td>
+            
+            @{var j = 1;
+                <td id="@j" class="colHeader" style="background:silver; border:outset;" onclick="selectColumn(this);"></td>
                 j += 1;
-                <td id="@j" class="colHeader" style="background:silver;" onclick="selectColumn(this);"></td>
+                <td id="@j" class="colHeader" style="background:silver; border:outset;" onclick="selectColumn(this);"></td>
+                j += 1;
+                <td id="@j" class="colHeader" style="background:silver; border:outset;" onclick="selectColumn(this);"></td>
+                j += 1;
+                <td id="@j" class="colHeader" style="background:silver; border:outset;" onclick="selectColumn(this);"></td>
                 j += 1;
                 foreach (Category item in ViewBag.Categories)
                 {
-                    <td id="@j" class="colHeader" style="background:silver;"onclick="selectColumn(this);"></td>
+                    <td id="@j" class="colHeader" style="background:silver; border:outset;"onclick="selectColumn(this);"></td>
                     j += 1;
                 }
             }
             
+        </tr>
+        <tr>
+            <th></th>
+            <th>Weights [+]</th>
+            <th></th>
+            <th></th>
+            @foreach (Category item in ViewBag.Categories)
+            {
+                <td></td>
+            }
         </tr>
         <tr id="weights">
             <td id="sectionHolder"></td>
@@ -419,81 +434,81 @@
 
             @{  
                     
-                List<CoursesUsers> courseUser = (from course in ViewBag.CoursesUser as IEnumerable<CoursesUsers>
-                                                 where course.UserProfileID == student.ID
-                                                 select course).ToList();
-                if (courseUser.Count() > 0)
+            List<CoursesUsers> courseUser = (from course in ViewBag.CoursesUser as IEnumerable<CoursesUsers>
+                                             where course.UserProfileID == student.ID
+                                             select course).ToList();
+            if (courseUser.Count() > 0)
+            {
+                foreach (CoursesUsers item in courseUser)
                 {
-                    foreach (CoursesUsers item in courseUser)
-                    {
                                <td>@item.Section</td>
-                    }
-                }                                                   
+                }
+            }                                                   
             }
 
                 <td id="@student.ID" >@student.LastName, @student.FirstName</td>               
                 
 
                 @{
-                    double totalGrade = 0;
-                    double totalPossible = 0;
-                    List<Score> totalOfCats = (from total in ViewBag.Scores as IEnumerable<Score>
-                                               where total.UserProfileID == student.ID && 
-                                               total.Points >= 0
-                                               select total).ToList();
+            double totalGrade = 0;
+            double totalPossible = 0;
+            List<Score> totalOfCats = (from total in ViewBag.Scores as IEnumerable<Score>
+                                       where total.UserProfileID == student.ID &&
+                                       total.Points >= 0
+                                       select total).ToList();
 
-                    
 
-                    if (totalOfCats.Count() > 0)
+
+            if (totalOfCats.Count() > 0)
+            {
+                for (int i = 0; i < totalOfCats.Count(); i++)
+                {
+                    if (totalCategoryPoints == 0)
                     {
-                        for (int i = 0; i < totalOfCats.Count(); i++)
-                        {
-                            if (totalCategoryPoints == 0)
-                            {
-                                totalGrade += totalOfCats[i].Points;
-                                
-                                //We always need to divide by 100%
-                                totalPossible += 100;
-                            }
-                            else
-                            {
-                                totalGrade += totalOfCats[i].Points * totalOfCats[i].AssignmentActivity.AbstractAssignment.Category.Points;
-                                totalPossible += 100 * totalOfCats[i].AssignmentActivity.AbstractAssignment.Category.Points;
-                            }
-                        }
+                        totalGrade += totalOfCats[i].Points;
+
+                        //We always need to divide by 100%
+                        totalPossible += 100;
                     }
-                    
-                    
-                    
-                    var totalPercent = (totalGrade / totalPossible)*100;
-                    var letter = "";
-                    foreach (LetterGrade item in letterList)
+                    else
                     {
-                        if (totalPercent >= item.MinimumRequired)
-                        {
-                            letter = item.Grade;
-                            break;
-                        }
+                        totalGrade += totalOfCats[i].Points * totalOfCats[i].AssignmentActivity.AbstractAssignment.Category.Points;
+                        totalPossible += 100 * totalOfCats[i].AssignmentActivity.AbstractAssignment.Category.Points;
                     }
+                }
+            }
+
+
+
+            var totalPercent = (totalGrade / totalPossible) * 100;
+            var letter = "";
+            foreach (LetterGrade item in letterList)
+            {
+                if (totalPercent >= item.MinimumRequired)
+                {
+                    letter = item.Grade;
+                    break;
+                }
+            }
                     <td id="grade">@letter</td>
                     <td>@totalPercent.ToString(".##")%</td>
-                    foreach (Category cat in ViewBag.Categories)
-                    {
-                        List<Score> scoreQuery = (from g in ViewBag.Scores as IEnumerable<Score>
-                                                  where g.UserProfileID == student.ID &&
-                                                  g.AssignmentActivity.AbstractAssignment.CategoryID == cat.ID && 
-                                                  g.Points >= 0
-                                                  select g).ToList();
+            foreach (Category cat in ViewBag.Categories)
+            {
+                List<Score> scoreQuery = (from g in ViewBag.Scores as IEnumerable<Score>
+                                          where g.UserProfileID == student.ID &&
+                                          g.AssignmentActivity.AbstractAssignment.CategoryID == cat.ID &&
+                                          g.Points >= 0
+                                          select g).ToList();
 
-                        if (scoreQuery.Count() > 0)
-                        {
+                if (scoreQuery.Count() > 0)
+                {
                             <td id="categoryGrade">@scoreQuery.First().Points.ToString(".##")%</td>
-                        }
-                        else
-                        {
+                }
+                else
+                {
                             <td id="categoryGrade">NG</td>
-                        }
-                    }
+                }
+            }
                 }
             </tr>
         }

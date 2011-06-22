@@ -210,33 +210,31 @@ namespace OSBLE.Controllers
            {
                double lowest = 10000;
                int id = 0;
+               int i = 0;
                if (categoryId > 0)
                {
-                   var studentScores = from scores in db.Scores
-                                       join activities in db.AssignmentActivities on scores.AssignmentActivityID equals activities.ID
-                                       join assignments in db.AbstractAssignments on activities.AbstractAssignmentID equals assignments.ID
-                                       join user in db.UserProfiles on scores.UserProfileID equals user.ID
-                                       where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
-                                       && scores.isDropped == false
-                                       group scores by scores.UserProfileID into userScores
-                                       select userScores;
-
-                   var assignmentScores = from a in db.AbstractAssignments
-                                          where a.CategoryID == categoryId
-                                          select a;
-
+                   var studentScores = (from scores in db.Scores
+                                        where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId &&
+                                        scores.isDropped == false &&
+                                        scores.Points >= 0
+                                        select scores).GroupBy(s => s.UserProfileID);
                    
-
                    if (studentScores.Count() > 0)
                    {
-                       for (int i = 0; i < studentScores.Count(); i++)
+                       for (i = 0; i < studentScores.Count(); i++)
                        {
                            var item = studentScores.AsEnumerable().ElementAt(i);
                            int counter = 0;
+                           
                            foreach (Score score in item)
                            {
-                               int possiblePoints = assignmentScores.AsEnumerable().ElementAt(counter).PointsPossible;
-                               double temp = score.Points / possiblePoints;
+                               //Find the assignment that corresponds because it wouldn't give me access
+                               //to points possible within the scores.
+                               var assignmentScore = from a in db.AbstractAssignments
+                                                     where a.ID == score.AssignmentActivity.AbstractAssignmentID
+                                                     select a;
+
+                               double temp = score.Points / assignmentScore.FirstOrDefault().PointsPossible;
 
                                if (temp < lowest)
                                {
@@ -245,11 +243,11 @@ namespace OSBLE.Controllers
                                }
                                counter++;
                            }
-                           foreach (Score score in item)
+                           foreach (Score newScore in item)
                            {
-                               if (score.ID == id)
+                               if (newScore.ID == id)
                                {
-                                   score.isDropped = true;
+                                   newScore.isDropped = true;
                                }
                            }
                            db.SaveChanges();
