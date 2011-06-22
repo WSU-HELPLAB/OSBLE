@@ -125,8 +125,8 @@
         //This needs to get the document locations and return their real location that the client side can open
         public IQueryable<DocumentLocation> GetDocumentLocations()
         {
-            return (new List<DocumentLocation>() { new DocumentLocation("xpsDoc.xps", 6, "bob", AuthorClassification.Student) }).ToArray().AsQueryable();
-            //return (new List<DocumentLocation>() { new DocumentLocation("csFile.cp", 6, "bob", AuthorClassification.Student) }).ToArray().AsQueryable();
+            //return (new List<DocumentLocation>() { new DocumentLocation("xpsDoc.xps", 6, "bob", AuthorClassification.Student) }).ToArray().AsQueryable();
+            return (new List<DocumentLocation>() { new DocumentLocation("csFile.cp", 6, "bob", AuthorClassification.Student) }).ToArray().AsQueryable();
         }
 
         public IQueryable<DocumentLocation> GetPeerReviewLocations()

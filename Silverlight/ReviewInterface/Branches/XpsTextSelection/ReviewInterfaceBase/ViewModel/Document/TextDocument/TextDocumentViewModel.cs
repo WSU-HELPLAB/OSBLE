@@ -157,7 +157,6 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
             thisView.DocumentViewer.LostFocus += new RoutedEventHandler(DocumentViewer_LostFocus);
             thisView.DocumentViewer.LayoutUpdated += new EventHandler(DocumentViewer_LayoutUpdated);
             thisView.DocumentViewer.SelectionChanged += new RoutedEventHandler(DocumentViewer_SelectionChanged);
-            thisView.DocumentViewer.ContentChanged += new ContentChangedEventHandler(DocumentViewer_ContentChanged);
 
             //find out what language we are using from the file extension
             ILanguage language = LanguageFactory.LanguageFromFileExtension(FileExtension);
@@ -305,7 +304,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
             selectionHighlighting.Canvas = HighlightOverlay;
             //selectionHighlighting.FillBrush = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));
             selectionHighlighting.FillBrush = new SolidColorBrush(Color.FromArgb(100, 100, 175, 200));
-            
+
             selectionHighlighting.StrokeBrush = new SolidColorBrush(Colors.Transparent);
             selectionHighlighting.Opacity = 0;
             try
@@ -316,9 +315,8 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
             {
                 currentSelection = null;
             }
-            
 
-            if (currentSelection== null || currentSelection.Count == 0)
+            if (currentSelection == null || currentSelection.Count == 0)
             {
                 reviewItemSelected = false;
             }
@@ -328,45 +326,6 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
             }
 
             ReviewItemSelectedChanged(this, EventArgs.Empty);
-        }
-
-        /// <summary>
-        /// This fires whenever the RichTextBox Content has been changed it is here that we determine the lines and children
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DocumentViewer_ContentChanged(object sender, RoutedEventArgs e)
-        {
-            int rows = 0;
-            double height = 0;
-            double previousLineBottem = 0;
-            lines = new List<RowDefinition>();
-            children = new List<StackPanel>();
-            foreach (Inline inline in ContentBlock.Inlines)
-            {
-                //we know that it goes run followed by line break as that is how we set it up,
-                //so we use this to get the height of the element in the run before the line break
-                if (inline is Run)
-                {
-                    TextPointer tp = (inline as Run).ContentStart;
-                    height = tp.GetCharacterRect(LogicalDirection.Forward).Bottom - previousLineBottem;
-                    previousLineBottem = tp.GetCharacterRect(LogicalDirection.Forward).Bottom;
-                }
-                if (inline is LineBreak)
-                {
-                    RowDefinition rd = new RowDefinition();
-                    rd.MinHeight = height;
-
-                    //it cant be the same as min so add just a little bit to make it different
-                    rd.MaxHeight = height + 0.1;
-                    lines.Add(rd);
-                    StackPanel sp = new StackPanel();
-                    sp.SetValue(Grid.RowProperty, rows);
-                    children.Add(sp);
-                    rows++;
-                }
-            }
-            ContentUpdated(this, EventArgs.Empty);
         }
 
         /// <summary>
