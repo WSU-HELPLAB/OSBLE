@@ -347,19 +347,19 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
         {
             int lineNumber = 0;
             
-            // compensating for multiple 
-            Inline startOfLine = null;
-            bool firstRun = true;
+            // vars for compensating for multiple runs
+            Inline firstRunOfLine = null;
+            bool isFirstRun = true;
             bool isEndline = false;
 
             foreach (Inline inline in ContentBlock.Inlines)
             {
-                // checking to see if it is the first run in a line
-                if (isEndline || firstRun)
+                // checking to see if it is the first run of a line
+                if (isEndline || isFirstRun)
                 {
-                    startOfLine = inline;
+                    firstRunOfLine = inline;
                     isEndline = false;
-                    firstRun = false;
+                    isFirstRun = false;
                 }
 
                 if (inline is Run)
@@ -381,7 +381,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
 
             if (contentPtr.Parent is Run)
             {
-                TextPointer tp = (startOfLine as Run).ContentStart;
+                TextPointer tp = (firstRunOfLine as Run).ContentStart;
 
                 int i = 0;
                 while (contentRect.X != tp.GetCharacterRect(LogicalDirection.Forward).X)
