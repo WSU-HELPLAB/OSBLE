@@ -147,7 +147,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
                     else
                     {
                         //this is a bug fix until I learn how to get the position of LineBreaks
-                        index = (textStart.GetNextInsertionPosition(LogicalDirection.Backward));
+                        index = (textStart.GetNextInsertionPosition(LogicalDirection.Forward));
                     }
                     rect = MakeRectange(textStart, index);
                     if (rect != null)

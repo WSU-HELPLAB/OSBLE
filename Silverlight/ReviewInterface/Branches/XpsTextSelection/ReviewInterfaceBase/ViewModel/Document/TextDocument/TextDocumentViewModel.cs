@@ -346,9 +346,22 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
         private Tuple<int, int> findContentLineNumber(TextPointer contentPtr)
         {
             int lineNumber = 0;
+            
+            // compensating for multiple 
+            Inline startOfLine = null;
+            bool firstRun = true;
+            bool isEndline = false;
 
             foreach (Inline inline in ContentBlock.Inlines)
             {
+                // checking to see if it is the first run in a line
+                if (isEndline || firstRun)
+                {
+                    startOfLine = inline;
+                    isEndline = false;
+                    firstRun = false;
+                }
+
                 if (inline is Run)
                 {
                     if (inline == contentPtr.Parent)
@@ -359,14 +372,16 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
                 else if (inline is LineBreak)
                 {
                     lineNumber++;
+                    isEndline = true;
                 }
             }
+           
 
             Rect contentRect = contentPtr.GetCharacterRect(LogicalDirection.Forward);
 
             if (contentPtr.Parent is Run)
             {
-                TextPointer tp = (contentPtr.Parent as Run).ContentStart;
+                TextPointer tp = (startOfLine as Run).ContentStart;
 
                 int i = 0;
                 while (contentRect.X != tp.GetCharacterRect(LogicalDirection.Forward).X)
