@@ -189,7 +189,10 @@ namespace FileUploader
         {
             UploadLocation.Items.Clear();
             UploadLocation.ItemsSource = e.Result;
-            UploadLocation.SelectedIndex = 0;
+            if (e.Result.Count > 0)
+            {
+                UploadLocation.SelectedIndex = 0;
+            }
         }        
 
         /// <summary>

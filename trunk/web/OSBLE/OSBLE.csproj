@@ -619,7 +619,6 @@
     <Content Include="Views\Rubric\Edit.cshtml" />
     <Content Include="Views\Rubric\Index.cshtml" />
     <Content Include="Views\Shared\_AddToGradebook.cshtml" />
-    <Content Include="Views\IssueVoting\Create.cshtml" />
     <Content Include="Views\AuthorRebuttal\Index.cshtml" />
     <Content Include="Views\AsyncIssueVoting\Index.cshtml" />
     <Content Include="Views\PeerReview\Index.cshtml" />
