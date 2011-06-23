@@ -309,7 +309,7 @@ namespace FileUploader
             switch (e.ActionRequested)
             {
                 case RemoteFileActions.Delete:
-                    ConfirmDeleteButton confirm = new ConfirmDeleteButton();
+                    ConfirmDeleteWindow confirm = new ConfirmDeleteWindow();
                     confirm.Show();
                     confirm.OKButton.Click += new RoutedEventHandler(RemoveRemoteSelectionButton_Click);
                     break;

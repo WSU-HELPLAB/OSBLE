@@ -176,6 +176,7 @@ namespace FileUploader
                 //check for a cancel request
                 if (CancelRequested)
                 {
+                    OnCancelled();
                     return;
                 }
 
@@ -229,14 +230,18 @@ namespace FileUploader
                 //recursively send over directory files
                 SyncListing(dl, basePath + dl.Name + "\\");
             }
+
+            //tell the caller that we're done
+            UploadComplete(this, EventArgs.Empty);
         }
 
         /// <summary>
-        /// This gets called when we're done with our initial task
+        /// This gets called when we're done with our initial task.  Not used because
+        /// this thread is triggered over several async calls.
         /// </summary>
         protected override void OnCompleted()
         {
-            UploadComplete(this, EventArgs.Empty);
+            
         }
 
         /// <summary>

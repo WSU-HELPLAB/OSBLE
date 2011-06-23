@@ -12,9 +12,9 @@ using System.Windows.Shapes;
 
 namespace FileUploader.Controls
 {
-    public partial class ConfirmDeleteButton : ChildWindow
+    public partial class ConfirmDeleteWindow : ChildWindow
     {
-        public ConfirmDeleteButton()
+        public ConfirmDeleteWindow()
         {
             InitializeComponent();
         }
