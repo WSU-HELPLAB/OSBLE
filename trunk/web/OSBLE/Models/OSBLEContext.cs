@@ -460,8 +460,8 @@ namespace OSBLE.Models
         {
             base.Seed(context);
 
-            context.SeedRoles();
-            context.SeedTestData();
+            //context.SeedRoles();
+            //context.SeedTestData();
         }
     }
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models.Rubrics
@@ -18,7 +15,5 @@ namespace OSBLE.Models.Rubrics
         public virtual ICollection<Level> Levels { get; set; }
 
         public virtual ICollection<Criterion> Criteria { get; set; }
-
     }
-
 }
