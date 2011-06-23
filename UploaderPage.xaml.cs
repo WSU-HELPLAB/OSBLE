@@ -28,7 +28,7 @@ namespace FileUploader
         private string authToken = "";
         private string OsbleUrl = "http://osble.org";
         public string RootPath;
-        private const string activityMessageUpdate = "Automated Message:\nThe files and links have been updated for the current course.";
+        private const string activityMessageUpdate = "Automated Message: Files & Links have been updated.";
         private RemoteFilesContextMenu remoteContextMenu = new RemoteFilesContextMenu();
         private LocalFilesContextMenu localContextMenu = new LocalFilesContextMenu();
 
