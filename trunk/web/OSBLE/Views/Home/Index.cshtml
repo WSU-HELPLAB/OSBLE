@@ -45,13 +45,12 @@
 </div>
 
 <div id="dashboard_right">
-<h3>Course Links @Helpers.CreateToolTip(ToolTips.HomeLinks) 
+<h3>Files &amp; Links @Helpers.CreateToolTip(ToolTips.HomeLinks) 
 @{if(ViewBag.CanEditCourseLinks)
   {
       <span id="file_upload_silverlight_span">
       @{ SilverlightObject so = ViewBag.Uploader as SilverlightObject; }
       @Html.DisplayFor(m => so, "SilverlightObject")
-      @Helpers.CreateToolTip(ToolTips.HomeLinksEdit)
       </span>
   }
 }
