@@ -62,17 +62,23 @@
   <wsdl:message name="UploaderWebService_IsValidKey_OutputMessage">
     <wsdl:part name="parameters" element="IsValidKeyResponse" />
   </wsdl:message>
-  <wsdl:message name="UploaderWebService_SyncFile_InputMessage">
-    <wsdl:part name="parameters" element="SyncFile" />
+  <wsdl:message name="UploaderWebService_PostActivityMessage_InputMessage">
+    <wsdl:part name="parameters" element="PostActivityMessage" />
   </wsdl:message>
-  <wsdl:message name="UploaderWebService_SyncFile_OutputMessage">
-    <wsdl:part name="parameters" element="SyncFileResponse" />
+  <wsdl:message name="UploaderWebService_PostActivityMessage_OutputMessage">
+    <wsdl:part name="parameters" element="PostActivityMessageResponse" />
   </wsdl:message>
   <wsdl:message name="UploaderWebService_PrepCurrentPath_InputMessage">
     <wsdl:part name="parameters" element="PrepCurrentPath" />
   </wsdl:message>
   <wsdl:message name="UploaderWebService_PrepCurrentPath_OutputMessage">
     <wsdl:part name="parameters" element="PrepCurrentPathResponse" />
+  </wsdl:message>
+  <wsdl:message name="UploaderWebService_SyncFile_InputMessage">
+    <wsdl:part name="parameters" element="SyncFile" />
+  </wsdl:message>
+  <wsdl:message name="UploaderWebService_SyncFile_OutputMessage">
+    <wsdl:part name="parameters" element="SyncFileResponse" />
   </wsdl:message>
   <wsdl:message name="UploaderWebService_UpdateListingOrder_InputMessage">
     <wsdl:part name="parameters" element="UpdateListingOrder" />
@@ -123,13 +129,17 @@
       <wsdl:input wsaw:Action="urn:UploaderWebService/IsValidKey" message="UploaderWebService_IsValidKey_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/IsValidKeyResponse" message="UploaderWebService_IsValidKey_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="SyncFile">
-      <wsdl:input wsaw:Action="urn:UploaderWebService/SyncFile" message="UploaderWebService_SyncFile_InputMessage" />
-      <wsdl:output wsaw:Action="urn:UploaderWebService/SyncFileResponse" message="UploaderWebService_SyncFile_OutputMessage" />
+    <wsdl:operation name="PostActivityMessage">
+      <wsdl:input wsaw:Action="urn:UploaderWebService/PostActivityMessage" message="UploaderWebService_PostActivityMessage_InputMessage" />
+      <wsdl:output wsaw:Action="urn:UploaderWebService/PostActivityMessageResponse" message="UploaderWebService_PostActivityMessage_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="PrepCurrentPath">
       <wsdl:input wsaw:Action="urn:UploaderWebService/PrepCurrentPath" message="UploaderWebService_PrepCurrentPath_InputMessage" />
       <wsdl:output wsaw:Action="urn:UploaderWebService/PrepCurrentPathResponse" message="UploaderWebService_PrepCurrentPath_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SyncFile">
+      <wsdl:input wsaw:Action="urn:UploaderWebService/SyncFile" message="UploaderWebService_SyncFile_InputMessage" />
+      <wsdl:output wsaw:Action="urn:UploaderWebService/SyncFileResponse" message="UploaderWebService_SyncFile_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="UpdateListingOrder">
       <wsdl:input wsaw:Action="urn:UploaderWebService/UpdateListingOrder" message="UploaderWebService_UpdateListingOrder_InputMessage" />

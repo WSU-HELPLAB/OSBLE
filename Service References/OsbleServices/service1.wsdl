@@ -111,8 +111,8 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="SyncFile">
-      <soap:operation soapAction="urn:UploaderWebService/SyncFile" style="document" />
+    <wsdl:operation name="PostActivityMessage">
+      <soap:operation soapAction="urn:UploaderWebService/PostActivityMessage" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -122,6 +122,15 @@
     </wsdl:operation>
     <wsdl:operation name="PrepCurrentPath">
       <soap:operation soapAction="urn:UploaderWebService/PrepCurrentPath" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SyncFile">
+      <soap:operation soapAction="urn:UploaderWebService/SyncFile" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
