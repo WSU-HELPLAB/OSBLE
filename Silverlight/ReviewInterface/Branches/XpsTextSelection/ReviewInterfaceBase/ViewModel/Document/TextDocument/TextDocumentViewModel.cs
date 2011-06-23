@@ -347,23 +347,21 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
         {
             int lineNumber = 0;
             
-            // vars for compensating for multiple runs
+            // vars for compensating for multiple run Lines
             Inline firstRunOfLine = null;
-            bool isFirstRun = true;
-            bool isEndline = false;
+            bool isNewline = true;
 
             foreach (Inline inline in ContentBlock.Inlines)
-            {
-                // checking to see if it is the first run of a line
-                if (isEndline || isFirstRun)
-                {
-                    firstRunOfLine = inline;
-                    isEndline = false;
-                    isFirstRun = false;
-                }
-
+            { 
                 if (inline is Run)
                 {
+                    // checking to see if it is the first run of a line
+                    if (isNewline)
+                    {
+                        firstRunOfLine = inline;
+                        isNewline = false;
+                    }
+
                     if (inline == contentPtr.Parent)
                     {
                         break;
@@ -372,7 +370,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
                 else if (inline is LineBreak)
                 {
                     lineNumber++;
-                    isEndline = true;
+                    isNewline = true;
                 }
             }
            
