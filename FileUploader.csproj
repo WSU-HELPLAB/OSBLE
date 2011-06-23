@@ -179,6 +179,9 @@
     <Content Include="Images\install.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Service References\OsbleServices\Arrays.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Service References\OsbleServices\FileUploader.OsbleServices.DirectoryListing.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -188,29 +191,25 @@
     <None Include="Service References\OsbleServices\FileUploader.OsbleServices.ParentDirectoryListing.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\OsbleServices\UploaderWebService.disco" />
+    <None Include="Service References\OsbleServices\OSBLE.Models.Services.Uploader.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleServices\service.wsdl" />
+    <None Include="Service References\OsbleServices\service.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleServices\service1.wsdl" />
+    <None Include="Service References\OsbleServices\service1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Properties\OutOfBrowserSettings.xml" />
     <None Include="Service References\OsbleServices\configuration91.svcinfo" />
     <None Include="Service References\OsbleServices\configuration.svcinfo" />
     <None Include="Service References\OsbleServices\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
-    <None Include="Properties\OutOfBrowserSettings.xml" />
     <Content Include="ServiceReferences.ClientConfig" />
-    <None Include="Service References\OsbleServices\UploaderWebService.wsdl" />
-    <None Include="Service References\OsbleServices\UploaderWebService.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleServices\UploaderWebService1.wsdl" />
-    <None Include="Service References\OsbleServices\UploaderWebService1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleServices\UploaderWebService2.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleServices\UploaderWebService3.xsd">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
