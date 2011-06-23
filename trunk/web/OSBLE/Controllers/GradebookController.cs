@@ -9,6 +9,7 @@ using OSBLE.Models.Users;
 using OSBLE.Models.Assignments.Activities.Scores;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments;
+using OSBLE.Models.Courses.GradebookOptions;
 using System.IO;
 
 namespace OSBLE.Controllers
@@ -206,6 +207,11 @@ namespace OSBLE.Controllers
        [HttpPost]
        public ActionResult AllDropLowest(int categoryId, int dropX)
        {
+           // storing the amount of assignments wanted to drop
+           var currentCategory = (from cat in db.Categories where cat.ID == categoryId select cat).FirstOrDefault();
+           currentCategory.gradebookOptions.dropX = dropX;
+           db.SaveChanges();
+
            if (ModelState.IsValid)
            {
                int i = 0;
@@ -447,7 +453,8 @@ namespace OSBLE.Controllers
                Points = 0,
                ColumnOrder = 0,
                Assignments = new List<AbstractAssignment>(),
-               TabColor = "Silver"
+               TabColor = "Silver",
+               gradebookOptions = new GradebookOptions()
            };
            db.Categories.Add(newCategory);
            db.SaveChanges();
@@ -781,6 +788,8 @@ namespace OSBLE.Controllers
            List<Category> allCategories = cats.ToList();
 
            Category currentTab = (from c in allCategories where c.ID == categoryId select c).First();
+           List<int> numDropped = new List<int>();
+           numDropped.Add(currentTab.gradebookOptions.dropX);
 
            if (currentTab == null)
            {
@@ -884,7 +893,7 @@ namespace OSBLE.Controllers
            ViewBag.GradeAssignments = gradeAssignments;
            ViewBag.Users = students;
            ViewBag.Percents = studentScores;
-           ViewBag.Dropped = droppedCount.Count();
+           ViewBag.Dropped = numDropped;
 
            Session["isTab"] = 1;
        }

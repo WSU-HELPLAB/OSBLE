@@ -56,5 +56,8 @@ namespace OSBLE.Models.Courses
         [Required]
         [Display(Name = "Gradables")]
         public ICollection<AbstractAssignment> Assignments { get; set; }
+
+        public virtual GradebookOptions.GradebookOptions gradebookOptions { get; set; }
+
     }
 }

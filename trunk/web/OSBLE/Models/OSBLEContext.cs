@@ -5,9 +5,11 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments.Activities.Scores;
 using OSBLE.Models.Courses;
+using OSBLE.Models.Courses.GradebookOptions;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Rubrics;
 using OSBLE.Models.Users;
+
 
 namespace OSBLE.Models
 {
@@ -197,6 +199,8 @@ namespace OSBLE.Models
 
             this.SaveChanges();
 
+            
+
             // Sample Courses
             Course c1 = new Course();
             c1.Prefix = "Cpt S";
@@ -204,13 +208,14 @@ namespace OSBLE.Models
             c1.Semester = "Spring";
             c1.Year = "2011";
             c1.Name = "Introduction to Programming";
-
+            
             Course c2 = new Course();
             c2.Prefix = "Art E";
             c2.Number = "345";
             c2.Semester = "Fall";
             c2.Year = "2011";
             c2.Name = "Underwater Basketweaving";
+            
 
             Community c3 = new Community();
             c3.Nickname = "Comm";
@@ -231,13 +236,18 @@ namespace OSBLE.Models
 
             this.SaveChanges();
 
+            GradebookOptions gradebook_options = new GradebookOptions();
+
             Category w1 = new Category();
             w1.Name = "Homework";
             w1.PointsPossible = 40;
+            w1.gradebookOptions = gradebook_options;
 
+            gradebook_options = new GradebookOptions();
             Category w2 = new Category();
             w2.Name = "Exams";
             w2.PointsPossible = 60;
+            w2.gradebookOptions = gradebook_options;
 
             c1.Categories = new List<Category>();
             c2.Categories = new List<Category>();

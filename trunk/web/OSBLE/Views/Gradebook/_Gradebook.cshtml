@@ -28,14 +28,24 @@
             <td id="averageScore" >0</td>  
         }
     </tr>
+    
     <tr>
+    @{
+        var numDropped = (from drop in ViewBag.Dropped as IEnumerable<int> select drop).FirstOrDefault();     
+    
         <th id="th4" ondblclick="clearDropLowest()">
             Name
         </th>
-        <th id="totalCustomize" ondblclick="displayCustomizeGrades();">
-            Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average" />
-        </th>
-        @{
+        
+            if( numDropped == 0)
+            {
+                <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average" /></th>
+            }
+            else
+            {
+                <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average [Dropped @numDropped]" /> </th>
+            }
+        
             int i = 1;
             foreach (AbstractAssignment item in ViewBag.Assignments)
             {   
@@ -52,17 +62,17 @@
             <td id="@user.ID" >@user.LastName, @user.FirstName</td>
                     
             @{
-                var percent = from p in ViewBag.Percents as IEnumerable<Score>
-                                where p.UserProfileID == user.ID
-                                select p;  
-                if (percent.Count() > 0)
-                {
+        var percent = from p in ViewBag.Percents as IEnumerable<Score>
+                      where p.UserProfileID == user.ID
+                      select p;
+        if (percent.Count() > 0)
+        {
                     <td id="total">@percent.First().Points.ToString(".##")%</td>
-                }
-                else
-                {
+        }
+        else
+        {
                     <td id="total">@String.Format("{0}", 0)</td>
-                }
+        }
             }
 
                 
