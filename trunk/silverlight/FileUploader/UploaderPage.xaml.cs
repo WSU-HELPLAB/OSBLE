@@ -28,6 +28,7 @@ namespace FileUploader
         private string authToken = "";
         private string OsbleUrl = "http://osble.org";
         public string RootPath;
+        private const string activityMessageUpdate = "Automated Message:\nThe files and links have been updated for the current course.";
         private RemoteFilesContextMenu remoteContextMenu = new RemoteFilesContextMenu();
         private LocalFilesContextMenu localContextMenu = new LocalFilesContextMenu();
 
@@ -416,6 +417,7 @@ namespace FileUploader
         void uploader_Closed(object sender, EventArgs e)
         {
             SelectionChanged(this, null);
+            client.PostActivityMessageAsync(activityMessageUpdate, course.Key, authToken);
         }
 
         void SelectionChanged(object sender, EventArgs e)
