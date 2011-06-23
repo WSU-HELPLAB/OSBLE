@@ -204,28 +204,26 @@ namespace OSBLE.Controllers
 
 
        [HttpPost]
-       public ActionResult AllDropLowest(int categoryId)
+       public ActionResult AllDropLowest(int categoryId, int dropX)
        {
            if (ModelState.IsValid)
            {
-               double lowest = 10000;
-               int id = 0;
                int i = 0;
                if (categoryId > 0)
                {
                    var studentScores = (from scores in db.Scores
                                         where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId &&
-                                        scores.isDropped == false &&
                                         scores.Points >= 0
                                         select scores).GroupBy(s => s.UserProfileID);
-                   
+
                    if (studentScores.Count() > 0)
                    {
                        for (i = 0; i < studentScores.Count(); i++)
                        {
+                           List<double> lowest = new List<double>();
+                           List<int> id = new List<int>();
                            var item = studentScores.AsEnumerable().ElementAt(i);
-                           int counter = 0;
-                           
+
                            foreach (Score score in item)
                            {
                                //Find the assignment that corresponds because it wouldn't give me access
@@ -233,25 +231,34 @@ namespace OSBLE.Controllers
                                var assignmentScore = from a in db.AbstractAssignments
                                                      where a.ID == score.AssignmentActivity.AbstractAssignmentID
                                                      select a;
-
+                               
+                               // create an ascending list of scores per student
+                               int j = 0;
                                double temp = score.Points / assignmentScore.FirstOrDefault().PointsPossible;
-
-                               if (temp < lowest)
+                               while (lowest.Count() > j && temp > lowest.ElementAt(j))
                                {
-                                   lowest = temp;
-                                   id = score.ID;
+                                   j++;
                                }
-                               counter++;
+                               lowest.Insert(j, temp);
+                               id.Insert(j, score.ID);
+                               
                            }
-                           foreach (Score newScore in item)
+
+                           // Dropping X lowest (if there are less assignments than specified to drop it only drops what is graded)
+                           for (int k = 0; k < dropX; k++)
                            {
-                               if (newScore.ID == id)
+                               if (k < lowest.Count()) // only drops the amount of graded assignments per student maximum
                                {
-                                   newScore.isDropped = true;
+                                   foreach (Score newScore in item)
+                                   {
+                                       if (newScore.ID == id.ElementAt(k))
+                                       {
+                                           newScore.isDropped = true;
+                                       }
+                                   }
                                }
                            }
                            db.SaveChanges();
-                           lowest = 10000;
                        }
                    }
                }
@@ -259,6 +266,7 @@ namespace OSBLE.Controllers
            BuildGradebook((int)Session["categoryId"]);
            return View("_Gradebook");
        }
+
 
 
        /// <summary>
