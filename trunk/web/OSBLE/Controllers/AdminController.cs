@@ -31,15 +31,21 @@ namespace OSBLE.Controllers
             // Add pending users to bottom of list.
             userprofiles = userprofiles.Concat(db.UserProfiles.Where(u =>  u.ID != currentUser.ID && u.UserName == null).ToList()).ToList();
             return View(userprofiles);
+            
         }
 
         //
         // GET: /Admin/Details/5
 
-        public ViewResult Details(int id)
+        public ActionResult Details(int id = -1)
         {
-            UserProfile userprofile = db.UserProfiles.Find(id);
-            return View(userprofile);
+            if( id != -1 )
+            {
+                UserProfile userprofile = db.UserProfiles.Find(id);
+                return View(userprofile);
+            }
+
+            return RedirectToAction("Index", "Admin");
         }
 
         public ActionResult Impersonate(int id)
@@ -56,11 +62,15 @@ namespace OSBLE.Controllers
         //
         // GET: /Admin/Edit/5
 
-        public ActionResult Edit(int id)
+        public ActionResult Edit(int id = -1)
         {
-            UserProfile userprofile = db.UserProfiles.Find(id);
-            ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name", userprofile.SchoolID);
-            return View(userprofile);
+            if( id != -1 ){
+                UserProfile userprofile = db.UserProfiles.Find(id);
+                ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name", userprofile.SchoolID); 
+                return View(userprofile);
+            }
+
+            return RedirectToAction("Index", "Admin");
         }
 
         //
@@ -82,10 +92,15 @@ namespace OSBLE.Controllers
         //
         // GET: /Admin/Delete/5
 
-        public ActionResult Delete(int id)
+        public ActionResult Delete(int id = -1)
         {
-            UserProfile userprofile = db.UserProfiles.Find(id);
-            return View(userprofile);
+            if( id != -1 )
+            {
+                UserProfile userprofile = db.UserProfiles.Find(id);
+                return View(userprofile);
+            }
+
+            return RedirectToAction("Index", "Admin");
         }
 
         //
