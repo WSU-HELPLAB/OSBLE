@@ -53,6 +53,8 @@ namespace FileUploader.Controls
                 &&
                 IsolatedStorageSettings.ApplicationSettings.Contains(IsolatedStorageKeys.Password.ToString())
                 &&
+                IsolatedStorageSettings.ApplicationSettings.Contains(IsolatedStorageKeys.SaveCredentials.ToString())
+                &&
                 (bool)IsolatedStorageSettings.ApplicationSettings[IsolatedStorageKeys.SaveCredentials.ToString()]
                 )
             {

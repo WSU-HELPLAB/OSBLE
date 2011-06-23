@@ -31,7 +31,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Path: " VerticalAlignment="Bottom" />
-            <TextBox x:Name="LocalFileTextBox" IsEnabled="False"  Grid.Row="0" Grid.Column="1" />
+            <TextBox x:Name="LocalFileTextBox" IsEnabled="True"  Grid.Row="0" Grid.Column="1" />
         </Grid>
         <my:FileList x:Name="LocalFileList" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
         <StackPanel 
