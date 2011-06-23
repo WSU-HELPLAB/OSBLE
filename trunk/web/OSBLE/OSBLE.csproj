@@ -443,6 +443,7 @@
     <Folder Include="Models\Gradables\StudioAssignment\Activities\" />
     <Folder Include="Models\RubricModel\" />
     <Folder Include="Validations\" />
+    <Folder Include="Views\IssueVoting\" />
     <Folder Include="Views\NewFolder1\" />
     <Folder Include="Views\SubbmissionAssignmentActivity\" />
     <Folder Include="Views\SubmissionAssignmentActivity\" />

@@ -1,22 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Data;
 using OSBLE.Models.Assignments.Activities;
-using System;
 
 namespace OSBLE.Models.Assignments
 {
     public class StudioAssignment : AbstractAssignment
     {
-
         public virtual ICollection<Deliverable> Deliverables { get; set; }
 
         [Required]
         [Display(Name = "Description")]
+        [StringLength(200)]
         public string Description { get; set; }
 
         [Required]
-        [Display(Name="Draft Assignment")]
+        [Display(Name = "Draft Assignment")]
         public bool IsDraft { get; set; }
 
         public StudioAssignment()

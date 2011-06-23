@@ -30,6 +30,7 @@ namespace OSBLE.Models.Courses
 
         [Required]
         [Display(Name = "Name")]
+        [StringLength(50)]
         public string Name { get; set; }
 
         [Required]
@@ -49,11 +50,11 @@ namespace OSBLE.Models.Courses
         /// <summary>
         /// Used for coloring the tab. Default to White.
         /// </summary>
+        [StringLength(50)]
         public string TabColor { get; set; }
 
         [Required]
         [Display(Name = "Gradables")]
         public ICollection<AbstractAssignment> Assignments { get; set; }
-
     }
 }

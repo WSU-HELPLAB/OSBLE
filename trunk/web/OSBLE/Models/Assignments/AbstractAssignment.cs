@@ -13,6 +13,7 @@ namespace OSBLE.Models.Assignments
         public int ID { get; set; }
 
         [Required]
+        [StringLength(100)]
         [Display(Name = "Name")]
         public string Name { get; set; }
 

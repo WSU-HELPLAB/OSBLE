@@ -9,22 +9,22 @@ namespace OSBLE.Models.Courses
         // Basic Course Info
 
         [Required]
-        [MaxLength(8)]
+        [StringLength(8)]
         [Display(Name = "Prefix")]
         public string Prefix { get; set; }
 
         [Required]
-        [MaxLength(8)]
+        [StringLength(8)]
         [Display(Name = "Number")]
         public string Number { get; set; }
 
         [Required]
-        [MaxLength(8)]
+        [StringLength(8)]
         [Display(Name = "Semester")]
         public string Semester { get; set; }
 
         [Required]
-        [MaxLength(4)]
+        [StringLength(4)]
         [Display(Name = "Year")]
         public string Year { get; set; }
 
@@ -57,10 +57,10 @@ namespace OSBLE.Models.Courses
 
         [Required]
         [Display(Name = "Minutes Late With No Penalty")]
-        public int MinutesLateWithNoPenalty { get; set;}
+        public int MinutesLateWithNoPenalty { get; set; }
 
         [Required]
-        [Range(0,100)]
+        [Range(0, 100)]
         [Display(Name = "Percent Penalty")]
         public int PercentPenalty { get; set; }
 
@@ -71,7 +71,6 @@ namespace OSBLE.Models.Courses
         [Required]
         [Display(Name = "Hours Late Until Zero")]
         public int HoursLateUntilZero { get; set; }
-
 
         // References
 

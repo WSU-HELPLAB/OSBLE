@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using OSBLE.Attributes;
-using OSBLE.Models.HomePage;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 
@@ -142,7 +141,6 @@ namespace OSBLE.Controllers
 
                 db.Mails.Add(mail);
                 db.SaveChanges();
-
                 using (NotificationController nc = new NotificationController())
                 {
                     nc.SendMailNotification(mail);

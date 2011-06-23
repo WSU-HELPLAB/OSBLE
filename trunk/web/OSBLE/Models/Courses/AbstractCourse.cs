@@ -12,6 +12,7 @@ namespace OSBLE.Models.Courses
 
         [Required]
         [Display(Name = "Name")]
+        [StringLength(100)]
         public string Name { get; set; }
 
         public abstract bool AllowEventPosting { get; set; }

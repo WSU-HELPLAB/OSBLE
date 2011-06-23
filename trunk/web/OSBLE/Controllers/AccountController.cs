@@ -24,11 +24,6 @@ namespace OSBLE.Controllers
             return View();
         }
 
-        public ActionResult ThrowError()
-        {
-            throw new Exception();
-        }
-
         public AccountController()
         {
             ViewBag.ReCaptchaPublicKey = getReCaptchaPublicKey();

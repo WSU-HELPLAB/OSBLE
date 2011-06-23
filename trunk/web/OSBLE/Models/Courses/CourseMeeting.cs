@@ -23,6 +23,7 @@ namespace OSBLE.Models.Courses
 
         public bool Saturday { get; set; }
 
+        [StringLength(50)]
         public string Name { get; set; }
 
         [DataType(DataType.Time)]
@@ -31,6 +32,7 @@ namespace OSBLE.Models.Courses
         [DataType(DataType.Time)]
         public DateTime EndTime { get; set; }
 
+        [StringLength(50)]
         public string Location { get; set; }
 
         public CourseMeeting()

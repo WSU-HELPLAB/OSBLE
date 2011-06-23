@@ -7,11 +7,12 @@ namespace OSBLE.Models.Courses
         // Community Options
 
         [Display(Name = "Community Description")]
+        [StringLength(100)]
         [Required]
         public string Description { get; set; }
 
         [Display(Name = "Enter a short (3-4 character) nickname to display in the dashboard for this community (e.g. Comm)")]
-        [MaxLength(5)]
+        [StringLength(7)]
         [Required]
         public string Nickname { get; set; }
 

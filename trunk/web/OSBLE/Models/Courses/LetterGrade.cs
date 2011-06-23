@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models.Courses
 {
@@ -14,11 +10,12 @@ namespace OSBLE.Models.Courses
 
         //should be 2 character array
         [Required]
-        [Display(Name="Letter Grade")]
+        [Display(Name = "Letter Grade")]
+        [StringLength(1)]
         public string Grade { get; set; }
 
         [Required]
-        [Display(Name="Minimum % Required")]
+        [Display(Name = "Minimum % Required")]
         public int MinimumRequired { get; set; }
 
         public LetterGrade()
