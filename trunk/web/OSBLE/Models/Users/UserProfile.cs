@@ -42,5 +42,26 @@ namespace OSBLE.Models.Users
             CanCreateCourses = false;
             DefaultCourse = 0;
         }
+
+        /// <summary>
+        /// Copy constructor
+        /// </summary>
+        /// <param name="up"></param>
+        public UserProfile(UserProfile up)
+            : base()
+        {
+            this.CanCreateCourses = up.CanCreateCourses;
+            this.DefaultCourse = up.DefaultCourse;
+            this.EmailAllNotifications = up.EmailAllNotifications;
+            this.FirstName = up.FirstName;
+            this.ID = up.ID;
+            this.Identification = up.Identification;
+            this.IsAdmin = up.IsAdmin;
+            this.LastName = up.LastName;
+            this.School = up.School;
+            this.SchoolID = up.SchoolID;
+            this.Scores = up.Scores;
+            this.UserName = up.UserName;
+        }
     }
 }

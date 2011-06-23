@@ -15,6 +15,7 @@ using OSBLE.Models;
 using OSBLE.Models.Services.Uploader;
 using OSBLE.Models.Users;
 using OSBLE.Models.Courses;
+using OSBLE.Models.HomePage;
 
 namespace OSBLE.Services
 {
@@ -296,6 +297,69 @@ namespace OSBLE.Services
         }
 
         /// <summary>
+        /// Posts the supplied message to the course's activity feed
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="courseId"></param>
+        /// <param name="authToken"></param>
+        /// <returns></returns>
+        [OperationContract]
+        public bool PostActivityMessage(string message, int courseId, string authToken)
+        {
+            //validate the user
+            if (!IsValidKey(authToken))
+            {
+                return false;
+            }
+
+            //pull the current user for easier access
+            UserProfile currentUser = activeSessions[authToken].UserProfile;
+
+            //find the course
+            Course course = (from c in db.Courses
+                             where c.ID == courseId
+                             select c).FirstOrDefault();
+
+            if (course == null)
+            {
+                return false;
+            }
+            
+            //use the data provided to create a new dashboard post
+            DashboardPost newDp = new DashboardPost();
+            newDp.Content = message;
+            newDp.Posted = DateTime.Now;
+            newDp.UserProfile = currentUser;
+            newDp.Course = course;
+
+            //add & save
+            db.DashboardPosts.Add(newDp);
+            db.SaveChanges();
+
+            //return success
+            return true;
+        }
+
+        /// <summary>
+        /// Synces all the directories on the current level if the user is valid
+        /// </summary>
+        /// <param name="dirList"></param>
+        /// <param name="relative"></param>
+        /// <param name="courseId"></param>
+        /// <param name="authToken"></param>
+        /// <returns></returns>
+        [OperationContract]
+        public bool PrepCurrentPath(DirectoryListing dirList, int courseId, string authToken)
+        {
+            if (!IsValidKey(authToken))
+            {
+                return false;
+            }
+            FileSystem.PrepCourseDocuments(dirList, courseId);
+            return true;
+        }
+
+        /// <summary>
         /// Synces one file to the server if the user is valid
         /// </summary>
         /// <param name="fileName"></param>
@@ -319,25 +383,6 @@ namespace OSBLE.Services
             }
 
             return true; 
-        }
-
-        /// <summary>
-        /// Synces all the directories on the current level if the user is valid
-        /// </summary>
-        /// <param name="dirList"></param>
-        /// <param name="relative"></param>
-        /// <param name="courseId"></param>
-        /// <param name="authToken"></param>
-        /// <returns></returns>
-        [OperationContract]
-        public bool PrepCurrentPath(DirectoryListing dirList, int courseId, string authToken)
-        {
-            if (!IsValidKey(authToken))
-            {
-               return false;
-            }
-            FileSystem.PrepCourseDocuments(dirList, courseId);
-            return true;
         }
 
         /// <summary>
@@ -389,7 +434,7 @@ namespace OSBLE.Services
                 UserProfile profile = (from p in db.UserProfiles
                                        where p.UserName == userName
                                        select p).First();
-
+                
                 //build our string to hash
                 string email = profile.UserName;
                 string date = DateTime.Now.ToLongTimeString();

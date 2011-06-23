@@ -21,7 +21,7 @@ namespace OSBLE.Models.Services.Uploader
 
         public UserSession(UserProfile profile)
         {
-            UserProfile = profile;
+            this.UserProfile = new UserProfile(profile);
             LastAccessTime = DateTime.Now;
         }
     }
