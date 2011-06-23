@@ -42,15 +42,17 @@ namespace FileUploader
 
         DispatcherTimer loginCheck = new DispatcherTimer();
 
+        public string localPath = "";
         public string LocalPath
         {
             get
             {
-                return LocalFileTextBox.Text;
+                return localPath;
             }
             set
             {
-                LocalFileTextBox.Text = value;
+                localPath = value;
+                LocalFileTextBox.Text = localPath;
 
                 //catch root folder issues on windows systems
                 if (LocalPath.Length > 0 && LocalPath.Substring(LocalPath.Length - 1) == ":")
@@ -240,8 +242,9 @@ namespace FileUploader
         {
             if (e.Key == Key.Enter)
             {
+                string oldPath = LocalPath;
                 LocalPath = (sender as TextBox).Text;
-                //LocalFileList_EmptyDirectoryEncountered(new FileList { DataContext = new DirectoryListing() { Name = "" } }, EventArgs.Empty);
+                LocalFileList.DataContext = FileOperations.BuildLocalDirectoryListing(LocalPath);
             }
         }
 
