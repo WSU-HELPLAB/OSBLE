@@ -58,6 +58,13 @@ namespace FileUploader
                 e.Handled = true;
                 Deployment.Current.Dispatcher.BeginInvoke(delegate { ReportErrorToDOM(e); });
             }
+            else
+            {
+                e.Handled = true;
+                string errorMsg = e.ExceptionObject.Message + e.ExceptionObject.StackTrace;
+                errorMsg = errorMsg.Replace('"', '\'').Replace("\r\n", @"\n");
+                MessageBox.Show(errorMsg);
+            }
         }
 
         private void ReportErrorToDOM(ApplicationUnhandledExceptionEventArgs e)
