@@ -2,7 +2,7 @@
     <system.serviceModel>
         <bindings>
             <basicHttpBinding>
-                <binding name="BasicHttpBinding_UploaderWebService1" maxBufferSize="2147483647"
+                <binding name="BasicHttpBinding_UploaderWebService" maxBufferSize="2147483647"
                     maxReceivedMessageSize="2147483647">
                     <security mode="Transport" />
                 </binding>
@@ -10,8 +10,8 @@
         </bindings>
         <client>
             <endpoint address="https://www.osble.org/Services/UploaderWebService.svc/Services/UploaderWebService.svc"
-                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_UploaderWebService1"
-                contract="OsbleServices.UploaderWebService" name="BasicHttpBinding_UploaderWebService1" />
+                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_UploaderWebService"
+                contract="OsbleServices.UploaderWebService" name="BasicHttpBinding_UploaderWebService" />
         </client>
     </system.serviceModel>
 </configuration>

@@ -127,20 +127,19 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="SyncFile">
+  <xs:element name="PostActivityMessage">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="data" nillable="true" type="xs:base64Binary" />
+        <xs:element minOccurs="0" name="message" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="courseId" type="xs:int" />
         <xs:element minOccurs="0" name="authToken" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="SyncFileResponse">
+  <xs:element name="PostActivityMessageResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="SyncFileResult" type="xs:boolean" />
+        <xs:element minOccurs="0" name="PostActivityMessageResult" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -157,6 +156,23 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="PrepCurrentPathResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SyncFile">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="data" nillable="true" type="xs:base64Binary" />
+        <xs:element minOccurs="0" name="courseId" type="xs:int" />
+        <xs:element minOccurs="0" name="authToken" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SyncFileResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="SyncFileResult" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
