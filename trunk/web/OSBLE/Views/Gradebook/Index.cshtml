@@ -100,11 +100,11 @@
     {
         float: left;
         border: 1px solid gray;
-        border-top-left-radius: 5px 10px;
-        border-top-right-radius: 5px 10px;
+        border-top-left-radius: 4px 4px;
+        border-top-right-radius: 4px 4px;
         background-color: #f5f5f5;
         border-bottom-width: 0;
-        margin: 0 0.5em -0.1em 0;
+        margin: 0 0.2em -0.1em 0;
         background: silver;
     }
     
@@ -334,17 +334,17 @@
         <tr class="colHeader">
             
             @{var j = 1;
-                <td id="@j" class="colHeader" style="background:silver; border:outset;" onclick="selectColumn(this);"></td>
+                <td id="@j" class="colHeader" style="background:silver; border:outset 2px;" onclick="selectColumn(this);"></td>
                 j += 1;
-                <td id="@j" class="colHeader" style="background:silver; border:outset;" onclick="selectColumn(this);"></td>
+                <td id="@j" class="colHeader" style="background:silver; border:outset 2px;" onclick="selectColumn(this);"></td>
                 j += 1;
-                <td id="@j" class="colHeader" style="background:silver; border:outset;" onclick="selectColumn(this);"></td>
+                <td id="@j" class="colHeader" style="background:silver; border:outset 2px;" onclick="selectColumn(this);"></td>
                 j += 1;
-                <td id="@j" class="colHeader" style="background:silver; border:outset;" onclick="selectColumn(this);"></td>
+                <td id="@j" class="colHeader" style="background:silver; border:outset 2px;" onclick="selectColumn(this);"></td>
                 j += 1;
                 foreach (Category item in ViewBag.Categories)
                 {
-                    <td id="@j" class="colHeader" style="background:silver; border:outset;"onclick="selectColumn(this);"></td>
+                    <td id="@j" class="colHeader" style="background:silver; border:outset 2px;"onclick="selectColumn(this);"></td>
                     j += 1;
                 }
             }
@@ -382,7 +382,10 @@
         <tr id="perfectScore">
             <th></th>
             <th id="th2">Perfect Score</th>
-            <td>A</td>
+            @{string grade = (from lg in ViewBag.LetterGrades as IEnumerable<LetterGrade>
+                              select lg.Grade).FirstOrDefault();
+            }
+            <td>@grade</td>
             <td id="perfectTotal">100%</td>
             
 
@@ -397,12 +400,17 @@
             <th id="th3">
                 Average Score
             </th>
-            <td>&nbsp</td>
+            <td id="averageLetter"></td>
             <td id="averageTotal">0</td>
             
-            @foreach (Category item in ViewBag.Categories)
-            {
-                <td id="averageScore">0</td>  
+            @{
+                double totalAverage = 0;
+                int totalStudents = 0;
+                   
+                foreach (Category item in ViewBag.Categories)
+                {
+                    <td id="averageScore">0</td>  
+                }
             }
             
         </tr>
@@ -441,7 +449,7 @@
             {
                 foreach (CoursesUsers item in courseUser)
                 {
-                               <td>@item.Section</td>
+                                   <td>@item.Section</td>
                 }
             }                                                   
             }
@@ -449,7 +457,7 @@
                 <td id="@student.ID" >@student.LastName, @student.FirstName</td>               
                 
 
-                @{
+            @{
             double totalGrade = 0;
             double totalPossible = 0;
             List<Score> totalOfCats = (from total in ViewBag.Scores as IEnumerable<Score>
@@ -481,6 +489,10 @@
 
 
             var totalPercent = (totalGrade / totalPossible) * 100;
+            
+            totalAverage += totalPercent;
+            totalStudents++;
+            
             var letter = "";
             foreach (LetterGrade item in letterList)
             {
@@ -490,8 +502,10 @@
                     break;
                 }
             }
-                    <td id="grade">@letter</td>
-                    <td>@totalPercent.ToString(".##")%</td>
+                
+                <td id="grade">@letter</td>
+                <td>@totalPercent.ToString(".##")%</td>
+                
             foreach (Category cat in ViewBag.Categories)
             {
                 List<Score> scoreQuery = (from g in ViewBag.Scores as IEnumerable<Score>
@@ -502,17 +516,30 @@
 
                 if (scoreQuery.Count() > 0)
                 {
-                            <td id="categoryGrade">@scoreQuery.First().Points.ToString(".##")%</td>
+                        <td id="categoryGrade">@scoreQuery.First().Points.ToString(".##")%</td>
                 }
                 else
                 {
-                            <td id="categoryGrade">NG</td>
+                        <td id="categoryGrade">NG</td>
                 }
             }
-                }
+            }
             </tr>
         }
     </table>
+    @{
+        totalAverage = (totalAverage / (totalStudents * 100)) * 100;
+        string averageLetter = "";
+        foreach (LetterGrade item in letterList)
+        {
+            if (totalAverage >= item.MinimumRequired)
+            {
+                averageLetter = item.Grade;
+                break;
+            }
+        }   
+    }
+    <input type="hidden" id="totalAverageHidden" value="@averageLetter" />
     <div class="slidingDiv" id="slidingDivID" style="display: none; position: absolute;">
         <form id="columnOptionsForm" method="post" action="/Gradebook/ModifyColumn" data-ajax="true"
         data-ajax-success="" data-ajax-update="#grades">
@@ -578,6 +605,7 @@
     $(document).ready(function () {
         //calculateRows();
         calculateCols();
+        $("#averageLetter").html($("#totalAverageHidden").val());
     });
 
     $(document).click(function () {
@@ -674,24 +702,24 @@
     });
 
 
-    $("#letterGradesID").click(function (e) {
+//    $("#letterGradesID").click(function (e) {
 
-        //The div has been clicked on for edit, therefore we don't want to hide it
-        //so we set isSHowing to false
-        isShowing = false;
-    });
+//        //The div has been clicked on for edit, therefore we don't want to hide it
+//        //so we set isSHowing to false
+//        isShowing = false;
+//    });
 
-    $(".colHeader").click(function (e) {
-        e.preventDefault();
-    });
+//    $(".colHeader").click(function (e) {
+//        e.preventDefault();
+//    });
 
-    $("#selectMenuID").click(function (e) {
-        e.preventDefault();
-    });
+//    $("#selectMenuID").click(function (e) {
+//        e.preventDefault();
+//    });
 
-    $("#displayColorsID").click(function (e) {
-        e.preventDefault();
-    });
+//    $("#displayColorsID").click(function (e) {
+//        e.preventDefault();
+//    });
 
 
     function displayColors() {
@@ -896,6 +924,13 @@
                     $(this).css("background-color", "white");
                 }
             });
+            $(this).find("th").each(function () {
+                if ($(this).attr("class") == "colHeader") {
+                }
+                else {
+                    $(this).css("background-color", "white");
+                }
+            });
         });
 
         currentHeader = $(col).attr("id");
@@ -903,10 +938,10 @@
         $("#grades tr").each(function () {        
 
             $(this).find("td:nth-child(" + $(col).attr("id") + ")").each(function () {
-                if ($(this).attr("id") == $(col).attr("id")) {
+                if ($(this).attr("class") == "colHeader") {
                 }
                 else {
-                    $(this).css("background-color", "DeepSkyBlue ");
+                    $(this).css("background-color", "DeepSkyBlue");
                 }
             });
             $(this).find("th:nth-child(" + $(col).attr("id") + ")").each(function () {
@@ -914,7 +949,7 @@
                     $("#selectMenuID").animate({ "height": "show" }, { duration: 300 });
                 }
                 else {
-                   // $(this).css("background-color", "DeepSkyBlue ");
+                   $(this).css("background-color", "DeepSkyBlue ");
                 }
             });
         });
