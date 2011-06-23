@@ -181,9 +181,8 @@
     </Content>
     <None Include="Properties\OutOfBrowserSettings.xml" />
     <Content Include="Service Endpoints.txt" />
-    <None Include="Service References\OsbleServices\Arrays.xsd">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="Service References\OsbleServices\configuration91.svcinfo" />
+    <None Include="Service References\OsbleServices\configuration.svcinfo" />
     <None Include="Service References\OsbleServices\FileUploader.OsbleServices.DirectoryListing.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -193,16 +192,17 @@
     <None Include="Service References\OsbleServices\FileUploader.OsbleServices.ParentDirectoryListing.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\OsbleServices\configuration91.svcinfo" />
-    <None Include="Service References\OsbleServices\configuration.svcinfo" />
-    <None Include="Service References\OsbleServices\OSBLE.Models.Services.Uploader.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="Service References\OsbleServices\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
     <Content Include="ServiceReferences.ClientConfig" />
+    <None Include="Service References\OsbleServices\Arrays.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleServices\OSBLE.Models.Services.Uploader.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Service References\OsbleServices\service.wsdl" />
     <None Include="Service References\OsbleServices\service.xsd">
       <SubType>Designer</SubType>
