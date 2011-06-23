@@ -20,7 +20,7 @@ namespace OSBLE.Models.Courses
 
         [Required]
         [StringLength(8)]
-        [Display(Name = "Semester")]
+        [Display(Name = "Term")]
         public string Semester { get; set; }
 
         [Required]
