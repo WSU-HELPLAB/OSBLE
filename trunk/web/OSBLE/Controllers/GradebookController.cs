@@ -207,13 +207,13 @@ namespace OSBLE.Controllers
        [HttpPost]
        public ActionResult AllDropLowest(int categoryId, int dropX)
        {
-           // storing the amount of assignments wanted to drop
-           var currentCategory = (from cat in db.Categories where cat.ID == categoryId select cat).FirstOrDefault();
-           currentCategory.gradebookOptions.dropX = dropX;
-           db.SaveChanges();
-
            if (ModelState.IsValid)
            {
+               // storing the amount of assignments wanted to drop
+               var currentCategory = (from cat in db.Categories where cat.ID == categoryId select cat).FirstOrDefault();
+               currentCategory.gradebookOptions.dropX = dropX;
+               db.SaveChanges();
+
                int i = 0;
                if (categoryId > 0)
                {

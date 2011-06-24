@@ -314,7 +314,7 @@
         if (e.keyCode == 13) {
 
             var row = $(this).parent("tr").next("tr");
-            if (row.attr("id") == "averageRow"){
+            if (row.attr("id") == "averageRow") {
                 clearLastCellFocus();
             }
             else {
@@ -323,10 +323,10 @@
                     cell = $(this).find("td:eq(" + colIndex + ")");
                 });
             }
-            if (cell != null){
+            if (cell != null) {
                 cellGainsFocus(cell);
             }
-            else{
+            else {
                 row = $(this).parent("tr");
                 row.each(function () {
                     cell = $(this).find("td:eq(" + colIndex + ")");
@@ -337,16 +337,26 @@
         else if (e.keyCode == 9) {
             e.preventDefault();
             var row = $(this).parent("tr");
+            // used for generating the column count
+            var temp = 1;
+            var ColCount = $('table tr:eq(' + temp + ') td').length;
+
             var colIndex = $(this).prevAll().length;
             colIndex = parseInt(colIndex);
-            colIndex += 1;
+            if (colIndex >= ColCount) {
+                row = $(this).parent("tr").next("tr");
+                colIndex = 2;
+            }
+            else {
+                colIndex += 1;
+            }
             row.each(function () {
                 cell = $(this).find("td:eq(" + colIndex + ")");
-            });            
-            if (cell != null){
+            });
+            if (cell != null) {
                 cellGainsFocus(cell);
             }
-            else{
+            else {
                 colIndex -= 1;
                 row.each(function () {
                     cell = $(this).find("td:eq(" + colIndex + ")");
@@ -857,25 +867,18 @@
                 }
             });
 
-            for (i = 0; i < $("#XtoDrop").val(); i++) {
-                //ajax call to drop the lowest score
-                $.ajax({
-                    async: false,
-                    type: "POST",
-                    url: "/Gradebook/AllDropLowest",
-                    data: { categoryId: catId[1], dropX: $('#XtoDrop').val() },
-                    success: function (response) {
-                        $("#grades").replaceWith(response);
-                    }
-                });
-            }
+            //ajax call to drop the lowest score
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: "/Gradebook/AllDropLowest",
+                data: { categoryId: catId[1], dropX: $('#XtoDrop').val() },
+                success: function (response) {
+                    $("#grades").replaceWith(response);
+                }
+            });
         }
-        if ($("#XtoDrop").val() == 0) {
-            $("#dropLowestButton").val("Average");
-        }
-        else {
-            $("#dropLowestButton").val("Average [Dropped " + $("#XtoDrop").val() + "]");
-        }
+        
         $("#customizeID").animate({ "height": "hide" }, { duration: 300 });
     }
 
@@ -944,7 +947,6 @@
                     $("#grades").replaceWith(response);
                 }
             });
-
         }
     }
 
