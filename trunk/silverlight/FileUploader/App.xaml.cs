@@ -20,8 +20,16 @@ namespace FileUploader
             this.Startup += this.Application_Startup;
             this.Exit += this.Application_Exit;
             this.UnhandledException += this.Application_UnhandledException;
-
+            this.CheckAndDownloadUpdateCompleted += new CheckAndDownloadUpdateCompletedEventHandler(App_CheckAndDownloadUpdateCompleted);
             InitializeComponent();
+        }
+
+        void App_CheckAndDownloadUpdateCompleted(object sender, CheckAndDownloadUpdateCompletedEventArgs e)
+        {
+            if (e.UpdateAvailable)
+            {
+                MessageBox.Show("An update for the OSBLE File Uploader is available.  To install, please restart the application");
+            }
         }
 
         public static void Navigate(UserControl newPage)
@@ -34,6 +42,7 @@ namespace FileUploader
         private Grid rootGrid = new Grid();
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            this.CheckAndDownloadUpdateAsync();
             this.RootVisual = rootGrid;
             rootGrid.Children.Add(new MainPage());
         }
