@@ -228,7 +228,7 @@
 @Html.Partial("_Tabs")
 
 <div class="selectMenu" id="selectMenuID" style="display: none; position: absolute;">
-    <table class="selectMenuTable">
+    <table class="selectMenuTable" title="Options">
 		<tr>
 		    <th align="center">Options</th>
 		</tr>
@@ -344,7 +344,10 @@
                 j += 1;
                 foreach (Category item in ViewBag.Categories)
                 {
-                    <td id="@j" class="colHeader" style="background:silver; border:outset 2px;"onclick="selectColumn(this);"></td>
+                    <td id="@j" class="colHeader" style="background:silver; border:outset 2px;"onclick="selectColumn(this);">
+                    <!--Makes the columns with color change options distinguishable-->
+                        <a>*</a>
+                    </td>
                     j += 1;
                 }
             }
