@@ -104,6 +104,7 @@ namespace OSBLE.Controllers
            AbstractAssignment assignment = db.AbstractAssignments.Find(assignmentId);
            db.AbstractAssignments.Remove(assignment);
            db.SaveChanges();
+           //UpdateCells();
        }
 
        [HttpPost]
