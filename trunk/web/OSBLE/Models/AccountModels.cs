@@ -107,7 +107,7 @@ namespace OSBLE.Models
         public string Email { get; set; }
 
         [Required(ErrorMessage = "Description Required")]
-        [Display(Name = "Briefly describe the problem you are having")]
+        [Display(Name = "Message body")]
         public string Message { get; set; }
     }
 }

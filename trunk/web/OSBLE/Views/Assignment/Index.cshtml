@@ -13,7 +13,6 @@
 @if (ViewBag.ActiveCourse.CourseRole.CanModify) {
 
     <a href="#" class="add_link" id="assignment_create_button">@Helpers.AddButton() Create New Assignment</a>
-    @Helpers.CreateToolTip(ToolTips.AssignmentCreate) 
         <script type="text/javascript">
             $(function () {
                 $('#assignment_create_dialog').dialog({
@@ -31,14 +30,12 @@
         
     <div id="assignment_create_dialog" title="Create New Assignment">
         <p>Select an assignment type to create:</p>
-        <p>@Html.ActionLink("Basic Assignment", "Create", "BasicAssignment")</p>
-        <p>@Html.ActionLink("Studio Assignment", "SilverlightTest", "StudioAssignment")</p>
+        <p>@Html.ActionLink("Basic Assignment", "Create", "BasicAssignment") @Helpers.CreateToolTip(ToolTips.AssignmentBasic) </p>
+        <p>@Html.ActionLink("Studio Assignment", "SilverlightTest", "StudioAssignment") @Helpers.CreateToolTip(ToolTips.AssignmentStudio) </p>
     </div>
 }
 
-<p>
-@Helpers.CreateToolTip(ToolTips.AssignmentCurrent) 
-</p>
+<p></p>
 
 @if (ViewBag.PastAssignments.Count == 0 &&
      ViewBag.PresentAssignments.Count == 0 &&

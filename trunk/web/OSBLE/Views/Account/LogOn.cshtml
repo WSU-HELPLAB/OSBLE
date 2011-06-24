@@ -1,5 +1,7 @@
 ﻿@model OSBLE.Models.LogOnModel
 
+@using OSBLE.Models
+
 @{
     ViewBag.Title = "Log On";
     Layout = "~/Views/Shared/_LogOn.cshtml";
@@ -15,7 +17,8 @@
 @using (Html.BeginForm()) {
     <div>
             <div class="editor-label">
-                @Html.LabelFor(m => m.UserName)
+                @Html.LabelFor(m => m.UserName, "Email Address")
+                @Helpers.CreateToolTip(ToolTips.AccountLogOnName) 
             </div>
             <div class="editor-field">
                 @Html.TextBoxFor(m => m.UserName, new { tabindex = "1" })<br />
@@ -23,6 +26,7 @@
             </div>
             <div class="editor-label">
                 @Html.LabelFor(m => m.Password)
+                @Helpers.CreateToolTip(ToolTips.AccountLogOnPassword) 
             </div>
             <div class="editor-field">
                 @Html.PasswordFor(m => m.Password, new { tabindex = "2" })<br />
@@ -31,6 +35,7 @@
             <div class="editor-label">
                 @Html.CheckBoxFor(m => m.RememberMe, new { tabindex = "3" })
                 @Html.LabelFor(m => m.RememberMe)
+                @Helpers.CreateToolTip(ToolTips.AccountLogOnRemember) 
             </div>
 
             @if (ViewBag.Attempts < 3)

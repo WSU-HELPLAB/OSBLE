@@ -4,11 +4,11 @@
 
 <p>@Html.ActionLink("Back to Dashboard","Index","Home")</p>
 
-<div id="notifications_read_legend">Read @Helpers.CreateToolTip(ToolTips.NotificationRead)</div>
+<div id="notifications_read_legend">Read</div>
 
-<div id="notifications_unread_legend">Unread @Helpers.CreateToolTip(ToolTips.NotificationUnread)</div>
+<div id="notifications_unread_legend">Unread</div>
 
 <div id="notifications">
-    @Html.Partial("_Notifications");
+    @Html.Partial("_Notifications")
 </div>
 

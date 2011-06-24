@@ -1,4 +1,5 @@
-﻿@using OSBLE.Models.Users
+﻿@using OSBLE.Models
+@using OSBLE.Models.Users
 @using OSBLE.Models.Courses
 
 @model OSBLE.Models.ChangePasswordModel
@@ -7,7 +8,7 @@
     ViewBag.Title = "Profile";
 }
 
-<h2>Upload Profile Picture</h2>
+<h2>Upload Profile Picture @Helpers.CreateToolTip(ToolTips.AccountProfilePicture) </h2>
 @Helpers.ProfilePicture(Url.Action("ProfilePicture"))
 
 <div id="picture_upload">
@@ -21,7 +22,7 @@
    
 <p><em>Supported Formats: BMP, GIF, EXIF, JPG, PNG and TIFF</em></p>
 
-<h2>Change Password</h2>
+<h2>Change Password @Helpers.CreateToolTip(ToolTips.AccountChangePassword) </h2>
 <p>
     Use the form below to change your password. 
 </p>
@@ -67,22 +68,23 @@
     </div>
 }
 
-<h2>Email Notifications</h2>
+<h2>Email Notifications @Helpers.CreateToolTip(ToolTips.AccountEmailNotifications) </h2>
 
-@using (Html.BeginForm("UpdateEmailSettings", "Account")) 
+@using (Html.BeginForm("UpdateEmailSettings", "Account"))
 { 
     <p>
-    <input type="checkbox" value="True" name="EmailAllNotifications" @if(ViewBag.CurrentUser.EmailAllNotifications){<text>checked="checked"</text>} />
-    <text>Send all OSBLE notifications to my e-mail address.</text>
+        <input type="checkbox" value="True" name="EmailAllNotifications" @if (ViewBag.CurrentUser.EmailAllNotifications)
+                                                                         {<text>checked="checked"</text>} />
+        <text>Send all OSBLE notifications to my e-mail address.</text>
     </p>
     
     <p>
-    <input type="submit" value="Update Email Settings" />
+        <input type="submit" value="Update Email Settings" />
     </p>
 
 }
 
-<h2>Course and Community Menu</h2>
+<h2>Course and Community Menu @Helpers.CreateToolTip(ToolTips.AccountMenuOptions) </h2>
 
 <p>Hidden courses/communities will not appear in your course list or your activity feed and must be unchecked to access again.</p>
 <p>Your default course will be the active course each time you log on to OSBLE.</p>
@@ -107,9 +109,9 @@
         <tr>
             <td class="coursemenu_option">
                 <input type="radio" name="defaultCourse" value="@cu.CourseID" @if ((cu.CourseID == ViewBag.CurrentUser.DefaultCourse) || ((ViewBag.CurrentCourses as List<CoursesUsers>).Where(c => c.CourseID == ViewBag.CurrentUser.DefaultCourse).Count() == 0 && firstCourse))
-                {
+                                                                              {
                     <text>checked="checked"</text>
-                } />
+                                                                              } />
             </td>
 
             <td>
@@ -131,7 +133,7 @@
             </td>
 
         </tr>
-        firstCourse = false;
+                                                                                firstCourse = false;
     }
 </table>
 <p>

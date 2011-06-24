@@ -40,35 +40,20 @@ namespace OSBLE.Models
 
         #region CourseToolTips
 
-            public static string CourseInformation = "Basic course information.";
-            public static string CoursePrefix = "The prefix for the department of the course.";
-            public static string CourseNumber = "Such as 101.";
-            public static string CourseName = "Full title of course.";
-            public static string CourseSemester = "Semester the course is being taught.";
-            public static string CourseYear = "Year the course is being taught.";
-
-            public static string CourseSchedule = "This section allows the instructor to set specifically the range of dates this course is held.";
-            public static string CourseStartDate = "This is when the course begins, most likely the beginning of the semester.";
-            public static string CourseEndDate = "This is the date when the course ends, most likely the end of the semester.";
-
-            public static string CourseMeetingTimes = "This section allows for the addition of multiple meeting times/ places each week.";
-
+            public static string CourseInformation = "Required course information. The prefix is typically the abbreviation of the department the course categorized with.";
+            public static string CourseSchedule = "This section allows the instructor to set specifically the range of dates this course is held. Typically these values will be the beginning and end of the semester or quarter the course is being taught, but allows for any desired range of dates.";
+            public static string CourseMeetingTimes = "This section allows for the addition of multiple meeting times and/ or places each week, such as a lab section and a lecture section.";
             public static string CourseBreaks = "This section allows for days to be taken off of the course during the normal meetings times, such as for national holidays.";
-            public static string CourseShowMeetings = "Showing course meetings and breaks on the calendar may or may not be necessary.";
 
-            public static string CourseSettings = "This section allows the instructor to set some advanced features for the students' permissions for this course.";
-            public static string CourseStudentPost = "Allow students to post new items to the dashboard or not.";
-            public static string CourseStudentReply = "Allow students to post replies to posts on the dashboard or not.";
-            public static string CourseStudentEvent = "Allow students to create events or not.";
-            public static string CourseInstructorEventApproval = "If this is checked, any event created by a student will require the instructor to review and approve it before it shows up on the calendar";
+            public static string CourseStudentPost = "This option allows for students to post items to the activity feed of the course, which will show up for every member of that course.    ";
+            public static string CourseStudentReply = "This option allows students to reply to items posted to the activity feed.";
+            public static string CourseStudentEvent = "Events that are posted in the course calendar will show up for every member of the course.";
+            public static string CourseInstructorEventApproval = "Any event created by a student will require the instructor to review and approve it before it shows up on the calendar.";
             public static string CourseInactive = "Only instructors and observers can log in while a course is set to inactive. ";
-            public static string CourseCalendarEvents = "The amount of time in advance that this course shows events in the course calendar. ";
+            public static string CourseCalendarEvents = "Events outside this window of time will not show up on the course calendar.";
         
-            public static string CourseGradingScheme = "Allows you to curve the grades.";
-
-            public static string CourseLatePolicy = "This determines how the automatic grading will handle late assignments.";
-
-            public static string CourseSave = "You must click this button to save the changes made in the above form, otherwise all changes will be lost.";
+            public static string CourseGradingScheme = "Using this section, you may change the cutoff for grades. This is something like automatic grade curving.";
+            public static string CourseLatePolicy = "This determines how the system will penalize for late assignments. Read the sentences below and set the options as desired.";
 
         #endregion
 
@@ -78,15 +63,9 @@ namespace OSBLE.Models
             public static string HomeNotifications = "This is where you get information about things that have occurred.";
             public static string HomeEvents = "This is where you can see upcoming events and deadlines.";
 
-            public static string HomeActivities = "This is where informational updates can be read and posted.";
-            public static string HomePostActivity = "Submit this post to be created.";
-            public static string HomePostToAllCourses = "Post this activity to all courses that you currently teach.";
-            public static string HomeEmailToClass = "If this option is checked, this post will be emailed to all students affected.";
-            public static string HomeShowAll = "Show all posts from all courses in the feed.";
-            public static string HomeShowOnly = "Show only posts from the current course in the feed.";
+            public static string HomeActivities = "The <em>Activity Feed</em> is where informational updates can be posted, read, and replied to.";
 
             public static string HomeLinks = "These are items pertinent to this class, such as files and websites.";
-            public static string HomeLinksEdit = "Click here to edit the items shown in this area.";
 
         #endregion
 
@@ -94,17 +73,15 @@ namespace OSBLE.Models
         #region NotificationToolTips
 
             public static string NotificationMain = "This page displays all the notifications you have received, both read and unread.";
-            public static string NotificationRead = "These are notificaitons that you have already read.";
-            public static string NotificationUnread = "These are notifications that you have yet to mark as read.";
 
         #endregion
 
 
         #region AssignmentToolTips
 
-            public static string AssignmentTitle = "Create one of two types of assignments using this interface, Basic or Studio. ";
-            public static string AssignmentCreate = "Click here to create an assignment. You will select the type of assignment through a dialog box.";
-            public static string AssignmentCurrent = "This is a list of all existing assignment for this course.";
+            public static string AssignmentTitle = "When you click \"Create New Assignment\" below, a dialog box will prompt you for which type of assignment you would like to create with .";
+            public static string AssignmentBasic = "Basic Assignments are...";
+            public static string AssignmentStudio = "Studio Assignments are...";
 
         #endregion
 
@@ -241,6 +218,28 @@ namespace OSBLE.Models
 
         #endregion
 
+        
+        #region AccountToolTips
+
+            public static string AccountProfilePicture = "Your profile picture will be displayed in a number of places such as your posts as a form of identification in addition to your name. <br /><br /> You must click \"Upload Picture\" after finding a picture to save it to the system. <br /><br /> If you no longer wish to have a profile picture, use the delete button to remove the picture from the server. <br /><br /> <em>Supported Formats: BMP, GIF, EXIF, JPG, PNG and TIFF</em>";
+            public static string AccountChangePassword = "New passwords must be at least " + Membership.MinRequiredPasswordLength + " characters long. ";
+            public static string AccountEmailNotifications = "The email address OSBLE uses to send information to your account is the email address you use to log in.";
+            public static string AccountMenuOptions = "Hidden courses/communities will not appear in your course list or your activity feed and must be unchecked to appear again. <br /><br /> Your default course will be the active course each time you log on to OSBLE.";
+
+            public static string AccountLogOnName = "This is the email address you used when registering your account with this system.";
+            public static string AccountLogOnPassword = "If you have forgotten your password, <a href='ResetPassword'>reset your password</a>.  ";
+            public static string AccountLogOnRemember = "If you allow this option, you will be automatically logged in when you access this system.";
+
+            public static string AccountResetPassword = "This email address must be the same one used to log in to OSBLE. If you don't have an account, <a href='Register'>register now</a>.";
+
+            public static string AccountContactEmail = "This is the email address you would like us to reply to. ";
+            public static string AccountContactMessage = "Briefly describe the reason for contacting us below.";
+
+            public static string AccountRegisterLogin = "Your email address will be the name you use to log in to OSBLE and will not be shared with anyone else using the system <br /><br /> Your password must be at least " + Membership.MinRequiredPasswordLength + " characters long.";
+            public static string AccountRegisterID = "This identification number is your school identification number. This allows instructors to use OSBLE to identify users based on their school identification numbers. ";
+
+        #endregion
+
 
         /*
          * TEMPLATE FOR ADDING TOOLTIPS (FOR ORGANIZATIONAL PURPOSES)
@@ -251,6 +250,10 @@ namespace OSBLE.Models
 
         #endregion
          *
+         * 
+         * ALSO:
+         *     To prevent additional unecessary whitespace in a tooltip, avoid using <p> tags at the beginning or end of the tooltip text.
+         * 
          */
 
 

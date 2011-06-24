@@ -37,6 +37,7 @@
     overflow: hidden;
 }
 
+
 .popup table, .popup tbody, .popup tr, .popup td, .popup table.*, .popup tbody.*, .popup tr.*, .popup * {
     margin: 0px;
     padding: 0px;
@@ -46,7 +47,7 @@
     height: 15px;
     width: 19px;
     margin: 0px;
-    padding: 0px;
+    padding: 0px !important;
     background-repeat: no-repeat;
     overflow: visible;
 }
@@ -62,17 +63,13 @@
 .popup td.bottom, .popup td.bottomleft, .popup.bottomright 
 {
     height: 19px;
-}
-.popup td.right, .popup td.topright, .popup.bottomright 
-{
-    width: 22px;
-}
+} 
 
 
 .popup td.right, .popup td.left {
     width: 19px;
     margin: 0px;
-    padding: 0px;
+    padding: 0px !important;
     overflow: visible;
 }
 
@@ -88,6 +85,7 @@
 
 .popup td.popup-contents 
 {
+    text-align: left;
     font-weight:normal;
     font-size: 12px;
     line-height: 1.2em;
@@ -100,4 +98,11 @@
     width: expression( 312px );
 }
 
-        
+.popup a
+{
+    color: #074974 !important;
+}
+.popup td.popup-contents a:hover
+{
+    color: #ff0000;
+}
