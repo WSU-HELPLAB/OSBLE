@@ -61,13 +61,9 @@
                           Background="DarkSlateGray" Width="3" />
 
         <!-- column 2 -->
-        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="2"  HorizontalAlignment="Right" VerticalAlignment="Center" 
-                    Margin="0,0,5,0">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock FontSize="16" FontWeight="Bold" Text="Uploading To:" />
-                <ComboBox x:Name="UploadLocation" DisplayMemberPath="Value" />
-            </StackPanel>
-        </StackPanel>
+        <TextBlock FontSize="16" FontWeight="Bold" Text="Uploading To:" Grid.Row="0" Grid.Column="2" Margin="0,5,0,5" 
+                   VerticalAlignment="Center" HorizontalAlignment="Center" />
+        <ComboBox x:Name="UploadLocation" DisplayMemberPath="Value" Grid.Row="1" Grid.Column="2" />
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2">
             <Button 
                 x:Name="UpButton" 
