@@ -101,6 +101,7 @@ namespace FileUploader
             RemoveRemoteSelectionButton.Click += new RoutedEventHandler(RemoveRemoteSelectionButton_Click);
             DownloadRemoteFileButton.Click += new RoutedEventHandler(DownloadRemoteFile);
             fileClient.OpenReadCompleted += new OpenReadCompletedEventHandler(DownloadRemoteFileCompleted);
+            this.KeyDown += new KeyEventHandler(UploaderPage_KeyDown);
 
             //get the remote server file list
             client.GetValidUploadLocationsAsync(authToken);
@@ -418,6 +419,18 @@ namespace FileUploader
         {
             SelectionChanged(this, null);
             client.PostActivityMessageAsync(activityMessageUpdate, course.Key, authToken);
+        }
+
+        void UploaderPage_KeyDown(object sender, KeyEventArgs e)
+        {
+            //CTRL + V = display version number
+            if (e.Key == Key.V)
+            {
+                if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+                {
+                    MessageBox.Show("File Uploader version " + (App.Current as FileUploader.App).VersionNumber);
+                }
+            }
         }
 
         void SelectionChanged(object sender, EventArgs e)
