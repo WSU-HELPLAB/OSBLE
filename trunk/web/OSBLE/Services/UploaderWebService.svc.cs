@@ -251,12 +251,10 @@ namespace OSBLE.Services
             UserProfile currentUser = activeSessions[authToken].UserProfile;
 
             //find all courses that the users is associated with
-            List<CoursesUsers> courses = (from course in db.Courses
+            List<CoursesUsers> courses = (from course in db.AbstractCourses
                                           join cu in db.CoursesUsers on course.ID equals cu.CourseID
                                           where
                                             course is Course
-                                            &&
-                                            course.Inactive == false
                                             &&
                                             cu.Hidden == false
                                             &&
