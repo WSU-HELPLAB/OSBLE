@@ -68,12 +68,25 @@ namespace FileUploader.Controls
             PasswordBox.KeyUp += new KeyEventHandler(TextBox_KeyUp);
             UserNameTextBox.KeyUp += new KeyEventHandler(TextBox_KeyUp);
             RememberCredentialsCheckBox.Checked += new RoutedEventHandler(RememberCredentialsCheckBox_Checked);
+            this.KeyDown += new KeyEventHandler(LoginWindow_KeyDown);
 
             //set up our "connection timeout" timer.  Currently set to to a 10 second timeout.  May
             //need to adjust.
             timer = new DispatcherTimer();
             timer.Interval = new TimeSpan(0, 0, 10);
             timer.Tick += new EventHandler(timer_Tick);
+        }
+
+        void LoginWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            //CTRL + V = display version number
+            if (e.Key == Key.V)
+            {
+                if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+                {
+                    MessageBox.Show("File Uploader version " + (App.Current as FileUploader.App).VersionNumber);
+                }
+            }
         }
 
         /// <summary>

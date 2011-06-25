@@ -9,12 +9,17 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.Reflection;
 
 namespace FileUploader
 {
     public partial class App : Application
     {
-
+        public String VersionNumber
+        {
+            get;
+            set;
+        }
         public App()
         {
             this.Startup += this.Application_Startup;
@@ -45,6 +50,14 @@ namespace FileUploader
             this.CheckAndDownloadUpdateAsync();
             this.RootVisual = rootGrid;
             rootGrid.Children.Add(new MainPage());
+
+            //find our version number
+            Assembly asm = Assembly.GetExecutingAssembly();
+            if (asm.FullName != null)
+            {
+                AssemblyName assemblyName = new AssemblyName(asm.FullName);
+                VersionNumber = assemblyName.Version.ToString();
+            }
         }
 
         private void Application_Exit(object sender, EventArgs e)
