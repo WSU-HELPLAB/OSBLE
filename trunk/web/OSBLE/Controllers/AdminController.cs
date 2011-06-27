@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using OSBLE.Models.HomePage;
+using System.Web.Security;
 using OSBLE.Attributes;
 using OSBLE.Models.Users;
-using System.Web.Security;
 
 namespace OSBLE.Controllers
 {
@@ -21,17 +18,17 @@ namespace OSBLE.Controllers
         {
             ViewBag.CurrentTab = "Administration";
         }
+
         //
         // GET: /Admin/
 
         public ViewResult Index()
         {
             // Get list of users (other than current user) ordered by last name, who are not pending
-            List<UserProfile> userprofiles = db.UserProfiles.Where(u => u.ID != currentUser.ID && u.UserName != null).OrderBy(u=>u.LastName).Include(u=>u.School).ToList();
+            List<UserProfile> userprofiles = db.UserProfiles.Where(u => u.ID != currentUser.ID && u.UserName != null).OrderBy(u => u.LastName).Include(u => u.School).ToList();
             // Add pending users to bottom of list.
-            userprofiles = userprofiles.Concat(db.UserProfiles.Where(u =>  u.ID != currentUser.ID && u.UserName == null).ToList()).ToList();
+            userprofiles = userprofiles.Concat(db.UserProfiles.Where(u => u.ID != currentUser.ID && u.UserName == null).ToList()).ToList();
             return View(userprofiles);
-            
         }
 
         //
@@ -39,7 +36,7 @@ namespace OSBLE.Controllers
 
         public ActionResult Details(int id = -1)
         {
-            if( id != -1 )
+            if (id != -1)
             {
                 UserProfile userprofile = db.UserProfiles.Find(id);
                 return View(userprofile);
@@ -64,9 +61,10 @@ namespace OSBLE.Controllers
 
         public ActionResult Edit(int id = -1)
         {
-            if( id != -1 ){
+            if (id != -1)
+            {
                 UserProfile userprofile = db.UserProfiles.Find(id);
-                ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name", userprofile.SchoolID); 
+                ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name", userprofile.SchoolID);
                 return View(userprofile);
             }
 
@@ -94,7 +92,7 @@ namespace OSBLE.Controllers
 
         public ActionResult Delete(int id = -1)
         {
-            if( id != -1 )
+            if (id != -1)
             {
                 UserProfile userprofile = db.UserProfiles.Find(id);
                 return View(userprofile);
@@ -109,15 +107,19 @@ namespace OSBLE.Controllers
         [HttpPost, ActionName("Delete")]
         public ActionResult DeleteConfirmed(int id)
         {
-            
-            
             UserProfile userprofile = db.UserProfiles.Find(id);
-            
-            if(userprofile != null) {
-                Membership.DeleteUser(userprofile.UserName);
-                db.UserProfiles.Remove(userprofile);
-                db.SaveChanges();
-            }
+
+            userprofile.CanCreateCourses = false;
+            userprofile.IsAdmin = false;
+            userprofile.Identification = "";
+            userprofile.FirstName = "Deleted";
+            userprofile.LastName = "User";
+            userprofile.SchoolID = 1;
+            userprofile.EmailAllNotifications = false;
+            Membership.DeleteUser(userprofile.UserName);
+            userprofile.UserName = "DeleteUser";
+
+            db.SaveChanges();
 
             return RedirectToAction("Index");
         }
@@ -127,6 +129,5 @@ namespace OSBLE.Controllers
             db.Dispose();
             base.Dispose(disposing);
         }
-
     }
 }

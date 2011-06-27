@@ -379,7 +379,6 @@
     <Content Include="Content\themes\base\jquery.ui.tabs.css" />
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
     <Content Include="Global.asax" />
-    <Content Include="OSBLE.Publish.xml" />
     <Content Include="Scripts\jquery-tooltip.js" />
     <Content Include="Scripts\jquery.selectboxes.js" />
     <Content Include="Scripts\osble.assignments.js" />
@@ -628,9 +627,6 @@
     <Content Include="Views\PeerReview\Index.cshtml" />
     <Content Include="Views\SyncIssueVoting\Index.cshtml" />
     <Content Include="Views\Account\ErrorPage.cshtml" />
-    <Content Include="Web.OSBLE Deployment.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
     <Content Include="Views\Account\ProfessionalRegister.cshtml" />
   </ItemGroup>
   <ItemGroup>
