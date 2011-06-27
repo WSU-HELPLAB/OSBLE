@@ -16,7 +16,6 @@
 <p>
     @if(ViewBag.ActiveCourse.CourseRole.CanModify || ViewBag.ActiveCourse.Course.AllowEventPosting) {
         @Html.ActionLink("Create New Event", "Create")
-        @Helpers.CreateToolTip(ToolTips.EventCreate ) 
     }
 </p>
 

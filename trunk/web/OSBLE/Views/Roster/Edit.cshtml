@@ -21,7 +21,7 @@
             @Helpers.CreateToolTip(ToolTips.RosterUserName) 
         </div>
         <div class="editor-label">
-            @Model.UserProfile.FirstName @Model.UserProfile.LastName
+            <input type="text" disabled="disabled" value="@Model.UserProfile.FirstName @Model.UserProfile.LastName" />
         </div>
 
         <div class="editor-label">
@@ -34,7 +34,7 @@
         </div>
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.Section) <em>(Enter 0 for all sections)</em>
+            @Html.LabelFor(model => model.Section)
             @Helpers.CreateToolTip(ToolTips.RosterSection) 
         </div>
         <div class="editor-field">
@@ -44,12 +44,10 @@
 
         <p>
             <input type="submit" value="Save User" />
-            @Helpers.CreateToolTip(ToolTips.RosterSave) 
         </p>
 
 }
 
 <div>
     @Html.ActionLink("Back to Users", "Index")
-    @Helpers.CreateToolTip(ToolTips.RosterBack) 
 </div>

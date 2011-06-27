@@ -16,7 +16,6 @@ if (!(ViewBag.ActiveCourse.Course is Community))
 {
 <div>
     <a href="#" onclick="$('#add_update_users').toggle('blind'); return false;">Add/Update Users</a>
-    @Helpers.CreateToolTip(ToolTips.RosterAddUpdate) 
 </div>
 <div id="add_update_users">
     <h4>Add Single User @Helpers.CreateToolTip(ToolTips.RosterSingleUser) </h4>
@@ -41,7 +40,6 @@ else
 {
 <div>
     @Html.ActionLink("Add By Email", "CreateByEmail")&nbsp;&nbsp;
-    @Helpers.CreateToolTip(ToolTips.RosterCommunityUser) 
 </div>
 }
 }

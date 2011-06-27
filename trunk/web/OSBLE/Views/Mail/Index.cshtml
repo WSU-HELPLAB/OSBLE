@@ -4,7 +4,7 @@
 @{
     ViewBag.Title = "Mail";
 }
-    <h2>New Message @Helpers.CreateToolTip(ToolTips.MailNewMessage) </h2>
+    <h2>New Message</h2>
     Enter recipient's name to compose message: 
     @Helpers.CreateToolTip(ToolTips.MailRecipient) <br />
 
@@ -29,16 +29,15 @@
 
     @if (ViewBag.BoxHeader == "Inbox")
     {
-        <h2>Inbox @Helpers.CreateToolTip(ToolTips.MailInbox) </h2>
-        <p>@Html.ActionLink("Go to Outbox","Outbox") @Helpers.CreateToolTip(ToolTips.MailOutbox) </p>
+        <h2>Inbox</h2>
+        <p>@Html.ActionLink("Go to Outbox","Outbox")</p>
     }
     else
     {
-        <h2>Outbox @Helpers.CreateToolTip(ToolTips.MailOutbox) </h2>
-        <p>@Html.ActionLink("Go to Inbox", "Index") @Helpers.CreateToolTip(ToolTips.MailInbox) </p>
+        <h2>Outbox</h2>
+        <p>@Html.ActionLink("Go to Inbox", "Index")</p>
     }
 
-    </h2>
 
 <table class="inbox_table">
     @{

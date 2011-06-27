@@ -141,7 +141,6 @@
     <Compile Include="Controllers\CourseController.cs" />
     <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\FileHandlerController.cs" />
-    <Compile Include="Controllers\GradebookController.cs" />
     <Compile Include="Controllers\SyncIssueVotingController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\PeerReviewController.cs" />

@@ -16,7 +16,6 @@
 
         <div class="editor-label">
             @Html.LabelFor(model => model.Name, "Community Name")
-            @Helpers.CreateToolTip(ToolTips.CommunityName) 
         </div>
         <div class="editor-field">
             @Html.EditorFor(model => model.Name)
@@ -25,7 +24,6 @@
 
         <div class="editor-label">
             @Html.LabelFor(model => model.Description)
-            @Helpers.CreateToolTip(ToolTips.CommunityDescription) 
         </div>
         <div class="editor-field">
             @Html.TextAreaFor(model => model.Description, new { rows = 5, cols = 60 })
@@ -51,13 +49,11 @@
 
        <div class="editor-field">
             @Html.LabelFor(model => model.CalendarWindowOfTime)
-            @Helpers.CreateToolTip(ToolTips.CommunityCalendarEvents) 
             @Html.TextBoxFor(model => model.CalendarWindowOfTime, new { size = 3 })
         </div>
         
         <p>
             <input type="submit" value="Create" />
-            @Helpers.CreateToolTip(ToolTips.CommunitySave) 
         </p>
  
 }

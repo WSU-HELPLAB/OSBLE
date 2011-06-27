@@ -16,7 +16,6 @@
 
         <div class="editor-label">
             @Html.LabelFor(model => model.Title)
-            @Helpers.CreateToolTip(ToolTips.EventTitle) 
         </div>
         <div class="editor-field">
             @Html.EditorFor(model => model.Title)
@@ -25,7 +24,6 @@
 
         <div class="editor-label">
             @Html.LabelFor(model => model.StartDate)
-            @Helpers.CreateToolTip(ToolTips.EventDate) 
         </div>
         <div class="editor-field">
             @Html.EditorFor(model => model.StartDate)
@@ -34,7 +32,6 @@
 
         <div class="editor-label">
             @Html.LabelFor(model => model.StartTime)
-            @Helpers.CreateToolTip(ToolTips.EventTime) 
         </div>
         <div class="editor-field">
             @Html.EditorFor(model => model.StartTime)
@@ -61,7 +58,6 @@
     
         <div class="editor-label">
             @Html.LabelFor(model => model.Link)
-            @Helpers.CreateToolTip(ToolTips.EventLink) 
         </div>
         <div class="editor-field">
             @Html.EditorFor(model => model.Link)
@@ -71,11 +67,9 @@
     
         <p>
             <input type="submit" value="Create Event" />
-            @Helpers.CreateToolTip(ToolTips.EventSave) 
         </p>
 }
 
 <div>
     @Html.ActionLink("Back to List", "Index")
-    @Helpers.CreateToolTip(ToolTips.EventBack) 
 </div>

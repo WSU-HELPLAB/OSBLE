@@ -26,14 +26,12 @@
         </div>
         <br />
         <div class="editor-field" style="clear: both;">
-            @Html.LabelFor(model => model.Subject): @Html.EditorFor(model => model.Subject)
-            @Helpers.CreateToolTip(ToolTips.MailCreateSubject) <br />
+            @Html.LabelFor(model => model.Subject): @Html.EditorFor(model => model.Subject)<br />
             @Html.ValidationMessageFor(model => model.Subject)
         </div>
 
         <div class="editor-label">
             @Html.LabelFor(model => model.Message)
-            @Helpers.CreateToolTip(ToolTips.MailCreateMessage) 
         </div>
         <div class="editor-field">
             @Html.TextAreaFor(model => model.Message,new {@id="send_mail_textarea"})<br />
@@ -42,12 +40,10 @@
 
         <p>
             <input type="submit" value="Send Message" />
-            @Helpers.CreateToolTip(ToolTips.MailSave) 
         </p>
 
 }
 
 <div>
     @Html.ActionLink("Back to Inbox", "Index")
-    @Helpers.CreateToolTip(ToolTips.MailBack) 
 </div>

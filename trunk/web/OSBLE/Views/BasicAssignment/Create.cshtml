@@ -274,7 +274,6 @@
         
     <div class="editor-label">
         @Html.LabelFor(model => model.Assignment.Name)
-        @Helpers.CreateToolTip(ToolTips.BasicAssignmentName)
     </div>
     <div class="editor-field">
         @Html.EditorFor(model => model.Assignment.Name)
@@ -282,7 +281,6 @@
     </div>
     <div class="editor-label">
         @Html.LabelFor(model => model.Assignment.Description)
-        @Helpers.CreateToolTip(ToolTips.BasicAssignmentDescription)
     </div>
     <div class="editor-field">
         @Html.TextAreaFor(model => model.Assignment.Description, new { rows = 5, cols = 65 })
@@ -317,7 +315,6 @@
 
     <div class="editor-label">
         @Html.LabelFor(model => submission.isTeam)
-        @Helpers.CreateToolTip(ToolTips.BasicAssignmentIsTeam)
     </div>
     <div class="editor-field">
         @Html.CheckBoxFor(model => submission.isTeam, new { id = "isTeam" })
@@ -326,7 +323,6 @@
     <div id="Team_Options" class="indented_options" style="display: none">
         <input type="radio" name="team_generation_options" value="PreviousAssignment" />
         Use teams defined in previous course assignment
-        @Helpers.CreateToolTip(ToolTips.BasicAssignmentTeamsPreviouslyDefined)
         <br />
         <ul id="PreviousAssignmentDiv" style="display: none" class="team_generation_options">
             <li>Select box goes here. </li>
@@ -338,7 +334,6 @@
         </ul>
         <input type="radio" name="team_generation_options" value="RandomTeams" />
         Generate teams randomly
-        @Helpers.CreateToolTip(ToolTips.BasicAssignmentTeamsRandom)
         <br />
         <ul id="RandomTeams" style="display: none" class="team_generation_options">
             <li>
@@ -361,7 +356,6 @@
         </ul>
         <input type="radio" name="team_generation_options" value="ManualTeams" />
         Specify teams manually
-        @Helpers.CreateToolTip(ToolTips.BasicAssignmentTeamsManual)
         <ul id="ManualTeams" style="display: none" class="team_generation_options">
             <li>
                 <button type="button" onclick="OpenTeamGeneration()">
@@ -373,7 +367,6 @@
     </div>
     <div class="editor-label">
         @Html.LabelFor(model => submission.InstructorCanReview)
-        @Helpers.CreateToolTip(ToolTips.BasicAssignmentInstructorLineReview)
     </div>
     <div class="editor-field">
         @Html.EditorFor(model => submission.InstructorCanReview)
@@ -406,7 +399,6 @@
                     <tr>
                         <td>
                             File Name
-                            @Helpers.CreateToolTip(ToolTips.BasicAssignmentDeliverableFileName)
                         </td>
                         <td>
                             <input type="text" id="new_deliverable_name" />
@@ -415,7 +407,6 @@
                     <tr>
                         <td>
                             Type
-                            @Helpers.CreateToolTip(ToolTips.BasicAssignmentDeliverableFileType)
                         </td>
                         <td>
                             <select id="new_deliverable_type">
@@ -432,8 +423,8 @@
         <tr>
             <td>
                 <a href="#" id="add_new_deliverable" title="Add New Deliverable">
-                    <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Deliverable" /></a>
-                @Helpers.CreateToolTip(ToolTips.BasicAssignmentDeliverableAdd)
+                    <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Deliverable" />
+                </a>
             </td>
         </tr>
     </table>
@@ -455,12 +446,11 @@
         });       
     </script>
     
-    <h3>Grading @Helpers.CreateToolTip(ToolTips.BasicAssignmentGrading) </h3>
+    <h3>Grading</h3>
     
     
     <div class="editor-label">
         @Html.LabelFor(model => model.Assignment.Category, "Category")
-        @Helpers.CreateToolTip(ToolTips.BasicAssignmentGradingCategory)
     </div>
     <div class="editor-field">
         @Html.DropDownListFor(model => model.Assignment.CategoryID, ViewBag.Categories as SelectList, new { id = "grade_category" })
@@ -482,7 +472,6 @@
             Worth
             @Html.TextBoxFor(model => model.Assignment.PointsPossible, new { id = "points_possible", size = 3 })
             Points in Category <span id="grade_category_label"></span>
-            @Helpers.CreateToolTip(ToolTips.BasicAssignmentGradingPoints)
             @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)
         </div>
 
@@ -505,7 +494,6 @@
     
     <p>
         <input type="submit" value="Create Basic Assignment" />
-        @Helpers.CreateToolTip(ToolTips.BasicAssignmentSave)
     </p>
     
     }

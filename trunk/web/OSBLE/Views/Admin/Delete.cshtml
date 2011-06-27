@@ -49,8 +49,8 @@
 </fieldset>
 @using (Html.BeginForm())
 {
-    <p>
+    <div>
         <input type="submit" value="Delete" /> @Helpers.CreateToolTip(ToolTips.AdminDelete)  |
-        @Html.ActionLink("Back to List", "Index") @Helpers.CreateToolTip(ToolTips.AdminBack) 
-    </p>
+        @Html.ActionLink("Back to List", "Index") 
+    </div>
 }

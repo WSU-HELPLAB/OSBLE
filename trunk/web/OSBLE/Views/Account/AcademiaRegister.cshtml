@@ -21,9 +21,9 @@
 @using (Html.BeginForm()) {
     @Html.ValidationSummary(true, "Account creation was unsuccessful. Please correct the errors and try again.")
     <div>
-<!--
+
         <h3>Login Information</h3>
--->
+
         <div class="editor-label">
             @Html.LabelFor(m => m.Email)
         </div>
@@ -45,9 +45,10 @@
             @Html.PasswordFor(m => m.ConfirmPassword)<br />
             @Html.ValidationMessageFor(m => m.ConfirmPassword)
         </div>
-<!--
+
+
         <h3>Identification</h3>
--->
+
         <div class="editor-label">
             @Html.LabelFor(m => m.FirstName)
         </div>
@@ -62,9 +63,7 @@
             @Html.TextBoxFor(m => m.LastName)<br />
             @Html.ValidationMessageFor(m => m.LastName)
         </div>
-<!--
-        <h3>School/Organization</h3>
--->
+<!-- <h3>School/Organization</h3> -->
         <div class="editor-label">
             @Html.LabelFor(model => model.SchoolID, "School/Organization")
         </div>
@@ -90,11 +89,14 @@
             @Html.TextBoxFor(m => m.ConfirmIdentification)<br />
             @Html.ValidationMessageFor(m => m.ConfirmIdentification)
         </div>
+
         <div>
             @Html.Partial("_ReCaptcha")
         </div>
+
         <p>
-            <input type="submit" value="Register" <!-- style="font-size: 1.2em; padding: 0.25em;" --> />
+            <input type="submit" value="Register" />
+            <!-- style="font-size: 1.2em; padding: 0.25em;" -->
         </p>
     </div>
 }

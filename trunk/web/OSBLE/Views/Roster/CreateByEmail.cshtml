@@ -14,7 +14,7 @@
     @Html.ValidationSummary(true)
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.UserProfileID, "Email Address") <em>(Must be the email used for OSBLE)</em>
+            @Html.LabelFor(model => model.UserProfileID, "Email Address")
             @Helpers.CreateToolTip(ToolTips.RosterEmail) 
         </div>
         <div class="editor-field">
@@ -32,7 +32,7 @@
         </div>
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.Section) <em>(Enter 0 for all sections)</em>
+            @Html.LabelFor(model => model.Section)
             @Helpers.CreateToolTip(ToolTips.RosterSection) 
         </div>
         <div class="editor-field">
@@ -42,11 +42,9 @@
 
         <p>
             <input type="submit" value="Add User" />
-            @Helpers.CreateToolTip(ToolTips.RosterSave) 
         </p>
 }
 
 <div>
     @Html.ActionLink("Back to Users", "Index")
-    @Helpers.CreateToolTip(ToolTips.RosterBack) 
 </div>

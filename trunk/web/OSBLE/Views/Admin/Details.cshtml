@@ -46,7 +46,7 @@
         @Html.DisplayFor(model => model.CanCreateCourses)
     </div>
 </fieldset>
-<p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) @Helpers.CreateToolTip(ToolTips.AdminEdit)  |
-    @Html.ActionLink("Back to List", "Index") @Helpers.CreateToolTip(ToolTips.AdminBack) 
-</p>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index") 
+</div>
