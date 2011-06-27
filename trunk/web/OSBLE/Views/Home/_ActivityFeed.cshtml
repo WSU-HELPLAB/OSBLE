@@ -32,24 +32,25 @@
         
             if (ViewBag.IsInstructor)
             {
-        <input
-            type="submit" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />
-        
-        <input type="checkbox" value="True" name="send_email" /> <text>Email to Class</text>
-        
+                <input type="submit" name="post_all" value="Post to All Courses I Teach" onclick="return confirm('Post this message to all your taught courses?');" />
+                <input type="checkbox" value="True" name="send_email" /> <text>Email to Class</text>
             }
+
+            if (ViewBag.IsLeader)
+            {
+                <input type="checkbox" value="True" name="send_email" /> <text>Email to Community</text>
+            }
+
         }
     }
 </div>
 <div class="dashboard_mode">
     @using (Html.BeginForm("SetDashboardMode", "Home", FormMethod.Post, new { id = "set_dashboard" }))
     {
-        <input type="radio" name="mode" value="false" @if (!ViewBag.DashboardSingleCourseMode)
-                                                      {<text>checked</text>}/><text>Show
-        all courses</text> 
-        <input type="radio" name="mode" value="true" @if (ViewBag.DashboardSingleCourseMode)
-                                                     {<text>checked</text>}/><text>Show
-        only <em>@Helpers.CourseTag(ViewBag.ActiveCourse.Course)</em></text> 
+        <input type="radio" name="mode" value="false" @if (!ViewBag.DashboardSingleCourseMode) {<text>checked="checked"</text>}/>
+            <text>Show all courses</text> 
+        <input type="radio" name="mode" value="true" @if (ViewBag.DashboardSingleCourseMode) {<text>checked="checked"</text>}/>
+            <text>Show only <em>@Helpers.CourseTag(ViewBag.ActiveCourse.Course)</em></text> 
     }
 </div>
 <script type="text/javascript">

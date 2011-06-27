@@ -95,6 +95,16 @@ namespace OSBLE.Controllers
                 ViewBag.IsInstructor = false;
             }
 
+            if (activeCourse.Course is Community && activeCourse.CourseRole.CanModify)
+            {
+                ViewBag.IsLeader = true;
+            }
+            else
+            {
+                ViewBag.IsLeader = false;
+            }
+
+
             // Get optional start post from query for pagination
             if (Request.Params["startPost"] != null)
             {
