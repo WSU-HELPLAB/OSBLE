@@ -23,6 +23,7 @@ namespace OSBLE.Models.HomePage
 
         [AllowHtml]
         [Required]
+        [StringLength(4000)] // Chris wanted us to allow longer posts.
         public string Content { get; set; }
 
         // User's name to show (anonymized on the controller)
