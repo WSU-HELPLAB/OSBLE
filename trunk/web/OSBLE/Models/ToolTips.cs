@@ -136,6 +136,9 @@ namespace OSBLE.Models
         
             public static string CommunityNickname = "This is a 3-4 letter nickname (identifier) for thisw community to be shown where there is not enough space to display the whole name of the community. Ideally, this nickname will be connected with the name somehow, such as an acronym or abbreviation.";
             public static string CommunityAllowPosting = "If you want participants and not just leaders to be able to post events to this community, you must check the box.";
+            public static string CommunityAllowFileUpload = "If you want participants and not just leaders to be able to post events to this community, you must check this box.";
+            public static string CommunityCalendarEvents = "For every user that is a part of this group, events will be displayed on their calendar this many weeks in advance.";
+            public static string CommunitySave = "You must click the button to save any changes you made on this page.";
 
         #endregion
 
