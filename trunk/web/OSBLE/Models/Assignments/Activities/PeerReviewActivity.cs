@@ -40,7 +40,7 @@ namespace OSBLE.Models.Assignments.Activities
         /// <summary>
         /// If true then student can view Peer Reviews done by others of their work.
         /// </summary>
-        [Display(Name = "Students can access the reviews of their subissions after the peer review deadline")]
+        [Display(Name = "Students can access the reviews of their submissions after the peer review deadline")]
         public bool CanStudentAccessReviews { get; set; }
 
             /// <summary>

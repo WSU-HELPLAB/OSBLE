@@ -106,19 +106,22 @@
 
        <div>
             <input type="radio" name="Presentation" value="PresentAllIssuesLogged" />
-            Present all issues logged by team, members, irrespective of voting results
+            Present all issues logged by team members, irrespective of voting results
+            @Helpers.CreateToolTip(ToolTips.AuthorRebuttalPresentationOptionsPresentAllIssuesLogged)
             <br />
         </div>
 
         <div>
             <input type="radio" name="Presentation" value="PresentIssuesXLogged" />
-            Present only issues that received at least @Html.TextBoxFor(model => model.xlogged, new { size = 3, id = "x_logged" }) number of votes
+            Present only issues that received at least @Html.TextBoxFor(model => model.xlogged, new { size = 3, id = "x_logged" })@Helpers.CreateToolTip(ToolTips.AuthorRebuttalxlogged) number of votes
+            @Helpers.CreateToolTip(ToolTips.AuthorRebuttalPresentationOptionsPresentIssuesXLogged)
             <br />
         </div>
         <div id="PresentIssuesXLogged_options" class="indented_options" style="display: none">
             <div>
                 <input type="radio" name="Presentation" value="PresentIssuesXPercentLogged" />
-                Present only issues for which @Html.TextBoxFor(model => model.xpercent, new { size = 3, id = "x_percent" }) percent of team members voted
+                Present only issues for which @Html.TextBoxFor(model => model.xpercent, new { size = 3, id = "x_percent" })@Helpers.CreateToolTip(ToolTips.AuthorRebuttalxpercent) percent of team members voted
+                @Helpers.CreateToolTip(ToolTips.AuthorRebuttalPresentationOptionsPresentIssuesXPercentLogged)
                 <br />
             </div>
         </div>
@@ -128,6 +131,7 @@
         <div>
             <input type="radio" name="Presentation" value="PresentOnlyIssuesModeratorVoted" />
             Present only issues for which team moderator voted
+            @Helpers.CreateToolTip(ToolTips.AuthorRebuttalPresentationOptionsPresentOnlyModeratorVoted)
             <br />
         </div>
 
@@ -136,12 +140,14 @@
         <div class="editor-field">
             @Html.CheckBoxFor(model => model.AuthorMustAcceptorRefuteEachIssue, new { id = "author_must_accept_or_refute_each_issue" })
             @Html.LabelFor(model => model.AuthorMustAcceptorRefuteEachIssue)
+            @Helpers.CreateToolTip(ToolTips.AuthorRebuttalAuthorMustAcceptorRefuteEachIssue)
             @Html.ValidationMessageFor(model => model.AuthorMustAcceptorRefuteEachIssue)
         </div>
         <div id="author_must_accept_or_refute_each_issue_options" class="indented_options" style="display: none">
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.AuthorMustDescribeHowAddressed, new { id = "author_must_describe_how_addressed" })
                 @Html.LabelFor(model => model.AuthorMustDescribeHowAddressed)
+                @Helpers.CreateToolTip(ToolTips.AuthorRebuttalAuthorMustDescribeHowAddressed)
                 @Html.ValidationMessageFor(model => model.AuthorMustDescribeHowAddressed)
             </div>
         </div>
@@ -149,12 +155,14 @@
         <div class="editor-field">
             @Html.CheckBoxFor(model => model.AuthorMustProvideRationale, new { id = "author_must_provide_rationale" })
             @Html.LabelFor(model => model.AuthorMustProvideRationale)
+            @Helpers.CreateToolTip(ToolTips.AuthorRebuttalAuthorMustProvideRationale)
             @Html.ValidationMessageFor(model => model.AuthorMustProvideRationale)
         </div>
         <div id="author_must_provide_rationale_options" class="indented_options" style="display: none">
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.AuthorMustSayIfIssueWasAddressed, new { id = "author_must_say_if_issue_was_addressed" })
                 @Html.LabelFor(model => model.AuthorMustSayIfIssueWasAddressed)
+                @Helpers.CreateToolTip(ToolTips.AuthorRebuttalAuthorMustSayIfIssueWasAddressed)
                 @Html.ValidationMessageFor(model => model.AuthorMustSayIfIssueWasAddressed)
             </div>
         </div>

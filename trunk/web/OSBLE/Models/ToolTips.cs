@@ -203,6 +203,56 @@ namespace OSBLE.Models
         #endregion
 
 
+        #region PeerReviewToolTips
+
+            public static string PeerReviewName = "";
+            public static string PeerReviewAbstractAssignmentID = "";
+            public static string PeerReviewUseOnlySubmittedStudents = "If you want only students who submitted this assignment to participate, you must check this box.";
+            public static string PeerReviewUseModerators = "If you want to use Moderators for this peer review, you must check this box.";
+            public static string PeerReviewIsAuthorAnonymous = "If you want the author of this peer review to be anonymous, you must check this box.";
+            public static string PeerReviewIsReviewersAnonymous = "If you want the reviewer of this peer review to be anonymous, you must check this box.";
+            public static string PeerReviewIsReviewersRoleAnonymous = "If you want the reviewers role in this peer review to be anonymous, you must check this box.";
+            public static string PeerReviewUseInlineComments = "If you want to use inline comments, you must check this box.";
+            public static string PeerReviewUseRubric = "If you would like to use a rubric for grading, you must check this box.";
+            public static string PeerReviewCanStudentAccessReviews = "If you want students to be able to access the reviews of their submissions after the peer review deadline, you must check this box.";
+            public static string PeerReviewHasStudentCompletedAssignedReviews = "If you want to require students to complete their assigned peer reviews before they can access the reviews of their own submission, you must check this box.";
+            public static string PeerReviewCanReviewerViewOthersReviews = "If you want the reviewer to be able to see the reviews made by other reviewers on this submission , you must check this box.";
+            public static string PeerReviewHasReviewerCompletedAssignedReviews = "If you want to require the reviewer to complete all of their assigned peer reviews before viewing others reviews of the current submission, you must check this box.";
+            public static string PeerReviewInstructorCompletesRubricRandomReview = "If you want the instructor to complete a rubric for a randomly selected review, you must check this box.";
+            public static string PeerReviewInstructorComletesRubricAllReviews = "If you want the instructor to complete rubrics for all the reviews, you must check this box.";
+              
+
+        #endregion
+
+
+        #region AuthorRebuttalToolTips
+
+            public static string AuthorRebuttalPresentationOptionsPresentAllIssuesLogged = "If you would like to present all issues logged by team members irrespective of voting results, you must select this button";
+            public static string AuthorRebuttalPresentationOptionsPresentIssuesXLogged = "If you want to present only issues that recieved at least X number of votes, you must select this button";
+            public static string AuthorRebuttalPresentationOptionsPresentIssuesXPercentLogged = "If you want to present only issue that recieved at least X percent of the members voted, you must select this button";
+            public static string AuthorRebuttalPresentationOptionsPresentOnlyModeratorVoted = "If you only want to present the issues voted on by the moderator, you must select this button";
+            public static string AuthorRebuttalxlogged = "You must enter amount of votes here";
+            public static string AuthorRebuttalxpercent = "You must enter the percent of votes here";
+            public static string AuthorRebuttalAuthorMustAcceptorRefuteEachIssue = "If you want the Author to have to change or refute each issue, you must check this box";
+            public static string AuthorRebuttalAuthorMustProvideRationale = "If you want the author to provide written rationale for each issue they refute, you must check this box";
+            public static string AuthorRebuttalAuthorMustSayIfIssueWasAddressed = "If you want to require the author to specify whether each issue was addressed in the resubmission, you must check this box";
+            public static string AuthorRebuttalAuthorMustDescribeHowAddressed = "If you want to require the author to describe how each issue was addressed, you must check this box";
+
+        #endregion
+
+
+        #region IssueVotingToolTips
+
+        public static string IssueVotingSetGradePercentOfIssues = "If you want to set the grade of this activity to a percent of issue's voted on, you must select this button";
+        public static string IssueVotingSetGradePercentAgreementWModerator = "If you would like to set the grade in agreement with moderator, you must select this button";
+        public static string IssueVotingSetGradeManually = "If you would like to set the grade manually, you must select this button";
+        public static string IssueVotingUseOnlyStudentWhoCompletedPeerReview = "If you want to use only students who completed a peer review of this submission, you must check this box";
+        public static string IssueVotingEnableIssueVotingDiscussion = "If you would like to enable issue voting discussion on this submission, you must check this box";
+        public static string IssueVotingReviewerMustCompleteIssueVoting = "If you want to require reviewers to have completed issue voting prior to joining a discussion, you must check this box";
+
+
+        #endregion
+
         /*
          * TEMPLATE FOR ADDING TOOLTIPS (FOR ORGANIZATIONAL PURPOSES)
          *

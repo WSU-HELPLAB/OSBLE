@@ -108,6 +108,7 @@
 
             <div class="editor-label">
                 @Html.LabelFor(model => model.Name)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewName)
             </div>
             <div class="editor-field">
                 @Html.EditorFor(model => model.Name)
@@ -116,6 +117,7 @@
 
             <div class="editor-label">
                 @Html.LabelFor(model => model.AbstractAssignmentID, "Abstract Assignment")
+                @Helpers.CreateToolTip(ToolTips.PeerReviewAbstractAssignmentID)
             </div>
             <div class="editor-field">
                 @Html.DropDownList("AbstractAssignmentID", String.Empty)
@@ -127,12 +129,14 @@
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.UseOnlySubmittedStudents, new { id = "use_only_submitted_student" })
                 @Html.LabelFor(model => model.UseOnlySubmittedStudents)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewUseOnlySubmittedStudents)
                 @Html.ValidationMessageFor(model => model.UseOnlySubmittedStudents)
             </div>
 
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.UseModerators, new { id = "use_moderators" })
                 @Html.LabelFor(model => model.UseModerators)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewUseModerators)
                 @Html.ValidationMessageFor(model => model.UseModerators)
             </div>
 
@@ -141,18 +145,21 @@
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.IsAuthorAnonymous, new { id = "is_author_anonymous" })
                 @Html.LabelFor(model => model.IsAuthorAnonymous)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewIsAuthorAnonymous)
                 @Html.ValidationMessageFor(model => model.IsAuthorAnonymous)
             </div>
 
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.IsReviewersAnonymous, new { id = "is_reviewer_anonymous" })
                 @Html.LabelFor(model => model.IsReviewersAnonymous)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewIsReviewersAnonymous)
                 @Html.ValidationMessageFor(model => model.IsReviewersAnonymous)
             </div>
 
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.IsReviewersRoleAnonymous, new { id = "is_reviewers_role_anonymous" })
                 @Html.LabelFor(model => model.IsReviewersRoleAnonymous)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewIsReviewersRoleAnonymous)
                 @Html.ValidationMessageFor(model => model.IsReviewersRoleAnonymous)
             </div>
 
@@ -161,24 +168,28 @@
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.UseInlineComments, new { id = "use_inline_comments" })
                 @Html.LabelFor(model => model.UseInlineComments)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewUseInlineComments)
                 @Html.ValidationMessageFor(model => model.UseInlineComments)
             </div>
 
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.UseRubric, new { id = "use_rubric" })
                 @Html.LabelFor(model => model.UseRubric)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewUseRubric)
                 @Html.ValidationMessageFor(model => model.UseRubric)
             </div>
             <div id="use_rubric_options" class="indented_options" style="display: none">
                 <div class="editor-field">
                     @Html.CheckBoxFor(model => model.InstructorCompletesRubricRandomReview, new { id = "instructor_completes_rubric_random_review" })
                     @Html.LabelFor(model => model.InstructorCompletesRubricRandomReview)
+                    @Helpers.CreateToolTip(ToolTips.PeerReviewInstructorCompletesRubricRandomReview)
                     @Html.ValidationMessageFor(model => model.InstructorCompletesRubricRandomReview)
                 </div>
 
                 <div class="editor-field">
                     @Html.CheckBoxFor(model => model.InstructorCompletesRubricAllReviews, new { id = "instructor_completes_rubric_all_reviews" })
                     @Html.LabelFor(model => model.InstructorCompletesRubricAllReviews)
+                    @Helpers.CreateToolTip(ToolTips.PeerReviewInstructorComletesRubricAllReviews)
                     @Html.ValidationMessageFor(model => model.InstructorCompletesRubricAllReviews)
                 </div>
             </div>
@@ -188,12 +199,14 @@
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.CanStudentAccessReviews, new { id = "can_student_access_reviews" })
                 @Html.LabelFor(model => model.CanStudentAccessReviews)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewCanStudentAccessReviews)
                 @Html.ValidationMessageFor(model => model.CanStudentAccessReviews)
             </div>
             <div id="can_student_access_reviews_options"  class="indented_options" style="display: none">
                 <div class="editor-field">
                     @Html.CheckBoxFor(model => model.HasStudentCompletedAssignedReviews, new { id = "has_student_completed_assigned_reviews" })
                     @Html.LabelFor(model => model.HasStudentCompletedAssignedReviews)
+                    @Helpers.CreateToolTip(ToolTips.PeerReviewHasStudentCompletedAssignedReviews)
                     @Html.ValidationMessageFor(model => model.HasStudentCompletedAssignedReviews)
                 </div>
             </div>
@@ -203,12 +216,14 @@
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.CanReviewerViewOthersReviews, new { id = "can_reviewer_view_others_reviews" })
                 @Html.LabelFor(model => model.CanReviewerViewOthersReviews)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewCanReviewerViewOthersReviews)
                 @Html.ValidationMessageFor(model => model.CanReviewerViewOthersReviews)
             </div>
             <div id="can_reviewer_access_reviews_options"  class="indented_options" style="display: none">
                 <div class="editor-field">
                     @Html.CheckBoxFor(model => model.HasReviewerCompletedAssignedReviews, new { id = "has_reviewer_completed_assigned_reviews" })
                     @Html.LabelFor(model => model.HasReviewerCompletedAssignedReviews)
+                    @Helpers.CreateToolTip(ToolTips.PeerReviewHasReviewerCompletedAssignedReviews)
                     @Html.ValidationMessageFor(model => model.HasReviewerCompletedAssignedReviews)
                 </div>
             </div>

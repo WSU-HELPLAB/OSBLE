@@ -43,18 +43,21 @@
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.peerReviewActivity.IsAuthorAnonymous, new { id = "is_author_anonymous" })
                 @Html.LabelFor(model => model.peerReviewActivity.IsAuthorAnonymous)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewIsAuthorAnonymous)
                 @Html.ValidationMessageFor(model => model.peerReviewActivity.IsAuthorAnonymous)
             </div>
 
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.peerReviewActivity.IsReviewersAnonymous, new { id = "is_reviewer_anonymous" })
                 @Html.LabelFor(model => model.peerReviewActivity.IsReviewersAnonymous)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewIsReviewersAnonymous)
                 @Html.ValidationMessageFor(model => model.peerReviewActivity.IsReviewersAnonymous)
             </div>
 
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.peerReviewActivity.IsReviewersRoleAnonymous, new { id = "is_reviewers_role_anonymous" })
                 @Html.LabelFor(model => model.peerReviewActivity.IsReviewersRoleAnonymous)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewIsReviewersRoleAnonymous)
                 @Html.ValidationMessageFor(model => model.peerReviewActivity.IsReviewersRoleAnonymous)
             </div>
             
@@ -63,18 +66,21 @@
             <div>
                 <input type="radio" name="SetGrade" value="PercentOfIssues" />
                 Set Grade to percentage of issues voted on
+                @Helpers.CreateToolTip(ToolTips.IssueVotingSetGradePercentOfIssues)
                 <br />
             </div>
 
             <div>
                 <input type="radio" name="SetGrade" value="PercentAgreementWModerator" />
                 Set grade to percent in agreement with moderator
+                @Helpers.CreateToolTip(ToolTips.IssueVotingSetGradePercentAgreementWModerator)
                 <br />
             </div>
 
             <div>
                 <input type="radio" name="SetGrade" value="Manually" />
                 Manually enter grade
+                @Helpers.CreateToolTip(ToolTips.IssueVotingSetGradeManually)
                 <br />
             </div>
 

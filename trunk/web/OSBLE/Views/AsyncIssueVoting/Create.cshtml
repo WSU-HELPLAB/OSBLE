@@ -61,6 +61,7 @@
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.UseOnlyStudentsWhoCompletedPeerReview, new { id = "use_only_students_who_completed_peer_review" })
                 @Html.LabelFor(model => model.UseOnlyStudentsWhoCompletedPeerReview)
+                @Helpers.CreateToolTip(ToolTips.IssueVotingUseOnlyStudentWhoCompletedPeerReview)
                 @Html.ValidationMessageFor(model => model.UseOnlyStudentsWhoCompletedPeerReview)
             </div>
 
@@ -69,18 +70,21 @@
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.peerReviewActivity.IsAuthorAnonymous, new { id = "is_author_anonymous" })
                 @Html.LabelFor(model => model.peerReviewActivity.IsAuthorAnonymous)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewIsAuthorAnonymous)
                 @Html.ValidationMessageFor(model => model.peerReviewActivity.IsAuthorAnonymous)
             </div>
 
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.peerReviewActivity.IsReviewersAnonymous, new { id = "is_reviewer_anonymous" })
                 @Html.LabelFor(model => model.peerReviewActivity.IsReviewersAnonymous)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewIsReviewersAnonymous)
                 @Html.ValidationMessageFor(model => model.peerReviewActivity.IsReviewersAnonymous)
             </div>
 
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.peerReviewActivity.IsReviewersRoleAnonymous, new { id = "is_reviewers_role_anonymous" })
                 @Html.LabelFor(model => model.peerReviewActivity.IsReviewersRoleAnonymous)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewIsReviewersRoleAnonymous)
                 @Html.ValidationMessageFor(model => model.peerReviewActivity.IsReviewersRoleAnonymous)
             </div>
 
@@ -89,12 +93,14 @@
             <div class="editor-field">
                 @Html.CheckBoxFor(model => model.EnableIssueVotingDiscussion, new { id = "enable_issue_voting_discussion" })
                 @Html.LabelFor(model => model.EnableIssueVotingDiscussion)
+                @Helpers.CreateToolTip(ToolTips.IssueVotingEnableIssueVotingDiscussion)
                 @Html.ValidationMessageFor(model => model.EnableIssueVotingDiscussion)
             </div>
             <div id="EnableIssueVotingDiscussion_options" class="indented_options" style="display: none">
                 <div class="editor-field">
                     @Html.CheckBoxFor(model => model.ReviewerMustCompleteIssueVoting, new { id = "reviewer_must_complete_issue_voting" })
                     @Html.LabelFor(model => model.ReviewerMustCompleteIssueVoting)
+                    @Helpers.CreateToolTip(ToolTips.IssueVotingReviewerMustCompleteIssueVoting)
                     @Html.ValidationMessageFor(model => model.ReviewerMustCompleteIssueVoting)
                 </div>
             </div>
@@ -104,18 +110,21 @@
             <div>
                 <input type="radio" name="SetGrade" value="PercentOfIssues" />
                 Set Grade to percentage of issues voted on
+                @Helpers.CreateToolTip(ToolTips.IssueVotingSetGradePercentOfIssues)
                 <br />
            </div>
 
            <div>
                 <input type="radio" name="SetGrade" value="PercentAgreementWModerator" />
                 Set grade to percent in agreement with moderator
+                @Helpers.CreateToolTip(ToolTips.IssueVotingSetGradePercentAgreementWModerator)
                 <br />
            </div>
 
            <div>
                 <input type="radio" name="SetGrade" value="Manually" />
                 Manually enter grade
+                @Helpers.CreateToolTip(ToolTips.IssueVotingSetGradeManually)
                 <br />
            </div>
 
