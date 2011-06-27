@@ -152,6 +152,11 @@ namespace OSBLE.Models
             this.UserProfiles.Add(up);
         }
 
+        public void SeedSchools()
+        {
+            this.Schools.Add(new School("Professional"));
+        }
+
         /// <summary>
         /// Adds course roles to db
         /// </summary>
@@ -469,8 +474,8 @@ namespace OSBLE.Models
         protected override void Seed(OSBLEContext context)
         {
             base.Seed(context);
-
             context.SeedRoles();
+            context.SeedSchools();
             context.SeedTestData();
         }
     }
@@ -486,6 +491,7 @@ namespace OSBLE.Models
             base.Seed(context);
 
             context.SeedRoles();
+            context.SeedSchools();
             context.SeedTestData();
         }
     }

@@ -1034,7 +1034,7 @@ ul.selector
     padding-right: 5px;
 }
 
-#notifications_list li div.notification_text 
+#notifications_list li div.notification_text
 {
     margin-right: 20px;
 }
@@ -1055,7 +1055,7 @@ ul.selector
     float: left;
 }
 
-.deliverable 
+.deliverable
 {
     width: 380px;
 }
@@ -1063,7 +1063,7 @@ ul.selector
 .meeting_time .meeting_time_tools, .break .break_tools, .deliverable .deliverable_tools
 {
     float: right;
-    padding: 3px;    
+    padding: 3px;
 }
 
 .deliverable .deliverable_tools
@@ -1132,7 +1132,7 @@ ul.selector
     vertical-align: top;
 }
 
-#deliverable_list 
+#deliverable_list
 {
     width: 250px;
 }
@@ -1151,16 +1151,16 @@ ul.selector
     display: block;
 }
 
-#deliverables_after 
+#deliverables_after
 {
     clear: both;
 }
 
-.recaptcha 
+.recaptcha
 {
     margin-top: 1.25em;
     margin-bottom: 1.25em;
-    margin-left: 90px;   
+    margin-left: 90px;
 }
 
 .helplab_display td
@@ -1168,25 +1168,19 @@ ul.selector
     text-align: left;
 }
 
-#privacy_notice 
+#privacy_notice
 {
     color: #111;
 }
 
-#privacy_notice h1, 
-#privacy_notice h2, 
-#privacy_notice h3, 
-#privacy_notice h4, 
-#privacy_notice h5, 
-#privacy_notice h6,
-#privacy_notice a
+#privacy_notice h1, #privacy_notice h2, #privacy_notice h3, #privacy_notice h4, #privacy_notice h5, #privacy_notice h6, #privacy_notice a
 {
     color: #074974;
 }
 
-.coursemenu_option 
+.coursemenu_option
 {
-    text-align: center;   
+    text-align: center;
 }
 
 .add_link
@@ -1207,7 +1201,7 @@ ul.assignment_deliverables, .assignment_deliverables ul
     padding-left: 0;
 }
 
-.assignment_deliverables li 
+.assignment_deliverables li
 {
     list-style-type: none;
     padding: 5px;
@@ -1228,18 +1222,18 @@ ul.assignment_deliverables, .assignment_deliverables ul
     margin-right: 10px;
 }
 
-.submission_deliverable th 
+.submission_deliverable th
 {
     text-align: left;
     vertical-align: top;
 }
 
-.submission_deliverables_end 
+.submission_deliverables_end
 {
     clear: both;
 }
 
-.deliverables_table 
+.deliverables_table
 {
     width: 100%;
 }
@@ -1253,5 +1247,12 @@ ul.assignment_deliverables, .assignment_deliverables ul
 
 #file_upload_silverlight_span
 {
-    float:right; width:45px; height:25px;
+    float: right;
+    width: 45px;
+    height: 25px;
+}
+
+#sign_up_dialog a
+{
+    color: Black;
 }

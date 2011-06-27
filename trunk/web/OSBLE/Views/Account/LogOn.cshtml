@@ -10,6 +10,30 @@
 <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
 
+<script>
+    $(function () {
+
+        $('#sign_up_dialog').dialog({
+            modal: true,
+            autoOpen: false,
+            resizable: false,
+            width: 450,
+            height: 200,
+            closeOnEscape: true
+        });
+
+        $('#sign_up_link').click(function () {
+            $('#sign_up_dialog').dialog('open');
+            
+            //This is to remove the focus from the create_academia_account so it doesn't have the box around it
+            $('#create_academia_account').blur();
+            return false;
+        });
+
+    });
+
+</script>
+
 <div>Online Studio Based Learning Environment</div>
 
 @Html.ValidationSummary(true, "Login was unsuccessful. Please correct the errors and try again.")
@@ -52,7 +76,7 @@
     
     
     <p>
-        Don't have an account? @Html.ActionLink("Sign Up", "Register", null, new { tabindex = "4" }).
+        Don't have an account? @Html.ActionLink("Sign Up", "Register", null, new {id= "sign_up_link", tabindex = "4" }).
     </p>
     <p>
         Forgot your password? @Html.ActionLink("Click Here", "ResetPassword").
@@ -65,6 +89,8 @@
 
         <script type="text/javascript">
             $(function () {
+
+
 
                 $('#privacy_notice').dialog(
                 {
@@ -100,4 +126,9 @@
 
     <div id="privacy_notice">
         @Html.Partial("Privacy")
+    </div>
+
+    <div id="sign_up_dialog" title="Create Account">
+    <p>Are you in academia (teachers, TAs, students) or the professional world?</p>
+        @Html.ActionLink("Create Academia Account", "AcademiaRegister", "Account", new { id = "create_academia_account" }) | @Html.ActionLink("Create Professional Account", "ProfessionalRegister", "Account")
     </div>

@@ -117,13 +117,10 @@ namespace OSBLE.Controllers
         }
 
         //
-        // GET: /Account/Register
-
-        public ActionResult Register()
+        // GET: /Account/ProfessionalRegister
+        public ActionResult ProfessionalRegister()
         {
             ViewBag.ReCaptchaPublicKey = getReCaptchaPublicKey();
-            ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name");
-
             return View();
         }
 
@@ -131,7 +128,82 @@ namespace OSBLE.Controllers
         // POST: /Account/Register
 
         [HttpPost]
-        public ActionResult Register(RegisterModel model)
+        public ActionResult ProfessionalRegister(RegisterModel model)
+        {
+            string privatekey = GetReCaptchaPrivateKey();
+
+            //Fall through if ReCaptcha is not set up correctly
+            if (privatekey == null || ReCaptcha.Validate(privateKey: privatekey))
+            {
+                model.School = (from c in db.Schools where c.Name == "Professional" select c).FirstOrDefault();
+                model.SchoolID = model.School.ID;
+
+                if (ModelState.IsValid)
+                {
+                    // Attempt to register the user
+                    MembershipCreateStatus createStatus;
+                    Membership.CreateUser(model.Email, model.Password, model.Email, null, null, true, null, out createStatus);
+
+                    if (createStatus == MembershipCreateStatus.Success)
+                    {
+                        FormsAuthentication.SetAuthCookie(model.Email, false /* createPersistentCookie */);
+
+                        try
+                        {
+                            UserProfile profile = new UserProfile();
+
+                            profile.UserName = model.Email;
+                            profile.FirstName = model.FirstName;
+                            profile.LastName = model.LastName;
+                            profile.Identification = model.Identification;
+                            profile.SchoolID = model.SchoolID;
+                            profile.School = db.Schools.Find(model.SchoolID);
+
+                            db.UserProfiles.Add(profile);
+                            db.SaveChanges();
+                        }
+                        catch (Exception e)
+                        {
+                            FormsAuthentication.SignOut();
+                            Membership.DeleteUser(model.Email);
+
+                            ModelState.AddModelError("", e.Message);
+
+                            return ProfessionalRegister();
+                        }
+
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", ErrorCodeToString(createStatus));
+                    }
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "The Captcha was incorrect try again.");
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        //
+        // GET: /Account/AcademiaRegister
+
+        public ActionResult AcademiaRegister()
+        {
+            ViewBag.ReCaptchaPublicKey = getReCaptchaPublicKey();
+            ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name");
+            return View();
+        }
+
+        //
+        // POST: /Account/Register
+
+        [HttpPost]
+        public ActionResult AcademiaRegister(RegisterModel model)
         {
             string privatekey = GetReCaptchaPrivateKey();
 
@@ -189,7 +261,7 @@ namespace OSBLE.Controllers
 
                             ModelState.AddModelError("", e.Message);
 
-                            return Register();
+                            return AcademiaRegister();
                         }
 
                         return RedirectToAction("Index", "Home");
