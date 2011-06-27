@@ -5,7 +5,8 @@ using OSBLE.Models.Users;
 
 namespace OSBLE.Models.HomePage
 {
-    public abstract class AbstractDashboard
+    
+    public abstract class AbstractDashboard 
     {
         [Required]
         [Key]
@@ -20,7 +21,7 @@ namespace OSBLE.Models.HomePage
 
         [AllowHtml]
         [Required]
-        [StringLength(4000)]
+        [StringLengthAttribute(4000)]
         public string Content { get; set; }
 
         // User's name to show (anonymized on the controller)

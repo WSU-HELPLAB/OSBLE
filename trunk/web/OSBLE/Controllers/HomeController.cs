@@ -12,6 +12,8 @@ using OSBLE.Models.Services.Uploader;
 using System.IO;
 using System.Net.Mail;
 using System.Configuration;
+using System.Reflection;
+using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Controllers
 {
@@ -112,6 +114,9 @@ namespace OSBLE.Controllers
             {
                 setupPostDisplay(dp);
             }
+
+            // Getting the maximum comment length for an activity feed
+            getMaxCommentLength();
 
             // Only send items in page to the dashboard.
             ViewBag.DashboardPostCount = dashboardPosts.Count();
@@ -354,6 +359,21 @@ namespace OSBLE.Controllers
 
             // Return to Dashboard.
             return RedirectToAction("Index");
+        }
+
+        /// <summary>
+        /// Gets the maximum Activity Feed comment length
+        /// </summary>
+        /// <returns></returns>
+        public void getMaxCommentLength()
+        {
+            var attribute = typeof(AbstractDashboard).GetProperties()
+                                  .Where(p => p.Name == "Content")
+                                  .Single()
+                                  .GetCustomAttributes(typeof(StringLengthAttribute), true)
+                                  .Single() as StringLengthAttribute;
+
+            ViewBag.MaxActivityFeedLength = attribute.MaximumLength;
         }
 
         [HttpPost]

@@ -2,31 +2,13 @@
 @using OSBLE.Models.Courses
 @using OSBLE.Models.HomePage
 
+
+
 <script type="text/javascript">
 
-//    $(function(){
-
-//        $('#Content').change(funciton(){
-//            if($(this).value() > 4000){
-//                $(this).value() = $(this).value().substring(0, 4000);
-//            }else{
-//                $('#remainingChars').value() = $(this).value().length();
-//            }
-//        });
-
-//    });
-
-//    function RemainingChars(field, remChars, max) {
-//        if (field.value.length > max) // if too long...trim it!
-//            field.value = field.value.substring(0, max);
-//        // otherwise, update 'characters left' counter
-//        else
-//            remChars.value = max - field.value.length;
-    //    }
-
     function RemainingChars() {
-        var remaining = 4000 - $('#ActivityFeed').val().length;
-        $('#remChars').val("(" + remaining + ") Charecters left");
+        var remaining =  $('#MaxContentChars').val() - $('#ActivityFeed').val().length;
+        $('#remChars').val("(" + remaining + ") Characters left");
     }
 
 </script>
@@ -34,13 +16,15 @@
 <div id="activity_new_post">
     @if ((ViewBag.ActiveCourse.CourseRole.CanGrade == true) || ((ViewBag.ActiveCourse.Course is Course)&&(ViewBag.ActiveCourse.Course.AllowDashboardPosts) == true))
     {
+        <input type="hidden" id="MaxContentChars" value="@ViewBag.MaxActivityFeedLength"/>
+        
         if (ViewBag.Error != null)
         {
         <h3 class="error">@ViewBag.Error</h3>
         }
         using (Html.BeginForm("NewPost", "Home", FormMethod.Post))
         {
-        <input id="remChars" name="remainingChars" readonly="true" type="text" value="(4000) Charecters left" /><br />
+        <input id="remChars" name="remainingChars" readonly="true" type="text" value="(@ViewBag.MaxActivityFeedLength) Characters left" /><br />
         <textarea id="ActivityFeed" name="Content" rows="5" cols="40" placeholder="Enter new feed post here..." 
         onkeyup="RemainingChars();" onkeydown="RemainingChars();" ></textarea><br />
         
