@@ -5,11 +5,11 @@ using System.Web.Mvc;
 using OSBLE.Attributes;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Courses;
+using OSBLE.Models.Courses.GradebookOptions;
 using OSBLE.Models.Users;
 using OSBLE.Models.Assignments.Activities.Scores;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments;
-using OSBLE.Models.Courses.GradebookOptions;
 using System.IO;
 
 namespace OSBLE.Controllers
