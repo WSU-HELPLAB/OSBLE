@@ -187,8 +187,6 @@ namespace OSBLE.Models
             public static string AccountEmailNotifications = "The email address OSBLE uses to send information to your account is the email address you use to log in.";
             public static string AccountMenuOptions = "Hidden courses/communities will not appear in your course list or your activity feed and must be unchecked to appear again. <br /><br /> Your default course will be the active course each time you log on to OSBLE.";
 
-            public static string AccountLogOnName = "This is the email address you used when registering your account with this system.";
-            public static string AccountLogOnPassword = "If you have forgotten your password, <a href='ResetPassword'>reset your password</a>.  ";
             public static string AccountLogOnRemember = "If you allow this option, you will be automatically logged in when you access this system.";
 
             public static string AccountResetPassword = "This email address must be the same one used to log in to OSBLE. If you don't have an account, <a href='Register'>register now</a>.";

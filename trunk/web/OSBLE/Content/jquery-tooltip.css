@@ -55,7 +55,7 @@
 .popup td.top, .popup td.bottom {
     height: 15px;
     margin: 0px;
-    padding: 0px;
+    padding: 0px !important;
     overflow: visible;
 }
 
