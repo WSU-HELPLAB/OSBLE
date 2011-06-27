@@ -12,7 +12,7 @@ namespace OSBLE.Models.Courses
         public string Description { get; set; }
 
         [Display(Name = "Enter a short (3-4 character) nickname to display in the dashboard for this community (e.g. Comm)")]
-        [StringLength(7)]
+        [StringLength(10)]
         [Required]
         public string Nickname { get; set; }
 
