@@ -49,11 +49,6 @@
 
         <div class="editor-label">
         </div>
-        <div class="editor-field">
-            @Html.EditorFor(model => model.AllowFileUpload) @Html.LabelFor(model => model.AllowFileUpload)
-            @Helpers.CreateToolTip(ToolTips.CommunityAllowFileUpload) <br />
-            @Html.ValidationMessageFor(model => model.AllowFileUpload)
-        </div>
     
         <div class="editor-field">
             @Html.LabelFor(model => model.CalendarWindowOfTime)

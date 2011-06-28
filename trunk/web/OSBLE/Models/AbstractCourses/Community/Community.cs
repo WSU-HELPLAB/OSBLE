@@ -19,9 +19,6 @@ namespace OSBLE.Models.Courses
         [Display(Name = "Allow all community members to post events in calendar")]
         public override bool AllowEventPosting { get; set; }
 
-        [Display(Name = "Allow all community members to upload files")]
-        public bool AllowFileUpload { get; set; }
-
         public Community()
             : base()
         {
