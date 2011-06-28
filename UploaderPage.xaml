@@ -30,8 +30,8 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Path: " VerticalAlignment="Bottom" />
-            <TextBox x:Name="LocalFileTextBox" IsEnabled="True"  Grid.Row="0" Grid.Column="1" />
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Path: " Margin="7,0,0,0" VerticalAlignment="Bottom" />
+            <TextBox x:Name="LocalFileTextBox" IsEnabled="True"  Grid.Row="0" Margin="0,0,7,0" Grid.Column="1" />
         </Grid>
         <my:FileList x:Name="LocalFileList" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
         <StackPanel 
@@ -61,10 +61,10 @@
                           Background="DarkSlateGray" Width="3" />
 
         <!-- column 2 -->
-        <TextBlock FontSize="16" FontWeight="Bold" Text="OSBLE" Grid.Row="0" Grid.Column="2" Margin="0,5,0,5" 
+        <TextBlock FontSize="16" FontWeight="Bold" Text="Remote Files on OSBLE" Grid.Row="0" Grid.Column="2" Margin="0,5,0,5" 
                    VerticalAlignment="Center" HorizontalAlignment="Center" />
-        <ComboBox x:Name="UploadLocation" DisplayMemberPath="Value" Grid.Row="1" Grid.Column="2" />
-        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2">
+        <ComboBox x:Name="UploadLocation" DisplayMemberPath="Value" Grid.Row="1" Grid.Column="2" Margin="7,0,7,0" />
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" >
             <Button 
                 x:Name="UpButton" 
                 Content="UP" 
