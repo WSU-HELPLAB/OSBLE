@@ -109,7 +109,7 @@ namespace OSBLE.Services
             {
                 //only allow those that can modify the course (probably instructors) to remove
                 //files
-                if (currentCourse.CourseRole.CanModify == true)
+                if (currentCourse.CourseRole.CanModify == true || currentCourse.CourseRole.CanUploadFiles == true)
                 {
                     //do a simple pattern match to make sure that the file to be uploaded is in
                     //the correct course folder
@@ -187,7 +187,7 @@ namespace OSBLE.Services
                                select c).FirstOrDefault();
             if (cu != null)
             {
-                if (cu.CourseRole.CanModify)
+                if (cu.CourseRole.CanModify || cu.CourseRole.CanUploadFiles == true)
                 {
                     return FileSystem.GetCourseDocumentsFileList(cu.Course as AbstractCourse, true);
                 }
@@ -258,7 +258,10 @@ namespace OSBLE.Services
                                             &&
                                             cu.UserProfileID == currentUser.ID
                                             && 
-                                            cu.CourseRole.CanModify == true
+                                               (cu.CourseRole.CanModify == true
+                                               || cu.CourseRole.CanUploadFiles == true
+                                               )
+                                            
                                           select cu).ToList();
             foreach (CoursesUsers cu in courses)
             {
@@ -405,7 +408,7 @@ namespace OSBLE.Services
             //make sure that we got something back
             if (currentCourse != null)
             {
-                if (currentCourse.CourseRole.CanModify)
+                if (currentCourse.CourseRole.CanModify || currentCourse.CourseRole.CanUploadFiles == true)
                 {
                     FileSystem.UpdateFileOrdering(listing);
                 }
