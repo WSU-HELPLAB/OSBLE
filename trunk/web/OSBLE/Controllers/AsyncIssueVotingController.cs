@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.Entity;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models.Assignments.Activities;
-using OSBLE.Models;
 
 namespace OSBLE.Controllers
-{ 
+{
     public class AsyncIssueVotingController : OSBLEController
     {
         //
@@ -17,7 +13,7 @@ namespace OSBLE.Controllers
 
         public ViewResult Index()
         {
-            var assignmentactivities = db.AssignmentActivities.Include(a => a.AbstractAssignment);
+            var assignmentactivities = db.AbstractAssignmentActivity.Include(a => a.AbstractAssignment);
             return View(assignmentactivities.ToList());
         }
 
@@ -26,7 +22,7 @@ namespace OSBLE.Controllers
 
         public ViewResult Details(int id)
         {
-            AsyncIssueVotingActivity asyncissuevotingactivity = db.AssignmentActivities.Find(id) as AsyncIssueVotingActivity;
+            AsyncIssueVotingActivity asyncissuevotingactivity = db.AbstractAssignmentActivity.Find(id) as AsyncIssueVotingActivity;
             return View(asyncissuevotingactivity);
         }
 
@@ -37,7 +33,7 @@ namespace OSBLE.Controllers
         {
             ViewBag.AbstractAssignmentID = new SelectList(db.AbstractAssignments, "ID", "Name");
             return View();
-        } 
+        }
 
         //
         // POST: /AsyncIssueVoting/Create
@@ -48,7 +44,7 @@ namespace OSBLE.Controllers
             string setgrade = Request.Params["SetGrade"];
 
             // had to use hard coded strings because otherwise through an error about constant values.
-            switch(setgrade)
+            switch (setgrade)
             {
                 case "PercentOfIssues":
                     asyncissuevotingactivity.Setgrade = IssueVotingActivity.SetGrade.PercentOfIssues;
@@ -65,21 +61,21 @@ namespace OSBLE.Controllers
 
             if (ModelState.IsValid)
             {
-                db.AssignmentActivities.Add(asyncissuevotingactivity);
+                db.AbstractAssignmentActivity.Add(asyncissuevotingactivity);
                 db.SaveChanges();
-                return RedirectToAction("Index");  
+                return RedirectToAction("Index");
             }
 
             ViewBag.AbstractAssignmentID = new SelectList(db.AbstractAssignments, "ID", "Name", asyncissuevotingactivity.AbstractAssignmentID);
             return View(asyncissuevotingactivity);
         }
-        
+
         //
         // GET: /AsyncIssueVoting/Edit/5
- 
+
         public ActionResult Edit(int id)
         {
-            AsyncIssueVotingActivity asyncissuevotingactivity = db.AssignmentActivities.Find(id) as AsyncIssueVotingActivity;
+            AsyncIssueVotingActivity asyncissuevotingactivity = db.AbstractAssignmentActivity.Find(id) as AsyncIssueVotingActivity;
             ViewBag.AbstractAssignmentID = new SelectList(db.AbstractAssignments, "ID", "Name", asyncissuevotingactivity.AbstractAssignmentID);
             return View(asyncissuevotingactivity);
         }
@@ -102,10 +98,10 @@ namespace OSBLE.Controllers
 
         //
         // GET: /AsyncIssueVoting/Delete/5
- 
+
         public ActionResult Delete(int id)
         {
-            AsyncIssueVotingActivity asyncissuevotingactivity = db.AssignmentActivities.Find(id) as AsyncIssueVotingActivity;
+            AsyncIssueVotingActivity asyncissuevotingactivity = db.AbstractAssignmentActivity.Find(id) as AsyncIssueVotingActivity;
             return View(asyncissuevotingactivity);
         }
 
@@ -115,8 +111,8 @@ namespace OSBLE.Controllers
         [HttpPost, ActionName("Delete")]
         public ActionResult DeleteConfirmed(int id)
         {
-            AsyncIssueVotingActivity asyncissuevotingactivity = db.AssignmentActivities.Find(id) as AsyncIssueVotingActivity;
-            db.AssignmentActivities.Remove(asyncissuevotingactivity);
+            AsyncIssueVotingActivity asyncissuevotingactivity = db.AbstractAssignmentActivity.Find(id) as AsyncIssueVotingActivity;
+            db.AbstractAssignmentActivity.Remove(asyncissuevotingactivity);
             db.SaveChanges();
             return RedirectToAction("Index");
         }

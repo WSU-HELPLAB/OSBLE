@@ -5,7 +5,7 @@ using OSBLE.Models.Assignments.Activities.Scores;
 
 namespace OSBLE.Models.Assignments.Activities
 {
-    public abstract class AssignmentActivity
+    public abstract class AbstractAssignmentActivity
     {
         [Required]
         [Key]
@@ -14,7 +14,7 @@ namespace OSBLE.Models.Assignments.Activities
         [Required]
         public string Name { get; set; }
 
-        public AssignmentActivity()
+        public AbstractAssignmentActivity()
         {
             DateTime dateTimeNow = DateTime.Now;
 

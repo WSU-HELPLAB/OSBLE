@@ -10,7 +10,7 @@ namespace OSBLE.Models.Assignments.Activities
     /// There should be one of these at the end of every Assignment 
     /// (except GradeAssignment, which only returns a StartDate)
     /// </summary>
-    public class StopActivity : AssignmentActivity
+    public class StopActivity : AbstractAssignmentActivity
     {
         public new int PointsPossible
         {

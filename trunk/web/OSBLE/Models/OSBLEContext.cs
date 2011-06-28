@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Web.Security;
+using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments.Activities.Scores;
@@ -9,7 +10,6 @@ using OSBLE.Models.Courses.GradebookOptions;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Rubrics;
 using OSBLE.Models.Users;
-
 
 namespace OSBLE.Models
 {
@@ -42,7 +42,7 @@ namespace OSBLE.Models
 
         // Assignments.Activities
 
-        public DbSet<AssignmentActivity> AssignmentActivities { get; set; }
+        public DbSet<AbstractAssignmentActivity> AbstractAssignmentActivity { get; set; }
 
         public DbSet<Deliverable> Deliverables { get; set; }
 
@@ -204,8 +204,6 @@ namespace OSBLE.Models
 
             this.SaveChanges();
 
-            
-
             // Sample Courses
             Course c1 = new Course();
             c1.Prefix = "Cpt S";
@@ -213,14 +211,13 @@ namespace OSBLE.Models
             c1.Semester = "Spring";
             c1.Year = "2011";
             c1.Name = "Introduction to Programming";
-            
+
             Course c2 = new Course();
             c2.Prefix = "Art E";
             c2.Number = "345";
             c2.Semester = "Fall";
             c2.Year = "2011";
             c2.Name = "Underwater Basketweaving";
-            
 
             Community c3 = new Community();
             c3.Nickname = "Comm";
@@ -463,6 +460,8 @@ namespace OSBLE.Models
         public DbSet<AuthorRebuttalActivity> AuthorRebuttalActivities { get; set; }
 
         public DbSet<AsyncIssueVotingActivity> AsyncIssueVotingActivities { get; set; }
+
+        public DbSet<Submission> Submissions { get; set; }
     }
 
     /// <summary>

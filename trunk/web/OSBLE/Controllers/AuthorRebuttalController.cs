@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.Entity;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models.Assignments.Activities;
-using OSBLE.Models;
 
 namespace OSBLE.Controllers
 {
@@ -17,7 +13,7 @@ namespace OSBLE.Controllers
 
         public ViewResult Index()
         {
-            var assignmentactivities = db.AssignmentActivities.Include(a => a.AbstractAssignment);
+            var assignmentactivities = db.AbstractAssignmentActivity.Include(a => a.AbstractAssignment);
             return View(assignmentactivities.ToList());
         }
 
@@ -26,7 +22,7 @@ namespace OSBLE.Controllers
 
         public ViewResult Details(int id)
         {
-            AuthorRebuttalActivity authorrebuttalactivity = db.AssignmentActivities.Find(id) as AuthorRebuttalActivity;
+            AuthorRebuttalActivity authorrebuttalactivity = db.AbstractAssignmentActivity.Find(id) as AuthorRebuttalActivity;
             return View(authorrebuttalactivity);
         }
 
@@ -37,7 +33,7 @@ namespace OSBLE.Controllers
         {
             ViewBag.AbstractAssignmentID = new SelectList(db.AbstractAssignments, "ID", "Name");
             return View();
-        } 
+        }
 
         //
         // POST: /AuthorRebuttal/Create
@@ -45,7 +41,6 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Create(AuthorRebuttalActivity authorrebuttalactivity)
         {
-
             string presentation = Request.Params["Presentation"];
 
             // had to use hard coded strings because otherwise through an error about constant values.
@@ -68,21 +63,21 @@ namespace OSBLE.Controllers
             };
             if (ModelState.IsValid)
             {
-                db.AssignmentActivities.Add(authorrebuttalactivity);
+                db.AbstractAssignmentActivity.Add(authorrebuttalactivity);
                 db.SaveChanges();
-                return RedirectToAction("Index");  
+                return RedirectToAction("Index");
             }
 
             ViewBag.AbstractAssignmentID = new SelectList(db.AbstractAssignments, "ID", "Name", authorrebuttalactivity.AbstractAssignmentID);
             return View(authorrebuttalactivity);
         }
-        
+
         //
         // GET: /AuthorRebuttal/Edit/5
- 
+
         public ActionResult Edit(int id)
         {
-            AuthorRebuttalActivity authorrebuttalactivity = db.AssignmentActivities.Find(id) as AuthorRebuttalActivity;
+            AuthorRebuttalActivity authorrebuttalactivity = db.AbstractAssignmentActivity.Find(id) as AuthorRebuttalActivity;
             ViewBag.AbstractAssignmentID = new SelectList(db.AbstractAssignments, "ID", "Name", authorrebuttalactivity.AbstractAssignmentID);
             return View(authorrebuttalactivity);
         }
@@ -105,10 +100,10 @@ namespace OSBLE.Controllers
 
         //
         // GET: /AuthorRebuttal/Delete/5
- 
+
         public ActionResult Delete(int id)
         {
-            AuthorRebuttalActivity authorrebuttalactivity = db.AssignmentActivities.Find(id) as AuthorRebuttalActivity;
+            AuthorRebuttalActivity authorrebuttalactivity = db.AbstractAssignmentActivity.Find(id) as AuthorRebuttalActivity;
             return View(authorrebuttalactivity);
         }
 
@@ -117,9 +112,9 @@ namespace OSBLE.Controllers
 
         [HttpPost, ActionName("Delete")]
         public ActionResult DeleteConfirmed(int id)
-        {            
-            AuthorRebuttalActivity authorrebuttalactivity = db.AssignmentActivities.Find(id) as AuthorRebuttalActivity;
-            db.AssignmentActivities.Remove(authorrebuttalactivity);
+        {
+            AuthorRebuttalActivity authorrebuttalactivity = db.AbstractAssignmentActivity.Find(id) as AuthorRebuttalActivity;
+            db.AbstractAssignmentActivity.Remove(authorrebuttalactivity);
             db.SaveChanges();
             return RedirectToAction("Index");
         }

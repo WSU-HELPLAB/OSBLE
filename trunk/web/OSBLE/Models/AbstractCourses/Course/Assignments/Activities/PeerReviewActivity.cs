@@ -10,7 +10,7 @@ namespace OSBLE.Models.Assignments.Activities
     {
         // Need (Link) to previous Activity
         // Requires a PeerReview
-        public virtual AssignmentActivity PreviousActivity { get; set; }
+        public virtual AbstractAssignmentActivity PreviousActivity { get; set; }
 
         [Display(Name = "Only students who submitted assignment may participate")]
         public bool UseOnlySubmittedStudents { get; set; }

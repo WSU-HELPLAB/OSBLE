@@ -37,7 +37,7 @@ namespace OSBLE.Models.Assignments.Activities.Scores
         [Required]
         public bool isDropped { get; set; }
 
-        public virtual AssignmentActivity AssignmentActivity { get; set; }
+        public virtual AbstractAssignmentActivity AssignmentActivity { get; set; }
 
         public Score() {
             Published = false;

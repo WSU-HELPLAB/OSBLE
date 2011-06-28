@@ -10,7 +10,7 @@ namespace OSBLE.Models.Assignments.Activities
     {
         //Need Link to Previous activity
         // Requires a PeerReview
-        public virtual AssignmentActivity PreviousActivity { get; set; }
+        public virtual AbstractAssignmentActivity PreviousActivity { get; set; }
         public virtual PeerReviewActivity PeerReview { get; set; }
 
         public enum PresentationOptions

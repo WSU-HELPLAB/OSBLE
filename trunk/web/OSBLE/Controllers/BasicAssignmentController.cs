@@ -27,28 +27,6 @@ namespace OSBLE.Controllers
         }
 
         //
-        // GET: /Assignment/
-
-        /*
-        public ViewResult Index()
-        {
-            //This is what it was but no longer works
-            var abstractgradables = db.AbstractGradables.ToList();
-            return View(abstractgradables);
-            //return View();
-        }*/
-
-        //
-        // GET: /Assignment/Details/5
-
-        /*
-        public ViewResult Details(int id)
-        {
-            SubmissionActivity assignment = db.AbstractGradables.Find(id) as SubmissionActivity;
-            return View(assignment);
-        }
-        */
-        //
         // GET: /Assignment/Create
 
         [CanModifyCourse]
@@ -136,8 +114,8 @@ namespace OSBLE.Controllers
 
                 db.SaveChanges();
 
-                db.AssignmentActivities.Add(submission);
-                db.AssignmentActivities.Add(stop);
+                db.AbstractAssignmentActivity.Add(submission);
+                db.AbstractAssignmentActivity.Add(stop);
 
                 db.SaveChanges();
 

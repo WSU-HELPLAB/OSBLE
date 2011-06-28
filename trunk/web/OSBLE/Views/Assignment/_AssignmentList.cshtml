@@ -1,120 +1,122 @@
 ﻿@using OSBLE.Models.Assignments
 @using OSBLE.Models.Assignments.Activities
-
 @model List<StudioAssignment>
-
 <div class="assignment_accordion">
-@foreach (StudioAssignment sa in Model)
-{
-    <div class="assignment_header"><a href="#">@sa.Name</a></div>
-    <div>
-        <div class="assignment_title">Description</div>
-        @* Add links to assignment description *@
-        <div class="assignment_description">@Helpers.Linkify(sa.Description)</div>
-
-        @if (sa.Deliverables.Count > 0)
-        {
-              
-            if (sa.AssignmentActivities.Where(aa => aa is SubmissionActivity).Count() > 0)
+    @foreach (StudioAssignment sa in Model)
+    {
+        <div class="assignment_header">
+            <a href="#">@sa.Name</a>
+        </div>
+        <div>
+        @Html.ActionLink("Submit", "Create", "Submission", new { id = sa.ID.ToString() }, new { })
+            <div class="assignment_title">
+                Description</div>
+            @* Add links to assignment description *@
+            <div class="assignment_description">@Helpers.Linkify(sa.Description)</div>
+            @if (sa.Deliverables.Count > 0)
             {
-            <div class="assignment_title">Submissions</div>
 
-            <ul class="assignment_deliverables">
-            @{
-                                @* First get full list of assignment activities. This is to later get the assignment activity
+                if (sa.AssignmentActivities.Where(aa => aa is SubmissionActivity).Count() > 0)
+                {
+                <div class="assignment_title">
+                    Submissions</div>
+
+                <ul class="assignment_deliverables">
+                    @{
+                        @* First get full list of assignment activities. This is to later get the assignment activity
                                 Immediately following each submission activity. The controller's responsibility is to send
                                 this view only lists of assignment activities where there are at least 2 activities and the last
                                 is a stop, which guarantees that if there are submission activities, there will be an activity
                                 after it to define an end date. *@
-                            List<AssignmentActivity> assignmentActivities = sa.AssignmentActivities.OrderBy(aa => aa.ReleaseDate).ToList();
-                                @* Now get each submission activity. *@
-                            List<AssignmentActivity> submissionActivities = assignmentActivities.Where(aa => aa is SubmissionActivity).OrderBy(aa => aa.ReleaseDate).ToList();
+                    List<AbstractAssignmentActivity> assignmentActivities = sa.AssignmentActivities.OrderBy(aa => aa.ReleaseDate).ToList();
+                    @* Now get each submission activity. *@
+                    List<AbstractAssignmentActivity> submissionActivities = assignmentActivities.Where(aa => aa is SubmissionActivity).OrderBy(aa => aa.ReleaseDate).ToList();
 
-                            foreach (SubmissionActivity submission in submissionActivities)
-                            {
+                    foreach (SubmissionActivity submission in submissionActivities)
+                    {
                                    
-                                    @* Get submission's release date as start date *@
-                                DateTime startDate = submission.ReleaseDate;
-                                    @* Get the activity following the submission's release date as end date *@
-                                DateTime endDate = assignmentActivities[assignmentActivities.IndexOf(submission) + 1].ReleaseDate;    
+                        @* Get submission's release date as start date *@
+                        DateTime startDate = submission.ReleaseDate;
+                        @* Get the activity following the submission's release date as end date *@
+                        DateTime endDate = assignmentActivities[assignmentActivities.IndexOf(submission) + 1].ReleaseDate;    
                                         
-                                 <li>
-                                    <table>
-                                        <tr>
-                                            <th>
-                                                <span>Start Date</span>
-                                            </th>
-                                            <td>
-                                                <span>@startDate.ToString()</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>
-                                                <span>End Date</span>
-                                            </th>
-                                            <td>
-                                                <span>@endDate.ToString()</span>
-                                            </td>
-                                        </tr>
-                                    </table>
-
-                                    <h4>Deliverables</h4>
-
-                                    <div>
-                                    @foreach (Deliverable d in sa.Deliverables)
-                                    {
-                                        SelectListItem sli = ViewBag.DeliverableTypes[d.Type];
-                                        <div class="submission_deliverable">
-                                            @* Get deliverable type string *@
-                                            <table>
-                                                <tr>
-                                                    <th>
-                                                        <span>Name</span>
-                                                    </th>
-                                                    <td>
-                                                        <span>@d.Name</span>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>
-                                                        <span>Type</span>
-                                                    </th>
-                                                    <td>
-                                                        <span>@sli.Text</span>
-                                                    </td>
-                                                </tr>
-                                                @*
+                        <li>
+                            <table>
+                                <tr>
+                                    <th>
+                                        <span>Start Date</span>
+                                    </th>
+                                    <td>
+                                        <span>@startDate.ToString()</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <span>End Date</span>
+                                    </th>
+                                    <td>
+                                        <span>@endDate.ToString()</span>
+                                    </td>
+                                </tr>
+                            </table>
+                            <h4>
+                                Deliverables</h4>
+                            <div>
+                                @foreach (Deliverable d in sa.Deliverables)
+                                {
+                                    SelectListItem sli = ViewBag.DeliverableTypes[d.Type];
+                                    <div class="submission_deliverable">
+                                        @* Get deliverable type string *@
+                                        <table>
+                                            <tr>
+                                                <th>
+                                                    <span>Name</span>
+                                                </th>
+                                                <td>
+                                                    <span>@d.Name</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>
+                                                    <span>Type</span>
+                                                </th>
+                                                <td>
+                                                    <span>@sli.Text</span>
+                                                </td>
+                                            </tr>
+                                            @*
                                                 TODO: This is where submission links/status should appear (for students)
                                                 and grading links should appear (for instructors)
                                                 *@
-                                            </table>
-                                        </div>
-
-                                    }
+                                        </table>
                                     </div>
-                                    <div class="submission_deliverables_end"></div>
-                                 </li>   
-                            }
+
+                                }
+                            </div>
+                            <div class="submission_deliverables_end">
+                            </div>
+                        </li>   
+                    }
                                 
-                            }
-            </ul>
+                    }
+                </ul>
+                }
+
+
             }
-    
-            
-        }
         
-        @* Only show grading if points possible are greater than 0 *@
-        @if (sa.PointsPossible > 0)
-        {
+@* Only show grading if points possible are greater than 0 *@
+            @if (sa.PointsPossible > 0)
+            {
 
-        <div class="assignment_title">Grading</div>
+                <div class="assignment_title">
+                    Grading</div>
 
-        <div class="assignment_grading">
-            Worth @sa.PointsPossible points in <em>@sa.Category.Name</em> category
-        </div>          
+                <div class="assignment_grading">
+                    Worth @sa.PointsPossible points in <em>@sa.Category.Name</em> category
+                </div>          
 
-        }
-
-    </div>
-}
+            }
+        </div>
+    }
 </div>

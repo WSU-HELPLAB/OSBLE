@@ -23,7 +23,7 @@ namespace OSBLE.Models.Assignments
         public virtual Category Category { get; set; }
 
         [Required]
-        public virtual ICollection<AssignmentActivity> AssignmentActivities { get; set; }
+        public virtual ICollection<AbstractAssignmentActivity> AssignmentActivities { get; set; }
 
         /// <summary>
         /// Grading points possible relative to sibling assignments in the parent category.
@@ -42,7 +42,7 @@ namespace OSBLE.Models.Assignments
             // Create Activities Collection if none exists
             if (AssignmentActivities == null)
             {
-                AssignmentActivities = new List<AssignmentActivity>();
+                AssignmentActivities = new List<AbstractAssignmentActivity>();
             }
         }
 

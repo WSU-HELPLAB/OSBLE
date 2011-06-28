@@ -487,8 +487,10 @@ body#layoutLogOn
 .dp_content
 {
     padding: 3px;
-    width: 100%;
+    width: 96%;
     margin-left: 20px;
+    white-space: pre-line;
+    word-wrap: break-word;
 }
 
 .dp_replies
@@ -927,6 +929,8 @@ body#layoutLogOn
     border: 1px solid #aaa;
     clear: both;
     padding: 5px;
+    white-space: pre-line;
+    word-wrap: break-word;
 }
 
 #add_update_users
