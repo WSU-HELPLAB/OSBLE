@@ -7,7 +7,7 @@
         {
         }
 
-        public CourseRole(string Name, bool CanModify, bool CanSeeAll, bool CanGrade, bool CanSubmit, bool Anonymized)
+        public CourseRole(string Name, bool CanModify, bool CanSeeAll, bool CanGrade, bool CanSubmit, bool CanUploadFiles, bool Anonymized)
             : base()
         {
             this.Name = Name;
@@ -15,6 +15,7 @@
             this.CanSeeAll = CanSeeAll;
             this.CanGrade = CanGrade;
             this.CanSubmit = CanSubmit;
+            this.CanUploadFiles = CanUploadFiles;
             this.Anonymized = Anonymized;
         }
 

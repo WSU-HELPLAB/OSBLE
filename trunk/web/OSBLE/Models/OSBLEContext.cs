@@ -165,22 +165,31 @@ namespace OSBLE.Models
             // Set up "static" values for Course Roles.
 
             // Instructor: Can Modify Course, See All, Can Grade
-            this.CourseRoles.Add(new CourseRole("Instructor", true, true, true, false, false));
+            this.CourseRoles.Add(new CourseRole(CourseRole.OSBLERoles.Instructor.ToString(), true, true, true, false, true, false));
+            
             // TA: Can See All, Can Grade
-            this.CourseRoles.Add(new CourseRole("TA", false, true, true, false, false));
+            this.CourseRoles.Add(new CourseRole(CourseRole.OSBLERoles.TA.ToString(), false, true, true, false, true, false));
+            
             // Student: Can Submit Assignments, All Anonymized
-            this.CourseRoles.Add(new CourseRole("Student", false, false, false, true, false));
+            this.CourseRoles.Add(new CourseRole(CourseRole.OSBLERoles.Student.ToString(), false, false, false, true, false, false));
+            
             // Moderator: No Special Privileges
-            this.CourseRoles.Add(new CourseRole("Moderator", false, false, false, false, false));
+            this.CourseRoles.Add(new CourseRole(CourseRole.OSBLERoles.Moderator.ToString(), false, false, false, false, false, false));
+            
             // Observer: Can See All, All Anonymized
-            this.CourseRoles.Add(new CourseRole("Observer", false, true, false, false, true));
+            this.CourseRoles.Add(new CourseRole(CourseRole.OSBLERoles.Observer.ToString(), false, true, false, false, false, true));
 
             // Community Roles
 
             // Leader: Can Modify Community
-            this.CommunityRoles.Add(new CommunityRole("Leader", true, true, true));
+            this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.Leader.ToString(), true, true, true, true));
+            
             // Participant: Cannot Modify Community
-            this.CommunityRoles.Add(new CommunityRole("Participant", false, true, true));
+            this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.Participant.ToString(), false, true, true, false));
+
+            //trusted communityt member: same as participant, but can upload files to the server
+            this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.TrustedCommunityMember.ToString(), false, true, true, true));
+
         }
 
         /// <summary>

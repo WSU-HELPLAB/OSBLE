@@ -7,7 +7,7 @@
         {
         }
 
-        public CommunityRole(string Name, bool CanModify, bool CanSeeAll, bool CanGrade)
+        public CommunityRole(string Name, bool CanModify, bool CanSeeAll, bool CanGrade, bool CanUploadFiles)
             : base()
         {
             this.Name = Name;
@@ -16,12 +16,14 @@
             this.CanGrade = CanGrade;
             this.CanSubmit = false;
             this.Anonymized = false;
+            this.CanUploadFiles = CanUploadFiles;
         }
 
         public enum OSBLERoles : int
         {
             Leader = 6,
-            Participant
+            Participant,
+            TrustedCommunityMember
         }
     }
 }

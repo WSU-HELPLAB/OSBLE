@@ -31,5 +31,9 @@ namespace OSBLE.Models.Courses
         [Required]
         [Display(Name = "All users in the course will appear anonymous to this user")]
         public bool Anonymized { get; set; }
+
+        [Required]
+        [Display(Name = "Allow the user to upload files")]
+        public bool CanUploadFiles { get; set; }
     }
 }

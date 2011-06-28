@@ -27,7 +27,7 @@ namespace OSBLE.Services
         private string filePath;
         private string currentpath;
         private const double sessionTimeoutInMinutes = -15.0;
-        private static Dictionary<string, UserSession> activeSessions = new Dictionary<string,UserSession>();
+        private static Dictionary<string, UserSession> activeSessions = new Dictionary<string, UserSession>();
 
         private OSBLEContext db = new OSBLEContext();
 
@@ -101,15 +101,15 @@ namespace OSBLE.Services
 
             //make sure that the selected user has write privileges for the supplied course
             CoursesUsers currentCourse = (from cu in db.CoursesUsers
-                                         where cu.CourseID == courseId && cu.UserProfileID == currentUser.ID
-                                         select cu).FirstOrDefault();
-            
+                                          where cu.CourseID == courseId && cu.UserProfileID == currentUser.ID
+                                          select cu).FirstOrDefault();
+
             //make sure that we got something back
             if (currentCourse != null)
             {
                 //only allow those that can modify the course (probably instructors) to remove
                 //files
-                if(currentCourse.CourseRole.CanModify == true)
+                if (currentCourse.CourseRole.CanModify == true)
                 {
                     //do a simple pattern match to make sure that the file to be uploaded is in
                     //the correct course folder
@@ -174,7 +174,7 @@ namespace OSBLE.Services
         {
             //only continue if we have a valid authentication key
             if (!IsValidKey(authToken))
-            { 
+            {
                 return new DirectoryListing();
             }
 
@@ -189,7 +189,7 @@ namespace OSBLE.Services
             {
                 if (cu.CourseRole.CanModify)
                 {
-                    return FileSystem.GetCourseDocumentsFileList(cu.Course as Course, true);
+                    return FileSystem.GetCourseDocumentsFileList(cu.Course as AbstractCourse, true);
                 }
             }
             return new DirectoryListing();
@@ -241,7 +241,7 @@ namespace OSBLE.Services
             //only continue if we have a valid authentication key
             if (!IsValidKey(authToken))
             {
-                return new Dictionary<int,string>();
+                return new Dictionary<int, string>();
             }
 
             //stores the list of possible upload locations
@@ -254,18 +254,15 @@ namespace OSBLE.Services
             List<CoursesUsers> courses = (from course in db.AbstractCourses
                                           join cu in db.CoursesUsers on course.ID equals cu.CourseID
                                           where
-                                            course is Course
-                                            &&
                                             cu.Hidden == false
                                             &&
                                             cu.UserProfileID == currentUser.ID
+                                            && 
+                                            cu.CourseRole.CanModify == true
                                           select cu).ToList();
             foreach (CoursesUsers cu in courses)
             {
-                if (cu.CourseRole.CanModify)
-                {
-                    uploadLocations.Add(cu.CourseID, String.Format("\"{0}\" Links", cu.Course.Name));
-                }
+                uploadLocations.Add(cu.CourseID, String.Format("\"{0}\" Links", cu.Course.Name));
             }
             return uploadLocations;
         }
@@ -322,7 +319,7 @@ namespace OSBLE.Services
             {
                 return false;
             }
-            
+
             //use the data provided to create a new dashboard post
             DashboardPost newDp = new DashboardPost();
             newDp.Content = message;
@@ -380,7 +377,7 @@ namespace OSBLE.Services
                 fs.Write(data, 0, (int)data.Length);
             }
 
-            return true; 
+            return true;
         }
 
         /// <summary>
@@ -402,9 +399,9 @@ namespace OSBLE.Services
 
             //make sure that the selected user has write privileges for the supplied course
             CoursesUsers currentCourse = (from cu in db.CoursesUsers
-                                         where cu.CourseID == courseId && cu.UserProfileID == currentUser.ID
-                                         select cu).FirstOrDefault();
-            
+                                          where cu.CourseID == courseId && cu.UserProfileID == currentUser.ID
+                                          select cu).FirstOrDefault();
+
             //make sure that we got something back
             if (currentCourse != null)
             {
@@ -432,7 +429,7 @@ namespace OSBLE.Services
                 UserProfile profile = (from p in db.UserProfiles
                                        where p.UserName == userName
                                        select p).First();
-                
+
                 //build our string to hash
                 string email = profile.UserName;
                 string date = DateTime.Now.ToLongTimeString();
