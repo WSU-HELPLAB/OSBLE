@@ -105,7 +105,7 @@ namespace OSBLE.Controllers
                         int i = 0;
                         foreach (var file in files)
                         {
-                            if (file.ContentLength > 0)
+                            if (file != null && file.ContentLength > 0)
                             {
                                 DeliverableType type = (DeliverableType)deliverables[i].Type;
                                 string fileName = Path.GetFileName(file.FileName);

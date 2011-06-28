@@ -105,7 +105,7 @@ namespace OSBLE.Controllers
 
             for (int i = 0; i < count; i++)
             {
-                if (Request.Params["letter-" + i.ToString()] != null &&  Request.Params["min-" + i.ToString()] != null)
+                if (Request.Params["letter-" + i.ToString()] != null && Request.Params["min-" + i.ToString()] != null)
                 {
                     LetterGrade lg = new LetterGrade();
 
@@ -115,7 +115,7 @@ namespace OSBLE.Controllers
                     course.LetterGrades.Add(lg);
                 }
             }
-            db.SaveChanges();            
+            db.SaveChanges();
         }
 
         //
