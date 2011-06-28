@@ -261,11 +261,20 @@ namespace OSBLE.Services
                                                (cu.CourseRole.CanModify == true
                                                || cu.CourseRole.CanUploadFiles == true
                                                )
-                                            
                                           select cu).ToList();
+            
             foreach (CoursesUsers cu in courses)
             {
-                uploadLocations.Add(cu.CourseID, String.Format("\"{0}\" Links", cu.Course.Name));
+                if (cu.Course is Course)
+                {
+                    Course c = cu.Course as Course;
+                    uploadLocations.Add(cu.CourseID, String.Format("{0} {1} ({2}, {3})", c.Prefix, c.Number, c.Semester, c.Year));
+                }
+                else if (cu.Course is Community)
+                {
+                    Community c = cu.Course as Community;
+                    uploadLocations.Add(cu.CourseID, String.Format("{0} - {1}", c.Nickname, c.Name));
+                }
             }
             return uploadLocations;
         }
