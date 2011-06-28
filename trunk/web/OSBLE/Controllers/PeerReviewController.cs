@@ -47,6 +47,24 @@ namespace OSBLE.Controllers
         {
             if (ModelState.IsValid)
             {
+                if(peerreviewactivity.UseRubric)
+                {
+                    string rubricoptions = Request.Params["RubricOptions"];
+
+                    // had to use hard coded strings because otherwise through an error about constant values.
+                    switch (rubricoptions)
+                    {
+                        case "InstructorCompletesRubricRandomReview":
+                            peerreviewactivity.rubricOptions = PeerReviewActivity.RubricOptions.InstructorCompletesRubricRandomReview;
+                            break;
+                        case "InstructorCompletesRubricAllReviews":
+                            peerreviewactivity.rubricOptions = PeerReviewActivity.RubricOptions.InstructorCompletesRubricAllReviews;
+                            break;
+                        default:
+                            break;
+                    };
+                }
+
                 db.AbstractAssignmentActivity.Add(peerreviewactivity);
                 db.SaveChanges();
                 return RedirectToAction("Index");  

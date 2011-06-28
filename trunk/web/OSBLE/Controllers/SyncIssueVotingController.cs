@@ -41,26 +41,26 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Create(SyncIssueVotingActivity syncissuevotingactivity)
         {
-            string setgrade = Request.Params["SetGrade"];
-
-            // had to use hard coded strings because otherwise through an error about constant values.
-            switch (setgrade)
-            {
-                case "PercentOfIssues":
-                    syncissuevotingactivity.Setgrade = SyncIssueVotingActivity.SetGrade.PercentOfIssues;
-                    break;
-                case "PercentAgreementWModerator":
-                    syncissuevotingactivity.Setgrade = SyncIssueVotingActivity.SetGrade.PercentAgreementWModerator;
-                    break;
-                case "Manually":
-                    syncissuevotingactivity.Setgrade = SyncIssueVotingActivity.SetGrade.Manually;
-                    break;
-                default:
-                    break;
-            };
-
             if (ModelState.IsValid)
             {
+                string setgrade = Request.Params["SetGrade"];
+
+                // had to use hard coded strings because otherwise through an error about constant values.
+                switch (setgrade)
+                {
+                    case "PercentOfIssues":
+                        syncissuevotingactivity.Setgrade = SyncIssueVotingActivity.SetGrade.PercentOfIssues;
+                        break;
+                    case "PercentAgreementWModerator":
+                        syncissuevotingactivity.Setgrade = SyncIssueVotingActivity.SetGrade.PercentAgreementWModerator;
+                        break;
+                    case "Manually":
+                        syncissuevotingactivity.Setgrade = SyncIssueVotingActivity.SetGrade.Manually;
+                        break;
+                    default:
+                        break;
+                };
+
                 db.AbstractAssignmentActivity.Add(syncissuevotingactivity);
                 db.SaveChanges();
                 return RedirectToAction("Index");

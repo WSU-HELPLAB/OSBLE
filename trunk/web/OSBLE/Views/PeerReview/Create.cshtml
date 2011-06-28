@@ -85,15 +85,10 @@
 
     function DisplayUseRubricOptions() {
         $('#use_rubric_options').show('highlight');
-        //default
-        $('#instructor_completes_rubric_random_review').attr('checked', true);
     }
 
     function HideUseRubricOptions() {
         $('#use_rubric_options').hide('highlight');
-        // unchecking the children boxes
-        $('#instructor_completes_rubric_random_review').removeAttr('checked');
-        $('#instructor_completes_rubric_all_reviews').removeAttr('checked');
     }
 
 </script>
@@ -179,19 +174,19 @@
                 @Html.ValidationMessageFor(model => model.UseRubric)
             </div>
             <div id="use_rubric_options" class="indented_options" style="display: none">
-                <div class="editor-field">
-                    @Html.CheckBoxFor(model => model.InstructorCompletesRubricRandomReview, new { id = "instructor_completes_rubric_random_review" })
-                    @Html.LabelFor(model => model.InstructorCompletesRubricRandomReview)
+                <div>
+                    <input type="radio" name="RubricOptions" value="InstructorCompletesRubricRandomReview" checked="true"/>
+                    Instructor completes rubric for randomly selected review
                     @Helpers.CreateToolTip(ToolTips.PeerReviewInstructorCompletesRubricRandomReview)
-                    @Html.ValidationMessageFor(model => model.InstructorCompletesRubricRandomReview)
-                </div>
+                    <br />
+               </div>
 
-                <div class="editor-field">
-                    @Html.CheckBoxFor(model => model.InstructorCompletesRubricAllReviews, new { id = "instructor_completes_rubric_all_reviews" })
-                    @Html.LabelFor(model => model.InstructorCompletesRubricAllReviews)
-                    @Helpers.CreateToolTip(ToolTips.PeerReviewInstructorComletesRubricAllReviews)
-                    @Html.ValidationMessageFor(model => model.InstructorCompletesRubricAllReviews)
-                </div>
+               <div>
+                    <input type="radio" name="RubricOptions" value="InstructorCompletesRubricAllReviews" />
+                    Instructor completes rubric for all reviews
+                    @Helpers.CreateToolTip(ToolTips.PeerReviewInstructorCompletesRubricAllReviews)
+                    <br />
+               </div>
             </div>
 
             <h4>Author access to completed reviews</h4>

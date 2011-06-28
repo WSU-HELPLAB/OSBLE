@@ -69,11 +69,12 @@ namespace OSBLE.Models.Assignments.Activities
 
         
         // if use rubric is selected
-        [Display(Name = "Instructor completes rubric for randomly selected review")]
-        public bool InstructorCompletesRubricRandomReview { get; set; }
-        [Display(Name = "Instructor completes rubric for all reviews")]
-        public bool InstructorCompletesRubricAllReviews { get; set; }
-        
-        
+        public enum RubricOptions
+        {
+            InstructorCompletesRubricRandomReview,
+            InstructorCompletesRubricAllReviews 
+        };
+
+        public RubricOptions rubricOptions { get; set; }
     }
 }
