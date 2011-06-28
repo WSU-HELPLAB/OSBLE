@@ -181,6 +181,7 @@ namespace FileUploader.Controls
             {
                 IsolatedStorageSettings.ApplicationSettings[IsolatedStorageKeys.UserName.ToString()] = "";
                 IsolatedStorageSettings.ApplicationSettings[IsolatedStorageKeys.Password.ToString()] = "";
+                IsolatedStorageSettings.ApplicationSettings[IsolatedStorageKeys.SaveCredentials.ToString()] = false;
             }
 
             timer.Start();
