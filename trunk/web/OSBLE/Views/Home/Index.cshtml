@@ -6,7 +6,7 @@
 }
 
 <div id="dashboard_left">
-<h3>Notifications @Helpers.CreateToolTip(ToolTips.HomeNotifications) </h3>
+<h3>Notifications</h3>
   
 <div id="notifications">
 @if (ViewBag.Notifications.Count == 0)
@@ -20,7 +20,7 @@
 <p>@Html.ActionLink("Show All Notifications", "Index", "Notification")</p>
 </div>
 
-<h3>Events &amp; Deadlines @Helpers.CreateToolTip(ToolTips.HomeEvents) 
+<h3>Events &amp; Deadlines 
 @if (@ViewBag.ActiveCourse.CourseRole.CanModify || @ViewBag.ActiveCourse.Course.AllowEventPosting)
 {
 <a href="@Url.Action("Create","Event")" title="Add New Event">@Helpers.AddButton()</a>
@@ -36,7 +36,7 @@
 </div>
 
 <div id="dashboard_middle">
-<h3>Activity Feed @Helpers.CreateToolTip(ToolTips.HomeActivities) </h3>
+<h3>Activity Feed</h3>
 
 <div id="activity_feed">
 @Html.Partial("_ActivityFeed")
@@ -45,7 +45,7 @@
 </div>
 
 <div id="dashboard_right">
-<h3>Files &amp; Links @Helpers.CreateToolTip(ToolTips.HomeLinks) 
+<h3>Files &amp; Links 
 @{if(ViewBag.CanEditCourseLinks)
   {
       <span id="file_upload_silverlight_span">

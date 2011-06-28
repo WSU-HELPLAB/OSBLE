@@ -29,7 +29,7 @@
 .popup {
     position: absolute;
     display: none;
-    z-index: 50;
+    z-index: 500;
     border-collapse: collapse;
     margin: 0px;
     padding: 0px;

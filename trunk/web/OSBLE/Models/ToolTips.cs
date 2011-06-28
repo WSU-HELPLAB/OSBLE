@@ -60,12 +60,7 @@ namespace OSBLE.Models
 
         #region HomeToolTips
 
-            public static string HomeNotifications = "This is where you get information about things that have occurred.";
-            public static string HomeEvents = "This is where you can see upcoming events and deadlines.";
-
-            public static string HomeActivities = "The <em>Activity Feed</em> is where informational updates can be posted, read, and replied to.";
-
-            public static string HomeLinks = "These are items pertinent to this class, such as files and websites.";
+            // There are currently no tooltips in the Home section
 
         #endregion
 
@@ -79,9 +74,7 @@ namespace OSBLE.Models
 
         #region AssignmentToolTips
 
-            public static string AssignmentTitle = "When you click \"Create New Assignment\" below, a dialog box will prompt you for which type of assignment you would like to create with .";
-            public static string AssignmentBasic = "Basic Assignments have the final products turned in then graded by an official grader. ";
-            public static string AssignmentStudio = "Studio Assignments are typically workshopped by peers prior to final grading.";
+            public static string AssignmentTitle = "When you click \"Create New Assignment\" below, a dialog box will prompt you for which type of assignment you would like to create, either a Basic Assignment or a Studio Assignment. <br /><br /> Basic Assignments have the final products turned in then graded by an official grader.  <br /><br /> Studio Assignments are typically workshopped by peers prior to final grading.";
 
         #endregion
 
@@ -259,9 +252,9 @@ namespace OSBLE.Models
         /*
          * TEMPLATE FOR ADDING TOOLTIPS (FOR ORGANIZATIONAL PURPOSES)
          *
-        #region ToolTips
+        #region [ViewName]ToolTips
 
-            public static string  = "";
+            public static string [ViewName][ToolTipName] = "";
 
         #endregion
          *
