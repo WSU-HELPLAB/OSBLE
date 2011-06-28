@@ -1070,7 +1070,7 @@ ul.selector
     padding: 3px;
 }
 
-.deliverable .deliverable_tools
+.deliverable .deliverable_tools, 
 {
     display: none;
 }

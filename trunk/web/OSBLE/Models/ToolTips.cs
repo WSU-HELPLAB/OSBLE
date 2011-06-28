@@ -89,7 +89,7 @@ namespace OSBLE.Models
         
             public static string BasicAssignmentUseRubric = "Check this box to create a rubric that will determine how this assignment is graded. (You have to click <em>Edit Rubric</em> to specify the rubric.)";
 
-            public static string BasicAssignmentDeliverables = "Deliverables are the actual assignment types that are expected to be turned in. Each assignment can have multiple files and file typess to turn in.";
+            public static string BasicAssignmentDeliverables = "Deliverables are the actual assignment types that are expected to be turned in. Each assignment can have multiple files and file types to turn in.";
 
             public static string BasicAssignmentAddToGradebook = "Adding an assignment to the gradebook means that the results of this assignment will affect the final grade of students.";
 

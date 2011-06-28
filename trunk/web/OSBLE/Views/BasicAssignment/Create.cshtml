@@ -40,19 +40,18 @@
             if ($(this).attr('checked')) {
                 $('#edit_rubric_div').show('highlight');
             }
-            else {
+            else 
+            {
                 $('#edit_rubric_div').hide('blind');
-
             }
         });
 
         $('#isTeam').change(function () {
             if ($(this).attr('checked')) {
-
                 DisplayTeamOptions();
             }
-            else {
-
+            else 
+            {
                 HideTeamOptions();
             }
         });
@@ -153,10 +152,47 @@
             UpdateGradeCategory();
         });
 
-    });
+    }); // end init
+
 
     function UpdateGradeCategory() {
         $('#grade_category_label').html($('#grade_category').selectedTexts()[0]);
+    }
+
+    function updateActivitiesName() {
+        $('#SubmissionName').val($('#Assignment_Name').val() + ' Submission');
+        $('#StopName').val($('#Assignment_Name').val() + ' Stop');
+    }
+
+
+    // due date
+
+    function updateDueDate() {
+        $('#DueDate').val($('#DueDate_Date').val() + ' ' + $('#DueDate_Time').val());
+    }
+
+
+    // release date
+
+    function updateReleaseDate() {
+        $('#ReleaseDate').val($('#ReleaseDate_Date').val() + ' ' + $('#ReleaseDate_Time').val());
+    }
+
+
+    // teams
+
+    function DisplayTeamOptions() {
+        $('#Team_Options').show('blind');
+    }
+    function HideTeamOptions() {
+        $('#Team_Options').hide('blind');
+    }
+
+    function OpenTeamGeneration() {
+        $('#team_generation_dialog').dialog('open'); return false;
+    }
+    function CloseTeamGenerationWindow() {
+        $('#team_generation_dialog').dialog('close'); return false;
     }
 
     function DisplayManualTeams() {
@@ -164,45 +200,15 @@
         $('#PreviousAssignmentDiv').hide();
         $('#ManualTeams').show('blind');
     }
-
     function DisplayRandomTeams() {
         $('#PreviousAssignmentDiv').hide();
         $('#ManualTeams').hide();
         $('#RandomTeams').show('blind');
     }
-
     function DisplayPreviousAssignment() {
         $('#RandomTeams').hide();
         $('#ManualTeams').hide();
         $('#PreviousAssignmentDiv').show('blind');
-    }
-
-    function DisplayTeamOptions() {
-        $('#Team_Options').show('blind');
-    }
-
-    function HideTeamOptions() {
-        $('#Team_Options').hide('blind');
-    }
-
-    function updateReleaseDate() {
-        $('#ReleaseDate').val($('#ReleaseDate_Date').val() + ' ' + $('#ReleaseDate_Time').val());
-    }
-
-    function updateDueDate() {
-        $('#DueDate').val($('#DueDate_Date').val() + ' ' + $('#DueDate_Time').val());
-    }
-    function updateActivitiesName() {
-        $('#SubmissionName').val($('#Assignment_Name').val() + ' Submission');
-        $('#StopName').val($('#Assignment_Name').val() + ' Stop');
-    }
-
-    function OpenTeamGeneration() {
-        $('#team_generation_dialog').dialog('open'); return false;
-    }
-
-    function OpenRubricDialog() {
-        $('#rubric_dialog').dialog('open'); return false;
     }
 
     function GenerateTeamsRandomly() {
@@ -232,10 +238,6 @@
         }
     }
 
-    function CloseTeamGenerationWindow() {
-        $('#team_generation_dialog').dialog('close'); return false;
-    }
-
     function TeamGenerationReady() {
 
         if ($("input[name='team_generation_options']:checked").val() == 'RandomTeams') {
@@ -248,6 +250,22 @@
         }
     }
 
+
+    // line review
+    
+    function ShowLineReview(){
+        $('#instructor_line_review').show('blind');
+    }
+    function HideLineReview() {
+        $('#instructor_line_review').hide('blind');
+    }
+
+
+    // rubric
+
+    function OpenRubricDialog() {
+        $('#rubric_dialog').dialog('open'); return false;
+    }
     function CloseRubric() {
         $('#rubric_dialog').dialog('close'); return false;
     }
@@ -369,7 +387,7 @@
         @Html.LabelFor(model => submission.InstructorCanReview)
     </div>
     <div class="editor-field">
-        @Html.EditorFor(model => submission.InstructorCanReview)
+        @Html.CheckBoxFor(model => submission.InstructorCanReview, new { id = "InstructorCanReview" })
         @Html.ValidationMessageFor(model => submission.InstructorCanReview)
     </div>
 
@@ -397,17 +415,11 @@
             <td>
                 <table>
                     <tr>
-                        <td>
-                            File Name
-                        </td>
-                        <td>
-                            <input type="text" id="new_deliverable_name" />
-                        </td>
+                        <td> File&nbsp;Name </td>
+                        <td> <input type="text" id="new_deliverable_name" /> </td>
                     </tr>
                     <tr>
-                        <td>
-                            Type
-                        </td>
+                        <td> Type </td>
                         <td>
                             <select id="new_deliverable_type">
                                 @foreach (SelectListItem dt in ViewBag.DeliverableTypes)
@@ -419,15 +431,23 @@
                     </tr>
                 </table>
             </td>
-        </tr>
-        <tr>
             <td>
-                <a href="#" id="add_new_deliverable" title="Add New Deliverable">
-                    <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Deliverable" />
-                </a>
+                <div>
+                    <a href="#" id="add_new_category" title="Add New Category" style="text-decoration:none;">
+                        <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Category" /> Add a Category
+                    </a>
+                </div>
+                <div id="category_data"></div>
             </td>
+
         </tr>
     </table>
+
+    <div>
+        <a href="#" id="add_new_deliverable" title="Add New Deliverable" style="text-decoration: none;">
+            <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Deliverable" /> Save Deliverable
+        </a>
+    </div>
     
     <div id="deliverable_data">
     </div>
@@ -497,9 +517,9 @@
     </p>
     
     }
-    <div>
-        @Html.ActionLink("Back to List", "Index", "Home") <br />
-    </div>
+    <p>
+        @Html.ActionLink("Back to List", "Index", "Home")
+    </p>
 }
 
 <div id="team_generation_dialog" title="Edit Teams">

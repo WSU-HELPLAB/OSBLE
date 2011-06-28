@@ -1,4 +1,11 @@
-﻿$(function () {
+﻿
+// global vars
+var deliverableIndex = 0;
+var categoryIndex = 0; // unique identifier
+var categoryCount = 0; // to check the number of categories
+
+
+$(function () {
 
     $('#add_new_deliverable').click(function () {
         addNewDeliverable();
@@ -22,9 +29,10 @@ function deliverableFormSubmit(e) {
     }
 }
 
-var deliverableIndex = 0;
 
 function addNewDeliverable(d) {
+
+    // validation
     if (d == undefined) {
         d = new Object({
             name: $('#new_deliverable_name').val(),
@@ -47,18 +55,17 @@ function addNewDeliverable(d) {
         return false;
     }
 
-    function duplicateObject() {
-        this.Value = false;
-        return this;
-    }
+    // not used...?
+    //function duplicateObject() {
+    //    this.Value = false;
+    //    return this;
+    //}
 
     duplicateExists = false;
 
     $('#deliverable_data').children().each(function () {
-        if (
-            (d.name.toLowerCase() == $(this).find('.deliverable_name').first().val().toLowerCase()) &&
-            (d.fileType == parseInt($(this).find('.deliverable_type').first().val()))
-            ) {
+        if ( (d.name.toLowerCase() == $(this).find('.deliverable_name').first().val().toLowerCase()) &&
+            (d.fileType == parseInt($(this).find('.deliverable_type').first().val())) ) {
 
             duplicateExists = true;
             return false;
@@ -70,6 +77,14 @@ function addNewDeliverable(d) {
         return false;
     }
 
+    // empty tag text box: do nothing
+    // empty category text box: ignore (don't add, don't warn)
+    // duplicate category: warning
+    //   list of categories, linked to 
+    // [saving the deliverable removes all categories and resets vars]
+
+    // validation successful --> add deliverable
+
     $('#deliverable_data').append('<div id="deliverable_' + deliverableIndex + '" class="deliverable" />');
 
     var newDeliverable = $('#deliverable_' + deliverableIndex);
@@ -77,13 +92,16 @@ function addNewDeliverable(d) {
     var typeVal = $('#new_deliverable_type').children('option').eq(d.fileType).val();
     var typeName = $('#new_deliverable_type').children('option').eq(d.fileType).html();
 
+    // delete button
     newDeliverable.append('<div class="deliverable_tools"><a href="#" title="Delete This Deliverable" onclick="$(this).parent().parent().hide(\'highlight\',function(){$(this).remove()}); setDeliverableIndex(); return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');
 
-
+    // main layout
     newDeliverable.append('<table><tr>');
     newDeliverable.append('<td>File Name:</td><td>' + d.name + '</td>');
     newDeliverable.append('</tr><tr>');
     newDeliverable.append('<td>Type:</td><td>' + typeName + '</td>');
+    newDeliverable.append('</tr><tr>');
+    newDeliverable.append('<td>Categories:</td><td><span title="i,s,b,w,y">Category A</span>, <span title="glow worm, i, robot">Category B</span></td>');
     newDeliverable.append('</tr></table>');
 
     newDeliverable.append('<input type="hidden" class="deliverable_name" value="' + d.name + '" />');
@@ -112,5 +130,63 @@ function setDeliverableIndex() {
 
         i++;
     });
-    
+
 }
+
+//deliverable categories
+//  add categories and tags to model(s)
+
+$(function () {
+
+    $('#add_new_category').click(function () {
+        addNewCategory();
+        return false;
+    });
+    
+});
+
+function categorySubmit(e) {
+    // if the return key is pressed, do nothing
+    if (e.which == 13) {
+        return false;
+    }
+}
+
+
+function addNewCategory() {
+
+    // limit to six
+    if (categoryCount >= 6) {
+        alert("The maximum number of categories is six.");
+        return false;
+    }
+
+    // create new item
+    $('#category_data').append('<div id="category_' + categoryIndex + '" class="deliverable" />');
+    var newCategory = $('#category_' + categoryIndex);
+
+    // delete button
+    newCategory.append('<div class="deliverable_tools"><a href="#" title="Delete This Deliverable" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove() }); categoryCount--; return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');
+
+    // main layout
+    newCategory.append('<table><tr>');
+    newCategory.append('<td>Category:</td><td> <input type="text" id="cat' + categoryIndex + '"> </td>');
+    newCategory.append('</tr><tr>');
+    newCategory.append('<td>Tags:</td><td> <input type="text" id="tag' + categoryIndex + '"> </td>');
+    newCategory.append('</tr></table>');
+
+    // add event listeners
+    $('#cat' + categoryIndex).keypress(categorySubmit);
+    $('#tag' + categoryIndex).keypress(categorySubmit);
+
+    // set focus to newly created category
+    $('#cat' + categoryIndex).focus();
+
+    // keep track of categories
+    categoryIndex++;
+    categoryCount++;
+
+}
+
+
+
