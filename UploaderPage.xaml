@@ -61,7 +61,7 @@
                           Background="DarkSlateGray" Width="3" />
 
         <!-- column 2 -->
-        <TextBlock FontSize="16" FontWeight="Bold" Text="Uploading To:" Grid.Row="0" Grid.Column="2" Margin="0,5,0,5" 
+        <TextBlock FontSize="16" FontWeight="Bold" Text="OSBLE" Grid.Row="0" Grid.Column="2" Margin="0,5,0,5" 
                    VerticalAlignment="Center" HorizontalAlignment="Center" />
         <ComboBox x:Name="UploadLocation" DisplayMemberPath="Value" Grid.Row="1" Grid.Column="2" />
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2">
