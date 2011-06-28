@@ -408,6 +408,7 @@
     <Content Include="Scripts\Silverlight.js" />
     <Content Include="Services\UploaderWebService.svc" />
     <Content Include="Silverlight.js" />
+    <Content Include="Scripts\multifile.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -631,6 +632,7 @@
     <Content Include="Views\Account\ErrorPage.cshtml" />
     <Content Include="Views\Account\ProfessionalRegister.cshtml" />
     <Content Include="Views\Submission\Create.cshtml" />
+    <Content Include="Views\Submission\SubmittedSuccessfully.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

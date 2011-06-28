@@ -13,15 +13,17 @@
     @Html.ValidationSummary(true)
     <fieldset>
         <legend>Submission</legend>
-        @foreach (Deliverable deliverable in ViewBag.Deliverables)
+        @foreach (Deliverable deliverable in ViewBag.Deliverables.Keys)
         {
             <div>
                 <br />
-                @deliverable.Name
+                Desired Name: @deliverable.Name
                 <br />
                 File Type: @(((DeliverableType)deliverable.Type).ToString())
                 <br />
-                <input type='file' name='file' />
+                Allowed File Extensions: @String.Join(", ", ViewBag.Deliverables[deliverable])
+                <br />
+                <input type='file' name='files' />
                 <br />
             </div>
         }

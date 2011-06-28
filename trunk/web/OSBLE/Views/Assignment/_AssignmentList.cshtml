@@ -8,7 +8,6 @@
             <a href="#">@sa.Name</a>
         </div>
         <div>
-        @Html.ActionLink("Submit", "Create", "Submission", new { id = sa.ID.ToString() }, new { })
             <div class="assignment_title">
                 Description</div>
             @* Add links to assignment description *@
@@ -19,7 +18,8 @@
                 if (sa.AssignmentActivities.Where(aa => aa is SubmissionActivity).Count() > 0)
                 {
                 <div class="assignment_title">
-                    Submissions</div>
+                    Submissions
+                    </div>
 
                 <ul class="assignment_deliverables">
                     @{
@@ -34,7 +34,7 @@
 
                     foreach (SubmissionActivity submission in submissionActivities)
                     {
-                                   
+                       @Html.ActionLink("Submit", "Create", "Submission", new { id = submission.ID.ToString() }, new { })            
                         @* Get submission's release date as start date *@
                         DateTime startDate = submission.ReleaseDate;
                         @* Get the activity following the submission's release date as end date *@

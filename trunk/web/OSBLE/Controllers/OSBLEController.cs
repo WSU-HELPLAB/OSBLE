@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using System.Web.SessionState;
-using OSBLE.Models.HomePage;
 using OSBLE.Models;
-using OSBLE.Models.Users;
-using OSBLE.Models.Courses;
 using OSBLE.Models.Assignments.Activities;
-using System.Reflection;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Controllers
 {
@@ -128,23 +127,17 @@ namespace OSBLE.Controllers
                 setCourseListTitle();
 
                 setDashboardDisplayMode();
-
             }
-
-
-
-
         }
 
         /// <summary>
-        /// Checks to see if the Course/Community roles have been populated. 
+        /// Checks to see if the Course/Community roles have been populated.
         /// Also adds WSU to schools if none exist.
         /// This is different from the sample data generation in OSBLEContext, which
         /// is meant for development purposes only.
         /// </summary>
         private void setupInitialDatabaseData()
         {
-
             if (db.AbstractRoles.Count() == 0)
             {
                 db.SeedRoles();
@@ -162,7 +155,6 @@ namespace OSBLE.Controllers
 
                 db.SaveChanges();
             }
-
         }
 
         /// <summary>
@@ -215,7 +207,7 @@ namespace OSBLE.Controllers
             menu.Add(new MenuItem("Administration", "Admin", "Index", false, false, false, true, false, false));
 
             ViewBag.Menu = menu;
-       } 
+        }
 
         /// <summary>
         /// Sets currentCourses for the current user, which is a list of
@@ -234,8 +226,8 @@ namespace OSBLE.Controllers
 
                 // Get list of courses this user is connected to. Remove inactive (for anyone other than instructors or observers) or hidden (for all) courses.
                 currentCourses = allUsersCourses.Where(cu => (cu.Course is Course) &&
-                    (((cu.Course as Course).Inactive == false) || 
-                    (cu.CourseRoleID == (int)CourseRole.OSBLERoles.Instructor) || 
+                    (((cu.Course as Course).Inactive == false) ||
+                    (cu.CourseRoleID == (int)CourseRole.OSBLERoles.Instructor) ||
                     (cu.CourseRoleID == (int)CourseRole.OSBLERoles.Observer)))
                     // Order first by descending start date (newest first)
                         .OrderByDescending(cu => (cu.Course as Course).StartDate)
@@ -267,7 +259,7 @@ namespace OSBLE.Controllers
                     activeCourseID = 0;
                 }
 
-                // Load currently selected course, as long as user is actually a member of said course. 
+                // Load currently selected course, as long as user is actually a member of said course.
                 // Otherwise, load first course.
                 if ((activeCourse = activeCoursePool.Where(cu => cu.CourseID == activeCourseID).FirstOrDefault()) == null)
                 {
@@ -292,6 +284,27 @@ namespace OSBLE.Controllers
         public void SetUnreadMessageCount()
         {
             ViewBag.UnreadMessageCount = (int)db.Mails.Where(m => (m.ToUserProfileID == currentUser.ID) && (m.Read == false)).Count();
+        }
+
+        protected string[] GetFileExtensions(DeliverableType deliverableType)
+        {
+            Type type = deliverableType.GetType();
+
+            FieldInfo fi = type.GetField(deliverableType.ToString());
+
+            //we get the attributes of the selected language
+            FileExtensions[] attrs = (fi.GetCustomAttributes(typeof(FileExtensions), false) as FileExtensions[]);
+
+            //make sure we have more than (should be exactly 1)
+            if (attrs.Length > 0 && attrs[0] is FileExtensions)
+            {
+                return attrs[0].Extensions;
+            }
+            else
+            {
+                //throw and exception if not decorated with any attrs because it is a requirement
+                throw new Exception("Languages must have be decorated with a FileExtensionAttribute");
+            }
         }
 
         protected List<SelectListItem> GetListOfDeliverableTypes()

@@ -12,18 +12,16 @@ using OSBLE.Models.Users;
 /*
  *
  *                FileSystem
- *               /    \     \
- *              /      \     \
- *          Courses   Users  Recaptcha
- *             /        \             \
- *         [courseID]   [userId]     Keys.txt
- *           /     \       \
- *          /       \   {global user content}
- *     CourseDocs    \
+ *               /        \
+ *              /          \
+ *          Courses       Users
+ *             /             \
+ *         [courseID]      [userId]
+ *           /      \           \
+ *          /        \      {global user content}
+ *     CourseDocs     \
  *         |          Assignments
  * {course docs go here}   |
- *                         |
- *                   [GradableId]
  *                         |
  *               [AssignmentActivityId]
  *                       /   \
@@ -126,7 +124,6 @@ namespace OSBLE
                         defaultOrderingCount++;
                     }
                     fList.SortOrder = defaultOrderingCount;
-                    
                 }
                 listing.Files.Add(fList);
             }
@@ -192,6 +189,27 @@ namespace OSBLE
         {
             Course c = new Course() { ID = courseId };
             return GetCourseDocumentsPath(c);
+        }
+
+        public static string GetSubmissionFolder(Course course, int assignmentActivityID, TeamMember subbmitter)
+        {
+            string path = getCoursePath(course);
+            path += "\\Assignments\\" + assignmentActivityID + "\\Submissions\\";
+            if (subbmitter.TeamUser == TeamsOrUsers.User)
+            {
+                path += subbmitter.UserProfileID;
+            }
+            else
+            {
+                path += subbmitter.TeamID;
+            }
+
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            return path;
         }
 
         /// <summary>
@@ -325,7 +343,6 @@ namespace OSBLE
             string orderingFile = Path.Combine(listing.AbsolutePath, OrderingFileName);
             using (StreamWriter writer = new StreamWriter(orderingFile))
             {
-
                 //files first
                 foreach (FileListing flisting in listing.Files)
                 {
@@ -346,7 +363,6 @@ namespace OSBLE
                     UpdateFileOrdering(dlisting);
                 }
             }
-
         }
 
         /// <summary>

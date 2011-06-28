@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Reflection;
 using System.Web.Mvc;
 using Newtonsoft.Json;
 using OSBLE.Attributes;
@@ -367,78 +366,10 @@ namespace OSBLE.Controllers
             return View(basic);
         }
 
-        //
-        // GET: /Assignment/Delete/5
-
-        /*
-        public ActionResult Delete(int id)
-        {
-            SubmissionActivity assignment = db.AbstractGradables.Find(id) as SubmissionActivity;
-            return View(assignment);
-        }
-        */
-
-        //
-        // POST: /Assignment/Delete/5
-
-        /*
-        [HttpPost, ActionName("Delete")]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            SubmissionActivity assignment = db.AbstractGradables.Find(id) as SubmissionActivity;
-            db.AbstractGradables.Remove(assignment);
-            db.SaveChanges();
-            return RedirectToAction("Index");
-        }
-         */
-
         protected override void Dispose(bool disposing)
         {
             db.Dispose();
             base.Dispose(disposing);
-        }
-
-        private List<SelectListItem> GetListOfDeliverableTypes()
-        {
-            List<SelectListItem> fileTypes = new List<SelectListItem>();
-            int i = 0;
-            DeliverableType deliverable = (DeliverableType)i;
-            while (Enum.IsDefined(typeof(DeliverableType), i))
-            {
-                Type type = deliverable.GetType();
-
-                FieldInfo fi = type.GetField(deliverable.ToString());
-
-                //we get the attributes of the selected language
-                FileExtensions[] attrs = (fi.GetCustomAttributes(typeof(FileExtensions), false) as FileExtensions[]);
-
-                //make sure we have more than (should be exactly 1)
-                if (attrs.Length > 0 && attrs[0] is FileExtensions)
-                {
-                    //we get the first attributes value which should be the fileExtension
-                    string s = deliverable.ToString();
-                    s += " (";
-                    s += string.Join(", ", attrs[0].Extensions);
-                    s += ")";
-
-                    SelectListItem sli = new SelectListItem();
-
-                    sli.Text = s;
-                    sli.Value = i.ToString();
-
-                    fileTypes.Add(sli);
-                }
-                else
-                {
-                    //throw and exception if not decorated with any attrs because it is a requirement
-                    throw new Exception("Languages must have be decorated with a FileExtensionAttribute");
-                }
-
-                i++;
-                deliverable = (DeliverableType)i;
-            }
-
-            return fileTypes;
         }
     }
 }
