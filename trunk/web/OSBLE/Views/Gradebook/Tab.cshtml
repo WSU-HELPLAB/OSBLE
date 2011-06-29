@@ -12,7 +12,7 @@
     }
     .colHeader img
     {
-        :right;
+        text-align:right;
     }
     .gradebook
     {
@@ -680,11 +680,13 @@
 
         menuClicked = true;
         var container = buttonClick.id;
-        currentCol = container;
+        containerId = container.split("-");
+        currentCol = containerId[1];
 
         //aligning the menu under the buttons
         x = $("#" + container).position().left;
         y = $("#" + container).position().top;
+        y += 9;
 
         //Moving the menu to the button that clicked it
         $("#slidingDivID").css("left", x + "px");
@@ -713,14 +715,14 @@
         //tabShowing = true;
         var container = col.id;
 
-        var x = parseInt($("#" + container).position().left);
+        /*var x = parseInt($("#" + container).position().left);
         var y = parseInt($("#" + container).position().top);
 
         $("#slidingDivID").css("left", x + "px");
         $("#slidingDivID").css("top", y + "px");
 
         x += 135;
-        y += 23;
+        y += 23;*/
 
         
         $("#grades tr").each(function () {
@@ -751,9 +753,11 @@
                     $(this).css("background-color", "DeepSkyBlue");
                 }
             });
-            $(this).find("th:nth-child(" + $(col).attr("id") + ")").each(function () {
-                    $("#slidingDivID").animate({ "height": "show" }, { duration: 300 });
-                    $(this).css("background-color", "DeepSkyBlue ");
+            
+            $(this).find("th:nth-child(" + currentHeader + ")").each(function () {
+                alert("got here");
+                //$("#slidingDivID").animate({ "height": "show" }, { duration: 300 });
+                $(this).css("background-color", "DeepSkyBlue ");
             });
         });
         isHighlighted = false;
@@ -858,18 +862,15 @@
                 }
             });
 
-            for (i = 0; i < $("#XtoDrop").val(); i++) {
-                //ajax call to drop the lowest score
-                $.ajax({
-                    async: false,
-                    type: "POST",
-                    url: "/Gradebook/AllDropLowest",
-                    data: { categoryId: newCatId[0], dropX: $('#XtoDrop').val() },
-                    success: function (response) {
-                        $("#grades").replaceWith(response);
-                    }
-                });
-            }
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: "/Gradebook/AllDropLowest",
+                data: { categoryId: newCatId[0], dropX: $('#XtoDrop').val() },
+                success: function (response) {
+                    $("#grades").replaceWith(response);
+                }
+            });
         }
         if ($("#XtoDrop").val() == 0) {
             $("#dropLowestButton").val("Average");

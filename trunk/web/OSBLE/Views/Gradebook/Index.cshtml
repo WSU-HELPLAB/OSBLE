@@ -630,11 +630,12 @@
         if (isShowing == true) {
             $("#letterGradesID").animate({ "height": "hide" }, { duration: 300 });
             isShowing = false;
-            clearLastCellFocus();
         }
         else {
             isShowing = true;
         }
+        clearLastAssignmentFocus();
+        clearLastCellFocus();
 
         if (isHighlighted == true) {
             $("#grades tr").each(function () {

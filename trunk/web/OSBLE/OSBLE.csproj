@@ -635,6 +635,7 @@
     <Content Include="Views\Account\ProfessionalRegister.cshtml" />
     <Content Include="Views\Submission\Create.cshtml" />
     <Content Include="Views\Submission\SubmittedSuccessfully.cshtml" />
+    <Content Include="Views\Gradebook\ImportColumnsFromCSV.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

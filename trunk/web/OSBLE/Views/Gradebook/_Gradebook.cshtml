@@ -11,16 +11,15 @@
     <tr class="colHeader">
             
         @{var j = 1;
-            <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             j += 1;
-            <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             j += 1;
             foreach (AbstractAssignment item in ViewBag.Assignments)
             {
-                <td id="@j" class="colHeader" style="background:silver; border:outset 3px; text-align:right;"onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);">
-                <div id="div-@j" style="display: none;" onmouseover="showButton(this);" onmouseout="hideButton(this);">
-                <!--Makes the columns with color change options distinguishable-->
-                    <img src="/Content/images/arrow_down.png" onmouseover="changeCursor()" style="cursor:pointer;"/>
+                <td id="@j" class="colHeader" style="background:silver; border:outset 3px; text-align:right;" onmouseover="showButton(this);" onmouseout="hideButton(this);">
+                <div id="div-@j" style="display: none;" onmouseover="showButton(this);" onmouseout="hideButton(this);" >
+                    <img id="img-@item.ID" src="/Content/images/arrow_down.png" onclick="ShowHide(this);" style="cursor:pointer;"/>
                 </div>
                 </td>
                 j += 1;
@@ -70,10 +69,10 @@
                 <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average [Dropped @numDropped]" /> </th>
             }
         
-            int i = 1;
+            int i = 2;
             foreach (AbstractAssignment item in ViewBag.Assignments)
             {   
-                <th id="header-@item.ID" onclick="changeHeaderName(this)">@item.Name<div id="cntnr" class="thButton"><button class="dropdown" id="@item.ID" onclick="ShowHide(this);"></button></div></th>
+                <th id="header-@item.ID" onclick="changeHeaderName(this)">@item.Name</th>
                 i += 1;
             }
         }
@@ -123,6 +122,8 @@
     }
     <script type="text/javascript">
         //var lastFocusedCell = null;
+        
+
         $(function () {
             calculateCols();
             keyControls();

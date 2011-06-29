@@ -1294,3 +1294,8 @@ ul.assignment_deliverables, .assignment_deliverables ul
     width: 240px;
     text-align: left;
 }
+
+#tabHeader a
+{
+    text-decoration: none;
+}

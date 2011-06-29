@@ -466,7 +466,6 @@ namespace OSBLE.Controllers
                {
                    var studentScores = (from scores in db.Scores
                                         where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId &&
-                                        scores.isDropped == false &&
                                         scores.Points >= 0
                                         select scores).GroupBy(s => s.UserProfileID);
                    
