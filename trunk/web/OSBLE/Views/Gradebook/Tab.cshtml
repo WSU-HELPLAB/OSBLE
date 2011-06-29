@@ -10,11 +10,15 @@
         width: 75px;
         border: none;
     }
+    .colHeader img
+    {
+        :right;
+    }
     .gradebook
     {
         width: auto;
         border-collapse: collapse;
-        border: 1px solid gray;
+        border: 1px solid #D0D0D0;
     }
     
     .gradebook td
@@ -27,7 +31,7 @@
     .gradebook td, .gradebook th, .gradebook tr
     {
         width: auto;
-        border: 1px solid gray;
+        border: 1px solid #D0D0D0;
     }
     
     .gradebook th
@@ -163,13 +167,24 @@
 </style>
 <div id="tabHeader">
     <h3>Gradebook</h3>
+    <div>
+        <a href="#" onclick="$('#import_grades_from_csv').toggle('blind'); return false;">Import Grades</a>
+    </div>
+    <div id='import_grades_from_csv'>Upload a comma-separated (CSV) file of student grades:<br />
+        @using (Html.BeginForm("ImportColumnsFromCSV", "Gradebook", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <input type="file" id="file" name="file" />
+            <input type="submit" value="Upload File" />
+        }
+    </div>
+    <br />
     @Html.Partial("_Tabs")
 </div>
 <div id="tableContent">
     @Html.Partial("_Gradebook")
     <div class="slidingDiv" id="slidingDivID" style="display: none; position: absolute;">
         <form id="columnOptionsForm" method="post" action="/Gradebook/ModifyColumn" data-ajax="true"
-              data-ajax-mode="replace" data-ajax-update="#grades">
+              data-ajax-mode="REPLACE" data-ajax-update="#grades">
         <input id="actionRequested" name="actionRequested" type="hidden" value="null" />
         <input id="assignmentId" name="assignmentId" type="hidden" value="null" />
         <table class="menu" id="menuID" onclick="setButtonId(this);">
@@ -201,6 +216,12 @@
                 <td>
                     <a href="#" onclick="setGradableAction('@GradebookController.ColumnAction.Clear.ToString()'); $('#columnOptionsForm').submit();">
                         Clear column</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="#" onclick="setGradableAction('@GradebookController.ColumnAction.ImportCSV.ToString()'); $('#columnOptionsForm').submit();">
+                        Import .CSV File</a>
                 </td>
             </tr>
         </table>
@@ -285,7 +306,7 @@
     //Keeps track of the number for addPoints
     var points = null;
     
-
+    
 
     $(document).ready(function () {
         //calculateRows();
@@ -309,73 +330,69 @@
         }
     });
 
-    $("#grades td").keydown(function (e) {
-        var cell = null;
-        if (e.keyCode == 13) {
+    function keyControls() {
+        if (lastFocusedCell != null) {
+            cellGainsFocus(lastFocusedCell);
+        }
+        $("#grades td").keydown(function (e) {
+            var cell = null;
+            if (e.keyCode == 13) {
 
-            var row = $(this).parent("tr").next("tr");
-            if (row.attr("id") == "averageRow") {
-                clearLastCellFocus();
+                var row = $(this).parent("tr").next("tr");
+                if (row.attr("id") == "averageRow") {
+                    clearLastCellFocus();
+                }
+                else {
+                    var colIndex = $(this).prevAll().length;
+                    row.each(function () {
+                        cell = $(this).find("td:eq(" + colIndex + ")");
+                    });
+                }
+                if (cell != null) {
+                    cellGainsFocus(cell);
+                }
+                else {
+                    row = $(this).parent("tr");
+                    row.each(function () {
+                        cell = $(this).find("td:eq(" + colIndex + ")");
+                    });
+                    clearLastCellFocus(cell);
+                }
             }
-            else {
+            else if (e.keyCode == 9) {
+                e.preventDefault();
+                var row = $(this).parent("tr");
                 var colIndex = $(this).prevAll().length;
-                row.each(function () {
-                    cell = $(this).find("td:eq(" + colIndex + ")");
-                });
-            }
-            if (cell != null) {
-                cellGainsFocus(cell);
-            }
-            else {
-                row = $(this).parent("tr");
-                row.each(function () {
-                    cell = $(this).find("td:eq(" + colIndex + ")");
-                });
-                clearLastCellFocus(cell);
-            }
-        }
-        else if (e.keyCode == 9) {
-            e.preventDefault();
-            var row = $(this).parent("tr");
-            // used for generating the column count
-            var temp = 1;
-            var ColCount = $('table tr:eq(' + temp + ') td').length;
-
-            var colIndex = $(this).prevAll().length;
-            colIndex = parseInt(colIndex);
-            if (colIndex >= ColCount) {
-                row = $(this).parent("tr").next("tr");
-                colIndex = 2;
-            }
-            else {
+                colIndex = parseInt(colIndex);
                 colIndex += 1;
-            }
-            row.each(function () {
-                cell = $(this).find("td:eq(" + colIndex + ")");
-            });
-            if (cell != null) {
-                cellGainsFocus(cell);
-            }
-            else {
-                colIndex -= 1;
                 row.each(function () {
                     cell = $(this).find("td:eq(" + colIndex + ")");
                 });
-                clearLastCellFocus(cell);
+                if (cell != null) {
+                    cellGainsFocus(cell);
+                }
+                else {
+                    colIndex -= 1;
+                    row.each(function () {
+                        cell = $(this).find("td:eq(" + colIndex + ")");
+                    });
+                    clearLastCellFocus(cell);
+                }
             }
-        }
-        else {
-        }
-    });
+            else {
+            }
+        });
 
-    $("#grades th").keydown(function (e) {
-        if (e.keyCode == 13) {
-            clearLastHeaderFocus(lastId);
-        }
-        else if (e.keyCode == 9) {
-            clearLastHeaderFocus(lastId);
-        }
-    });
+        $("#grades th").keydown(function (e) {
+            if (e.keyCode == 13) {
+                clearLastHeaderFocus(lastId);
+            }
+            else if (e.keyCode == 9) {
+                clearLastHeaderFocus(lastId);
+            }
+        });
+
+    }
 
 
     function displayCustomizeGrades() {
@@ -484,7 +501,6 @@
             lastFocusedCell.attr("onclick", 'cellGainsFocus(this)');
             lastFocusedCell = null;
 
-
             //AJAX call
             //What we need:
             //UserID
@@ -504,23 +520,23 @@
 
             //if we are editing a gradebook cell then ajaxIDs[1] will contain a value
             else {
-                $.ajax({
-                    type: "POST",
-                    url: "/Gradebook/ModifyCell",
-                    data: { value: cellValue, userId: ajaxIDs[0], assignmentId: ajaxIDs[1] },
-                    success: function (){
-                                if ($("#isDropLowest") == 1) {
-                                    clearDropLowest(ajaxIDs[0])
-                                }
+                if (!isNaN(parseFloat(cellValue))) { 
+                    $.ajax({
+                        type: "POST",
+                        url: "/Gradebook/ModifyCell",
+                        data: { value: cellValue, userId: ajaxIDs[0], assignmentId: ajaxIDs[1] },
+                        success: function (response) {
+                            if ($("#numDropped").val() >= 1) {
+                                clearDropLowest(ajaxIDs[0])
                             }
-                });
-           }
-
-           //This is were the realtime calculations happen upon entering points recieved
-           //The calculate rows will be removed
-           //calculateRows();
-
-           calculateCols();
+                            else {
+                                $("#grades").replaceWith(response);
+                            }
+                        }
+                    });
+                }
+            }
+            calculateCols();
         }
     }
 
@@ -551,7 +567,7 @@
         }
     }
 
-    function calculateRows() {
+    /*function calculateRows() {
 
         //clear any previous focus
         clearLastCellFocus();
@@ -583,7 +599,7 @@
             });
         });
 
-    }
+    }*/
 
 
     function calculateTotal() {
@@ -603,7 +619,7 @@
     function calculateCols() {
 
         //clear any previous focus
-        clearLastCellFocus();
+        //clearLastCellFocus();
 
         //We start at 3 because rows 1 and 2 are the student names and total
         var colIndex = 2;
@@ -684,97 +700,59 @@
         $("#slidingDivID").animate({ "height": "hide" }, { duration: 75 });
     }
 
-    function insertRight(button) {
-        colIndex = parseInt(currentCol);
-        colIndex += 1;
+    function selectColumn(col) {
 
-        //Shifting table headers to the right and renaming header names
-        $("#grades tr th").each(function () {
-            var cellId = $(this).attr("id").split("-");
-            var cellText = $(this).html().split(" ");
+        //tabShowing = true;
+        var container = col.id;
 
-            if (cellText[0] == "Column" || cellText[0] == "" || cellText[0] == "&nbsp;") {
-                if (cellId[1] >= colIndex) {
-                    cellId[1] = parseInt(cellId[1]);
-                    cellId[1] += 1;
-                    cellText[1] = parseInt(cellText[1]);
-                    cellText[1] += 1;
+        var x = parseInt($("#" + container).position().left);
+        var y = parseInt($("#" + container).position().top);
+
+        $("#slidingDivID").css("left", x + "px");
+        $("#slidingDivID").css("top", y + "px");
+
+        x += 135;
+        y += 23;
+
+        
+        $("#grades tr").each(function () {
+            $(this).find("td").each(function () {
+                if ($(this).attr("class") == "colHeader") {
                 }
-                $(this).attr("id", "th-" + cellId[1]);
-                $(this).html("Column " + cellText[1] + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + cellId[1] + ' onclick="ShowHide(this);"></button></div>');
-            }
-            else {
-                if (cellId[1] >= colIndex) {
-                    cellId[1] = parseInt(cellId[1]);
-                    cellId[1] += 1;
-                    cellText[1] = parseInt(cellText[1]);
-                    cellText[1] += 1;
+                else {
+                    $(this).css("background-color", "white");
                 }
-                $(this).attr("id", "th-" + cellId[1]);
-                $(this).html(cellText[0] + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + cellId[1] + ' onclick="ShowHide(this);"></button></div>');
-            }
-        });
-
-        //Setting the new ID's for the new column's table
-        $(document).ready(function () {
-            $("#grades").find("tr").each(function () {
-                $(this).find("td").eq(currentCol).after('<td onclick="cellGainsFocus(this)">0</td>');
+            });
+            $(this).find("th").each(function () {
+                if ($(this).attr("class") == "colHeader") {
+                }
+                else {
+                    $(this).css("background-color", "white");
+                }
             });
         });
 
-        //Setting up the new column header
-        $(document).ready(function () {
-            $("#grades").find("tr").each(function () {
-                $(this).find("th").eq(currentCol).after('<th id=th-' + colIndex + ' onclick="changeHeaderName(this)">Column ' + colIndex + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + colIndex + ' onclick="ShowHide(this);"></button></div></th>');
+        currentHeader = $(col).attr("id");
+
+        $("#grades tr").each(function () {
+
+            $(this).find("td:nth-child(" + $(col).attr("id") + ")").each(function () {
+                if ($(this).attr("class") == "colHeader") {
+                }
+                else {
+                    $(this).css("background-color", "DeepSkyBlue");
+                }
+            });
+            $(this).find("th:nth-child(" + $(col).attr("id") + ")").each(function () {
+                    $("#slidingDivID").animate({ "height": "show" }, { duration: 300 });
+                    $(this).css("background-color", "DeepSkyBlue ");
             });
         });
+        isHighlighted = false;
+
     }
 
-    function insertLeft(button) {
-        colIndex = parseInt(currentCol);
-
-        //Shifting table headers to the right and renaming header names
-        $("#grades tr th").each(function () {
-            var cellId = $(this).attr("id").split("-");
-            var cellText = $(this).html().split(" ");
-
-            if (cellText[0] == "Column" || cellText[0] == "") {
-                if (cellId[1] >= colIndex) {
-                    cellId[1] = parseInt(cellId[1]);
-                    cellId[1] += 1;
-                    cellText[1] = parseInt(cellText[1]);
-                    cellText[1] += 1;
-                }
-                $(this).attr("id", "th-" + cellId[1]);
-                $(this).html("Column " + cellText[1] + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + cellId[1] + ' onclick="ShowHide(this);"></button></div>');
-            }
-            else {
-                if (cellId[1] >= colIndex) {
-                    cellId[1] = parseInt(cellId[1]);
-                    cellId[1] += 1;
-                    cellText[1] = parseInt(cellText[1]);
-                    cellText[1] += 1;
-                }
-                $(this).attr("id", "th-" + cellId[1]);
-                $(this).html(cellText[0] + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + cellId[1] + ' onclick="ShowHide(this);"></button></div>');
-            }
-        });
-
-        //Setting the new ID's for the new column's table
-        $(document).ready(function () {
-            $("#grades").find("tr").each(function () {
-                $(this).find("td").eq(currentCol).before('<td onclick="cellGainsFocus(this)">0</td>');
-            });
-        });
-
-        //Setting up the new column header
-        $(document).ready(function () {
-            $("#grades").find("tr").each(function () {
-                $(this).find("th").eq(currentCol).before('<th id=th-' + colIndex + ' onclick="changeHeaderName(this)">Column ' + colIndex + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + colIndex + ' onclick="ShowHide(this);"></button></div></th>');
-            });
-        });
-    }
-
+   
     function clearCol() {
         var rows = $("#grades tr");
         currentCol = parseInt(currentCol);
@@ -861,29 +839,36 @@
 
         if (catId[1] != null) {
             var i = 0;
-
+            var newCatId = catId[1].split("#");
             $.ajax({
                 async: false,
                 type: "POST",
                 url: "/Gradebook/ClearAllDropLowest",
-                data: { categoryId: catId[1] },
+                data: { categoryId: newCatId[0] },
                 success: function (response) {
                     $("#grades").replaceWith(response);
                 }
             });
 
-            //ajax call to drop the lowest score
-            $.ajax({
-                async: false,
-                type: "POST",
-                url: "/Gradebook/AllDropLowest",
-                data: { categoryId: catId[1], dropX: $('#XtoDrop').val() },
-                success: function (response) {
-                    $("#grades").replaceWith(response);
-                }
-            });
+            for (i = 0; i < $("#XtoDrop").val(); i++) {
+                //ajax call to drop the lowest score
+                $.ajax({
+                    async: false,
+                    type: "POST",
+                    url: "/Gradebook/AllDropLowest",
+                    data: { categoryId: newCatId[0] },
+                    success: function (response) {
+                        $("#grades").replaceWith(response);
+                    }
+                });
+            }
         }
-        
+        if ($("#XtoDrop").val() == 0) {
+            $("#dropLowestButton").val("Average");
+        }
+        else {
+            $("#dropLowestButton").val("Average [Dropped " + $("#XtoDrop").val() + "]");
+        }
         $("#customizeID").animate({ "height": "hide" }, { duration: 300 });
     }
 
@@ -898,12 +883,12 @@
 
         //make sure we are on a valid page
         if (catId[1] != null) {
-
+            var newCatId = catId[1].split("#");
             //ajax call to clear the drop lowest
             $.ajax({
                 type: "POST",
                 url: "/Gradebook/ClearDropLowest",
-                data: { categoryId: catId[1], userId: id },
+                data: { categoryId: newCatId[0], userId: id },
                 success: DropLowest(id)
             });
         }
@@ -920,13 +905,13 @@
 
         //make sure we are on a valid page
         if (catId[1] != null) {
-
+            var newCatId = catId[1].split("#");
             //ajax call to clear the drop lowest
             $.ajax({
                 async: false,
                 type: "POST",
                 url: "/Gradebook/ClearDropLowest",
-                data: { categoryId: catId[1] },
+                data: { categoryId: newCatId[0] },
                 success: dropAllLowest()
             });
         }
@@ -943,15 +928,16 @@
 
         //make sure we are on a valid page
         if (catId[1] != null) {
-
+            var newCatId = catId[1].split("#");
             $.ajax({
                 type: "POST",
                 url: "/Gradebook/DropLowest",
-                data: { categoryId: catId[1], userId: id },
+                data: { categoryId: newCatId[0], userId: id },
                 success: function (response) {
                     $("#grades").replaceWith(response);
                 }
             });
+
         }
     }
 
@@ -975,6 +961,17 @@
             type: "POST",
             url: "/Gradebook/AddCategory",
             success: window.location.reload(true)
+        });
+    }
+
+    function importGrades() {
+
+        var filename = $("#file").val();
+
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/ImportColumnsFromCSV",
+            data: { file: filename }
         });
     }
 

@@ -950,6 +950,23 @@ body#layoutLogOn
     margin-bottom: 0.5em;
 }
 
+#import_grades_from_csv
+{
+    border: 1px solid #eeeeff;
+    border-bottom: 5px solid #eeeeff;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-bottom: 8px;
+    width: 400px;
+    display: none;
+}
+
+#import_grades_from_csv h4
+{
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
 .selector
 {
     clear: both;
@@ -992,6 +1009,12 @@ ul.selector
 }
 
 #import_roster_tools
+{
+    clear: both;
+    padding-top: 2em;
+}
+
+#import_assignment_tools
 {
     clear: both;
     padding-top: 2em;

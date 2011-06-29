@@ -15,7 +15,7 @@
     {
         width: auto;
         border-collapse: collapse;
-        border: 1px solid gray;
+        border: 1px solid #D0D0D0;
     }
     
     .gradebook td
@@ -28,7 +28,7 @@
     .gradebook td, .gradebook th, .gradebook tr
     {
         width: auto;
-        border: 1px solid gray;
+        border: 1px solid #D0D0D0;
     }
     
     .gradebook th
@@ -232,12 +232,27 @@
 		<tr>
 		    <th align="center">Options</th>
 		</tr>
-		<tr>
-			<td><a onmouseover="displayColors();" >Change Tab Color</a></td>
-		</tr>
+        <tr>
+            <td><a>Insert Category Left</a></td>
+        </tr>
+        <tr>
+            <td><a>Insert Category Right</a></td>
+        </tr>
+        <tr>
+            <td><a>Import Grades Here...</a></td>
+        </tr>
+        <tr>
+            <td><a>Move Column Right</a></td>
+        </tr>
+        <tr>
+            <td><a>Move Column Left</a></td>
+        </tr>
         <tr>
             <td><a onclick="deleteCategory();">Delete Category</a></td>
         </tr>
+        <tr>
+			<td><a onmouseover="displayColors();" >Change Category Color</a></td>
+		</tr>
 	</table>
 </div>
 
@@ -334,17 +349,17 @@
         <tr class="colHeader">
             
             @{var j = 1;
-                <td id="@j" class="colHeader" style="background:silver; border:outset 2px;" onclick="selectColumn(this);"></td>
+                <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onclick="selectColumn(this);"></td>
                 j += 1;
-                <td id="@j" class="colHeader" style="background:silver; border:outset 2px;" onclick="selectColumn(this);"></td>
+                <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onclick="selectColumn(this);"></td>
                 j += 1;
-                <td id="@j" class="colHeader" style="background:silver; border:outset 2px;" onclick="selectColumn(this);"></td>
+                <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onclick="selectColumn(this);"></td>
                 j += 1;
-                <td id="@j" class="colHeader" style="background:silver; border:outset 2px;" onclick="selectColumn(this);"></td>
+                <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onclick="selectColumn(this);"></td>
                 j += 1;
                 foreach (Category item in ViewBag.Categories)
                 {
-                    <td id="@j" class="colHeader" style="background:silver; border:outset 2px;"onclick="selectColumn(this);">
+                    <td id="@j" class="colHeader" style="background:silver; border:outset 3px;"onclick="selectColumn(this);">
                     <!--Makes the columns with color change options distinguishable-->
                         <a>*</a>
                     </td>

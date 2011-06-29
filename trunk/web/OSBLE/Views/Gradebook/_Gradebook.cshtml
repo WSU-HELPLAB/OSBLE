@@ -7,6 +7,28 @@
 }
 
 <table id="grades" class="gradebook">
+
+    <tr class="colHeader">
+            
+        @{var j = 1;
+            <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            j += 1;
+            <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            j += 1;
+            foreach (AbstractAssignment item in ViewBag.Assignments)
+            {
+                <td id="@j" class="colHeader" style="background:silver; border:outset 3px; text-align:right;"onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);">
+                <div id="div-@j" style="display: none;" onmouseover="showButton(this);" onmouseout="hideButton(this);">
+                <!--Makes the columns with color change options distinguishable-->
+                    <img src="/Content/images/arrow_down.png" onmouseover="changeCursor()" style="cursor:pointer;"/>
+                </div>
+                </td>
+                j += 1;
+            }
+        }
+            
+    </tr>
+
     <tr id="perfectScore">
         <th id="th2">Perfect Score</th>
         <td id="perfectTotal">100%</td>
@@ -18,7 +40,7 @@
     </tr>
     <tr id="averageRow">
         <th id="th3">
-            Averave Score
+            Average Score
         </th>
         <td id="averageTotal">
             0
@@ -32,6 +54,8 @@
     <tr>
     @{
         var numDropped = (from drop in ViewBag.Dropped as IEnumerable<int> select drop).FirstOrDefault();     
+        
+        <input type="hidden" id="numDropped" value="@numDropped" />
     
         <th id="th4" ondblclick="clearDropLowest()">
             Name
@@ -98,9 +122,21 @@
         </tr>
     }
     <script type="text/javascript">
+        //var lastFocusedCell = null;
         $(function () {
             calculateCols();
+            keyControls();
         });
+
+        function showButton(column) {
+            var container = column.id;
+            $("#div-" + container).animate({ "height": "show" }, { duration: 0 });
+        }
+
+        function hideButton(column) {
+            var container = column.id;
+            $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
+        }
     </script>
 
 </table>
