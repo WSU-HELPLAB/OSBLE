@@ -6,12 +6,25 @@
 <div id="tabHeader">
     <ul>
         <li id="selected" class="main"><a href="/Gradebook/Index">Main</a></li>
-
         @{
-            
+            double totalPoints = 0;
             foreach (Category item in ViewBag.Categories)
             {
-                <li class="@item.ID" style="background:@item.TabColor;"><a href="/Gradebook/Tab/?categoryId=@item.ID">@item.Name</a></li>
+                //calculating total points of all categories
+                totalPoints += (item.Points);
+            }
+            foreach (Category item in ViewBag.Categories)
+            {
+                var displayWeight = (item.Points / totalPoints) * 100;
+                if (item.Points == 0)
+                {
+                    <li class="@item.ID" style="background:@item.TabColor;"><a href="/Gradebook/Tab/?categoryId=@item.ID" style="text-decoration:none;">@item.Name (0)%)</a></li>
+                }
+                else
+                {
+                    <li class="@item.ID" style="background:@item.TabColor;"><a href="/Gradebook/Tab/?categoryId=@item.ID" style="text-decoration:none;">@item.Name (@displayWeight.ToString(".##")%)</a></li>
+                }
+
             }
         }
         <li><a href="#" onclick="newTab()">+</a></li>
