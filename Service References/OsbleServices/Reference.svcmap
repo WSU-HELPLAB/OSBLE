@@ -23,12 +23,12 @@
     <MetadataSource Address="https://www.osble.org/Services/UploaderWebService.svc/mex" Protocol="mex" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="service22.wsdl" MetadataType="Wsdl" ID="85f85ed6-c3b3-4046-a39b-82174c56771b" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
-    <MetadataFile FileName="service23.wsdl" MetadataType="Wsdl" ID="0843acf6-8035-4a47-b22e-1cae0d99a164" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
+    <MetadataFile FileName="service5.wsdl" MetadataType="Wsdl" ID="386dd046-25c1-488b-883a-4c9023dee432" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
+    <MetadataFile FileName="service6.wsdl" MetadataType="Wsdl" ID="035cfabb-ebc0-4ce1-bebe-977b54fc81ad" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
     <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="06ce0a68-933c-4a8b-b0e8-81180ebeb1de" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
-    <MetadataFile FileName="service22.xsd" MetadataType="Schema" ID="20e917c0-db67-465e-b626-17fe3d5a8547" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
-    <MetadataFile FileName="OSBLE.Models.Services.Uploader11.xsd" MetadataType="Schema" ID="42e116d8-65c0-4fc4-b4de-e9eecbfe7963" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
-    <MetadataFile FileName="Arrays11.xsd" MetadataType="Schema" ID="05470195-45cd-476f-9736-d50965a5d6d2" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
+    <MetadataFile FileName="service14.xsd" MetadataType="Schema" ID="2c2e5e1d-50f1-4533-acbc-4c577985dfa2" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
+    <MetadataFile FileName="OSBLE.Models.Services.Uploader3.xsd" MetadataType="Schema" ID="c4c0d5c0-6345-4e97-86a8-9159b48c01b2" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
+    <MetadataFile FileName="Arrays3.xsd" MetadataType="Schema" ID="06c4cdec-eaba-4d71-b0c0-94af26a6d498" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
