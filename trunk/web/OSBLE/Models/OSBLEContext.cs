@@ -252,13 +252,13 @@ namespace OSBLE.Models
             Category w1 = new Category();
             w1.Name = "Homework";
             w1.PointsPossible = 40;
-            w1.gradebookOptions = gradebook_options;
+            w1.GradebookOptions = gradebook_options;
 
             gradebook_options = new GradebookOptions();
             Category w2 = new Category();
             w2.Name = "Exams";
             w2.PointsPossible = 60;
-            w2.gradebookOptions = gradebook_options;
+            w2.GradebookOptions = gradebook_options;
 
             c1.Categories = new List<Category>();
             c2.Categories = new List<Category>();
@@ -479,6 +479,7 @@ namespace OSBLE.Models
     /// </summary>
     public class OSBLEContextAlwaysCreateInitializer : DropCreateDatabaseAlways<OSBLEContext>
     {
+
         protected override void Seed(OSBLEContext context)
         {
             base.Seed(context);
