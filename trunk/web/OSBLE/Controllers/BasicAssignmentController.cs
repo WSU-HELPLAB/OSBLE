@@ -277,22 +277,45 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult Edit(int id)
         {
-            BasicAssignmentViewModel basicViewModel = new BasicAssignmentViewModel();
-            BasicAssignment assignment = db.BasicAssignments.Find(id);
+            List<Deliverable> Deliverables = new List<Deliverable>();
+            BasicAssignmentViewModel viewModel = new BasicAssignmentViewModel();
+            BasicAssignment assignment = db.AbstractAssignments.Find(id) as BasicAssignment;
 
-            if (assignment.Category.CourseID != ActiveCourse.CourseID)
+            if (assignment != null && assignment.Category.Course == activeCourse.Course)
             {
-                return RedirectToAction("Index", "Home");
+                SubmissionActivity submission = (from c in assignment.AssignmentActivities where c is SubmissionActivity select c as SubmissionActivity).FirstOrDefault();
+                StopActivity stop = (from c in assignment.AssignmentActivities where c is StopActivity select c as StopActivity).FirstOrDefault();
+
+                if (submission != null && stop != null)
+                {
+                    // Copy default Late Policy settings
+                    Course active = activeCourse.Course as Course;
+
+                    viewModel.Assignment = assignment;
+
+                    viewModel.Submission.HoursLatePerPercentPenalty = submission.HoursLatePerPercentPenalty;
+                    viewModel.Submission.HoursLateUntilZero = submission.HoursLateUntilZero;
+                    viewModel.Submission.PercentPenalty = submission.PercentPenalty;
+                    viewModel.Submission.MinutesLateWithNoPenalty = submission.MinutesLateWithNoPenalty;
+
+                    viewModel.TeamCreation = createTeamCreationSilverlightObject();
+                    viewModel.RubricCreation = createRubricCreationSilverlightObject();
+
+                    //TO DO: need to load existing teams not make new ones
+                    viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"] = serializeTeamMemers(getTeamMembers());
+
+                    //TO DO: need to load existing categories not make new ones
+                    var cat = from c in db.Categories
+                              where c.CourseID == active.ID
+                              select c;
+                    ViewBag.Categories = new SelectList(cat, "ID", "Name");
+                    ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
+                    ViewBag.Deliverables = Deliverables;
+                    return View(viewModel);
+                }
             }
 
-            basicViewModel.Assignment = assignment;
-            basicViewModel.Submission = assignment.AssignmentActivities.Where(aa => aa is SubmissionActivity).First() as SubmissionActivity;
-            basicViewModel.Stop = assignment.AssignmentActivities.Where(aa => aa is StopActivity).FirstOrDefault() as StopActivity;
-
-            ViewBag.Categories = new SelectList(db.Categories, "ID", "Name", assignment.CategoryID);
-            ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
-
-            return View(basicViewModel);
+            return RedirectToAction("Index", "Assignment");
         }
 
         [HttpPost]

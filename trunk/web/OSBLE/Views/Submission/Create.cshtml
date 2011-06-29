@@ -16,7 +16,7 @@
         $('#file_uploader_form').submit(function ValidateForm(event) {
             var file_uploaders = $("#file_uploader_form :input");
             var i = 0;
-            for (i = 0; i <= file_uploaders.length; i++) {
+            for (i = 0; i < file_uploaders.length; i++) {
                 if (isValid(file_uploaders[i]) == false) {
                     if (!confirm('One or more deliverables does not have a file. Would you like to continue')) {
                         event.preventDefault();
@@ -32,6 +32,8 @@
         var filePath = elem.value;
         var indexOfDot = filePath.indexOf('.');
         if (indexOfDot == -1) {
+
+        //this does not work for IE
             elem.value = "";
             return false;
         }
