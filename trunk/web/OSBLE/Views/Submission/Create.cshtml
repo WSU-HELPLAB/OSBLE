@@ -61,84 +61,82 @@
 </script>
 @{
     int fileUploadsSoFar = 0;
+    int inBrowserCount = 0;
 }
 @using (Html.BeginForm("Create", "Submission", FormMethod.Post, new { id = "file_uploader_form", enctype = "multipart/form-data" }))
 {
     @Html.ValidationSummary(true)
     <fieldset>
         <legend>Submission</legend>
-        @{
-            int inBrowserCount = 0;
-            foreach (Deliverable deliverable in ViewBag.Deliverables.Keys)
-            {
-                <table>
+        @foreach (Deliverable deliverable in ViewBag.Deliverables.Keys)
+        {
+            <table id="submission_table">
+                <tr>
+                    <td>
+                        <b>Desired Name:</b>
+                    </td>
+                    <td>
+                        @deliverable.Name
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>File Type:</b>
+                    </td>
+                    <td>
+                        @(((DeliverableType)deliverable.Type).ToString())
+                    </td>
+                </tr>
+                @if (((DeliverableType)deliverable.Type) != DeliverableType.InBrowserText)
+                {
                     <tr>
                         <td>
-                            <b>Desired Name:</b>
+                            <b>Allowed File Extensions:</b>
                         </td>
                         <td>
-                            @deliverable.Name
+                            @String.Join(" ", ViewBag.Deliverables[deliverable])
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <b>File Type:</b>
-                        </td>
-                        <td>
-                            @(((DeliverableType)deliverable.Type).ToString())
-                        </td>
-                    </tr>
-                    @if (((DeliverableType)deliverable.Type) != DeliverableType.InBrowserText)
-                    {
-                        <tr>
-                            <td>
-                                <b>Allowed File Extensions:</b>
-                            </td>
-                            <td>
-                                @String.Join(" ", ViewBag.Deliverables[deliverable])
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                @{
-                                    //write javascript code to create a new array call it stringArray{0} where {0} is the one we are on.
-                                    //then push all the allowed extensions on it while removing the . from them
-                                    string newString = "";
-                                    newString = "var stringArray" + fileUploadsSoFar.ToString() + " = new Array();";
-                                    foreach (string s in ViewBag.Deliverables[deliverable])
-                                    {
-                                        newString += "stringArray" + fileUploadsSoFar.ToString() + ".push(" + "\"" + s.Remove(0, 1) + "\");";
-                                    }
+                            @{
+                                //write javascript code to create a new array call it stringArray{0} where {0} is the one we are on.
+                                //then push all the allowed extensions on it while removing the . from them
+                                string newString = "";
+                                newString = "var stringArray" + fileUploadsSoFar.ToString() + " = new Array();";
+                                foreach (string s in ViewBag.Deliverables[deliverable])
+                                {
+                                    newString += "stringArray" + fileUploadsSoFar.ToString() + ".push(" + "\"" + s.Remove(0, 1) + "\");";
                                 }
-                                <script type="text/javascript">
-                                    //we create our JavaScript string this is where it runs the code it just generated.
-                                    @MvcHtmlString.Create(newString);
-                                </script>
-                                @{
+                            }
+                            <script type="text/javascript">
+                                //we create our JavaScript string this is where it runs the code it just generated.
+                                @MvcHtmlString.Create(newString);
+                            </script>
+                            @{
 
-                                    <input type='file' name='files' onchange="checkFileExension(this, @MvcHtmlString.Create("stringArray" + fileUploadsSoFar.ToString()))"/>
-                                }
-                                @{
-                                    fileUploadsSoFar++;
-                                }
-                            </td>
-                        </tr>
-                    }
-                    // InBrowserText field
-                    else 
-                    {
-                        <tr>
-                            <td colspan="2">
-                                <input type="hidden" name="desiredName[@inBrowserCount]" readonly="true" value="@deliverable.Name"/>
-                                <textarea name="inBrowserText[@inBrowserCount]" rows="10" cols = "50"></textarea>
-                            </td>
-                        </tr>
+                                <input type='file' name='files' onchange="checkFileExension(this, @MvcHtmlString.Create("stringArray" + fileUploadsSoFar.ToString()))"/>
+                            }
+                            @{
+                                fileUploadsSoFar++;
+                            }
+                        </td>
+                    </tr>
+                }
+                // InBrowserText field
+                else 
+                {
+                    <tr>
+                        <td colspan="2">
+                            <input type="hidden" name="desiredName[@inBrowserCount]" readonly="true" value="@deliverable.Name"/>
+                            <textarea name="inBrowserText[@inBrowserCount]" rows="10" cols = "53" ></textarea>
+                        </td>
+                    </tr>
                         
-                        inBrowserCount++;
-                    }
-                </table>
-                <br/>
-            }
+                    inBrowserCount++;
+                }
+            </table>
+            <br/>
         }
         <p>
             <input type="submit" value="Create"/>
