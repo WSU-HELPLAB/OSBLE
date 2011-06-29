@@ -69,6 +69,14 @@ namespace OSBLE.Controllers
         {
             if (id != null)
             {
+                // if (ModelState.IsValid)
+                //{
+                //  db.Submissions.Add(submission);
+                //    db.SaveChanges();
+                //    return RedirectToAction("Index");
+                // }
+
+
                 AbstractAssignmentActivity activity = db.AbstractAssignmentActivity.Find(id);
 
                 if (activity as SubmissionActivity != null)
@@ -127,6 +135,22 @@ namespace OSBLE.Controllers
                             }
                             i++;
                         }
+
+                        // Creates the text files from text boxes
+                        int j = 0;
+                        string delName;
+                        do
+                        {
+                            delName = Request.Params["desiredName[" + j + "]"];
+                            if (delName != null)
+                            {
+                                string inbrowser = Request.Params["inBrowserText[" + j + "]"];
+                                var path = Path.Combine(FileSystem.GetSubmissionFolder(activeCourse.Course as Course, (int)id, teamMember), delName + ".txt");
+                                System.IO.File.WriteAllText(path, inbrowser);
+                            }
+                            j++;
+                        } while (delName != null);
+
                         return RedirectToAction("SubmittedSuccessfully");
                     }
                 }
@@ -134,6 +158,7 @@ namespace OSBLE.Controllers
 
             return Create(id);
         }
+            
 
         private TeamMember findTeamMember(ICollection<TeamMember> members, int userProfileID)
         {

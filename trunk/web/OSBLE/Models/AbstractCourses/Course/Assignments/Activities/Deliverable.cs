@@ -22,6 +22,10 @@ namespace OSBLE.Models.Assignments.Activities
 
         [FileExtensions(new string[] { ".zip" })]
         Zip,
+
+        [FileExtensions(new string[] { ".txt" })]
+        InBrowserText,
+
         /// <summary>
         /// This file type is not supported by the Osble Review process and thus a Review process will not be allowed for this
         /// file
