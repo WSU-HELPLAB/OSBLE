@@ -425,7 +425,6 @@ namespace OSBLE.Controllers
                     {
                         db.DashboardPosts.Add(newDp);
 
-#if !DEBUG
                         //pull all users that have asked to receive activity posts via email
                         List<UserProfile> usersWantingEmail = (from u in db.UserProfiles
                                                                where u.EmailAllActivityPosts == true
@@ -466,9 +465,6 @@ namespace OSBLE.Controllers
                         foreach (UserProfile up in usersWantingEmail)
                         {
                             addresses.Add(new MailAddress(up.UserName, up.FirstName + " " + up.LastName));
-                            body += "\n\n";
-                            body += "This message was sent based on a previously expressed desire to receive activity posts via email.  If you wish to turn this setting off, please update your user profile settings in OSBLE.\n\n";
-                            body += "http://osble.org";
                         }
 
                         //If the instructor wanted to email the entire class, add these users as well.  
@@ -487,7 +483,6 @@ namespace OSBLE.Controllers
 
                         //Send the message
                         Email.Send(subject, body, addresses);
-#endif
                     }
                 }
             }

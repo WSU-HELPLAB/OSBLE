@@ -11,6 +11,7 @@ namespace OSBLE.Utility
     {
         public static void Send(string subject, string message, IEnumerable<MailAddress> to)
         {
+#if !DEBUG
             SmtpClient mailClient = new SmtpClient();
             mailClient.UseDefaultCredentials = true;
 
@@ -30,6 +31,7 @@ namespace OSBLE.Utility
 
             //bomb's away!
             mailClient.Send(mm);
+#endif
         }
     }
 }
