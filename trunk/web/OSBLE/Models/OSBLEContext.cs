@@ -8,8 +8,9 @@ using OSBLE.Models.Assignments.Activities.Scores;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.GradebookOptions;
 using OSBLE.Models.HomePage;
-using OSBLE.Models.Rubrics;
+using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.Users;
+using OSBLE.Models.Courses.Rubrics;
 
 namespace OSBLE.Models
 {

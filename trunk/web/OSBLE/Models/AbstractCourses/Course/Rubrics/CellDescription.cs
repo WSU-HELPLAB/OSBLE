@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models.Rubrics
+namespace OSBLE.Models.Courses.Rubrics
 {
     
     public class CellDescription

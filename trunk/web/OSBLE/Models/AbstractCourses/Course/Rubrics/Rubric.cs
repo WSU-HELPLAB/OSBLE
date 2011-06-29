@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models.Rubrics
+namespace OSBLE.Models.Courses.Rubrics
 {
     public class Rubric
     {
@@ -11,6 +11,12 @@ namespace OSBLE.Models.Rubrics
 
         [Required]
         public string Description { get; set; }
+
+        [Required]
+        public bool HasCriteriaComments { get; set; }
+
+        [Required]
+        public bool HasGlobalComments { get; set; }
 
         public virtual ICollection<Level> Levels { get; set; }
 

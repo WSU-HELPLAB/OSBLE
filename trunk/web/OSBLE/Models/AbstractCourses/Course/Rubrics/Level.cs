@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models.Rubrics
+namespace OSBLE.Models.Courses.Rubrics
 {
     public class Level
     {
@@ -25,6 +25,12 @@ namespace OSBLE.Models.Rubrics
 
         [Required]
         public string LevelTitle { get; set; }
+
+        public Level()
+            : base()
+        {
+            RangeStart = 0;
+        }
 
     }
 

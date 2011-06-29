@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
-using OSBLE.Models.Rubrics;
+using OSBLE.Models.Courses.Rubrics;
 
 namespace OSBLE.Models.Assignments
 {

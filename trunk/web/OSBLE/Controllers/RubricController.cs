@@ -5,7 +5,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using OSBLE.Models.Rubrics;
+using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models;
 
 namespace OSBLE.Controllers

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models.Rubrics
+namespace OSBLE.Models.Courses.Rubrics
 {
     public class Criterion
     {
@@ -22,6 +22,9 @@ namespace OSBLE.Models.Rubrics
 
         [Required]
         public string CriterionTitle { get; set; }
+
+        [Required]
+        public double Weight { get; set; }
 
     }
 }

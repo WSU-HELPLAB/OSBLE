@@ -95,6 +95,7 @@
     </Reference>
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.DomainServices.Hosting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
@@ -161,7 +162,6 @@
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\SyncIssueVotingActivity.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\BasicAssignment.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\GradeAssignment.cs" />
-    <Compile Include="Models\AbstractCourses\Course\GradebookOptions\GradebookOptions.cs" />
     <Compile Include="Models\AbstractCourses\Course\GradebookOptions\LetterGrade.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Criterion.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Level.cs" />

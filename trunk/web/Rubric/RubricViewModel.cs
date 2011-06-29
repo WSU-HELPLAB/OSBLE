@@ -4,19 +4,19 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using ChemProV.PFD.Streams.PropertiesWindow;
 using System.Collections.Generic;
+using System.Windows.Browser;
 
 namespace OsbleRubric
 {
-    public class RubricModel
+    public class RubricViewModel
     {
         #region Attributes
 
         private CustomDataGrid customDataGrid = new CustomDataGrid();
         private Rubric thisView = new Rubric();
         private List<ICell> dataFromCells = new List<ICell>();
-
+        public enum CheckboxValues { ColumnComment, GlobalComment };
         #endregion Attributes
 
         #region constants
@@ -45,7 +45,7 @@ namespace OsbleRubric
         /// <summary>
         /// Constructor
         /// </summary>
-        public RubricModel()
+        public RubricViewModel()
         {
             initialize();
         }
@@ -99,8 +99,11 @@ namespace OsbleRubric
 
             //setting up the initial grayed arrows
             adjustArrowIcons();
-        }
 
+            //attach event listeners to our view
+            thisView.CancelChanges.Click += new RoutedEventHandler(CancelChanges_Click);
+            thisView.PublishChanges.Click += new RoutedEventHandler(PublishChanges_Click);
+        }
 
         /// <summary>
         /// attempts to place an ICell into the grid at the ICells given row/column/data. Returns false if no data was added
@@ -182,6 +185,7 @@ namespace OsbleRubric
 
             return returnVal;
         }
+        
         /// <summary>
         ///  /// returns the number of rows from dataFromCells list
         /// </summary>
@@ -255,8 +259,6 @@ namespace OsbleRubric
                 }
             }
         }
-        
-
 
         /// <summary>
         /// this method saves all the data from the cells into a list. This method will most probably need changes as changes are made within the grid
@@ -302,7 +304,7 @@ namespace OsbleRubric
                         {
                             foreach (UIElement ui in (br.Child as StackPanel).Children) //look through the the stackpanel for a checkbox, add that to dataFromCells
                             {
-                                if (ui is CheckBox) dataFromCells.Add(new CheckBoxCell(row, col, (bool)(ui as CheckBox).IsChecked));
+                                if (ui is CheckBox) dataFromCells.Add(new CheckBoxCell(row, col, (bool)(ui as CheckBox).IsChecked) {Information = CheckboxValues.ColumnComment.ToString() });
                             }
                         }
                     }
@@ -313,7 +315,7 @@ namespace OsbleRubric
                     {
                         foreach (UIElement ui in (br.Child as StackPanel).Children)
                         {
-                            if (ui is CheckBox) dataFromCells.Add(new CheckBoxCell(row, col, (bool)(ui as CheckBox).IsChecked));
+                            if (ui is CheckBox) dataFromCells.Add(new CheckBoxCell(row, col, (bool)(ui as CheckBox).IsChecked) { Information = CheckboxValues.GlobalComment.ToString() });
                         }
                     }
                 }
@@ -1109,6 +1111,36 @@ namespace OsbleRubric
         }
 
         #region Events
+
+        /// <summary>
+        /// Called when the user clicks on the "Cancel" button in the view
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CancelChanges_Click(object sender, RoutedEventArgs e)
+        {
+            HtmlPage.Window.Invoke("CloseRubric", "");
+        }
+
+        /// <summary>
+        /// Called when the user clicks the "Publish" button in the view
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void PublishChanges_Click(object sender, RoutedEventArgs e)
+        {
+            this.getData();
+            
+            //loop through all of our data
+            foreach(ICell cell in this.dataFromCells)
+            {
+                if (cell is HeaderCell)
+                {
+                   
+                }
+            }
+            
+        }
 
         /// <summary>
         /// event for the delete button(s) in the first column (deletes a row)

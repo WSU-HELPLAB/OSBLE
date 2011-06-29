@@ -17,7 +17,7 @@ namespace OsbleRubric
         public MainPage()
         {
             InitializeComponent();
-            RubricModel j = new RubricModel();
+            RubricViewModel j = new RubricViewModel();
             LayoutRoot.Children.Add(j.GetView());
         }
     }

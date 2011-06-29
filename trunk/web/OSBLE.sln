@@ -14,6 +14,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileUploader", "..\silverlight\FileUploader\FileUploader.csproj", "{79706350-C34D-4A51-B22F-273EC8289E5D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rubric", "Rubric\Rubric.csproj", "{77BD61DF-7C05-468A-AA47-1050E674E12C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7297687F-BF8A-4195-8EA3-A05DA302B24E} = {7297687F-BF8A-4195-8EA3-A05DA302B24E}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution

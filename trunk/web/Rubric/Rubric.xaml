@@ -12,8 +12,8 @@
                 </Grid>
             </ScrollViewer>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button x:Name="PublishChanges" Content="Save Changes" Margin="0,0,20,0"  Click="PublishChanges_Click" Width="133" />
-                <Button x:Name="CancelChanges" Content="Close" Width="133" Click="CancelChanges_Click"  />
+                <Button x:Name="PublishChanges" Content="Save Changes" Margin="0,0,20,0" Width="133" />
+                <Button x:Name="CancelChanges" Content="Close" Width="133" />
             </StackPanel>
         </StackPanel>
     </Grid>
