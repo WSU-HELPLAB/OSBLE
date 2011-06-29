@@ -14,6 +14,16 @@
     }
     
 }
+
+<script type="text/javascript">
+
+    function RemainingChars(id) {
+        var remaining = $('#MaxContentChars').val() - $('#@id').val().length;
+        $('#remChars').val("(" + remaining + ") Characters left");
+    }
+
+</script>
+
         <div class="dp_post" id="dp_post_@(Model.ID)">
             <div class="dp_post_header">
                 @* Reply Only *@
@@ -120,7 +130,11 @@
                         method="post">
                         <input type="hidden" name="reply_to" value="@Model.ID" />
                         <input type="hidden" name="latest_reply" value="0" id="latest_reply_@(Model.ID)" />
-                        <textarea name="Content" rows="5" cols="40" id="dp_replybox_content_@(Model.ID)" placeholder="Enter reply here..."></textarea><br />
+                        <input id="remChars" name="remainingChars" readonly="true" type="text" value="(@ViewBag.MaxActivityFeedLength) Characters left" /><br />
+                        <textarea 
+                            name="Content" rows="5" cols="40" id="dp_replybox_content_@(Model.ID)" placeholder="Enter reply here..."
+                            onkeyup="RemainingChars(dp_replybox_content_@(Model.ID));" onkeydown="RemainingChars(dp_replybox_content_@(Model.ID));">
+                        </textarea><br />
                         <input type="submit" name="post_reply" value="Post Reply" />
                     </form>
 
