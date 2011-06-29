@@ -477,7 +477,6 @@ namespace OSBLE.Controllers
                            List<int> id = new List<int>();
 
                            var item = studentScores.AsEnumerable().ElementAt(i);
-                           //int counter = 0;
                            
                            foreach (Score score in item)
                            {

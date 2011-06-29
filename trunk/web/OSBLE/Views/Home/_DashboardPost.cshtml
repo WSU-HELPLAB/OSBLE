@@ -22,6 +22,11 @@
         $('#remCharsReply').val("(" + remainingReply + ") Characters left");
     }
 
+    //refreshes the count of how many charecters you can input
+    function refreshCount() {
+        $('#remCharsReply').val("(" + $('#MaxContentChars').val() + ") Characters left");
+    }
+
 </script>
         <div class="dp_post" id="dp_post_@(Model.ID)">
             <div class="dp_post_header">
@@ -120,8 +125,7 @@
                 <div class="dp_replylink">
                     <a href="#" id="reply_@(Model.ID)">Reply</a>
                 </div>
-                <div class="dp_replybox" id="replybox_@(Model.ID)">
-                        
+                <div class="dp_replybox" id="replybox_@(Model.ID)" >   
                     <form action="@Url.Action("NewReply")"
                         data-ajax="true"
                         data-ajax-update="#dp_replies_for_@(Model.ID)"
@@ -133,11 +137,10 @@
                         method="post">
                         <input type="hidden" name="reply_to" value="@Model.ID" />
                         <input type="hidden" name="latest_reply" value="0" id="latest_reply_@(Model.ID)" />
-                        <input type="hidden" id="MaxContentChars" value="@ViewBag.MaxActivityFeedLength"/>
                         <input id="remCharsReply" name="remainingCharsReply" readonly="true" type="text" value="(@ViewBag.MaxActivityFeedLength) Characters left" /><br />
                         <textarea name="Content" rows="5" cols="40" id="dp_replybox_content_@(Model.ID)" placeholder="Enter reply here..."
-                            onkeyup="RemainingCharsReply(@(Model.ID))" onkeydown="RemainingCharsReply(@(Model.ID))"></textarea><br />
-                        <input id="reply @(Model.ID) button" type="submit" name="post_reply" value="Post Reply" />
+                            onkeyup="RemainingCharsReply(@(Model.ID))" onkeydown="RemainingCharsReply(@(Model.ID))" ></textarea><br />
+                        <input id="reply @(Model.ID) button" type="submit" name="post_reply" value="Post Reply" onclick="refreshCount()" />
                     </form>
 
                     <br />
