@@ -69,13 +69,6 @@ namespace OSBLE.Controllers
         {
             if (id != null)
             {
-                // if (ModelState.IsValid)
-                //{
-                //  db.Submissions.Add(submission);
-                //    db.SaveChanges();
-                //    return RedirectToAction("Index");
-                // }
-
                 AbstractAssignmentActivity activity = db.AbstractAssignmentActivity.Find(id);
 
                 if (activity as SubmissionActivity != null)

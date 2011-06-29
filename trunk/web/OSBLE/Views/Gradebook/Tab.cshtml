@@ -864,7 +864,7 @@
                     async: false,
                     type: "POST",
                     url: "/Gradebook/AllDropLowest",
-                    data: { categoryId: newCatId[0] },
+                    data: { categoryId: newCatId[0], dropX: $('#XtoDrop').val() },
                     success: function (response) {
                         $("#grades").replaceWith(response);
                     }
