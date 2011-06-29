@@ -533,11 +533,11 @@
 
                 if (scoreQuery.Count() > 0)
                 {
-                        <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID)">@scoreQuery.First().Points.ToString(".##")%</td>
+                        <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID)" style="cursor:pointer;">@scoreQuery.First().Points.ToString(".##")%</td>
                 }
                 else
                 {
-                        <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID)">NG</td>
+                        <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID)" style="cursor:pointer;">NG</td>
                 }
             }
             }
@@ -589,10 +589,6 @@
             </tr>
         </table>
         </form>
-
-
-
-
 
         <script type="text/javascript">
             function setGradableAction(actionName) {
