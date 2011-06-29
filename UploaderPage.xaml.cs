@@ -418,7 +418,20 @@ namespace FileUploader
         void uploader_Closed(object sender, EventArgs e)
         {
             SelectionChanged(this, null);
-            client.PostActivityMessageAsync(activityMessageUpdate, course.Key, authToken);
+            string message = activityMessageUpdate;
+            if (sender is UploadingModal)
+            {
+                UploadingModal uploader = sender as UploadingModal;
+                if (uploader.Listing.Files.Count < 5)
+                {
+                    message += "  The following files have been updated:";
+                    foreach (FileListing listing in uploader.Listing.Files)
+                    {
+                        message += "\n" + listing.Name;
+                    }
+                }
+            }
+            client.PostActivityMessageAsync(message, course.Key, authToken);
         }
 
         void UploaderPage_KeyDown(object sender, KeyEventArgs e)
