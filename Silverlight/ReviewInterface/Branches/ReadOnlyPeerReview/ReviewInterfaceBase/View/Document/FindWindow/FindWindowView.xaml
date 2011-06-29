@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="ReviewInterfaceBase.View.Document.FindWindow.FindWindowView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+    xmlns:findWindow="clr-namespace:ReviewInterfaceBase.View.Document.FindWindow"
+    xmlns:behaviors="clr-namespace:ReviewInterfaceBase.ViewModel.Behaviors"
+>
+    <Popup x:Name="Find_Popup">
+        <Border CornerRadius="1" BorderBrush="DarkBlue" BorderThickness="5" MinHeight="220" MinWidth="100">
+            <Interactivity:Interaction.Behaviors>
+                <behaviors:ResizePopupBorder/>
+            </Interactivity:Interaction.Behaviors>
+            <StackPanel Background="White">
+                <findWindow:Header x:Name="Header" Height="16"/>
+                <StackPanel Margin="5">
+                    <TextBlock Margin="0,10,0,0">
+                Find What:
+                    </TextBlock>
+                    <TextBox x:Name="SearchingFor_TextBox" Text="{Binding LookingFor, Mode=TwoWay}"/>
+                    <TextBlock>
+                Look in:
+                    </TextBlock>
+                    <ComboBox x:Name="SearchIn_ComboBox"/>
+                    <TextBlock Text="Options"/>
+                    <CheckBox x:Name="MatchCase_CheckBox" Content="Match Case" IsChecked="{Binding MatchCase, Mode=TwoWay}"/>
+                    <CheckBox x:Name="MatchWholeWord_CheckBox" Content="Match Whole Word" IsChecked="{Binding MatchWholeWord, Mode=TwoWay}"/>
+                    <CheckBox x:Name="SearchUp_CheckBox" Content="Search Up" IsChecked="{Binding SearchUp, Mode=TwoWay}"/>
+                </StackPanel>
+                <Button x:Name="FindNext_Button" Content="Find Next (F3)"/>
+            </StackPanel>
+        </Border>
+    </Popup>
+</UserControl>
