@@ -76,7 +76,6 @@ namespace OSBLE.Controllers
                 //    return RedirectToAction("Index");
                 // }
 
-
                 AbstractAssignmentActivity activity = db.AbstractAssignmentActivity.Find(id);
 
                 if (activity as SubmissionActivity != null)
@@ -116,6 +115,13 @@ namespace OSBLE.Controllers
                             if (file != null && file.ContentLength > 0)
                             {
                                 DeliverableType type = (DeliverableType)deliverables[i].Type;
+
+                                //jump over all DeliverableType.InBrowserText as they will be handled separately
+                                while (type == DeliverableType.InBrowserText)
+                                {
+                                    i++;
+                                    type = (DeliverableType)deliverables[i].Type;
+                                }
                                 string fileName = Path.GetFileName(file.FileName);
                                 string extension = Path.GetExtension(file.FileName);
 
@@ -158,7 +164,6 @@ namespace OSBLE.Controllers
 
             return Create(id);
         }
-            
 
         private TeamMember findTeamMember(ICollection<TeamMember> members, int userProfileID)
         {
