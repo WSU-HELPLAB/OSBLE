@@ -172,7 +172,6 @@
     <Compile Include="Models\AbstractCourses\Course\Assignments\StudioAssignment.cs" />
     <Compile Include="Models\AbstractCourses\Course\Submission.cs" />
     <Compile Include="Models\Assignments\Activities\IssueVotingWrapper.cs" />
-    <Compile Include="Models\Courses\GradebookOptions\GradebookOptions.cs" />
     <Compile Include="Models\HomePage\AbstractDashboard.cs" />
     <Compile Include="Models\AbstractCourses\AbstractRole.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\AssignmentActivity.cs" />
