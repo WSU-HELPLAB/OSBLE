@@ -219,6 +219,11 @@
         width: auto;
         border: 1px solid gray;
     }
+    
+    .rowHeader
+    {
+        width: 500px;
+    } 
 	
 </style>
 
@@ -356,6 +361,8 @@
                 j += 1;
                 <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onclick="selectColumn(this);"></td>
                 j += 1;
+                <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onclick="selectColumn(this);"></td>
+                j += 1;
                 foreach (Category item in ViewBag.Categories)
                 {
                     <td id="@j" class="colHeader" style="background:silver; border:outset 3px;"onclick="selectColumn(this);">
@@ -367,7 +374,9 @@
             }
             
         </tr>
+        
         <tr>
+            <td id="row-1" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onclick="selectRow(this);"></td>
             <th></th>
             <th>Weights [+]</th>
             <th></th>
@@ -378,6 +387,7 @@
             }
         </tr>
         <tr id="weights">
+            <td id="row-2" class="rowHeader" style="background:silver; border:outset 3px;" onclick="selectRow(this);"></td>
             <td id="sectionHolder"></td>
             <td id="catScheme" onclick="cellGainsFocus(this);">&nbsp  Weight1</td>
             <td id="grade"></td>
@@ -397,6 +407,7 @@
 
         </tr>
         <tr id="perfectScore">
+            <td id="row-3" class="rowHeader" style="background:silver; border:outset 3px;" onclick="selectRow(this);"></td>
             <th></th>
             <th id="th2">Perfect Score</th>
             @{string grade = (from lg in ViewBag.LetterGrades as IEnumerable<LetterGrade>
@@ -413,6 +424,7 @@
 
         </tr>
         <tr>
+            <td id="row-4" class="rowHeader" style="background:silver; border:outset 3px;" onclick="selectRow(this);"></td>
             <th></th>
             <th id="th3">
                 Average Score
@@ -423,7 +435,7 @@
             @{
                 double totalAverage = 0;
                 int totalStudents = 0;
-                   
+
                 foreach (Category item in ViewBag.Categories)
                 {
                     <td id="averageScore">0</td>  
@@ -432,6 +444,7 @@
             
         </tr>
         <tr id="categoryHeaders">
+            <td id="row-5" class="rowHeader" style="background:silver; border:outset 3px;" onclick="selectRow(this);"></td>
             <th>Section</th>
             <th>Name</th>
             <th ondblclick="displayLetterGrades();">Grade</th>
@@ -450,12 +463,14 @@
 
             List<LetterGrade> letterList = (from lg in ViewBag.LetterGrades as IEnumerable<LetterGrade>
                                             select lg).ToList();
-            
+            var r = 6;
         }
         <!--loop through all users -->
         @foreach (OSBLE.Models.Users.UserProfile student in ViewBag.Students)
         {        
             <tr id="studentGrades">
+                <td id="row-@r" class="rowHeader" style="background:silver; border:outset 3px;" onclick="selectRow(this);"></td>
+                @{r++;}
 
             @{  
                     
@@ -506,10 +521,10 @@
 
 
             var totalPercent = (totalGrade / totalPossible) * 100;
-            
+
             totalAverage += totalPercent;
             totalStudents++;
-            
+
             var letter = "";
             foreach (LetterGrade item in letterList)
             {
@@ -635,14 +650,14 @@
         if (isHighlighted == true) {
             $("#grades tr").each(function () {
                 $(this).find("td").each(function () {
-                    if ($(this).attr("class") == "colHeader") {
+                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
                     }
                     else {
                         $(this).css("background-color", "white");
                     }
                 });
                 $(this).find("th").each(function () {
-                    if ($(this).attr("class") == "colHeader") {
+                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
                     }
                     else {
                         $(this).css("background-color", "white");
@@ -932,14 +947,14 @@
         
         $("#grades tr").each(function () {
             $(this).find("td").each(function () {
-                if ($(this).attr("class") == "colHeader") {
+                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
                 }
                 else {
                     $(this).css("background-color", "white");
                 }
             });
             $(this).find("th").each(function () {
-                if ($(this).attr("class") == "colHeader") {
+                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
                 }
                 else {
                     $(this).css("background-color", "white");
@@ -949,10 +964,10 @@
 
         currentHeader = $(col).attr("id");
 
-        $("#grades tr").each(function () {        
+        $("#grades tr").each(function () {
 
             $(this).find("td:nth-child(" + $(col).attr("id") + ")").each(function () {
-                if ($(this).attr("class") == "colHeader") {
+                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
                 }
                 else {
                     $(this).css("background-color", "DeepSkyBlue");
@@ -1006,6 +1021,45 @@
 
     function goToCategoryTab(catID) {
         location.href = "/Gradebook/Tab/?categoryId=" + catID;
+    }
+
+    function selectRow(row) {
+        var container = row.id.split("-");
+        var count = 0;
+
+        $("#grades tr").each(function () {
+            $(this).find("td").each(function () {
+                if ($(this).attr("class") == "rowHeader" || $(this).attr("class") == "colHeader") {
+                }
+                else {
+                    $(this).css("background-color", "white");
+                }
+            });
+            $(this).find("th").each(function () {
+                if ($(this).attr("class") == "rowHeader" || $(this).attr("class") == "colHeader") {
+                }
+                else {
+                    $(this).css("background-color", "white");
+                }
+            });
+        });
+
+        $('#grades tr').each(function () {
+            if (count == container[1]) {
+                $(this).find("td").each(function () {
+                    if ($(this).attr("class") != "rowHeader") {
+                        $(this).css("background-color", "DeepSkyBlue");
+                    }
+                });
+                $(this).find("th").each(function () {
+                    if ($(this).attr("class") != "rowHeader" && $(this).attr("class") != "colHeader") {
+                        $(this).css("background-color", "DeepSkyBlue");
+                    }
+                });
+            }
+            count++;
+        });
+        isHighlighted = false;
     }
 
 </script>
