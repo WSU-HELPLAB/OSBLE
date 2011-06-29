@@ -18,7 +18,7 @@
 <script type="text/javascript">
 
     function RemainingChars(id) {
-        var remaining = $('#MaxContentChars').val() - $('#@id').val().length;
+        var remaining = $('#MaxContentChars').val() - $('#' + id).val().length;
         $('#remChars').val("(" + remaining + ") Characters left");
     }
 
