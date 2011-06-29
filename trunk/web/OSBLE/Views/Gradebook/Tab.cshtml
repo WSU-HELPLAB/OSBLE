@@ -362,9 +362,17 @@
             else if (e.keyCode == 9) {
                 e.preventDefault();
                 var row = $(this).parent("tr");
+                // used for generating the column count
+                var temp = 1;
+                var ColCount = $('table tr:eq(' + temp + ') td').length;
                 var colIndex = $(this).prevAll().length;
                 colIndex = parseInt(colIndex);
-                colIndex += 1;
+                if (colIndex >= ColCount) {
+                    row = $(this).parent("tr").next("tr");
+                    colIndex = 2;
+                } else {
+                    colIndex += 1;
+                }
                 row.each(function () {
                     cell = $(this).find("td:eq(" + colIndex + ")");
                 });
