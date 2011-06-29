@@ -171,7 +171,6 @@
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\StopActivity.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\StudioAssignment.cs" />
     <Compile Include="Models\AbstractCourses\Course\Submission.cs" />
-    <Compile Include="Models\Assignments\Activities\IssueVotingWrapper.cs" />
     <Compile Include="Models\HomePage\AbstractDashboard.cs" />
     <Compile Include="Models\AbstractCourses\AbstractRole.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\AssignmentActivity.cs" />
@@ -445,6 +444,7 @@
   <ItemGroup>
     <Folder Include="FileSystem\Courses\1\CourseDocs\" />
     <Folder Include="FileSystem\Courses\4\CourseDocs\" />
+    <Folder Include="Models\Assignments\Activities\" />
     <Folder Include="Models\Gradables\StudioAssignment\Activities\" />
     <Folder Include="Models\RubricModel\" />
     <Folder Include="Validations\" />
