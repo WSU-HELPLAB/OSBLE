@@ -203,6 +203,12 @@
     <None Include="Service References\OsbleServices\Arrays1.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\OsbleServices\Arrays2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleServices\Arrays3.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Service References\OsbleServices\configuration91.svcinfo" />
     <None Include="Service References\OsbleServices\configuration.svcinfo" />
     <None Include="Service References\OsbleServices\FileUploader.OsbleServices.DirectoryListing.datasource">
@@ -220,17 +226,35 @@
     <None Include="Service References\OsbleServices\OSBLE.Models.Services.Uploader1.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\OsbleServices\OSBLE.Models.Services.Uploader2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleServices\OSBLE.Models.Services.Uploader3.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Service References\OsbleServices\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
     <Content Include="ServiceReferences.ClientConfig" />
     <None Include="Service References\OsbleServices\service.wsdl" />
+    <None Include="Service References\OsbleServices\service.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Service References\OsbleServices\service1.wsdl" />
     <None Include="Service References\OsbleServices\service1.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\OsbleServices\service11.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleServices\service12.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleServices\service13.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleServices\service14.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\OsbleServices\service2.wsdl" />
@@ -241,6 +265,10 @@
     <None Include="Service References\OsbleServices\service21.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\OsbleServices\service3.wsdl" />
+    <None Include="Service References\OsbleServices\service4.wsdl" />
+    <None Include="Service References\OsbleServices\service5.wsdl" />
+    <None Include="Service References\OsbleServices\service6.wsdl" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
