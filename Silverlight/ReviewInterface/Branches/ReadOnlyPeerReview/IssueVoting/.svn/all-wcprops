@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/IssueVoting
+END
+IssueVoting.xaml
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/IssueVoting/IssueVoting.xaml
+END
+App.xaml
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/IssueVoting/App.xaml
+END
+WebClientWrapper.cs
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/IssueVoting/WebClientWrapper.cs
+END
+IssueVoting.xaml.cs
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/IssueVoting/IssueVoting.xaml.cs
+END
+App.xaml.cs
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/IssueVoting/App.xaml.cs
+END
+DocumentsLoadedEventArgs.cs
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/IssueVoting/DocumentsLoadedEventArgs.cs
+END
+IssueVoting.csproj
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/svnroot/osble/!svn/ver/942/branches/Osble2.0/ReviewInterface/Branches/XpsTextSelection/IssueVoting/IssueVoting.csproj
+END
