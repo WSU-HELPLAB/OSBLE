@@ -220,7 +220,6 @@
         border: 1px solid gray;
     }
 	
-	
 </style>
 
 <h3>Gradebook</h3>
@@ -534,11 +533,11 @@
 
                 if (scoreQuery.Count() > 0)
                 {
-                        <td id="categoryGrade">@scoreQuery.First().Points.ToString(".##")%</td>
+                        <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID)">@scoreQuery.First().Points.ToString(".##")%</td>
                 }
                 else
                 {
-                        <td id="categoryGrade">NG</td>
+                        <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID)">NG</td>
                 }
             }
             }
@@ -1007,6 +1006,10 @@
             url: "/Gradebook/AddCategory",
             success: window.location.reload(true)
         });
+    }
+
+    function goToCategoryTab(catID) {
+        location.href = "/Gradebook/Tab/?categoryId=" + catID;
     }
 
 </script>
