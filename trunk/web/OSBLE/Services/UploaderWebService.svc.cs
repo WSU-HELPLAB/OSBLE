@@ -319,8 +319,17 @@ namespace OSBLE.Services
                 return false;
             }
 
-            //pull the current user for easier access
-            UserProfile currentUser = activeSessions[authToken].UserProfile;
+            //because "currentUser" was pulled from a previous DB context, we need
+            //to repull using the current context
+            int profileId = activeSessions[authToken].UserProfile.ID;
+            UserProfile currentUser = (from u in db.UserProfiles
+                                       where u.ID == profileId
+                                       select u).FirstOrDefault();
+
+            if (currentUser == null)
+            {
+                return false;
+            }
 
             //find the course
             Course course = (from c in db.Courses
