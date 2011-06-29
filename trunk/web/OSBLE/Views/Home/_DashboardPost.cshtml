@@ -125,6 +125,9 @@
                     <form action="@Url.Action("NewReply")"
                         data-ajax="true"
                         data-ajax-update="#dp_replies_for_@(Model.ID)"
+                        data-ajax-begin="$('#reply_@(Model.ID)_button').attr('disabled', 'disabled')"
+                        data-ajax-failure="alert('There was an error sending your reply.')"
+                        data-ajax-complete="$('#reply_@(Model.ID)_button').removeAttr('disabled')"
                         data-ajax-success="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');}); $('#dp_replybox_content_@(Model.ID)').val('')"
                         data-ajax-mode="after"
                         method="post">
@@ -135,7 +138,7 @@
                             name="Content" rows="5" cols="40" id="dp_replybox_content_@(Model.ID)" placeholder="Enter reply here..."
                             onkeyup="RemainingChars(dp_replybox_content_@(Model.ID));" onkeydown="RemainingChars(dp_replybox_content_@(Model.ID));">
                         </textarea><br />
-                        <input type="submit" name="post_reply" value="Post Reply" />
+                        <input id="reply_@(Model.ID)_button" type="submit" name="post_reply" value="Post Reply" />
                     </form>
 
                     <br />
