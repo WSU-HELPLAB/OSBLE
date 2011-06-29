@@ -1284,7 +1284,7 @@ ul.assignment_deliverables, .assignment_deliverables ul
     color: Black;
 }
 
-#remChars
+#remChars, #remCharsReply
 {
     border: none;
 }
