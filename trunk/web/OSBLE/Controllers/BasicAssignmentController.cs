@@ -114,9 +114,9 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
 
                 // Causes a duplicate entry into the database
-                db.AbstractAssignmentActivity.Add(submission);
-                db.AbstractAssignmentActivity.Add(stop);
-                db.SaveChanges();
+                //db.AbstractAssignmentActivity.Add(submission);
+                //db.AbstractAssignmentActivity.Add(stop);
+                //db.SaveChanges();
 
                 if (basic.Submission.isTeam)
                 {
