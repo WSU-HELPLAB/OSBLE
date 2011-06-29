@@ -14,6 +14,7 @@ using System.Net.Mail;
 using System.Configuration;
 using System.Reflection;
 using System.ComponentModel.DataAnnotations;
+using OSBLE.Utility;
 
 namespace OSBLE.Controllers
 {
@@ -407,10 +408,10 @@ namespace OSBLE.Controllers
 
             foreach (CoursesUsers cu in CoursesToPost)
             {
-                Course c = null;
-                if (cu.Course is Course)
+                AbstractCourse c = null;
+                if (cu.Course is AbstractCourse)
                 {
-                    c = (Course)cu.Course;
+                    c = (AbstractCourse)cu.Course;
                 }
                 if (cu.CourseRole.CanGrade || ((c != null) && (c.AllowDashboardPosts)))
                 {
@@ -425,35 +426,67 @@ namespace OSBLE.Controllers
                         db.DashboardPosts.Add(newDp);
 
 #if !DEBUG
-                        // Instructor email to class
+                        //pull all users that have asked to receive activity posts via email
+                        List<UserProfile> usersWantingEmail = (from u in db.UserProfiles
+                                                               where u.EmailAllActivityPosts == true
+                                                               select u).ToList();
+
+                        //construct the subject & body
+                        string subject = "";
+                        string body = "";
+                        List<MailAddress> addresses = new List<MailAddress>();
+
+                        //slightly different messages depending on course type
+                        if (c is Course)
+                        {
+                            Course course = c as Course;
+                            subject = "[OSBLE " + course.Prefix + " " + course.Number + "] Notice from Instructor " + currentUser.FirstName + " " + currentUser.LastName;
+                            body = currentUser.FirstName + " " + currentUser.LastName + " sent the following message to the class at " + dp.Posted.ToString() + ":";
+                            body += "\n\n";
+                            body += dp.Content;
+                        }
+                        else if (c is Community)
+                        {
+                            Community community = c as Community;
+                            subject = "[OSBLE " + community.Name + "] Notice from " + currentUser.FirstName + " " + currentUser.LastName;
+                            body = currentUser.FirstName + " " + currentUser.LastName + " sent the following message to the community at " + dp.Posted.ToString() + ":";
+                            body += "\n\n";
+                            body += dp.Content;
+                        }
+                        else
+                        {
+                            //this should never execute, but just in case...
+                            subject = "OSBLE Activity Post";
+                            body = currentUser.FirstName + " " + currentUser.LastName + " sent the following message at " + dp.Posted.ToString() + ":";
+                            body += "\n\n";
+                            body += dp.Content;
+                        }
+                        
+                        //add the users to the email list
+                        foreach (UserProfile up in usersWantingEmail)
+                        {
+                            addresses.Add(new MailAddress(up.UserName, up.FirstName + " " + up.LastName));
+                            body += "\n\n";
+                            body += "This message was sent based on a previously expressed desire to receive activity posts via email.  If you wish to turn this setting off, please update your user profile settings in OSBLE.\n\n";
+                            body += "http://osble.org";
+                        }
+
+                        //If the instructor wanted to email the entire class, add these users as well.  
+                        //We should be in the clear if adding dupes from above as we're dealing with references
+                        //to the same object.
                         if (c != null && sendEmail && cu.CourseRole.CanModify)
                         {
-                            // Construct email
-                            SmtpClient mailClient = new SmtpClient();
-                            mailClient.UseDefaultCredentials = true;
-
-                            MailAddress toFrom = new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"],"OSBLE");
-                            MailMessage mm = new MailMessage();
-
-                            mm.From = toFrom;
-                            mm.To.Add(toFrom);
-
-                            mm.Subject = "[OSBLE " + c.Prefix + " " + c.Number + "] Notice from Instructor " + currentUser.FirstName + " " + currentUser.LastName;
-
-                            mm.Body = currentUser.FirstName + " " + currentUser.LastName + " sent the following message to the class at " + dp.Posted.ToString() + ":";
-                            mm.Body += "\n\n";
-                            mm.Body += dp.Content;
-
                             foreach (CoursesUsers member in db.CoursesUsers.Where(coursesUsers => coursesUsers.CourseID == c.ID).ToList())
                             {
                                 if (member.UserProfile.UserName != null) // Ignore pending users
                                 {
-                                    mm.Bcc.Add(new MailAddress(member.UserProfile.UserName, member.UserProfile.FirstName + " " + member.UserProfile.LastName));
+                                    addresses.Add(new MailAddress(member.UserProfile.UserName, member.UserProfile.FirstName + " " + member.UserProfile.LastName));
                                 }
                             }
-
-                            mailClient.Send(mm);
                         }
+
+                        //Send the message
+                        Email.Send(subject, body, addresses);
 #endif
                     }
                 }

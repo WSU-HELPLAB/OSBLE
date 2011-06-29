@@ -204,6 +204,7 @@
     <Compile Include="Services\UploaderWebService.svc.cs">
       <DependentUpon>UploaderWebService.svc</DependentUpon>
     </Compile>
+    <Compile Include="Utility\Email.cs" />
     <Compile Include="Utility\FileSystem.cs" />
     <Compile Include="Attributes\CanModifyCourse.cs" />
     <Compile Include="Attributes\CanSeeAllCourse.cs" />

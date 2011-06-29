@@ -23,6 +23,7 @@ namespace OSBLE.Models.Courses
             : base()
         {
             AllowEventPosting = true;
+            AllowDashboardPosts = true;
         }
     }
 }

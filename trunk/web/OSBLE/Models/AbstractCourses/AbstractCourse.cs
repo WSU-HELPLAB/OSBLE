@@ -19,6 +19,9 @@ namespace OSBLE.Models.Courses
 
         public virtual ICollection<Event> Events { get; set; }
 
+        [Display(Name = "Allow students to post new threads in activity feed")]
+        public bool AllowDashboardPosts { get; set; }
+
         [Display(Name = "Amount of weeks into the future to show events in calendar")]
         public int CalendarWindowOfTime { get; set; }
 

@@ -87,6 +87,7 @@ namespace OSBLE.Controllers
         public ActionResult UpdateEmailSettings()
         {
             currentUser.EmailAllNotifications = Convert.ToBoolean(Request.Params["EmailallNotifications"]);
+            currentUser.EmailAllActivityPosts = Convert.ToBoolean(Request.Params["EmailAllActivityPosts"]);
 
             db.Entry(currentUser).State = EntityState.Modified;
             db.SaveChanges();

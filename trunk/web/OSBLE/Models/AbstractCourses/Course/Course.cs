@@ -30,9 +30,6 @@ namespace OSBLE.Models.Courses
 
         // Course Options
 
-        [Display(Name = "Allow students to post new threads in activity feed")]
-        public bool AllowDashboardPosts { get; set; }
-
         [Display(Name = "Allow students to reply to threads posted in activity feed")]
         public bool AllowDashboardReplies { get; set; }
 

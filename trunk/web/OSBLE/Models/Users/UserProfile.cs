@@ -34,6 +34,11 @@ namespace OSBLE.Models.Users
         // User E-mail Notification Settings
 
         public bool EmailAllNotifications { get; set; }
+
+        /// <summary>
+        /// If set, will email all activity feed posts to the users
+        /// </summary>
+        public bool EmailAllActivityPosts { get; set; }
      
         public UserProfile()
             : base()

@@ -79,6 +79,12 @@
     </p>
     
     <p>
+        <input type="checkbox" value="True" name="EmailAllActivityPosts" @if (ViewBag.CurrentUser.EmailAllActivityPosts)
+                                                                         {<text>checked="checked"</text>} />
+        <text>Send all activity feed posts to my e-mail address.</text>
+    </p>
+    
+    <p>
         <input type="submit" value="Update Email Settings" />
     </p>
 
