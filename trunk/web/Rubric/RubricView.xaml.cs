@@ -4,9 +4,9 @@ using System.Windows.Controls;
 
 namespace OsbleRubric
 {
-    public partial class Rubric : UserControl
+    public partial class RubricView : UserControl
     {
-        public Rubric()
+        public RubricView()
         {
             InitializeComponent();
         }

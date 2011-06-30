@@ -9,8 +9,8 @@
     <ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Rubric</RootNamespace>
-    <AssemblyName>Rubric</AssemblyName>
+    <RootNamespace>OsbleRubric</RootNamespace>
+    <AssemblyName>OsbleRubric</AssemblyName>
     <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
@@ -90,11 +90,16 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rubric.xaml.cs">
-      <DependentUpon>Rubric.xaml</DependentUpon>
+    <Compile Include="RubricView.xaml.cs">
+      <DependentUpon>RubricView.xaml</DependentUpon>
     </Compile>
     <Compile Include="RubricCell.cs" />
     <Compile Include="RubricViewModel.cs" />
+    <Compile Include="Service References\OsbleServices\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -105,13 +110,44 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Rubric.xaml">
+    <Page Include="RubricView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AppManifest.xml" />
+    <None Include="Service References\OsbleServices\OsbleRubric.OsbleServices.CellDescription.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OsbleServices\OsbleRubric.OsbleServices.Criterion.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OsbleServices\OsbleRubric.OsbleServices.Level.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OsbleServices\OsbleRubric.OsbleServices.Rubric.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OsbleServices\RubricService.disco" />
+    <None Include="Service References\OsbleServices\configuration91.svcinfo" />
+    <None Include="Service References\OsbleServices\configuration.svcinfo" />
+    <None Include="Service References\OsbleServices\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <Content Include="ServiceReferences.ClientConfig" />
+    <None Include="Service References\OsbleServices\RubricService.wsdl" />
+    <None Include="Service References\OsbleServices\RubricService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleServices\RubricService1.wsdl" />
+    <None Include="Service References\OsbleServices\RubricService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleServices\RubricService2.xsd">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\add.png" />
@@ -125,6 +161,12 @@
     <Resource Include="Icons\downArrowGrayedOut.png" />
     <Resource Include="Icons\upArrow.png" />
     <Resource Include="Icons\upArrowGrayedOut.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\OsbleServices\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

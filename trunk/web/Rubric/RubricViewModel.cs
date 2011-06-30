@@ -6,6 +6,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Collections.Generic;
 using System.Windows.Browser;
+using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using OsbleRubric.OsbleServices;
 
 namespace OsbleRubric
 {
@@ -14,9 +17,10 @@ namespace OsbleRubric
         #region Attributes
 
         private CustomDataGrid customDataGrid = new CustomDataGrid();
-        private Rubric thisView = new Rubric();
+        private RubricView thisView = new RubricView();
         private List<ICell> dataFromCells = new List<ICell>();
         public enum CheckboxValues { ColumnComment, GlobalComment };
+
         #endregion Attributes
 
         #region constants
@@ -1105,7 +1109,7 @@ namespace OsbleRubric
         /// returns the view for a rubric
         /// </summary>
         /// <returns></returns>
-        public Rubric GetView()
+        public RubricView GetView()
         {
             return thisView;
         }
@@ -1130,15 +1134,81 @@ namespace OsbleRubric
         void PublishChanges_Click(object sender, RoutedEventArgs e)
         {
             this.getData();
-            
+
+            //will house the final form of the data that we will send to the client
+            Rubric rubric = new Rubric();
+            List<CellDescription> cellDescriptions = new List<CellDescription>();
+            rubric.Criteria = new ObservableCollection<Criterion>();
+            rubric.Levels = new ObservableCollection<Level>();
+
             //loop through all of our data
             foreach(ICell cell in this.dataFromCells)
             {
+                //Unfortunately, our data is scattered all over the place.  As such, we really
+                //don't know the dimensions of our rubric.  As a little hack, we can
+                //just create new rows & columns based on the current cell
+                while (rubric.Levels.Count + 1 < cell.Column)
+                {
+                    rubric.Levels.Add(new Level() { ID = rubric.Levels.Count} );
+                }
+                while (rubric.Criteria.Count + 1 < cell.Row)
+                {
+                    rubric.Criteria.Add(new Criterion() {ID = rubric.Criteria.Count} );
+                }
+
+                //header cells are analogous to Levels
                 if (cell is HeaderCell)
                 {
-                   
+                    HeaderCell header = cell as HeaderCell;
+                    Level currentLevel = rubric.Levels[header.Column];
+                    currentLevel.RangeStart = 0;
+                    currentLevel.RangeEnd = header.ComboBoxValue;
+                    currentLevel.LevelTitle = header.Information;
+                }
+
+                //rubric cells are cell descriptions
+                else if (cell is RubricCell)
+                {
+                    RubricCell currentCell = cell as RubricCell;
+                    
+                    //huge assumption: If the current column is 1, then we have a points spread
+                    //otherwise, we have a cell description
+                    if (currentCell.Column == 1)
+                    {
+                        double someDouble = 0.0;
+                        double.TryParse(currentCell.Information, out someDouble);
+                        rubric.Criteria[currentCell.Row].Weight = someDouble;
+                    }
+                    else
+                    {
+                        CellDescription desc = new CellDescription();
+                        desc.CriterionID = currentCell.Row;
+                        desc.LevelID = currentCell.Column;
+                        desc.Description = currentCell.Information;
+                        cellDescriptions.Add(desc);
+                    }
+                    
+                }
+
+                //there should only be two checkbox values.  One to enable column comments and one
+                //to enable global comments
+                else if (cell is CheckBoxCell)
+                {
+                    CheckBoxCell cb = cell as CheckBoxCell;
+                    if (cell.Information.CompareTo(CheckboxValues.ColumnComment.ToString()) == 0)
+                    {
+                        rubric.HasCriteriaComments = cb.CheckBoxValue;
+                    }
+                    else if (cell.Information.CompareTo(CheckboxValues.GlobalComment.ToString()) == 0)
+                    {
+                        rubric.HasGlobalComments = cb.CheckBoxValue;
+                    }
                 }
             }
+
+            //at the end of all of this, we should have a fully realized rubric with criteria and levels
+            //and a list of cell descriptions for each
+
             
         }
 

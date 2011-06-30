@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" />
+  <xs:element name="DoWork">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DoWorkResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetFakeCellDescription">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetFakeCellDescriptionResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="GetFakeCellDescriptionResult" nillable="true" type="q1:CellDescription" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetFakeCriterion">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetFakeCriterionResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="GetFakeCriterionResult" nillable="true" type="q2:Criterion" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetFakeLevel">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetFakeLevelResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="GetFakeLevelResult" nillable="true" type="q3:Level" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetFakeRubric">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetFakeRubricResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="GetFakeRubricResult" nillable="true" type="q4:Rubric" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

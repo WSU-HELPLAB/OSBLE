@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="01831060-6806-44e7-91bc-9ac507536659" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>true</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings>
+      <CollectionMapping TypeName="System.Collections.ObjectModel.ObservableCollection`1" Category="List" />
+    </CollectionMappings>
+    <GenerateSerializableTypes>false</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:17532/Services/RubricService.svc" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="RubricService.disco" MetadataType="Disco" ID="8d7f7e05-7a15-442f-98f9-3d3866f01d22" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?disco" />
+    <MetadataFile FileName="RubricService.wsdl" MetadataType="Wsdl" ID="e98b6c94-def4-4f85-b63e-de3d341d0bcd" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?wsdl=wsdl0" />
+    <MetadataFile FileName="RubricService.xsd" MetadataType="Schema" ID="aa7c93c1-9fa5-4900-b07d-27fbc35528ed" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?xsd=xsd2" />
+    <MetadataFile FileName="RubricService1.xsd" MetadataType="Schema" ID="8d2eef25-b1a1-4ccf-b571-322f01aedb3c" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?xsd=xsd0" />
+    <MetadataFile FileName="RubricService2.xsd" MetadataType="Schema" ID="a8ac3f2c-ce05-4663-80ee-cc2f7052104c" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?xsd=xsd1" />
+    <MetadataFile FileName="RubricService1.wsdl" MetadataType="Wsdl" ID="f6b7d844-6a57-42b5-874b-dddef1a6b8f7" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?wsdl" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

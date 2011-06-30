@@ -1,0 +1,17 @@
+﻿<configuration>
+    <system.serviceModel>
+        <bindings>
+            <customBinding>
+                <binding name="CustomBinding_RubricService">
+                    <binaryMessageEncoding />
+                    <httpTransport maxReceivedMessageSize="2147483647" maxBufferSize="2147483647" />
+                </binding>
+            </customBinding>
+        </bindings>
+        <client>
+            <endpoint address="http://localhost:17532/Services/RubricService.svc"
+                binding="customBinding" bindingConfiguration="CustomBinding_RubricService"
+                contract="OsbleServices.RubricService" name="CustomBinding_RubricService" />
+        </client>
+    </system.serviceModel>
+</configuration>
