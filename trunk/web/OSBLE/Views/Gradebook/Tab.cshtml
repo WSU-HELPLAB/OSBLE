@@ -312,6 +312,9 @@
 
     //Keeps track of the number for addPoints
     var points = null;
+
+    //Keeps track of assignmentId
+    var assignId = 0;
     
     
 
@@ -796,7 +799,6 @@
                 });
 
                 $(this).find("th:nth-child(" + currentHeader + ")").each(function () {
-                    //$("#slidingDivID").animate({ "height": "show" }, { duration: 300 });
                     $(this).css("background-color", "DeepSkyBlue ");
                 });
             });
@@ -1030,13 +1032,13 @@
         }
     }
 
-    function addPoints() {
+    function addPoints(points) {
         var num = $("#XtoAdd").val();
         var id = $(points).attr("id");
         $.ajax({
             type: "POST",
             url: "/Gradebook/AddPoints",
-            data: { assignmentId: id, number: num },
+            data: { assignmentId: currentCol, number: num },
             success: function (response) {
                     $("#grades").replaceWith(response);
             }

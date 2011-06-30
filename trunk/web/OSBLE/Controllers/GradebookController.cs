@@ -295,7 +295,8 @@ namespace OSBLE.Controllers
                PointsPossible = pointsPossible,
                AssignmentActivities = new List<AbstractAssignmentActivity>(),
                CategoryID = categoryId,
-               ColumnOrder = position
+               ColumnOrder = position,
+               addedPoints = 0
            };
            db.GradeAssignments.Add(newAssignment);
            db.SaveChanges();
@@ -757,13 +758,21 @@ namespace OSBLE.Controllers
                    List<Score> grades = (from grade in db.Scores
                                          where grade.AssignmentActivity.AbstractAssignmentID == assignmentId
                                          select grade).ToList();
+                   var assignment = (from assigns in db.AbstractAssignments
+                                      where assigns.ID == assignmentId
+                                      select assigns).FirstOrDefault();
 
                    if (grades.Count() > 0)
                    {
                        foreach (Score item in grades)
                        {
+                           if (assignment.addedPoints > 0)
+                           {
+                               item.Points -= assignment.addedPoints;
+                           }
                            item.Points += number;
                        }
+                       assignment.addedPoints = number;
                        db.SaveChanges();
                    }
                }
@@ -935,7 +944,8 @@ namespace OSBLE.Controllers
                        ID = item.AssignmentId,
                        Category = scores.category,
                        CategoryID = scores.category.ID,
-                       PointsPossible = scores.perfectScore
+                       PointsPossible = scores.perfectScore,
+                       addedPoints = 0
                    };
                    studentScore.AssignmentActivity.AbstractAssignment = newGA;
                    percentList.Add(studentScore);
@@ -1055,7 +1065,8 @@ namespace OSBLE.Controllers
                    PointsPossible = 100,
                    AssignmentActivities = new List<AbstractAssignmentActivity>(),
                    CategoryID = categoryId,
-                   ColumnOrder = 0
+                   ColumnOrder = 0,
+                   addedPoints = 0
                };
                db.AbstractAssignments.Add(newAssignment);
                db.SaveChanges();
@@ -1185,7 +1196,8 @@ namespace OSBLE.Controllers
                    PointsPossible = 100,
                    AssignmentActivities = new List<AbstractAssignmentActivity>(),
                    CategoryID = newCategory.ID,
-                   ColumnOrder = 0
+                   ColumnOrder = 0,
+                   addedPoints = 0
                };
                db.GradeAssignments.Add(newAssignment);
                db.SaveChanges();
