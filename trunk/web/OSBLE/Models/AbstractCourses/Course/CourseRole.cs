@@ -21,6 +21,9 @@
 
         public enum OSBLERoles : int
         {
+            //Instructor being the first one is used in RosterController so any new roles add at the end.
+            //Also Note that community members magically start 6 which is one past the end of this and they will
+            //need to update if you add a new role here.  (Also update any old data)
             Instructor = 1,
             TA,
             Student,

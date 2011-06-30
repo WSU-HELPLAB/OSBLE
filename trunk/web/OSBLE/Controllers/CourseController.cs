@@ -59,6 +59,13 @@ namespace OSBLE.Controllers
                     course.CourseMeetings.Add(cm);
                 }
             }
+
+            db.SaveChanges();
+
+            Category category = new Category() { Points = 100, ColumnOrder = 0, Name = "Assignments" };
+
+            course.Categories.Add(category);
+
             db.SaveChanges();
         }
 
@@ -115,6 +122,7 @@ namespace OSBLE.Controllers
                     course.LetterGrades.Add(lg);
                 }
             }
+
             db.SaveChanges();
         }
 

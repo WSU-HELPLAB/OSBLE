@@ -43,8 +43,7 @@ namespace OSBLE
 
         protected void Application_Start()
         {
-            
-        #if DEBUG
+#if DEBUG
             //Development only.
             System.Data.Entity.Database.SetInitializer(new OSBLE.Models.OSBLEContextModelChangeInitializer());
             //System.Data.Entity.Database.SetInitializer(new OSBLE.Models.OSBLEContextAlwaysCreateInitializer());

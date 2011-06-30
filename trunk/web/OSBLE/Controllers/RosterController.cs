@@ -15,7 +15,7 @@ namespace OSBLE.Controllers
 {
     [Authorize]
     [RequireActiveCourse]
-    [CanGradeCourse]
+    [CanModifyCourse]
     public class RosterController : OSBLEController
     {
         public RosterController()
@@ -99,12 +99,14 @@ namespace OSBLE.Controllers
                 if (ActiveCourse.Course is Course)
                 {
                     // Set custom role order for display
-                    List<CourseRole.OSBLERoles> rolesOrder = new List<CourseRole.OSBLERoles>(new CourseRole.OSBLERoles[] {
-                                CourseRole.OSBLERoles.Student,
-                                CourseRole.OSBLERoles.TA,
-                                CourseRole.OSBLERoles.Moderator,
-                                CourseRole.OSBLERoles.Observer,
-                                CourseRole.OSBLERoles.Instructor });
+                    List<CourseRole.OSBLERoles> rolesOrder = new List<CourseRole.OSBLERoles>();
+
+                    int i = (int)CourseRole.OSBLERoles.Instructor;
+                    while (Enum.IsDefined(typeof(CourseRole.OSBLERoles), i))
+                    {
+                        rolesOrder.Add((CourseRole.OSBLERoles)i);
+                        i++;
+                    }
 
                     foreach (CourseRole.OSBLERoles r in rolesOrder)
                     {
@@ -114,10 +116,14 @@ namespace OSBLE.Controllers
                 else
                 { // Community
                     // Set custom role order for display
-                    List<CommunityRole.OSBLERoles> rolesOrder = new List<CommunityRole.OSBLERoles>(new CommunityRole.OSBLERoles[] {
-                                CommunityRole.OSBLERoles.Leader,
-                                CommunityRole.OSBLERoles.TrustedCommunityMember,
-                                CommunityRole.OSBLERoles.Participant });
+                    List<CommunityRole.OSBLERoles> rolesOrder = new List<CommunityRole.OSBLERoles>();
+
+                    int i = (int)CommunityRole.OSBLERoles.Leader;
+                    while (Enum.IsDefined(typeof(CommunityRole.OSBLERoles), i))
+                    {
+                        rolesOrder.Add((CommunityRole.OSBLERoles)i);
+                        i++;
+                    }
 
                     foreach (CommunityRole.OSBLERoles r in rolesOrder)
                     {

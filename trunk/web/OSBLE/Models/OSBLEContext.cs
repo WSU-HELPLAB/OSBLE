@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity;
+﻿using System.Data.Entity;
 using System.Web.Security;
 using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Assignments;
@@ -256,16 +255,13 @@ namespace OSBLE.Models
 
             this.SaveChanges();
 
-            
-
             Category w1 = new Category();
             w1.Name = "Homework";
+            w1.Points = 40;
 
             Category w2 = new Category();
             w2.Name = "Exams";
-
-            c1.Categories = new List<Category>();
-            c2.Categories = new List<Category>();
+            w2.Points = 60;
 
             c1.Categories.Add(w1);
             c1.Categories.Add(w2);

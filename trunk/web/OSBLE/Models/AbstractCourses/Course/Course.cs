@@ -90,6 +90,8 @@ namespace OSBLE.Models.Courses
         public Course()
             : base()
         {
+            Categories = new List<Category>();
+
             // Set default values for course settings.
             AllowDashboardPosts = true;
             AllowDashboardReplies = true;
@@ -105,6 +107,7 @@ namespace OSBLE.Models.Courses
 
             StartDate = DateTime.Now.Date;
             EndDate = DateTime.Now.Date.AddDays(112); // Add 16 weeks.
+            Categories = new List<Category>();
         }
     }
 }

@@ -21,6 +21,8 @@
 
         public enum OSBLERoles : int
         {
+            //Leader being the first one is used in RosterController so any new roles add at the end.
+            //Also note that this 6 is one past the end of CourseRole.
             Leader = 6,
             Participant,
             TrustedCommunityMember
