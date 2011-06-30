@@ -13,10 +13,6 @@ namespace OSBLE.Models.Assignments
         [StringLength(200)]
         public string Description { get; set; }
 
-        [Required]
-        [Display(Name = "Draft Assignment")]
-        public bool IsDraft { get; set; }
-
         public StudioAssignment()
             : base()
         {

@@ -201,7 +201,7 @@ namespace OSBLE.Controllers
             menu.Add(new MenuItem("Dashboard", "Home", "Index"));
             menu.Add(new MenuItem("Assignments", "Assignment", "Index", false, false, false, false, true, false));
             menu.Add(new MenuItem("Grades", "Gradebook", "Index", false, false, true, false, true, false));
-            menu.Add(new MenuItem("Users", "Roster", "Index", false, true, false, false, false, false));
+            menu.Add(new MenuItem("Users", "Roster", "Index", true, false, false, false, false, false));
             menu.Add(new MenuItem("Course Settings", "Course", "Edit", true, true, true, false, true, false));
             menu.Add(new MenuItem("Community Settings", "Community", "Edit", true, true, true, false, false, true));
             menu.Add(new MenuItem("Administration", "Admin", "Index", false, false, false, true, false, false));
@@ -304,6 +304,56 @@ namespace OSBLE.Controllers
                 //throw and exception if not decorated with any attrs because it is a requirement
                 throw new Exception("Languages must have be decorated with a FileExtensionAttribute");
             }
+        }
+
+        protected TeamMember GetTeamorUserForCurrentUser(SubmissionActivity activity)
+        {
+            TeamMember teamMember = new TeamMember();
+            if ((activity as SubmissionActivity).isTeam)
+            {
+                teamMember.TeamUser = TeamsOrUsers.Team;
+                TeamMember temp = null;
+                foreach (Team team in (activity as SubmissionActivity).Teams)
+                {
+                    temp = findTeamMember(team.Members, currentUser.ID);
+                    if (temp != null)
+                    {
+                        teamMember.Team = team;
+                        teamMember.TeamID = team.ID;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                teamMember.TeamUser = TeamsOrUsers.User;
+                teamMember.User = currentUser;
+                teamMember.UserProfileID = currentUser.ID;
+            }
+            return teamMember;
+        }
+
+        private TeamMember findTeamMember(ICollection<TeamMember> members, int userProfileID)
+        {
+            foreach (TeamMember member in members)
+            {
+                if (member.TeamUser == TeamsOrUsers.Team)
+                {
+                    TeamMember teamMember = findTeamMember(member.Team.Members, userProfileID);
+                    if (teamMember != null)
+                    {
+                        return member;
+                    }
+                }
+                else
+                {
+                    if (member.UserProfileID == userProfileID)
+                    {
+                        return member;
+                    }
+                }
+            }
+            return null;
         }
 
         protected List<SelectListItem> GetListOfDeliverableTypes()

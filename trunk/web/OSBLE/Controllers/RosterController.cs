@@ -8,7 +8,6 @@ using System.Web;
 using System.Web.Mvc;
 using LumenWorks.Framework.IO.Csv;
 using OSBLE.Attributes;
-using OSBLE.Models.HomePage;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 
@@ -380,7 +379,14 @@ namespace OSBLE.Controllers
             if (CanModifyOwnLink(coursesusers))
             {
                 ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", coursesusers.UserProfileID);
-                ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name", coursesusers.CourseRoleID);
+                if (activeCourse.Course is Course)
+                {
+                    ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name", coursesusers.CourseRoleID);
+                }
+                else // Community Roles
+                {
+                    ViewBag.CourseRoleID = new SelectList(db.CommunityRoles, "ID", "Name");
+                }
                 return View(coursesusers);
             }
             return RedirectToAction("Index");

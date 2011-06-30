@@ -1093,7 +1093,7 @@ ul.selector
     padding: 3px;
 }
 
-.deliverable .deliverable_tools, 
+.deliverable .deliverable_tools,
 {
     display: none;
 }
@@ -1298,4 +1298,10 @@ ul.assignment_deliverables, .assignment_deliverables ul
 #tabHeader a
 {
     text-decoration: none;
+}
+
+.word_wrap
+{
+    white-space: pre-line;
+    word-wrap: break-word;
 }

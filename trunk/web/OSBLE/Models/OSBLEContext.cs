@@ -7,10 +7,9 @@ using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments.Activities.Scores;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.GradebookOptions;
+using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.HomePage;
-using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.Users;
-using OSBLE.Models.Courses.Rubrics;
 
 namespace OSBLE.Models
 {
@@ -167,16 +166,16 @@ namespace OSBLE.Models
 
             // Instructor: Can Modify Course, See All, Can Grade
             this.CourseRoles.Add(new CourseRole(CourseRole.OSBLERoles.Instructor.ToString(), true, true, true, false, true, false));
-            
+
             // TA: Can See All, Can Grade
             this.CourseRoles.Add(new CourseRole(CourseRole.OSBLERoles.TA.ToString(), false, true, true, false, true, false));
-            
+
             // Student: Can Submit Assignments, All Anonymized
             this.CourseRoles.Add(new CourseRole(CourseRole.OSBLERoles.Student.ToString(), false, false, false, true, false, false));
-            
+
             // Moderator: No Special Privileges
             this.CourseRoles.Add(new CourseRole(CourseRole.OSBLERoles.Moderator.ToString(), false, false, false, false, false, false));
-            
+
             // Observer: Can See All, All Anonymized
             this.CourseRoles.Add(new CourseRole(CourseRole.OSBLERoles.Observer.ToString(), false, true, false, false, false, true));
 
@@ -184,13 +183,12 @@ namespace OSBLE.Models
 
             // Leader: Can Modify Community
             this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.Leader.ToString(), true, true, true, true));
-            
+
             // Participant: Cannot Modify Community
             this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.Participant.ToString(), false, true, true, false));
 
             //trusted communityt member: same as participant, but can upload files to the server
             this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.TrustedCommunityMember.ToString(), false, true, true, true));
-
         }
 
         /// <summary>
@@ -480,7 +478,6 @@ namespace OSBLE.Models
     /// </summary>
     public class OSBLEContextAlwaysCreateInitializer : DropCreateDatabaseAlways<OSBLEContext>
     {
-
         protected override void Seed(OSBLEContext context)
         {
             base.Seed(context);

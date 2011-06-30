@@ -5,7 +5,6 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using OSBLE.Attributes;
-using OSBLE.Models;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
@@ -17,8 +16,6 @@ namespace OSBLE.Controllers
     [CanSubmitAssignments]
     public class SubmissionController : OSBLEController
     {
-        private OSBLEContext db = new OSBLEContext();
-
         //
         // GET: /Submission/Create
 
@@ -79,28 +76,7 @@ namespace OSBLE.Controllers
 
                     if (assignment != null && assignment.Category.CourseID == activeCourse.CourseID && activeCourse.CourseRole.CanSubmit == true && assignment is StudioAssignment)
                     {
-                        TeamMember teamMember = new TeamMember();
-                        if ((activity as SubmissionActivity).isTeam)
-                        {
-                            teamMember.TeamUser = TeamsOrUsers.Team;
-                            TeamMember temp = null;
-                            foreach (Team team in (activity as SubmissionActivity).Teams)
-                            {
-                                temp = findTeamMember(team.Members, currentUser.ID);
-                                if (temp != null)
-                                {
-                                    teamMember.Team = team;
-                                    teamMember.TeamID = team.ID;
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            teamMember.TeamUser = TeamsOrUsers.User;
-                            teamMember.User = currentUser;
-                            teamMember.UserProfileID = currentUser.ID;
-                        }
+                        TeamMember teamMember = GetTeamorUserForCurrentUser(activity as SubmissionActivity);
 
                         int i = 0;
                         foreach (var file in files)
@@ -156,29 +132,6 @@ namespace OSBLE.Controllers
             }
 
             return Create(id);
-        }
-
-        private TeamMember findTeamMember(ICollection<TeamMember> members, int userProfileID)
-        {
-            foreach (TeamMember member in members)
-            {
-                if (member.TeamUser == TeamsOrUsers.Team)
-                {
-                    TeamMember teamMember = findTeamMember(member.Team.Members, userProfileID);
-                    if (teamMember != null)
-                    {
-                        return member;
-                    }
-                }
-                else
-                {
-                    if (member.UserProfileID == userProfileID)
-                    {
-                        return member;
-                    }
-                }
-            }
-            return null;
         }
 
         protected override void Dispose(bool disposing)
