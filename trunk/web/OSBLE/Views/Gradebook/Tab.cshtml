@@ -64,47 +64,6 @@
         left: 400px;
     }
     
-    .customize
-    {
-        width: auto;
-        height: auto;
-        background-color: white;
-        top: 33px;
-        left: 400px;
-    }
-    
-    .customizeTable 
-    {
-    	border: 1px solid gray;
-    	color: black;
-    }
-    
-    .customizeTable input
-    {
-    	width: 50px;
-    }
-    
-    
-    .addPoints
-    {
-        width: auto;
-        height: auto;
-        background-color: white;
-        top: 33px;
-        left: 400px;
-    }
-    
-    .addPointsTable 
-    {
-    	border: 1px solid gray;
-    	color: black;
-    }
-    
-    .addPointsTable input
-    {
-    	width: 50px;
-    }
-    
     .dropdown
     {
         float: right;
@@ -169,13 +128,21 @@
     {
         width: 500px;
     }
+    
+    #XtoDrop
+    {
+        width: 45px;
+    }
+    
+    #XtoAdd
+    {
+        width: 45px;
+    }
+    
 </style>
 <div id="tabHeader">
     <h3>Gradebook</h3>
-    <div>
-        <a href="#" onclick="$('#import_grades_from_csv').toggle('blind'); return false;">Import Grades</a>
-    </div>
-    <div id='import_grades_from_csv'>Upload a comma-separated (CSV) file of student grades:<br />
+    <div id='import_grades_from_csv'  title="Import file">Upload a comma-separated (CSV) file of student grades:<br /><br />
         @using (Html.BeginForm("ImportColumnsFromCSV", "Gradebook", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             <input type="file" id="file" name="file" />
@@ -226,7 +193,7 @@
             </tr>
             <tr>
                 <td>
-                    <a href="#" onclick="setGradableAction('@GradebookController.ColumnAction.ImportCSV.ToString()'); $('#columnOptionsForm').submit();">
+                    <a href="#" onclick="displayImportGrades(this);">
                         Import .CSV File</a>
                 </td>
             </tr>
@@ -248,41 +215,25 @@
         </script>
     </div>
 
-<div class="customize" id="customizeID" style="display: none; position: absolute;">
+<div class="customize" id="customizeID" style="display:none" title="Drop Lowest">
 	<form id="dropLowestSubmit" onsubmit="dropAllLowest(); return false;"  >
-        <table class="customizeTable">
-		    <tr>
-		        <th align="center" colspan="3">Drop Lowest</th>
-		    </tr>
-		    <tr>
-			    <td>Drop lowest</td>
-			    <td><input id="XtoDrop"/></td>
-		        <td>from category</td>
-		    </tr>
-		    <tr>
-		        <td align="right" colspan="3"><input id="dropLowestSubmit" type="submit" value="Apply"/></td>
-                <td align="right" colspan="3"><input id="dropLowestCancel" type="button" onclick="hideFunctions();" value="Cancel" /></td>
-	        </tr>
-	    </table>
+		<text>Drop lowest</text>
+		<input id="XtoDrop"/>
+		<text>from category.</text>
+        <br />
+		    
+		<td align="right" colspan="3"><input id="dropLowestSubmit" type="submit" onclick="hideFunctions();" value="Apply"/></td>
+        <td align="right" colspan="3"><input id="dropLowestCancel" type="button" onclick="hideFunctions();" value="Cancel" /></td>
     </form>
 </div>
 
-<div class="addPoints" id="addPointsID" style="display: none; position: absolute;">
+<div class="addPoints" id="addPointsID" style="display: none;" title="Add Points">
 	<form id="addPointsSubmit" onsubmit="addPoints(this); return false;"  >
-        <table class="addPointsTable">
-		    <tr>
-		        <th align="center" colspan="3">Add Points</th>
-		    </tr>
-		    <tr>
-			    <td>Add </td>
-			    <td><input id="XtoAdd"/></td>
-		        <td>points to each score</td>
-		    </tr>
-		    <tr>
-		        <td align="right" colspan="3"><input id="addPointsSubmit" type="submit" value="Apply"/></td>
-                <td align="right" colspan="3"><input id="addPointsCancel" type="button" onclick="hideFunctions();" value="Cancel" /></td>
-	        </tr>
-	    </table>
+		<text>Add</text>
+		<input id="XtoAdd"/>
+		<text>points to each score</text>
+		<td align="right" colspan="3"><input id="addPointsSubmit" type="submit" onclick="hideFunctions();" value="Apply"/></td>
+        <td align="right" colspan="3"><input id="addPointsCancel" type="button" onclick="hideFunctions();" value="Cancel" /></td>
     </form>
 </div>
 
@@ -410,7 +361,7 @@
                 colIndex = parseInt(colIndex);
                 if (colIndex >= ColCount) {
                     row = $(this).parent("tr").next("tr");
-                    colIndex = 2;
+                    colIndex = 3;
                 } else {
                     colIndex += 1;
                 }
@@ -446,16 +397,40 @@
 
 
     function displayCustomizeGrades() {
-        $("#customizeID").animate({ "height": "show" }, { duration: 300 });
+       
+        $("#customizeID").dialog({
+            modal: true,
+            resizable: false,
+            width: 290,
+            height: 120,
+            closeOnEscape: false
+        });
     }
 
-    function displayAddPoints(button) {
-        $("#addPointsID").animate({ "height": "show" }, { duration: 300 });
+    function displayAddPoints() {
+
+        $("#addPointsID").dialog({
+            modal: true,
+            resizable: false,
+            width: 290,
+            height: 120,
+            closeOnEscape: false
+        });
+    }
+
+    function displayImportGrades() {
+        $("#import_grades_from_csv").dialog({
+            modal: true,
+            resizable: false,
+            width: 450,
+            height: 130,
+            closeOnEscape: false
+        });
     }
 
     function hideFunctions() {
-        $("#customizeID").animate({ "height": "hide" }, { duration: 300 });
-        $("#addPointsID").animate({ "height": "hide" }, { duration: 300 });
+        $("#customizeID").dialog('close');
+        $("#addPointsID").dialog('close');
     }
 
     function setButtonId(button) {
@@ -467,7 +442,7 @@
         if (lastFocusedCell != null) {
             var cellValue = lastFocusedCell.children().val();
             var cellID = lastFocusedCell.attr("id").split("-");
-            lastFocusedCell.html(cellValue + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + id + ' onclick="ShowHide(this);"></button></div>');
+            lastFocusedCell.html(cellValue);
             lastFocusedCell.attr("onclick", 'changeHeaderName(this)');
             lastFocusedCell = null;
 
@@ -530,10 +505,22 @@
 
     function clearLastCellFocus() {
 
+
+        
+
         //if a prior cell has already received focus in the past, we need to turn it back into
         //a normal table cell
         if (lastFocusedCell != null) {
+            $("#grades tr").each(function () {
+                $(this).find("td").each(function () {
+                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                        $(this).css("background-color", "Silver");
+                    }
+                    else {
 
+                    }
+                });
+            });
             //The ID's will be stored in ajaxId's array.
             //ajaxIDs[0] = userId
             //ajaxIds[1] = gradableId
@@ -593,8 +580,26 @@
 
     function cellGainsFocus(someCell) {
 
+        $("#grades tr").each(function () {
+            $(this).find("td").each(function () {
+                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                    $(this).css("background-color", "Silver");
+                }
+                else {
+
+                }
+            });
+        });
+
+
         //we are in a data cell so we need to set isDataCell to true
         isDataCell = true;
+        var cell = null
+        var row = $(someCell).parent("tr").prevAll().length;
+        var colIndex = $(someCell).prevAll().length;
+        //colIndex = parseInt(colIndex + 1);
+
+        
 
         //Header needs to lose focus
         if (header == true) {
@@ -617,6 +622,14 @@
             lastFocusedCell = someCell;
             $("#lastCell").val(someCell);
         }
+
+        var cell = $("#grades").find("tr:eq(0)");
+        cell = cell.find("td:eq(" + colIndex + ")");
+        cell.css("background-color", "#FFFF84");
+
+        var cell2 = $("#grades").find("tr:eq(" + row + ")");
+        cell2 = cell2.find("td:eq(0)");
+        cell2.css("background-color", "#FFFF84");
     }
 
     /*function calculateRows() {

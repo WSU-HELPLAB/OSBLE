@@ -9,7 +9,6 @@ using OSBLE.Models.Users;
 using OSBLE.Models.Assignments.Activities.Scores;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments;
-using OSBLE.Models.Courses.GradebookOptions;
 using System.IO;
 using System.Web;
 
@@ -460,7 +459,7 @@ namespace OSBLE.Controllers
            {
                //storing the amount of assignments wanted to drop
                var currentCatagory = (from cat in db.Categories where cat.ID == categoryId select cat).FirstOrDefault();
-               currentCatagory.GradebookOptions.dropX = dropX;
+               currentCatagory.dropX = dropX;
                db.SaveChanges();
 
                int i = 0;
@@ -761,7 +760,6 @@ namespace OSBLE.Controllers
                ColumnOrder = 0,
                Assignments = new List<AbstractAssignment>(),
                TabColor = color,
-               GradebookOptions = new GradebookOptions()
            };
            db.Categories.Add(newCategory);
            db.SaveChanges();
@@ -1097,7 +1095,7 @@ namespace OSBLE.Controllers
 
            Category currentTab = (from c in allCategories where c.ID == categoryId select c).First();
            List<int> numDropped = new List<int>();
-           numDropped.Add(currentTab.GradebookOptions.dropX);
+           numDropped.Add(currentTab.dropX);
 
            if (currentTab == null)
            {

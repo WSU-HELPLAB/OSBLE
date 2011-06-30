@@ -164,7 +164,6 @@
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\SyncIssueVotingActivity.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\BasicAssignment.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\GradeAssignment.cs" />
-    <Compile Include="Models\AbstractCourses\Course\GradebookOptions\GradebookOptions.cs" />
     <Compile Include="Models\AbstractCourses\Course\GradebookOptions\LetterGrade.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Criterion.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Level.cs" />
