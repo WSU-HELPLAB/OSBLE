@@ -5,6 +5,7 @@ using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments.Activities.Scores;
+//using OSBLE.Models.Assignments.Activities.CommentCategories;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.HomePage;
@@ -59,6 +60,12 @@ namespace OSBLE.Models
         public DbSet<Score> Scores { get; set; }
 
         public DbSet<RubricScore> RubricScores { get; set; }
+
+        // Assignments.Activities.CommentCategories
+
+        //public DbSet<CommentCategory> CommentCategories { get; set; }
+
+        //public DbSet<CommentCategoryTag> CommentCategoryTags { get; set; }
 
         // Courses
 

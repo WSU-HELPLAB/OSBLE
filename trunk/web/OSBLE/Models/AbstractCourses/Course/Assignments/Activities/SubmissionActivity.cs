@@ -22,6 +22,7 @@ namespace OSBLE.Models.Assignments.Activities
         [Display(Name = "Can Instructor Do A Line By Line Review?")]
         public bool InstructorCanReview { get; set; }
 
+        
         //NEED RUBRIC
     }
 }

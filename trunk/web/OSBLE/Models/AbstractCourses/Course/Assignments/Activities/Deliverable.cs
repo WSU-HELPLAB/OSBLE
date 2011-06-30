@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.AbstractCourses.Course.Assignments.Activities.CommentCategories;
 
 namespace OSBLE.Models.Assignments.Activities
 {
@@ -74,6 +76,7 @@ namespace OSBLE.Models.Assignments.Activities
         //TODO: Make required later.
         //[Required]
         [Display(Name = "Comment Categories")]
-        public string CommentCategories { get; set; }
+        public ICollection<CommentCategory> CommentCategories { get; set; }
     }
+
 }

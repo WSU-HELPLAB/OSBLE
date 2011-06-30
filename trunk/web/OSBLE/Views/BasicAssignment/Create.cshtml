@@ -46,6 +46,7 @@
             }
         });
 
+
         $('#isTeam').change(function () {
             if ($(this).attr('checked')) {
                 DisplayTeamOptions();
@@ -152,11 +153,13 @@
             UpdateGradeCategory();
         });
 
+
+
     }); // end init
 
 
     function UpdateGradeCategory() {
-        $('#grade_category_label').html($('#grade_category').selectedTexts()[0]);
+        $('#grade_category_label').html( $('#grade_category').selectedTexts()[0] );
     }
 
     function updateActivitiesName() {
@@ -251,18 +254,7 @@
     }
 
 
-    // line review
-    
-    function ShowLineReview(){
-        $('#instructor_line_review').show('blind');
-    }
-    function HideLineReview() {
-        $('#instructor_line_review').hide('blind');
-    }
-
-
     // rubric
-
     function OpenRubricDialog() {
         $('#rubric_dialog').dialog('open'); return false;
     }
@@ -383,12 +375,61 @@
         </ul>
         <!-- in the future generate teams with mixed ability and Generate teams with same-ability will need to go here -->
     </div>
+    
     <div class="editor-label">
         @Html.LabelFor(model => submission.InstructorCanReview)
     </div>
     <div class="editor-field">
         @Html.CheckBoxFor(model => submission.InstructorCanReview, new { id = "InstructorCanReview" })
         @Html.ValidationMessageFor(model => submission.InstructorCanReview)
+    </div>
+    <div id="line_review_config" class="indented_options" style="display: none;">
+        <input type="radio" name="line_review_options" value="ManualConfig" /> New Configuration <br />
+        <div id="manual_config_options" class="indented_options" style="display: none;" >
+            <p> Name: <input type="text" /> </p>
+            <p>
+                <a href="#" id="add_new_category" title="Add New Category" style="text-decoration:none;">
+                    <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Category" /> Add a Category
+                </a>
+            </p>
+            <div id="category_data"></div>
+            <br style="clear: both;" />
+        </div>
+        <input type="radio" name="line_review_options" value="AutoConfig" /> Load Configuration <br />
+        <div id="auto_config_options" class="indented_options" style="display: none;" >
+            <br /> Select a configuration <br />
+            <select>
+                <option value="a">Aaaaaaaaaa</option>
+                <option value="b">Bbbbbbbbbb</option>
+                <option value="c">Cccccccccc</option>
+            </select>
+            <div id="saved_config_display" class="indented_options">
+                <br />
+                <table>
+                    <tr>
+                        <td>Severity</td>
+                        <td>
+                            <select>
+                                <option value="a">1</option>
+                                <option value="b">2</option>
+                                <option value="c">3</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Scope</td>
+                        <td>
+                            <select>
+                                <option value="a">1</option>
+                                <option value="b">2</option>
+                                <option value="c">3</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <br />
     </div>
 
     <div class="editor-label">
@@ -410,6 +451,7 @@
 
     <h3>Deliverables @Helpers.CreateToolTip(ToolTips.BasicAssignmentDeliverables) </h3>
    
+<!--
     <table id="deliverables_table">
         <tr>
             <td>
@@ -442,7 +484,25 @@
 
         </tr>
     </table>
-
+-->
+    
+    <table id="deliverables_table">
+        <tr>
+            <td> File&nbsp;Name </td>
+            <td> <input type="text" id="new_deliverable_name" /> </td>
+        </tr>
+        <tr>
+            <td> Type </td>
+            <td>
+                <select id="new_deliverable_type">
+                    @foreach (SelectListItem dt in ViewBag.DeliverableTypes)
+                    {
+                        <option value="@dt.Value">@dt.Text</option>
+                    }
+                </select>
+            </td>
+        </tr>
+    </table>
     <div>
         <a href="#" id="add_new_deliverable" title="Add New Deliverable" style="text-decoration: none;">
             <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Deliverable" /> Save Deliverable
@@ -476,7 +536,6 @@
         @Html.DropDownListFor(model => model.Assignment.CategoryID, ViewBag.Categories as SelectList, new { id = "grade_category" })
         @Html.ValidationMessageFor(model => model.Assignment.Category)
     </div>
-    
     
         
     <div class="editor-label">
