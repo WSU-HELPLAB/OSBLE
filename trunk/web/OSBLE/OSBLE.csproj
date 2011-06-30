@@ -200,6 +200,9 @@
     <Compile Include="Models\ViewModels\StudioAssignmentViewModel.cs" />
     <Compile Include="Services\AuthenticationDomainService.cs" />
     <Compile Include="Services\OSBLEService.cs" />
+    <Compile Include="Services\RubricService.svc.cs">
+      <DependentUpon>RubricService.svc</DependentUpon>
+    </Compile>
     <Compile Include="Services\SilverlightFaultBehavior.cs" />
     <Compile Include="Services\UploaderWebService.svc.cs">
       <DependentUpon>UploaderWebService.svc</DependentUpon>
@@ -408,6 +411,7 @@
     <Content Include="Scripts\osble.courses.js" />
     <Content Include="Scripts\osble.js" />
     <Content Include="Scripts\Silverlight.js" />
+    <Content Include="Services\RubricService.svc" />
     <Content Include="Services\UploaderWebService.svc" />
     <Content Include="Silverlight.js" />
     <Content Include="Scripts\multifile.js" />

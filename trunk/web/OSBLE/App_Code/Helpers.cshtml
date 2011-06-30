@@ -38,9 +38,14 @@
     {
         text += d.DisplayTitle;
     }
-    if(d is DashboardPost)
+    AbstractDashboard dash = d;
+    if(d is DashboardReply)
     {
-        DashboardPost dp = d as DashboardPost;
+        dash = (d as DashboardReply).Parent;
+    }
+    if (dash is DashboardPost)
+    {
+        DashboardPost dp = dash as DashboardPost;
         if(dp.Course is Community)
         {
             text += ", " + d.UserProfile.School.Name;
