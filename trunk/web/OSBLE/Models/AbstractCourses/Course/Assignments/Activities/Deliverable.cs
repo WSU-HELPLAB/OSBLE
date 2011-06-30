@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using OSBLE.Models.AbstractCourses.Course.Assignments.Activities.CommentCategories;
 
 namespace OSBLE.Models.Assignments.Activities
 {
@@ -70,13 +68,12 @@ namespace OSBLE.Models.Assignments.Activities
         [Required]
         [Display(Name = "File Name")]
         [RegularExpression(@"^[a-zA-Z0-9\._\-]*$",
-            ErrorMessage="File names can only contain alphanumerics, '-', '_', and '.'")]
+            ErrorMessage = "File names can only contain alphanumerics, '-', '_', and '.'")]
         public string Name { get; set; }
 
         //TODO: Make required later.
         //[Required]
-        [Display(Name = "Comment Categories")]
-        public ICollection<CommentCategory> CommentCategories { get; set; }
+        //[Display(Name = "Comment Categories")]
+        //public ICollection<CommentCategory> CommentCategories { get; set; }
     }
-
 }
