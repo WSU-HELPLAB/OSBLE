@@ -290,6 +290,7 @@
     var lastFocusedCell = null;
     var showDropDown = false;
     var changedShow = false;
+    var isHighlighted = false;
 
     //displays current column
     var currentCol = 0;
@@ -356,10 +357,16 @@
             isHighlighted = false;
         }
         else {
+
             isHighlighted = true;
         }
 
     });
+
+    function hideTabColors() {
+        $("#selectMenuID").animate({ "height": "hide" }, { duration: 300 });
+        $("#displayColorsID").animate({ "height": "hide" }, { duration: 300 });
+    }
 
     function keyControls() {
         if (lastFocusedCell != null) {
@@ -776,24 +783,25 @@
             });
         });
 
-        currentHeader = $(col).attr("id");
+        currentHeader = $(col).attr("id").split("-");
+        if(currentHeader[1] == null){
+            $("#grades tr").each(function () {
 
-        $("#grades tr").each(function () {
+                $(this).find("td:nth-child(" + currentHeader + ")").each(function () {
+                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                    }
+                    else {
+                        $(this).css("background-color", "DeepSkyBlue");
+                    }
+                });
 
-            $(this).find("td:nth-child(" + $(col).attr("id") + ")").each(function () {
-                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-                }
-                else {
-                    $(this).css("background-color", "DeepSkyBlue");
-                }
+                $(this).find("th:nth-child(" + currentHeader + ")").each(function () {
+                    //$("#slidingDivID").animate({ "height": "show" }, { duration: 300 });
+                    $(this).css("background-color", "DeepSkyBlue ");
+                });
             });
-            
-            $(this).find("th:nth-child(" + currentHeader + ")").each(function () {
-                //$("#slidingDivID").animate({ "height": "show" }, { duration: 300 });
-                $(this).css("background-color", "DeepSkyBlue ");
-            });
-        });
-        isHighlighted = false;
+            isHighlighted = false;
+        }
 
     }
 
@@ -821,12 +829,12 @@
         $('#grades tr').each(function () {
             if (count == container[1]) {
                 $(this).find("td").each(function () {
-                    if ($(this).attr("class") != "rowHeader") {
+                    if ($(this).attr("class") != "rowHeader" && $(this).attr("class") != "colHeader") {
                         $(this).css("background-color", "DeepSkyBlue");
                     }
                 });
                 $(this).find("th").each(function () {
-                    if ($(this).attr("class") != "rowHeader" && $(this).attr("class") != "colHeader") {
+                    if ($(this).attr("class") != "rowHeader") {
                         $(this).css("background-color", "DeepSkyBlue");
                     }
                 });

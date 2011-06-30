@@ -1029,32 +1029,28 @@
             });
         });
 
-        currentHeader = $(col).attr("id");
+        currentHeader = $(col).attr("id").split("-");
+        if (currentHeader[1] == null) {
+            $("#grades tr").each(function () {
 
-        $("#grades tr").each(function () {
-
-            $(this).find("td:nth-child(" + $(col).attr("id") + ")").each(function () {
-                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-                }
-                else {
-                    $(this).css("background-color", "DeepSkyBlue");
-                }
+                $(this).find("td:nth-child(" + currentHeader + ")").each(function () {
+                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                    }
+                    else {
+                        $(this).css("background-color", "DeepSkyBlue");
+                    }
+                });
+                $(this).find("th:nth-child(" + currentHeader + ")").each(function () {
+                    if ($(this).attr("class") == "colHeader" && $(col).attr("id") > 4) {
+                        $("#selectMenuID").animate({ "height": "show" }, { duration: 300 });
+                    }
+                    else {
+                        $(this).css("background-color", "DeepSkyBlue ");
+                    }
+                });
             });
-
-            $(this).find("th:nth-child(" + $(col).attr("id") + ")").each(function () {
-                if ($(this).attr("class") == "colHeader" && $(col).attr("id") > 4) {
-                    $("#selectMenuID").animate({ "height": "show" }, { duration: 300 });
-                }
-                else if ($(this).attr("id") == "gradeHeader") {
-                    $("#letterGradesID").animate({ "height": "show" }, { duration: 300 });
-
-                }
-                else {
-                    $(this).css("background-color", "DeepSkyBlue ");
-                }
-            });
-        });
-        isHighlighted = false;
+            isHighlighted = false;
+        }
         
     }
 
