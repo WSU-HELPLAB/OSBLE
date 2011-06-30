@@ -4,6 +4,7 @@
 @using OSBLE.Models.Assignments.Activities.Scores;
 @{
     Layout = null;
+    var index = 0;
 }
 
 <table id="grades" class="gradebook">
@@ -17,6 +18,9 @@
     <tr class="colHeader">
             
         @{var j = 1;
+            <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onclick="selectRow(this);"></td>
+            index++;
+            j += 1;
             <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);"></td>
             j += 1;
             <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);"></td>
@@ -35,6 +39,8 @@
     </tr>
 
     <tr id="perfectScore">
+        <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onclick="selectRow(this);"></td>
+        @{index++;}
         <th id="th2">Perfect Score</th>
         <td id="perfectTotal">100%</td>
         @foreach (AbstractAssignment item in ViewBag.Assignments)
@@ -44,6 +50,8 @@
         
     </tr>
     <tr id="averageRow">
+    <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onclick="selectRow(this);"></td>
+    @{index++;}
         <th id="th3">
             Average Score
         </th>
@@ -57,6 +65,8 @@
     </tr>
     
     <tr>
+    <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onclick="selectRow(this);"></td>
+    @{index++;}
     @{
     
         <th id="th4" ondblclick="clearDropLowest()">
@@ -85,6 +95,8 @@
     @foreach (OSBLE.Models.Users.UserProfile user in ViewBag.Users)
     {        
         <tr id="studentGrades">
+            <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onclick="selectRow(this);"></td>
+            @{index++;}
             <td id="@user.ID" >@user.LastName, @user.FirstName</td>
                     
             @{

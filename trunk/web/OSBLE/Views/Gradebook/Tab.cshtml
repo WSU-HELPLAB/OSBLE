@@ -164,6 +164,11 @@
     {
         float: left;
     }
+    
+    .rowHeader
+    {
+        width: 500px;
+    }
 </style>
 <div id="tabHeader">
     <h3>Gradebook</h3>
@@ -333,7 +338,7 @@
         if (isHighlighted == true) {
             $("#grades tr").each(function () {
                 $(this).find("td").each(function () {
-                    if ($(this).attr("class") == "colHeader") {
+                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
                     }
                     else {
                         $(this).css("background-color", "white");
@@ -756,7 +761,7 @@
         
         $("#grades tr").each(function () {
             $(this).find("td").each(function () {
-                if ($(this).attr("class") == "colHeader") {
+                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
                 }
                 else {
                     $(this).css("background-color", "white");
@@ -776,7 +781,7 @@
         $("#grades tr").each(function () {
 
             $(this).find("td:nth-child(" + $(col).attr("id") + ")").each(function () {
-                if ($(this).attr("class") == "colHeader") {
+                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
                 }
                 else {
                     $(this).css("background-color", "DeepSkyBlue");
@@ -790,6 +795,45 @@
         });
         isHighlighted = false;
 
+    }
+
+    function selectRow(row) {
+        var container = row.id.split("-");
+        var count = 0;
+
+        $("#grades tr").each(function () {
+            $(this).find("td").each(function () {
+                if ($(this).attr("class") == "rowHeader" || $(this).attr("class") == "colHeader") {
+                }
+                else {
+                    $(this).css("background-color", "white");
+                }
+            });
+            $(this).find("th").each(function () {
+                if ($(this).attr("class") == "rowHeader" || $(this).attr("class") == "colHeader") {
+                }
+                else {
+                    $(this).css("background-color", "white");
+                }
+            });
+        });
+
+        $('#grades tr').each(function () {
+            if (count == container[1]) {
+                $(this).find("td").each(function () {
+                    if ($(this).attr("class") != "rowHeader") {
+                        $(this).css("background-color", "DeepSkyBlue");
+                    }
+                });
+                $(this).find("th").each(function () {
+                    if ($(this).attr("class") != "rowHeader" && $(this).attr("class") != "colHeader") {
+                        $(this).css("background-color", "DeepSkyBlue");
+                    }
+                });
+            }
+            count++;
+        });
+        isHighlighted = false;
     }
 
    
