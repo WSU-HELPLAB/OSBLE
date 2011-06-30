@@ -8,17 +8,23 @@
 
 <table id="grades" class="gradebook">
 
+@{
+        var numDropped = (from drop in ViewBag.Dropped as IEnumerable<int> select drop).FirstOrDefault();     
+        
+        <input type="hidden" id="numDropped" value="@numDropped" />
+    }
+
     <tr class="colHeader">
             
         @{var j = 1;
-            <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);"></td>
             j += 1;
-            <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);"></td>
             j += 1;
             foreach (AbstractAssignment item in ViewBag.Assignments)
             {
-                <td id="@j" class="colHeader" style="background:silver; border:outset 3px; text-align:right;" onmouseover="showButton(this);" onmouseout="hideButton(this);">
-                <div id="div-@j" style="display: none;" onmouseover="showButton(this);" onmouseout="hideButton(this);" >
+                <td id="@j" class="colHeader" style="background:silver; border:outset 3px; text-align:right;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);">
+                <div id="div-@j" style="display: none;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);">
                     <img id="img-@item.ID" src="/Content/images/arrow_down.png" onclick="ShowHide(this);" style="cursor:pointer;"/>
                 </div>
                 </td>
@@ -52,9 +58,6 @@
     
     <tr>
     @{
-        var numDropped = (from drop in ViewBag.Dropped as IEnumerable<int> select drop).FirstOrDefault();     
-        
-        <input type="hidden" id="numDropped" value="@numDropped" />
     
         <th id="th4" ondblclick="clearDropLowest()">
             Name
@@ -122,7 +125,6 @@
     }
     <script type="text/javascript">
         //var lastFocusedCell = null;
-        
 
         $(function () {
             calculateCols();
