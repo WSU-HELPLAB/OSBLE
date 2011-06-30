@@ -18,7 +18,7 @@
     <tr class="colHeader">
             
         @{var j = 1;
-            <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onclick="selectRow(this);"></td>
+            <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(this);"></td>
             index++;
             j += 1;
             <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);"></td>
@@ -39,7 +39,7 @@
     </tr>
 
     <tr id="perfectScore">
-        <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onclick="selectRow(this);"></td>
+        <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(this);"></td>
         @{index++;}
         <th id="th2">Perfect Score</th>
         <td id="perfectTotal">100%</td>
@@ -50,7 +50,7 @@
         
     </tr>
     <tr id="averageRow">
-    <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onclick="selectRow(this);"></td>
+    <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(this);"></td>
     @{index++;}
         <th id="th3">
             Average Score
@@ -65,7 +65,7 @@
     </tr>
     
     <tr>
-    <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onclick="selectRow(this);"></td>
+    <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(this);"></td>
     @{index++;}
     @{
     
@@ -95,7 +95,7 @@
     @foreach (OSBLE.Models.Users.UserProfile user in ViewBag.Users)
     {        
         <tr id="studentGrades">
-            <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onclick="selectRow(this);"></td>
+            <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(this);"></td>
             @{index++;}
             <td id="@user.ID" >@user.LastName, @user.FirstName</td>
                     
@@ -146,11 +146,15 @@
         function showButton(column) {
             var container = column.id;
             $("#div-" + container).animate({ "height": "show" }, { duration: 0 });
+            $("#div-" + container).css("background-color", "Yellow");
+            $("#" + container).css("background-color", "Yellow");
         }
 
         function hideButton(column) {
             var container = column.id;
             $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
+            $("#div-" + container).css("background-color", "Silver");
+            $('#' + container).css("background-color", "Silver");
         }
     </script>
 
