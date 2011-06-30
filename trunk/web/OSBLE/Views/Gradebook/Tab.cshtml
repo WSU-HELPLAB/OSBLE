@@ -180,6 +180,7 @@
     <br />
     @Html.Partial("_Tabs")
 </div>
+<input type="hidden" id="lastCell" value="null"/>
 <div id="tableContent">
     @Html.Partial("_Gradebook")
     <div class="slidingDiv" id="slidingDivID" style="display: none; position: absolute;">
@@ -328,6 +329,31 @@
             hideDropDown();
             showDropDown = false;
         }
+
+        if (isHighlighted == true) {
+            $("#grades tr").each(function () {
+                $(this).find("td").each(function () {
+                    if ($(this).attr("class") == "colHeader") {
+                    }
+                    else {
+                        $(this).css("background-color", "white");
+                    }
+                });
+                $(this).find("th").each(function () {
+                    if ($(this).attr("class") == "colHeader") {
+                    }
+                    else {
+                        $(this).css("background-color", "white");
+                    }
+                });
+            });
+            hideTabColors();
+            isHighlighted = false;
+        }
+        else {
+            isHighlighted = true;
+        }
+
     });
 
     function keyControls() {
@@ -401,6 +427,7 @@
         });
 
     }
+
 
 
     function displayCustomizeGrades() {
@@ -538,7 +565,8 @@
                                 clearDropLowest(ajaxIDs[0])
                             }
                             else {
-                                $("#grades").replaceWith(response);
+                                //$("#grades").replaceWith(response);
+                                
                             }
                         }
                     });
@@ -572,6 +600,7 @@
             someCell.html(inputText);
             inputText.focus();
             lastFocusedCell = someCell;
+            $("#lastCell").val(someCell);
         }
     }
 
@@ -755,7 +784,6 @@
             });
             
             $(this).find("th:nth-child(" + currentHeader + ")").each(function () {
-                alert("got here");
                 //$("#slidingDivID").animate({ "height": "show" }, { duration: 300 });
                 $(this).css("background-color", "DeepSkyBlue ");
             });
@@ -971,6 +999,7 @@
             url: "/Gradebook/AddCategory",
             success: window.location.reload(true)
         });
+        
     }
 
     function importGrades() {
