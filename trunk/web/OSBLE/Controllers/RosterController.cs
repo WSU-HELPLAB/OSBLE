@@ -116,6 +116,7 @@ namespace OSBLE.Controllers
                     // Set custom role order for display
                     List<CommunityRole.OSBLERoles> rolesOrder = new List<CommunityRole.OSBLERoles>(new CommunityRole.OSBLERoles[] {
                                 CommunityRole.OSBLERoles.Leader,
+                                CommunityRole.OSBLERoles.TrustedCommunityMember,
                                 CommunityRole.OSBLERoles.Participant });
 
                     foreach (CommunityRole.OSBLERoles r in rolesOrder)
