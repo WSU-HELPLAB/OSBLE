@@ -112,8 +112,6 @@ namespace OsbleRubric.OsbleServices {
         
         private string CriterionTitleField;
         
-        private string DescriptionField;
-        
         private int IDField;
         
         private OsbleRubric.OsbleServices.Rubric RubricField;
@@ -131,19 +129,6 @@ namespace OsbleRubric.OsbleServices {
                 if ((object.ReferenceEquals(this.CriterionTitleField, value) != true)) {
                     this.CriterionTitleField = value;
                     this.RaisePropertyChanged("CriterionTitle");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Description {
-            get {
-                return this.DescriptionField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.DescriptionField, value) != true)) {
-                    this.DescriptionField = value;
-                    this.RaisePropertyChanged("Description");
                 }
             }
         }
@@ -448,6 +433,11 @@ namespace OsbleRubric.OsbleServices {
         System.IAsyncResult BeginGetFakeRubric(System.AsyncCallback callback, object asyncState);
         
         OsbleRubric.OsbleServices.Rubric EndGetFakeRubric(System.IAsyncResult result);
+        
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:RubricService/GetRubricList", ReplyAction="urn:RubricService/GetRubricListResponse")]
+        System.IAsyncResult BeginGetRubricList(System.AsyncCallback callback, object asyncState);
+        
+        System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric> EndGetRubricList(System.IAsyncResult result);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -532,6 +522,25 @@ namespace OsbleRubric.OsbleServices {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class GetRubricListCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        public GetRubricListCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric> Result {
+            get {
+                base.RaiseExceptionIfNecessary();
+                return ((System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric>)(this.results[0]));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public partial class RubricServiceClient : System.ServiceModel.ClientBase<OsbleRubric.OsbleServices.RubricService>, OsbleRubric.OsbleServices.RubricService {
         
         private BeginOperationDelegate onBeginDoWorkDelegate;
@@ -563,6 +572,12 @@ namespace OsbleRubric.OsbleServices {
         private EndOperationDelegate onEndGetFakeRubricDelegate;
         
         private System.Threading.SendOrPostCallback onGetFakeRubricCompletedDelegate;
+        
+        private BeginOperationDelegate onBeginGetRubricListDelegate;
+        
+        private EndOperationDelegate onEndGetRubricListDelegate;
+        
+        private System.Threading.SendOrPostCallback onGetRubricListCompletedDelegate;
         
         private BeginOperationDelegate onBeginOpenDelegate;
         
@@ -626,6 +641,8 @@ namespace OsbleRubric.OsbleServices {
         public event System.EventHandler<GetFakeLevelCompletedEventArgs> GetFakeLevelCompleted;
         
         public event System.EventHandler<GetFakeRubricCompletedEventArgs> GetFakeRubricCompleted;
+        
+        public event System.EventHandler<GetRubricListCompletedEventArgs> GetRubricListCompleted;
         
         public event System.EventHandler<System.ComponentModel.AsyncCompletedEventArgs> OpenCompleted;
         
@@ -850,6 +867,50 @@ namespace OsbleRubric.OsbleServices {
             base.InvokeAsync(this.onBeginGetFakeRubricDelegate, null, this.onEndGetFakeRubricDelegate, this.onGetFakeRubricCompletedDelegate, userState);
         }
         
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.IAsyncResult OsbleRubric.OsbleServices.RubricService.BeginGetRubricList(System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginGetRubricList(callback, asyncState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric> OsbleRubric.OsbleServices.RubricService.EndGetRubricList(System.IAsyncResult result) {
+            return base.Channel.EndGetRubricList(result);
+        }
+        
+        private System.IAsyncResult OnBeginGetRubricList(object[] inValues, System.AsyncCallback callback, object asyncState) {
+            return ((OsbleRubric.OsbleServices.RubricService)(this)).BeginGetRubricList(callback, asyncState);
+        }
+        
+        private object[] OnEndGetRubricList(System.IAsyncResult result) {
+            System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric> retVal = ((OsbleRubric.OsbleServices.RubricService)(this)).EndGetRubricList(result);
+            return new object[] {
+                    retVal};
+        }
+        
+        private void OnGetRubricListCompleted(object state) {
+            if ((this.GetRubricListCompleted != null)) {
+                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
+                this.GetRubricListCompleted(this, new GetRubricListCompletedEventArgs(e.Results, e.Error, e.Cancelled, e.UserState));
+            }
+        }
+        
+        public void GetRubricListAsync() {
+            this.GetRubricListAsync(null);
+        }
+        
+        public void GetRubricListAsync(object userState) {
+            if ((this.onBeginGetRubricListDelegate == null)) {
+                this.onBeginGetRubricListDelegate = new BeginOperationDelegate(this.OnBeginGetRubricList);
+            }
+            if ((this.onEndGetRubricListDelegate == null)) {
+                this.onEndGetRubricListDelegate = new EndOperationDelegate(this.OnEndGetRubricList);
+            }
+            if ((this.onGetRubricListCompletedDelegate == null)) {
+                this.onGetRubricListCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnGetRubricListCompleted);
+            }
+            base.InvokeAsync(this.onBeginGetRubricListDelegate, null, this.onEndGetRubricListDelegate, this.onGetRubricListCompletedDelegate, userState);
+        }
+        
         private System.IAsyncResult OnBeginOpen(object[] inValues, System.AsyncCallback callback, object asyncState) {
             return ((System.ServiceModel.ICommunicationObject)(this)).BeginOpen(callback, asyncState);
         }
@@ -982,6 +1043,18 @@ namespace OsbleRubric.OsbleServices {
             public OsbleRubric.OsbleServices.Rubric EndGetFakeRubric(System.IAsyncResult result) {
                 object[] _args = new object[0];
                 OsbleRubric.OsbleServices.Rubric _result = ((OsbleRubric.OsbleServices.Rubric)(base.EndInvoke("GetFakeRubric", _args, result)));
+                return _result;
+            }
+            
+            public System.IAsyncResult BeginGetRubricList(System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[0];
+                System.IAsyncResult _result = base.BeginInvoke("GetRubricList", _args, callback, asyncState);
+                return _result;
+            }
+            
+            public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric> EndGetRubricList(System.IAsyncResult result) {
+                object[] _args = new object[0];
+                System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric> _result = ((System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric>)(base.EndInvoke("GetRubricList", _args, result)));
                 return _result;
             }
         }

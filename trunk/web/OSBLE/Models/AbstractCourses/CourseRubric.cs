@@ -3,25 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Courses.Rubrics;
 
-namespace OSBLE.Models.Courses.Rubrics
+namespace OSBLE.Models.AbstractCourses
 {
-    public class Criterion
+    public class CourseRubric
     {
         [Required]
         [Key]
-        public int ID { get; set; }
+        [Column(Order=0)]
+        public int CourseID { get; set; }
+        public virtual AbstractCourse Course { get; set; }
 
         [Required]
+        [Key]
+        [Column(Order=1)]
         public int RubricID { get; set; }
-
         public virtual Rubric Rubric { get; set; }
-
-        [Required]
-        public string CriterionTitle { get; set; }
-
-        [Required]
-        public double Weight { get; set; }
-
     }
 }

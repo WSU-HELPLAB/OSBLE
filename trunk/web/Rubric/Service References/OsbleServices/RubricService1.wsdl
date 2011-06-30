@@ -58,6 +58,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="GetRubricList">
+      <soap12:operation soapAction="urn:RubricService/GetRubricList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="RubricService">
     <wsdl:port name="CustomBinding_RubricService" binding="tns:CustomBinding_RubricService">

@@ -37,6 +37,12 @@
   <wsdl:message name="RubricService_GetFakeRubric_OutputMessage">
     <wsdl:part name="parameters" element="GetFakeRubricResponse" />
   </wsdl:message>
+  <wsdl:message name="RubricService_GetRubricList_InputMessage">
+    <wsdl:part name="parameters" element="GetRubricList" />
+  </wsdl:message>
+  <wsdl:message name="RubricService_GetRubricList_OutputMessage">
+    <wsdl:part name="parameters" element="GetRubricListResponse" />
+  </wsdl:message>
   <wsdl:portType name="RubricService">
     <wsdl:operation name="DoWork">
       <wsdl:input wsaw:Action="urn:RubricService/DoWork" message="RubricService_DoWork_InputMessage" />
@@ -57,6 +63,10 @@
     <wsdl:operation name="GetFakeRubric">
       <wsdl:input wsaw:Action="urn:RubricService/GetFakeRubric" message="RubricService_GetFakeRubric_InputMessage" />
       <wsdl:output wsaw:Action="urn:RubricService/GetFakeRubricResponse" message="RubricService_GetFakeRubric_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetRubricList">
+      <wsdl:input wsaw:Action="urn:RubricService/GetRubricList" message="RubricService_GetRubricList_InputMessage" />
+      <wsdl:output wsaw:Action="urn:RubricService/GetRubricListResponse" message="RubricService_GetRubricList_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
 </wsdl:definitions>

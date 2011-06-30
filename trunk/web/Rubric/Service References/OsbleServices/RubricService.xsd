@@ -13,7 +13,6 @@
   <xs:complexType name="Criterion">
     <xs:sequence>
       <xs:element minOccurs="0" name="CriterionTitle" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="ID" type="xs:int" />
       <xs:element minOccurs="0" name="Rubric" nillable="true" type="tns:Rubric" />
       <xs:element minOccurs="0" name="RubricID" type="xs:int" />
@@ -55,4 +54,10 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Level" nillable="true" type="tns:Level" />
+  <xs:complexType name="ArrayOfRubric">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Rubric" nillable="true" type="tns:Rubric" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfRubric" nillable="true" type="tns:ArrayOfRubric" />
 </xs:schema>

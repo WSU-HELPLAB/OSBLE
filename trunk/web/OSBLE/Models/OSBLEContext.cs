@@ -10,6 +10,7 @@ using OSBLE.Models.Courses.GradebookOptions;
 using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
+using OSBLE.Models.AbstractCourses;
 
 namespace OSBLE.Models
 {
@@ -105,6 +106,9 @@ namespace OSBLE.Models
         public DbSet<Criterion> Criteria { get; set; }
 
         public DbSet<CellDescription> LevelDescriptions { get; set; }
+
+        public DbSet<CourseRubric> CourseRubrics { get; set; }
+
 
         // Users
 

@@ -59,4 +59,16 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="GetRubricList">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetRubricListResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="GetRubricListResult" nillable="true" type="q5:ArrayOfRubric" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>
