@@ -21,6 +21,7 @@ namespace OSBLE.Controllers
    public class GradebookController : OSBLEController
    {
        public enum ColumnAction { InsertLeft, InsertRight, Delete, Clear, ImportCSV, NoAction };
+       public int colorCount { get; set; }
 
        //
        // GET: /Gradebook/
@@ -697,15 +698,69 @@ namespace OSBLE.Controllers
        public ActionResult AddCategory()
        {
            var currentCourseId = ActiveCourse.CourseID;
+           var numTabs = from cats in db.Categories
+                         where cats.CourseID == currentCourseId
+                         select cats;
+           int colorCount = numTabs.Count();
+           string color = null;
+           string name = null;
+           switch (colorCount)
+           {
+               case 0:
+                   color = "#74FEF8";
+                   name = "Category 1";
+                   break;
+               case 1:
+                   color = "Tomato";
+                   name = "Category 2";
+                   break;
+               case 2:
+                   color = "LightBlue";
+                   name = "Category 3";
+                   break;
+               case 3:
+                   color = "SpringGreen";
+                   name = "Category 4";
+                   break;
+               case 4:
+                   color = "BurlyWood";
+                   name = "Category 5";
+                   break;
+               case 5:
+                   color = "Yellow";
+                   name = "Category 6";
+                   break;
+               case 6:
+                   color = "Plum";
+                   name = "Category 7";
+                   break;
+               case 7:
+                   color = "Orange";
+                   name = "Category 8";
+                   break;
+               case 8:
+                   color = "Pink";
+                   name = "Category 9";
+                   break;
+               case 9:
+                   color = "Purple";
+                   name = "Category 10";
+                   break;
+               default:
+                   color = "#74FEF8";
+                   name = "Category";
+                   break;
+           };
+
            Category newCategory = new Category()
            {
-               Name = "Untitled",
+               Name = name,
                CourseID = currentCourseId,
                Course = ViewBag.ActiveCourse.Course,
                Points = 0,
                ColumnOrder = 0,
                Assignments = new List<AbstractAssignment>(),
-               TabColor = "Silver",
+               TabColor = color,
                GradebookOptions = new GradebookOptions()
            };
            db.Categories.Add(newCategory);
