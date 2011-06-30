@@ -86,6 +86,7 @@ namespace OSBLE.Models.Courses
         [Display(Name = "Include course meetings and breaks in course calendar")]
         public bool ShowMeetings { get; set; }
 
+
         public Course()
             : base()
         {

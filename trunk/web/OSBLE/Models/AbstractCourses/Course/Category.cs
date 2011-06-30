@@ -16,6 +16,7 @@ namespace OSBLE.Models.Courses
         {
             ColumnOrder = 0;
             Assignments = new List<AbstractAssignment>();
+            dropX = 0;
         }
 
         [Key]
@@ -35,12 +36,7 @@ namespace OSBLE.Models.Courses
 
         [Required]
         [Display(Name = "Weight")]
-        public double Points { get; set; }
-
-        /// <summary>
-        /// Grading points possible relative to sibling categories in the parent course.
-        /// </summary>
-        public double PointsPossible { get; set; }
+        public double Points { get; set; }       
 
         /// <summary>
         /// Used for visual ordering of various categories (tabs in the gradebook).  Defaults to a value of 0.
@@ -57,7 +53,7 @@ namespace OSBLE.Models.Courses
         [Display(Name = "Gradables")]
         public ICollection<AbstractAssignment> Assignments { get; set; }
 
-        public virtual GradebookOptions.GradebookOptions GradebookOptions { get; set; }
+        public int dropX { get; set; }
 
     }
 }
