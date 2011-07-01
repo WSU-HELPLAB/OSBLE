@@ -2,12 +2,6 @@
 
 namespace OSBLE.Models.Users
 {
-    public enum TeamsOrUsers
-    {
-        Team,
-        User
-    }
-
     public class TeamMember
     {
         [Key]
@@ -21,7 +15,7 @@ namespace OSBLE.Models.Users
         /// </summary>
         ///
         [Required]
-        public TeamsOrUsers TeamUser
+        public TeamOrUser TeamUser
         {
             get;
             set;

@@ -17,7 +17,7 @@ namespace OSBLE.Models.AbstractCourses.Course
         /// </summary>
         ///
         [Required]
-        public TeamsOrUsers TeamUser { get; set; }
+        public TeamOrUser TeamUser { get; set; }
 
         public int? UserProfileID { get; set; }
 

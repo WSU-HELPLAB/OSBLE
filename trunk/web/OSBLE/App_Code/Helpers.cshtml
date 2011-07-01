@@ -31,7 +31,7 @@
 }
 @* For dashboard posts/replies, echos display name along with optional title. *@
 @helper DisplayNameForDashboard(AbstractDashboard d)
-{
+    {
     <text>@d.DisplayName</text>
     string text = "";
     if (d.DisplayTitle != "")
@@ -39,14 +39,14 @@
         text += d.DisplayTitle;
     }
     AbstractDashboard dash = d;
-    if(d is DashboardReply)
+    if (d is DashboardReply)
     {
         dash = (d as DashboardReply).Parent;
     }
     if (dash is DashboardPost)
     {
         DashboardPost dp = dash as DashboardPost;
-        if(dp.Course is Community)
+        if (dp.Course is Community)
         {
             text += ", " + d.UserProfile.School.Name;
         }
@@ -121,16 +121,22 @@ Also runs content through nl2br to convert newlines to <br /> tags. *@
 @* Converts new lines to html <br /> tags in a content area. *@
 @helper nl2br(string content)
     {
-        string[] s = content.Split('\n');
+    <text> @content </text>
+        /* This used to convert new lines to <br/> tags but was found unneeded left in just incase I am wrong
+        string[] s = content.Split("\r\n".ToCharArray(), StringSplitOptions.None);
         for (int i = 0; i < s.Length; i++)
         {
-    @s[i]
-            if (i != s.Length - 1)
-            {
-    <text><br /></text>
+            if (s[i].Length != 0)
+            { 
+                @s[i]
             }
-        }
-}
+            else
+            { 
+                <text><br /></text>
+            }
+        }*/
+    }
+        
 @* Displays the tag for the course/community (e.g. CptS 121 or Comm) *@
 @helper CourseTag(AbstractCourse ac)
     {

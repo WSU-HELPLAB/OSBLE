@@ -7,6 +7,8 @@ using OSBLE.Attributes;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
+using OSBLE.Models.Users;
+using OSBLE.Models.ViewModels;
 
 namespace OSBLE.Controllers
 {
@@ -137,46 +139,94 @@ namespace OSBLE.Controllers
             return View();
         }
 
-        [HttpPost]
-        public ActionResult GetSubmission(string assignment_id)
+        [ChildActionOnly]
+        [CanModifyCourse]
+        public ActionResult ActivityTeacherTable(int id)
         {
             try
             {
-                int assignmentID = Int32.Parse(assignment_id);
-                var assignment = (from c in db.AbstractAssignments where c.ID == assignmentID select c).FirstOrDefault();
+                StudioActivity studioActivity = db.AbstractAssignmentActivity.Find(id) as StudioActivity;
 
-                var submissions = from c in assignment.AssignmentActivities where c is SubmissionActivity select c as SubmissionActivity;
+                StudioAssignment assignment = studioActivity.AbstractAssignment as StudioAssignment;
 
-                var json = new Dictionary<int, List<bool>>();
-                foreach (SubmissionActivity sa in submissions)
+                if (studioActivity.AbstractAssignment.Category.Course == activeCourse.Course)
                 {
-                    string folderLocation = FileSystem.GetSubmissionFolder(activeCourse.Course as Course, sa.ID, GetTeamorUserForCurrentUser(sa));
-                    List<bool> list = new List<bool>();
-                    foreach (Deliverable deliverable in (assignment as StudioAssignment).Deliverables)
+                    //FileSystem.GetAssignmentActivitySubmissionFolder(activeCourse.Course as Course, studioActivity.ID);
+
+                    ActivityTeacherTableViewModel viewModel = new ActivityTeacherTableViewModel();
+
+                    IEnumerable<TeamUser> submitters;
+
+                    if (studioActivity.isTeam)
                     {
-                        string[] allowedExtensions = GetFileExtensions((DeliverableType)deliverable.Type);
+                        submitters = (from c in studioActivity.Teams select new TeamUser() { Team = c }).ToList();
 
-                        bool found = false;
-
-                        foreach (string extension in allowedExtensions)
+                        //linq barfs on enums in entity framework so got to set it manually
+                        foreach (TeamUser teamUser in submitters)
                         {
-                            FileInfo fileInfo = new FileInfo(Path.Combine(folderLocation, deliverable.Name += extension));
-                            if (fileInfo.Exists)
-                            {
-                                found = true;
-                                break;
-                            }
+                            teamUser.TeamOrUser = TeamOrUser.Team;
                         }
-                        list.Add(found);
                     }
-                    json.Add(sa.ID, list);
-                }
+                    else
+                    {
+                        submitters = (from c in db.CoursesUsers where c.CourseID == activeCourse.CourseID && c.CourseRole.CanSubmit select new TeamUser { UserProfile = c.UserProfile }).ToList();
 
-                //ViewBag.Submitted = true;
-                return Json(json);
+                        //linq barfs on enums in entity framework so got to set it manually
+                        foreach (TeamUser teamUser in submitters)
+                        {
+                            teamUser.TeamOrUser = TeamOrUser.User;
+                        }
+                    }
+
+                    foreach (TeamUser teamUser in submitters)
+                    {
+                        ActivityTeacherTableViewModel.SubmissionInfo info = new ActivityTeacherTableViewModel.SubmissionInfo();
+
+                        DirectoryInfo submissionFolder = new DirectoryInfo(FileSystem.GetSubmissionFolder(activeCourse.Course as Course, studioActivity.ID, new TeamUser() { TeamOrUser = TeamOrUser.User, UserProfile = teamUser.UserProfile }));
+
+                        //if team
+                        if (TeamOrUser.Team == teamUser.TeamOrUser)
+                        {
+                            info.isTeam = true;
+                            info.SubmitterID = teamUser.Team.ID;
+                            info.Name = teamUser.Team.Name;
+                        }
+
+                            //if student
+                        else
+                        {
+                            info.isTeam = false;
+                            info.SubmitterID = teamUser.UserProfile.ID;
+                            info.Name = teamUser.UserProfile.LastName + ", " + teamUser.UserProfile.FirstName;
+                        }
+
+                        if (submissionFolder.Exists)
+                        {
+                            info.Time = submissionFolder.LastWriteTime;
+                        }
+                        else
+                        {
+                            info.Time = null;
+                        }
+
+                        //will need to fix this
+                        info.Graded = false;
+
+                        viewModel.SubmissionsInfo.Add(info);
+                    }
+
+                    return View(viewModel);
+                }
+                else
+                {
+                    throw new Exception("Tried to access AssignmentActivity of a different course than the active one");
+                }
             }
-            catch { }
-            return null;
+
+            catch (Exception e)
+            {
+                throw new Exception("Failed ActivityTeacherTable", e);
+            }
         }
     }
 }

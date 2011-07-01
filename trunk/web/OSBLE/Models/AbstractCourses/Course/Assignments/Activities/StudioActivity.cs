@@ -1,13 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Models.Assignments.Activities
 {
     public abstract class StudioActivity : AbstractAssignmentActivity
     {
+        public StudioActivity()
+        {
+            Teams = new List<Team>();
+        }
+
         // Late Policy
 
         [Required]
@@ -26,5 +29,11 @@ namespace OSBLE.Models.Assignments.Activities
         [Required]
         [Display(Name = "Hours Late Until Zero")]
         public int HoursLateUntilZero { get; set; }
+
+        [Required]
+        [Display(Name = "This is a team assignment")]
+        public bool isTeam { get; set; }
+
+        public ICollection<Team> Teams { get; set; }
     }
 }

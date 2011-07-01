@@ -37,7 +37,7 @@ namespace OSBLE.Models.Assignments.Activities
         [Required]
         public int AbstractAssignmentID { get; set; }
 
-        public AbstractAssignment AbstractAssignment { get; set; }
+        public virtual AbstractAssignment AbstractAssignment { get; set; }
 
         /// <summary>
         /// Grading points possible relative to sibling assignment activities in the parent assignment.

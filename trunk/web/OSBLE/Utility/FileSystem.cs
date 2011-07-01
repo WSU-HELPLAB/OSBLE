@@ -191,17 +191,23 @@ namespace OSBLE
             return GetCourseDocumentsPath(c);
         }
 
-        public static string GetSubmissionFolder(Course course, int assignmentActivityID, TeamMember subbmitter)
+        public static string GetAssignmentActivitySubmissionFolder(Course course, int assignmentActivityID)
         {
             string path = getCoursePath(course);
             path += "\\Assignments\\" + assignmentActivityID + "\\Submissions\\";
-            if (subbmitter.TeamUser == TeamsOrUsers.User)
+            return path;
+        }
+
+        public static string GetSubmissionFolder(Course course, int assignmentActivityID, TeamUser subbmitter)
+        {
+            string path = GetAssignmentActivitySubmissionFolder(course, assignmentActivityID);
+            if (subbmitter.TeamOrUser == TeamOrUser.User)
             {
-                path += subbmitter.UserProfileID;
+                path += subbmitter.UserProfile.ID;
             }
             else
             {
-                path += subbmitter.TeamID;
+                path += subbmitter.Team.ID;
             }
 
             if (!Directory.Exists(path))

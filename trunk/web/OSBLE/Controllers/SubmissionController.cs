@@ -76,7 +76,7 @@ namespace OSBLE.Controllers
 
                     if (assignment != null && assignment.Category.CourseID == activeCourse.CourseID && activeCourse.CourseRole.CanSubmit == true && assignment is StudioAssignment)
                     {
-                        TeamMember teamMember = GetTeamorUserForCurrentUser(activity as SubmissionActivity);
+                        TeamUser teamUser = GetTeamorUserForCurrentUser(activity as SubmissionActivity);
 
                         int i = 0;
                         foreach (var file in files)
@@ -98,7 +98,7 @@ namespace OSBLE.Controllers
 
                                 if (allowFileExtensions.Contains(extension))
                                 {
-                                    var path = Path.Combine(FileSystem.GetSubmissionFolder(activeCourse.Course as Course, (int)id, teamMember), deliverables[i].Name + extension);
+                                    var path = Path.Combine(FileSystem.GetSubmissionFolder(activeCourse.Course as Course, (int)id, teamUser), deliverables[i].Name + extension);
                                     file.SaveAs(path);
                                 }
                                 else
@@ -120,8 +120,11 @@ namespace OSBLE.Controllers
                             if (delName != null)
                             {
                                 string inbrowser = Request.Params["inBrowserText[" + j + "]"];
-                                var path = Path.Combine(FileSystem.GetSubmissionFolder(activeCourse.Course as Course, (int)id, teamMember), delName + ".txt");
-                                System.IO.File.WriteAllText(path, inbrowser);
+                                if (inbrowser.Length > 0)
+                                {
+                                    var path = Path.Combine(FileSystem.GetSubmissionFolder(activeCourse.Course as Course, (int)id, teamUser), delName + ".txt");
+                                    System.IO.File.WriteAllText(path, inbrowser);
+                                }
                             }
                             j++;
                         } while (delName != null);

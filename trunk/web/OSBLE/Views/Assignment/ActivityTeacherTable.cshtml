@@ -1,0 +1,50 @@
+﻿@using OSBLE.Models.ViewModels
+@model ActivityTeacherTableViewModel
+
+@{
+    Layout = "";
+}
+
+<table border="1">
+<tr>
+<th>
+Name
+</th>
+<th>
+Submitted Time
+</th>
+<th>
+Grading Stats
+</th>
+<th>
+View/Grade
+</th>
+</tr>
+
+
+@foreach (ActivityTeacherTableViewModel.SubmissionInfo info in Model.SubmissionsInfo)
+{
+ <tr>
+ <td>
+ @info.Name
+ </td>
+ <td>
+ @if (info.Time == null)
+ {
+     <text>Not Submitted</text>
+ }
+ else
+ { 
+     @info.Time
+ }
+ </td>
+ <td>
+ @info.Graded
+ </td>
+ <td>
+ <button>View/Grade</button>
+ </td>
+ </tr>   
+}
+
+</table>

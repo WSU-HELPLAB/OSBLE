@@ -154,13 +154,13 @@ namespace OSBLE.Controllers
                                 TeamMember teamMember_db = new TeamMember();
                                 if (serializeableMember.isUser)
                                 {
-                                    teamMember_db.TeamUser = TeamsOrUsers.User;
+                                    teamMember_db.TeamUser = TeamOrUser.User;
                                     teamMember_db.UserProfileID = serializeableMember.UserID;
                                     teamMember_db.TeamID = null;
                                 }
                                 else
                                 {
-                                    teamMember_db.TeamUser = TeamsOrUsers.Team;
+                                    teamMember_db.TeamUser = TeamOrUser.Team;
                                     teamMember_db.TeamID = serializeableMember.TeamID;
                                     teamMember_db.UserProfileID = null;
                                 }

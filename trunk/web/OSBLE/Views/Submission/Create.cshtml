@@ -15,12 +15,27 @@
         $('#file_uploader_form').submit(function ValidateForm(event) {
             var file_uploaders = $("#file_uploader_form :input");
             var i = 0;
+            var askedToContinue = false;
             for (i = 0; i < file_uploaders.length; i++) {
                 if (isValid(file_uploaders[i]) == false) {
+                    askedToContinue = true;
                     if (!confirm('One or more deliverables does not have a file. Would you like to continue')) {
                         event.preventDefault();
                     }
                     break;
+                }
+            }
+
+            if (askedToContinue == false) {
+                var inBrowserTextAreas = $("#file_uploader_form :textarea");
+                for (i = 0; i < inBrowserTextAreas.length; i++) {
+                    if (inBrowserTextAreas.value.length == 0) {
+                        askedToContinue = true;
+                        if (!confirm('One or more deliverables does not have a file. Would you like to continue')) {
+                            event.preventDefault();
+                        }
+                        break;
+                    }
                 }
             }
 
