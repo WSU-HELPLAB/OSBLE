@@ -346,11 +346,16 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
         private Tuple<int, int> findContentLineNumber(TextPointer contentPtr)
         {
             int lineNumber = 0;
-            
+
+            //if contentPtr's parent is a Paragraph, move it to the next insertion position so it's parent will be a run.
+            if (contentPtr.Parent is Paragraph)
+            {
+                contentPtr = contentPtr.GetNextInsertionPosition(LogicalDirection.Forward);
+            }
             // vars for compensating for multiple run Lines
             Inline firstRunOfLine = null;
             bool isNewline = true;
-
+            //setting the linenumber
             foreach (Inline inline in ContentBlock.Inlines)
             { 
                 if (inline is Run)
@@ -376,7 +381,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
            
 
             Rect contentRect = contentPtr.GetCharacterRect(LogicalDirection.Forward);
-
+            //setting i (index)
             if (contentPtr.Parent is Run)
             {
                 TextPointer tp = (firstRunOfLine as Run).ContentStart;

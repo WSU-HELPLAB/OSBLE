@@ -122,6 +122,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
             }
         }
 
+
         /// <summary>
         /// This does a full update based on the Properties of this class
         /// NOTE: TextStart, TextEnd, Canvas, FillBrush, ContentStart, StrokeBrush must all not equal null or this function does nothing
@@ -132,6 +133,15 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
             List<Rectangle> rectangles = new List<Rectangle>();
             if (textStart != null && textEnd != null && canvas != null && fillBrush != null && contentStart != null && strokeBrush != null)
             {
+                //if textend or textstart's parent is a Paragraph, move it to the next insertion position so it's parent will be a Run.
+                if (textEnd.Parent is Paragraph)
+                {
+                    textEnd = textEnd.GetNextInsertionPosition(LogicalDirection.Forward);
+                }
+                if (textStart.Parent is Paragraph)
+                {
+                    textStart = textStart.GetNextInsertionPosition(LogicalDirection.Forward);
+                }
                 Rectangle rect;
                 //We get the rect for the first and last char
                 Rect start = textStart.GetCharacterRect(LogicalDirection.Forward);
@@ -148,6 +158,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
                     {
                         //this is a bug fix until I learn how to get the position of LineBreaks
                         index = (textStart.GetNextInsertionPosition(LogicalDirection.Forward));
+                        //index = (textStart.GetNextInsertionPosition(LogicalDirection.Backward));
                     }
                     rect = MakeRectange(textStart, index);
                     if (rect != null)
@@ -212,7 +223,6 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
 
         private Rectangle MakeRectange(TextPointer tpStart, TextPointer tpEnd)
         {
-
             //We get the rect for the first and last char
             if (tpStart == null || tpEnd == null)
             {
@@ -220,6 +230,8 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
             }
             Rect start = tpStart.GetCharacterRect(LogicalDirection.Forward);
             Rect end = tpEnd.GetCharacterRect(LogicalDirection.Forward);
+
+
 
             //then we make a new Rectangle and set it to the correct size, location, fillBrush and Opacity
             Rectangle rect = new Rectangle();

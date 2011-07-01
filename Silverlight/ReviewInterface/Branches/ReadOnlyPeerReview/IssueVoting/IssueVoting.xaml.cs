@@ -39,8 +39,6 @@ namespace IssueVoting
 
             LocalInitilizer();
 
-            MessageBox.Show(mpVM.GetView().Content.ToString());
-
         }
 
         private void mpVM_OpeningDocumentsComplete(object sender, EventArgs e)
