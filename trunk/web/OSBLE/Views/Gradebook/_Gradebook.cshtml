@@ -18,16 +18,16 @@
     <tr class="colHeader">
             
         @{var j = 1;
-            <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(this);"></td>
+            <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8; width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(this);"></td>
             index++;
             j += 1;
-            <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);"></td>
+            <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color:#E8E8E8" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);"></td>
             j += 1;
-            <td id="@j" class="colHeader" style="background:silver; border:outset 3px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);"></td>
+            <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color:#E8E8E8" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);"></td>
             j += 1;
             foreach (AbstractAssignment item in ViewBag.Assignments)
             {
-                <td id="@j" class="colHeader" style="background:silver; border:outset 3px; text-align:right;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);">
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; text-align:right;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);">
                 <div id="div-@j" style="display: none;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);">
                     <img id="img-@item.ID" src="/Content/images/arrow_down.png" onclick="ShowHide(this);" style="cursor:pointer;"/>
                 </div>
@@ -39,7 +39,7 @@
     </tr>
 
     <tr id="perfectScore">
-        <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(this);"></td>
+        <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8" width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(this);"></td>
         @{index++;}
         <th id="th2">Perfect Score</th>
         <td id="perfectTotal">100%</td>
@@ -50,7 +50,7 @@
         
     </tr>
     <tr id="averageRow">
-    <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(this);"></td>
+    <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8" width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(this);"></td>
     @{index++;}
         <th id="th3">
             Average Score
@@ -65,7 +65,7 @@
     </tr>
     
     <tr>
-    <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(this);"></td>
+    <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8" width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(this);"></td>
     @{index++;}
     @{
     
@@ -83,15 +83,15 @@
             }
         
             int i = 2;
-            foreach (AbstractAssignment item in ViewBag.Assignments)
+            foreach (AbstractAssignment assign in ViewBag.Assignments)
             {
-                if (item.addedPoints > 0)
+                if (assign.addedPoints > 0)
                 {   
-                    <th id="header-@item.ID" onclick="changeHeaderName(this)">@item.Name (Added @item.addedPoints)</th>
+                    <th id="header-@assign.ID" onclick="changeHeaderName(this)">@assign.Name (Added @assign.addedPoints)</th>
                 }
                 else
                 {
-                    <th id="header-@item.ID" onclick="changeHeaderName(this)">@item.Name </th>
+                    <th id="header-@assign.ID" onclick="changeHeaderName(this)">@assign.Name </th>
                 }
                 i += 1;
             }
@@ -102,7 +102,7 @@
     @foreach (OSBLE.Models.Users.UserProfile user in ViewBag.Users)
     {        
         <tr id="studentGrades">
-            <td id="_row-@index" class="rowHeader" style="background:silver; border:outset 3px; width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(this);"></td>
+            <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; width:25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(this);"></td>
             @{index++;}
             <td id="@user.ID" >@user.LastName, @user.FirstName</td>
                     
@@ -144,25 +144,13 @@
     }
     <script type="text/javascript">
         //var lastFocusedCell = null;
-
+        var onMouseOver = false;
         $(function () {
             calculateCols();
             keyControls();
         });
 
-        function showButton(column) {
-            var container = column.id;
-            $("#div-" + container).animate({ "height": "show" }, { duration: 0 });
-            $("#div-" + container).css("background-color", "#FFFF84");
-            $("#" + container).css("background-color", "#FFFF84");
-        }
-
-        function hideButton(column) {
-            var container = column.id;
-            $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
-            $("#div-" + container).css("background-color", "Silver");
-            $('#' + container).css("background-color", "Silver");
-        }
+        
     </script>
 
 </table>

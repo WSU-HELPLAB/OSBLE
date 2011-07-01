@@ -100,7 +100,7 @@
         border-top-right-radius: 4px 4px;
         background-color: #f5f5f5;
         border-bottom-width: 0;
-        margin: 0 0.2em -0.1em 0;
+        margin: 0 0.2em 0em 0;
         background: silver;
     }
     
@@ -136,7 +136,7 @@
     
     #XtoAdd
     {
-        width: 45px;
+        width: 60px;
     }
     
 </style>
@@ -231,7 +231,7 @@
 	<form id="addPointsSubmit" onsubmit="addPoints(this); return false;"  >
 		<text>Add</text>
 		<input id="XtoAdd"/>
-		<text>points to each score</text>
+		<text>points to each original score</text>
 		<td align="right" colspan="3"><input id="addPointsSubmit" type="submit" onclick="hideFunctions();" value="Apply"/></td>
         <td align="right" colspan="3"><input id="addPointsCancel" type="button" onclick="hideFunctions();" value="Cancel" /></td>
     </form>
@@ -266,6 +266,8 @@
 
     //Keeps track of assignmentId
     var assignId = 0;
+
+    var onMouseOver = false;
     
     
 
@@ -294,6 +296,8 @@
             $("#grades tr").each(function () {
                 $(this).find("td").each(function () {
                     if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                        $(this).css("background-color", "#DCDCDC");
+                        $(this).find("div").css("background-color", "#DCDCDC");
                     }
                     else {
                         $(this).css("background-color", "white");
@@ -395,10 +399,41 @@
     }
 
 
+    function showButton(column) {
+        var container = column.id;
+        $("#div-" + container).animate({ "height": "show" }, { duration: 0 });
+        
+            //alert($("#" + container).css("background-color"));
+            if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)"
+                || $("#" + container).css("background-color") == "rgb(255, 255, 132)" && $("#div-" + container).css("background-color") == "rgb(255, 255, 132)") {
+
+                $("#" + container).css("background-color", "#FFFF84");
+                $("#div-" + container).css("background-color", "#FFFF84");
+            }
+            //onMouseOver = false;
+        
+    }
+
+    function hideButton(column) {
+        var container = column.id;
+        $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
+
+            //alert($("#" + container).css("background-color"));
+        if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)"
+            || $("#" + container).css("background-color") == "rgb(255, 255, 132)" && $("#div-" + container).css("background-color") == "rgb(255, 255, 132)") {
+
+                $("#div-" + container).css("background-color", "#DCDCDC");
+                $('#' + container).css("background-color", "#DCDCDC");
+            }
+    }
+
+
 
     function displayCustomizeGrades() {
-       
+
         $("#customizeID").dialog({
+
+
             modal: true,
             resizable: false,
             width: 290,
@@ -511,10 +546,14 @@
         //if a prior cell has already received focus in the past, we need to turn it back into
         //a normal table cell
         if (lastFocusedCell != null) {
+
             $("#grades tr").each(function () {
                 $(this).find("td").each(function () {
                     if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-                        $(this).css("background-color", "Silver");
+                        $(this).css("background-color", "#DCDCDC");
+                        $(this).find("div").css("background-color", "#DCDCDC");
+                        $(this).attr("onmouseout", "hideButton(this);");
+                        onMouseOver = false;
                     }
                     else {
 
@@ -583,7 +622,8 @@
         $("#grades tr").each(function () {
             $(this).find("td").each(function () {
                 if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-                    $(this).css("background-color", "Silver");
+                    $(this).css("background-color", "#DCDCDC");
+                    $(this).find("div").css("background-color", "#DCDCDC");
                 }
                 else {
 
@@ -626,10 +666,16 @@
         var cell = $("#grades").find("tr:eq(0)");
         cell = cell.find("td:eq(" + colIndex + ")");
         cell.css("background-color", "#FFFF84");
+        cell.find("div").css("background-color", "#FFFF84");
+        cell.removeAttr("onmouseout");
 
         var cell2 = $("#grades").find("tr:eq(" + row + ")");
         cell2 = cell2.find("td:eq(0)");
         cell2.css("background-color", "#FFFF84");
+        cell2.find("div").css("background-color", "#FFFF84");
+        cell2.removeAttr("onmouseout");
+
+        onMouseOver = true;
     }
 
     /*function calculateRows() {
@@ -768,10 +814,10 @@
     }
 
     function selectColumn(col) {
-
+        
+        clearLastCellFocus();
         //tabShowing = true;
         var container = col.id;
-
         /*var x = parseInt($("#" + container).position().left);
         var y = parseInt($("#" + container).position().top);
 
@@ -781,10 +827,11 @@
         x += 135;
         y += 23;*/
 
-        
         $("#grades tr").each(function () {
             $(this).find("td").each(function () {
                 if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                    $(this).css("background-color", "#DCDCDC");
+                    $(this).find("div").css("background-color", "#DCDCDC");
                 }
                 else {
                     $(this).css("background-color", "white");
@@ -799,12 +846,16 @@
             });
         });
 
+        $("#" + container).css("background-color", "#AAAAAA");
+        $("#div-" + container).css("background-color", "#AAAAAA");
+
         currentHeader = $(col).attr("id").split("-");
         if(currentHeader[1] == null){
             $("#grades tr").each(function () {
 
                 $(this).find("td:nth-child(" + currentHeader + ")").each(function () {
                     if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                        //$(this).css("background-color", "#AAAAAA");
                     }
                     else {
                         $(this).css("background-color", "DeepSkyBlue");
@@ -827,6 +878,8 @@
         $("#grades tr").each(function () {
             $(this).find("td").each(function () {
                 if ($(this).attr("class") == "rowHeader" || $(this).attr("class") == "colHeader") {
+                    $(this).css("background-color", "#DCDCDC");
+                    $(this).find("div").css("background-color", "#DCDCDC");
                 }
                 else {
                     $(this).css("background-color", "white");
