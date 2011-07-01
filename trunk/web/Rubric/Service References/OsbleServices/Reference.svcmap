@@ -23,12 +23,22 @@
     <MetadataSource Address="http://localhost:17532/Services/RubricService.svc" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="RubricService.disco" MetadataType="Disco" ID="8d7f7e05-7a15-442f-98f9-3d3866f01d22" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?disco" />
-    <MetadataFile FileName="RubricService.wsdl" MetadataType="Wsdl" ID="e98b6c94-def4-4f85-b63e-de3d341d0bcd" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?wsdl=wsdl0" />
+    <MetadataFile FileName="RubricService3.xsd" MetadataType="Schema" ID="99b7c030-c7f8-4625-a16f-bcb8ca72828d" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?xsd=xsd7" />
+    <MetadataFile FileName="RubricService31.xsd" MetadataType="Schema" ID="94330cd3-5ccc-4cbe-b174-ec705c8df15c" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?xsd=xsd3" />
+    <MetadataFile FileName="RubricService4.xsd" MetadataType="Schema" ID="a65ae77f-02f6-4403-93c0-111e6edd5fff" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?xsd=xsd12" />
+    <MetadataFile FileName="RubricService32.xsd" MetadataType="Schema" ID="0e86a912-e63f-41a4-a6b1-513006c16284" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?xsd=xsd6" />
     <MetadataFile FileName="RubricService.xsd" MetadataType="Schema" ID="aa7c93c1-9fa5-4900-b07d-27fbc35528ed" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?xsd=xsd2" />
-    <MetadataFile FileName="RubricService1.xsd" MetadataType="Schema" ID="8d2eef25-b1a1-4ccf-b571-322f01aedb3c" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?xsd=xsd0" />
+    <MetadataFile FileName="RubricService33.xsd" MetadataType="Schema" ID="f3af6bd6-ff41-4c69-a8a0-023e74da7aa4" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?xsd=xsd11" />
+    <MetadataFile FileName="RubricService34.xsd" MetadataType="Schema" ID="b7f4ed13-9fd2-4974-885d-5c241fcb78c5" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?xsd=xsd9" />
+    <MetadataFile FileName="RubricService35.xsd" MetadataType="Schema" ID="8dd96e1c-c846-4978-8412-2684767a7b4d" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?xsd=xsd5" />
     <MetadataFile FileName="RubricService2.xsd" MetadataType="Schema" ID="a8ac3f2c-ce05-4663-80ee-cc2f7052104c" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?xsd=xsd1" />
+    <MetadataFile FileName="RubricService.wsdl" MetadataType="Wsdl" ID="e98b6c94-def4-4f85-b63e-de3d341d0bcd" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?wsdl=wsdl0" />
+    <MetadataFile FileName="RubricService36.xsd" MetadataType="Schema" ID="4caa59cb-662c-4a52-96f3-6064b3d60415" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?xsd=xsd8" />
+    <MetadataFile FileName="RubricService37.xsd" MetadataType="Schema" ID="3f1d197f-6768-4d8a-b71f-4cf47e17328b" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?xsd=xsd4" />
+    <MetadataFile FileName="RubricService1.xsd" MetadataType="Schema" ID="8d2eef25-b1a1-4ccf-b571-322f01aedb3c" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?xsd=xsd0" />
     <MetadataFile FileName="RubricService1.wsdl" MetadataType="Wsdl" ID="f6b7d844-6a57-42b5-874b-dddef1a6b8f7" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?wsdl" />
+    <MetadataFile FileName="RubricService.disco" MetadataType="Disco" ID="8d7f7e05-7a15-442f-98f9-3d3866f01d22" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?disco" />
+    <MetadataFile FileName="RubricService38.xsd" MetadataType="Schema" ID="a2bf5fd0-3e72-4b96-b22a-20294cafa5c4" SourceId="1" SourceUrl="http://localhost:17532/Services/RubricService.svc?xsd=xsd10" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

@@ -5,6 +5,16 @@
       <xsd:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd0" />
       <xsd:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
       <xsd:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" />
+      <xsd:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" />
+      <xsd:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.HomePage" />
+      <xsd:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd5" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Users" />
+      <xsd:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd6" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models" />
+      <xsd:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd7" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments.Activities.Scores" />
+      <xsd:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd8" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments.Activities" />
+      <xsd:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd9" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments" />
+      <xsd:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd10" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.GradebookOptions" />
+      <xsd:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd11" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Rubric" />
+      <xsd:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd12" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
     </xsd:schema>
   </wsdl:types>
   <wsdl:message name="RubricService_DoWork_InputMessage">
@@ -37,11 +47,29 @@
   <wsdl:message name="RubricService_GetFakeRubric_OutputMessage">
     <wsdl:part name="parameters" element="GetFakeRubricResponse" />
   </wsdl:message>
+  <wsdl:message name="RubricService_GetCourses_InputMessage">
+    <wsdl:part name="parameters" element="GetCourses" />
+  </wsdl:message>
+  <wsdl:message name="RubricService_GetCourses_OutputMessage">
+    <wsdl:part name="parameters" element="GetCoursesResponse" />
+  </wsdl:message>
+  <wsdl:message name="RubricService_GetRubricsForCourse_InputMessage">
+    <wsdl:part name="parameters" element="GetRubricsForCourse" />
+  </wsdl:message>
+  <wsdl:message name="RubricService_GetRubricsForCourse_OutputMessage">
+    <wsdl:part name="parameters" element="GetRubricsForCourseResponse" />
+  </wsdl:message>
   <wsdl:message name="RubricService_GetRubricList_InputMessage">
     <wsdl:part name="parameters" element="GetRubricList" />
   </wsdl:message>
   <wsdl:message name="RubricService_GetRubricList_OutputMessage">
     <wsdl:part name="parameters" element="GetRubricListResponse" />
+  </wsdl:message>
+  <wsdl:message name="RubricService_SaveRubric_InputMessage">
+    <wsdl:part name="parameters" element="SaveRubric" />
+  </wsdl:message>
+  <wsdl:message name="RubricService_SaveRubric_OutputMessage">
+    <wsdl:part name="parameters" element="SaveRubricResponse" />
   </wsdl:message>
   <wsdl:portType name="RubricService">
     <wsdl:operation name="DoWork">
@@ -64,9 +92,21 @@
       <wsdl:input wsaw:Action="urn:RubricService/GetFakeRubric" message="RubricService_GetFakeRubric_InputMessage" />
       <wsdl:output wsaw:Action="urn:RubricService/GetFakeRubricResponse" message="RubricService_GetFakeRubric_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="GetCourses">
+      <wsdl:input wsaw:Action="urn:RubricService/GetCourses" message="RubricService_GetCourses_InputMessage" />
+      <wsdl:output wsaw:Action="urn:RubricService/GetCoursesResponse" message="RubricService_GetCourses_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetRubricsForCourse">
+      <wsdl:input wsaw:Action="urn:RubricService/GetRubricsForCourse" message="RubricService_GetRubricsForCourse_InputMessage" />
+      <wsdl:output wsaw:Action="urn:RubricService/GetRubricsForCourseResponse" message="RubricService_GetRubricsForCourse_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="GetRubricList">
       <wsdl:input wsaw:Action="urn:RubricService/GetRubricList" message="RubricService_GetRubricList_InputMessage" />
       <wsdl:output wsaw:Action="urn:RubricService/GetRubricListResponse" message="RubricService_GetRubricList_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SaveRubric">
+      <wsdl:input wsaw:Action="urn:RubricService/SaveRubric" message="RubricService_SaveRubric_InputMessage" />
+      <wsdl:output wsaw:Action="urn:RubricService/SaveRubricResponse" message="RubricService_SaveRubric_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
 </wsdl:definitions>

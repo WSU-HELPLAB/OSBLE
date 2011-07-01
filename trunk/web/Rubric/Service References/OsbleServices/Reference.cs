@@ -405,6 +405,1949 @@ namespace OsbleRubric.OsbleServices {
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="AbstractCourse", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses")]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(OsbleRubric.OsbleServices.Course))]
+    public partial class AbstractCourse : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private bool AllowDashboardPostsField;
+        
+        private bool AllowEventPostingField;
+        
+        private int CalendarWindowOfTimeField;
+        
+        private System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Event> EventsField;
+        
+        private int IDField;
+        
+        private string NameField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool AllowDashboardPosts {
+            get {
+                return this.AllowDashboardPostsField;
+            }
+            set {
+                if ((this.AllowDashboardPostsField.Equals(value) != true)) {
+                    this.AllowDashboardPostsField = value;
+                    this.RaisePropertyChanged("AllowDashboardPosts");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool AllowEventPosting {
+            get {
+                return this.AllowEventPostingField;
+            }
+            set {
+                if ((this.AllowEventPostingField.Equals(value) != true)) {
+                    this.AllowEventPostingField = value;
+                    this.RaisePropertyChanged("AllowEventPosting");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int CalendarWindowOfTime {
+            get {
+                return this.CalendarWindowOfTimeField;
+            }
+            set {
+                if ((this.CalendarWindowOfTimeField.Equals(value) != true)) {
+                    this.CalendarWindowOfTimeField = value;
+                    this.RaisePropertyChanged("CalendarWindowOfTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Event> Events {
+            get {
+                return this.EventsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.EventsField, value) != true)) {
+                    this.EventsField = value;
+                    this.RaisePropertyChanged("Events");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Name {
+            get {
+                return this.NameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NameField, value) != true)) {
+                    this.NameField = value;
+                    this.RaisePropertyChanged("Name");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Course", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses")]
+    public partial class Course : OsbleRubric.OsbleServices.AbstractCourse {
+        
+        private bool AllowDashboardRepliesField;
+        
+        private System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Category> CategoriesField;
+        
+        private System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CourseBreak> CourseBreaksField;
+        
+        private System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CourseMeeting> CourseMeetingsField;
+        
+        private System.DateTime EndDateField;
+        
+        private int HoursLatePerPercentPenaltyField;
+        
+        private int HoursLateUntilZeroField;
+        
+        private bool InactiveField;
+        
+        private System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.LetterGrade> LetterGradesField;
+        
+        private int MinutesLateWithNoPenaltyField;
+        
+        private string NumberField;
+        
+        private int PercentPenaltyField;
+        
+        private string PrefixField;
+        
+        private bool RequireInstructorApprovalForEventPostingField;
+        
+        private string SemesterField;
+        
+        private bool ShowMeetingsField;
+        
+        private System.DateTime StartDateField;
+        
+        private string YearField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool AllowDashboardReplies {
+            get {
+                return this.AllowDashboardRepliesField;
+            }
+            set {
+                if ((this.AllowDashboardRepliesField.Equals(value) != true)) {
+                    this.AllowDashboardRepliesField = value;
+                    this.RaisePropertyChanged("AllowDashboardReplies");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Category> Categories {
+            get {
+                return this.CategoriesField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CategoriesField, value) != true)) {
+                    this.CategoriesField = value;
+                    this.RaisePropertyChanged("Categories");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CourseBreak> CourseBreaks {
+            get {
+                return this.CourseBreaksField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CourseBreaksField, value) != true)) {
+                    this.CourseBreaksField = value;
+                    this.RaisePropertyChanged("CourseBreaks");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CourseMeeting> CourseMeetings {
+            get {
+                return this.CourseMeetingsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CourseMeetingsField, value) != true)) {
+                    this.CourseMeetingsField = value;
+                    this.RaisePropertyChanged("CourseMeetings");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.DateTime EndDate {
+            get {
+                return this.EndDateField;
+            }
+            set {
+                if ((this.EndDateField.Equals(value) != true)) {
+                    this.EndDateField = value;
+                    this.RaisePropertyChanged("EndDate");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int HoursLatePerPercentPenalty {
+            get {
+                return this.HoursLatePerPercentPenaltyField;
+            }
+            set {
+                if ((this.HoursLatePerPercentPenaltyField.Equals(value) != true)) {
+                    this.HoursLatePerPercentPenaltyField = value;
+                    this.RaisePropertyChanged("HoursLatePerPercentPenalty");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int HoursLateUntilZero {
+            get {
+                return this.HoursLateUntilZeroField;
+            }
+            set {
+                if ((this.HoursLateUntilZeroField.Equals(value) != true)) {
+                    this.HoursLateUntilZeroField = value;
+                    this.RaisePropertyChanged("HoursLateUntilZero");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool Inactive {
+            get {
+                return this.InactiveField;
+            }
+            set {
+                if ((this.InactiveField.Equals(value) != true)) {
+                    this.InactiveField = value;
+                    this.RaisePropertyChanged("Inactive");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.LetterGrade> LetterGrades {
+            get {
+                return this.LetterGradesField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.LetterGradesField, value) != true)) {
+                    this.LetterGradesField = value;
+                    this.RaisePropertyChanged("LetterGrades");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int MinutesLateWithNoPenalty {
+            get {
+                return this.MinutesLateWithNoPenaltyField;
+            }
+            set {
+                if ((this.MinutesLateWithNoPenaltyField.Equals(value) != true)) {
+                    this.MinutesLateWithNoPenaltyField = value;
+                    this.RaisePropertyChanged("MinutesLateWithNoPenalty");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Number {
+            get {
+                return this.NumberField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NumberField, value) != true)) {
+                    this.NumberField = value;
+                    this.RaisePropertyChanged("Number");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int PercentPenalty {
+            get {
+                return this.PercentPenaltyField;
+            }
+            set {
+                if ((this.PercentPenaltyField.Equals(value) != true)) {
+                    this.PercentPenaltyField = value;
+                    this.RaisePropertyChanged("PercentPenalty");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Prefix {
+            get {
+                return this.PrefixField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.PrefixField, value) != true)) {
+                    this.PrefixField = value;
+                    this.RaisePropertyChanged("Prefix");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool RequireInstructorApprovalForEventPosting {
+            get {
+                return this.RequireInstructorApprovalForEventPostingField;
+            }
+            set {
+                if ((this.RequireInstructorApprovalForEventPostingField.Equals(value) != true)) {
+                    this.RequireInstructorApprovalForEventPostingField = value;
+                    this.RaisePropertyChanged("RequireInstructorApprovalForEventPosting");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Semester {
+            get {
+                return this.SemesterField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.SemesterField, value) != true)) {
+                    this.SemesterField = value;
+                    this.RaisePropertyChanged("Semester");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool ShowMeetings {
+            get {
+                return this.ShowMeetingsField;
+            }
+            set {
+                if ((this.ShowMeetingsField.Equals(value) != true)) {
+                    this.ShowMeetingsField = value;
+                    this.RaisePropertyChanged("ShowMeetings");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.DateTime StartDate {
+            get {
+                return this.StartDateField;
+            }
+            set {
+                if ((this.StartDateField.Equals(value) != true)) {
+                    this.StartDateField = value;
+                    this.RaisePropertyChanged("StartDate");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Year {
+            get {
+                return this.YearField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.YearField, value) != true)) {
+                    this.YearField = value;
+                    this.RaisePropertyChanged("Year");
+                }
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Event", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.HomePage")]
+    public partial class Event : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private bool AllowLinkingField;
+        
+        private bool ApprovedField;
+        
+        private OsbleRubric.OsbleServices.AbstractCourse CourseField;
+        
+        private int CourseIDField;
+        
+        private string DescriptionField;
+        
+        private System.DateTime EndDateField;
+        
+        private bool HideDeleteField;
+        
+        private bool HideTimeField;
+        
+        private int IDField;
+        
+        private string LinkField;
+        
+        private string LinkTitleField;
+        
+        private bool NoDateTimeField;
+        
+        private OsbleRubric.OsbleServices.UserProfile PosterField;
+        
+        private int PosterIDField;
+        
+        private System.DateTime StartDateField;
+        
+        private System.DateTime StartTimeField;
+        
+        private string TitleField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool AllowLinking {
+            get {
+                return this.AllowLinkingField;
+            }
+            set {
+                if ((this.AllowLinkingField.Equals(value) != true)) {
+                    this.AllowLinkingField = value;
+                    this.RaisePropertyChanged("AllowLinking");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool Approved {
+            get {
+                return this.ApprovedField;
+            }
+            set {
+                if ((this.ApprovedField.Equals(value) != true)) {
+                    this.ApprovedField = value;
+                    this.RaisePropertyChanged("Approved");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public OsbleRubric.OsbleServices.AbstractCourse Course {
+            get {
+                return this.CourseField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CourseField, value) != true)) {
+                    this.CourseField = value;
+                    this.RaisePropertyChanged("Course");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int CourseID {
+            get {
+                return this.CourseIDField;
+            }
+            set {
+                if ((this.CourseIDField.Equals(value) != true)) {
+                    this.CourseIDField = value;
+                    this.RaisePropertyChanged("CourseID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Description {
+            get {
+                return this.DescriptionField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.DescriptionField, value) != true)) {
+                    this.DescriptionField = value;
+                    this.RaisePropertyChanged("Description");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.DateTime EndDate {
+            get {
+                return this.EndDateField;
+            }
+            set {
+                if ((this.EndDateField.Equals(value) != true)) {
+                    this.EndDateField = value;
+                    this.RaisePropertyChanged("EndDate");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool HideDelete {
+            get {
+                return this.HideDeleteField;
+            }
+            set {
+                if ((this.HideDeleteField.Equals(value) != true)) {
+                    this.HideDeleteField = value;
+                    this.RaisePropertyChanged("HideDelete");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool HideTime {
+            get {
+                return this.HideTimeField;
+            }
+            set {
+                if ((this.HideTimeField.Equals(value) != true)) {
+                    this.HideTimeField = value;
+                    this.RaisePropertyChanged("HideTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Link {
+            get {
+                return this.LinkField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.LinkField, value) != true)) {
+                    this.LinkField = value;
+                    this.RaisePropertyChanged("Link");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string LinkTitle {
+            get {
+                return this.LinkTitleField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.LinkTitleField, value) != true)) {
+                    this.LinkTitleField = value;
+                    this.RaisePropertyChanged("LinkTitle");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool NoDateTime {
+            get {
+                return this.NoDateTimeField;
+            }
+            set {
+                if ((this.NoDateTimeField.Equals(value) != true)) {
+                    this.NoDateTimeField = value;
+                    this.RaisePropertyChanged("NoDateTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public OsbleRubric.OsbleServices.UserProfile Poster {
+            get {
+                return this.PosterField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.PosterField, value) != true)) {
+                    this.PosterField = value;
+                    this.RaisePropertyChanged("Poster");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int PosterID {
+            get {
+                return this.PosterIDField;
+            }
+            set {
+                if ((this.PosterIDField.Equals(value) != true)) {
+                    this.PosterIDField = value;
+                    this.RaisePropertyChanged("PosterID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.DateTime StartDate {
+            get {
+                return this.StartDateField;
+            }
+            set {
+                if ((this.StartDateField.Equals(value) != true)) {
+                    this.StartDateField = value;
+                    this.RaisePropertyChanged("StartDate");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.DateTime StartTime {
+            get {
+                return this.StartTimeField;
+            }
+            set {
+                if ((this.StartTimeField.Equals(value) != true)) {
+                    this.StartTimeField = value;
+                    this.RaisePropertyChanged("StartTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Title {
+            get {
+                return this.TitleField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TitleField, value) != true)) {
+                    this.TitleField = value;
+                    this.RaisePropertyChanged("Title");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="UserProfile", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Users")]
+    public partial class UserProfile : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private bool CanCreateCoursesField;
+        
+        private int DefaultCourseField;
+        
+        private bool EmailAllActivityPostsField;
+        
+        private bool EmailAllNotificationsField;
+        
+        private string FirstNameField;
+        
+        private int IDField;
+        
+        private string IdentificationField;
+        
+        private bool IsAdminField;
+        
+        private string LastNameField;
+        
+        private OsbleRubric.OsbleServices.School SchoolField;
+        
+        private int SchoolIDField;
+        
+        private System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Score> ScoresField;
+        
+        private string UserNameField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool CanCreateCourses {
+            get {
+                return this.CanCreateCoursesField;
+            }
+            set {
+                if ((this.CanCreateCoursesField.Equals(value) != true)) {
+                    this.CanCreateCoursesField = value;
+                    this.RaisePropertyChanged("CanCreateCourses");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int DefaultCourse {
+            get {
+                return this.DefaultCourseField;
+            }
+            set {
+                if ((this.DefaultCourseField.Equals(value) != true)) {
+                    this.DefaultCourseField = value;
+                    this.RaisePropertyChanged("DefaultCourse");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool EmailAllActivityPosts {
+            get {
+                return this.EmailAllActivityPostsField;
+            }
+            set {
+                if ((this.EmailAllActivityPostsField.Equals(value) != true)) {
+                    this.EmailAllActivityPostsField = value;
+                    this.RaisePropertyChanged("EmailAllActivityPosts");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool EmailAllNotifications {
+            get {
+                return this.EmailAllNotificationsField;
+            }
+            set {
+                if ((this.EmailAllNotificationsField.Equals(value) != true)) {
+                    this.EmailAllNotificationsField = value;
+                    this.RaisePropertyChanged("EmailAllNotifications");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string FirstName {
+            get {
+                return this.FirstNameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.FirstNameField, value) != true)) {
+                    this.FirstNameField = value;
+                    this.RaisePropertyChanged("FirstName");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Identification {
+            get {
+                return this.IdentificationField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.IdentificationField, value) != true)) {
+                    this.IdentificationField = value;
+                    this.RaisePropertyChanged("Identification");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool IsAdmin {
+            get {
+                return this.IsAdminField;
+            }
+            set {
+                if ((this.IsAdminField.Equals(value) != true)) {
+                    this.IsAdminField = value;
+                    this.RaisePropertyChanged("IsAdmin");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string LastName {
+            get {
+                return this.LastNameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.LastNameField, value) != true)) {
+                    this.LastNameField = value;
+                    this.RaisePropertyChanged("LastName");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public OsbleRubric.OsbleServices.School School {
+            get {
+                return this.SchoolField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.SchoolField, value) != true)) {
+                    this.SchoolField = value;
+                    this.RaisePropertyChanged("School");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int SchoolID {
+            get {
+                return this.SchoolIDField;
+            }
+            set {
+                if ((this.SchoolIDField.Equals(value) != true)) {
+                    this.SchoolIDField = value;
+                    this.RaisePropertyChanged("SchoolID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Score> Scores {
+            get {
+                return this.ScoresField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ScoresField, value) != true)) {
+                    this.ScoresField = value;
+                    this.RaisePropertyChanged("Scores");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string UserName {
+            get {
+                return this.UserNameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.UserNameField, value) != true)) {
+                    this.UserNameField = value;
+                    this.RaisePropertyChanged("UserName");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="School", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models")]
+    public partial class School : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private int IDField;
+        
+        private string NameField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Name {
+            get {
+                return this.NameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NameField, value) != true)) {
+                    this.NameField = value;
+                    this.RaisePropertyChanged("Name");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Score", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments.Activities.Score" +
+        "s")]
+    public partial class Score : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private OsbleRubric.OsbleServices.AbstractAssignmentActivity AssignmentActivityField;
+        
+        private int AssignmentActivityIDField;
+        
+        private int IDField;
+        
+        private double MultiplierField;
+        
+        private double PointsField;
+        
+        private bool PublishedField;
+        
+        private System.Nullable<System.DateTime> PublishedDateField;
+        
+        private OsbleRubric.OsbleServices.UserProfile UserProfileField;
+        
+        private int UserProfileIDField;
+        
+        private bool isDroppedField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public OsbleRubric.OsbleServices.AbstractAssignmentActivity AssignmentActivity {
+            get {
+                return this.AssignmentActivityField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AssignmentActivityField, value) != true)) {
+                    this.AssignmentActivityField = value;
+                    this.RaisePropertyChanged("AssignmentActivity");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int AssignmentActivityID {
+            get {
+                return this.AssignmentActivityIDField;
+            }
+            set {
+                if ((this.AssignmentActivityIDField.Equals(value) != true)) {
+                    this.AssignmentActivityIDField = value;
+                    this.RaisePropertyChanged("AssignmentActivityID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public double Multiplier {
+            get {
+                return this.MultiplierField;
+            }
+            set {
+                if ((this.MultiplierField.Equals(value) != true)) {
+                    this.MultiplierField = value;
+                    this.RaisePropertyChanged("Multiplier");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public double Points {
+            get {
+                return this.PointsField;
+            }
+            set {
+                if ((this.PointsField.Equals(value) != true)) {
+                    this.PointsField = value;
+                    this.RaisePropertyChanged("Points");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool Published {
+            get {
+                return this.PublishedField;
+            }
+            set {
+                if ((this.PublishedField.Equals(value) != true)) {
+                    this.PublishedField = value;
+                    this.RaisePropertyChanged("Published");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Nullable<System.DateTime> PublishedDate {
+            get {
+                return this.PublishedDateField;
+            }
+            set {
+                if ((this.PublishedDateField.Equals(value) != true)) {
+                    this.PublishedDateField = value;
+                    this.RaisePropertyChanged("PublishedDate");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public OsbleRubric.OsbleServices.UserProfile UserProfile {
+            get {
+                return this.UserProfileField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.UserProfileField, value) != true)) {
+                    this.UserProfileField = value;
+                    this.RaisePropertyChanged("UserProfile");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int UserProfileID {
+            get {
+                return this.UserProfileIDField;
+            }
+            set {
+                if ((this.UserProfileIDField.Equals(value) != true)) {
+                    this.UserProfileIDField = value;
+                    this.RaisePropertyChanged("UserProfileID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool isDropped {
+            get {
+                return this.isDroppedField;
+            }
+            set {
+                if ((this.isDroppedField.Equals(value) != true)) {
+                    this.isDroppedField = value;
+                    this.RaisePropertyChanged("isDropped");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="AbstractAssignmentActivity", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments.Activities")]
+    public partial class AbstractAssignmentActivity : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private OsbleRubric.OsbleServices.AbstractAssignment AbstractAssignmentField;
+        
+        private int AbstractAssignmentIDField;
+        
+        private int ColumnOrderField;
+        
+        private int IDField;
+        
+        private string NameField;
+        
+        private int PointsPossibleField;
+        
+        private System.DateTime ReleaseDateField;
+        
+        private System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Score> ScoresField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public OsbleRubric.OsbleServices.AbstractAssignment AbstractAssignment {
+            get {
+                return this.AbstractAssignmentField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AbstractAssignmentField, value) != true)) {
+                    this.AbstractAssignmentField = value;
+                    this.RaisePropertyChanged("AbstractAssignment");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int AbstractAssignmentID {
+            get {
+                return this.AbstractAssignmentIDField;
+            }
+            set {
+                if ((this.AbstractAssignmentIDField.Equals(value) != true)) {
+                    this.AbstractAssignmentIDField = value;
+                    this.RaisePropertyChanged("AbstractAssignmentID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ColumnOrder {
+            get {
+                return this.ColumnOrderField;
+            }
+            set {
+                if ((this.ColumnOrderField.Equals(value) != true)) {
+                    this.ColumnOrderField = value;
+                    this.RaisePropertyChanged("ColumnOrder");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Name {
+            get {
+                return this.NameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NameField, value) != true)) {
+                    this.NameField = value;
+                    this.RaisePropertyChanged("Name");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int PointsPossible {
+            get {
+                return this.PointsPossibleField;
+            }
+            set {
+                if ((this.PointsPossibleField.Equals(value) != true)) {
+                    this.PointsPossibleField = value;
+                    this.RaisePropertyChanged("PointsPossible");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.DateTime ReleaseDate {
+            get {
+                return this.ReleaseDateField;
+            }
+            set {
+                if ((this.ReleaseDateField.Equals(value) != true)) {
+                    this.ReleaseDateField = value;
+                    this.RaisePropertyChanged("ReleaseDate");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Score> Scores {
+            get {
+                return this.ScoresField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ScoresField, value) != true)) {
+                    this.ScoresField = value;
+                    this.RaisePropertyChanged("Scores");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="AbstractAssignment", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments")]
+    public partial class AbstractAssignment : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.AbstractAssignmentActivity> AssignmentActivitiesField;
+        
+        private OsbleRubric.OsbleServices.Category CategoryField;
+        
+        private int CategoryIDField;
+        
+        private int ColumnOrderField;
+        
+        private int IDField;
+        
+        private bool IsDraftField;
+        
+        private string NameField;
+        
+        private int PointsPossibleField;
+        
+        private OsbleRubric.OsbleServices.Rubric RubricField;
+        
+        private System.Nullable<int> RubricIDField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.AbstractAssignmentActivity> AssignmentActivities {
+            get {
+                return this.AssignmentActivitiesField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AssignmentActivitiesField, value) != true)) {
+                    this.AssignmentActivitiesField = value;
+                    this.RaisePropertyChanged("AssignmentActivities");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public OsbleRubric.OsbleServices.Category Category {
+            get {
+                return this.CategoryField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CategoryField, value) != true)) {
+                    this.CategoryField = value;
+                    this.RaisePropertyChanged("Category");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int CategoryID {
+            get {
+                return this.CategoryIDField;
+            }
+            set {
+                if ((this.CategoryIDField.Equals(value) != true)) {
+                    this.CategoryIDField = value;
+                    this.RaisePropertyChanged("CategoryID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ColumnOrder {
+            get {
+                return this.ColumnOrderField;
+            }
+            set {
+                if ((this.ColumnOrderField.Equals(value) != true)) {
+                    this.ColumnOrderField = value;
+                    this.RaisePropertyChanged("ColumnOrder");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool IsDraft {
+            get {
+                return this.IsDraftField;
+            }
+            set {
+                if ((this.IsDraftField.Equals(value) != true)) {
+                    this.IsDraftField = value;
+                    this.RaisePropertyChanged("IsDraft");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Name {
+            get {
+                return this.NameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NameField, value) != true)) {
+                    this.NameField = value;
+                    this.RaisePropertyChanged("Name");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int PointsPossible {
+            get {
+                return this.PointsPossibleField;
+            }
+            set {
+                if ((this.PointsPossibleField.Equals(value) != true)) {
+                    this.PointsPossibleField = value;
+                    this.RaisePropertyChanged("PointsPossible");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public OsbleRubric.OsbleServices.Rubric Rubric {
+            get {
+                return this.RubricField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.RubricField, value) != true)) {
+                    this.RubricField = value;
+                    this.RaisePropertyChanged("Rubric");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Nullable<int> RubricID {
+            get {
+                return this.RubricIDField;
+            }
+            set {
+                if ((this.RubricIDField.Equals(value) != true)) {
+                    this.RubricIDField = value;
+                    this.RaisePropertyChanged("RubricID");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Category", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses")]
+    public partial class Category : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.AbstractAssignment> AssignmentsField;
+        
+        private int ColumnOrderField;
+        
+        private OsbleRubric.OsbleServices.Course CourseField;
+        
+        private int CourseIDField;
+        
+        private OsbleRubric.OsbleServices.GradebookOptions GradebookOptionsField;
+        
+        private int IDField;
+        
+        private string NameField;
+        
+        private double PointsField;
+        
+        private double PointsPossibleField;
+        
+        private string TabColorField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.AbstractAssignment> Assignments {
+            get {
+                return this.AssignmentsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AssignmentsField, value) != true)) {
+                    this.AssignmentsField = value;
+                    this.RaisePropertyChanged("Assignments");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ColumnOrder {
+            get {
+                return this.ColumnOrderField;
+            }
+            set {
+                if ((this.ColumnOrderField.Equals(value) != true)) {
+                    this.ColumnOrderField = value;
+                    this.RaisePropertyChanged("ColumnOrder");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public OsbleRubric.OsbleServices.Course Course {
+            get {
+                return this.CourseField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CourseField, value) != true)) {
+                    this.CourseField = value;
+                    this.RaisePropertyChanged("Course");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int CourseID {
+            get {
+                return this.CourseIDField;
+            }
+            set {
+                if ((this.CourseIDField.Equals(value) != true)) {
+                    this.CourseIDField = value;
+                    this.RaisePropertyChanged("CourseID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public OsbleRubric.OsbleServices.GradebookOptions GradebookOptions {
+            get {
+                return this.GradebookOptionsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.GradebookOptionsField, value) != true)) {
+                    this.GradebookOptionsField = value;
+                    this.RaisePropertyChanged("GradebookOptions");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Name {
+            get {
+                return this.NameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NameField, value) != true)) {
+                    this.NameField = value;
+                    this.RaisePropertyChanged("Name");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public double Points {
+            get {
+                return this.PointsField;
+            }
+            set {
+                if ((this.PointsField.Equals(value) != true)) {
+                    this.PointsField = value;
+                    this.RaisePropertyChanged("Points");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public double PointsPossible {
+            get {
+                return this.PointsPossibleField;
+            }
+            set {
+                if ((this.PointsPossibleField.Equals(value) != true)) {
+                    this.PointsPossibleField = value;
+                    this.RaisePropertyChanged("PointsPossible");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string TabColor {
+            get {
+                return this.TabColorField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TabColorField, value) != true)) {
+                    this.TabColorField = value;
+                    this.RaisePropertyChanged("TabColor");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="GradebookOptions", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.GradebookOptions")]
+    public partial class GradebookOptions : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private int dropXField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int dropX {
+            get {
+                return this.dropXField;
+            }
+            set {
+                if ((this.dropXField.Equals(value) != true)) {
+                    this.dropXField = value;
+                    this.RaisePropertyChanged("dropX");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="CourseBreak", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses")]
+    public partial class CourseBreak : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private System.DateTime EndDateField;
+        
+        private int IDField;
+        
+        private string NameField;
+        
+        private System.DateTime StartDateField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.DateTime EndDate {
+            get {
+                return this.EndDateField;
+            }
+            set {
+                if ((this.EndDateField.Equals(value) != true)) {
+                    this.EndDateField = value;
+                    this.RaisePropertyChanged("EndDate");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Name {
+            get {
+                return this.NameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NameField, value) != true)) {
+                    this.NameField = value;
+                    this.RaisePropertyChanged("Name");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.DateTime StartDate {
+            get {
+                return this.StartDateField;
+            }
+            set {
+                if ((this.StartDateField.Equals(value) != true)) {
+                    this.StartDateField = value;
+                    this.RaisePropertyChanged("StartDate");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="CourseMeeting", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses")]
+    public partial class CourseMeeting : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private System.DateTime EndTimeField;
+        
+        private bool FridayField;
+        
+        private int IDField;
+        
+        private string LocationField;
+        
+        private bool MondayField;
+        
+        private string NameField;
+        
+        private bool SaturdayField;
+        
+        private System.DateTime StartTimeField;
+        
+        private bool SundayField;
+        
+        private bool ThursdayField;
+        
+        private bool TuesdayField;
+        
+        private bool WednesdayField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.DateTime EndTime {
+            get {
+                return this.EndTimeField;
+            }
+            set {
+                if ((this.EndTimeField.Equals(value) != true)) {
+                    this.EndTimeField = value;
+                    this.RaisePropertyChanged("EndTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool Friday {
+            get {
+                return this.FridayField;
+            }
+            set {
+                if ((this.FridayField.Equals(value) != true)) {
+                    this.FridayField = value;
+                    this.RaisePropertyChanged("Friday");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Location {
+            get {
+                return this.LocationField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.LocationField, value) != true)) {
+                    this.LocationField = value;
+                    this.RaisePropertyChanged("Location");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool Monday {
+            get {
+                return this.MondayField;
+            }
+            set {
+                if ((this.MondayField.Equals(value) != true)) {
+                    this.MondayField = value;
+                    this.RaisePropertyChanged("Monday");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Name {
+            get {
+                return this.NameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NameField, value) != true)) {
+                    this.NameField = value;
+                    this.RaisePropertyChanged("Name");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool Saturday {
+            get {
+                return this.SaturdayField;
+            }
+            set {
+                if ((this.SaturdayField.Equals(value) != true)) {
+                    this.SaturdayField = value;
+                    this.RaisePropertyChanged("Saturday");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.DateTime StartTime {
+            get {
+                return this.StartTimeField;
+            }
+            set {
+                if ((this.StartTimeField.Equals(value) != true)) {
+                    this.StartTimeField = value;
+                    this.RaisePropertyChanged("StartTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool Sunday {
+            get {
+                return this.SundayField;
+            }
+            set {
+                if ((this.SundayField.Equals(value) != true)) {
+                    this.SundayField = value;
+                    this.RaisePropertyChanged("Sunday");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool Thursday {
+            get {
+                return this.ThursdayField;
+            }
+            set {
+                if ((this.ThursdayField.Equals(value) != true)) {
+                    this.ThursdayField = value;
+                    this.RaisePropertyChanged("Thursday");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool Tuesday {
+            get {
+                return this.TuesdayField;
+            }
+            set {
+                if ((this.TuesdayField.Equals(value) != true)) {
+                    this.TuesdayField = value;
+                    this.RaisePropertyChanged("Tuesday");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool Wednesday {
+            get {
+                return this.WednesdayField;
+            }
+            set {
+                if ((this.WednesdayField.Equals(value) != true)) {
+                    this.WednesdayField = value;
+                    this.RaisePropertyChanged("Wednesday");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="LetterGrade", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses")]
+    public partial class LetterGrade : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private string GradeField;
+        
+        private int IDField;
+        
+        private int MinimumRequiredField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Grade {
+            get {
+                return this.GradeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.GradeField, value) != true)) {
+                    this.GradeField = value;
+                    this.RaisePropertyChanged("Grade");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int MinimumRequired {
+            get {
+                return this.MinimumRequiredField;
+            }
+            set {
+                if ((this.MinimumRequiredField.Equals(value) != true)) {
+                    this.MinimumRequiredField = value;
+                    this.RaisePropertyChanged("MinimumRequired");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="SimpleCourse", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Rubric")]
+    public partial class SimpleCourse : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private int CourseIDField;
+        
+        private string NameField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int CourseID {
+            get {
+                return this.CourseIDField;
+            }
+            set {
+                if ((this.CourseIDField.Equals(value) != true)) {
+                    this.CourseIDField = value;
+                    this.RaisePropertyChanged("CourseID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Name {
+            get {
+                return this.NameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NameField, value) != true)) {
+                    this.NameField = value;
+                    this.RaisePropertyChanged("Name");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(Namespace="", ConfigurationName="OsbleServices.RubricService")]
     public interface RubricService {
@@ -434,10 +2377,25 @@ namespace OsbleRubric.OsbleServices {
         
         OsbleRubric.OsbleServices.Rubric EndGetFakeRubric(System.IAsyncResult result);
         
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:RubricService/GetCourses", ReplyAction="urn:RubricService/GetCoursesResponse")]
+        System.IAsyncResult BeginGetCourses(System.AsyncCallback callback, object asyncState);
+        
+        System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.AbstractCourse> EndGetCourses(System.IAsyncResult result);
+        
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:RubricService/GetRubricsForCourse", ReplyAction="urn:RubricService/GetRubricsForCourseResponse")]
+        System.IAsyncResult BeginGetRubricsForCourse(OsbleRubric.OsbleServices.SimpleCourse course, System.AsyncCallback callback, object asyncState);
+        
+        System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric> EndGetRubricsForCourse(System.IAsyncResult result);
+        
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:RubricService/GetRubricList", ReplyAction="urn:RubricService/GetRubricListResponse")]
         System.IAsyncResult BeginGetRubricList(System.AsyncCallback callback, object asyncState);
         
-        System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric> EndGetRubricList(System.IAsyncResult result);
+        System.Collections.Generic.Dictionary<OsbleRubric.OsbleServices.SimpleCourse, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric>> EndGetRubricList(System.IAsyncResult result);
+        
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:RubricService/SaveRubric", ReplyAction="urn:RubricService/SaveRubricResponse")]
+        System.IAsyncResult BeginSaveRubric(int courseId, OsbleRubric.OsbleServices.Rubric rubric, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CellDescription> descriptions, System.AsyncCallback callback, object asyncState);
+        
+        int EndSaveRubric(System.IAsyncResult result);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -522,6 +2480,44 @@ namespace OsbleRubric.OsbleServices {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class GetCoursesCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        public GetCoursesCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.AbstractCourse> Result {
+            get {
+                base.RaiseExceptionIfNecessary();
+                return ((System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.AbstractCourse>)(this.results[0]));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class GetRubricsForCourseCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        public GetRubricsForCourseCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric> Result {
+            get {
+                base.RaiseExceptionIfNecessary();
+                return ((System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric>)(this.results[0]));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public partial class GetRubricListCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
         
         private object[] results;
@@ -531,10 +2527,29 @@ namespace OsbleRubric.OsbleServices {
             this.results = results;
         }
         
-        public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric> Result {
+        public System.Collections.Generic.Dictionary<OsbleRubric.OsbleServices.SimpleCourse, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric>> Result {
             get {
                 base.RaiseExceptionIfNecessary();
-                return ((System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric>)(this.results[0]));
+                return ((System.Collections.Generic.Dictionary<OsbleRubric.OsbleServices.SimpleCourse, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric>>)(this.results[0]));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class SaveRubricCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        public SaveRubricCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        public int Result {
+            get {
+                base.RaiseExceptionIfNecessary();
+                return ((int)(this.results[0]));
             }
         }
     }
@@ -573,11 +2588,29 @@ namespace OsbleRubric.OsbleServices {
         
         private System.Threading.SendOrPostCallback onGetFakeRubricCompletedDelegate;
         
+        private BeginOperationDelegate onBeginGetCoursesDelegate;
+        
+        private EndOperationDelegate onEndGetCoursesDelegate;
+        
+        private System.Threading.SendOrPostCallback onGetCoursesCompletedDelegate;
+        
+        private BeginOperationDelegate onBeginGetRubricsForCourseDelegate;
+        
+        private EndOperationDelegate onEndGetRubricsForCourseDelegate;
+        
+        private System.Threading.SendOrPostCallback onGetRubricsForCourseCompletedDelegate;
+        
         private BeginOperationDelegate onBeginGetRubricListDelegate;
         
         private EndOperationDelegate onEndGetRubricListDelegate;
         
         private System.Threading.SendOrPostCallback onGetRubricListCompletedDelegate;
+        
+        private BeginOperationDelegate onBeginSaveRubricDelegate;
+        
+        private EndOperationDelegate onEndSaveRubricDelegate;
+        
+        private System.Threading.SendOrPostCallback onSaveRubricCompletedDelegate;
         
         private BeginOperationDelegate onBeginOpenDelegate;
         
@@ -642,7 +2675,13 @@ namespace OsbleRubric.OsbleServices {
         
         public event System.EventHandler<GetFakeRubricCompletedEventArgs> GetFakeRubricCompleted;
         
+        public event System.EventHandler<GetCoursesCompletedEventArgs> GetCoursesCompleted;
+        
+        public event System.EventHandler<GetRubricsForCourseCompletedEventArgs> GetRubricsForCourseCompleted;
+        
         public event System.EventHandler<GetRubricListCompletedEventArgs> GetRubricListCompleted;
+        
+        public event System.EventHandler<SaveRubricCompletedEventArgs> SaveRubricCompleted;
         
         public event System.EventHandler<System.ComponentModel.AsyncCompletedEventArgs> OpenCompleted;
         
@@ -868,12 +2907,102 @@ namespace OsbleRubric.OsbleServices {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.IAsyncResult OsbleRubric.OsbleServices.RubricService.BeginGetCourses(System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginGetCourses(callback, asyncState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.AbstractCourse> OsbleRubric.OsbleServices.RubricService.EndGetCourses(System.IAsyncResult result) {
+            return base.Channel.EndGetCourses(result);
+        }
+        
+        private System.IAsyncResult OnBeginGetCourses(object[] inValues, System.AsyncCallback callback, object asyncState) {
+            return ((OsbleRubric.OsbleServices.RubricService)(this)).BeginGetCourses(callback, asyncState);
+        }
+        
+        private object[] OnEndGetCourses(System.IAsyncResult result) {
+            System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.AbstractCourse> retVal = ((OsbleRubric.OsbleServices.RubricService)(this)).EndGetCourses(result);
+            return new object[] {
+                    retVal};
+        }
+        
+        private void OnGetCoursesCompleted(object state) {
+            if ((this.GetCoursesCompleted != null)) {
+                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
+                this.GetCoursesCompleted(this, new GetCoursesCompletedEventArgs(e.Results, e.Error, e.Cancelled, e.UserState));
+            }
+        }
+        
+        public void GetCoursesAsync() {
+            this.GetCoursesAsync(null);
+        }
+        
+        public void GetCoursesAsync(object userState) {
+            if ((this.onBeginGetCoursesDelegate == null)) {
+                this.onBeginGetCoursesDelegate = new BeginOperationDelegate(this.OnBeginGetCourses);
+            }
+            if ((this.onEndGetCoursesDelegate == null)) {
+                this.onEndGetCoursesDelegate = new EndOperationDelegate(this.OnEndGetCourses);
+            }
+            if ((this.onGetCoursesCompletedDelegate == null)) {
+                this.onGetCoursesCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnGetCoursesCompleted);
+            }
+            base.InvokeAsync(this.onBeginGetCoursesDelegate, null, this.onEndGetCoursesDelegate, this.onGetCoursesCompletedDelegate, userState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.IAsyncResult OsbleRubric.OsbleServices.RubricService.BeginGetRubricsForCourse(OsbleRubric.OsbleServices.SimpleCourse course, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginGetRubricsForCourse(course, callback, asyncState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric> OsbleRubric.OsbleServices.RubricService.EndGetRubricsForCourse(System.IAsyncResult result) {
+            return base.Channel.EndGetRubricsForCourse(result);
+        }
+        
+        private System.IAsyncResult OnBeginGetRubricsForCourse(object[] inValues, System.AsyncCallback callback, object asyncState) {
+            OsbleRubric.OsbleServices.SimpleCourse course = ((OsbleRubric.OsbleServices.SimpleCourse)(inValues[0]));
+            return ((OsbleRubric.OsbleServices.RubricService)(this)).BeginGetRubricsForCourse(course, callback, asyncState);
+        }
+        
+        private object[] OnEndGetRubricsForCourse(System.IAsyncResult result) {
+            System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric> retVal = ((OsbleRubric.OsbleServices.RubricService)(this)).EndGetRubricsForCourse(result);
+            return new object[] {
+                    retVal};
+        }
+        
+        private void OnGetRubricsForCourseCompleted(object state) {
+            if ((this.GetRubricsForCourseCompleted != null)) {
+                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
+                this.GetRubricsForCourseCompleted(this, new GetRubricsForCourseCompletedEventArgs(e.Results, e.Error, e.Cancelled, e.UserState));
+            }
+        }
+        
+        public void GetRubricsForCourseAsync(OsbleRubric.OsbleServices.SimpleCourse course) {
+            this.GetRubricsForCourseAsync(course, null);
+        }
+        
+        public void GetRubricsForCourseAsync(OsbleRubric.OsbleServices.SimpleCourse course, object userState) {
+            if ((this.onBeginGetRubricsForCourseDelegate == null)) {
+                this.onBeginGetRubricsForCourseDelegate = new BeginOperationDelegate(this.OnBeginGetRubricsForCourse);
+            }
+            if ((this.onEndGetRubricsForCourseDelegate == null)) {
+                this.onEndGetRubricsForCourseDelegate = new EndOperationDelegate(this.OnEndGetRubricsForCourse);
+            }
+            if ((this.onGetRubricsForCourseCompletedDelegate == null)) {
+                this.onGetRubricsForCourseCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnGetRubricsForCourseCompleted);
+            }
+            base.InvokeAsync(this.onBeginGetRubricsForCourseDelegate, new object[] {
+                        course}, this.onEndGetRubricsForCourseDelegate, this.onGetRubricsForCourseCompletedDelegate, userState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         System.IAsyncResult OsbleRubric.OsbleServices.RubricService.BeginGetRubricList(System.AsyncCallback callback, object asyncState) {
             return base.Channel.BeginGetRubricList(callback, asyncState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric> OsbleRubric.OsbleServices.RubricService.EndGetRubricList(System.IAsyncResult result) {
+        System.Collections.Generic.Dictionary<OsbleRubric.OsbleServices.SimpleCourse, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric>> OsbleRubric.OsbleServices.RubricService.EndGetRubricList(System.IAsyncResult result) {
             return base.Channel.EndGetRubricList(result);
         }
         
@@ -882,7 +3011,7 @@ namespace OsbleRubric.OsbleServices {
         }
         
         private object[] OnEndGetRubricList(System.IAsyncResult result) {
-            System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric> retVal = ((OsbleRubric.OsbleServices.RubricService)(this)).EndGetRubricList(result);
+            System.Collections.Generic.Dictionary<OsbleRubric.OsbleServices.SimpleCourse, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric>> retVal = ((OsbleRubric.OsbleServices.RubricService)(this)).EndGetRubricList(result);
             return new object[] {
                     retVal};
         }
@@ -909,6 +3038,56 @@ namespace OsbleRubric.OsbleServices {
                 this.onGetRubricListCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnGetRubricListCompleted);
             }
             base.InvokeAsync(this.onBeginGetRubricListDelegate, null, this.onEndGetRubricListDelegate, this.onGetRubricListCompletedDelegate, userState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.IAsyncResult OsbleRubric.OsbleServices.RubricService.BeginSaveRubric(int courseId, OsbleRubric.OsbleServices.Rubric rubric, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CellDescription> descriptions, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginSaveRubric(courseId, rubric, descriptions, callback, asyncState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        int OsbleRubric.OsbleServices.RubricService.EndSaveRubric(System.IAsyncResult result) {
+            return base.Channel.EndSaveRubric(result);
+        }
+        
+        private System.IAsyncResult OnBeginSaveRubric(object[] inValues, System.AsyncCallback callback, object asyncState) {
+            int courseId = ((int)(inValues[0]));
+            OsbleRubric.OsbleServices.Rubric rubric = ((OsbleRubric.OsbleServices.Rubric)(inValues[1]));
+            System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CellDescription> descriptions = ((System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CellDescription>)(inValues[2]));
+            return ((OsbleRubric.OsbleServices.RubricService)(this)).BeginSaveRubric(courseId, rubric, descriptions, callback, asyncState);
+        }
+        
+        private object[] OnEndSaveRubric(System.IAsyncResult result) {
+            int retVal = ((OsbleRubric.OsbleServices.RubricService)(this)).EndSaveRubric(result);
+            return new object[] {
+                    retVal};
+        }
+        
+        private void OnSaveRubricCompleted(object state) {
+            if ((this.SaveRubricCompleted != null)) {
+                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
+                this.SaveRubricCompleted(this, new SaveRubricCompletedEventArgs(e.Results, e.Error, e.Cancelled, e.UserState));
+            }
+        }
+        
+        public void SaveRubricAsync(int courseId, OsbleRubric.OsbleServices.Rubric rubric, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CellDescription> descriptions) {
+            this.SaveRubricAsync(courseId, rubric, descriptions, null);
+        }
+        
+        public void SaveRubricAsync(int courseId, OsbleRubric.OsbleServices.Rubric rubric, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CellDescription> descriptions, object userState) {
+            if ((this.onBeginSaveRubricDelegate == null)) {
+                this.onBeginSaveRubricDelegate = new BeginOperationDelegate(this.OnBeginSaveRubric);
+            }
+            if ((this.onEndSaveRubricDelegate == null)) {
+                this.onEndSaveRubricDelegate = new EndOperationDelegate(this.OnEndSaveRubric);
+            }
+            if ((this.onSaveRubricCompletedDelegate == null)) {
+                this.onSaveRubricCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnSaveRubricCompleted);
+            }
+            base.InvokeAsync(this.onBeginSaveRubricDelegate, new object[] {
+                        courseId,
+                        rubric,
+                        descriptions}, this.onEndSaveRubricDelegate, this.onSaveRubricCompletedDelegate, userState);
         }
         
         private System.IAsyncResult OnBeginOpen(object[] inValues, System.AsyncCallback callback, object asyncState) {
@@ -1046,15 +3225,55 @@ namespace OsbleRubric.OsbleServices {
                 return _result;
             }
             
+            public System.IAsyncResult BeginGetCourses(System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[0];
+                System.IAsyncResult _result = base.BeginInvoke("GetCourses", _args, callback, asyncState);
+                return _result;
+            }
+            
+            public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.AbstractCourse> EndGetCourses(System.IAsyncResult result) {
+                object[] _args = new object[0];
+                System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.AbstractCourse> _result = ((System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.AbstractCourse>)(base.EndInvoke("GetCourses", _args, result)));
+                return _result;
+            }
+            
+            public System.IAsyncResult BeginGetRubricsForCourse(OsbleRubric.OsbleServices.SimpleCourse course, System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[1];
+                _args[0] = course;
+                System.IAsyncResult _result = base.BeginInvoke("GetRubricsForCourse", _args, callback, asyncState);
+                return _result;
+            }
+            
+            public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric> EndGetRubricsForCourse(System.IAsyncResult result) {
+                object[] _args = new object[0];
+                System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric> _result = ((System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric>)(base.EndInvoke("GetRubricsForCourse", _args, result)));
+                return _result;
+            }
+            
             public System.IAsyncResult BeginGetRubricList(System.AsyncCallback callback, object asyncState) {
                 object[] _args = new object[0];
                 System.IAsyncResult _result = base.BeginInvoke("GetRubricList", _args, callback, asyncState);
                 return _result;
             }
             
-            public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric> EndGetRubricList(System.IAsyncResult result) {
+            public System.Collections.Generic.Dictionary<OsbleRubric.OsbleServices.SimpleCourse, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric>> EndGetRubricList(System.IAsyncResult result) {
                 object[] _args = new object[0];
-                System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric> _result = ((System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric>)(base.EndInvoke("GetRubricList", _args, result)));
+                System.Collections.Generic.Dictionary<OsbleRubric.OsbleServices.SimpleCourse, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric>> _result = ((System.Collections.Generic.Dictionary<OsbleRubric.OsbleServices.SimpleCourse, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric>>)(base.EndInvoke("GetRubricList", _args, result)));
+                return _result;
+            }
+            
+            public System.IAsyncResult BeginSaveRubric(int courseId, OsbleRubric.OsbleServices.Rubric rubric, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CellDescription> descriptions, System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[3];
+                _args[0] = courseId;
+                _args[1] = rubric;
+                _args[2] = descriptions;
+                System.IAsyncResult _result = base.BeginInvoke("SaveRubric", _args, callback, asyncState);
+                return _result;
+            }
+            
+            public int EndSaveRubric(System.IAsyncResult result) {
+                object[] _args = new object[0];
+                int _result = ((int)(base.EndInvoke("SaveRubric", _args, result)));
                 return _result;
             }
         }

@@ -60,4 +60,10 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ArrayOfRubric" nillable="true" type="tns:ArrayOfRubric" />
+  <xs:complexType name="ArrayOfCellDescription">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="CellDescription" nillable="true" type="tns:CellDescription" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfCellDescription" nillable="true" type="tns:ArrayOfCellDescription" />
 </xs:schema>

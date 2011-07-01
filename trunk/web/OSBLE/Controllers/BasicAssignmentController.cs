@@ -258,6 +258,9 @@ namespace OSBLE.Controllers
 
         private SilverlightObject createRubricCreationSilverlightObject()
         {
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            parameters.Add("courseId", activeCourse.CourseID.ToString());
+
             return new SilverlightObject
             {
                 CSSId = "rubric_silverlight",
@@ -265,9 +268,7 @@ namespace OSBLE.Controllers
                 Width = "800",
                 Height = "580",
                 OnLoaded = "SLObjectLoaded",
-                Parameters = new Dictionary<string, string>()
-                {
-                }
+                Parameters = parameters
             };
         }
 

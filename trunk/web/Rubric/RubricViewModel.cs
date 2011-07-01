@@ -20,6 +20,8 @@ namespace OsbleRubric
         private List<ICell> dataFromCells = new List<ICell>();
         public enum CheckboxValues { ColumnComment, GlobalComment };
         private RubricServiceClient client = new RubricServiceClient();
+        private int currentCourseId = 0;
+        
         #endregion Attributes
 
         #region constants
@@ -58,6 +60,20 @@ namespace OsbleRubric
         /// </summary>
         private void initialize()
         {
+            //attach event listeners to our view
+            thisView.CancelChanges.Click += new RoutedEventHandler(CancelChanges_Click);
+            thisView.PublishChanges.Click += new RoutedEventHandler(PublishChanges_Click);
+
+            //attach event listeners to our web service
+            client.GetRubricListCompleted += new EventHandler<GetRubricListCompletedEventArgs>(GetRubricListCompleted);
+            client.SaveRubricCompleted += new EventHandler<SaveRubricCompletedEventArgs>(SaveRubricCompleted);
+           
+            //stash the current course id
+            if (App.Current.Resources["courseId"] != null)
+            {
+                Int32.TryParse(App.Current.Resources["courseId"].ToString(), out currentCourseId);
+            }
+
             //adding grid to the view
             if (thisView.LayoutRoot.Children.Contains(customDataGrid.BaseGrid) == false) //won't try to add the grid if init is run again
             {
@@ -102,10 +118,6 @@ namespace OsbleRubric
 
             //setting up the initial grayed arrows
             adjustArrowIcons();
-
-            //attach event listeners to our view
-            thisView.CancelChanges.Click += new RoutedEventHandler(CancelChanges_Click);
-            thisView.PublishChanges.Click += new RoutedEventHandler(PublishChanges_Click);
         }
 
         /// <summary>
@@ -1115,6 +1127,16 @@ namespace OsbleRubric
 
         #region Events
 
+        void SaveRubricCompleted(object sender, SaveRubricCompletedEventArgs e)
+        {
+            
+        }
+
+        void GetRubricListCompleted(object sender, GetRubricListCompletedEventArgs e)
+        {
+            //courseRubrics = e.Result;
+        }
+
         /// <summary>
         /// Called when the user clicks on the "Cancel" button in the view
         /// </summary>
@@ -1136,7 +1158,10 @@ namespace OsbleRubric
 
             //will house the final form of the data that we will send to the client
             Rubric rubric = new Rubric();
-            List<CellDescription> cellDescriptions = new List<CellDescription>();
+            rubric.HasCriteriaComments = false;
+            rubric.HasGlobalComments = false;
+            rubric.Description = "No Descrption";
+            ObservableCollection<CellDescription> cellDescriptions = new ObservableCollection<CellDescription>();
             rubric.Criteria = new ObservableCollection<Criterion>();
             rubric.Levels = new ObservableCollection<Level>();
 
@@ -1169,11 +1194,20 @@ namespace OsbleRubric
                 //just create new rows & columns based on the current cell
                 while (rubric.Levels.Count - 1 < cell.Column)
                 {
-                    rubric.Levels.Add(new Level() { ID = rubric.Levels.Count} );
+                    Level l = new Level();
+                    l.ID = rubric.Levels.Count;
+                    l.LevelTitle = "No Title";
+                    l.RangeEnd = 0;
+                    l.RangeStart = 0;
+                    rubric.Levels.Add(l);
                 }
                 while (rubric.Criteria.Count - 1 < cell.Row)
                 {
-                    rubric.Criteria.Add(new Criterion() {ID = rubric.Criteria.Count} );
+                    Criterion crit = new Criterion();
+                    crit.CriterionTitle = "No Title";
+                    crit.Weight = 0;
+                    crit.ID = rubric.Criteria.Count;
+                    rubric.Criteria.Add(crit);
                 }
 
                 //header cells are analogous to Levels
@@ -1223,7 +1257,7 @@ namespace OsbleRubric
             rubric.Levels.RemoveAt(0);
             rubric.Criteria.RemoveAt(0);
 
-            client.GetRubricListAsync();
+            //client.SaveRubricAsync(currentCourseId, rubric, cellDescriptions);
         }
 
         /// <summary>

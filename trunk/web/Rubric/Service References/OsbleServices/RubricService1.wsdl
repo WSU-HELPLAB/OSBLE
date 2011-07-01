@@ -1,79 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="RubricService" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-  <wsp:Policy wsu:Id="CustomBinding_RubricService_policy">
-    <wsp:ExactlyOne>
-      <wsp:All>
-        <msb:BinaryEncoding xmlns:msb="http://schemas.microsoft.com/ws/06/2004/mspolicy/netbinary1" />
-        <wsaw:UsingAddressing />
-      </wsp:All>
-    </wsp:ExactlyOne>
-  </wsp:Policy>
   <wsdl:import namespace="" location="http://localhost:17532/Services/RubricService.svc?wsdl=wsdl0" />
   <wsdl:types />
-  <wsdl:binding name="CustomBinding_RubricService" type="RubricService">
-    <wsp:PolicyReference URI="#CustomBinding_RubricService_policy" />
-    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+  <wsdl:binding name="BasicHttpBinding_RubricService" type="RubricService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
     <wsdl:operation name="DoWork">
-      <soap12:operation soapAction="urn:RubricService/DoWork" style="document" />
+      <soap:operation soapAction="urn:RubricService/DoWork" style="document" />
       <wsdl:input>
-        <soap12:body use="literal" />
+        <soap:body use="literal" />
       </wsdl:input>
       <wsdl:output>
-        <soap12:body use="literal" />
+        <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="GetFakeCellDescription">
-      <soap12:operation soapAction="urn:RubricService/GetFakeCellDescription" style="document" />
+      <soap:operation soapAction="urn:RubricService/GetFakeCellDescription" style="document" />
       <wsdl:input>
-        <soap12:body use="literal" />
+        <soap:body use="literal" />
       </wsdl:input>
       <wsdl:output>
-        <soap12:body use="literal" />
+        <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="GetFakeCriterion">
-      <soap12:operation soapAction="urn:RubricService/GetFakeCriterion" style="document" />
+      <soap:operation soapAction="urn:RubricService/GetFakeCriterion" style="document" />
       <wsdl:input>
-        <soap12:body use="literal" />
+        <soap:body use="literal" />
       </wsdl:input>
       <wsdl:output>
-        <soap12:body use="literal" />
+        <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="GetFakeLevel">
-      <soap12:operation soapAction="urn:RubricService/GetFakeLevel" style="document" />
+      <soap:operation soapAction="urn:RubricService/GetFakeLevel" style="document" />
       <wsdl:input>
-        <soap12:body use="literal" />
+        <soap:body use="literal" />
       </wsdl:input>
       <wsdl:output>
-        <soap12:body use="literal" />
+        <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="GetFakeRubric">
-      <soap12:operation soapAction="urn:RubricService/GetFakeRubric" style="document" />
+      <soap:operation soapAction="urn:RubricService/GetFakeRubric" style="document" />
       <wsdl:input>
-        <soap12:body use="literal" />
+        <soap:body use="literal" />
       </wsdl:input>
       <wsdl:output>
-        <soap12:body use="literal" />
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCourses">
+      <soap:operation soapAction="urn:RubricService/GetCourses" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetRubricsForCourse">
+      <soap:operation soapAction="urn:RubricService/GetRubricsForCourse" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="GetRubricList">
-      <soap12:operation soapAction="urn:RubricService/GetRubricList" style="document" />
+      <soap:operation soapAction="urn:RubricService/GetRubricList" style="document" />
       <wsdl:input>
-        <soap12:body use="literal" />
+        <soap:body use="literal" />
       </wsdl:input>
       <wsdl:output>
-        <soap12:body use="literal" />
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SaveRubric">
+      <soap:operation soapAction="urn:RubricService/SaveRubric" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="RubricService">
-    <wsdl:port name="CustomBinding_RubricService" binding="tns:CustomBinding_RubricService">
-      <soap12:address location="http://localhost:17532/Services/RubricService.svc" />
-      <wsa10:EndpointReference>
-        <wsa10:Address>http://localhost:17532/Services/RubricService.svc</wsa10:Address>
-      </wsa10:EndpointReference>
+    <wsdl:port name="BasicHttpBinding_RubricService" binding="tns:BasicHttpBinding_RubricService">
+      <soap:address location="http://localhost:17532/Services/RubricService.svc" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

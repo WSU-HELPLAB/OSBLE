@@ -21,7 +21,10 @@ namespace OSBLE
             routes.IgnoreRoute("Scripts/{*pathInfo}");
             routes.IgnoreRoute("ClientBin/{*pathInfo}");
             routes.IgnoreRoute("Services/{*pathInfo}");
-
+#if DEBUG
+            routes.IgnoreRoute("clientaccesspolicy.xml");
+            routes.IgnoreRoute("crossdomain.xml");
+#endif
             routes.MapRoute(
                 "File System",
                 "FileSystem/{*pathInfo}",

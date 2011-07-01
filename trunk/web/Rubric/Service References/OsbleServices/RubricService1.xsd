@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" />
+  <xs:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" />
+  <xs:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd11" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Rubric" />
+  <xs:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd12" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
   <xs:element name="DoWork">
     <xs:complexType>
       <xs:sequence />
@@ -59,6 +62,32 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="GetCourses">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCoursesResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" minOccurs="0" name="GetCoursesResult" nillable="true" type="q5:ArrayOfAbstractCourse" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetRubricsForCourse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Rubric" minOccurs="0" name="course" nillable="true" type="q6:SimpleCourse" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetRubricsForCourseResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="GetRubricsForCourseResult" nillable="true" type="q7:ArrayOfRubric" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="GetRubricList">
     <xs:complexType>
       <xs:sequence />
@@ -67,7 +96,23 @@
   <xs:element name="GetRubricListResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="GetRubricListResult" nillable="true" type="q5:ArrayOfRubric" />
+        <xs:element xmlns:q8="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="GetRubricListResult" nillable="true" type="q8:ArrayOfKeyValueOfSimpleCourseArrayOfRubricCzkHZrLf" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SaveRubric">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="courseId" type="xs:int" />
+        <xs:element xmlns:q9="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="rubric" nillable="true" type="q9:Rubric" />
+        <xs:element xmlns:q10="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="descriptions" nillable="true" type="q10:ArrayOfCellDescription" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SaveRubricResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="SaveRubricResult" type="xs:int" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

@@ -185,6 +185,7 @@
     <Compile Include="Models\HomePage\Event.cs" />
     <Compile Include="Models\AbstractCourses\Course\Category.cs" />
     <Compile Include="Models\List.cs" />
+    <Compile Include="Models\Services\Rubric\SimpleCourse.cs" />
     <Compile Include="Models\Services\Uploader\ParentDirectoryListing.cs" />
     <Compile Include="Models\Services\Uploader\UserSession.cs" />
     <Compile Include="Models\ToolTips.cs" />
@@ -245,6 +246,7 @@
     <Content Include="App_Code\Libraries\LumenWorks.Framework.IO.dll" />
     <Content Include="App_Data\FirstNames.txt" />
     <Content Include="App_Data\LastNames.txt" />
+    <Content Include="clientaccesspolicy.xml" />
     <Content Include="ClientBin\FileUploader.xap" />
     <Content Include="ClientBin\Rubric.xap" />
     <Content Include="ClientBin\StudioTimelineCreation.xap" />
@@ -385,6 +387,7 @@
     <Content Include="Content\themes\base\jquery.ui.slider.css" />
     <Content Include="Content\themes\base\jquery.ui.tabs.css" />
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
+    <Content Include="crossdomain.xml" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\jquery-tooltip.js" />
     <Content Include="Scripts\jquery.selectboxes.js" />
