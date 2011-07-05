@@ -29,7 +29,8 @@
     <OutOfBrowserSettingsFile>Properties\OutOfBrowserSettings.xml</OutOfBrowserSettingsFile>
     <UsePlatformExtensions>false</UsePlatformExtensions>
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
-    <LinkedServerProject>..\OSBLE\OSBLE.csproj</LinkedServerProject>
+    <LinkedServerProject>
+    </LinkedServerProject>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
@@ -178,9 +179,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\OsbleServices\RubricService38.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleServices\RubricService4.xsd">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>

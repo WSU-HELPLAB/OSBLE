@@ -8,6 +8,10 @@
     <Grid x:Name="MainLayoutRoot" Background="White">
         <StackPanel x:Name="MainStackPanel">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Rubric Name:" VerticalAlignment="Center" />
+                <TextBox x:Name="RubricDescriptionTextBox" Width="250" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Visibility="Collapsed">
                 <TextBlock Text="Course:" VerticalAlignment="Center" />
                 <ComboBox x:Name="CourseComboBox" DisplayMemberPath="Name" Width="150" />
                 <TextBlock Text="Rubric:" Margin="15,0,0,0" VerticalAlignment="Center" />

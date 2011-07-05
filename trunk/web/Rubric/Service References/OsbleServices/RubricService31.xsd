@@ -2,7 +2,6 @@
 <xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.HomePage" />
   <xs:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd9" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments" />
-  <xs:import schemaLocation="http://localhost:17532/Services/RubricService.svc?xsd=xsd10" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.GradebookOptions" />
   <xs:complexType name="ArrayOfAbstractCourse">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="AbstractCourse" nillable="true" type="tns:AbstractCourse" />
@@ -26,12 +25,11 @@
       <xs:element minOccurs="0" name="ColumnOrder" type="xs:int" />
       <xs:element minOccurs="0" name="Course" nillable="true" type="tns:Course" />
       <xs:element minOccurs="0" name="CourseID" type="xs:int" />
-      <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.GradebookOptions" minOccurs="0" name="GradebookOptions" nillable="true" type="q3:GradebookOptions" />
       <xs:element minOccurs="0" name="ID" type="xs:int" />
       <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="Points" type="xs:double" />
-      <xs:element minOccurs="0" name="PointsPossible" type="xs:double" />
       <xs:element minOccurs="0" name="TabColor" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="dropX" type="xs:int" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Category" nillable="true" type="tns:Category" />

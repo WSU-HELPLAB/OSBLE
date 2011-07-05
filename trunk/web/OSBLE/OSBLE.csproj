@@ -652,6 +652,7 @@
     <Content Include="Views\Assignment\_AssignmentContentTeacher.cshtml" />
     <Content Include="Views\Assignment\_ActivityTeacherView.cshtml" />
     <Content Include="Views\Assignment\ActivityTeacherTable.cshtml" />
+    <Content Include="Views\BasicAssignment\_RubricSelect.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

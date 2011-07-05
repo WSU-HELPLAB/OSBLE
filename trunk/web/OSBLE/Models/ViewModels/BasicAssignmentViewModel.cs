@@ -1,5 +1,6 @@
 ﻿using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
+using System.ComponentModel;
 
 namespace OSBLE.Models.ViewModels
 {
@@ -11,6 +12,9 @@ namespace OSBLE.Models.ViewModels
             Stop = new StopActivity();
             Assignment = new BasicAssignment();
         }
+
+        [DisplayName("Use Rubric?")]
+        public bool UseRubric { get; set; }
 
         public SubmissionActivity Submission { get; set; }
 

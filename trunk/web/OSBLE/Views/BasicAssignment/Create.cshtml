@@ -36,7 +36,7 @@
             updateActivitiesName();
         });
 
-        $('#use_rubric').change(function () {
+        $('#UseRubric').change(function () {
             if ($(this).attr('checked')) {
                 $('#edit_rubric_div').show('highlight');
             }
@@ -258,8 +258,18 @@
     function OpenRubricDialog() {
         $('#rubric_dialog').dialog('open'); return false;
     }
+
     function CloseRubric() {
-        $('#rubric_dialog').dialog('close'); return false;
+        $('#rubric_dialog').dialog('close');
+        $.ajax({
+            type: "POST",
+            url: "/BasicAssignment/GetRubrics",
+            data: "",
+            success: function (msg) {
+                $('#RubricSelect').html(msg);
+            }
+        });   
+        return false;
     }
 
 </script>
@@ -433,17 +443,20 @@
     </div>
 
     <div class="editor-label">
-        @Html.Label("Use Rubric?")
+        @Html.LabelFor(m => Model.UseRubric)
         @Helpers.CreateToolTip(ToolTips.BasicAssignmentUseRubric)
     </div>
     <div class="editor-field">
-        @Html.CheckBox("use_rubric", false, new { id = "use_rubric" })
+        @Html.EditorFor(m => Model.UseRubric)
     </div>
     <div id="edit_rubric_div" style="display: none">
         <ul id="rubic_ul" class="team_generation_options">
+            <li id="RubricSelect">
+                @Html.Partial("_RubricSelect")
+            </li>
             <li>
-                <button type="button" onclick="OpenRubricDialog()">
-                    Edit Rubric...
+                <button type="button" onclick="OpenRubricDialog()" value="Create Rubric">
+                    Create Rubric
                 </button>
             </li>
         </ul>

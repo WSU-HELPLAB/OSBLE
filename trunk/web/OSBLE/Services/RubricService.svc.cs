@@ -74,8 +74,14 @@ namespace OSBLE.Services
             return retVal;
         }
 
+        /// <summary>
+        /// Returns a list of rubrics to be used with the course.  Note that the rubrics only
+        /// contain a name and an ID.  To obtain a full rubric, please use GetRubric()
+        /// </summary>
+        /// <param name="course"></param>
+        /// <returns></returns>
         [OperationContract]
-        public List<Rubric> GetRubricsForCourse(SimpleCourse course)
+        public ObservableCollection<Rubric> GetRubricsForCourse(SimpleCourse course)
         {
             OSBLEContext db = new OSBLEContext();
             db.Configuration.LazyLoadingEnabled = false;
@@ -87,22 +93,15 @@ namespace OSBLE.Services
                          where cr.CourseID == course.CourseID
                          select r;
             rubrics = result.ToList();
-            
+            ObservableCollection<Rubric> finalRubrics = new ObservableCollection<Rubric>();
             foreach (Rubric r in rubrics)
             {
-                ((IObjectContextAdapter)db).ObjectContext.Detach(r);
-                /*
-                foreach (Level l in r.Levels)
-                {
-                    l.Rubric = null;
-                }
-                foreach (Criterion c in r.Criteria)
-                {
-                    c.Rubric = null;
-                }
-                 * */
+                Rubric miniRubric = new Rubric();
+                miniRubric.ID = r.ID;
+                miniRubric.Description = r.Description;
+                finalRubrics.Add(r);
             }
-            return rubrics;
+            return finalRubrics;
         }
 
         /// <summary>

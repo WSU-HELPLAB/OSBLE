@@ -1638,6 +1638,8 @@ namespace OsbleRubric.OsbleServices {
         
         private System.Nullable<int> RubricIDField;
         
+        private double addedPointsField;
+        
         [System.Runtime.Serialization.DataMemberAttribute()]
         public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.AbstractAssignmentActivity> AssignmentActivities {
             get {
@@ -1768,6 +1770,19 @@ namespace OsbleRubric.OsbleServices {
             }
         }
         
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public double addedPoints {
+            get {
+                return this.addedPointsField;
+            }
+            set {
+                if ((this.addedPointsField.Equals(value) != true)) {
+                    this.addedPointsField = value;
+                    this.RaisePropertyChanged("addedPoints");
+                }
+            }
+        }
+        
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         
         protected void RaisePropertyChanged(string propertyName) {
@@ -1791,17 +1806,15 @@ namespace OsbleRubric.OsbleServices {
         
         private int CourseIDField;
         
-        private OsbleRubric.OsbleServices.GradebookOptions GradebookOptionsField;
-        
         private int IDField;
         
         private string NameField;
         
         private double PointsField;
         
-        private double PointsPossibleField;
-        
         private string TabColorField;
+        
+        private int dropXField;
         
         [System.Runtime.Serialization.DataMemberAttribute()]
         public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.AbstractAssignment> Assignments {
@@ -1856,19 +1869,6 @@ namespace OsbleRubric.OsbleServices {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public OsbleRubric.OsbleServices.GradebookOptions GradebookOptions {
-            get {
-                return this.GradebookOptionsField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.GradebookOptionsField, value) != true)) {
-                    this.GradebookOptionsField = value;
-                    this.RaisePropertyChanged("GradebookOptions");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
         public int ID {
             get {
                 return this.IDField;
@@ -1908,19 +1908,6 @@ namespace OsbleRubric.OsbleServices {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public double PointsPossible {
-            get {
-                return this.PointsPossibleField;
-            }
-            set {
-                if ((this.PointsPossibleField.Equals(value) != true)) {
-                    this.PointsPossibleField = value;
-                    this.RaisePropertyChanged("PointsPossible");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
         public string TabColor {
             get {
                 return this.TabColorField;
@@ -1932,23 +1919,6 @@ namespace OsbleRubric.OsbleServices {
                 }
             }
         }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="GradebookOptions", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.GradebookOptions")]
-    public partial class GradebookOptions : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private int dropXField;
         
         [System.Runtime.Serialization.DataMemberAttribute()]
         public int dropX {

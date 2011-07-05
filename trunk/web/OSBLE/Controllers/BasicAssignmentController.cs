@@ -11,6 +11,7 @@ using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
+using OSBLE.Models.Courses.Rubrics;
 
 namespace OSBLE.Controllers
 {
@@ -23,6 +24,19 @@ namespace OSBLE.Controllers
             : base()
         {
             ViewBag.CurrentTab = "Assignments";
+        }
+
+        [HttpPost]
+        [CanModifyCourse]
+        public ActionResult GetRubrics()
+        {
+            List<Rubric> rubrics = (from cr in db.CourseRubrics
+                                    join r in db.Rubrics on cr.RubricID equals r.ID
+                                    where cr.CourseID == activeCourse.CourseID
+                                    select r).ToList();
+            rubrics.Insert(0, new Rubric() { ID = 0, Description = "" });
+            ViewBag.Rubrics = rubrics.ToList();
+            return View("_RubricSelect");
         }
 
         //
@@ -44,6 +58,13 @@ namespace OSBLE.Controllers
 
             viewModel.TeamCreation = createTeamCreationSilverlightObject();
             viewModel.RubricCreation = createRubricCreationSilverlightObject();
+
+            List<Rubric> rubrics = (from cr in db.CourseRubrics
+                          join r in db.Rubrics on cr.RubricID equals r.ID
+                          where cr.CourseID == activeCourse.CourseID
+                          select r).ToList();
+            rubrics.Insert(0, new Rubric() { ID=0, Description="" });
+            ViewBag.Rubrics = rubrics.ToList();
 
             viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"] = serializeTeamMemers(getTeamMembers());
 
@@ -108,6 +129,15 @@ namespace OSBLE.Controllers
 
                 basic.Assignment.AssignmentActivities.Add(submission);
                 basic.Assignment.AssignmentActivities.Add(stop);
+
+                if (basic.UseRubric)
+                { 
+                    int rubricId = 0;
+                    if(Int32.TryParse(Request.Form["RubricToUse"].ToString(), out rubricId))
+                    {
+                        basic.Assignment.RubricID = rubricId;
+                    }
+                }
 
                 db.BasicAssignments.Add(basic.Assignment);
 
@@ -266,7 +296,7 @@ namespace OSBLE.Controllers
                 CSSId = "rubric_silverlight",
                 XapName = "Rubric",
                 Width = "800",
-                Height = "580",
+                Height = "600",
                 OnLoaded = "SLObjectLoaded",
                 Parameters = parameters
             };

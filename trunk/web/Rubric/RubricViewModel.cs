@@ -67,7 +67,7 @@ namespace OsbleRubric
             //attach event listeners to our web service
             client.GetRubricListCompleted += new EventHandler<GetRubricListCompletedEventArgs>(GetRubricListCompleted);
             client.SaveRubricCompleted += new EventHandler<SaveRubricCompletedEventArgs>(SaveRubricCompleted);
-           
+
             //stash the current course id
             if (App.Current.Resources["courseId"] != null)
             {
@@ -1129,12 +1129,11 @@ namespace OsbleRubric
 
         void SaveRubricCompleted(object sender, SaveRubricCompletedEventArgs e)
         {
-            
+            HtmlPage.Window.Invoke("CloseRubric", "");
         }
 
         void GetRubricListCompleted(object sender, GetRubricListCompletedEventArgs e)
         {
-            //courseRubrics = e.Result;
         }
 
         /// <summary>
@@ -1160,7 +1159,7 @@ namespace OsbleRubric
             Rubric rubric = new Rubric();
             rubric.HasCriteriaComments = false;
             rubric.HasGlobalComments = false;
-            rubric.Description = "No Descrption";
+            rubric.Description = thisView.RubricDescriptionTextBox.Text;
             ObservableCollection<CellDescription> cellDescriptions = new ObservableCollection<CellDescription>();
             rubric.Criteria = new ObservableCollection<Criterion>();
             rubric.Levels = new ObservableCollection<Level>();
@@ -1257,7 +1256,7 @@ namespace OsbleRubric
             rubric.Levels.RemoveAt(0);
             rubric.Criteria.RemoveAt(0);
 
-            //client.SaveRubricAsync(currentCourseId, rubric, cellDescriptions);
+            client.SaveRubricAsync(currentCourseId, rubric, cellDescriptions);
         }
 
         /// <summary>

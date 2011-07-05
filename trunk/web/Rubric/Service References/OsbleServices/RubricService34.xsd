@@ -15,6 +15,7 @@
       <xs:element minOccurs="0" name="PointsPossible" type="xs:int" />
       <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="Rubric" nillable="true" type="q3:Rubric" />
       <xs:element minOccurs="0" name="RubricID" nillable="true" type="xs:int" />
+      <xs:element minOccurs="0" name="addedPoints" type="xs:double" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="AbstractAssignment" nillable="true" type="tns:AbstractAssignment" />
