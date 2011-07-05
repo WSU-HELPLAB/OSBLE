@@ -157,9 +157,11 @@ $(function () {
     $('#InstructorCanReview').change(function () {
         if ($(this).attr('checked')) {
             $('#line_review_config').show('blind');
+            $('#line_review_info').show('blind');
         }
         else {
             $('#line_review_config').hide('blind');
+            $('#line_review_info').hide('blind');
         }
     });
 
