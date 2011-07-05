@@ -1305,3 +1305,26 @@ ul.assignment_deliverables, .assignment_deliverables ul
     white-space: pre-line;
     word-wrap: break-word;
 }
+.TeacherActivityTable
+{
+	border-width: 0px;
+	border-spacing: 0px;
+	border-style: outset;
+	border-color: gray;
+	border-collapse: separate;
+	background-color: white;
+}
+.TeacherActivityTable th {
+	border-width: 1px;
+	padding: 1px;
+	border-style: inset;
+	border-color: gray;
+	background-color: white;
+}
+.TeacherActivityTable td {
+	border-width: 1px;
+	padding: 1px;
+	border-style: inset;
+	border-color: gray;
+	background-color: white;
+}

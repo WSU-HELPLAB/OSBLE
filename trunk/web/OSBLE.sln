@@ -19,9 +19,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsbleRubric", "Rubric\Osble
 		{7297687F-BF8A-4195-8EA3-A05DA302B24E} = {7297687F-BF8A-4195-8EA3-A05DA302B24E}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReviewInterfaceBase", "ReviewInterface\ReviewInterfaceBase\ReviewInterfaceBase.csproj", "{85886C57-E5B3-4009-8743-4A7C0228E6ED}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 6
+		SccNumberOfProjects = 7
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
 		SccLocalPath0 = .
@@ -40,6 +42,9 @@ Global
 		SccProjectUniqueName5 = Rubric\\OsbleRubric.csproj
 		SccProjectName5 = Rubric
 		SccLocalPath5 = Rubric
+		SccProjectUniqueName6 = ReviewInterface\\ReviewInterfaceBase\\ReviewInterfaceBase.csproj
+		SccProjectName6 = ReviewInterface/ReviewInterfaceBase
+		SccLocalPath6 = ReviewInterface\\ReviewInterfaceBase
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +82,12 @@ Global
 		{77BD61DF-7C05-468A-AA47-1050E674E12C}.OSBLE Deployment|Any CPU.Build.0 = Release|Any CPU
 		{77BD61DF-7C05-468A-AA47-1050E674E12C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77BD61DF-7C05-468A-AA47-1050E674E12C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85886C57-E5B3-4009-8743-4A7C0228E6ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85886C57-E5B3-4009-8743-4A7C0228E6ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85886C57-E5B3-4009-8743-4A7C0228E6ED}.OSBLE Deployment|Any CPU.ActiveCfg = Release|Any CPU
+		{85886C57-E5B3-4009-8743-4A7C0228E6ED}.OSBLE Deployment|Any CPU.Build.0 = Release|Any CPU
+		{85886C57-E5B3-4009-8743-4A7C0228E6ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85886C57-E5B3-4009-8743-4A7C0228E6ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
