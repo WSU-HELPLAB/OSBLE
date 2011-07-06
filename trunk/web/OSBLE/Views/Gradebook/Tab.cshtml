@@ -140,6 +140,7 @@
     }
     
 </style>
+
 <div id="tabHeader">
     <h3>Gradebook</h3>
     <div id='import_grades_from_csv'  title="Import file">Upload a comma-separated (CSV) file of student grades:<br /><br />
@@ -159,7 +160,7 @@
     @Html.Partial("_Tabs")
 </div>
 <input type="hidden" id="lastCell" value="null"/>
-<div id="tableContent">
+<div id="tableContent" >
     @Html.Partial("_Gradebook")
     <div class="slidingDiv" id="slidingDivID" style="display: none; position: absolute;">
         <form id="columnOptionsForm" method="post" action="/Gradebook/ModifyColumn" data-ajax="true"
@@ -275,7 +276,6 @@
 
     var onMouseOver = false;
     
-    
 
     $(document).ready(function () {
         //calculateRows();
@@ -284,6 +284,7 @@
     });
 
     $(document).click(function () {
+
         if (changedShow == true) {
             if (showDropDown == false) {
                 if (menuClicked == true) {
@@ -299,24 +300,7 @@
         }
 
         if (isHighlighted == true) {
-//            $("#grades tr").each(function () {
-//                $(this).find("td").each(function () {
-//                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-//                        $(this).css("background-color", "#DCDCDC");
-//                        $(this).find("div").css("background-color", "#DCDCDC");
-//                    }
-//                    else {
-//                        $(this).css("background-color", "white");
-//                    }
-//                });
-//                $(this).find("th").each(function () {
-//                    if ($(this).attr("class") == "colHeader") {
-//                    }
-//                    else {
-//                        $(this).css("background-color", "white");
-//                    }
-//                });
-//            });
+
             hideTabColors();
             isHighlighted = false;
         }
@@ -324,7 +308,6 @@
 
             isHighlighted = true;
         }
-
     });
 
     function hideTabColors() {
@@ -365,12 +348,13 @@
                 e.preventDefault();
                 var row = $(this).parent("tr");
                 // used for generating the column count
-                var temp = 1;
-                var ColCount = $('table tr:eq(' + temp + ') td').length;
+                var one = 1;
+                var ColCount = $('table tr:eq(' + one + ') td').length;
                 var colIndex = $(this).prevAll().length;
                 colIndex = parseInt(colIndex);
                 if (colIndex >= ColCount) {
                     row = $(this).parent("tr").next("tr");
+                    // coded based off the original design if you change the column structure you might need to change this
                     colIndex = 3;
                 } else {
                     colIndex += 1;
@@ -545,13 +529,9 @@
 
     function clearLastCellFocus() {
 
-
-        
-
         //if a prior cell has already received focus in the past, we need to turn it back into
         //a normal table cell
         if (lastFocusedCell != null) {
-
             $("#grades tr").each(function () {
                 $(this).find("td").each(function () {
                     if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
@@ -588,7 +568,7 @@
             //GradableID
             //and the value to modify (cellValue)
 
-            if (ajaxIDs[0] == "pointsPossible"){
+            if (ajaxIDs[0] == "pointsPossible") {
                 $.ajax({
                     type: "POST",
                     url: "/Gradebook/ModifyPossiblePoints",
@@ -601,7 +581,7 @@
 
             //if we are editing a gradebook cell then ajaxIDs[1] will contain a value
             else {
-                if (!isNaN(parseFloat(cellValue))) { 
+                if (!isNaN(parseFloat(cellValue))) {
                     $.ajax({
                         type: "POST",
                         url: "/Gradebook/ModifyCell",
@@ -612,14 +592,14 @@
                             }
                             else {
                                 //$("#grades").replaceWith(response);
-                                
+
                             }
                         }
                     });
                 }
             }
             calculateCols();
-        }
+        } 
     }
 
     function cellGainsFocus(someCell) {
@@ -849,7 +829,6 @@
 
                 $(this).find("td:nth-child(" + currentHeader + ")").each(function () {
                     if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-                        //$(this).css("background-color", "#AAAAAA");
                     }
                     else {
                         $(this).css("background-color", "DeepSkyBlue");
@@ -880,25 +859,23 @@
                 }
             });
             $(this).find("th").each(function () {
-                if ($(this).attr("class") == "rowHeader" || $(this).attr("class") == "colHeader") {
-                }
-                else {
+                if ($(this).attr("class") != "colHeader") {
                     $(this).css("background-color", "white");
                 }
             });
         });
 
         $('#grades tr').each(function () {
-            if (count == container[1]) {
+            if (count == container[1] && container[1] != 0) {
                 $(this).find("td").each(function () {
-                    if ($(this).attr("class") != "rowHeader" && $(this).attr("class") != "colHeader") {
+                    if ($(this).attr("class") == "rowHeader") {
+                        $(this).css("background-color", "#AAAAAA");
+                    } else if ($(this).attr("class") != "colHeader") {
                         $(this).css("background-color", "DeepSkyBlue");
                     }
                 });
                 $(this).find("th").each(function () {
-                    if ($(this).attr("class") != "rowHeader") {
-                        $(this).css("background-color", "DeepSkyBlue");
-                    }
+                    $(this).css("background-color", "DeepSkyBlue");
                 });
             }
             count++;
