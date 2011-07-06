@@ -8,7 +8,7 @@ namespace OSBLE.Models.Courses.Rubrics
 {
     public class RubricEvaluation
     {
-        private RubricEvaluation()
+        public RubricEvaluation()
         {
             CriterionEvaluations = new List<CriterionEvaluation>();
         }
@@ -36,6 +36,9 @@ namespace OSBLE.Models.Courses.Rubrics
         public bool IsPublished { get; set; }
 
         public DateTime? DatePublished { get; set; }
+
+        [StringLength(4000)]
+        public string GlobalComment { get; set; }
 
         [Required]
         public virtual ICollection<CriterionEvaluation> CriterionEvaluations { get; set; }
