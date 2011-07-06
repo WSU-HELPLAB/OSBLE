@@ -289,6 +289,19 @@ namespace OSBLE.Controllers
        {
            int categoryId = Convert.ToInt32(Session["CurrentCategoryID"]);
 
+           var allAssignments = from assign in db.AbstractAssignments
+                                where assign.CategoryID == categoryId &&
+                                assign.ColumnOrder >= position
+                                select assign;
+
+           if (allAssignments.Count() > 0)
+           {
+               foreach (AbstractAssignment item in allAssignments)
+               {
+                   item.ColumnOrder += 1;
+               }
+           }
+
            GradeAssignment newAssignment = new GradeAssignment()
            {
                Name = columnName,
@@ -836,6 +849,79 @@ namespace OSBLE.Controllers
 
 
        [HttpPost]
+       public ActionResult MoveRight(int assignmentId)
+       {
+           if (ModelState.IsValid)
+           {
+               if (assignmentId > 0)
+               {
+                   var assignmentColPosition = from col in db.AbstractAssignments
+                                            where col.ID == assignmentId
+                                            select col;
+
+                   if (assignmentColPosition.Count() > 0)
+                   {
+                       int nextCol = Convert.ToInt32(assignmentColPosition.First().ColumnOrder) + 1;
+
+                       var nextAssignmentColPosition = from next in db.AbstractAssignments
+                                                       where next.ColumnOrder >= nextCol
+                                                       select next;
+
+                       if (nextAssignmentColPosition.Count() > 0)
+                       {
+                           int tempCol = assignmentColPosition.First().ColumnOrder;
+                           assignmentColPosition.First().ColumnOrder = nextAssignmentColPosition.First().ColumnOrder;
+                           nextAssignmentColPosition.First().ColumnOrder = tempCol;
+
+                           db.SaveChanges();
+                       }
+                   }
+
+               }
+           }
+
+           BuildGradebook((int)Session["categoryId"]);
+           return View("_Gradebook");
+       }
+
+       [HttpPost]
+       public ActionResult MoveLeft(int assignmentId)
+       {
+           if (ModelState.IsValid)
+           {
+               if (assignmentId > 0)
+               {
+                   var assignmentColPosition = from col in db.AbstractAssignments
+                                               where col.ID == assignmentId
+                                               select col;
+                   if (assignmentColPosition.Count() > 0)
+                   {
+                       int prevCol = Convert.ToInt32(assignmentColPosition.First().ColumnOrder) - 1;
+
+                       var prevAssignmentColPosition = from next in db.AbstractAssignments
+                                                       where next.ColumnOrder <= prevCol
+                                                       orderby next.ColumnOrder descending
+                                                       select next;
+
+                       if (prevAssignmentColPosition.Count() > 0)
+                       {
+                           int tempCol = assignmentColPosition.First().ColumnOrder;
+                           assignmentColPosition.First().ColumnOrder = prevAssignmentColPosition.First().ColumnOrder;
+                           prevAssignmentColPosition.First().ColumnOrder = tempCol;
+
+                           db.SaveChanges();
+                       }
+                   }
+
+               }
+           }
+
+           BuildGradebook((int)Session["categoryId"]);
+           return View("_Gradebook");
+       }
+
+
+       [HttpPost]
        public ActionResult ModifyCell(double value, int userId, int assignmentId)
        {
 
@@ -1108,6 +1194,7 @@ namespace OSBLE.Controllers
            //pull the gradables (columns) for the current weight (tab)
            List<AbstractAssignment> assignments = (from a in db.AbstractAssignments
                                                    where a.CategoryID == currentTab.ID
+                                                   orderby a.ColumnOrder
                                                    select a).ToList();
 
            if (assignments.Count() == 0)

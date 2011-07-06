@@ -27,9 +27,12 @@
             j += 1;
             foreach (AbstractAssignment item in ViewBag.Assignments)
             {
-                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; text-align:right;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);">
-                <div id="div-@j" style="display: none;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);">
-                    <img id="img-@item.ID" src="/Content/images/arrow_down.png" onclick="ShowHide(this);" style="cursor:pointer;"/>
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; text-align:center;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);">
+                    
+                <div id="div-@j" style="display: none; margin:0 auto;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);">
+                    <img id="imgLeft-@item.ID" src="/Content/images/arrow_left.png" onclick="moveLeft(this);" style="cursor:pointer; float:left; padding-top:2px;"/>
+                    <img id="imgDown-@item.ID" src="/Content/images/arrow_down.png" onclick="ShowHide(this);" style="cursor:pointer; padding-bottom:2px;"/>
+                    <img id="imgRight-@item.ID" src="/Content/images/arrow_right.png" onclick="moveRight(this);" style="cursor:pointer; float:right;" />
                 </div>
                 </td>
                 j += 1;
@@ -83,7 +86,7 @@
             }
         
             int i = 2;
-            foreach (AbstractAssignment assign in ViewBag.Assignments)
+            foreach (AbstractAssignment assign in ViewBag.GradeAssignments)
             {
                 if (assign.addedPoints > 0)
                 {   

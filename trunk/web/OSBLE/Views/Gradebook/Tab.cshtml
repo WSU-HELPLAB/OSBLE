@@ -1133,4 +1133,32 @@
         });
     }
 
+    function moveRight(header) {
+
+        var id = header.id.split("-");
+
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/MoveRight",
+            data: { assignmentId: id[1] },
+            success: function (response) {
+                $("#grades").replaceWith(response);
+            }
+        });
+    }
+
+    function moveLeft(header) {
+
+        var id = header.id.split("-");
+
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/MoveLeft",
+            data: { assignmentId: id[1] },
+            success: function (response) {
+                $("#grades").replaceWith(response);
+            }
+        });
+    }
+
 </script>
