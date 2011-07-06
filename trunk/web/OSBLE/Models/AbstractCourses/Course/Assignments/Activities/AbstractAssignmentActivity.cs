@@ -25,7 +25,7 @@ namespace OSBLE.Models.Assignments.Activities
             ReleaseDate = new DateTime(dateTimeNow.Year, dateTimeNow.Month, dateTimeNow.Day, 0, 0, 0);
             ReleaseDate = ReleaseDate.AddDays(1);
 
-            TeamUsers = new List<TeamUser>();
+            TeamUsers = new List<TeamUserMember>();
         }
 
         [Required]
@@ -58,7 +58,7 @@ namespace OSBLE.Models.Assignments.Activities
         [Display(Name = "Is This A Team Assignment?")]
         public bool isTeam { get; set; }
 
-        public virtual ICollection<TeamUser> TeamUsers { get; set; }
+        public virtual ICollection<TeamUserMember> TeamUsers { get; set; }
 
         [Required]
         [Display(Name = "Minutes Late With No Penalty")]

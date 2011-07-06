@@ -193,23 +193,33 @@ namespace OSBLE.Controllers
                             //for every member of that team make a new TeamMember
                             foreach (SerializableTeamMember serializeableMember in team.Value)
                             {
-                                TeamUser teamUser_db;
+                                TeamUserMember teamUser_db;
                                 if (serializeableMember.isUser)
                                 {
-                                    teamUser_db = new TeamUser((from c in db.UserProfiles
-                                                                where c.ID == serializeableMember.UserID
-                                                                select c).FirstOrDefault());
+                                    UserMember userMember = new UserMember();
+                                    userMember.UserProfile = (from c in db.UserProfiles
+                                                              where c.ID == serializeableMember.UserID
+                                                              select c).FirstOrDefault();
+                                    userMember.UserProfileID = userMember.UserProfile.ID;
+                                    teamUser_db = userMember;
                                 }
                                 else
                                 {
-                                    teamUser_db = new TeamUser((from c in db.Teams
-                                                                where c.ID == serializeableMember.TeamID
-                                                                select c).FirstOrDefault());
+                                    TeamMember teamMember = new TeamMember();
+                                    teamMember.Team = (from c in db.Teams
+                                                       where c.ID == serializeableMember.TeamID
+                                                       select c).FirstOrDefault();
+                                    teamMember.TeamID = teamMember.Team.ID;
+
+                                    teamUser_db = teamMember;
                                 }
                                 team_db.Members.Add(teamUser_db);
                             }
 
-                            submission.TeamUsers.Add(new TeamUser(team_db));
+                            TeamMember tm = new TeamMember();
+                            tm.Team = team_db;
+
+                            submission.TeamUsers.Add(tm);
 
                             db.Teams.Add(team_db);
                         }
@@ -225,7 +235,10 @@ namespace OSBLE.Controllers
 
                     foreach (UserProfile user in users)
                     {
-                        submission.TeamUsers.Add(new TeamUser(user));
+                        UserMember um = new UserMember();
+                        um.UserProfile = user;
+
+                        submission.TeamUsers.Add(um);
                     }
                     db.SaveChanges();
                 }

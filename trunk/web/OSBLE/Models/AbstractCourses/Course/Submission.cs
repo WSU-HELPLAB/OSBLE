@@ -13,7 +13,7 @@ namespace OSBLE.Models.AbstractCourses.Course
         [Required]
         public int TeamUserID { get; set; }
 
-        public virtual TeamUser TeamUser { get; set; }
+        public virtual TeamUserMember TeamUser { get; set; }
 
         [Required]
         public int AbstractAssignmentActivityID { get; set; }

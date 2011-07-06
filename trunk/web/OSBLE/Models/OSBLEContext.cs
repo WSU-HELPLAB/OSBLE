@@ -136,7 +136,7 @@ namespace OSBLE.Models
 
         public DbSet<UserProfile> UserProfiles { get; set; }
 
-        public DbSet<TeamUser> TeamUsers { get; set; }
+        public DbSet<TeamUserMember> TeamUsers { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

@@ -77,7 +77,7 @@ namespace OSBLE.Controllers
 
                     if (assignment != null && assignment.Category.CourseID == activeCourse.CourseID && activeCourse.CourseRole.CanSubmit == true && assignment is StudioAssignment)
                     {
-                        TeamUser teamUser = TeamUser.GetTeamUser(activity as SubmissionActivity, currentUser);
+                        TeamUserMember teamUser = GetTeamUser(activity as SubmissionActivity, currentUser);
 
                         int i = 0;
                         foreach (var file in files)

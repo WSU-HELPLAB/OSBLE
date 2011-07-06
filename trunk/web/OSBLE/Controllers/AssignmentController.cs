@@ -54,7 +54,9 @@ namespace OSBLE.Controllers
                 {
                     List<Tuple<bool, DateTime>> submitted = new List<Tuple<bool, DateTime>>();
 
-                    string folderLocation = FileSystem.GetSubmissionFolder(true, activeCourse.Course as Course, activity.ID, TeamUser.GetTeamUser(activity, currentUser));
+                    TeamUserMember teamUser = GetTeamUser(activity, currentUser);
+
+                    string folderLocation = FileSystem.GetSubmissionFolder(true, activeCourse.Course as Course, activity.ID, teamUser);
 
                     foreach (Deliverable deliverable in (activity.AbstractAssignment as StudioAssignment).Deliverables)
                     {
@@ -155,7 +157,7 @@ namespace OSBLE.Controllers
 
                     ActivityTeacherTableViewModel viewModel = new ActivityTeacherTableViewModel();
 
-                    foreach (TeamUser teamUser in studioActivity.TeamUsers)
+                    foreach (TeamUserMember teamUser in studioActivity.TeamUsers)
                     {
                         ActivityTeacherTableViewModel.SubmissionInfo info = new ActivityTeacherTableViewModel.SubmissionInfo();
 
@@ -163,19 +165,19 @@ namespace OSBLE.Controllers
                         DirectoryInfo submissionFolder = new DirectoryInfo(FileSystem.GetSubmissionFolder(false, activeCourse.Course as Course, studioActivity.ID, teamUser));
 
                         //if team
-                        if (TeamOrUser.Team == (TeamOrUser)teamUser.TeamOrUser)
+                        if (teamUser is TeamMember)
                         {
                             info.isTeam = true;
-                            info.SubmitterID = teamUser.Team.ID;
-                            info.Name = teamUser.Team.Name;
+                            info.SubmitterID = (teamUser as TeamMember).ID;
+                            info.Name = (teamUser as TeamMember).Team.Name;
                         }
 
                             //if student
                         else
                         {
                             info.isTeam = false;
-                            info.SubmitterID = teamUser.UserProfile.ID;
-                            info.Name = teamUser.UserProfile.LastName + ", " + teamUser.UserProfile.FirstName;
+                            info.SubmitterID = (teamUser as UserMember).UserProfile.ID;
+                            info.Name = (teamUser as UserMember).UserProfile.LastName + ", " + (teamUser as UserMember).UserProfile.FirstName;
                         }
 
                         if (submissionFolder.Exists)
