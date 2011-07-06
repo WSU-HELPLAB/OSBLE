@@ -143,6 +143,7 @@
 <div id="tabHeader">
     <h3>Gradebook</h3>
     <div id='import_grades_from_csv'  title="Import file">Upload a comma-separated (CSV) file of student grades:<br /><br />
+        <span><input type="checkbox"/>Check to import into this cell</span>
         @using (Html.BeginForm("ImportColumnsFromCSV", "Gradebook", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             <input type="file" id="file" name="file" />
@@ -458,7 +459,7 @@
             modal: true,
             resizable: false,
             width: 450,
-            height: 130,
+            height: 150,
             closeOnEscape: false
         });
     }
