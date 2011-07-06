@@ -1,6 +1,6 @@
-﻿using OSBLE.Models.Assignments;
+﻿using System.ComponentModel;
+using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
-using System.ComponentModel;
 
 namespace OSBLE.Models.ViewModels
 {
@@ -11,6 +11,7 @@ namespace OSBLE.Models.ViewModels
             Submission = new SubmissionActivity();
             Stop = new StopActivity();
             Assignment = new BasicAssignment();
+            isGradable = true;
         }
 
         [DisplayName("Use Rubric?")]
@@ -27,5 +28,7 @@ namespace OSBLE.Models.ViewModels
         public SilverlightObject RubricCreation { get; set; }
 
         public string SerializedTeamMembersJSON { get; set; }
+
+        public bool isGradable { get; set; }
     }
 }

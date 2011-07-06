@@ -306,54 +306,6 @@ namespace OSBLE.Controllers
             }
         }
 
-        protected TeamUser GetTeamorUserForCurrentUser(SubmissionActivity activity)
-        {
-            TeamUser teamUser = new TeamUser();
-            if ((activity as SubmissionActivity).isTeam)
-            {
-                teamUser.TeamOrUser = TeamOrUser.Team;
-                TeamMember temp = null;
-                foreach (Team team in (activity as SubmissionActivity).Teams)
-                {
-                    temp = findTeamMember(team.Members, currentUser.ID);
-                    if (temp != null)
-                    {
-                        teamUser.Team = team;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                teamUser.TeamOrUser = TeamOrUser.User;
-                teamUser.UserProfile = currentUser;
-            }
-            return teamUser;
-        }
-
-        private TeamMember findTeamMember(ICollection<TeamMember> members, int userProfileID)
-        {
-            foreach (TeamMember member in members)
-            {
-                if (member.TeamUser == TeamOrUser.Team)
-                {
-                    TeamMember teamMember = findTeamMember(member.Team.Members, userProfileID);
-                    if (teamMember != null)
-                    {
-                        return member;
-                    }
-                }
-                else
-                {
-                    if (member.UserProfileID == userProfileID)
-                    {
-                        return member;
-                    }
-                }
-            }
-            return null;
-        }
-
         protected List<SelectListItem> GetListOfDeliverableTypes()
         {
             List<SelectListItem> fileTypes = new List<SelectListItem>();

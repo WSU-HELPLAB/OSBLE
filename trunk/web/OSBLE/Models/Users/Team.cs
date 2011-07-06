@@ -19,5 +19,17 @@ namespace OSBLE.Models.Users
 
         [Required]
         public ICollection<TeamMember> Members { get; set; }
+
+        public bool Contains(UserProfile user)
+        {
+            foreach (TeamMember member in Members)
+            {
+                if (member.Contains(user))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

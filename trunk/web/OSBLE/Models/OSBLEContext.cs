@@ -1,9 +1,11 @@
 ﻿using System.Data.Entity;
 using System.Web.Security;
+using OSBLE.Models.AbstractCourses;
 using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments.Activities.Scores;
+
 //using OSBLE.Models.Assignments.Activities.CommentCategories;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
@@ -11,6 +13,7 @@ using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
 using OSBLE.Models.AbstractCourses;
 using System.Web;
+using OSBLE.Utility;
 
 namespace OSBLE.Models
 {
@@ -136,6 +139,8 @@ namespace OSBLE.Models
         public DbSet<Mail> Mails { get; set; }
 
         public DbSet<UserProfile> UserProfiles { get; set; }
+
+        public DbSet<TeamUser> TeamUsers { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -275,8 +280,45 @@ namespace OSBLE.Models
             w2.Name = "Exams";
             w2.Points = 60;
 
+            Category w3 = new Category();
+            w3.Name = Constants.UnGradableCatagory;
+            w3.Points = 0;
+
+            c1.Categories.Add(w3);
             c1.Categories.Add(w1);
             c1.Categories.Add(w2);
+
+            w1 = new Category();
+            w1.Name = "Homework";
+            w1.Points = 40;
+
+            w2 = new Category();
+            w2.Name = "Exams";
+            w2.Points = 60;
+
+            w3 = new Category();
+            w3.Name = Constants.UnGradableCatagory;
+            w3.Points = 0;
+
+            c2.Categories.Add(w3);
+            c2.Categories.Add(w1);
+            c2.Categories.Add(w2);
+
+            w1 = new Category();
+            w1.Name = "Homework";
+            w1.Points = 40;
+
+            w2 = new Category();
+            w2.Name = "Exams";
+            w2.Points = 60;
+
+            w3 = new Category();
+            w3.Name = Constants.UnGradableCatagory;
+            w3.Points = 0;
+
+            c4.Categories.Add(w3);
+            c4.Categories.Add(w1);
+            c4.Categories.Add(w2);
 
             MembershipUserCollection muc = Membership.GetAllUsers();
             foreach (MembershipUser mu in muc)

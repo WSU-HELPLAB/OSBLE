@@ -54,7 +54,7 @@ namespace OSBLE.Controllers
                 {
                     List<Tuple<bool, DateTime>> submitted = new List<Tuple<bool, DateTime>>();
 
-                    string folderLocation = FileSystem.GetSubmissionFolder(activeCourse.Course as Course, activity.ID, GetTeamorUserForCurrentUser(activity));
+                    string folderLocation = FileSystem.GetSubmissionFolder(true, activeCourse.Course as Course, activity.ID, TeamUser.GetTeamUser(activity, currentUser));
 
                     foreach (Deliverable deliverable in (activity.AbstractAssignment as StudioAssignment).Deliverables)
                     {
@@ -155,37 +155,15 @@ namespace OSBLE.Controllers
 
                     ActivityTeacherTableViewModel viewModel = new ActivityTeacherTableViewModel();
 
-                    IEnumerable<TeamUser> submitters;
-
-                    if (studioActivity.isTeam)
-                    {
-                        submitters = (from c in studioActivity.Teams select new TeamUser() { Team = c }).ToList();
-
-                        //linq barfs on enums in entity framework so got to set it manually
-                        foreach (TeamUser teamUser in submitters)
-                        {
-                            teamUser.TeamOrUser = TeamOrUser.Team;
-                        }
-                    }
-                    else
-                    {
-                        submitters = (from c in db.CoursesUsers where c.CourseID == activeCourse.CourseID && c.CourseRole.CanSubmit select new TeamUser { UserProfile = c.UserProfile }).ToList();
-
-                        //linq barfs on enums in entity framework so got to set it manually
-                        foreach (TeamUser teamUser in submitters)
-                        {
-                            teamUser.TeamOrUser = TeamOrUser.User;
-                        }
-                    }
-
-                    foreach (TeamUser teamUser in submitters)
+                    foreach (TeamUser teamUser in studioActivity.TeamUsers)
                     {
                         ActivityTeacherTableViewModel.SubmissionInfo info = new ActivityTeacherTableViewModel.SubmissionInfo();
 
-                        DirectoryInfo submissionFolder = new DirectoryInfo(FileSystem.GetSubmissionFolder(activeCourse.Course as Course, studioActivity.ID, new TeamUser() { TeamOrUser = TeamOrUser.User, UserProfile = teamUser.UserProfile }));
+                        //This checks when something was submitted by the folder modify time it is imperative that they don't get modified except when a student submits something to that folder.
+                        DirectoryInfo submissionFolder = new DirectoryInfo(FileSystem.GetSubmissionFolder(false, activeCourse.Course as Course, studioActivity.ID, teamUser));
 
                         //if team
-                        if (TeamOrUser.Team == teamUser.TeamOrUser)
+                        if (TeamOrUser.Team == (TeamOrUser)teamUser.TeamOrUser)
                         {
                             info.isTeam = true;
                             info.SubmitterID = teamUser.Team.ID;

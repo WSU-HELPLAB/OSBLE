@@ -68,6 +68,7 @@ namespace OSBLE.Controllers
             {
                 AbstractAssignmentActivity activity = db.AbstractAssignmentActivity.Find(id);
 
+                //purposefully not using the is statement as we also want to make sure it is not a null SubmissionActivity
                 if (activity as SubmissionActivity != null)
                 {
                     AbstractAssignment assignment = db.AbstractAssignments.Find(activity.AbstractAssignmentID);
@@ -76,7 +77,7 @@ namespace OSBLE.Controllers
 
                     if (assignment != null && assignment.Category.CourseID == activeCourse.CourseID && activeCourse.CourseRole.CanSubmit == true && assignment is StudioAssignment)
                     {
-                        TeamUser teamUser = GetTeamorUserForCurrentUser(activity as SubmissionActivity);
+                        TeamUser teamUser = TeamUser.GetTeamUser(activity as SubmissionActivity, currentUser);
 
                         int i = 0;
                         foreach (var file in files)
@@ -98,7 +99,7 @@ namespace OSBLE.Controllers
 
                                 if (allowFileExtensions.Contains(extension))
                                 {
-                                    var path = Path.Combine(FileSystem.GetSubmissionFolder(activeCourse.Course as Course, (int)id, teamUser), deliverables[i].Name + extension);
+                                    var path = Path.Combine(FileSystem.GetSubmissionFolder(true, activeCourse.Course as Course, (int)id, teamUser), deliverables[i].Name + extension);
                                     file.SaveAs(path);
                                 }
                                 else
@@ -122,7 +123,7 @@ namespace OSBLE.Controllers
                                 string inbrowser = Request.Params["inBrowserText[" + j + "]"];
                                 if (inbrowser.Length > 0)
                                 {
-                                    var path = Path.Combine(FileSystem.GetSubmissionFolder(activeCourse.Course as Course, (int)id, teamUser), delName + ".txt");
+                                    var path = Path.Combine(FileSystem.GetSubmissionFolder(true, activeCourse.Course as Course, (int)id, teamUser), delName + ".txt");
                                     System.IO.File.WriteAllText(path, inbrowser);
                                 }
                             }

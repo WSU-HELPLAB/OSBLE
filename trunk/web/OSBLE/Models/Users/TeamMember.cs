@@ -31,10 +31,25 @@ namespace OSBLE.Models.Users
 
         public int? TeamID { get; set; }
 
+        /// <summary>
+        /// TeamMember cannot contain a team that is its 'parent' as this would cause a circular reference
+        /// </summary>
         public virtual Team Team
         {
             get;
             set;
+        }
+
+        public bool Contains(UserProfile user)
+        {
+            if (user.ID == UserProfileID)
+            {
+                return true;
+            }
+            else
+            {
+                return Team.Contains(user);
+            }
         }
     }
 }

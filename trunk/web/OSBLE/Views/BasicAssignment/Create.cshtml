@@ -4,13 +4,14 @@
 @{
     ViewBag.Title = "Create Basic Assignment";
 }
-<h2>Create Basic Assignment @Helpers.CreateToolTip(ToolTips.BasicAssignmentTitle) </h2>
-
+<h2>
+    Create Basic Assignment @Helpers.CreateToolTip(ToolTips.BasicAssignmentTitle)
+</h2>
 <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/osble.assignments.js")" type="text/javascript"></script>
 <script type="text/javascript">
-    
+
     var isTeamGenerationReady = false;
 
     $(function () {
@@ -40,8 +41,7 @@
             if ($(this).attr('checked')) {
                 $('#edit_rubric_div').show('highlight');
             }
-            else 
-            {
+            else {
                 $('#edit_rubric_div').hide('blind');
             }
         });
@@ -51,8 +51,7 @@
             if ($(this).attr('checked')) {
                 DisplayTeamOptions();
             }
-            else 
-            {
+            else {
                 HideTeamOptions();
             }
         });
@@ -126,24 +125,14 @@
 
         // Set up add to gradebook checkbox
 
-        var oldPointsPossible = parseInt($('#points_possible').val());
-
-        if (parseInt($('#points_possible').val()) == 0) {
-            $('#add_to_gradebook').attr('checked', false);
-            $('#grade_options').css('display', 'none');
-        } else {
-            $('#add_to_gradebook').attr('checked', true);
-            $('#grade_options').css('display', 'block');
-        }
-
         $('#add_to_gradebook').change(function () {
             if ($('#add_to_gradebook').attr('checked')) {
-                $('#grade_options').show('blind');
-                $('#points_possible').val(oldPointsPossible.toString());
+                $('#grading').show('blind');
+                $('html,body').animate({
+                    scrollTop: $("#grading").offset().top
+                }, 2000);
             } else {
-                $('#grade_options').hide();
-                oldPointsPossible = parseInt($('#points_possible').val());
-                $('#points_possible').val('0');
+                $('#grading').hide('blind');
             }
         });
 
@@ -155,11 +144,11 @@
 
 
 
-    }); // end init
+    });  // end init
 
 
     function UpdateGradeCategory() {
-        $('#grade_category_label').html( $('#grade_category').selectedTexts()[0] );
+        $('#grade_category_label').html($('#grade_category').selectedTexts()[0]);
     }
 
     function updateActivitiesName() {
@@ -268,7 +257,7 @@
             success: function (msg) {
                 $('#RubricSelect').html(msg);
             }
-        });   
+        });
         return false;
     }
 
@@ -325,20 +314,12 @@
         @Html.TextBox("DueDate_Time", convertTime(stop.ReleaseDate), new { @id = "DueDate_Time", @class = "time_picker", size = 9 })
     </div>
     <div class="editor-label">
-        @Html.LabelFor(model => model.Assignment.IsDraft)
+        @Html.CheckBoxFor(model => model.Assignment.IsDraft) @Html.LabelFor(model => model.Assignment.IsDraft)
         @Helpers.CreateToolTip(ToolTips.BasicAssignmentIsDraft)
-    </div>
-    <div class="editor-field">
-        @Html.CheckBoxFor(model => model.Assignment.IsDraft)
-        @Html.ValidationMessageFor(model => model.Assignment.IsDraft)
     </div>
 
     <div class="editor-label">
-        @Html.LabelFor(model => submission.isTeam)
-    </div>
-    <div class="editor-field">
-        @Html.CheckBoxFor(model => submission.isTeam, new { id = "isTeam" })
-        @Html.ValidationMessageFor(model => submission.isTeam)
+        @Html.CheckBoxFor(model => submission.isTeam, new { id = "isTeam" }) @Html.LabelFor(model => submission.isTeam)
     </div>
     <div id="Team_Options" class="indented_options" style="display: none">
         <input type="radio" name="team_generation_options" value="PreviousAssignment" />
@@ -387,7 +368,7 @@
     </div>
     
     <div class="editor-label">
-        @Html.LabelFor(model => submission.InstructorCanReview)
+        @Html.CheckBoxFor(model => submission.InstructorCanReview, new { id = "InstructorCanReview" }) @Html.LabelFor(model => submission.InstructorCanReview)
     </div>
     <div class="editor-field">
         @Html.CheckBoxFor(model => submission.InstructorCanReview, new { id = "InstructorCanReview" })
@@ -398,11 +379,8 @@
     </div>
 
     <div class="editor-label">
-        @Html.LabelFor(m => Model.UseRubric)
+        @Html.EditorFor(m => Model.UseRubric) @Html.LabelFor(m => Model.UseRubric)
         @Helpers.CreateToolTip(ToolTips.BasicAssignmentUseRubric)
-    </div>
-    <div class="editor-field">
-        @Html.EditorFor(m => Model.UseRubric)
     </div>
     <div id="edit_rubric_div" style="display: none">
         <ul id="rubic_ul" class="team_generation_options">
@@ -417,9 +395,11 @@
         </ul>
     </div>
 
-    <h3>Deliverables @Helpers.CreateToolTip(ToolTips.BasicAssignmentDeliverables) </h3>
+    <h3>
+        Deliverables @Helpers.CreateToolTip(ToolTips.BasicAssignmentDeliverables)
+    </h3>
    
-<!--
+    <!--
     <table id="deliverables_table">
         <tr>
             <td>
@@ -456,11 +436,17 @@
     
     <table id="deliverables_table">
         <tr>
-            <td> File&nbsp;Name </td>
-            <td> <input type="text" id="new_deliverable_name" /> </td>
+            <td>
+                File&nbsp;Name
+            </td>
+            <td>
+                <input type="text" id="new_deliverable_name" />
+            </td>
         </tr>
         <tr>
-            <td> Type </td>
+            <td>
+                Type
+            </td>
             <td>
                 <select id="new_deliverable_type">
                     @foreach (SelectListItem dt in ViewBag.DeliverableTypes)
@@ -521,8 +507,8 @@
     </div>
     <div>
         <a href="#" id="add_new_deliverable" title="Add New Deliverable" style="text-decoration: none;">
-            <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Deliverable" /> Save Deliverable
-        </a>
+            <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Deliverable" />
+            Save Deliverable </a>
     </div>
     
     <div id="deliverable_data">
@@ -544,49 +530,43 @@
     
     <h3>Grading</h3>
     
-    
-    <div class="editor-label">
-        @Html.LabelFor(model => model.Assignment.Category, "Category")
-    </div>
-    <div class="editor-field">
-        @Html.DropDownListFor(model => model.Assignment.CategoryID, ViewBag.Categories as SelectList, new { id = "grade_category" })
-        @Html.ValidationMessageFor(model => model.Assignment.Category)
-    </div>
-    
-        
-    <div class="editor-label">
-        Add to Gradebook
-        @Helpers.CreateToolTip(ToolTips.BasicAssignmentAddToGradebook)
-    </div>
-    <div class="editor-field">
-        <input type="checkbox" id="add_to_gradebook" checked="checked" />
-    </div>
-    
-    <div id="grade_options" class="indented_options">
-        <div class="editor-field">
-            Worth
-            @Html.TextBoxFor(model => model.Assignment.PointsPossible, new { id = "points_possible", size = 3 })
-            Points in Category <span id="grade_category_label"></span>
-            @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)
+        <div class="editor-label">
+        @Html.CheckBoxFor(model => model.isGradable, new { id = "add_to_gradebook" }) @Html.Label("Will This Assignment Be Graded?")@Helpers.CreateToolTip(ToolTips.BasicAssignmentAddToGradebook)
         </div>
-
-    <h3>Late Policy @Helpers.CreateToolTip(ToolTips.BasicAssignmentLatePolicy) </h3>
-        <p>
-            Students may submit assignments up to @Html.TextBoxFor(model => model.Submission.MinutesLateWithNoPenalty, new { size = 3 })
-            minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.Submission.PercentPenalty, new { size = 3 })
-            percent per @Html.TextBoxFor(model => model.Submission.HoursLatePerPercentPenalty, new { size = 3 })
-            hours late will be applied.<br />
-            @Html.ValidationMessageFor(model => model.Submission.MinutesLateWithNoPenalty)
-            @Html.ValidationMessageFor(model => model.Submission.PercentPenalty)
-            @Html.ValidationMessageFor(model => model.Submission.HoursLatePerPercentPenalty)
-        </p>
-        <p>
-            Assignments that are submitted more than @Html.TextBoxFor(model => model.Submission.HoursLateUntilZero, new { size = 3 })
-            hours after the due date and time will receive an automatic 0.<br />
-            @Html.ValidationMessageFor(model => model.Submission.HoursLateUntilZero)
-        </p>
+    <div id='grading'>    
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Assignment.Category, "Category")
+        </div>
+        <div class="editor-field">
+            @Html.DropDownListFor(model => model.Assignment.CategoryID, ViewBag.Categories as SelectList, new { id = "grade_category" })
+            @Html.ValidationMessageFor(model => model.Assignment.Category)
+        </div>
+        <div id="grade_options" class="indented_options">
+            <div class="editor-field">
+                Worth
+                @Html.TextBoxFor(model => model.Assignment.PointsPossible, new { id = "points_possible", size = 3 })
+                Points in Category <span id="grade_category_label"></span>
+                @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)
+            </div>
+            <h3>
+                Late Policy @Helpers.CreateToolTip(ToolTips.BasicAssignmentLatePolicy)
+            </h3>
+            <p>
+                Students may submit assignments up to @Html.TextBoxFor(model => model.Submission.MinutesLateWithNoPenalty, new { size = 3 })
+                minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.Submission.PercentPenalty, new { size = 3 })
+                percent per @Html.TextBoxFor(model => model.Submission.HoursLatePerPercentPenalty, new { size = 3 })
+                hours late will be applied.<br />
+                @Html.ValidationMessageFor(model => model.Submission.MinutesLateWithNoPenalty)
+                @Html.ValidationMessageFor(model => model.Submission.PercentPenalty)
+                @Html.ValidationMessageFor(model => model.Submission.HoursLatePerPercentPenalty)
+            </p>
+            <p>
+                Assignments that are submitted more than @Html.TextBoxFor(model => model.Submission.HoursLateUntilZero, new { size = 3 })
+                hours after the due date and time will receive an automatic 0.<br />
+                @Html.ValidationMessageFor(model => model.Submission.HoursLateUntilZero)
+            </p>
+        </div>
     </div>
-    
     <p>
         <input type="submit" value="Create Basic Assignment" />
     </p>
@@ -596,7 +576,6 @@
         @Html.ActionLink("Back to List", "Index", "Home")
     </p>
 }
-
 <div id="team_generation_dialog" title="Edit Teams">
     @Html.DisplayFor(m => m.TeamCreation)
 </div>

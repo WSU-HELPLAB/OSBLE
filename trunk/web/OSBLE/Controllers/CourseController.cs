@@ -5,6 +5,7 @@ using System.Data;
 using System.Web.Mvc;
 using OSBLE.Attributes;
 using OSBLE.Models.Courses;
+using OSBLE.Utility;
 
 namespace OSBLE.Controllers
 {
@@ -59,12 +60,6 @@ namespace OSBLE.Controllers
                     course.CourseMeetings.Add(cm);
                 }
             }
-
-            db.SaveChanges();
-
-            Category category = new Category() { Points = 100, ColumnOrder = 0, Name = "Assignments" };
-
-            course.Categories.Add(category);
 
             db.SaveChanges();
         }
@@ -147,6 +142,19 @@ namespace OSBLE.Controllers
                 cu.CourseID = course.ID;
                 cu.UserProfileID = currentUser.ID;
                 cu.CourseRoleID = (int)CourseRole.OSBLERoles.Instructor;
+
+                //Add new Categories to the course
+                Category category = new Category();
+                category.Name = Constants.UnGradableCatagory;
+                category.Points = 0;
+
+                db.Categories.Add(category);
+
+                category = new Category();
+                category.Name = "Assignments";
+                category.Points = 100;
+
+                db.Categories.Add(category);
 
                 db.CoursesUsers.Add(cu);
                 db.SaveChanges();

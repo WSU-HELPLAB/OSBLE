@@ -198,10 +198,10 @@ namespace OSBLE
             return path;
         }
 
-        public static string GetSubmissionFolder(Course course, int assignmentActivityID, TeamUser subbmitter)
+        public static string GetSubmissionFolder(bool createPathIfNotExists, Course course, int assignmentActivityID, TeamUser subbmitter)
         {
             string path = GetAssignmentActivitySubmissionFolder(course, assignmentActivityID);
-            if (subbmitter.TeamOrUser == TeamOrUser.User)
+            if ((TeamOrUser)subbmitter.TeamOrUser == TeamOrUser.User)
             {
                 path += subbmitter.UserProfile.ID;
             }
@@ -210,7 +210,7 @@ namespace OSBLE
                 path += subbmitter.Team.ID;
             }
 
-            if (!Directory.Exists(path))
+            if (!Directory.Exists(path) && createPathIfNotExists)
             {
                 Directory.CreateDirectory(path);
             }

@@ -9,9 +9,10 @@ using OSBLE.Models;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
+using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
-using OSBLE.Models.Courses.Rubrics;
+using OSBLE.Utility;
 
 namespace OSBLE.Controllers
 {
@@ -46,7 +47,6 @@ namespace OSBLE.Controllers
         public ActionResult Create()
         {
             //we create a basic assignment that is a StudioAssignment with a submission and a stop
-            List<Deliverable> Deliverables = new List<Deliverable>();
             BasicAssignmentViewModel viewModel = new BasicAssignmentViewModel();
 
             // Copy default Late Policy settings
@@ -60,25 +60,30 @@ namespace OSBLE.Controllers
             viewModel.RubricCreation = createRubricCreationSilverlightObject();
 
             List<Rubric> rubrics = (from cr in db.CourseRubrics
-                          join r in db.Rubrics on cr.RubricID equals r.ID
-                          where cr.CourseID == activeCourse.CourseID
-                          select r).ToList();
-            rubrics.Insert(0, new Rubric() { ID=0, Description="" });
+                                    join r in db.Rubrics on cr.RubricID equals r.ID
+                                    where cr.CourseID == activeCourse.CourseID
+                                    select r).ToList();
+            rubrics.Insert(0, new Rubric() { ID = 0, Description = "" });
             ViewBag.Rubrics = rubrics.ToList();
 
             viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"] = serializeTeamMemers(getTeamMembers());
 
-            var cat = from c in db.Categories
-                      where c.CourseID == active.ID
-                      select c;
-            ViewBag.Categories = new SelectList(cat, "ID", "Name");
-            ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
-            ViewBag.Deliverables = Deliverables;
+            setupViewBag();
+
             return View(viewModel);
         }
 
         //
         // POST: /Assignment/Create
+
+        private void setupViewBag()
+        {
+            var cat = from c in (activeCourse.Course as Course).Categories
+                      where c.Name != Constants.UnGradableCatagory
+                      select c;
+            ViewBag.Categories = new SelectList(cat, "ID", "Name");
+            ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
+        }
 
         [HttpPost]
         [CanModifyCourse]
@@ -107,6 +112,13 @@ namespace OSBLE.Controllers
                 ModelState.AddModelError("time", "The due date must come after the release date");
             }
 
+            if (Request.Params["isGradable"].ToString() == "false")
+            {
+                basic.Assignment.Category = (from c in (activeCourse.Course as Course).Categories
+                                             where c.Name == Constants.UnGradableCatagory
+                                             select c).FirstOrDefault();
+            }
+
             if (ModelState.IsValid)
             {
                 SubmissionActivity submission = new SubmissionActivity();
@@ -131,9 +143,9 @@ namespace OSBLE.Controllers
                 basic.Assignment.AssignmentActivities.Add(stop);
 
                 if (basic.UseRubric)
-                { 
+                {
                     int rubricId = 0;
-                    if(Int32.TryParse(Request.Form["RubricToUse"].ToString(), out rubricId))
+                    if (Int32.TryParse(Request.Form["RubricToUse"].ToString(), out rubricId))
                     {
                         basic.Assignment.RubricID = rubricId;
                     }
@@ -197,7 +209,7 @@ namespace OSBLE.Controllers
                                 team_db.Members.Add(teamMember_db);
                             }
 
-                            submission.Teams.Add(team_db);
+                            submission.TeamUsers.Add(new TeamUser(team_db));
 
                             db.Teams.Add(team_db);
                         }
@@ -206,7 +218,15 @@ namespace OSBLE.Controllers
                 }
                 else
                 {
-                    submission.Teams = null;
+                    var users = from c in db.CoursesUsers
+                                where c.CourseID == activeCourse.CourseID
+                                && c.CourseRole.CanSubmit
+                                select c.UserProfile;
+
+                    foreach (UserProfile user in users)
+                    {
+                        submission.TeamUsers.Add(new TeamUser(user));
+                    }
                     db.SaveChanges();
                 }
 
@@ -215,8 +235,9 @@ namespace OSBLE.Controllers
 
             basic.TeamCreation = createTeamCreationSilverlightObject();
             basic.RubricCreation = createRubricCreationSilverlightObject();
-            ViewBag.Categories = new SelectList(db.Categories, "ID", "Name", basic.Assignment.CategoryID);
-            ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
+            setupViewBag();
+            //ViewBag.Categories = new SelectList(db.Categories, "ID", "Name", basic.Assignment.CategoryID);
+            //ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
 
             basic.SerializedTeamMembersJSON = basic.TeamCreation.Parameters["teamMembers"] = serializeTeamMemers(getTeamMembers());
 
