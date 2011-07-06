@@ -122,6 +122,10 @@ namespace OSBLE.Models
 
         public DbSet<CourseRubric> CourseRubrics { get; set; }
 
+        public DbSet<RubricEvaluation> RubricEvaluations { get; set; }
+
+        public DbSet<CriterionEvaluation> CriterionEvaluations { get; set; }
+
 
         // Users
 
