@@ -21,6 +21,6 @@ namespace OSBLE.Models.Courses.Rubrics
         public int? Score { get; set; }
 
         [MaxLength(4000)]
-        public string? Comment { get; set; }
+        public string Comment { get; set; }
     }
 }
