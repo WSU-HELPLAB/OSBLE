@@ -313,10 +313,6 @@
         @Html.TextBox("DueDate_Date", convertToMonthDayYearFormat(stop.ReleaseDate), new { @id = "DueDate_Date", @class = "date_picker", size = 9 })
         @Html.TextBox("DueDate_Time", convertTime(stop.ReleaseDate), new { @id = "DueDate_Time", @class = "time_picker", size = 9 })
     </div>
-    <div class="editor-label">
-        @Html.CheckBoxFor(model => model.Assignment.IsDraft) @Html.LabelFor(model => model.Assignment.IsDraft)
-        @Helpers.CreateToolTip(ToolTips.BasicAssignmentIsDraft)
-    </div>
 
     <div class="editor-label">
         @Html.CheckBoxFor(model => submission.isTeam, new { id = "isTeam" }) @Html.LabelFor(model => submission.isTeam)
@@ -564,7 +560,16 @@
         </div>
     </div>
     <p>
-        <input type="submit" value="Create Basic Assignment" />
+        @Html.HiddenFor(model => model.Assignment.IsDraft, new { id = "is_draft" })
+        <input type="submit" value="Create Basic Assignment" /> <input type="submit" value="Save as Draft" id="save_draft" />@Helpers.CreateToolTip(ToolTips.BasicAssignmentIsDraft)
+        <script type="text/javascript">
+            $(function () {
+                $('#save_draft').click(function () {
+                    alert('This assignment will be saved as a draft and will not be released even if the release date passes');
+                    $('#is_draft').val('True');
+                });
+            });
+        </script>
     </p>
     
     }

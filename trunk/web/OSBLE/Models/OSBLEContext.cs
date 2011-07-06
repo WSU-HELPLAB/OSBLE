@@ -181,7 +181,7 @@ namespace OSBLE.Models
 
         public void SeedSchools()
         {
-            this.Schools.Add(new School("Professional"));
+            this.Schools.Add(new School(Constants.ProfessionalSchool));
         }
 
         /// <summary>

@@ -14,6 +14,7 @@ using Microsoft.Web.Helpers;
 using OSBLE.Models;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
+using OSBLE.Utility;
 
 namespace OSBLE.Controllers
 {
@@ -136,7 +137,7 @@ namespace OSBLE.Controllers
             //Fall through if ReCaptcha is not set up correctly
             if (privatekey == null || ReCaptcha.Validate(privateKey: privatekey))
             {
-                model.School = (from c in db.Schools where c.Name == "Professional" select c).FirstOrDefault();
+                model.School = (from c in db.Schools where c.Name == Constants.ProfessionalSchool select c).FirstOrDefault();
                 model.SchoolID = model.School.ID;
 
                 if (ModelState.IsValid)
@@ -196,7 +197,9 @@ namespace OSBLE.Controllers
         public ActionResult AcademiaRegister()
         {
             ViewBag.ReCaptchaPublicKey = getReCaptchaPublicKey();
-            ViewBag.SchoolID = new SelectList(db.Schools, "ID", "Name");
+            ViewBag.SchoolID = new SelectList(from c in db.Schools
+                                              where c.Name != Constants.ProfessionalSchool
+                                              select c, "ID", "Name");
             return View();
         }
 
