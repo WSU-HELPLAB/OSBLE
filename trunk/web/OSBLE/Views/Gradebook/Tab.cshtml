@@ -143,9 +143,14 @@
 <div id="tabHeader">
     <h3>Gradebook</h3>
     <div id='import_grades_from_csv'  title="Import file">Upload a comma-separated (CSV) file of student grades:<br /><br />
-        <span><input type="checkbox"/>Check to import into this cell</span>
+        
+
         @using (Html.BeginForm("ImportColumnsFromCSV", "Gradebook", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
+            <span><input type="radio" name="rdio" value="r" checked="checked" />Import to the right of this column</span><br />
+            <span><input type="radio" name="rdio" value="l"/>Import to the left of this column</span><br /><br />
+            <span><input type="checkbox"/>Overwrite values in this column</span><br /><br />
+            <input type="hidden" name="assignmentColumnId" id="column_assignment_id" />
             <input type="file" id="file" name="file" />
             <input type="submit" value="Upload File" />
         }
@@ -294,24 +299,24 @@
         }
 
         if (isHighlighted == true) {
-            $("#grades tr").each(function () {
-                $(this).find("td").each(function () {
-                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-                        $(this).css("background-color", "#DCDCDC");
-                        $(this).find("div").css("background-color", "#DCDCDC");
-                    }
-                    else {
-                        $(this).css("background-color", "white");
-                    }
-                });
-                $(this).find("th").each(function () {
-                    if ($(this).attr("class") == "colHeader") {
-                    }
-                    else {
-                        $(this).css("background-color", "white");
-                    }
-                });
-            });
+//            $("#grades tr").each(function () {
+//                $(this).find("td").each(function () {
+//                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+//                        $(this).css("background-color", "#DCDCDC");
+//                        $(this).find("div").css("background-color", "#DCDCDC");
+//                    }
+//                    else {
+//                        $(this).css("background-color", "white");
+//                    }
+//                });
+//                $(this).find("th").each(function () {
+//                    if ($(this).attr("class") == "colHeader") {
+//                    }
+//                    else {
+//                        $(this).css("background-color", "white");
+//                    }
+//                });
+//            });
             hideTabColors();
             isHighlighted = false;
         }
@@ -434,7 +439,6 @@
 
         $("#customizeID").dialog({
 
-
             modal: true,
             resizable: false,
             width: 290,
@@ -458,8 +462,8 @@
         $("#import_grades_from_csv").dialog({
             modal: true,
             resizable: false,
-            width: 450,
-            height: 150,
+            width: 500,
+            height: 225,
             closeOnEscape: false
         });
     }
@@ -620,19 +624,6 @@
 
     function cellGainsFocus(someCell) {
 
-        $("#grades tr").each(function () {
-            $(this).find("td").each(function () {
-                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-                    $(this).css("background-color", "#DCDCDC");
-                    $(this).find("div").css("background-color", "#DCDCDC");
-                }
-                else {
-
-                }
-            });
-        });
-
-
         //we are in a data cell so we need to set isDataCell to true
         isDataCell = true;
         var cell = null
@@ -786,6 +777,8 @@
         var container = buttonClick.id;
         containerId = container.split("-");
         currentCol = containerId[1];
+        //alert(currentCol);
+        $("#column_assignment_id").val(currentCol);
 
         //aligning the menu under the buttons
         x = $("#" + container).position().left;

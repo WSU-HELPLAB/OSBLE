@@ -45,15 +45,13 @@ namespace OSBLE.Controllers
        public ActionResult ImportColumnsFromCSV(HttpPostedFileBase file)
        {
            Session["GradeFile"] = file;
+           Session["radio"] = Request.Params["rdio"];
+           Session["assignmentId"] = Request.Params["assignmentColumnId"];
 
            List<string[]> parsedData = new List<string[]>();
            List<int> positionList = new List<int>();
            List<int> doNotAdd = new List<int>();
-           int currentCourseId = ActiveCourse.CourseID;
-           int studentID = 0;
-           int studentIdPosition = 0;
-           int doNotIncludeCols = 0;
-           
+           int currentCourseId = ActiveCourse.CourseID;           
 
            var students = from student in db.CoursesUsers
                           where student.CourseID == currentCourseId
@@ -75,112 +73,7 @@ namespace OSBLE.Controllers
            file.InputStream.Seek(0, SeekOrigin.Begin);
            file.InputStream.Position = 0;
 
-           #region
-           /*if (parsedData.Count > 0)
-           {
-               for (int i = 0; i < parsedData.Count(); i++)
-               {
-                   int count = 0;
-                   int currentColOrder = 0;
-                   var item = parsedData.ElementAt(i);
-                   foreach (var num in item)
-                   {
-                       if (i == 0)
-                       {
-                           if (num == "Last Name")
-                           {
-                               doNotIncludeCols++;
-                           }
-                           else if (num == "First Name")
-                           {
-                               doNotIncludeCols++;
-                           }
-                           else if (num == "Student ID")
-                           {
-                               studentIdPosition = count;
-                           }
-                           else if (num == "Remote ID")
-                           {
-                               doNotIncludeCols++;
-                           }
-                           else if (num == "Aggregate Performance")
-                           {
-                               doNotIncludeCols++;
-                           }
-                           else if (num == "Aggregate Participation")
-                           {
-                               doNotIncludeCols++;
-                           }
-                           else if (num == "Aggregate Total")
-                           {
-                               doNotIncludeCols++;
-                           }
-                           else if (num == "Total")
-                           {
-                               doNotIncludeCols++;
-                           }
-
-                           else
-                           {
-                               var position = (from pos in db.AbstractAssignments
-                                               orderby pos.ColumnOrder descending
-                                               select pos).First();
-                               AddColumn(num.ToString(), 10, position.ColumnOrder + 1);
-                               positionList.Add(position.ColumnOrder + 1);
-                           }
-                       }
-                       else
-                       {
-                           if (count <= doNotIncludeCols)
-                           {
-                               if (count == studentIdPosition)
-                               {
-                                   studentID = Convert.ToInt32(num);
-                               }
-                           }
-                           else
-                           {
-                               var student = from stu in db.CoursesUsers
-                                             where stu.UserProfileID == studentID
-                                             select stu;
-
-                               if (student.Count() > 0)
-                               {
-                                   int col = positionList.ElementAt(currentColOrder);
-                                   currentColOrder++;
-                                   var assignment = from a in db.AbstractAssignments
-                                                    where a.ColumnOrder == col
-                                                    select a;
-
-                                   var assignmentQuery = from a in db.AssignmentActivities
-                                                         where a.AbstractAssignment.ColumnOrder == col
-                                                         select a;
-
-                                   var currentAssignment = assignmentQuery.FirstOrDefault();
-
-                                   if (assignment.Count() > 0)
-                                   {
-                                       Score newScore = new Score()
-                                       {
-                                           UserProfileID = studentID,
-                                           Points = Convert.ToDouble(num),
-                                           AssignmentActivityID = currentAssignment.ID,
-                                           PublishedDate = DateTime.Now,
-                                           isDropped = false
-                                       };
-                                       db.Scores.Add(newScore);
-                                       db.SaveChanges();
-                                   }
-                               }
-                           }
-                       }
-                       count++;
-                   }
-               }
-           }
-           BuildGradebook((int)Session["categoryId"]);
-           return View("_Gradebook");*/
-           #endregion
+          
            return View();
        }
 
@@ -211,6 +104,8 @@ namespace OSBLE.Controllers
            {
                for (int i = 0; i < parsedData.Count(); i++)
                {
+                   int currentAssignmentID = Convert.ToInt32(Session["assignmentId"]); ;
+                   int assignmentNumber = 1;
                    int count = 0;
                    int currentColOrder = 0;
                    var item = parsedData.ElementAt(i);
@@ -226,12 +121,52 @@ namespace OSBLE.Controllers
                                }
                                else
                                {
-                                   var position = (from pos in db.AbstractAssignments
-                                                   orderby pos.ColumnOrder descending
-                                                   select pos).First();
-                                   AddColumn(assignment.ToString(), 10, position.ColumnOrder + 1);
-                                   positionList.Add(position.ColumnOrder + 1);
-                                   index.Add(count);
+                                   AbstractAssignment assign = (from g in db.AbstractAssignments where g.ID == currentAssignmentID select g).First();
+                                   if (Session["radio"].ToString() == "r")
+                                   {
+                                       
+                                       var position = from pos in db.AbstractAssignments
+                                                      where pos.ColumnOrder > assign.ColumnOrder
+                                                      select pos;
+
+                                       if (position.Count() > 0)
+                                       {
+                                           
+                                           foreach (AbstractAssignment col in position)
+                                           {
+                                               col.ColumnOrder += 1;
+                                           }
+                                           db.SaveChanges();
+
+                                           AddColumn(assignment.ToString(), 10, assign.ColumnOrder + assignmentNumber);
+                                           positionList.Add(assign.ColumnOrder + assignmentNumber);
+                                           index.Add(count);
+                                           currentAssignmentID = (from g in db.AbstractAssignments where g.ColumnOrder == (assign.ColumnOrder + 1) select g.ID).First();
+                                       }
+                                       
+                                   }
+                                   else if (Session["radio"].ToString() == "l")
+                                   {
+
+                                       var position = from pos in db.AbstractAssignments
+                                                      where pos.ColumnOrder >= assign.ColumnOrder
+                                                      select pos;
+
+                                       if (position.Count() > 0)
+                                       {
+                                           
+                                           foreach (AbstractAssignment col in position)
+                                           {
+                                               col.ColumnOrder += 1;
+                                           }
+                                           db.SaveChanges();
+
+                                           AddColumn(assignment.ToString(), 10, assign.ColumnOrder);
+                                           positionList.Add(assign.ColumnOrder - 1);    
+                                           index.Add(count);
+                                       }
+
+                                   }
                                }
                            }
                        }
@@ -250,7 +185,6 @@ namespace OSBLE.Controllers
                                {
                                    int col = positionList.ElementAt(currentColOrder);
                                    currentColOrder++;
-
                                    var assign = from a in db.AbstractAssignments
                                                 where a.ColumnOrder == col
                                                 select a;
