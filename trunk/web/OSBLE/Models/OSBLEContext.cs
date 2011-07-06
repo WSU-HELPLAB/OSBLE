@@ -10,6 +10,7 @@ using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
 using OSBLE.Models.AbstractCourses;
+using System.Web;
 
 namespace OSBLE.Models
 {
@@ -26,7 +27,14 @@ namespace OSBLE.Models
 
         public OSBLEContext()
             : base("OSBLEData")
-        { }
+        {
+            //Needed for EF 4.1 CF RIA Services.  See:
+            //http://varunpuranik.wordpress.com/2011/06/29/wcf-ria-services-support-for-ef-4-1-and-ef-code-first/
+            if (HttpContext.Current == null)
+            {
+                Database.SetInitializer<OSBLEContext>(null);
+            }
+        }
 
         public DbSet<School> Schools { get; set; }
 

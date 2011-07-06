@@ -86,6 +86,9 @@
       <HintPath>App_Code\Libraries\LumenWorks.Framework.IO.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.ServiceModel.DomainServices.EntityFramework">
+      <HintPath>..\packages\RIAServices.EntityFramework.4.1.60629.0\lib\Net40\Microsoft.ServiceModel.DomainServices.EntityFramework.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Web.Helpers">
       <HintPath>..\packages\microsoft-web-helpers.1.15\lib\Microsoft.Web.Helpers.dll</HintPath>
       <Private>True</Private>
@@ -150,6 +153,7 @@
     <Compile Include="Controllers\RubricController.cs" />
     <Compile Include="Controllers\StudioAssignmentController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
+    <Compile Include="EntityFramework\DbContextExtensions.cs" />
     <Compile Include="Models\AbstractCourses\CourseRubric.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\AbstractAssignment.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\AsyncIssueVotingActivity.cs" />
