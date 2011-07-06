@@ -21,5 +21,7 @@ namespace OSBLE.Models.Courses.Rubrics
         public virtual ICollection<Level> Levels { get; set; }
 
         public virtual ICollection<Criterion> Criteria { get; set; }
+
+        public virtual ICollection<CellDescription> CellDescriptions { get; set; }
     }
 }

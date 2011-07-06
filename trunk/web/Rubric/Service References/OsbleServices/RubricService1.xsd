@@ -105,7 +105,6 @@
       <xs:sequence>
         <xs:element minOccurs="0" name="courseId" type="xs:int" />
         <xs:element xmlns:q9="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="rubric" nillable="true" type="q9:Rubric" />
-        <xs:element xmlns:q10="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="descriptions" nillable="true" type="q10:ArrayOfCellDescription" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

@@ -1,0 +1,51 @@
+﻿@model OSBLE.Models.ViewModels.RubricViewModel
+@using OSBLE.Models.Courses.Rubrics;
+
+@{int maxLevelScore = (from c in Model.Rubric.Levels
+                       select c.RangeEnd).Sum(); }
+
+@{foreach (Criterion crit in Model.Rubric.Criteria)
+  {
+      <div>
+        <div>@crit.CriterionTitle (Weight: @crit.Weight)</div>
+        @{List<CellDescription> descriptions = (from d in Model.Rubric.CellDescriptions
+                                                where d.CriterionID == crit.ID
+                                                select d).ToList();
+                                               }
+        <ul>
+        @{int previousMax = 0;}
+        @{foreach (CellDescription desc in descriptions)
+          {
+              <li><em>@desc.Level.LevelTitle (@previousMax - @(previousMax + desc.Level.RangeEnd))</em>
+              @{previousMax += desc.Level.RangeEnd;}
+              <br />
+              @desc.Description</li>
+          }
+        }
+        </ul>
+        <input id="crit_amount_@(crit.ID)" type="text" style="border:0" />
+        <div id="crit_slider_@(crit.ID)"></div>
+        @{if (Model.Rubric.HasCriteriaComments)
+          {
+              <div>
+                <textarea id="crit_comment_@(crit.ID)"></textarea>
+              </div>
+          }
+  }
+        <script type="text/javascript">
+            $(function () {
+                $("#crit_slider_@(crit.ID)").slider({
+                    value: 0,
+                    min: 0,
+                    max: @maxLevelScore,
+                    step: 1,
+                    slide: function (event, ui) {
+                        $("#crit_amount_@(crit.ID)").val(ui.value);
+                    }
+                });
+                $("#crit_amount_@(crit.ID)").val($("#crit_slider_@(crit.ID)").slider("value"));
+            });
+        </script>
+      </div>
+  }
+    }

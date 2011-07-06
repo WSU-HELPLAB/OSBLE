@@ -161,7 +161,7 @@ namespace OSBLE.Services
         /// <param name="descriptions"></param>
         /// <returns></returns>
         [OperationContract]
-        public int SaveRubric(int courseId, Rubric rubric, ObservableCollection<CellDescription> descriptions)
+        public int SaveRubric(int courseId, Rubric rubric)
         {
             OSBLEContext db = new OSBLEContext();
 
@@ -197,7 +197,7 @@ namespace OSBLE.Services
             //***
 
             //start building links for the cell descriptions
-            foreach (CellDescription desc in descriptions)
+            foreach (CellDescription desc in rubric.CellDescriptions)
             {
                 //use LINQ to find the referenced object
                 Criterion crit = (from c in rubric.Criteria
@@ -239,10 +239,6 @@ namespace OSBLE.Services
 
             //now, save to the DB
             db.Rubrics.Add(rubric);
-            foreach (CellDescription desc in descriptions)
-            {
-                db.LevelDescriptions.Add(desc);
-            }
             db.SaveChanges();
 
             //with that saved, we can create a rubric / course assocation

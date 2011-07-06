@@ -20,4 +20,29 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="UserProfile" nillable="true" type="tns:UserProfile" />
+  <xs:complexType name="ArrayOfTeamUser">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="TeamUser" nillable="true" type="tns:TeamUser" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfTeamUser" nillable="true" type="tns:ArrayOfTeamUser" />
+  <xs:complexType name="TeamUser">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="Team" nillable="true" type="tns:Team" />
+      <xs:element minOccurs="0" name="TeamID" nillable="true" type="xs:int" />
+      <xs:element minOccurs="0" name="TeamOrUser" type="xs:int" />
+      <xs:element minOccurs="0" name="UserProfile" nillable="true" type="tns:UserProfile" />
+      <xs:element minOccurs="0" name="UserProfileID" nillable="true" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TeamUser" nillable="true" type="tns:TeamUser" />
+  <xs:complexType name="Team">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="Members" nillable="true" type="tns:ArrayOfTeamUser" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Team" nillable="true" type="tns:Team" />
 </xs:schema>

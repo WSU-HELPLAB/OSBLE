@@ -305,6 +305,8 @@ namespace OsbleRubric.OsbleServices {
     [System.Runtime.Serialization.DataContractAttribute(Name="Rubric", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics")]
     public partial class Rubric : object, System.ComponentModel.INotifyPropertyChanged {
         
+        private System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CellDescription> CellDescriptionsField;
+        
         private System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Criterion> CriteriaField;
         
         private string DescriptionField;
@@ -316,6 +318,19 @@ namespace OsbleRubric.OsbleServices {
         private int IDField;
         
         private System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Level> LevelsField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CellDescription> CellDescriptions {
+            get {
+                return this.CellDescriptionsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CellDescriptionsField, value) != true)) {
+                    this.CellDescriptionsField = value;
+                    this.RaisePropertyChanged("CellDescriptions");
+                }
+            }
+        }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
         public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Criterion> Criteria {
@@ -1489,15 +1504,27 @@ namespace OsbleRubric.OsbleServices {
         
         private int ColumnOrderField;
         
+        private int HoursLatePerPercentPenaltyField;
+        
+        private int HoursLateUntilZeroField;
+        
         private int IDField;
         
+        private int MinutesLateWithNoPenaltyField;
+        
         private string NameField;
+        
+        private int PercentPenaltyField;
         
         private int PointsPossibleField;
         
         private System.DateTime ReleaseDateField;
         
         private System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Score> ScoresField;
+        
+        private System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.TeamUser> TeamUsersField;
+        
+        private bool isTeamField;
         
         [System.Runtime.Serialization.DataMemberAttribute()]
         public OsbleRubric.OsbleServices.AbstractAssignment AbstractAssignment {
@@ -1539,6 +1566,32 @@ namespace OsbleRubric.OsbleServices {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
+        public int HoursLatePerPercentPenalty {
+            get {
+                return this.HoursLatePerPercentPenaltyField;
+            }
+            set {
+                if ((this.HoursLatePerPercentPenaltyField.Equals(value) != true)) {
+                    this.HoursLatePerPercentPenaltyField = value;
+                    this.RaisePropertyChanged("HoursLatePerPercentPenalty");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int HoursLateUntilZero {
+            get {
+                return this.HoursLateUntilZeroField;
+            }
+            set {
+                if ((this.HoursLateUntilZeroField.Equals(value) != true)) {
+                    this.HoursLateUntilZeroField = value;
+                    this.RaisePropertyChanged("HoursLateUntilZero");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
         public int ID {
             get {
                 return this.IDField;
@@ -1552,6 +1605,19 @@ namespace OsbleRubric.OsbleServices {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
+        public int MinutesLateWithNoPenalty {
+            get {
+                return this.MinutesLateWithNoPenaltyField;
+            }
+            set {
+                if ((this.MinutesLateWithNoPenaltyField.Equals(value) != true)) {
+                    this.MinutesLateWithNoPenaltyField = value;
+                    this.RaisePropertyChanged("MinutesLateWithNoPenalty");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
         public string Name {
             get {
                 return this.NameField;
@@ -1560,6 +1626,19 @@ namespace OsbleRubric.OsbleServices {
                 if ((object.ReferenceEquals(this.NameField, value) != true)) {
                     this.NameField = value;
                     this.RaisePropertyChanged("Name");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int PercentPenalty {
+            get {
+                return this.PercentPenaltyField;
+            }
+            set {
+                if ((this.PercentPenaltyField.Equals(value) != true)) {
+                    this.PercentPenaltyField = value;
+                    this.RaisePropertyChanged("PercentPenalty");
                 }
             }
         }
@@ -1599,6 +1678,32 @@ namespace OsbleRubric.OsbleServices {
                 if ((object.ReferenceEquals(this.ScoresField, value) != true)) {
                     this.ScoresField = value;
                     this.RaisePropertyChanged("Scores");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.TeamUser> TeamUsers {
+            get {
+                return this.TeamUsersField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TeamUsersField, value) != true)) {
+                    this.TeamUsersField = value;
+                    this.RaisePropertyChanged("TeamUsers");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool isTeam {
+            get {
+                return this.isTeamField;
+            }
+            set {
+                if ((this.isTeamField.Equals(value) != true)) {
+                    this.isTeamField = value;
+                    this.RaisePropertyChanged("isTeam");
                 }
             }
         }
@@ -1779,6 +1884,111 @@ namespace OsbleRubric.OsbleServices {
                 if ((this.addedPointsField.Equals(value) != true)) {
                     this.addedPointsField = value;
                     this.RaisePropertyChanged("addedPoints");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="TeamUser", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Users")]
+    public partial class TeamUser : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private int IDField;
+        
+        private OsbleRubric.OsbleServices.Team TeamField;
+        
+        private System.Nullable<int> TeamIDField;
+        
+        private int TeamOrUserField;
+        
+        private OsbleRubric.OsbleServices.UserProfile UserProfileField;
+        
+        private System.Nullable<int> UserProfileIDField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public OsbleRubric.OsbleServices.Team Team {
+            get {
+                return this.TeamField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TeamField, value) != true)) {
+                    this.TeamField = value;
+                    this.RaisePropertyChanged("Team");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Nullable<int> TeamID {
+            get {
+                return this.TeamIDField;
+            }
+            set {
+                if ((this.TeamIDField.Equals(value) != true)) {
+                    this.TeamIDField = value;
+                    this.RaisePropertyChanged("TeamID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TeamOrUser {
+            get {
+                return this.TeamOrUserField;
+            }
+            set {
+                if ((this.TeamOrUserField.Equals(value) != true)) {
+                    this.TeamOrUserField = value;
+                    this.RaisePropertyChanged("TeamOrUser");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public OsbleRubric.OsbleServices.UserProfile UserProfile {
+            get {
+                return this.UserProfileField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.UserProfileField, value) != true)) {
+                    this.UserProfileField = value;
+                    this.RaisePropertyChanged("UserProfile");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Nullable<int> UserProfileID {
+            get {
+                return this.UserProfileIDField;
+            }
+            set {
+                if ((this.UserProfileIDField.Equals(value) != true)) {
+                    this.UserProfileIDField = value;
+                    this.RaisePropertyChanged("UserProfileID");
                 }
             }
         }
@@ -2275,6 +2485,66 @@ namespace OsbleRubric.OsbleServices {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Team", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Users")]
+    public partial class Team : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private int IDField;
+        
+        private System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.TeamUser> MembersField;
+        
+        private string NameField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.TeamUser> Members {
+            get {
+                return this.MembersField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.MembersField, value) != true)) {
+                    this.MembersField = value;
+                    this.RaisePropertyChanged("Members");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Name {
+            get {
+                return this.NameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NameField, value) != true)) {
+                    this.NameField = value;
+                    this.RaisePropertyChanged("Name");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="SimpleCourse", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Rubric")]
     public partial class SimpleCourse : object, System.ComponentModel.INotifyPropertyChanged {
         
@@ -2363,7 +2633,7 @@ namespace OsbleRubric.OsbleServices {
         System.Collections.Generic.Dictionary<OsbleRubric.OsbleServices.SimpleCourse, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.Rubric>> EndGetRubricList(System.IAsyncResult result);
         
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:RubricService/SaveRubric", ReplyAction="urn:RubricService/SaveRubricResponse")]
-        System.IAsyncResult BeginSaveRubric(int courseId, OsbleRubric.OsbleServices.Rubric rubric, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CellDescription> descriptions, System.AsyncCallback callback, object asyncState);
+        System.IAsyncResult BeginSaveRubric(int courseId, OsbleRubric.OsbleServices.Rubric rubric, System.AsyncCallback callback, object asyncState);
         
         int EndSaveRubric(System.IAsyncResult result);
     }
@@ -3011,8 +3281,8 @@ namespace OsbleRubric.OsbleServices {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.IAsyncResult OsbleRubric.OsbleServices.RubricService.BeginSaveRubric(int courseId, OsbleRubric.OsbleServices.Rubric rubric, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CellDescription> descriptions, System.AsyncCallback callback, object asyncState) {
-            return base.Channel.BeginSaveRubric(courseId, rubric, descriptions, callback, asyncState);
+        System.IAsyncResult OsbleRubric.OsbleServices.RubricService.BeginSaveRubric(int courseId, OsbleRubric.OsbleServices.Rubric rubric, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginSaveRubric(courseId, rubric, callback, asyncState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -3023,8 +3293,7 @@ namespace OsbleRubric.OsbleServices {
         private System.IAsyncResult OnBeginSaveRubric(object[] inValues, System.AsyncCallback callback, object asyncState) {
             int courseId = ((int)(inValues[0]));
             OsbleRubric.OsbleServices.Rubric rubric = ((OsbleRubric.OsbleServices.Rubric)(inValues[1]));
-            System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CellDescription> descriptions = ((System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CellDescription>)(inValues[2]));
-            return ((OsbleRubric.OsbleServices.RubricService)(this)).BeginSaveRubric(courseId, rubric, descriptions, callback, asyncState);
+            return ((OsbleRubric.OsbleServices.RubricService)(this)).BeginSaveRubric(courseId, rubric, callback, asyncState);
         }
         
         private object[] OnEndSaveRubric(System.IAsyncResult result) {
@@ -3040,11 +3309,11 @@ namespace OsbleRubric.OsbleServices {
             }
         }
         
-        public void SaveRubricAsync(int courseId, OsbleRubric.OsbleServices.Rubric rubric, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CellDescription> descriptions) {
-            this.SaveRubricAsync(courseId, rubric, descriptions, null);
+        public void SaveRubricAsync(int courseId, OsbleRubric.OsbleServices.Rubric rubric) {
+            this.SaveRubricAsync(courseId, rubric, null);
         }
         
-        public void SaveRubricAsync(int courseId, OsbleRubric.OsbleServices.Rubric rubric, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CellDescription> descriptions, object userState) {
+        public void SaveRubricAsync(int courseId, OsbleRubric.OsbleServices.Rubric rubric, object userState) {
             if ((this.onBeginSaveRubricDelegate == null)) {
                 this.onBeginSaveRubricDelegate = new BeginOperationDelegate(this.OnBeginSaveRubric);
             }
@@ -3056,8 +3325,7 @@ namespace OsbleRubric.OsbleServices {
             }
             base.InvokeAsync(this.onBeginSaveRubricDelegate, new object[] {
                         courseId,
-                        rubric,
-                        descriptions}, this.onEndSaveRubricDelegate, this.onSaveRubricCompletedDelegate, userState);
+                        rubric}, this.onEndSaveRubricDelegate, this.onSaveRubricCompletedDelegate, userState);
         }
         
         private System.IAsyncResult OnBeginOpen(object[] inValues, System.AsyncCallback callback, object asyncState) {
@@ -3232,11 +3500,10 @@ namespace OsbleRubric.OsbleServices {
                 return _result;
             }
             
-            public System.IAsyncResult BeginSaveRubric(int courseId, OsbleRubric.OsbleServices.Rubric rubric, System.Collections.ObjectModel.ObservableCollection<OsbleRubric.OsbleServices.CellDescription> descriptions, System.AsyncCallback callback, object asyncState) {
-                object[] _args = new object[3];
+            public System.IAsyncResult BeginSaveRubric(int courseId, OsbleRubric.OsbleServices.Rubric rubric, System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[2];
                 _args[0] = courseId;
                 _args[1] = rubric;
-                _args[2] = descriptions;
                 System.IAsyncResult _result = base.BeginInvoke("SaveRubric", _args, callback, asyncState);
                 return _result;
             }

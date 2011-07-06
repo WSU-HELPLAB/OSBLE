@@ -22,6 +22,7 @@
   <xs:element name="Criterion" nillable="true" type="tns:Criterion" />
   <xs:complexType name="Rubric">
     <xs:sequence>
+      <xs:element minOccurs="0" name="CellDescriptions" nillable="true" type="tns:ArrayOfCellDescription" />
       <xs:element minOccurs="0" name="Criteria" nillable="true" type="tns:ArrayOfCriterion" />
       <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="HasCriteriaComments" type="xs:boolean" />
@@ -31,6 +32,12 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Rubric" nillable="true" type="tns:Rubric" />
+  <xs:complexType name="ArrayOfCellDescription">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="CellDescription" nillable="true" type="tns:CellDescription" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfCellDescription" nillable="true" type="tns:ArrayOfCellDescription" />
   <xs:complexType name="ArrayOfCriterion">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="Criterion" nillable="true" type="tns:Criterion" />
@@ -60,10 +67,4 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ArrayOfRubric" nillable="true" type="tns:ArrayOfRubric" />
-  <xs:complexType name="ArrayOfCellDescription">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="CellDescription" nillable="true" type="tns:CellDescription" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfCellDescription" nillable="true" type="tns:ArrayOfCellDescription" />
 </xs:schema>

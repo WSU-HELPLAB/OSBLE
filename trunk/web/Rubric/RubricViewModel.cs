@@ -1163,6 +1163,7 @@ namespace OsbleRubric
             ObservableCollection<CellDescription> cellDescriptions = new ObservableCollection<CellDescription>();
             rubric.Criteria = new ObservableCollection<Criterion>();
             rubric.Levels = new ObservableCollection<Level>();
+            rubric.CellDescriptions = new ObservableCollection<CellDescription>();
 
             //loop through all of our data
             foreach(ICell cell in this.dataFromCells)
@@ -1243,7 +1244,7 @@ namespace OsbleRubric
                         desc.CriterionID = currentCell.Row;
                         desc.LevelID = currentCell.Column;
                         desc.Description = currentCell.Information;
-                        cellDescriptions.Add(desc);
+                        rubric.CellDescriptions.Add(desc);
                     }   
                 }
             }
@@ -1256,7 +1257,7 @@ namespace OsbleRubric
             rubric.Levels.RemoveAt(0);
             rubric.Criteria.RemoveAt(0);
 
-            client.SaveRubricAsync(currentCourseId, rubric, cellDescriptions);
+            client.SaveRubricAsync(currentCourseId, rubric);
         }
 
         /// <summary>
