@@ -74,6 +74,7 @@ namespace OSBLE.Models.Assignments.Activities
         //TODO: Make required later.
         //[Required]
         //[Display(Name = "Comment Categories")]
+        //[MaxLength(6)]
         //public ICollection<CommentCategory> CommentCategories { get; set; }
     }
 }
