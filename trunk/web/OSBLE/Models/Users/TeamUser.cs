@@ -74,8 +74,12 @@ namespace OSBLE.Models.Users
             }
             else
             {
-                return Team.Contains(user);
+                if (Team != null)
+                {
+                    return Team.Contains(user);
+                }
             }
+            return false;
         }
 
         public static TeamUser GetTeamUser(StudioActivity activity, UserProfile user)

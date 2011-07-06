@@ -195,7 +195,6 @@
     <Compile Include="Models\Services\Uploader\ParentDirectoryListing.cs" />
     <Compile Include="Models\Services\Uploader\UserSession.cs" />
     <Compile Include="Models\ToolTips.cs" />
-    <Compile Include="Models\Users\TeamMember.cs" />
     <Compile Include="Models\Users\Team.cs" />
     <Compile Include="Models\Users\TeamUser.cs" />
     <Compile Include="Models\ViewModels\AssignmentListViewModel.cs" />

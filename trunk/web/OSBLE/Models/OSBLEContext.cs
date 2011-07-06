@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity;
+using System.Web;
 using System.Web.Security;
 using OSBLE.Models.AbstractCourses;
 using OSBLE.Models.AbstractCourses.Course;
@@ -11,8 +12,6 @@ using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
-using OSBLE.Models.AbstractCourses;
-using System.Web;
 using OSBLE.Utility;
 
 namespace OSBLE.Models
@@ -125,17 +124,13 @@ namespace OSBLE.Models
 
         public DbSet<CourseRubric> CourseRubrics { get; set; }
 
-        
-        //public DbSet<RubricEvaluation> RubricEvaluations { get; set; }
+        public DbSet<RubricEvaluation> RubricEvaluations { get; set; }
 
-        //public DbSet<CriterionEvaluation> CriterionEvaluations { get; set; }
-
+        public DbSet<CriterionEvaluation> CriterionEvaluations { get; set; }
 
         // Users
 
         public DbSet<Team> Teams { get; set; }
-
-        public DbSet<TeamMember> TeamMembers { get; set; }
 
         public DbSet<Mail> Mails { get; set; }
 
@@ -160,6 +155,11 @@ namespace OSBLE.Models
             modelBuilder.Entity<Rubric>()
                 .HasMany(r => r.Levels)
                 .WithRequired(l => l.Rubric)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<RubricEvaluation>()
+                .HasRequired(re => re.Recipient)
+                .WithMany()
                 .WillCascadeOnDelete(false);
         }
 

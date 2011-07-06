@@ -7,7 +7,7 @@ namespace OSBLE.Models.Users
     {
         public Team()
         {
-            Members = new List<TeamMember>();
+            Members = new List<TeamUser>();
         }
 
         [Key]
@@ -18,11 +18,11 @@ namespace OSBLE.Models.Users
         public string Name { get; set; }
 
         [Required]
-        public ICollection<TeamMember> Members { get; set; }
+        public virtual ICollection<TeamUser> Members { get; set; }
 
         public bool Contains(UserProfile user)
         {
-            foreach (TeamMember member in Members)
+            foreach (TeamUser member in Members)
             {
                 if (member.Contains(user))
                 {

@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Assignments.Activities;
-using System.Collections.Generic;
 using OSBLE.Models.Assignments.Activities.Scores;
 
 namespace OSBLE.Models.Users
@@ -39,7 +39,7 @@ namespace OSBLE.Models.Users
         /// If set, will email all activity feed posts to the users
         /// </summary>
         public bool EmailAllActivityPosts { get; set; }
-     
+
         public UserProfile()
             : base()
         {

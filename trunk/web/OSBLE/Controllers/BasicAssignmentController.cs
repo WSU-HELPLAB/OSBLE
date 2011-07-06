@@ -193,20 +193,20 @@ namespace OSBLE.Controllers
                             //for every member of that team make a new TeamMember
                             foreach (SerializableTeamMember serializeableMember in team.Value)
                             {
-                                TeamMember teamMember_db = new TeamMember();
+                                TeamUser teamUser_db;
                                 if (serializeableMember.isUser)
                                 {
-                                    teamMember_db.TeamUser = TeamOrUser.User;
-                                    teamMember_db.UserProfileID = serializeableMember.UserID;
-                                    teamMember_db.TeamID = null;
+                                    teamUser_db = new TeamUser((from c in db.UserProfiles
+                                                                where c.ID == serializeableMember.UserID
+                                                                select c).FirstOrDefault());
                                 }
                                 else
                                 {
-                                    teamMember_db.TeamUser = TeamOrUser.Team;
-                                    teamMember_db.TeamID = serializeableMember.TeamID;
-                                    teamMember_db.UserProfileID = null;
+                                    teamUser_db = new TeamUser((from c in db.Teams
+                                                                where c.ID == serializeableMember.TeamID
+                                                                select c).FirstOrDefault());
                                 }
-                                team_db.Members.Add(teamMember_db);
+                                team_db.Members.Add(teamUser_db);
                             }
 
                             submission.TeamUsers.Add(new TeamUser(team_db));

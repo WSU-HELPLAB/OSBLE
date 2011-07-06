@@ -370,10 +370,6 @@
     <div class="editor-label">
         @Html.CheckBoxFor(model => submission.InstructorCanReview, new { id = "InstructorCanReview" }) @Html.LabelFor(model => submission.InstructorCanReview)
     </div>
-    <div class="editor-field">
-        @Html.CheckBoxFor(model => submission.InstructorCanReview, new { id = "InstructorCanReview" })
-        @Html.ValidationMessageFor(model => submission.InstructorCanReview)
-    </div>
     <div id="line_review_info" class="indented_options" style="display: none" >
         <em>You may configure the line review options for each deliverable in the deliverable section.</em>
     </div>
