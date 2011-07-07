@@ -661,7 +661,7 @@ namespace OSBLE.Controllers
                    name = "Category 2";
                    break;
                case 2:
-                   color = "LightBlue";
+                   color = "Plum";
                    name = "Category 3";
                    break;
                case 3:
@@ -677,7 +677,7 @@ namespace OSBLE.Controllers
                    name = "Category 6";
                    break;
                case 6:
-                   color = "Plum";
+                   color = "#B3BE53";
                    name = "Category 7";
                    break;
                case 7:
@@ -689,7 +689,7 @@ namespace OSBLE.Controllers
                    name = "Category 9";
                    break;
                case 9:
-                   color = "Purple";
+                   color = "#13BE00";
                    name = "Category 10";
                    break;
                default:

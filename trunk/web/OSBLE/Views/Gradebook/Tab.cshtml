@@ -275,6 +275,9 @@
     var assignId = 0;
 
     var onMouseOver = false;
+
+    // this is for if we click off the table
+    var offTable = false;
     
 
     $(document).ready(function () {
@@ -284,6 +287,13 @@
     });
 
     $(document).click(function () {
+        if (offTable == true) {
+            clearLastCellFocus();
+            offTable = false;
+        } else {
+            offTable = true;
+        }
+
 
         if (changedShow == true) {
             if (showDropDown == false) {
@@ -429,6 +439,9 @@
             height: 120,
             closeOnEscape: false
         });
+
+        // this is for if we click off the table
+        offTable = false;
     }
 
     function displayAddPoints() {
@@ -440,6 +453,9 @@
             height: 120,
             closeOnEscape: false
         });
+
+        // this is for if we click off the table
+        offTable = false;
     }
 
     function displayImportGrades() {
@@ -450,6 +466,9 @@
             height: 225,
             closeOnEscape: false
         });
+
+        // this is for if we click off the table
+        offTable = false;
     }
 
     function hideFunctions() {
@@ -483,6 +502,10 @@
     }
 
     function changeHeaderName(someHeader) {
+
+        // this is for if we click off the table
+        offTable = false;
+
         //Header needs to lose focus
         if (header == true) {
             clearLastHeaderFocus(lastId);
@@ -604,6 +627,9 @@
 
     function cellGainsFocus(someCell) {
 
+        // this is for if we click off the table
+        offTable = false;
+
         //we are in a data cell so we need to set isDataCell to true
         isDataCell = true;
         var cell = null
@@ -611,7 +637,24 @@
         var colIndex = $(someCell).prevAll().length;
         //colIndex = parseInt(colIndex + 1);
 
-        
+        $("#grades tr").each(function () {
+            $(this).find("td").each(function () {
+                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                    $(this).css("background-color", "#DCDCDC");
+                    $(this).find("div").css("background-color", "#DCDCDC");
+                }
+                else {
+                    $(this).css("background-color", "white");
+                }
+            });
+            $(this).find("th").each(function () {
+                if ($(this).attr("class") == "colHeader") {
+                }
+                else {
+                    $(this).css("background-color", "white");
+                }
+            });
+        });
 
         //Header needs to lose focus
         if (header == true) {
@@ -788,6 +831,9 @@
     }
 
     function selectColumn(col) {
+
+        // this is for if we click off the table
+        offTable = false;
         
         clearLastCellFocus();
         //tabShowing = true;
@@ -845,6 +891,10 @@
     }
 
     function selectRow(row) {
+
+        // this is for if we click off the table
+        offTable = false;
+
         var container = row.id.split("-");
         var count = 0;
 
@@ -883,8 +933,12 @@
         isHighlighted = false;
     }
 
-   
+
     function clearCol() {
+
+        // this is for if we click off the table
+        offTable = false;
+
         var rows = $("#grades tr");
         currentCol = parseInt(currentCol);
         currentCol += 1;
@@ -897,6 +951,10 @@
 
     //Deleting the whole column
     function deleteCol() {
+
+        // this is for if we click off the table
+        offTable = false;
+
         colIndex = parseInt(currentCol);
         colIndex += 1;
 
@@ -943,6 +1001,10 @@
     }
 
     function newTab() {
+
+        // this is for if we click off the table
+        offTable = false;
+
         $.ajax({
             type: "POST",
             url: "/Gradebook/AddWeight",
@@ -953,6 +1015,9 @@
     }
 
     function dropAllLowest() {
+
+        // this is for if we click off the table
+        offTable = false;
         
         //set isDropLowest to 1 meaning true.
         $("#isDropLowest").val(1);
@@ -1002,6 +1067,10 @@
 
     function clearDropLowest(id) {
 
+
+        // this is for if we click off the table
+        offTable = false;
+
         //get the pathname so we can use the categoryId
         var pathname = window.location.toString();
 
@@ -1023,6 +1092,10 @@
     }
 
     function clearAllDropLowest() {
+
+
+        // this is for if we click off the table
+        offTable = false;
 
         //get the pathname so we can use the categoryId
         var pathname = window.location.toString();
@@ -1047,6 +1120,9 @@
 
     function DropLowest(id) {
 
+        // this is for if we click off the table
+        offTable = false;
+
         //get the pathname so we can use the categoryId
         var pathname = window.location.toString();
 
@@ -1070,6 +1146,10 @@
     }
 
     function addPoints(points) {
+
+        // this is for if we click off the table
+        offTable = false;
+
         var num = $("#XtoAdd").val();
         var id = $(points).attr("id");
         $.ajax({
@@ -1085,6 +1165,9 @@
 
     function newTab() {
 
+        // this is for if we click off the table
+        offTable = false;
+
         $.ajax({
             type: "POST",
             url: "/Gradebook/AddCategory",
@@ -1094,6 +1177,9 @@
     }
 
     function importGrades() {
+
+        // this is for if we click off the table
+        offTable = false;
 
         var filename = $("#file").val();
 
@@ -1106,6 +1192,7 @@
 
     function moveRight(header) {
 
+        offTable = false;
         var id = header.id.split("-");
 
         $.ajax({
@@ -1119,6 +1206,9 @@
     }
 
     function moveLeft(header) {
+
+        // this is for if we click off the table
+        offTable = false;
 
         var id = header.id.split("-");
 
