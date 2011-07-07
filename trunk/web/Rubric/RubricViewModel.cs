@@ -606,7 +606,9 @@ namespace OsbleRubric
             {
                 Height = RowHeight - 12,
                 Width = returnVal.Width,
-                TextWrapping = TextWrapping.Wrap
+                TextWrapping = TextWrapping.Wrap,
+                AcceptsReturn = true,
+                
             };
 
             returnVal.Children.Add(textbox);
@@ -667,7 +669,7 @@ namespace OsbleRubric
                 HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment = VerticalAlignment.Center
             };
-            TextBox textbox = new TextBox() { Height = 85, Width = (Col0Width - 35), TextWrapping = TextWrapping.Wrap };
+            TextBox textbox = new TextBox() { Height = 85, Width = (Col0Width - 35), TextWrapping = TextWrapping.Wrap, AcceptsReturn = true };
             Image deleteIcon = new Image { Source = deleteIconSource, Height = 22, Width = 22, Margin = new Thickness(0, 3, 17, 0), HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
 
             //tooltip for deleteIcon
