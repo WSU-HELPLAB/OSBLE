@@ -17,7 +17,7 @@ namespace OSBLE.Controllers
 
         public ViewResult Index()
         {
-            var assignmentactivities = db.AbstractAssignmentActivity.Include(p => p.AbstractAssignment);
+            var assignmentactivities = db.AbstractAssignmentActivities.Include(p => p.AbstractAssignment);
             return View(assignmentactivities.ToList());
         }
 
@@ -26,7 +26,7 @@ namespace OSBLE.Controllers
 
         public ViewResult Details(int id)
         {
-            PeerReviewActivity peerreviewactivity = db.AbstractAssignmentActivity.Find(id) as PeerReviewActivity;
+            PeerReviewActivity peerreviewactivity = db.AbstractAssignmentActivities.Find(id) as PeerReviewActivity;
             return View(peerreviewactivity);
         }
 
@@ -65,7 +65,7 @@ namespace OSBLE.Controllers
                     };
                 }
 
-                db.AbstractAssignmentActivity.Add(peerreviewactivity);
+                db.AbstractAssignmentActivities.Add(peerreviewactivity);
                 db.SaveChanges();
                 return RedirectToAction("Index");  
             }
@@ -79,7 +79,7 @@ namespace OSBLE.Controllers
  
         public ActionResult Edit(int id)
         {
-            PeerReviewActivity peerreviewactivity = db.AbstractAssignmentActivity.Find(id) as PeerReviewActivity;
+            PeerReviewActivity peerreviewactivity = db.AbstractAssignmentActivities.Find(id) as PeerReviewActivity;
             ViewBag.AbstractAssignmentID = new SelectList(db.AbstractAssignments, "ID", "Name", peerreviewactivity.AbstractAssignmentID);
             return View(peerreviewactivity);
         }
@@ -105,7 +105,7 @@ namespace OSBLE.Controllers
  
         public ActionResult Delete(int id)
         {
-            PeerReviewActivity peerreviewactivity = db.AbstractAssignmentActivity.Find(id) as PeerReviewActivity;
+            PeerReviewActivity peerreviewactivity = db.AbstractAssignmentActivities.Find(id) as PeerReviewActivity;
             return View(peerreviewactivity);
         }
 
@@ -115,8 +115,8 @@ namespace OSBLE.Controllers
         [HttpPost, ActionName("Delete")]
         public ActionResult DeleteConfirmed(int id)
         {            
-            PeerReviewActivity peerreviewactivity = db.AbstractAssignmentActivity.Find(id) as PeerReviewActivity;
-            db.AbstractAssignmentActivity.Remove(peerreviewactivity);
+            PeerReviewActivity peerreviewactivity = db.AbstractAssignmentActivities.Find(id) as PeerReviewActivity;
+            db.AbstractAssignmentActivities.Remove(peerreviewactivity);
             db.SaveChanges();
             return RedirectToAction("Index");
         }

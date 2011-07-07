@@ -72,7 +72,7 @@ namespace OSBLE.Controllers
                             if (fileInfo.Exists)
                             {
                                 found = true;
-                                timeSubmitted = fileInfo.CreationTime;
+                                timeSubmitted = fileInfo.LastWriteTime;
                                 break;
                             }
                         }
@@ -141,13 +141,20 @@ namespace OSBLE.Controllers
             return View();
         }
 
-        [ChildActionOnly]
+        //[ChildActionOnly]
         [CanModifyCourse]
         public ActionResult ActivityTeacherTable(int id)
         {
+            //This can be used to simulate a long load time
+            /*Int64 i = 0;
+            while (i < 2000000000)
+            {
+                i++;
+            }*/
+
             try
             {
-                StudioActivity studioActivity = db.AbstractAssignmentActivity.Find(id) as StudioActivity;
+                StudioActivity studioActivity = db.AbstractAssignmentActivities.Find(id) as StudioActivity;
 
                 StudioAssignment assignment = studioActivity.AbstractAssignment as StudioAssignment;
 
@@ -156,6 +163,9 @@ namespace OSBLE.Controllers
                     //FileSystem.GetAssignmentActivitySubmissionFolder(activeCourse.Course as Course, studioActivity.ID);
 
                     ActivityTeacherTableViewModel viewModel = new ActivityTeacherTableViewModel();
+
+                    int numberOfSubmissions = 0;
+                    int numberGraded = 0;
 
                     foreach (TeamUserMember teamUser in studioActivity.TeamUsers)
                     {
@@ -182,18 +192,41 @@ namespace OSBLE.Controllers
 
                         if (submissionFolder.Exists)
                         {
+                            //unfortunately LastWriteTime for a directory does not take into account it's file or
+                            //sub directories and these we need to check to see when the last file was written too.
                             info.Time = submissionFolder.LastWriteTime;
+                            foreach (FileInfo file in submissionFolder.GetFiles())
+                            {
+                                if (file.LastWriteTime > info.Time)
+                                {
+                                    info.Time = file.LastWriteTime;
+                                }
+                            }
+                            numberOfSubmissions++;
                         }
                         else
                         {
                             info.Time = null;
                         }
 
-                        //will need to fix this
+                        //will need to actually implement this:
+                        /*if(graded)
+                        {
+                        info.Graded = true;
+                        numberGraded++;
+                        }
+                        else
+                        {*/
+                        //info.Graded = false;
+                        //}
                         info.Graded = false;
-
                         viewModel.SubmissionsInfo.Add(info);
                     }
+
+                    ViewBag.NumberOfSubmissions = numberOfSubmissions;
+                    ViewBag.NumberGraded = numberGraded;
+
+                    ViewBag.ExpectedSubmissionsAndGrades = studioActivity.TeamUsers.Count;
 
                     return View(viewModel);
                 }

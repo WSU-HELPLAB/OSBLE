@@ -20,7 +20,7 @@ namespace OSBLE.Services
         [OperationContract]
         public string GetFileLocation(int abstractAssignmentActivityID, int submissionID)
         {
-            AbstractAssignmentActivity activity = db.AbstractAssignmentActivity.Find(abstractAssignmentActivityID);
+            AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(abstractAssignmentActivityID);
 
             if (activity.AbstractAssignment.Category.CourseID == CurrentCourseUser.CourseID)
             {

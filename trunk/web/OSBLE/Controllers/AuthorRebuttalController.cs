@@ -13,7 +13,7 @@ namespace OSBLE.Controllers
 
         public ViewResult Index()
         {
-            var assignmentactivities = db.AbstractAssignmentActivity.Include(a => a.AbstractAssignment);
+            var assignmentactivities = db.AbstractAssignmentActivities.Include(a => a.AbstractAssignment);
             return View(assignmentactivities.ToList());
         }
 
@@ -22,7 +22,7 @@ namespace OSBLE.Controllers
 
         public ViewResult Details(int id)
         {
-            AuthorRebuttalActivity authorrebuttalactivity = db.AbstractAssignmentActivity.Find(id) as AuthorRebuttalActivity;
+            AuthorRebuttalActivity authorrebuttalactivity = db.AbstractAssignmentActivities.Find(id) as AuthorRebuttalActivity;
             return View(authorrebuttalactivity);
         }
 
@@ -63,7 +63,7 @@ namespace OSBLE.Controllers
             };
             if (ModelState.IsValid)
             {
-                db.AbstractAssignmentActivity.Add(authorrebuttalactivity);
+                db.AbstractAssignmentActivities.Add(authorrebuttalactivity);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
@@ -77,7 +77,7 @@ namespace OSBLE.Controllers
 
         public ActionResult Edit(int id)
         {
-            AuthorRebuttalActivity authorrebuttalactivity = db.AbstractAssignmentActivity.Find(id) as AuthorRebuttalActivity;
+            AuthorRebuttalActivity authorrebuttalactivity = db.AbstractAssignmentActivities.Find(id) as AuthorRebuttalActivity;
             ViewBag.AbstractAssignmentID = new SelectList(db.AbstractAssignments, "ID", "Name", authorrebuttalactivity.AbstractAssignmentID);
             return View(authorrebuttalactivity);
         }
@@ -103,7 +103,7 @@ namespace OSBLE.Controllers
 
         public ActionResult Delete(int id)
         {
-            AuthorRebuttalActivity authorrebuttalactivity = db.AbstractAssignmentActivity.Find(id) as AuthorRebuttalActivity;
+            AuthorRebuttalActivity authorrebuttalactivity = db.AbstractAssignmentActivities.Find(id) as AuthorRebuttalActivity;
             return View(authorrebuttalactivity);
         }
 
@@ -113,8 +113,8 @@ namespace OSBLE.Controllers
         [HttpPost, ActionName("Delete")]
         public ActionResult DeleteConfirmed(int id)
         {
-            AuthorRebuttalActivity authorrebuttalactivity = db.AbstractAssignmentActivity.Find(id) as AuthorRebuttalActivity;
-            db.AbstractAssignmentActivity.Remove(authorrebuttalactivity);
+            AuthorRebuttalActivity authorrebuttalactivity = db.AbstractAssignmentActivities.Find(id) as AuthorRebuttalActivity;
+            db.AbstractAssignmentActivities.Remove(authorrebuttalactivity);
             db.SaveChanges();
             return RedirectToAction("Index");
         }

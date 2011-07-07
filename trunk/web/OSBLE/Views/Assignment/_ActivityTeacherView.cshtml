@@ -1,18 +1,31 @@
 ﻿@using OSBLE.Models.Assignments.Activities
 @model AbstractAssignmentActivity
 
+<script type="text/javascript">
+
+    function Ajaxfailed() {
+        alert('Failed to get information from the server try to refresh the page');
+    }
+
+</script>
 
 @*This page is for teachers only*@
 @if (ViewBag.ActiveCourse.CourseRole.CanModify)
 {
+    
     int StudioAssignmentCounter = ViewBag.StudioAssignmentCounter;
     int activityCounter = ViewBag.ActivityCounter;
+    
+    string accordionHeaderID = StudioAssignmentCounter.ToString() + "_" + activityCounter.ToString();
+    string tableID = "table_" + StudioAssignmentCounter.ToString() + "_" + activityCounter.ToString();
+    
+    
      @* Get submission's release date as start date *@
     DateTime startDate = Model.ReleaseDate;
                     @* Get the activity following the submission's release date as end date *@
     DateTime endDate = ViewBag.EndDate;
         <div class="activity_header">
-        <a id="@(StudioAssignmentCounter.ToString() + "_" + activityCounter.ToString())" href="#">@Model.Name</a>
+        @Ajax.ActionLink(Model.Name, "ActivityTeacherTable", "Assignment", new { id = Model.ID }, new AjaxOptions() { LoadingElementId="Loading",  InsertionMode = InsertionMode.Replace, UpdateTargetId = tableID, OnFailure = "Ajaxfailed" }, new { id = accordionHeaderID })
     </div>
     <div>
                         <table>
@@ -55,8 +68,11 @@
 
                             }
                         </table>
+                        <text id="Loading">We are trying to find the data from in our mess... it will be displayed as soon as we find it </text>
+    <div id="@(tableID)">
+    </div>
                         @{
-                            Html.RenderAction("ActivityTeacherTable", new { id = Model.ID });
+                            //Html.RenderAction("ActivityTeacherTable", new { id = Model.ID });
                             }
                         <div class="submission_deliverables_end">
                         </div>

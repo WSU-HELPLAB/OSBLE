@@ -188,7 +188,7 @@ namespace OSBLE.Controllers
                                    var assign = from a in db.AbstractAssignments
                                                 where a.ColumnOrder == col
                                                 select a;
-                                   var assignmentQuery = from a in db.AbstractAssignmentActivity
+                                   var assignmentQuery = from a in db.AbstractAssignmentActivities
                                                          where a.AbstractAssignment.ColumnOrder == col
                                                          select a;
 
@@ -256,7 +256,7 @@ namespace OSBLE.Controllers
                PointsPossible = newAssignment.PointsPossible
 
            };
-           db.AbstractAssignmentActivity.Add(newActivity);
+           db.AbstractAssignmentActivities.Add(newActivity);
            db.SaveChanges();
        }
 
@@ -617,7 +617,7 @@ namespace OSBLE.Controllers
                                        where g.ID == assignmentId
                                        select g;
 
-                   var activityQuery = from a in db.AbstractAssignmentActivity
+                   var activityQuery = from a in db.AbstractAssignmentActivities
                                        where a.AbstractAssignmentID == assignmentId
                                        select a;
 
@@ -868,7 +868,7 @@ namespace OSBLE.Controllers
                                    a.ID == assignmentId
                                    select g;
 
-               var assignmentQuery = from a in db.AbstractAssignmentActivity
+               var assignmentQuery = from a in db.AbstractAssignmentActivities
                                      where a.AbstractAssignmentID == assignmentId
                                      select a;
 
@@ -1154,7 +1154,7 @@ namespace OSBLE.Controllers
                    /*ColumnOrder = 0,
                    Scores = new List<Score>()*/
                };
-               db.AbstractAssignmentActivity.Add(newActivity);
+               db.AbstractAssignmentActivities.Add(newActivity);
                db.SaveChanges();
            }
 
@@ -1285,7 +1285,7 @@ namespace OSBLE.Controllers
                    /*ColumnOrder = 0,
                    Scores = new List<Score>()*/
                };
-               db.AbstractAssignmentActivity.Add(newActivity);
+               db.AbstractAssignmentActivities.Add(newActivity);
                db.SaveChanges();
 
                //with a new weight / gradable combo created, we can

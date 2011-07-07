@@ -23,7 +23,7 @@ namespace OSBLE.Controllers
         {
             if (id != null)
             {
-                AbstractAssignmentActivity activity = db.AbstractAssignmentActivity.Find(id);
+                AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(id);
 
                 if (activity != null)
                 {
@@ -66,7 +66,7 @@ namespace OSBLE.Controllers
         {
             if (id != null)
             {
-                AbstractAssignmentActivity activity = db.AbstractAssignmentActivity.Find(id);
+                AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(id);
 
                 //purposefully not using the is statement as we also want to make sure it is not a null SubmissionActivity
                 if (activity as SubmissionActivity != null)

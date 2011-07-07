@@ -66,9 +66,23 @@ namespace OSBLE.Controllers
             rubrics.Insert(0, new Rubric() { ID = 0, Description = "" });
             ViewBag.Rubrics = rubrics.ToList();
 
+            var assignmentActivites = from c in db.AbstractAssignmentActivities
+                                      where c.AbstractAssignment.Category.CourseID == activeCourse.CourseID
+                                      select c;
+
+            Dictionary<string, string> activityTeams = new Dictionary<string, string>();
+
+            foreach (var activity in assignmentActivites)
+            {
+                if (activity.isTeam)
+                {
+                    activityTeams.Add(activity.Name, serializeTeamMemers(getTeamMembers(activity)));
+                }
+            }
+
             viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"] = serializeTeamMemers(getTeamMembers());
 
-            setupViewBag();
+            setupViewBagForCreate();
 
             return View(viewModel);
         }
@@ -76,13 +90,14 @@ namespace OSBLE.Controllers
         //
         // POST: /Assignment/Create
 
-        private void setupViewBag()
+        private void setupViewBagForCreate()
         {
             var cat = from c in (activeCourse.Course as Course).Categories
                       where c.Name != Constants.UnGradableCatagory
                       select c;
             ViewBag.Categories = new SelectList(cat, "ID", "Name");
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
+            ViewBag.AllowedFileNames = from c in FileSystem.GetCourseDocumentsFileList(activeCourse.Course, includeParentLink: false).Files select c.Name;
         }
 
         [HttpPost]
@@ -248,7 +263,7 @@ namespace OSBLE.Controllers
 
             basic.TeamCreation = createTeamCreationSilverlightObject();
             basic.RubricCreation = createRubricCreationSilverlightObject();
-            setupViewBag();
+            setupViewBagForCreate();
             //ViewBag.Categories = new SelectList(db.Categories, "ID", "Name", basic.Assignment.CategoryID);
             //ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
 
@@ -267,6 +282,12 @@ namespace OSBLE.Controllers
             {
                 return null;
             }
+        }
+
+        private List<SerializableTeamMember> getTeamMembers(AbstractAssignmentActivity activity)
+        {
+            //TO DO: Implement this function
+            throw new NotImplementedException();
         }
 
         private List<SerializableTeamMember> getTeamMembers()
@@ -291,13 +312,7 @@ namespace OSBLE.Controllers
                     teamMember.UserID = cu.UserProfileID;
                     teamMember.isUser = true;
 
-                    ///////////////////////TEST/////////////////////////
-                    if (i % 2 == 0)
-                    {
-                        teamMember.Subbmitted = true;
-                    }
-                    i++;
-                    ///////////////////////////////////////////////////
+                    //Need to find if they submitted the previous activity
 
                     teamMembmers.Add(teamMember);
                 }

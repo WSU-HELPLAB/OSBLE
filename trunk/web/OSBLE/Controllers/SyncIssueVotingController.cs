@@ -13,7 +13,7 @@ namespace OSBLE.Controllers
 
         public ViewResult Index()
         {
-            var assignmentactivities = db.AbstractAssignmentActivity.Include(i => i.AbstractAssignment);
+            var assignmentactivities = db.AbstractAssignmentActivities.Include(i => i.AbstractAssignment);
             return View(assignmentactivities.ToList());
         }
 
@@ -22,7 +22,7 @@ namespace OSBLE.Controllers
 
         public ViewResult Details(int id)
         {
-            SyncIssueVotingActivity syncissuevotingactivity = db.AbstractAssignmentActivity.Find(id) as SyncIssueVotingActivity;
+            SyncIssueVotingActivity syncissuevotingactivity = db.AbstractAssignmentActivities.Find(id) as SyncIssueVotingActivity;
             return View(syncissuevotingactivity);
         }
 
@@ -61,7 +61,7 @@ namespace OSBLE.Controllers
                         break;
                 };
 
-                db.AbstractAssignmentActivity.Add(syncissuevotingactivity);
+                db.AbstractAssignmentActivities.Add(syncissuevotingactivity);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
@@ -75,7 +75,7 @@ namespace OSBLE.Controllers
 
         public ActionResult Edit(int id)
         {
-            SyncIssueVotingActivity syncissuevotingactivity = db.AbstractAssignmentActivity.Find(id) as SyncIssueVotingActivity;
+            SyncIssueVotingActivity syncissuevotingactivity = db.AbstractAssignmentActivities.Find(id) as SyncIssueVotingActivity;
             ViewBag.AbstractAssignmentID = new SelectList(db.AbstractAssignments, "ID", "Name", syncissuevotingactivity.AbstractAssignmentID);
             return View(syncissuevotingactivity);
         }
@@ -101,7 +101,7 @@ namespace OSBLE.Controllers
 
         public ActionResult Delete(int id)
         {
-            SyncIssueVotingActivity syncissuevotingactivity = db.AbstractAssignmentActivity.Find(id) as SyncIssueVotingActivity;
+            SyncIssueVotingActivity syncissuevotingactivity = db.AbstractAssignmentActivities.Find(id) as SyncIssueVotingActivity;
             return View(syncissuevotingactivity);
         }
 
@@ -111,8 +111,8 @@ namespace OSBLE.Controllers
         [HttpPost, ActionName("Delete")]
         public ActionResult DeleteConfirmed(int id)
         {
-            SyncIssueVotingActivity syncissuevotingactivity = db.AbstractAssignmentActivity.Find(id) as SyncIssueVotingActivity;
-            db.AbstractAssignmentActivity.Remove(syncissuevotingactivity);
+            SyncIssueVotingActivity syncissuevotingactivity = db.AbstractAssignmentActivities.Find(id) as SyncIssueVotingActivity;
+            db.AbstractAssignmentActivities.Remove(syncissuevotingactivity);
             db.SaveChanges();
             return RedirectToAction("Index");
         }

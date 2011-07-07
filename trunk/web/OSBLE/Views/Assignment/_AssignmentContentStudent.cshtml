@@ -139,6 +139,7 @@ int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
                         </li>   
                                 if (ViewBag.CanSubmit && submission.ReleaseDate < DateTime.Now)
                                 { 
+                                    
                         <button onclick="location.href='@Url.Action("Create", "Submission", new { id = submission.ID.ToString() })'">
                             Submit Files For This Submission</button>   
                                 }
