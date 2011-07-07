@@ -3,49 +3,240 @@
 
 @{int maxLevelScore = (from c in Model.Rubric.Levels
                        select c.RangeEnd).Sum(); }
+@{double totalRubricPoints = (from c in Model.Rubric.Criteria
+                           select c.Weight).Sum(); }
+@{string critInputPrefix = "crit_amount";}
+@{string critSliderPrefix = "crit_slider";}
+@{string critCommentPrefix = "crit_comment";}
+@{string gradeId ="grade"; }
+@{int sliderTableLength = 880;}
+@{int textInputLenght = 25;}
+@{int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;}
 
+<script type="text/javascript">
+
+    //loads all sliders after document load
+    function loadSliders() {
+    @{foreach (Criterion crit in Model.Rubric.Criteria)
+    {
+        string sliderId = String.Format("\"#{0}_{1}\"", critSliderPrefix, crit.ID);
+        string js = String.Concat("\t$(", sliderId, ").slider({",
+                        "value: 0, ",
+                        "min: 0, ",
+                        "max: ", maxLevelScore, ", ",
+                        "step: 1, ",
+                        "slide: updateSlider ",
+                            "});\n");
+        @Html.Raw(js)
+    }    
+    }
+    }
+
+    function updateGrade()
+    {
+        var grade = 0.0;
+        @{foreach (Criterion crit in Model.Rubric.Criteria)
+        {
+            string targetId = String.Format("\"#{0}_{1}\"", critInputPrefix, crit.ID);
+            @Html.Raw("\tgrade += $("+ targetId +").val() / " + maxLevelScore + " * "+ crit.Weight / totalRubricPoints +";\n")
+
+        }
+        }
+        $('#@gradeId').html(Math.round(grade * 100) + "%");
+    }
+
+    //updates individual sliders with new values
+    function updateSlider(event, ui) {
+        var pieces = event.target.id.split('_');
+        var target = pieces[2];
+        var targetId = "#@(critInputPrefix)_" + target;
+        $(targetId).val(ui.value);
+        updateGrade();
+    }
+
+    $(document).ready(loadSliders);
+</script>
+
+<style type="text/css">
+
+.criterion_div
+{
+    background: #9BB7C4;
+    margin-bottom:15px;
+    padding:15px;
+    font-size:12px;
+}
+
+.dashboard table th
+{
+    text-align:left;
+}
+
+.dashboard table th, .dashboard table th
+{
+    padding:4px;
+}
+
+.level_1
+{
+    background: #FF8991;
+}
+
+.level_2
+{
+    background: #FF9335;
+}
+
+.level_3
+{
+    background: #00DD04;
+}
+
+.level_4
+{
+    background: #75BAFF;
+}
+
+.level_header
+{
+    font-size:14px;
+    font-weight:bold;
+}
+
+.criterion_header
+{
+    font-size:18px;
+    font-weight:bold;
+}
+
+#rubric_evaluator
+{
+    width:920px;
+    margin-right:auto;
+    margin-left:auto;
+}
+
+.selector_table
+{
+    width:@(sliderTableLength)px;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.selector_table th
+{
+    padding:3px;
+    margin:0;
+}
+
+.text_input_score
+{
+    width: @(textInputLenght)px;
+    background: #9BB7C4;
+}
+
+.zero_score
+{
+    width:@(sliderTableCellWidth)px;
+    background: #CFCFCF;
+}
+
+</style>
+@using (Html.BeginForm())
+{
+<div id="rubric_evaluator">
+    <div class="dashboard">
+    <div style="float:right;"><input type="submit" value="Save as Draft" />
+<input type="submit" value="Publish to Student" /></div>
+        <table>
+            <tr>
+                <th>Assignment:</th>
+                <td>
+                    @Html.DropDownListFor(m => m.SelectedAssignment, Model.Assignments)
+                </td>
+                <th>Section:</th>
+                <td>
+                    @Html.DropDownListFor(m => m.SelectedSection, Model.Sections)
+                </td>
+            </tr>
+            <tr>
+                <th>Student:</th>
+                <td>
+                    @Html.DropDownListFor(m => m.SelectedStudent, Model.Students)
+                </td>
+                <th>Grade:</th>
+                <td id="@gradeId">0%</td>
+            </tr>
+        </table>        
+    </div>
 @{foreach (Criterion crit in Model.Rubric.Criteria)
   {
-      <div>
-        <div>@crit.CriterionTitle (Weight: @crit.Weight)</div>
+   <div class="criterion_div">
+        <div class="criterion_header">@crit.CriterionTitle (Weight: @crit.Weight)</div>
         @{List<CellDescription> descriptions = (from d in Model.Rubric.CellDescriptions
                                                 where d.CriterionID == crit.ID
                                                 select d).ToList();
                                                }
         <ul>
-        @{int previousMax = 0;}
+        @{int previousMax = 1;}
         @{foreach (CellDescription desc in descriptions)
           {
-              <li><em>@desc.Level.LevelTitle (@previousMax - @(previousMax + desc.Level.RangeEnd))</em>
+              <li><span class="level_header"><em>@(desc.Level.LevelTitle).</em> (@previousMax - @(previousMax + desc.Level.RangeEnd - 1))</span>
               @{previousMax += desc.Level.RangeEnd;}
               <br />
-              @desc.Description</li>
+              @Html.Raw(desc.Description.Replace("\r\n", "\n").Replace("\r", "<br />").Replace("\n", "<br />")) </li>
           }
         }
         </ul>
-        <input id="crit_amount_@(crit.ID)" type="text" style="border:0" />
-        <div id="crit_slider_@(crit.ID)"></div>
+        <table class="selector_table">
+            <tr>
+                <th class="zero_score">0</th>
+                @{previousMax = 1;}
+                @{int counter = 0;}
+                @{foreach (Level level in Model.Rubric.Levels)
+                  {
+                      counter++;
+                      string cssClass = "level_4";
+                      if (counter < 5)
+                      {
+                          cssClass = "level_" + counter.ToString();
+                      } 
+                      <th class="@cssClass" style="width:@(sliderTableCellWidth * level.RangeEnd)px;">@level.LevelTitle (@previousMax - @(previousMax + level.RangeEnd - 1))</th>
+                      previousMax += level.RangeEnd;
+                  }
+                }
+                <th class="text_input_score"></th>
+            </tr>
+            <tr>
+                <td colspan="@(Model.Rubric.Levels.Count + 1)">
+                    <div id="@(String.Format("{0}_{1}", critSliderPrefix, crit.ID))"></div>
+                </td>
+                <td class="text_input_score">
+                    <input class="text_input_score" id="@(String.Format("{0}_{1}", critInputPrefix, crit.ID))" name="@(String.Format("{0}_{1}", critInputPrefix, crit.ID))" type="text" value="0" style="border:0; padding-left:7px;" size="1" />    
+                </td>
+            </tr>        
         @{if (Model.Rubric.HasCriteriaComments)
           {
-              <div>
-                <textarea id="crit_comment_@(crit.ID)"></textarea>
-              </div>
+            <tr>
+                <td colspan="@(Model.Rubric.Levels.Count + 2)" >&nbsp;</td>
+            </tr>
+            <tr>
+                <td colspan="@(Model.Rubric.Levels.Count + 2)" >Comments:</td>
+            </tr>
+            <tr>
+                <td colspan="@(Model.Rubric.Levels.Count + 2)" ><textarea 
+                    id="@(String.Format("{0}_{1}", critCommentPrefix, crit.ID))"
+                    name="@(String.Format("{0}_{1}", critCommentPrefix, crit.ID))"
+                    style="width:95%; height:75px; margin-left:auto; margin-right:auto;"
+                    ></textarea></td>
+            </tr>
           }
+        }
+    </table>
+   </div>   
   }
-        <script type="text/javascript">
-            $(function () {
-                $("#crit_slider_@(crit.ID)").slider({
-                    value: 0,
-                    min: 0,
-                    max: @maxLevelScore,
-                    step: 1,
-                    slide: function (event, ui) {
-                        $("#crit_amount_@(crit.ID)").val(ui.value);
-                    }
-                });
-                $("#crit_amount_@(crit.ID)").val($("#crit_slider_@(crit.ID)").slider("value"));
-            });
-        </script>
-      </div>
-  }
-    }
+}
+<input type="submit" value="Save as Draft" />
+<input type="submit" value="Publish to Student" />
+</div>
+}
