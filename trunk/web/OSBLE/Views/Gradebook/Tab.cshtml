@@ -246,15 +246,15 @@
 
 <script type="text/jscript">
     var lastFocusedCell = null;
-    var showDropDown = false;
-    var changedShow = false;
     var isHighlighted = false;
+
+    var menuSelected = false;
+    var menuUnSelected = false;
+    var currentHeader = null;
+    var dataCellColId = null;
 
     //displays current column
     var currentCol = 0;
-
-    //bool stating if you clicked the menu button and not the cell
-    var menuClicked = false;
 
     //stores the ID we will be using for the header
     var lastId = null;
@@ -275,9 +275,6 @@
     var assignId = 0;
 
     var onMouseOver = false;
-
-    // this is for if we click off the table
-    var offTable = false;
     
 
     $(document).ready(function () {
@@ -287,37 +284,22 @@
     });
 
     $(document).click(function () {
-        if (offTable == true) {
-            clearLastCellFocus();
-            offTable = false;
-        } else {
-            offTable = true;
-        }
 
-
-        if (changedShow == true) {
-            if (showDropDown == false) {
-                if (menuClicked == true) {
-                    hideDropDown();
-                }
-            }
-            changedShow = false;
-        }
-        else {
-
-            hideDropDown();
-            showDropDown = false;
-        }
+        hideDropDown();
+        clearLastCellFocus();
+        isDataCell = false;
 
         if (isHighlighted == true) {
-
-            hideTabColors();
+            resetCellColor();
             isHighlighted = false;
         }
         else {
-
+            if (menuSelected == false && menuUnSelected == true) {
+                resetCellColor();
+            }
             isHighlighted = true;
         }
+        menuUnSelected = false;
     });
 
     function hideTabColors() {
@@ -418,16 +400,16 @@
         var container = column.id;
         $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
 
-            //alert($("#" + container).css("background-color"));
-        if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)"
-            || $("#" + container).css("background-color") == "rgb(255, 255, 132)" && $("#div-" + container).css("background-color") == "rgb(255, 255, 132)") {
+        if ((isDataCell == true && container != dataCellColId) || isDataCell == false) { 
+                //alert($("#" + container).css("background-color"));
+            if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)"
+                || $("#" + container).css("background-color") == "rgb(255, 255, 132)" && $("#div-" + container).css("background-color") == "rgb(255, 255, 132)") {
 
-                $("#div-" + container).css("background-color", "#DCDCDC");
-                $('#' + container).css("background-color", "#DCDCDC");
+                    $("#div-" + container).css("background-color", "#DCDCDC");
+                    $('#' + container).css("background-color", "#DCDCDC");
             }
+        }
     }
-
-
 
     function displayCustomizeGrades() {
 
@@ -440,8 +422,6 @@
             closeOnEscape: false
         });
 
-        // this is for if we click off the table
-        offTable = false;
     }
 
     function displayAddPoints() {
@@ -453,9 +433,6 @@
             height: 120,
             closeOnEscape: false
         });
-
-        // this is for if we click off the table
-        offTable = false;
     }
 
     function displayImportGrades() {
@@ -466,9 +443,6 @@
             height: 225,
             closeOnEscape: false
         });
-
-        // this is for if we click off the table
-        offTable = false;
     }
 
     function hideFunctions() {
@@ -502,10 +476,7 @@
     }
 
     function changeHeaderName(someHeader) {
-
-        // this is for if we click off the table
-        offTable = false;
-
+    
         //Header needs to lose focus
         if (header == true) {
             clearLastHeaderFocus(lastId);
@@ -626,9 +597,9 @@
     }
 
     function cellGainsFocus(someCell) {
-
-        // this is for if we click off the table
-        offTable = false;
+        hideDropDown();
+  
+        window.event.cancelBubble = true;
 
         //we are in a data cell so we need to set isDataCell to true
         isDataCell = true;
@@ -636,6 +607,7 @@
         var row = $(someCell).parent("tr").prevAll().length;
         var colIndex = $(someCell).prevAll().length;
         //colIndex = parseInt(colIndex + 1);
+        dataCellColId = (colIndex + 1).toString() ;
 
         $("#grades tr").each(function () {
             $(this).find("td").each(function () {
@@ -671,7 +643,7 @@
 
             var textValue = someCell.text();
             var inputText = $('<input class="cellInput" type="text" value="' + textValue + '" />');
-            someCell.removeAttr("onclick");
+            //someCell.removeAttr("onclick");
             someCell.html(inputText);
             inputText.focus();
             lastFocusedCell = someCell;
@@ -682,7 +654,7 @@
         cell = cell.find("td:eq(" + colIndex + ")");
         cell.css("background-color", "#FFFF84");
         cell.find("div").css("background-color", "#FFFF84");
-        cell.removeAttr("onmouseout");
+        //cell.removeAttr("onmouseout");
 
         var cell2 = $("#grades").find("tr:eq(" + row + ")");
         cell2 = cell2.find("td:eq(0)");
@@ -786,6 +758,11 @@
     }
 
     function ShowHide(buttonClick) {
+
+        menuSelected = true;
+        
+        resetCellColor();
+
         //Store which assignment button was clicked so we can use it with Add Points
         points = buttonClick
         var x = 0;
@@ -796,11 +773,9 @@
             header = false;
         }
 
-        menuClicked = true;
         var container = buttonClick.id;
         containerId = container.split("-");
         currentCol = containerId[1];
-        //alert(currentCol);
         $("#column_assignment_id").val(currentCol);
 
         //aligning the menu under the buttons
@@ -814,63 +789,39 @@
 
         //Animation for menu
         $("#slidingDivID").animate({ "height": "show" }, { duration: 75 });
-        if (showDropDown == true) {
-            showDropDown = false;
-            changedShow = true;
-        }
 
-        else {
-            showDropDown = true;
-            changedShow = true;
-        }
     }
 
     //Hiding the drop down menu when clicked off
     function hideDropDown() {
-        $("#slidingDivID").animate({ "height": "hide" }, { duration: 75 });
+        $("#slidingDivID").animate({ "height": "hide" }, { duration: 0 });
     }
 
     function selectColumn(col) {
 
-        // this is for if we click off the table
-        offTable = false;
+        var container = col.id;
         
         clearLastCellFocus();
-        //tabShowing = true;
-        var container = col.id;
-        /*var x = parseInt($("#" + container).position().left);
-        var y = parseInt($("#" + container).position().top);
+        resetCellColor();
 
-        $("#slidingDivID").css("left", x + "px");
-        $("#slidingDivID").css("top", y + "px");
+        var temp = $(col).attr("id").split("-");
+        // if there is a drop down we want to cancel following events and set it up to close the drop down
+        if (menuSelected == true && (menuUnSelected == false || currentHeader[0] != temp[0])) {
 
-        x += 135;
-        y += 23;*/
+            window.event.cancelBubble = true;
+            menuSelected = false;
+            menuUnSelected = true;
+        } else {
+            menuUnSelected = false;
+        }
 
-        $("#grades tr").each(function () {
-            $(this).find("td").each(function () {
-                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-                    $(this).css("background-color", "#DCDCDC");
-                    $(this).find("div").css("background-color", "#DCDCDC");
-                }
-                else {
-                    $(this).css("background-color", "white");
-                }
-            });
-            $(this).find("th").each(function () {
-                if ($(this).attr("class") == "colHeader") {
-                }
-                else {
-                    $(this).css("background-color", "white");
-                }
-            });
-        });
+        currentHeader = temp;
 
         $("#" + container).css("background-color", "#AAAAAA");
         $("#div-" + container).css("background-color", "#AAAAAA");
 
-        currentHeader = $(col).attr("id").split("-");
-        if(currentHeader[1] == null){
+        if (currentHeader[1] == null) {
+            
             $("#grades tr").each(function () {
 
                 $(this).find("td:nth-child(" + currentHeader + ")").each(function () {
@@ -892,28 +843,16 @@
 
     function selectRow(row) {
 
-        // this is for if we click off the table
-        offTable = false;
-
         var container = row.id.split("-");
         var count = 0;
-
-        $("#grades tr").each(function () {
-            $(this).find("td").each(function () {
-                if ($(this).attr("class") == "rowHeader" || $(this).attr("class") == "colHeader") {
-                    $(this).css("background-color", "#DCDCDC");
-                    $(this).find("div").css("background-color", "#DCDCDC");
-                }
-                else {
-                    $(this).css("background-color", "white");
-                }
-            });
-            $(this).find("th").each(function () {
-                if ($(this).attr("class") != "colHeader") {
-                    $(this).css("background-color", "white");
-                }
-            });
-        });
+        
+        resetCellColor();
+        // if a Menu is down on any column this closes it and stops the .click event from firing
+        if (menuUnSelected == true) {
+            hideDropDown();
+            menuUnSelected = false;
+            window.event.cancelBubble = true;
+        }
 
         $('#grades tr').each(function () {
             if (count == container[1] && container[1] != 0) {
@@ -936,9 +875,6 @@
 
     function clearCol() {
 
-        // this is for if we click off the table
-        offTable = false;
-
         var rows = $("#grades tr");
         currentCol = parseInt(currentCol);
         currentCol += 1;
@@ -951,9 +887,6 @@
 
     //Deleting the whole column
     function deleteCol() {
-
-        // this is for if we click off the table
-        offTable = false;
 
         colIndex = parseInt(currentCol);
         colIndex += 1;
@@ -1002,9 +935,6 @@
 
     function newTab() {
 
-        // this is for if we click off the table
-        offTable = false;
-
         $.ajax({
             type: "POST",
             url: "/Gradebook/AddWeight",
@@ -1016,9 +946,6 @@
 
     function dropAllLowest() {
 
-        // this is for if we click off the table
-        offTable = false;
-        
         //set isDropLowest to 1 meaning true.
         $("#isDropLowest").val(1);
 
@@ -1067,10 +994,6 @@
 
     function clearDropLowest(id) {
 
-
-        // this is for if we click off the table
-        offTable = false;
-
         //get the pathname so we can use the categoryId
         var pathname = window.location.toString();
 
@@ -1092,10 +1015,6 @@
     }
 
     function clearAllDropLowest() {
-
-
-        // this is for if we click off the table
-        offTable = false;
 
         //get the pathname so we can use the categoryId
         var pathname = window.location.toString();
@@ -1119,9 +1038,6 @@
     }
 
     function DropLowest(id) {
-
-        // this is for if we click off the table
-        offTable = false;
 
         //get the pathname so we can use the categoryId
         var pathname = window.location.toString();
@@ -1147,9 +1063,6 @@
 
     function addPoints(points) {
 
-        // this is for if we click off the table
-        offTable = false;
-
         var num = $("#XtoAdd").val();
         var id = $(points).attr("id");
         $.ajax({
@@ -1165,9 +1078,6 @@
 
     function newTab() {
 
-        // this is for if we click off the table
-        offTable = false;
-
         $.ajax({
             type: "POST",
             url: "/Gradebook/AddCategory",
@@ -1177,9 +1087,6 @@
     }
 
     function importGrades() {
-
-        // this is for if we click off the table
-        offTable = false;
 
         var filename = $("#file").val();
 
@@ -1192,7 +1099,6 @@
 
     function moveRight(header) {
 
-        offTable = false;
         var id = header.id.split("-");
 
         $.ajax({
@@ -1207,9 +1113,6 @@
 
     function moveLeft(header) {
 
-        // this is for if we click off the table
-        offTable = false;
-
         var id = header.id.split("-");
 
         $.ajax({
@@ -1219,6 +1122,26 @@
             success: function (response) {
                 $("#grades").replaceWith(response);
             }
+        });
+    }
+
+    function resetCellColor() {
+
+        $("#grades tr").each(function () {
+            $(this).find("td").each(function () {
+                if ($(this).attr("class") == "rowHeader" || $(this).attr("class") == "colHeader") {
+                    $(this).css("background-color", "#DCDCDC");
+                    $(this).find("div").css("background-color", "#DCDCDC");
+                }
+                else {
+                    $(this).css("background-color", "white");
+                }
+            });
+            $(this).find("th").each(function () {
+                if ($(this).attr("class") != "colHeader") {
+                    $(this).css("background-color", "white");
+                }
+            });
         });
     }
 

@@ -353,31 +353,34 @@
         <tr class="colHeader">
             
             @{var j = 1;
+              var r = 0;
+                <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                j++;
+                r++;
                 <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
-                j += 1;
+                j++;
                 <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
-                j += 1;
+                j++;
                 <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
-                j += 1;
+                j++;
                 <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
-                j += 1;
-                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
-                j += 1;
+                j++;
                 foreach (Category item in ViewBag.Categories)
                 {
                     <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 3px; text-align:right;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);">
-                        <div id="div-@j" style="display: none;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);">
-                            <img id="img-@item.ID" src="/Content/images/arrow_down.png" onclick="ShowHide(this);" style="cursor:pointer;" onclick="displayLetterGrades()"/>
+                        <div id="div-@j"  style="display: none;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);">
+                            <img id="img-@item.ID" src="/Content/images/arrow_down.png" onclick="ShowHide(this);" style="cursor:pointer;"/>
                         </div>
                     </td>
-                    j += 1;
+                    j++;
                 }
             }
             
         </tr>
         
         <tr>
-            <td id="row-1" class="rowHeader" style="background:#DCDCDC; border:outset 3px; width: 25px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 3px; width: 25px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            @{r++;}
             <th></th>
             <th>Weights [+]</th>
             <th></th>
@@ -388,7 +391,8 @@
             }
         </tr>
         <tr id="weights">
-            <td id="row-2" class="rowHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            @{r++;}
             <td id="sectionHolder"></td>
             <td id="catScheme" onclick="cellGainsFocus(this);">&nbsp  Weight1</td>
             <td id="grade"></td>
@@ -408,7 +412,8 @@
 
         </tr>
         <tr id="perfectScore">
-            <td id="row-3" class="rowHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            @{r++;}
             <th></th>
             <th id="th2">Perfect Score</th>
             @{string grade = (from lg in ViewBag.LetterGrades as IEnumerable<LetterGrade>
@@ -425,7 +430,8 @@
 
         </tr>
         <tr>
-            <td id="row-4" class="rowHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            @{r++;}
             <th></th>
             <th id="th3">
                 Average Score
@@ -445,7 +451,8 @@
             
         </tr>
         <tr id="categoryHeaders">
-            <td id="row-5" class="rowHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            @{r++;}
             <th>Section</th>
             <th>Name</th>
             <th id="gradeHeader" ondblclick="displayLetterGrades();">Grade</th>
@@ -464,7 +471,6 @@
 
             List<LetterGrade> letterList = (from lg in ViewBag.LetterGrades as IEnumerable<LetterGrade>
                                             select lg).ToList();
-            var r = 6;
         }
         <!--loop through all users -->
         @foreach (OSBLE.Models.Users.UserProfile student in ViewBag.Students)
@@ -638,6 +644,7 @@
     });
 
     $(document).click(function () {
+
         if (isShowing == true) {
             $("#letterGradesID").animate({ "height": "hide" }, { duration: 300 });
             isShowing = false;
@@ -647,24 +654,7 @@
         }
 
         if (isHighlighted == true) {
-            $("#grades tr").each(function () {
-                $(this).find("td").each(function () {
-                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-                        $(this).css("background-color", "#DCDCDC");
-                        $(this).find("div").css("background-color", "#DCDCDC");
-                    }
-                    else {
-                        $(this).css("background-color", "white");
-                    }
-                });
-                $(this).find("th").each(function () {
-                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-                    }
-                    else {
-                        $(this).css("background-color", "white");
-                    }
-                });
-            });
+            resetCellColor();
             hideTabColors();
             isHighlighted = false;
         }
@@ -794,8 +784,8 @@
     }
 
     function hideTabColors() {
-        $("#selectMenuID").animate({ "height": "hide" }, { duration: 300 });
-        $("#displayColorsID").animate({ "height": "hide" }, { duration: 300 });
+        $("#selectMenuID").animate({ "height": "hide" }, { duration: 0 });
+        $("#displayColorsID").animate({ "height": "hide" }, { duration: 0 });
     }
 
     function deleteCategory() {
@@ -998,7 +988,6 @@
             showDropDown = false;
             changedShow = true;
         }
-
         else {
             showDropDown = true;
             changedShow = true;
@@ -1008,46 +997,20 @@
     function selectColumn(col) {
 
         clearLastCellFocus();
+        if (showDropDown == false) {
+            hideTabColors();
+        }
+
         //tabShowing = true;
         var container = col.id;
 
-//        var x = parseInt($("#" + container).position().left);
-//        var y = parseInt($("#" + container).position().top);
-
-//        $("#selectMenuID").css("left", x + "px");
-//        $("#selectMenuID").css("top", y + "px");
-
-//        x += 135;
-//        y += 23;
-
-//        $("#displayColorsID").css("left", x + "px");
-//        $("#displayColorsID").css("top", y + "px");
-
-        
-        
-        $("#grades tr").each(function () {
-            $(this).find("td").each(function () {
-                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-                    $(this).css("background-color", "#DCDCDC");
-                    $(this).find("div").css("background-color", "#DCDCDC");
-                }
-                else {
-                    $(this).css("background-color", "white");
-                }
-            });
-            $(this).find("th").each(function () {
-                if ($(this).attr("class") == "colHeader") {
-                }
-                else {
-                    $(this).css("background-color", "white");
-                }
-            });
-        });
+        resetCellColor();
 
         $("#" + container).css("background-color", "#AAAAAA");
         $("#div-" + container).css("background-color", "#AAAAAA");
 
         currentHeader = $(col).attr("id").split("-");
+        
         if(currentHeader[1] == null) {
             $("#grades tr").each(function () {
 
@@ -1061,7 +1024,6 @@
 
                 $(this).find("th:nth-child(" + currentHeader + ")").each(function () {
                     if ($(this).attr("class") == "colHeader" && $(col).attr("id") > 4) {
-                        $("#selectMenuID").animate({ "height": "show" }, { duration: 300 });
                     }
                     else {
                         $(this).css("background-color", "DeepSkyBlue ");
@@ -1111,8 +1073,35 @@
     }
 
     function selectRow(row) {
+        
         var container = row.id.split("-");
         var count = 0;
+
+        hideTabColors();
+        resetCellColor();
+
+        $('#grades tr').each(function () {
+            if (count == container[1] && container[1] != 0) {
+                $(this).find("td").each(function () {
+                    if ($(this).attr("class") == "rowHeader") {
+                        $(this).css("background-color", "#AAAAAA");
+                  } else {
+                        $(this).css("background-color", "DeepSkyBlue");
+                    }
+                });
+                $(this).find("th").each(function () {
+                    if ($(this).attr("class") != "colHeader") {
+                        $(this).css("background-color", "DeepSkyBlue");
+                    }
+                });
+            }
+            count++;
+        });
+        isHighlighted = false;
+        showDropDown = false;
+    }
+
+    function resetCellColor() {
 
         $("#grades tr").each(function () {
             $(this).find("td").each(function () {
@@ -1130,23 +1119,6 @@
                 }
             });
         });
-
-        $('#grades tr').each(function () {
-            if (count == container[1] && container[1] != 0) {
-                $(this).find("td").each(function () {
-                    if ($(this).attr("class") == "rowHeader") {
-                        $(this).css("background-color", "#AAAAAA");
-                    } else if ($(this).attr("class") != "colHeader") {
-                        $(this).css("background-color", "DeepSkyBlue");
-                    }
-                });
-                $(this).find("th").each(function () {
-                    $(this).css("background-color", "DeepSkyBlue");
-                });
-            }
-            count++;
-        });
-        isHighlighted = false;
     }
 
 </script>
