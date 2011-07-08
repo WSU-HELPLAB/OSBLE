@@ -6,6 +6,7 @@ using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Users;
 using System.Web.Mvc;
+using OSBLE.Models.Assignments.Activities;
 
 namespace OSBLE.Models.ViewModels
 {
@@ -20,10 +21,10 @@ namespace OSBLE.Models.ViewModels
 
         public Rubric Rubric { get; set; }
         public RubricEvaluation Evaluation { get; set; }
-        public AbstractAssignment SelectedAssignment { get; set; }
-        public SelectList Assignments { get; set; }
-        public SelectList Students { get; set; }
-        public UserProfile SelectedStudent { get; set; }
+        public AbstractAssignmentActivity SelectedAssignmentActivity { get; set; }
+        public List<AbstractAssignmentActivity> AssignmentActivities { get; set; }
+        public List<TeamUserMember> TeamUsers { get; set; }
+        public TeamUserMember SelectedTeam { get; set; }
         public SelectList Sections { get; set; }
         public int SelectedSection { get; set; }
     }

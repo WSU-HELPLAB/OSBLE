@@ -9,5 +9,15 @@ namespace OSBLE.Models.Users
         public int ID { get; set; }
 
         public abstract bool Contains(UserProfile user);
+
+        public string Name
+        {
+            get
+            {
+                return GetName();
+            }
+        }
+
+        public abstract string GetName();
     }
 }

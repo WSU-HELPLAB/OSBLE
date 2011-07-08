@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Users;
+using OSBLE.Models.Assignments.Activities;
 
 namespace OSBLE.Models.Courses.Rubrics
 {
@@ -28,9 +29,9 @@ namespace OSBLE.Models.Courses.Rubrics
         public virtual TeamUserMember Recipient { get; set; }
 
         [Required]
-        public int AssignmentID { get; set; }
+        public int AbstractAssignmentActivityID { get; set; }
 
-        public virtual AbstractAssignment Assignment { get; set; }
+        public virtual AbstractAssignmentActivity Assignment { get; set; }
 
         [Required]
         public bool IsPublished { get; set; }

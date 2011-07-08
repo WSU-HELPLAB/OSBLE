@@ -13,5 +13,10 @@ namespace OSBLE.Models.Users
         {
             return Team.Contains(user);
         }
+
+        public override string GetName()
+        {
+            return Team.Name;
+        } 
     }
 }

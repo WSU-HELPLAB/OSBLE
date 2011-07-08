@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System;
 
 namespace OSBLE.Models.Users
 {
@@ -12,6 +13,11 @@ namespace OSBLE.Models.Users
         public override bool Contains(UserProfile user)
         {
             return UserProfileID == user.ID;
+        }
+
+        public override string GetName()
+        {
+            return String.Format("{0}, {1}", UserProfile.LastName, UserProfile.FirstName);
         }
     }
 }
