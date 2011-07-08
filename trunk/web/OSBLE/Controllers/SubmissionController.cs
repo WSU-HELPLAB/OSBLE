@@ -130,7 +130,7 @@ namespace OSBLE.Controllers
                             j++;
                         } while (delName != null);
 
-                        return RedirectToAction("SubmittedSuccessfully");
+                        return RedirectToAction("Index", "Assignment");
                     }
                 }
             }

@@ -135,13 +135,28 @@ int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
                                 }
                             </div>
                             <div class="submission_deliverables_end">
+                            @Ajax.ActionLink("Submit Files For This Submission", "Create", "Submission", new { id = submission.ID.ToString() }, new AjaxOptions() { InsertionMode = InsertionMode.InsertAfter, HttpMethod = "Get", UpdateTargetId = "submitFiles", OnComplete="SubmissionLoaded" }, new object())
+
+                            <script type="text/javascript">
+
+                                function SubmissionLoaded() {
+                                    $('#submitFiles').show('blind');
+
+                                }
+                            </script>
+
+                            <div id="submitFiles" style="display:none">
+                                    
+                            </div>
                             </div>
                         </li>   
                                 if (ViewBag.CanSubmit && submission.ReleaseDate < DateTime.Now)
-                                { 
+                                {
                                     
-                        <button onclick="location.href='@Url.Action("Create", "Submission", new { id = submission.ID.ToString() })'">
-                            Submit Files For This Submission</button>   
+                        
+                                    
+                                    <!--<button onclick="location.href='@Url.Action("Create", "Submission", new { id = submission.ID.ToString() })'">
+                            Submit Files For This Submission</button>   -->
                                 }
 
                                 submissionCounter++;
