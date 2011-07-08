@@ -1,27 +1,30 @@
 ﻿@model OSBLE.Models.ViewModels.RubricViewModel
 @using OSBLE.Models.Courses.Rubrics;
-
+@using OSBLE.Models.Assignments.Activities;
+@using OSBLE.Models.Users;
+@{ViewBag.Title = "Rubric Evaluation";}
 @{int maxLevelScore = (from c in Model.Rubric.Levels
                        select c.RangeEnd).Sum(); }
 @{double totalRubricPoints = (from c in Model.Rubric.Criteria
                            select c.Weight).Sum(); }
-@{string critInputPrefix = "crit_amount";}
-@{string critSliderPrefix = "crit_slider";}
-@{string critCommentPrefix = "crit_comment";}
+@{string critInputPrefix = ViewBag.CritInputPrefix;}
+@{string critSliderPrefix = ViewBag.CritSliderPrefix;}
+@{string critCommentPrefix = ViewBag.CritCommentPrefix;}
+@{string selectedActivity = ViewBag.ActivitySelectId;}
+@{string selectedTeam = ViewBag.TeamSelectId;}
 @{string gradeId ="grade"; }
 @{int sliderTableLength = 880;}
 @{int textInputLenght = 25;}
 @{int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;}
-
 <script type="text/javascript">
 
     //loads all sliders after document load
     function loadSliders() {
-    @{foreach (Criterion crit in Model.Rubric.Criteria)
+    @{foreach (CriterionEvaluation critEval in Model.Evaluation.CriterionEvaluations)
     {
-        string sliderId = String.Format("\"#{0}_{1}\"", critSliderPrefix, crit.ID);
+        string sliderId = String.Format("\"#{0}_{1}\"", critSliderPrefix, critEval.Criterion.ID);
         string js = String.Concat("\t$(", sliderId, ").slider({",
-                        "value: 0, ",
+                        "value: "+ critEval.Score +", ",
                         "min: 0, ",
                         "max: ", maxLevelScore, ", ",
                         "step: 1, ",
@@ -30,6 +33,14 @@
         @Html.Raw(js)
     }    
     }
+        $('#@selectedActivity').change(triggerPostBack);
+        $('#@selectedTeam').change(triggerPostBack);
+        updateGrade();
+    }
+
+    function triggerPostBack()
+    {
+        $('#rubric_form').submit();
     }
 
     function updateGrade()
@@ -142,39 +153,66 @@
 }
 
 </style>
-@using (Html.BeginForm())
+@using (Html.BeginForm("Index", "Rubric", FormMethod.Post, new { id = "rubric_form" }))
 {
+
+<input type="hidden" name="@ViewBag.AbstractAssignmentActivityId" value="@Model.SelectedAssignmentActivity.ID" />
+<input type="hidden" name="@ViewBag.TeamUserId" value="@Model.SelectedTeam.ID" />
 <div id="rubric_evaluator">
+    <h1>Rubric Evaluation of @Model.SelectedAssignmentActivity.Name for @Model.Evaluation.Recipient.GetName()</h1>
     <div class="dashboard">
     <div style="float:right;"><input type="submit" value="Save as Draft" />
 <input type="submit" value="Publish to Student" /></div>
         <table>
             <tr>
-                <th>Assignment:</th>
+                <th>Activity:</th>
                 <td>
-                    @Html.DropDownListFor(m => m.SelectedAssignment, Model.Assignments)
+                    <select id="@selectedActivity" name="@selectedActivity">
+                        @{foreach (AbstractAssignmentActivity activity in Model.AssignmentActivities)
+                          {
+                              string optionText = "<option value=\"{0}\" {1}>{2}</option>";
+                              string selectedValue = "";
+                              if (activity.ID == Model.SelectedAssignmentActivity.ID)
+                              {
+                                  selectedValue = "selected=\"selected\"";
+                              }
+                              @Html.Raw(String.Format(optionText, activity.ID, selectedValue, activity.Name));
+                          }
+                          }
+                    </select>
                 </td>
-                <th>Section:</th>
+                <th>Team / User:</th>
                 <td>
-                    @Html.DropDownListFor(m => m.SelectedSection, Model.Sections)
+                    <select id="@selectedTeam" name="@selectedTeam">
+                        @{foreach (TeamUserMember user in Model.TeamUsers)
+                          {
+                              string optionText = "<option value=\"{0}\" {1}>{2}</option>";
+                              string selectedValue = "";
+                              if (user.ID == Model.SelectedTeam.ID)
+                              {
+                                  selectedValue = "selected=\"selected\"";
+                              }
+                              @Html.Raw(String.Format(optionText, user.ID, selectedValue, user.GetName()));
+                          }
+                          }
+                    </select>
                 </td>
             </tr>
             <tr>
-                <th>Student:</th>
-                <td>
-                    @Html.DropDownListFor(m => m.SelectedStudent, Model.Students)
-                </td>
                 <th>Grade:</th>
                 <td id="@gradeId">0%</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
             </tr>
         </table>        
     </div>
-@{foreach (Criterion crit in Model.Rubric.Criteria)
+
+@{foreach (CriterionEvaluation critEval in Model.Evaluation.CriterionEvaluations)
   {
    <div class="criterion_div">
-        <div class="criterion_header">@crit.CriterionTitle (Weight: @crit.Weight)</div>
+        <div class="criterion_header">@critEval.Criterion.CriterionTitle (Weight: @critEval.Criterion.Weight)</div>
         @{List<CellDescription> descriptions = (from d in Model.Rubric.CellDescriptions
-                                                where d.CriterionID == crit.ID
+                                                where d.CriterionID == critEval.Criterion.ID
                                                 select d).ToList();
                                                }
         <ul>
@@ -187,7 +225,7 @@
               @Html.Raw(desc.Description.Replace("\r\n", "\n").Replace("\r", "<br />").Replace("\n", "<br />")) </li>
           }
         }
-        </ul>
+        </ul>        
         <table class="selector_table">
             <tr>
                 <th class="zero_score">0</th>
@@ -209,10 +247,10 @@
             </tr>
             <tr>
                 <td colspan="@(Model.Rubric.Levels.Count + 1)">
-                    <div id="@(String.Format("{0}_{1}", critSliderPrefix, crit.ID))"></div>
+                    <div id="@(String.Format("{0}_{1}", critSliderPrefix, critEval.Criterion.ID))"></div>
                 </td>
                 <td class="text_input_score">
-                    <input class="text_input_score" id="@(String.Format("{0}_{1}", critInputPrefix, crit.ID))" name="@(String.Format("{0}_{1}", critInputPrefix, crit.ID))" type="text" value="0" style="border:0; padding-left:7px;" size="1" />    
+                    <input class="text_input_score" id="@(String.Format("{0}_{1}", critInputPrefix, critEval.Criterion.ID))" name="@(String.Format("{0}_{1}", critInputPrefix, critEval.Criterion.ID))" type="text" value="@critEval.Score" style="border:0; padding-left:7px;" size="1" />    
                 </td>
             </tr>        
         @{if (Model.Rubric.HasCriteriaComments)
@@ -225,10 +263,12 @@
             </tr>
             <tr>
                 <td colspan="@(Model.Rubric.Levels.Count + 2)" ><textarea 
-                    id="@(String.Format("{0}_{1}", critCommentPrefix, crit.ID))"
-                    name="@(String.Format("{0}_{1}", critCommentPrefix, crit.ID))"
+                    id="@(String.Format("{0}_{1}", critCommentPrefix, critEval.Criterion.ID))"
+                    name="@(String.Format("{0}_{1}", critCommentPrefix, critEval.Criterion.ID))"
+                    rows="10"
+                    cols="80"
                     style="width:95%; height:75px; margin-left:auto; margin-right:auto;"
-                    ></textarea></td>
+                    >@critEval.Comment</textarea></td>
             </tr>
           }
         }
@@ -236,7 +276,23 @@
    </div>   
   }
 }
+
+@{if (Model.Rubric.HasGlobalComments)
+  {
+      <div class="criterion_div">
+        <div class="criterion_header">Final Comments</div>
+        <textarea 
+                    id="@ViewBag.GlobalCommentId"
+                    name="@ViewBag.GlobalCommentId"
+                    rows="10"
+                    cols="80"
+                    style="width:95%; height:75px; margin-left:auto; margin-right:auto;"
+                    >@Model.Evaluation.GlobalComment</textarea>
+       </div>
+  }
+}
 <input type="submit" value="Save as Draft" />
 <input type="submit" value="Publish to Student" />
 </div>
+    
 }
