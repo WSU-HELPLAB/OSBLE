@@ -51,7 +51,7 @@ namespace OSBLE.Models
 
         // Assignments.Activities
 
-        public DbSet<AbstractAssignmentActivity> AbstractAssignmentActivity { get; set; }
+        public DbSet<AbstractAssignmentActivity> AbstractAssignmentActivities { get; set; }
 
         public DbSet<Deliverable> Deliverables { get; set; }
 
