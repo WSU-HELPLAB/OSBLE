@@ -2,6 +2,7 @@
 @using OSBLE.Models.Courses;
 @using OSBLE.Models.Assignments;
 @using OSBLE.Models.Assignments.Activities.Scores;
+@using OSBLE.Utility;
 @{
     ViewBag.Title = "Index";
 }
@@ -353,46 +354,49 @@
         <tr class="colHeader">
             
             @{var j = 1;
-              var r = 0;
-                <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
-                j++;
-                r++;
-                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
-                j++;
-                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
-                j++;
-                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
-                j++;
-                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
-                j++;
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                j += 1;
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                j += 1;
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                j += 1;
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                j += 1;
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                j += 1;
                 foreach (Category item in ViewBag.Categories)
                 {
-                    <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 3px; text-align:right;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);">
-                        <div id="div-@j"  style="display: none;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);">
-                            <img id="img-@item.ID" src="/Content/images/arrow_down.png" onclick="ShowHide(this);" style="cursor:pointer;"/>
-                        </div>
-                    </td>
-                    j++;
+                    if (item.Name != Constants.UnGradableCatagory)
+                    {
+                        <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; text-align:right;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);">
+                            <div id="div-@j" style="display: none;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);">
+                                <img id="img-@item.ID" src="/Content/images/arrow_down.png" onclick="ShowHide(this);" style="cursor:pointer;" onclick="displayLetterGrades()"/>
+                            </div>
+                        </td>
+                        j += 1;
+                    }
+                    
                 }
             }
             
         </tr>
         
         <tr>
-            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 3px; width: 25px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
-            @{r++;}
+            <td id="row-1" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; width: 25px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             <th></th>
             <th>Weights [+]</th>
             <th></th>
             <th></th>
             @foreach (Category item in ViewBag.Categories)
             {
-                <td></td>
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <td></td>
+                }
             }
         </tr>
         <tr id="weights">
-            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
-            @{r++;}
+            <td id="row-2" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             <td id="sectionHolder"></td>
             <td id="catScheme" onclick="cellGainsFocus(this);">&nbsp  Weight1</td>
             <td id="grade"></td>
@@ -400,20 +404,25 @@
                 double totalCategoryPoints = 0;
                 foreach (Category item in ViewBag.Categories)
                 {
-                    totalCategoryPoints += item.Points;
+                    if (item.Name != Constants.UnGradableCatagory)
+                    {
+                        totalCategoryPoints += item.Points;
+                    }
                 }
             }
             <td id="categoryTotal">@totalCategoryPoints</td>
             
             @foreach (Category item in ViewBag.Categories)
             {
-                <td id="weight-@item.ID" onclick="cellGainsFocus(this)">@item.Points</td>
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <td id="weight-@item.ID" onclick="cellGainsFocus(this)">@item.Points</td>
+                }
             }
 
         </tr>
         <tr id="perfectScore">
-            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
-            @{r++;}
+            <td id="row-3" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             <th></th>
             <th id="th2">Perfect Score</th>
             @{string grade = (from lg in ViewBag.LetterGrades as IEnumerable<LetterGrade>
@@ -425,13 +434,15 @@
 
             @foreach (Category item in ViewBag.Categories)
             {
-                <td id="@item.ID">100%</td>   
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <td id="@item.ID">100%</td>   
+                }
             }
 
         </tr>
         <tr>
-            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
-            @{r++;}
+            <td id="row-4" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             <th></th>
             <th id="th3">
                 Average Score
@@ -445,14 +456,16 @@
 
                 foreach (Category item in ViewBag.Categories)
                 {
-                    <td id="averageScore">0</td>  
+                    if (item.Name != Constants.UnGradableCatagory)
+                    {
+                        <td id="averageScore">0</td>  
+                    }
                 }
             }
             
         </tr>
         <tr id="categoryHeaders">
-            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
-            @{r++;}
+            <td id="row-5" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             <th>Section</th>
             <th>Name</th>
             <th id="gradeHeader" ondblclick="displayLetterGrades();">Grade</th>
@@ -460,7 +473,10 @@
             
             @foreach (Category item in ViewBag.Categories)
             {
-                <th id="@item.ID" class="colHeader" onclick="changeAssignmentName(this);" style="background:@item.TabColor">@item.Name</th>
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <th id="@item.ID" class="colHeader" onclick="changeAssignmentName(this);" style="background:@item.TabColor">@item.Name</th>
+                }
             }
 
         </tr>
@@ -476,7 +492,7 @@
         @foreach (OSBLE.Models.Users.UserProfile student in ViewBag.Students)
         {        
             <tr id="studentGrades">
-                <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 3px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
                 @{r++;}
 
             @{  
@@ -500,7 +516,7 @@
             double totalGrade = 0;
             double totalPossible = 0;
             List<Score> totalOfCats = (from total in ViewBag.Scores as IEnumerable<Score>
-                                       where total.UserProfileID == student.ID &&
+                                       where total.TeamUserMemberID == student.ID &&
                                        total.Points >= 0
                                        select total).ToList();
 
@@ -548,18 +564,22 @@
             foreach (Category cat in ViewBag.Categories)
             {
                 List<Score> scoreQuery = (from g in ViewBag.Scores as IEnumerable<Score>
-                                          where g.UserProfileID == student.ID &&
+                                          where g.TeamUserMemberID == student.ID &&
                                           g.AssignmentActivity.AbstractAssignment.CategoryID == cat.ID &&
+                                          g.AssignmentActivity.AbstractAssignment.Category.Name != Constants.UnGradableCatagory &&
                                           g.Points >= 0
                                           select g).ToList();
 
                 if (scoreQuery.Count() > 0)
                 {
-                        <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID)" style="cursor:pointer;">@scoreQuery.First().Points.ToString(".##")%</td>
+                    <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID)" style="cursor:pointer;">@scoreQuery.First().Points.ToString(".##")%</td>
                 }
                 else
                 {
+                    if (cat.Name != Constants.UnGradableCatagory)
+                    {
                         <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID)" style="cursor:pointer;">NG</td>
+                    }
                 }
             }
             }

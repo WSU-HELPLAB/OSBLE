@@ -26,6 +26,8 @@ namespace OSBLE.Models.Assignments.Activities
             ReleaseDate = ReleaseDate.AddDays(1);
 
             TeamUsers = new List<TeamUserMember>();
+
+            addedPoints = 0;
         }
 
         [Required]
@@ -51,6 +53,8 @@ namespace OSBLE.Models.Assignments.Activities
         /// Used for visual ordering of assignment activities in the gradebook.  Defaults to a value of 0.
         /// </summary>
         public int ColumnOrder { get; set; }
+
+        public double addedPoints { get; set; }
 
         public virtual ICollection<Score> Scores { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿@using OSBLE.Models.Courses
+@using OSBLE.Utility
 @{
     Layout = null;
 }
@@ -16,13 +17,17 @@
             foreach (Category item in ViewBag.Categories)
             {
                 var displayWeight = (item.Points / totalPoints) * 100;
-                if (item.Points == 0)
+                if (item.Points == 0 && item.Name != Constants.UnGradableCatagory )
                 {
                     <li class="@item.ID" style="background:@item.TabColor;"><a href="/Gradebook/Tab/?categoryId=@item.ID" style="text-decoration:none;">@item.Name (0%)</a></li>
                 }
-                else
+                else if (item.Name != Constants.UnGradableCatagory)
                 {
                     <li class="@item.ID" style="background:@item.TabColor;"><a href="/Gradebook/Tab/?categoryId=@item.ID" style="text-decoration:none;">@item.Name (@displayWeight.ToString(".##")%)</a></li>
+                }
+                else
+                {
+                    //Do nothing because we don't want to show category Constants.UnGradableCategory
                 }
 
             }

@@ -24,9 +24,9 @@ namespace OSBLE.Models.Assignments.Activities.Scores
         public double Multiplier { get; set; }
 
         [Required]
-        public int UserProfileID { get; set; }
+        public int TeamUserMemberID { get; set; }
 
-        public virtual UserProfile UserProfile { get; set; }
+        public virtual TeamUserMember TeamUserMember { get; set; }
 
         [Required]
         public int AssignmentActivityID { get; set; }

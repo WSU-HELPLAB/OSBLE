@@ -7,13 +7,14 @@
     var index = 0;
 }
 
-<table id="grades" class="gradebook">
-
 @{
-        var numDropped = (from drop in ViewBag.Dropped as IEnumerable<int> select drop).FirstOrDefault();     
-        
+        var numDropped = (from drop in ViewBag.Dropped as IEnumerable<int> select drop).First();
         <input type="hidden" id="numDropped" value="@numDropped" />
     }
+
+<table id="grades" class="gradebook">
+
+
 
     <tr class="colHeader">
             
@@ -25,12 +26,12 @@
             j += 1;
             <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color:#E8E8E8" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);"></td>
             j += 1;
-            foreach (AbstractAssignment item in ViewBag.Assignments)
+            foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
             {
                 <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; text-align:center; min-width: 45px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(this);">
                     
-                <div id="div-@j" style="display: none; margin:0 auto;" onmouseover="showButton(this);" onmouseout="hideButton(this);" >
-                    <img id="imgLeft-@item.ID" src="/Content/images/arrow_left.png" onclick="moveLeft(this);" style="cursor:pointer; float:left; padding-top:1px;"/>
+                <div id="div-@j" style="display: none; margin:0 auto;" onclick="selectColumn(this);">
+                    <img id="imgLeft-@item.ID" src="/Content/images/arrow_left.png" onclick="moveLeft(this);" style="cursor:pointer; float:left; padding-top:2px;"/>
                     <img id="imgDown-@item.ID" src="/Content/images/arrow_down.png" onclick="ShowHide(this);" style="cursor:pointer; padding-bottom:2px;"/>
                     <img id="imgRight-@item.ID" src="/Content/images/arrow_right.png" onclick="moveRight(this);" style="cursor:pointer; float:right;" />
                 </div>
@@ -46,7 +47,7 @@
         @{index++;}
         <th id="th2">Perfect Score</th>
         <td id="perfectTotal">100%</td>
-        @foreach (AbstractAssignment item in ViewBag.Assignments)
+        @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
         {
             <td id="pointsPossible-@item.ID" onclick="cellGainsFocus(this)">@item.PointsPossible</td>
         }
@@ -61,7 +62,7 @@
         <td id="averageTotal">
             0
         </td>
-        @foreach (AbstractAssignment item in ViewBag.Assignments)
+        @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
         {
             <td id="averageScore" >0</td>  
         }
@@ -86,8 +87,9 @@
             }
         
             int i = 2;
-            foreach (AbstractAssignment assign in ViewBag.GradeAssignments)
+            foreach (AbstractAssignmentActivity assign in ViewBag.GradeAssignments)
             {
+                
                 if (assign.addedPoints > 0)
                 {   
                     <th id="header-@assign.ID" onclick="changeHeaderName(this)">@assign.Name (Added @assign.addedPoints)</th>
@@ -107,11 +109,11 @@
         <tr id="studentGrades">
             <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; width:25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(this);"></td>
             @{index++;}
-            <td id="@user.ID" >@user.LastName, @user.FirstName</td>
+            <td id="@user.Identification" >@user.LastName, @user.FirstName</td>
                     
             @{
               var percent = from p in ViewBag.Percents as IEnumerable<Score>
-                            where p.UserProfileID == user.ID
+                            where p.TeamUserMemberID == user.ID
                             select p;
               if (percent.Count() > 0)
               {
@@ -124,23 +126,23 @@
             }
 
                 
-            @foreach (AbstractAssignment gradeAssignment in ViewBag.GradeAssignments)
+            @foreach (AbstractAssignmentActivity gradeAssignmentActivity in ViewBag.GradeAssignments)
             {
 
                 var gradableQuery = from g in ViewBag.Grades as IEnumerable<Score>
-                                    where g.AssignmentActivity.AbstractAssignmentID == gradeAssignment.ID
-                                    && g.UserProfileID == user.ID
+                                    where g.AssignmentActivityID == gradeAssignmentActivity.ID
+                                    && g.TeamUserMember.ID == user.ID
                                     && g.Points >= 0
                                     select g;
                 //use the stored score if possible.  Otherwise, just use a "0"
                 if (gradableQuery.Count() > 0)
                 {
-                        <td id="@String.Format("{0}-{1}", user.ID, gradeAssignment.ID)" onclick="cellGainsFocus(this)">@gradableQuery.First().Points</td>
+                    <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" onclick="cellGainsFocus(this)">@gradableQuery.First().Points</td>
                 }
                 else
                 {
                     //Razor didn't like me using just a "0" so I had to wrap it inside String.Format
-                            <td id="@String.Format("{0}-{1}", user.ID, gradeAssignment.ID)" onclick="cellGainsFocus(this)">NG</td>
+                    <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" onclick="cellGainsFocus(this)">NG</td>
                 }
             }
         </tr>

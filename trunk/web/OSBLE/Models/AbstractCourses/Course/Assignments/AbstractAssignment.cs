@@ -47,8 +47,6 @@ namespace OSBLE.Models.Assignments
         }
 
 
-        public double addedPoints { get; set; }
-
         public bool IsDraft { get; set; }
 
         public int? RubricID { get; set; }

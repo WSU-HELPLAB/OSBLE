@@ -194,18 +194,30 @@ namespace OSBLE.Controllers
 
                                    var currentAssignment = assignmentQuery.FirstOrDefault();
 
+                                   UserProfile user = (from u in db.UserProfiles
+                                                       where u.Identification == studentId.ToString()
+                                                       select u).FirstOrDefault();
+
                                    if (assign.Count() > 0)
                                    {
-                                       Score newScore = new Score()
+                                       if (user != null)
                                        {
-                                           UserProfileID = studentId,
-                                           Points = Convert.ToDouble(assignment),
-                                           AssignmentActivityID = currentAssignment.ID,
-                                           PublishedDate = DateTime.Now,
-                                           isDropped = false
-                                       };
-                                       db.Scores.Add(newScore);
-                                       db.SaveChanges();
+                                           var teamuser = from c in currentAssignment.TeamUsers where c.Contains(user) select c;
+
+                                           if (teamuser.Count() > 0)
+                                           {
+                                               Score newScore = new Score()
+                                               {
+                                                   TeamUserMemberID = teamuser.First().ID,
+                                                   Points = Convert.ToDouble(assignment),
+                                                   AssignmentActivityID = currentAssignment.ID,
+                                                   PublishedDate = DateTime.Now,
+                                                   isDropped = false
+                                               };
+                                               db.Scores.Add(newScore);
+                                               db.SaveChanges();
+                                           }
+                                       }
                                    }
                                }
                            }
@@ -223,14 +235,35 @@ namespace OSBLE.Controllers
        {
            int categoryId = Convert.ToInt32(Session["CurrentCategoryID"]);
 
-           var allAssignments = from assign in db.AbstractAssignments
-                                where assign.CategoryID == categoryId &&
+           List<TeamUserMember> userMembers = new List<TeamUserMember>();
+
+           int currentCourseId = ActiveCourse.CourseID;
+           List<CoursesUsers> Users = (from user in db.CoursesUsers
+                                       where user.CourseID == currentCourseId
+                                       select user).ToList();
+
+           foreach (CoursesUsers u in Users)
+           {
+               UserMember userMember = new UserMember()
+               {
+                   ID = u.UserProfileID,
+                   UserProfile = u.UserProfile,
+                   UserProfileID = u.UserProfileID
+               };
+               userMembers.Add(userMember);
+               db.TeamUsers.Add(userMember);
+               
+           }
+           db.SaveChanges();
+
+           var allAssignments = from assign in db.AbstractAssignmentActivity
+                                where assign.AbstractAssignment.CategoryID == categoryId &&
                                 assign.ColumnOrder >= position
                                 select assign;
 
            if (allAssignments.Count() > 0)
            {
-               foreach (AbstractAssignment item in allAssignments)
+               foreach (AbstractAssignmentActivity item in allAssignments)
                {
                    item.ColumnOrder += 1;
                }
@@ -242,22 +275,26 @@ namespace OSBLE.Controllers
                PointsPossible = pointsPossible,
                AssignmentActivities = new List<AbstractAssignmentActivity>(),
                CategoryID = categoryId,
-               ColumnOrder = position,
-               addedPoints = 0
+               ColumnOrder = position,               
            };
            db.GradeAssignments.Add(newAssignment);
            db.SaveChanges();
 
-           AbstractAssignmentActivity newActivity = new GradeActivity()
+           GradeActivity newActivity = new GradeActivity()
            {
                AbstractAssignmentID = newAssignment.ID,
                AbstractAssignment = newAssignment,
                Name = "Untitled",
-               PointsPossible = newAssignment.PointsPossible
-
+               PointsPossible = newAssignment.PointsPossible,
+               TeamUsers = userMembers,
+               ColumnOrder = position
            };
            db.AbstractAssignmentActivities.Add(newActivity);
            db.SaveChanges();
+
+
+           
+           
        }
 
        /************
@@ -310,7 +347,7 @@ namespace OSBLE.Controllers
                {
                    var studentScores = from scores in db.Scores
                                        where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
-                                       && scores.UserProfileID == userId
+                                       && scores.TeamUserMemberID == userId
                                        && scores.isDropped == true
                                        select scores;
                    if (studentScores.Count() > 0)
@@ -360,11 +397,11 @@ namespace OSBLE.Controllers
                if (categoryId > 0)
                {
                    var studentScores = from scores in db.Scores
-                                       join user in db.UserProfiles on scores.UserProfileID equals user.ID
+                                       join user in db.UserProfiles on scores.TeamUserMemberID equals user.ID
                                        where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
-                                       && scores.UserProfileID == userId
+                                       && scores.TeamUserMemberID == userId
                                        && scores.isDropped == false
-                                       group scores by scores.UserProfileID into userScores
+                                       group scores by scores.TeamUserMemberID into userScores
                                        select userScores;
 
                    if (studentScores.Count() > 0)
@@ -415,7 +452,7 @@ namespace OSBLE.Controllers
                    var studentScores = (from scores in db.Scores
                                         where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId &&
                                         scores.Points >= 0
-                                        select scores).GroupBy(s => s.UserProfileID);
+                                        select scores).GroupBy(s => s.TeamUserMemberID);
                    
                    if (studentScores.Count() > 0)
                    {
@@ -587,13 +624,13 @@ namespace OSBLE.Controllers
            {
                if (assignmentId != 0)
                {
-                   var assignmentQuery = from a in db.AbstractAssignments
+                   var assignmentQuery = from a in db.AbstractAssignmentActivity
                                          where a.ID == assignmentId
                                          select a;
 
                    if (assignmentQuery.Count() > 0)
                    {
-                       foreach (AbstractAssignment item in assignmentQuery)
+                       foreach (AbstractAssignmentActivity item in assignmentQuery)
                        {
                            item.Name = value;
                        }
@@ -613,17 +650,13 @@ namespace OSBLE.Controllers
            {
                if (assignmentId != 0)
                {
-                   var gradableQuery = from g in db.AbstractAssignments
-                                       where g.ID == assignmentId
-                                       select g;
-
-                   var activityQuery = from a in db.AbstractAssignmentActivities
+                   var activityQuery = from a in db.AbstractAssignmentActivity
                                        where a.AbstractAssignmentID == assignmentId
                                        select a;
 
-                   if (gradableQuery.Count() > 0)
+                   if (activityQuery.Count() > 0)
                    {
-                       foreach (AbstractAssignment item in gradableQuery)
+                       foreach (AbstractAssignmentActivity item in activityQuery)
                        {
                            item.PointsPossible = value;
                        }
@@ -758,9 +791,10 @@ namespace OSBLE.Controllers
                    List<Score> grades = (from grade in db.Scores
                                          where grade.AssignmentActivity.AbstractAssignmentID == assignmentId
                                          select grade).ToList();
-                   var assignment = (from assigns in db.AbstractAssignments
-                                      where assigns.ID == assignmentId
-                                      select assigns).FirstOrDefault();
+
+                   var assignment = (from assigns in db.AbstractAssignmentActivity
+                                     where assigns.ID == assignmentId
+                                     select assigns).FirstOrDefault();
 
                    if (grades.Count() > 0)
                    {
@@ -781,6 +815,31 @@ namespace OSBLE.Controllers
            return View("_Gradebook");
        }
 
+       [HttpPost]
+       public ActionResult ChangeCategoryName(int assignmentId, string categoryName)
+       {
+           if (ModelState.IsValid)
+           {
+               if (assignmentId != 0)
+               {
+                   int currentCourseId = ActiveCourse.CourseID;
+
+                   AbstractAssignment assignment = (from assign in db.AbstractAssignments where assign.ID == assignmentId select assign).FirstOrDefault();
+                   Category category = (from cat in db.Categories where cat.Name == categoryName && cat.CourseID == currentCourseId select cat).FirstOrDefault();
+                   int newCategoryLastAssignment = (from a in db.AbstractAssignments where a.CategoryID == category.ID orderby a.ColumnOrder descending select a.ColumnOrder).FirstOrDefault();
+
+                   if (assignment != null && category != null)
+                   {
+                       assignment.CategoryID = category.ID;
+                       assignment.ColumnOrder = newCategoryLastAssignment + 1;
+                       db.SaveChanges();
+                   }
+
+               }
+           }
+           BuildGradebook((int)Session["categoryId"]);
+           return View("_Gradebook");
+       }
 
        [HttpPost]
        public ActionResult MoveRight(int assignmentId)
@@ -789,16 +848,21 @@ namespace OSBLE.Controllers
            {
                if (assignmentId > 0)
                {
-                   var assignmentColPosition = from col in db.AbstractAssignments
-                                            where col.ID == assignmentId
-                                            select col;
+                   int categoryId = (int)Session["categoryId"];
+
+                   var assignmentColPosition = from col in db.AbstractAssignmentActivity
+                                               where col.ID == assignmentId
+                                               && col.AbstractAssignment.CategoryID == categoryId
+                                               select col;
 
                    if (assignmentColPosition.Count() > 0)
                    {
                        int nextCol = Convert.ToInt32(assignmentColPosition.First().ColumnOrder) + 1;
 
-                       var nextAssignmentColPosition = from next in db.AbstractAssignments
-                                                       where next.ColumnOrder >= nextCol
+                       var nextAssignmentColPosition = from next in db.AbstractAssignmentActivity
+                                                       where next.ColumnOrder >= nextCol &&
+                                                       next.AbstractAssignment.CategoryID == categoryId
+                                                       orderby next.ColumnOrder
                                                        select next;
 
                        if (nextAssignmentColPosition.Count() > 0)
@@ -810,7 +874,6 @@ namespace OSBLE.Controllers
                            db.SaveChanges();
                        }
                    }
-
                }
            }
 
@@ -825,15 +888,19 @@ namespace OSBLE.Controllers
            {
                if (assignmentId > 0)
                {
-                   var assignmentColPosition = from col in db.AbstractAssignments
-                                               where col.ID == assignmentId
+                   int categoryId = (int)Session["categoryId"];
+
+                   var assignmentColPosition = from col in db.AbstractAssignmentActivity
+                                               where col.ID == assignmentId &&
+                                               col.AbstractAssignment.CategoryID == categoryId
                                                select col;
                    if (assignmentColPosition.Count() > 0)
                    {
                        int prevCol = Convert.ToInt32(assignmentColPosition.First().ColumnOrder) - 1;
 
-                       var prevAssignmentColPosition = from next in db.AbstractAssignments
-                                                       where next.ColumnOrder <= prevCol
+                       var prevAssignmentColPosition = from next in db.AbstractAssignmentActivity
+                                                       where next.ColumnOrder <= prevCol &&
+                                                       next.AbstractAssignment.CategoryID == categoryId
                                                        orderby next.ColumnOrder descending
                                                        select next;
 
@@ -856,45 +923,57 @@ namespace OSBLE.Controllers
 
 
        [HttpPost]
-       public ActionResult ModifyCell(double value, int userId, int assignmentId)
+       public ActionResult ModifyCell(double value, string userId, int assignmentId)
        {
 
            //Continue if we have a valid gradable ID
            if (assignmentId != 0)
            {
-               var gradableQuery = from g in db.Scores
-                                   join a in db.AbstractAssignments on g.AssignmentActivity.AbstractAssignmentID equals a.ID
-                                   where g.UserProfileID == userId &&
-                                   a.ID == assignmentId
-                                   select g;
-
-               var assignmentQuery = from a in db.AbstractAssignmentActivities
-                                     where a.AbstractAssignmentID == assignmentId
-                                     select a;
-
-               var currentAssignment = assignmentQuery.FirstOrDefault();
-
-               if (gradableQuery.Count() > 0)
+               //Get student
+               var user = (from u in db.UserProfiles where u.Identification == userId select u).FirstOrDefault();
+               
+               if (user != null)
                {
-                   foreach (Score item in gradableQuery)
+                   var gradableQuery = from g in db.Scores
+                                       join a in db.AbstractAssignmentActivity on g.AssignmentActivityID equals a.ID
+                                       where g.TeamUserMemberID == user.ID &&
+                                       a.ID == assignmentId
+                                       select g;
+
+                   var assignmentQuery = from a in db.AbstractAssignmentActivity
+                                         where a.AbstractAssignmentID == assignmentId
+                                         select a;
+
+                   var currentAssignment = assignmentQuery.FirstOrDefault();
+
+                   if (gradableQuery.Count() > 0)
                    {
-                       item.Points = value;
+                       foreach (Score item in gradableQuery)
+                       {
+                           item.Points = value;
+                       }
+                       db.SaveChanges();
                    }
-                   db.SaveChanges();
-               }
-               else
-               {
-                   Score newScore = new Score()
+                   else
                    {
-                       UserProfileID = userId,
-                       Points = value,
-                       AssignmentActivityID = currentAssignment.ID,
-                       PublishedDate = DateTime.Now,
-                       isDropped = false
-                   };
+                       
+                        var teamuser = from c in currentAssignment.TeamUsers where c.Contains(user) select c;
+                        if (teamuser.Count() > 0)
+                        {
+                            Score newScore = new Score()
+                            {
+                                TeamUserMember = teamuser.First(),
+                                Points = value,
+                                AssignmentActivityID = currentAssignment.ID,
+                                PublishedDate = DateTime.Now,
+                                isDropped = false
+                            };
 
-                   db.Scores.Add(newScore);
-                   db.SaveChanges();
+                            db.Scores.Add(newScore);
+                            db.SaveChanges();
+                        }
+                       
+                   }
                }
            }
 
@@ -921,7 +1000,7 @@ namespace OSBLE.Controllers
                switch (action)
                {
                    case ColumnAction.InsertLeft:
-                       int position = (assignments.ColumnOrder == 0) ? 0 : assignments.ColumnOrder - 1;
+                       int position = (assignments.ColumnOrder == 1) ? 1 : assignments.ColumnOrder - 1;
                        AddColumn("Untitled", 100, position);
                        break;
                    case ColumnAction.InsertRight:
@@ -986,7 +1065,7 @@ namespace OSBLE.Controllers
                                    AssignmentId = assignmentScores.Key,
                                    StudentScores =
                                                    from stu in assignmentScores
-                                                   group stu by stu.UserProfileID into students
+                                                   group stu by stu.TeamUserMemberID into students
                                                    select new
                                                    {
                                                        StudentId = students.Key,
@@ -1006,7 +1085,7 @@ namespace OSBLE.Controllers
                    Score studentScore = new Score()
                    {
                        AssignmentActivity = scores.activity,
-                       UserProfileID = scores.StudentId,
+                       TeamUserMemberID = scores.StudentId,
                        Points = ((scores.Score / scores.perfectScore)*100),
                        isDropped = false
                    };
@@ -1017,8 +1096,7 @@ namespace OSBLE.Controllers
                        ID = item.AssignmentId,
                        Category = scores.category,
                        CategoryID = scores.category.ID,
-                       PointsPossible = scores.perfectScore,
-                       addedPoints = 0
+                       PointsPossible = scores.perfectScore
                    };
                    studentScore.AssignmentActivity.AbstractAssignment = newGA;
                    percentList.Add(studentScore);
@@ -1114,20 +1192,21 @@ namespace OSBLE.Controllers
            List<Category> allCategories = cats.ToList();
 
            Category currentTab = (from c in allCategories where c.ID == categoryId select c).First();
-           List<int> numDropped = new List<int>();
-           numDropped.Add(currentTab.dropX);
 
            if (currentTab == null)
            {
                currentTab = (from c in allCategories select c).First();
            }
 
+           List<int> numDropped = new List<int>();
+           numDropped.Add(currentTab.dropX);
+
            //save to the session.  Needed later for AJAX-related updates.
            Session["CurrentCategoryId"] = currentTab.ID;
 
            //pull the gradables (columns) for the current weight (tab)
-           List<AbstractAssignment> assignments = (from a in db.AbstractAssignments
-                                                   where a.CategoryID == currentTab.ID
+           List<AbstractAssignmentActivity> assignments = (from a in db.AbstractAssignmentActivity
+                                                   where a.AbstractAssignment.CategoryID == currentTab.ID
                                                    orderby a.ColumnOrder
                                                    select a).ToList();
 
@@ -1139,8 +1218,7 @@ namespace OSBLE.Controllers
                    PointsPossible = 100,
                    AssignmentActivities = new List<AbstractAssignmentActivity>(),
                    CategoryID = categoryId,
-                   ColumnOrder = 0,
-                   addedPoints = 0
+                   ColumnOrder = 1
                };
                db.AbstractAssignments.Add(newAssignment);
                db.SaveChanges();
@@ -1150,19 +1228,20 @@ namespace OSBLE.Controllers
                    AbstractAssignmentID = newAssignment.ID,
                    Name = "Untitled",
                    PointsPossible = newAssignment.PointsPossible,
-                   AbstractAssignment = newAssignment
-                   /*ColumnOrder = 0,
-                   Scores = new List<Score>()*/
+                   AbstractAssignment = newAssignment,
+                   ColumnOrder = 1,
+                   //Scores = new List<Score>()
                };
                db.AbstractAssignmentActivities.Add(newActivity);
                db.SaveChanges();
            }
 
            //Pull the gradeAssignments
-           List<AbstractAssignment> gradeAssignments = (from ga in db.AbstractAssignments
-                                                     where ga.CategoryID == currentTab.ID
-                                                     orderby ga.ColumnOrder
-                                                     select ga).ToList();
+           List<AbstractAssignmentActivity> gradeAssignments = (from ga in db.AbstractAssignmentActivity
+                                                                where ga.AbstractAssignment.CategoryID == currentTab.ID &&
+                                                                (!(ga is StopActivity))
+                                                                orderby ga.ColumnOrder
+                                                                select ga).ToList();
 
            //Pull the dropped lowest
            var droppedCount = from scores in db.Scores
@@ -1177,17 +1256,18 @@ namespace OSBLE.Controllers
                                          orderby up.LastName, up.FirstName
                                          select up).ToList();
 
+
            //Finally the scores for each student.
            List<Score> scor = (from score in db.Scores
                                where score.AssignmentActivity.AbstractAssignment.CategoryID == currentTab.ID
                                select score).ToList();
 
            var userScore = from scores in db.Scores
-                           join user in db.UserProfiles on scores.UserProfileID equals user.ID
+                           join user in db.UserProfiles on scores.TeamUserMemberID equals user.ID
                            where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
                            && scores.isDropped == false
                            && scores.Points >= 0
-                           group scores by scores.UserProfileID into userScores
+                           group scores by scores.TeamUserMemberID into userScores
                            select userScores;
 
            if (userScore.Count() > 0)
@@ -1196,21 +1276,29 @@ namespace OSBLE.Controllers
                {
                    double currentPoints = 0;
                    double currentTotal = 0;
-                   int currentUser = 0;
+                   TeamUserMember currentUser = new UserMember();
                    var item = userScore.AsEnumerable().ElementAt(i);
+                   var currentAssignment = item.First().AssignmentActivity;
+
                    foreach (Score a in item)
                    {
-                       currentUser = a.UserProfileID;
+                       currentUser = a.TeamUserMember;
                        currentPoints += a.Points;
                        currentTotal += a.AssignmentActivity.AbstractAssignment.PointsPossible;
                    }
-                   Score newscore = new Score()
+                   UserMember user = currentUser as UserMember;
+                   
+                   var teamuser = from c in currentAssignment.TeamUsers where c.Contains(user.UserProfile) select c;
+                   if (teamuser.Count() > 0)
                    {
-                       UserProfileID = currentUser,
-                       Points = ((currentPoints / currentTotal) * 100),
-                       isDropped = false
-                   };
-                   studentScores.Add(newscore);
+                       Score newscore = new Score()
+                       {
+                           TeamUserMemberID = teamuser.First().ID,
+                           Points = ((currentPoints / currentTotal) * 100),
+                           isDropped = false
+                       };
+                       studentScores.Add(newscore);
+                   }
                }
            }
 
@@ -1270,8 +1358,7 @@ namespace OSBLE.Controllers
                    PointsPossible = 100,
                    AssignmentActivities = new List<AbstractAssignmentActivity>(),
                    CategoryID = newCategory.ID,
-                   ColumnOrder = 0,
-                   addedPoints = 0
+                   ColumnOrder = 0
                };
                db.GradeAssignments.Add(newAssignment);
                db.SaveChanges();
