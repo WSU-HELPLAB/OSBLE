@@ -59,13 +59,6 @@ namespace OSBLE.Controllers
             viewModel.TeamCreation = createTeamCreationSilverlightObject();
             viewModel.RubricCreation = createRubricCreationSilverlightObject();
 
-            List<Rubric> rubrics = (from cr in db.CourseRubrics
-                                    join r in db.Rubrics on cr.RubricID equals r.ID
-                                    where cr.CourseID == activeCourse.CourseID
-                                    select r).ToList();
-            rubrics.Insert(0, new Rubric() { ID = 0, Description = "" });
-            ViewBag.Rubrics = rubrics.ToList();
-
             var assignmentActivites = from c in db.AbstractAssignmentActivities
                                       where c.AbstractAssignment.Category.CourseID == activeCourse.CourseID
                                       select c;
@@ -92,6 +85,13 @@ namespace OSBLE.Controllers
 
         private void setupViewBagForCreate()
         {
+            List<Rubric> rubrics = (from cr in db.CourseRubrics
+                                    join r in db.Rubrics on cr.RubricID equals r.ID
+                                    where cr.CourseID == activeCourse.CourseID
+                                    select r).ToList();
+            rubrics.Insert(0, new Rubric() { ID = 0, Description = "" });
+            ViewBag.Rubrics = rubrics.ToList();
+
             var cat = from c in (activeCourse.Course as Course).Categories
                       where c.Name != Constants.UnGradableCatagory
                       select c;
@@ -287,7 +287,8 @@ namespace OSBLE.Controllers
         private List<SerializableTeamMember> getTeamMembers(AbstractAssignmentActivity activity)
         {
             //TO DO: Implement this function
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            return new List<SerializableTeamMember>();
         }
 
         private List<SerializableTeamMember> getTeamMembers()
