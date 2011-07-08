@@ -178,7 +178,6 @@
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\StopActivity.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\StudioAssignment.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\RubricEvaluation.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Submission.cs" />
     <Compile Include="Models\HomePage\AbstractDashboard.cs" />
     <Compile Include="Models\AbstractCourses\AbstractRole.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\AbstractAssignmentActivity.cs" />

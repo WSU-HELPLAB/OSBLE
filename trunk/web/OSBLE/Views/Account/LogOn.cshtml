@@ -10,7 +10,7 @@
 <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
 
-<script>
+<script type="text/javascript">
     $(function () {
 
         $('#sign_up_dialog').dialog({
@@ -33,7 +33,6 @@
     });
 
 </script>
-
 <div>Online Studio Based Learning Environment</div>
 
 @Html.ValidationSummary(true, "Login was unsuccessful. Please correct the errors and try again.")
@@ -128,5 +127,5 @@
 
     <div id="sign_up_dialog" title="Create Account">
     <p>Are you in academia (teachers, TAs, students) or the professional world?</p>
-        @Html.ActionLink("Create Academia Account", "AcademiaRegister", "Account", new { id = "create_academia_account" }) | @Html.ActionLink("Create Professional Account", "ProfessionalRegister", "Account")
+        @Html.ActionLink("Create Academic Account", "AcademiaRegister", "Account", new { id = "create_academia_account" }) | @Html.ActionLink("Create Professional Account", "ProfessionalRegister", "Account")
     </div>

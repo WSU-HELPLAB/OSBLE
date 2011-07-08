@@ -2,7 +2,6 @@
 using System.Web;
 using System.Web.Security;
 using OSBLE.Models.AbstractCourses;
-using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments.Activities.Scores;
@@ -524,12 +523,10 @@ namespace OSBLE.Models
         public DbSet<AuthorRebuttalActivity> AuthorRebuttalActivities { get; set; }
 
         public DbSet<AsyncIssueVotingActivity> AsyncIssueVotingActivities { get; set; }
-
-        public DbSet<Submission> Submissions { get; set; }
     }
 
     /// <summary>
-    /// Meant to be called everytime the database is accessed. By default OSBLEContextModelChangeInitializer is being used.
+    /// Meant to be called every time the database is accessed. By default OSBLEContextModelChangeInitializer is being used.
     /// Change the SetInitializer entry in Global.asax to this if you want to force a database recreate.
     /// </summary>
     public class OSBLEContextAlwaysCreateInitializer : DropCreateDatabaseAlways<OSBLEContext>

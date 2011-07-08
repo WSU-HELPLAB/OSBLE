@@ -56,7 +56,7 @@ namespace OSBLE.Controllers
 
                     TeamUserMember teamUser = GetTeamUser(activity, currentUser);
 
-                    string folderLocation = FileSystem.GetSubmissionFolder(true, activeCourse.Course as Course, activity.ID, teamUser);
+                    string folderLocation = FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.Course as Course, activity.ID, teamUser);
 
                     foreach (Deliverable deliverable in (activity.AbstractAssignment as StudioAssignment).Deliverables)
                     {
@@ -172,7 +172,7 @@ namespace OSBLE.Controllers
                         ActivityTeacherTableViewModel.SubmissionInfo info = new ActivityTeacherTableViewModel.SubmissionInfo();
 
                         //This checks when something was submitted by the folder modify time it is imperative that they don't get modified except when a student submits something to that folder.
-                        DirectoryInfo submissionFolder = new DirectoryInfo(FileSystem.GetSubmissionFolder(false, activeCourse.Course as Course, studioActivity.ID, teamUser));
+                        DirectoryInfo submissionFolder = new DirectoryInfo(FileSystem.GetTeamUserSubmissionFolder(false, activeCourse.Course as Course, studioActivity.ID, teamUser));
 
                         //if team
                         if (teamUser is TeamMember)

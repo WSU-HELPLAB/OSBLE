@@ -21,6 +21,13 @@ namespace OSBLE.Controllers
 
         public ActionResult Create(int? id)
         {
+            //This will simulate long load times
+            /*Int64 i = 0;
+            while (i < 1000000000)
+            {
+                i++;
+            }*/
+
             if (id != null)
             {
                 AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(id);
@@ -99,7 +106,7 @@ namespace OSBLE.Controllers
 
                                 if (allowFileExtensions.Contains(extension))
                                 {
-                                    var path = Path.Combine(FileSystem.GetSubmissionFolder(true, activeCourse.Course as Course, (int)id, teamUser), deliverables[i].Name + extension);
+                                    var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.Course as Course, (int)id, teamUser), deliverables[i].Name + extension);
                                     file.SaveAs(path);
                                 }
                                 else
@@ -123,7 +130,7 @@ namespace OSBLE.Controllers
                                 string inbrowser = Request.Params["inBrowserText[" + j + "]"];
                                 if (inbrowser.Length > 0)
                                 {
-                                    var path = Path.Combine(FileSystem.GetSubmissionFolder(true, activeCourse.Course as Course, (int)id, teamUser), delName + ".txt");
+                                    var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.Course as Course, (int)id, teamUser), delName + ".txt");
                                     System.IO.File.WriteAllText(path, inbrowser);
                                 }
                             }

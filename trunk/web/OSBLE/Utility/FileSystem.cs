@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Web;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Services.Uploader;
@@ -29,7 +30,7 @@ using OSBLE.Models.Users;
  *                  AADocs   Submissions
  *                     |             \
  *       {assignment activity docs}   \
- *                                   [TeamId]
+ *                                   [TeamUserMemberId]
  *                                        |
  *                                {team submissions}
  * */
@@ -194,20 +195,20 @@ namespace OSBLE
         public static string GetAssignmentActivitySubmissionFolder(Course course, int assignmentActivityID)
         {
             string path = getCoursePath(course);
-            path += "\\Assignments\\" + assignmentActivityID + "\\Submissions\\";
+            path += "Assignments\\" + assignmentActivityID + "\\Submissions\\";
             return path;
         }
 
-        public static string GetSubmissionFolder(bool createPathIfNotExists, Course course, int assignmentActivityID, TeamUserMember subbmitter)
+        public static string GetTeamUserSubmissionFolder(bool createPathIfNotExists, Course course, int assignmentActivityID, TeamUserMember subbmitter)
         {
             string path = GetAssignmentActivitySubmissionFolder(course, assignmentActivityID);
             if (subbmitter is TeamMember)
             {
-                path += (subbmitter as TeamMember).TeamID;
+                path += (subbmitter as TeamMember).TeamID + "\\";
             }
             else
             {
-                path += (subbmitter as UserMember).UserProfileID;
+                path += (subbmitter as UserMember).UserProfileID + "\\";
             }
 
             if (!Directory.Exists(path) && createPathIfNotExists)
@@ -216,6 +217,25 @@ namespace OSBLE
             }
 
             return path;
+        }
+
+        public static string GetDeliverable(Course course, int assignmentActivityID, TeamUserMember subbmitter, string fileName, string[] possibleFileExtensions)
+        {
+            string path = GetTeamUserSubmissionFolder(false, course, assignmentActivityID, subbmitter);
+
+            if (Directory.Exists(path))
+            {
+                string[] files = Directory.GetFiles(path);
+
+                foreach (string extension in possibleFileExtensions)
+                {
+                    if (files.Contains(path + fileName + extension))
+                    {
+                        return (path + fileName + extension);
+                    }
+                }
+            }
+            return null;
         }
 
         /// <summary>

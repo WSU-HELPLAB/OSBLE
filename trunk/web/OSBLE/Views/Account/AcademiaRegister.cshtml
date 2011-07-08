@@ -65,7 +65,8 @@
         </div>
 <!-- <h3>School/Organization</h3> -->
         <div class="editor-label">
-            @Html.LabelFor(model => model.SchoolID, "School/Organization")
+            @Html.LabelFor(model => model.SchoolID)
+            <br />  Don't see your school in the list? @Html.ActionLink("Request that it be added", "ContactUs")<br />
         </div>
         <div class="editor-field">
             @try {

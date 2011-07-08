@@ -1,9 +1,8 @@
-﻿@model OSBLE.Models.AbstractCourses.Course.Submission
-@using OSBLE.Models.Assignments.Activities;
+﻿@using OSBLE.Models.Assignments.Activities;
 @using OSBLE.Models;
 @{
     Layout = "";
-    ViewBag.Title = "Create";
+    ViewBag.Title = "Submission";
 }
 <h2>Submission</h2>
 <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
@@ -130,11 +129,10 @@
                                 //we create our JavaScript string this is where it runs the code it just generated.
                                 @MvcHtmlString.Create(newString);
                             </script>
-                            @{
-
                                 <input type='file' name='files' onchange="checkFileExension(this, @MvcHtmlString.Create("stringArray" + fileUploadsSoFar.ToString()))"/>
-                            }
+
                             @{
+                                
                                 fileUploadsSoFar++;
                             }
                         </td>
@@ -156,10 +154,7 @@
             <br/>
         }
         <p>
-            <input type="submit" value="Create"/>
+            <input type="submit" value="Submit"/>
         </p>
     </fieldset>
 }
-<div>
-    @Html.ActionLink("Back to Assignment List", "Index", "Assignment")
-</div>

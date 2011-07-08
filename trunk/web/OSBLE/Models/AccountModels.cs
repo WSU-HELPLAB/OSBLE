@@ -69,6 +69,7 @@ namespace OSBLE.Models
         public string LastName { get; set; }
 
         [Required]
+        [Display(Name = "School")]
         public int SchoolID { get; set; }
 
         [Display(Name = "School")]
@@ -91,7 +92,7 @@ namespace OSBLE.Models
         [Email(ErrorMessage = "Email Address is not valid!")]
         [DataType(DataType.EmailAddress)]
         [Display(Name = "Email address")]
-        public string EmailAddress{ get; set; }
+        public string EmailAddress { get; set; }
     }
 
     public class ContactUsModel

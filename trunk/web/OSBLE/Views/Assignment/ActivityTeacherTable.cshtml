@@ -22,7 +22,10 @@ Submitted Time
 Grading Stats
 </th>
 <th>
-View/Grade
+Grade
+</th>
+<th>
+Download Submission
 </th>
 </tr>
 
@@ -47,7 +50,10 @@ View/Grade
  @info.Graded
  </td>
  <td>
- <button>View/Grade</button>
+ <button>Grade</button>
+ </td>
+ <td>
+ <button>@Html.ActionLink("Download Submission", "GetSubmissionZip", "FileHandler", new { }, new { })</button>
  </td>
  </tr>   
 }

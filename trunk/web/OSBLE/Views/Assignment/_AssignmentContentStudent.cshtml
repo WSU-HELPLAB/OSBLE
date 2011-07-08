@@ -1,5 +1,6 @@
 ﻿@using OSBLE.Models.Assignments
 @using OSBLE.Models.Assignments.Activities
+@using OSBLE.Models.Users;
 @model StudioAssignment
 
 @{
@@ -124,29 +125,44 @@ int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
                                                         }
                                                     </td>
                                                 </tr>
-@*
-                                                TODO: This is where submission links/status should appear (for students)
-                                                and grading links should appear (for instructors)
-                                                *@
+                                                
                                             }
                                         </table>
+                                        <div>
+                                        @if ((ViewBag.SubmissionDictionary[submission.ID][deliverablesCounter] as Tuple<bool, DateTime>).Item1)
+                                        {
+                                            @Html.ActionLink("View Submission", "GetSubmission", "FileHandler", new { assignmentActivityID = submission.ID, userProfileID = (ViewBag.CurrentUser as UserProfile).ID, fileName = d.Name, type = d.Type }, new { });
+                                        }
+                                        </div>
                                     </div>
                                             deliverablesCounter++;
                                 }
                             </div>
                             <div class="submission_deliverables_end">
-                            @Ajax.ActionLink("Submit Files For This Submission", "Create", "Submission", new { id = submission.ID.ToString() }, new AjaxOptions() { InsertionMode = InsertionMode.InsertAfter, HttpMethod = "Get", UpdateTargetId = "submitFiles", OnComplete="SubmissionLoaded" }, new object())
+                            @Ajax.ActionLink("Submit Files For This Submission", "Create", "Submission", new { id = submission.ID.ToString() }, new AjaxOptions() { InsertionMode = InsertionMode.Replace, LoadingElementId="Loading", HttpMethod = "Get", UpdateTargetId = "submitFiles", OnComplete = "SubmissionLoaded" }, new object())
 
                             <script type="text/javascript">
 
                                 function SubmissionLoaded() {
-                                    $('#submitFiles').show('blind');
+                                    $('#submit_files_dialog').dialog('open');
 
                                 }
                             </script>
 
-                            <div id="submitFiles" style="display:none">
-                                    
+                            <text id="Loading" style="display:none"> <br />Please Wait...</text>
+                            <div id="submit_files_dialog" style="display:none">
+                                    <div id= "submitFiles"></div>
+                                    <script type="text/javascript">
+                                        $(function () {
+                                            $('#submit_files_dialog').dialog(
+                                            {
+                                                modal:true,
+                                                autoOpen: false,
+                                                height: 600,
+                                                width: 500
+                                            });
+                                        });
+                                    </script>
                             </div>
                             </div>
                         </li>   
