@@ -332,8 +332,14 @@ namespace OSBLE.Controllers
        [HttpPost]
        public void DeleteColumn(int assignmentId)
        {
-           AbstractAssignment assignment = db.AbstractAssignments.Find(assignmentId);
-           db.AbstractAssignments.Remove(assignment);
+           AbstractAssignmentActivity assignment = db.AbstractAssignmentActivities.Find(assignmentId);
+           List<TeamUserMember> teamMember = (from a in assignment.TeamUsers select a).ToList();
+           foreach (UserMember item in teamMember)
+           {
+               db.TeamUsers.Remove(item);
+           }
+           db.SaveChanges();
+           db.AbstractAssignmentActivities.Remove(assignment);
            db.SaveChanges();
        }
 
@@ -751,7 +757,20 @@ namespace OSBLE.Controllers
        [HttpPost]
        public ActionResult DeleteCategory(int categoryId)
        {
-           Category category = db.Categories.Find(categoryId);
+           List<AbstractAssignmentActivity> assignmentList = (from assignments in db.AbstractAssignmentActivities
+                                                              where assignments.AbstractAssignment.CategoryID == categoryId
+                                                              select assignments).ToList();
+           for (int i = 0; i < assignmentList.Count(); i++)
+           {
+               List<TeamUserMember> teamMember = (from a in assignmentList.ElementAt(i).TeamUsers select a).ToList();
+               foreach (UserMember item in teamMember)
+               {
+                   db.TeamUsers.Remove(item);
+               }
+               db.SaveChanges();
+           }
+
+           Category category = db.Categories.Find(categoryId);   
            db.Categories.Remove(category);
            db.SaveChanges();
 

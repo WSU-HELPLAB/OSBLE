@@ -355,67 +355,62 @@
         $("#grades td").keydown(function (e) {
             var cell = null;
             if (e.keyCode == 13) {
-                if (stopKeyPressEvent == false) {
-                    cell = $(this).children().val();
+                cell = $(this).children().val();
 
-                    if (isNaN(parseFloat(cell))) {
-                        alert("Cell value must be a number");
-                        return false;
-                    }
+                if (isNaN(parseFloat(cell))) {
+                    alert("Cell value must be a number");
+                    return false;
+                }
 
-                    var row = $(this).parent("tr").next("tr");
-                    if (row.attr("id") == "averageRow") {
-                        clearLastCellFocus();
-                    }
-                    else {
-                        var colIndex = $(this).prevAll().length;
-                        row.each(function () {
-                            cell = $(this).find("td:eq(" + colIndex + ")");
-                        });
-                    }
-                    if (cell != null) {
-                        cellGainsFocus(cell);
-                    }
-                    else {
-                        row = $(this).parent("tr");
-                        row.each(function () {
-                            cell = $(this).find("td:eq(" + colIndex + ")");
-                        });
-                        clearLastCellFocus(cell);
-                    }
+                var row = $(this).parent("tr").next("tr");
+                if (row.attr("id") == "averageRow") {
+                    clearLastCellFocus();
+                }
+                else {
+                    var colIndex = $(this).prevAll().length;
+                    row.each(function () {
+                        cell = $(this).find("td:eq(" + colIndex + ")");
+                    });
+                }
+                if (cell != null) {
+                    cellGainsFocus(cell);
+                }
+                else {
+                    row = $(this).parent("tr");
+                    row.each(function () {
+                        cell = $(this).find("td:eq(" + colIndex + ")");
+                    });
+                    clearLastCellFocus(cell);
                 }
             }
             else if (e.keyCode == 9) {
                 e.preventDefault();
-                if (stopKeyPressEvent == false) {
-                    var row = $(this).parent("tr");
-                    // used for generating the column count
-                    var one = 1;
-                    var ColCount = $('table tr:eq(' + one + ') td').length;
-                    var colIndex = $(this).prevAll().length;
-                    colIndex = parseInt(colIndex);
-                    if (colIndex >= ColCount) {
-                        row = $(this).parent("tr").next("tr");
-                        // coded based off the original design if you change the column structure you might need to change this
-                        colIndex = 3;
-                    } else {
-                        colIndex += 1;
-                    }
+                var row = $(this).parent("tr");
+                // used for generating the column count
+                var one = 1;
+                var ColCount = $('table tr:eq(' + one + ') td').length;
+                var colIndex = $(this).prevAll().length;
+                colIndex = parseInt(colIndex);
+                if (colIndex >= ColCount) {
+                    row = $(this).parent("tr").next("tr");
+                    // coded based off the original design if you change the column structure you might need to change this
+                    colIndex = 3;
+                } else {
+                    colIndex += 1;
+                }
+                row.each(function () {
+                    cell = $(this).find("td:eq(" + colIndex + ")");
+                });
+                if (cell != null) {
+                    cellGainsFocus(cell);
+                }
+                else {
+                    colIndex -= 1;
                     row.each(function () {
                         cell = $(this).find("td:eq(" + colIndex + ")");
                     });
-                    if (cell != null) {
-                        cellGainsFocus(cell);
-                    }
-                    else {
-                        colIndex -= 1;
-                        row.each(function () {
-                            cell = $(this).find("td:eq(" + colIndex + ")");
-                        });
-                        clearLastCellFocus(cell);
-                    }
+                    clearLastCellFocus(cell);
                 }
-                stopKeyPressEvent = false;
             }
             else {
             }
