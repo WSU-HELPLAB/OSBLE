@@ -436,10 +436,34 @@
 
         $("#grades th").keydown(function (e) {
             if (e.keyCode == 13) {
-                clearLastHeaderFocus(lastId);
+                var cell = null;
+                var row = $(this).parent("tr").next("tr");
+                var colIndex = $(this).prevAll().length;
+                row.each(function () {
+                    cell = $(this).find("td:eq(" + colIndex + ")");
+                    cellGainsFocus(cell);
+                });
             }
             else if (e.keyCode == 9) {
-                clearLastHeaderFocus(lastId);
+                e.preventDefault();
+                var cell = null;
+                var row = $(this).parent("tr");
+                var colIndex = $(this).prevAll().length;
+                row.each(function () {
+                    cell = $(this).find("th:eq(" + colIndex + ")");
+                });
+                if (cell.html() == null) {
+                    clearLastHeaderFocus();
+                    row = $(this).parent("tr").next("tr");
+                    colIndex = 3;
+                    row.each(function () {
+                        cell = $(this).find("td:eq(" + colIndex + ")");
+                        cellGainsFocus(cell);
+                    });
+
+                    return false;
+                }
+                changeHeaderName(cell);
             }
         });
 
@@ -739,20 +763,19 @@
         }
 
         else {
-            //do this once so we don't have to constantly do it later
-            someCell = $(someCell);
-
             //clear any previous focus
             clearLastCellFocus();
-
-            var textValue = someCell.text();
-            var inputText = $('<input class="cellInput" type="text" value="' + textValue + '" />');
-            //someCell.removeAttr("onclick");
-            someCell.html(inputText);
-            inputText.focus();
-            lastFocusedCell = someCell;
-            $("#lastCell").val(someCell);
         }
+        //do this once so we don't have to constantly do it later
+        someCell = $(someCell);
+
+        var textValue = someCell.text();
+        var inputText = $('<input class="cellInput" type="text" value="' + textValue + '" />');
+        //someCell.removeAttr("onclick");
+        someCell.html(inputText);
+        inputText.focus();
+        lastFocusedCell = someCell;
+        $("#lastCell").val(someCell);
 
         var cell = $("#grades").find("tr:eq(0)");
         cell = cell.find("td:eq(" + colIndex + ")");
