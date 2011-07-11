@@ -354,24 +354,7 @@
                 var row = $(this).parent("tr").next("tr");
                 if (row.attr("id") == "averageRow") {
                     clearLastCellFocus();
-                }
-                else {
-                    var colIndex = $(this).prevAll().length;
-                    row.each(function () {
-                        cell = $(this).find("td:eq(" + colIndex + ")");
-                    });
-                }
-                if (cell != null) {
-                    cellGainsFocus(cell);
-                }
-                else {
-                    row = $(this).parent("tr");
-                    row.each(function () {
-                        cell = $(this).find("td:eq(" + colIndex + ")");
-                    });
-                    clearLastCellFocus(cell);
-                }
-                else {
+                } else {
                     var colIndex = $(this).prevAll().length;
                 }
                 row.each(function () {
@@ -386,7 +369,7 @@
                         cell = $(this).find("td:eq(" + colIndex + ")");
                     });
                     clearLastCellFocus(cell);
-                }
+                }                
             }
             else if (e.keyCode == 9) {
                 e.preventDefault();
