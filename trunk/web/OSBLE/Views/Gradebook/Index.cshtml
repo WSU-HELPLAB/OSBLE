@@ -737,7 +737,27 @@
             cellGainsFocus(cell);
 
         }
-    });    
+    });
+
+    $("#grades th").keydown(function (e) {
+        if (e.keyCode == 13) {
+            clearLastAssignmentFocus();
+        }
+        else if (e.keyCode == 9) {
+            e.preventDefault();
+            var cell = null;
+            var row = $(this).parent("tr");
+            var colIndex = $(this).prevAll().length;
+            row.each(function () {
+                cell = $(this).find("th:eq(" + colIndex + ")");
+            });
+            if (cell.html() == null) {
+                clearLastAssignmentFocus();
+                return false;
+            }
+            changeAssignmentName(cell);
+        }
+    });
 
     $("#letterGradesID td").keydown(function (e) {
         var cell = null;
