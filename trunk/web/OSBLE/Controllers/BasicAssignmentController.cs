@@ -344,7 +344,7 @@ namespace OSBLE.Controllers
             return new SilverlightObject
             {
                 CSSId = "rubric_silverlight",
-                XapName = "Rubric",
+                XapName = "OsbleRubric",
                 Width = "800",
                 Height = "600",
                 OnLoaded = "SLObjectLoaded",

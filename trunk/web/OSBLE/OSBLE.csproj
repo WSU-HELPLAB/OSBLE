@@ -19,7 +19,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <UseIISExpress>false</UseIISExpress>
-    <SilverlightApplicationList>{AB420045-1365-43D9-A243-EB735E776BEC}|..\TeamCreation\TeamCreation.csproj|ClientBin|False,{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}|..\StudioTimelineCreation\StudioTimelineCreation.csproj|ClientBin|False,{79706350-C34D-4A51-B22F-273EC8289E5D}|..\..\silverlight\FileUploader\FileUploader.csproj|ClientBin|False,{77BD61DF-7C05-468A-AA47-1050E674E12C}|..\Rubric\Rubric.csproj|ClientBin|False</SilverlightApplicationList>
+    <SilverlightApplicationList>{AB420045-1365-43D9-A243-EB735E776BEC}|..\TeamCreation\TeamCreation.csproj|ClientBin|False,{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}|..\StudioTimelineCreation\StudioTimelineCreation.csproj|ClientBin|False,{79706350-C34D-4A51-B22F-273EC8289E5D}|..\..\silverlight\FileUploader\FileUploader.csproj|ClientBin|False,{4196777B-69DF-4B8C-95CF-D4487C34F03F}|..\OsbleRubric\OsbleRubric.csproj|ClientBin|False</SilverlightApplicationList>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -97,9 +97,12 @@
       <HintPath>..\packages\Newtonsoft.Json.4.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Data.Services" />
+    <Reference Include="System.Data.Services.Client" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.DomainServices.EntityFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="System.ServiceModel.DomainServices.Hosting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
@@ -190,7 +193,6 @@
     <Compile Include="Models\HomePage\Event.cs" />
     <Compile Include="Models\AbstractCourses\Course\Category.cs" />
     <Compile Include="Models\List.cs" />
-    <Compile Include="Models\Services\Rubric\SimpleCourse.cs" />
     <Compile Include="Models\Services\Uploader\ParentDirectoryListing.cs" />
     <Compile Include="Models\Services\Uploader\UserSession.cs" />
     <Compile Include="Models\ToolTips.cs" />
@@ -213,6 +215,7 @@
     <Compile Include="Services\ReviewInterfaceService.svc.cs">
       <DependentUpon>ReviewInterfaceService.svc</DependentUpon>
     </Compile>
+    <Compile Include="Services\RubricRiaService.cs" />
     <Compile Include="Services\RubricService.svc.cs">
       <DependentUpon>RubricService.svc</DependentUpon>
     </Compile>
@@ -261,7 +264,7 @@
     <Content Include="App_Data\LastNames.txt" />
     <Content Include="clientaccesspolicy.xml" />
     <Content Include="ClientBin\FileUploader.xap" />
-    <Content Include="ClientBin\Rubric.xap" />
+    <Content Include="ClientBin\OsbleRubric.xap" />
     <Content Include="ClientBin\StudioTimelineCreation.xap" />
     <Content Include="ClientBin\TeamCreation.xap" />
     <Content Include="Content\favicon.ico" />
@@ -403,6 +406,8 @@
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
     <Content Include="crossdomain.xml" />
     <Content Include="Global.asax" />
+    <Content Include="OsbleRubricTestPage.aspx" />
+    <Content Include="OsbleRubricTestPage.html" />
     <Content Include="Scripts\osble.teacher_activity.js" />
     <Content Include="Scripts\jquery-tooltip.js" />
     <Content Include="Scripts\jquery.selectboxes.js" />

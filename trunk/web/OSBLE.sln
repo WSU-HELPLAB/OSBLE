@@ -13,9 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudioTimelineCreation", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileUploader", "..\silverlight\FileUploader\FileUploader.csproj", "{79706350-C34D-4A51-B22F-273EC8289E5D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsbleRubric", "Rubric\OsbleRubric.csproj", "{77BD61DF-7C05-468A-AA47-1050E674E12C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsbleRubric", "OsbleRubric\OsbleRubric.csproj", "{4196777B-69DF-4B8C-95CF-D4487C34F03F}"
 	ProjectSection(ProjectDependencies) = postProject
-		{7297687F-BF8A-4195-8EA3-A05DA302B24E} = {7297687F-BF8A-4195-8EA3-A05DA302B24E}
 		{7297687F-BF8A-4195-8EA3-A05DA302B24E} = {7297687F-BF8A-4195-8EA3-A05DA302B24E}
 	EndProjectSection
 EndProject
@@ -37,9 +36,9 @@ Global
 		SccProjectUniqueName4 = ..\\silverlight\\FileUploader\\FileUploader.csproj
 		SccProjectName4 = ../silverlight/FileUploader
 		SccLocalPath4 = ..\\silverlight\\FileUploader
-		SccProjectUniqueName5 = Rubric\\OsbleRubric.csproj
-		SccProjectName5 = Rubric
-		SccLocalPath5 = Rubric
+		SccProjectUniqueName5 = OsbleRubric\\OsbleRubric.csproj
+		SccProjectName5 = OsbleRubric
+		SccLocalPath5 = OsbleRubric
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,12 +70,12 @@ Global
 		{79706350-C34D-4A51-B22F-273EC8289E5D}.OSBLE Deployment|Any CPU.Build.0 = Release|Any CPU
 		{79706350-C34D-4A51-B22F-273EC8289E5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79706350-C34D-4A51-B22F-273EC8289E5D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{77BD61DF-7C05-468A-AA47-1050E674E12C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{77BD61DF-7C05-468A-AA47-1050E674E12C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{77BD61DF-7C05-468A-AA47-1050E674E12C}.OSBLE Deployment|Any CPU.ActiveCfg = Release|Any CPU
-		{77BD61DF-7C05-468A-AA47-1050E674E12C}.OSBLE Deployment|Any CPU.Build.0 = Release|Any CPU
-		{77BD61DF-7C05-468A-AA47-1050E674E12C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{77BD61DF-7C05-468A-AA47-1050E674E12C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4196777B-69DF-4B8C-95CF-D4487C34F03F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4196777B-69DF-4B8C-95CF-D4487C34F03F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4196777B-69DF-4B8C-95CF-D4487C34F03F}.OSBLE Deployment|Any CPU.ActiveCfg = Release|Any CPU
+		{4196777B-69DF-4B8C-95CF-D4487C34F03F}.OSBLE Deployment|Any CPU.Build.0 = Release|Any CPU
+		{4196777B-69DF-4B8C-95CF-D4487C34F03F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4196777B-69DF-4B8C-95CF-D4487C34F03F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

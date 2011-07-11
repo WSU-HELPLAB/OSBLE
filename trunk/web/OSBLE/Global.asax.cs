@@ -26,6 +26,8 @@ namespace OSBLE
 #if DEBUG
             routes.IgnoreRoute("clientaccesspolicy.xml");
             routes.IgnoreRoute("crossdomain.xml");
+            routes.IgnoreRoute("OsbleRubricTestPage.html");
+            routes.IgnoreRoute("OsbleRubricTestPage.aspx");
 #endif
             routes.MapRoute(
                 "File System",

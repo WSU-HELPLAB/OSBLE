@@ -11,7 +11,6 @@ using OSBLE.Models;
 using OSBLE.Models.Users;
 using OSBLE.Models.Courses;
 using System.Collections.ObjectModel;
-using OSBLE.Models.Services.Rubric;
 using OSBLE.Models.AbstractCourses;
 using System.Data.Entity.Infrastructure;
 
@@ -80,78 +79,78 @@ namespace OSBLE.Services
         /// </summary>
         /// <param name="course"></param>
         /// <returns></returns>
-        [OperationContract]
-        public ObservableCollection<Rubric> GetRubricsForCourse(SimpleCourse course)
-        {
-            OSBLEContext db = new OSBLEContext();
-            db.Configuration.LazyLoadingEnabled = false;
+        //[OperationContract]
+        //public ObservableCollection<Rubric> GetRubricsForCourse(SimpleCourse course)
+        //{
+        //    OSBLEContext db = new OSBLEContext();
+        //    db.Configuration.LazyLoadingEnabled = false;
            
-            List<Rubric> rubrics = new List<Rubric>();
+        //    List<Rubric> rubrics = new List<Rubric>();
 
-            var result = from cr in db.CourseRubrics
-                         join r in db.Rubrics on cr.RubricID equals r.ID
-                         where cr.CourseID == course.CourseID
-                         select r;
-            rubrics = result.ToList();
-            ObservableCollection<Rubric> finalRubrics = new ObservableCollection<Rubric>();
-            foreach (Rubric r in rubrics)
-            {
-                Rubric miniRubric = new Rubric();
-                miniRubric.ID = r.ID;
-                miniRubric.Description = r.Description;
-                finalRubrics.Add(r);
-            }
-            return finalRubrics;
-        }
+        //    var result = from cr in db.CourseRubrics
+        //                 join r in db.Rubrics on cr.RubricID equals r.ID
+        //                 where cr.CourseID == course.CourseID
+        //                 select r;
+        //    rubrics = result.ToList();
+        //    ObservableCollection<Rubric> finalRubrics = new ObservableCollection<Rubric>();
+        //    foreach (Rubric r in rubrics)
+        //    {
+        //        Rubric miniRubric = new Rubric();
+        //        miniRubric.ID = r.ID;
+        //        miniRubric.Description = r.Description;
+        //        finalRubrics.Add(r);
+        //    }
+        //    return finalRubrics;
+        //}
 
-        /// <summary>
-        /// Returns a key value pair of courses and their associated rubrics
-        /// </summary>
-        /// <returns></returns>
-        [OperationContract]
-        public Dictionary<SimpleCourse, ObservableCollection<Rubric>> GetRubricList()
-        {
-            //pull the current user
-            OSBLEContext db = new OSBLEContext();
-            UserProfile currentUser = ValidateUser();
-            if (currentUser == null)
-            {
-                //return new Dictionary<SimpleCourse, ObservableCollection<Rubric>>();
-            }
+        ///// <summary>
+        ///// Returns a key value pair of courses and their associated rubrics
+        ///// </summary>
+        ///// <returns></returns>
+        //[OperationContract]
+        //public Dictionary<SimpleCourse, ObservableCollection<Rubric>> GetRubricList()
+        //{
+        //    //pull the current user
+        //    OSBLEContext db = new OSBLEContext();
+        //    UserProfile currentUser = ValidateUser();
+        //    if (currentUser == null)
+        //    {
+        //        //return new Dictionary<SimpleCourse, ObservableCollection<Rubric>>();
+        //    }
             
-            //pull all courses in which the current user has modify access or is associated
-            //with a community
-            //int userId = currentUser.ID;
-            var result = from cr in db.CourseRubrics
-                         join ac in db.AbstractCourses on cr.CourseID equals ac.ID
-                         join cu in db.CoursesUsers on ac.ID equals cu.CourseID
-                         join ru in db.Rubrics on cr.RubricID equals ru.ID
-                         /*
-                         where
-                            (cu.CourseRole.CanModify || ac is Community)
-                            &&
-                            cu.UserProfileID == userId
-                          * */
-                         select new {Course = ac, Rubric = ru };
+        //    //pull all courses in which the current user has modify access or is associated
+        //    //with a community
+        //    //int userId = currentUser.ID;
+        //    var result = from cr in db.CourseRubrics
+        //                 join ac in db.AbstractCourses on cr.CourseID equals ac.ID
+        //                 join cu in db.CoursesUsers on ac.ID equals cu.CourseID
+        //                 join ru in db.Rubrics on cr.RubricID equals ru.ID
+        //                 /*
+        //                 where
+        //                    (cu.CourseRole.CanModify || ac is Community)
+        //                    &&
+        //                    cu.UserProfileID == userId
+        //                  * */
+        //                 select new {Course = ac, Rubric = ru };
 
-            //create the necessary return dictionary
-            Dictionary<SimpleCourse, ObservableCollection<Rubric>> courseRubrics = new Dictionary<SimpleCourse, ObservableCollection<Rubric>>();
-            foreach (var item in result.ToList())
-            {
-                SimpleCourse simpleCourse = new SimpleCourse();
-                simpleCourse.CourseID = item.Course.ID;
-                simpleCourse.Name = item.Course.Name;
-                if (!courseRubrics.ContainsKey(simpleCourse))
-                {
-                    courseRubrics.Add(simpleCourse, new ObservableCollection<Rubric>());
-                }
-                if (!courseRubrics[simpleCourse].Contains(item.Rubric))
-                {
-                    courseRubrics[simpleCourse].Add(item.Rubric);
-                }
-            }
-            return courseRubrics;
-        }
+        //    //create the necessary return dictionary
+        //    Dictionary<SimpleCourse, ObservableCollection<Rubric>> courseRubrics = new Dictionary<SimpleCourse, ObservableCollection<Rubric>>();
+        //    foreach (var item in result.ToList())
+        //    {
+        //        SimpleCourse simpleCourse = new SimpleCourse();
+        //        simpleCourse.CourseID = item.Course.ID;
+        //        simpleCourse.Name = item.Course.Name;
+        //        if (!courseRubrics.ContainsKey(simpleCourse))
+        //        {
+        //            courseRubrics.Add(simpleCourse, new ObservableCollection<Rubric>());
+        //        }
+        //        if (!courseRubrics[simpleCourse].Contains(item.Rubric))
+        //        {
+        //            courseRubrics[simpleCourse].Add(item.Rubric);
+        //        }
+        //    }
+        //    return courseRubrics;
+        //}
 
         /// <summary>
         /// Will create a new rubric or save an existing rubric based on the supplied information.  
