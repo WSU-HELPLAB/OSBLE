@@ -265,6 +265,7 @@
     <Content Include="ClientBin\StudioTimelineCreation.xap" />
     <Content Include="ClientBin\TeamCreation.xap" />
     <Content Include="Content\favicon.ico" />
+    <Content Include="Content\images\arrow_left.png" />
     <Content Include="Content\images\helplab_logo.png" />
     <Content Include="Content\images\tooltip\109_AllAnnotations_Help_16x16_72.png" />
     <Content Include="Content\images\account.png" />

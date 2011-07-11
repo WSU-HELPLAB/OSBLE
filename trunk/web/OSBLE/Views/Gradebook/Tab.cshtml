@@ -316,6 +316,8 @@
 
     var currentHeaderCell = null;
 
+    var stopKeyPressEvent = false;
+
 
     $(document).ready(function () {
         //calculateRows();
@@ -353,56 +355,67 @@
         $("#grades td").keydown(function (e) {
             var cell = null;
             if (e.keyCode == 13) {
+                if (stopKeyPressEvent == false) {
+                    cell = $(this).children().val();
 
-                var row = $(this).parent("tr").next("tr");
-                if (row.attr("id") == "averageRow") {
-                    clearLastCellFocus();
-                }
-                else {
-                    var colIndex = $(this).prevAll().length;
-                    row.each(function () {
-                        cell = $(this).find("td:eq(" + colIndex + ")");
-                    });
-                }
-                if (cell != null) {
-                    cellGainsFocus(cell);
-                }
-                else {
-                    row = $(this).parent("tr");
-                    row.each(function () {
-                        cell = $(this).find("td:eq(" + colIndex + ")");
-                    });
-                    clearLastCellFocus(cell);
+                    if (isNaN(parseFloat(cell))) {
+                        alert("Cell value must be a number");
+                        return false;
+                    }
+
+                    var row = $(this).parent("tr").next("tr");
+                    if (row.attr("id") == "averageRow") {
+                        clearLastCellFocus();
+                    }
+                    else {
+                        var colIndex = $(this).prevAll().length;
+                        row.each(function () {
+                            cell = $(this).find("td:eq(" + colIndex + ")");
+                        });
+                    }
+                    if (cell != null) {
+                        cellGainsFocus(cell);
+                    }
+                    else {
+                        row = $(this).parent("tr");
+                        row.each(function () {
+                            cell = $(this).find("td:eq(" + colIndex + ")");
+                        });
+                        clearLastCellFocus(cell);
+                    }
                 }
             }
             else if (e.keyCode == 9) {
                 e.preventDefault();
-                var row = $(this).parent("tr");
-                // used for generating the column count
-                var one = 1;
-                var ColCount = $('table tr:eq(' + one + ') td').length;
-                var colIndex = $(this).prevAll().length;
-                colIndex = parseInt(colIndex);
-                if (colIndex >= ColCount) {
-                    row = $(this).parent("tr").next("tr");
-                    // coded based off the original design if you change the column structure you might need to change this
-                    colIndex = 3;
-                } else {
-                    colIndex += 1;
-                }
-                row.each(function () {
-                    cell = $(this).find("td:eq(" + colIndex + ")");
-                });
-                if (cell != null) {
-                    cellGainsFocus(cell);
-                }
-                else {
-                    colIndex -= 1;
+                if (stopKeyPressEvent == false) {
+                    var row = $(this).parent("tr");
+                    // used for generating the column count
+                    var one = 1;
+                    var ColCount = $('table tr:eq(' + one + ') td').length;
+                    var colIndex = $(this).prevAll().length;
+                    colIndex = parseInt(colIndex);
+                    if (colIndex >= ColCount) {
+                        row = $(this).parent("tr").next("tr");
+                        // coded based off the original design if you change the column structure you might need to change this
+                        colIndex = 3;
+                    } else {
+                        colIndex += 1;
+                    }
                     row.each(function () {
                         cell = $(this).find("td:eq(" + colIndex + ")");
                     });
-                    clearLastCellFocus(cell);
+                    if (cell != null) {
+                        cellGainsFocus(cell);
+                    }
+                    else {
+                        colIndex -= 1;
+                        row.each(function () {
+                            cell = $(this).find("td:eq(" + colIndex + ")");
+                        });
+                        clearLastCellFocus(cell);
+                    }
                 }
+                stopKeyPressEvent = false;
             }
             else {
             }
@@ -628,6 +641,11 @@
             var catId = pathname.split("=");
 
             var cellValue = lastFocusedCell.children().val();
+            if (isNaN(parseFloat(cellValue))) {
+                window.event.cancelBubble = true;
+                stopKeyPressEvent = false;
+                return false;
+            }
             lastFocusedCell.html("");
             lastFocusedCell.text(cellValue);
             lastFocusedCell.attr("onclick", 'cellGainsFocus(this)');
@@ -670,6 +688,7 @@
                 }
             }
             calculateCols();
+            //calculateRows();
         } 
     }
 
@@ -725,20 +744,6 @@
         onMouseOver = true;
     }
 
-    function calculateTotal() {
-        if (header == true) {
-            clearLastHeaderFocus(lastId);
-        }
-        //clear any previous focus
-        clearLastCellFocus();
-
-        var final = 0;
-        $("#grades tr td").each(function () {
-            final += parseInt($(this).text());
-        });
-        alert("Total Table: " + final);
-    }
-
     function calculateCols() {
 
         //clear any previous focus
@@ -781,6 +786,39 @@
             }
         });
     }
+
+//    function calculateRows() {
+
+//        var totalPerfect = 0;
+
+//        $("#grades #perfectScore").each(function () {
+//            $(this).find("td").each(function () {
+//                var id = $(this).attr("id").split("-");
+//                if (id[0] == "pointsPossible") {
+//                    totalPerfect += parseInt($(this).text());
+//                }
+//            });
+//        });
+
+//        $("#grades #studentGrades").each(function () {
+//            var total = 0;
+//            $(this).find("td").each(function () {
+//                var id = $(this).attr("id").split("-");
+//                if (id[0] == "_row") {
+//                }
+//                else if (id[1] == null) {
+//                }
+//                else {
+//                    total += parseInt($(this).text());
+//                }
+//            });
+//            $(this).find("td").each(function () {
+//                if ($(this).attr("id") == "total") {
+//                    $(this).text((total / totalPerfect * 100).toFixed(2) + "%");
+//                }
+//            });
+//        });
+//    }
 
     function ShowHide(buttonClick) {
 
