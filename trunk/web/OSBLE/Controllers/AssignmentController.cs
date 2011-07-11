@@ -178,7 +178,7 @@ namespace OSBLE.Controllers
                         if (teamUser is TeamMember)
                         {
                             info.isTeam = true;
-                            info.SubmitterID = (teamUser as TeamMember).ID;
+                            info.SubmitterID = teamUser.ID;
                             info.Name = (teamUser as TeamMember).Team.Name;
                         }
 
@@ -186,7 +186,7 @@ namespace OSBLE.Controllers
                         else
                         {
                             info.isTeam = false;
-                            info.SubmitterID = (teamUser as UserMember).UserProfile.ID;
+                            info.SubmitterID = teamUser.ID;
                             info.Name = (teamUser as UserMember).UserProfile.LastName + ", " + (teamUser as UserMember).UserProfile.FirstName;
                         }
 
@@ -227,6 +227,11 @@ namespace OSBLE.Controllers
                     ViewBag.NumberGraded = numberGraded;
 
                     ViewBag.ExpectedSubmissionsAndGrades = studioActivity.TeamUsers.Count;
+                    ViewBag.activityID = studioActivity.ID;
+
+                    var activities = (from c in assignment.AssignmentActivities orderby c.ReleaseDate select c).ToList();
+
+                    ViewBag.DueDate = activities[activities.IndexOf(studioActivity) + 1].ReleaseDate;
 
                     return View(viewModel);
                 }

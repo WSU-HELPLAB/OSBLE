@@ -2,9 +2,11 @@
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
+using Ionic.Zip;
 using OSBLE.Attributes;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Controllers
 {
@@ -80,9 +82,119 @@ namespace OSBLE.Controllers
             throw new Exception("File Not Found");
         }
 
+        [Authorize]
+        [CanGradeCourse]
+        [NotForCommunity]
+        public ActionResult GetAllSubmissionsForActivity(int assignmentActivityID)
+        {
+            AbstractAssignmentActivity acitivity = db.AbstractAssignmentActivities.Find(assignmentActivityID);
+
+            try
+            {
+                if (acitivity.AbstractAssignment.Category.CourseID == activeCourse.CourseID)
+                {
+                    Stream stream = FileSystem.FindZipFile(acitivity);
+
+                    string zipFileName = acitivity.Name + ".zip";
+
+                    if (stream != null)
+                    {
+                        return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
+                    }
+
+                    //This can be used to simulate a long load time
+                    Int64 i = 0;
+                    while (i < 2000000000)
+                    {
+                        i++;
+                    }
+
+                    string submissionfolder = FileSystem.GetAssignmentActivitySubmissionFolder(acitivity.AbstractAssignment.Category.Course, acitivity.ID);
+
+                    using (ZipFile zipfile = new ZipFile())
+                    {
+                        DirectoryInfo acitvityDirectory = new DirectoryInfo(submissionfolder);
+
+                        if (!acitvityDirectory.Exists)
+                        {
+                            FileSystem.CreateZipFolder(zipfile, acitivity);
+                        }
+                        else
+                        {
+                            foreach (DirectoryInfo submissionDirectory in acitvityDirectory.GetDirectories())
+                            {
+                                zipfile.AddDirectory(submissionDirectory.FullName, (from c in acitivity.TeamUsers where c.ID.ToString() == submissionDirectory.Name select c).FirstOrDefault().Name);
+                            }
+
+                            FileSystem.CreateZipFolder(zipfile, acitivity);
+                        }
+                        stream = FileSystem.GetDocumentForRead(zipfile.Name);
+
+                        return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in GetSubmissionZip", e);
+            }
+            return RedirectToAction("Index", "Home");
+        }
+
+        [Authorize]
+        [CanGradeCourse]
+        [NotForCommunity]
         public ActionResult GetSubmissionZip(int assignmentActivityID, int teamUserID)
         {
-            throw new NotImplementedException();
+            //This can be used to simulate a long load time
+            /*Int64 i = 0;
+            while (i < 2000000000)
+            {
+                i++;
+            }*/
+
+            AbstractAssignmentActivity acitivity = db.AbstractAssignmentActivities.Find(assignmentActivityID);
+
+            try
+            {
+                TeamUserMember teamUser = db.TeamUsers.Find(teamUserID);
+                if (acitivity.AbstractAssignment.Category.CourseID == activeCourse.CourseID && acitivity.TeamUsers.Contains(teamUser))
+                {
+                    Stream stream = FileSystem.FindZipFile(acitivity, teamUser);
+
+                    string zipFileName = acitivity.Name + " by " + teamUser.Name + ".zip";
+
+                    if (stream != null)
+                    {
+                        return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
+                    }
+
+                    //This can be used to simulate a long load time
+                    Int64 i = 0;
+                    while (i < 2000000000)
+                    {
+                        i++;
+                    }
+
+                    string submissionfolder = FileSystem.GetTeamUserSubmissionFolder(false, (activeCourse.Course as Course), assignmentActivityID, db.TeamUsers.Find(teamUserID));
+
+                    using (ZipFile zipfile = new ZipFile())
+                    {
+                        zipfile.AddDirectory(submissionfolder);
+
+                        FileSystem.CreateZipFolder(zipfile, acitivity, teamUser);
+
+                        stream = FileSystem.GetDocumentForRead(zipfile.Name);
+
+                        return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in GetSubmissionZip", e);
+            }
+            return RedirectToAction("Index", "Home");
         }
     }
 }

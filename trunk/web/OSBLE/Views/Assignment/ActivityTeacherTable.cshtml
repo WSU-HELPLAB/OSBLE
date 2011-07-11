@@ -3,11 +3,57 @@
 
 @{
     Layout = "";
+    int submissionInfoCounter = 0;
 }
 
+<script type="text/javascript">
+
+    function create_and_open_downloading_submission_dialog() {
+
+        //create the div that we will then make into a dialog
+
+        $('body').append(
+       '<div id="downloading_submission_dialog" title="Download Submission"> \
+        <p>The zip is being generated and will automatically start downloading when it is ready, please no not leave the page or click the link again</p> \
+    </div>');
+
+        //make the div we just created into a dialog box
+
+        $('#downloading_submission_dialog').dialog({
+            modal: false,
+            autoOpen: true,
+            resizable: true,
+            width: 350,
+            height: 300,
+            closeOnEscape: true,
+            close: remove_downloading_submission_dialog,
+            buttons: {"OK": remove_downloading_submission_dialog}
+        });
+
+
+
+        $('#downloading_submission_dialog').dialog('open');
+
+        return false;
+
+    }
+
+    function remove_downloading_submission_dialog() {
+
+        //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
+        $('#downloading_submission_dialog').dialog("destroy");
+
+        //then remove the div
+        $('#downloading_submission_dialog').remove();
+    }
+            </script>
+
 <div>
-@ViewBag.NumberOfSubmissions of @ViewBag.ExpectedSubmissionsAndGrades submissions received;
-@ViewBag.NumberGraded of @ViewBag.ExpectedSubmissionsAndGrades submissions graded.
+<p>
+@ViewBag.NumberOfSubmissions of @ViewBag.ExpectedSubmissionsAndGrades submissions received <br />
+@ViewBag.NumberGraded of @ViewBag.ExpectedSubmissionsAndGrades submissions graded <br />
+ <br />@Html.ActionLink("Download all submissions for this activity", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentActivityID = ViewBag.activityID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+</p>
 </div>
 
 <table class="TeacherActivityTable">
@@ -39,11 +85,18 @@ Download Submission
  <td>
  @if (info.Time == null)
  {
-     <text>Not Submitted</text>
+     <span style="color:Red">Not Submitted</span>
  }
  else
- { 
-     @info.Time
+ {
+     if (info.Time < ViewBag.DueDate)
+     {
+     <span>@info.Time</span>
+     }
+     else
+     {
+         <span style="color:Red">@info.Time</span> 
+     }
  }
  </td>
  <td>
@@ -53,9 +106,18 @@ Download Submission
  <button>Grade</button>
  </td>
  <td>
- <button>@Html.ActionLink("Download Submission", "GetSubmissionZip", "FileHandler", new { }, new { })</button>
+ @if (info.Time != null)
+ { 
+ @Html.ActionLink("Download Submission", "GetSubmissionZip", "FileHandler", new { teamUserID = info.SubmitterID, assignmentActivityID = ViewBag.activityID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+ }
+ else
+ { 
+ <text>Nothing To Download</text>
+ }
+ 
  </td>
  </tr>   
+ submissionInfoCounter++;
 }
 
 </table>

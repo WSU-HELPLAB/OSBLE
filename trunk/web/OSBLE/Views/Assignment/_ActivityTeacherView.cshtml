@@ -40,16 +40,7 @@
                     <span>End Date</span>
                 </th>
                 <td>
-                    <!--Make the due date red if less than 3 days away from being due-->
-                    @if (endDate > DateTime.Now && endDate < DateTime.Now.AddDays(3))
-                    { 
-                        <span style="color: Red">@endDate.ToString()</span>
-                                        
-                    }
-                    else
-                    {
                         <span>@endDate.ToString()</span>
-                    }
                 </td>
             </tr>
             @* Only show grading if points possible are greater than 0 *@

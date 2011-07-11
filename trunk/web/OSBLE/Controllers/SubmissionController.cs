@@ -106,6 +106,7 @@ namespace OSBLE.Controllers
 
                                 if (allowFileExtensions.Contains(extension))
                                 {
+                                    FileSystem.RemoveZipFile(activity, teamUser);
                                     var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.Course as Course, (int)id, teamUser), deliverables[i].Name + extension);
                                     file.SaveAs(path);
                                 }

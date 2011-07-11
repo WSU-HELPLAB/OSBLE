@@ -22,7 +22,7 @@ namespace OSBLE
             routes.IgnoreRoute("ClientBin/{*pathInfo}");
             routes.IgnoreRoute("Services/{*pathInfo}");
 
-//for debugging in-browser silverlight apps
+            //for debugging in-browser silverlight apps
 #if DEBUG
             routes.IgnoreRoute("clientaccesspolicy.xml");
             routes.IgnoreRoute("crossdomain.xml");
@@ -60,7 +60,7 @@ namespace OSBLE
             //Development only.
             System.Data.Entity.Database.SetInitializer(new OSBLE.Models.OSBLEContextModelChangeInitializer());
             //System.Data.Entity.Database.SetInitializer(new OSBLE.Models.OSBLEContextAlwaysCreateInitializer());
-        #endif
+#endif
 
             AreaRegistration.RegisterAllAreas();
 

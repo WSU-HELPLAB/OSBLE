@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
+using Ionic.Zip;
+using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Services.Uploader;
 using OSBLE.Models.Users;
@@ -13,13 +15,13 @@ using OSBLE.Models.Users;
 /*
  *
  *                FileSystem
- *               /        \
- *              /          \
- *          Courses       Users
- *             /             \
- *         [courseID]      [userId]
- *           /      \           \
- *          /        \      {global user content}
+ *               /    \    \
+ *              /      \   ZipFolder
+ *          Courses   Users    \
+ *             /         \    Records.txt { %hash%.zip}
+ *         [courseID]  [userId]
+ *           /      \      \
+ *          /        \ {global user content}
  *     CourseDocs     \
  *         |          Assignments
  * {course docs go here}   |
@@ -162,6 +164,237 @@ namespace OSBLE
             return listing;
         }
 
+        private static string getZipFolderLocation()
+        {
+            return getRootPath() + "ZipFolder";
+        }
+
+        private static string getZipFilesRecords()
+        {
+            return getZipFolderLocation() + "\\" + "Records.txt";
+        }
+
+        private static void RemoveOldZipFiles()
+        {
+            string records = getZipFilesRecords();
+            string[] fileLines = { };
+            try
+            {
+                using (StreamReader sr = new StreamReader(records))
+                {
+                    fileLines = sr.ReadToEnd().Split("\r\n".ToCharArray());
+                }
+
+                //delete the old file since we have it saved in memory
+                new FileInfo(records).Delete();
+
+                try
+                {
+                    using (StreamWriter sw = new StreamWriter(records))
+                    {
+                        foreach (string line in fileLines)
+                        {
+                            if (line.Trim() != "")
+                            {
+                                string[] lineSections = line.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                                DateTime dt = DateTime.Parse(lineSections[2]);
+                                dt = dt.AddDays(7);
+
+                                //if the file is more than 7 days old remove the file
+                                if (dt < DateTime.Now)
+                                {
+                                    FileInfo zipFile = new FileInfo(getZipFolderLocation() + "\\" + lineSections[1]);
+                                    zipFile.Delete();
+                                }
+                                else
+                                {
+                                    //if not older than 7 days then write the file back into the records file
+                                    sw.WriteLine(line);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                catch (Exception e)
+                {
+                    throw new Exception("{root}\\ZipFolder\\Records.txt is corrupt", e);
+                }
+            }
+            catch
+            {
+                //the records file must not exist so we got to make sure the directory exists
+
+                DirectoryInfo info = new DirectoryInfo(getZipFolderLocation());
+                if (!(info.Exists))
+                {
+                    info.Create();
+                }
+
+                return;
+            }
+        }
+
+        /// <summary>
+        /// This generates a new fileName that in the given directory with the given extension
+        /// </summary>
+        /// <param name="directory">This must be a valid directory</param>
+        /// <param name="extension">This must be an extension name with the . included</param>
+        /// <returns>The full name (including directory of a file name that is guaranteed not to exist already
+        /// in the given directory</returns>
+        private static string GeneratedUnusedFileName(string directory, string extension)
+        {
+            FileInfo info;
+            do
+            {
+                Random rand = new Random();
+                info = new FileInfo(directory + "\\" + rand.Next().ToString() + extension);
+            } while (info.Exists);
+            return info.FullName;
+        }
+
+        private static void AddEntryToZipRecords(string zipFileName, string realName, DateTime created)
+        {
+            using (StreamWriter sw = new StreamWriter(getZipFilesRecords(), true))
+            {
+                sw.WriteLine(zipFileName.Split(new char[] { '\\' }).Last() + "," + SanitizeCommas(realName) + "," + created.ToString());
+            }
+        }
+
+        private static string UnSanitizeCommas(string s)
+        {
+            s = s.Replace("&comma;", ",");
+            s = s.Replace("&amp;", "&");
+
+            return s;
+        }
+
+        private static string SanitizeCommas(string s)
+        {
+            string newString = s.Replace("&", "&amp;");
+            newString = s.Replace(",", "&comma;");
+            return newString;
+        }
+
+        private static string FindZipFileLocation(string realName)
+        {
+            try
+            {
+                using (StreamReader sr = new StreamReader(getZipFilesRecords()))
+                {
+                    while (!sr.EndOfStream)
+                    {
+                        string line = sr.ReadLine();
+                        if (line.Trim() != "")
+                        {
+                            string[] lineSections = line.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                            if (lineSections[1] == realName)
+                            {
+                                return getZipFolderLocation() + "\\" + lineSections[0];
+                            }
+                        }
+                    }
+
+                    return null;
+                }
+            }
+            catch
+            {
+                //error to guess we didn't find it
+                return null;
+            }
+        }
+
+        private static void deleteFile(string path)
+        {
+            new FileInfo(path).Delete();
+        }
+
+        private static string getRealFileZipName(AbstractAssignmentActivity activity, TeamUserMember member = null)
+        {
+            string s = "activityID = " + activity.ID.ToString();
+            if (member != null)
+            {
+                s += " TeamuserMemberID = " + member.ID;
+            }
+            return s;
+        }
+
+        public static void RemoveZipFile(AbstractAssignmentActivity activity, TeamUserMember teamUser)
+        {
+            bool foundTeamUserZip = false, foundActivityZip = false;
+            string pathTeamUser = FindZipFileLocation(getRealFileZipName(activity, teamUser));
+
+            if (pathTeamUser != null)
+            {
+                foundTeamUserZip = true;
+                deleteFile(pathTeamUser);
+            }
+
+            string pathActivity = FindZipFileLocation(getRealFileZipName(activity));
+
+            if (pathActivity != null)
+            {
+                foundActivityZip = true;
+                deleteFile(pathActivity);
+            }
+
+            if (foundActivityZip || foundTeamUserZip)
+            {
+                //we deleted a file so we got to update the records
+
+                string recordFile;
+                using (StreamReader sr = new StreamReader(getZipFilesRecords()))
+                {
+                    recordFile = sr.ReadToEnd();
+                }
+
+                deleteFile(getZipFilesRecords());
+
+                string activityRealname = getRealFileZipName(activity);
+                string teamUserRealname = getRealFileZipName(activity, teamUser);
+
+                using (StreamWriter sw = new StreamWriter(getZipFilesRecords()))
+                {
+                    foreach (string line in recordFile.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        if (line.Trim() != "")
+                        {
+                            string realName = line.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)[1];
+                            if (realName != activityRealname && realName != teamUserRealname)
+                            {
+                                sw.WriteLine(line);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public static FileStream FindZipFile(AbstractAssignmentActivity activity, TeamUserMember teamUser = null)
+        {
+            string location = FindZipFileLocation(getRealFileZipName(activity, teamUser));
+            if (location != null)
+            {
+                return GetDocumentForRead(location);
+            }
+            return null;
+        }
+
+        public static bool CreateZipFolder(ZipFile zipFile, AbstractAssignmentActivity activity, TeamUserMember teamUser = null)
+        {
+            RemoveOldZipFiles();
+            string path = getZipFolderLocation();
+
+            string zipFileName = GeneratedUnusedFileName(path, ".zip");
+
+            zipFile.Save(zipFileName);
+
+            AddEntryToZipRecords(zipFileName, getRealFileZipName(activity, teamUser), DateTime.Now);
+
+            return true;
+        }
+
         /// <summary>
         /// Returns a list of course documents wrapped in a DirectoryListing object
         /// </summary>
@@ -195,21 +428,14 @@ namespace OSBLE
         public static string GetAssignmentActivitySubmissionFolder(Course course, int assignmentActivityID)
         {
             string path = getCoursePath(course);
-            path += "Assignments\\" + assignmentActivityID + "\\Submissions\\";
+            path += "Assignments" + "\\" + assignmentActivityID + "\\Submissions";
             return path;
         }
 
         public static string GetTeamUserSubmissionFolder(bool createPathIfNotExists, Course course, int assignmentActivityID, TeamUserMember subbmitter)
         {
             string path = GetAssignmentActivitySubmissionFolder(course, assignmentActivityID);
-            if (subbmitter is TeamMember)
-            {
-                path += (subbmitter as TeamMember).TeamID + "\\";
-            }
-            else
-            {
-                path += (subbmitter as UserMember).UserProfileID + "\\";
-            }
+            path += "\\" + subbmitter.ID;
 
             if (!Directory.Exists(path) && createPathIfNotExists)
             {
@@ -221,7 +447,7 @@ namespace OSBLE
 
         public static string GetDeliverable(Course course, int assignmentActivityID, TeamUserMember subbmitter, string fileName, string[] possibleFileExtensions)
         {
-            string path = GetTeamUserSubmissionFolder(false, course, assignmentActivityID, subbmitter);
+            string path = GetTeamUserSubmissionFolder(false, course, assignmentActivityID, subbmitter) + "\\";
 
             if (Directory.Exists(path))
             {
@@ -395,10 +621,13 @@ namespace OSBLE
         /// Never, EVER use this function.
         /// Unless you want to wipe out the filesystem. Then by all means use it.
         /// (Used in Sample Data generation on model change.)
+        /// As an add measure this function will do nothing if you are not in debug mode
         /// </summary>
         public static void WipeOutFileSystem()
         {
+#if DEBUG
             EmptyFolder(getRootPath());
+#endif
         }
     }
 }
