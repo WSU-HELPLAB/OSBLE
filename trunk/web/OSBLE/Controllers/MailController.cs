@@ -79,7 +79,7 @@ namespace OSBLE.Controllers
                     CoursesUsers ourCu = currentCourses.Where(c => c.CourseID == courseID).FirstOrDefault();
                     CoursesUsers theirCu = db.CoursesUsers.Where(c => (c.CourseID == courseID) && (c.UserProfileID == u.ID)).FirstOrDefault();
 
-                    if ((ourCu != null) && (theirCu != null) && (!(ourCu.CourseRole.Anonymized) || (theirCu.CourseRole.CanGrade == true)))
+                    if ((ourCu != null) && (theirCu != null) && (!(ourCu.AbstractRole.Anonymized) || (theirCu.AbstractRole.CanGrade == true)))
                     {
                         return true;
                     }
@@ -203,7 +203,7 @@ namespace OSBLE.Controllers
 
             // If we are not anonymous in a course, allow search of all users.
             List<int> authorizedCourses = currentCourses
-                .Where(c => c.CourseRole.Anonymized == false)
+                .Where(c => c.AbstractRole.Anonymized == false)
                 .Select(c => c.CourseID)
                 .ToList();
 
@@ -216,12 +216,12 @@ namespace OSBLE.Controllers
 
             // If we are anonymous, limit search to ourselves plus instructors/TAs
             List<int> addedCourses = currentCourses
-                .Where(c => c.CourseRole.Anonymized == true)
+                .Where(c => c.AbstractRole.Anonymized == true)
                 .Select(c => c.CourseID)
                 .ToList();
 
             List<UserProfile> addedUsers = db.CoursesUsers
-                .Where(c => addedCourses.Contains(c.CourseID) && ((c.UserProfileID == currentUser.ID) || (c.CourseRole.CanGrade == true)))
+                .Where(c => addedCourses.Contains(c.CourseID) && ((c.UserProfileID == currentUser.ID) || (c.AbstractRole.CanGrade == true)))
                 .Select(c => c.UserProfile)
                 .ToList();
 

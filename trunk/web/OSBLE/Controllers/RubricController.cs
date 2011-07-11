@@ -164,7 +164,7 @@ namespace OSBLE.Controllers
             //assignments are storied within categories, which are found within
             //the active course.  
             List<AbstractAssignmentActivity> activities = new List<AbstractAssignmentActivity>();
-            foreach (Category cat in (activeCourse.Course as Course).Categories)
+            foreach (Category cat in (activeCourse.AbstractCourse as Course).Categories)
             {
                 foreach (AbstractAssignment assignment in cat.Assignments)
                 {

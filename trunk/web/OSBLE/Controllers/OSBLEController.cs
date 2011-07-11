@@ -164,7 +164,7 @@ namespace OSBLE.Controllers
         /// </summary>
         private void setCourseListTitle()
         {
-            if (currentCourses.Where(c => c.Course is Community).Count() > 0)
+            if (currentCourses.Where(c => c.AbstractCourse is Community).Count() > 0)
             {
                 ViewBag.CourseListTitle = "Course/Community";
             }
@@ -224,17 +224,17 @@ namespace OSBLE.Controllers
                 List<CoursesUsers> allUsersCourses = db.CoursesUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
 
                 // Get list of courses this user is connected to. Remove inactive (for anyone other than instructors or observers) or hidden (for all) courses.
-                currentCourses = allUsersCourses.Where(cu => (cu.Course is Course) &&
-                    (((cu.Course as Course).Inactive == false) ||
+                currentCourses = allUsersCourses.Where(cu => (cu.AbstractCourse is Course) &&
+                    (((cu.AbstractCourse as Course).Inactive == false) ||
                     (cu.CourseRoleID == (int)CourseRole.OSBLERoles.Instructor) ||
                     (cu.CourseRoleID == (int)CourseRole.OSBLERoles.Observer)))
                     // Order first by descending start date (newest first)
-                        .OrderByDescending(cu => (cu.Course as Course).StartDate)
+                        .OrderByDescending(cu => (cu.AbstractCourse as Course).StartDate)
                     // Order next by whether the course is inactive, placing inactive courses underneath active.
-                        .OrderBy(cu => (cu.Course as Course).Inactive).ToList();
+                        .OrderBy(cu => (cu.AbstractCourse as Course).Inactive).ToList();
 
                 // Add communities under courses, ordered by name
-                currentCourses = currentCourses.Concat(allUsersCourses.Where(cu => cu.Course is Community).OrderBy(cu => cu.Course.Name).ToList()).ToList();
+                currentCourses = currentCourses.Concat(allUsersCourses.Where(cu => cu.AbstractCourse is Community).OrderBy(cu => cu.AbstractCourse.Name).ToList()).ToList();
 
                 // Only consider non-hidden courses as the active course.
                 List<CoursesUsers> activeCoursePool = currentCourses.Where(cu => cu.Hidden == false).ToList();

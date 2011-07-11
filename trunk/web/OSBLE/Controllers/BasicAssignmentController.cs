@@ -50,7 +50,7 @@ namespace OSBLE.Controllers
             BasicAssignmentViewModel viewModel = new BasicAssignmentViewModel();
 
             // Copy default Late Policy settings
-            Course active = activeCourse.Course as Course;
+            Course active = activeCourse.AbstractCourse as Course;
             viewModel.Submission.HoursLatePerPercentPenalty = active.HoursLatePerPercentPenalty;
             viewModel.Submission.HoursLateUntilZero = active.HoursLateUntilZero;
             viewModel.Submission.PercentPenalty = active.PercentPenalty;
@@ -92,12 +92,12 @@ namespace OSBLE.Controllers
             rubrics.Insert(0, new Rubric() { ID = 0, Description = "" });
             ViewBag.Rubrics = rubrics.ToList();
 
-            var cat = from c in (activeCourse.Course as Course).Categories
+            var cat = from c in (activeCourse.AbstractCourse as Course).Categories
                       where c.Name != Constants.UnGradableCatagory
                       select c;
             ViewBag.Categories = new SelectList(cat, "ID", "Name");
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
-            ViewBag.AllowedFileNames = from c in FileSystem.GetCourseDocumentsFileList(activeCourse.Course, includeParentLink: false).Files select c.Name;
+            ViewBag.AllowedFileNames = from c in FileSystem.GetCourseDocumentsFileList(activeCourse.AbstractCourse, includeParentLink: false).Files select c.Name;
         }
 
         [HttpPost]
@@ -129,7 +129,7 @@ namespace OSBLE.Controllers
 
             if (Request.Params["isGradable"].ToString() == "false")
             {
-                basic.Assignment.Category = (from c in (activeCourse.Course as Course).Categories
+                basic.Assignment.Category = (from c in (activeCourse.AbstractCourse as Course).Categories
                                              where c.Name == Constants.UnGradableCatagory
                                              select c).FirstOrDefault();
             }
@@ -245,7 +245,7 @@ namespace OSBLE.Controllers
                 {
                     var users = from c in db.CoursesUsers
                                 where c.CourseID == activeCourse.CourseID
-                                && c.CourseRole.CanSubmit
+                                && c.AbstractRole.CanSubmit
                                 select c.UserProfile;
 
                     foreach (UserProfile user in users)
@@ -297,7 +297,7 @@ namespace OSBLE.Controllers
 
             var couresesUsers = (from c in db.CoursesUsers
                                  where c.CourseID == activeCourse.CourseID
-                                 && (c.CourseRole.ID == (int)CourseRole.OSBLERoles.Student)
+                                 && (c.AbstractRole.ID == (int)CourseRole.OSBLERoles.Student)
                                  select c).ToList();
 
             int i = 0;
@@ -307,7 +307,7 @@ namespace OSBLE.Controllers
                 foreach (CoursesUsers cu in couresesUsers)
                 {
                     SerializableTeamMember teamMember = new SerializableTeamMember();
-                    teamMember.IsModerator = cu.CourseRole.ID == (int)CourseRole.OSBLERoles.Moderator;
+                    teamMember.IsModerator = cu.AbstractRole.ID == (int)CourseRole.OSBLERoles.Moderator;
                     teamMember.Name = cu.UserProfile.FirstName + " " + cu.UserProfile.LastName;
                     teamMember.Section = cu.Section;
                     teamMember.UserID = cu.UserProfileID;
@@ -362,7 +362,7 @@ namespace OSBLE.Controllers
             BasicAssignmentViewModel viewModel = new BasicAssignmentViewModel();
             BasicAssignment assignment = db.AbstractAssignments.Find(id) as BasicAssignment;
 
-            if (assignment != null && assignment.Category.Course == activeCourse.Course)
+            if (assignment != null && assignment.Category.Course == activeCourse.AbstractCourse)
             {
                 SubmissionActivity submission = (from c in assignment.AssignmentActivities where c is SubmissionActivity select c as SubmissionActivity).FirstOrDefault();
                 StopActivity stop = (from c in assignment.AssignmentActivities where c is StopActivity select c as StopActivity).FirstOrDefault();
@@ -370,7 +370,7 @@ namespace OSBLE.Controllers
                 if (submission != null && stop != null)
                 {
                     // Copy default Late Policy settings
-                    Course active = activeCourse.Course as Course;
+                    Course active = activeCourse.AbstractCourse as Course;
 
                     viewModel.Assignment = assignment;
 

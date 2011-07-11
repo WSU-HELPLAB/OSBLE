@@ -198,7 +198,7 @@ namespace OSBLE.Controllers
 
             NameValueCollection parameters = Request.Params;
 
-            Course updateCourse = (Course)activeCourse.Course;
+            Course updateCourse = (Course)activeCourse.AbstractCourse;
 
             updateCourse.Inactive = course.Inactive;
             updateCourse.AllowDashboardPosts = course.AllowDashboardPosts;

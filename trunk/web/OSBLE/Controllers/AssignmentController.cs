@@ -42,7 +42,7 @@ namespace OSBLE.Controllers
 
             Dictionary<int, List<Tuple<bool, DateTime>>> submissionDictionary = new Dictionary<int, List<Tuple<bool, DateTime>>>();
 
-            if (activeCourse.CourseRole.CanSubmit)
+            if (activeCourse.AbstractRole.CanSubmit)
             {
                 //Get whether or not the students (CanSubmit) have submitted each deliverable for each submission activity
                 var submissionActivities = (from c in studioAssignments
@@ -56,7 +56,7 @@ namespace OSBLE.Controllers
 
                     TeamUserMember teamUser = GetTeamUser(activity, currentUser);
 
-                    string folderLocation = FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.Course as Course, activity.ID, teamUser);
+                    string folderLocation = FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, activity.ID, teamUser);
 
                     foreach (Deliverable deliverable in (activity.AbstractAssignment as StudioAssignment).Deliverables)
                     {
@@ -116,7 +116,7 @@ namespace OSBLE.Controllers
 
             List<StudioAssignment> draftAssignments = new List<StudioAssignment>();
 
-            if (ActiveCourse.CourseRole.CanModify)
+            if (ActiveCourse.AbstractRole.CanModify)
             {
                 // Draft assignments (viewable by instructor only) are assignments that have not yet been published to students
                 draftAssignments = studioAssignments.Where(
@@ -132,7 +132,7 @@ namespace OSBLE.Controllers
             ViewBag.PresentAssignments = presentAssignments;
             ViewBag.FutureAssignments = futureAssignments;
             ViewBag.DraftAssignments = draftAssignments;
-            ViewBag.CanSubmit = activeCourse.CourseRole.CanSubmit;
+            ViewBag.CanSubmit = activeCourse.AbstractRole.CanSubmit;
             ViewBag.SubmissionDictionary = submissionDictionary;
 
             ViewBag.DeliverableTypes = GetListOfDeliverableTypes();
@@ -158,7 +158,7 @@ namespace OSBLE.Controllers
 
                 StudioAssignment assignment = studioActivity.AbstractAssignment as StudioAssignment;
 
-                if (studioActivity.AbstractAssignment.Category.Course == activeCourse.Course)
+                if (studioActivity.AbstractAssignment.Category.Course == activeCourse.AbstractCourse)
                 {
                     //FileSystem.GetAssignmentActivitySubmissionFolder(activeCourse.Course as Course, studioActivity.ID);
 
@@ -172,7 +172,7 @@ namespace OSBLE.Controllers
                         ActivityTeacherTableViewModel.SubmissionInfo info = new ActivityTeacherTableViewModel.SubmissionInfo();
 
                         //This checks when something was submitted by the folder modify time it is imperative that they don't get modified except when a student submits something to that folder.
-                        DirectoryInfo submissionFolder = new DirectoryInfo(FileSystem.GetTeamUserSubmissionFolder(false, activeCourse.Course as Course, studioActivity.ID, teamUser));
+                        DirectoryInfo submissionFolder = new DirectoryInfo(FileSystem.GetTeamUserSubmissionFolder(false, activeCourse.AbstractCourse as Course, studioActivity.ID, teamUser));
 
                         //if team
                         if (teamUser is TeamMember)

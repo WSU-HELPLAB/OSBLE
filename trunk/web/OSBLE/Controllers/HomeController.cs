@@ -87,7 +87,7 @@ namespace OSBLE.Controllers
             }
 
             
-            if (activeCourse.Course is Course && activeCourse.CourseRole.CanModify)
+            if (activeCourse.AbstractCourse is Course && activeCourse.AbstractRole.CanModify)
             {
                 ViewBag.IsInstructor = true;
             }
@@ -96,7 +96,7 @@ namespace OSBLE.Controllers
                 ViewBag.IsInstructor = false;
             }
 
-            if (activeCourse.Course is Community && activeCourse.CourseRole.CanModify)
+            if (activeCourse.AbstractCourse is Community && activeCourse.AbstractRole.CanModify)
             {
                 ViewBag.IsLeader = true;
             }
@@ -138,7 +138,7 @@ namespace OSBLE.Controllers
 
         private void setupCourseLinks()
         {
-            DirectoryListing listing = FileSystem.GetCourseDocumentsFileList(activeCourse.Course, false);
+            DirectoryListing listing = FileSystem.GetCourseDocumentsFileList(activeCourse.AbstractCourse, false);
             SilverlightObject fileUploader = new SilverlightObject
             {
                 CSSId = "file_uploader",
@@ -154,7 +154,7 @@ namespace OSBLE.Controllers
             //AC: I don't think that this is the best way to restrict access.  Might be worth
             //revisiting at a later date.
             ViewBag.CanEditCourseLinks = false;
-            if (ActiveCourse.CourseRole.CanModify)
+            if (ActiveCourse.AbstractRole.CanModify)
             {
                 ViewBag.CanEditCourseLinks = true;
             }
@@ -171,7 +171,7 @@ namespace OSBLE.Controllers
         private void setupEvents()
         {
             // Set start and end dates of event viewing to current viewing settings for the course
-            int eventDays = 7 * ActiveCourse.Course.CalendarWindowOfTime;
+            int eventDays = 7 * ActiveCourse.AbstractCourse.CalendarWindowOfTime;
 
             DateTime today = DateTime.Now.Date;
             DateTime upto = today.AddDays(eventDays);
@@ -212,7 +212,7 @@ namespace OSBLE.Controllers
             // Setup Display Name/Display Title/Profile Picture/Mail Button/Delete Button
 
             // If user is not anonymous, this post was written by current user, or the poster is an Instructor/TA, display name and picture.
-            if ((posterCu == null) || !currentCu.CourseRole.Anonymized || (currentCu.UserProfileID == posterCu.UserProfileID) || posterCu.CourseRole.CanGrade)
+            if ((posterCu == null) || !currentCu.AbstractRole.Anonymized || (currentCu.UserProfileID == posterCu.UserProfileID) || posterCu.AbstractRole.CanGrade)
             {
                 // Display Name
                 if (posterCu != null)
@@ -225,7 +225,7 @@ namespace OSBLE.Controllers
                 }
 
                 // Allow deletion if current user is poster or is an instructor
-                if (currentCu.CourseRole.CanModify || ((posterCu != null) && (posterCu.UserProfileID == currentCu.UserProfileID)))
+                if (currentCu.AbstractRole.CanModify || ((posterCu != null) && (posterCu.UserProfileID == currentCu.UserProfileID)))
                 {
                     post.CanDelete = true;
                 }
@@ -263,11 +263,11 @@ namespace OSBLE.Controllers
                 DashboardPost thisDp = post as DashboardPost;
 
                 // For posts, set reply box display if the course allows replies or if Instructor/TA.
-                if ((currentCu.Course is Course &&
-                        ((currentCu.Course as Course).AllowDashboardReplies)
-                         || (currentCu.CourseRole.CanGrade))
+                if ((currentCu.AbstractCourse is Course &&
+                        ((currentCu.AbstractCourse as Course).AllowDashboardReplies)
+                         || (currentCu.AbstractRole.CanGrade))
                     // For communities, always allow replies
-                    || (currentCu.Course is Community)
+                    || (currentCu.AbstractCourse is Community)
                     )
                 {
                     thisDp.CanReply = true;
@@ -403,23 +403,23 @@ namespace OSBLE.Controllers
             }
             else if (Request.Form["post_all"] != null)
             { // Post to all courses.
-                CoursesToPost = currentCourses.Where(cu=>cu.Course is Course && cu.CourseRole.CanModify && !cu.Hidden).ToList();
+                CoursesToPost = currentCourses.Where(cu=>cu.AbstractCourse is Course && cu.AbstractRole.CanModify && !cu.Hidden).ToList();
             }
 
             foreach (CoursesUsers cu in CoursesToPost)
             {
                 AbstractCourse c = null;
-                if (cu.Course is AbstractCourse)
+                if (cu.AbstractCourse is AbstractCourse)
                 {
-                    c = (AbstractCourse)cu.Course;
+                    c = (AbstractCourse)cu.AbstractCourse;
                 }
-                if (cu.CourseRole.CanGrade || ((c != null) && (c.AllowDashboardPosts)))
+                if (cu.AbstractRole.CanGrade || ((c != null) && (c.AllowDashboardPosts)))
                 {
                     DashboardPost newDp = new DashboardPost();
                     newDp.Content = dp.Content;
                     newDp.Posted = dp.Posted;
                     newDp.UserProfile = dp.UserProfile;
-                    newDp.Course = cu.Course;
+                    newDp.Course = cu.AbstractCourse;
 
                     if (ModelState.IsValid)
                     {
@@ -470,7 +470,7 @@ namespace OSBLE.Controllers
                         //If the instructor wanted to email the entire class, add these users as well.  
                         //We should be in the clear if adding dupes from above as we're dealing with references
                         //to the same object.
-                        if (c != null && sendEmail && cu.CourseRole.CanModify)
+                        if (c != null && sendEmail && cu.AbstractRole.CanModify)
                         {
                             foreach (CoursesUsers member in db.CoursesUsers.Where(coursesUsers => coursesUsers.CourseID == c.ID).ToList())
                             {
@@ -518,11 +518,11 @@ namespace OSBLE.Controllers
                                    select c).FirstOrDefault();
 
                 Course course = null;
-                if (cu.Course is Course)
+                if (cu.AbstractCourse is Course)
                 {
-                    course = (Course)cu.Course;
+                    course = (Course)cu.AbstractCourse;
                 }
-                if ((cu != null) && (cu.CourseRole.CanGrade || ((course != null) && (course.AllowDashboardReplies))))
+                if ((cu != null) && (cu.AbstractRole.CanGrade || ((course != null) && (course.AllowDashboardReplies))))
                 {
                     if (ModelState.IsValid)
                     {
@@ -572,8 +572,8 @@ namespace OSBLE.Controllers
 
             if (dp != null)
             {
-                CoursesUsers cu = currentCourses.Where(c => c.Course == dp.Course).FirstOrDefault();
-                if ((dp.UserProfileID == currentUser.ID) || ((cu != null) && (cu.CourseRole.CanGrade)))
+                CoursesUsers cu = currentCourses.Where(c => c.AbstractCourse == dp.Course).FirstOrDefault();
+                if ((dp.UserProfileID == currentUser.ID) || ((cu != null) && (cu.AbstractRole.CanGrade)))
                 {
                     dp.Replies.Clear();
                     db.SaveChanges();
@@ -605,8 +605,8 @@ namespace OSBLE.Controllers
 
             if (dr != null)
             {
-                CoursesUsers cu = currentCourses.Where(c => c.Course == dr.Parent.Course).FirstOrDefault();
-                if ((dr.UserProfileID == currentUser.ID) || ((cu != null) && (cu.CourseRole.CanGrade)))
+                CoursesUsers cu = currentCourses.Where(c => c.AbstractCourse == dr.Parent.Course).FirstOrDefault();
+                if ((dr.UserProfileID == currentUser.ID) || ((cu != null) && (cu.AbstractRole.CanGrade)))
                 {
                     db.DashboardReplies.Remove(dr);
                     db.SaveChanges();
@@ -634,8 +634,8 @@ namespace OSBLE.Controllers
 
             // A role for both our current user and 
             // the one we're trying to see
-            AbstractRole ourRole = currentCourses.Where(c => c.CourseID == course).Select(c=>c.CourseRole).FirstOrDefault();
-            AbstractRole theirRole = db.CoursesUsers.Where(c => (c.CourseID == course) && (c.UserProfileID == userProfile)).Select(c=>c.CourseRole).FirstOrDefault();
+            AbstractRole ourRole = currentCourses.Where(c => c.CourseID == course).Select(c=>c.AbstractRole).FirstOrDefault();
+            AbstractRole theirRole = db.CoursesUsers.Where(c => (c.CourseID == course) && (c.UserProfileID == userProfile)).Select(c=>c.AbstractRole).FirstOrDefault();
 
             // Show picture if user is requesting their own profile picture or they have the right to view the profile picture
             if (userProfile == currentUser.ID ||

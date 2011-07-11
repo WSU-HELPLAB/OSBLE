@@ -96,7 +96,7 @@ namespace OSBLE.Controllers
                 //Get all the users for each role
                 List<AbstractRole> roles = new List<AbstractRole>();
 
-                if (ActiveCourse.Course is Course)
+                if (ActiveCourse.AbstractCourse is Course)
                 {
                     // Set custom role order for display
                     List<CourseRole.OSBLERoles> rolesOrder = new List<CourseRole.OSBLERoles>();
@@ -136,7 +136,7 @@ namespace OSBLE.Controllers
                     UsersByRole usersByRole = new UsersByRole();
                     usersByRole.RoleName = role.Name;
                     usersByRole.Users = new List<UserProfile>(from c in section
-                                                              where role.ID == c.CourseRole.ID
+                                                              where role.ID == c.AbstractRole.ID
                                                               orderby c.UserProfile.LastName
                                                               select c.UserProfile
                                                               );
@@ -386,7 +386,7 @@ namespace OSBLE.Controllers
             if (CanModifyOwnLink(coursesusers))
             {
                 ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", coursesusers.UserProfileID);
-                if (activeCourse.Course is Course)
+                if (activeCourse.AbstractCourse is Course)
                 {
                     ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name", coursesusers.CourseRoleID);
                 }
@@ -466,7 +466,7 @@ namespace OSBLE.Controllers
         {
             var diffTeacher = (from c in db.CoursesUsers
                                where (c.CourseID == courseUser.CourseID
-                               && c.CourseRole.CanModify == true
+                               && c.AbstractRole.CanModify == true
                                && c.UserProfileID != courseUser.UserProfileID)
                                select c);
 

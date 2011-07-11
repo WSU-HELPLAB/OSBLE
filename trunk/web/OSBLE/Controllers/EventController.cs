@@ -24,10 +24,10 @@ namespace OSBLE.Controllers
             DateTime StartDate = new DateTime();
             DateTime EndDate = new DateTime();
 
-            if(ActiveCourse.Course is Course) {
-                StartDate = (ActiveCourse.Course as Course).StartDate;
-                EndDate = (ActiveCourse.Course as Course).EndDate;
-            } else if(ActiveCourse.Course is Community) { 
+            if(ActiveCourse.AbstractCourse is Course) {
+                StartDate = (ActiveCourse.AbstractCourse as Course).StartDate;
+                EndDate = (ActiveCourse.AbstractCourse as Course).EndDate;
+            } else if(ActiveCourse.AbstractCourse is Community) { 
                 // For communities there are no start/end dates, so get earliest and latest events
                 Event firstEvent = db.Events.Where(e => e.CourseID == ActiveCourse.CourseID).OrderBy(e => e.StartDate).FirstOrDefault();
                 Event lastEvent = db.Events.Where(e => e.CourseID == ActiveCourse.CourseID).OrderByDescending(e => e.StartDate).FirstOrDefault();
@@ -76,7 +76,7 @@ namespace OSBLE.Controllers
         public ActionResult Create(Event e)
         {
             // Set to current user and poster
-            e.Course = ActiveCourse.Course;
+            e.Course = ActiveCourse.AbstractCourse;
             e.Poster = currentUser;
 
             // Default to not Approved.
@@ -87,10 +87,10 @@ namespace OSBLE.Controllers
             e.StartDate = e.StartDate.AddHours(e.StartTime.Hour).AddMinutes(e.StartTime.Minute);
 
             // Approve if instructor/leader, course is community, or approval is not required.
-            if (activeCourse.CourseRole.CanModify ||
-                ((activeCourse.Course is Course) &&
-                !(activeCourse.Course as Course).RequireInstructorApprovalForEventPosting) ||
-                (activeCourse.Course is Community)
+            if (activeCourse.AbstractRole.CanModify ||
+                ((activeCourse.AbstractCourse is Course) &&
+                !(activeCourse.AbstractCourse as Course).RequireInstructorApprovalForEventPosting) ||
+                (activeCourse.AbstractCourse is Community)
                 )
             {
                 e.Approved = true;
@@ -131,7 +131,7 @@ namespace OSBLE.Controllers
                 return View("AlreadyApproved");
             }
 
-            if (e.Course != ActiveCourse.Course)
+            if (e.Course != ActiveCourse.AbstractCourse)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -145,7 +145,7 @@ namespace OSBLE.Controllers
         {
             Event e = db.Events.Find(id);
 
-            if (e.Course != ActiveCourse.Course)
+            if (e.Course != ActiveCourse.AbstractCourse)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -163,7 +163,7 @@ namespace OSBLE.Controllers
         {
             Event e = db.Events.Find(id);
 
-            if (e.Course != ActiveCourse.Course)
+            if (e.Course != ActiveCourse.AbstractCourse)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -243,8 +243,8 @@ namespace OSBLE.Controllers
 
             if (e != null)
             {
-                CoursesUsers cu = currentCourses.Where(c => c.Course == e.Course).FirstOrDefault();
-                if (((cu != null) && (cu.CourseRole.CanModify)))
+                CoursesUsers cu = currentCourses.Where(c => c.AbstractCourse == e.Course).FirstOrDefault();
+                if (((cu != null) && (cu.AbstractRole.CanModify)))
                 {
                     db.Events.Remove(e);
                     db.SaveChanges();
@@ -264,12 +264,12 @@ namespace OSBLE.Controllers
         [NonAction]
         public List<Event> GetActiveCourseEvents(DateTime StartDate, DateTime EndDate)
         {
-            List<Event> events = ActiveCourse.Course.Events.Where(e => e.Approved && (e.StartDate >= StartDate) && (e.StartDate <= EndDate)).ToList();
+            List<Event> events = ActiveCourse.AbstractCourse.Events.Where(e => e.Approved && (e.StartDate >= StartDate) && (e.StartDate <= EndDate)).ToList();
 
             // Add course meeting times and breaks.
-            if (ActiveCourse.Course is Course && ((ActiveCourse.Course as Course).ShowMeetings == true))
+            if (ActiveCourse.AbstractCourse is Course && ((ActiveCourse.AbstractCourse as Course).ShowMeetings == true))
             {
-                Course course = (Course)ActiveCourse.Course;
+                Course course = (Course)ActiveCourse.AbstractCourse;
 
                 // Add breaks within window to events
                 foreach (CourseBreak cb in course.CourseBreaks)

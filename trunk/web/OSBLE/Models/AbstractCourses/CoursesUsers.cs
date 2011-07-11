@@ -17,12 +17,12 @@ namespace OSBLE.Models.Courses
         [Column(Order = 1)]
         public int CourseID { get; set; }
 
-        public virtual AbstractCourse Course { get; set; }
+        public virtual AbstractCourse AbstractCourse { get; set; }
 
         [Required]
         public int CourseRoleID { get; set; }
 
-        public virtual AbstractRole CourseRole { get; set; }
+        public virtual AbstractRole AbstractRole { get; set; }
 
         [Required]
         public int Section { get; set; }

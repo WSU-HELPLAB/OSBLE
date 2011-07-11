@@ -45,8 +45,8 @@ namespace OSBLE.Services
 
                 CurrentCourseUser = db.CoursesUsers.Where(cu => cu.CourseID == activeCourse &&
                                                     cu.UserProfileID == currentUserProfile.ID &&
-                                                    cu.Course is Course &&
-                                                    (!(cu.Course as Course).Inactive ||
+                                                    cu.AbstractCourse is Course &&
+                                                    (!(cu.AbstractCourse as Course).Inactive ||
                                                         cu.CourseRoleID == (int)CourseRole.OSBLERoles.Instructor ||
                                                         cu.CourseRoleID == (int)CourseRole.OSBLERoles.Observer
                                                     )).FirstOrDefault();

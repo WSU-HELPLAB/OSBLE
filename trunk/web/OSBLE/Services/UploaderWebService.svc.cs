@@ -109,7 +109,7 @@ namespace OSBLE.Services
             {
                 //only allow those that can modify the course (probably instructors) to remove
                 //files
-                if (currentCourse.CourseRole.CanModify == true || currentCourse.CourseRole.CanUploadFiles == true)
+                if (currentCourse.AbstractRole.CanModify == true || currentCourse.AbstractRole.CanUploadFiles == true)
                 {
                     //do a simple pattern match to make sure that the file to be uploaded is in
                     //the correct course folder
@@ -187,9 +187,9 @@ namespace OSBLE.Services
                                select c).FirstOrDefault();
             if (cu != null)
             {
-                if (cu.CourseRole.CanModify || cu.CourseRole.CanUploadFiles == true)
+                if (cu.AbstractRole.CanModify || cu.AbstractRole.CanUploadFiles == true)
                 {
-                    return FileSystem.GetCourseDocumentsFileList(cu.Course as AbstractCourse, true);
+                    return FileSystem.GetCourseDocumentsFileList(cu.AbstractCourse as AbstractCourse, true);
                 }
             }
             return new DirectoryListing();
@@ -258,21 +258,21 @@ namespace OSBLE.Services
                                             &&
                                             cu.UserProfileID == currentUser.ID
                                             && 
-                                               (cu.CourseRole.CanModify == true
-                                               || cu.CourseRole.CanUploadFiles == true
+                                               (cu.AbstractRole.CanModify == true
+                                               || cu.AbstractRole.CanUploadFiles == true
                                                )
                                           select cu).ToList();
             
             foreach (CoursesUsers cu in courses)
             {
-                if (cu.Course is Course)
+                if (cu.AbstractCourse is Course)
                 {
-                    Course c = cu.Course as Course;
+                    Course c = cu.AbstractCourse as Course;
                     uploadLocations.Add(cu.CourseID, String.Format("{0} {1} ({2}, {3})", c.Prefix, c.Number, c.Semester, c.Year));
                 }
-                else if (cu.Course is Community)
+                else if (cu.AbstractCourse is Community)
                 {
-                    Community c = cu.Course as Community;
+                    Community c = cu.AbstractCourse as Community;
                     uploadLocations.Add(cu.CourseID, String.Format("{0} - {1}", c.Nickname, c.Name));
                 }
             }
@@ -426,7 +426,7 @@ namespace OSBLE.Services
             //make sure that we got something back
             if (currentCourse != null)
             {
-                if (currentCourse.CourseRole.CanModify || currentCourse.CourseRole.CanUploadFiles == true)
+                if (currentCourse.AbstractRole.CanModify || currentCourse.AbstractRole.CanUploadFiles == true)
                 {
                     FileSystem.UpdateFileOrdering(listing);
                 }

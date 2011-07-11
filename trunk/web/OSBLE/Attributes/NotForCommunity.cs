@@ -17,7 +17,7 @@ namespace OSBLE.Attributes
             {
                 OSBLEController controller = filterContext.Controller as OSBLEController;
 
-                if (controller.ActiveCourse.Course is Community)
+                if (controller.ActiveCourse.AbstractCourse is Community)
                 {
                     filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
                 }

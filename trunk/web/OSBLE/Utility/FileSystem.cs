@@ -14,27 +14,30 @@ using OSBLE.Models.Users;
 //the intended use of the folder
 /*
  *
- *                FileSystem
- *               /    \    \
- *              /      \   ZipFolder
- *          Courses   Users    \
- *             /         \    Records.txt { %hash%.zip}
- *         [courseID]  [userId]
- *           /      \      \
- *          /        \ {global user content}
- *     CourseDocs     \
- *         |          Assignments
- * {course docs go here}   |
- *                         |
- *               [AssignmentActivityId]
- *                       /   \
- *                      /     \
- *                  AADocs   Submissions
- *                     |             \
- *       {assignment activity docs}   \
- *                                   [TeamUserMemberId]
- *                                        |
- *                                {team submissions}
+ *                          FileSystem
+ *                         /          \
+ *                        /            \
+ *                    Courses          Users
+ *                     /                  \
+ *                [courseID]            [userId]
+ *               /     |    \                \
+ *              /      |     \         {global user content}
+ *     CourseDocs      |      ZipFolder
+ *          |    Assignments        \
+ *          |          |             \
+ *  {course docs}      |              \
+ *                     |       Records.txt { %random number%.zip}
+ *                     |
+ *           [AssignmentActivityId]
+ *                 /       \
+ *                /         \
+ *             AADocs   Submissions
+ *                |               \
+ *    {assignment activity docs}   \
+ *                                  \
+ *                           [TeamUserMemberId]
+ *                                   |
+ *                          {team submissions}
  * */
 
 namespace OSBLE
@@ -164,19 +167,19 @@ namespace OSBLE
             return listing;
         }
 
-        private static string getZipFolderLocation()
+        private static string getZipFolderLocation(Course course)
         {
-            return getRootPath() + "ZipFolder";
+            return getCoursePath(course) + "ZipFolder";
         }
 
-        private static string getZipFilesRecords()
+        private static string getZipFilesRecords(Course course)
         {
-            return getZipFolderLocation() + "\\" + "Records.txt";
+            return getZipFolderLocation(course) + "\\" + "Records.txt";
         }
 
-        private static void RemoveOldZipFiles()
+        private static void RemoveOldZipFiles(Course course)
         {
-            string records = getZipFilesRecords();
+            string records = getZipFilesRecords(course);
             string[] fileLines = { };
             try
             {
@@ -203,7 +206,7 @@ namespace OSBLE
                                 //if the file is more than 7 days old remove the file
                                 if (dt < DateTime.Now)
                                 {
-                                    FileInfo zipFile = new FileInfo(getZipFolderLocation() + "\\" + lineSections[1]);
+                                    FileInfo zipFile = new FileInfo(getZipFolderLocation(course) + "\\" + lineSections[1]);
                                     zipFile.Delete();
                                 }
                                 else
@@ -225,7 +228,7 @@ namespace OSBLE
             {
                 //the records file must not exist so we got to make sure the directory exists
 
-                DirectoryInfo info = new DirectoryInfo(getZipFolderLocation());
+                DirectoryInfo info = new DirectoryInfo(getZipFolderLocation(course));
                 if (!(info.Exists))
                 {
                     info.Create();
@@ -253,9 +256,9 @@ namespace OSBLE
             return info.FullName;
         }
 
-        private static void AddEntryToZipRecords(string zipFileName, string realName, DateTime created)
+        private static void AddEntryToZipRecords(Course course, string zipFileName, string realName, DateTime created)
         {
-            using (StreamWriter sw = new StreamWriter(getZipFilesRecords(), true))
+            using (StreamWriter sw = new StreamWriter(getZipFilesRecords(course), true))
             {
                 sw.WriteLine(zipFileName.Split(new char[] { '\\' }).Last() + "," + SanitizeCommas(realName) + "," + created.ToString());
             }
@@ -276,11 +279,11 @@ namespace OSBLE
             return newString;
         }
 
-        private static string FindZipFileLocation(string realName)
+        private static string FindZipFileLocation(Course course, string realName)
         {
             try
             {
-                using (StreamReader sr = new StreamReader(getZipFilesRecords()))
+                using (StreamReader sr = new StreamReader(getZipFilesRecords(course)))
                 {
                     while (!sr.EndOfStream)
                     {
@@ -290,7 +293,7 @@ namespace OSBLE
                             string[] lineSections = line.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                             if (lineSections[1] == realName)
                             {
-                                return getZipFolderLocation() + "\\" + lineSections[0];
+                                return getZipFolderLocation(course) + "\\" + lineSections[0];
                             }
                         }
                     }
@@ -320,10 +323,10 @@ namespace OSBLE
             return s;
         }
 
-        public static void RemoveZipFile(AbstractAssignmentActivity activity, TeamUserMember teamUser)
+        public static void RemoveZipFile(Course course, AbstractAssignmentActivity activity, TeamUserMember teamUser)
         {
             bool foundTeamUserZip = false, foundActivityZip = false;
-            string pathTeamUser = FindZipFileLocation(getRealFileZipName(activity, teamUser));
+            string pathTeamUser = FindZipFileLocation(course, getRealFileZipName(activity, teamUser));
 
             if (pathTeamUser != null)
             {
@@ -331,7 +334,7 @@ namespace OSBLE
                 deleteFile(pathTeamUser);
             }
 
-            string pathActivity = FindZipFileLocation(getRealFileZipName(activity));
+            string pathActivity = FindZipFileLocation(course, getRealFileZipName(activity));
 
             if (pathActivity != null)
             {
@@ -344,17 +347,17 @@ namespace OSBLE
                 //we deleted a file so we got to update the records
 
                 string recordFile;
-                using (StreamReader sr = new StreamReader(getZipFilesRecords()))
+                using (StreamReader sr = new StreamReader(getZipFilesRecords(course)))
                 {
                     recordFile = sr.ReadToEnd();
                 }
 
-                deleteFile(getZipFilesRecords());
+                deleteFile(getZipFilesRecords(course));
 
                 string activityRealname = getRealFileZipName(activity);
                 string teamUserRealname = getRealFileZipName(activity, teamUser);
 
-                using (StreamWriter sw = new StreamWriter(getZipFilesRecords()))
+                using (StreamWriter sw = new StreamWriter(getZipFilesRecords(course)))
                 {
                     foreach (string line in recordFile.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
                     {
@@ -371,9 +374,9 @@ namespace OSBLE
             }
         }
 
-        public static FileStream FindZipFile(AbstractAssignmentActivity activity, TeamUserMember teamUser = null)
+        public static FileStream FindZipFile(Course course, AbstractAssignmentActivity activity, TeamUserMember teamUser = null)
         {
-            string location = FindZipFileLocation(getRealFileZipName(activity, teamUser));
+            string location = FindZipFileLocation(course, getRealFileZipName(activity, teamUser));
             if (location != null)
             {
                 return GetDocumentForRead(location);
@@ -381,16 +384,16 @@ namespace OSBLE
             return null;
         }
 
-        public static bool CreateZipFolder(ZipFile zipFile, AbstractAssignmentActivity activity, TeamUserMember teamUser = null)
+        public static bool CreateZipFolder(Course course, ZipFile zipFile, AbstractAssignmentActivity activity, TeamUserMember teamUser = null)
         {
-            RemoveOldZipFiles();
-            string path = getZipFolderLocation();
+            RemoveOldZipFiles(course);
+            string path = getZipFolderLocation(course);
 
             string zipFileName = GeneratedUnusedFileName(path, ".zip");
 
             zipFile.Save(zipFileName);
 
-            AddEntryToZipRecords(zipFileName, getRealFileZipName(activity, teamUser), DateTime.Now);
+            AddEntryToZipRecords(course, zipFileName, getRealFileZipName(activity, teamUser), DateTime.Now);
 
             return true;
         }

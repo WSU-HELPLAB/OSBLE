@@ -83,7 +83,7 @@ namespace OSBLE.Controllers
                 return RedirectToAction("Index");
             }
 
-            Community updateCommunity = (Community)activeCourse.Course;
+            Community updateCommunity = (Community)activeCourse.AbstractCourse;
 
             updateCommunity.AllowEventPosting = community.AllowEventPosting;
             updateCommunity.CalendarWindowOfTime = community.CalendarWindowOfTime;

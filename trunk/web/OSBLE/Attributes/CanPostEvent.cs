@@ -20,7 +20,7 @@ namespace OSBLE.Attributes
                 CoursesUsers cu = controller.ActiveCourse;
 
                 // Course allows Instructors to post events, community allows Leaders to post events.
-                if (!(cu.CourseRole.CanModify || cu.Course.AllowEventPosting))
+                if (!(cu.AbstractRole.CanModify || cu.AbstractCourse.AllowEventPosting))
                 {
                     filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
                 }

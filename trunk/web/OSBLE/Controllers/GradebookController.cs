@@ -1136,7 +1136,7 @@ namespace OSBLE.Controllers
                                                      where ga.Category.CourseID == currentCourseId
                                                      select ga).ToList();
 
-           List<LetterGrade> letterGradeList = ((activeCourse.Course as Course).LetterGrades).ToList();
+           List<LetterGrade> letterGradeList = ((activeCourse.AbstractCourse as Course).LetterGrades).ToList();
 
            ViewBag.Students = studentList;
            ViewBag.Scores = percentList;

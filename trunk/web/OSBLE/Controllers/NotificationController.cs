@@ -100,7 +100,7 @@ namespace OSBLE.Controllers
             // Send notification to original thread poster if poster is not anonymized, 
             // are still in the course,
             // and are not the poster of the new reply.
-            if (dpPosterCu != null && !dpPosterCu.CourseRole.Anonymized && dp.UserProfileID != poster.ID) { 
+            if (dpPosterCu != null && !dpPosterCu.AbstractRole.Anonymized && dp.UserProfileID != poster.ID) { 
                 sendToUsers.Add(dp.UserProfileID);
             }
 
@@ -112,7 +112,7 @@ namespace OSBLE.Controllers
                 // are still in the course,
                 // and are not the poster of the new reply.
                 // Also checks to make sure a duplicate notification is not sent.
-                if (drPosterCu != null && !drPosterCu.CourseRole.Anonymized && dr.UserProfileID != poster.ID && !sendToUsers.Contains(dr.UserProfileID))
+                if (drPosterCu != null && !drPosterCu.AbstractRole.Anonymized && dr.UserProfileID != poster.ID && !sendToUsers.Contains(dr.UserProfileID))
                 {
                     sendToUsers.Add(dr.UserProfileID);
                 }

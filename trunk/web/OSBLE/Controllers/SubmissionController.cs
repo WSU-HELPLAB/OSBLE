@@ -36,7 +36,7 @@ namespace OSBLE.Controllers
                 {
                     AbstractAssignment assignment = db.AbstractAssignments.Find(activity.AbstractAssignmentID);
 
-                    if (assignment != null && assignment.Category.CourseID == activeCourse.CourseID && activeCourse.CourseRole.CanSubmit == true && assignment is StudioAssignment)
+                    if (assignment != null && assignment.Category.CourseID == activeCourse.CourseID && activeCourse.AbstractRole.CanSubmit == true && assignment is StudioAssignment)
                     {
                         setViewBagDeliverables((assignment as StudioAssignment).Deliverables);
 
@@ -82,7 +82,7 @@ namespace OSBLE.Controllers
 
                     List<Deliverable> deliverables = new List<Deliverable>((assignment as StudioAssignment).Deliverables);
 
-                    if (assignment != null && assignment.Category.CourseID == activeCourse.CourseID && activeCourse.CourseRole.CanSubmit == true && assignment is StudioAssignment)
+                    if (assignment != null && assignment.Category.CourseID == activeCourse.CourseID && activeCourse.AbstractRole.CanSubmit == true && assignment is StudioAssignment)
                     {
                         TeamUserMember teamUser = GetTeamUser(activity as SubmissionActivity, currentUser);
 
@@ -106,8 +106,8 @@ namespace OSBLE.Controllers
 
                                 if (allowFileExtensions.Contains(extension))
                                 {
-                                    FileSystem.RemoveZipFile(activity, teamUser);
-                                    var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.Course as Course, (int)id, teamUser), deliverables[i].Name + extension);
+                                    FileSystem.RemoveZipFile(activeCourse.AbstractCourse as Course, activity, teamUser);
+                                    var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, teamUser), deliverables[i].Name + extension);
                                     file.SaveAs(path);
                                 }
                                 else
@@ -131,7 +131,7 @@ namespace OSBLE.Controllers
                                 string inbrowser = Request.Params["inBrowserText[" + j + "]"];
                                 if (inbrowser.Length > 0)
                                 {
-                                    var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.Course as Course, (int)id, teamUser), delName + ".txt");
+                                    var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, teamUser), delName + ".txt");
                                     System.IO.File.WriteAllText(path, inbrowser);
                                 }
                             }

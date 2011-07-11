@@ -62,11 +62,11 @@ namespace OSBLE.Controllers
             try
             {
                 //If u are looking at the activeCourse and you can either see all or looking at your own let it pass
-                if (activeCourse.CourseID == activity.AbstractAssignment.Category.CourseID && (activeCourse.CourseRole.CanSeeAll || currentUser.ID == userProfileID))
+                if (activeCourse.CourseID == activity.AbstractAssignment.Category.CourseID && (activeCourse.AbstractRole.CanSeeAll || currentUser.ID == userProfileID))
                 {
                     var teamUser = (from c in activity.TeamUsers where c.Contains(db.UserProfiles.Find(userProfileID)) select c).FirstOrDefault();
 
-                    string path = FileSystem.GetDeliverable(activeCourse.Course as Course, assignmentActivityID, teamUser, fileName, GetFileExtensions(type));
+                    string path = FileSystem.GetDeliverable(activeCourse.AbstractCourse as Course, assignmentActivityID, teamUser, fileName, GetFileExtensions(type));
 
                     if (path != null)
                     {
@@ -93,7 +93,7 @@ namespace OSBLE.Controllers
             {
                 if (acitivity.AbstractAssignment.Category.CourseID == activeCourse.CourseID)
                 {
-                    Stream stream = FileSystem.FindZipFile(acitivity);
+                    Stream stream = FileSystem.FindZipFile(activeCourse.AbstractCourse as Course, acitivity);
 
                     string zipFileName = acitivity.Name + ".zip";
 
@@ -117,7 +117,7 @@ namespace OSBLE.Controllers
 
                         if (!acitvityDirectory.Exists)
                         {
-                            FileSystem.CreateZipFolder(zipfile, acitivity);
+                            FileSystem.CreateZipFolder(activeCourse.AbstractCourse as Course, zipfile, acitivity);
                         }
                         else
                         {
@@ -126,7 +126,7 @@ namespace OSBLE.Controllers
                                 zipfile.AddDirectory(submissionDirectory.FullName, (from c in acitivity.TeamUsers where c.ID.ToString() == submissionDirectory.Name select c).FirstOrDefault().Name);
                             }
 
-                            FileSystem.CreateZipFolder(zipfile, acitivity);
+                            FileSystem.CreateZipFolder(activeCourse.AbstractCourse as Course, zipfile, acitivity);
                         }
                         stream = FileSystem.GetDocumentForRead(zipfile.Name);
 
@@ -160,7 +160,7 @@ namespace OSBLE.Controllers
                 TeamUserMember teamUser = db.TeamUsers.Find(teamUserID);
                 if (acitivity.AbstractAssignment.Category.CourseID == activeCourse.CourseID && acitivity.TeamUsers.Contains(teamUser))
                 {
-                    Stream stream = FileSystem.FindZipFile(acitivity, teamUser);
+                    Stream stream = FileSystem.FindZipFile(activeCourse.AbstractCourse as Course, acitivity, teamUser);
 
                     string zipFileName = acitivity.Name + " by " + teamUser.Name + ".zip";
 
@@ -176,13 +176,13 @@ namespace OSBLE.Controllers
                         i++;
                     }
 
-                    string submissionfolder = FileSystem.GetTeamUserSubmissionFolder(false, (activeCourse.Course as Course), assignmentActivityID, db.TeamUsers.Find(teamUserID));
+                    string submissionfolder = FileSystem.GetTeamUserSubmissionFolder(false, (activeCourse.AbstractCourse as Course), assignmentActivityID, db.TeamUsers.Find(teamUserID));
 
                     using (ZipFile zipfile = new ZipFile())
                     {
                         zipfile.AddDirectory(submissionfolder);
 
-                        FileSystem.CreateZipFolder(zipfile, acitivity, teamUser);
+                        FileSystem.CreateZipFolder(activeCourse.AbstractCourse as Course, zipfile, acitivity, teamUser);
 
                         stream = FileSystem.GetDocumentForRead(zipfile.Name);
 
