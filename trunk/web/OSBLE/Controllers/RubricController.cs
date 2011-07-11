@@ -29,6 +29,8 @@ namespace OSBLE.Controllers
             ViewBag.ActivitySelectId = "selected_activity";
             ViewBag.TeamSelectId = "selected_team";
             ViewBag.GlobalCommentId = ViewBag.CritCommentPrefix + "_global";
+            ViewBag.DraftButtonId = "save_as_draft";
+            ViewBag.PublishButtonId = "publish_to_student";
         }
 
         /// <summary>
@@ -43,22 +45,6 @@ namespace OSBLE.Controllers
             Int32.TryParse(Request.Form[ViewBag.AbstractAssignmentActivityId].ToString(), out abstractId);
             Int32.TryParse(Request.Form[ViewBag.TeamUserId].ToString(), out teamId);
 
-            //The user has the possiblility of changing the currently selected activity and
-            //team.  When this happens, we don't want to associate any current data
-            //with this new evaluation.
-            int otherActivityId = 0;
-            int otherTeamId = 0;
-            Int32.TryParse(Request.Form[ViewBag.ActivitySelectId].ToString(), out otherActivityId);
-            Int32.TryParse(Request.Form[ViewBag.TeamSelectId].ToString(), out otherTeamId);
-
-            if (abstractId != otherActivityId || teamId != otherTeamId)
-            {
-                viewModel = GetRubricViewModel(otherActivityId, otherTeamId);
-
-                //return without filling in any other form data
-                return viewModel;
-            }
-
             //before we populate with FORM values, fill in the basic stuff
             if (abstractId > 0 && teamId > 0)
             {
@@ -66,10 +52,11 @@ namespace OSBLE.Controllers
             }
 
             //now, change the view model based on what we were passed through the form
+            viewModel.Evaluation.RecipientID = teamId;
             foreach (CriterionEvaluation critEval in viewModel.Evaluation.CriterionEvaluations)
             {
-                string critScoreKey = String.Format("{0}_{1}", ViewBag.CritInputPrefix, critEval.Criterion.ID);
-                string critCommentKey = String.Format("{0}_{1}", ViewBag.CritCommentPrefix, critEval.Criterion.ID);
+                string critScoreKey = String.Format("{0}_{1}", ViewBag.CritInputPrefix, critEval.CriterionID);
+                string critCommentKey = String.Format("{0}_{1}", ViewBag.CritCommentPrefix, critEval.CriterionID);
                 if (Request.Form.AllKeys.Contains(critScoreKey))
                 {
                     int score = 0;
@@ -82,6 +69,17 @@ namespace OSBLE.Controllers
                 }
             }
 
+            //Set the published status based on what button the user selected.  Note
+            //that once published, a review cannot be unpublished.  In this case,
+            //the "save as draft" and "publish to student" buttons do the same thing.
+            //In the future, it might be cool to have the "draft" button grayed out or
+            //something.
+            string publishKey = ViewBag.PublishButtonId;
+            if (Request.Form.AllKeys.Contains(publishKey))
+            {
+                viewModel.Evaluation.IsPublished = true;
+            }
+
             string globalCommentKey = ViewBag.GlobalCommentId;
             if (Request.Form.AllKeys.Contains(globalCommentKey))
             {
@@ -89,6 +87,22 @@ namespace OSBLE.Controllers
             }
             
             return viewModel;
+        }
+
+        private bool HasValidViewModel(RubricViewModel viewModel)
+        {
+            //make sure that we found a rubric and that we have an activity to grade
+            if (viewModel.Rubric == null || viewModel.AssignmentActivities == null || viewModel.AssignmentActivities.Count == 0)
+            {
+                return false;
+            }
+
+            //Make sure that the current activity is attached to the active course
+            if (viewModel.SelectedAssignmentActivity.AbstractAssignment.Category.CourseID != activeCourse.CourseID)
+            {
+                return false;
+            }
+            return true;
         }
 
         /// <summary>
@@ -132,10 +146,13 @@ namespace OSBLE.Controllers
             {
                 //if nothing exists, we need to build a dummy eval for the view to process
                 viewModel.Evaluation.Recipient = teamUser;
+                viewModel.Evaluation.AbstractAssignmentActivityID = activity.ID;
+                viewModel.Evaluation.EvaluatorID = CurrentUser.ID;
                 foreach (Criterion crit in rubric.Criteria)
                 {
                     CriterionEvaluation critEval = new CriterionEvaluation();
                     critEval.Criterion = crit;
+                    critEval.CriterionID = crit.ID;
                     critEval.Score = 0;
                     critEval.Comment = "";
                     viewModel.Evaluation.CriterionEvaluations.Add(critEval);
@@ -168,6 +185,25 @@ namespace OSBLE.Controllers
         public ActionResult Index(RubricViewModel viewModel)
         {
             RubricViewModel vm = BuildViewModelFromForm();
+
+            if (!HasValidViewModel(vm))
+            {
+                return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
+            }
+
+            //if we've gotten this far, then it's probably okay to save to the DB
+            if(ModelState.IsValid)
+            {
+                if (vm.Evaluation.ID != 0)
+                {
+                    db.Entry(vm.Evaluation).State = EntityState.Modified;
+                }
+                else
+                {
+                    db.RubricEvaluations.Add(vm.Evaluation);
+                }
+                db.SaveChanges();
+            }
             return View(vm);
         }
 
@@ -176,14 +212,7 @@ namespace OSBLE.Controllers
         {
             RubricViewModel viewModel = GetRubricViewModel(abstractAssignmentActivityId, teamUserId);
 
-            //make sure that we found a rubric and that we have an activity to grade
-            if (viewModel.Rubric == null || viewModel.AssignmentActivities.Count == 0)
-            {
-                return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
-            }
-
-            //Make sure that the current activity is attached to the active course
-            if (viewModel.SelectedAssignmentActivity.AbstractAssignment.Category.CourseID != activeCourse.CourseID)
+            if (!HasValidViewModel(viewModel))
             {
                 return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
             }

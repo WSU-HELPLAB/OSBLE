@@ -12,6 +12,7 @@ namespace OSBLE.Models.Courses.Rubrics
         public RubricEvaluation()
         {
             CriterionEvaluations = new List<CriterionEvaluation>();
+            IsPublished = false;
         }
 
         [Key]
@@ -31,7 +32,7 @@ namespace OSBLE.Models.Courses.Rubrics
         [Required]
         public int AbstractAssignmentActivityID { get; set; }
 
-        public virtual AbstractAssignmentActivity Assignment { get; set; }
+        public virtual AbstractAssignmentActivity AssignmentActivity { get; set; }
 
         [Required]
         public bool IsPublished { get; set; }
