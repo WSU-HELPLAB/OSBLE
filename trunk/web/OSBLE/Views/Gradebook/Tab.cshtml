@@ -362,7 +362,6 @@
                         return false;
                     }
                 }
-
                 var row = $(this).parent("tr").next("tr");
                 if (row.attr("id") == "averageRow") {
                     clearLastCellFocus();
@@ -419,8 +418,8 @@
                 row.each(function () {
                     cell = $(this).find("td:eq(" + colIndex + ")");
                 });
-                if (cell != null) {
-                    cellGainsFocus(cell);
+                    if (cell != null) {
+                        cellGainsFocus(cell);
                 }
                 else {
                     colIndex -= 1;
@@ -611,16 +610,7 @@
 
         hideDropDown();
         resetTableColors();
-        //Header needs to lose focus
-        if (header == true) {
-            clearLastHeaderFocus(lastId);
-            header = false;
-        }
-
-        //If a cell has focus we want to clear it before we start to edit the header
-        clearLastCellFocus();
-
-
+        
         //do this once so we don't have to constantly do it later
         someHeader = $(someHeader);
 
@@ -630,13 +620,20 @@
             lastId = cellId[1];
         }
 
-        //clear the last headers focus
-        clearLastHeaderFocus(lastId);
+        //Header needs to lose focus
+        if (header == true) {
+            clearLastHeaderFocus(lastId);
+            header = false;
+        } else {
+            //If a cell has focus we want to clear it before we start to edit the header
+            clearLastCellFocus();
+        }
+
 
         //split and get the column number from the id
         var cellId = someHeader.attr("id").split("-");
         lastId = cellId[1];
-
+        
         var textValue = someHeader.text();
         var inputText = $('<input class="cellInput" type="text" value="' + textValue + '" />');
 
@@ -751,8 +748,6 @@
         var cell = null
         var row = $(someCell).parent("tr").prevAll().length;
         var colIndex = $(someCell).prevAll().length;
-        //colIndex = parseInt(colIndex + 1);
-        dataCellColId = (colIndex + 1).toString() ;
 
         resetTableColors();
 
