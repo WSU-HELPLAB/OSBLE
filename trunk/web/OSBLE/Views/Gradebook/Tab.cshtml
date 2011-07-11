@@ -367,7 +367,11 @@
                 if (row.attr("id") == "averageRow") {
                     clearLastCellFocus();
                 }
-                else {
+                else if (row.html() == null) {
+                    clearLastCellFocus();
+                    return false;
+                }
+                else{
                     var colIndex = $(this).prevAll().length;
                     row.each(function () {
                         cell = $(this).find("td:eq(" + colIndex + ")");
@@ -398,11 +402,15 @@
                 var row = $(this).parent("tr");
                 // used for generating the column count
                 var one = 1;
-                var ColCount = $('table tr:eq(' + one + ') td').length;
+                var colCount = $('table tr:eq(' + one + ') td').length;
                 var colIndex = $(this).prevAll().length;
                 colIndex = parseInt(colIndex);
-                if (colIndex >= ColCount) {
+                if (colIndex >= colCount) {
                     row = $(this).parent("tr").next("tr");
+                    if (row.html() == null) {
+                        clearLastCellFocus();
+                        return false;
+                    }
                     // coded based off the original design if you change the column structure you might need to change this
                     colIndex = 3;
                 } else {
