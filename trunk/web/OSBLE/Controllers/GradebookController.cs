@@ -1050,7 +1050,11 @@ namespace OSBLE.Controllers
                                             orderby up.LastName, up.FirstName
                                             select up).ToList();
 
-           var mainScores =    from score in db.Scores
+           List<Score> scor = (from s in db.Scores
+                               where s.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId
+                               select s).ToList();
+
+           var mainScores =    from score in scor
                                join category in db.Categories on score.AssignmentActivity.AbstractAssignment.CategoryID equals category.ID
                                where score.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId && 
                                score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID &&
@@ -1062,11 +1066,12 @@ namespace OSBLE.Controllers
                                    AssignmentId = assignmentScores.Key,
                                    StudentScores =
                                                    from stu in assignmentScores
-                                                   group stu by stu.TeamUserMemberID into students
+                                                   group stu by stu.TeamUserMember.Name into students
                                                    select new
                                                    {
                                                        StudentId = students.Key,
                                                        Score = students.Sum(stu => stu.Points),
+                                                       teamUserMember = students.Select(stu => stu.TeamUserMember).FirstOrDefault(),
                                                        perfectScore = students.Sum(stu => stu.AssignmentActivity.AbstractAssignment.PointsPossible),
                                                        category = students.Select(stu => stu.AssignmentActivity.AbstractAssignment.Category).FirstOrDefault(),
                                                        activity = students.Select(stu => stu.AssignmentActivity).FirstOrDefault()
@@ -1078,11 +1083,11 @@ namespace OSBLE.Controllers
                for (int i = 0; i < item.StudentScores.Count(); i++ )
                {
                    var scores = item.StudentScores.ElementAt(i);
-
+                   
                    Score studentScore = new Score()
                    {
                        AssignmentActivity = scores.activity,
-                       TeamUserMemberID = scores.StudentId,
+                       TeamUserMember = scores.teamUserMember,
                        Points = ((scores.Score / scores.perfectScore)*100),
                        isDropped = false
                    };

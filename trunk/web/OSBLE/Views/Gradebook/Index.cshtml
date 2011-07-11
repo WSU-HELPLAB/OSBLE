@@ -238,25 +238,25 @@
 		    <th align="center">Options</th>
 		</tr>
         <tr>
-            <td><a>Insert Category Left</a></td>
+            <td><a style="cursor:pointer">Insert Category Left</a></td>
         </tr>
         <tr>
-            <td><a>Insert Category Right</a></td>
+            <td><a style="cursor:pointer">Insert Category Right</a></td>
         </tr>
         <tr>
-            <td><a>Import Grades Here...</a></td>
+            <td><a style="cursor:pointer">Import Grades Here...</a></td>
         </tr>
         <tr>
-            <td><a>Move Column Right</a></td>
+            <td><a style="cursor:pointer">Move Column Right</a></td>
         </tr>
         <tr>
-            <td><a>Move Column Left</a></td>
+            <td><a style="cursor:pointer">Move Column Left</a></td>
         </tr>
         <tr>
-            <td><a onclick="deleteCategory();">Delete Category</a></td>
+            <td><a style="cursor:pointer" onclick="deleteCategory();">Delete Category</a></td>
         </tr>
         <tr>
-			<td id="changeColor" onmouseover="displayColors(this);" ><a >Change Category Color</a></td>
+			<td id="changeColor" onmouseover="displayColors(this);"><a style="cursor:pointer">Change Category Color</a></td>
 		</tr>
 	</table>
 </div>
@@ -516,8 +516,9 @@
             @{
             double totalGrade = 0;
             double totalPossible = 0;
+            var totalPercent = 0.0;
             List<Score> totalOfCats = (from total in ViewBag.Scores as IEnumerable<Score>
-                                       where total.TeamUserMemberID == student.ID &&
+                                       where total.TeamUserMember.Contains(student) &&
                                        total.Points >= 0
                                        select total).ToList();
 
@@ -540,14 +541,17 @@
                         totalPossible += 100 * totalOfCats[i].AssignmentActivity.AbstractAssignment.Category.Points;
                     }
                 }
+                
             }
 
 
-
-            var totalPercent = (totalGrade / totalPossible) * 100;
-
-            totalAverage += totalPercent;
+            totalPercent = (totalGrade / totalPossible) * 100;
+            if (totalPercent > 0)
+            {
+                totalAverage += totalPercent;
+            }
             totalStudents++;
+            
 
             var letter = "";
             foreach (LetterGrade item in letterList)
@@ -565,10 +569,10 @@
             foreach (Category cat in ViewBag.Categories)
             {
                 List<Score> scoreQuery = (from g in ViewBag.Scores as IEnumerable<Score>
-                                          where g.TeamUserMemberID == student.ID &&
-                                          g.AssignmentActivity.AbstractAssignment.CategoryID == cat.ID &&
+                                          where g.AssignmentActivity.AbstractAssignment.CategoryID == cat.ID &&
                                           g.AssignmentActivity.AbstractAssignment.Category.Name != Constants.UnGradableCatagory &&
-                                          g.Points >= 0
+                                          g.Points >= 0 &&
+                                          g.TeamUserMember.Contains(student)
                                           select g).ToList();
 
                 if (scoreQuery.Count() > 0)
