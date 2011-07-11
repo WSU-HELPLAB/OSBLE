@@ -17,7 +17,7 @@ using System.Web.Routing;
 using OSBLE.Models.Assignments.Activities.Scores;
 
 namespace OSBLE.Controllers
-{ 
+{
     public class RubricController : OSBLEController
     {
         public RubricController()
@@ -87,7 +87,7 @@ namespace OSBLE.Controllers
             {
                 viewModel.Evaluation.GlobalComment = Request.Form[globalCommentKey].ToString();
             }
-            
+
             return viewModel;
         }
 
@@ -194,7 +194,7 @@ namespace OSBLE.Controllers
             }
 
             //if we've gotten this far, then it's probably okay to save to the DB
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 //save to the rubric evaluations table
                 if (vm.Evaluation.ID != 0)
@@ -207,47 +207,45 @@ namespace OSBLE.Controllers
                 }
                 db.SaveChanges();
 
-                //Also, for this to show up in the gradebook, we need to add / modify some information
-                //in the "Scores" table.
-                var gradableQuery = from g in db.Scores
-                                    join a in db.AbstractAssignmentActivities on g.AssignmentActivityID equals a.ID
-                                    where g.TeamUserMemberID == vm.Evaluation.RecipientID
-                                    &&
-                                    a.ID == vm.Evaluation.AssignmentActivity.AbstractAssignment.ID
-                                    select g;
-
-                //figure out the raw (non-normalized) final score.
-                int? sum = (from a in vm.Evaluation.CriterionEvaluations
-                            select a.Score).Sum();
-
-                //should never be null, but you never know...
-                if (sum == null)
+                //if the evaluation has been published, update the scores in the gradebook
+                if (vm.Evaluation.IsPublished)
                 {
-                    sum = 0;
-                }
+                    Score grade = (from g in db.Scores
+                                   join a in db.AbstractAssignmentActivities on g.AssignmentActivityID equals a.ID
+                                   where g.TeamUserMemberID == vm.Evaluation.RecipientID
+                                   &&
+                                   a.ID == vm.Evaluation.AssignmentActivity.AbstractAssignment.ID
+                                   select g).FirstOrDefault();
 
-                if (gradableQuery.Count() > 0)
-                {
-                    //modify.  Is a loop necessary?
-                    foreach (Score item in gradableQuery)
+                    //figure out the raw (non-normalized) final score.
+                    int? sum = (from a in vm.Evaluation.CriterionEvaluations
+                                select a.Score).Sum();
+
+                    //should never be null, but you never know...
+                    if (sum == null)
                     {
-                        item.Points = (int)sum;
+                        sum = 0;
                     }
-                    db.SaveChanges();
-                }
-                else
-                {
-                    //create
-                    Score newScore = new Score()
+
+                    if (grade != null)
                     {
-                        TeamUserMemberID = vm.Evaluation.RecipientID,
-                        Points = (int)sum,
-                        AssignmentActivityID = vm.Evaluation.AbstractAssignmentActivityID,
-                        PublishedDate = DateTime.Now,
-                        isDropped = false
-                    };
-                    db.Scores.Add(newScore);
-                    db.SaveChanges();
+                        grade.Points = (int)sum;
+                        db.SaveChanges();
+                    }
+                    else
+                    {
+                        //create
+                        Score newScore = new Score()
+                        {
+                            TeamUserMemberID = vm.Evaluation.RecipientID,
+                            Points = (int)sum,
+                            AssignmentActivityID = vm.Evaluation.AbstractAssignmentActivityID,
+                            PublishedDate = DateTime.Now,
+                            isDropped = false
+                        };
+                        db.Scores.Add(newScore);
+                        db.SaveChanges();
+                    }
                 }
             }
             return View(vm);
