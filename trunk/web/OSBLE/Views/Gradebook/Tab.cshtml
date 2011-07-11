@@ -282,14 +282,7 @@
 
 <script type="text/jscript">
     var lastFocusedCell = null;
-    var showDropDown = false;
-    var changedShow = false;
-    //var isHighlighted = false;
-
-    var menuSelected = false;
-    var menuUnSelected = false;
     var currentHeader = null;
-    var dataCellColId = null;
 
     //displays current column
     var currentCol = 0;
@@ -312,12 +305,7 @@
     //Keeps track of assignmentId
     var assignId = 0;
 
-    var onMouseOver = false;
-
     var currentHeaderCell = null;
-
-    var stopKeyPressEvent = false;
-
 
     $(document).ready(function () {
         //calculateRows();
@@ -482,7 +470,6 @@
             $("#" + container).css("background-color", "#FFFF84");
             $("#div-" + container).css("background-color", "#FFFF84");
         }
-        //onMouseOver = false;
     }
     
     function hideOnlyButton(column) {
@@ -497,7 +484,6 @@
 
         $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
 
-        //alert($("#" + container).css("background-color"));
         if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)"
         || $("#" + container).css("background-color") == "rgb(255, 255, 132)" && $("#div-" + container).css("background-color") == "rgb(255, 255, 132)") {
 
@@ -750,14 +736,13 @@
         var colIndex = $(someCell).prevAll().length;
 
         resetTableColors();
+        hideDropDown();
 
         //Header needs to lose focus
         if (header == true) {
             clearLastHeaderFocus(lastId);
             header = false;
-        }
-
-        else {
+        } else {
             //clear any previous focus
             clearLastCellFocus();
         }
@@ -784,8 +769,6 @@
         cell2.css("background-color", "#FFFF84");
         cell2.find("div").css("background-color", "#FFFF84");
         cell2.removeAttr("onmouseout");
-
-        onMouseOver = true;
     }
 
     function calculateCols() {
