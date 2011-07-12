@@ -99,16 +99,16 @@ namespace OSBLE.Controllers
                 if (ActiveCourse.AbstractCourse is Course)
                 {
                     // Set custom role order for display
-                    List<Privileges.CourseRoles> rolesOrder = new List<Privileges.CourseRoles>();
+                    List<CourseRole.CourseRoles> rolesOrder = new List<CourseRole.CourseRoles>();
 
-                    int i = (int)Privileges.CourseRoles.Instructor;
-                    while (Enum.IsDefined(typeof(Privileges.CourseRoles), i))
+                    int i = (int)CourseRole.CourseRoles.Instructor;
+                    while (Enum.IsDefined(typeof(CourseRole.CourseRoles), i))
                     {
-                        rolesOrder.Add((Privileges.CourseRoles)i);
+                        rolesOrder.Add((CourseRole.CourseRoles)i);
                         i++;
                     }
 
-                    foreach (Privileges.CourseRoles r in rolesOrder)
+                    foreach (CourseRole.CourseRoles r in rolesOrder)
                     {
                         roles.Add(db.CourseRoles.Find((int)r));
                     }
@@ -248,7 +248,7 @@ namespace OSBLE.Controllers
                     }
 
                     // Make sure no student has the same ID as existing non-student members.
-                    List<CoursesUsers> otherMembers = db.CoursesUsers.Where(c => c.AbstractCourseID == activeCourse.AbstractCourseID && c.AbstractRoleID != (int)Privileges.CourseRoles.Student).ToList();
+                    List<CoursesUsers> otherMembers = db.CoursesUsers.Where(c => c.AbstractCourseID == activeCourse.AbstractCourseID && c.AbstractRoleID != (int)CourseRole.CourseRoles.Student).ToList();
                     foreach (CoursesUsers member in otherMembers)
                     {
                         if (usedIdentifications.Contains(member.UserProfile.Identification))
@@ -259,7 +259,7 @@ namespace OSBLE.Controllers
                     }
 
                     // No duplicate IDs, so we can remove the current course links to add the new ones.
-                    var students = from c in db.CoursesUsers where c.AbstractCourseID == activeCourse.AbstractCourseID && c.AbstractRoleID == (int)Privileges.CourseRoles.Student select c;
+                    var students = from c in db.CoursesUsers where c.AbstractCourseID == activeCourse.AbstractCourseID && c.AbstractRoleID == (int)CourseRole.CourseRoles.Student select c;
                     foreach (CoursesUsers student in students)
                     {
                         db.CoursesUsers.Remove(student);
@@ -270,7 +270,7 @@ namespace OSBLE.Controllers
                     foreach (RosterEntry entry in rosterEntries)
                     {
                         CoursesUsers courseUser = new CoursesUsers();
-                        courseUser.AbstractRoleID = (int)Privileges.CourseRoles.Student;
+                        courseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
                         courseUser.Section = entry.Section;
                         courseUser.UserProfile = new UserProfile();
                         courseUser.UserProfile.Identification = entry.Identification;
@@ -306,7 +306,7 @@ namespace OSBLE.Controllers
         [NotForCommunity]
         public ActionResult Create()
         {
-            ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
+            ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name");
             return View();
         }
 
@@ -327,7 +327,7 @@ namespace OSBLE.Controllers
                 catch
                 {
                     ModelState.AddModelError("", "This ID Number already exists in this class");
-                    ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
+                    ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name");
                     return View();
                 }
             }
@@ -341,11 +341,11 @@ namespace OSBLE.Controllers
         {
             if (!(ViewBag.ActiveCourse.AbstractCourse is Community))
             {
-                ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
+                ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name");
             }
             else // Community Roles
             {
-                ViewBag.CourseRoleID = new SelectList(db.CommunityRoles, "ID", "Name");
+                ViewBag.AbstractRoleID = new SelectList(db.CommunityRoles, "ID", "Name");
             }
             return View();
         }
@@ -367,7 +367,7 @@ namespace OSBLE.Controllers
                 catch (Exception e)
                 {
                     ModelState.AddModelError("", e.Message);
-                    ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name");
+                    ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name");
                     return View();
                 }
             }
@@ -388,11 +388,11 @@ namespace OSBLE.Controllers
                 ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", coursesusers.UserProfileID);
                 if (activeCourse.AbstractCourse is Course)
                 {
-                    ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name", coursesusers.AbstractRoleID);
+                    ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name", coursesusers.AbstractRoleID);
                 }
                 else // Community Roles
                 {
-                    ViewBag.CourseRoleID = new SelectList(db.CommunityRoles, "ID", "Name");
+                    ViewBag.AbstractRoleID = new SelectList(db.CommunityRoles, "ID", "Name");
                 }
                 return View(coursesusers);
             }
@@ -415,8 +415,8 @@ namespace OSBLE.Controllers
                     return RedirectToAction("Index");
                 }
                 ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", coursesusers.UserProfileID);
-                ViewBag.CourseID = new SelectList(db.Courses, "ID", "Prefix", coursesusers.AbstractCourseID);
-                ViewBag.CourseRoleID = new SelectList(db.CourseRoles, "ID", "Name", coursesusers.AbstractRoleID);
+                ViewBag.AbstractCourse = new SelectList(db.Courses, "ID", "Prefix", coursesusers.AbstractCourseID);
+                ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name", coursesusers.AbstractRoleID);
                 return View(coursesusers);
             }
             return RedirectToAction("Index");

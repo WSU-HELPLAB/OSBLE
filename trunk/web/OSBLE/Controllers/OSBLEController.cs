@@ -226,8 +226,8 @@ namespace OSBLE.Controllers
                 // Get list of courses this user is connected to. Remove inactive (for anyone other than instructors or observers) or hidden (for all) courses.
                 currentCourses = allUsersCourses.Where(cu => (cu.AbstractCourse is Course) &&
                     (((cu.AbstractCourse as Course).Inactive == false) ||
-                    (cu.AbstractRoleID == (int)Privileges.CourseRoles.Instructor) ||
-                    (cu.AbstractRoleID == (int)Privileges.CourseRoles.Observer)))
+                    (cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor) ||
+                    (cu.AbstractRoleID == (int)CourseRole.CourseRoles.Observer)))
                     // Order first by descending start date (newest first)
                         .OrderByDescending(cu => (cu.AbstractCourse as Course).StartDate)
                     // Order next by whether the course is inactive, placing inactive courses underneath active.

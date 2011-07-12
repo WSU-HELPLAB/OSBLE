@@ -25,11 +25,11 @@
         </div>
 
         <div class="editor-label">
-            @Html.LabelFor(model => model.AbstractRoleID, "CourseRole")
+            @Html.LabelFor(model => model.AbstractRoleID, "Course Role")
             @Helpers.CreateToolTip(ToolTips.RosterRole) 
         </div>
         <div class="editor-field">
-            @Html.DropDownList("CourseRoleID", String.Empty)
+            @Html.DropDownList("AbstractRoleID", String.Empty)
             @Html.ValidationMessageFor(model => model.AbstractRoleID)
         </div>
 

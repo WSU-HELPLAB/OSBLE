@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
+using System.Net.Mail;
 using System.Web.Mvc;
 using OSBLE.Attributes;
-using OSBLE.Models.HomePage;
-using OSBLE.Models.Courses;
-using OSBLE.Models.Users;
 using OSBLE.Models;
-using System.Drawing;
+using OSBLE.Models.Courses;
+using OSBLE.Models.HomePage;
 using OSBLE.Models.Services.Uploader;
-using System.IO;
-using System.Net.Mail;
-using System.Configuration;
-using System.Reflection;
-using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.Users;
 using OSBLE.Utility;
 
 namespace OSBLE.Controllers
@@ -86,7 +83,6 @@ namespace OSBLE.Controllers
                 viewedCourses = currentCourses.Where(cu => !cu.Hidden).Select(cu => cu.AbstractCourseID).ToList();
             }
 
-            
             if (activeCourse.AbstractCourse is Course && activeCourse.AbstractRole.CanModify)
             {
                 ViewBag.IsInstructor = true;
@@ -104,7 +100,6 @@ namespace OSBLE.Controllers
             {
                 ViewBag.IsLeader = false;
             }
-
 
             // Get optional start post from query for pagination
             if (Request.Params["startPost"] != null)
@@ -285,17 +280,17 @@ namespace OSBLE.Controllers
         /// Gets optional role title for certain roles in a course/community
         /// (Instructors/TAs in courses, Leaders in communities)
         /// </summary>
-        /// <param name="CourseRoleID">The Role ID of the user in question</param>
+        /// <param name="AbstractRoleID">The Role ID of the user in question</param>
         /// <returns>Returns a title for a user in a course if they are in a leadership role in that course</returns>
-        private string getRoleTitle(int CourseRoleID)
+        private string getRoleTitle(int AbstractRoleID)
         {
-            switch (CourseRoleID)
+            switch (AbstractRoleID)
             {
                 case (int)CommunityRole.OSBLERoles.Leader:
                     return "Leader";
-                case (int)Privileges.CourseRoles.Instructor:
+                case (int)CourseRole.CourseRoles.Instructor:
                     return "Instructor";
-                case (int)Privileges.CourseRoles.TA:
+                case (int)CourseRole.CourseRoles.TA:
                     return "TA";
                 default:
                     return "";
@@ -403,7 +398,7 @@ namespace OSBLE.Controllers
             }
             else if (Request.Form["post_all"] != null)
             { // Post to all courses.
-                CoursesToPost = currentCourses.Where(cu=>cu.AbstractCourse is Course && cu.AbstractRole.CanModify && !cu.Hidden).ToList();
+                CoursesToPost = currentCourses.Where(cu => cu.AbstractCourse is Course && cu.AbstractRole.CanModify && !cu.Hidden).ToList();
             }
 
             foreach (CoursesUsers cu in CoursesToPost)
@@ -460,14 +455,14 @@ namespace OSBLE.Controllers
                             body += "\n\n";
                             body += dp.Content;
                         }
-                        
+
                         //add the users to the email list
                         foreach (UserProfile up in usersWantingEmail)
                         {
                             addresses.Add(new MailAddress(up.UserName, up.FirstName + " " + up.LastName));
                         }
 
-                        //If the instructor wanted to email the entire class, add these users as well.  
+                        //If the instructor wanted to email the entire class, add these users as well.
                         //We should be in the clear if adding dupes from above as we're dealing with references
                         //to the same object.
                         if (c != null && sendEmail && cu.AbstractRole.CanModify)
@@ -632,10 +627,10 @@ namespace OSBLE.Controllers
             // User Profile object of user we are trying to get a picture of
             UserProfile u = db.UserProfiles.Find(userProfile);
 
-            // A role for both our current user and 
+            // A role for both our current user and
             // the one we're trying to see
-            AbstractRole ourRole = currentCourses.Where(c => c.AbstractCourseID == course).Select(c=>c.AbstractRole).FirstOrDefault();
-            AbstractRole theirRole = db.CoursesUsers.Where(c => (c.AbstractCourseID == course) && (c.UserProfileID == userProfile)).Select(c=>c.AbstractRole).FirstOrDefault();
+            AbstractRole ourRole = currentCourses.Where(c => c.AbstractCourseID == course).Select(c => c.AbstractRole).FirstOrDefault();
+            AbstractRole theirRole = db.CoursesUsers.Where(c => (c.AbstractCourseID == course) && (c.UserProfileID == userProfile)).Select(c => c.AbstractRole).FirstOrDefault();
 
             // Show picture if user is requesting their own profile picture or they have the right to view the profile picture
             if (userProfile == currentUser.ID ||

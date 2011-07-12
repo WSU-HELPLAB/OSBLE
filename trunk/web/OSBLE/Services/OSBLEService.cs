@@ -47,8 +47,8 @@ namespace OSBLE.Services
                                                     cu.UserProfileID == currentUserProfile.ID &&
                                                     cu.AbstractCourse is Course &&
                                                     (!(cu.AbstractCourse as Course).Inactive ||
-                                                        cu.AbstractRoleID == (int)Privileges.CourseRoles.Instructor ||
-                                                        cu.AbstractRoleID == (int)Privileges.CourseRoles.Observer
+                                                        cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor ||
+                                                        cu.AbstractRoleID == (int)CourseRole.CourseRoles.Observer
                                                     )).FirstOrDefault();
             }
         }

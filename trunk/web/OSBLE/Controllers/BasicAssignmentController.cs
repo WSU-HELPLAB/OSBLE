@@ -297,7 +297,7 @@ namespace OSBLE.Controllers
 
             var couresesUsers = (from c in db.CoursesUsers
                                  where c.AbstractCourseID == activeCourse.AbstractCourseID
-                                 && (c.AbstractRole.ID == (int)Privileges.CourseRoles.Student)
+                                 && (c.AbstractRole.ID == (int)CourseRole.CourseRoles.Student)
                                  select c).ToList();
 
             int i = 0;
@@ -307,7 +307,7 @@ namespace OSBLE.Controllers
                 foreach (CoursesUsers cu in couresesUsers)
                 {
                     SerializableTeamMember teamMember = new SerializableTeamMember();
-                    teamMember.IsModerator = cu.AbstractRole.ID == (int)Privileges.CourseRoles.Moderator;
+                    teamMember.IsModerator = cu.AbstractRole.ID == (int)CourseRole.CourseRoles.Moderator;
                     teamMember.Name = cu.UserProfile.FirstName + " " + cu.UserProfile.LastName;
                     teamMember.Section = cu.Section;
                     teamMember.UserID = cu.UserProfileID;

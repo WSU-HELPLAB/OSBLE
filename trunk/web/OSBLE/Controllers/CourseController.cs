@@ -141,7 +141,7 @@ namespace OSBLE.Controllers
                 CoursesUsers cu = new CoursesUsers();
                 cu.AbstractCourseID = course.ID;
                 cu.UserProfileID = currentUser.ID;
-                cu.AbstractRoleID = (int)Privileges.CourseRoles.Instructor;
+                cu.AbstractRoleID = (int)CourseRole.CourseRoles.Instructor;
 
                 //Add new Categories to the course
                 Category category = new Category();

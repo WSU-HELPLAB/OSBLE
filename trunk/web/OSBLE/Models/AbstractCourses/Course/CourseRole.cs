@@ -1,13 +1,13 @@
 ﻿namespace OSBLE.Models.Courses
 {
-    public class Privileges : AbstractRole
+    public class CourseRole : AbstractRole
     {
-        public Privileges()
+        public CourseRole()
             : base()
         {
         }
 
-        public Privileges(string Name, bool CanModify, bool CanSeeAll, bool CanGrade, bool CanSubmit, bool CanUploadFiles, bool Anonymized)
+        public CourseRole(string Name, bool CanModify, bool CanSeeAll, bool CanGrade, bool CanSubmit, bool CanUploadFiles, bool Anonymized)
             : base()
         {
             this.Name = Name;

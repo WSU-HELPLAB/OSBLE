@@ -143,7 +143,7 @@ namespace OSBLE.Controllers
         {
             // Get all instructors in the course.
             List<UserProfile> instructors = db.CoursesUsers.Where(c => (c.AbstractCourseID == e.CourseID)
-                && (c.AbstractRoleID == (int)Privileges.CourseRoles.Instructor))
+                && (c.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor))
                 .Select(c => c.UserProfile).ToList();
 
             foreach (UserProfile instructor in instructors)

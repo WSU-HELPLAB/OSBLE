@@ -1065,7 +1065,7 @@ namespace OSBLE.Controllers
            //pull the students in the course.  Each student is a row.
            List<UserProfile> studentList = (from up in db.UserProfiles
                                             join cu in db.CoursesUsers on up.ID equals cu.UserProfileID
-                                            where cu.AbstractCourseID == currentCourseId && cu.AbstractRoleID == (int)Privileges.CourseRoles.Student
+                                            where cu.AbstractCourseID == currentCourseId && cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student
                                             orderby up.LastName, up.FirstName
                                             select up).ToList();
 
@@ -1290,7 +1290,7 @@ namespace OSBLE.Controllers
            //pull the students in the course.  Each student is a row.
            List<UserProfile> students = (from up in db.UserProfiles
                                          join cu in db.CoursesUsers on up.ID equals cu.UserProfileID
-                                         where cu.AbstractCourseID == currentCourseId && cu.AbstractRoleID == (int)Privileges.CourseRoles.Student
+                                         where cu.AbstractCourseID == currentCourseId && cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student
                                          orderby up.LastName, up.FirstName
                                          select up).ToList();
 
