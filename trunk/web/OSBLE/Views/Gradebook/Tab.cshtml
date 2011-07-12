@@ -313,13 +313,13 @@
 
     });
 
-    $(document).click(function () {
+    $(document).click(function (e) {
 
         if (header == true) {
-            clearLastHeaderFocus(lastId);
+            clearLastHeaderFocus();
         }
         else {
-            clearLastCellFocus();
+            clearLastCellFocus(e);
         }
 
         hideDropDown();
@@ -327,19 +327,19 @@
         resetTableColors();
     });
 
-    $(window).unload(function () {
-        clearLastCellFocus();
-    });
+//    $(window).unload(function () {
+//        clearLastCellFocus(evt);
+//    });
 
     function hideTabColors() {
-        $("#selectMenuID").animate({ "height": "hide" }, { duration: 300 });
-        $("#displayColorsID").animate({ "height": "hide" }, { duration: 300 });
+        $("#selectMenuID").animate({ "height": "hide" }, { duration: 0 });
+        $("#displayColorsID").animate({ "height": "hide" }, { duration: 0 });
     }
 
     function keyControls() {
-        if (lastFocusedCell != null) {
-            cellGainsFocus(lastFocusedCell);
-        }
+//        if (lastFocusedCell != null) {
+//            cellGainsFocus(event, lastFocusedCell);
+//        }
         $("#grades td").keydown(function (e) {
             var cell = null;
             if (e.keyCode == 13) {
@@ -352,10 +352,10 @@
                 }
                 var row = $(this).parent("tr").next("tr");
                 if (row.attr("id") == "averageRow") {
-                    clearLastCellFocus();
+                    clearLastCellFocus(e);
                 }
                 else if (row.html() == null) {
-                    clearLastCellFocus();
+                    clearLastCellFocus(e);
                     return false;
                 }
                 else{
@@ -365,14 +365,14 @@
                     });
                 }
                 if (cell != null) {
-                    cellGainsFocus(cell);
+                    cellGainsFocus(e, cell);
                 }
                 else {
                     row = $(this).parent("tr");
                     row.each(function () {
                         cell = $(this).find("td:eq(" + colIndex + ")");
                     });
-                    clearLastCellFocus(cell);
+                    clearLastCellFocus(e);
                 }
             }
             else if (e.keyCode == 9) {
@@ -395,7 +395,7 @@
                 if (colIndex >= colCount) {
                     row = $(this).parent("tr").next("tr");
                     if (row.html() == null) {
-                        clearLastCellFocus();
+                        clearLastCellFocus(e);
                         return false;
                     }
                     // coded based off the original design if you change the column structure you might need to change this
@@ -407,14 +407,14 @@
                     cell = $(this).find("td:eq(" + colIndex + ")");
                 });
                     if (cell != null) {
-                        cellGainsFocus(cell);
+                        cellGainsFocus(e, cell);
                 }
                 else {
                     colIndex -= 1;
                     row.each(function () {
                         cell = $(this).find("td:eq(" + colIndex + ")");
                     });
-                    clearLastCellFocus(cell);
+                    clearLastCellFocus(e);
                 }
             }
             else {
@@ -428,7 +428,7 @@
                 var colIndex = $(this).prevAll().length;
                 row.each(function () {
                     cell = $(this).find("td:eq(" + colIndex + ")");
-                    cellGainsFocus(cell);
+                    cellGainsFocus(e, cell);
                 });
             }
             else if (e.keyCode == 9) {
@@ -445,12 +445,12 @@
                     colIndex = 3;
                     row.each(function () {
                         cell = $(this).find("td:eq(" + colIndex + ")");
-                        cellGainsFocus(cell);
+                        cellGainsFocus(e, cell);
                     });
 
                     return false;
                 }
-                changeHeaderName(cell);
+                changeHeaderName(e, cell);
             }
         });
 
@@ -464,8 +464,7 @@
 
         $("#div-" + container).animate({ "height": "show" }, { duration: 0 });
 
-        if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)"
-            || $("#" + container).css("background-color") == "rgb(255, 255, 132)" && $("#div-" + container).css("background-color") == "rgb(255, 255, 132)") {
+        if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)") {
 
             $("#" + container).css("background-color", "#FFFF84");
             $("#div-" + container).css("background-color", "#FFFF84");
@@ -484,8 +483,7 @@
 
         $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
 
-        if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)"
-        || $("#" + container).css("background-color") == "rgb(255, 255, 132)" && $("#div-" + container).css("background-color") == "rgb(255, 255, 132)") {
+        if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)") {
 
             $("#div-" + container).css("background-color", "#DCDCDC");
             $('#' + container).css("background-color", "#DCDCDC");
@@ -505,7 +503,7 @@
                 }
             });
             $(this).find("th").each(function () {
-                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                if ($(this).attr("class") == "colHeader") {
                 }
                 else {
                     $(this).css("background-color", "white");
@@ -569,14 +567,14 @@
     function setButtonId(button) {
     }
 
-    function clearLastHeaderFocus(id) {
+    function clearLastHeaderFocus() {
 
         //if a header already had focus then we need to change it back and display text
         if (lastFocusedCell != null) {
             var cellValue = lastFocusedCell.children().val();
             var cellID = lastFocusedCell.attr("id").split("-");
             lastFocusedCell.html(cellValue);
-            lastFocusedCell.attr("onclick", 'changeHeaderName(this)');
+            lastFocusedCell.attr("onclick", 'changeHeaderName(event, this)');
             lastFocusedCell = null;
 
 
@@ -591,8 +589,9 @@
         }
     }
 
-    function changeHeaderName(someHeader) {
-        window.event.cancelBubble = true;
+    function changeHeaderName(evt, someHeader) {
+        evt.cancelBubble = true;
+
         if ($(lastFocusedCell).attr("id") == $(someHeader).attr("id")) {
             return false;
         }
@@ -611,11 +610,11 @@
 
         //Header needs to lose focus
         if (header == true) {
-            clearLastHeaderFocus(lastId);
+            clearLastHeaderFocus();
             header = false;
         } else {
             //If a cell has focus we want to clear it before we start to edit the header
-            clearLastCellFocus();
+            clearLastCellFocus(evt);
         }
 
 
@@ -632,9 +631,10 @@
         lastFocusedCell = someHeader;
         header = true;
 
+        selectRowColumnHeaderOfSelected(someHeader);
     }
 
-    function clearLastCellFocus() {
+    function clearLastCellFocus(evt) {
 
         //if a prior cell has already received focus in the past, we need to turn it back into
         //a normal table cell
@@ -671,8 +671,7 @@
             }
             else {
                 if (isNaN(parseFloat(cellValue))) {
-                    window.event.cancelBubble = true;
-                    stopKeyPressEvent = false;
+                    evt.cancelBubble = true;
                     return false;
                 }
             }
@@ -684,7 +683,7 @@
             else {
                 lastFocusedCell.text(cellValue);
             }
-            lastFocusedCell.attr("onclick", 'cellGainsFocus(this)');
+            lastFocusedCell.attr("onclick", 'cellGainsFocus(event, this)');
             lastFocusedCell = null;
 
             //AJAX call
@@ -728,9 +727,9 @@
         } 
     }
 
-    function cellGainsFocus(someCell) {
+    function cellGainsFocus(evt, someCell) {
         //When we click a cell we want do this to cancel the document onclick event
-        window.event.cancelBubble = true;
+        evt.cancelBubble = true;
 
         if ($(lastFocusedCell).attr("id") == $(someCell).attr("id")) {
             return false;
@@ -738,21 +737,18 @@
 
         //we are in a data cell so we need to set isDataCell to true
         isDataCell = true;
-        var cell = null
-        var row = $(someCell).parent("tr").prevAll().length;
-        var colIndex = $(someCell).prevAll().length;
 
         resetTableColors();
         hideDropDown();
 
         //Header needs to lose focus
         if (header == true) {
-            clearLastHeaderFocus(lastId);
+            clearLastHeaderFocus();
             header = false;
         } 
 
         //clear any previous focus
-        clearLastCellFocus();
+        clearLastCellFocus(evt);
         
         //do this once so we don't have to constantly do it later
         someCell = $(someCell);
@@ -765,12 +761,19 @@
         lastFocusedCell = someCell;
         $("#lastCell").val(someCell);
 
+        selectRowColumnHeaderOfSelected(someCell);
+    }
+
+    function selectRowColumnHeaderOfSelected(someCell) {
+        var row = $(someCell).parent("tr").prevAll().length;
+        var colIndex = $(someCell).prevAll().length;
+
         var cell = $("#grades").find("tr:eq(0)");
         cell = cell.find("td:eq(" + colIndex + ")");
         cell.css("background-color", "#FFFF84");
         cell.find("div").css("background-color", "#FFFF84");
         cell.attr("onmouseout", "hideOnlyButton(this);");
-        
+
 
         var cell2 = $("#grades").find("tr:eq(" + row + ")");
         cell2 = cell2.find("td:eq(0)");
@@ -855,11 +858,10 @@
 //        });
 //    }
 
-    function ShowHide(buttonClick) {
+    function ShowHide(evt, buttonClick) {
+        evt.cancelBubble = true;
 
-        selectColumn(currentHeaderCell);
-
-        window.event.cancelBubble = true;
+        selectColumn(evt, currentHeaderCell);
 
         //Store which assignment button was clicked so we can use it with Add Points
         points = buttonClick;
@@ -867,7 +869,7 @@
         var y = 0;
         //if you click a button in the header from a header already chosen
         if (header == true) {
-            clearLastHeaderFocus(lastId);
+            clearLastHeaderFocus();
             header = false;
         }
 
@@ -895,35 +897,28 @@
         $("#slidingDivID").animate({ "height": "hide" }, { duration: 0 });
     }
 
-    function selectColumn(col) {
-        //window.event.cancelBubble = true;
-        var id;
+    function selectColumn(evt, col) {
+        evt.cancelBubble = true;
+
         if (header == true) {
             clearLastHeaderFocus();
         }
         else {
-            clearLastCellFocus();
+            clearLastCellFocus(evt);
         }
+
         hideDropDown();
-        //tabShowing = true;
-        var container = col.id.split("-");
-
-        if (container[1] != null) {
-            id = container[1];
-        }
-        else {
-            id = container[0];
-        }
-
         resetTableColors();
 
-        $("#" + id).css("background-color", "#AAAAAA");
-        $("#div-" + id).css("background-color", "#AAAAAA");
+        var container = col.id.split("-");
 
-        //currentHeader = $(col).attr("id").split("-");
+        if (container[1] == null) {
+            $("#" + container).css("background-color", "#AAAAAA");
+            $("#div-" + container).css("background-color", "#AAAAAA");
+
             $("#grades tr").each(function () {
 
-                $(this).find("td:nth-child(" + id + ")").each(function () {
+                $(this).find("td:nth-child(" + container + ")").each(function () {
                     if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
                     }
                     else {
@@ -931,22 +926,26 @@
                     }
                 });
 
-                $(this).find("th:nth-child(" + id + ")").each(function () {
+                $(this).find("th:nth-child(" + container + ")").each(function () {
                     $(this).css("background-color", "DeepSkyBlue ");
                 });
             });
-            //isHighlighted = false;
-        window.event.cancelBubble = true;
-
+        }
     }
 
-    function selectRow(row) {
+    function selectRow(evt, row) {
+        evt.cancelBubble = true;
 
         var container = row.id.split("-");
         var count = 0;
-        if (lastFocusedCell != null) {
-            clearLastCellFocus();
+
+        if (header == true) {
+            clearLastHeaderFocus();
         }
+        else {
+            clearLastCellFocus(evt);
+        }
+
         hideDropDown();
         resetTableColors();
 
@@ -965,8 +964,6 @@
             }
             count++;
         });
-        window.event.cancelBubble = true;
-        //isHighlighted = false;
     }
 
 
@@ -1014,7 +1011,7 @@
                 }
                 $(this).attr("id", "th-" + cellId[1]);
                 $(this).html("");
-                $(this).html("Column " + cellText[1] + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + cellId[1] + ' onclick="ShowHide(this);"></button></div>');
+                $(this).html("Column " + cellText[1] + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + cellId[1] + ' onclick="ShowHide(event, this);"></button></div>');
             }
             else {
                 if (cellId[1] >= colIndex) {
@@ -1025,7 +1022,7 @@
                 }
                 $(this).attr("id", "th-" + cellId[1]);
                 $(this).html("");
-                $(this).html(cellText[0] + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + cellId[1] + ' onclick="ShowHide(this);"></button></div>');
+                $(this).html(cellText[0] + '<div id="cntnr" class="thButton"><button class="dropdown" id=' + cellId[1] + ' onclick="ShowHide(event, this);"></button></div>');
             }
         });
     }
