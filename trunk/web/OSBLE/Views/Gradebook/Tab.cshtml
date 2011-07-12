@@ -429,6 +429,7 @@
 
                 //increment colIndex so we get the next cell
                 colIndex++;
+
                 row.each(function () {
                     //find the next cell
                     cell = $(this).find("td:eq(" + colIndex + ")");
@@ -441,7 +442,7 @@
                     clearLastCellFocus(e);
 
                     //find the next row
-                    row = $(this).row = $(this).parent("tr").next("tr");
+                    row =  $(this).parent("tr").next("tr");
 
                     //set the col Index back to the first editable cell in the table
                     colIndex = 3;
@@ -641,11 +642,13 @@
         resetTableColors();
         //Header needs to lose focus
         if (header == true) {
+            clearLastHeaderFocus();
             header = false;
+        } else {
+            //If a cell has focus we want to clear it before we start to edit the header
+            clearLastCellFocus();
         }
 
-        //If a cell has focus we want to clear it before we start to edit the header
-        clearLastCellFocus();
 
 
         //do this once so we don't have to constantly do it later
