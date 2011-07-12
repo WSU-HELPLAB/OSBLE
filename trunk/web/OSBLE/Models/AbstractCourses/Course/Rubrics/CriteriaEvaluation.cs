@@ -12,7 +12,7 @@ namespace OSBLE.Models.Courses.Rubrics
         [Column(Order = 1)]
         public int CriterionID { get; set; }
 
-        public Criterion Criterion { get; set; }
+        public virtual Criterion Criterion { get; set; }
 
         public int? Score { get; set; }
 

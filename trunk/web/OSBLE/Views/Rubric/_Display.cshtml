@@ -16,6 +16,12 @@ int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght
 string selectedActivity = ViewBag.ActivitySelectId;
 string selectedTeam = ViewBag.TeamSelectId;
 bool isEditable = ViewBag.isEditable;
+string textBoxDisabled = "";
+
+if (!isEditable)
+{
+    textBoxDisabled = "disabled=disabled";
+}
 
 }
 
@@ -106,6 +112,26 @@ bool isEditable = ViewBag.isEditable;
     background: #CFCFCF;
 }
 
+.level_1
+{
+    background: #FF8991;
+}
+
+.level_2
+{
+    background: #FF9335;
+}
+
+.level_3
+{
+    background: #00DD04;
+}
+
+.level_4
+{
+    background: #75BAFF;
+}
+
 </style>
 
         <div style="clear: both">
@@ -159,7 +185,7 @@ bool isEditable = ViewBag.isEditable;
                                 </div>
                             </td>
                             <td class="text_input_score">
-                                <input class="text_input_score" id="@(String.Format("{0}_{1}", critInputPrefix, critEval.Criterion.ID))" name="@(String.Format("{0}_{1}", critInputPrefix, critEval.Criterion.ID))" type="text" value="@critEval.Score" style="border:0; padding-left:7px;" size="1" />
+                                <input class="text_input_score" id="@(String.Format("{0}_{1}", critInputPrefix, critEval.Criterion.ID))" name="@(String.Format("{0}_{1}", critInputPrefix, critEval.Criterion.ID))" type="text" value="@critEval.Score" style="border:0; padding-left:7px;" size="1" @textBoxDisabled />
                             </td>
                         </tr>
                         @{if (Model.Rubric.HasCriteriaComments)
@@ -182,6 +208,7 @@ bool isEditable = ViewBag.isEditable;
                                 rows="10"
                                 cols="80"
                                 style="width:95%; height:75px; margin-left:auto; margin-right:auto;"
+                                @textBoxDisabled
                                 >@critEval.Comment</textarea>
                                 </td>
                             </tr>

@@ -75,6 +75,15 @@ namespace OSBLE.Controllers
             {
                 AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(id);
 
+                TeamUserMember teamUserMember = GetTeamUser(activity, currentUser);
+
+                var score = (from c in activity.Scores where c.TeamUserMemberID == teamUserMember.ID select c).FirstOrDefault();
+
+                if (score != null)
+                {
+                    throw new Exception("Cannot submit to an assignmentActivity that already has a score");
+                }
+
                 //purposefully not using the is statement as we also want to make sure it is not a null SubmissionActivity
                 if (activity as SubmissionActivity != null)
                 {

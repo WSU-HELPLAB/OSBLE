@@ -286,7 +286,7 @@ namespace OSBLE.Controllers
             ViewBag.UnreadMessageCount = (int)db.Mails.Where(m => (m.ToUserProfileID == currentUser.ID) && (m.Read == false)).Count();
         }
 
-        public static TeamUserMember GetTeamUser(StudioActivity activity, UserProfile user)
+        public static TeamUserMember GetTeamUser(AbstractAssignmentActivity activity, UserProfile user)
         {
             var teamUser = (from c in activity.TeamUsers where c.Contains(user) == true select c).FirstOrDefault();
 

@@ -11,6 +11,6 @@
 
 <h3>Grade: @((ViewBag.Score as Score).Points / ViewBag.PossiblePoints * 100)%</h3>
           
-@Html.Partial("_Display")
+@Html.Partial("_Display", Model)
 @Html.ActionLink("Return to assignment list", "Index", "Assignment")
           
