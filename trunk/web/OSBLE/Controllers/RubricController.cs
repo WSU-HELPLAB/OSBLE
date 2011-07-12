@@ -219,19 +219,23 @@ namespace OSBLE.Controllers
                                    a.ID == vm.Evaluation.AssignmentActivity.AbstractAssignment.ID
                                    select g).FirstOrDefault();
 
-                    //figure out the raw (non-normalized) final score.
-                    int? sum = (from a in vm.Evaluation.CriterionEvaluations
-                                select a.Score).Sum();
-
-                    //should never be null, but you never know...
-                    if (sum == null)
+                    //figure out the normalized final score.
+                    int maxLevelScore = (from c in vm.Rubric.Levels
+                                         select c.RangeEnd).Sum();
+                    double totalRubricPoints = (from c in vm.Rubric.Criteria
+                                                select c.Weight).Sum();
+                    double studentScore = 0.0;
+                    foreach (CriterionEvaluation critEval in vm.Evaluation.CriterionEvaluations)
                     {
-                        sum = 0;
+                        studentScore += (int)critEval.Score / maxLevelScore * (critEval.Criterion.Weight / totalRubricPoints);
                     }
+
+                    //normalize the score with the abstract assignment score
+                    studentScore *= vm.Evaluation.AssignmentActivity.PointsPossible;
 
                     if (grade != null)
                     {
-                        grade.Points = (int)sum;
+                        grade.Points = studentScore;
                         db.SaveChanges();
                     }
                     else
@@ -240,7 +244,7 @@ namespace OSBLE.Controllers
                         Score newScore = new Score()
                         {
                             TeamUserMemberID = vm.Evaluation.RecipientID,
-                            Points = (int)sum,
+                            Points = studentScore,
                             AssignmentActivityID = vm.Evaluation.AbstractAssignmentActivityID,
                             PublishedDate = DateTime.Now,
                             isDropped = false
