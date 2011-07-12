@@ -386,12 +386,12 @@
         </tr>
         
         <tr>
-            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; width: 25px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; width: 25px;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             @{r++;}
-            <th></th>
-            <th>Weights [+]</th>
-            <th></th>
-            <th></th>
+            <td></td>
+            <td><b>Weights [+]</b></td>
+            <td></td>
+            <td></td>
             @foreach (Category item in ViewBag.Categories)
             {
                 if (item.Name != Constants.UnGradableCatagory)
@@ -401,7 +401,7 @@
             }
         </tr>
         <tr id="weights">
-            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             @{r++;}
             <td id="sectionHolder"></td>
             <td id="catScheme" onclick="cellGainsFocus(event, this);">&nbsp  Weight1</td>
@@ -428,10 +428,10 @@
 
         </tr>
         <tr id="perfectScore">
-            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             @{r++;}
-            <th></th>
-            <th id="th2">Perfect Score</th>
+            <td></td>
+            <td id="th2"><b>Perfect Score</b></td>
             @{string grade = (from lg in ViewBag.LetterGrades as IEnumerable<LetterGrade>
                               select lg.Grade).FirstOrDefault();
             }
@@ -449,12 +449,12 @@
 
         </tr>
         <tr>
-            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             @{r++;}
-            <th></th>
-            <th id="th3">
-                Average Score
-            </th>
+            <td></td>
+            <td id="th3">
+                <b>Average Score</b>
+            </td>
             <td id="averageLetter"></td>
             <td id="averageTotal">0</td>
             
@@ -473,7 +473,7 @@
             
         </tr>
         <tr id="categoryHeaders">
-            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             @{r++;}
             <th>Section</th>
             <th>Name</th>
@@ -501,7 +501,7 @@
         @foreach (OSBLE.Models.Users.UserProfile student in ViewBag.Students)
         {        
             <tr id="studentGrades">
-                <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
                 @{r++;}
 
             @{  
@@ -572,7 +572,14 @@
             }
                 
                 <td id="grade">@letter</td>
-                <td>@totalPercent.ToString(".##")%</td>
+                if (totalPercent > 0)
+                {
+                    <td>@totalPercent.ToString(".##")%</td>
+                }
+                else
+                {
+                    <td>@String.Format("{0}", 0)%</td>
+                }
                 
             foreach (Category cat in ViewBag.Categories)
             {
@@ -1051,6 +1058,8 @@
 
         evt.cancelBubble = true;
 
+        
+
         //Store which assignment button was clicked so we can use it with Add Points
         points = buttonClick
         var x = 0;
@@ -1147,7 +1156,7 @@
     function goToCategoryTab(catID) {
         location.href = "/Gradebook/Tab/?categoryId=" + catID;    }
 
-    function selectRow(row) {
+    function selectRow(row, e) {
 
         hideTabColors(); 
         if (lastFocusedCell != null) {
@@ -1155,7 +1164,8 @@
         }
         resetTableColors();
 
-        window.event.cancelBubble = true;
+        
+        e.cancelBubble = true;
 
         var container = row.id.split("-");
         var count = 0;
