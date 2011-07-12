@@ -1118,7 +1118,7 @@ namespace OSBLE.Controllers
                                                        StudentId = students.Key,
                                                        Score = students.Sum(stu => stu.Points),
                                                        teamUserMember = students.Select(stu => stu.TeamUserMember).FirstOrDefault(),
-                                                       perfectScore = students.Sum(stu => stu.AssignmentActivity.AbstractAssignment.PointsPossible),
+                                                       perfectScore = students.Sum(stu => stu.AssignmentActivity.PointsPossible),
                                                        category = students.Select(stu => stu.AssignmentActivity.AbstractAssignment.Category).FirstOrDefault(),
                                                        activity = students.Select(stu => stu.AssignmentActivity).FirstOrDefault()
                                                    }
