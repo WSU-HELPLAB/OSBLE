@@ -442,7 +442,7 @@
                     clearLastCellFocus(e);
 
                     //find the next row
-                    row =  $(this).parent("tr").next("tr");
+                    row = $(this).parent("tr").next("tr");
 
                     //set the col Index back to the first editable cell in the table
                     colIndex = 3;
@@ -679,6 +679,7 @@
 
         //someHeader.removeAttr("onclick");
         someHeader.html(inputText);
+        inputText[0].selectionStart();
         inputText.focus();
         lastFocusedCell = someHeader;
         header = true;
@@ -811,6 +812,7 @@
         //someCell.removeAttr("onclick");
         someCell.html(inputText);
         inputText.focus();
+        inputText.select();
         lastFocusedCell = someCell;
         $("#lastCell").val(someCell);
 

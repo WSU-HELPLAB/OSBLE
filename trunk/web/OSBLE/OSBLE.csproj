@@ -410,6 +410,9 @@
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
     <Content Include="crossdomain.xml" />
     <Content Include="Global.asax" />
+    <Content Include="obj\Debug\OSBLE.csproj.FileListAbsolute.txt" />
+    <Content Include="obj\Debug\OSBLE.dll" />
+    <Content Include="obj\Debug\OSBLE.pdb" />
     <Content Include="OsbleRubricTestPage.aspx" />
     <Content Include="OsbleRubricTestPage.html" />
     <Content Include="Scripts\osble.teacher_activity.js" />
@@ -481,6 +484,15 @@
   <ItemGroup>
     <Folder Include="FileSystem\Courses\1\CourseDocs\" />
     <Folder Include="FileSystem\Courses\4\CourseDocs\" />
+    <Folder Include="Models\Assignments\Activities\" />
+    <Folder Include="Models\Gradables\StudioAssignment\Activities\" />
+    <Folder Include="Models\RubricModel\" />
+    <Folder Include="obj\Debug\TempPE\" />
+    <Folder Include="Validations\" />
+    <Folder Include="Views\IssueVoting\" />
+    <Folder Include="Views\NewFolder1\" />
+    <Folder Include="Views\SubbmissionAssignmentActivity\" />
+    <Folder Include="Views\SubmissionAssignmentActivity\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
@@ -665,6 +677,8 @@
     <Content Include="Views\BasicAssignment\_RubricSelect.cshtml" />
     <Content Include="Views\Rubric\Index.cshtml" />
     <Content Include="Views\Submission\_Submit.cshtml" />
+    <None Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <None Include="obj\Debug\ResolveAssemblyReference.cache" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />
