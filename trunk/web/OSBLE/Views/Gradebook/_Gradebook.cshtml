@@ -45,7 +45,7 @@
     <tr id="perfectScore">
         <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8" width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
         @{index++;}
-        <th id="th2">Perfect Score</th>
+        <td id="th2"><b>Perfect Score</b></td>
         <td id="perfectTotal">100%</td>
         @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
         {
@@ -56,9 +56,9 @@
     <tr id="averageRow">
     <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8" width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
     @{index++;}
-        <th id="th3">
-            Average Score
-        </th>
+        <td id="th3">
+            <b>Average Score</b>
+        </td>
         <td id="averageTotal">
             0
         </td>
@@ -154,6 +154,28 @@
             calculateCols();
             keyControls();
         });
+
+
+        function showButton(column) {
+
+            var container = column.id;
+            currentHeaderCell = column;
+
+            $("#div-" + container).animate({ "height": "show" }, { duration: 0 });
+
+            if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)"
+            || $("#" + container).css("background-color") == "rgb(255, 255, 132)" && $("#div-" + container).css("background-color") == "rgb(255, 255, 132)") {
+
+                $("#" + container).css("background-color", "#FFFF84");
+                $("#div-" + container).css("background-color", "#FFFF84");
+            }
+        }
+
+        function hideOnlyButton(column) {
+            var container = column.id;
+
+            $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
+        }
 
         
     </script>

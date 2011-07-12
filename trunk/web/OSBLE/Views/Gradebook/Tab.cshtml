@@ -327,9 +327,12 @@
         resetTableColors();
     });
 
-//    $(window).unload(function () {
-//        clearLastCellFocus(evt);
-//    });
+    //This is called when the page is navigated away from. We want to make sure
+    //any pending changes get saved before it navigates away.
+    $(window).unload(function () {
+        clearLastCellFocus();
+        clearLastHeaderFocus();
+    });
 
     function hideTabColors() {
         $("#selectMenuID").animate({ "height": "hide" }, { duration: 0 });
@@ -342,26 +345,48 @@
 //        }
         $("#grades td").keydown(function (e) {
             var cell = null;
+
+            //13 means enter is pressed
             if (e.keyCode == 13) {
+
+                //current cells value when enter is pressed
                 cell = $(this).children().val();
+
                 if (cell.toString() != "NG") {
+
+                    //This checks to make sure cell is a number
                     if (isNaN(parseFloat(cell))) {
+
+                        //if cell is not a number, alert the user it must be and kick out of this function
                         alert("Cell value must be a number");
                         return false;
                     }
                 }
+
+                //the next row from the current cell
                 var row = $(this).parent("tr").next("tr");
+
+                //If perfect score is being edited, we just save perfect score by clearing the cells focus
                 if (row.attr("id") == "averageRow") {
                     clearLastCellFocus(e);
                 }
+
+                //this means there are no more rows so clear the cells focus and kick out
                 else if (row.html() == null) {
                     clearLastCellFocus(e);
                     return false;
                 }
-                else{
+
+                else {
+                    //get the current columns index
                     var colIndex = $(this).prevAll().length;
                     row.each(function () {
+
+                        //cell is the cell one row down from the current cell when enter was pressed
                         cell = $(this).find("td:eq(" + colIndex + ")");
+
+                        //give focus to the new cell
+                        cellGainsFocus(cell);
                     });
                 }
                 if (cell != null) {
@@ -375,36 +400,58 @@
                     clearLastCellFocus(e);
                 }
             }
+
+            //if tab is pressed
             else if (e.keyCode == 9) {
+                //prevent the default tab from happening and use our code.
                 e.preventDefault();
 
+                //cell gets the value in the textbox when tab is pressed
                 cell = $(this).children().val();
+
                 if (cell.toString() != "NG") {
+
+                    //This checks to make sure cell is a number
                     if (isNaN(parseFloat(cell))) {
+
+                        //if cell is not a number, alert the user it must be and kick out of this function
                         alert("Cell value must be a number");
                         return false;
                     }
                 }
 
+                //This gets the current row the user is on
                 var row = $(this).parent("tr");
-                // used for generating the column count
-                var one = 1;
-                var colCount = $('table tr:eq(' + one + ') td').length;
+
+                //find the length of the table
+                var colCount = $('table tr:eq(1) td').length;
+
+                //find the length of the current columns index
                 var colIndex = $(this).prevAll().length;
+
+                //This turns colIndex into an integer
                 colIndex = parseInt(colIndex);
+
+                //if we are on the last column of the table
                 if (colIndex >= colCount) {
+
+                    //we need to find the next row
                     row = $(this).parent("tr").next("tr");
+
+                    //if we are on the last row, clear the cells focus and return out of the cell
                     if (row.html() == null) {
                         clearLastCellFocus(e);
                         return false;
                     }
-                    // coded based off the original design if you change the column structure you might need to change this
+
+                    //set the colIndex to 3 (Beginning of the editable cells)
                     colIndex = 3;
                 } else {
                     colIndex += 1;
                 }
                 row.each(function () {
                     cell = $(this).find("td:eq(" + colIndex + ")");
+                    cellGainsFocus(cell);
                 });
                     if (cell != null) {
                         cellGainsFocus(e, cell);
@@ -458,7 +505,7 @@
 
 
     function showButton(column) {
-
+            
         var container = column.id;
         currentHeaderCell = column;
 
@@ -598,7 +645,15 @@
 
         hideDropDown();
         resetTableColors();
-        
+        //Header needs to lose focus
+        if (header == true) {
+            header = false;
+        }
+
+        //If a cell has focus we want to clear it before we start to edit the header
+        clearLastCellFocus();
+
+
         //do this once so we don't have to constantly do it later
         someHeader = $(someHeader);
 
@@ -731,10 +786,11 @@
         //When we click a cell we want do this to cancel the document onclick event
         evt.cancelBubble = true;
 
+        //If the cell we are already on has focus, and the user clicks on it again
+        //we don't want to do anything.
         if ($(lastFocusedCell).attr("id") == $(someCell).attr("id")) {
             return false;
         }
-
         //we are in a data cell so we need to set isDataCell to true
         isDataCell = true;
 
@@ -770,15 +826,23 @@
 
         var cell = $("#grades").find("tr:eq(0)");
         cell = cell.find("td:eq(" + colIndex + ")");
+
+        //change the current column headers background to highlighted
         cell.css("background-color", "#FFFF84");
         cell.find("div").css("background-color", "#FFFF84");
+
+        //change the mouseout function so we don't change the color and only hide the div
         cell.attr("onmouseout", "hideOnlyButton(this);");
-
-
+        
+        //find the current rows header
         var cell2 = $("#grades").find("tr:eq(" + row + ")");
         cell2 = cell2.find("td:eq(0)");
+
+        //change the current rows header background to highlighted
         cell2.css("background-color", "#FFFF84");
         cell2.find("div").css("background-color", "#FFFF84");
+
+        //remove the current rows onmouseout function so we it doesn't become unhighlighted
         cell2.removeAttr("onmouseout");
     }
 

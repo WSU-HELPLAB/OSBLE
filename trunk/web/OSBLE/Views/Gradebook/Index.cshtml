@@ -621,7 +621,7 @@
     <input type="hidden" id="totalAverageHidden" value="@averageLetter" />
     <div class="slidingDiv" id="slidingDivID" style="display: none; position: absolute;">
         <form id="columnOptionsForm" method="post" action="/Gradebook/ModifyColumn" data-ajax="true"
-        data-ajax-success="" data-ajax-update="#grades">
+        data-ajax-success="">
         <input id="actionRequested" name="actionRequested" type="hidden" value="null" />
         <input id="assignmentId" name="assignmentId" type="hidden" value="null" />
         <table class="menu" id="menuID">
@@ -677,7 +677,7 @@
     var currentHeader = null;
 
     //holds the index of the header that was clicked to select all
-    var currentHeader = -1;
+    var currentHeaderCell = null;
 
     $(document).ready(function () {
         //calculateRows();
@@ -863,7 +863,7 @@
     }
 
     function showButton(column) {
-        currentHeader = column;
+        currentHeaderCell = column;
         var container = column.id;
         $("#div-" + container).animate({ "height": "show" }, { duration: 0 });
 
@@ -990,7 +990,7 @@
         someAssignment.html(inputText);
         inputText.focus();
         lastFocusedAssignment = someAssignment;
-        event.preventDefault();
+        evt.preventDefault();
         header = true;
                 
     }
@@ -1054,7 +1054,7 @@
 
     function ShowHide(evt, buttonClick) {
 
-        selectColumn(evt, currentHeader);
+        selectColumn(evt, currentHeaderCell);
 
         evt.cancelBubble = true;
 
