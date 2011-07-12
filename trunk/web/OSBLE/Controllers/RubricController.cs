@@ -1,23 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Entity;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using OSBLE.Models.Courses.Rubrics;
-using OSBLE.Models;
-using OSBLE.Models.ViewModels;
-using OSBLE.Attributes;
-using OSBLE.Models.Courses;
-using OSBLE.Models.Assignments;
-using OSBLE.Models.Users;
-using OSBLE.Models.Assignments.Activities;
 using System.Web.Routing;
+using OSBLE.Attributes;
+using OSBLE.Models.Assignments;
+using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments.Activities.Scores;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Courses.Rubrics;
+using OSBLE.Models.Users;
+using OSBLE.Models.ViewModels;
 
 namespace OSBLE.Controllers
 {
+    [Authorize]
+    [RequireActiveCourse]
     public class RubricController : OSBLEController
     {
         public RubricController()
@@ -162,7 +161,7 @@ namespace OSBLE.Controllers
             }
 
             //assignments are storied within categories, which are found within
-            //the active course.  
+            //the active course.
             List<AbstractAssignmentActivity> activities = new List<AbstractAssignmentActivity>();
             foreach (Category cat in (activeCourse.AbstractCourse as Course).Categories)
             {
@@ -177,6 +176,7 @@ namespace OSBLE.Controllers
                     }
                 }
             }
+
             viewModel.AssignmentActivities = activities;
             viewModel.TeamUsers = activity.TeamUsers.OrderBy(t => t.Name).ToList();
             return viewModel;
@@ -187,6 +187,8 @@ namespace OSBLE.Controllers
         public ActionResult Index(RubricViewModel viewModel)
         {
             RubricViewModel vm = BuildViewModelFromForm();
+
+            ViewBag.isEditable = true;
 
             if (!HasValidViewModel(vm))
             {
@@ -261,7 +263,40 @@ namespace OSBLE.Controllers
                 return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
             }
 
+            ViewBag.isEditable = true;
             return View(viewModel);
+        }
+
+        public ActionResult View(int abstractAssignmentActivityId, int teamUserId)
+        {
+            RubricViewModel viewModel = GetRubricViewModel(abstractAssignmentActivityId, teamUserId);
+
+            if (HasValidViewModel(viewModel))
+            {
+                bool isOwnAssignment = false;
+
+                if (activeCourse.AbstractRole.CanSubmit)
+                {
+                    TeamUserMember teamUser = db.TeamUsers.Find(teamUserId);
+
+                    if (teamUser.Contains(currentUser))
+                    {
+                        isOwnAssignment = true;
+                    }
+                }
+
+                if (activeCourse.AbstractRole.CanGrade || isOwnAssignment)
+                {
+                    AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(abstractAssignmentActivityId);
+
+                    ViewBag.PossiblePoints = activity.PointsPossible;
+                    ViewBag.Score = (from c in activity.Scores where c.TeamUserMemberID == teamUserId select c).FirstOrDefault();
+                    ViewBag.isEditable = false;
+
+                    return View(viewModel);
+                }
+            }
+            return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
         }
     }
 }

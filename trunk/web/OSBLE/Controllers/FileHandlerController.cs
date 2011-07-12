@@ -180,8 +180,10 @@ namespace OSBLE.Controllers
 
                     using (ZipFile zipfile = new ZipFile())
                     {
-                        zipfile.AddDirectory(submissionfolder);
-
+                        if (new DirectoryInfo(submissionfolder).Exists)
+                        {
+                            zipfile.AddDirectory(submissionfolder);
+                        }
                         FileSystem.CreateZipFolder(activeCourse.AbstractCourse as Course, zipfile, acitivity, teamUser);
 
                         stream = FileSystem.GetDocumentForRead(zipfile.Name);

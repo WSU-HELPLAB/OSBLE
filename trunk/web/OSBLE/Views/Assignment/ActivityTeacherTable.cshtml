@@ -14,7 +14,7 @@
 
         $('body').append(
        '<div id="downloading_submission_dialog" title="Download Submission"> \
-        <p>The zip is being generated and will automatically start downloading when it is ready, please no not leave the page or click the link again</p> \
+        <p>The zip is being generated and will automatically start downloading when it is ready, please do not leave the page or click the link again</p> \
     </div>');
 
         //make the div we just created into a dialog box
@@ -65,7 +65,7 @@ Name
 Submitted Time
 </th>
 <th>
-Grading Stats
+Grading Status
 </th>
 <th>
 Grade
@@ -85,11 +85,18 @@ Download Submission
  <td>
  @if (info.Time == null)
  {
+     if (info.Graded)
+     { 
+     <span>Not Submitted</span>
+     }
+     else
+     { 
      <span style="color:Red">Not Submitted</span>
+     }
  }
  else
  {
-     if (info.Time < ViewBag.DueDate)
+     if (info.Time < ViewBag.DueDate || info.Graded)
      {
      <span>@info.Time</span>
      }
@@ -100,10 +107,17 @@ Download Submission
  }
  </td>
  <td>
- @info.Graded
+ @if (info.Graded)
+ {
+     <span>Graded</span>
+ }
+ else
+ {
+     <span style="color:Red">Not Graded</span>
+ }
  </td>
  <td>
- <button>Grade</button>
+ @Html.ActionLink("Grade", "Index", "Rubric", new { abstractAssignmentActivityId = ViewBag.activityID, teamUserId = info.SubmitterID }, new { })
  </td>
  <td>
  @if (info.Time != null)

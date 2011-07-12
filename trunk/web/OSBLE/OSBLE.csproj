@@ -677,6 +677,8 @@
     <Content Include="Views\BasicAssignment\_RubricSelect.cshtml" />
     <Content Include="Views\Rubric\Index.cshtml" />
     <Content Include="Views\Submission\_Submit.cshtml" />
+    <Content Include="Views\Rubric\_Display.cshtml" />
+    <Content Include="Views\Rubric\View.cshtml" />
     <None Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
     <None Include="obj\Debug\ResolveAssemblyReference.cache" />
   </ItemGroup>

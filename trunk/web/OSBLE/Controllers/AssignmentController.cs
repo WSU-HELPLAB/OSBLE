@@ -209,20 +209,20 @@ namespace OSBLE.Controllers
                             info.Time = null;
                         }
 
-                        //will need to actually implement this:
-                        /*if(graded)
+                        if ((from c in studioActivity.Scores where c.TeamUserMemberID == teamUser.ID select c).FirstOrDefault() != null)
                         {
-                        info.Graded = true;
-                        numberGraded++;
+                            info.Graded = true;
+                            numberGraded++;
                         }
                         else
-                        {*/
-                        //info.Graded = false;
-                        //}
-                        info.Graded = false;
+                        {
+                            info.Graded = false;
+                        }
                         viewModel.SubmissionsInfo.Add(info);
                     }
 
+                    //This orders the list into alphabetical order
+                    viewModel.SubmissionsInfo = (from c in viewModel.SubmissionsInfo orderby c.Name select c).ToList();
                     ViewBag.NumberOfSubmissions = numberOfSubmissions;
                     ViewBag.NumberGraded = numberGraded;
 

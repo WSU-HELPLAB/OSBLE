@@ -1,6 +1,9 @@
 ﻿@using OSBLE.Models.Assignments
 @using OSBLE.Models.Assignments.Activities
 @using OSBLE.Models.Users;
+@using System.Linq;
+@using OSBLE.Models.Assignments.Activities.Scores
+@using OSBLE.Controllers;
 @model StudioAssignment
 
 @{
@@ -139,8 +142,16 @@ int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
                                 }
                             </div>
                             <div class="submission_deliverables_end">
+                            @{Score score = (from c in submission.Scores where c.TeamUserMemberID == (OSBLEController.GetTeamUser(submission, ViewBag.CurrentUser as UserProfile)).ID select c).FirstOrDefault();  }
+                            @if(score == null)
+                            {
                             @Ajax.ActionLink("Submit Files For This Submission", "Create", "Submission", new { id = submission.ID.ToString() }, new AjaxOptions() { InsertionMode = InsertionMode.Replace, LoadingElementId="Loading", HttpMethod = "Get", UpdateTargetId = "submitFiles", OnComplete = "SubmissionLoaded" }, new object())
-
+                            }
+                            else
+                            {
+                                @Html.ActionLink("View Grade", "View", "Rubric", new { abstractAssignmentActivityId = submission.ID, teamUserId =  (OSBLEController.GetTeamUser(submission, ViewBag.CurrentUser as UserProfile)).ID}, new { })
+                            }
+                            
                             <script type="text/javascript">
 
                                 function SubmissionLoaded() {
