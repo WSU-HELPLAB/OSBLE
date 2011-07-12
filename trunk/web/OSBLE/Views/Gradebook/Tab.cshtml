@@ -386,7 +386,7 @@
                         cell = $(this).find("td:eq(" + colIndex + ")");
 
                         //give focus to the new cell
-                        cellGainsFocus(cell);
+                        cellGainsFocus(e, cell);
                     });
                 }
                 if (cell != null) {
@@ -403,6 +403,7 @@
 
             //if tab is pressed
             else if (e.keyCode == 9) {
+
                 //prevent the default tab from happening and use our code.
                 e.preventDefault();
 
@@ -423,45 +424,36 @@
                 //This gets the current row the user is on
                 var row = $(this).parent("tr");
 
-                //find the length of the table
-                var colCount = $('table tr:eq(1) td').length;
-
-                //find the length of the current columns index
+                //col index gets the length of the cell we are on
                 var colIndex = $(this).prevAll().length;
 
-                //This turns colIndex into an integer
-                colIndex = parseInt(colIndex);
-
-                //if we are on the last column of the table
-                if (colIndex >= colCount) {
-
-                    //we need to find the next row
-                    row = $(this).parent("tr").next("tr");
-
-                    //if we are on the last row, clear the cells focus and return out of the cell
-                    if (row.html() == null) {
-                        clearLastCellFocus(e);
-                        return false;
-                    }
-
-                    //set the colIndex to 3 (Beginning of the editable cells)
-                    colIndex = 3;
-                } else {
-                    colIndex += 1;
-                }
+                //increment colIndex so we get the next cell
+                colIndex++;
                 row.each(function () {
+                    //find the next cell
                     cell = $(this).find("td:eq(" + colIndex + ")");
-                    cellGainsFocus(cell);
                 });
+
+                //If the next cell does not exist because it is off the table
                 if (cell.html() == null) {
+                    
+                    //Clear the last cell focus
                     clearLastCellFocus(e);
-                    row = $(this).parent("tr").next("tr");
+
+                    //find the next row
+                    row = $(this).row = $(this).parent("tr").next("tr");
+
+                    //set the col Index back to the first editable cell in the table
                     colIndex = 3;
+
                     row.each(function () {
+
+                        //find the next cell if it exists and and give it focus
                         cell = $(this).find("td:eq(" + colIndex + ")");
                         cellGainsFocus(e, cell);
                     });
 
+                    //we have given the next cell focus so we want to return out of this function
                     return false;
                 }
                 cellGainsFocus(e, cell);
