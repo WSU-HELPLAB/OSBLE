@@ -101,7 +101,7 @@ namespace OSBLE.Services
 
             //make sure that the selected user has write privileges for the supplied course
             CoursesUsers currentCourse = (from cu in db.CoursesUsers
-                                          where cu.CourseID == courseId && cu.UserProfileID == currentUser.ID
+                                          where cu.AbstractCourseID == courseId && cu.UserProfileID == currentUser.ID
                                           select cu).FirstOrDefault();
 
             //make sure that we got something back
@@ -183,7 +183,7 @@ namespace OSBLE.Services
 
             //find the current course
             CoursesUsers cu = (from c in db.CoursesUsers
-                               where c.CourseID == courseId && c.UserProfileID == currentUser.ID
+                               where c.AbstractCourseID == courseId && c.UserProfileID == currentUser.ID
                                select c).FirstOrDefault();
             if (cu != null)
             {
@@ -252,7 +252,7 @@ namespace OSBLE.Services
 
             //find all courses that the users is associated with
             List<CoursesUsers> courses = (from course in db.AbstractCourses
-                                          join cu in db.CoursesUsers on course.ID equals cu.CourseID
+                                          join cu in db.CoursesUsers on course.ID equals cu.AbstractCourseID
                                           where
                                             cu.Hidden == false
                                             &&
@@ -268,12 +268,12 @@ namespace OSBLE.Services
                 if (cu.AbstractCourse is Course)
                 {
                     Course c = cu.AbstractCourse as Course;
-                    uploadLocations.Add(cu.CourseID, String.Format("{0} {1} ({2}, {3})", c.Prefix, c.Number, c.Semester, c.Year));
+                    uploadLocations.Add(cu.AbstractCourseID, String.Format("{0} {1} ({2}, {3})", c.Prefix, c.Number, c.Semester, c.Year));
                 }
                 else if (cu.AbstractCourse is Community)
                 {
                     Community c = cu.AbstractCourse as Community;
-                    uploadLocations.Add(cu.CourseID, String.Format("{0} - {1}", c.Nickname, c.Name));
+                    uploadLocations.Add(cu.AbstractCourseID, String.Format("{0} - {1}", c.Nickname, c.Name));
                 }
             }
             return uploadLocations;
@@ -420,7 +420,7 @@ namespace OSBLE.Services
 
             //make sure that the selected user has write privileges for the supplied course
             CoursesUsers currentCourse = (from cu in db.CoursesUsers
-                                          where cu.CourseID == courseId && cu.UserProfileID == currentUser.ID
+                                          where cu.AbstractCourseID == courseId && cu.UserProfileID == currentUser.ID
                                           select cu).FirstOrDefault();
 
             //make sure that we got something back

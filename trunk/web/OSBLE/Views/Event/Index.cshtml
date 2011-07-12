@@ -14,7 +14,7 @@
 </p>
 
 <p>
-    @if(ViewBag.ActiveCourse.CourseRole.CanModify || ViewBag.ActiveCourse.Course.AllowEventPosting) {
+    @if(ViewBag.ActiveCourse.AbstractRole.CanModify || ViewBag.ActiveCourse.Course.AllowEventPosting) {
         @Html.ActionLink("Create New Event", "Create")
     }
 </p>

@@ -20,7 +20,7 @@
 @* Only use this helper in a place that requires an active course (uses [RequireActiveCourse] attribute) *@
 @helper DisplayName(UserProfile user, CoursesUsers activeCourse, bool show = false)
     {
-        if (!activeCourse.CourseRole.Anonymized && (activeCourse.CourseRole.CanGrade || (user.ID == activeCourse.UserProfileID) || show))
+        if (!activeCourse.AbstractRole.Anonymized && (activeCourse.AbstractRole.CanGrade || (user.ID == activeCourse.UserProfileID) || show))
         {
     <text>@user.FirstName @user.LastName</text>
         }

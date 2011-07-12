@@ -51,7 +51,7 @@ namespace OSBLE.Controllers
         {
             DashboardPost dp = db.DashboardPosts.Find(id);
             // Ensure post exists and that user is in the course.
-            if (dp == null || (currentCourses.Where(cc => cc.CourseID == dp.CourseID).Count() < 1))
+            if (dp == null || (currentCourses.Where(cc => cc.AbstractCourseID == dp.CourseID).Count() < 1))
             {
                 return RedirectToAction("Index");
             }
@@ -79,11 +79,11 @@ namespace OSBLE.Controllers
             if (DashboardSingleCourseMode)
             {
                 viewedCourses = new List<int>();
-                viewedCourses.Add(activeCourse.CourseID);
+                viewedCourses.Add(activeCourse.AbstractCourseID);
             }
             else // All course mode. Display posts for all non-hidden courses the user is attached to.
             {
-                viewedCourses = currentCourses.Where(cu => !cu.Hidden).Select(cu => cu.CourseID).ToList();
+                viewedCourses = currentCourses.Where(cu => !cu.Hidden).Select(cu => cu.AbstractCourseID).ToList();
             }
 
             
@@ -195,12 +195,12 @@ namespace OSBLE.Controllers
             if (post is DashboardPost)
             {
                 DashboardPost dp = post as DashboardPost;
-                courseList = db.CoursesUsers.Where(c => c.CourseID == dp.CourseID).ToList();
+                courseList = db.CoursesUsers.Where(c => c.AbstractCourseID == dp.CourseID).ToList();
             }
             else if (post is DashboardReply)
             {
                 DashboardReply dr = post as DashboardReply;
-                courseList = db.CoursesUsers.Where(c => c.CourseID == dr.Parent.CourseID).ToList();
+                courseList = db.CoursesUsers.Where(c => c.AbstractCourseID == dr.Parent.CourseID).ToList();
             }
 
             // Get Course/User link for current user.
@@ -240,7 +240,7 @@ namespace OSBLE.Controllers
                 {
                     // Display Titles for Instructors/TAs for Courses, or Leader of Communities.
 
-                    post.DisplayTitle = getRoleTitle(posterCu.CourseRoleID);
+                    post.DisplayTitle = getRoleTitle(posterCu.AbstractRoleID);
 
                     post.ShowProfilePicture = true;
                 }
@@ -293,9 +293,9 @@ namespace OSBLE.Controllers
             {
                 case (int)CommunityRole.OSBLERoles.Leader:
                     return "Leader";
-                case (int)CourseRole.OSBLERoles.Instructor:
+                case (int)Privileges.CourseRoles.Instructor:
                     return "Instructor";
-                case (int)CourseRole.OSBLERoles.TA:
+                case (int)Privileges.CourseRoles.TA:
                     return "TA";
                 default:
                     return "";
@@ -472,7 +472,7 @@ namespace OSBLE.Controllers
                         //to the same object.
                         if (c != null && sendEmail && cu.AbstractRole.CanModify)
                         {
-                            foreach (CoursesUsers member in db.CoursesUsers.Where(coursesUsers => coursesUsers.CourseID == c.ID).ToList())
+                            foreach (CoursesUsers member in db.CoursesUsers.Where(coursesUsers => coursesUsers.AbstractCourseID == c.ID).ToList())
                             {
                                 if (member.UserProfile.UserName != null) // Ignore pending users
                                 {
@@ -514,7 +514,7 @@ namespace OSBLE.Controllers
             { // Does the post we're replying to exist?
                 // Are we a member of the course we're replying to?
                 CoursesUsers cu = (from c in currentCourses
-                                   where c.CourseID == replyToPost.CourseID
+                                   where c.AbstractCourseID == replyToPost.CourseID
                                    select c).FirstOrDefault();
 
                 Course course = null;
@@ -634,8 +634,8 @@ namespace OSBLE.Controllers
 
             // A role for both our current user and 
             // the one we're trying to see
-            AbstractRole ourRole = currentCourses.Where(c => c.CourseID == course).Select(c=>c.AbstractRole).FirstOrDefault();
-            AbstractRole theirRole = db.CoursesUsers.Where(c => (c.CourseID == course) && (c.UserProfileID == userProfile)).Select(c=>c.AbstractRole).FirstOrDefault();
+            AbstractRole ourRole = currentCourses.Where(c => c.AbstractCourseID == course).Select(c=>c.AbstractRole).FirstOrDefault();
+            AbstractRole theirRole = db.CoursesUsers.Where(c => (c.AbstractCourseID == course) && (c.UserProfileID == userProfile)).Select(c=>c.AbstractRole).FirstOrDefault();
 
             // Show picture if user is requesting their own profile picture or they have the right to view the profile picture
             if (userProfile == currentUser.ID ||

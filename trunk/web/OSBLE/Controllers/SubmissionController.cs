@@ -36,7 +36,7 @@ namespace OSBLE.Controllers
                 {
                     AbstractAssignment assignment = db.AbstractAssignments.Find(activity.AbstractAssignmentID);
 
-                    if (assignment != null && assignment.Category.CourseID == activeCourse.CourseID && activeCourse.AbstractRole.CanSubmit == true && assignment is StudioAssignment)
+                    if (assignment != null && assignment.Category.CourseID == activeCourse.AbstractCourseID && activeCourse.AbstractRole.CanSubmit == true && assignment is StudioAssignment)
                     {
                         setViewBagDeliverables((assignment as StudioAssignment).Deliverables);
 
@@ -82,7 +82,7 @@ namespace OSBLE.Controllers
 
                     List<Deliverable> deliverables = new List<Deliverable>((assignment as StudioAssignment).Deliverables);
 
-                    if (assignment != null && assignment.Category.CourseID == activeCourse.CourseID && activeCourse.AbstractRole.CanSubmit == true && assignment is StudioAssignment)
+                    if (assignment != null && assignment.Category.CourseID == activeCourse.AbstractCourseID && activeCourse.AbstractRole.CanSubmit == true && assignment is StudioAssignment)
                     {
                         TeamUserMember teamUser = GetTeamUser(activity as SubmissionActivity, currentUser);
 

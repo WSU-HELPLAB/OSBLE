@@ -29,8 +29,8 @@ namespace OSBLE.Controllers
                 EndDate = (ActiveCourse.AbstractCourse as Course).EndDate;
             } else if(ActiveCourse.AbstractCourse is Community) { 
                 // For communities there are no start/end dates, so get earliest and latest events
-                Event firstEvent = db.Events.Where(e => e.CourseID == ActiveCourse.CourseID).OrderBy(e => e.StartDate).FirstOrDefault();
-                Event lastEvent = db.Events.Where(e => e.CourseID == ActiveCourse.CourseID).OrderByDescending(e => e.StartDate).FirstOrDefault();
+                Event firstEvent = db.Events.Where(e => e.CourseID == ActiveCourse.AbstractCourseID).OrderBy(e => e.StartDate).FirstOrDefault();
+                Event lastEvent = db.Events.Where(e => e.CourseID == ActiveCourse.AbstractCourseID).OrderByDescending(e => e.StartDate).FirstOrDefault();
 
                 // If either event is null, return an empty list to the view.
                 if ((firstEvent == null) || (lastEvent == null))
@@ -185,7 +185,7 @@ namespace OSBLE.Controllers
             Event e = db.Events.Find(id);
 
             // Event not part of this course
-            if (e.CourseID != ActiveCourse.CourseID)
+            if (e.CourseID != ActiveCourse.AbstractCourseID)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -206,7 +206,7 @@ namespace OSBLE.Controllers
             {
                 // Validate original event. make sure it exists and is part of the active course.
                 Event originalEvent = db.Events.Find(e.ID);
-                if ((originalEvent == null) || (originalEvent.CourseID != ActiveCourse.CourseID))
+                if ((originalEvent == null) || (originalEvent.CourseID != ActiveCourse.AbstractCourseID))
                 {
                     return RedirectToAction("Index", "Home");
                 }

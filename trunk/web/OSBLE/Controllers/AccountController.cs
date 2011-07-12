@@ -102,7 +102,7 @@ namespace OSBLE.Controllers
         {
             foreach (CoursesUsers cu in currentCourses)
             {
-                bool newHidden = Convert.ToBoolean(Request.Params["cu_hidden_" + cu.CourseID]);
+                bool newHidden = Convert.ToBoolean(Request.Params["cu_hidden_" + cu.AbstractCourseID]);
                 if (newHidden != cu.Hidden)
                 {
                     cu.Hidden = newHidden;

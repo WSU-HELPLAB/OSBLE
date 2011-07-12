@@ -9,7 +9,7 @@ using OSBLE.Models.Courses;
 using OSBLE.Models.Services.Uploader;
 using OSBLE.Models.Users;
 
-//the folllowing is a diagram of our file system.  Items in brackes [] indicate
+//the following is a diagram of our file system.  Items in brackets [] indicate
 //using a key of sorts (e.g. the user id).  Items in curly braces {} indicate
 //the intended use of the folder
 /*

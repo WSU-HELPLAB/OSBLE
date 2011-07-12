@@ -139,9 +139,9 @@ namespace OSBLE.Controllers
 
                 // Make current user an instructor on new course.
                 CoursesUsers cu = new CoursesUsers();
-                cu.CourseID = course.ID;
+                cu.AbstractCourseID = course.ID;
                 cu.UserProfileID = currentUser.ID;
-                cu.CourseRoleID = (int)CourseRole.OSBLERoles.Instructor;
+                cu.AbstractRoleID = (int)Privileges.CourseRoles.Instructor;
 
                 //Add new Categories to the course
                 Category category = new Category();
@@ -176,7 +176,7 @@ namespace OSBLE.Controllers
         public ActionResult Edit()
         {
             ViewBag.CurrentTab = "Course Settings";
-            Course course = (Course)db.Courses.Find(activeCourse.CourseID);
+            Course course = (Course)db.Courses.Find(activeCourse.AbstractCourseID);
             return View(course);
         }
 
@@ -191,7 +191,7 @@ namespace OSBLE.Controllers
         {
             ViewBag.CurrentTab = "Course Settings";
 
-            if (course.ID != activeCourse.CourseID)
+            if (course.ID != activeCourse.AbstractCourseID)
             {
                 return RedirectToAction("Home");
             }

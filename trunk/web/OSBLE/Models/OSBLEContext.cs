@@ -91,7 +91,7 @@ namespace OSBLE.Models
 
         public DbSet<CourseMeeting> CourseMeetings { get; set; }
 
-        public DbSet<CourseRole> CourseRoles { get; set; }
+        public DbSet<Privileges> CourseRoles { get; set; }
 
         public DbSet<CoursesUsers> CoursesUsers { get; set; }
 
@@ -191,19 +191,19 @@ namespace OSBLE.Models
             // Set up "static" values for Course Roles.
 
             // Instructor: Can Modify Course, See All, Can Grade
-            this.CourseRoles.Add(new CourseRole(CourseRole.OSBLERoles.Instructor.ToString(), true, true, true, false, true, false));
+            this.CourseRoles.Add(new Privileges(Privileges.CourseRoles.Instructor.ToString(), true, true, true, false, true, false));
 
             // TA: Can See All, Can Grade
-            this.CourseRoles.Add(new CourseRole(CourseRole.OSBLERoles.TA.ToString(), false, true, true, false, true, false));
+            this.CourseRoles.Add(new Privileges(Privileges.CourseRoles.TA.ToString(), false, true, true, false, true, false));
 
             // Student: Can Submit Assignments, All Anonymized
-            this.CourseRoles.Add(new CourseRole(CourseRole.OSBLERoles.Student.ToString(), false, false, false, true, false, false));
+            this.CourseRoles.Add(new Privileges(Privileges.CourseRoles.Student.ToString(), false, false, false, true, false, false));
 
             // Moderator: No Special Privileges
-            this.CourseRoles.Add(new CourseRole(CourseRole.OSBLERoles.Moderator.ToString(), false, false, false, false, false, false));
+            this.CourseRoles.Add(new Privileges(Privileges.CourseRoles.Moderator.ToString(), false, false, false, false, false, false));
 
             // Observer: Can See All, All Anonymized
-            this.CourseRoles.Add(new CourseRole(CourseRole.OSBLERoles.Observer.ToString(), false, true, false, false, false, true));
+            this.CourseRoles.Add(new Privileges(Privileges.CourseRoles.Observer.ToString(), false, true, false, false, false, true));
 
             // Community Roles
 
@@ -350,155 +350,155 @@ namespace OSBLE.Models
             #region add course users
 
             CoursesUsers cu = new CoursesUsers();
-            cu.CourseID = 1;
+            cu.AbstractCourseID = 1;
             cu.UserProfileID = 1;
-            cu.CourseRoleID = (int)CourseRole.OSBLERoles.Instructor;
+            cu.AbstractRoleID = (int)Privileges.CourseRoles.Instructor;
             cu.Section = 0;
 
             CoursesUsers cu2 = new CoursesUsers();
-            cu2.CourseID = 2;
+            cu2.AbstractCourseID = 2;
             cu2.UserProfileID = 1;
-            cu2.CourseRoleID = (int)CourseRole.OSBLERoles.Observer;
+            cu2.AbstractRoleID = (int)Privileges.CourseRoles.Observer;
             cu2.Section = 0;
 
             CoursesUsers cu3 = new CoursesUsers();
-            cu3.CourseID = 1;
+            cu3.AbstractCourseID = 1;
             cu3.UserProfileID = 2;
-            cu3.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu3.AbstractRoleID = (int)Privileges.CourseRoles.Student;
             cu3.Section = 1;
 
             CoursesUsers cu4 = new CoursesUsers();
-            cu4.CourseID = 2;
+            cu4.AbstractCourseID = 2;
             cu4.UserProfileID = 3;
-            cu4.CourseRoleID = (int)CourseRole.OSBLERoles.Instructor;
+            cu4.AbstractRoleID = (int)Privileges.CourseRoles.Instructor;
             cu4.Section = 0;
 
             CoursesUsers cu5 = new CoursesUsers();
-            cu5.CourseID = 2;
+            cu5.AbstractCourseID = 2;
             cu5.UserProfileID = 2;
-            cu5.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu5.AbstractRoleID = (int)Privileges.CourseRoles.Student;
             cu5.Section = 2;
 
             CoursesUsers cu6 = new CoursesUsers();
-            cu6.CourseID = 3;
+            cu6.AbstractCourseID = 3;
             cu6.UserProfileID = 1;
-            cu6.CourseRoleID = (int)CommunityRole.OSBLERoles.Leader;
+            cu6.AbstractRoleID = (int)CommunityRole.OSBLERoles.Leader;
             cu6.Section = 0;
 
             CoursesUsers cu7 = new CoursesUsers();
-            cu7.CourseID = 3;
+            cu7.AbstractCourseID = 3;
             cu7.UserProfileID = 2;
-            cu7.CourseRoleID = (int)CommunityRole.OSBLERoles.Participant;
+            cu7.AbstractRoleID = (int)CommunityRole.OSBLERoles.Participant;
             cu7.Section = 0;
 
             CoursesUsers cu8 = new CoursesUsers();
-            cu8.CourseID = 4;
+            cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 4;
-            cu8.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu8.AbstractRoleID = (int)Privileges.CourseRoles.Student;
             cu8.Section = 0;
             this.CoursesUsers.Add(cu8);
             this.SaveChanges();
 
             cu8 = new CoursesUsers();
-            cu8.CourseID = 4;
+            cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 5;
-            cu8.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu8.AbstractRoleID = (int)Privileges.CourseRoles.Student;
             cu8.Section = 0;
             this.CoursesUsers.Add(cu8);
             this.SaveChanges();
 
             cu8 = new CoursesUsers();
-            cu8.CourseID = 4;
+            cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 1;
-            cu8.CourseRoleID = (int)CourseRole.OSBLERoles.Instructor;
+            cu8.AbstractRoleID = (int)Privileges.CourseRoles.Instructor;
             cu8.Section = 0;
             this.CoursesUsers.Add(cu8);
             this.SaveChanges();
 
             cu8 = new CoursesUsers();
-            cu8.CourseID = 4;
+            cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 6;
-            cu8.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu8.AbstractRoleID = (int)Privileges.CourseRoles.Student;
             cu8.Section = 0;
             this.CoursesUsers.Add(cu8);
             this.SaveChanges();
 
             cu8 = new CoursesUsers();
-            cu8.CourseID = 4;
+            cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 7;
-            cu8.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu8.AbstractRoleID = (int)Privileges.CourseRoles.Student;
             cu8.Section = 0;
             this.CoursesUsers.Add(cu8);
             this.SaveChanges();
 
             cu8 = new CoursesUsers();
-            cu8.CourseID = 4;
+            cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 8;
-            cu8.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu8.AbstractRoleID = (int)Privileges.CourseRoles.Student;
             cu8.Section = 0;
             this.CoursesUsers.Add(cu8);
             this.SaveChanges();
 
             cu8 = new CoursesUsers();
-            cu8.CourseID = 4;
+            cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 9;
-            cu8.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu8.AbstractRoleID = (int)Privileges.CourseRoles.Student;
             cu8.Section = 0;
             this.CoursesUsers.Add(cu8);
             this.SaveChanges();
 
             cu8 = new CoursesUsers();
-            cu8.CourseID = 4;
+            cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 10;
-            cu8.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu8.AbstractRoleID = (int)Privileges.CourseRoles.Student;
             cu8.Section = 0;
             this.CoursesUsers.Add(cu8);
             this.SaveChanges();
 
             cu8 = new CoursesUsers();
-            cu8.CourseID = 4;
+            cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 11;
-            cu8.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu8.AbstractRoleID = (int)Privileges.CourseRoles.Student;
             cu8.Section = 0;
             this.CoursesUsers.Add(cu8);
             this.SaveChanges();
 
             cu8 = new CoursesUsers();
-            cu8.CourseID = 4;
+            cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 12;
-            cu8.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu8.AbstractRoleID = (int)Privileges.CourseRoles.Student;
             cu8.Section = 0;
             this.CoursesUsers.Add(cu8);
             this.SaveChanges();
 
             cu8 = new CoursesUsers();
-            cu8.CourseID = 4;
+            cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 13;
-            cu8.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu8.AbstractRoleID = (int)Privileges.CourseRoles.Student;
             cu8.Section = 0;
             this.CoursesUsers.Add(cu8);
             this.SaveChanges();
 
             cu8 = new CoursesUsers();
-            cu8.CourseID = 4;
+            cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 14;
-            cu8.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu8.AbstractRoleID = (int)Privileges.CourseRoles.Student;
             cu8.Section = 0;
             this.CoursesUsers.Add(cu8);
             this.SaveChanges();
 
             cu8 = new CoursesUsers();
-            cu8.CourseID = 4;
+            cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 15;
-            cu8.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu8.AbstractRoleID = (int)Privileges.CourseRoles.Student;
             cu8.Section = 0;
             this.CoursesUsers.Add(cu8);
             this.SaveChanges();
 
             cu8 = new CoursesUsers();
-            cu8.CourseID = 4;
+            cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 16;
-            cu8.CourseRoleID = (int)CourseRole.OSBLERoles.Student;
+            cu8.AbstractRoleID = (int)Privileges.CourseRoles.Student;
             cu8.Section = 0;
             this.CoursesUsers.Add(cu8);
             this.SaveChanges();

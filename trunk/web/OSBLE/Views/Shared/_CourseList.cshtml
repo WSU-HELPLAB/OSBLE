@@ -16,21 +16,23 @@ using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_cour
             if(cu.Hidden) {
                 continue;
             }
-            
-            string courseDisplay = @Helpers.CourseTag(cu.Course) + " - " + cu.Course.Name + " (" + cu.CourseRole.Name + ")";
 
-            if((cu.Course is Course) && (cu.Course as Course).Inactive) {
+            string courseDisplay = @Helpers.CourseTag(cu.AbstractCourse) + " - " + cu.AbstractCourse.Name + " (" + cu.AbstractRole.Name + ")";
+
+            if ((cu.AbstractCourse is Course) && (cu.AbstractCourse as Course).Inactive)
+            {
                 courseDisplay += " [INACTIVE]";
             }
 
             CoursesUsers ac = ViewBag.ActiveCourse as CoursesUsers;
             
-            if(cu.Course is Course && !courseOptGroup) {
+            if(cu.AbstractCourse is Course && !courseOptGroup) {
                 courseOptGroup = true;
                 @:<optgroup label="Courses">
             }
 
-            if(cu.Course is Community && !communityOptGroup) {
+            if (cu.AbstractCourse is Community && !communityOptGroup)
+            {
                 communityOptGroup = true;
                 if(courseOptGroup) {
                 @:</optgroup>
@@ -38,13 +40,13 @@ using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_cour
                 @:<optgroup label="Communities">
             }
 
-            if ((ac != null) && (ac.CourseID == cu.CourseID))
+            if ((ac != null) && (ac.AbstractCourseID == cu.AbstractCourseID))
             {
-            <option value=@cu.CourseID selected="selected">@courseDisplay</option>
+            <option value=@cu.AbstractCourseID selected="selected">@courseDisplay</option>
             }
             else
             {
-            <option value=@cu.CourseID>@courseDisplay</option>
+            <option value=@cu.AbstractCourseID>@courseDisplay</option>
             }
 
         }

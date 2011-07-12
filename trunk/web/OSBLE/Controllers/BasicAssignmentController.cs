@@ -33,7 +33,7 @@ namespace OSBLE.Controllers
         {
             List<Rubric> rubrics = (from cr in db.CourseRubrics
                                     join r in db.Rubrics on cr.RubricID equals r.ID
-                                    where cr.CourseID == activeCourse.CourseID
+                                    where cr.CourseID == activeCourse.AbstractCourseID
                                     select r).ToList();
             rubrics.Insert(0, new Rubric() { ID = 0, Description = "" });
             ViewBag.Rubrics = rubrics.ToList();
@@ -60,7 +60,7 @@ namespace OSBLE.Controllers
             viewModel.RubricCreation = createRubricCreationSilverlightObject();
 
             var assignmentActivites = from c in db.AbstractAssignmentActivities
-                                      where c.AbstractAssignment.Category.CourseID == activeCourse.CourseID
+                                      where c.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID
                                       select c;
 
             Dictionary<string, string> activityTeams = new Dictionary<string, string>();
@@ -87,7 +87,7 @@ namespace OSBLE.Controllers
         {
             List<Rubric> rubrics = (from cr in db.CourseRubrics
                                     join r in db.Rubrics on cr.RubricID equals r.ID
-                                    where cr.CourseID == activeCourse.CourseID
+                                    where cr.CourseID == activeCourse.AbstractCourseID
                                     select r).ToList();
             rubrics.Insert(0, new Rubric() { ID = 0, Description = "" });
             ViewBag.Rubrics = rubrics.ToList();
@@ -244,7 +244,7 @@ namespace OSBLE.Controllers
                 else
                 {
                     var users = from c in db.CoursesUsers
-                                where c.CourseID == activeCourse.CourseID
+                                where c.AbstractCourseID == activeCourse.AbstractCourseID
                                 && c.AbstractRole.CanSubmit
                                 select c.UserProfile;
 
@@ -296,8 +296,8 @@ namespace OSBLE.Controllers
             List<SerializableTeamMember> teamMembmers = new List<SerializableTeamMember>();
 
             var couresesUsers = (from c in db.CoursesUsers
-                                 where c.CourseID == activeCourse.CourseID
-                                 && (c.AbstractRole.ID == (int)CourseRole.OSBLERoles.Student)
+                                 where c.AbstractCourseID == activeCourse.AbstractCourseID
+                                 && (c.AbstractRole.ID == (int)Privileges.CourseRoles.Student)
                                  select c).ToList();
 
             int i = 0;
@@ -307,7 +307,7 @@ namespace OSBLE.Controllers
                 foreach (CoursesUsers cu in couresesUsers)
                 {
                     SerializableTeamMember teamMember = new SerializableTeamMember();
-                    teamMember.IsModerator = cu.AbstractRole.ID == (int)CourseRole.OSBLERoles.Moderator;
+                    teamMember.IsModerator = cu.AbstractRole.ID == (int)Privileges.CourseRoles.Moderator;
                     teamMember.Name = cu.UserProfile.FirstName + " " + cu.UserProfile.LastName;
                     teamMember.Section = cu.Section;
                     teamMember.UserID = cu.UserProfileID;
@@ -339,7 +339,7 @@ namespace OSBLE.Controllers
         private SilverlightObject createRubricCreationSilverlightObject()
         {
             Dictionary<string, string> parameters = new Dictionary<string, string>();
-            parameters.Add("courseId", activeCourse.CourseID.ToString());
+            parameters.Add("courseId", activeCourse.AbstractCourseID.ToString());
 
             return new SilverlightObject
             {
@@ -406,7 +406,7 @@ namespace OSBLE.Controllers
             BasicAssignment assignment = db.BasicAssignments.Find(basic.Assignment.ID);
 
             // Make sure assignment to update belongs to this course.
-            if (assignment.Category.CourseID != ActiveCourse.CourseID)
+            if (assignment.Category.CourseID != ActiveCourse.AbstractCourseID)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -415,7 +415,7 @@ namespace OSBLE.Controllers
             if (basic.Assignment.CategoryID != assignment.CategoryID)
             {
                 Category c = db.Categories.Find(basic.Assignment.CategoryID);
-                if (c.CourseID != ActiveCourse.CourseID)
+                if (c.CourseID != ActiveCourse.AbstractCourseID)
                 {
                     return RedirectToAction("Index", "Home");
                 }

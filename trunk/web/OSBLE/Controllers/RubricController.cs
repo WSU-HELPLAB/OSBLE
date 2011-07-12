@@ -100,7 +100,7 @@ namespace OSBLE.Controllers
             }
 
             //Make sure that the current activity is attached to the active course
-            if (viewModel.SelectedAssignmentActivity.AbstractAssignment.Category.CourseID != activeCourse.CourseID)
+            if (viewModel.SelectedAssignmentActivity.AbstractAssignment.Category.CourseID != activeCourse.AbstractCourseID)
             {
                 return false;
             }

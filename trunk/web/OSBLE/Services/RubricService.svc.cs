@@ -57,7 +57,7 @@ namespace OSBLE.Services
         {
             OSBLEContext db = new OSBLEContext();
             var result = from ac in db.AbstractCourses
-                                             join cu in db.CoursesUsers on ac.ID equals cu.CourseID
+                                             join cu in db.CoursesUsers on ac.ID equals cu.AbstractCourseID
                                              /*
                                              where
                                                 (cu.CourseRole.CanModify || ac is Community)

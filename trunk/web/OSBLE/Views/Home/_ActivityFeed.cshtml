@@ -14,7 +14,7 @@
 </script>
 
 <div id="activity_new_post">
-    @if ((ViewBag.ActiveCourse.CourseRole.CanGrade == true) || ((ViewBag.ActiveCourse.Course is Course)&&(ViewBag.ActiveCourse.Course.AllowDashboardPosts) == true))
+    @if ((ViewBag.ActiveCourse.AbstractRole.CanGrade == true) || ((ViewBag.ActiveCourse.AbstractCourse is Course)&&(ViewBag.ActiveCourse.Course.AllowDashboardPosts) == true))
     {
         <input type="hidden" id="MaxContentChars" value="@ViewBag.MaxActivityFeedLength"/>
         
@@ -28,7 +28,7 @@
         <textarea id="ActivityFeed" name="Content" rows="5" cols="40" placeholder="Enter new feed post here..." 
         onkeyup="RemainingChars();" onkeydown="RemainingChars();" ></textarea><br />
         
-        <input type="submit" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.Course)" /> 
+        <input type="submit" name="post_active" value="Post to @Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)" /> 
         
             if (ViewBag.IsInstructor)
             {
@@ -50,7 +50,7 @@
         <input type="radio" name="mode" value="false" @if (!ViewBag.DashboardSingleCourseMode) {<text>checked="checked"</text>}/>
             <text>Show all courses</text> 
         <input type="radio" name="mode" value="true" @if (ViewBag.DashboardSingleCourseMode) {<text>checked="checked"</text>}/>
-            <text>Show only <em>@Helpers.CourseTag(ViewBag.ActiveCourse.Course)</em></text> 
+            <text>Show only <em>@Helpers.CourseTag(ViewBag.ActiveCourse.AbstractCourse)</em></text> 
     }
 </div>
 <script type="text/javascript">

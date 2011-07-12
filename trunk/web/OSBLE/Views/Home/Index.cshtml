@@ -21,14 +21,14 @@
 </div>
 
 <h3>Events &amp; Deadlines 
-@if (@ViewBag.ActiveCourse.CourseRole.CanModify || @ViewBag.ActiveCourse.Course.AllowEventPosting)
+@if (@ViewBag.ActiveCourse.AbstractRole.CanModify || @ViewBag.ActiveCourse.AbstractCourse.AllowEventPosting)
 {
 <a href="@Url.Action("Create","Event")" title="Add New Event">@Helpers.AddButton()</a>
 }
 </h3>
 
 <div id="important_dates">
-<p>Next @ViewBag.ActiveCourse.Course.CalendarWindowOfTime Weeks</p>
+<p>Next @ViewBag.ActiveCourse.AbstractCourse.CalendarWindowOfTime Weeks</p>
 @Html.Partial("_Events",(List<Event>)ViewBag.Events)
 <p>@Html.ActionLink("Show All Events", "Index", "Event")</p>
 </div>

@@ -51,10 +51,10 @@ namespace OSBLE.Controllers
            List<string[]> parsedData = new List<string[]>();
            List<int> positionList = new List<int>();
            List<int> doNotAdd = new List<int>();
-           int currentCourseId = ActiveCourse.CourseID;           
+           int currentCourseId = ActiveCourse.AbstractCourseID;           
 
            var students = from student in db.CoursesUsers
-                          where student.CourseID == currentCourseId
+                          where student.AbstractCourseID == currentCourseId
                           group student by student.UserProfile.ID into studentList
                           select studentList;
 
@@ -237,9 +237,9 @@ namespace OSBLE.Controllers
 
            List<TeamUserMember> userMembers = new List<TeamUserMember>();
 
-           int currentCourseId = ActiveCourse.CourseID;
+           int currentCourseId = ActiveCourse.AbstractCourseID;
            List<CoursesUsers> Users = (from user in db.CoursesUsers
-                                       where user.CourseID == currentCourseId
+                                       where user.AbstractCourseID == currentCourseId
                                        select user).ToList();
 
            foreach (CoursesUsers u in Users)
@@ -681,7 +681,7 @@ namespace OSBLE.Controllers
        [HttpPost]
        public ActionResult AddCategory()
        {
-           var currentCourseId = ActiveCourse.CourseID;
+           var currentCourseId = ActiveCourse.AbstractCourseID;
            var numTabs = from cats in db.Categories
                          where cats.CourseID == currentCourseId
                          select cats;
@@ -840,7 +840,7 @@ namespace OSBLE.Controllers
            {
                if (assignmentId != 0)
                {
-                   int currentCourseId = ActiveCourse.CourseID;
+                   int currentCourseId = ActiveCourse.AbstractCourseID;
 
                    AbstractAssignment assignment = (from assign in db.AbstractAssignments where assign.ID == assignmentId select assign).FirstOrDefault();
                    Category category = (from cat in db.Categories where cat.Name == categoryName && cat.CourseID == currentCourseId select cat).FirstOrDefault();
@@ -1055,7 +1055,7 @@ namespace OSBLE.Controllers
        public ActionResult Index()
        {
            //LINQ complains when we use this directly in our queries,so pull it beforehand
-           int currentCourseId = ActiveCourse.CourseID;
+           int currentCourseId = ActiveCourse.AbstractCourseID;
            List<Score> percentList = new List<Score>();
 
            var letterGrades = from letters in db.Courses
@@ -1065,7 +1065,7 @@ namespace OSBLE.Controllers
            //pull the students in the course.  Each student is a row.
            List<UserProfile> studentList = (from up in db.UserProfiles
                                             join cu in db.CoursesUsers on up.ID equals cu.UserProfileID
-                                            where cu.CourseID == currentCourseId && cu.CourseRoleID == (int)CourseRole.OSBLERoles.Student
+                                            where cu.AbstractCourseID == currentCourseId && cu.AbstractRoleID == (int)Privileges.CourseRoles.Student
                                             orderby up.LastName, up.FirstName
                                             select up).ToList();
 
@@ -1125,7 +1125,7 @@ namespace OSBLE.Controllers
            }
 
            List<CoursesUsers> courseUsers = (from users in db.CoursesUsers
-                                             where users.CourseID == currentCourseId
+                                             where users.AbstractCourseID == currentCourseId
                                              select users).ToList();
 
            List<Category> categories = (from category in db.Categories
@@ -1171,7 +1171,7 @@ namespace OSBLE.Controllers
 
        public void AddLetterGrade(string grade, int minReq)
        {
-           int currentCourseId = ActiveCourse.CourseID;
+           int currentCourseId = ActiveCourse.AbstractCourseID;
 
            LetterGrade newLetterGrade = new LetterGrade()
            {
@@ -1200,7 +1200,7 @@ namespace OSBLE.Controllers
        private void BuildGradebook(int categoryId)
        {
            //LINQ complains when we use this directly in our queries, so pull it beforehand
-           int currentCourseId = ActiveCourse.CourseID;
+           int currentCourseId = ActiveCourse.AbstractCourseID;
            List<TeamUserMember> userMembers = new List<TeamUserMember>();
            //List of students scores
            List<Score> studentScores = new List<Score>();
@@ -1234,7 +1234,7 @@ namespace OSBLE.Controllers
            if (assignments.Count() == 0)
            {
                List<CoursesUsers> Users = (from user in db.CoursesUsers
-                                           where user.CourseID == currentCourseId
+                                           where user.AbstractCourseID == currentCourseId
                                            select user).ToList();
 
                foreach (CoursesUsers u in Users)
@@ -1290,7 +1290,7 @@ namespace OSBLE.Controllers
            //pull the students in the course.  Each student is a row.
            List<UserProfile> students = (from up in db.UserProfiles
                                          join cu in db.CoursesUsers on up.ID equals cu.UserProfileID
-                                         where cu.CourseID == currentCourseId && cu.CourseRoleID == (int)CourseRole.OSBLERoles.Student
+                                         where cu.AbstractCourseID == currentCourseId && cu.AbstractRoleID == (int)Privileges.CourseRoles.Student
                                          orderby up.LastName, up.FirstName
                                          select up).ToList();
 
@@ -1359,7 +1359,7 @@ namespace OSBLE.Controllers
        private int GetDefaultWeightId()
        {
            //LINQ complains when we use this directly in our queries,so pull it beforehand
-           int currentCourseId = ActiveCourse.CourseID;
+           int currentCourseId = ActiveCourse.AbstractCourseID;
 
            //List to store teamUserMembers
            List<TeamUserMember> userMembers = new List<TeamUserMember>();
@@ -1392,7 +1392,7 @@ namespace OSBLE.Controllers
                db.SaveChanges();
 
                List<CoursesUsers> Users = (from user in db.CoursesUsers
-                                           where user.CourseID == currentCourseId
+                                           where user.AbstractCourseID == currentCourseId
                                            select user).ToList();
 
                foreach (CoursesUsers u in Users)

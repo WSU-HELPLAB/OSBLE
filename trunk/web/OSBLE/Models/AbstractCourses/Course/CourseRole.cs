@@ -1,13 +1,13 @@
 ﻿namespace OSBLE.Models.Courses
 {
-    public class CourseRole : AbstractRole
+    public class Privileges : AbstractRole
     {
-        public CourseRole()
+        public Privileges()
             : base()
         {
         }
 
-        public CourseRole(string Name, bool CanModify, bool CanSeeAll, bool CanGrade, bool CanSubmit, bool CanUploadFiles, bool Anonymized)
+        public Privileges(string Name, bool CanModify, bool CanSeeAll, bool CanGrade, bool CanSubmit, bool CanUploadFiles, bool Anonymized)
             : base()
         {
             this.Name = Name;
@@ -19,7 +19,7 @@
             this.Anonymized = Anonymized;
         }
 
-        public enum OSBLERoles : int
+        public enum CourseRoles : int
         {
             //Instructor being the first one is used in RosterController so any new roles add at the end.
             //Also Note that community members magically start 6 which is one past the end of this and they will

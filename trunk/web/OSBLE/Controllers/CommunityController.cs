@@ -39,9 +39,9 @@ namespace OSBLE.Controllers
 
                 // Make current user a leader on new community.
                 CoursesUsers cu = new CoursesUsers();
-                cu.CourseID = community.ID;
+                cu.AbstractCourseID = community.ID;
                 cu.UserProfileID = currentUser.ID;
-                cu.CourseRoleID = (int)CommunityRole.OSBLERoles.Leader;
+                cu.AbstractRoleID = (int)CommunityRole.OSBLERoles.Leader;
 
                 db.CoursesUsers.Add(cu);
                 db.SaveChanges();
@@ -63,7 +63,7 @@ namespace OSBLE.Controllers
         public ActionResult Edit()
         {
             ViewBag.CurrentTab = "Community Settings";
-            Community community = db.Communities.Find(activeCourse.CourseID);
+            Community community = db.Communities.Find(activeCourse.AbstractCourseID);
             return View(community);
         }
 
@@ -78,7 +78,7 @@ namespace OSBLE.Controllers
         {
             ViewBag.CurrentTab = "Community Settings";
 
-            if (community.ID != activeCourse.CourseID)
+            if (community.ID != activeCourse.AbstractCourseID)
             {
                 return RedirectToAction("Index");
             }

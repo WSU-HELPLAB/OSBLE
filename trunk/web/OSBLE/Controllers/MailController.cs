@@ -75,9 +75,9 @@ namespace OSBLE.Controllers
             {
                 foreach (CoursesUsers cu in currentCourses)
                 {
-                    int courseID = cu.CourseID;
-                    CoursesUsers ourCu = currentCourses.Where(c => c.CourseID == courseID).FirstOrDefault();
-                    CoursesUsers theirCu = db.CoursesUsers.Where(c => (c.CourseID == courseID) && (c.UserProfileID == u.ID)).FirstOrDefault();
+                    int courseID = cu.AbstractCourseID;
+                    CoursesUsers ourCu = currentCourses.Where(c => c.AbstractCourseID == courseID).FirstOrDefault();
+                    CoursesUsers theirCu = db.CoursesUsers.Where(c => (c.AbstractCourseID == courseID) && (c.UserProfileID == u.ID)).FirstOrDefault();
 
                     if ((ourCu != null) && (theirCu != null) && (!(ourCu.AbstractRole.Anonymized) || (theirCu.AbstractRole.CanGrade == true)))
                     {
@@ -204,11 +204,11 @@ namespace OSBLE.Controllers
             // If we are not anonymous in a course, allow search of all users.
             List<int> authorizedCourses = currentCourses
                 .Where(c => c.AbstractRole.Anonymized == false)
-                .Select(c => c.CourseID)
+                .Select(c => c.AbstractCourseID)
                 .ToList();
 
             List<UserProfile> authorizedUsers = db.CoursesUsers
-                .Where(c => authorizedCourses.Contains(c.CourseID))
+                .Where(c => authorizedCourses.Contains(c.AbstractCourseID))
                 .Select(c => c.UserProfile)
                 .ToList();
 
@@ -217,11 +217,11 @@ namespace OSBLE.Controllers
             // If we are anonymous, limit search to ourselves plus instructors/TAs
             List<int> addedCourses = currentCourses
                 .Where(c => c.AbstractRole.Anonymized == true)
-                .Select(c => c.CourseID)
+                .Select(c => c.AbstractCourseID)
                 .ToList();
 
             List<UserProfile> addedUsers = db.CoursesUsers
-                .Where(c => addedCourses.Contains(c.CourseID) && ((c.UserProfileID == currentUser.ID) || (c.AbstractRole.CanGrade == true)))
+                .Where(c => addedCourses.Contains(c.AbstractCourseID) && ((c.UserProfileID == currentUser.ID) || (c.AbstractRole.CanGrade == true)))
                 .Select(c => c.UserProfile)
                 .ToList();
 

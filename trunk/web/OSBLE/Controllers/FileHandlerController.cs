@@ -17,7 +17,7 @@ namespace OSBLE.Controllers
         public ActionResult CourseDocument(int courseId, string filePath)
         {
             var course = (from c in db.CoursesUsers
-                          where c.UserProfileID == currentUser.ID && c.CourseID == courseId
+                          where c.UserProfileID == currentUser.ID && c.AbstractCourseID == courseId
                           select c).FirstOrDefault();
 
             if (course != null)
@@ -62,7 +62,7 @@ namespace OSBLE.Controllers
             try
             {
                 //If u are looking at the activeCourse and you can either see all or looking at your own let it pass
-                if (activeCourse.CourseID == activity.AbstractAssignment.Category.CourseID && (activeCourse.AbstractRole.CanSeeAll || currentUser.ID == userProfileID))
+                if (activeCourse.AbstractCourseID == activity.AbstractAssignment.Category.CourseID && (activeCourse.AbstractRole.CanSeeAll || currentUser.ID == userProfileID))
                 {
                     var teamUser = (from c in activity.TeamUsers where c.Contains(db.UserProfiles.Find(userProfileID)) select c).FirstOrDefault();
 
@@ -91,7 +91,7 @@ namespace OSBLE.Controllers
 
             try
             {
-                if (acitivity.AbstractAssignment.Category.CourseID == activeCourse.CourseID)
+                if (acitivity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID)
                 {
                     Stream stream = FileSystem.FindZipFile(activeCourse.AbstractCourse as Course, acitivity);
 
@@ -158,7 +158,7 @@ namespace OSBLE.Controllers
             try
             {
                 TeamUserMember teamUser = db.TeamUsers.Find(teamUserID);
-                if (acitivity.AbstractAssignment.Category.CourseID == activeCourse.CourseID && acitivity.TeamUsers.Contains(teamUser))
+                if (acitivity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID && acitivity.TeamUsers.Contains(teamUser))
                 {
                     Stream stream = FileSystem.FindZipFile(activeCourse.AbstractCourse as Course, acitivity, teamUser);
 
@@ -170,11 +170,11 @@ namespace OSBLE.Controllers
                     }
 
                     //This can be used to simulate a long load time
-                    Int64 i = 0;
+                    /*Int64 i = 0;
                     while (i < 2000000000)
                     {
                         i++;
-                    }
+                    }*/
 
                     string submissionfolder = FileSystem.GetTeamUserSubmissionFolder(false, (activeCourse.AbstractCourse as Course), assignmentActivityID, db.TeamUsers.Find(teamUserID));
 

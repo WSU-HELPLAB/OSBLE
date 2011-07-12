@@ -22,7 +22,7 @@ namespace OSBLE.Services
         {
             AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(abstractAssignmentActivityID);
 
-            if (activity.AbstractAssignment.Category.CourseID == CurrentCourseUser.CourseID)
+            if (activity.AbstractAssignment.Category.CourseID == CurrentCourseUser.AbstractCourseID)
             {
                 var teamUser = (from c in activity.TeamUsers where c.Contains(currentUserProfile) == true select c).FirstOrDefault();
             }

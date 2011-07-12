@@ -11,7 +11,8 @@
 
 <h2>Assignments @Helpers.CreateToolTip(ToolTips.AssignmentTitle) </h2>
 
-@if (ViewBag.ActiveCourse.CourseRole.CanModify) {
+@if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+{
 
     <a href="#" class="add_link" id="assignment_create_button">@Helpers.AddButton() Create New Assignment</a>
         <script type="text/javascript">

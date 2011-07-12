@@ -9,7 +9,7 @@
     int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
 }
 @*This page is for teachers only*@
-@if (ViewBag.ActiveCourse.CourseRole.CanModify)
+@if (ViewBag.ActiveCourse.AbstractRole.CanModify)
 { 
 
     <div class="assignment_header">

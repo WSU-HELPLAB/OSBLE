@@ -23,7 +23,7 @@
             <a href="@Url.Action("Create", "Event", new { start = e.StartDate })" title="Add Event At This Time">@Helpers.AddButton()</a>
             }
 
-            @if (ViewBag.ActiveCourse.CourseRole.CanModify && !e.HideDelete)
+            @if (ViewBag.ActiveCourse.AbstractRole.CanModify && !e.HideDelete)
             {
             <a title="Modify This Event" href="@Url.Action("Edit", "Event", new { ID = e.ID })">@Helpers.EditButton()</a>
             }

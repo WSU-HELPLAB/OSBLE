@@ -43,12 +43,12 @@ namespace OSBLE.Services
                 int activeCourse = (int)Context.Session["ActiveCourse"];
 
 
-                CurrentCourseUser = db.CoursesUsers.Where(cu => cu.CourseID == activeCourse &&
+                CurrentCourseUser = db.CoursesUsers.Where(cu => cu.AbstractCourseID == activeCourse &&
                                                     cu.UserProfileID == currentUserProfile.ID &&
                                                     cu.AbstractCourse is Course &&
                                                     (!(cu.AbstractCourse as Course).Inactive ||
-                                                        cu.CourseRoleID == (int)CourseRole.OSBLERoles.Instructor ||
-                                                        cu.CourseRoleID == (int)CourseRole.OSBLERoles.Observer
+                                                        cu.AbstractRoleID == (int)Privileges.CourseRoles.Instructor ||
+                                                        cu.AbstractRoleID == (int)Privileges.CourseRoles.Observer
                                                     )).FirstOrDefault();
             }
         }

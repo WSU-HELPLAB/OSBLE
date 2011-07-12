@@ -31,7 +31,7 @@ namespace OSBLE.Controllers
             List<StudioAssignment> studioAssignments = db.StudioAssignments.Where(
                     sa =>
                         // Assignments must be from the active course
-                        sa.Category.CourseID == ActiveCourse.CourseID &&
+                        sa.Category.CourseID == ActiveCourse.AbstractCourseID &&
                         // There must be at least two activities in the assignment
                         sa.AssignmentActivities.Count() >= 2 &&
                         // The first activity must be a studio activity

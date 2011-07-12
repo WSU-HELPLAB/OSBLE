@@ -10,9 +10,9 @@
 
 <h4>@ViewBag.Notice</h4>
 
-@if (ViewBag.ActiveCourse.CourseRole.CanModify)
+@if (ViewBag.ActiveCourse.AbstractRole.CanModify)
 {
-if (!(ViewBag.ActiveCourse.Course is Community))
+if (!(ViewBag.ActiveCourse.AbstractCourse is Community))
 {
 <div>
     <a href="#" onclick="$('#add_update_users').toggle('blind'); return false;">Add/Update Users</a>
@@ -102,7 +102,7 @@ else
                             <a title="Mail This User" href="@Url.Action("Create", "Mail", new { recipientID = user.ID })">@Helpers.MailButton()</a>
                             }
                             
-                            @if(ViewBag.ActiveCourse.CourseRole.CanModify) {
+                            @if(ViewBag.ActiveCourse.AbstractRole.CanModify) {
                             <a title="Modify This User" href="@Url.Action("Edit", "Roster", new { userProfileID = user.ID })">@Helpers.EditButton()</a>
 
                             <form action="@Url.Action("Delete")"

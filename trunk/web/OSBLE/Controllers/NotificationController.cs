@@ -95,7 +95,7 @@ namespace OSBLE.Controllers
         {
             List<int> sendToUsers = new List<int>();
 
-            CoursesUsers dpPosterCu = db.CoursesUsers.Where(cu => cu.CourseID == dp.CourseID && cu.UserProfileID == dp.UserProfileID).FirstOrDefault();
+            CoursesUsers dpPosterCu = db.CoursesUsers.Where(cu => cu.AbstractCourseID == dp.CourseID && cu.UserProfileID == dp.UserProfileID).FirstOrDefault();
 
             // Send notification to original thread poster if poster is not anonymized, 
             // are still in the course,
@@ -106,7 +106,7 @@ namespace OSBLE.Controllers
 
             foreach (DashboardReply dr in dp.Replies)
             {
-                CoursesUsers drPosterCu = db.CoursesUsers.Where(cu => cu.CourseID == dp.CourseID && cu.UserProfileID == dr.UserProfileID).FirstOrDefault();
+                CoursesUsers drPosterCu = db.CoursesUsers.Where(cu => cu.AbstractCourseID == dp.CourseID && cu.UserProfileID == dr.UserProfileID).FirstOrDefault();
                 
                 // Send notifications to each participant as long as they are not anonymized, 
                 // are still in the course,
@@ -142,8 +142,8 @@ namespace OSBLE.Controllers
         public void SendEventApprovalNotification(Event e)
         {
             // Get all instructors in the course.
-            List<UserProfile> instructors = db.CoursesUsers.Where(c => (c.CourseID == e.CourseID)
-                && (c.CourseRoleID == (int)CourseRole.OSBLERoles.Instructor))
+            List<UserProfile> instructors = db.CoursesUsers.Where(c => (c.AbstractCourseID == e.CourseID)
+                && (c.AbstractRoleID == (int)Privileges.CourseRoles.Instructor))
                 .Select(c => c.UserProfile).ToList();
 
             foreach (UserProfile instructor in instructors)

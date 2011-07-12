@@ -131,7 +131,7 @@
                     <text>Community</text>
                 }
                 </small>
-                @Helpers.CourseTag(cu.Course) &mdash; @cu.Course.Name (@cu.CourseRole.Name)
+                @Helpers.CourseTag(cu.AbstractCourse) &mdash; @cu.AbstractCourse.Name (@cu.AbstractRole.Name)
             </td>
             <td class="coursemenu_option">
             <input type="checkbox" value="True" name="cu_hidden_@(cu.CourseID)" @if (cu.Hidden)
