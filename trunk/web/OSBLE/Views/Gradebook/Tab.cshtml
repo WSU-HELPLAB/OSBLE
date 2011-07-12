@@ -329,8 +329,8 @@
 
     //This is called when the page is navigated away from. We want to make sure
     //any pending changes get saved before it navigates away.
-    $(window).unload(function () {
-        clearLastCellFocus();
+    $(window).unload(function (e) {
+        clearLastCellFocus(e);
         clearLastHeaderFocus();
     });
 
@@ -453,16 +453,18 @@
                     cell = $(this).find("td:eq(" + colIndex + ")");
                     cellGainsFocus(cell);
                 });
-                    if (cell != null) {
-                        cellGainsFocus(e, cell);
-                }
-                else {
-                    colIndex -= 1;
+                if (cell.html() == null) {
+                    clearLastCellFocus(e);
+                    row = $(this).parent("tr").next("tr");
+                    colIndex = 3;
                     row.each(function () {
                         cell = $(this).find("td:eq(" + colIndex + ")");
+                        cellGainsFocus(e, cell);
                     });
-                    clearLastCellFocus(e);
+
+                    return false;
                 }
+                cellGainsFocus(e, cell);
             }
             else {
             }
@@ -974,15 +976,15 @@
         hideDropDown();
         resetTableColors();
 
-        var container = col.id.split("-");
+        currentHeader = col.id.split("-");
 
-        if (container[1] == null) {
-            $("#" + container).css("background-color", "#AAAAAA");
-            $("#div-" + container).css("background-color", "#AAAAAA");
+        if (currentHeader[1] == null) {
+            $("#" + currentHeader).css("background-color", "#AAAAAA");
+            $("#div-" + currentHeader).css("background-color", "#AAAAAA");
 
             $("#grades tr").each(function () {
 
-                $(this).find("td:nth-child(" + container + ")").each(function () {
+                $(this).find("td:nth-child(" + currentHeader + ")").each(function () {
                     if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
                     }
                     else {
@@ -990,7 +992,7 @@
                     }
                 });
 
-                $(this).find("th:nth-child(" + container + ")").each(function () {
+                $(this).find("th:nth-child(" + currentHeader + ")").each(function () {
                     $(this).css("background-color", "DeepSkyBlue ");
                 });
             });

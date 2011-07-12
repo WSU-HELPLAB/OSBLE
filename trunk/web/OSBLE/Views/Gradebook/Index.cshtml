@@ -1158,8 +1158,10 @@
 
     function selectRow(row, e) {
 
-        hideTabColors(); 
-        if (lastFocusedCell != null) {
+        hideTabColors();
+        if (header == true) {
+            clearLastAssignmentFocus();
+        } else {
             clearLastCellFocus();
         }
         resetTableColors();
