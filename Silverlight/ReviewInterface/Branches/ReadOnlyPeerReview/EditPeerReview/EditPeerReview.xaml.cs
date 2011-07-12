@@ -10,6 +10,7 @@ using System.Collections.Generic;
 
 using ReviewInterfaceBase.HelperClasses;
 using System.Xml.Linq;
+using System.Windows;
 
 namespace EditPeerReview
 {
@@ -17,7 +18,6 @@ namespace EditPeerReview
     {
         private MainPageViewModel mpVM = new MainPageViewModel();
 
-        //my additions
         /// <summary>
         /// This is how we know if the documents are 'opened' on the main page
         /// This only turns to true after they have been opened and the UI thread is started
@@ -28,10 +28,6 @@ namespace EditPeerReview
         /// This keeps a reference for all the PeerReviewDocuments
         /// </summary>
         private IList<DocumentInfo> PeerReviewDocuments = null;
-
-
-
-        
 
         private void ReadPeerReview(XDocument xDoc, string author, Classification role)
         {
@@ -48,7 +44,12 @@ namespace EditPeerReview
                 {
                     if (DocumentHolder.idOfDocument.ToString() == id)
                     {
-                        DocumentHolder.LoadIssueVotingComments(document, noteAuthor);
+                        if (DocumentHolder is SpatialDocumentHolderViewModel)
+                        {
+                            (DocumentHolder as SpatialDocumentHolderViewModel).LoadSavedPeerReviewComments(document, noteAuthor);
+                        }
+                        //DocumentHolder
+                        //DocumentHolder.LoadIssueVotingComments(document, noteAuthor);
                     }
                 }
             }
@@ -95,9 +96,6 @@ namespace EditPeerReview
             OpenPeerReviewDocuments();
         }
 
-
-        //my additions end
-
         public EditPeerReview()
         {
             InitializeComponent();
@@ -107,7 +105,6 @@ namespace EditPeerReview
 
             LocalInitilizer();
         }
-
      
         private void LocalInitilizer()
         {
@@ -145,18 +142,17 @@ namespace EditPeerReview
             clientWrapper.StartAsycLoad();
         }
 
-        private void clientWrapper_LoadCompleted(object sender, DocumentsLoadedEventArgs e)
-        {
-            mpVM.LoadDocuments(e.Documents);
-        }
-
-
         private void DocumentHolderViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             foreach (IDocumentHolderViewModel DocumentHolder in e.NewItems)
             {
                 DocumentHolder.AllowNewComments();
             }
+        }
+
+        private void clientWrapper_LoadCompleted(object sender, DocumentsLoadedEventArgs e)
+        {
+            mpVM.LoadDocuments(e.Documents);
         }
     }
 }

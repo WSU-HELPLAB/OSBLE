@@ -696,6 +696,16 @@ namespace ReviewInterfaceBase.ViewModel.DocumentHolder
             }
         }
 
+        public void LoadSavedPeerReviewComments(XElement xmlDocument, NoteAuthor author)
+        {
+            foreach (XElement xmlComment in xmlDocument.Descendants("Comments").ElementAt(0).Descendants("Comment"))
+            {
+                ISpatialLocation location = spatialDocumentViewModel.GetReferenceLocationFromXml(xmlComment.Descendants("Location").First());
+                //commentManipulation.addIssueVotingComment(xmlComment, author, location, spatialDocumentViewModel.GetContentSize());
+                commentManipulation.addSavedPeerReviewComment(xmlComment, location, spatialDocumentViewModel.GetContentSize());
+            }
+        }
+
         public void LoadIssueVotingCommentsWithoutIssueVoting(XElement xmlDocument, NoteAuthor author)
         {
             foreach (XElement xmlComment in xmlDocument.Descendants("Comments").ElementAt(0).Descendants("Comment"))

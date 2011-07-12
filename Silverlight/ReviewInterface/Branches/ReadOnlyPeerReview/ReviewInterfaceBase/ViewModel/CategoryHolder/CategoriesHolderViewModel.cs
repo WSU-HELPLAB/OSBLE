@@ -7,12 +7,15 @@ using System.Xml.Linq;
 using ReviewInterfaceBase.Model.CatergoryHolder;
 using ReviewInterfaceBase.View.CategoryHolder;
 using ReviewInterfaceBase.ViewModel.Category;
+using ReviewInterfaceBase.View.Category;
 
 namespace ReviewInterfaceBase.ViewModel.CategoryHolder
 {
     public class CategoriesHolderViewModel
     {
         public event SizeChangedEventHandler SizeChanged = delegate { };
+
+        public event EventHandler LoadComplete = delegate { };
 
         private CategoriesHolderView thisView = new CategoriesHolderView();
 
@@ -32,6 +35,7 @@ namespace ReviewInterfaceBase.ViewModel.CategoryHolder
         {
             get { return thisModel.Categories; }
         }
+
 
         private void updateView()
         {
@@ -77,7 +81,21 @@ namespace ReviewInterfaceBase.ViewModel.CategoryHolder
                 }
             }
         }
-
+        public void CategorySelection()
+        {
+            foreach (UIElement ui in thisView.LayoutRoot.Children)
+            {
+                //hmm
+            }
+            foreach (CategoryViewModel cvm in Categories)
+            {
+                //cvm.SelectedTagIndex = 1;
+                foreach (string s in (cvm.GetView() as CategoryView).TagHolder.Items)
+                {
+                    MessageBox.Show(s);
+                }
+            }
+        }
         public CategoriesHolderViewModel()
         {
             thisView = new CategoriesHolderView();
@@ -93,8 +111,15 @@ namespace ReviewInterfaceBase.ViewModel.CategoryHolder
         public void LoadCategories(int documentID)
         {
             thisModel = new CategoryHolderModel(documentID);
+            thisModel.TagsLoaded += new EventHandler(thisModel_TagsLoaded);
             thisModel.LoadCompleted += new EventHandler(thisModel_LoadComplete);
             thisModel.Load();
+        }
+
+        void thisModel_TagsLoaded(object sender, EventArgs e)
+        {
+            //This event needs to be tied into whatever owns CHVM to let them know the tags are loaded and that they are selectable now
+            LoadComplete(sender, e);
         }
 
         public void ReadXml(XElement categories)
@@ -127,12 +152,17 @@ namespace ReviewInterfaceBase.ViewModel.CategoryHolder
         private void thisModel_LoadComplete(object sender, EventArgs e)
         {
             updateView();
+
+
+
             thisView.SizeChanged += new SizeChangedEventHandler(thisView_SizeChanged);
             foreach (CategoryViewModel cvm in Categories)
             {
                 //whenever one of the sizes changes we assume we changed so this wires it up to do that
                 cvm.SizeChanged += new SizeChangedEventHandler(thisView_SizeChanged);
             }
+
+            //LoadComplete(this, EventArgs.Empty);
         }
     }
 }

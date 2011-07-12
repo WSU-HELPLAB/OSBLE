@@ -20,7 +20,6 @@
         /// <returns>This is supposed to be a collection of Categories</returns>
         public IQueryable<Category> GetCategories(int DocumentID)
         {
-
             return new List<Category>()
                 {
                     new Category("Scope", 0),
@@ -126,9 +125,8 @@
         //This needs to get the document locations and return their real location that the client side can open
         public IQueryable<DocumentLocation> GetDocumentLocations()
         {
-           //return (new List<DocumentLocation>() { new DocumentLocation("txt.txt", 6, "bob", AuthorClassification.Student) }).ToArray().AsQueryable();
-            return (new List<DocumentLocation>() { new DocumentLocation("4.xps", 6, "bob", AuthorClassification.Student) }).ToArray().AsQueryable();
-            //return (new List<DocumentLocation>() { new DocumentLocation("FDS.cp", 6, "bob", AuthorClassification.Student) }).ToArray().AsQueryable();
+            //return (new List<DocumentLocation>() { new DocumentLocation("4.xps", 6, "bob", AuthorClassification.Student) }).ToArray().AsQueryable();
+            return (new List<DocumentLocation>() { new DocumentLocation("FDS.cp", 6, "bob", AuthorClassification.Student) }).ToArray().AsQueryable();
         }
 
         public IQueryable<DocumentLocation> GetPeerReviewLocations()

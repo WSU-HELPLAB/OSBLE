@@ -9,6 +9,7 @@ namespace ReviewInterfaceBase.Model.CatergoryHolder
     public class CategoryHolderModel : IModel
     {
         public event EventHandler LoadCompleted;
+        public event EventHandler TagsLoaded;
         private static int allowedCategories = 6;
         private int documentID;
 
@@ -52,11 +53,21 @@ namespace ReviewInterfaceBase.Model.CatergoryHolder
             {
                 CategoryViewModel cvm = new CategoryViewModel();
                 cvm.LoadTags(category.Name, category.ID);
+                
+                //me tying the event
+                cvm.LoadComplete += new EventHandler(cvm_LoadComplete);
+
                 categories.Add(cvm);
             }
 
             //Let anyone else know (aka our ViewModel) that we are done loading
             LoadCompleted(this, EventArgs.Empty);
+        }
+
+        void cvm_LoadComplete(object sender, EventArgs e)
+        {
+            //Letting others know that the tags have been loaded in
+            TagsLoaded(sender, e);
         }
 
         public void Load()

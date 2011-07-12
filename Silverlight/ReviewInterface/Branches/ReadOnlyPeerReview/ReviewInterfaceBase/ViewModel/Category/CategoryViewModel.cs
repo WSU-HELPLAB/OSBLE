@@ -17,6 +17,9 @@ namespace ReviewInterfaceBase.ViewModel.Category
         public event SizeChangedEventHandler SizeChanged = delegate { };
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
+        //mine
+        public event EventHandler LoadComplete = delegate { };
+
         private FrameworkElement thisView = new CategoryView();
         private CategoryModel thisModel;
 
@@ -107,8 +110,17 @@ namespace ReviewInterfaceBase.ViewModel.Category
 
         private void thisModel_LoadComplete(object sender, EventArgs e)
         {
+
+
             PropertyChanged(this, new PropertyChangedEventArgs("TagViewList"));
             thisView.SizeChanged += new SizeChangedEventHandler(thisView_SizeChanged);
+
+
+            //my event
+            LoadComplete(this, EventArgs.Empty);
+            
+
+            
         }
 
         public FrameworkElement GetView()
