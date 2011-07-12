@@ -47,14 +47,6 @@ namespace OSBLE.Services
                                  where c.ID == activeCourse
                                  select c).FirstOrDefault();
 
-                //AC: I don't think that this query works any more.  
-                CurrentCourseUser = db.CoursesUsers.Where(cu => cu.AbstractCourseID == activeCourse &&
-                                                    cu.UserProfileID == currentUserProfile.ID &&
-                                                    cu.AbstractCourse is Course &&
-                                                    (!(cu.AbstractCourse as Course).Inactive ||
-                                                        cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor ||
-                                                        cu.AbstractRoleID == (int)CourseRole.CourseRoles.Observer
-                                                    )).FirstOrDefault();
             }
         }
     }

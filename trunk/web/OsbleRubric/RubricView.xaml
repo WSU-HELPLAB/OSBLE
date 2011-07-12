@@ -7,14 +7,12 @@
 
     <Grid x:Name="MainLayoutRoot" Background="White">
         <StackPanel x:Name="MainStackPanel">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Visibility="Collapsed">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <TextBlock Text="Course:" VerticalAlignment="Center" />
                 <ComboBox x:Name="CourseComboBox" DisplayMemberPath="Name" Width="150" />
                 <TextBlock Text="Rubric:" Margin="15,0,0,0" VerticalAlignment="Center" />
-                <ComboBox x:Name="RubricComboBox" Width="150" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0" >
-                <TextBlock Text="Rubric Name:" VerticalAlignment="Center" />
+                <ComboBox x:Name="RubricComboBox" DisplayMemberPath="Description" Width="150" />
+                <TextBlock Text="Rubric Name:" Margin="15,0,0,0" VerticalAlignment="Center" />
                 <TextBox x:Name="RubricDescriptionTextBox" Width="250" />
             </StackPanel>
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Height="550" Width="790">

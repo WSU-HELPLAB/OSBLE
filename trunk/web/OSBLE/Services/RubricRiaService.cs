@@ -22,7 +22,22 @@ using OSBLE.Models.Courses.Rubrics;
     [EnableClientAccess()]
     public class RubricRiaService : OSBLEService
     {
+        public Criterion DummyCriterion()
+        {
+            throw new NotImplementedException("You're not supposed to use this!");
+        }
+
+        public Level DummyLevel()
+        {
+            throw new NotImplementedException("You're not supposed to use this!");
+        }
+
         public Community DummyCommunity()
+        {
+            throw new NotImplementedException("You're not supposed to use this!");
+        }
+
+        public CellDescription DummyCellDescription()
         {
             throw new NotImplementedException("You're not supposed to use this!");
         }
@@ -30,7 +45,7 @@ using OSBLE.Models.Courses.Rubrics;
         public IQueryable<AbstractCourse> GetCourses()
         {
             var courses = from course in db.AbstractCourses
-                          join cu in db.CoursesUsers on course.ID equals cu.AbstractRoleID
+                          join cu in db.CoursesUsers on course.ID equals cu.AbstractCourseID
                           where cu.UserProfileID == currentUserProfile.ID
                           &&
                           (
@@ -56,9 +71,9 @@ using OSBLE.Models.Courses.Rubrics;
             return rubrics.AsQueryable();
         }
 
-        public void SaveRubric(Rubric rubric)
+        public bool SaveRubric(int courseId, Rubric rubric)
         {
-
+            return true;
         }
     }
 }

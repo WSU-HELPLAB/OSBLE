@@ -94,11 +94,6 @@
       <DependentUpon>RubricView.xaml</DependentUpon>
     </Compile>
     <Compile Include="RubricViewModel.cs" />
-    <Compile Include="Service References\OsbleServices\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -116,53 +111,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AppManifest.xml" />
-    <None Include="Service References\OsbleServices\OsbleRubric.OsbleServices.AbstractCourse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\OsbleServices\OsbleRubric.OsbleServices.CellDescription.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\OsbleServices\OsbleRubric.OsbleServices.Criterion.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\OsbleServices\OsbleRubric.OsbleServices.Level.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\OsbleServices\OsbleRubric.OsbleServices.Rubric.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\OsbleServices\RubricService.wsdl" />
-    <None Include="Service References\OsbleServices\RubricService.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleServices\RubricService1.wsdl" />
-    <None Include="Service References\OsbleServices\RubricService1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleServices\RubricService2.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleServices\RubricService3.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleServices\RubricService4.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleServices\RubricService5.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleServices\RubricService6.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleServices\RubricService7.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleServices\RubricService8.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleServices\RubricService9.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <Content Include="ServiceReferences.ClientConfig" />
   </ItemGroup>
   <ItemGroup>
@@ -176,24 +124,6 @@
     <Resource Include="Icons\help.png" />
     <Resource Include="Icons\upArrow.png" />
     <Resource Include="Icons\upArrowGrayedOut.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadataStorage Include="Service References\OsbleServices\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\OsbleServices\RubricService.disco" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\OsbleServices\configuration91.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\OsbleServices\configuration.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\OsbleServices\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
