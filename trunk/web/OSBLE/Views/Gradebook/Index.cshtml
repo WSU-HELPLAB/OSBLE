@@ -304,47 +304,47 @@
         </tr>
 		<tr>
 			<td>A</td>
-			<td onclick="cellGainsFocus(this);">93</td>
+			<td onclick="cellGainsFocus(event, this);">93</td>
 		</tr>
 		<tr>
 			<td>A-</td>
-			<td onclick="cellGainsFocus(this);">90</td>
+			<td onclick="cellGainsFocus(event, this);">90</td>
 		</tr>
 		<tr>
 			<td>B+</td>
-			<td onclick="cellGainsFocus(this);">87</td>
+			<td onclick="cellGainsFocus(event, this);">87</td>
 		</tr>
 		<tr>
 			<td>B</td>
-			<td onclick="cellGainsFocus(this);">83</td>
+			<td onclick="cellGainsFocus(event, this);">83</td>
 		</tr>
 		<tr>
 			<td>B-</td>
-			<td onclick="cellGainsFocus(this);">80</td>
+			<td onclick="cellGainsFocus(evetn, this);">80</td>
 		</tr>
 		<tr>
 			<td>C+</td>
-			<td onclick="cellGainsFocus(this);">77</td>
+			<td onclick="cellGainsFocus(event, this);">77</td>
 		</tr>
 		<tr>
 			<td>C</td>
-			<td onclick="cellGainsFocus(this);">73</td>
+			<td onclick="cellGainsFocus(event, this);">73</td>
 		</tr>
 		<tr>
 			<td>C-</td>
-			<td onclick="cellGainsFocus(this);">70</td>
+			<td onclick="cellGainsFocus(event, this);">70</td>
 		</tr>
 		<tr>
 			<td>D+</td>
-			<td onclick="cellGainsFocus(this);">67</td>
+			<td onclick="cellGainsFocus(event, this);">67</td>
 		</tr>
 		<tr>
 			<td>D</td>
-			<td onclick="cellGainsFocus(this);">63</td>
+			<td onclick="cellGainsFocus(event, event, this);">63</td>
 		</tr>
 		<tr>
 			<td>F</td>
-			<td onclick="cellGainsFocus(this);">0</td>
+			<td onclick="cellGainsFocus(event, this);">0</td>
 		</tr>
 	</table>
 </div>
@@ -355,25 +355,25 @@
             
             @{var j = 1;
               var r = 0;
-                <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
                 j += 1;
                 r++;
-                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
                 j += 1;
-                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
                 j += 1;
-                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
                 j += 1;
-                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
                 j += 1;
                 foreach (Category item in ViewBag.Categories)
                 {
                     if (item.Name != Constants.UnGradableCatagory)
                     {
-                        <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; text-align:center;" onclick="selectColumn(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);">
+                        <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; text-align:center;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);">
                             <div id="div-@j" style="display: none;" onmouseover="showButton(this);" onmouseout="hideButton(this);">
                                 <img id="imgLeft-@item.ID" src="/Content/images/arrow_left.png" onclick="moveLeft(this);" style="cursor:pointer; float:left; padding-top:1px;"/>
-                                <img id="img-@item.ID" src="/Content/images/arrow_down.png" onclick="ShowHide(this);" style="cursor:pointer;" />
+                                <img id="img-@item.ID" src="/Content/images/arrow_down.png" onclick="ShowHide(event, this);" style="cursor:pointer;" />
                                 <img id="imgRight-@item.ID" src="/Content/images/arrow_right.png" onclick="moveRight(this);" style="cursor:pointer; float:right;" />
                             </div>
                         </td>
@@ -404,7 +404,7 @@
             <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             @{r++;}
             <td id="sectionHolder"></td>
-            <td id="catScheme" onclick="cellGainsFocus(this);">&nbsp  Weight1</td>
+            <td id="catScheme" onclick="cellGainsFocus(event, this);">&nbsp  Weight1</td>
             <td id="grade"></td>
             @{
                 double totalCategoryPoints = 0;
@@ -422,7 +422,7 @@
             {
                 if (item.Name != Constants.UnGradableCatagory)
                 {
-                    <td id="weight-@item.ID" onclick="cellGainsFocus(this)">@item.Points</td>
+                    <td id="weight-@item.ID" onclick="cellGainsFocus(event, this)">@item.Points</td>
                 }
             }
 
@@ -484,7 +484,7 @@
             {
                 if (item.Name != Constants.UnGradableCatagory)
                 {
-                    <th id="@item.ID" class="colHeader" onclick="changeAssignmentName(this);" style="background:@item.TabColor">@item.Name</th>
+                    <th id="@item.ID" class="colHeader" onclick="changeAssignmentName(event, this);" style="background:@item.TabColor">@item.Name</th>
                 }
             }
 
@@ -658,7 +658,7 @@
 </div>
 
 
-<script type="text/jscript">
+<script type="text/javascript">
     //display if the letter grade menu is showing
     var isShowing = false;
     var lastFocusedAssignment = null;
@@ -734,7 +734,7 @@
 
             });
 
-            cellGainsFocus(cell);
+            cellGainsFocus(e, cell);
 
         }
     });
@@ -755,7 +755,7 @@
                 clearLastAssignmentFocus();
                 return false;
             }
-            changeAssignmentName(cell);
+            changeAssignmentName(e, cell);
         }
     });
 
@@ -771,7 +771,7 @@
 
             });
 
-            cellGainsFocus(cell);
+            cellGainsFocus(e, cell);
 
         }
     });
@@ -861,8 +861,7 @@
         $("#div-" + container).animate({ "height": "show" }, { duration: 0 });
 
         //alert($("#" + container).css("background-color"));
-        if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)"
-                || $("#" + container).css("background-color") == "rgb(255, 255, 132)" && $("#div-" + container).css("background-color") == "rgb(255, 255, 132)") {
+        if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)") {
 
             $("#" + container).css("background-color", "#FFFF84");
             $("#div-" + container).css("background-color", "#FFFF84");
@@ -875,8 +874,7 @@
         $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
 
         //alert($("#" + container).css("background-color"));
-        if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)"
-            || $("#" + container).css("background-color") == "rgb(255, 255, 132)" && $("#div-" + container).css("background-color") == "rgb(255, 255, 132)") {
+        if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)") {
 
             $("#div-" + container).css("background-color", "#DCDCDC");
             $('#' + container).css("background-color", "#DCDCDC");
@@ -894,7 +892,7 @@
             var cellValue = lastFocusedCell.children().val();
             lastFocusedCell.html("");
             lastFocusedCell.text(cellValue);
-            lastFocusedCell.attr("onclick", 'cellGainsFocus(this)');
+            lastFocusedCell.attr("onclick", 'cellGainsFocus(event, this)');
             lastFocusedCell = null;
 
             $.ajax({
@@ -908,8 +906,8 @@
         }
     }
 
-    function cellGainsFocus(someCell) {
-        window.event.cancelBubble = true;
+    function cellGainsFocus(evt, someCell) {
+        evt.cancelBubble = true;
         if ($(lastFocusedCell).attr("id") == $(someCell).attr("id")) {
             return false;
         }
@@ -944,7 +942,7 @@
             newCategoryId = lastFocusedAssignment.attr("id");
             var cellValue = lastFocusedAssignment.children().val();
             lastFocusedAssignment.html(cellValue);
-            lastFocusedAssignment.attr("onclick", 'changeAssignmentName(this)');
+            lastFocusedAssignment.attr("onclick", 'changeAssignmentName(event, this)');
             lastFocusedAssignment = null;
 
             $.ajax({
@@ -959,8 +957,8 @@
         }
     }
 
-    function changeAssignmentName(someAssignment) {
-        window.event.cancelBubble = true;
+    function changeAssignmentName(evt, someAssignment) {
+        evt.cancelBubble = true;
         if ($(lastFocusedAssignment).attr("id") == $(someAssignment).attr("id")) {
             return false;
         }
@@ -1047,11 +1045,11 @@
         });
     }
 
-    function ShowHide(buttonClick) {
+    function ShowHide(evt, buttonClick) {
 
-        selectColumn(currentHeader);
+        selectColumn(evt, currentHeader);
 
-        window.event.cancelBubble = true;
+        evt.cancelBubble = true;
 
         //Store which assignment button was clicked so we can use it with Add Points
         points = buttonClick
@@ -1076,8 +1074,8 @@
 
     }
 
-    function selectColumn(col) {
-        window.event.cancelBubble = true;
+    function selectColumn(evt, col) {
+        evt.cancelBubble = true;
         if (header == true) {
             clearLastAssignmentFocus();
         } else {
@@ -1147,8 +1145,7 @@
     }
 
     function goToCategoryTab(catID) {
-        location.href = "/Gradebook/Tab/?categoryId=" + catID;
-    }
+        location.href = "/Gradebook/Tab/?categoryId=" + catID;    }
 
     function selectRow(row) {
 
@@ -1173,7 +1170,7 @@
                 });
                 $(this).find("th").each(function () {
                     if ($(this).attr("class") != "colHeader") { 
-                    $(this).css("background-color", "DeepSkyBlue");
+                        $(this).css("background-color", "DeepSkyBlue");
                     }
                 });
             }
