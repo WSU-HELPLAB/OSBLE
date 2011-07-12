@@ -144,6 +144,10 @@
 
 <div id="tabHeader">
     <h3>Gradebook</h3>
+    @{
+        var studentId = ViewBag.StudentId;    
+    }
+    <input id="studentId" type="hidden" value="@studentId" />
     <div id='import_grades_from_csv'  title="Import file">Upload a comma-separated (CSV) file of student grades:<br /><br />
         
 
@@ -307,9 +311,26 @@
 
     var currentHeaderCell = null;
 
-    $(document).ready(function () {
+    $(document).ready(function (e) {
         //calculateRows();
         calculateCols();
+        var studentId = $("#studentId").val()
+        var cell = null;
+        if (studentId != "") {
+            $("#grades #studentGrades").each(function () {
+                $(this).find("td").each(function () {
+                    if ($(this).attr("id") == studentId) {
+                        var row = $(this).parent("tr");
+                        var colIndex = $(this).prevAll().length;
+                        colIndex = parseInt(colIndex - 1);
+                        row.each(function () {
+                            cell = $(this).find("td:eq(" + colIndex + ")");
+                            selectRow(e, cell);
+                        });
+                    }
+                });
+            });
+        }
 
     });
 
@@ -998,8 +1019,12 @@
 
     function selectRow(evt, row) {
         evt.cancelBubble = true;
-
-        var container = row.id.split("-");
+        if (row.id == null) {
+            var container = row.attr("id").split("-");
+        }
+        else {
+            var container = row.id.split("-");
+        }
         var count = 0;
 
         if (header == true) {

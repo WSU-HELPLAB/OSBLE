@@ -117,7 +117,14 @@
                             select p;
               if (percent.Count() > 0)
               {
-                    <td id="total">@percent.First().Points.ToString(".##")%</td>
+                  if (percent.First().Points > 0)
+                  {
+                      <td id="total">@percent.First().Points.ToString(".##")%</td>
+                  }
+                  else 
+                  {
+                      <td id="total">@String.Format("{0}", 0)%</td>
+                  }
               }
               else
               {

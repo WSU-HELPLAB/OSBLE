@@ -592,13 +592,20 @@
 
                 if (scoreQuery.Count() > 0)
                 {
-                    <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID)" style="cursor:pointer;">@scoreQuery.First().Points.ToString(".##")%</td>
+                    if (scoreQuery.First().Points > 0)
+                    {
+                        <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID, @student.Identification)" style="cursor:pointer;">@scoreQuery.First().Points.ToString(".##")%</td>
+                    }
+                    else
+                    {
+                        <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID, @student.Identification)" style="cursor:pointer;">@String.Format("{0}", 0)%</td>
+                    }
                 }
                 else
                 {
                     if (cat.Name != Constants.UnGradableCatagory)
                     {
-                        <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID)" style="cursor:pointer;">NG</td>
+                        <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID, @student.Identification)" style="cursor:pointer;">NG</td>
                     }
                 }
             }
@@ -1153,8 +1160,16 @@
         });
     }
 
-    function goToCategoryTab(catID) {
-        location.href = "/Gradebook/Tab/?categoryId=" + catID;    }
+    function goToCategoryTab(catID, stuID) {
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/SetTabStudent",
+            data: { studentId: stuID.toString() },
+            success: function () {
+                location.href = "/Gradebook/Tab/?categoryId=" + catID;
+            }
+        });
+    }
 
     function selectRow(row, e) {
 

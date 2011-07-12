@@ -1054,6 +1054,18 @@ namespace OSBLE.Controllers
        }
 
        [HttpPost]
+       public void SetTabStudent( string studentId )
+       {
+           if (ModelState.IsValid)
+           {
+               if (studentId != null)
+               {
+                   Session["StudentID"] = studentId;
+               }
+           }
+       }
+
+       [HttpPost]
        public ActionResult UpdateCells()
        {
            return View("_Gradebook");
@@ -1175,6 +1187,11 @@ namespace OSBLE.Controllers
                categoryId = GetDefaultWeightId();
            }
            Session["categoryId"] = categoryId;
+           if (Session["StudentID"] != null)
+           {
+               ViewBag.StudentId = Session["StudentID"];
+           }
+           Session["StudentID"] = null;
            BuildGradebook((int)categoryId);
            if (Convert.ToInt32(Session["isTab"]) == 0)
            {
