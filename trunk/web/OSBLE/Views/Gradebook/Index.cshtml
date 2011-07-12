@@ -910,7 +910,9 @@
 
     function cellGainsFocus(someCell) {
         window.event.cancelBubble = true;
-        
+        if ($(lastFocusedCell).attr("id") == $(someCell).attr("id")) {
+            return false;
+        }
         hideTabColors();
         resetTableColors();
         
@@ -959,6 +961,10 @@
 
     function changeAssignmentName(someAssignment) {
         window.event.cancelBubble = true;
+        if ($(lastFocusedAssignment).attr("id") == $(someAssignment).attr("id")) {
+            return false;
+        }
+
         //do this once so we don't have to constantly do it later
         someAssignment = $(someAssignment);
 

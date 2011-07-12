@@ -593,6 +593,9 @@
 
     function changeHeaderName(someHeader) {
         window.event.cancelBubble = true;
+        if ($(lastFocusedCell).attr("id") == $(someHeader).attr("id")) {
+            return false;
+        }
 
         hideDropDown();
         resetTableColors();
@@ -623,7 +626,7 @@
         var textValue = someHeader.text();
         var inputText = $('<input class="cellInput" type="text" value="' + textValue + '" />');
 
-        someHeader.removeAttr("onclick");
+        //someHeader.removeAttr("onclick");
         someHeader.html(inputText);
         inputText.focus();
         lastFocusedCell = someHeader;
@@ -728,7 +731,11 @@
     function cellGainsFocus(someCell) {
         //When we click a cell we want do this to cancel the document onclick event
         window.event.cancelBubble = true;
-        
+
+        if ($(lastFocusedCell).attr("id") == $(someCell).attr("id")) {
+            return false;
+        }
+
         //we are in a data cell so we need to set isDataCell to true
         isDataCell = true;
         var cell = null
@@ -742,10 +749,11 @@
         if (header == true) {
             clearLastHeaderFocus(lastId);
             header = false;
-        } else {
-            //clear any previous focus
-            clearLastCellFocus();
-        }
+        } 
+
+        //clear any previous focus
+        clearLastCellFocus();
+        
         //do this once so we don't have to constantly do it later
         someCell = $(someCell);
 
