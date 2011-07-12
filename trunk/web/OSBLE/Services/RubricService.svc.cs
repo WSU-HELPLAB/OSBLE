@@ -243,7 +243,7 @@ namespace OSBLE.Services
             //with that saved, we can create a rubric / course assocation
             CourseRubric cr = new CourseRubric();
             cr.RubricID = rubric.ID;
-            cr.CourseID = courseId;
+            cr.AbstractCourseID = courseId;
             db.CourseRubrics.Add(cr);
             db.SaveChanges();
 

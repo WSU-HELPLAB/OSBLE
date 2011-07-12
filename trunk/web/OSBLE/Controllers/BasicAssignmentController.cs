@@ -33,7 +33,7 @@ namespace OSBLE.Controllers
         {
             List<Rubric> rubrics = (from cr in db.CourseRubrics
                                     join r in db.Rubrics on cr.RubricID equals r.ID
-                                    where cr.CourseID == activeCourse.AbstractCourseID
+                                    where cr.AbstractCourseID == activeCourse.AbstractCourseID
                                     select r).ToList();
             rubrics.Insert(0, new Rubric() { ID = 0, Description = "" });
             ViewBag.Rubrics = rubrics.ToList();
@@ -87,7 +87,7 @@ namespace OSBLE.Controllers
         {
             List<Rubric> rubrics = (from cr in db.CourseRubrics
                                     join r in db.Rubrics on cr.RubricID equals r.ID
-                                    where cr.CourseID == activeCourse.AbstractCourseID
+                                    where cr.AbstractCourseID == activeCourse.AbstractCourseID
                                     select r).ToList();
             rubrics.Insert(0, new Rubric() { ID = 0, Description = "" });
             ViewBag.Rubrics = rubrics.ToList();

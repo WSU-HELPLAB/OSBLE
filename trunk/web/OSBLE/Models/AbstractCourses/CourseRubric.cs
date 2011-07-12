@@ -13,8 +13,8 @@ namespace OSBLE.Models.AbstractCourses
         [Required]
         [Key]
         [Column(Order=0)]
-        public int CourseID { get; set; }
-        public virtual AbstractCourse Course { get; set; }
+        public int AbstractCourseID { get; set; }
+        public virtual AbstractCourse AbstractCourse { get; set; }
 
         [Required]
         [Key]

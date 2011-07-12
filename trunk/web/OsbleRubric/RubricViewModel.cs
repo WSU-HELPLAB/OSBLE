@@ -23,6 +23,8 @@ namespace OsbleRubric
         public enum CheckboxValues { ColumnComment, GlobalComment };
         private RubricServiceClient client = new RubricServiceClient();
         private int currentCourseId = 0;
+        private RubricRiaContext context = new RubricRiaContext();
+        private AbstractCourse activeCourse = null;
         
         #endregion Attributes
 
@@ -69,6 +71,8 @@ namespace OsbleRubric
             //attach event listeners to our web service
             client.SaveRubricCompleted += new EventHandler<SaveRubricCompletedEventArgs>(SaveRubricCompleted);
 
+            thisView.CourseComboBox.ItemsSource = context.Load(context.GetCoursesQuery()).Entities;
+            //IEnumerable<AbstractCourse> course = context.Load(context.GetActiveCourseQuery()).Entities;
 
             //stash the current course id
             if (App.Current.Resources["courseId"] != null)

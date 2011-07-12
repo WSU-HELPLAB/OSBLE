@@ -28,6 +28,7 @@ namespace OSBLE.Services
         protected OSBLEContext db = new OSBLEContext();
         protected CoursesUsers CurrentCourseUser = null;
         protected UserProfile currentUserProfile = null;
+        protected AbstractCourse currentCourse = null;
 
         protected HttpContext Context = System.Web.HttpContext.Current;
                 
@@ -42,7 +43,11 @@ namespace OSBLE.Services
             {
                 int activeCourse = (int)Context.Session["ActiveCourse"];
 
+                currentCourse = (from c in db.AbstractCourses
+                                 where c.ID == activeCourse
+                                 select c).FirstOrDefault();
 
+                //AC: I don't think that this query works any more.  
                 CurrentCourseUser = db.CoursesUsers.Where(cu => cu.AbstractCourseID == activeCourse &&
                                                     cu.UserProfileID == currentUserProfile.ID &&
                                                     cu.AbstractCourse is Course &&

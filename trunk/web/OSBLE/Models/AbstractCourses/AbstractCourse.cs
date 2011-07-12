@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.HomePage;
+using System.Runtime.Serialization;
 
 namespace OSBLE.Models.Courses
 {
+    [KnownType(typeof(Community))]
+    [KnownType(typeof(Course))]
     public abstract class AbstractCourse
     {
         [Required]

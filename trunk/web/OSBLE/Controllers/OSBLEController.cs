@@ -263,6 +263,7 @@ namespace OSBLE.Controllers
                 if ((activeCourse = activeCoursePool.Where(cu => cu.AbstractCourseID == activeCourseID).FirstOrDefault()) == null)
                 {
                     activeCourse = activeCoursePool.FirstOrDefault();
+                    context.Session["ActiveCourse"] = activeCourse.AbstractCourseID;
                 }
 
                 ViewBag.ActiveCourse = activeCourse;

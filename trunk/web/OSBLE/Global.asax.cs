@@ -28,6 +28,8 @@ namespace OSBLE
             routes.IgnoreRoute("crossdomain.xml");
             routes.IgnoreRoute("OsbleRubricTestPage.html");
             routes.IgnoreRoute("OsbleRubricTestPage.aspx");
+            routes.IgnoreRoute("SilverlightSandboxTestPage.html");
+            routes.IgnoreRoute("SilverlightSandboxTestPage.aspx");
 #endif
             routes.MapRoute(
                 "File System",
