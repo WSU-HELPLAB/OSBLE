@@ -73,7 +73,7 @@ using OSBLE.Models.Courses.Rubrics;
 
         public void AddRubric(Rubric rubric)
         {
-            return;
+            //rubric.
         }
 
         public void EditRubric(Rubric rubric)

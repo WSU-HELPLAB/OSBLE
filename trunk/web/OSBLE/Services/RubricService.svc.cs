@@ -235,7 +235,7 @@ namespace OSBLE.Services
 
             //finally, make sure that the rubric's ID is 0 as well
             rubric.ID = 0;
-
+            
             //now, save to the DB
             db.Rubrics.Add(rubric);
             db.SaveChanges();
