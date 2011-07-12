@@ -71,9 +71,14 @@ using OSBLE.Models.Courses.Rubrics;
             return rubrics.AsQueryable();
         }
 
-        public bool SaveRubric(int courseId, Rubric rubric)
+        public void AddRubric(Rubric rubric)
         {
-            return true;
+            return;
+        }
+
+        public void EditRubric(Rubric rubric)
+        {
+            return;
         }
     }
 }

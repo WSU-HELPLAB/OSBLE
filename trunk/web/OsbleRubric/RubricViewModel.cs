@@ -28,6 +28,7 @@ namespace OsbleRubric
         private int currentCourseId = 0;
         private RubricRiaContext context = new RubricRiaContext();
         private OSBLE.Models.Courses.AbstractCourse activeCourse = null;
+        private Rubric selectedRubric = new Rubric();
         
         #endregion Attributes
 
@@ -135,6 +136,7 @@ namespace OsbleRubric
             {
                 OSBLE.Models.Courses.Rubrics.Rubric rubric = thisView.RubricComboBox.SelectedItem as OSBLE.Models.Courses.Rubrics.Rubric;
                 thisView.RubricDescriptionTextBox.Text = rubric.Description;
+                selectedRubric = rubric;
                 BuildGridFromRubric(rubric);
             }
         }
@@ -1250,13 +1252,17 @@ namespace OsbleRubric
         void PublishChanges_Click(object sender, RoutedEventArgs e)
         {
             this.getData();
-            /*
+            
             //will house the final form of the data that we will send to the client
             Rubric rubric = new Rubric();
+            if (selectedRubric.ID > 0)
+            {
+                rubric = selectedRubric;
+            }
             rubric.HasCriteriaComments = false;
             rubric.HasGlobalComments = false;
             rubric.Description = thisView.RubricDescriptionTextBox.Text;
-            List<CellDescription> cellDescriptions = new List<CellDescription>();
+
             List<Criterion> Criteria = new List<Criterion>();
             List<Level> Levels = new List<Level>();
             List<CellDescription> CellDescriptions = new List<CellDescription>();
@@ -1309,7 +1315,7 @@ namespace OsbleRubric
                 if (cell is HeaderCell)
                 {
                     HeaderCell header = cell as HeaderCell;
-                    Level currentLevel = rubric.Levels[header.Column];
+                    Level currentLevel = Levels[header.Column];
                     currentLevel.RangeStart = 0;
                     currentLevel.RangeEnd = header.ComboBoxValue;
                     currentLevel.LevelTitle = header.Information;
@@ -1325,13 +1331,13 @@ namespace OsbleRubric
                     //otherwise, we have a cell description
                     if (currentCell.Column == 0)
                     {
-                        rubric.Criteria[currentCell.Row].CriterionTitle = cell.Information;
+                        Criteria[currentCell.Row].CriterionTitle = cell.Information;
                     }
                     else if (currentCell.Column == 1)
                     {
                         double someDouble = 0.0;
                         double.TryParse(currentCell.Information, out someDouble);
-                        rubric.Criteria[currentCell.Row].Weight = someDouble;
+                        Criteria[currentCell.Row].Weight = someDouble;
                     }
                     else
                     {
@@ -1352,11 +1358,13 @@ namespace OsbleRubric
             Levels.RemoveAt(0);
             Criteria.RemoveAt(0);
 
-            rubric.Levels = Levels.ToArray();
-            rubric.Criteria = Criteria.ToArray();
-            rubric.CellDescriptions = CellDescriptions.ToArray();
-
-            */
+            //if the rubric doesn't have an ID, then we need to add it to the context,
+            //otherwise, RIA magic should take care of updating.
+            if (rubric.ID < 1)
+            {
+                context.Rubrics.Add(rubric);
+            }
+            context.SubmitChanges();
 
             //client.SaveRubricAsync(currentCourseId, rubric);
         }
