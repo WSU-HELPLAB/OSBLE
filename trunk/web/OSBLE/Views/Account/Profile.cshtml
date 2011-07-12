@@ -114,7 +114,7 @@
         
         <tr>
             <td class="coursemenu_option">
-                <input type="radio" name="defaultCourse" value="@cu.CourseID" @if ((cu.CourseID == ViewBag.CurrentUser.DefaultCourse) || ((ViewBag.CurrentCourses as List<CoursesUsers>).Where(c => c.CourseID == ViewBag.CurrentUser.DefaultCourse).Count() == 0 && firstCourse))
+                <input type="radio" name="defaultCourse" value="@cu.AbstractCourseID" @if ((cu.AbstractCourseID == ViewBag.CurrentUser.DefaultCourse) || ((ViewBag.CurrentCourses as List<CoursesUsers>).Where(c => c.AbstractCourseID == ViewBag.CurrentUser.DefaultCourse).Count() == 0 && firstCourse))
                                                                               {
                     <text>checked="checked"</text>
                                                                               } />
@@ -122,7 +122,7 @@
 
             <td>
                 <small>
-                @if (cu.Course is Course)
+                @if (cu.AbstractCourse is Course)
                 {
                     <text>Course</text>
                 }
@@ -134,7 +134,7 @@
                 @Helpers.CourseTag(cu.AbstractCourse) &mdash; @cu.AbstractCourse.Name (@cu.AbstractRole.Name)
             </td>
             <td class="coursemenu_option">
-            <input type="checkbox" value="True" name="cu_hidden_@(cu.CourseID)" @if (cu.Hidden)
+            <input type="checkbox" value="True" name="cu_hidden_@(cu.AbstractCourseID)" @if (cu.Hidden)
                                                                                 {<text>checked="checked"</text>} />
             </td>
 
