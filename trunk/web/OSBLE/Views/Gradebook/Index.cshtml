@@ -371,7 +371,7 @@
                     if (item.Name != Constants.UnGradableCatagory)
                     {
                         <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; text-align:center;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);">
-                            <div id="div-@j" style="display: none;" onmouseover="showButton(this);" onmouseout="hideButton(this);">
+                            <div id="div-@j" style="display: none;">
                                 <img id="imgLeft-@item.ID" src="/Content/images/arrow_left.png" onclick="moveLeft(this);" style="cursor:pointer; float:left; padding-top:1px;"/>
                                 <img id="img-@item.ID" src="/Content/images/arrow_down.png" onclick="ShowHide(event, this);" style="cursor:pointer;" />
                                 <img id="imgRight-@item.ID" src="/Content/images/arrow_right.png" onclick="moveRight(this);" style="cursor:pointer; float:right;" />
@@ -872,22 +872,25 @@
     function showButton(column) {
         currentHeaderCell = column;
         var container = column.id;
+
         $("#div-" + container).animate({ "height": "show" }, { duration: 0 });
 
-        //alert($("#" + container).css("background-color"));
         if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)") {
 
             $("#" + container).css("background-color", "#FFFF84");
             $("#div-" + container).css("background-color", "#FFFF84");
         }
-        //onMouseOver = false;
+    }
+
+    function hideOnlyButton(column) {
+        var container = column.id;
+        $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
     }
 
     function hideButton(column) {
         var container = column.id;
         $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
 
-        //alert($("#" + container).css("background-color"));
         if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)") {
 
             $("#div-" + container).css("background-color", "#DCDCDC");
@@ -901,6 +904,18 @@
         //if a prior cell has already received focus in the past, we need to turn it back into
         //a normal table cell
         if (lastFocusedCell != null) {
+            $("#grades tr").each(function () {
+                $(this).find("td").each(function () {
+                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                        $(this).css("background-color", "#DCDCDC");
+                        $(this).find("div").css("background-color", "#DCDCDC");
+                        $(this).attr("onmouseout", "hideButton(this);");
+                    }
+                    else {
+
+                    }
+                });
+            });
 
             var catId = lastFocusedCell.attr("id").split("-");
             var cellValue = lastFocusedCell.children().val();
@@ -925,6 +940,7 @@
         if ($(lastFocusedCell).attr("id") == $(someCell).attr("id")) {
             return false;
         }
+
         hideTabColors();
         resetTableColors();
         
@@ -945,13 +961,30 @@
         //someCell.removeAttr("onclick");
         someCell.html(inputText);
         inputText.focus();
+        inputText.select();
         lastFocusedCell = someCell;
+        evt.preventDefault();
+
+        //Highlights the row and column headers of the selected cell
+        selectRowColumnHeaderOfSelected(someCell);
         
         
     }
 
     function clearLastAssignmentFocus() {
         if (lastFocusedAssignment != null) {
+            $("#grades tr").each(function () {
+                $(this).find("td").each(function () {
+                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                        $(this).css("background-color", "#DCDCDC");
+                        $(this).find("div").css("background-color", "#DCDCDC");
+                        $(this).attr("onmouseout", "hideButton(this);");
+                    }
+                    else {
+
+                    }
+                });
+            });
 
             newCategoryId = lastFocusedAssignment.attr("id");
             var cellValue = lastFocusedAssignment.children().val();
@@ -996,12 +1029,40 @@
         //someAssignment.removeAttr("onclick");
         someAssignment.html(inputText);
         inputText.focus();
+        inputText.select();
         lastFocusedAssignment = someAssignment;
         evt.preventDefault();
         header = true;
-                
+
+        //Highlights the row and column headers of the selected cell
+        selectRowColumnHeaderOfSelected(someAssignment);   
     }
 
+    function selectRowColumnHeaderOfSelected(someCell) {
+        var row = $(someCell).parent("tr").prevAll().length;
+        var colIndex = $(someCell).prevAll().length;
+
+        var cell = $("#grades").find("tr:eq(0)");
+        cell = cell.find("td:eq(" + colIndex + ")");
+
+        //change the current column headers background to highlighted
+        cell.css("background-color", "#FFFF84");
+        cell.find("div").css("background-color", "#FFFF84");
+
+        //change the mouseout function so we don't change the color and only hide the div
+        cell.attr("onmouseout", "hideOnlyButton(this);");
+
+        //find the current rows header
+        var cell2 = $("#grades").find("tr:eq(" + row + ")");
+        cell2 = cell2.find("td:eq(0)");
+
+        //change the current rows header background to highlighted
+        cell2.css("background-color", "#FFFF84");
+        cell2.find("div").css("background-color", "#FFFF84");
+
+        //remove the current rows onmouseout function so we it doesn't become unhighlighted
+        cell2.removeAttr("onmouseout");
+    }
 
     function calculateRows() {
         

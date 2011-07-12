@@ -28,8 +28,7 @@
             j += 1;
             foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
             {
-                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; text-align:center; min-width: 45px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(event, this);">
-                    
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; text-align:center; min-width: 45px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(event, this);">  
                 <div id="div-@j" style="display: none; margin:0 auto;">
                     <img id="imgLeft-@item.ID" src="/Content/images/arrow_left.png" onclick="moveLeft(this);" style="cursor:pointer; float:left; padding-top:1px;"/>
                     <img id="imgDown-@item.ID" src="/Content/images/arrow_down.png" onclick="ShowHide(event, this);" style="cursor:pointer; padding-bottom:2px;"/>

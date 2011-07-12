@@ -634,12 +634,25 @@
 
         //if a header already had focus then we need to change it back and display text
         if (lastFocusedCell != null) {
+            $("#grades tr").each(function () {
+                $(this).find("td").each(function () {
+                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                        $(this).css("background-color", "#DCDCDC");
+                        $(this).find("div").css("background-color", "#DCDCDC");
+                        $(this).attr("onmouseout", "hideButton(this);");
+                        onMouseOver = false;
+                    }
+                    else {
+
+                    }
+                });
+            });
+
             var cellValue = lastFocusedCell.children().val();
             var cellID = lastFocusedCell.attr("id").split("-");
             lastFocusedCell.html(cellValue);
             lastFocusedCell.attr("onclick", 'changeHeaderName(event, this)');
             lastFocusedCell = null;
-
 
             $.ajax({
                 type: "POST",
@@ -670,8 +683,6 @@
             clearLastCellFocus();
         }
 
-
-
         //do this once so we don't have to constantly do it later
         someHeader = $(someHeader);
 
@@ -700,11 +711,13 @@
 
         //someHeader.removeAttr("onclick");
         someHeader.html(inputText);
-        inputText[0].selectionStart();
         inputText.focus();
+        inputText.select();
         lastFocusedCell = someHeader;
+        evt.preventDefault();
         header = true;
 
+        // highlights the column and row headers of the selected header
         selectRowColumnHeaderOfSelected(someHeader);
     }
 
@@ -836,7 +849,9 @@
         inputText.select();
         lastFocusedCell = someCell;
         $("#lastCell").val(someCell);
+        evt.preventDefault();
 
+        //Highlights the row and column headers of the selected cell
         selectRowColumnHeaderOfSelected(someCell);
     }
 
