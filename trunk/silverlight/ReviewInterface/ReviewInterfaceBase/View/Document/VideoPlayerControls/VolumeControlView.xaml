@@ -1,0 +1,16 @@
+﻿<UserControl x:Class="ReviewInterfaceBase.View.Document.VideoPlayerControls.VolumeControlView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    >
+    <StackPanel Orientation="Horizontal"  x:Name="Window">
+
+        <!--This ranges from 0 to 1 because that is what media Elements volume does, it also starts at .5 as that is the default for the media element-->
+
+        <Button x:Name="Mute" ToolTipService.ToolTip="Mute" Height="30">
+            <Image Source="/Osble;component/View/Icons/speaker.png" />
+        </Button>
+        <Slider x:Name="VolumeControlSlider" Value=".5" Minimum="0" Maximum="1" Orientation="Horizontal" Width="100" LargeChange=".05"/>
+    </StackPanel>
+</UserControl>
