@@ -1379,13 +1379,6 @@ namespace OsbleRubric
 
         #region Events
 
-        /* AC: Needs to be updated for RIA services
-        void SaveRubricCompleted(object sender, SaveRubricCompletedEventArgs e)
-        {
-            HtmlPage.Window.Invoke("CloseRubric", "");
-        }
-         * */
-
         /// <summary>
         /// Called when the user clicks on the "Cancel" button in the view
         /// </summary>
@@ -1582,7 +1575,13 @@ namespace OsbleRubric
             }
 
             //save changes & refresh the rubrics list
-            context.SubmitChanges().Completed += new EventHandler(CourseComboBox_SelectionChanged);
+            context.SubmitChanges().Completed += new EventHandler(FinalizeSaving);
+        }
+
+        void FinalizeSaving(object sender, EventArgs e)
+        {
+            MessageBox.Show("Your rubric has been saved to OSBLE.");
+            CourseComboBox_SelectionChanged(sender, e);
         }
 
         /// <summary>
