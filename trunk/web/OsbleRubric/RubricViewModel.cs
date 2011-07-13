@@ -137,7 +137,7 @@ namespace OsbleRubric
                 OSBLE.Models.Courses.Rubrics.Rubric rubric = thisView.RubricComboBox.SelectedItem as OSBLE.Models.Courses.Rubrics.Rubric;
                 thisView.RubricDescriptionTextBox.Text = rubric.Description;
                 selectedRubric = rubric;
-                BuildGridFromRubric(rubric);
+                //BuildGridFromRubric(rubric);
             }
         }
 
@@ -213,8 +213,79 @@ namespace OsbleRubric
         /// Models the data grid from the supplied rubric
         /// </summary>
         /// <param name="rubric"></param>
-        private void BuildGridFromRubric(Rubric rubric)
+        private void BuildGridFromRubric(Rubric rubric, ICollection<CellDescription> cellDescriptions)
         {
+            //Clearing the rubric entirely and reinitializing (to add default col/rows)
+            customDataGrid.ClearAll();
+            initialize();
+
+            //remove the add button row temporarily
+            customDataGrid.RemoveRow(customDataGrid.BaseGrid.RowDefinitions.Count - 1);
+
+            //Adding empty rows 
+            while (rubric.Criteria.Count < (customDataGrid.BaseGrid.RowDefinitions.Count + 1))//+1 to account for last row that was temporarily removed
+            {
+                createCriterionRow();
+            }
+
+            //Adding the add button row back in
+            createAddButtonRow(); 
+
+            //removing the last two columns temporarily
+            customDataGrid.RemoveColumn(customDataGrid.BaseGrid.ColumnDefinitions.Count - 1); 
+            customDataGrid.RemoveColumn(customDataGrid.BaseGrid.ColumnDefinitions.Count - 1);
+
+            //Adding empty columns
+            while (rubric.Levels.Count > (customDataGrid.BaseGrid.ColumnDefinitions.Count + 2)) //+2 to account for last two rows that were temp removed
+            {
+                createLevelColumn();
+            }
+
+            //adding the temporarily deleted columns back in
+            createAddButtonColumn(); 
+            createCommentColumn();
+
+            //setting tabs, updating last rows textblock position, fixing/adjusting arrow icons
+            setTabIndex();
+            updateLastRow();
+            changeDownArrow(1, downArrowIconSource);
+            adjustArrowIcons();
+
+            int i = 0;
+            //The Levels in rubric.Levels are added in order (i hope), so we can add them from left to right
+            foreach (Level lvl in rubric.Levels)
+            {
+                ICell ic = new HeaderCell(0, i + 2); //0 for the cell (as all Levels will be inserted into the top row), +2 to account for the first two columns that arent header cells
+                (ic as HeaderCell).ComboBoxValue = lvl.RangeEnd;
+                (ic as HeaderCell).Information = lvl.LevelTitle;
+                placeICell(ic);
+                i++;
+            }
+
+            int j = 0;
+            //The Criteria in rubric.Criteria are added in order, so we can add them top to bottom
+            foreach (Criterion crit in rubric.Criteria)
+            {
+                ICell criterionCell = new RubricCell(j + 1, 0, crit.CriterionTitle);  //+1 to account for the first row that isn't a row for criterion
+                placeICell(criterionCell);
+                ICell weightCell = new RubricCell(j + 1, 1, crit.Weight.ToString());
+                placeICell(weightCell);
+                j++;
+            }
+
+            //Adding cell descriptions, who's location in the grid is CriterionID for the row index, LevelID for the column index. (Note: probably need to offset to account for non-descriptive cells in the grid)
+            foreach (CellDescription cd in cellDescriptions)
+            {
+                ICell ic = new RubricCell(cd.CriterionID + 1, cd.LevelID + 2, cd.Description); 
+                placeICell(ic);
+            }
+
+            //Setting up the Icells for the checkboxcells and then placing them
+            ICell globalCommentCell = new CheckBoxCell(rubric.Criteria.Count - 1, 1, rubric.HasGlobalComments);
+            ICell enableCommentsCell = new CheckBoxCell(0, rubric.Levels.Count-1, rubric.HasCriteriaComments);
+            placeICell(globalCommentCell);
+            placeICell(enableCommentsCell);
+
 
         }
 
@@ -428,7 +499,10 @@ namespace OsbleRubric
                     {
                         foreach (UIElement ui in (br.Child as StackPanel).Children)
                         {
-                            if (ui is CheckBox) dataFromCells.Add(new CheckBoxCell(row, col, (bool)(ui as CheckBox).IsChecked) { Information = CheckboxValues.GlobalComment.ToString() });
+                            if (ui is CheckBox)
+                            {
+                                dataFromCells.Add(new CheckBoxCell(row, col, (bool)(ui as CheckBox).IsChecked) { Information = CheckboxValues.GlobalComment.ToString() });
+                            }
                         }
                     }
                 }
@@ -829,6 +903,7 @@ namespace OsbleRubric
             returnVal.Children.Add(helpIconImg);
             return returnVal;
         }
+
 
         /// <summary>
         /// This method swaps row1 with row2 if its a valid swap
