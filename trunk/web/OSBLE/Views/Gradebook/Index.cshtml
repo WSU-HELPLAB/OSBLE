@@ -270,12 +270,12 @@
             <td><a style="cursor:pointer" onclick="deleteCategory();">Delete Category</a></td>
         </tr>
         <tr>
-			<td id="changeColor" ><a id="changeColorId" style="cursor:pointer" onmouseover="displayColors(this);">Change Category Color</a></td>
+			<td id="changeColor" ><a id="changeColorId" style="cursor:pointer" onmouseover="displayColors();">Change Category Color</a></td>
 		</tr>
 	</table>
 </div>
 
-<div class="displayColors" id="displayColorsID" style="display: none; position: absolute;" onmouseover="displayColors(this);" onmouseout="hideDisplayColors();">
+<div class="displayColors" id="displayColorsID" style="display: none; position: absolute;" onmouseover="displayColors();" onmouseout="hideDisplayColors();">
     <table class="displayColorsTable">
 		<tr>
 		    <th align="center" colspan="3">Colors</th>
@@ -846,12 +846,11 @@
 //    });
 
 
-    function displayColors(position) {
+    function displayColors() {
         
         var x = 0;
         var y = 0;
 
-        var container = position.id;
         //alert(container);
         //aligning the menu under the buttons
         x = $("#selectMenuID").position().left;
