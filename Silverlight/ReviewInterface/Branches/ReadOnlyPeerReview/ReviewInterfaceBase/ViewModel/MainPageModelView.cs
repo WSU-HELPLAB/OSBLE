@@ -37,10 +37,11 @@ namespace ReviewInterfaceBase.ViewModel
 
         #region Fields
 
+        //OLDCODE
         /// <summary>
         /// This is a reference to rubricViewModel
         /// </summary>
-        private RubricViewModel rubricViewModel = new RubricViewModel();
+        //private RubricViewModel rubricViewModel = new RubricViewModel();
 
         /// <summary>
         /// This is a reference to the FindWindowViewModel
@@ -68,11 +69,14 @@ namespace ReviewInterfaceBase.ViewModel
 
         #region Properties
 
+        //OLDCODE
+        /*
         public RubricViewModel RubricViewModel
         {
             get { return rubricViewModel; }
             set { rubricViewModel = value; }
         }
+         */
 
         public FindWindowViewModel FindWindowViewModel
         {
@@ -109,18 +113,21 @@ namespace ReviewInterfaceBase.ViewModel
             thisView.SizeChanged += new SizeChangedEventHandler(thisView_SizeChanged);
             thisView.MouseRightButtonDown += new MouseButtonEventHandler(thisView_MouseRightButtonDown);
 
+            /*OLDCODE2
             //This sets up the events needed for the GridSplitter technically this should be its own View and ViewModel but
             //to much overhead
             thisView.GridSplitter.MouseLeftButtonDown += new MouseButtonEventHandler(GridSplitter_MouseLeftButtonDown);
             thisView.GridSplitter.MouseMove += new MouseEventHandler(GridSplitter_MouseMove);
             thisView.GridSplitter.MouseLeftButtonUp += new MouseButtonEventHandler(GridSplitter_MouseLeftButtonUp);
             thisView.GridSplitter.LostMouseCapture += new MouseEventHandler(GridSplitter_LostMouseCapture);
+             */
 
             findWindowViewModel.FindNext += new EventHandler(findWindowViewModel_FindNext);
 
+            //OLDCODE
             //We set the content of the RubricScrollViewer to be that of the rubricViewModel's view
-            thisView.RubricScrollViewer.Content = rubricViewModel.GetView();
-            rubricViewModel.SizeChanged += new SizeChangedEventHandler(rubricViewModel_SizeChanged);
+            //thisView.RubricScrollViewer.Content = rubricViewModel.GetView();
+            //rubricViewModel.SizeChanged += new SizeChangedEventHandler(rubricViewModel_SizeChanged);
 
             //then we add the FindWindowViewModel's View to the LayoutRoot Children
             thisView.LayoutRoot.Children.Add(findWindowViewModel.GetView());
@@ -244,8 +251,10 @@ namespace ReviewInterfaceBase.ViewModel
 
         private void thisView_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            thisView.LayoutRoot.RowDefinitions[0].Height = new GridLength(e.NewSize.Height - (thisView.LayoutRoot.RowDefinitions[2].ActualHeight + thisView.LayoutRoot.RowDefinitions[1].ActualHeight));
+           
+            thisView.LayoutRoot.RowDefinitions[0].Height = new GridLength(e.NewSize.Height/*OLDCODE - ( thisView.LayoutRoot.RowDefinitions[2].ActualHeight + thisView.LayoutRoot.RowDefinitions[1].ActualHeight)*/);
             thisView.CustomTabControlHolder.Height = thisView.LayoutRoot.RowDefinitions[0].Height.Value - (thisView.ButtonToolbar.ActualHeight + 10);
+            /*OLDCODE  */
         }
 
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
@@ -351,12 +360,16 @@ namespace ReviewInterfaceBase.ViewModel
             findWindowViewModel.isOpen = !findWindowViewModel.isOpen;
         }
 
+        //OLDCODE
+        /*
         private void rubricViewModel_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             thisView.LayoutRoot.RowDefinitions[0].Height = new GridLength(thisView.ActualHeight - (thisView.LayoutRoot.RowDefinitions[2].ActualHeight + thisView.LayoutRoot.RowDefinitions[1].ActualHeight));
             thisView.CustomTabControlHolder.Height = thisView.LayoutRoot.RowDefinitions[0].Height.Value - (thisView.ButtonToolbar.ActualHeight + 10);
         }
+         */
 
+        /*OLDCODE2
         private void GridSplitter_LostMouseCapture(object sender, MouseEventArgs e)
         {
             draggingGridSplitter = false;
@@ -370,7 +383,7 @@ namespace ReviewInterfaceBase.ViewModel
 
         private void GridSplitter_MouseMove(object sender, MouseEventArgs e)
         {
-            //This controls how the grid works on the GridSplitter is dragged
+             //This controls how the grid works on the GridSplitter is dragged
             if (draggingGridSplitter)
             {
                 double rubricHeight = thisView.ActualHeight - e.GetPosition(thisView).Y;
@@ -393,12 +406,13 @@ namespace ReviewInterfaceBase.ViewModel
             }
         }
 
+       
         private void GridSplitter_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             thisView.GridSplitter.CaptureMouse();
             draggingGridSplitter = true;
         }
-
+        */
         #endregion Private Event Handlers
 
         #region Public Methods
