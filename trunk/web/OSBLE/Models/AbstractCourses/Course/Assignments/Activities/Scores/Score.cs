@@ -24,6 +24,9 @@ namespace OSBLE.Models.Assignments.Activities.Scores
         public double Multiplier { get; set; }
 
         [Required]
+        public double LatePenaltyPercent { get; set; }
+
+        [Required]
         public int TeamUserMemberID { get; set; }
 
         public virtual TeamUserMember TeamUserMember { get; set; }
@@ -41,6 +44,7 @@ namespace OSBLE.Models.Assignments.Activities.Scores
             Published = false;
             Points = 0;
             Multiplier = 1.0;
+            LatePenaltyPercent = 0;
         }
     }
 }

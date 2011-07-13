@@ -1,14 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using OSBLE.Models.Assignments;
+using OSBLE.Models.Assignments.Activities;
 
 namespace OSBLE.Models.ViewModels
 {
     public class ActivityTeacherTableViewModel
     {
-        public ActivityTeacherTableViewModel()
+        public ActivityTeacherTableViewModel(AbstractAssignment assignment, AbstractAssignmentActivity activity)
         {
+            Assignment = assignment;
+            Activity = activity;
             SubmissionsInfo = new List<SubmissionInfo>();
         }
+
+        public AbstractAssignment Assignment { get; set; }
+
+        public AbstractAssignmentActivity Activity { get; set; }
 
         public List<SubmissionInfo> SubmissionsInfo { get; set; }
 

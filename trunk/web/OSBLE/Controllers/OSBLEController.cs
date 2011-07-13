@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Web;
@@ -291,6 +292,54 @@ namespace OSBLE.Controllers
             var teamUser = (from c in activity.TeamUsers where c.Contains(user) == true select c).FirstOrDefault();
 
             return teamUser;
+        }
+
+        protected DateTime? GetSubmissionTime(Course course, AbstractAssignmentActivity activity, TeamUserMember teamUser)
+        {
+            DirectoryInfo submissionFolder = new DirectoryInfo(FileSystem.GetTeamUserSubmissionFolder(false, course, activity.ID, teamUser));
+
+            DateTime timeSubmitted;
+
+            if (submissionFolder.Exists)
+            {
+                //unfortunately LastWriteTime for a directory does not take into account it's file or
+                //sub directories and these we need to check to see when the last file was written too.
+                timeSubmitted = submissionFolder.LastWriteTime;
+                foreach (FileInfo file in submissionFolder.GetFiles())
+                {
+                    if (file.LastWriteTime > timeSubmitted)
+                    {
+                        timeSubmitted = file.LastWriteTime;
+                    }
+                }
+                return timeSubmitted;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        protected double CalcualateLatePenaltyPercent(AbstractAssignmentActivity activity, TimeSpan lateness)
+        {
+            //Purposefully lose of data being nice
+            if (activity.MinutesLateWithNoPenalty < (int)lateness.TotalMinutes)
+            {
+                //Purposefully lose of data as this doesn't come into effect until you have past it
+                if (activity.HoursLateUntilZero > (int)(lateness.TotalHours))
+                {
+                    //100 percent of points deducted for being late.... ouch :p
+                    return 100.00;
+                }
+                else
+                {
+                    //rounded up as it should be
+                    int numberOfTimePenatlyIsDeducted = (int)lateness.TotalHours + 1 % activity.HoursLatePerPercentPenalty;
+
+                    return activity.PercentPenalty * numberOfTimePenatlyIsDeducted;
+                }
+            }
+            return 0;
         }
 
         protected string[] GetFileExtensions(DeliverableType deliverableType)

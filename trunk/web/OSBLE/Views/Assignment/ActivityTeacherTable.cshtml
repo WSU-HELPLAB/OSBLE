@@ -1,11 +1,15 @@
 ﻿@using OSBLE.Models.ViewModels
+@using OSBLE.Models.Assignments.Activities
+@using OSBLE.Models.Assignments
 @model ActivityTeacherTableViewModel
-
 @{
     Layout = "";
     int submissionInfoCounter = 0;
-}
 
+    bool inlineReview = Model.Activity is SubmissionActivity && (Model.Activity as SubmissionActivity).InstructorCanReview;
+    bool rubric = Model.Activity is SubmissionActivity && Model.Assignment.RubricID != null || Model.Assignment.RubricID != 0;
+    bool deliverables = Model.Assignment is StudioAssignment && (Model.Assignment as StudioAssignment).Deliverables.Count > 0;
+}
 <script type="text/javascript">
 
     function create_and_open_downloading_submission_dialog() {
@@ -27,7 +31,7 @@
             height: 300,
             closeOnEscape: true,
             close: remove_downloading_submission_dialog,
-            buttons: {"OK": remove_downloading_submission_dialog}
+            buttons: { "OK": remove_downloading_submission_dialog }
         });
 
 
@@ -46,98 +50,117 @@
         //then remove the div
         $('#downloading_submission_dialog').remove();
     }
-            </script>
-
+</script>
 <div>
-<p>
-@ViewBag.NumberOfSubmissions of @ViewBag.ExpectedSubmissionsAndGrades submissions received <br />
-@ViewBag.NumberGraded of @ViewBag.ExpectedSubmissionsAndGrades submissions graded <br />
- <br />@Html.ActionLink("Download all submissions for this activity", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentActivityID = ViewBag.activityID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
-</p>
+    <p>
+        @ViewBag.NumberOfSubmissions of @ViewBag.ExpectedSubmissionsAndGrades submissions
+        received
+        <br />
+        @ViewBag.NumberGraded of @ViewBag.ExpectedSubmissionsAndGrades submissions graded
+        <br />
+        <br />@Html.ActionLink("Download all submissions for this activity", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentActivityID = ViewBag.activityID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+    </p>
 </div>
-
 <table class="TeacherActivityTable">
-<tr>
-<th>
-Name
-</th>
-<th>
-Submitted Time
-</th>
-<th>
-Grading Status
-</th>
-<th>
-Inline Review Interface
-</th>
-<th>
-Grade
-</th>
-<th>
-Download Submission
-</th>
-</tr>
+    <tr>
+        <th>
+            Name
+        </th>
+        <th>
+            Submitted Time
+        </th>
+        <th>
+            Grading Status
+        </th>
+        @if (inlineReview)
+        { 
+            <th>
+                Inline Review Interface
+            </th>
+        }
+        @if (rubric)
+        { 
+            <th>
+                Rubric
+            </th>
+        }
+        @if(deliverables)
+        {
+            <th>
+                Download Submission
+            </th>
+            }
+    </tr>
+    @foreach (ActivityTeacherTableViewModel.SubmissionInfo info in Model.SubmissionsInfo)
+    {
+        <tr>
+            <td>
+                @info.Name
+            </td>
+            <td>
+                @if (info.Time == null)
+                {
+                    if (info.Graded)
+                    { 
+                    <span>Not Submitted</span>
+                    }
+                    else
+                    { 
+                    <span style="color: Red">Not Submitted</span>
+                    }
+                }
+                else
+                {
+                    if (info.Time.Value.AddMinutes(-Model.Activity.MinutesLateWithNoPenalty) < ViewBag.DueDate)
+                    {
+                    <span>@info.Time</span>
+                    }
+                    else
+                    {
+                        TimeSpan time = info.Time.Value - ((DateTime)ViewBag.DueDate);
 
-
-@foreach (ActivityTeacherTableViewModel.SubmissionInfo info in Model.SubmissionsInfo)
-{
- <tr>
- <td>
- @info.Name
- </td>
- <td>
- @if (info.Time == null)
- {
-     if (info.Graded)
-     { 
-     <span>Not Submitted</span>
-     }
-     else
-     { 
-     <span style="color:Red">Not Submitted</span>
-     }
- }
- else
- {
-     if (info.Time < ViewBag.DueDate || info.Graded)
-     {
-     <span>@info.Time</span>
-     }
-     else
-     {
-         <span style="color:Red">@info.Time</span> 
-     }
- }
- </td>
- <td>
- @if (info.Graded)
- {
-     <span>Graded</span>
- }
- else
- {
-     <span style="color:Red">Not Graded</span>
- }
- </td>
- <td>
- @Html.ActionLink("Review", "InlineReview", "Assignment", new {assignmentActivityID= ViewBag.activityID, teamUserID = info.SubmitterID}, new {})
- </td>
- <td>
- @Html.ActionLink("Grade", "Index", "Rubric", new { abstractAssignmentActivityId = ViewBag.activityID, teamUserId = info.SubmitterID }, new { })
- </td>
- <td>
- @if (info.Time != null)
- { 
- @Html.ActionLink("Download Submission", "GetSubmissionZip", "FileHandler", new { teamUserID = info.SubmitterID, assignmentActivityID = ViewBag.activityID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
- }
- else
- { 
- <text>Nothing To Download</text>
- }
- 
- </td>
- </tr>   
- submissionInfoCounter++;
-}
-
+                        //Purposefully rounding up
+                    <span style="color: Red">@((int)time.TotalHours + 1)
+                        Hours Late</span> 
+                    }
+                }
+            </td>
+            <td>
+                @if (info.Graded)
+                {
+                    <span>Graded</span>
+                }
+                else
+                {
+                    <span style="color: Red">Not Graded</span>
+                }
+            </td>
+            @if (inlineReview)
+            { 
+                <td>
+                    @Html.ActionLink("Review", "InlineReview", "Assignment", new { assignmentActivityID = ViewBag.activityID, teamUserID = info.SubmitterID }, new { })
+                </td>
+            }
+            @if (rubric)
+            { 
+                <td>
+                    @Html.ActionLink("Grade", "Index", "Rubric", new { abstractAssignmentActivityId = ViewBag.activityID, teamUserId = info.SubmitterID }, new { })
+                </td>
+            }
+            @if(deliverables)
+            {
+                <td>
+                    @if (info.Time != null)
+                { 
+                        @Html.ActionLink("Download Submission", "GetSubmissionZip", "FileHandler", new { teamUserID = info.SubmitterID, assignmentActivityID = ViewBag.activityID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+                }
+                else
+                { 
+                        <text>Nothing Received</text>
+                }
+                </td>
+                }
+        </tr>   
+                submissionInfoCounter++;
+    }
 </table>

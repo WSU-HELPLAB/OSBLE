@@ -163,63 +163,50 @@ namespace OSBLE.Controllers
                 {
                     //FileSystem.GetAssignmentActivitySubmissionFolder(activeCourse.Course as Course, studioActivity.ID);
 
-                    ActivityTeacherTableViewModel viewModel = new ActivityTeacherTableViewModel();
+                    ActivityTeacherTableViewModel viewModel = new ActivityTeacherTableViewModel(studioActivity.AbstractAssignment, studioActivity);
 
                     int numberOfSubmissions = 0;
                     int numberGraded = 0;
 
                     foreach (TeamUserMember teamUser in studioActivity.TeamUsers)
                     {
-                        ActivityTeacherTableViewModel.SubmissionInfo info = new ActivityTeacherTableViewModel.SubmissionInfo();
+                        ActivityTeacherTableViewModel.SubmissionInfo submissionInfo = new ActivityTeacherTableViewModel.SubmissionInfo();
 
                         //This checks when something was submitted by the folder modify time it is imperative that they don't get modified except when a student submits something to that folder.
-                        DirectoryInfo submissionFolder = new DirectoryInfo(FileSystem.GetTeamUserSubmissionFolder(false, activeCourse.AbstractCourse as Course, studioActivity.ID, teamUser));
+
+                        submissionInfo.Time = GetSubmissionTime(activeCourse.AbstractCourse as Course, studioActivity, teamUser);
+
+                        if (submissionInfo.Time != null)
+                        {
+                            numberOfSubmissions++;
+                        }
 
                         //if team
                         if (teamUser is TeamMember)
                         {
-                            info.isTeam = true;
-                            info.SubmitterID = teamUser.ID;
-                            info.Name = (teamUser as TeamMember).Team.Name;
+                            submissionInfo.isTeam = true;
+                            submissionInfo.SubmitterID = teamUser.ID;
+                            submissionInfo.Name = (teamUser as TeamMember).Team.Name;
                         }
 
                             //if student
                         else
                         {
-                            info.isTeam = false;
-                            info.SubmitterID = teamUser.ID;
-                            info.Name = (teamUser as UserMember).UserProfile.LastName + ", " + (teamUser as UserMember).UserProfile.FirstName;
-                        }
-
-                        if (submissionFolder.Exists)
-                        {
-                            //unfortunately LastWriteTime for a directory does not take into account it's file or
-                            //sub directories and these we need to check to see when the last file was written too.
-                            info.Time = submissionFolder.LastWriteTime;
-                            foreach (FileInfo file in submissionFolder.GetFiles())
-                            {
-                                if (file.LastWriteTime > info.Time)
-                                {
-                                    info.Time = file.LastWriteTime;
-                                }
-                            }
-                            numberOfSubmissions++;
-                        }
-                        else
-                        {
-                            info.Time = null;
+                            submissionInfo.isTeam = false;
+                            submissionInfo.SubmitterID = teamUser.ID;
+                            submissionInfo.Name = (teamUser as UserMember).UserProfile.LastName + ", " + (teamUser as UserMember).UserProfile.FirstName;
                         }
 
                         if ((from c in studioActivity.Scores where c.TeamUserMemberID == teamUser.ID select c).FirstOrDefault() != null)
                         {
-                            info.Graded = true;
+                            submissionInfo.Graded = true;
                             numberGraded++;
                         }
                         else
                         {
-                            info.Graded = false;
+                            submissionInfo.Graded = false;
                         }
-                        viewModel.SubmissionsInfo.Add(info);
+                        viewModel.SubmissionsInfo.Add(submissionInfo);
                     }
 
                     //This orders the list into alphabetical order
