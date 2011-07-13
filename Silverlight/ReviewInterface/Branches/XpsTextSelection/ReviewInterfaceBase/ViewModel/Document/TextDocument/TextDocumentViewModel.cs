@@ -158,6 +158,8 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
             thisView.DocumentViewer.LayoutUpdated += new EventHandler(DocumentViewer_LayoutUpdated);
             thisView.DocumentViewer.SelectionChanged += new RoutedEventHandler(DocumentViewer_SelectionChanged);
 
+
+
             //find out what language we are using from the file extension
             ILanguage language = LanguageFactory.LanguageFromFileExtension(FileExtension);
 
@@ -174,11 +176,38 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
                 ContentBlock = InitializeDocumentViewer(streamReader);
             }
 
+            //Setting lines and children values
+            setUpLinesAndChildren();
+
             //since we cannot get this information until the ContentBlock as actually happened which wont be until
             //after the UI thread notices for now we will return dummy data for lines and children and we will
             //set it for real when it gets updated
             lines.Add(new RowDefinition());
             children.Add(new StackPanel());
+        }
+
+        /// <summary>
+        /// Adds the appropriate amount of StackPanels into children and RowDefintions into lines
+        /// </summary>
+        private void setUpLinesAndChildren()
+        {
+            int rows = 0;
+            foreach (Inline inline in ContentBlock.Inlines)
+            {
+                if (inline is Run)
+                {
+                    TextPointer tp = (inline as Run).ContentStart;
+                }
+                if (inline is LineBreak)
+                {
+                    RowDefinition rd = new RowDefinition();
+                    lines.Add(rd);
+                    StackPanel sp = new StackPanel();
+                    sp.SetValue(Grid.RowProperty, rows);
+                    children.Add(sp);
+                    rows++;
+                }
+            }
         }
 
         /// <summary>
@@ -346,11 +375,16 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
         private Tuple<int, int> findContentLineNumber(TextPointer contentPtr)
         {
             int lineNumber = 0;
-            
+
+            //if contentPtr's parent is a Paragraph, move it to the next insertion position so it's parent will be a run.
+            if (contentPtr.Parent is Paragraph)
+            {
+                contentPtr = contentPtr.GetNextInsertionPosition(LogicalDirection.Forward);
+            }
             // vars for compensating for multiple run Lines
             Inline firstRunOfLine = null;
             bool isNewline = true;
-
+            //setting the linenumber
             foreach (Inline inline in ContentBlock.Inlines)
             { 
                 if (inline is Run)
@@ -376,7 +410,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
            
 
             Rect contentRect = contentPtr.GetCharacterRect(LogicalDirection.Forward);
-
+            //setting i (index)
             if (contentPtr.Parent is Run)
             {
                 TextPointer tp = (firstRunOfLine as Run).ContentStart;

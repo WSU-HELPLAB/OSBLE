@@ -6,6 +6,8 @@ using System.Xml;
 using ReviewInterfaceBase.View.Comment;
 using ReviewInterfaceBase.ViewModel.CategoryHolder;
 using ReviewInterfaceBase.ViewModel.Comment.Location;
+using System.Xml.Linq;
+using ReviewInterfaceBase.ViewModel.Category;
 
 namespace ReviewInterfaceBase.ViewModel.Comment
 {
@@ -13,6 +15,23 @@ namespace ReviewInterfaceBase.ViewModel.Comment
     {
         private new PeerReviewCommentView thisView;
         CategoriesHolderViewModel categoriesHolderVM;
+
+        private bool loadedComment = false;
+        /// <summary>
+        /// This boolean value indicates whether or not the PeerReviewCommentViewModel is representing a loaded-in, previously saved comment. 
+        /// </summary>
+        public bool LoadedComment
+        {
+            set { loadedComment = value; }
+            get { return loadedComment; }
+        }
+        //XElement containing the Categories pertaining to this instance of a PeerReviewComment. Used for loading saved PeerReviews
+        private XElement myXMLCategory;
+        public XElement XMLCategory
+        {
+            set {myXMLCategory = value;}
+            get {return myXMLCategory;}
+        }
 
         /// <summary>
         /// This creates a NoteText that is a PeerReviewCommentViewModel, PeerReviewCommentView, and CommentModel
@@ -41,12 +60,40 @@ namespace ReviewInterfaceBase.ViewModel.Comment
             thisView.Note.TextChanged += new TextChangedEventHandler(base.Note_TextChanged);
 
             categoriesHolderVM = new CategoriesHolderViewModel();
+            categoriesHolderVM.LoadComplete += new EventHandler(categoriesHolderVM_LoadComplete);
 
             categoriesHolderVM.LoadCategories(documentID);
 
             thisView.LayoutRoot.Children.Insert(1, categoriesHolderVM.GetView());
 
             categoriesHolderVM.SizeChanged += new SizeChangedEventHandler(categoriesHolderVM_SizeChanged);
+        }
+
+        /// <summary>
+        /// Event that is fired when a CategoryViewModel has loaded the tags into it's CategoryView. This event selects the item in the CategoryViewModel's taglist
+        /// </summary>
+        void categoriesHolderVM_LoadComplete(object sender, EventArgs e)
+        {
+            if (LoadedComment) //Only run the content of this event if the PeerREviewCommentVM is of the saved type
+            {
+                foreach (XElement xml in XMLCategory.Descendants())
+                {
+                    if (xml.Attribute("Name").Value == (sender as CategoryViewModel).Name)
+                    {
+                        for (int i = 0; i < ((sender as CategoryViewModel).TagList.Count); i++)
+                        {
+                            if ((sender as CategoryViewModel).TagList[i].Text == xml.Attribute("SelectedTagText").Value)
+                            {
+                                (sender as CategoryViewModel).SelectedTagIndex = i;
+                                //If a match, get out of loop after setting the index
+                                break;
+                            }
+                        }
+                        //If match, get out of loop after for loop
+                        break;
+                    }
+                }
+            }
         }
 
         protected override void GiveNoteFocus(object sender, MouseButtonEventArgs e)
@@ -109,7 +156,7 @@ namespace ReviewInterfaceBase.ViewModel.Comment
 
                 noteWidth = limitingWidth;
             }
-
+            
             thisView.Header.Width = noteWidth - thisView.HeaderContent.ActualWidth;
 
             thisView.Note.Width = noteWidth;

@@ -112,6 +112,7 @@
     <Compile Include="HelperClasses\DocumentInfo.cs" />
     <Compile Include="ViewModel\Comment\Location\ISpatialLocation.cs" />
     <Compile Include="ViewModel\Comment\Location\TextLocation.cs" />
+    <Compile Include="ViewModel\Comment\ViewPeerReviewCommentViewModel.cs" />
     <Compile Include="ViewModel\Comment\Location\XpsLocation.cs" />
     <Compile Include="ViewModel\DocumentHolder\IDocumentHolderViewModel.cs" />
     <Compile Include="ViewModel\DocumentHolder\SpatialDocumentHolderViewModel.cs" />

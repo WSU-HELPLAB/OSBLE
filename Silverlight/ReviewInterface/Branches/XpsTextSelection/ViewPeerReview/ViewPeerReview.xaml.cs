@@ -10,9 +10,9 @@ using ReviewInterfaceBase.ViewModel.DocumentHolder;
 using ReviewInterfaceBase.Web;
 using System.Windows;
 
-namespace IssueVoting
+namespace ViewPeerReview
 {
-    public partial class IssueVoting : UserControl
+    public partial class ViewPeerReview : UserControl
     {
         /// <summary>
         /// This keeps a reference to the MainPageViewModel
@@ -30,7 +30,7 @@ namespace IssueVoting
         /// </summary>
         private bool documentsOpened = false;
 
-        public IssueVoting()
+        public ViewPeerReview()
         {
             InitializeComponent();
 
@@ -39,6 +39,13 @@ namespace IssueVoting
 
             LocalInitilizer();
 
+            //Killing the save button by collapsing it
+            UIElement saveButton = (UIElement)(mpVM.GetView().Content as Grid).FindName("Save");
+            if (saveButton is Button)
+
+            {
+                saveButton.Visibility = System.Windows.Visibility.Collapsed;
+            }
         }
 
         private void mpVM_OpeningDocumentsComplete(object sender, EventArgs e)
@@ -132,7 +139,7 @@ namespace IssueVoting
                 {
                     if (DocumentHolder.idOfDocument.ToString() == id)
                     {
-                        DocumentHolder.LoadIssueVotingComments(document, noteAuthor);
+                        (DocumentHolder as SpatialDocumentHolderViewModel).LoadIssueVotingCommentsWithoutIssueVoting(document, noteAuthor);
                     }
                 }
             }

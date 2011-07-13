@@ -17,8 +17,14 @@ namespace ReviewInterfaceBase.ViewModel.Category
         public event SizeChangedEventHandler SizeChanged = delegate { };
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
+        //Event to let PeerReviewCommentViewModels know that the tags have been loaded
+        public event EventHandler LoadComplete = delegate { };
+
         private FrameworkElement thisView = new CategoryView();
         private CategoryModel thisModel;
+
+        //Static bool, value changes to true if any CategoryViewModel uses ReadXML, which should only happen with issuevoting/viewpeerreview. 
+        private static bool readFromXml = false;
 
         /// <summary>
         /// The name of the Category
@@ -90,8 +96,11 @@ namespace ReviewInterfaceBase.ViewModel.Category
             writer.WriteEndElement();
         }
 
+        
         public void ReadXml(XElement Category)
         {
+            //Setting readFromXml to true so that certain events won't fire when unneeded.
+            readFromXml = true;
             Label lb = new Label();
             string text;
             text = Category.Attribute("Name").Value;
@@ -109,6 +118,12 @@ namespace ReviewInterfaceBase.ViewModel.Category
         {
             PropertyChanged(this, new PropertyChangedEventArgs("TagViewList"));
             thisView.SizeChanged += new SizeChangedEventHandler(thisView_SizeChanged);
+
+            //Only fire LoadComplete event if readFromXml is false. The assumption is that ReadXml will only be run during issuevoting/viewpeerreview pages (where we don't want the events to run)
+            if (readFromXml == false)
+            {
+                LoadComplete(this, EventArgs.Empty);
+            }
         }
 
         public FrameworkElement GetView()

@@ -13,7 +13,7 @@
     <RootNamespace>ReviewInterfaceBase.Web</RootNamespace>
     <AssemblyName>ReviewInterfaceBase.Web</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <SilverlightApplicationList>{85886C57-E5B3-4009-8743-4A7C0228E6ED}|..\Osble\Osble.csproj|ClientBin|False,{84A7338D-8FD4-4A92-93EA-D02D24704F2E}|..\PeerReview\PeerReview.csproj|ClientBin|False,{1577599E-3904-46A0-86EF-671A79895C26}|..\IssueVoting\IssueVoting.csproj|ClientBin|False</SilverlightApplicationList>
+    <SilverlightApplicationList>{85886C57-E5B3-4009-8743-4A7C0228E6ED}|..\Osble\Osble.csproj|ClientBin|False,{84A7338D-8FD4-4A92-93EA-D02D24704F2E}|..\PeerReview\PeerReview.csproj|ClientBin|False,{1577599E-3904-46A0-86EF-671A79895C26}|..\IssueVoting\IssueVoting.csproj|ClientBin|False,{D7E4F1AB-379C-4AD4-BBCF-A0002F44811C}|..\ViewPeerReview\ViewPeerReview.csproj|ClientBin|False,{172F41E1-B3F6-4519-9DBE-E08B2EE2BC1B}|..\EditPeerReview\EditPeerReview.csproj|ClientBin|False</SilverlightApplicationList>
     <UseIISExpress>false</UseIISExpress>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -65,14 +65,20 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ClientBin\EditPeerReview.xap" />
     <Content Include="ClientBin\IssueVoting.xap" />
     <Content Include="ClientBin\PeerReview.xap" />
     <Content Include="ClientBin\ReviewInterfaceBase.xap" />
+    <Content Include="ClientBin\ViewPeerReview.xap" />
+    <Content Include="EditPeerReviewTestPage.aspx" />
+    <Content Include="EditPeerReviewTestPage.html" />
     <Content Include="IssueVotingTestPage.aspx" />
     <Content Include="IssueVotingTestPage.html" />
     <Content Include="PeerReviewTestPage.aspx" />
     <Content Include="PeerReviewTestPage.html" />
     <Content Include="Silverlight.js" />
+    <Content Include="ViewPeerReviewTestPage.aspx" />
+    <Content Include="ViewPeerReviewTestPage.html" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

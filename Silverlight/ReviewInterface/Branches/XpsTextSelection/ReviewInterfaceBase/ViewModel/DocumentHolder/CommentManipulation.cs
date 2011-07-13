@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -13,6 +14,7 @@ using ReviewInterfaceBase.HelperClasses;
 using ReviewInterfaceBase.View.Comment;
 using ReviewInterfaceBase.ViewModel.Comment;
 using ReviewInterfaceBase.ViewModel.Comment.Location;
+using ReviewInterfaceBase.ViewModel.Category;
 
 namespace ReviewInterfaceBase.ViewModel.DocumentHolder
 {
@@ -387,6 +389,28 @@ namespace ReviewInterfaceBase.ViewModel.DocumentHolder
         }
 
         /// <summary>
+        /// This adds a NoteText from an xmlComment
+        /// </summary>
+        /// <param name="xmlComment">an XElement of a comment</param>
+        public void addSavedPeerReviewComment(XElement xmlComment, ISpatialLocation location, Size documentSize)
+        {
+            //create ViewModel (this in turn makes the View)
+            ICommentViewModel commentViewModel = new PeerReviewCommentView(documentID, location).ViewModel;
+
+            //Setting the boolean value of SavedComment to true so that PeerReviewCommentViewModel will know how to handle it
+            (commentViewModel as PeerReviewCommentViewModel).LoadedComment = true;
+
+            initializeSpatialComment(commentViewModel, documentSize);
+
+            //The last comment in the observable collection "comments" will be the one that was just added. So we can apply the note for the comment from the xml
+            comments[comments.Count - 1].NoteText = xmlComment.Attribute("NoteText").Value;
+
+            //Setting the value of XMLCategory to the portion of the xmlComment that has the categories
+            (commentViewModel as PeerReviewCommentViewModel).XMLCategory = xmlComment.Descendants("Categories").ElementAt(0);
+
+        }
+
+        /// <summary>
         /// This adds a new NoteText
         /// </summary>
         /// <param name="location">location of the text that the noteText is commenting on</param>
@@ -396,6 +420,19 @@ namespace ReviewInterfaceBase.ViewModel.DocumentHolder
         {
             //create ViewModel (this in turn makes the View)
             ICommentViewModel commentViewModel = new IssueVotingCommentViewModel(xmlComment, author, location);
+            initializeSpatialComment(commentViewModel, documentSize);
+        }
+
+        /// <summary>
+        /// This adds a new read-only(has no issue voting options) Notetext
+        /// </summary>
+        /// <param name="location">location of the text that the noteText is commenting on</param>
+        /// <param name="ContentStart">Start of RichTextBox content</param>
+        /// <param name="ContentEnd">End of RichTextBox content</param>
+        public void addIssueVotingCommentWithoutIssueVoting(XElement xmlComment, NoteAuthor author, ISpatialLocation location, Size documentSize)
+        {
+            //create ViewModel (this in turn makes the View)
+            ICommentViewModel commentViewModel = new ViewPeerReviewCommentViewModel(xmlComment, author, location);
             initializeSpatialComment(commentViewModel, documentSize);
         }
 
