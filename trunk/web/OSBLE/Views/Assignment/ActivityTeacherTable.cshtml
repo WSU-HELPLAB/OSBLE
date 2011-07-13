@@ -68,6 +68,9 @@ Submitted Time
 Grading Status
 </th>
 <th>
+Inline Review Interface
+</th>
+<th>
 Grade
 </th>
 <th>
@@ -115,6 +118,9 @@ Download Submission
  {
      <span style="color:Red">Not Graded</span>
  }
+ </td>
+ <td>
+ @Html.ActionLink("Review", "InlineReview", "Assignment", new {assignmentActivityID= ViewBag.activityID, teamUserID = info.SubmitterID}, new {})
  </td>
  <td>
  @Html.ActionLink("Grade", "Index", "Rubric", new { abstractAssignmentActivityId = ViewBag.activityID, teamUserId = info.SubmitterID }, new { })

@@ -1,5 +1,11 @@
-﻿@{
+﻿@model OSBLE.Models.ViewModels.InlineReviewViewModel
+@using OSBLE.Models
+@{
     ViewBag.Title = "InlineReview";
 }
 
 <h2>InlineReview</h2>
+
+<div style="width:100%; height:100%">
+@Html.DisplayFor(m=>m.ReviewInterface)
+</div>

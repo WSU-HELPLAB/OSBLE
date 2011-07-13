@@ -134,7 +134,7 @@ int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
                                         <div>
                                         @if ((ViewBag.SubmissionDictionary[submission.ID][deliverablesCounter] as Tuple<bool, DateTime>).Item1)
                                         {
-                                            @Html.ActionLink("View Submission", "GetSubmissionDeliverable", "FileHandler", new { assignmentActivityID = submission.ID, userProfileID = (ViewBag.CurrentUser as UserProfile).ID, fileName = d.Name, type = d.Type }, new { });
+                                            @Html.ActionLink("View Submission", "GetSubmissionDeliverableByType", "FileHandler", new { assignmentActivityID = submission.ID, userProfileID = (ViewBag.CurrentUser as UserProfile).ID, fileName = d.Name, type = d.Type }, new { });
                                         }
                                         </div>
                                     </div>

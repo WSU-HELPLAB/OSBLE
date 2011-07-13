@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Web.Mvc;
 using OSBLE.Attributes;
+using OSBLE.Models;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
@@ -247,9 +248,40 @@ namespace OSBLE.Controllers
             }
         }
 
+        [CanGradeCourse]
         public ActionResult InlineReview(int assignmentActivityID, int teamUserID)
         {
-            return View();
+            try
+            {
+                AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(assignmentActivityID);
+                TeamUserMember teamUser = db.TeamUsers.Find(teamUserID);
+                if (activity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID && activity.TeamUsers.Contains(teamUser))
+                {
+                    Session.Add("CurrentActivityID", assignmentActivityID);
+                    Session.Add("TeamUserID", teamUserID);
+
+                    return View(new InlineReviewViewModel() { ReviewInterface = createInlineReviewSilverlightObject() });
+                }
+            }
+            catch
+            { }
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        private SilverlightObject createInlineReviewSilverlightObject()
+        {
+            return new SilverlightObject
+            {
+                CSSId = "inline_review_silverlight",
+                XapName = "PeerReview",
+                Width = "99%",
+                Height = "99%",
+                OnLoaded = "SLObjectLoaded",
+                Parameters = new Dictionary<string, string>()
+                {
+                }
+            };
         }
     }
 }

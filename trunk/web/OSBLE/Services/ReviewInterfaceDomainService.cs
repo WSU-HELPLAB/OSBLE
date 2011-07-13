@@ -18,14 +18,14 @@
         protected AbstractAssignmentActivity activity;
         protected TeamUserMember teamUser;
 
-        private ReviewInterfaceDomainService()
+        public ReviewInterfaceDomainService()
         {
             activity = db.AbstractAssignmentActivities.Find((int)context.Session["CurrentActivityID"]);
             teamUser = db.TeamUsers.Find((int)context.Session["TeamUserID"]);
 
-            if (activity == null || teamUser == null)
+            if (activity == null || teamUser == null || currentCourse as Course == null)
             {
-                throw new Exception("Session did not contain valid IDs for activity or teamUser");
+                throw new Exception("Session did not contain valid IDs for activity or teamUser or currentCourse is not a Course");
             }
         }
 
@@ -38,7 +38,14 @@
             int i = 0;
             foreach (FileInfo file in new DirectoryInfo(path).GetFiles())
             {
-                DocumentLocation location = new DocumentLocation(file.FullName, i, teamUser.Name, AuthorClassification.Student);
+                string filePath = file.FullName;
+                int startOfWebPath = filePath.IndexOf("FileSystem");
+
+                //get the raw url (not web accessible due to MVC restrictions)
+                string rawUrl = VirtualPathUtility.ToAbsolute("~/" + "FileHandler/GetSubmissionDeliverable?assignmentActivityID=" + activity.ID.ToString() + "&teamUserID=" + teamUser.ID.ToString() + "&fileName=" + file.Name);
+
+                DocumentLocation location = new DocumentLocation(rawUrl, i, teamUser.Name, AuthorClassification.Student);
+                documentsToBeReviewed.Add(location);
                 i++;
             }
             return documentsToBeReviewed.ToArray().AsQueryable();
@@ -51,9 +58,10 @@
 
         public void UploadFile(string str)
         {
-            StreamWriter sw = new StreamWriter(FileSystem.GetTeamUserReviewFolderLocation(currentCourse as Course, activity.AbstractAssignmentID, teamUser.ID) + "/PeerReview.xml");
-            sw.Write(str);
-            sw.Close();
+            using (StreamWriter sw = new StreamWriter(FileSystem.GetTeamUserReviewFolderLocation(currentCourse as Course, activity.AbstractAssignmentID, teamUser.ID) + "/PeerReview.xml"))
+            {
+                sw.Write(str);
+            }
         }
     }
 }

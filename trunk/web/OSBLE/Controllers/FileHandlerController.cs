@@ -53,8 +53,29 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [CanGradeCourse]
+        public ActionResult GetSubmissionDeliverable(int assignmentActivityID, int teamUserID, string fileName)
+        {
+            try
+            {
+                AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(assignmentActivityID);
+                TeamUserMember teamUser = db.TeamUsers.Find(teamUserID);
+
+                if (activity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID && teamUser != null)
+                {
+                    string path = FileSystem.GetDeliverable(activeCourse.AbstractCourse as Course, assignmentActivityID, teamUser, fileName);
+                    return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
+                }
+            }
+            catch
+            { }
+            //either not authorized or bad parameters were passed in
+            throw new Exception();
+        }
+
         [NotForCommunity]
-        public ActionResult GetSubmissionDeliverable(int assignmentActivityID, int userProfileID, string fileName, DeliverableType type)
+
+        public ActionResult GetSubmissionDeliverableByType(int assignmentActivityID, int userProfileID, string fileName, DeliverableType type)
         {
             AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(assignmentActivityID);
 
@@ -82,7 +103,6 @@ namespace OSBLE.Controllers
             throw new Exception("File Not Found");
         }
 
-        [Authorize]
         [CanGradeCourse]
         [NotForCommunity]
         public ActionResult GetAllSubmissionsForActivity(int assignmentActivityID)
@@ -141,7 +161,6 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        [Authorize]
         [CanGradeCourse]
         [NotForCommunity]
         public ActionResult GetSubmissionZip(int assignmentActivityID, int teamUserID)

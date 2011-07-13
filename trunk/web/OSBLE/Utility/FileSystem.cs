@@ -374,14 +374,28 @@ namespace OSBLE
             }
         }
 
-        public static string GetReviewFolderLoaction(Course course, int abstractAssignmentActivityID)
+        public static string GetReviewFolderLocation(Course course, int abstractAssignmentActivityID)
         {
             return GetAssignmentActivityFolder(course, abstractAssignmentActivityID);
         }
 
+        /// <summary>
+        /// This gets the path and if it does not exist it will create it
+        /// </summary>
+        /// <param name="course"></param>
+        /// <param name="abstractAssignmentActivityID"></param>
+        /// <param name="teamUserID"></param>
+        /// <returns></returns>
         public static string GetTeamUserReviewFolderLocation(Course course, int abstractAssignmentActivityID, int teamUserID)
         {
-            return GetReviewFolderLoaction(course, abstractAssignmentActivityID) + "\\Reviews\\" + teamUserID;
+            string path = GetReviewFolderLocation(course, abstractAssignmentActivityID) + "\\Reviews\\" + teamUserID;
+            DirectoryInfo info = new DirectoryInfo(path);
+
+            if (!info.Exists)
+            {
+                info.Create();
+            }
+            return path;
         }
 
         public static FileStream FindZipFile(Course course, AbstractAssignmentActivity activity, TeamUserMember teamUser = null)
@@ -447,7 +461,7 @@ namespace OSBLE
 
         public static string GetAssignmentActivitySubmissionFolder(Course course, int assignmentActivityID)
         {
-            return GetAssignmentActivitySubmissionFolder(course, assignmentActivityID) + "\\Submissions";
+            return GetAssignmentActivityFolder(course, assignmentActivityID) + "\\Submissions";
         }
 
         public static string GetTeamUserSubmissionFolder(bool createPathIfNotExists, Course course, int assignmentActivityID, TeamUserMember subbmitter)
@@ -461,6 +475,11 @@ namespace OSBLE
             }
 
             return path;
+        }
+
+        public static string GetDeliverable(Course course, int assignmentActivityID, TeamUserMember subbmitter, string fileName)
+        {
+            return GetTeamUserSubmissionFolder(false, course, assignmentActivityID, subbmitter) + "\\" + fileName;
         }
 
         public static string GetDeliverable(Course course, int assignmentActivityID, TeamUserMember subbmitter, string fileName, string[] possibleFileExtensions)
