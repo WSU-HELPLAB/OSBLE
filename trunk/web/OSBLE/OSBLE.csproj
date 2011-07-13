@@ -209,15 +209,14 @@
     <Compile Include="Models\Services\Uploader\DirectoryListing.cs" />
     <Compile Include="Models\Services\Uploader\FileListing.cs" />
     <Compile Include="Models\SilverlightObject.cs" />
+    <Compile Include="Models\ViewModels\ReviewInterfaceModels.cs" />
     <Compile Include="Models\ViewModels\RubricViewModel.cs" />
     <Compile Include="Models\ViewModels\SerializableTeamMembers.cs" />
     <Compile Include="Models\ViewModels\ActivityTeacherTableViewModel.cs" />
     <Compile Include="Models\ViewModels\StudioAssignmentViewModel.cs" />
     <Compile Include="Services\AuthenticationDomainService.cs" />
     <Compile Include="Services\OSBLEService.cs" />
-    <Compile Include="Services\ReviewInterfaceService.svc.cs">
-      <DependentUpon>ReviewInterfaceService.svc</DependentUpon>
-    </Compile>
+    <Compile Include="Services\ReviewInterfaceDomainService.cs" />
     <Compile Include="Services\RubricRiaService.cs" />
     <Compile Include="Services\RubricService.svc.cs">
       <DependentUpon>RubricService.svc</DependentUpon>
@@ -441,7 +440,6 @@
     <Content Include="Scripts\osble.courses.js" />
     <Content Include="Scripts\osble.js" />
     <Content Include="Scripts\Silverlight.js" />
-    <Content Include="Services\ReviewInterfaceService.svc" />
     <Content Include="Services\RubricService.svc" />
     <Content Include="Services\UploaderWebService.svc" />
     <Content Include="Silverlight.js" />
@@ -681,6 +679,7 @@
     <Content Include="Views\Rubric\View.cshtml" />
     <None Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
     <None Include="obj\Debug\ResolveAssemblyReference.cache" />
+    <Content Include="Views\Assignment\InlineReview.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

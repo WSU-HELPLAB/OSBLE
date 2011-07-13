@@ -7,12 +7,12 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Xml;
+using OSBLE.Services;
 using ReviewInterfaceBase.HelperClasses;
 using ReviewInterfaceBase.View.DocumentHolder;
 using ReviewInterfaceBase.ViewModel.DocumentHolder;
 using ReviewInterfaceBase.ViewModel.FindWindow;
 using ReviewInterfaceBase.ViewModel.Rubric;
-using ReviewInterfaceBase.Web;
 
 namespace ReviewInterfaceBase.ViewModel
 {
@@ -225,10 +225,10 @@ namespace ReviewInterfaceBase.ViewModel
             //I know we want utf-8 but not sure how to the xmlWriter to write that so I just change it manually.
             sb.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 
-            FakeDomainContext fakeDomainContext = new FakeDomainContext();
+            ReviewInterfaceDomainContext ReviewInterfaceDC = new ReviewInterfaceDomainContext();
 
             //Then we upload the file as well as register an event for when it has been uploaded
-            fakeDomainContext.UploadFile(sb.ToString()).Completed += new EventHandler(FileUploadComplete);
+            ReviewInterfaceDC.UploadFile(sb.ToString()).Completed += new EventHandler(FileUploadComplete);
         }
 
         private void FileUploadComplete(object sender, EventArgs e)

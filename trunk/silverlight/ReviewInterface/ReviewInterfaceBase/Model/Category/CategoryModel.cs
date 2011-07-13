@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ServiceModel.DomainServices.Client;
+using OSBLE.Services;
 using ReviewInterfaceBase.ViewModel.Tag;
-using ReviewInterfaceBase.Web;
 
 namespace ReviewInterfaceBase.Model.Category
 {
@@ -48,23 +47,23 @@ namespace ReviewInterfaceBase.Model.Category
 
         public void Load()
         {
-            FakeDomainContext fakeDomainContext = new FakeDomainContext();
-            var entityQuerey = fakeDomainContext.GetTagsQuery(id);
-            var loadTagOperation = fakeDomainContext.Load<ReviewInterfaceBase.Web.Tag>(entityQuerey);
-            loadTagOperation.Completed += new EventHandler(loadTagOperation_Completed);
+            ReviewInterfaceDomainContext fakeDomainContext = new ReviewInterfaceDomainContext();
+            //var entityQuerey = fakeDomainContext.GetTagsQuery(id);
+            //var loadTagOperation = fakeDomainContext.Load<OSBLE.Models.Tag>(entityQuerey);
+            //loadTagOperation.Completed += new EventHandler(loadTagOperation_Completed);
         }
 
         private void loadTagOperation_Completed(object sender, EventArgs e)
         {
-            LoadOperation<Web.Tag> loadOperation = sender as LoadOperation<Web.Tag>;
-            tagViewModelList = new List<TagViewModel>();
-            foreach (Web.Tag tag in loadOperation.Entities)
-            {
-                tagViewModelList.Add(new TagViewModel(tag.Name));
-            }
+            //LoadOperation<OSBLE.Models.Tag> loadOperation = sender as LoadOperation<OSBLE.Models.Tag>;
+            //tagViewModelList = new List<TagViewModel>();
+            //foreach (OSBLE.Models.Tag tag in loadOperation.Entities)
+            //{
+            //    tagViewModelList.Add(new TagViewModel(tag.Name));
+            //}
 
-            //Let anyone else know (aka our ViewModel) that we are done loading
-            LoadCompleted(this, EventArgs.Empty);
+            ////Let anyone else know (aka our ViewModel) that we are done loading
+            //LoadCompleted(this, EventArgs.Empty);
         }
     }
 }

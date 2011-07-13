@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ServiceModel.DomainServices.Client;
 using ReviewInterfaceBase.ViewModel.Category;
-using ReviewInterfaceBase.Web;
 
 namespace ReviewInterfaceBase.Model.CatergoryHolder
 {
@@ -46,37 +44,37 @@ namespace ReviewInterfaceBase.Model.CatergoryHolder
 
         private void loadCategoriesOperation_Completed(object sender, EventArgs e)
         {
-            categories.Clear();
-            LoadOperation<Web.Category> loadOperation = sender as LoadOperation<Web.Category>;
-            foreach (Web.Category category in loadOperation.Entities)
-            {
-                CategoryViewModel cvm = new CategoryViewModel();
-                cvm.LoadTags(category.Name, category.ID);
-                categories.Add(cvm);
-            }
+            //categories.Clear();
+            //LoadOperation<Web.Category> loadOperation = sender as LoadOperation<Web.Category>;
+            //foreach (Web.Category category in loadOperation.Entities)
+            //{
+            //    CategoryViewModel cvm = new CategoryViewModel();
+            //    cvm.LoadTags(category.Name, category.ID);
+            //    categories.Add(cvm);
+            //}
 
-            //Let anyone else know (aka our ViewModel) that we are done loading
-            LoadCompleted(this, EventArgs.Empty);
+            ////Let anyone else know (aka our ViewModel) that we are done loading
+            //LoadCompleted(this, EventArgs.Empty);
         }
 
         public void Load()
         {
-            if (documentID == -1)
-            {
-                throw new Exception("DocumentID was -1 which indicates it was not set using the correct constructor, please pass in documentID when calling the constructor if you then want to use Load");
-            }
-            FakeDomainContext fakeDomainContext = new FakeDomainContext();
-            var entityQuerey = fakeDomainContext.GetCategoriesQuery(documentID);
-            var loadCategoriesOperation = fakeDomainContext.Load<ReviewInterfaceBase.Web.Category>(entityQuerey);
-            loadCategoriesOperation.Completed += new EventHandler(loadCategoriesOperation_Completed);
+            //if (documentID == -1)
+            //{
+            //    throw new Exception("DocumentID was -1 which indicates it was not set using the correct constructor, please pass in documentID when calling the constructor if you then want to use Load");
+            //}
+            //ReviewInterfaceDomainContext fakeDomainContext = new ReviewInterfaceDomainContext();
+            //var entityQuerey = fakeDomainContext.GetCategoriesQuery(documentID);
+            //var loadCategoriesOperation = fakeDomainContext.Load<ReviewInterfaceBase.Web.Category>(entityQuerey);
+            //loadCategoriesOperation.Completed += new EventHandler(loadCategoriesOperation_Completed);
         }
 
         public void LoadIssueVotingCategories()
         {
-            FakeDomainContext fakeDomainContext = new FakeDomainContext();
-            var entityQuerey = fakeDomainContext.GetIssueVotingCategoriesQuery();
-            var loadCategoriesOperation = fakeDomainContext.Load<ReviewInterfaceBase.Web.Category>(entityQuerey);
-            loadCategoriesOperation.Completed += new EventHandler(loadCategoriesOperation_Completed);
+            //FakeDomainContext fakeDomainContext = new FakeDomainContext();
+            //var entityQuerey = fakeDomainContext.GetIssueVotingCategoriesQuery();
+            //var loadCategoriesOperation = fakeDomainContext.Load<ReviewInterfaceBase.Web.Category>(entityQuerey);
+            //loadCategoriesOperation.Completed += new EventHandler(loadCategoriesOperation_Completed);
         }
     }
 }

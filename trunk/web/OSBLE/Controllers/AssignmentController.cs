@@ -141,7 +141,7 @@ namespace OSBLE.Controllers
             return View();
         }
 
-        //[ChildActionOnly]
+        //This is to be used with Ajax
         [CanModifyCourse]
         public ActionResult ActivityTeacherTable(int id)
         {
@@ -245,6 +245,11 @@ namespace OSBLE.Controllers
             {
                 throw new Exception("Failed ActivityTeacherTable", e);
             }
+        }
+
+        public ActionResult InlineReview(int assignmentActivityID, int teamUserID)
+        {
+            return View();
         }
     }
 }

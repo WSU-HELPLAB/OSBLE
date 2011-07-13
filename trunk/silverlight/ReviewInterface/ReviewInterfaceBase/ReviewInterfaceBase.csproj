@@ -29,7 +29,7 @@
     <OutOfBrowserSettingsFile>Properties\OutOfBrowserSettings.xml</OutOfBrowserSettingsFile>
     <UsePlatformExtensions>false</UsePlatformExtensions>
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
-    <LinkedServerProject>..\ReviewInterfaceBase.Web\ReviewInterfaceBase.Web.csproj</LinkedServerProject>
+    <LinkedServerProject>..\..\..\web\OSBLE\OSBLE.csproj</LinkedServerProject>
     <Utf8Output>true</Utf8Output>
     <ExpressionBlendVersion>4.0.20901.0</ExpressionBlendVersion>
     <SccProjectName>SAK</SccProjectName>

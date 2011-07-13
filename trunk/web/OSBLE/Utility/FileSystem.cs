@@ -29,15 +29,15 @@ using OSBLE.Models.Users;
  *                     |       Records.txt { %random number%.zip}
  *                     |
  *           [AssignmentActivityId]
- *                 /       \
- *                /         \
- *             AADocs   Submissions
- *                |               \
- *    {assignment activity docs}   \
- *                                  \
- *                           [TeamUserMemberId]
- *                                   |
- *                          {team submissions}
+ *           /       \          \
+ *          /         \          \
+ *       AADocs   Submissions    Reviews
+ *          |          |             \
+ *      {aa docs}      |      [TeamuserMemberId]
+ *                     |                 |
+ *            [TeamUserMemberId]         |
+ *                     |             {reviews}
+ *            {team submissions}
  * */
 
 namespace OSBLE
@@ -374,6 +374,16 @@ namespace OSBLE
             }
         }
 
+        public static string GetReviewFolderLoaction(Course course, int abstractAssignmentActivityID)
+        {
+            return GetAssignmentActivityFolder(course, abstractAssignmentActivityID);
+        }
+
+        public static string GetTeamUserReviewFolderLocation(Course course, int abstractAssignmentActivityID, int teamUserID)
+        {
+            return GetReviewFolderLoaction(course, abstractAssignmentActivityID) + "\\Reviews\\" + teamUserID;
+        }
+
         public static FileStream FindZipFile(Course course, AbstractAssignmentActivity activity, TeamUserMember teamUser = null)
         {
             string location = FindZipFileLocation(course, getRealFileZipName(activity, teamUser));
@@ -428,11 +438,16 @@ namespace OSBLE
             return GetCourseDocumentsPath(c);
         }
 
-        public static string GetAssignmentActivitySubmissionFolder(Course course, int assignmentActivityID)
+        public static string GetAssignmentActivityFolder(Course course, int assignmentActivityID)
         {
             string path = getCoursePath(course);
-            path += "Assignments" + "\\" + assignmentActivityID + "\\Submissions";
+            path += "Assignments" + "\\" + assignmentActivityID;
             return path;
+        }
+
+        public static string GetAssignmentActivitySubmissionFolder(Course course, int assignmentActivityID)
+        {
+            return GetAssignmentActivitySubmissionFolder(course, assignmentActivityID) + "\\Submissions";
         }
 
         public static string GetTeamUserSubmissionFolder(bool createPathIfNotExists, Course course, int assignmentActivityID, TeamUserMember subbmitter)

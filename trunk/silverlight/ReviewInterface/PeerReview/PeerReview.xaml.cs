@@ -2,10 +2,11 @@
 using System.Collections.Specialized;
 using System.ServiceModel.DomainServices.Client;
 using System.Windows.Controls;
+using OSBLE.Models.ViewModels.ReviewInterface;
+using OSBLE.Services;
 using PeerReview.HelperClasses;
 using ReviewInterfaceBase.ViewModel;
 using ReviewInterfaceBase.ViewModel.DocumentHolder;
-using ReviewInterfaceBase.Web;
 
 namespace PeerReview
 {
@@ -40,10 +41,9 @@ namespace PeerReview
 
             this.LayoutRoot.Children.Add(mpVM.GetView());
 
-            FakeDomainContext context = new FakeDomainContext();
-            FakeDomainContext fakeDomainContext = new FakeDomainContext();
-            var entityQuerey = fakeDomainContext.GetDocumentLocationsQuery();
-            var loadDocumentLocationsOperation = fakeDomainContext.Load<ReviewInterfaceBase.Web.DocumentLocation>(entityQuerey);
+            ReviewInterfaceDomainContext reviewInterfaceDC = new ReviewInterfaceDomainContext();
+            var entityQuerey = reviewInterfaceDC.GetDocumentLocationsQuery();
+            var loadDocumentLocationsOperation = reviewInterfaceDC.Load<DocumentLocation>(entityQuerey);
             loadDocumentLocationsOperation.Completed += new EventHandler(loadDocumentLocationsOperation_Completed);
         }
 
