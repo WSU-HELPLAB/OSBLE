@@ -230,6 +230,20 @@
 
 <h3>Gradebook</h3>
 
+
+    <div>
+        <a href="#" onclick="$('#export_grades_to_csv').toggle('blind'); return false;">Export Gradebook</a>
+    </div>
+    <br />
+    <div id='export_grades_to_csv' title="Exprt Grades" style="display:none;">
+        <div>Export this gradebook to a comma-separated (CSV)<br /><br />
+            <text>Do you want to export the gradebook?</text><br />
+            <input type="button" value="YES" onclick="exportGradesToCSV();" />
+            <input type="button" value="NO" onclick="$('#export_grades_to_csv').toggle('blind'); return false;" />
+        </div><br />
+    </div>
+
+
 @Html.Partial("_Tabs")
 
 <div class="selectMenu" id="selectMenuID" style="display: none; position: absolute;">
@@ -389,7 +403,7 @@
             <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; width: 25px;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             @{r++;}
             <td></td>
-            <td><b>Weights [+]</b></td>
+            <td><b>Weights</b></td>
             <td></td>
             <td></td>
             @foreach (Category item in ViewBag.Categories)
@@ -540,13 +554,12 @@
                     {
                         totalGrade += totalOfCats[i].Points;
 
-                        //We always need to divide by 100%
-                        totalPossible += 100;
+                        totalPossible += totalOfCats[i].AssignmentActivity.PointsPossible;
                     }
                     else
                     {
                         totalGrade += totalOfCats[i].Points * totalOfCats[i].AssignmentActivity.AbstractAssignment.Category.Points;
-                        totalPossible += 100 * totalOfCats[i].AssignmentActivity.AbstractAssignment.Category.Points;
+                        totalPossible += totalOfCats[i].AssignmentActivity.PointsPossible * totalOfCats[i].AssignmentActivity.AbstractAssignment.Category.Points;
                     }
                 }
                 
@@ -592,9 +605,18 @@
 
                 if (scoreQuery.Count() > 0)
                 {
-                    if (scoreQuery.First().Points > 0)
+                    double categoryPoints = 0;
+                    double categoryPointsPossible = 0;
+                    double totalCategoryPercent = 0;
+                    foreach (Score item in scoreQuery)
                     {
-                        <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID, @student.Identification)" style="cursor:pointer;">@scoreQuery.First().Points.ToString(".##")%</td>
+                        categoryPoints += item.Points;
+                        categoryPointsPossible += item.AssignmentActivity.PointsPossible;
+                    }
+                    totalCategoryPercent = ((categoryPoints / categoryPointsPossible) * 100);
+                    if (totalCategoryPercent > 0)
+                    {
+                        <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID, @student.Identification)" style="cursor:pointer;">@totalCategoryPercent.ToString(".##")%</td>
                     }
                     else
                     {
@@ -1300,6 +1322,14 @@
             type: "POST",
             url: "/Gradebook/MoveCategoryLeft",
             data: { categoryId: id[1] },
+            success: window.location.reload(true)
+        });
+    }
+
+    function exportGradesToCSV() {
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/ExportGadesToCSV",
             success: window.location.reload(true)
         });
     }

@@ -944,6 +944,17 @@ body#layoutLogOn
 	display: none;
 }
 
+#export_grades_to_csv
+{
+	border: 1px solid #eeeeff;
+	border-bottom: 5px solid #eeeeff;
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-bottom: 8px;
+	width: 400px;
+	display: none;
+}
+
 #add_update_users h4
 {
 	margin-top: 0.5em;
