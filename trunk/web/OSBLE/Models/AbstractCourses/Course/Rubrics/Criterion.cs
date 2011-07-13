@@ -10,6 +10,7 @@ namespace OSBLE.Models.Courses.Rubrics
     {
         [Required]
         [Key]
+        [Editable(true)]
         public int ID { get; set; }
 
         [Required]

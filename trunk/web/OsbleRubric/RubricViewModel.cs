@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -13,6 +14,7 @@ using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.Courses;
 
 using System.ServiceModel.DomainServices.Client;
+using OSBLE.Models.AbstractCourses;
 
 namespace OsbleRubric
 {
@@ -27,9 +29,28 @@ namespace OsbleRubric
 
         private int currentCourseId = 0;
         private RubricRiaContext context = new RubricRiaContext();
-        private OSBLE.Models.Courses.AbstractCourse activeCourse = null;
+        private AbstractCourse activeCourse = null;
+
+        //icky global variable needed to store rubric information between
+        //asynchronous server callbacks
+        private List<CellDescription> cellDescriptions = new List<CellDescription>();
+        private List<Criterion> criteria = new List<Criterion>();
+        private List<Level> levels = new List<Level>();
+
+        private AbstractCourse ActiveCourse
+        {
+            get
+            {
+                return activeCourse;
+            }
+            set
+            {
+                currentCourseId = value.ID;
+                activeCourse = value;
+            }
+        }
         private Rubric selectedRubric = new Rubric();
-        
+
         #endregion Attributes
 
         #region constants
@@ -130,47 +151,103 @@ namespace OsbleRubric
             adjustArrowIcons();
         }
 
-        void RubricComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (thisView.RubricComboBox.SelectedItem is OSBLE.Models.Courses.Rubrics.Rubric)
-            {
-                OSBLE.Models.Courses.Rubrics.Rubric rubric = thisView.RubricComboBox.SelectedItem as OSBLE.Models.Courses.Rubrics.Rubric;
-                thisView.RubricDescriptionTextBox.Text = rubric.Description;
-                selectedRubric = rubric;
-                //BuildGridFromRubric(rubric);
-            }
-        }
-
         /// <summary>
         /// Whenever the course combo box changes, we need to update our list of rubrics
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void CourseComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        void CourseComboBox_SelectionChanged(object sender, EventArgs e)
         {
-            if (thisView.CourseComboBox.SelectedItem is OSBLE.Models.Courses.AbstractCourse)
+            if (thisView.CourseComboBox.SelectedItem is AbstractCourse)
             {
-                OSBLE.Models.Courses.AbstractCourse course = thisView.CourseComboBox.SelectedItem as OSBLE.Models.Courses.AbstractCourse;
+                AbstractCourse course = thisView.CourseComboBox.SelectedItem as AbstractCourse;
                 context.Load(context.GetRubricsForCourseQuery(course.ID)).Completed += new EventHandler(GetRubricsComplete);
             }            
         }
 
         void GetRubricsComplete(object sender, EventArgs e)
         {
-            if (sender is LoadOperation<OSBLE.Models.Courses.Rubrics.Rubric>)
+            if (sender is LoadOperation<Rubric>)
             {
                 thisView.RubricComboBox.Items.Clear();
-                OSBLE.Models.Courses.Rubrics.Rubric rubric = new OSBLE.Models.Courses.Rubrics.Rubric();
+                Rubric rubric = new Rubric();
                 rubric.ID = 0;
                 rubric.Description = "--Create New Rubric--";
                 thisView.RubricComboBox.Items.Insert(0, rubric);
 
-                LoadOperation<OSBLE.Models.Courses.Rubrics.Rubric> load = sender as LoadOperation<OSBLE.Models.Courses.Rubrics.Rubric>;
-                foreach (OSBLE.Models.Courses.Rubrics.Rubric r in load.Entities)
+                LoadOperation<Rubric> load = sender as LoadOperation<Rubric>;
+                foreach (Rubric r in load.Entities)
                 {
                     thisView.RubricComboBox.Items.Add(r);
                 }
-                thisView.RubricComboBox.SelectedIndex = 0;
+                if (selectedRubric.ID == 0)
+                {
+                    thisView.RubricComboBox.SelectedIndex = 0;
+                }
+                else
+                {
+                    foreach (object item in thisView.RubricComboBox.Items)
+                    {
+                        if ((item as Rubric).ID == selectedRubric.ID)
+                        {
+                            thisView.RubricComboBox.SelectedItem = item;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called after the user changes the current rubric.  
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void RubricComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (thisView.RubricComboBox.SelectedItem is Rubric)
+            {
+                Rubric rubric = thisView.RubricComboBox.SelectedItem as Rubric;
+                thisView.RubricDescriptionTextBox.Text = rubric.Description;
+                selectedRubric = rubric;
+                context.RubricHasEvaluations(rubric.ID).Completed += new EventHandler(RubricHasEvaluationsComplete);
+                context.Load(context.GetCellDescriptionsQuery(rubric.ID)).Completed += new EventHandler(CellDescriptionsLoaded);
+            }
+        }
+
+        void CellDescriptionsLoaded(object sender, EventArgs e)
+        {
+            if (sender is LoadOperation<CellDescription>)
+            {
+                LoadOperation<CellDescription> load = sender as LoadOperation<CellDescription>;
+                cellDescriptions.Clear();
+                foreach (CellDescription desc in load.Entities)
+                {
+                    cellDescriptions.Add(desc);
+                }
+                BuildGridFromRubric(selectedRubric, cellDescriptions);
+            }
+        }
+
+        /// <summary>
+        /// Rubrics that have evaluations attached to them cannot be edited as it would
+        /// mess up any existing evaluations.  When this is the case, we can rename the
+        /// rubric to xxx (copy) and reset the rubric ID which will cause the system
+        /// to insert a new record rather than updating an existing one.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void RubricHasEvaluationsComplete(object sender, EventArgs e)
+        {
+            if (sender is InvokeOperation<bool>)
+            {
+                InvokeOperation<bool> result = sender as InvokeOperation<bool>;
+
+                if (result.Value)
+                {
+                    selectedRubric.ID = 0;
+                    thisView.RubricDescriptionTextBox.Text += " (copy)";
+                }
             }
         }
 
@@ -182,15 +259,15 @@ namespace OsbleRubric
         /// <param name="e"></param>
         void GetActiveCourseComplete(object sender, EventArgs e)
         {
-            if(sender is LoadOperation<OSBLE.Models.Courses.AbstractCourse>)
+            if(sender is LoadOperation<AbstractCourse>)
             {
-                LoadOperation<OSBLE.Models.Courses.AbstractCourse> load = sender as LoadOperation<OSBLE.Models.Courses.AbstractCourse>;
+                LoadOperation<AbstractCourse> load = sender as LoadOperation<AbstractCourse>;
                 
                 //there's only one in here, but it's far easier to just do a loop rather than
                 //pull out the item from the enumeration.
                 foreach (OSBLE.Models.Courses.AbstractCourse course in load.Entities)
                 {
-                    activeCourse = course;
+                    ActiveCourse = course;
                 }
             }
 
@@ -199,8 +276,8 @@ namespace OsbleRubric
             {
                 if (item is OSBLE.Models.Courses.AbstractCourse)
                 {
-                    OSBLE.Models.Courses.AbstractCourse course = item as OSBLE.Models.Courses.AbstractCourse;
-                    if (course.ID == activeCourse.ID)
+                    AbstractCourse course = item as AbstractCourse;
+                    if (course.ID == ActiveCourse.ID)
                     {
                         thisView.CourseComboBox.SelectedItem = item;
                         return;
@@ -1334,16 +1411,16 @@ namespace OsbleRubric
             {
                 rubric = selectedRubric;
             }
+            else
+            {
+                selectedRubric = rubric;
+            }
             rubric.HasCriteriaComments = false;
             rubric.HasGlobalComments = false;
             rubric.Description = thisView.RubricDescriptionTextBox.Text;
 
-            List<Criterion> Criteria = new List<Criterion>();
-            List<Level> Levels = new List<Level>();
-            List<CellDescription> CellDescriptions = new List<CellDescription>();
-
             //loop through all of our data
-            foreach(ICell cell in this.dataFromCells)
+            foreach (ICell cell in this.dataFromCells)
             {
 
                 //there should only be two checkbox values.  One to enable column comments and one
@@ -1353,44 +1430,77 @@ namespace OsbleRubric
                     CheckBoxCell cb = cell as CheckBoxCell;
                     if (cell.Information.CompareTo(CheckboxValues.ColumnComment.ToString()) == 0)
                     {
-                        rubric.HasCriteriaComments = cb.CheckBoxValue;
+                        selectedRubric.HasCriteriaComments = cb.CheckBoxValue;
                     }
                     else if (cell.Information.CompareTo(CheckboxValues.GlobalComment.ToString()) == 0)
                     {
-                        rubric.HasGlobalComments = cb.CheckBoxValue;
+                        selectedRubric.HasGlobalComments = cb.CheckBoxValue;
                     }
 
                     //Because checkbox cells don't contain any data, we can just continue on
                     //to the next item in our collection
                     continue;
                 }
+            }
+
+            if (rubric.ID < 1)
+            {
+                context.Rubrics.Add(rubric);
+            }
+            context.SubmitChanges().Completed += new EventHandler(SaveRubricInternals);
+        }
+
+        /// <summary>
+        /// After saving the initial rubric, we can now save the "internals" of the rubric:
+        ///    Levels
+        ///    Criteria
+        ///    Cell Descriptions (happens in stage 3)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void SaveRubricInternals(object sender, EventArgs e)
+        {
+            criteria = new List<Criterion>();
+            levels = new List<Level>();
+            cellDescriptions = new List<CellDescription>();
+
+            //loop through all of our data
+            foreach (ICell cell in this.dataFromCells)
+            {
+
+                if (cell is CheckBoxCell)
+                {
+                    continue;
+                }
 
                 //Unfortunately, our data is scattered all over the place.  As such, we really
                 //don't know the dimensions of our rubric.  As a little hack, we can
                 //just create new rows & columns based on the current cell
-                while (Levels.Count - 1 < cell.Column)
+                while (levels.Count - 1 < cell.Column)
                 {
                     Level l = new Level();
-                    l.ID = Levels.Count;
+                    l.ID = 0; //Levels.Count;
                     l.LevelTitle = "No Title";
                     l.RangeEnd = 0;
                     l.RangeStart = 0;
-                    Levels.Add(l);
+                    l.RubricID = selectedRubric.ID;
+                    levels.Add(l);
                 }
-                while (Criteria.Count - 1 < cell.Row)
+                while (criteria.Count - 1 < cell.Row)
                 {
                     Criterion crit = new Criterion();
                     crit.CriterionTitle = "No Title";
                     crit.Weight = 0;
-                    crit.ID = Criteria.Count;
-                    Criteria.Add(crit);
+                    crit.ID = 0; //Criteria.Count;
+                    crit.RubricID = selectedRubric.ID;
+                    criteria.Add(crit);
                 }
 
                 //header cells are analogous to Levels
                 if (cell is HeaderCell)
                 {
                     HeaderCell header = cell as HeaderCell;
-                    Level currentLevel = Levels[header.Column];
+                    Level currentLevel = levels[header.Column];
                     currentLevel.RangeStart = 0;
                     currentLevel.RangeEnd = header.ComboBoxValue;
                     currentLevel.LevelTitle = header.Information;
@@ -1400,19 +1510,19 @@ namespace OsbleRubric
                 else if (cell is RubricCell)
                 {
                     RubricCell currentCell = cell as RubricCell;
-                    
+
                     //huge assumptions: column 0 is the criterion title
                     //                  column 1 is the point spread for the criterion
                     //otherwise, we have a cell description
                     if (currentCell.Column == 0)
                     {
-                        Criteria[currentCell.Row].CriterionTitle = cell.Information;
+                        criteria[currentCell.Row].CriterionTitle = cell.Information;
                     }
                     else if (currentCell.Column == 1)
                     {
                         double someDouble = 0.0;
                         double.TryParse(currentCell.Information, out someDouble);
-                        Criteria[currentCell.Row].Weight = someDouble;
+                        criteria[currentCell.Row].Weight = someDouble;
                     }
                     else
                     {
@@ -1420,8 +1530,8 @@ namespace OsbleRubric
                         desc.CriterionID = currentCell.Row;
                         desc.LevelID = currentCell.Column;
                         desc.Description = currentCell.Information;
-                        CellDescriptions.Add(desc);
-                    }   
+                        cellDescriptions.Add(desc);
+                    }
                 }
             }
 
@@ -1429,19 +1539,50 @@ namespace OsbleRubric
             //and a list of cell descriptions for each.  Because I'm using the Row & Column info from 
             //the data cells, our final rubric will have one empy criterion and two empty levels.  
             //Remove these manually
-            Levels.RemoveAt(1);
-            Levels.RemoveAt(0);
-            Criteria.RemoveAt(0);
+            levels.RemoveAt(1);
+            levels.RemoveAt(0);
+            criteria.RemoveAt(0);
 
-            //if the rubric doesn't have an ID, then we need to add it to the context,
-            //otherwise, RIA magic should take care of updating.
-            if (rubric.ID < 1)
+            //save the levels and criteria
+            foreach (Level l in levels)
             {
-                context.Rubrics.Add(rubric);
+                context.Levels.Add(l);
             }
-            context.SubmitChanges();
+            foreach (Criterion c in criteria)
+            {
+                context.Criterions.Add(c);
+            }
 
-            //client.SaveRubricAsync(currentCourseId, rubric);
+            //attach the rubric to the current course
+            CourseRubric cr = new CourseRubric();
+            cr.RubricID = selectedRubric.ID;
+            cr.AbstractCourseID = ActiveCourse.ID;
+            context.CourseRubrics.Add(cr);
+
+            context.SubmitChanges().Completed += new EventHandler(SaveCellDescriptions);
+        }
+
+        /// <summary>
+        /// Stage 3 in rubric saving.  With all other pieces now having a
+        /// shiny-new ID number, we can finally attach cell descriptions to the rubric
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void SaveCellDescriptions(object sender, EventArgs e)
+        {
+            foreach (CellDescription desc in cellDescriptions)
+            {
+                Criterion crit = criteria[desc.CriterionID - 1];
+                Level level = levels[desc.LevelID - 2];
+                desc.CriterionID = crit.ID;
+                desc.Criterion = crit;
+                desc.LevelID = level.ID;
+                desc.Level = level;
+                context.CellDescriptions.Add(desc);
+            }
+
+            //save changes & refresh the rubrics list
+            context.SubmitChanges().Completed += new EventHandler(CourseComboBox_SelectionChanged);
         }
 
         /// <summary>

@@ -12,6 +12,7 @@ namespace OSBLE.Services
     using System.ServiceModel.DomainServices.Server;
     using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
+using OSBLE.Models.AbstractCourses;
 
 
     // Implements application logic using the OsbleEntities context.
@@ -42,6 +43,28 @@ using OSBLE.Models.Courses.Rubrics;
             throw new NotImplementedException("You're not supposed to use this!");
         }
 
+        public CourseRubric DummyCourseRubric()
+        {
+            throw new NotImplementedException("You're not supposed to use this!");
+        }
+
+        public AbstractCourse GetActiveCourse()
+        {
+            return currentCourse;
+        }
+
+        public IQueryable<CellDescription> GetCellDescriptions(int rubricId)
+        {
+            List<CellDescription> cellDesc = (from desc in db.LevelDescriptions
+                                              join level in db.Levels on desc.LevelID equals level.ID
+                                              join crit in db.Criteria on desc.CriterionID equals crit.ID
+                                              where level.RubricID == rubricId
+                                              &&
+                                              crit.RubricID == rubricId
+                                              select desc).ToList();
+            return cellDesc.AsQueryable();
+        }
+
         public IQueryable<AbstractCourse> GetCourses()
         {
             var courses = from course in db.AbstractCourses
@@ -57,11 +80,6 @@ using OSBLE.Models.Courses.Rubrics;
             return courses.AsQueryable();
         }
 
-        public AbstractCourse GetActiveCourse()
-        {
-            return currentCourse;
-        }
-
         public IQueryable<Rubric> GetRubricsForCourse(int courseId)
         {
             var rubrics = from rubric in db.Rubrics
@@ -71,14 +89,101 @@ using OSBLE.Models.Courses.Rubrics;
             return rubrics.AsQueryable();
         }
 
-        public void AddRubric(Rubric rubric)
+        [Insert]
+        public void AddCourseRubric(CourseRubric courseRubric)
         {
-            //rubric.
+            //make sure that the association doesn't already exist
+            int count = (from cr in db.CourseRubrics
+                          where cr.RubricID == courseRubric.RubricID
+                          &&
+                          cr.AbstractCourseID == courseRubric.AbstractCourseID
+                          select cr).Count();
+            if (count == 0)
+            {
+                db.CourseRubrics.Add(courseRubric);
+                db.SaveChanges();
+            }
         }
 
-        public void EditRubric(Rubric rubric)
+        [Insert]
+        public void AddCellDescription(CellDescription desc)
         {
-            return;
+            Criterion crit = (from c in db.Criteria where c.ID == desc.CriterionID select c).FirstOrDefault();
+            crit.Rubric.CellDescriptions.Add(desc);
+            db.Entry(crit.Rubric).State = EntityState.Modified;
+            db.SaveChanges();
+        }
+
+        [Delete]
+        public void DeleteCellDescription(CellDescription desc)
+        {
+            db.LevelDescriptions.Remove(desc);
+            db.SaveChanges();
+        }
+
+        [Insert]
+        public void AddCriterion(Criterion crit)
+        {
+            db.Criteria.Add(crit);
+            db.SaveChanges();
+        }
+
+        [Insert]
+        public void AddLevel(Level level)
+        {
+            db.Levels.Add(level);
+            db.SaveChanges();
+        }
+
+        [Insert]
+        public void AddRubric(Rubric rubric)
+        {
+            db.Rubrics.Add(rubric);
+            db.SaveChanges();
+        }
+
+        [Update]
+        public void UpdateRubric(Rubric rubric)
+        {
+            db.Entry(rubric).State = EntityState.Modified;
+
+            //when updating a rubric, we must thow away any existing levels, criteria,
+            //and cell descriptions
+            List<Level> levels = (from l in db.Levels where l.RubricID == rubric.ID select l).ToList();
+            List<Criterion> criteria = (from c in db.Criteria where c.RubricID == rubric.ID select c).ToList();
+            List<CellDescription> cellDesc = (from desc in db.LevelDescriptions
+                                              join level in db.Levels on desc.LevelID equals level.ID
+                                              join crit in db.Criteria on desc.CriterionID equals crit.ID
+                                              where level.RubricID == rubric.ID
+                                              &&
+                                              crit.RubricID == rubric.ID
+                                              select desc).ToList();
+            foreach (Level l in levels)
+            {
+                db.Levels.Remove(l);
+            }
+            foreach (Criterion c in criteria)
+            {
+                db.Criteria.Remove(c);
+            }
+            foreach (CellDescription d in cellDesc)
+            {
+                db.LevelDescriptions.Remove(d);
+            }
+
+            db.SaveChanges();
+        }
+
+        public bool RubricHasEvaluations(int rubricId)
+        {
+            int items = (from e in db.RubricEvaluations
+                         where e.AssignmentActivity.AbstractAssignment.Rubric.ID == rubricId
+                         select e).Count();
+            if (items > 0)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

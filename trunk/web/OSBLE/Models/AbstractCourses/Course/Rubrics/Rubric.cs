@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ServiceModel.DomainServices.Server;
+using System.ComponentModel;
 
 namespace OSBLE.Models.Courses.Rubrics
 {
@@ -8,6 +9,7 @@ namespace OSBLE.Models.Courses.Rubrics
     {
         [Required]
         [Key]
+        [Editable(true)]
         public int ID { get; set; }
 
         [Required]

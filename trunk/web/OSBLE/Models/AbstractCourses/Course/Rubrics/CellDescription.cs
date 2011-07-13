@@ -14,6 +14,7 @@ namespace OSBLE.Models.Courses.Rubrics
         [Column(Order = 0)]
         public int CriterionID { get; set; }
 
+        [Association("Criterion", "CriterionID", "ID")]
         public virtual Criterion Criterion { get; set; }
 
         [Required]
@@ -21,6 +22,7 @@ namespace OSBLE.Models.Courses.Rubrics
         [Column(Order = 1)]
         public int LevelID { get; set; }
 
+        [Association("Level", "LevelID", "ID")]
         public virtual Level Level { get; set; }
 
         [Required]
