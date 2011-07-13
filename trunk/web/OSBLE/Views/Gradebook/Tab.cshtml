@@ -130,7 +130,7 @@
         width: 500px;
     }
     
-    #XtoDrop
+    #XtoDrop, #XtoTake
     {
         width: 45px;
     }
@@ -138,6 +138,18 @@
     #XtoAdd
     {
         width: 60px;
+    }
+    
+    #CompAverage_radio, #XtoDrop_radio, #XtoTake_radio
+    {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+    
+    #dropLowest_btns
+    {
+        margin-top: 10px;
+        float: right;
     }
     
 </style>
@@ -236,13 +248,28 @@
 
 <div class="customize" id="customizeID" style="display:none" title="Drop Lowest">
 	<form id="dropLowestSubmit" onsubmit="dropAllLowest(); return false;"  >
-		<text>Drop lowest</text>
+        
+        <input id="CompAverage_radio" name="customize_radio" type="radio" checked="checked" />
+        <text>Compute Average of Scores</text>
+        <br />
+		
+        <input id="XtoDrop_radio" name="customize_radio" type="radio" /> 
+        <text>Drop lowest</text>
 		<input id="XtoDrop"/>
 		<text>from category.</text>
         <br />
-		    
-		<td align="right" colspan="3"><input id="dropLowestSubmit" type="submit" onclick="hideFunctions();" value="Apply"/></td>
-        <td align="right" colspan="3"><input id="dropLowestCancel" type="button" onclick="hideFunctions();" value="Cancel" /></td>
+
+        <input id="XtoTake_radio" name="customize_radio" type="radio" />
+        <text>Take heighest</text>
+        <input id="XtoTake" />
+        <text>from category.</text>
+        <br />
+
+		<div id="dropLowest_btns">    
+		    <input id="dropLowestSubmit" type="submit" onclick="hideFunctions();" value="Apply" />
+            <input id="dropLowestCancel" type="button" onclick="hideFunctions();" value="Cancel" />
+        </div>
+
     </form>
 </div>
 
@@ -582,8 +609,7 @@
 
             modal: true,
             resizable: false,
-            width: 290,
-            height: 120,
+            width: 310,
             closeOnEscape: false
         });
 
