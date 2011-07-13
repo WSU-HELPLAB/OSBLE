@@ -898,24 +898,28 @@
         }
     }
 
+    function clearRowColumnHeader() {
+        $("#grades tr").each(function () {
+            $(this).find("td").each(function () {
+                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                    $(this).css("background-color", "#DCDCDC");
+                    $(this).find("div").css("background-color", "#DCDCDC");
+                    $(this).attr("onmouseout", "hideButton(this);");
+                }
+                else {
+
+                }
+            });
+        });
+    }
 
     function clearLastCellFocus() {
 
         //if a prior cell has already received focus in the past, we need to turn it back into
         //a normal table cell
         if (lastFocusedCell != null) {
-            $("#grades tr").each(function () {
-                $(this).find("td").each(function () {
-                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-                        $(this).css("background-color", "#DCDCDC");
-                        $(this).find("div").css("background-color", "#DCDCDC");
-                        $(this).attr("onmouseout", "hideButton(this);");
-                    }
-                    else {
 
-                    }
-                });
-            });
+            clearRowColumnHeader();
 
             var catId = lastFocusedCell.attr("id").split("-");
             var cellValue = lastFocusedCell.children().val();
@@ -973,18 +977,8 @@
 
     function clearLastAssignmentFocus() {
         if (lastFocusedAssignment != null) {
-            $("#grades tr").each(function () {
-                $(this).find("td").each(function () {
-                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-                        $(this).css("background-color", "#DCDCDC");
-                        $(this).find("div").css("background-color", "#DCDCDC");
-                        $(this).attr("onmouseout", "hideButton(this);");
-                    }
-                    else {
 
-                    }
-                });
-            });
+            clearRowColumnHeader();
 
             newCategoryId = lastFocusedAssignment.attr("id");
             var cellValue = lastFocusedAssignment.children().val();
@@ -1291,10 +1285,10 @@
     function moveRight(header) {
 
         var id = header.id.split("-");
-        alert(id);
+        alert(id[1]);
         $.ajax({
             type: "POST",
-            url: "/Gradebook/MoveRight",
+            url: "/Gradebook/MoveCategoryRight",
             data: { categoryId: id[1] },
             success: function (response) {
                 $("#grades").replaceWith(response);
@@ -1305,10 +1299,11 @@
     function moveLeft(header) {
 
         var id = header.id.split("-");
+        alert(id[1]);
 
         $.ajax({
             type: "POST",
-            url: "/Gradebook/MoveLeft",
+            url: "/Gradebook/MoveCategoryLeft",
             data: { categoryId: id[1] },
             success: function (response) {
                 $("#grades").replaceWith(response);

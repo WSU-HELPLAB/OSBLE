@@ -950,6 +950,76 @@ namespace OSBLE.Controllers
            return View("_Gradebook");
        }
 
+       [HttpPost]
+       public ActionResult MoveCategoryRight(int categoryId)
+       {
+           if (ModelState.IsValid)
+           {
+               if (categoryId > 0)
+               {
+                   var categoryColPosition = from col in db.Categories
+                                             where col.ID == categoryId 
+                                             select col;
+                   if (categoryColPosition.Count() > 0)
+                   {
+                       int nextCol = Convert.ToInt32(categoryColPosition.First().ColumnOrder) + 1;
+                       int courseId = Convert.ToInt32(categoryColPosition.First().CourseID);
+
+                       var prevAssignmentColPosition = from next in db.Categories
+                                                       where next.ColumnOrder >= nextCol &&
+                                                       next.CourseID == courseId
+                                                       orderby next.ColumnOrder 
+                                                       select next;
+
+                       if (prevAssignmentColPosition.Count() > 0)
+                       {
+                           int tempCol = categoryColPosition.First().ColumnOrder;
+                           categoryColPosition.First().ColumnOrder = prevAssignmentColPosition.First().ColumnOrder;
+                           prevAssignmentColPosition.First().ColumnOrder = tempCol;
+
+                           db.SaveChanges();
+                       }
+                   }
+               }
+           }
+           return View("index");
+       }
+
+       [HttpPost]
+       public ActionResult MoveCategoryLeft(int categoryId)
+       {
+           if (ModelState.IsValid)
+           {
+               if (categoryId > 0)
+               {
+                   var categoryColPosition = from col in db.Categories
+                                               where col.ID == categoryId
+                                               select col;
+                   if (categoryColPosition.Count() > 0)
+                   {
+                       int prevCol = Convert.ToInt32(categoryColPosition.First().ColumnOrder) - 1;
+                       int courseId = Convert.ToInt32(categoryColPosition.First().CourseID);
+
+                       var prevAssignmentColPosition = from next in db.Categories
+                                                       where next.ColumnOrder <= prevCol && 
+                                                       next.CourseID == courseId
+                                                       orderby next.ColumnOrder descending
+                                                       select next;
+
+                       if (prevAssignmentColPosition.Count() > 0)
+                       {
+                           int tempCol = categoryColPosition.First().ColumnOrder;
+                           categoryColPosition.First().ColumnOrder = prevAssignmentColPosition.First().ColumnOrder;
+                           prevAssignmentColPosition.First().ColumnOrder = tempCol;
+
+                           db.SaveChanges();
+                       }
+                   }
+               }
+           }
+           return View("index");
+       }
+
 
        [HttpPost]
        public ActionResult ModifyCell(double value, string userId, int assignmentId)

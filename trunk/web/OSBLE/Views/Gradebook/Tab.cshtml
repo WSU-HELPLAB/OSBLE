@@ -634,19 +634,8 @@
 
         //if a header already had focus then we need to change it back and display text
         if (lastFocusedCell != null) {
-            $("#grades tr").each(function () {
-                $(this).find("td").each(function () {
-                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-                        $(this).css("background-color", "#DCDCDC");
-                        $(this).find("div").css("background-color", "#DCDCDC");
-                        $(this).attr("onmouseout", "hideButton(this);");
-                        onMouseOver = false;
-                    }
-                    else {
 
-                    }
-                });
-            });
+            clearRowColumnHeader();
 
             var cellValue = lastFocusedCell.children().val();
             var cellID = lastFocusedCell.attr("id").split("-");
@@ -721,24 +710,29 @@
         selectRowColumnHeaderOfSelected(someHeader);
     }
 
+    function clearRowColumnHeader() {
+        $("#grades tr").each(function () {
+            $(this).find("td").each(function () {
+                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                    $(this).css("background-color", "#DCDCDC");
+                    $(this).find("div").css("background-color", "#DCDCDC");
+                    $(this).attr("onmouseout", "hideButton(this);");
+                }
+                else {
+
+                }
+            });
+        });
+    }
+
     function clearLastCellFocus(evt) {
 
         //if a prior cell has already received focus in the past, we need to turn it back into
         //a normal table cell
         if (lastFocusedCell != null) {
-            $("#grades tr").each(function () {
-                $(this).find("td").each(function () {
-                    if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-                        $(this).css("background-color", "#DCDCDC");
-                        $(this).find("div").css("background-color", "#DCDCDC");
-                        $(this).attr("onmouseout", "hideButton(this);");
-                        onMouseOver = false;
-                    }
-                    else {
+            
+            clearRowColumnHeader();
 
-                    }
-                });
-            });
             //The ID's will be stored in ajaxId's array.
             //ajaxIDs[0] = userId
             //ajaxIds[1] = gradableId
@@ -1297,7 +1291,6 @@
     function moveRight(header) {
 
         var id = header.id.split("-");
-
         $.ajax({
             type: "POST",
             url: "/Gradebook/MoveRight",
@@ -1311,7 +1304,6 @@
     function moveLeft(header) {
 
         var id = header.id.split("-");
-
         $.ajax({
             type: "POST",
             url: "/Gradebook/MoveLeft",
