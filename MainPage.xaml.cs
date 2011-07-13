@@ -28,13 +28,24 @@ namespace FileUploader
             //event handlers
             login.ValidTokenReceived += new EventHandler(ValidTokenReceived);
             InstallButton.Click += new RoutedEventHandler(InstallButton_Click);
-
+            this.KeyDown += new KeyEventHandler(MainPage_KeyDown);
             if (Application.Current.IsRunningOutOfBrowser)
             {
                 InstallButton.Visibility = System.Windows.Visibility.Collapsed;
                 login.Show();
             }
 
+        }
+        void MainPage_KeyDown(object sender, KeyEventArgs e)
+        {
+            //CTRL + V = display version number
+            if (e.Key == Key.V)
+            {
+                if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+                {
+                    MessageBox.Show("File Uploader version " + (App.Current as FileUploader.App).VersionNumber);
+                }
+            }
         }
 
         void InstallButton_Click(object sender, RoutedEventArgs e)
