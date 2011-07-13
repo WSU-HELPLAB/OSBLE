@@ -1519,8 +1519,9 @@ namespace OSBLE.Controllers
 
            //pull all weights (tabs) for the current course
            var cats = from category in db.Categories
-                            where category.CourseID == currentCourseId
-                            select category;
+                      where category.CourseID == currentCourseId
+                      orderby category.ColumnOrder
+                      select category;
 
            List<Category> allCategories = cats.ToList();
 

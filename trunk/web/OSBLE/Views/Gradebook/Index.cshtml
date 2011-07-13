@@ -270,42 +270,42 @@
             <td><a style="cursor:pointer" onclick="deleteCategory();">Delete Category</a></td>
         </tr>
         <tr>
-			<td id="changeColor" onmouseover="displayColors(this);"><a style="cursor:pointer">Change Category Color</a></td>
+			<td id="changeColor" ><a id="changeColorId" style="cursor:pointer" onmouseover="displayColors(this);">Change Category Color</a></td>
 		</tr>
 	</table>
 </div>
 
-<div class="displayColors" id="displayColorsID" style="display: none; position: absolute;">
+<div class="displayColors" id="displayColorsID" style="display: none; position: absolute;" onmouseover="displayColors(this);" onmouseout="hideDisplayColors();">
     <table class="displayColorsTable">
 		<tr>
 		    <th align="center" colspan="3">Colors</th>
 		</tr>
 		<tr>
-			<td style="background:Silver;"><a href"#" onclick="changeColor('Silver');">Silver</a></td>
+			<td style="background:Silver;"><a style="cursor:pointer;" href"#" onclick="changeColor('Silver');">Silver</a></td>
 		</tr>
         <tr>
-			<td style="background:Tomato;"><a href"#" onclick="changeColor('Tomato');">Red</a></td>
+			<td style="background:Tomato;"><a style="cursor:pointer;" href"#" onclick="changeColor('Tomato');">Red</a></td>
 		</tr>
         <tr>
-			<td style="background:LightBlue;"><a href"#" onclick="changeColor('LightBlue');">Blue</a></td>
+			<td style="background:LightBlue;"><a style="cursor:pointer;" href"#" onclick="changeColor('LightBlue');">Blue</a></td>
 		</tr>
         <tr>
-			<td style="background:SpringGreen;"><a href"#" onclick="changeColor('SpringGreen');">Green</a></td>
+			<td style="background:SpringGreen;"><a style="cursor:pointer;" href"#" onclick="changeColor('SpringGreen');">Green</a></td>
 		</tr>
         <tr>
-			<td style="background:BurlyWood;"><a href"#" onclick="changeColor('BurlyWood');">Brown</a></td>
+			<td style="background:BurlyWood;"><a style="cursor:pointer;" href"#" onclick="changeColor('BurlyWood');">Brown</a></td>
 		</tr>
         <tr>
-			<td style="background:Yellow;"><a href"#" onclick="changeColor('Yellow');">Yellow</a></td>
+			<td style="background:Yellow;"><a style="cursor:pointer;" href"#" onclick="changeColor('Yellow');">Yellow</a></td>
 		</tr>
         <tr>
-			<td style="background:Plum;"><a href"#" onclick="changeColor('Plum');">Purple</a></td>
+			<td style="background:Plum;"><a style="cursor:pointer;" href"#" onclick="changeColor('Plum');">Purple</a></td>
         </tr>
         <tr>
-			<td style="background:Orange;"><a href"#" onclick="changeColor('Orange');">Orange</a></td>
+			<td style="background:Orange;"><a style="cursor:pointer;" href"#" onclick="changeColor('Orange');">Orange</a></td>
         </tr>
         <tr>
-			<td style="background:Pink;"><a href"#" onclick="changeColor('Pink');">Pink</a></td>
+			<td style="background:Pink;"><a style="cursor:pointer;" href"#" onclick="changeColor('Pink');">Pink</a></td>
 		</tr>
 	</table>
 </div>
@@ -510,6 +510,15 @@
 
             List<LetterGrade> letterList = (from lg in ViewBag.LetterGrades as IEnumerable<LetterGrade>
                                             select lg).ToList();
+
+            bool categoryHasPoints = false;
+            foreach (Category category in ViewBag.Categories)
+            {
+                if (category.Points != 0)
+                {
+                    categoryHasPoints = true;
+                }
+            }
         }
         <!--loop through all users -->
         @foreach (OSBLE.Models.Users.UserProfile student in ViewBag.Students)
@@ -543,14 +552,13 @@
                                        where total.TeamUserMember.Contains(student) &&
                                        total.Points >= 0
                                        select total).ToList();
-
-
+            
 
             if (totalOfCats.Count() > 0)
             {
                 for (int i = 0; i < totalOfCats.Count(); i++)
                 {
-                    if (totalCategoryPoints == 0)
+                    if (categoryHasPoints == false)
                     {
                         totalGrade += totalOfCats[i].Points;
 
@@ -564,9 +572,14 @@
                 }
                 
             }
-
-
-            totalPercent = (totalGrade / totalPossible) * 100;
+            if (categoryHasPoints == false)
+            {
+                totalPercent = (totalGrade / totalPossible) * 100;
+            }
+            else
+            {
+                totalPercent = (totalGrade / totalPossible) * 100;
+            }
             if (totalPercent > 0)
             {
                 totalAverage += totalPercent;
@@ -841,18 +854,17 @@
         var container = position.id;
         //alert(container);
         //aligning the menu under the buttons
-        x = $("#" + container).position().left;
-        y = $("#" + container).position().top;
-        y += 9;
-        //alert(x);
-        //alert(y);
+        x = $("#selectMenuID").position().left;
+        y = $("#selectMenuID").position().top;
+        y += 179;
+        x += 173;
 
         //Moving the menu to the button that clicked it
         $("#displayColorsID").css("left", x + "px");
         $("#displayColorsID").css("top", y + "px");
 
         //Animation for menu
-        $("#displayColorsID").animate({ "height": "show" }, { duration: 300 });
+        $("#displayColorsID").animate({ "height": "show" }, { duration: 0 });
         tabShowing = true;
     }
 
@@ -876,6 +888,10 @@
 
     function hideTabColors() {
         $("#selectMenuID").animate({ "height": "hide" }, { duration: 0 });
+        $("#displayColorsID").animate({ "height": "hide" }, { duration: 0 });
+    }
+
+    function hideDisplayColors() {
         $("#displayColorsID").animate({ "height": "hide" }, { duration: 0 });
     }
 
