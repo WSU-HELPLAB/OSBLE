@@ -11,6 +11,7 @@ using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments;
 using System.IO;
 using System.Web;
+using OSBLE.Utility;
 
 namespace OSBLE.Controllers
 {
@@ -695,6 +696,7 @@ namespace OSBLE.Controllers
            var currentCourseId = ActiveCourse.AbstractCourseID;
            var numTabs = from cats in db.Categories
                          where cats.CourseID == currentCourseId
+                         orderby cats.ColumnOrder descending
                          select cats;
            int colorCount = numTabs.Count();
            string color = null;
@@ -752,16 +754,14 @@ namespace OSBLE.Controllers
                Name = name,
                CourseID = currentCourseId,
                Points = 0,
-               ColumnOrder = 0,
+               ColumnOrder = numTabs.First().ColumnOrder + 1,
                Assignments = new List<AbstractAssignment>(),
                TabColor = color
            };
+
            db.Categories.Add(newCategory);
            db.SaveChanges();
-           Tab(newCategory.ID);
-
-           Tab((int)Session["categoryId"]);
-           return View("_Tabs");
+           return View("Index");
        }
 
        [HttpPost]
@@ -965,24 +965,24 @@ namespace OSBLE.Controllers
                        int nextCol = Convert.ToInt32(categoryColPosition.First().ColumnOrder) + 1;
                        int courseId = Convert.ToInt32(categoryColPosition.First().CourseID);
 
-                       var prevAssignmentColPosition = from next in db.Categories
+                       var nextCategoryColPosition = from next in db.Categories
                                                        where next.ColumnOrder >= nextCol &&
                                                        next.CourseID == courseId
                                                        orderby next.ColumnOrder 
                                                        select next;
 
-                       if (prevAssignmentColPosition.Count() > 0)
+                       if (nextCategoryColPosition.Count() > 0)
                        {
                            int tempCol = categoryColPosition.First().ColumnOrder;
-                           categoryColPosition.First().ColumnOrder = prevAssignmentColPosition.First().ColumnOrder;
-                           prevAssignmentColPosition.First().ColumnOrder = tempCol;
+                           categoryColPosition.First().ColumnOrder = nextCategoryColPosition.First().ColumnOrder;
+                           nextCategoryColPosition.First().ColumnOrder = tempCol;
 
                            db.SaveChanges();
                        }
                    }
                }
            }
-           return View("index");
+           return View("Index");
        }
 
        [HttpPost]
@@ -1000,24 +1000,25 @@ namespace OSBLE.Controllers
                        int prevCol = Convert.ToInt32(categoryColPosition.First().ColumnOrder) - 1;
                        int courseId = Convert.ToInt32(categoryColPosition.First().CourseID);
 
-                       var prevAssignmentColPosition = from next in db.Categories
+                       var prevCategoryColPosition = from next in db.Categories
                                                        where next.ColumnOrder <= prevCol && 
-                                                       next.CourseID == courseId
+                                                       next.CourseID == courseId && 
+                                                       next.Name != Constants.UnGradableCatagory
                                                        orderby next.ColumnOrder descending
                                                        select next;
 
-                       if (prevAssignmentColPosition.Count() > 0)
+                       if (prevCategoryColPosition.Count() > 0)
                        {
                            int tempCol = categoryColPosition.First().ColumnOrder;
-                           categoryColPosition.First().ColumnOrder = prevAssignmentColPosition.First().ColumnOrder;
-                           prevAssignmentColPosition.First().ColumnOrder = tempCol;
+                           categoryColPosition.First().ColumnOrder = prevCategoryColPosition.First().ColumnOrder;
+                           prevCategoryColPosition.First().ColumnOrder = tempCol;
 
                            db.SaveChanges();
                        }
                    }
                }
            }
-           return View("index");
+           return View("Index");
        }
 
 
@@ -1116,6 +1117,8 @@ namespace OSBLE.Controllers
                    case ColumnAction.ImportCSV:
                        
                        break;
+                   default:
+                       break;
 
                }
            }
@@ -1123,6 +1126,7 @@ namespace OSBLE.Controllers
            return View("_Gradebook");
        }
 
+       
        [HttpPost]
        public void SetTabStudent( string studentId )
        {
@@ -1227,6 +1231,7 @@ namespace OSBLE.Controllers
 
            List<Category> categories = (from category in db.Categories
                                         where category.CourseID == currentCourseId
+                                        orderby category.ColumnOrder 
                                         select category).ToList();
 
            List<GradeAssignment> gradeAssignments = (from ga in db.GradeAssignments

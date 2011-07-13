@@ -817,13 +817,13 @@
         var y = 0;
 
         var container = position.id;
-        alert(container);
+        //alert(container);
         //aligning the menu under the buttons
         x = $("#" + container).position().left;
         y = $("#" + container).position().top;
         y += 9;
-        alert(x);
-        alert(y);
+        //alert(x);
+        //alert(y);
 
         //Moving the menu to the button that clicked it
         $("#displayColorsID").css("left", x + "px");
@@ -1285,29 +1285,22 @@
     function moveRight(header) {
 
         var id = header.id.split("-");
-        alert(id[1]);
         $.ajax({
             type: "POST",
             url: "/Gradebook/MoveCategoryRight",
             data: { categoryId: id[1] },
-            success: function (response) {
-                $("#grades").replaceWith(response);
-            }
+            success: window.location.reload(true)
         });
     }
 
     function moveLeft(header) {
 
         var id = header.id.split("-");
-        alert(id[1]);
-
         $.ajax({
             type: "POST",
             url: "/Gradebook/MoveCategoryLeft",
             data: { categoryId: id[1] },
-            success: function (response) {
-                $("#grades").replaceWith(response);
-            }
+            success: window.location.reload(true)
         });
     }
 
