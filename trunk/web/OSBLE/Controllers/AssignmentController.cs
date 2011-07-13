@@ -235,6 +235,18 @@ namespace OSBLE.Controllers
             }
         }
 
+        public ActionResult GetTeamMembers(int teamID)
+        {
+            try
+            {
+                return this.Content(String.Join("; ", (
+                    (from c in (db.TeamUsers.Find(teamID) as TeamMember).Team.Members select c.Name).ToArray())));
+            }
+            catch { }
+
+            return this.Content("");
+        }
+
         [CanGradeCourse]
         public ActionResult InlineReview(int assignmentActivityID, int teamUserID)
         {

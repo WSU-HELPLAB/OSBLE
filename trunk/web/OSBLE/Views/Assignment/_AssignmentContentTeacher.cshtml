@@ -20,10 +20,9 @@
             Description</div>
         @* Add links to assignment description *@
         <div class="assignment_description">@Helpers.Linkify(sa.Description)</div>
-        @if (sa.Deliverables.Count > 0)
-        {
+        
 
-            if (sa.AssignmentActivities.Where(aa => aa is SubmissionActivity).Count() > 0)
+            @if (sa.AssignmentActivities.Where(aa => aa is SubmissionActivity).Count() > 0)
             {
             <div class="assignment_title">
                 Activities
@@ -56,6 +55,6 @@
                 }
                 </div>
             }
-        }
+        
     </div>
 }

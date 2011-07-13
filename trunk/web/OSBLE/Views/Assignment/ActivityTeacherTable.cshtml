@@ -1,14 +1,17 @@
 ﻿@using OSBLE.Models.ViewModels
 @using OSBLE.Models.Assignments.Activities
 @using OSBLE.Models.Assignments
+@using OSBLE.Utility
 @model ActivityTeacherTableViewModel
 @{
     Layout = "";
     int submissionInfoCounter = 0;
 
-    bool inlineReview = Model.Activity is SubmissionActivity && (Model.Activity as SubmissionActivity).InstructorCanReview;
-    bool rubric = Model.Activity is SubmissionActivity && Model.Assignment.RubricID != null || Model.Assignment.RubricID != 0;
-    bool deliverables = Model.Assignment is StudioAssignment && (Model.Assignment as StudioAssignment).Deliverables.Count > 0;
+    bool inlineReviewAllowed = Model.Activity is SubmissionActivity && (Model.Activity as SubmissionActivity).InstructorCanReview;
+    bool hasRubric = Model.Activity is SubmissionActivity && Model.Assignment.RubricID != null && Model.Assignment.RubricID != 0;
+    bool hasDeliverables = Model.Assignment is StudioAssignment && (Model.Assignment as StudioAssignment).Deliverables.Count > 0;
+    bool isGradable = Model.Assignment.Category.Name != Constants.UnGradableCatagory;
+    bool isTeam = Model.Activity.isTeam;
 }
 <script type="text/javascript">
 
@@ -66,66 +69,88 @@
         <th>
             Name
         </th>
-        <th>
-            Submitted Time
-        </th>
+        @if (hasDeliverables)
+        { 
+            <th>
+                Submitted Time
+            </th>
+        }
+        @if (isGradable)
+        { 
         <th>
             Grading Status
         </th>
-        @if (inlineReview)
+        }
+        @if (inlineReviewAllowed)
         { 
             <th>
                 Inline Review Interface
             </th>
         }
-        @if (rubric)
+        @if (hasRubric)
         { 
             <th>
                 Rubric
             </th>
         }
-        @if(deliverables)
+        @if (hasDeliverables)
         {
             <th>
                 Download Submission
             </th>
-            }
+        }
     </tr>
     @foreach (ActivityTeacherTableViewModel.SubmissionInfo info in Model.SubmissionsInfo)
     {
+        string nameID = "TeamUserID_" + info.SubmitterID.ToString();
         <tr>
             <td>
-                @info.Name
-            </td>
-            <td>
-                @if (info.Time == null)
-                {
-                    if (info.Graded)
-                    { 
-                    <span>Not Submitted</span>
-                    }
-                    else
-                    { 
-                    <span style="color: Red">Not Submitted</span>
-                    }
+                @if (isTeam)
+                { 
+                    @Ajax.ActionLink(info.Name, "GetTeamMembers", new { teamID = info.SubmitterID }, new AjaxOptions() { InsertionMode = InsertionMode.Replace, UpdateTargetId = nameID })<br />
                 }
                 else
-                {
-                    if (info.Time.Value.AddMinutes(-Model.Activity.MinutesLateWithNoPenalty) < ViewBag.DueDate)
+                { 
+                    @info.Name
+                }
+                <div id="@nameID">
+                </div>
+            </td>
+            @if (hasDeliverables)
+            { 
+                <td>
+                    @if (info.Time == null)
                     {
-                    <span>@info.Time</span>
+                        if (info.Graded)
+                        { 
+                        <span>Not Submitted</span>
+                        }
+                        else
+                        { 
+                        <span style="color: Red">Not Submitted</span>
+                        }
                     }
                     else
                     {
-                        TimeSpan time = info.Time.Value - ((DateTime)ViewBag.DueDate);
+                        if (info.Time.Value.AddMinutes(-Model.Activity.MinutesLateWithNoPenalty) < ViewBag.DueDate)
+                        {
+                        <span>@info.Time</span>
+                        }
+                        else
+                        {
+                            TimeSpan time = info.Time.Value - ((DateTime)ViewBag.DueDate);
 
-                        //Purposefully rounding up
-                    <span style="color: Red">@((int)time.TotalHours + 1)
-                        Hours Late</span> 
+                            //Purposefully rounding up
+                        <span style="color: Red">@((int)time.TotalHours + 1)
+                            Hours Late</span> 
+                        }
                     }
-                }
-            </td>
+                </td>
+            }
+            @if (isGradable)
+            { 
             <td>
+            
                 @if (info.Graded)
                 {
                     <span>Graded</span>
@@ -135,32 +160,33 @@
                     <span style="color: Red">Not Graded</span>
                 }
             </td>
-            @if (inlineReview)
+            }
+            @if (inlineReviewAllowed)
             { 
                 <td>
                     @Html.ActionLink("Review", "InlineReview", "Assignment", new { assignmentActivityID = ViewBag.activityID, teamUserID = info.SubmitterID }, new { })
                 </td>
             }
-            @if (rubric)
+            @if (hasRubric)
             { 
                 <td>
-                    @Html.ActionLink("Grade", "Index", "Rubric", new { abstractAssignmentActivityId = ViewBag.activityID, teamUserId = info.SubmitterID }, new { })
+                    @Html.ActionLink("Fill out Rubric", "Index", "Rubric", new { abstractAssignmentActivityId = ViewBag.activityID, teamUserId = info.SubmitterID }, new { })
                 </td>
             }
-            @if(deliverables)
+            @if (hasDeliverables)
             {
                 <td>
                     @if (info.Time != null)
-                { 
+                    { 
                         @Html.ActionLink("Download Submission", "GetSubmissionZip", "FileHandler", new { teamUserID = info.SubmitterID, assignmentActivityID = ViewBag.activityID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
-                }
-                else
-                { 
+                    }
+                    else
+                    { 
                         <text>Nothing Received</text>
-                }
+                    }
                 </td>
-                }
+            }
         </tr>   
-                submissionInfoCounter++;
+            submissionInfoCounter++;
     }
 </table>
