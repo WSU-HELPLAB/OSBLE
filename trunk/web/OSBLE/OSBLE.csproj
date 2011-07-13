@@ -409,9 +409,6 @@
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
     <Content Include="crossdomain.xml" />
     <Content Include="Global.asax" />
-    <Content Include="obj\Debug\OSBLE.csproj.FileListAbsolute.txt" />
-    <Content Include="obj\Debug\OSBLE.dll" />
-    <Content Include="obj\Debug\OSBLE.pdb" />
     <Content Include="OsbleRubricTestPage.aspx" />
     <Content Include="OsbleRubricTestPage.html" />
     <Content Include="Scripts\osble.teacher_activity.js" />
@@ -485,7 +482,6 @@
     <Folder Include="Models\Assignments\Activities\" />
     <Folder Include="Models\Gradables\StudioAssignment\Activities\" />
     <Folder Include="Models\RubricModel\" />
-    <Folder Include="obj\Debug\TempPE\" />
     <Folder Include="Validations\" />
     <Folder Include="Views\IssueVoting\" />
     <Folder Include="Views\NewFolder1\" />
@@ -677,8 +673,6 @@
     <Content Include="Views\Submission\_Submit.cshtml" />
     <Content Include="Views\Rubric\_Display.cshtml" />
     <Content Include="Views\Rubric\View.cshtml" />
-    <None Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
-    <None Include="obj\Debug\ResolveAssemblyReference.cache" />
     <Content Include="Views\Assignment\InlineReview.cshtml" />
   </ItemGroup>
   <ItemGroup>

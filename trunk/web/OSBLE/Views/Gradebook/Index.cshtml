@@ -260,12 +260,12 @@
         <tr>
             <td><a style="cursor:pointer">Import Grades Here...</a></td>
         </tr>
-        <tr>
+        @*<tr>
             <td><a style="cursor:pointer">Move Column Right</a></td>
         </tr>
         <tr>
             <td><a style="cursor:pointer">Move Column Left</a></td>
-        </tr>
+        </tr>*@
         <tr>
             <td><a style="cursor:pointer" onclick="deleteCategory();">Delete Category</a></td>
         </tr>
@@ -848,18 +848,14 @@
 
     function displayColors() {
         
-        var x = 0;
-        var y = 0;
-
-        //alert(container);
         //aligning the menu under the buttons
-        x = $("#selectMenuID").position().left;
-        y = $("#selectMenuID").position().top;
-        y += 179;
+        var x = $("#selectMenuID").position().left;
         x += 173;
+        var y = $("#selectMenuID").position().top;
+        y += 128;
 
         //Moving the menu to the button that clicked it
-        $("#displayColorsID").css("left", x + "px");
+        $("#displayColorsID").css('left', x + "px");
         $("#displayColorsID").css("top", y + "px");
 
         //Animation for menu
@@ -1170,8 +1166,7 @@
 
         //aligning the menu under the buttons
         x = $("#" + container).position().left;
-        y = $("#" + container).position().top;
-        y += 9;
+        y = $("#" + container).position().top + 9;
 
         //Moving the menu to the button that clicked it
         $("#selectMenuID").css("left", x + "px");
