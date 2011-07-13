@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="ReviewInterfaceBase.View.Comment.CollapsedCommentView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+    xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing"
+    xmlns:System="clr-namespace:System;assembly=mscorlib"
+    >
+
+    <Border x:Name="LayoutRoot" Background="{Binding NoteBrush}" >
+        <StackPanel x:Name="HeaderContent" Orientation="Horizontal" Height="16" HorizontalAlignment="Right">
+
+            <TextBlock Text="{Binding NoteText}" MaxWidth="57"/>
+            <!--this is the minimize button-->
+            <sdk:Label Opacity=".7" BorderBrush="Gray" Background="DarkBlue" Foreground="White" BorderThickness="1" Height="Auto" x:Name="Minimize_Label" Width="22" Content="-" HorizontalAlignment="Center" ToolTipService.ToolTip="Click To Minimize Comment"/>
+
+            <!--this is the maximize button-->
+            <sdk:Label Opacity=".7" BorderBrush="Gray" Background="DarkBlue" Foreground="White" BorderThickness="1" Height="Auto" x:Name="Maximize_Label" Width="22" Content="[]" HorizontalAlignment="Center" ToolTipService.ToolTip="Click To Maximize Comment"/>
+
+            <!--this is the delete button-->
+            <sdk:Label Opacity=".7" BorderBrush="Gray" Background="DarkRed" Foreground="White" BorderThickness="1" Height="Auto" x:Name="X_Label" Width="22" Content="X" HorizontalAlignment="Center" ToolTipService.ToolTip="Click To Delete Comment"/>
+        </StackPanel>
+    </Border>
+</UserControl>
