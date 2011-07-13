@@ -81,21 +81,7 @@ namespace ReviewInterfaceBase.ViewModel.CategoryHolder
                 }
             }
         }
-        public void CategorySelection()
-        {
-            foreach (UIElement ui in thisView.LayoutRoot.Children)
-            {
-                //hmm
-            }
-            foreach (CategoryViewModel cvm in Categories)
-            {
-                //cvm.SelectedTagIndex = 1;
-                foreach (string s in (cvm.GetView() as CategoryView).TagHolder.Items)
-                {
-                    MessageBox.Show(s);
-                }
-            }
-        }
+        
         public CategoriesHolderViewModel()
         {
             thisView = new CategoriesHolderView();
@@ -118,7 +104,7 @@ namespace ReviewInterfaceBase.ViewModel.CategoryHolder
 
         void thisModel_TagsLoaded(object sender, EventArgs e)
         {
-            //This event needs to be tied into whatever owns CHVM to let them know the tags are loaded and that they are selectable now
+            //Letting listeners know tags have been loaded into the CategoryViewModels
             LoadComplete(sender, e);
         }
 

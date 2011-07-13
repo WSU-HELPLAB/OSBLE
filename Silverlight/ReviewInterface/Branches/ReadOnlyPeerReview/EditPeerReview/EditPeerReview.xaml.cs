@@ -31,8 +31,6 @@ namespace EditPeerReview
 
         private void ReadPeerReview(XDocument xDoc, string author, Classification role)
         {
-            NoteAuthor noteAuthor = new NoteAuthor(role, author);
-
             IEnumerable<XElement> ele = xDoc.Descendants("Document");
 
             //For each peerReview we match up the document is made on using the ID from the peerReviewDocument and the DocumentId
@@ -46,10 +44,8 @@ namespace EditPeerReview
                     {
                         if (DocumentHolder is SpatialDocumentHolderViewModel)
                         {
-                            (DocumentHolder as SpatialDocumentHolderViewModel).LoadSavedPeerReviewComments(document, noteAuthor);
+                            (DocumentHolder as SpatialDocumentHolderViewModel).LoadSavedPeerReviewComments(document);
                         }
-                        //DocumentHolder
-                        //DocumentHolder.LoadIssueVotingComments(document, noteAuthor);
                     }
                 }
             }
@@ -117,15 +113,6 @@ namespace EditPeerReview
             var entityQuerey = fakeDomainContext.GetDocumentLocationsQuery();
             var loadDocumentLocationsOperation = fakeDomainContext.Load<ReviewInterfaceBase.Web.DocumentLocation>(entityQuerey);
             loadDocumentLocationsOperation.Completed += new EventHandler(loadDocumentLocationsOperation_Completed);
-
-
-            //Now we start two asynchronous threads and they both need to finish before we can proceed
-
-            /*
-            //Load Document Locations
-            var documentQuerey = fakeDomainContext.GetDocumentLocationsQuery();
-            var loadDocumentLocationsOperation = fakeDomainContext.Load<ReviewInterfaceBase.Web.DocumentLocation>(documentQuerey);
-            loadDocumentLocationsOperation.Completed += new EventHandler(loadDocumentLocationsOperation_Completed);*/
 
             //Load PeerReview Locations
             var peerReivewQuerey = fakeDomainContext.GetPeerReviewLocationsQuery();

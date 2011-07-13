@@ -18,7 +18,7 @@ namespace ReviewInterfaceBase.ViewModel.Comment
 
         private bool loadedComment = false;
         /// <summary>
-        /// This boolean value indicated whether or not the PeerReviewCommentViewModel is representing a loaded-in, previously saved comment. 
+        /// This boolean value indicates whether or not the PeerReviewCommentViewModel is representing a loaded-in, previously saved comment. 
         /// </summary>
         public bool LoadedComment
         {
@@ -42,11 +42,6 @@ namespace ReviewInterfaceBase.ViewModel.Comment
         {
             thisView = (view as PeerReviewCommentView);
             base.Initilize(thisView, referenceLocation);
-        }
-
-        public void LoadInCategories()//(XElement xmlComment)
-        {
-            categoriesHolderVM.CategorySelection();
         }
 
         public void Initialize(int documentID)
@@ -74,6 +69,9 @@ namespace ReviewInterfaceBase.ViewModel.Comment
             categoriesHolderVM.SizeChanged += new SizeChangedEventHandler(categoriesHolderVM_SizeChanged);
         }
 
+        /// <summary>
+        /// Event that is fired when a CategoryViewModel has loaded the tags into it's CategoryView. This event selects the item in the CategoryViewModel's taglist
+        /// </summary>
         void categoriesHolderVM_LoadComplete(object sender, EventArgs e)
         {
             if (LoadedComment) //Only run the content of this event if the PeerREviewCommentVM is of the saved type
@@ -91,7 +89,7 @@ namespace ReviewInterfaceBase.ViewModel.Comment
                                 break;
                             }
                         }
-                        //If match, get out of loop after for
+                        //If match, get out of loop after for loop
                         break;
                     }
                 }

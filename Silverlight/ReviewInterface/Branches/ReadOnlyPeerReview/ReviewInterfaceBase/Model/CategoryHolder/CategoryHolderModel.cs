@@ -54,7 +54,7 @@ namespace ReviewInterfaceBase.Model.CatergoryHolder
                 CategoryViewModel cvm = new CategoryViewModel();
                 cvm.LoadTags(category.Name, category.ID);
                 
-                //me tying the event
+                //Tying the event to let listeners know when tags have been loaded
                 cvm.LoadComplete += new EventHandler(cvm_LoadComplete);
 
                 categories.Add(cvm);
