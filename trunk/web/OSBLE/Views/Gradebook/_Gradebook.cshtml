@@ -26,7 +26,7 @@
             j += 1;
             <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color:#E8E8E8" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(event, this);"></td>
             j += 1;
-            foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
+            foreach (AbstractAssignmentActivity item in ViewBag.GradeAssignments)
             {
                 <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; text-align:center; min-width: 45px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(event, this);">  
                 <div id="div-@j" style="display: none; margin:0 auto;">
@@ -46,22 +46,22 @@
         @{index++;}
         <td id="th2"><b>Perfect Score</b></td>
         <td id="perfectTotal">100%</td>
-        @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
+        @foreach (AbstractAssignmentActivity item in ViewBag.GradeAssignments)
         {
             <td id="pointsPossible-@item.ID" onclick="cellGainsFocus(event, this)">@item.PointsPossible</td>
         }
         
     </tr>
     <tr id="averageRow">
-    <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8" width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
-    @{index++;}
+        <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8" width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
+        @{index++;}
         <td id="th3">
             <b>Average Score</b>
         </td>
         <td id="averageTotal">
             0
         </td>
-        @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
+        @foreach (AbstractAssignmentActivity item in ViewBag.GradeAssignments)
         {
             <td id="averageScore" >0</td>  
         }

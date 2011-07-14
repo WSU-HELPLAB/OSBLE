@@ -32,7 +32,11 @@
 
             }
         }
-        <li><a href="#" onclick="newTab()">+</a></li>
+        @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+        {
+            <li><a href="#" onclick="newTab()">+</a></li>
+        }
+        
     </ul>
 </div> 
 

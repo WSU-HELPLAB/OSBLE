@@ -1,0 +1,200 @@
+﻿@using OSBLE.Controllers;
+@using OSBLE.Models.Assignments;
+@using OSBLE.Models.Assignments.Activities;
+@using OSBLE.Models.Assignments.Activities.Scores;
+@using OSBLE.Models.Users
+@{
+    Layout = null;
+}
+
+<style type="text/css">
+    .cellInput
+    {
+        width: 75px;
+        border: none;
+    }
+    .gradebook
+    {
+        width: auto;
+        border-collapse: collapse;
+        border: 1px solid #D0D0D0;
+    }
+    
+    .gradebook td
+    {
+        padding: 3px;
+        width: auto;
+        height: 25px;
+    }
+    
+    .gradebook td, .gradebook th, .gradebook tr
+    {
+        min-width: 50px;
+        width: auto;
+        border: 1px solid #D0D0D0;
+    }
+    
+    .gradebook th
+    {
+        text-align: left;
+    }
+    #tabHeader ul
+    {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    #tabHeader li a
+    {
+        padding: 0 1em;
+    }
+    #tabHeader
+    {
+        border-bottom:1px;
+    }
+    #tableContent
+    {
+        clear: both;
+    }
+    
+    #h3
+    {
+        margin: 0;
+        padding: 0 0 1em 0;
+    }
+    
+    #tabHeader li
+    {
+        float: left;
+        border: 1px solid gray;
+        border-top-left-radius: 4px 4px;
+        border-top-right-radius: 4px 4px;
+        background-color: #f5f5f5;
+        border-bottom-width: 0;
+        border-bottom: 1px;
+        margin: 0 0.2em -0.1em 0;
+        background: silver;
+    }
+    
+    #tabHeader #selected
+    {
+        position: relative;
+        border-bottom:1px solid #fff;
+        background: white;
+    }
+</style>
+
+
+@Html.Partial("_Tabs")
+
+<div id="tableContent">
+    <table id="grades" class="gradebook">
+
+        <tr id="perfectScore">
+                <td id="th2"><b>Perfect Score</b></td>
+                <td id="perfectTotal">100%</td>
+                @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
+                {
+                    <td id="pointsPossible-@item.ID">@item.PointsPossible</td>
+                }
+        
+        </tr>
+        <tr id="averageRow">
+            <td id="th3">
+                <b>Average Score</b>
+            </td>
+            <td id="averageTotal">
+                0
+            </td>
+            @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
+            {
+                <td id="averageScore" >0</td>  
+            }
+        </tr>
+        <tr>    
+            <th id="th4">
+                Name
+            </th>
+            @{
+                
+                if (ViewBag.NumDropped == 0)
+                {
+                    <th id="totalCustomize">Total [Average]</th>
+                }
+                else
+                {
+                    <th id="totalCustomize">Total [Dropped @ViewBag.NumDropped]</th>
+                }
+        
+                int i = 2;
+                foreach (AbstractAssignmentActivity assign in ViewBag.Assignments)
+                {
+                
+                    if (assign.addedPoints > 0)
+                    {   
+                        <th id="header-@assign.ID">@assign.Name (Added @assign.addedPoints)</th>
+                    }
+                    else
+                    {
+                        <th id="header-@assign.ID">@assign.Name </th>
+                    }
+                    i += 1;
+                }
+            }
+            
+        </tr>
+        @{
+            UserProfile cu = (from user in ViewBag.CurrentStudent as IEnumerable<UserProfile> select user).FirstOrDefault();
+            
+            <td>@cu.LastName, @cu.FirstName</td>
+            
+            List<Score> scoreList = (from scores in ViewBag.UserScores as IEnumerable<Score>
+                                     select scores).ToList();
+            
+            if (scoreList.Count() > 0)
+            {
+                double totalPoints = 0;
+                double totalPossible = 0;
+            
+                            
+                foreach (Score s in scoreList)   
+                {
+                    totalPoints += s.Points;
+                    totalPossible += s.AssignmentActivity.PointsPossible;
+                }
+                
+                totalPoints = (totalPoints / totalPossible) * 100;
+                <td>@totalPoints%</td>
+            }
+            else
+            {
+                <td>NG</td>
+            }
+            
+            foreach (AbstractAssignmentActivity assignment in ViewBag.Assignments)
+            {
+                var score = (from scores in ViewBag.UserScores as IEnumerable<Score>
+                               where scores.AssignmentActivityID == assignment.ID
+                               select scores);
+                
+                if (score.Count() > 0)
+                {        
+                    <td>@score.First().Points</td>
+                }
+                else
+                {
+                    <td>NG</td>
+                }
+            
+            }
+        }
+
+    </table>
+</div>
+
+<script type="text/javascript">
+
+    
+
+</script>

@@ -255,30 +255,50 @@ namespace OSBLE.Controllers
            string averageScore = ",Average Score,";
            string headerString = "Section,Name,Grade,Total Grade";
            string averageLetter = "";
+           bool categoryHasWeights = false;
 
            double totalColumnGrade = 0;
            double totalPossibleGrade = 0;
+           double categoryTotalPoints = 0;
 
            List<Category> categories = (from cat in db.Categories
                                         where cat.CourseID == currentCourseId
+                                        orderby cat.ColumnOrder 
                                         select cat).ToList();
 
            if (categories.Count() > 0)
            {
                foreach (Category item in categories)
                {
-                   List<AbstractAssignmentActivity> assignments = (from assignment in db.AbstractAssignmentActivities
-                                                                   where assignment.AbstractAssignment.CategoryID == item.ID
-                                                                   select assignment).ToList();
                    if (item.Name != Constants.UnGradableCatagory)
                    {
-                       headerString += "," + item.Name.ToUpper();
-                       weights += "," + item.Points.ToString();
-                   }
-                   foreach (AbstractAssignmentActivity assign in assignments)
-                   {
-                       headerString += "," + assign.Name;
-                       weights += ",";
+                       if (item.Points > 0)
+                       {
+                           categoryHasWeights = true;
+                           List<Score> TotalScores = (from s in db.Scores
+                                                      where s.AssignmentActivity.AbstractAssignment.CategoryID == item.ID
+                                                      select s).ToList();
+                           if (TotalScores.Count > 0)
+                           {
+                               categoryTotalPoints += item.Points;
+                           }
+                       }
+
+                       List<AbstractAssignmentActivity> assignments = (from assignment in db.AbstractAssignmentActivities
+                                                                       where assignment.AbstractAssignment.CategoryID == item.ID &&
+                                                                       (!(assignment is StopActivity))
+                                                                       orderby assignment.ColumnOrder
+                                                                       select assignment).ToList();
+                       if (item.Name != Constants.UnGradableCatagory)
+                       {
+                           headerString += "," + item.Name.ToUpper();
+                           weights += "," + item.Points.ToString();
+                       }
+                       foreach (AbstractAssignmentActivity assign in assignments)
+                       {
+                           headerString += "," + assign.Name;
+                           weights += ",";
+                       }
                    }
                }
            }
@@ -305,20 +325,57 @@ namespace OSBLE.Controllers
                                             orderby up.LastName, up.FirstName
                                             select up).ToList();
 
-           double totalCoursePointsPossible = (from points in db.AbstractAssignmentActivities
-                                            where points.AbstractAssignment.Category.CourseID == currentCourseId
-                                            select points.PointsPossible).Sum();
 
-           double totaCourseScore = (from score in db.Scores
-                                  where score.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId
-                                  select score.Points).Sum();
+           double totalScore = 0;
+           double totalPossible = 0;
+           double totalPercent = 0;
+           string totalScoreString = "";
+          
+           foreach (Category category in categories)
+           {
+               if (category.Name != Constants.UnGradableCatagory)
+               {
+                   double totalCourseScore = 0;
+                   double totalCoursePointsPossible = 0;
 
-           double totalScore = ((Convert.ToDouble(totaCourseScore) / (Convert.ToDouble(totalCoursePointsPossible * studentList.Count()))) * 100);
-           string totalScoreString = "," + totalScore.ToString(".##") + "%";
+                   var totalCourseScoreQuery = (from score in db.Scores
+                                                where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
+                                                select score);
+
+                   if (totalCourseScoreQuery.Count() > 0)
+                   {
+                       totalCourseScore = totalCourseScoreQuery.Sum(s => s.Points);
+                       foreach (Score s in totalCourseScoreQuery)
+                       {
+                           totalCoursePointsPossible += s.AssignmentActivity.PointsPossible;
+                       }
+                   }
+
+                   if (categoryHasWeights == true)
+                   {
+                       if (totalCourseScoreQuery.Count() > 0)
+                       {
+                           totalScore = totalCourseScore * (category.Points / categoryTotalPoints);
+                           totalPercent += totalScore / studentList.Count();
+                           totalScoreString = "," + totalPercent.ToString(".##") + "%";
+                       }
+                   }
+                   else
+                   {
+                       totalScore += totalCourseScore;
+                       totalPossible += totalCoursePointsPossible;
+                   }
+               }
+           }
+           if (categoryHasWeights == false)
+           {
+               totalPercent = (totalScore / totalPossible) * 100;
+               totalScoreString = "," + totalPercent.ToString(".##") + "%";
+           }
 
            foreach (LetterGrade letter in letterGrades)
            {
-               if (totalScore > letter.MinimumRequired)
+               if (totalPercent > letter.MinimumRequired)
                {
                    averageLetter = letter.Grade;
                    break;
@@ -328,12 +385,16 @@ namespace OSBLE.Controllers
 
            if (studentList.Count() > 0)
            {
-               double totalGradePercet = 0;
+               
                double totalGradePossible = 0;
                string studentString = "";
                foreach (UserProfile user in studentList)
                {
-                   
+                   double totalGradePercent = 0;
+                   double totalCategoryPointsPossible = 0;
+
+                   double totalGrade = 0;
+                   double totalPossiblePoints = 0;
 
                    //Section
                    string section;
@@ -383,31 +444,61 @@ namespace OSBLE.Controllers
 
                            var TotalUserScore = (from scor in TotalScores
                                                  where scor.TeamUserMember.Contains(user)
-                                                 select scor.Points).Sum();
+                                                 select scor);
 
                            var totalCategoryScore = (from score in TotalScores
                                                      where score.Points >= 0
                                                      select score.Points).Sum();
 
-                           var totalCategoryPointsPossible = (from pointsPossible in db.AbstractAssignmentActivities
-                                                              where pointsPossible.AbstractAssignment.CategoryID == c.ID
-                                                              select pointsPossible.PointsPossible).Sum();
+                           if (categoryHasWeights == true)
+                           {
+                               totalGradePercent += TotalUserScore.Sum(s => s.Points) * (c.Points / categoryTotalPoints);
+                           }
+                           else
+                           {
+                               totalGradePercent = TotalUserScore.Sum(s => s.Points);
+                               totalGrade += TotalUserScore.Sum(s => s.Points);
+                               foreach (Score score in TotalUserScore)
+                               {
+                                   totalCategoryPointsPossible = score.AssignmentActivity.PointsPossible;
+                                   totalPossiblePoints += score.AssignmentActivity.PointsPossible;
+                               }
+                           }
 
-                           double displayUserCategoryTotal = Convert.ToDouble(TotalUserScore) / Convert.ToDouble(totalCategoryPointsPossible);
-                           totalGradePercet += TotalUserScore;
-                           totalGradePossible += totalCategoryPointsPossible;
-
-                           totalColumnGrade += totalCategoryScore;
-                           totalPossibleGrade += totalCategoryPointsPossible;
-
-                           categoryTotals += "," + (displayUserCategoryTotal * 100).ToString(".##") + "%";
+                           if (totalGradePercent == 0)
+                           {
+                               categoryTotals += ",NG";
+                           }
+                           else
+                           {
+                               //LEFT OFF HERE!
+                               if (categoryHasWeights == false)
+                               {
+                                   categoryTotals += "," + ((totalGradePercent / totalCategoryPointsPossible) * 100).ToString(".##") + "%";
+                               }
+                               else
+                               {
+                                   
+                               }
+                           }
+                           
                            perfectScore += "," + 100 + "%";
-                           averageScore += "," + (Convert.ToDouble(totalCategoryScore) / Convert.ToDouble(totalCategoryPointsPossible * studentList.Count()) * 100).ToString(".##") + "%";
+                           double categoryScore = (Convert.ToDouble(totalCategoryScore) / Convert.ToDouble(totalCategoryPointsPossible * studentList.Count()) * 100);
+                           if (categoryScore == 0)
+                           {
+                               averageScore += ",NG";
+                           }
+                           else
+                           {
+                               averageScore += "," + categoryScore.ToString(".##") + "%";
+                           }
+                           
                        }
 
                        //Assignments
                        List<AbstractAssignmentActivity> assignments = (from assignment in db.AbstractAssignmentActivities
-                                                                       where assignment.AbstractAssignment.CategoryID == c.ID
+                                                                       where assignment.AbstractAssignment.CategoryID == c.ID &&
+                                                                       (!(assignment is StopActivity))
                                                                        select assignment).ToList();
                       
                        foreach (AbstractAssignmentActivity assign in assignments)
@@ -430,14 +521,37 @@ namespace OSBLE.Controllers
                            //Find the points possible of the assignment and multiply that by the
                            //number of students in the class who have scores
                            totalPointsPossible = (assign.PointsPossible * scores.Count());
-                           
-                           categoryTotals += "," + userScore.Points;
+
+                           if (userScore != null)
+                           {
+                               categoryTotals += "," + userScore.Points;
+                           }
+                           else
+                           {
+                               categoryTotals += ",NG";
+                           }
+
                            perfectScore += "," + assign.PointsPossible;
-                           averageScore += "," + ((totalPoints / totalPointsPossible) * 100);
+                           if (totalPoints == 0)
+                           {
+                               averageScore += ",NG";
+                           }
+                           else
+                           {
+                               averageScore += "," + ((totalPoints / totalPointsPossible) * 100);
+                           }
                        }
                        
                    }
-                   double total = ((totalGradePercet / totalGradePossible) * 100);
+                   double total = 0;
+                   if (categoryHasWeights == true)
+                   {
+                       total = totalGradePercent;
+                   }
+                   else
+                   {
+                       total = ((totalGrade / totalPossiblePoints) * 100);
+                   }
                    userTotalGrade = "," + total.ToString(".##") + "%";
                    //Add the studentString to the file
 
@@ -446,6 +560,7 @@ namespace OSBLE.Controllers
                        if (total > min.MinimumRequired)
                        {
                            userLetterGrade += min.Grade;
+                           break;
                        }
                    }
 
@@ -1270,7 +1385,7 @@ namespace OSBLE.Controllers
                                    select grade).FirstOrDefault();
 
                    var assignmentQuery = from a in db.AbstractAssignmentActivities
-                                         where a.AbstractAssignmentID == assignmentId
+                                         where a.ID == assignmentId
                                          select a;
 
                    var currentAssignment = assignmentQuery.FirstOrDefault();
@@ -1382,6 +1497,22 @@ namespace OSBLE.Controllers
        /// <returns></returns>
        public ActionResult Index()
        {
+
+           if (activeCourse.AbstractRole.CanGrade == true)
+           {
+               return TeacherIndex();
+           }
+           else if (activeCourse.AbstractRole.CanSubmit == true)
+           {
+               return StudentIndex();
+           }
+           return RedirectToAction("Index", "Home");
+           
+       }
+
+
+       public ActionResult TeacherIndex()
+       {
            //LINQ complains when we use this directly in our queries,so pull it beforehand
            int currentCourseId = ActiveCourse.AbstractCourseID;
            List<Score> percentList = new List<Score>();
@@ -1401,14 +1532,14 @@ namespace OSBLE.Controllers
                                where s.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId
                                select s).ToList();
 
-           
+
            List<CoursesUsers> courseUsers = (from users in db.CoursesUsers
                                              where users.AbstractCourseID == currentCourseId
                                              select users).ToList();
 
            List<Category> categories = (from category in db.Categories
                                         where category.CourseID == currentCourseId
-                                        orderby category.ColumnOrder 
+                                        orderby category.ColumnOrder
                                         select category).ToList();
 
            List<GradeAssignment> gradeAssignments = (from ga in db.GradeAssignments
@@ -1440,10 +1571,10 @@ namespace OSBLE.Controllers
                                studentScores.Add(score);
                            }
                        }
-                   }      
+                   }
                }
            }
-           
+
 
            ViewBag.Students = studentList;
            ViewBag.Scores = studentScores;
@@ -1452,8 +1583,50 @@ namespace OSBLE.Controllers
            ViewBag.GradeAssignments = gradeAssignments;
            ViewBag.LetterGrades = letterGradeList;
 
-           return View();
+           return View("Index");
        }
+
+       public ActionResult StudentIndex()
+       {
+           bool usesWeights = false;
+           int currentCourseId = activeCourse.AbstractCourseID;
+
+           List<Category> categories = (from category in db.Categories
+                                         where category.CourseID == currentCourseId
+                                         orderby category.ColumnOrder
+                                         select category).ToList();
+
+           List<LetterGrade> letterGrades = ((activeCourse.AbstractCourse as Course).LetterGrades).ToList();
+
+           List<UserProfile> currentUser = new List<UserProfile>();
+           currentUser.Add(CurrentUser);
+
+           int sectionNumber = (from section in db.CoursesUsers
+                                where section.UserProfileID == CurrentUser.ID
+                                select section.Section).FirstOrDefault();
+
+           List<Score> categoryTotalPercent = (from categoryTotal in db.Scores
+                                               where categoryTotal.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId
+                                               select categoryTotal).ToList();
+
+           List<Score> userCategoryTotalPercent = (from userCategoryTotal in categoryTotalPercent
+                                                   where userCategoryTotal.TeamUserMember.Contains(CurrentUser)
+                                                   select userCategoryTotal).ToList();
+
+           double totalCategoryWeights = (from cat in db.Categories
+                                          where cat.CourseID == currentCourseId &&
+                                          cat.Points > 0
+                                          select cat.Points).Sum();
+
+           ViewBag.Categories = categories;
+           ViewBag.LetterGrades = letterGrades;
+           ViewBag.CurrentStudent = currentUser;
+           ViewBag.SectionNumber = sectionNumber;
+           ViewBag.AllUserGrades = userCategoryTotalPercent;
+           ViewBag.TotalCategoryWeights = totalCategoryWeights;
+           return View("Index");
+       }
+
 
        /// <summary>
        /// Switches to one of the tabs (Categories) to display the assignments
@@ -1472,27 +1645,61 @@ namespace OSBLE.Controllers
                ViewBag.StudentId = Session["StudentID"];
            }
            Session["StudentID"] = null;
-           BuildGradebook((int)categoryId);
-           if (Convert.ToInt32(Session["isTab"]) == 0)
+
+           if (activeCourse.AbstractRole.CanGrade == true)
            {
-               return RedirectToRoute("Index");
+               BuildGradebook((int)categoryId);
+               return View();
            }
-           return View();
+           else if (activeCourse.AbstractRole.CanSubmit == true)
+           {
+               BuildStudentGradebook((int)categoryId);
+               return View();
+           }
+
+           return RedirectToAction("Index", "Home");
+           
        }
 
 
-       public void AddLetterGrade(string grade, int minReq)
+       private void BuildStudentGradebook(int categoryId)
        {
            int currentCourseId = ActiveCourse.AbstractCourseID;
 
-           LetterGrade newLetterGrade = new LetterGrade()
-           {
-               Grade = grade,
-               MinimumRequired = minReq
-           };
+           List<Category> categories = (from category in db.Categories
+                                        where category.CourseID == currentCourseId
+                                        orderby category.ColumnOrder
+                                        select category).ToList();
 
+           List<AbstractAssignmentActivity> assignments = (from assignment in db.AbstractAssignmentActivities
+                                                           where assignment.AbstractAssignment.CategoryID == categoryId &&
+                                                           (!(assignment is StopActivity))
+                                                           select assignment).ToList();
+
+           List<UserProfile> currentUser = new List<UserProfile>();
+           currentUser.Add(CurrentUser);
+
+           List<Score> totalScores = (from scores in db.Scores
+                                      where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
+                                      select scores).ToList();
+
+           List<Score> userScores = (from score in totalScores
+                                     where score.TeamUserMember.Contains(CurrentUser)
+                                     select score).ToList();
+
+
+           int numDropped = (from cats in categories
+                             where cats.ID == categoryId
+                             select cats.dropX).FirstOrDefault();
+                             
+
+           ViewBag.Categories = categories;
+           ViewBag.Assignments = assignments;
+           ViewBag.CurrentStudent = currentUser;
+           ViewBag.NumDropped = numDropped;
+           ViewBag.UserScores = userScores;
        }
-
+       
 
 
 
@@ -1539,12 +1746,14 @@ namespace OSBLE.Controllers
            Session["CurrentCategoryId"] = currentTab.ID;
 
            //pull the gradables (columns) for the current weight (tab)
-           List<AbstractAssignmentActivity> assignments = (from a in db.AbstractAssignmentActivities
-                                                   where a.AbstractAssignment.CategoryID == currentTab.ID
-                                                   orderby a.ColumnOrder
-                                                   select a).ToList();
+           //Pull the gradeAssignments
+           List<AbstractAssignmentActivity> gradeAssignments = (from ga in db.AbstractAssignmentActivities
+                                                                where ga.AbstractAssignment.CategoryID == currentTab.ID &&
+                                                                (!(ga is StopActivity))
+                                                                orderby ga.ColumnOrder
+                                                                select ga).ToList();
 
-           if (assignments.Count() == 0)
+           if (gradeAssignments.Count() == 0)
            {
                List<CoursesUsers> Users = (from user in db.CoursesUsers
                                            where user.AbstractCourseID == currentCourseId
@@ -1586,13 +1795,6 @@ namespace OSBLE.Controllers
                db.AbstractAssignmentActivities.Add(newActivity);
                db.SaveChanges();
            }
-
-           //Pull the gradeAssignments
-           List<AbstractAssignmentActivity> gradeAssignments = (from ga in db.AbstractAssignmentActivities
-                                                                where ga.AbstractAssignment.CategoryID == currentTab.ID &&
-                                                                (!(ga is StopActivity))
-                                                                orderby ga.ColumnOrder
-                                                                select ga).ToList();
 
            //Pull the dropped lowest
            var droppedCount = from scores in db.Scores
@@ -1655,7 +1857,6 @@ namespace OSBLE.Controllers
            //save everything that we need to the viewebag
            ViewBag.Categories = allCategories;
            ViewBag.Grades = scor;
-           ViewBag.Assignments = assignments;
            ViewBag.GradeAssignments = gradeAssignments;
            ViewBag.Users = students;
            ViewBag.Percents = studentScores;

@@ -1,0 +1,281 @@
+﻿@using OSBLE.Controllers;
+@using OSBLE.Models.Courses;
+@using OSBLE.Models.Assignments;
+@using OSBLE.Models.Assignments.Activities.Scores;
+@using OSBLE.Models.Users
+@using OSBLE.Utility;
+@{
+    Layout = null;
+}
+
+<style type="text/css">
+    .cellInput
+    {
+        width: 75px;
+        border: none;
+    }
+    .gradebook
+    {
+        width: auto;
+        border-collapse: collapse;
+        border: 1px solid #D0D0D0;
+    }
+    
+    .gradebook td
+    {
+        padding: 3px;
+        width: auto;
+        height: 25px;
+    }
+    
+    .gradebook td, .gradebook th, .gradebook tr
+    {
+        min-width: 50px;
+        width: auto;
+        border: 1px solid #D0D0D0;
+    }
+    
+    .gradebook th
+    {
+        text-align: left;
+    }
+    #tabHeader ul
+    {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    #tabHeader li a
+    {
+        padding: 0 1em;
+    }
+    #tabHeader
+    {
+        border-bottom:1px;
+    }
+    #tableContent
+    {
+        clear: both;
+    }
+    
+    #h3
+    {
+        margin: 0;
+        padding: 0 0 1em 0;
+    }
+    
+    #tabHeader li
+    {
+        float: left;
+        border: 1px solid gray;
+        border-top-left-radius: 4px 4px;
+        border-top-right-radius: 4px 4px;
+        background-color: #f5f5f5;
+        border-bottom-width: 0;
+        border-bottom: 1px;
+        margin: 0 0.2em -0.1em 0;
+        background: silver;
+    }
+    
+    #tabHeader #selected
+    {
+        position: relative;
+        border-bottom:1px solid #fff;
+        background: white;
+    }
+</style>
+
+@Html.Partial("_Tabs")
+
+<div id="tableContent">
+    <table id="grades" class="gradebook">
+         <tr>
+            <td></td>
+            <td><b>Weights</b></td>
+            <td></td>
+            <td></td>
+            @foreach (Category item in ViewBag.Categories)
+            {
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <td></td>
+                }
+            }
+        </tr>
+        <tr id="weights">
+            <td id="sectionHolder"></td>
+            <td id="catScheme" onclick="cellGainsFocus(event, this);">&nbsp  Weight1</td>
+            <td id="grade"></td>
+            @{
+                double totalCategoryPoints = 0;
+                foreach (Category item in ViewBag.Categories)
+                {
+                    if (item.Name != Constants.UnGradableCatagory)
+                    {
+                        totalCategoryPoints += item.Points;
+                    }
+                }
+            }
+            <td id="categoryTotal">@totalCategoryPoints</td>
+            
+            @foreach (Category item in ViewBag.Categories)
+            {
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <td id="weight-@item.ID" onclick="cellGainsFocus(event, this)">@item.Points</td>
+                }
+            }
+
+        </tr>
+        <tr id="perfectScore">
+            <td id="sectionHolder"></td>
+            <td id="th2"><b>Perfect Score</b></td>
+            @{string grade = (from lg in ViewBag.LetterGrades as IEnumerable<LetterGrade>
+                              select lg.Grade).FirstOrDefault();
+            }
+            <td>@grade</td>
+            <td id="perfectTotal">100%</td>
+            
+
+            @foreach (Category item in ViewBag.Categories)
+            {
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <td id="@item.ID">100%</td>   
+                }
+            }
+
+        </tr>
+        <tr>
+            <td></td>
+            <td id="th3">
+                <b>Average Score</b>
+            </td>
+            <td id="averageLetter"></td>
+            <td id="averageTotal">0</td>
+            
+            @{
+                double totalAverage = 0;
+                int totalStudents = 0;
+
+                foreach (Category item in ViewBag.Categories)
+                {
+                    if (item.Name != Constants.UnGradableCatagory)
+                    {
+                        <td id="averageScore">0</td>  
+                    }
+                }
+            }
+            
+        </tr>
+        <tr id="categoryHeaders">
+            <th>Section</th>
+            <th>Name</th>
+            <th id="gradeHeader" ondblclick="displayLetterGrades();">Grade</th>
+            <th>Total Grade</th>
+            
+            @foreach (Category item in ViewBag.Categories)
+            {
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <th id="@item.ID" class="colHeader" onclick="changeAssignmentName(event, this);" style="background:@item.TabColor">@item.Name</th>
+                }
+            }
+
+        </tr>
+        <tr>
+            @{
+                UserProfile cu = (from user in ViewBag.CurrentStudent as IEnumerable<UserProfile> select user).FirstOrDefault();
+                <td>@ViewBag.SectionNumber</td>
+                <td>@cu.LastName, @cu.FirstName</td>
+                
+                <td></td>
+                
+                List<Score> userScores = (from scores in ViewBag.AllUserGrades as IEnumerable<Score> select scores).ToList();
+                List<Category> categoryWeights = (from cats in ViewBag.Categories as IEnumerable<Category>
+                                                  where cats.Points > 0
+                                                  select cats).ToList();                                           
+                
+                //Holds the total grade
+                double totalGrade = 0;
+                
+                //Holds the users total score
+                double totalGradePoints = 0;
+                
+                //Holds the category weight / total of all category weights
+                double totalGradePossible = 0;
+                
+                //Holds to total of all category weights
+                double catPossibleWeight = 0;
+
+                //Get the total of the category weights that have grades
+                if (ViewBag.TotalCategoryWeights > 0)
+                {
+                    foreach (Category category in ViewBag.Categories)
+                    {
+                        if (category.Points > 0)
+                        {
+                            //Check to see if the current category contains grades
+                            foreach (Score score in userScores)
+                            {                                
+                                if (score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
+                                {
+                                    
+                                }           
+                            }
+                            catPossibleWeight += category.Points;
+                        }
+                    }
+                }
+                
+                //Get the total score for the class
+                foreach(Category category in ViewBag.Categories)
+                {
+                    if (category.Name != Constants.UnGradableCatagory)
+                    {
+                        foreach (Score userScore in userScores)
+                        {
+                            if (userScore.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
+                            {
+                                totalGrade += userScore.Points * (category.Points / totalCategoryPoints);
+                            }
+                        }
+                    }
+                }
+                
+                <td>@totalGrade%</td>
+                
+                if (userScores.Count() > 0)
+                {
+                    
+                    foreach (Category category in ViewBag.Categories)
+                    {
+                        if (category.Name != Constants.UnGradableCatagory)
+                        {
+                            double categoryPoints = 0;
+                            double categoryPossible = 0;
+                            foreach (Score userScore in userScores)
+                            {
+                                if (userScore.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
+                                {
+                                    categoryPoints += userScore.Points;
+                                    categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                }
+                            }
+                            double total = (categoryPoints / categoryPossible) * 100;
+                            if (total >= 0)
+                            {
+                                <td>@total%</td>
+                            }
+                            else
+                            {
+                                <td>NG</td>
+                            }
+                        }
+                    }
+                }
+            }
+        </tr>
+    </table>
+</div>
