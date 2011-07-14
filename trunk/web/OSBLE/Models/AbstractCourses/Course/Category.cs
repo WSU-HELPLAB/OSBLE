@@ -55,5 +55,17 @@ namespace OSBLE.Models.Courses
 
         public int dropX { get; set; }
 
+        public enum GradeOptions
+        {
+            CompAverage,
+            XtoDrop,
+            XtoTake
+        };
+        /// <summary>
+        /// This is to go with the enum GradeOptions
+        /// </summary>
+        [Required]
+        public int Customize { get; set; }
+
     }
 }

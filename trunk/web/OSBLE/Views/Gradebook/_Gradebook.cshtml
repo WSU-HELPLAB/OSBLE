@@ -2,6 +2,7 @@
 @using OSBLE.Models.Assignments;
 @using OSBLE.Models.Assignments.Activities;
 @using OSBLE.Models.Assignments.Activities.Scores;
+@using OSBLE.Models.Courses;
 @{
     Layout = null;
     var index = 0;
@@ -10,6 +11,8 @@
 @{
         var numDropped = (from drop in ViewBag.Dropped as IEnumerable<int> select drop).First();
         <input type="hidden" id="numDropped" value="@numDropped" />
+        var customize_option = (from co in ViewBag.Customize as IEnumerable<Category.GradeOptions> select co).FirstOrDefault();
+        <input type="hidden" id="customize_option" value="@customize_option" />
     }
 
 <table id="grades" class="gradebook">
@@ -76,29 +79,33 @@
             Name
         </th>
         
-            if( numDropped == 0)
-            {
-                <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average" /></th>
+        if (customize_option == Category.GradeOptions.XtoDrop && numDropped != 0)
+        {
+                <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average [Drop @numDropped lowest]" /> </th>
+        }
+        else if (customize_option == Category.GradeOptions.XtoTake && numDropped != 0)
+        {
+            <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average [Keep @numDropped highest]" /> </th>
+        }
+        else
+        {
+            <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average" /></th>
+        }
+
+        int i = 2;
+        foreach (AbstractAssignmentActivity assign in ViewBag.GradeAssignments)
+        {
+
+            if (assign.addedPoints > 0)
+            {   
+                    <th id="header-@assign.ID" onclick="changeHeaderName(event, this)">@assign.Name (Added @assign.addedPoints)</th>
             }
             else
             {
-                <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average [Dropped @numDropped]" /> </th>
-            }
-        
-            int i = 2;
-            foreach (AbstractAssignmentActivity assign in ViewBag.GradeAssignments)
-            {
-                
-                if (assign.addedPoints > 0)
-                {   
-                    <th id="header-@assign.ID" onclick="changeHeaderName(event, this)">@assign.Name (Added @assign.addedPoints)</th>
-                }
-                else
-                {
                     <th id="header-@assign.ID" onclick="changeHeaderName(event, this)">@assign.Name </th>
-                }
-                i += 1;
             }
+            i += 1;
+        }
         }
             
     </tr>
@@ -120,7 +127,7 @@
                   {
                       <td id="total">@percent.First().Points.ToString(".##")%</td>
                   }
-                  else 
+                  else
                   {
                       <td id="total">@String.Format("{0}", 0)%</td>
                   }
@@ -154,37 +161,25 @@
         </tr>
     }
     <script type="text/javascript">
-        //var lastFocusedCell = null;
-        var onMouseOver = false;
         $(function () {
+//            alert($('#customize_option').val());
+//            alert($('#numDropped').val());
+//            if ($('#customize_option').val() == "CompAverage" || $('#numDropped').val() == 0) {
+//                $('#CompAverage_radio').attr('checked', true);
+//            }
+//            else if ($('#customize_option') == "XtoDrop") {
+//                $('#XtoDrop_radio').attr('checked', true);
+//                $('#XtoDrop').val(numDropped);
+//            }
+//            else if ($('#customize_option') == "XtoTake") {
+//                $('#XtoTake_radio').attr('checked', true);
+//                $('#XtoTake').val(numDropped);
+//            }
+
             calculateCols();
             keyControls();
         });
 
-
-        function showButton(column) {
-
-            var container = column.id;
-            currentHeaderCell = column;
-
-            $("#div-" + container).animate({ "height": "show" }, { duration: 0 });
-
-            if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)"
-            || $("#" + container).css("background-color") == "rgb(255, 255, 132)" && $("#div-" + container).css("background-color") == "rgb(255, 255, 132)") {
-
-                $("#" + container).css("background-color", "#FFFF84");
-                $("#div-" + container).css("background-color", "#FFFF84");
-            }
-        }
-
-        function hideOnlyButton(column) {
-            var container = column.id;
-
-            $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
-        }
-
-        
     </script>
-
 </table>
 

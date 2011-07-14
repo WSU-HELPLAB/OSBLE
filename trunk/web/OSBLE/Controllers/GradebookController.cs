@@ -793,7 +793,7 @@ namespace OSBLE.Controllers
 
 
        [HttpPost]
-       public ActionResult AllDropLowest(int categoryId, int dropX)
+       public ActionResult AllDropLowest(int categoryId, int dropX, string customize)
        {
            if (ModelState.IsValid)
            {
@@ -802,49 +802,115 @@ namespace OSBLE.Controllers
                currentCatagory.dropX = dropX;
                db.SaveChanges();
 
-               int i = 0;
-               if (categoryId > 0)
+               switch (customize)
                {
-                   List<Score> scoreList = (from s in db.Scores
-                                            where s.AssignmentActivity.AbstractAssignment.CategoryID == categoryId &&
-                                            s.Points >= 0
-                                            select s).ToList();
+                   case "CompAverage":
+                       currentCatagory.Customize = (int)Category.GradeOptions.CompAverage;
+                       db.SaveChanges();
+                       break;
+                   case "XtoDrop":
+                       currentCatagory.Customize = (int)Category.GradeOptions.XtoDrop;
+                       db.SaveChanges();
+                       break;
+                   case "XtoTake":
+                       currentCatagory.Customize = (int)Category.GradeOptions.XtoTake;
+                       db.SaveChanges();
+                       break;
+                   default:
+                       break;
+               };
 
-                   var studentScores = (from scores in scoreList
-                                        select scores).GroupBy(s => s.TeamUserMember.Name);
-                   
-                   if (studentScores.Count() > 0)
+
+              
+               if (customize != "CompAverage")
+               {
+                   if (categoryId > 0)
                    {
-                       for (i = 0; i < studentScores.Count(); i++)
+                       List<Score> scoreList = (from s in db.Scores
+                                                where s.AssignmentActivity.AbstractAssignment.CategoryID == categoryId &&
+                                                s.Points >= 0
+                                                select s).ToList();
+
+                       var studentScores = (from scores in scoreList
+                                            select scores).GroupBy(s => s.TeamUserMember.Name);
+
+                       if (studentScores.Count() > 0)
                        {
-                           List<double> lowest = new List<double>();
-                           List<int> id = new List<int>();
-
-                           var item = studentScores.AsEnumerable().ElementAt(i);
-                           
-                           foreach (Score score in item)
+                           for (int i = 0; i < studentScores.Count(); i++)
                            {
-                               //Find the assignment that corresponds because it wouldn't give me access
-                               //to points possible within the scores.
-                               var assignmentScore = from a in db.AbstractAssignments
-                                                     where a.ID == score.AssignmentActivity.AbstractAssignmentID
-                                                     select a;
-                               // create an ascending list of scores per student
-                               int j = 0;
-                               double temp = score.Points / assignmentScore.FirstOrDefault().PointsPossible;
+                               List<double> lowest = new List<double>();
+                               List<int> id = new List<int>();
 
-                               while (lowest.Count() > j && temp > lowest.ElementAt(j))
+                               var item = studentScores.AsEnumerable().ElementAt(i);
+
+                               foreach (Score score in item)
                                {
-                                   j++;
-                               }
-                               lowest.Insert(j, temp);
-                               id.Insert(j, score.ID);
-                           }
+                                   //Find the assignment that corresponds because it wouldn't give me access
+                                   //to points possible within the scores.
+                                   var assignmentScore = from a in db.AbstractAssignments
+                                                         where a.ID == score.AssignmentActivity.AbstractAssignmentID
+                                                         select a;
+                                   // create an ascending list of scores per student
+                                   int j = 0;
+                                   double temp = score.Points / assignmentScore.FirstOrDefault().PointsPossible;
 
-                           // Dropping X lowest ( if there are less assignments than specified to drop, it only drops what is graded)
-                           for (int k = 0; k < dropX; k++)
-                           {
-                               if (k < lowest.Count()) // only drops the amount of graded assignments per student maximum
+                                   while (lowest.Count() > j && temp > lowest.ElementAt(j))
+                                   {
+                                       j++;
+                                   }
+                                   lowest.Insert(j, temp);
+                                   id.Insert(j, score.ID);
+                               }
+                               var max = 0;
+
+                               if (customize == "XtoDrop")
+                               {
+                                   // Dropping X lowest ( if there are less assignments than specified to drop, it only drops what is graded)
+                                   if (dropX > lowest.Count())
+                                   {
+                                       max = lowest.Count();
+                                   }
+                                   else
+                                   {
+                                       max = dropX;
+                                   }
+
+
+                                   //for (int k = 0; k < dropX && k < lowest.Count(); k++)
+                                   //{
+                                   //    //if (k < lowest.Count()) // only drops the amount of graded assignments per student maximum
+                                   //    //{
+                                   //        foreach (Score newScore in item)
+                                   //        {
+                                   //            if (newScore.ID == id.ElementAt(k))
+                                   //            {
+                                   //                newScore.isDropped = true;
+                                   //            }
+                                   //        }
+                                   //    //}
+                                   //}
+                               }
+                               else
+                               {
+                                   // Taking X highest ( if there are less assignments than specified to take, it only takes what is graded)
+                                   max = lowest.Count() - dropX;
+
+                                   //for (int k = 0; k < (lowest.Count() - dropX); k++)
+                                   //{
+                                   //    if (k < lowest.Count()) // only takes the amount of graded assignments per student minimum
+                                   //    {
+                                   //        foreach (Score newScore in item)
+                                   //        {
+                                   //            if (newScore.ID == id.ElementAt(k))
+                                   //            {
+                                   //                newScore.isDropped = true;
+                                   //            }
+                                   //        }
+                                   //    }
+                                   //}
+                               }
+
+                               for (int k = 0; k < max; ++k)
                                {
                                    foreach (Score newScore in item)
                                    {
@@ -854,17 +920,16 @@ namespace OSBLE.Controllers
                                        }
                                    }
                                }
-                           }
 
-                           db.SaveChanges();
+                               db.SaveChanges();
+                           }
                        }
                    }
                }
            }
-           BuildGradebook((int)Session["categoryId"]);
+           BuildGradebook(categoryId);
            return View("_Gradebook");
        }
-
 
        /// <summary>
        /// Clears a gradable (column) from the current table.
@@ -1742,6 +1807,9 @@ namespace OSBLE.Controllers
            List<int> numDropped = new List<int>();
            numDropped.Add(currentTab.dropX);
 
+           List<Category.GradeOptions> customizeOption = new List<Category.GradeOptions>();
+           customizeOption.Add((Category.GradeOptions)currentTab.Customize);
+
            //save to the session.  Needed later for AJAX-related updates.
            Session["CurrentCategoryId"] = currentTab.ID;
 
@@ -1861,6 +1929,7 @@ namespace OSBLE.Controllers
            ViewBag.Users = students;
            ViewBag.Percents = studentScores;
            ViewBag.Dropped = numDropped;
+           ViewBag.Customize = customizeOption;
 
            Session["isTab"] = 1;
        }
