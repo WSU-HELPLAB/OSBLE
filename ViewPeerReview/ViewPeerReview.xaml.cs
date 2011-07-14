@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ServiceModel.DomainServices.Client;
-using System.Windows;
 using System.Windows.Controls;
 using System.Xml.Linq;
 using IssueVoting.HelperClasses;
@@ -41,11 +40,7 @@ namespace ViewPeerReview
             LocalInitilizer();
 
             //Killing the save button by collapsing it
-            UIElement saveButton = (UIElement)(mpVM.GetView().Content as Grid).FindName("Save");
-            if (saveButton is Button)
-            {
-                saveButton.Visibility = System.Windows.Visibility.Collapsed;
-            }
+            mpVM.HideSaveButtons();
         }
 
         private void mpVM_OpeningDocumentsComplete(object sender, EventArgs e)

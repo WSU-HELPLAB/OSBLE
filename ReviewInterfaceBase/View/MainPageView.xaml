@@ -6,7 +6,7 @@
     xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
     xmlns:toolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
     >
-    <Border BorderThickness="5" BorderBrush="LightGray">
+    <Border x:Name="MainBorder" BorderThickness="5" BorderBrush="LightGray">
         <Grid x:Name="LayoutRoot">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -14,12 +14,23 @@
                 <!--OLDCODE <RowDefinition Height="200"/>-->
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0">
-                <StackPanel x:Name="ButtonToolbar" Orientation="Horizontal" Margin="3" >
-                    <Button x:Name="Save" Margin="0,0,5,0" ToolTipService.ToolTip="Save This Review" Height="16">
-                        <Image Source="/Osble;component/View/Icons/saveHS.png" />
+                <StackPanel x:Name="ButtonToolbarTop" Orientation="Horizontal">
+                    <Button x:Name="PublishTop" Margin="0,0,15,0" MinWidth="75">
+                        Publish
+                    </Button>
+                    <Button x:Name="SaveAsDraftTop" MinWidth="75">
+                        Save as Draft
                     </Button>
                 </StackPanel>
                 <ContentPresenter x:Name="CustomTabControlHolder" />
+                <StackPanel x:Name="ButtonToolbarBottom" Orientation="Horizontal">
+                    <Button x:Name="PublishBottom" Margin="0,0,15,0" MinWidth="75">
+                        Publish
+                    </Button>
+                    <Button x:Name="SaveAsDraftBottom" MinWidth="75">
+                        Save as Draft
+                    </Button>
+                </StackPanel>
             </StackPanel>
 
             <!--OLDCODE2 <controls:GridSplitter

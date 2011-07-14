@@ -40,7 +40,7 @@ namespace IssueVoting.HelperClasses
             client.OpenReadCompleted += new OpenReadCompletedEventHandler(client_OpenReadCompleted);
             DocumentLocation docLocation = documentEnumerator.Current as DocumentLocation;
             Uri url = new Uri(docLocation.Location, UriKind.Relative);
-            client.OpenReadAsync(url, new DocumentInfo(docLocation.ID, docLocation.Location, docLocation.Author, (Classification)docLocation.Role));
+            client.OpenReadAsync(url, new DocumentInfo(docLocation.ID, docLocation.FileName, docLocation.Author, (Classification)docLocation.Role));
         }
 
         private void client_OpenReadCompleted(object sender, OpenReadCompletedEventArgs e)
@@ -64,7 +64,7 @@ namespace IssueVoting.HelperClasses
             {
                 DocumentLocation docLocation = documentEnumerator.Current as DocumentLocation;
                 Uri url = new Uri(docLocation.Location, UriKind.Relative);
-                client.OpenReadAsync(url, new DocumentInfo(docLocation.ID, docLocation.Location, docLocation.Author, (Classification)docLocation.Role));
+                client.OpenReadAsync(url, new DocumentInfo(docLocation.ID, docLocation.FileName, docLocation.Author, (Classification)docLocation.Role));
             }
             catch
             {
