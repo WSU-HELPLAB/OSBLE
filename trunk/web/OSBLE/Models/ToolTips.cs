@@ -40,21 +40,25 @@ namespace OSBLE.Models
 
         #region CourseToolTips
 
-            public static string CourseInformation = "Required course information. The prefix is typically the abbreviation of the department the course categorized with.";
-            public static string CourseSchedule = "This section allows the instructor to set specifically the range of dates this course is held. Typically these values will be the beginning and end of the semester or quarter the course is being taught, but allows for any desired range of dates.";
-            public static string CourseMeetingTimes = "This section allows for the addition of multiple meeting times and/ or places each week, such as a lab section and a lecture section.";
-            public static string CourseBreaks = "This section allows for days to be taken off of the course during the normal meetings times, such as for national holidays.";
 
-            public static string CourseStudentPost = "This option allows for students to post items to the activity feed of the course, which will show up for every member of that course.    ";
-            public static string CourseStudentReply = "This option allows students to reply to items posted to the activity feed.";
-            public static string CourseStudentEvent = "Events that are posted in the course calendar will show up for every member of the course.";
-            public static string CourseInstructorEventApproval = "Any event created by a student will require the instructor to review and approve it before it shows up on the calendar.";
-            public static string CourseInactive = "Only instructors and observers can log in while a course is set to inactive. ";
-            public static string CourseCalendarEvents = "Events outside this window of time will not show up on the course calendar.";
-        
-            public static string CourseGradingScheme = "Using this section, you may change the cutoff for grades. This is something like automatic grade curving.";
-            public static string CourseLatePolicy = "This determines how the system will penalize for late assignments. Read the sentences below and set the options as desired.";
+            public static string CoursePrefix = "(Required) course prefix may have a maximum of 8 characters, e.g., \"CptS\"";
+            public static string CourseNumber = "(Required) course number may have a maximum of 8 characters, e.g., \"443\"";
+            public static string CourseName = "(Required) course name may have a maxiumum of 100 characters, e.g., \"Human-Computer Interaction\"";
+            public static string CourseTerm = "(Required) the term in which this class is held: Fall, Winter, Spring, Summer";
+            public static string CourseYear = "(Required) the year in which this class is held, e.g., 2011";
+            public static string CourseStartDate = "(Required) the date of the first day of class";
+            public static string CourseEndDate = "(Required) the date of the last day of class (or the final exam)";
+            public static string CourseMeetingTimes = "Click on the \"+\" to specify regular meeting times for lectures, labs, etc. These can be optionally included on the course calendar.";
+            public static string CourseBreaks = "Click on the \"+\" button to specify course breaks and holidays. These can optionally be included on the course calendar.";
 
+            public static string CourseStudentPost = "Check this box to allow students to post new messages to the activity feed.";
+            public static string CourseStudentReply = "Check this box to allow students to reply to messages posted to the activity feed.";
+            public static string CourseStudentEvent = "Check this box to allow students to post items to the course calendar.";
+            public static string CourseInstructorEventApproval = "Check this box to require instructor to approve items before they appear on the course calendar.";
+            public static string CourseInactive = "Check this box to make the course \"inactive.\"  Only instructors and observers can access a course when it is set to inactive.";
+            public static string CourseCalendarEvents = "Specify the number of weeks of events to show in the course calendar by default. Events outside this window of time can still be accessed by clicking on the \"Show All Events\" link.";
+            public static string CourseGradingScheme = "Using this section, you may define the grading scheme for the course. For each letter grade, you must specify the minimum percentage required to receive that grade.";
+            public static string CourseLatePolicy = "Using this section, you specify the penalties that OSBLE will automatically apply to late assignments.";
         #endregion
 
 

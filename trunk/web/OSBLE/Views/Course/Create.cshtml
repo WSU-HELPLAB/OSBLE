@@ -18,7 +18,7 @@
 {
     @Html.ValidationSummary(true)
 
-    <h3>Course Information @Helpers.CreateToolTip(ToolTips.CourseInformation) </h3>
+    <h3>Course Information</h3>
     
     <table>
         <tr>
@@ -26,6 +26,7 @@
         <td>
         <div class="editor-label">
             @Html.LabelFor(model => model.Prefix)
+            @Helpers.CreateToolTip(ToolTips.CoursePrefix)
         </div>
         <div class="editor-field">
             @Html.TextBoxFor(model => model.Prefix, new { size = 6 })
@@ -35,6 +36,7 @@
         <td>
         <div class="editor-label">
             @Html.LabelFor(model => model.Number)
+            @Helpers.CreateToolTip(ToolTips.CourseNumber)
         </div>
         <div class="editor-field">
             @Html.TextBoxFor(model => model.Number, new { size = 4 })
@@ -43,6 +45,7 @@
         <td>
             <div class="editor-label">
             @Html.LabelFor(model => model.Name)
+            @Helpers.CreateToolTip(ToolTips.CourseName)
         </div>
         <div class="editor-field">
             @Html.EditorFor(model => model.Name)
@@ -57,6 +60,7 @@
         <td>
         <div class="editor-label">
             @Html.LabelFor(model => model.Semester)
+            @Helpers.CreateToolTip(ToolTips.CourseTerm)
         </div>
         <div class="editor-field">
             @Html.TextBoxFor(model => model.Semester, new { size = 6 })
@@ -68,6 +72,7 @@
 
         <div class="editor-label">
             @Html.LabelFor(model => model.Year)
+            @Helpers.CreateToolTip(ToolTips.CourseYear)
         </div>
         <div class="editor-field">
             @Html.TextBoxFor(model => model.Year, new { size = 4 })
@@ -79,13 +84,15 @@
         </tr>
     </table>
     
-    <h3>Course Schedule @Helpers.CreateToolTip(ToolTips.CourseSchedule) </h3>
+    <h3>Course Schedule</h3>
     
     <table>
     <tr>
         <td>
             <div class="editor-label">
             @Html.LabelFor(model => model.StartDate, "Start Date")
+            @Helpers.CreateToolTip(ToolTips.CourseStartDate)
+
         </div>
         <div class="editor-field">
             @Html.EditorFor(model => model.StartDate)<br />
@@ -95,6 +102,7 @@
         <td>
         <div class="editor-label">
             @Html.LabelFor(model => model.EndDate, "End Date")
+            @Helpers.CreateToolTip(ToolTips.CourseEndDate)
         </div>
         <div class="editor-field">
             @Html.EditorFor(model => model.EndDate)<br />
