@@ -21,11 +21,11 @@ namespace OSBLE.Models.Courses.Rubrics
         [Required]
         public bool HasGlobalComments { get; set; }
 
-        [Association("Levels", "ID", "ID")]
+        [Association("Levels", "ID", "RubricID")]
         [Include]
         public virtual ICollection<Level> Levels { get; set; }
 
-        [Association("Criteria", "ID", "ID")]
+        [Association("Criteria", "ID", "RubricID")]
         [Include]
         public virtual ICollection<Criterion> Criteria { get; set; }
 

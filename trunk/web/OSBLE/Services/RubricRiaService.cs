@@ -55,14 +55,18 @@ using OSBLE.Models.AbstractCourses;
 
         public IQueryable<CellDescription> GetCellDescriptions(int rubricId)
         {
-            List<CellDescription> cellDesc = (from desc in db.LevelDescriptions
+            Rubric rubric = db.Rubrics.Find(rubricId);
+            if (rubric != null)
+                return rubric.CellDescriptions.AsQueryable();
+            else return null;
+            /*List<CellDescription> cellDesc = (from desc in db.LevelDescriptions
                                               join level in db.Levels on desc.LevelID equals level.ID
                                               join crit in db.Criteria on desc.CriterionID equals crit.ID
                                               where level.RubricID == rubricId
                                               &&
                                               crit.RubricID == rubricId
                                               select desc).ToList();
-            return cellDesc.AsQueryable();
+            return cellDesc.AsQueryable();*/
         }
 
         public IQueryable<AbstractCourse> GetCourses()

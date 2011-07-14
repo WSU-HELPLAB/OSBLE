@@ -222,10 +222,14 @@ namespace OsbleRubric
                 LoadOperation<CellDescription> load = sender as LoadOperation<CellDescription>;
                 cellDescriptions.Clear();
                 foreach (CellDescription desc in load.Entities)
-                {
+                { 
                     cellDescriptions.Add(desc);
                 }
+                
+                //Only build the rubric if its not a new rubric(assuming ID of 0 means new rubric)
                 BuildGridFromRubric(selectedRubric, cellDescriptions);
+                
+                
             }
         }
 
@@ -292,6 +296,8 @@ namespace OsbleRubric
         /// <param name="rubric"></param>
         private void BuildGridFromRubric(Rubric rubric, ICollection<CellDescription> cellDescriptions)
         {
+
+            if (rubric.Levels.Count == 0 || rubric.Criteria.Count == 0) return;
             //Clearing the rubric entirely and reinitializing (to add default col/rows)
             customDataGrid.ClearAll();
             initialize();
@@ -299,8 +305,10 @@ namespace OsbleRubric
             //remove the add button row temporarily
             customDataGrid.RemoveRow(customDataGrid.BaseGrid.RowDefinitions.Count - 1);
 
-            //Adding empty rows 
-            while (rubric.Criteria.Count < (customDataGrid.BaseGrid.RowDefinitions.Count + 1))//+1 to account for last row that was temporarily removed
+            //Adding empty rows into the grid until the amount of Criteria rows in the grid is equal to the amount of criterias from rubric
+            //Using (rubric.Criteria.Count) because its the real number of Criteria in rubric.
+            //Using (customDataGrid.BaseGrid.RowDefinitions.Count - 1) for the number of Criteria actually in the grid. (-1 for the row that on the top is not a criteria)
+            while ((rubric.Criteria.Count) > (customDataGrid.BaseGrid.RowDefinitions.Count - 1))
             {
                 createCriterionRow();
             }
@@ -308,12 +316,15 @@ namespace OsbleRubric
             //Adding the add button row back in
             createAddButtonRow(); 
 
+
             //removing the last two columns temporarily
             customDataGrid.RemoveColumn(customDataGrid.BaseGrid.ColumnDefinitions.Count - 1); 
             customDataGrid.RemoveColumn(customDataGrid.BaseGrid.ColumnDefinitions.Count - 1);
 
-            //Adding empty columns
-            while (rubric.Levels.Count > (customDataGrid.BaseGrid.ColumnDefinitions.Count + 2)) //+2 to account for last two rows that were temp removed
+            //Adding empty columns into the grid until the amount of Level columns in the grid is equal to the amount of levels from the rubric
+            //Using (rubric.Levels.Count) because its the real number of levels in the rubric 
+            //Using  (customDataGrid.BaseGrid.ColumnDefinitions.Count - 2) for the number of Levels actually in the grid. (-2 for the columns on the left that are not levels)
+            while ((rubric.Levels.Count) > (customDataGrid.BaseGrid.ColumnDefinitions.Count - 2)) //+2 to account for last two rows that were temp removed
             {
                 createLevelColumn();
             }
@@ -332,6 +343,11 @@ namespace OsbleRubric
             //The Levels in rubric.Levels are added in order (i hope), so we can add them from left to right
             foreach (Level lvl in rubric.Levels)
             {
+                //This if statement will block any levels that were added to the db as empty placeholder cells
+                if (lvl.RangeEnd == 0 && lvl.RangeStart == 0 && lvl.LevelTitle == "No Title")
+                {
+                    MessageBox.Show("OOPS");
+                }
                 ICell ic = new HeaderCell(0, i + 2); //0 for the cell (as all Levels will be inserted into the top row), +2 to account for the first two columns that arent header cells
                 (ic as HeaderCell).ComboBoxValue = lvl.RangeEnd;
                 (ic as HeaderCell).Information = lvl.LevelTitle;
@@ -343,6 +359,11 @@ namespace OsbleRubric
             //The Criteria in rubric.Criteria are added in order, so we can add them top to bottom
             foreach (Criterion crit in rubric.Criteria)
             {
+                //This if statement will block any criteria that were added to the db as empty placeholder cells
+                if (crit.CriterionTitle == "No Title" && crit.Weight == 0) 
+                {
+                    MessageBox.Show("OOPS");
+                }
                 ICell criterionCell = new RubricCell(j + 1, 0, crit.CriterionTitle);  //+1 to account for the first row that isn't a row for criterion
                 placeICell(criterionCell);
                 ICell weightCell = new RubricCell(j + 1, 1, crit.Weight.ToString());
@@ -351,15 +372,29 @@ namespace OsbleRubric
             }
 
             //Adding cell descriptions, who's location in the grid is CriterionID for the row index, LevelID for the column index. (Note: probably need to offset to account for non-descriptive cells in the grid)
+
+            int rowIndex = 0;
+            int colIndex = 0;
             foreach (CellDescription cd in cellDescriptions)
             {
-                ICell ic = new RubricCell(cd.CriterionID + 1, cd.LevelID + 2, cd.Description); 
+                ICell ic = new RubricCell(rowIndex + 1, colIndex + 2, cd.Description); 
                 placeICell(ic);
+                colIndex++;
+                //if the colIndex+1 (+1 to account for 0 offset) is greater than the amount of levels (col), then reset it to 0 and increment columns
+                if ((colIndex + 1) > rubric.Levels.Count) 
+                {
+                    rowIndex++;
+                    colIndex = 0;
+                    if ((rowIndex + 1) > rubric.Criteria.Count)//same idea as colIndex if check above
+                    {
+                        rowIndex = 0;
+                    }
+                }
             }
 
             //Setting up the Icells for the checkboxcells and then placing them
-            ICell globalCommentCell = new CheckBoxCell(rubric.Criteria.Count - 1, 1, rubric.HasGlobalComments);
-            ICell enableCommentsCell = new CheckBoxCell(0, rubric.Levels.Count-1, rubric.HasCriteriaComments);
+            ICell globalCommentCell = new CheckBoxCell(customDataGrid.BaseGrid.RowDefinitions.Count - 1, 1, rubric.HasGlobalComments);
+            ICell enableCommentsCell = new CheckBoxCell(0, customDataGrid.BaseGrid.ColumnDefinitions.Count - 1, rubric.HasCriteriaComments);
             placeICell(globalCommentCell);
             placeICell(enableCommentsCell);
 
@@ -1532,17 +1567,27 @@ namespace OsbleRubric
             //and a list of cell descriptions for each.  Because I'm using the Row & Column info from 
             //the data cells, our final rubric will have one empy criterion and two empty levels.  
             //Remove these manually
-            levels.RemoveAt(1);
-            levels.RemoveAt(0);
-            criteria.RemoveAt(0);
+         //   levels.RemoveAt(1);
+          //  levels.RemoveAt(0);
+         //   criteria.RemoveAt(0);
 
             //save the levels and criteria
             foreach (Level l in levels)
             {
+                //This if statement will block any levels that were added to the list as empty placeholder cells
+                if (l.RangeEnd == 0 && l.RangeStart == 0 && l.LevelTitle == "No Title")
+                {
+                    continue;
+                }
                 context.Levels.Add(l);
             }
             foreach (Criterion c in criteria)
             {
+                //This if statement will block any criteria that were added to the list as empty placeholder cells
+                if (c.CriterionTitle == "No Title" && c.Weight == 0)
+                {
+                    continue;
+                }
                 context.Criterions.Add(c);
             }
 
@@ -1565,8 +1610,8 @@ namespace OsbleRubric
         {
             foreach (CellDescription desc in cellDescriptions)
             {
-                Criterion crit = criteria[desc.CriterionID - 1];
-                Level level = levels[desc.LevelID - 2];
+                Criterion crit = criteria[desc.CriterionID];
+                Level level = levels[desc.LevelID];
                 desc.CriterionID = crit.ID;
                 desc.Criterion = crit;
                 desc.LevelID = level.ID;
