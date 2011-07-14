@@ -23,7 +23,7 @@
 <h3>Events &amp; Deadlines 
 @if (@ViewBag.ActiveCourse.AbstractRole.CanModify || @ViewBag.ActiveCourse.AbstractCourse.AllowEventPosting)
 {
-<a href="@Url.Action("Create","Event")" title="Add New Event">@Helpers.AddButton()</a>
+<a href="@Url.Action("Create","Event")" title="Add New Event or Deadline">@Helpers.AddButton()</a>
 }
 </h3>
 
