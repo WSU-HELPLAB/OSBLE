@@ -275,7 +275,7 @@ namespace OSBLE.Controllers
                 CSSId = "inline_review_silverlight",
                 XapName = "PeerReview",
                 Width = "99%",
-                Height = "99%",
+                Height = "1000px",
                 OnLoaded = "SLObjectLoaded",
                 Parameters = new Dictionary<string, string>()
                 {

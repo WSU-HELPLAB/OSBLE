@@ -36,17 +36,23 @@
 
             List<DocumentLocation> documentsToBeReviewed = new List<DocumentLocation>();
             int i = 0;
-            foreach (FileInfo file in new DirectoryInfo(path).GetFiles())
+
+            DirectoryInfo di = new DirectoryInfo(path);
+
+            if (di.Exists)
             {
-                string filePath = file.FullName;
-                int startOfWebPath = filePath.IndexOf("FileSystem");
+                foreach (FileInfo file in di.GetFiles())
+                {
+                    string filePath = file.FullName;
+                    int startOfWebPath = filePath.IndexOf("FileSystem");
 
-                //get the raw url (not web accessible due to MVC restrictions)
-                string rawUrl = VirtualPathUtility.ToAbsolute("~/" + "FileHandler/GetSubmissionDeliverable?assignmentActivityID=" + activity.ID.ToString() + "&teamUserID=" + teamUser.ID.ToString() + "&fileName=" + file.Name);
+                    //get the raw url (not web accessible due to MVC restrictions)
+                    string rawUrl = VirtualPathUtility.ToAbsolute("~/" + "FileHandler/GetSubmissionDeliverable?assignmentActivityID=" + activity.ID.ToString() + "&teamUserID=" + teamUser.ID.ToString() + "&fileName=" + file.Name);
 
-                DocumentLocation location = new DocumentLocation(rawUrl, i, teamUser.Name, AuthorClassification.Student);
-                documentsToBeReviewed.Add(location);
-                i++;
+                    DocumentLocation location = new DocumentLocation(rawUrl, i, teamUser.Name, AuthorClassification.Student);
+                    documentsToBeReviewed.Add(location);
+                    i++;
+                }
             }
             return documentsToBeReviewed.ToArray().AsQueryable();
         }

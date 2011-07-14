@@ -6,12 +6,11 @@
     xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=System.Windows.Controls"
     >
 
-    <Grid x:Name="LayoutRoot" Background="White">
+    <Grid x:Name="LayoutRoot">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <primitives:TabPanel x:Name="TabPanel" Grid.Row="0">
-        </primitives:TabPanel>
+        <primitives:TabPanel x:Name="TabPanel" Grid.Row="0"/>
     </Grid>
 </UserControl>

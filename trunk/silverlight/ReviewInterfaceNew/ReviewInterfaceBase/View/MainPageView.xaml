@@ -5,32 +5,32 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
     xmlns:toolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
-    xmlns:a="clr-namespace:ReviewInterfaceBase"
-    mc:Ignorable="d"
-    d:DesignHeight="300" d:DesignWidth="400">
-    <Grid x:Name="LayoutRoot" Background="White">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-          <!--OLDCODE2 <RowDefinition Height="5"/>-->
-              <!--OLDCODE <RowDefinition Height="200"/>-->
-        </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0">
-            <StackPanel x:Name="ButtonToolbar" Orientation="Horizontal" Margin="3" >
-                <Button x:Name="Save" Margin="0,0,5,0" ToolTipService.ToolTip="Save This Review" Height="16">
-                    <Image Source="/Osble;component/View/Icons/saveHS.png" />
-                </Button>
+    >
+    <Border BorderThickness="5" BorderBrush="LightGray">
+        <Grid x:Name="LayoutRoot">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <!--OLDCODE2 <RowDefinition Height="5"/>-->
+                <!--OLDCODE <RowDefinition Height="200"/>-->
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0">
+                <StackPanel x:Name="ButtonToolbar" Orientation="Horizontal" Margin="3" >
+                    <Button x:Name="Save" Margin="0,0,5,0" ToolTipService.ToolTip="Save This Review" Height="16">
+                        <Image Source="/Osble;component/View/Icons/saveHS.png" />
+                    </Button>
+                </StackPanel>
+                <ContentPresenter x:Name="CustomTabControlHolder" />
             </StackPanel>
-            <ContentPresenter x:Name="CustomTabControlHolder" />
-        </StackPanel>
 
-        <!--OLDCODE2 <controls:GridSplitter
+            <!--OLDCODE2 <controls:GridSplitter
                     x:Name="GridSplitter"
                     Grid.Row="1"
-			        HorizontalAlignment="Stretch"
-			        Height="5"
+                    HorizontalAlignment="Stretch"
+                    Height="5"
                     Cursor="SizeNS"
-			        Background="LightGray"/> -->
+                    Background="LightGray"/> -->
 
-        <!--OLDCODE  <ScrollViewer x:Name="RubricScrollViewer" Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>-->
-    </Grid>
+            <!--OLDCODE  <ScrollViewer x:Name="RubricScrollViewer" Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>-->
+        </Grid>
+    </Border>
 </UserControl>

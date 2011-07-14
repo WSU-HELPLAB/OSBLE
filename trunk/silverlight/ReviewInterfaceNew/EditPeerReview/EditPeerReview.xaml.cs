@@ -1,16 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ServiceModel.DomainServices.Client;
 using System.Windows.Controls;
+using System.Xml.Linq;
 using EditPeerReview.HelperClasses;
+using OSBLE.Models.ViewModels.ReviewInterface;
+using OSBLE.Services;
+using ReviewInterfaceBase.HelperClasses;
 using ReviewInterfaceBase.ViewModel;
 using ReviewInterfaceBase.ViewModel.DocumentHolder;
-using ReviewInterfaceBase.Web;
-using System.Collections.Generic;
-
-using ReviewInterfaceBase.HelperClasses;
-using System.Xml.Linq;
-using System.Windows;
 
 namespace EditPeerReview
 {
@@ -101,22 +100,21 @@ namespace EditPeerReview
 
             LocalInitilizer();
         }
-     
+
         private void LocalInitilizer()
         {
             mpVM.DocumentHolderViewModels.CollectionChanged += new NotifyCollectionChangedEventHandler(DocumentHolderViewModels_CollectionChanged);
 
             this.LayoutRoot.Children.Add(mpVM.GetView());
 
-            FakeDomainContext context = new FakeDomainContext();
-            FakeDomainContext fakeDomainContext = new FakeDomainContext();
-            var entityQuerey = fakeDomainContext.GetDocumentLocationsQuery();
-            var loadDocumentLocationsOperation = fakeDomainContext.Load<ReviewInterfaceBase.Web.DocumentLocation>(entityQuerey);
+            ReviewInterfaceDomainContext ReviewInterfaceDC = new ReviewInterfaceDomainContext();
+            var entityQuerey = ReviewInterfaceDC.GetDocumentLocationsQuery();
+            var loadDocumentLocationsOperation = ReviewInterfaceDC.Load<DocumentLocation>(entityQuerey);
             loadDocumentLocationsOperation.Completed += new EventHandler(loadDocumentLocationsOperation_Completed);
 
             //Load PeerReview Locations
-            var peerReivewQuerey = fakeDomainContext.GetPeerReviewLocationsQuery();
-            var loadPeerReviewLocationsOperation = fakeDomainContext.Load<ReviewInterfaceBase.Web.DocumentLocation>(peerReivewQuerey);
+            var peerReivewQuerey = ReviewInterfaceDC.GetPeerReviewLocationsQuery();
+            var loadPeerReviewLocationsOperation = ReviewInterfaceDC.Load<DocumentLocation>(peerReivewQuerey);
             loadPeerReviewLocationsOperation.Completed += new EventHandler(loadPeerReviewLocationsOperation_Completed);
         }
 
