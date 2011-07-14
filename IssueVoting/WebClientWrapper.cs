@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Windows;
+using OSBLE.Models.ViewModels.ReviewInterface;
 using ReviewInterfaceBase.HelperClasses;
-using ReviewInterfaceBase.Web;
 
 namespace IssueVoting.HelperClasses
 {

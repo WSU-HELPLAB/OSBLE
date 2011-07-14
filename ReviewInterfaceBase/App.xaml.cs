@@ -18,19 +18,6 @@ namespace ReviewInterfaceBase
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            if (e.InitParams != null)
-            {
-                foreach (var data in e.InitParams)
-                {
-                    //GET INIT parameters here.  This is probably going to be some sort of session key.
-                    //So my SL application can tell the web services what it is and what it needs
-                    if (data.Key == "SessionKey")
-                    {
-                        //this needs to tell the web service what our sessionKey is
-                        (new ReviewInterfaceBase.Web.FakeDomainContext()).SetSessionID(data.Key);
-                    }
-                }
-            }
             MainPageViewModel viewModel = new MainPageViewModel();
             MainPageView mpv = viewModel.GetView();
 

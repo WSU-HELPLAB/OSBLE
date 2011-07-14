@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ServiceModel.DomainServices.Client;
+using System.Windows;
 using System.Windows.Controls;
 using System.Xml.Linq;
 using IssueVoting.HelperClasses;
+using OSBLE.Models.ViewModels.ReviewInterface;
+using OSBLE.Services;
 using ReviewInterfaceBase.HelperClasses;
 using ReviewInterfaceBase.ViewModel;
 using ReviewInterfaceBase.ViewModel.DocumentHolder;
-using ReviewInterfaceBase.Web;
-using System.Windows;
 
 namespace ViewPeerReview
 {
@@ -42,7 +43,6 @@ namespace ViewPeerReview
             //Killing the save button by collapsing it
             UIElement saveButton = (UIElement)(mpVM.GetView().Content as Grid).FindName("Save");
             if (saveButton is Button)
-
             {
                 saveButton.Visibility = System.Windows.Visibility.Collapsed;
             }
@@ -75,18 +75,18 @@ namespace ViewPeerReview
             this.LayoutRoot.Children.Add(mpVM.GetView());
 
             //Get DomainContext
-            FakeDomainContext fakeDomainContext = new FakeDomainContext();
+            ReviewInterfaceDomainContext ReviewInterfaceDomainContext = new ReviewInterfaceDomainContext();
 
             //Now we start two asynchronous threads and they both need to finish before we can proceed
 
             //Load Document Locations
-            var documentQuerey = fakeDomainContext.GetDocumentLocationsQuery();
-            var loadDocumentLocationsOperation = fakeDomainContext.Load<ReviewInterfaceBase.Web.DocumentLocation>(documentQuerey);
+            var documentQuerey = ReviewInterfaceDomainContext.GetDocumentLocationsQuery();
+            var loadDocumentLocationsOperation = ReviewInterfaceDomainContext.Load<DocumentLocation>(documentQuerey);
             loadDocumentLocationsOperation.Completed += new EventHandler(loadDocumentLocationsOperation_Completed);
 
             //Load PeerReview Locations
-            var peerReivewQuerey = fakeDomainContext.GetPeerReviewLocationsQuery();
-            var loadPeerReviewLocationsOperation = fakeDomainContext.Load<ReviewInterfaceBase.Web.DocumentLocation>(peerReivewQuerey);
+            var peerReivewQuerey = ReviewInterfaceDomainContext.GetPeerReviewLocationsQuery();
+            var loadPeerReviewLocationsOperation = ReviewInterfaceDomainContext.Load<DocumentLocation>(peerReivewQuerey);
             loadPeerReviewLocationsOperation.Completed += new EventHandler(loadPeerReviewLocationsOperation_Completed);
         }
 

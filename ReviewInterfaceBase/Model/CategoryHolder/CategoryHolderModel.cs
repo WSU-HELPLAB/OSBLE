@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ServiceModel.DomainServices.Client;
 using ReviewInterfaceBase.ViewModel.Category;
-using ReviewInterfaceBase.Web;
 
 namespace ReviewInterfaceBase.Model.CatergoryHolder
 {
@@ -47,13 +45,14 @@ namespace ReviewInterfaceBase.Model.CatergoryHolder
 
         private void loadCategoriesOperation_Completed(object sender, EventArgs e)
         {
+            /*
             categories.Clear();
             LoadOperation<Web.Category> loadOperation = sender as LoadOperation<Web.Category>;
             foreach (Web.Category category in loadOperation.Entities)
             {
                 CategoryViewModel cvm = new CategoryViewModel();
                 cvm.LoadTags(category.Name, category.ID);
-                
+
                 //Tying the event to let listeners know when tags have been loaded
                 cvm.LoadComplete += new EventHandler(cvm_LoadComplete);
 
@@ -62,9 +61,10 @@ namespace ReviewInterfaceBase.Model.CatergoryHolder
 
             //Let anyone else know (aka our ViewModel) that we are done loading
             LoadCompleted(this, EventArgs.Empty);
+             */
         }
 
-        void cvm_LoadComplete(object sender, EventArgs e)
+        private void cvm_LoadComplete(object sender, EventArgs e)
         {
             //Letting others know that the tags have been loaded in
             TagsLoaded(sender, e);
@@ -72,6 +72,7 @@ namespace ReviewInterfaceBase.Model.CatergoryHolder
 
         public void Load()
         {
+            /*
             if (documentID == -1)
             {
                 throw new Exception("DocumentID was -1 which indicates it was not set using the correct constructor, please pass in documentID when calling the constructor if you then want to use Load");
@@ -80,14 +81,20 @@ namespace ReviewInterfaceBase.Model.CatergoryHolder
             var entityQuerey = fakeDomainContext.GetCategoriesQuery(documentID);
             var loadCategoriesOperation = fakeDomainContext.Load<ReviewInterfaceBase.Web.Category>(entityQuerey);
             loadCategoriesOperation.Completed += new EventHandler(loadCategoriesOperation_Completed);
+             */
+
+            //This was added while Categories dont work with OSBLE needs to be removed when they do
+            LoadCompleted(this, EventArgs.Empty);
         }
 
         public void LoadIssueVotingCategories()
         {
+            /*
             FakeDomainContext fakeDomainContext = new FakeDomainContext();
             var entityQuerey = fakeDomainContext.GetIssueVotingCategoriesQuery();
             var loadCategoriesOperation = fakeDomainContext.Load<ReviewInterfaceBase.Web.Category>(entityQuerey);
             loadCategoriesOperation.Completed += new EventHandler(loadCategoriesOperation_Completed);
+             */
         }
     }
 }

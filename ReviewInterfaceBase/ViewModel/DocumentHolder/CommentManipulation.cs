@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -14,7 +14,6 @@ using ReviewInterfaceBase.HelperClasses;
 using ReviewInterfaceBase.View.Comment;
 using ReviewInterfaceBase.ViewModel.Comment;
 using ReviewInterfaceBase.ViewModel.Comment.Location;
-using ReviewInterfaceBase.ViewModel.Category;
 
 namespace ReviewInterfaceBase.ViewModel.DocumentHolder
 {
@@ -407,7 +406,6 @@ namespace ReviewInterfaceBase.ViewModel.DocumentHolder
 
             //Setting the value of XMLCategory to the portion of the xmlComment that has the categories
             (commentViewModel as PeerReviewCommentViewModel).XMLCategory = xmlComment.Descendants("Categories").ElementAt(0);
-
         }
 
         /// <summary>

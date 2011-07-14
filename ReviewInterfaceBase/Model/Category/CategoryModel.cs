@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ServiceModel.DomainServices.Client;
 using ReviewInterfaceBase.ViewModel.Tag;
-using ReviewInterfaceBase.Web;
 
 namespace ReviewInterfaceBase.Model.Category
 {
@@ -48,14 +46,20 @@ namespace ReviewInterfaceBase.Model.Category
 
         public void Load()
         {
+            /*
             FakeDomainContext fakeDomainContext = new FakeDomainContext();
             var entityQuerey = fakeDomainContext.GetTagsQuery(id);
             var loadTagOperation = fakeDomainContext.Load<ReviewInterfaceBase.Web.Tag>(entityQuerey);
             loadTagOperation.Completed += new EventHandler(loadTagOperation_Completed);
+             */
+
+            //This was added while Categories dont work with OSBLE needs to be removed when they do
+            LoadCompleted(this, EventArgs.Empty);
         }
 
         private void loadTagOperation_Completed(object sender, EventArgs e)
         {
+            /*
             LoadOperation<Web.Tag> loadOperation = sender as LoadOperation<Web.Tag>;
             tagViewModelList = new List<TagViewModel>();
             foreach (Web.Tag tag in loadOperation.Entities)
@@ -65,6 +69,7 @@ namespace ReviewInterfaceBase.Model.Category
 
             //Let anyone else know (aka our ViewModel) that we are done loading
             LoadCompleted(this, EventArgs.Empty);
+             */
         }
     }
 }
