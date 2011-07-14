@@ -1,20 +1,12 @@
-﻿
-namespace OSBLE.Services
+﻿namespace OSBLE.Services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.ComponentModel.DataAnnotations;
     using System.Linq;
     using System.ServiceModel.DomainServices.Hosting;
     using System.ServiceModel.DomainServices.Server;
+    using System.Web;
     using OSBLE.Models;
     using OSBLE.Models.Courses;
-    using System.Runtime.Serialization;
-    using System.Web.Configuration;
-    using System.Web;
     using OSBLE.Models.Users;
-
 
     /// <summary>
     /// Provides current user and active course context,
@@ -26,12 +18,12 @@ namespace OSBLE.Services
     public class OSBLEService : DomainService
     {
         protected OSBLEContext db = new OSBLEContext();
-        protected CoursesUsers CurrentCourseUser = null;
+        protected CoursesUsers currentCourseUser = null;
         protected UserProfile currentUserProfile = null;
         protected AbstractCourse currentCourse = null;
 
         protected HttpContext Context = System.Web.HttpContext.Current;
-                
+
         public OSBLEService()
             : base()
         {
@@ -47,9 +39,11 @@ namespace OSBLE.Services
                                  where c.ID == activeCourse
                                  select c).FirstOrDefault();
 
+                currentCourseUser = (from c in db.CoursesUsers
+                                     where c.AbstractCourseID == currentCourse.ID
+                                     && c.UserProfileID == currentUserProfile.ID
+                                     select c).FirstOrDefault();
             }
         }
     }
 }
-
-

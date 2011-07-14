@@ -239,6 +239,7 @@ namespace OSBLE.Controllers
         {
             try
             {
+                //This is a nice way to just return a text as the view
                 return this.Content(String.Join("; ", (
                     (from c in (db.TeamUsers.Find(teamID) as TeamMember).Team.Members select c.Name).ToArray())));
             }
@@ -259,7 +260,10 @@ namespace OSBLE.Controllers
                     Session.Add("CurrentActivityID", assignmentActivityID);
                     Session.Add("TeamUserID", teamUserID);
 
-                    return View(new InlineReviewViewModel() { ReviewInterface = createInlineReviewSilverlightObject() });
+                    //if publish file exists then teacher can not save as draft
+                    bool canSaveAsDraft = !(new FileInfo(FileSystem.GetTeamUserPeerReview(false, activeCourse.AbstractCourse as Course, assignmentActivityID, teamUserID)).Exists);
+
+                    return View(new InlineReviewViewModel() { ReviewInterface = createEditInlineReviewSilverlightObject(canSaveAsDraft) });
                 }
             }
             catch
@@ -268,18 +272,55 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        private SilverlightObject createInlineReviewSilverlightObject()
+        public ActionResult ViewInlineReview(int abstractAssignmentActivityId, int teamUserId)
+        {
+            try
+            {
+                AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(abstractAssignmentActivityId);
+                TeamUserMember teamUser = db.TeamUsers.Find(teamUserId);
+
+                if (activity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourse.ID && teamUser.Contains(currentUser))
+                {
+                    Session.Add("CurrentActivityID", activity.ID);
+                    Session.Add("TeamUserID", teamUser.ID);
+                    return View("InlineReview", new InlineReviewViewModel() { ReviewInterface = ViewInlineReviewSilverlightObject() });
+                }
+            }
+            catch
+            { }
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        private SilverlightObject ViewInlineReviewSilverlightObject()
         {
             return new SilverlightObject
             {
                 CSSId = "inline_review_silverlight",
-                XapName = "PeerReview",
+                XapName = "ViewPeerReview",
                 Width = "99%",
-                Height = "1000px",
+                Height = "99%",
                 OnLoaded = "SLObjectLoaded",
                 Parameters = new Dictionary<string, string>()
                 {
                 }
+            };
+        }
+
+        private SilverlightObject createEditInlineReviewSilverlightObject(bool canSaveAsDraft)
+        {
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+
+            parameters.Add("CanSaveAsDraft", canSaveAsDraft.ToString());
+
+            return new SilverlightObject
+            {
+                CSSId = "inline_review_silverlight",
+                XapName = "EditPeerReview",
+                Width = "99%",
+                Height = "99%",
+                OnLoaded = "SLObjectLoaded",
+                Parameters = parameters
             };
         }
     }

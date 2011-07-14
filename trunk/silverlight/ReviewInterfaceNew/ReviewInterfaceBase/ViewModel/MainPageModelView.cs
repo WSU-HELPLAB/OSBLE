@@ -108,7 +108,10 @@ namespace ReviewInterfaceBase.ViewModel
             thisView = new MainPageView();
 
             //This setups up all the events needed on the view directly
-            thisView.Save.Click += new RoutedEventHandler(Save_Click);
+            thisView.PublishTop.Click += new RoutedEventHandler(Save_Click);
+            thisView.PublishBottom.Click += new RoutedEventHandler(Save_Click);
+            thisView.SaveAsDraftTop.Click += new RoutedEventHandler(SaveAsDraft_Click);
+            thisView.SaveAsDraftBottom.Click += new RoutedEventHandler(SaveAsDraft_Click);
             thisView.SizeChanged += new SizeChangedEventHandler(thisView_SizeChanged);
             thisView.MouseRightButtonDown += new MouseButtonEventHandler(thisView_MouseRightButtonDown);
 
@@ -201,12 +204,7 @@ namespace ReviewInterfaceBase.ViewModel
             OpeningDocumentsComplete(this, EventArgs.Empty);
         }
 
-        /// <summary>
-        /// This is the code that is run when the files is saved
-        /// </summary>
-        /// <param name="sender">sender</param>
-        /// <param name="e">not used</param>
-        private void Save_Click(object sender, RoutedEventArgs e)
+        private StringBuilder SaveReview()
         {
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.Indent = true;
@@ -214,27 +212,45 @@ namespace ReviewInterfaceBase.ViewModel
 
             StringBuilder sb = new StringBuilder();
 
-            XmlWriter writer = XmlWriter.Create(sb, settings);
-
-            //we write the first overall element
-            writer.WriteStartElement("ReviewInterfaceBasePeerReview");
-
-            //Then each DocumentHolder writes whatever it has too.
-            foreach (IDocumentHolderViewModel DocumentHolderViewModel in DocumentHolderViewModels)
+            using (XmlWriter writer = XmlWriter.Create(sb, settings))
             {
-                DocumentHolderViewModel.WriteXml(writer);
+                //we write the first overall element
+                writer.WriteStartElement("ReviewInterfaceBasePeerReview");
+
+                //Then each DocumentHolder writes whatever it has too.
+                foreach (IDocumentHolderViewModel DocumentHolderViewModel in DocumentHolderViewModels)
+                {
+                    DocumentHolderViewModel.WriteXml(writer);
+                }
+                writer.WriteEndElement();
             }
-            writer.WriteEndElement();
-            writer.Close();
 
             //I do not know why but it writes utf-16 and then throws an error when it tries to read it so this is a hot fix
             //I know we want utf-8 but not sure how to the xmlWriter to write that so I just change it manually.
             sb.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 
+            return sb;
+        }
+
+        private void SaveAsDraft_Click(object sender, RoutedEventArgs e)
+        {
             ReviewInterfaceDomainContext ReviewInterfaceDC = new ReviewInterfaceDomainContext();
 
             //Then we upload the file as well as register an event for when it has been uploaded
-            ReviewInterfaceDC.UploadFile(sb.ToString()).Completed += new EventHandler(FileUploadComplete);
+            ReviewInterfaceDC.UploadReviewDraft(SaveReview().ToString()).Completed += new EventHandler(FileUploadComplete);
+        }
+
+        /// <summary>
+        /// This is the code that is run when the files is saved
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">not used</param>
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            ReviewInterfaceDomainContext ReviewInterfaceDC = new ReviewInterfaceDomainContext();
+
+            //Then we upload the file as well as register an event for when it has been uploaded
+            ReviewInterfaceDC.UploadFile(SaveReview().ToString()).Completed += new EventHandler(FileUploadComplete);
         }
 
         private void FileUploadComplete(object sender, EventArgs e)
@@ -250,8 +266,8 @@ namespace ReviewInterfaceBase.ViewModel
 
         private void thisView_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            thisView.LayoutRoot.RowDefinitions[0].Height = new GridLength(e.NewSize.Height/*OLDCODE - ( thisView.LayoutRoot.RowDefinitions[2].ActualHeight + thisView.LayoutRoot.RowDefinitions[1].ActualHeight)*/);
-            thisView.CustomTabControlHolder.Height = thisView.LayoutRoot.RowDefinitions[0].Height.Value - (thisView.ButtonToolbar.ActualHeight + 10);
+            thisView.LayoutRoot.RowDefinitions[0].Height = new GridLength(thisView.MainBorder.ActualHeight - (thisView.MainBorder.BorderThickness.Top + thisView.MainBorder.BorderThickness.Bottom) /*OLDCODE - ( thisView.LayoutRoot.RowDefinitions[2].ActualHeight + thisView.LayoutRoot.RowDefinitions[1].ActualHeight)*/);
+            thisView.CustomTabControlHolder.Height = thisView.LayoutRoot.RowDefinitions[0].Height.Value - (thisView.ButtonToolbarBottom.ActualHeight + thisView.ButtonToolbarTop.ActualHeight);
             /*OLDCODE  */
         }
 
@@ -423,6 +439,20 @@ namespace ReviewInterfaceBase.ViewModel
         public MainPageView GetView()
         {
             return thisView;
+        }
+
+        public void HideSaveButtons()
+        {
+            thisView.PublishTop.Visibility = Visibility.Collapsed;
+            thisView.SaveAsDraftTop.Visibility = Visibility.Collapsed;
+            thisView.PublishBottom.Visibility = Visibility.Collapsed;
+            thisView.SaveAsDraftBottom.Visibility = Visibility.Collapsed;
+        }
+
+        public void HideDraftButton()
+        {
+            thisView.SaveAsDraftTop.Visibility = Visibility.Collapsed;
+            thisView.SaveAsDraftBottom.Visibility = Visibility.Collapsed;
         }
 
         #endregion Public Methods

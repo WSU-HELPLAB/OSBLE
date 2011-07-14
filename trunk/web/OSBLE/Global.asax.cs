@@ -30,6 +30,10 @@ namespace OSBLE
             routes.IgnoreRoute("OsbleRubricTestPage.aspx");
             routes.IgnoreRoute("SilverlightSandboxTestPage.html");
             routes.IgnoreRoute("SilverlightSandboxTestPage.aspx");
+            routes.IgnoreRoute("ViewPeerReviewTestPage.aspx");
+            routes.IgnoreRoute("ViewPeerReviewTestPage.html");
+            routes.IgnoreRoute("EditPeerReviewTestPage.aspx");
+            routes.IgnoreRoute("EditPeerReviewTestPage.html");
 #endif
             routes.MapRoute(
                 "File System",

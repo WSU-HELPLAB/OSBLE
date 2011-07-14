@@ -53,7 +53,7 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        [CanGradeCourse]
+        [NotForCommunity]
         public ActionResult GetSubmissionDeliverable(int assignmentActivityID, int teamUserID, string fileName)
         {
             try
@@ -61,7 +61,8 @@ namespace OSBLE.Controllers
                 AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(assignmentActivityID);
                 TeamUserMember teamUser = db.TeamUsers.Find(teamUserID);
 
-                if (activity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID && teamUser != null)
+                //make sure assignmentActivity is part of the activeCourse and (the person can grade  or is allowed access to it)
+                if (activity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID && (activeCourse.AbstractRole.CanGrade || teamUser.Contains(currentUser)))
                 {
                     string path = FileSystem.GetDeliverable(activeCourse.AbstractCourse as Course, assignmentActivityID, teamUser, fileName);
                     return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
@@ -74,7 +75,6 @@ namespace OSBLE.Controllers
         }
 
         [NotForCommunity]
-
         public ActionResult GetSubmissionDeliverableByType(int assignmentActivityID, int userProfileID, string fileName, DeliverableType type)
         {
             AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(assignmentActivityID);
@@ -159,6 +159,47 @@ namespace OSBLE.Controllers
                 throw new Exception("Error in GetSubmissionZip", e);
             }
             return RedirectToAction("Index", "Home");
+        }
+
+        [NotForCommunity]
+        public ActionResult GetTeamUserPeerReview(int assignmentActivityID, int teamUserID)
+        {
+            try
+            {
+                AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(assignmentActivityID);
+                TeamUserMember teamUser = db.TeamUsers.Find(teamUserID);
+
+                if ((activity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID))
+                {
+                    if (activeCourse.AbstractRole.CanGrade)
+                    {
+                        //if we are dealing with a teacher first give them the published but if it doesn't exists give them a draft if that doesn't exist give em nothing
+                        string path = FileSystem.GetTeamUserPeerReview(false, activeCourse.AbstractCourse as Course, assignmentActivityID, teamUser.ID);
+                        if (new FileInfo(path).Exists)
+                        {
+                            return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
+                        }
+                        else
+                        {
+                            path = FileSystem.GetTeamUserPeerReviewDraft(false, activeCourse.AbstractCourse as Course, assignmentActivityID, teamUser.ID);
+                            if (new FileInfo(path).Exists)
+                            {
+                                return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
+                            }
+                        }
+                    }
+                    else if (activeCourse.AbstractRole.CanSubmit && teamUser.Contains(currentUser))
+                    {
+                        //if we are dealing with student try to give them the published one but if that doesn't exist give them nothing
+                        string path = FileSystem.GetTeamUserPeerReview(false, activeCourse.AbstractCourse as Course, assignmentActivityID, teamUser.ID);
+                        return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
+                    }
+                }
+            }
+            catch
+            { }
+            //either not authorized or bad parameters were passed in
+            throw new Exception();
         }
 
         [CanGradeCourse]

@@ -386,15 +386,27 @@ namespace OSBLE
         /// <param name="abstractAssignmentActivityID"></param>
         /// <param name="teamUserID"></param>
         /// <returns></returns>
-        public static string GetTeamUserReviewFolderLocation(Course course, int abstractAssignmentActivityID, int teamUserID)
+        public static string GetTeamUserReviewFolderLocation(bool createPathIfNotExists, Course course, int abstractAssignmentActivityID, int teamUserID)
         {
             string path = GetReviewFolderLocation(course, abstractAssignmentActivityID) + "\\Reviews\\" + teamUserID;
             DirectoryInfo info = new DirectoryInfo(path);
 
-            if (!info.Exists)
+            if (!info.Exists && createPathIfNotExists)
             {
                 info.Create();
             }
+            return path;
+        }
+
+        public static string GetTeamUserPeerReviewDraft(bool createPathIfNotExists, Course course, int abstractAssignmentActivityID, int teamUserID)
+        {
+            return GetTeamUserReviewFolderLocation(createPathIfNotExists, course, abstractAssignmentActivityID, teamUserID) + "\\PeerReviewDraft.xml";
+        }
+
+        public static string GetTeamUserPeerReview(bool createPathIfNotExists, Course course, int abstractAssignmentActivityID, int teamUserID)
+        {
+            string path = GetTeamUserReviewFolderLocation(createPathIfNotExists, course, abstractAssignmentActivityID, teamUserID);
+            path += "\\PeerReview.xml";
             return path;
         }
 

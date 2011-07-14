@@ -142,14 +142,31 @@ int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
                                 }
                             </div>
                             <div class="submission_deliverables_end">
-                            @{Score score = (from c in submission.Scores where c.TeamUserMemberID == (OSBLEController.GetTeamUser(submission, ViewBag.CurrentUser as UserProfile)).ID select c).FirstOrDefault();  }
-                            @if(score == null)
+                            @{
+                        TeamUserMember teamUser = (OSBLEController.GetTeamUser(submission, ViewBag.CurrentUser as UserProfile));
+                                Score score = (from c in submission.Scores where c.TeamUserMemberID == teamUser.ID select c).FirstOrDefault();
+                            if(score == null)
                             {
-                            @Ajax.ActionLink("Submit Files For This Submission", "Create", "Submission", new { id = submission.ID.ToString() }, new AjaxOptions() { InsertionMode = InsertionMode.Replace, LoadingElementId="Loading", HttpMethod = "Get", UpdateTargetId = "submitFiles", OnComplete = "SubmissionLoaded" }, new object())
+                                AjaxOptions options = new AjaxOptions() 
+                                { 
+                                    InsertionMode = InsertionMode.Replace,
+                           LoadingElementId="Loading",
+                           HttpMethod = "Get",
+                           UpdateTargetId = "submitFiles",
+                           OnComplete = "SubmissionLoaded" 
+                                };
+                            @Ajax.ActionLink("Submit Files For This Submission", "Create", "Submission", new { id = submission.ID.ToString() }, options, new object())
                             }
                             else
                             {
-                                @Html.ActionLink("View Grade", "View", "Rubric", new { abstractAssignmentActivityId = submission.ID, teamUserId =  (OSBLEController.GetTeamUser(submission, ViewBag.CurrentUser as UserProfile)).ID}, new { })
+                                @Html.ActionLink("View Grade", "View", "Rubric", new { abstractAssignmentActivityId = submission.ID, teamUserId = teamUser.ID }, new { })
+                            }
+                            
+                            FileInfo info = new FileInfo(OSBLE.FileSystem.GetTeamUserPeerReview(false, ViewBag.ActiveCourse.AbstractCourse, submission.ID, teamUser.ID));
+                        if (info.Exists)
+                                {
+                                    <br />@Html.ActionLink("View Inline Comments", "ViewInlineReview", new { abstractAssignmentActivityId = submission.ID, teamUserId = teamUser.ID });
+                                }
                             }
                             
                             <script type="text/javascript">
@@ -177,16 +194,16 @@ int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
                             </div>
                             </div>
                         </li>   
-                                if (ViewBag.CanSubmit && submission.ReleaseDate < DateTime.Now)
-                                {
+                        if (ViewBag.CanSubmit && submission.ReleaseDate < DateTime.Now)
+                        {
                                     
                         
                                     
                                     <!--<button onclick="location.href='@Url.Action("Create", "Submission", new { id = submission.ID.ToString() })'">
                             Submit Files For This Submission</button>   -->
-                                }
+                        }
 
-                                submissionCounter++;
+                        submissionCounter++;
                     }
                                 
                     }

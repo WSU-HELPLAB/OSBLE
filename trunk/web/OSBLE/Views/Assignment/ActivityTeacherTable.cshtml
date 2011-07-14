@@ -103,6 +103,7 @@
     @foreach (ActivityTeacherTableViewModel.SubmissionInfo info in Model.SubmissionsInfo)
     {
         string nameID = "TeamUserID_" + info.SubmitterID.ToString();
+        bool hasSubbmitted = info.Time != null;
         <tr>
             <td>
                 @if (isTeam)
@@ -119,8 +120,9 @@
             @if (hasDeliverables)
             { 
                 <td>
-                    @if (info.Time == null)
+                    @if (hasSubbmitted == false)
                     {
+                        //if we have graded display Not Submitted in back else display it in red
                         if (info.Graded)
                         { 
                         <span>Not Submitted</span>
@@ -132,6 +134,7 @@
                     }
                     else
                     {
+                        //if it is on time (including the grace period) then display when it was submitted else display how late it is in hrs and in red
                         if (info.Time.Value.AddMinutes(-Model.Activity.MinutesLateWithNoPenalty) < ViewBag.DueDate)
                         {
                         <span>@info.Time</span>
@@ -161,11 +164,22 @@
                 }
             </td>
             }
+            
+            
             @if (inlineReviewAllowed)
-            { 
+            {
+                
                 <td>
+                @if (hasSubbmitted)
+                {
                     @Html.ActionLink("Review", "InlineReview", "Assignment", new { assignmentActivityID = ViewBag.activityID, teamUserID = info.SubmitterID }, new { })
+                }
+                else
+                {
+                    <span>Nothing to Review</span>
+                }
                 </td>
+                
             }
             @if (hasRubric)
             { 

@@ -23,7 +23,16 @@
             activity = db.AbstractAssignmentActivities.Find((int)context.Session["CurrentActivityID"]);
             teamUser = db.TeamUsers.Find((int)context.Session["TeamUserID"]);
 
-            if (activity == null || teamUser == null || currentCourse as Course == null)
+            //Giant if statement
+            if (
+                //First make sure we have no nulls
+                activity == null || teamUser == null || currentCourse as Course == null || currentCourseUser == null
+
+                //then make sure that activity is of the current course and the activity contains the teamUser
+                || activity.AbstractAssignment.Category.Course != currentCourse || !activity.TeamUsers.Contains(teamUser)
+
+                //then make sure they have the right role either can grade or they are student looking at their own work
+                || (!((currentCourseUser.AbstractRole.CanGrade) || (currentCourseUser.AbstractRole.CanSubmit && teamUser.Contains(currentUserProfile)))))
             {
                 throw new Exception("Session did not contain valid IDs for activity or teamUser or currentCourse is not a Course");
             }
@@ -44,12 +53,11 @@
                 foreach (FileInfo file in di.GetFiles())
                 {
                     string filePath = file.FullName;
-                    int startOfWebPath = filePath.IndexOf("FileSystem");
 
                     //get the raw url (not web accessible due to MVC restrictions)
                     string rawUrl = VirtualPathUtility.ToAbsolute("~/" + "FileHandler/GetSubmissionDeliverable?assignmentActivityID=" + activity.ID.ToString() + "&teamUserID=" + teamUser.ID.ToString() + "&fileName=" + file.Name);
 
-                    DocumentLocation location = new DocumentLocation(rawUrl, i, teamUser.Name, AuthorClassification.Student);
+                    DocumentLocation location = new DocumentLocation(rawUrl, i, teamUser.Name, AuthorClassification.Student, file.Name);
                     documentsToBeReviewed.Add(location);
                     i++;
                 }
@@ -59,12 +67,30 @@
 
         public IQueryable<DocumentLocation> GetPeerReviewLocations()
         {
+            string path = FileSystem.GetTeamUserPeerReview(false, currentCourse as Course, activity.ID, teamUser.ID);
+
+            FileInfo file = new FileInfo(path);
+
+            if (file.Exists)
+            {
+                string rawUrl = VirtualPathUtility.ToAbsolute("~/FileHandler/GetTeamUserPeerReview?assignmentActivityID=" + activity.ID.ToString() + "&teamUserID=" + teamUser.ID.ToString());
+
+                return (new List<DocumentLocation>() { new DocumentLocation(rawUrl, 100, teamUser.Name, AuthorClassification.Instructor, file.Name) }).AsQueryable();
+            }
             return null;
         }
 
         public void UploadFile(string str)
         {
-            using (StreamWriter sw = new StreamWriter(FileSystem.GetTeamUserReviewFolderLocation(currentCourse as Course, activity.AbstractAssignmentID, teamUser.ID) + "/PeerReview.xml"))
+            using (StreamWriter sw = new StreamWriter(FileSystem.GetTeamUserPeerReview(true, currentCourse as Course, activity.AbstractAssignmentID, teamUser.ID)))
+            {
+                sw.Write(str);
+            }
+        }
+
+        public void UploadReviewDraft(string str)
+        {
+            using (StreamWriter sw = new StreamWriter(FileSystem.GetTeamUserPeerReviewDraft(true, currentCourse as Course, activity.AbstractAssignmentID, teamUser.ID)))
             {
                 sw.Write(str);
             }

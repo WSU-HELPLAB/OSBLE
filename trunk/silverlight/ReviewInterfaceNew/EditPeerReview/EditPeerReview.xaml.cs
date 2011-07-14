@@ -91,21 +91,26 @@ namespace EditPeerReview
             OpenPeerReviewDocuments();
         }
 
-        public EditPeerReview()
+        public EditPeerReview(bool canSaveAsDraft)
         {
             InitializeComponent();
 
             //Attach a handler for when the MainPage is done opening the documents.
             mpVM.OpeningDocumentsComplete += new EventHandler(mpVM_OpeningDocumentsComplete);
 
-            LocalInitilizer();
+            LocalInitilizer(canSaveAsDraft);
         }
 
-        private void LocalInitilizer()
+        private void LocalInitilizer(bool canSaveAsDraft)
         {
             mpVM.DocumentHolderViewModels.CollectionChanged += new NotifyCollectionChangedEventHandler(DocumentHolderViewModels_CollectionChanged);
 
             this.LayoutRoot.Children.Add(mpVM.GetView());
+
+            if (canSaveAsDraft == false)
+            {
+                mpVM.HideDraftButton();
+            }
 
             ReviewInterfaceDomainContext ReviewInterfaceDC = new ReviewInterfaceDomainContext();
             var entityQuerey = ReviewInterfaceDC.GetDocumentLocationsQuery();

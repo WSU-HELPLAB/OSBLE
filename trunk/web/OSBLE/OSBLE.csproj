@@ -19,7 +19,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <UseIISExpress>false</UseIISExpress>
-    <SilverlightApplicationList>{AB420045-1365-43D9-A243-EB735E776BEC}|..\TeamCreation\TeamCreation.csproj|ClientBin|False,{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}|..\StudioTimelineCreation\StudioTimelineCreation.csproj|ClientBin|False,{79706350-C34D-4A51-B22F-273EC8289E5D}|..\..\silverlight\FileUploader\FileUploader.csproj|ClientBin|False,{4196777B-69DF-4B8C-95CF-D4487C34F03F}|..\OsbleRubric\OsbleRubric.csproj|ClientBin|False,{D7C51CF9-3BB2-44CF-9880-E35EF83A1F85}|..\SilverlightSandbox\SilverlightSandbox.csproj|ClientBin|False,{84A7338D-8FD4-4A92-93EA-D02D24704F2E}|..\..\silverlight\ReviewInterface\PeerReview\PeerReview.csproj|ClientBin|False</SilverlightApplicationList>
+    <SilverlightApplicationList>{AB420045-1365-43D9-A243-EB735E776BEC}|..\TeamCreation\TeamCreation.csproj|ClientBin|False,{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}|..\StudioTimelineCreation\StudioTimelineCreation.csproj|ClientBin|False,{79706350-C34D-4A51-B22F-273EC8289E5D}|..\..\silverlight\FileUploader\FileUploader.csproj|ClientBin|False,{4196777B-69DF-4B8C-95CF-D4487C34F03F}|..\OsbleRubric\OsbleRubric.csproj|ClientBin|False,{D7C51CF9-3BB2-44CF-9880-E35EF83A1F85}|..\SilverlightSandbox\SilverlightSandbox.csproj|ClientBin|False,{84A7338D-8FD4-4A92-93EA-D02D24704F2E}|..\..\silverlight\ReviewInterface\PeerReview\PeerReview.csproj|ClientBin|False,{D7E4F1AB-379C-4AD4-BBCF-A0002F44811C}|..\..\silverlight\ReviewInterfaceNew\ViewPeerReview\ViewPeerReview.csproj|ClientBin|False,{172F41E1-B3F6-4519-9DBE-E08B2EE2BC1B}|..\..\silverlight\ReviewInterfaceNew\EditPeerReview\EditPeerReview.csproj|ClientBin|False</SilverlightApplicationList>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -266,12 +266,14 @@
     <Content Include="App_Data\FirstNames.txt" />
     <Content Include="App_Data\LastNames.txt" />
     <Content Include="clientaccesspolicy.xml" />
+    <Content Include="ClientBin\EditPeerReview.xap" />
     <Content Include="ClientBin\FileUploader.xap" />
     <Content Include="ClientBin\OsbleRubric.xap" />
     <Content Include="ClientBin\PeerReview.xap" />
     <Content Include="ClientBin\SilverlightSandbox.xap" />
     <Content Include="ClientBin\StudioTimelineCreation.xap" />
     <Content Include="ClientBin\TeamCreation.xap" />
+    <Content Include="ClientBin\ViewPeerReview.xap" />
     <Content Include="Content\favicon.ico" />
     <Content Include="Content\images\arrow_left.png" />
     <Content Include="Content\images\helplab_logo.png" />
@@ -410,6 +412,8 @@
     <Content Include="Content\themes\base\jquery.ui.tabs.css" />
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
     <Content Include="crossdomain.xml" />
+    <Content Include="EditPeerReviewTestPage.aspx" />
+    <Content Include="EditPeerReviewTestPage.html" />
     <Content Include="Global.asax" />
     <Content Include="OsbleRubricTestPage.aspx" />
     <Content Include="OsbleRubricTestPage.html" />
@@ -447,6 +451,8 @@
     <Content Include="Scripts\multifile.js" />
     <Content Include="SilverlightSandboxTestPage.aspx" />
     <Content Include="SilverlightSandboxTestPage.html" />
+    <Content Include="ViewPeerReviewTestPage.aspx" />
+    <Content Include="ViewPeerReviewTestPage.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

@@ -6,7 +6,8 @@ namespace OSBLE.Models.ViewModels.ReviewInterface
     {
         Student,
         Moderator,
-        Anonymous
+        Anonymous,
+        Instructor
     }
 
     public class DocumentLocation
@@ -15,6 +16,7 @@ namespace OSBLE.Models.ViewModels.ReviewInterface
         int id;
         string author;
         AuthorClassification role;
+        string fileName;
 
         public string Location
         {
@@ -37,18 +39,24 @@ namespace OSBLE.Models.ViewModels.ReviewInterface
             get { return id; }
         }
 
+        public string FileName
+        {
+            get { return fileName; }
+        }
+
         public DocumentLocation()
         {
             location = "DEFAULT";
             id = 0;
         }
 
-        public DocumentLocation(string location, int id, string author, AuthorClassification role)
+        public DocumentLocation(string location, int id, string author, AuthorClassification role, string fileName)
         {
             this.location = location;
             this.id = id;
             this.author = author;
             this.role = role;
+            this.fileName = fileName;
         }
     }
 }
