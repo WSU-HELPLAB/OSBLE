@@ -8,6 +8,7 @@ using EditPeerReview.HelperClasses;
 using OSBLE.Models.ViewModels.ReviewInterface;
 using OSBLE.Services;
 using ReviewInterfaceBase.HelperClasses;
+using ReviewInterfaceBase.View;
 using ReviewInterfaceBase.ViewModel;
 using ReviewInterfaceBase.ViewModel.DocumentHolder;
 
@@ -16,6 +17,8 @@ namespace EditPeerReview
     public partial class EditPeerReview : UserControl
     {
         private MainPageViewModel mpVM = new MainPageViewModel();
+
+        private LoadingWindow loadingWindow = new LoadingWindow();
 
         /// <summary>
         /// This is how we know if the documents are 'opened' on the main page
@@ -81,6 +84,7 @@ namespace EditPeerReview
                 {
                     ReadPeerReview(XDocument.Load(peerReview.Stream), peerReview.Author, peerReview.Role);
                 }
+                //mpVM.HideLoadingWindow();
             }
         }
 
@@ -95,6 +99,8 @@ namespace EditPeerReview
         {
             InitializeComponent();
 
+            (loadingWindow as ChildWindow).Show();
+
             //Attach a handler for when the MainPage is done opening the documents.
             mpVM.OpeningDocumentsComplete += new EventHandler(mpVM_OpeningDocumentsComplete);
 
@@ -106,6 +112,8 @@ namespace EditPeerReview
             mpVM.DocumentHolderViewModels.CollectionChanged += new NotifyCollectionChangedEventHandler(DocumentHolderViewModels_CollectionChanged);
 
             this.LayoutRoot.Children.Add(mpVM.GetView());
+
+            mpVM.ShowLoadingWindow();
 
             if (canSaveAsDraft == false)
             {

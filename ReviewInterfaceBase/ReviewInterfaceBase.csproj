@@ -214,6 +214,9 @@
     <Compile Include="View\CustomTabControlView.xaml.cs">
       <DependentUpon>CustomTabControlView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\LoadingWindow.xaml.cs">
+      <DependentUpon>LoadingWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Rubric\RubicView.xaml.cs">
       <DependentUpon>RubicView.xaml</DependentUpon>
     </Compile>
@@ -293,6 +296,10 @@
     <Page Include="View\CustomTabControlView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\LoadingWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\MainPageView.xaml">
       <SubType>Designer</SubType>
