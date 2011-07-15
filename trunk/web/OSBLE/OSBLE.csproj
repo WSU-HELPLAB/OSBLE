@@ -683,6 +683,10 @@
     <Content Include="Views\Rubric\_Display.cshtml" />
     <Content Include="Views\Rubric\View.cshtml" />
     <Content Include="Views\Assignment\InlineReview.cshtml" />
+    <Content Include="Views\Gradebook\_StudentGradebook.cshtml" />
+    <Content Include="Views\Gradebook\_StudentTab.cshtml" />
+    <Content Include="Views\Gradebook\_TeacherGradebook.cshtml" />
+    <Content Include="Views\Gradebook\_TeacherTab.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />
