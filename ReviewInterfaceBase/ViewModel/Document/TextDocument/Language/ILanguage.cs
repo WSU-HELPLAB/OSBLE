@@ -2,9 +2,9 @@
 {
     /// <summary>
     /// All supported languages.
-    /// Note: When adding a new language you need to add the name here, with a Attribue
-    /// FileExtensionAttribute that has the assosiated file type. You also need to add
-    /// a class file that inhierts from ILanguage, and add an entry to LanguageFactorty.LanguageSelector function
+    /// Note: When adding a new language you need to add the name here, with a Attribute
+    /// FileExtensionAttribute that has the associated file type. You also need to add
+    /// a class file that inherits from ILanguage, and add an entry to LanguageFactorty.LanguageSelector function
     /// </summary>
     public enum Languages
     {
@@ -14,7 +14,7 @@
         [FileExtensionAttribute(new string[] { ".cpp", ".h" })]
         CPlusPlus,
 
-        [FileExtensionAttribute(new string[] { ".cp" })]
+        [FileExtensionAttribute(new string[] { ".cs" })]
         CSharp,
 
         [FileExtensionAttribute(new string[] { ".py" })]

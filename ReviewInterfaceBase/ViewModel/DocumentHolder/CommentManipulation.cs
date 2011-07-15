@@ -396,7 +396,7 @@ namespace ReviewInterfaceBase.ViewModel.DocumentHolder
             //create ViewModel (this in turn makes the View)
             ICommentViewModel commentViewModel = new PeerReviewCommentView(documentID, location).ViewModel;
 
-            //Setting the boolean value of SavedComment to true so that PeerReviewCommentViewModel will know how to handle it
+            //Setting the Boolean value of SavedComment to true so that PeerReviewCommentViewModel will know how to handle it
             (commentViewModel as PeerReviewCommentViewModel).LoadedComment = true;
 
             initializeSpatialComment(commentViewModel, documentSize);

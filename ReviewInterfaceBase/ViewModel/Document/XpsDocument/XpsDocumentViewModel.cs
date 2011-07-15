@@ -276,7 +276,8 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
                     }
                     else
                     {
-                        (pagesHolder.Children[location.PageNumber] as Canvas).Children.Add(fe);
+                        //I dunno if this will always work but it should....
+                        ((pagesHolder.Children[location.PageNumber] as Canvas).Children[0] as Canvas).Children.Add(fe);
                     }
                 }
             }
@@ -286,7 +287,6 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
 
         public void RemoveReferenceLocationHighlighting(IEnumerable<FrameworkElement> toBeRemoved)
         {
-            //again this should contain one rectangle but just in case we changed to contain many this will still work
             foreach (FrameworkElement fe in toBeRemoved)
             {
                 rectangleSelection.XpsCanvas.Children.Remove(fe);

@@ -8,12 +8,12 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument.Language
         /// <summary>
         /// This goes throw the enum Language and finds the Language that has the
         /// attribute FileExtensionAttribute that has the value that matches FileExtension
-        /// this returns a class that inhierts from ILanguage which is assoicated with
+        /// this returns a class that inherits from ILanguage which is associated with
         /// the fileExtension that was passed in or the NUllLanguage if no class such class
         /// exists
         /// </summary>
         /// <param name="fileExtension">a known file extension</param>
-        /// <returns>A Language Class assoicated with the given string or NullLanguage if no such
+        /// <returns>A Language Class associated with the given string or NullLanguage if no such
         /// class exists</returns>
         public static ILanguage LanguageFromFileExtension(string fileExtension)
         {
@@ -31,13 +31,13 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument.Language
 
                 FieldInfo fi = type.GetField(language.ToString());
 
-                //we get the attriutes of the selected language
+                //we get the attributes of the selected language
                 FileExtensionAttribute[] attrs = (fi.GetCustomAttributes(typeof(FileExtensionAttribute), false) as FileExtensionAttribute[]);
 
                 //make sure we have more than (should be exactly 1)
                 if (attrs.Length > 0 && attrs[0] is FileExtensionAttribute)
                 {
-                    //we get the first attribues value which should be the fileExtension
+                    //we get the first attributes value which should be the fileExtension
                     foreach (string s in attrs[0].Value)
                     {
                         if (fileExtension == s)
@@ -49,7 +49,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument.Language
                 }
                 else
                 {
-                    //throw and exception if not decorated with any attrs because it is a requirment
+                    //throw and exception if not decorated with any attrs because it is a requirement
                     throw new Exception("Languages must have be decorated with a FileExtensionAttribute");
                 }
 
@@ -63,10 +63,10 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument.Language
         }
 
         /// <summary>
-        /// Pass in a entry of the enum Language and it returns an instance of the class assoicated with that entry.
+        /// Pass in a entry of the enum Language and it returns an instance of the class associated with that entry.
         /// </summary>
         /// <param name="lang">The languages which you want a class off</param>
-        /// <returns>An instace of Ilanguage of the type requested</returns>
+        /// <returns>An instance of ILanguage of the type requested</returns>
         public static ILanguage LanguageSelector(Languages lang)
         {
             ILanguage Ilang;
@@ -98,8 +98,8 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument.Language
                  *      Ilang = new NewLangaugeClass();
                  * }
                  *
-                 * where NewLangaugeName has been added to the enum Langauges
-                 * and where NewLangaugeClass is a new class that inheirts from ILanguage
+                 * where NewLangaugeName has been added to the enum Languages
+                 * and where NewLangaugeClass is a new class that inherits from ILanguage
                  */
 
             else
