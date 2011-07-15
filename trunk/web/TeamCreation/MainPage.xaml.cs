@@ -57,50 +57,45 @@ namespace TeamCreation
         {
             List<string> teamNames = findAllTeams(teamMembers);
 
-            //if teamNames.Count == 0 then no teams have been assigned
-            if (teamNames.Count == 0)
+
+            membersBySection.Clear();
+
+            moderators = (from c in teamMembers where c.IsModerator == true orderby c.Name select c).ToList();
+            var members = from c in teamMembers where c.IsModerator == false select c;
+
+            foreach (var member in members)
             {
-                moderators = (from c in teamMembers where c.IsModerator == true orderby c.Name select c).ToList();
-                var members = from c in teamMembers where c.IsModerator == false select c;
-
-                foreach (var member in members)
+                if (membersBySection.Keys.Contains(member.Section))
                 {
-                    if (membersBySection.Keys.Contains(member.Section))
-                    {
-                        membersBySection[member.Section].Add(member);
-                    }
-                    else
-                    {
-                        membersBySection.Add(member.Section, new List<SerializableTeamMember>() { member });
-                    }
-                }
-
-                if (membersBySection.Count() == 1 || membersBySection.Count() == 0)
-                {
-                    ComboBoxItem cbi = new ComboBoxItem();
-                    cbi.Content = "1";
-                    comboSections.Items.Add(cbi);
-                    comboSections.SelectedIndex = 0;
-                    HeaderStackPanel.Children.Remove(SectionTextBlock);
-                    HeaderStackPanel.Children.Remove(comboSections);
-                    //remove the section combo box only one section
-                    SetUpTeamsForSection();
+                    membersBySection[member.Section].Add(member);
                 }
                 else
                 {
-                    foreach (var c in membersBySection)
-                    {
-                        ComboBoxItem cbi = new ComboBoxItem();
-                        cbi.Content = c.Key.ToString();
-                        comboSections.Items.Add(cbi);
-                    }
-                    comboSections.SelectionChanged += new SelectionChangedEventHandler(comboSections_SelectionChanged);
-                    comboSections.SelectedIndex = 0;
+                    membersBySection.Add(member.Section, new List<SerializableTeamMember>() { member });
                 }
+            }
+
+            if (membersBySection.Count() == 1 || membersBySection.Count() == 0)
+            {
+                ComboBoxItem cbi = new ComboBoxItem();
+                cbi.Content = "1";
+                comboSections.Items.Add(cbi);
+                comboSections.SelectedIndex = 0;
+                HeaderStackPanel.Children.Remove(SectionTextBlock);
+                HeaderStackPanel.Children.Remove(comboSections);
+                //remove the section combo box only one section
+                SetUpTeamsForSection();
             }
             else
             {
-                SetUpTeamsForSection();
+                foreach (var c in membersBySection)
+                {
+                    ComboBoxItem cbi = new ComboBoxItem();
+                    cbi.Content = c.Key.ToString();
+                    comboSections.Items.Add(cbi);
+                }
+                comboSections.SelectionChanged += new SelectionChangedEventHandler(comboSections_SelectionChanged);
+                comboSections.SelectedIndex = 0;
             }
         }
 
@@ -110,7 +105,7 @@ namespace TeamCreation
             this.Teams.Children.Clear();
             int sectionNum = int.Parse((comboSections.SelectedItem as ComboBoxItem).Content as string);
             List<SerializableTeamMember> members = null;
-            if (membersBySection.Count > 0)
+            if (membersBySection.Count > 1)
             {
                 members = membersBySection[sectionNum];
             }
@@ -305,6 +300,20 @@ namespace TeamCreation
             {
                 HtmlPage.Window.Invoke("CloseTeamGenerationWindow", "");
             }
+        }
+
+        [ScriptableMemberAttribute]
+        public void SetAvailableTeamMembers(string content)
+        {
+            string SerializedTeamMembersJSON = Uri.UnescapeDataString(content);
+
+            List<SerializableTeamMember> teamMembers = JsonConvert.DeserializeObject<List<SerializableTeamMember>>(SerializedTeamMembersJSON);
+
+            if (teamMembers == null)
+            {
+                teamMembers = new List<SerializableTeamMember>();
+            }
+            InitilizeTeams(teamMembers);
         }
 
         [ScriptableMemberAttribute]

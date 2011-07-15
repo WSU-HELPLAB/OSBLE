@@ -203,6 +203,14 @@
         $('#PreviousAssignmentDiv').show('blind');
     }
 
+    function OpenPreviousTeam() {
+        OpenTeamGeneration();
+        if (isTeamGenerationReady) {
+            var jsonData = $('#SerializedTeamMembersJSON').val();
+            document.getElementById("team_creation_silverlight").Content.MainPage.SetAvailableTeamMembers(jsonData);
+        }
+    }
+
     function GenerateTeamsRandomly() {
         if ($("input[name='team_or_people']:checked").val() == 'Teams') {
             var teams = parseInt($('#total_teams').val());
@@ -211,7 +219,7 @@
             }
             else {
                 OpenTeamGeneration();
-                if (TeamGenerationReady) {
+                if (isTeamGenerationReady) {
                     document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfTeams(parseInt($('#total_teams').val()));
                 }
             }
@@ -223,7 +231,7 @@
             }
             else {
                 OpenTeamGeneration();
-                if (TeamGenerationReady) {
+                if (isTeamGenerationReady) {
                     document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfPeople(parseInt($('#people_per_team').val()));
                 }
             }
@@ -232,6 +240,7 @@
 
     function TeamGenerationReady() {
 
+        isTeamGenerationReady = true;
         if ($("input[name='team_generation_options']:checked").val() == 'RandomTeams') {
             if ($("input[name='team_or_people']:checked").val() == 'Teams') {
                 document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfTeams(parseInt($('#total_teams').val()));
@@ -239,6 +248,10 @@
             else {
                 document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfPeople(parseInt($('#people_per_team').val()));
             }
+        }
+        else if ($("input[name='team_generation_options']:checked").val() == 'PreviousAssignment') {
+            var jsonData = $('#SerializedTeamMembersJSON').val();
+            document.getElementById("team_creation_silverlight").Content.MainPage.SetAvailableTeamMembers(jsonData);
         }
     }
 
@@ -322,11 +335,13 @@
         Use teams defined in previous course assignment
         <br />
         <ul id="PreviousAssignmentDiv" style="display: none" class="team_generation_options">
-            <li>Select box goes here. </li>
+            <li>
+                @Html.DropDownListFor(m => m.SerializedTeamMembersJSON, ViewBag.PastTeamAssignments as SelectList)
+            </li>
             <br />
             <li>
-                <button type="button" onclick="OpenTeamGeneration()">
-                    Generate Teams...</button>
+                <button type="button" onclick="OpenPreviousTeam()">
+                    View Teams</button>
             </li>
         </ul>
         <input type="radio" name="team_generation_options" value="RandomTeams" />

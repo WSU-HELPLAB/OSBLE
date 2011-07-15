@@ -40,6 +40,14 @@ namespace OSBLE.Controllers
             return View("_RubricSelect");
         }
 
+        [HttpPost]
+        [CanModifyCourse]
+        public ActionResult PastTeamsChange()
+        {
+            return View("_TeamSilverlightObject");
+        }
+
+
         //
         // GET: /Assignment/Create
 
@@ -63,15 +71,17 @@ namespace OSBLE.Controllers
                                       where c.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID
                                       select c;
 
-            Dictionary<string, string> activityTeams = new Dictionary<string, string>();
-
-            foreach (var activity in assignmentActivites)
+            //set up past team assignments
+            List<object> pastTeamAssignments = new List<object>();
+            foreach (var activity in assignmentActivites.ToList())
             {
                 if (activity.isTeam)
                 {
-                    activityTeams.Add(activity.Name, serializeTeamMemers(getTeamMembers(activity)));
+                    string json = serializeTeamMemers(getTeamMembers(activity));
+                    pastTeamAssignments.Add(new { ID = json, Name = activity.Name });
                 }
             }
+            ViewBag.PastTeamAssignments = new SelectList(pastTeamAssignments, "ID", "Name", null);
 
             viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"] = serializeTeamMemers(getTeamMembers());
 
@@ -279,9 +289,70 @@ namespace OSBLE.Controllers
 
         private List<SerializableTeamMember> getTeamMembers(AbstractAssignmentActivity activity)
         {
-            //TO DO: Implement this function
-            //throw new NotImplementedException();
-            return new List<SerializableTeamMember>();
+            List<SerializableTeamMember> teamMembmers = new List<SerializableTeamMember>();
+
+            foreach (TeamUserMember member in activity.TeamUsers)
+            {
+                SerializableTeamMember serializedMember = new SerializableTeamMember();
+                serializedMember.Name = member.Name;
+
+                if (member is UserMember)
+                {
+                    UserMember uMember = member as UserMember;
+
+                    CoursesUsers cu = (from c in db.CoursesUsers
+                                       where
+                                          c.AbstractCourseID == activeCourse.AbstractCourseID
+                                          &&
+                                          c.UserProfileID == uMember.UserProfileID
+                                       select c).FirstOrDefault();
+
+                    if (cu == null)
+                    {
+                        continue;
+                    }
+                    serializedMember.UserID = uMember.UserProfileID;
+                    serializedMember.isUser = true;
+                    serializedMember.IsModerator = cu.AbstractRole.ID == (int)CourseRole.CourseRoles.Moderator;
+                    serializedMember.Section = cu.Section;
+                    teamMembmers.Add(serializedMember);
+                }
+                else if(member is TeamMember)
+                {
+                    TeamMember tMember = member as TeamMember;
+                    foreach (TeamUserMember tum in tMember.Team.Members)
+                    {
+                        if (tum is UserMember)
+                        {
+                            serializedMember = new SerializableTeamMember();
+                            serializedMember.Name = tum.Name;
+
+                            UserMember uMember = tum as UserMember;
+
+                            CoursesUsers cu = (from c in db.CoursesUsers
+                                               where
+                                                  c.AbstractCourseID == activeCourse.AbstractCourseID
+                                                  &&
+                                                  c.UserProfileID == uMember.UserProfileID
+                                               select c).FirstOrDefault();
+
+                            if (cu == null)
+                            {
+                                continue;
+                            }
+                            serializedMember.InTeamName = tMember.Name;
+                            serializedMember.UserID = uMember.UserProfileID;
+                            serializedMember.isUser = true;
+                            serializedMember.IsModerator = cu.AbstractRole.ID == (int)CourseRole.CourseRoles.Moderator;
+                            serializedMember.Section = cu.Section;
+                            teamMembmers.Add(serializedMember);
+                        }
+                    }
+                }
+                
+            }
+
+            return teamMembmers;
         }
 
         private List<SerializableTeamMember> getTeamMembers()
