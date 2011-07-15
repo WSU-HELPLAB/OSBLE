@@ -57,8 +57,6 @@ namespace OSBLE.Models
 
         public DbSet<GradeActivity> GradeActivities { get; set; }
 
-        public DbSet<SingleSubmissionActivity> SingleSubmissionActivities { get; set; }
-
         public DbSet<StopActivity> StopActivities { get; set; }
 
         public DbSet<SubmissionActivity> SubmissionActivities { get; set; }

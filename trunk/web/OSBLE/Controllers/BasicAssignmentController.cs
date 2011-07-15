@@ -274,14 +274,7 @@ namespace OSBLE.Controllers
 
         private string serializeTeamMemers(List<SerializableTeamMember> members)
         {
-            if (members.Count > 1)
-            {
-                return Uri.EscapeDataString(JsonConvert.SerializeObject(members));
-            }
-            else
-            {
-                return null;
-            }
+            return Uri.EscapeDataString(JsonConvert.SerializeObject(members));
         }
 
         private List<SerializableTeamMember> getTeamMembers(AbstractAssignmentActivity activity)
@@ -302,7 +295,7 @@ namespace OSBLE.Controllers
 
             int i = 0;
 
-            if (couresesUsers.Count >= 2)
+            if (couresesUsers.Count > 0)
             {
                 foreach (CoursesUsers cu in couresesUsers)
                 {

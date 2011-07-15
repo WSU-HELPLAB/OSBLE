@@ -169,7 +169,6 @@
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\PeerReviewActivity.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\Scores\RubricScore.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\Scores\Score.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\SingleSubmissionActivity.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\StudioActivity.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\SyncIssueVotingActivity.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\BasicAssignment.cs" />

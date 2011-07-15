@@ -84,6 +84,7 @@ namespace TeamCreation
                     HeaderStackPanel.Children.Remove(SectionTextBlock);
                     HeaderStackPanel.Children.Remove(comboSections);
                     //remove the section combo box only one section
+                    SetUpTeamsForSection();
                 }
                 else
                 {
@@ -99,16 +100,17 @@ namespace TeamCreation
             }
             else
             {
+                SetUpTeamsForSection();
             }
         }
 
-        private void comboSections_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void SetUpTeamsForSection()
         {
             this.UnassignedList.MemberList.Clear();
             this.Teams.Children.Clear();
             int sectionNum = int.Parse((comboSections.SelectedItem as ComboBoxItem).Content as string);
-            List<SerializableTeamMember> members;
-            if (membersBySection.Count > 1)
+            List<SerializableTeamMember> members = null;
+            if (membersBySection.Count > 0)
             {
                 members = membersBySection[sectionNum];
             }
@@ -118,34 +120,46 @@ namespace TeamCreation
                 members = membersBySection.FirstOrDefault().Value;
             }
 
-            foreach (SerializableTeamMember member in members)
+            if (members != null)
             {
-                if (member.InTeamName != null && member.InTeamName != "Unassigned Team")
+                foreach (SerializableTeamMember member in members)
                 {
-                    bool teamFound = false;
-                    foreach (Team team in Teams.Children)
+                    if (member.InTeamName != null && member.InTeamName != "Unassigned Team")
                     {
-                        if (team.TeamName.Text == member.InTeamName)
+                        bool teamFound = false;
+                        foreach (Team team in Teams.Children)
                         {
-                            team.MemberList.Add(new Member(member));
-                            teamFound = true;
-                            break;
+                            if (team.TeamName.Text == member.InTeamName)
+                            {
+                                team.MemberList.Add(new Member(member));
+                                teamFound = true;
+                                break;
+                            }
+                        }
+                        if (teamFound == false)
+                        {
+                            CreateTeam(member, member.InTeamName);
                         }
                     }
-                    if (teamFound == false)
+                    else
                     {
-                        CreateTeam(member, member.InTeamName);
+                        this.UnassignedList.MemberList.Add(new Member(member));
                     }
                 }
-                else
-                {
-                    this.UnassignedList.MemberList.Add(new Member(member));
-                }
+            }
+            else
+            {
+                MessageBox.Show("There are no students in this section");
             }
 
             AddButton addbutton = new AddButton();
             addbutton.AddTeamRequested += new EventHandler(NewTeamBox_AddTeamRequested);
             Teams.Children.Add(addbutton);
+        }
+
+        private void comboSections_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            SetUpTeamsForSection();
         }
 
         private List<string> findAllTeams(List<SerializableTeamMember> teamMembers)

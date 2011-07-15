@@ -10,7 +10,7 @@ namespace OSBLE.Models.Assignments
 
         [Required]
         [Display(Name = "Description")]
-        [StringLength(200)]
+        [StringLength(4000)]
         public string Description { get; set; }
 
         public StudioAssignment()
