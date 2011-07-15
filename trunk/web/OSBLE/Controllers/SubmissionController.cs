@@ -115,6 +115,17 @@ namespace OSBLE.Controllers
 
                                 if (allowFileExtensions.Contains(extension))
                                 {
+                                    //If a submission of any extension exists delete it.  This is needed because they could submit a .c file and then a .cs file and the teacher would not know which one is the real one.
+                                    string submission = FileSystem.GetDeliverable(activeCourse.AbstractCourse as Course, activity.ID, teamUser, deliverables[i].Name, allowFileExtensions);
+                                    if (submission != null)
+                                    {
+                                        FileInfo oldSubmission = new FileInfo(submission);
+
+                                        if (oldSubmission.Exists)
+                                        {
+                                            oldSubmission.Delete();
+                                        }
+                                    }
                                     FileSystem.RemoveZipFile(activeCourse.AbstractCourse as Course, activity, teamUser);
                                     var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, teamUser), deliverables[i].Name + extension);
                                     file.SaveAs(path);
