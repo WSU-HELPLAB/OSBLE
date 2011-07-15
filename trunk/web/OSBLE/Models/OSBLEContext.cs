@@ -49,6 +49,10 @@ namespace OSBLE.Models
 
         public DbSet<StudioAssignment> StudioAssignments { get; set; }
 
+        public DbSet<CommentCategory> CommentCategories { get; set; }
+
+        public DbSet<CommentCategoryConfiguration> CommentCategoryConfigurations { get; set; }
+
         // Assignments.Activities
 
         public DbSet<AbstractAssignmentActivity> AbstractAssignmentActivities { get; set; }
@@ -117,7 +121,7 @@ namespace OSBLE.Models
 
         public DbSet<Criterion> Criteria { get; set; }
 
-        public DbSet<CellDescription> LevelDescriptions { get; set; }
+        public DbSet<CellDescription> CellDescriptions { get; set; }
 
         public DbSet<CourseRubric> CourseRubrics { get; set; }
 

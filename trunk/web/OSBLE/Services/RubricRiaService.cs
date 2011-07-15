@@ -121,7 +121,7 @@ using OSBLE.Models.AbstractCourses;
         [Delete]
         public void DeleteCellDescription(CellDescription desc)
         {
-            db.LevelDescriptions.Remove(desc);
+            db.CellDescriptions.Remove(desc);
             db.SaveChanges();
         }
 
@@ -155,7 +155,7 @@ using OSBLE.Models.AbstractCourses;
             //and cell descriptions
             List<Level> levels = (from l in db.Levels where l.RubricID == rubric.ID select l).ToList();
             List<Criterion> criteria = (from c in db.Criteria where c.RubricID == rubric.ID select c).ToList();
-            List<CellDescription> cellDesc = (from desc in db.LevelDescriptions
+            List<CellDescription> cellDesc = (from desc in db.CellDescriptions
                                               join level in db.Levels on desc.LevelID equals level.ID
                                               join crit in db.Criteria on desc.CriterionID equals crit.ID
                                               where level.RubricID == rubric.ID
@@ -172,7 +172,7 @@ using OSBLE.Models.AbstractCourses;
             }
             foreach (CellDescription d in cellDesc)
             {
-                db.LevelDescriptions.Remove(d);
+                db.CellDescriptions.Remove(d);
             }
 
             db.SaveChanges();
