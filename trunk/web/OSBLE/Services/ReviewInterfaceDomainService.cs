@@ -82,17 +82,23 @@
 
         public void UploadFile(string str)
         {
-            using (StreamWriter sw = new StreamWriter(FileSystem.GetTeamUserPeerReview(true, currentCourse as Course, activity.AbstractAssignmentID, teamUser.ID)))
+            if (currentCourseUser.AbstractRole.CanGrade)
             {
-                sw.Write(str);
+                using (StreamWriter sw = new StreamWriter(FileSystem.GetTeamUserPeerReview(true, currentCourse as Course, activity.AbstractAssignmentID, teamUser.ID)))
+                {
+                    sw.Write(str);
+                }
             }
         }
 
         public void UploadReviewDraft(string str)
         {
-            using (StreamWriter sw = new StreamWriter(FileSystem.GetTeamUserPeerReviewDraft(true, currentCourse as Course, activity.AbstractAssignmentID, teamUser.ID)))
+            if (currentCourseUser.AbstractRole.CanGrade)
             {
-                sw.Write(str);
+                using (StreamWriter sw = new StreamWriter(FileSystem.GetTeamUserPeerReviewDraft(true, currentCourse as Course, activity.AbstractAssignmentID, teamUser.ID)))
+                {
+                    sw.Write(str);
+                }
             }
         }
     }
