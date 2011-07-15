@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -9,6 +10,7 @@ using System.Windows.Input;
 using System.Xml;
 using OSBLE.Services;
 using ReviewInterfaceBase.HelperClasses;
+using ReviewInterfaceBase.View;
 using ReviewInterfaceBase.View.DocumentHolder;
 using ReviewInterfaceBase.ViewModel.DocumentHolder;
 using ReviewInterfaceBase.ViewModel.FindWindow;
@@ -18,9 +20,11 @@ namespace ReviewInterfaceBase.ViewModel
     /// <summary>
     /// This is the top most container
     /// </summary>
-    public class MainPageViewModel
+    public class MainPageViewModel : INotifyPropertyChanged
     {
         #region Delegates
+
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         /// <summary>
         /// This is supposed to be fired whenever we would like to close the MainPage but this might not be needed ever
@@ -36,11 +40,17 @@ namespace ReviewInterfaceBase.ViewModel
 
         #region Fields
 
+        private LoadingWindow loadingWindow = null;
+
         //OLDCODE
         /// <summary>
         /// This is a reference to rubricViewModel
         /// </summary>
         //private RubricViewModel rubricViewModel = new RubricViewModel();
+
+        private string saveAsDraftButtonContent = "Save As Draft";
+
+        private string publishButtonContent = "Publish";
 
         /// <summary>
         /// This is a reference to the FindWindowViewModel
@@ -67,6 +77,26 @@ namespace ReviewInterfaceBase.ViewModel
         #endregion Fields
 
         #region Properties
+
+        public string SaveAsDraftButtonContent
+        {
+            get { return saveAsDraftButtonContent; }
+            set
+            {
+                saveAsDraftButtonContent = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("SaveAsDraftButtonContent"));
+            }
+        }
+
+        public string PublishButtonContent
+        {
+            get { return publishButtonContent; }
+            set
+            {
+                publishButtonContent = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("PublishButtonContent"));
+            }
+        }
 
         //OLDCODE
         /*
@@ -106,6 +136,8 @@ namespace ReviewInterfaceBase.ViewModel
         {
             //first initialize our view
             thisView = new MainPageView();
+
+            thisView.DataContext = this;
 
             //This setups up all the events needed on the view directly
             thisView.PublishTop.Click += new RoutedEventHandler(Save_Click);
@@ -238,6 +270,8 @@ namespace ReviewInterfaceBase.ViewModel
 
             //Then we upload the file as well as register an event for when it has been uploaded
             ReviewInterfaceDC.UploadReviewDraft(SaveReview().ToString()).Completed += new EventHandler(FileUploadComplete);
+
+            SaveAsDraftButtonContent = "Saving...";
         }
 
         /// <summary>
@@ -247,14 +281,23 @@ namespace ReviewInterfaceBase.ViewModel
         /// <param name="e">not used</param>
         private void Save_Click(object sender, RoutedEventArgs e)
         {
+            //ShowLoadingWindow();
             ReviewInterfaceDomainContext ReviewInterfaceDC = new ReviewInterfaceDomainContext();
 
             //Then we upload the file as well as register an event for when it has been uploaded
             ReviewInterfaceDC.UploadFile(SaveReview().ToString()).Completed += new EventHandler(FileUploadComplete);
+
+            PublishButtonContent = "Saving...";
+
+            //We hide the SaveAsDraft because when something has been publish it can no longer be saved as a draft
+            thisView.SaveAsDraftBottom.Visibility = Visibility.Collapsed;
+            thisView.SaveAsDraftTop.Visibility = Visibility.Collapsed;
         }
 
         private void FileUploadComplete(object sender, EventArgs e)
         {
+            PublishButtonContent = "Publish";
+            SaveAsDraftButtonContent = "Save As Draft";
             MessageBox.Show("The file was saved");
         }
 
@@ -453,6 +496,24 @@ namespace ReviewInterfaceBase.ViewModel
         {
             thisView.SaveAsDraftTop.Visibility = Visibility.Collapsed;
             thisView.SaveAsDraftBottom.Visibility = Visibility.Collapsed;
+        }
+
+        public void ShowLoadingWindow()
+        {
+            if (loadingWindow == null)
+            {
+                loadingWindow = new LoadingWindow();
+            }
+            // loadingWindow.Show();
+        }
+
+        public void HideLoadingWindow()
+        {
+            if (loadingWindow != null)
+            {
+                MessageBox.Show("Closing Loading Window");
+                loadingWindow.Close();
+            }
         }
 
         #endregion Public Methods

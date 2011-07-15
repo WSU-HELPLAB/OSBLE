@@ -69,6 +69,8 @@ namespace ViewPeerReview
             //we add the view of MainPage to 'view'
             this.LayoutRoot.Children.Add(mpVM.GetView());
 
+            mpVM.ShowLoadingWindow();
+
             //Get DomainContext
             ReviewInterfaceDomainContext ReviewInterfaceDomainContext = new ReviewInterfaceDomainContext();
 
@@ -116,6 +118,7 @@ namespace ViewPeerReview
                 {
                     ReadPeerReview(XDocument.Load(peerReview.Stream), peerReview.Author, peerReview.Role);
                 }
+                mpVM.HideLoadingWindow();
             }
         }
 
