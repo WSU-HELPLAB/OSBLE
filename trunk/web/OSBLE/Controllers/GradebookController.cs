@@ -739,7 +739,7 @@ namespace OSBLE.Controllers
                    }
                }
            }
-           BuildGradebook((int)Session["categoryId"]);
+           //BuildGradebook((int)Session["categoryId"]);
            return View("_Gradebook");
        }
 

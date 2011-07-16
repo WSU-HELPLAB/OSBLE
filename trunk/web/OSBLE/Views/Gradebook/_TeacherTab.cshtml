@@ -157,7 +157,9 @@
 </style>
 
     @{
-        var studentId = ViewBag.StudentId;    
+        var studentId = ViewBag.StudentId;  
+        var customize_option = (from co in ViewBag.Customize as IEnumerable<Category.GradeOptions> select co).FirstOrDefault();
+        var numDropped = (from drop in ViewBag.Dropped as IEnumerable<int> select drop).First(); 
     }
     <input id="studentId" type="hidden" value="@studentId" />
     
@@ -248,23 +250,48 @@
 
 <div class="customize" id="customizeID" style="display:none" title="Drop Lowest">
 	<form id="dropLowestSubmit" onsubmit="dropAllLowest(); return false;"  >
-		<input id="CompAverage_radio" name="Customize_radio" type="radio" value="CompAverage" />
+
+        @if (customize_option == Category.GradeOptions.CompAverage || numDropped == 0)
+        {
+            <input id="CompAverage_radio" name="Customize_radio" type="radio" value="CompAverage" checked="checked" />
+        }
+        else
+        {
+            <input id="CompAverage_radio" name="Customize_radio" type="radio" value="CompAverage" />
+        }
         <text>Compute Average of Scores</text>
         <br />
 		
-        <input id="XtoDrop_radio" name="Customize_radio" type="radio" value="XtoDrop" /> 
-        <text>Drop lowest</text>
-		<input id="XtoDrop" />
+        @if (customize_option == Category.GradeOptions.XtoDrop)
+        {
+            <input id="XtoDrop_radio" name="Customize_radio" type="radio" value="XtoDrop" checked="checked"/> 
+            <text>Drop lowest</text>
+		    <input id="XtoDrop" value="@numDropped"/>
+        }
+        else
+        {
+            <input id="XtoDrop_radio" name="Customize_radio" type="radio" value="XtoDrop" /> 
+            <text>Drop lowest</text>
+		    <input id="XtoDrop" />
+        }
 		<text>from category.</text>
         <br />
 
-        <input id="XtoTake_radio" name="Customize_radio" type="radio" value="XtoTake"/>
-        <text>Take highest</text>
-        <input id="XtoTake" />
+        @if (customize_option == Category.GradeOptions.XtoTake)
+        {
+            <input id="XtoTake_radio" name="Customize_radio" type="radio" value="XtoTake" checked="checked"/>
+            <text>Take highest</text>
+            <input id="XtoTake" value="@numDropped" />
+        }
+        else
+        {
+            <input id="XtoTake_radio" name="Customize_radio" type="radio" value="XtoTake"/>
+            <text>Take highest</text>
+            <input id="XtoTake" />
+        }
         <text>from category.</text>
         <br />
             
-
 		<div id="dropLowest_btns">    
 		    <input id="dropLowestSubmit" type="submit" onclick="hideFunctions();" value="Apply" />
             <input id="dropLowestCancel" type="button" onclick="hideFunctions();" value="Cancel" />
@@ -337,6 +364,9 @@
     var assignId = 0;
 
     var currentHeaderCell = null;
+
+    var global_event;
+    var global_cell;
 
     $(function () {
         $("input[name='Customize_radio']").change(function () {
@@ -451,6 +481,7 @@
                         //cell is the cell one row down from the current cell when enter was pressed
                         cell = $(this).find("td:eq(" + colIndex + ")");
 
+
                         //give focus to the new cell
                         cellGainsFocus(e, cell);
                     });
@@ -465,6 +496,8 @@
                     });
                     clearLastCellFocus(e);
                 }
+                global_cell = cell;
+                global_event = e;
             }
 
             //if tab is pressed
@@ -561,7 +594,6 @@
                 changeHeaderName(e, cell);
             }
         });
-
     }
 
 
@@ -619,7 +651,6 @@
     }
 
     function displayCustomizeGrades() {
-
         $("#customizeID").dialog({
 
             modal: true,
@@ -834,7 +865,7 @@
                         data: { value: cellValue, userId: ajaxIDs[0], assignmentId: ajaxIDs[1] },
                         success: function (response) {
                             if ($("#numDropped").val() >= 1) {
-                                clearDropLowest(ajaxIDs[0])
+                                clearDropLowest(ajaxIDs[0]);
                             }
                             else {
                                 //$("#grades").replaceWith(response);
@@ -1197,7 +1228,8 @@
                 url: "/Gradebook/ClearAllDropLowest",
                 data: { categoryId: newCatId[0] },
                 success: function (response) {
-                    $("#grades").replaceWith(response);
+                // this makes the _Gradebook view reload and it already does after the all droplowest call below
+//                    $("#grades").replaceWith(response);
                 }
             });
 
@@ -1244,28 +1276,28 @@
         }
     }
 
-    function clearAllDropLowest() {
+//    function clearAllDropLowest() {
 
-        //get the pathname so we can use the categoryId
-        var pathname = window.location.toString();
+//        //get the pathname so we can use the categoryId
+//        var pathname = window.location.toString();
 
-        //split the pathname at the "="
-        //catId[1] = categoryId
-        var catId = pathname.split("=");
+//        //split the pathname at the "="
+//        //catId[1] = categoryId
+//        var catId = pathname.split("=");
 
-        //make sure we are on a valid page
-        if (catId[1] != null) {
-            var newCatId = catId[1].split("#");
-            //ajax call to clear the drop lowest
-            $.ajax({
-                async: false,
-                type: "POST",
-                url: "/Gradebook/ClearDropLowest",
-                data: { categoryId: newCatId[0] },
-                success: dropAllLowest()
-            });
-        }
-    }
+//        //make sure we are on a valid page
+//        if (catId[1] != null) {
+//            var newCatId = catId[1].split("#");
+//            //ajax call to clear the drop lowest
+//            $.ajax({
+//                async: false,
+//                type: "POST",
+//                url: "/Gradebook/ClearDropLowest",
+//                data: { categoryId: newCatId[0] },
+//                success: dropAllLowest()
+//            });
+//        }
+//    }
 
     function DropLowest(id) {
 
@@ -1285,6 +1317,9 @@
                 data: { categoryId: newCatId[0], userId: id },
                 success: function (response) {
                     $("#grades").replaceWith(response);
+
+                    cellGainsFocus(global_event, global_cell);
+                    alert("_TeacherTab DropLowest");
                 }
             });
         }

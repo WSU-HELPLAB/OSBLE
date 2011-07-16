@@ -9,7 +9,7 @@
 }
 
 @{
-        var numDropped = (from drop in ViewBag.Dropped as IEnumerable<int> select drop).First();
+        var numDropped = (from drop in ViewBag.Dropped as IEnumerable<int> select drop).FirstOrDefault();
         <input type="hidden" id="numDropped" value="@numDropped" />
         var customize_option = (from co in ViewBag.Customize as IEnumerable<Category.GradeOptions> select co).FirstOrDefault();
         <input type="hidden" id="customize_option" value="@customize_option" />
@@ -162,19 +162,6 @@
     }
     <script type="text/javascript">
         $(function () {
-//            alert($('#customize_option').val());
-//            alert($('#numDropped').val());
-//            if ($('#customize_option').val() == "CompAverage" || $('#numDropped').val() == 0) {
-//                $('#CompAverage_radio').attr('checked', true);
-//            }
-//            else if ($('#customize_option') == "XtoDrop") {
-//                $('#XtoDrop_radio').attr('checked', true);
-//                $('#XtoDrop').val(numDropped);
-//            }
-//            else if ($('#customize_option') == "XtoTake") {
-//                $('#XtoTake_radio').attr('checked', true);
-//                $('#XtoTake').val(numDropped);
-//            }
 
             calculateCols();
             keyControls();
