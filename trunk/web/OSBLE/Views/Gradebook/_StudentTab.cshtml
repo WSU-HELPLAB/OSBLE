@@ -219,7 +219,14 @@
                 }
 
                 totalPoints = (totalPoints / totalPossible) * 100;
-                <td>@totalPoints.ToString(".#")%</td>
+                if (totalPoints > 0)
+                {
+                    <td>@totalPoints.ToString(".#")%</td>
+                }
+                else
+                {
+                    <td>@String.Format("{0}", 0)</td>
+                }
             }
             else
             {
@@ -240,7 +247,14 @@
                     }
                     else
                     {
-                        <td>@score.First().Points.ToString(".#")</td>
+                        if (score.First().Points > 0)
+                        {
+                            <td>@score.First().Points.ToString(".#")</td>
+                        }
+                        else
+                        {
+                            <td>@String.Format("{0}", 0)</td>
+                        }
                     }
                 }
                 else

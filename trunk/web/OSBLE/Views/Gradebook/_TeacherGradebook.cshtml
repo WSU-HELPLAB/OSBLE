@@ -673,7 +673,14 @@
                       }
                   }
                 <td>@letter</td>
-                <td>@totalGrade.ToString(".#")%</td>
+                if (totalGrade > 0)
+                {
+                    <td>@totalGrade.ToString(".#")%</td>
+                }
+                else
+                {
+                    <td>@String.Format("{0}", 0)%</td>
+                }
                   totalGrade = 0;
 
                   foreach (Category c in ViewBag.Categories)
