@@ -166,9 +166,10 @@ $(function () {
     $('#add_new_category').click(function () {
         addNewCategory();
         return false;
+        //
     });
 
-    $('#new_collection_name').val("");
+    $('#category_config_name').val("");
 
     $("input[name='line_review_options']").change(function () {
         if ($("input[name='line_review_options']:checked").val() == 'ManualConfig') {
@@ -185,9 +186,10 @@ $(function () {
     });
 
 
-    //$('#comment_category_selection').change(switchCommentConfig);
-    //loadConfigs();
-
+    $('#comment_category_selection option:eq(0)').attr('selected', 'selected');
+    $('#comment_category_selection').change(switchCommentConfigListener);
+    switchCommentConfig( $('#comment_category_selection option:eq(0)').val() );
+    
 });
 
 // apply this function in an event listener to every text box to prevent accidental submission of the whole form by the user
@@ -198,6 +200,13 @@ function disableSubmit(e) {
     }
 }
 
+function switchCommentConfigListener() {
+    switchCommentConfig($(this).val());
+}
+function switchCommentConfig(id) {
+    $("#comment_config_samples").children().hide();
+    $("#comment_sample_" + id).show('blind');
+}
 // ajax code
 //   commented out rather than deleted to allow for reimplementation
 /*
@@ -354,10 +363,10 @@ function addNewCategory() {
         var d = $('#' + dataId);
 
         // all one line because append adds closing tags automatically if there isn't a closing tag (ie </div>) within the string it is appending :/
-        d.append('<div><input type="text" id="' + categoryOptionIdPrefix + '_' + categoryOptionIndex[i] + '" name="' + categoryOptionIdPrefix + '_' + categoryOptionIndex[i] + '"> <div style="display: inline; position:relative; top:0.25em;"><a href="#" title="Delete This Option" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove() }); categoryOptionIndex[' + i + ']--; return false;"><img src="/Content/images/delete_up.png" alt="Delete" /></a></div> </div>');
+        d.append('<div><input type="text" id="' + categoryOptionIdPrefix + '_' + categoryOptionIndex[i] + '" name="' + categoryOptionIdPrefix + '_' + categoryOptionIndex[i] + '"> <div style="display: inline; position:relative; top:0.25em;"><a href="#" tabindex="9000' + categoryOptionIndex[i] + '" title="Delete This Option" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove() }); categoryOptionIndex[' + i + ']--; return false;"><img src="/Content/images/delete_up.png" alt="Delete" /></a></div> </div>');
 
-        $('#option_' + i + '_' + categoryOptionIndex[i]).focus();
-        $('#option_' + i + '_' + categoryOptionIndex[i]).keypress(disableSubmit);
+        $('#' + categoryOptionIdPrefix + '_' + categoryOptionIndex[i]).focus();
+        $('#' + categoryOptionIdPrefix + '_' + categoryOptionIndex[i]).keypress(disableSubmit);
 
         categoryOptionIndex[i]++;
 
@@ -365,7 +374,7 @@ function addNewCategory() {
     });
 
     // set focus to newly created category
-    $('#' + categoryId).focus();
+    $('#' + categoryId).focus(); // doesn't work, but I don't want to change any names
 
     // keep track of indices
     categoryIndex++;
