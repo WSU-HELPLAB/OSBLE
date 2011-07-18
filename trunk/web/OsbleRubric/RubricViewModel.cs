@@ -81,13 +81,14 @@ namespace OsbleRubric
         /// </summary>
         public RubricViewModel()
         {
-            initialize();
+            //initialize();
+            init();
         }
 
         /// <summary>
-        /// sets up all the default paramaters for the grid & adds the initial rows/columns
+        /// Sets up the views listerns/ria/adds the grid to the view/sets properties of 
         /// </summary>
-        private void initialize()
+        private void init()
         {
             //attach event listeners to our view
             thisView.CancelChanges.Click += new RoutedEventHandler(CancelChanges_Click);
@@ -96,8 +97,11 @@ namespace OsbleRubric
             thisView.RubricComboBox.SelectionChanged += new SelectionChangedEventHandler(RubricComboBox_SelectionChanged);
 
             //RIA Magic goes here
-            thisView.CourseComboBox.ItemsSource = context.Load(context.GetCoursesQuery()).Entities;
-            context.Load(context.GetActiveCourseQuery()).Completed += new EventHandler(GetActiveCourseComplete);
+            if (thisView.CourseComboBox.ItemsSource == null)
+            {
+                thisView.CourseComboBox.ItemsSource = context.Load(context.GetCoursesQuery()).Entities;
+                context.Load(context.GetActiveCourseQuery()).Completed += new EventHandler(GetActiveCourseComplete);
+            }
 
             //stash the current course id
             if (App.Current.Resources["courseId"] != null)
@@ -106,10 +110,7 @@ namespace OsbleRubric
             }
 
             //adding grid to the view
-            if (thisView.LayoutRoot.Children.Contains(customDataGrid.BaseGrid) == false) //won't try to add the grid if init is run again
-            {
-                thisView.LayoutRoot.Children.Add(customDataGrid.BaseGrid);
-            }
+            thisView.LayoutRoot.Children.Add(customDataGrid.BaseGrid);
 
             //setting color for grid
             customDataGrid.BaseGrid.Background = new SolidColorBrush(Colors.LightGray);
@@ -121,6 +122,15 @@ namespace OsbleRubric
             customDataGrid.BorderBrush = new SolidColorBrush(Colors.Black);
             customDataGrid.BorderThickness = 2.0;
 
+            //Building the initial grid
+            buildGridDefaults();
+        }
+
+        /// <summary>
+        /// Builds the default grid (Has 1 crit/1 level (the minimum))
+        /// </summary>
+        private void buildGridDefaults()
+        {
             //adding initial columns & rows
             customDataGrid.PlaceUIElement(createPerformanceCritTitleCell(), 0, 0);
             customDataGrid.PlaceUIElement(createCritWeightTitleCell(), 1, 0);
@@ -129,12 +139,12 @@ namespace OsbleRubric
             createCommentColumn();
             createCriterionRow();
             createAddButtonRow();
-            
+
 
             //setting widths/heights for the table
             //setting heights for rows
             customDataGrid.BaseGrid.RowDefinitions[0].Height = new GridLength(Row0Height);
-            for (int i = 1; i < customDataGrid.BaseGrid.RowDefinitions.Count-1; ++i)
+            for (int i = 1; i < customDataGrid.BaseGrid.RowDefinitions.Count - 1; ++i)
             {
                 customDataGrid.BaseGrid.RowDefinitions[i].Height = new GridLength(RowHeight);
             }
@@ -167,8 +177,11 @@ namespace OsbleRubric
 
         void GetRubricsComplete(object sender, EventArgs e)
         {
+            //Remove selection changed event
+            thisView.RubricComboBox.SelectionChanged -= new SelectionChangedEventHandler(RubricComboBox_SelectionChanged);
             if (sender is LoadOperation<Rubric>)
             {
+
                 thisView.RubricComboBox.Items.Clear();
                 Rubric rubric = new Rubric();
                 rubric.ID = 0;
@@ -196,6 +209,9 @@ namespace OsbleRubric
                     }
                 }
             }
+
+            //Adding back in selection changed event
+            thisView.RubricComboBox.SelectionChanged += new SelectionChangedEventHandler(RubricComboBox_SelectionChanged);
         }
 
         /// <summary>
@@ -227,9 +243,8 @@ namespace OsbleRubric
                 }
                 
                 //Only build the rubric if its not a new rubric(assuming ID of 0 means new rubric)
+                //If new rubric (ID of 0) then rebuild the grid as a "fresh" rubric
                 BuildGridFromRubric(selectedRubric, cellDescriptions);
-                
-                
             }
         }
 
@@ -296,11 +311,13 @@ namespace OsbleRubric
         /// <param name="rubric"></param>
         private void BuildGridFromRubric(Rubric rubric, ICollection<CellDescription> cellDescriptions)
         {
-
-            if (rubric.Levels.Count == 0 || rubric.Criteria.Count == 0) return;
             //Clearing the rubric entirely and reinitializing (to add default col/rows)
             customDataGrid.ClearAll();
-            initialize();
+            buildGridDefaults();
+            //initialize();
+
+            //Return now if there are no levels/criteria (otherwise breaking will occur)
+            if (rubric.Levels.Count == 0 || rubric.Criteria.Count == 0) return;
 
             //remove the add button row temporarily
             customDataGrid.RemoveRow(customDataGrid.BaseGrid.RowDefinitions.Count - 1);
@@ -343,11 +360,6 @@ namespace OsbleRubric
             //The Levels in rubric.Levels are added in order (i hope), so we can add them from left to right
             foreach (Level lvl in rubric.Levels)
             {
-                //This if statement will block any levels that were added to the db as empty placeholder cells
-                if (lvl.RangeEnd == 0 && lvl.RangeStart == 0 && lvl.LevelTitle == "No Title")
-                {
-                    MessageBox.Show("OOPS");
-                }
                 ICell ic = new HeaderCell(0, i + 2); //0 for the cell (as all Levels will be inserted into the top row), +2 to account for the first two columns that arent header cells
                 (ic as HeaderCell).ComboBoxValue = lvl.RangeEnd;
                 (ic as HeaderCell).Information = lvl.LevelTitle;
@@ -359,11 +371,6 @@ namespace OsbleRubric
             //The Criteria in rubric.Criteria are added in order, so we can add them top to bottom
             foreach (Criterion crit in rubric.Criteria)
             {
-                //This if statement will block any criteria that were added to the db as empty placeholder cells
-                if (crit.CriterionTitle == "No Title" && crit.Weight == 0) 
-                {
-                    MessageBox.Show("OOPS");
-                }
                 ICell criterionCell = new RubricCell(j + 1, 0, crit.CriterionTitle);  //+1 to account for the first row that isn't a row for criterion
                 placeICell(criterionCell);
                 ICell weightCell = new RubricCell(j + 1, 1, crit.Weight.ToString());
@@ -520,7 +527,8 @@ namespace OsbleRubric
             int numofCols = getColumnCount();
 
             customDataGrid.ClearAll();
-            initialize();
+            buildGridDefaults();
+            //initialize();
 
             //adding empty rows
             customDataGrid.RemoveRow(customDataGrid.BaseGrid.RowDefinitions.Count - 1); //remove the add button row temporarily
