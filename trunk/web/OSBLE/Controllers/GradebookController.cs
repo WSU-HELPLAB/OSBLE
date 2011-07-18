@@ -738,7 +738,7 @@ namespace OSBLE.Controllers
                    }
                }
            }
-           //BuildGradebook((int)Session["categoryId"]);
+           BuildGradebook((int)Session["categoryId"]);
            return View("_Gradebook");
        }
 
@@ -873,40 +873,11 @@ namespace OSBLE.Controllers
                                    {
                                        max = dropX;
                                    }
-
-
-                                   //for (int k = 0; k < dropX && k < lowest.Count(); k++)
-                                   //{
-                                   //    //if (k < lowest.Count()) // only drops the amount of graded assignments per student maximum
-                                   //    //{
-                                   //        foreach (Score newScore in item)
-                                   //        {
-                                   //            if (newScore.ID == id.ElementAt(k))
-                                   //            {
-                                   //                newScore.isDropped = true;
-                                   //            }
-                                   //        }
-                                   //    //}
-                                   //}
                                }
                                else
                                {
                                    // Taking X highest ( if there are less assignments than specified to take, it only takes what is graded)
                                    max = lowest.Count() - dropX;
-
-                                   //for (int k = 0; k < (lowest.Count() - dropX); k++)
-                                   //{
-                                   //    if (k < lowest.Count()) // only takes the amount of graded assignments per student minimum
-                                   //    {
-                                   //        foreach (Score newScore in item)
-                                   //        {
-                                   //            if (newScore.ID == id.ElementAt(k))
-                                   //            {
-                                   //                newScore.isDropped = true;
-                                   //            }
-                                   //        }
-                                   //    }
-                                   //}
                                }
 
                                for (int k = 0; k < max; ++k)
@@ -926,7 +897,7 @@ namespace OSBLE.Controllers
                    }
                }
            }
-           BuildGradebook(categoryId);
+           BuildGradebook((int)Session["categoryId"]);
            return View("_Gradebook");
        }
 

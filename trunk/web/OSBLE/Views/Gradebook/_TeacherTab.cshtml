@@ -163,6 +163,7 @@
         var numDropped = (from drop in ViewBag.Dropped as IEnumerable<int> select drop).First(); 
     }
     <input id="studentId" type="hidden" value="@studentId" />
+
     
     <div id='import_grades_from_csv'  title="Import file">Upload a comma-separated (CSV) file of student grades:<br /><br />
         
@@ -371,7 +372,7 @@
 
     $(function () {
         $("input[name='Customize_radio']").change(function () {
-            if ($("input[name='customize_radio']:checked").val() == 'CompAverage') {
+            if ($("input[name='Customize_radio']:checked").val() == 'CompAverage') {
                 $('#XtoDrop').val(null);
                 $('#XtoTake').val(null);
             }
@@ -876,8 +877,8 @@
                     });
                 }
             }
-            //calculateCols();
-            //calculateRows();
+            calculateCols();
+            calculateRows();
         }
     }
 
@@ -990,38 +991,70 @@
         });
     }
 
-    //    function calculateRows() {
+    function calculateRows() {
+        var totalArr = [];
+        var temp;
+        
+        $("#grades #perfectScore").each(function () {
+            $(this).find("td").each(function () {
+                var id = $(this).attr("id").split("-");
+                if (id[0] == "pointsPossible") {
+                    temp = parseInt($(this).text());
+                    totalArr.push(temp);
+                }
+            });
+        });
 
-    //        var totalPerfect = 0;
+        $("#grades #studentGrades").each(function () {
+            var total = [];
+            var grade = 0;
+            var i = 0;
 
-    //        $("#grades #perfectScore").each(function () {
-    //            $(this).find("td").each(function () {
-    //                var id = $(this).attr("id").split("-");
-    //                if (id[0] == "pointsPossible") {
-    //                    totalPerfect += parseInt($(this).text());
-    //                }
-    //            });
-    //        });
+            $(this).find("td").each(function () {
+                var id = $(this).attr("id").split("-");
 
-    //        $("#grades #studentGrades").each(function () {
-    //            var total = 0;
-    //            $(this).find("td").each(function () {
-    //                var id = $(this).attr("id").split("-");
-    //                if (id[0] == "_row") {
-    //                }
-    //                else if (id[1] == null) {
-    //                }
-    //                else {
-    //                    total += parseInt($(this).text());
-    //                }
-    //            });
-    //            $(this).find("td").each(function () {
-    //                if ($(this).attr("id") == "total") {
-    //                    $(this).text((total / totalPerfect * 100).toFixed(2) + "%");
-    //                }
-    //            });
-    //        });
-    //    }
+                if (id[0] == "_row") {
+                }
+                else if (id[1] == null) {
+                }
+                else if (isNaN(parseInt($(this).text()))) {
+                    i++;
+                } else {
+                    grade = parseInt($(this).text());
+                    grade /= totalArr[i]
+                    grade *= 100;
+                    // making the list of grades a ascending array 
+                    for (var j = 0; j < total.length && grade > total[j]; j++) {
+                    }
+                    total.splice(j, 0, grade);
+
+                    i++;
+                }
+            });
+
+            // this handles drop x lowest and take x highest
+            var dropXIndex = 0;
+            if ($("input[name='Customize_radio']:checked").val() == "XtoDrop") {
+                dropXIndex = $("#numDropped").val();
+            } else if ($("input[name='Customize_radio']:checked").val() == "XtoTake") {
+                dropXIndex = total.length - ($("#numDropped").val());
+            }
+
+            grade = 0;
+            // summing all the grades (not including any drops if there are any)
+            for (var count = dropXIndex; count < total.length; count++) {
+                grade += total[count];
+            }
+
+            grade /= (total.length - dropXIndex);
+
+            $(this).find("td").each(function () {
+                if ($(this).attr("id") == "total") {
+                    $(this).text(grade.toFixed(2) + "%");
+                }
+            });
+        });
+    }
 
     function ShowHide(evt, buttonClick) {
         evt.cancelBubble = true;
@@ -1230,7 +1263,7 @@
                 data: { categoryId: newCatId[0] },
                 success: function (response) {
                 // this makes the _Gradebook view reload and it already does after the all droplowest call below
-//                    $("#grades").replaceWith(response);
+                    //$("#grades").replaceWith(response);
                 }
             });
 
@@ -1317,10 +1350,7 @@
                 url: "/Gradebook/DropLowest",
                 data: { categoryId: newCatId[0], userId: id },
                 success: function (response) {
-                    $("#grades").replaceWith(response);
-
-                    cellGainsFocus(global_event, global_cell);
-                    alert("_TeacherTab DropLowest");
+                    //$("#grades").replaceWith(response);
                 }
             });
         }
