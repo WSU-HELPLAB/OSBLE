@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 using Newtonsoft.Json;
 using OSBLE.Attributes;
 using OSBLE.Models;
 using OSBLE.Models.Assignments;
+using OSBLE.Models.AbstractCourses;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
@@ -88,6 +91,14 @@ namespace OSBLE.Controllers
 
             setupViewBagForCreate();
 
+
+            // line by line review configurations
+            List<CommentCategoryConfiguration> configs = (from cc in db.CommentCategoryConfigurations
+                                    where cc.ID != null
+                                    select cc).ToList();
+            // add code to give sample of configuration to user?
+            ViewBag.CommentCategories = configs;
+
             return View(viewModel);
         }
 
@@ -115,6 +126,7 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult Create(BasicAssignmentViewModel basic)
         {
+
             string serializedTeams = null;
             try
             {
@@ -152,7 +164,7 @@ namespace OSBLE.Controllers
 
                 submission.ReleaseDate = basic.Submission.ReleaseDate;
                 submission.Name = basic.Submission.Name;
-
+                
                 submission.PointsPossible = basic.Submission.PointsPossible;
 
                 submission.HoursLatePerPercentPenalty = basic.Submission.HoursLatePerPercentPenalty;
@@ -615,6 +627,101 @@ namespace OSBLE.Controllers
 
             return View(basic);
         }
+
+        
+        // ajax handling code for comments
+        //   kept in case ajax wanted to be reimplemented
+        /*
+        [HttpPost]
+        [CanModifyCourse]
+        public string SaveCommentCollection(string name, string data)
+        {
+
+            JavaScriptSerializer ser = new JavaScriptSerializer();
+            string[][] dataArray = ser.Deserialize<string[][]>(HttpUtility.UrlDecode(data));
+
+            string output = "[" + HttpUtility.UrlDecode(name);
+
+            CommentCollection newCC = new CommentCollection(HttpUtility.UrlDecode(name));
+
+            newCC.Name = HttpUtility.UrlDecode(name);
+
+            for (int i = 0; i < dataArray.Length; i++)
+            {
+                CommentCategory cc = new CommentCategory(dataArray[i][0]);
+                output += "," + dataArray[i][0];
+
+                for (int j = 1; j < dataArray[i].Length; j++)
+                {
+                    output += "," + dataArray[i][j];
+                    cc.CommentCategoryTags.Add( new CommentCategoryTag(dataArray[i][j]) );
+                }
+
+                newCC.CommentCategories.Add( cc );
+            }
+
+            // validate
+
+            //db.CommentCollections.Add(newCC);
+
+            //db.SaveChanges();
+
+
+            return output + "]";
+        }
+
+        [HttpPost]
+        [CanModifyCourse]
+        public string GetCollectionContents(int inputID)
+        {
+            
+            List<CommentCollection> q1 = (from c in db.CommentCollections
+                                    where c.ID == inputID
+                                    select c).ToList();
+
+            string output = "[";
+            foreach (CommentCollection cc in q1)
+            {
+                output += "." + cc.Name + ".";
+                foreach (CommentCategory c in cc.CommentCategories)
+                {
+                    output += "[" + c.Name;
+
+                    foreach (CommentCategoryTag t in c.CommentCategoryTags)
+                    {
+                        output += "," + t.value;
+                    }
+
+                    output += "],";
+                }
+            }
+            // removes trailing comma and adds ending bracket
+            //output = output.Substring(0, output.Length - 1) + "]";
+            
+            string output = "[" + inputID.ToString() + "]";
+            return HttpUtility.UrlEncode(output);
+        }
+
+        [HttpPost]
+        [CanModifyCourse]
+        public string GetCollections()
+        {
+            
+            // add logic for current course here
+            List<CommentCollection> q = (from c in db.CommentCollections where c.Name != null select c).ToList();
+
+            string output = "[";
+            foreach (CommentCollection c in q)
+            {
+                output += "[\"" + c.ID + "\",\"" + c.Name + "\"],";
+            }
+            output = output.Substring(0, output.Length - 1) + "]";
+            
+            string output = "[[\"1\",\"Abc\"],[\"2\",\"Def\"]]";
+            return output;
+        }
+        */
+
 
         protected override void Dispose(bool disposing)
         {

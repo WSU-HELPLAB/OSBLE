@@ -168,6 +168,7 @@ $(function () {
         return false;
     });
 
+    $('#new_collection_name').val("");
 
     $("input[name='line_review_options']").change(function () {
         if ($("input[name='line_review_options']:checked").val() == 'ManualConfig') {
@@ -183,7 +184,10 @@ $(function () {
         }
     });
 
-    
+
+    //$('#comment_category_selection').change(switchCommentConfig);
+    //loadConfigs();
+
 });
 
 // apply this function in an event listener to every text box to prevent accidental submission of the whole form by the user
@@ -194,6 +198,116 @@ function disableSubmit(e) {
     }
 }
 
+// ajax code
+//   commented out rather than deleted to allow for reimplementation
+/*
+function saveConfig() {
+
+    // validate here
+    
+    $.ajax({
+        url: '/BasicAssignment/SaveCommentCollection',
+        data: { name: encodeURI( $("#category_config_name").val() ), data: encodeURI( getNewCategoryData() ) }, 
+        type: "POST",
+        success: function (data) {
+
+            //if(){
+
+            loadConfigs();
+            // reset name, remove the categories
+            $('#category_data').empty();
+            $('#new_collection_name').val("");
+
+            $('#category_data').append( decodeURI(data) ); // temp, this will be status to tell whether or not to reset #category_data and #new_collection_name (server side validation)
+        }
+    });
+
+    return false;
+}
+function getNewCategoryData(){
+
+    var data = new Array();
+    var cur = 0;
+
+    $("#category_data").children().map( function(){
+        cur = data.push( new Array() );
+        $(this).find("input").map(function(){
+            data[cur-1].push( $(this).val() );
+        });
+    });
+    
+    return JSON.stringify(data);
+}
+
+function loadConfigs() {
+    
+    // currently, select all
+    $.ajax({
+        url: '/BasicAssignment/GetCollections',
+        type: "POST",
+        success: function (data) {
+            displayConfigs(data);
+        }
+    });
+
+}
+
+function displayConfigs(data) {
+    $("#comment_category_selection").empty();
+    $("#comment_category_selection").append("<option value='null'>[None Selected]</option>");
+    
+    // loop over data
+    dataArray = JSON.parse(data);
+    for (i=0;i<dataArray.length;i++) {
+        $("#comment_category_selection").append("<option value='" + dataArray[i][0] + "'>" + dataArray[i][1] + "</option>");
+    }
+
+}
+
+function switchCommentConfig() {
+    // use this to load the select box onload and after a new category is added
+
+    //$("#comment_category_selection").attr("disabled", true);
+    // notification of loading
+
+    $.ajax({
+        url: '/BasicAssignment/GetCollectionContents',
+        data: { inputID: $(this).val() },
+        type: "POST",
+        success: function (data) {
+            displayCommentConfig( decodeURI(data) );
+        }
+    });
+
+}
+
+function displayCommentConfig(data) {
+
+    // defaults
+    //$("#comment_category_selection").attr("disabled", false);
+    //$('#comment_category_selection option:eq(0)').attr('selected', 'selected')
+
+    $("#saved_config_display").empty();
+
+    // load from database
+    //while(data){
+    //collectionName = data.name;
+    //collectionID = data.ID;
+
+    //}
+
+    //$("#comment_category_selection").append("<option value='" + collectionID + "'>" + collectionName + "</option>");
+    //$("#saved_config_display").append("<div id='configID_" + collectionID + "' class='indented_options' style='display:none;'> [TEMPORARY PLACEHOLDER " + collectionID + "] </div>");
+    $("#saved_config_display").append(data);
+
+    //$("#saved_config_display").append("<div id='configID_null' class='indented_options' style='display:none;'></div>");
+    //$("#saved_config_display").append("<div id='configID_2' class='indented_options' style='display:none;'> aaa </div>");
+    //$("#saved_config_display").append("<div id='configID_5' class='indented_options' style='display:none;'> bbb </div>");
+    //$("#saved_config_display").append("<div id='configID_6' class='indented_options' style='display:none;'> ccc </div>");
+
+    //var newCollectionDisplay = $('#display_' + i);
+}
+*/
 
 function addNewCategory() {
 
@@ -226,7 +340,7 @@ function addNewCategory() {
     newCategory.append('</tr><tr><td colspan="2"><div id="' + dataId + '"> <input type="text" id="' + categoryOptionIdPrefix + '_0" name="' + categoryOptionIdPrefix + '_0"> <br />');
     // required first option
     newCategory.append('');
-
+    
 
     newCategory.append('</div><td></tr></table>');
 
@@ -241,6 +355,8 @@ function addNewCategory() {
 
         // all one line because append adds closing tags automatically if there isn't a closing tag (ie </div>) within the string it is appending :/
         d.append('<div><input type="text" id="' + categoryOptionIdPrefix + '_' + categoryOptionIndex[i] + '" name="' + categoryOptionIdPrefix + '_' + categoryOptionIndex[i] + '"> <div style="display: inline; position:relative; top:0.25em;"><a href="#" title="Delete This Option" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove() }); categoryOptionIndex[' + i + ']--; return false;"><img src="/Content/images/delete_up.png" alt="Delete" /></a></div> </div>');
+
+        $('#option_' + i + '_' + categoryOptionIndex[i]).focus();
         $('#option_' + i + '_' + categoryOptionIndex[i]).keypress(disableSubmit);
 
         categoryOptionIndex[i]++;
@@ -256,8 +372,4 @@ function addNewCategory() {
     categoryCount++;
 
 }
-
-
-
-
 
