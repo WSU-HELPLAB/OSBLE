@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ServiceModel.DomainServices.Client;
+using OSBLE.Models.AbstractCourses;
+using OSBLE.Services;
 using ReviewInterfaceBase.ViewModel.Category;
 
 namespace ReviewInterfaceBase.Model.CatergoryHolder
@@ -45,10 +48,9 @@ namespace ReviewInterfaceBase.Model.CatergoryHolder
 
         private void loadCategoriesOperation_Completed(object sender, EventArgs e)
         {
-            /*
             categories.Clear();
-            LoadOperation<Web.Category> loadOperation = sender as LoadOperation<Web.Category>;
-            foreach (Web.Category category in loadOperation.Entities)
+            LoadOperation<CommentCategory> loadOperation = sender as LoadOperation<CommentCategory>;
+            foreach (CommentCategory category in loadOperation.Entities)
             {
                 CategoryViewModel cvm = new CategoryViewModel();
                 cvm.LoadTags(category.Name, category.ID);
@@ -61,7 +63,6 @@ namespace ReviewInterfaceBase.Model.CatergoryHolder
 
             //Let anyone else know (aka our ViewModel) that we are done loading
             LoadCompleted(this, EventArgs.Empty);
-             */
         }
 
         private void cvm_LoadComplete(object sender, EventArgs e)
@@ -72,16 +73,14 @@ namespace ReviewInterfaceBase.Model.CatergoryHolder
 
         public void Load()
         {
-            /*
             if (documentID == -1)
             {
                 throw new Exception("DocumentID was -1 which indicates it was not set using the correct constructor, please pass in documentID when calling the constructor if you then want to use Load");
             }
-            FakeDomainContext fakeDomainContext = new FakeDomainContext();
-            var entityQuerey = fakeDomainContext.GetCategoriesQuery(documentID);
-            var loadCategoriesOperation = fakeDomainContext.Load<ReviewInterfaceBase.Web.Category>(entityQuerey);
+            ReviewInterfaceDomainContext ReviewInterfaceDC = new ReviewInterfaceDomainContext();
+            var entityQuerey = ReviewInterfaceDC.GetCategoriesQuery(documentID);
+            var loadCategoriesOperation = ReviewInterfaceDC.Load<CommentCategory>(entityQuerey);
             loadCategoriesOperation.Completed += new EventHandler(loadCategoriesOperation_Completed);
-             */
 
             //This was added while Categories dont work with OSBLE needs to be removed when they do
             LoadCompleted(this, EventArgs.Empty);

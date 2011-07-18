@@ -524,8 +524,14 @@
             <div class="editor-field">
                 Worth
                 @Html.TextBoxFor(model => model.Assignment.PointsPossible, new { id = "points_possible", size = 3 })
-                Points in Category <span id="grade_category_label"></span>
+                Points for the entire Assignment in Category <span id="grade_category_label"></span>
                 @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)
+            </div>
+            <div class="editor-field">
+                Worth
+                @Html.TextBoxFor(model => model.Submission.PointsPossible, new { id = "submission_points_possible", size = 3 })
+                Points For Submission Activity <span id="grade_category_label"></span>
+                @Html.ValidationMessageFor(model => model.Submission.PointsPossible)
             </div>
             <h3>
                 Late Policy @Helpers.CreateToolTip(ToolTips.BasicAssignmentLatePolicy)

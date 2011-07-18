@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using System.ServiceModel.DomainServices.Client;
 using System.Windows.Controls;
 using System.Xml.Linq;
@@ -25,6 +26,8 @@ namespace EditPeerReview
         /// This only turns to true after they have been opened and the UI thread is started
         /// </summary>
         private bool documentsOpened = false;
+
+        private bool peerReviewDocumentsLoaded = false;
 
         /// <summary>
         /// This keeps a reference for all the PeerReviewDocuments
@@ -58,14 +61,23 @@ namespace EditPeerReview
             //We have loaded the locations of the PeerReivews now we give it to the WebClient so it can load the documents
             LoadOperation<DocumentLocation> loadPeerReviewLocationOperation = sender as LoadOperation<DocumentLocation>;
 
-            WebClientWrapper clientWrapper = new WebClientWrapper(loadPeerReviewLocationOperation.Entities);
-            clientWrapper.LoadCompleted += new DocumentsLoadedEventHandler(PeerReviewDocumentsLoadCompleted);
-            clientWrapper.StartAsycLoad();
+            if (loadPeerReviewLocationOperation.Entities.Count() > 0)
+            {
+                WebClientWrapper clientWrapper = new WebClientWrapper(loadPeerReviewLocationOperation.Entities);
+                clientWrapper.LoadCompleted += new DocumentsLoadedEventHandler(PeerReviewDocumentsLoadCompleted);
+                clientWrapper.StartAsycLoad();
+            }
+            else
+            {
+                peerReviewDocumentsLoaded = true;
+                OpenPeerReviewDocuments();
+            }
         }
 
         private void PeerReviewDocumentsLoadCompleted(object sender, DocumentsLoadedEventArgs e)
         {
             //We have finished loading the PeerReviewDocuments now
+            peerReviewDocumentsLoaded = true;
             PeerReviewDocuments = e.Documents;
             OpenPeerReviewDocuments();
         }
@@ -77,14 +89,17 @@ namespace EditPeerReview
             //Since both of this involved asynchronous process we cannot say which order they will happen in and thus need to check for both
             //Both should call this function and since both will set their item with in this thread there should be no problems with
             //multi-threaded systems
-            if (documentsOpened == true && PeerReviewDocuments != null)
+            if (documentsOpened == true && peerReviewDocumentsLoaded == true)
             {
-                //Load each document
-                foreach (DocumentInfo peerReview in PeerReviewDocuments)
+                if (PeerReviewDocuments != null)
                 {
-                    ReadPeerReview(XDocument.Load(peerReview.Stream), peerReview.Author, peerReview.Role);
+                    //Load each document
+                    foreach (DocumentInfo peerReview in PeerReviewDocuments)
+                    {
+                        ReadPeerReview(XDocument.Load(peerReview.Stream), peerReview.Author, peerReview.Role);
+                    }
                 }
-                //mpVM.HideLoadingWindow();
+                loadingWindow.Close();
             }
         }
 
@@ -95,11 +110,14 @@ namespace EditPeerReview
             OpenPeerReviewDocuments();
         }
 
+        public void ShowLoadingWindow()
+        {
+            loadingWindow.Show();
+        }
+
         public EditPeerReview(bool canSaveAsDraft)
         {
             InitializeComponent();
-
-            (loadingWindow as ChildWindow).Show();
 
             //Attach a handler for when the MainPage is done opening the documents.
             mpVM.OpeningDocumentsComplete += new EventHandler(mpVM_OpeningDocumentsComplete);

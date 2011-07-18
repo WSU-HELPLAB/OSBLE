@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ServiceModel.DomainServices.Client;
+using OSBLE.Models.AbstractCourses;
+using OSBLE.Services;
 using ReviewInterfaceBase.ViewModel.Tag;
 
 namespace ReviewInterfaceBase.Model.Category
@@ -46,30 +49,25 @@ namespace ReviewInterfaceBase.Model.Category
 
         public void Load()
         {
-            /*
-            FakeDomainContext fakeDomainContext = new FakeDomainContext();
-            var entityQuerey = fakeDomainContext.GetTagsQuery(id);
-            var loadTagOperation = fakeDomainContext.Load<ReviewInterfaceBase.Web.Tag>(entityQuerey);
-            loadTagOperation.Completed += new EventHandler(loadTagOperation_Completed);
-             */
+            //Tags are call CommentCategoryOption in OSBLE
 
-            //This was added while Categories dont work with OSBLE needs to be removed when they do
-            LoadCompleted(this, EventArgs.Empty);
+            ReviewInterfaceDomainContext ReviewInterfaceDC = new ReviewInterfaceDomainContext();
+            var entityQuerey = ReviewInterfaceDC.GetCommentCategoryOptionsQuery(id);
+            var loadTagOperation = ReviewInterfaceDC.Load<CommentCategoryOption>(entityQuerey);
+            loadTagOperation.Completed += new EventHandler(loadTagOperation_Completed);
         }
 
         private void loadTagOperation_Completed(object sender, EventArgs e)
         {
-            /*
-            LoadOperation<Web.Tag> loadOperation = sender as LoadOperation<Web.Tag>;
+            LoadOperation<CommentCategoryOption> loadOperation = sender as LoadOperation<CommentCategoryOption>;
             tagViewModelList = new List<TagViewModel>();
-            foreach (Web.Tag tag in loadOperation.Entities)
+            foreach (CommentCategoryOption tag in loadOperation.Entities)
             {
                 tagViewModelList.Add(new TagViewModel(tag.Name));
             }
 
             //Let anyone else know (aka our ViewModel) that we are done loading
             LoadCompleted(this, EventArgs.Empty);
-             */
         }
     }
 }
