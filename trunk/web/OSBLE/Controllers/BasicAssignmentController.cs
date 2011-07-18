@@ -190,9 +190,12 @@ namespace OSBLE.Controllers
                     if (Request.Form["line_review_options"].ToString().CompareTo("ManualConfig") == 0)
                     {
                         CommentCategoryConfiguration config = BuildCommentCategories();
-                        db.CommentCategoryConfigurations.Add(config);
-                        db.SaveChanges();
-                        basic.Assignment.CommentCategoryConfigurationID = config.ID;
+                        if (config.Categories.Count > 0)
+                        {
+                            db.CommentCategoryConfigurations.Add(config);
+                            db.SaveChanges();
+                            basic.Assignment.CommentCategoryConfigurationID = config.ID;
+                        }
                     }
                 }
 
