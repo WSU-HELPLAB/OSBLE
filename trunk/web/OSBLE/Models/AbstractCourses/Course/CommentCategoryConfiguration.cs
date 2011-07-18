@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using OSBLE.Models.Assignments;
 
-namespace OSBLE.Models.AbstractCourses
+namespace OSBLE.Models.AbstractCourses.Course
 {
     public class CommentCategoryConfiguration
     {

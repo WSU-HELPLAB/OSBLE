@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.AbstractCourses;
+using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
-using OSBLE.Models.AbstractCourses;
 
 namespace OSBLE.Models.Assignments
 {
@@ -48,14 +49,17 @@ namespace OSBLE.Models.Assignments
         }
 
         public int? CommentCategoryID { get; set; }
+
         public CommentCategory CommentCategory { get; set; }
 
         public bool IsDraft { get; set; }
 
         public int? RubricID { get; set; }
+
         public virtual Rubric Rubric { get; set; }
 
         public int? CommentCategoryConfigurationID { get; set; }
+
         public virtual CommentCategoryConfiguration CommentCategoryConfiguration { get; set; }
     }
 }

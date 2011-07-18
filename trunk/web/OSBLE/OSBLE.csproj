@@ -160,8 +160,8 @@
     <Compile Include="Controllers\StudioAssignmentController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="EntityFramework\DbContextExtensions.cs" />
-    <Compile Include="Models\AbstractCourses\CommentCategory.cs" />
-    <Compile Include="Models\AbstractCourses\CommentCategoryConfiguration.cs" />
+    <Compile Include="Models\AbstractCourses\Course\CommentCategory.cs" />
+    <Compile Include="Models\AbstractCourses\Course\CommentCategoryConfiguration.cs" />
     <Compile Include="Models\AbstractCourses\CourseRubric.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\AbstractAssignment.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\AsyncIssueVotingActivity.cs" />

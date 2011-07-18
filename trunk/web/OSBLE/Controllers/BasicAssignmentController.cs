@@ -8,6 +8,8 @@ using System.Web.Script.Serialization;
 using Newtonsoft.Json;
 using OSBLE.Attributes;
 using OSBLE.Models;
+using OSBLE.Models.AbstractCourses;
+using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.AbstractCourses;
 using OSBLE.Models.Assignments.Activities;
@@ -16,7 +18,6 @@ using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
 using OSBLE.Utility;
-using OSBLE.Models.AbstractCourses;
 
 namespace OSBLE.Controllers
 {
@@ -50,7 +51,6 @@ namespace OSBLE.Controllers
         {
             return View("_TeamSilverlightObject");
         }
-
 
         //
         // GET: /Assignment/Create
@@ -341,7 +341,7 @@ namespace OSBLE.Controllers
                     serializedMember.Section = cu.Section;
                     teamMembmers.Add(serializedMember);
                 }
-                else if(member is TeamMember)
+                else if (member is TeamMember)
                 {
                     TeamMember tMember = member as TeamMember;
                     foreach (TeamUserMember tum in tMember.Team.Members)
@@ -373,7 +373,6 @@ namespace OSBLE.Controllers
                         }
                     }
                 }
-                
             }
 
             return teamMembmers;
@@ -448,7 +447,7 @@ namespace OSBLE.Controllers
             List<string> keys = (from key in Request.Form.AllKeys
                                  where key.Contains("category_")
                                  select key).ToList();
-            
+
             //we know this one for sure so no need to loop
             config.Name = Request.Form["category_config_name"].ToString();
 
@@ -459,7 +458,7 @@ namespace OSBLE.Controllers
                 //many underscores the current key has, we can determine what data it is
                 //providing to us
                 string[] pieces = key.Split('_');
-                
+
                 //length of 2 is a category name
                 if (pieces.Length == 2)
                 {
@@ -469,7 +468,6 @@ namespace OSBLE.Controllers
                     //does the comment category already exist?
                     CommentCategory category = GetCategoryOrCreateNew(config, catId);
                     category.Name = Request.Form[key].ToString();
-
                 }
                 //length of 4 is a category option
                 else if (pieces.Length == 4)

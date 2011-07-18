@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.AbstractCourses.Course;
 
 namespace OSBLE.Models.AbstractCourses
 {
@@ -16,7 +14,7 @@ namespace OSBLE.Models.AbstractCourses
         public string Name { get; set; }
 
         [Required]
-        public IList<CommentCategoryOption> Options { get; set; }
+        public virtual IList<CommentCategoryOption> Options { get; set; }
 
         public CommentCategory()
         {

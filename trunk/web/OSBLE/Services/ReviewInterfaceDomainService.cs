@@ -7,6 +7,7 @@
     using System.ServiceModel.DomainServices.Hosting;
     using System.Web;
     using OSBLE.Models.AbstractCourses;
+    using OSBLE.Models.AbstractCourses.Course;
     using OSBLE.Models.Assignments.Activities;
     using OSBLE.Models.Courses;
     using OSBLE.Models.Users;

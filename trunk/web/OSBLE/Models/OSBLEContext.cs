@@ -2,6 +2,7 @@
 using System.Web;
 using System.Web.Security;
 using OSBLE.Models.AbstractCourses;
+using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments.Activities.Scores;

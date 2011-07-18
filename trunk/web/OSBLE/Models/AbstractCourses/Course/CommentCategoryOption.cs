@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
-using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models.AbstractCourses
+namespace OSBLE.Models.AbstractCourses.Course
 {
     public class CommentCategoryOption
     {
