@@ -42,6 +42,8 @@ namespace ReviewInterfaceBase.ViewModel
 
         private LoadingWindow loadingWindow = null;
 
+        private ReviewInterfaceDomainContext ReviewInterfaceDC = new ReviewInterfaceDomainContext();
+
         //OLDCODE
         /// <summary>
         /// This is a reference to rubricViewModel
@@ -195,7 +197,7 @@ namespace ReviewInterfaceBase.ViewModel
         public void LoadDocuments(IList<DocumentInfo> Documents)
         {
             bool first = true;
-
+            TabItem firstDocHolder = null;
             //This is where we open and display the documents
             foreach (DocumentInfo document in Documents)
             {
@@ -220,20 +222,33 @@ namespace ReviewInterfaceBase.ViewModel
                 DocumentHolder.Content = DocumentHolderViewModel.GetView();
 
                 customTabControlViewModel.AddTabItem(DocumentHolder);
+
+                //Set the new DocumentHolder as the one selected by the TabControl
+                customTabControlViewModel.SelectedTab = DocumentHolder;
+
+                //Then UpdateLayout this will force all of its UI to be sorted out this mostly affects
+                //the richTextBox which doesn't figure out its content until is displayed which is problematic
+                //when we try to attach comments to the runs that don't really exist yet.
+                thisView.UpdateLayout();
+
                 if (first)
                 {
-                    //We attach this handler so we know when the documents have been updated by the UI thread.
-                    DocumentHolder.LayoutUpdated += new EventHandler(DocumentHolder_LayoutUpdated);
-                    customTabControlViewModel.SelectedTab = DocumentHolder;
+                    firstDocHolder = DocumentHolder;
                     first = false;
                 }
             }
+
+            customTabControlViewModel.SelectedTab = firstDocHolder;
+
+            //We fire this because the documents have been updated by the UI thread
+            thisView.UpdateLayout();
+            OpeningDocumentsComplete(this, EventArgs.Empty);
         }
 
         private void DocumentHolder_LayoutUpdated(object sender, EventArgs e)
         {
             //We fire this because the documents have been updated by the UI thread
-            OpeningDocumentsComplete(this, EventArgs.Empty);
+            //OpeningDocumentsComplete(this, EventArgs.Empty);
         }
 
         private StringBuilder SaveReview()
@@ -248,7 +263,6 @@ namespace ReviewInterfaceBase.ViewModel
             {
                 //we write the first overall element
                 writer.WriteStartElement("ReviewInterfaceBasePeerReview");
-
                 //Then each DocumentHolder writes whatever it has too.
                 foreach (IDocumentHolderViewModel DocumentHolderViewModel in DocumentHolderViewModels)
                 {
@@ -267,10 +281,8 @@ namespace ReviewInterfaceBase.ViewModel
         private void SaveAsDraft_Click(object sender, RoutedEventArgs e)
         {
             ReviewInterfaceDomainContext ReviewInterfaceDC = new ReviewInterfaceDomainContext();
-
             //Then we upload the file as well as register an event for when it has been uploaded
             ReviewInterfaceDC.UploadReviewDraft(SaveReview().ToString()).Completed += new EventHandler(FileUploadComplete);
-
             SaveAsDraftButtonContent = "Saving...";
         }
 

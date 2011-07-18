@@ -7,6 +7,7 @@ using IssueVoting.HelperClasses;
 using OSBLE.Models.ViewModels.ReviewInterface;
 using OSBLE.Services;
 using ReviewInterfaceBase.HelperClasses;
+using ReviewInterfaceBase.View;
 using ReviewInterfaceBase.ViewModel;
 using ReviewInterfaceBase.ViewModel.DocumentHolder;
 
@@ -14,6 +15,8 @@ namespace ViewPeerReview
 {
     public partial class ViewPeerReview : UserControl
     {
+        private LoadingWindow loadingWindow = new LoadingWindow();
+
         /// <summary>
         /// This keeps a reference to the MainPageViewModel
         /// </summary>
@@ -29,6 +32,13 @@ namespace ViewPeerReview
         /// This only turns to true after they have been opened and the UI thread is started
         /// </summary>
         private bool documentsOpened = false;
+
+        private bool peerReviewLoaded = false;
+
+        public void ShowLoadingWindow()
+        {
+            loadingWindow.Show();
+        }
 
         public ViewPeerReview()
         {
@@ -62,14 +72,13 @@ namespace ViewPeerReview
         private void DocumentLocationsLoadCompleted(object sender, DocumentsLoadedEventArgs e)
         {
             mpVM.LoadDocuments(e.Documents);
+            loadingWindow.Close();
         }
 
         private void LocalInitilizer()
         {
             //we add the view of MainPage to 'view'
             this.LayoutRoot.Children.Add(mpVM.GetView());
-
-            mpVM.ShowLoadingWindow();
 
             //Get DomainContext
             ReviewInterfaceDomainContext ReviewInterfaceDomainContext = new ReviewInterfaceDomainContext();
@@ -101,6 +110,7 @@ namespace ViewPeerReview
         {
             //We have finished loading the PeerReviewDocuments now
             PeerReviewDocuments = e.Documents;
+            peerReviewLoaded = true;
             OpenPeerReviewDocuments();
         }
 
@@ -111,12 +121,15 @@ namespace ViewPeerReview
             //Since both of this involved asynchronous process we cannot say which order they will happen in and thus need to check for both
             //Both should call this function and since both will set their item with in this thread there should be no problems with
             //multi-threaded systems
-            if (documentsOpened == true && PeerReviewDocuments != null)
+            if (documentsOpened == true && peerReviewLoaded == true)
             {
-                //Load each document
-                foreach (DocumentInfo peerReview in PeerReviewDocuments)
+                if (PeerReviewDocuments != null)
                 {
-                    ReadPeerReview(XDocument.Load(peerReview.Stream), peerReview.Author, peerReview.Role);
+                    //Load each document
+                    foreach (DocumentInfo peerReview in PeerReviewDocuments)
+                    {
+                        ReadPeerReview(XDocument.Load(peerReview.Stream), peerReview.Author, peerReview.Role);
+                    }
                 }
                 mpVM.HideLoadingWindow();
             }

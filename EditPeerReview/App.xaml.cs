@@ -22,7 +22,12 @@ namespace EditPeerReview
                 //we want canSaveAsDraft to be true iff "CanSaveAsDraft" == false
                 canSaveAsDraft = (!(e.InitParams["CanSaveAsDraft"] == "False"));
             }
-            this.RootVisual = new EditPeerReview(canSaveAsDraft);
+
+            EditPeerReview editPeerReview = new EditPeerReview(canSaveAsDraft);
+
+            this.RootVisual = editPeerReview;
+
+            editPeerReview.ShowLoadingWindow();
         }
 
         private void Application_Exit(object sender, EventArgs e)

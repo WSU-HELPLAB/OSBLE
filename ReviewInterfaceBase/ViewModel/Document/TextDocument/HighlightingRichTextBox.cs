@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using System;
 
 namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
 {
@@ -122,7 +122,6 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
             }
         }
 
-
         /// <summary>
         /// This does a full update based on the Properties of this class
         /// NOTE: TextStart, TextEnd, Canvas, FillBrush, ContentStart, StrokeBrush must all not equal null or this function does nothing
@@ -168,7 +167,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
                     textStart = index.GetNextInsertionPosition(LogicalDirection.Forward);
                     start = textStart.GetCharacterRect(LogicalDirection.Forward);
                 }
-                
+
                 rect = MakeRectange(textStart, textEnd);
                 if (rect != null)
                 {
@@ -184,7 +183,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
         }
 
         /// <summary>
-        /// This sets the rectangles Stroke to transpernt and the the Fill to FillBrush
+        /// This sets the rectangles Stroke to transparent and the the Fill to FillBrush
         /// </summary>
         /// <param name="rectangles">rectangles to be updated</param>
         public void SolidHighlighting(IEnumerable<Rectangle> rectangles)
@@ -219,8 +218,6 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
 
         #region HelperFunctions
 
-
-
         private Rectangle MakeRectange(TextPointer tpStart, TextPointer tpEnd)
         {
             //We get the rect for the first and last char
@@ -230,8 +227,6 @@ namespace ReviewInterfaceBase.ViewModel.Document.TextFileDocument
             }
             Rect start = tpStart.GetCharacterRect(LogicalDirection.Forward);
             Rect end = tpEnd.GetCharacterRect(LogicalDirection.Forward);
-
-
 
             //then we make a new Rectangle and set it to the correct size, location, fillBrush and Opacity
             Rectangle rect = new Rectangle();

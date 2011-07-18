@@ -59,20 +59,27 @@ namespace EditPeerReview.HelperClasses
         {
             documentEnumerator = documentLocations.GetEnumerator();
 
-            documentEnumerator.Reset();
+            try
+            {
+                documentEnumerator.Reset();
 
-            //according to MSDN a next is needed after a reset in order for it to point to the first element because a reset puts it before the first element
-            documentEnumerator.MoveNext();
+                //according to MSDN a next is needed after a reset in order for it to point to the first element because a reset puts it before the first element
+                documentEnumerator.MoveNext();
 
-            //Attach a listener for when it is done loading the first document
-            client.OpenReadCompleted += new OpenReadCompletedEventHandler(client_OpenReadCompleted);
+                //Attach a listener for when it is done loading the first document
+                client.OpenReadCompleted += new OpenReadCompletedEventHandler(client_OpenReadCompleted);
 
-            //Get the current docLocation
-            DocumentLocation docLocation = documentEnumerator.Current as DocumentLocation;
-            Uri url = new Uri(docLocation.Location, UriKind.Relative);
+                //Get the current docLocation
+                DocumentLocation docLocation = documentEnumerator.Current as DocumentLocation;
+                Uri url = new Uri(docLocation.Location, UriKind.Relative);
 
-            //Load the first Document
-            client.OpenReadAsync(url, new DocumentInfo(docLocation.ID, docLocation.FileName, docLocation.Author, (ReviewInterfaceBase.HelperClasses.Classification)docLocation.Role));
+                //Load the first Document
+                client.OpenReadAsync(url, new DocumentInfo(docLocation.ID, docLocation.FileName, docLocation.Author, (ReviewInterfaceBase.HelperClasses.Classification)docLocation.Role));
+            }
+            catch
+            {
+                LoadCompleted(this, new DocumentsLoadedEventArgs(documents));
+            }
         }
 
         private void client_OpenReadCompleted(object sender, OpenReadCompletedEventArgs e)

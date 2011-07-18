@@ -33,14 +33,21 @@ namespace IssueVoting.HelperClasses
         public void StartAsycLoad()
         {
             documentEnumerator = documentLocations.GetEnumerator();
-
-            documentEnumerator.Reset();
-            documentEnumerator.MoveNext();
-            //according to MSDN a next is needed after a reset in order for it to point to the first element because a reset puts it before the first element
-            client.OpenReadCompleted += new OpenReadCompletedEventHandler(client_OpenReadCompleted);
-            DocumentLocation docLocation = documentEnumerator.Current as DocumentLocation;
-            Uri url = new Uri(docLocation.Location, UriKind.Relative);
-            client.OpenReadAsync(url, new DocumentInfo(docLocation.ID, docLocation.FileName, docLocation.Author, (Classification)docLocation.Role));
+            try
+            {
+                documentEnumerator.Reset();
+                documentEnumerator.MoveNext();
+                //according to MSDN a next is needed after a reset in order for it to point to the first element because a reset puts it before the first element
+                client.OpenReadCompleted += new OpenReadCompletedEventHandler(client_OpenReadCompleted);
+                DocumentLocation docLocation = documentEnumerator.Current as DocumentLocation;
+                Uri url = new Uri(docLocation.Location, UriKind.Relative);
+                client.OpenReadAsync(url, new DocumentInfo(docLocation.ID, docLocation.FileName, docLocation.Author, (Classification)docLocation.Role));
+            }
+            catch
+            {
+                //well nothing to load so guess we are done loading
+                LoadCompleted(this, new DocumentsLoadedEventArgs(documents));
+            }
         }
 
         private void client_OpenReadCompleted(object sender, OpenReadCompletedEventArgs e)
