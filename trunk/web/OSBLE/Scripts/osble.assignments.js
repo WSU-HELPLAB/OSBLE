@@ -197,6 +197,11 @@ function disableSubmit(e) {
 
 function addNewCategory() {
 
+    var categoryId = 'category_' + categoryIndex;
+    var categoryOptionIdPrefix = 'category_option_' + categoryIndex;
+    var dataId = 'option_data_' + categoryIndex;
+    var addOptionId = 'add_option_' + categoryIndex;
+
     // limit to six
     if (categoryCount >= MAX_CATEGORIES) {
         alert("The maximum number of categories is " + MAX_CATEGORIES + ".");
@@ -204,21 +209,21 @@ function addNewCategory() {
     }
 
     // create new item
-    $('#category_data').append('<div id="category_' + categoryIndex + '" class="deliverable" />');
-    var newCategory = $('#category_' + categoryIndex);
+    $('#category_data').append('<div id="' + categoryId + '" class="deliverable" />');
+    var newCategory = $('#' + categoryId);
 
     // delete button
     newCategory.append('<div class="deliverable_tools"><a href="#" title="Delete This Deliverable" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove() }); categoryCount--; return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');
 
     // main layout
     newCategory.append('<table><tr>');
-    newCategory.append('<td>Category Name:</td><td> <input type="text" id="category_' + categoryIndex + '"> </td>');
+    newCategory.append('<td>Category Name:</td><td> <input type="text" id="' + categoryId + '" name="' + categoryId + '"> </td>');
     newCategory.append('</tr><tr>');
     newCategory.append('<td>Options:</td><td></td></tr><tr> ');
 
     //      
-    newCategory.append('<td><a href="#" id="add_option_' + categoryIndex + '" title="Add New Option" style="text-decoration:none;"> <img src="/Content/images/add_up.png" alt="(+)" /> Add New Option </a> </td>'); // must be all one line to work
-    newCategory.append('</tr><tr><td colspan="2"><div id="option_data_' + categoryIndex + '"> <input type="text" id="category_option_' + categoryIndex + '_0"> <br />');
+    newCategory.append('<td><a href="#" id="' + addOptionId + '" title="Add New Option" style="text-decoration:none;"> <img src="/Content/images/add_up.png" alt="(+)" /> Add New Option </a> </td>'); // must be all one line to work
+    newCategory.append('</tr><tr><td colspan="2"><div id="' + dataId + '"> <input type="text" id="' + categoryOptionIdPrefix + '_0" name="' + categoryOptionIdPrefix + '_0"> <br />');
     // required first option
     newCategory.append('');
 
@@ -226,16 +231,16 @@ function addNewCategory() {
     newCategory.append('</div><td></tr></table>');
 
     // add event listeners
-    $('#category_' + categoryIndex).keypress(disableSubmit);
-    $('#category_option_' + categoryIndex + '_0').keypress(disableSubmit);
+    $('#' + categoryId).keypress(disableSubmit);
+    $('#' + categoryOptionIdPrefix + '_0').keypress(disableSubmit);
 
     $('#add_option_' + categoryIndex).click(function () {
 
         var i = this.id.substring(11, this.id.length);
-        var d = $('#option_data_' + i);
+        var d = $('#' + dataId);
 
         // all one line because append adds closing tags automatically if there isn't a closing tag (ie </div>) within the string it is appending :/
-        d.append('<div><input type="text" id="category_option_' + i + '_' + categoryOptionIndex[i] + '"> <div style="display: inline; position:relative; top:0.25em;"><a href="#" title="Delete This Option" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove() }); categoryOptionIndex[' + i + ']--; return false;"><img src="/Content/images/delete_up.png" alt="Delete" /></a></div> </div>');
+        d.append('<div><input type="text" id="' + categoryOptionIdPrefix + '_' + i + '_' + categoryOptionIndex[i] + '" name="' + categoryOptionIdPrefix + '_' + i + '_' + categoryOptionIndex[i] + '"> <div style="display: inline; position:relative; top:0.25em;"><a href="#" title="Delete This Option" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove() }); categoryOptionIndex[' + i + ']--; return false;"><img src="/Content/images/delete_up.png" alt="Delete" /></a></div> </div>');
         $('#option_' + i + '_' + categoryOptionIndex[i]).keypress(disableSubmit);
 
         categoryOptionIndex[i]++;
@@ -244,7 +249,7 @@ function addNewCategory() {
     });
 
     // set focus to newly created category
-    $('#category_' + categoryIndex).focus();
+    $('#' + categoryId).focus();
 
     // keep track of indices
     categoryIndex++;
