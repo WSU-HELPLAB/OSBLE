@@ -157,11 +157,9 @@ $(function () {
     $('#InstructorCanReview').change(function () {
         if ($(this).attr('checked')) {
             $('#line_review_config').show('blind');
-            $('#line_review_info').show('blind');
         }
         else {
             $('#line_review_config').hide('blind');
-            $('#line_review_info').hide('blind');
         }
     });
 
@@ -214,13 +212,13 @@ function addNewCategory() {
 
     // main layout
     newCategory.append('<table><tr>');
-    newCategory.append('<td>Category Name:</td><td> <input type="text" id="cat' + categoryIndex + '"> </td>');
+    newCategory.append('<td>Category Name:</td><td> <input type="text" id="category_' + categoryIndex + '"> </td>');
     newCategory.append('</tr><tr>');
     newCategory.append('<td>Options:</td><td></td></tr><tr> ');
 
     //      
     newCategory.append('<td><a href="#" id="add_option_' + categoryIndex + '" title="Add New Option" style="text-decoration:none;"> <img src="/Content/images/add_up.png" alt="(+)" /> Add New Option </a> </td>'); // must be all one line to work
-    newCategory.append('</tr><tr><td colspan="2"><div id="option_data_' + categoryIndex + '"> <input type="text" id="option_' + categoryIndex + '_0"> <br />');
+    newCategory.append('</tr><tr><td colspan="2"><div id="option_data_' + categoryIndex + '"> <input type="text" id="category_option_' + categoryIndex + '_0"> <br />');
     // required first option
     newCategory.append('');
 
@@ -228,8 +226,8 @@ function addNewCategory() {
     newCategory.append('</div><td></tr></table>');
 
     // add event listeners
-    $('#cat' + categoryIndex).keypress(disableSubmit);
-    $('#option_' + categoryIndex + '_0').keypress(disableSubmit);
+    $('#category_' + categoryIndex).keypress(disableSubmit);
+    $('#category_option_' + categoryIndex + '_0').keypress(disableSubmit);
 
     $('#add_option_' + categoryIndex).click(function () {
 
@@ -237,7 +235,7 @@ function addNewCategory() {
         var d = $('#option_data_' + i);
 
         // all one line because append adds closing tags automatically if there isn't a closing tag (ie </div>) within the string it is appending :/
-        d.append('<div><input type="text" id="option_' + i + '_' + categoryOptionIndex[i] + '"> <div style="display: inline; position:relative; top:0.25em;"><a href="#" title="Delete This Option" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove() }); categoryOptionIndex[' + i + ']--; return false;"><img src="/Content/images/delete_up.png" alt="Delete" /></a></div> </div>');
+        d.append('<div><input type="text" id="category_option_' + i + '_' + categoryOptionIndex[i] + '"> <div style="display: inline; position:relative; top:0.25em;"><a href="#" title="Delete This Option" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove() }); categoryOptionIndex[' + i + ']--; return false;"><img src="/Content/images/delete_up.png" alt="Delete" /></a></div> </div>');
         $('#option_' + i + '_' + categoryOptionIndex[i]).keypress(disableSubmit);
 
         categoryOptionIndex[i]++;
@@ -246,7 +244,7 @@ function addNewCategory() {
     });
 
     // set focus to newly created category
-    $('#cat' + categoryIndex).focus();
+    $('#category_' + categoryIndex).focus();
 
     // keep track of indices
     categoryIndex++;
