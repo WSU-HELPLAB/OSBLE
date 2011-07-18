@@ -2,16 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using System.Web.Script.Serialization;
 using Newtonsoft.Json;
 using OSBLE.Attributes;
 using OSBLE.Models;
 using OSBLE.Models.AbstractCourses;
 using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Assignments;
-using OSBLE.Models.AbstractCourses;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
@@ -91,11 +88,10 @@ namespace OSBLE.Controllers
 
             setupViewBagForCreate();
 
-
             // line by line review configurations
             List<CommentCategoryConfiguration> configs = (from cc in db.CommentCategoryConfigurations
-                                    where cc.ID != null
-                                    select cc).ToList();
+                                                          where cc.ID != null
+                                                          select cc).ToList();
             // add code to give sample of configuration to user?
             ViewBag.CommentCategories = configs;
 
@@ -126,7 +122,6 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult Create(BasicAssignmentViewModel basic)
         {
-
             string serializedTeams = null;
             try
             {
@@ -164,7 +159,7 @@ namespace OSBLE.Controllers
 
                 submission.ReleaseDate = basic.Submission.ReleaseDate;
                 submission.Name = basic.Submission.Name;
-                
+
                 submission.PointsPossible = basic.Submission.PointsPossible;
 
                 submission.HoursLatePerPercentPenalty = basic.Submission.HoursLatePerPercentPenalty;
@@ -173,6 +168,7 @@ namespace OSBLE.Controllers
                 submission.MinutesLateWithNoPenalty = basic.Submission.MinutesLateWithNoPenalty;
 
                 submission.isTeam = basic.Submission.isTeam;
+                submission.InstructorCanReview = basic.Submission.InstructorCanReview;
 
                 stop.Name = basic.Stop.Name;
                 stop.ReleaseDate = basic.Stop.ReleaseDate;
@@ -626,7 +622,6 @@ namespace OSBLE.Controllers
             return View(basic);
         }
 
-        
         // ajax handling code for comments
         //   kept in case ajax wanted to be reimplemented
         /*
@@ -634,7 +629,6 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public string SaveCommentCollection(string name, string data)
         {
-
             JavaScriptSerializer ser = new JavaScriptSerializer();
             string[][] dataArray = ser.Deserialize<string[][]>(HttpUtility.UrlDecode(data));
 
@@ -664,7 +658,6 @@ namespace OSBLE.Controllers
 
             //db.SaveChanges();
 
-
             return output + "]";
         }
 
@@ -672,7 +665,6 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public string GetCollectionContents(int inputID)
         {
-            
             List<CommentCollection> q1 = (from c in db.CommentCollections
                                     where c.ID == inputID
                                     select c).ToList();
@@ -695,7 +687,7 @@ namespace OSBLE.Controllers
             }
             // removes trailing comma and adds ending bracket
             //output = output.Substring(0, output.Length - 1) + "]";
-            
+
             string output = "[" + inputID.ToString() + "]";
             return HttpUtility.UrlEncode(output);
         }
@@ -704,7 +696,6 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public string GetCollections()
         {
-            
             // add logic for current course here
             List<CommentCollection> q = (from c in db.CommentCollections where c.Name != null select c).ToList();
 
@@ -714,12 +705,11 @@ namespace OSBLE.Controllers
                 output += "[\"" + c.ID + "\",\"" + c.Name + "\"],";
             }
             output = output.Substring(0, output.Length - 1) + "]";
-            
+
             string output = "[[\"1\",\"Abc\"],[\"2\",\"Def\"]]";
             return output;
         }
         */
-
 
         protected override void Dispose(bool disposing)
         {

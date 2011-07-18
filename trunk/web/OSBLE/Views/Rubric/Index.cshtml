@@ -3,21 +3,21 @@
 @using OSBLE.Models.Assignments.Activities;
 @using OSBLE.Models.Users;
 @{ViewBag.Title = "Rubric Evaluation";
-int maxLevelScore = (from c in Model.Rubric.Levels
-                       select c.RangeEnd).Sum(); 
-double totalRubricPoints = (from c in Model.Rubric.Criteria
-                              select c.Weight).Sum(); 
-string critInputPrefix = ViewBag.CritInputPrefix;
-string critSliderPrefix = ViewBag.CritSliderPrefix;
-string critCommentPrefix = ViewBag.CritCommentPrefix;
-string selectedActivity = ViewBag.ActivitySelectId;
-string selectedTeam = ViewBag.TeamSelectId;
-string draftButton = ViewBag.DraftButtonId;
-string publishButton= ViewBag.PublishButtonId;
-string gradeId = "grade"; 
-int sliderTableLength = 880;
-int textInputLenght = 25;
-int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;}
+  int maxLevelScore = (from c in Model.Rubric.Levels
+                       select c.RangeEnd).Sum();
+  double totalRubricPoints = (from c in Model.Rubric.Criteria
+                              select c.Weight).Sum();
+  string critInputPrefix = ViewBag.CritInputPrefix;
+  string critSliderPrefix = ViewBag.CritSliderPrefix;
+  string critCommentPrefix = ViewBag.CritCommentPrefix;
+  string selectedActivity = ViewBag.ActivitySelectId;
+  string selectedTeam = ViewBag.TeamSelectId;
+  string draftButton = ViewBag.DraftButtonId;
+  string publishButton = ViewBag.PublishButtonId;
+  string gradeId = "grade";
+  int sliderTableLength = 880;
+  int textInputLenght = 25;
+  int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;}
 <script type="text/javascript">
 
 function create_and_open_downloading_submission_dialog() {
@@ -89,32 +89,28 @@ function create_and_open_downloading_submission_dialog() {
     }
 </script>
 <style type="text/css">
-
-.dashboard
-{
-    float:left;
-}
-
-.dashboard table th
-{
-    text-align:left;
-}
-
-.dashboard table th, .dashboard table th
-{
-    padding:4px;
-}
-
-#rubric_evaluator
-{
-    width:920px;
-    margin-right:auto;
-    margin-left:auto;
-}
-
+    .dashboard
+    {
+        float: left;
+    }
+    
+    .dashboard table th
+    {
+        text-align: left;
+    }
+    
+    .dashboard table th, .dashboard table th
+    {
+        padding: 4px;
+    }
+    
+    #rubric_evaluator
+    {
+        width: 920px;
+        margin-right: auto;
+        margin-left: auto;
+    }
 </style>
-
-
 <div id="rubric_evaluator">
     <h1>
         Rubric Evaluation of @Model.SelectedAssignmentActivity.Name for @Model.Evaluation.Recipient.GetName()</h1>
@@ -158,18 +154,20 @@ function create_and_open_downloading_submission_dialog() {
                     </select>
                 </td>
             </tr>
+        </table>
+        <table>
             <tr>
                 <th>
                     Grade:
                 </th>
-                <td id="@gradeId">
+                <td id="@gradeId" style="padding-right:25px">
                     0%
                 </td>
-                <th>
-                 Download Submission
-                </th>
                 <td>
-                @Html.ActionLink("Download Submission", "GetSubmissionZip", "FileHandler", new { teamUserID = Model.SelectedTeam.ID, assignmentActivityID = Model.SelectedAssignmentActivity.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+                    @Html.ActionLink("Download Submission Files", "GetSubmissionZip", "FileHandler", new { teamUserID = Model.SelectedTeam.ID, assignmentActivityID = Model.SelectedAssignmentActivity.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+                </td>
+                <td>
+                    @Html.ActionLink("View Inline Comments", "InlineReview", "Assignment", new { assignmentActivityID = Model.SelectedAssignmentActivity.ID, teamUserID = Model.SelectedTeam.ID }, new { style = "padding-left: 25px;" })
                 </td>
             </tr>
         </table>

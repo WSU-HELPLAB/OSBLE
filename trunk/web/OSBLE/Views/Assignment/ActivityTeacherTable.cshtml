@@ -172,7 +172,7 @@
                 <td>
                 @if (hasSubbmitted)
                 {
-                    @Html.ActionLink("Review", "InlineReview", "Assignment", new { assignmentActivityID = ViewBag.activityID, teamUserID = info.SubmitterID }, new { })
+                    @Html.ActionLink("Create Inline Comments", "InlineReview", "Assignment", new { assignmentActivityID = ViewBag.activityID, teamUserID = info.SubmitterID }, new { })
                 }
                 else
                 {
