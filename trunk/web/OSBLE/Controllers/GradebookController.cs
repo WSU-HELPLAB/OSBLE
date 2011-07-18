@@ -619,15 +619,17 @@ namespace OSBLE.Controllers
                }
            }
 
-           AbstractAssignment newAssignment = new GradeAssignment()
+           StudioAssignment newAssignment = new StudioAssignment()
            {
-               Name = columnName,
-               PointsPossible = pointsPossible,
+               Name = "Untitled",
+               //PointsPossible = 100,
                AssignmentActivities = new List<AbstractAssignmentActivity>(),
                CategoryID = categoryId,
-               ColumnOrder = position
+               ColumnOrder = 1,
+               Description = "No description",
+               IsDraft = false
            };
-           db.AbstractAssignments.Add(newAssignment);
+           db.StudioAssignments.Add(newAssignment);
            db.SaveChanges();
 
            GradeActivity newActivity = new GradeActivity()
@@ -641,10 +643,7 @@ namespace OSBLE.Controllers
            };
            db.AbstractAssignmentActivities.Add(newActivity);
            db.SaveChanges();
-
-
-           
-           
+    
        }
 
        /************
@@ -1075,7 +1074,7 @@ namespace OSBLE.Controllers
                if (assignmentId != 0)
                {
                    var activityQuery = from a in db.AbstractAssignmentActivities
-                                       where a.AbstractAssignmentID == assignmentId
+                                       where a.ID == assignmentId
                                        select a;
 
                    if (activityQuery.Count() > 0)
@@ -1616,7 +1615,7 @@ namespace OSBLE.Controllers
                                         orderby category.ColumnOrder
                                         select category).ToList();
 
-           List<GradeAssignment> gradeAssignments = (from ga in db.GradeAssignments
+           List<AbstractAssignment> gradeAssignments = (from ga in db.AbstractAssignments
                                                      where ga.Category.CourseID == currentCourseId
                                                      select ga).ToList();
 
@@ -1880,15 +1879,17 @@ namespace OSBLE.Controllers
                }
                db.SaveChanges();
 
-               GradeAssignment newAssignment = new GradeAssignment()
+               StudioAssignment newAssignment = new StudioAssignment()
                {
                    Name = "Untitled",
-                   PointsPossible = 100,
+                   //PointsPossible = 100,
                    AssignmentActivities = new List<AbstractAssignmentActivity>(),
                    CategoryID = categoryId,
-                   ColumnOrder = 1
+                   ColumnOrder = 1,
+                   Description = "No description",
+                   IsDraft = false
                };
-               db.AbstractAssignments.Add(newAssignment);
+               db.StudioAssignments.Add(newAssignment);
                db.SaveChanges();
 
                GradeActivity newActivity = new GradeActivity()
@@ -2032,15 +2033,17 @@ namespace OSBLE.Controllers
                }
                db.SaveChanges();
 
-               GradeAssignment newAssignment = new GradeAssignment()
+               StudioAssignment newAssignment = new StudioAssignment()
                {
                    Name = "Untitled",
-                   PointsPossible = 100,
+                   //PointsPossible = 100,
                    AssignmentActivities = new List<AbstractAssignmentActivity>(),
                    CategoryID = newCategory.ID,
-                   ColumnOrder = 0
+                   ColumnOrder = 1,
+                   Description = "No description",
+                   IsDraft = false
                };
-               db.GradeAssignments.Add(newAssignment);
+               db.StudioAssignments.Add(newAssignment);
                db.SaveChanges();
 
                AbstractAssignmentActivity newActivity = new GradeActivity()

@@ -218,14 +218,14 @@ namespace OSBLE.Controllers
                                    select g).FirstOrDefault();
 
                     //figure out the normalized final score.
-                    int maxLevelScore = (from c in vm.Rubric.Levels
-                                         select c.RangeEnd).Sum();
+                    double maxLevelScore = (from c in vm.Rubric.Levels
+                                            select c.RangeEnd).Sum();
                     double totalRubricPoints = (from c in vm.Rubric.Criteria
                                                 select c.Weight).Sum();
                     double studentScore = 0.0;
                     foreach (CriterionEvaluation critEval in vm.Evaluation.CriterionEvaluations)
                     {
-                        studentScore += (int)critEval.Score / maxLevelScore * (critEval.Criterion.Weight / totalRubricPoints);
+                        studentScore += (double)critEval.Score / maxLevelScore * (critEval.Criterion.Weight / totalRubricPoints);
                     }
 
                     //normalize the score with the abstract assignment score

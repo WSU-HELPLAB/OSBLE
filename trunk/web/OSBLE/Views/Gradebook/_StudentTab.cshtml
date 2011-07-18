@@ -133,7 +133,7 @@
                 totalGrade = (assignPoints / assignPossible) * 100;
             }
             <td id="averageTotal">
-                @totalGrade.ToString(".##")%
+                @totalGrade.ToString(".#")%
             </td>
             @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
             {
@@ -219,7 +219,7 @@
                 }
 
                 totalPoints = (totalPoints / totalPossible) * 100;
-                <td>@totalPoints%</td>
+                <td>@totalPoints.ToString(".#")%</td>
             }
             else
             {
@@ -234,7 +234,7 @@
 
                 if (score.Count() > 0)
                 {        
-                    <td>@score.First().Points</td>
+                    <td>@score.First().Points.ToString(".#")</td>
                 }
                 else
                 {

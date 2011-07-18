@@ -154,6 +154,14 @@ namespace OSBLE.Controllers
 
             if (ModelState.IsValid)
             {
+                int currentCategoryId = basic.Assignment.CategoryID;
+
+                //Get the next column order
+                int colOrder = (from assignment in db.AbstractAssignmentActivities
+                                where assignment.AbstractAssignment.CategoryID == currentCategoryId
+                                orderby assignment.ColumnOrder descending
+                                select assignment.ColumnOrder).FirstOrDefault();
+
                 SubmissionActivity submission = new SubmissionActivity();
                 StopActivity stop = new StopActivity();
 
@@ -169,6 +177,8 @@ namespace OSBLE.Controllers
 
                 submission.isTeam = basic.Submission.isTeam;
                 submission.InstructorCanReview = basic.Submission.InstructorCanReview;
+
+                submission.ColumnOrder = colOrder++;
 
                 stop.Name = basic.Stop.Name;
                 stop.ReleaseDate = basic.Stop.ReleaseDate;

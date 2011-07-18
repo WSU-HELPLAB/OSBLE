@@ -206,7 +206,7 @@
                 }
                 
                 <td>@letter</td>
-                <td>@totalGrade.ToString(".##")%</td>
+                <td>@totalGrade.ToString(".#")%</td>
                 
                 
                 int totalStudents = 0;
@@ -234,7 +234,7 @@
                         totalAverage += categoryScore * 100;
                         if (oneScore == true)
                         {
-                            <td id="averageScore">@totalAverage.ToString(".##")%</td>  
+                            <td id="averageScore">@totalAverage.ToString(".#")%</td>  
                         }
                         else
                         {
@@ -323,7 +323,7 @@
                 }
                 
                 <td>@letter</td>
-                <td>@totalGrade.ToString(".##")%</td>
+                <td>@totalGrade.ToString(".#")%</td>
                 
                 if (userScores.Count() > 0)
                 {
@@ -345,7 +345,7 @@
                             double total = (categoryPoints / categoryPossible) * 100;
                             if (total >= 0)
                             {
-                                <td>@total.ToString(".##")%</td>
+                                <td>@total.ToString(".#")%</td>
                             }
                             else
                             {

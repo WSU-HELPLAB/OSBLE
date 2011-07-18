@@ -526,7 +526,7 @@
                 }
                 
                 <td>@letter</td>
-                <td>@totalGrade.ToString(".##")%</td>
+                <td>@totalGrade.ToString(".#")%</td>
                 
                 
                 int totalStudents = 0;
@@ -623,7 +623,7 @@
                 <td id="@student.ID" >@student.LastName, @student.FirstName</td>   
                 
                 
-                  totalGrade = 0;
+                  totalGrade = 0.0;
                   totalCategoryPoints = 0;
                   totalCategoryPossible = 0;
                   foreach (Category c in ViewBag.Categories)
@@ -673,7 +673,7 @@
                       }
                   }
                 <td>@letter</td>
-                <td>@totalGrade.ToString(".##")%</td>
+                <td>@totalGrade.ToString(".#")%</td>
                   totalGrade = 0;
 
                   foreach (Category c in ViewBag.Categories)
@@ -696,9 +696,17 @@
 
                           totalCategoryGrade = (points / possible) * 100;
                           //totalGrade = totalCategoryGrade * (c.Points / ViewBag.TotalCategoryWeights) * 100;
-                          if (totalCategoryGrade > 0)
+                          if (totalCategoryGrade >= 0)
                           {
-                              <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.Identification)" style="cursor:pointer;">@totalCategoryGrade.ToString(".##")%</td>
+                              //It didn't like to put a 0, so I had to use string format to make it display
+                              if (totalCategoryGrade == 0)
+                              {
+                                  <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.Identification)" style="cursor:pointer;">@String.Format("{0}", 0)%</td>
+                              }
+                              else
+                              {
+                                  <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.Identification)" style="cursor:pointer;">@totalCategoryGrade.ToString(".#")%</td>
+                              }
                           }
                           else
                           {
@@ -1152,8 +1160,8 @@
                 data: { value: cellValue, categoryId: catId[1] }
             });
 
-            calculateRows();
-            calculateCols();
+            //calculateRows();
+            //calculateCols();
         }
     }
 
