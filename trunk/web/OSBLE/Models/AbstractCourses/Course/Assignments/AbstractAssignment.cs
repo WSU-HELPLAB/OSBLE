@@ -53,7 +53,9 @@ namespace OSBLE.Models.Assignments
         public bool IsDraft { get; set; }
 
         public int? RubricID { get; set; }
-
         public virtual Rubric Rubric { get; set; }
+
+        public int? CommentCategoryConfigurationID { get; set; }
+        public virtual CommentCategoryConfiguration CommentCategoryConfiguration { get; set; }
     }
 }
