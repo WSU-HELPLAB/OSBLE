@@ -92,8 +92,7 @@ namespace OSBLE.Controllers
             List<CommentCategoryConfiguration> configs = (from cc in db.CommentCategoryConfigurations
                                                           where cc.ID != null
                                                           select cc).ToList();
-            // add code to give sample of configuration to user?
-            ViewBag.CommentCategories = configs;
+            ViewBag.CommentConfigurations = configs;
 
             return View(viewModel);
         }

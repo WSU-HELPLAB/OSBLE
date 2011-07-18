@@ -398,13 +398,40 @@
         </div>
         <input type="radio" name="line_review_options" value="AutoConfig" />Use Previous Configuration <br />
         <div id="auto_config_options" class="indented_options" style="display: none;" >
-            <br /> Select a configuration <br />
-            <select id="comment_category_selection" name="comment_category_selection"> 
-                @foreach (CommentCategoryConfiguration c in ViewBag.CommentCategories)
+            <br /> Select a configuration <br /> 
+            
+            <select id="comment_category_selection" name="comment_category_selection">
+                @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)
                 {
-                    <option value="@c.ID" >@c.Name</option>
+                    <option value="@ccc.ID" >@ccc.Name</option>
                 }
             </select>
+        
+            <div id="comment_config_samples" class="indented_options">
+            @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)
+            {
+                string id = "comment_sample_" + @ccc.ID;
+                <div id="@id" style="display:none;"> 
+                    <table>
+                        <tr>
+                            <td style="padding-right:10px;"> <strong>Category</strong> </td> <td> <strong>Options</strong> </td>
+                        </tr>
+                        @foreach (CommentCategory cc in ccc.Categories)
+                        {
+                        <tr>
+                            <td valign="top" style="padding-right:10px;">@cc.Name</td>
+                            <td>
+                                @foreach (CommentCategoryOption cco in cc.Options)
+                                {
+                                    @cco.Name <br />
+                                }
+                            </td>
+                        </tr>
+                        }
+                    </table>
+                </div>
+            }
+            </div>
         </div>
         <br />
     </div>
