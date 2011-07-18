@@ -152,7 +152,7 @@
         {
             <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average" /></th>
         }
-
+@*
         int i = 2;
         foreach (AbstractAssignmentActivity assign in ViewBag.GradeAssignments)
         {
@@ -164,24 +164,23 @@
             else
             {
                 <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average [Dropped @numDropped]" /> </th>
-            }
+            }*@
         
             int i = 2;
-            foreach (AbstractAssignmentActivity assign in ViewBag.Assignments)
+            foreach (AbstractAssignmentActivity a in ViewBag.Assignments)
             {
                 
-                if (assign.addedPoints > 0)
+                if (a.addedPoints > 0)
                 {   
-                    <th id="header-@assign.ID" onclick="changeHeaderName(event, this)">@assign.Name (Added @assign.addedPoints)</th>
+                    <th id="header-@a.ID" onclick="changeHeaderName(event, this)">@a.Name (Added @a.addedPoints)</th>
                 }
                 else
                 {
-                    <th id="header-@assign.ID" onclick="changeHeaderName(event, this)">@assign.Name </th>
+                    <th id="header-@a.ID" onclick="changeHeaderName(event, this)">@a.Name </th>
             }
             i += 1;
         }
-        }
-            
+    }
     </tr>
     <!--loop through all users -->
     @foreach (OSBLE.Models.Users.UserProfile user in ViewBag.Users)

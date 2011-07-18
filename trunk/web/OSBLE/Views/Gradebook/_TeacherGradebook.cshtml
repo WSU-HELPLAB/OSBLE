@@ -615,7 +615,7 @@
                   {
                       foreach (CoursesUsers item in courseUser)
                       {
-                                        <td>@item.Section</td>
+                           <td>@item.Section</td>
                       }
                   }                                                   
                 
@@ -638,23 +638,25 @@
                           double points = 0;
                           double possible = 0;
                           double totalCategoryGrade = 0;
-                          foreach (Score score in userScores)
+                          if (userScores.Count() > 0)
                           {
-                              points += score.Points;
-                              possible += score.AssignmentActivity.PointsPossible;
-                          }
+                              foreach (Score score in userScores)
+                              {
+                                  points += score.Points;
+                                  possible += score.AssignmentActivity.PointsPossible;
+                              }
 
-                          totalCategoryGrade = (points / possible);
-                          if (ViewBag.TotalCategoryWeights > 0)
-                          {
-                              totalGrade += totalCategoryGrade * (c.Points / ViewBag.TotalCategoryWeights) * 100;
+                              totalCategoryGrade = (points / possible);
+                              if (ViewBag.TotalCategoryWeights > 0)
+                              {
+                                  totalGrade += totalCategoryGrade * (c.Points / ViewBag.TotalCategoryWeights) * 100;
+                              }
+                              else
+                              {
+                                  totalCategoryPoints += points;
+                                  totalCategoryPossible += possible;
+                              }
                           }
-                          else
-                          {
-                              totalCategoryPoints += points;
-                              totalCategoryPossible += possible;
-                          }
-
                       }
                   }
                   if (ViewBag.TotalCategoryWeights == 0)
@@ -694,7 +696,14 @@
 
                           totalCategoryGrade = (points / possible) * 100;
                           //totalGrade = totalCategoryGrade * (c.Points / ViewBag.TotalCategoryWeights) * 100;
-                        <td>@totalCategoryGrade.ToString(".##")%</td>
+                          if (totalCategoryGrade > 0)
+                          {
+                              <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.Identification)" style="cursor:pointer;">@totalCategoryGrade.ToString(".##")%</td>
+                          }
+                          else
+                          {
+                              <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.Identification)" style="cursor:pointer;">NG</td>
+                          }
                       }
                   }
                 

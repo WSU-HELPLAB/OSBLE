@@ -1945,7 +1945,7 @@ namespace OSBLE.Controllers
                    {
                        currentUser = a.TeamUserMember;
                        currentPoints += a.Points;
-                       currentTotal += a.AssignmentActivity.AbstractAssignment.PointsPossible;
+                       currentTotal += a.AssignmentActivity.PointsPossible;
                    }
                    UserMember user = currentUser as UserMember;
                    
