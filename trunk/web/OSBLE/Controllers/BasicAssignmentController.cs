@@ -197,6 +197,11 @@ namespace OSBLE.Controllers
                             basic.Assignment.CommentCategoryConfigurationID = config.ID;
                         }
                     }
+                    else if (Request.Form["line_review_options"].ToString().CompareTo("AutoConfig") == 0)
+                    {
+                        basic.Assignment.CommentCategoryConfigurationID = Convert.ToInt32(Request.Params["comment_category_selection"]); 
+                    }
+
                 }
 
                 if (basic.UseRubric)
