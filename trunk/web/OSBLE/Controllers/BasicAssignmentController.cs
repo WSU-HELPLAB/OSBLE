@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using OSBLE.Attributes;
 using OSBLE.Models;
 using OSBLE.Models.AbstractCourses;
-using OSBLE.Models.AbstractCourses.Course;
+//using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
@@ -15,6 +15,7 @@ using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
 using OSBLE.Utility;
+using OSBLE.Models.AbstractCourses.Course;
 
 namespace OSBLE.Controllers
 {

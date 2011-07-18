@@ -233,8 +233,15 @@
                              select scores);
 
                 if (score.Count() > 0)
-                {        
-                    <td>@score.First().Points.ToString(".#")</td>
+                {
+                    if (score.First().AssignmentActivity.AbstractAssignment.Rubric != null)
+                    {   
+                        <td>@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { abstractAssignmentActivityId = score.First().AssignmentActivityID, teamUserID = score.First().TeamUserMemberID }, new { })</td>
+                    }
+                    else
+                    {
+                        <td>@score.First().Points.ToString(".#")</td>
+                    }
                 }
                 else
                 {

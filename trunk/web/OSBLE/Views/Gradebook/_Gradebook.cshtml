@@ -223,9 +223,9 @@
                 //use the stored score if possible.  Otherwise, just use a "0"
                 if (gradableQuery.Count() > 0)
                 {
-                    if (gradeAssignmentActivity is StudioActivity)
+                    if (gradeAssignmentActivity.AbstractAssignment.Rubric != null)
                     {
-                        <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic; color:Red;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { abstractAssignmentActivityId = gradableQuery.First().AssignmentActivityID, teamUserID = gradableQuery.First().TeamUserMemberID }, new { })</td>
+                        <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { abstractAssignmentActivityId = gradableQuery.First().AssignmentActivityID, teamUserID = gradableQuery.First().TeamUserMemberID }, new { })</td>
                     }
                     else
                     {
@@ -234,7 +234,6 @@
                 }
                 else
                 {
-                    //Razor didn't like me using just a "0" so I had to wrap it inside String.Format
                     <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" onclick="cellGainsFocus(event, this)">NG</td>
                 }
             }

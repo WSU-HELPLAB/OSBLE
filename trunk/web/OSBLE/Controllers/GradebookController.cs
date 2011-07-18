@@ -126,9 +126,9 @@ namespace OSBLE.Controllers
                                    if (Session["radio"].ToString() == "r")
                                    {
                                        
-                                       var position = from pos in db.AbstractAssignmentActivities
-                                                      where pos.ColumnOrder > assign.ColumnOrder
-                                                      select pos;
+                                       List<AbstractAssignmentActivity> position = (from pos in db.AbstractAssignmentActivities
+                                                                                    where pos.ColumnOrder > assign.ColumnOrder
+                                                                                    select pos).ToList();
 
                                        if (position.Count() > 0)
                                        {
@@ -194,11 +194,11 @@ namespace OSBLE.Controllers
                                {
                                    int col = positionList.ElementAt(currentColOrder);
                                    currentColOrder++;
-                                   var assign = from a in db.AbstractAssignments
-                                                where a.ColumnOrder == col
-                                                select a;
+                                //var assign = from a in db.AbstractAssignments
+                                //            where a.ColumnOrder == col
+                                //            select a;
                                    var assignmentQuery = from a in db.AbstractAssignmentActivities
-                                                         where a.AbstractAssignment.ColumnOrder == col
+                                                         where a.ColumnOrder == col
                                                          select a;
 
                                    var currentAssignment = assignmentQuery.FirstOrDefault();
@@ -207,7 +207,7 @@ namespace OSBLE.Controllers
                                                        where u.Identification == studentId
                                                        select u).FirstOrDefault();
 
-                                   if (assign.Count() > 0)
+                                   if (assignmentQuery.Count() > 0)
                                    {
                                        if (user != null)
                                        {
