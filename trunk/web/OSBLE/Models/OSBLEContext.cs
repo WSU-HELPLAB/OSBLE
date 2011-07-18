@@ -53,6 +53,8 @@ namespace OSBLE.Models
 
         public DbSet<CommentCategoryConfiguration> CommentCategoryConfigurations { get; set; }
 
+        public DbSet<CommentCategoryOption> CommentCategoryOptions { get; set; }
+
         // Assignments.Activities
 
         public DbSet<AbstractAssignmentActivity> AbstractAssignmentActivities { get; set; }

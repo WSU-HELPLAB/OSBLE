@@ -240,7 +240,7 @@ function addNewCategory() {
         var d = $('#' + dataId);
 
         // all one line because append adds closing tags automatically if there isn't a closing tag (ie </div>) within the string it is appending :/
-        d.append('<div><input type="text" id="' + categoryOptionIdPrefix + '_' + i + '_' + categoryOptionIndex[i] + '" name="' + categoryOptionIdPrefix + '_' + i + '_' + categoryOptionIndex[i] + '"> <div style="display: inline; position:relative; top:0.25em;"><a href="#" title="Delete This Option" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove() }); categoryOptionIndex[' + i + ']--; return false;"><img src="/Content/images/delete_up.png" alt="Delete" /></a></div> </div>');
+        d.append('<div><input type="text" id="' + categoryOptionIdPrefix + '_' + categoryOptionIndex[i] + '" name="' + categoryOptionIdPrefix + '_' + categoryOptionIndex[i] + '"> <div style="display: inline; position:relative; top:0.25em;"><a href="#" title="Delete This Option" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove() }); categoryOptionIndex[' + i + ']--; return false;"><img src="/Content/images/delete_up.png" alt="Delete" /></a></div> </div>');
         $('#option_' + i + '_' + categoryOptionIndex[i]).keypress(disableSubmit);
 
         categoryOptionIndex[i]++;

@@ -13,6 +13,7 @@ using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
 using OSBLE.Utility;
+using OSBLE.Models.AbstractCourses;
 
 namespace OSBLE.Controllers
 {
@@ -166,6 +167,17 @@ namespace OSBLE.Controllers
 
                 basic.Assignment.AssignmentActivities.Add(submission);
                 basic.Assignment.AssignmentActivities.Add(stop);
+
+                if (basic.Submission.InstructorCanReview)
+                {
+                    if (Request.Form["line_review_options"].ToString().CompareTo("ManualConfig") == 0)
+                    {
+                        CommentCategoryConfiguration config = BuildCommentCategories();
+                        db.CommentCategoryConfigurations.Add(config);
+                        db.SaveChanges();
+                        basic.Assignment.CommentCategoryConfigurationID = config.ID;
+                    }
+                }
 
                 if (basic.UseRubric)
                 {
@@ -414,6 +426,76 @@ namespace OSBLE.Controllers
                 OnLoaded = "SLObjectLoaded",
                 Parameters = parameters
             };
+        }
+
+        private CommentCategoryConfiguration BuildCommentCategories()
+        {
+            CommentCategoryConfiguration config = new CommentCategoryConfiguration();
+
+            //all keys that we care about start with "category_"
+            List<string> keys = (from key in Request.Form.AllKeys
+                                 where key.Contains("category_")
+                                 select key).ToList();
+            
+            //we know this one for sure so no need to loop
+            config.Name = Request.Form["category_config_name"].ToString();
+
+            //but the rest are variable, so we need to loop
+            foreach (string key in keys)
+            {
+                //All category keys go something like "category_BLAH1_BLAH2_...".  Based on how
+                //many underscores the current key has, we can determine what data it is
+                //providing to us
+                string[] pieces = key.Split('_');
+                
+                //length of 2 is a category name
+                if (pieces.Length == 2)
+                {
+                    int catId = 0;
+                    Int32.TryParse(pieces[1], out catId);
+
+                    //does the comment category already exist?
+                    CommentCategory category = GetCategoryOrCreateNew(config, catId);
+                    category.Name = Request.Form[key].ToString();
+
+                }
+                //length of 4 is a category option
+                else if (pieces.Length == 4)
+                {
+                    int catId = 0;
+                    int order = 0;
+                    Int32.TryParse(pieces[2], out catId);
+                    Int32.TryParse(pieces[3], out order);
+                    CommentCategory category = GetCategoryOrCreateNew(config, catId);
+                    CommentCategoryOption option = new CommentCategoryOption();
+                    option.Name = Request.Form[key].ToString();
+                    category.Options.Insert(order, option);
+                }
+            }
+
+            //when we're all done, zero out the category IDs to ensure that the items get
+            //added to the DB correctly
+            foreach (CommentCategory c in config.Categories)
+            {
+                c.ID = 0;
+            }
+
+            return config;
+        }
+
+        private CommentCategory GetCategoryOrCreateNew(CommentCategoryConfiguration config, int categoryId)
+        {
+            //does the comment category already exist?
+            CommentCategory category = (from c in config.Categories
+                                        where c.ID == categoryId
+                                        select c).FirstOrDefault();
+            if (category == null)
+            {
+                category = new CommentCategory();
+                category.ID = categoryId;
+                config.Categories.Add(category);
+            }
+            return category;
         }
 
         //

@@ -175,6 +175,7 @@
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\SyncIssueVotingActivity.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\BasicAssignment.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\GradeAssignment.cs" />
+    <Compile Include="Models\AbstractCourses\Course\CommentCategoryOption.cs" />
     <Compile Include="Models\AbstractCourses\Course\GradebookOptions\LetterGrade.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\CriteriaEvaluation.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Criterion.cs" />
@@ -490,8 +491,6 @@
   <ItemGroup>
     <Folder Include="FileSystem\Courses\1\CourseDocs\" />
     <Folder Include="FileSystem\Courses\4\CourseDocs\" />
-    <Folder Include="Models\Assignments\Activities\" />
-    <Folder Include="Models\Gradables\StudioAssignment\Activities\" />
     <Folder Include="Models\RubricModel\" />
     <Folder Include="Validations\" />
     <Folder Include="Views\IssueVoting\" />
