@@ -152,18 +152,94 @@
             <td id="th3">
                 <b>Average Score</b>
             </td>
-            <td id="averageLetter"></td>
-            <td id="averageTotal">0</td>
             
             @{
-                double totalAverage = 0;
+                List<Score> totalScores = (from scores in ViewBag.CategoryTotalPercent as IEnumerable<Score> select scores).ToList();                                       
+                
+                //Holds the total grade
+                double totalGrade = 0;
+                totalCategoryPoints = 0;
+                double totalCategoryPossible = 0;
+                //Get the total score for the class
+                foreach (Category category in ViewBag.CatsWithWeightsAndScores)
+                {
+                    if (category.Name != Constants.UnGradableCatagory)
+                    {
+                        double categoryPoints = 0;
+                        double categoryPossible = 0;
+                        double categoryTotal = 0;
+                        foreach (Score userScore in totalScores)
+                        {
+                            if (userScore.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
+                            {
+                                categoryPoints += userScore.Points;
+                                categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                            }
+                        }
+                        categoryTotal = categoryPoints / categoryPossible;
+                        
+                        if (ViewBag.TotalCategoryWeights > 0)
+                        {
+                            totalGrade += categoryTotal * (category.Points / ViewBag.TotalCategoryWeights) * 100;
+                        }
+                        else
+                        {
+                            totalCategoryPoints += categoryPoints;
+                            totalCategoryPossible += categoryPossible;
+                        }
+                    }
+                }
+                
+                if (ViewBag.TotalCategoryWeights == 0)
+                {
+                    totalGrade = (totalCategoryPoints / totalCategoryPossible) * 100;
+                }
+
+                var letter = "";
+                foreach (LetterGrade item in ViewBag.LetterGrades)
+                {
+                    if (totalGrade >= item.MinimumRequired)
+                    {
+                        letter = item.Grade;
+                        break;
+                    }
+                }
+                
+                <td>@letter</td>
+                <td>@totalGrade.ToString(".##")%</td>
+                
+                
                 int totalStudents = 0;
 
                 foreach (Category item in ViewBag.Categories)
                 {
                     if (item.Name != Constants.UnGradableCatagory)
                     {
-                        <td id="averageScore">0</td>  
+                        double totalAverage = 0;
+                        double averagePoints = 0;
+                        double averagePossible = 0;
+
+                        //Make sure there is at least one score in the category
+                        bool oneScore = false;
+                        foreach (Score score in ViewBag.CategoryTotalPercent)
+                        {
+                            if (score.AssignmentActivity.AbstractAssignment.CategoryID == item.ID)
+                            {
+                                oneScore = true;
+                                averagePoints += score.Points;
+                                averagePossible += score.AssignmentActivity.PointsPossible;
+                            }
+                        }
+                        double categoryScore = averagePoints / averagePossible;
+                        totalAverage += categoryScore * 100;
+                        if (oneScore == true)
+                        {
+                            <td id="averageScore">@totalAverage.ToString(".##")%</td>  
+                        }
+                        else
+                        {
+                            <td id="averageScore">NG</td>
+                        }
                     }
                 }
             }
@@ -189,66 +265,69 @@
                 UserProfile cu = (from user in ViewBag.CurrentStudent as IEnumerable<UserProfile> select user).FirstOrDefault();
                 <td>@ViewBag.SectionNumber</td>
                 <td>@cu.LastName, @cu.FirstName</td>
-                
-                <td></td>
+               
                 
                 List<Score> userScores = (from scores in ViewBag.AllUserGrades as IEnumerable<Score> select scores).ToList();
                 List<Category> categoryWeights = (from cats in ViewBag.Categories as IEnumerable<Category>
                                                   where cats.Points > 0
-                                                  select cats).ToList();                                           
-                
-                //Holds the total grade
-                double totalGrade = 0;
-                
-                //Holds the users total score
-                double totalGradePoints = 0;
-                
-                //Holds the category weight / total of all category weights
-                double totalGradePossible = 0;
-                
-                //Holds to total of all category weights
-                double catPossibleWeight = 0;
+                                                  select cats).ToList();
 
-                //Get the total of the category weights that have grades
-                if (ViewBag.TotalCategoryWeights > 0)
-                {
-                    foreach (Category category in ViewBag.Categories)
-                    {
-                        if (category.Points > 0)
-                        {
-                            //Check to see if the current category contains grades
-                            foreach (Score score in userScores)
-                            {                                
-                                if (score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
-                                {
-                                    
-                                }           
-                            }
-                            catPossibleWeight += category.Points;
-                        }
-                    }
-                }
-                
+
+                //Holds the total grade
+                totalGrade = 0;
+                totalCategoryPoints = 0;
+                totalCategoryPossible = 0;
+
                 //Get the total score for the class
-                foreach(Category category in ViewBag.Categories)
+                foreach (Category category in ViewBag.CatsWithWeightsAndScores)
                 {
                     if (category.Name != Constants.UnGradableCatagory)
                     {
+                        double categoryPoints = 0;
+                        double categoryPossible = 0;
+                        double categoryTotal = 0;
                         foreach (Score userScore in userScores)
                         {
                             if (userScore.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
                             {
-                                totalGrade += userScore.Points * (category.Points / totalCategoryPoints);
+                                categoryPoints += userScore.Points;
+                                categoryPossible += userScore.AssignmentActivity.PointsPossible;
                             }
+                        }
+                        categoryTotal = categoryPoints / categoryPossible;
+                        if (ViewBag.TotalCategoryWeights > 0)
+                        {
+                            totalGrade += categoryTotal * (category.Points / ViewBag.TotalCategoryWeights) * 100;
+                        }
+                        else
+                        {
+                            totalCategoryPoints += categoryPoints;
+                            totalCategoryPossible += categoryPossible;
                         }
                     }
                 }
+
+                if (ViewBag.TotalCategoryWeights == 0)
+                {
+                    totalGrade = (totalCategoryPoints / totalCategoryPossible) * 100;
+                }
+
+                letter = "";
+                foreach (LetterGrade item in ViewBag.LetterGrades)
+                {
+                    if (totalGrade >= item.MinimumRequired)
+                    {
+                        letter = item.Grade;
+                        break;
+                    }
+                }
                 
-                <td>@totalGrade%</td>
+                <td>@letter</td>
+                <td>@totalGrade.ToString(".##")%</td>
                 
                 if (userScores.Count() > 0)
                 {
-                    
+
                     foreach (Category category in ViewBag.Categories)
                     {
                         if (category.Name != Constants.UnGradableCatagory)
@@ -266,7 +345,7 @@
                             double total = (categoryPoints / categoryPossible) * 100;
                             if (total >= 0)
                             {
-                                <td>@total%</td>
+                                <td>@total.ToString(".##")%</td>
                             }
                             else
                             {

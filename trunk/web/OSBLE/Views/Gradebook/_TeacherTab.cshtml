@@ -17,6 +17,7 @@
     {
         text-align:right;
     }
+    
     .gradebook
     {
         width: auto;
@@ -178,7 +179,7 @@
     </div>
     <br />
     @Html.Partial("_Tabs")
-</div>
+
 <input type="hidden" id="lastCell" value="null"/>
 <div id="tableContent" >
     @Html.Partial("_Gradebook")
@@ -387,8 +388,8 @@
     });
 
     $(document).ready(function (e) {
-        //calculateRows();
-        calculateCols();
+        
+        
         var studentId = $("#studentId").val()
         var cell = null;
         if (studentId != "") {

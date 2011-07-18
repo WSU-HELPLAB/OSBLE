@@ -104,12 +104,65 @@
             <td id="th3">
                 <b>Average Score</b>
             </td>
+            @{
+                //Holds the total grade
+                double totalGrade = 0;
+                
+                //Holds the users total score
+                double totalGradePoints = 0;
+                
+                //Holds the category weight / total of all category weights
+                double totalGradePossible = 0;
+                
+                //Holds to total of all category weights
+                double catPossibleWeight = 0;
+
+                double assignPoints = 0;
+                double assignPossible = 0;
+                
+                //Get the total score for the class
+                foreach (AbstractAssignmentActivity assign in ViewBag.Assignments)
+                {
+                    foreach (Score userScore in ViewBag.TotalScores)
+                    {
+                        assignPoints += userScore.Points;
+                        assignPossible += userScore.AssignmentActivity.PointsPossible;
+                    }
+                    
+                }
+                totalGrade = (assignPoints / assignPossible) * 100;
+            }
             <td id="averageTotal">
-                0
+                @totalGrade.ToString(".##")%
             </td>
             @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
             {
-                <td id="averageScore" >0</td>  
+                var score = (from scores in ViewBag.TotalScores as IEnumerable<Score>
+                             where scores.AssignmentActivityID == item.ID
+                             select scores);
+                
+                double totalAverage = 0;
+                double averagePoints = 0;
+                double averagePossible = 0;
+
+                //Make sure there is at least one score in the category
+                bool oneScore = false;
+                foreach (Score s in score)
+                {
+                    oneScore = true;
+                    averagePoints += s.Points;
+                    averagePossible += s.AssignmentActivity.PointsPossible;
+                }
+                double categoryScore = averagePoints / averagePossible;
+                totalAverage += categoryScore * 10;
+                if (oneScore == true)
+                {
+                    <td id="averageScore">@totalAverage.ToString(".#")</td>  
+                }
+                else
+                {
+                    <td id="averageScore">NG</td>
+                }
             }
         </tr>
         <tr>    
@@ -126,11 +179,11 @@
                 {
                     <th id="totalCustomize">Total [Dropped @ViewBag.NumDropped]</th>
                 }
-        
+
                 int i = 2;
                 foreach (AbstractAssignmentActivity assign in ViewBag.Assignments)
                 {
-                
+
                     if (assign.addedPoints > 0)
                     {   
                         <th id="header-@assign.ID">@assign.Name (Added @assign.addedPoints)</th>
@@ -144,6 +197,7 @@
             }
             
         </tr>
+        <tr>
         @{
             UserProfile cu = (from user in ViewBag.CurrentStudent as IEnumerable<UserProfile> select user).FirstOrDefault();
             
@@ -151,19 +205,19 @@
             
             List<Score> scoreList = (from scores in ViewBag.UserScores as IEnumerable<Score>
                                      select scores).ToList();
-            
+
             if (scoreList.Count() > 0)
             {
                 double totalPoints = 0;
                 double totalPossible = 0;
-            
-                            
-                foreach (Score s in scoreList)   
+
+
+                foreach (Score s in scoreList)
                 {
                     totalPoints += s.Points;
                     totalPossible += s.AssignmentActivity.PointsPossible;
                 }
-                
+
                 totalPoints = (totalPoints / totalPossible) * 100;
                 <td>@totalPoints%</td>
             }
@@ -171,13 +225,13 @@
             {
                 <td>NG</td>
             }
-            
+
             foreach (AbstractAssignmentActivity assignment in ViewBag.Assignments)
             {
                 var score = (from scores in ViewBag.UserScores as IEnumerable<Score>
-                               where scores.AssignmentActivityID == assignment.ID
-                               select scores);
-                
+                             where scores.AssignmentActivityID == assignment.ID
+                             select scores);
+
                 if (score.Count() > 0)
                 {        
                     <td>@score.First().Points</td>
@@ -189,6 +243,7 @@
             
             }
         }
+        </tr>
 
     </table>
 </div>

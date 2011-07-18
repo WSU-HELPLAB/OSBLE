@@ -122,7 +122,7 @@ namespace OSBLE.Controllers
                                }
                                else
                                {
-                                   AbstractAssignmentActivity assign = (from g in db.AbstractAssignmentActivities where g.ID == currentAssignmentID select g).First();
+                                   AbstractAssignmentActivity assign = (from g in db.AbstractAssignmentActivities where g.ID == currentAssignmentID select g).FirstOrDefault();
                                    if (Session["radio"].ToString() == "r")
                                    {
                                        
@@ -142,14 +142,14 @@ namespace OSBLE.Controllers
                                            AddColumn(assignment.ToString(), 10, assign.ColumnOrder + assignmentNumber);
                                            positionList.Add(assign.ColumnOrder + assignmentNumber);
                                            index.Add(count);
-                                           currentAssignmentID = (from g in db.AbstractAssignments where g.ColumnOrder == (assign.ColumnOrder + 1) select g.ID).First();
+                                           currentAssignmentID = (from g in db.AbstractAssignments where g.ColumnOrder == (assign.ColumnOrder + 1) select g.ID).FirstOrDefault();
                                        }
                                        else
                                        {
                                            AddColumn(assignment.ToString(), 10, assign.ColumnOrder + assignmentNumber);
                                            positionList.Add(assign.ColumnOrder + assignmentNumber);
                                            index.Add(count);
-                                           currentAssignmentID = (from g in db.AbstractAssignments where g.ColumnOrder == (assign.ColumnOrder + 1) select g.ID).First();
+                                           currentAssignmentID = (from g in db.AbstractAssignments where g.ColumnOrder == (assign.ColumnOrder + 1) select g.ID).FirstOrDefault();
                                        }
                                        
                                    }
@@ -619,7 +619,7 @@ namespace OSBLE.Controllers
                }
            }
 
-           GradeAssignment newAssignment = new GradeAssignment()
+           AbstractAssignment newAssignment = new GradeAssignment()
            {
                Name = columnName,
                PointsPossible = pointsPossible,
@@ -627,7 +627,7 @@ namespace OSBLE.Controllers
                CategoryID = categoryId,
                ColumnOrder = position
            };
-           db.GradeAssignments.Add(newAssignment);
+           db.AbstractAssignments.Add(newAssignment);
            db.SaveChanges();
 
            GradeActivity newActivity = new GradeActivity()
@@ -1224,12 +1224,13 @@ namespace OSBLE.Controllers
                if (assignmentId > 0)
                {
                    List<Score> grades = (from grade in db.Scores
-                                         where grade.AssignmentActivity.AbstractAssignmentID == assignmentId &&
+                                         where grade.AssignmentActivityID == assignmentId &&
                                          grade.Points >= 0
                                          select grade).ToList();
 
                    var assignment = (from assigns in db.AbstractAssignmentActivities
                                      where assigns.ID == assignmentId
+                                     orderby assigns.ColumnOrder
                                      select assigns).FirstOrDefault();
 
                    if (grades.Count() > 0)
@@ -1260,13 +1261,21 @@ namespace OSBLE.Controllers
                {
                    int currentCourseId = ActiveCourse.AbstractCourseID;
 
-                   AbstractAssignment assignment = (from assign in db.AbstractAssignments where assign.ID == assignmentId select assign).FirstOrDefault();
-                   Category category = (from cat in db.Categories where cat.Name == categoryName && cat.CourseID == currentCourseId select cat).FirstOrDefault();
-                   int newCategoryLastAssignment = (from a in db.AbstractAssignments where a.CategoryID == category.ID orderby a.ColumnOrder descending select a.ColumnOrder).FirstOrDefault();
+                   AbstractAssignmentActivity assignment = (from assign in db.AbstractAssignmentActivities 
+                                                            where assign.ID == assignmentId 
+                                                            select assign).FirstOrDefault();
+
+                   Category category = (from cat in db.Categories 
+                                        where cat.Name == categoryName && cat.CourseID == currentCourseId 
+                                        select cat).FirstOrDefault();
+
+                   int newCategoryLastAssignment = (from a in db.AbstractAssignmentActivities 
+                                                    where a.AbstractAssignment.CategoryID == category.ID 
+                                                    select a.ColumnOrder).FirstOrDefault();
 
                    if (assignment != null && category != null)
                    {
-                       assignment.CategoryID = category.ID;
+                       assignment.AbstractAssignment.CategoryID = category.ID;
                        assignment.ColumnOrder = newCategoryLastAssignment + 1;
                        db.SaveChanges();
                    }
@@ -1505,7 +1514,7 @@ namespace OSBLE.Controllers
            //only continue if we received a valid gradable id
            if (assignmentId != 0)
            {
-               AbstractAssignment assignments = (from g in db.AbstractAssignments where g.ID == assignmentId select g).First();
+               AbstractAssignmentActivity assignments = (from g in db.AbstractAssignmentActivities where g.ID == assignmentId select g).FirstOrDefault();
                switch (action)
                {
                    case ColumnAction.InsertLeft:
@@ -1611,9 +1620,27 @@ namespace OSBLE.Controllers
                                                      where ga.Category.CourseID == currentCourseId
                                                      select ga).ToList();
 
+           List<Score> allGrades = (from grades in db.Scores
+                                    where grades.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId &&
+                                    grades.Points >= 0
+                                    select grades).ToList();
+
            List<LetterGrade> letterGradeList = ((activeCourse.AbstractCourse as Course).LetterGrades).ToList();
 
            List<Score> studentScores = new List<Score>();
+
+           List<Score> categoryTotalPercent = (from categoryTotal in db.Scores
+                                               where categoryTotal.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId &&
+                                               categoryTotal.Points >= 0
+                                               select categoryTotal).ToList();
+
+           List<Category> categoriesWithWeightsAndScores = (from cats in categoryTotalPercent
+                                                            select cats.AssignmentActivity.AbstractAssignment.Category).Distinct().ToList();
+
+           double totalCategoryWeights = (from cat in categoriesWithWeightsAndScores
+                                          select cat.Points).Sum();
+
+
 
            foreach (UserProfile up in studentList)
            {
@@ -1647,6 +1674,10 @@ namespace OSBLE.Controllers
            ViewBag.CoursesUser = courseUsers;
            ViewBag.GradeAssignments = gradeAssignments;
            ViewBag.LetterGrades = letterGradeList;
+           ViewBag.AllGrades = allGrades;
+           ViewBag.CategoryTotalPercent = categoryTotalPercent;
+           ViewBag.CatsWithWeightsAndScores = categoriesWithWeightsAndScores;
+           ViewBag.TotalCategoryWeights = totalCategoryWeights;
 
            return View("Index");
        }
@@ -1661,7 +1692,7 @@ namespace OSBLE.Controllers
                                          orderby category.ColumnOrder
                                          select category).ToList();
 
-           List<LetterGrade> letterGrades = ((activeCourse.AbstractCourse as Course).LetterGrades).ToList();
+           List<LetterGrade> letterGrades = ((activeCourse.AbstractCourse as Course).LetterGrades).OrderByDescending(l => l.MinimumRequired).ToList();
 
            List<UserProfile> currentUser = new List<UserProfile>();
            currentUser.Add(CurrentUser);
@@ -1671,17 +1702,22 @@ namespace OSBLE.Controllers
                                 select section.Section).FirstOrDefault();
 
            List<Score> categoryTotalPercent = (from categoryTotal in db.Scores
-                                               where categoryTotal.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId
+                                               where categoryTotal.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId &&
+                                               categoryTotal.Points >= 0
                                                select categoryTotal).ToList();
 
            List<Score> userCategoryTotalPercent = (from userCategoryTotal in categoryTotalPercent
                                                    where userCategoryTotal.TeamUserMember.Contains(CurrentUser)
                                                    select userCategoryTotal).ToList();
 
-           double totalCategoryWeights = (from cat in db.Categories
-                                          where cat.CourseID == currentCourseId &&
-                                          cat.Points > 0
+           List<Category> categoriesWithWeightsAndScores = (from cats in categoryTotalPercent
+                                                            where cats.TeamUserMember.Contains(CurrentUser) &&
+                                                            cats.Points >= 0
+                                                            select cats.AssignmentActivity.AbstractAssignment.Category).Distinct().ToList();
+
+           double totalCategoryWeights = (from cat in categoriesWithWeightsAndScores
                                           select cat.Points).Sum();
+
 
            ViewBag.Categories = categories;
            ViewBag.LetterGrades = letterGrades;
@@ -1689,6 +1725,8 @@ namespace OSBLE.Controllers
            ViewBag.SectionNumber = sectionNumber;
            ViewBag.AllUserGrades = userCategoryTotalPercent;
            ViewBag.TotalCategoryWeights = totalCategoryWeights;
+           ViewBag.CatsWithWeightsAndScores = categoriesWithWeightsAndScores;
+           ViewBag.CategoryTotalPercent = categoryTotalPercent;
            return View("Index");
        }
 
@@ -1739,13 +1777,15 @@ namespace OSBLE.Controllers
            List<AbstractAssignmentActivity> assignments = (from assignment in db.AbstractAssignmentActivities
                                                            where assignment.AbstractAssignment.CategoryID == categoryId &&
                                                            (!(assignment is StopActivity))
+                                                           orderby assignment.ColumnOrder
                                                            select assignment).ToList();
 
            List<UserProfile> currentUser = new List<UserProfile>();
            currentUser.Add(CurrentUser);
 
            List<Score> totalScores = (from scores in db.Scores
-                                      where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
+                                      where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId &&
+                                      scores.Points >= 0
                                       select scores).ToList();
 
            List<Score> userScores = (from score in totalScores
@@ -1763,6 +1803,7 @@ namespace OSBLE.Controllers
            ViewBag.CurrentStudent = currentUser;
            ViewBag.NumDropped = numDropped;
            ViewBag.UserScores = userScores;
+           ViewBag.TotalScores = totalScores;
        }
        
 
@@ -1880,7 +1921,8 @@ namespace OSBLE.Controllers
 
            //Finally the scores for each student.
            List<Score> scor = (from score in db.Scores
-                               where score.AssignmentActivity.AbstractAssignment.CategoryID == currentTab.ID
+                               where score.AssignmentActivity.AbstractAssignment.CategoryID == currentTab.ID &&
+                               score.Points >= 0
                                select score).ToList();
 
            var userScore = from scores in scor
@@ -1925,7 +1967,7 @@ namespace OSBLE.Controllers
            //save everything that we need to the viewebag
            ViewBag.Categories = allCategories;
            ViewBag.Grades = scor;
-           ViewBag.GradeAssignments = gradeAssignments;
+           ViewBag.Assignments = gradeAssignments;
            ViewBag.Users = students;
            ViewBag.Percents = studentScores;
            ViewBag.Dropped = numDropped;

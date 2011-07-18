@@ -29,7 +29,7 @@
             j += 1;
             <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color:#E8E8E8" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(event, this);"></td>
             j += 1;
-            foreach (AbstractAssignmentActivity item in ViewBag.GradeAssignments)
+            foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
             {
                 <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; text-align:center; min-width: 45px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(event, this);">  
                 <div id="div-@j" style="display: none; margin:0 auto;">
@@ -49,7 +49,7 @@
         @{index++;}
         <td id="th2"><b>Perfect Score</b></td>
         <td id="perfectTotal">100%</td>
-        @foreach (AbstractAssignmentActivity item in ViewBag.GradeAssignments)
+        @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
         {
             <td id="pointsPossible-@item.ID" onclick="cellGainsFocus(event, this)">@item.PointsPossible</td>
         }
@@ -61,13 +61,74 @@
         <td id="th3">
             <b>Average Score</b>
         </td>
-        <td id="averageTotal">
+        @*<td id="averageTotal">
             0
         </td>
         @foreach (AbstractAssignmentActivity item in ViewBag.GradeAssignments)
         {
             <td id="averageScore" >0</td>  
-        }
+        }*@
+
+        @{       //Holds the total grade
+                double totalGrade = 0;
+                
+                //Holds the users total score
+                double totalGradePoints = 0;
+                
+                //Holds the category weight / total of all category weights
+                double totalGradePossible = 0;
+                
+                //Holds to total of all category weights
+                double catPossibleWeight = 0;
+
+                double assignPoints = 0;
+                double assignPossible = 0;
+                
+                //Get the total score for the class
+                foreach (AbstractAssignmentActivity assign in ViewBag.Assignments)
+                {
+                    foreach (Score userScore in ViewBag.Grades)
+                    {
+                        assignPoints += userScore.Points;
+                        assignPossible += userScore.AssignmentActivity.PointsPossible;
+                    }
+                    
+                }
+                totalGrade = (assignPoints / assignPossible) * 100;
+            }
+            <td id="averageTotal">
+                @totalGrade.ToString(".##")%
+            </td>
+            @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
+            {
+                var score = (from scores in ViewBag.Grades as IEnumerable<Score>
+                             where scores.AssignmentActivityID == item.ID
+                             select scores);
+                
+                double totalAverage = 0;
+                double averagePoints = 0;
+                int numStudents = 0;
+
+                //Make sure there is at least one score in the category
+                bool oneScore = false;
+                foreach (Score s in score)
+                {
+                    oneScore = true;
+                    averagePoints += s.Points;
+                    numStudents++;
+                }
+                double categoryScore = averagePoints / numStudents;
+                totalAverage += categoryScore;
+                if (oneScore == true)
+                {
+                    <td id="averageScore">@totalAverage.ToString(".#")</td>  
+                }
+                else
+                {
+                    <td id="averageScore">NG</td>
+                }
+            }
+
     </tr>
     
     <tr>
@@ -102,6 +163,19 @@
             }
             else
             {
+                <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average [Dropped @numDropped]" /> </th>
+            }
+        
+            int i = 2;
+            foreach (AbstractAssignmentActivity assign in ViewBag.Assignments)
+            {
+                
+                if (assign.addedPoints > 0)
+                {   
+                    <th id="header-@assign.ID" onclick="changeHeaderName(event, this)">@assign.Name (Added @assign.addedPoints)</th>
+                }
+                else
+                {
                     <th id="header-@assign.ID" onclick="changeHeaderName(event, this)">@assign.Name </th>
             }
             i += 1;
@@ -139,7 +213,7 @@
             }
 
                 
-            @foreach (AbstractAssignmentActivity gradeAssignmentActivity in ViewBag.GradeAssignments)
+            @foreach (AbstractAssignmentActivity gradeAssignmentActivity in ViewBag.Assignments)
             {
 
                 var gradableQuery = from g in ViewBag.Grades as IEnumerable<Score>
@@ -162,8 +236,7 @@
     }
     <script type="text/javascript">
         $(function () {
-
-            calculateCols();
+            
             keyControls();
         });
 
