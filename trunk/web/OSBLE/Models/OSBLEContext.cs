@@ -44,10 +44,6 @@ namespace OSBLE.Models
 
         public DbSet<AbstractAssignment> AbstractAssignments { get; set; }
 
-        public DbSet<BasicAssignment> BasicAssignments { get; set; }
-
-        public DbSet<GradeAssignment> GradeAssignments { get; set; }
-
         public DbSet<StudioAssignment> StudioAssignments { get; set; }
 
         public DbSet<CommentCategory> CommentCategories { get; set; }

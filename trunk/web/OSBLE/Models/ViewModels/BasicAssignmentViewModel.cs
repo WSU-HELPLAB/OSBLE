@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
-using System.Web.Mvc;
 
 namespace OSBLE.Models.ViewModels
 {
@@ -11,7 +10,7 @@ namespace OSBLE.Models.ViewModels
         {
             Submission = new SubmissionActivity();
             Stop = new StopActivity();
-            Assignment = new BasicAssignment();
+            Assignment = new StudioAssignment();
             isGradable = true;
         }
 
@@ -22,7 +21,7 @@ namespace OSBLE.Models.ViewModels
 
         public StopActivity Stop { get; set; }
 
-        public BasicAssignment Assignment { get; set; }
+        public StudioAssignment Assignment { get; set; }
 
         public SilverlightObject TeamCreation { get; set; }
 

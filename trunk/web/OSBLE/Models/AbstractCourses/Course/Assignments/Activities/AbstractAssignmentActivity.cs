@@ -59,7 +59,7 @@ namespace OSBLE.Models.Assignments.Activities
         public virtual ICollection<Score> Scores { get; set; }
 
         [Required]
-        [Display(Name = "Is This A Team Assignment?")]
+        [Display(Name = "Is This A Team Activity?")]
         public bool isTeam { get; set; }
 
         public virtual ICollection<TeamUserMember> TeamUsers { get; set; }

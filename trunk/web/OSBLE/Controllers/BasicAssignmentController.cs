@@ -206,7 +206,7 @@ namespace OSBLE.Controllers
                     }
                 }
 
-                db.BasicAssignments.Add(basic.Assignment);
+                db.StudioAssignments.Add(basic.Assignment);
 
                 db.SaveChanges();
 
@@ -522,7 +522,7 @@ namespace OSBLE.Controllers
         {
             List<Deliverable> Deliverables = new List<Deliverable>();
             BasicAssignmentViewModel viewModel = new BasicAssignmentViewModel();
-            BasicAssignment assignment = db.AbstractAssignments.Find(id) as BasicAssignment;
+            StudioAssignment assignment = db.AbstractAssignments.Find(id) as StudioAssignment;
 
             if (assignment != null && assignment.Category.Course == activeCourse.AbstractCourse)
             {
@@ -565,7 +565,7 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult Edit(BasicAssignmentViewModel basic)
         {
-            BasicAssignment assignment = db.BasicAssignments.Find(basic.Assignment.ID);
+            StudioAssignment assignment = db.StudioAssignments.Find(basic.Assignment.ID);
 
             // Make sure assignment to update belongs to this course.
             if (assignment.Category.CourseID != ActiveCourse.AbstractCourseID)
