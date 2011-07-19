@@ -98,16 +98,26 @@
                     
                 }
                 totalGrade = (assignPoints / assignPossible) * 100;
+            
+                if (totalGrade.ToString() == "NaN")
+                {
+                    <td id="averageTotal">
+                        NG
+                    </td>
+                }
+                else
+                {
+                    <td id="averageTotal">
+                        @totalGrade.ToString(".#")%
+                    </td>
+                }
             }
-            <td id="averageTotal">
-                @totalGrade.ToString(".#")%
-            </td>
             @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
             {
                 var score = (from scores in ViewBag.Grades as IEnumerable<Score>
-                             where scores.AssignmentActivityID == item.ID                            
+                             where scores.AssignmentActivityID == item.ID
                              select scores);
-                
+
                 double totalAverage = 0;
                 double averagePoints = 0;
                 int numStudents = 0;
@@ -169,16 +179,16 @@
                 <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average [Dropped @numDropped]" /> </th>
             }*@
         
-            int i = 2;
-            foreach (AbstractAssignmentActivity a in ViewBag.Assignments)
-            {
-                
-                if (a.addedPoints > 0)
-                {   
+        int i = 2;
+        foreach (AbstractAssignmentActivity a in ViewBag.Assignments)
+        {
+
+            if (a.addedPoints > 0)
+            {   
                     <th id="header-@a.ID" onclick="changeHeaderName(event, this)">@a.Name (Added @a.addedPoints)</th>
-                }
-                else
-                {
+            }
+            else
+            {
                     <th id="header-@a.ID" onclick="changeHeaderName(event, this)">@a.Name </th>
             }
             i += 1;
@@ -220,7 +230,7 @@
 
                 var gradableQuery = from g in ViewBag.Grades as IEnumerable<Score>
                                     where g.AssignmentActivityID == gradeAssignmentActivity.ID
-                                    && g.TeamUserMember.Contains(user) 
+                                    && g.TeamUserMember.Contains(user)
                                     //&& g.Points >= 0
                                     select g;
                 //use the stored score if possible.  Otherwise, just use a "0"
@@ -242,7 +252,7 @@
                         var teamUser = from tu in gradeAssignmentActivity.TeamUsers where tu.Contains(user) select tu;
                         if (teamUser.Count() > 0)
                         {
-                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink("NG", "Index", "Rubric", new { abstractAssignmentActivityId = gradeAssignmentActivity.ID, teamUserID = teamUser.First().ID}, new { })</td>
+                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink("NG", "Index", "Rubric", new { abstractAssignmentActivityId = gradeAssignmentActivity.ID, teamUserID = teamUser.First().ID }, new { })</td>
                         }
                     }
                     else

@@ -473,6 +473,7 @@
                 else if (row.html() == null) {
                     clearLastCellFocus(e);
                     return false;
+                    
                 }
 
                 else {
@@ -781,7 +782,8 @@
         inputText.focus();
         inputText.select();
         lastFocusedCell = someHeader;
-        evt.preventDefault();
+        try { evt.preventDefault(); }
+        catch (er) { evt.returnValue = false; }
         header = true;
 
         // highlights the column and row headers of the selected header
@@ -789,12 +791,13 @@
     }
 
     function clearRowColumnHeader() {
+        
         $("#grades tr").each(function () {
             $(this).find("td").each(function () {
                 if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
                     $(this).css("background-color", "#DCDCDC");
                     $(this).find("div").css("background-color", "#DCDCDC");
-                    $(this).attr("onmouseout", "hideButton(this);");
+                    $(this).attr("onmouseout", "").mouseout(function () { hideButton(this); });
                 }
                 else {
                 }
@@ -841,7 +844,8 @@
             else {
                 lastFocusedCell.text(cellValue);
             }
-            lastFocusedCell.attr("onclick", 'cellGainsFocus(event, this)');
+            $(lastFocusedCell).attr("onclick", "").click(function () { cellGainsFocus(event, this); });
+            
             lastFocusedCell = null;
 
             //AJAX call
@@ -922,7 +926,7 @@
         $("#lastCell").val(someCell);
 
         try { evt.preventDefault(); }
-        catch (er) {evt.returnValue = false; }
+        catch (er) { evt.returnValue = false; }
 
         //Highlights the row and column headers of the selected cell
         selectRowColumnHeaderOfSelected(someCell);
@@ -940,7 +944,7 @@
         cell.find("div").css("background-color", "#FFFF84");
 
         //change the mouseout function so we don't change the color and only hide the div
-        cell.attr("onmouseout", "hideOnlyButton(this);");
+        cell.attr("onmouseout", "").mouseout(function () { hideOnlyButton(this); });
 
         //find the current rows header
         var cell2 = $("#grades").find("tr:eq(" + row + ")");
