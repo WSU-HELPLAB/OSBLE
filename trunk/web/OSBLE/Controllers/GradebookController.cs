@@ -1658,6 +1658,11 @@ namespace OSBLE.Controllers
                                     grades.isDropped == false
                                     select grades).ToList();
 
+           List<Score> allGradedAssignments = (from grades in allGrades
+                                               join assignments in db.AbstractAssignmentActivities on grades.AssignmentActivityID equals assignments.ID
+                                               where assignments.Scores.Count() > 0
+                                               select grades).ToList();
+
            List<LetterGrade> letterGradeList = ((activeCourse.AbstractCourse as Course).LetterGrades).ToList();
 
            List<Score> studentScores = new List<Score>();
@@ -1673,6 +1678,12 @@ namespace OSBLE.Controllers
 
            double totalCategoryWeights = (from cat in categoriesWithWeightsAndScores
                                           select cat.Points).Sum();
+
+           List<AbstractAssignmentActivity> assignmentList = (from assignment in db.AbstractAssignmentActivities
+                                                              join scores in db.Scores on assignment.ID equals scores.AssignmentActivityID
+                                                              where assignment.Scores.Count() > 0 &&
+                                                              scores.Points >= 0
+                                                              select assignment).Distinct().ToList();
 
 
 
@@ -1712,6 +1723,8 @@ namespace OSBLE.Controllers
            ViewBag.CategoryTotalPercent = categoryTotalPercent;
            ViewBag.CatsWithWeightsAndScores = categoriesWithWeightsAndScores;
            ViewBag.TotalCategoryWeights = totalCategoryWeights;
+           ViewBag.AllGradedAssignments = allGradedAssignments;
+           ViewBag.Assignments = assignmentList;
 
            return View("Index");
        }
@@ -1726,6 +1739,13 @@ namespace OSBLE.Controllers
                                          orderby category.ColumnOrder
                                          select category).ToList();
 
+           List<UserProfile> studentList = (from up in db.UserProfiles
+                                            join cu in db.CoursesUsers on up.ID equals cu.UserProfileID
+                                            where cu.AbstractCourseID == currentCourseId && cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student
+                                            orderby up.LastName, up.FirstName
+                                            select up).ToList();
+
+
            List<LetterGrade> letterGrades = ((activeCourse.AbstractCourse as Course).LetterGrades).OrderByDescending(l => l.MinimumRequired).ToList();
 
            List<UserProfile> currentUser = new List<UserProfile>();
@@ -1736,8 +1756,7 @@ namespace OSBLE.Controllers
                                 select section.Section).FirstOrDefault();
 
            List<Score> categoryTotalPercent = (from categoryTotal in db.Scores
-                                               where categoryTotal.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId &&
-                                               categoryTotal.Points >= 0
+                                               where categoryTotal.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId 
                                                select categoryTotal).ToList();
 
            List<Score> userCategoryTotalPercent = (from userCategoryTotal in categoryTotalPercent
@@ -1761,6 +1780,7 @@ namespace OSBLE.Controllers
            ViewBag.TotalCategoryWeights = totalCategoryWeights;
            ViewBag.CatsWithWeightsAndScores = categoriesWithWeightsAndScores;
            ViewBag.CategoryTotalPercent = categoryTotalPercent;
+           ViewBag.Students = studentList;
            return View("Index");
        }
 
@@ -1958,7 +1978,6 @@ namespace OSBLE.Controllers
            List<Score> scor = (from score in db.Scores
                                where score.AssignmentActivity.AbstractAssignment.CategoryID == currentTab.ID &&
                                score.Points >= 0
-                               //score.isDropped == false
                                select score).ToList();
 
            var userScore = from scores in scor

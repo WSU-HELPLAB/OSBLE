@@ -105,8 +105,7 @@
             @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
             {
                 var score = (from scores in ViewBag.Grades as IEnumerable<Score>
-                             where scores.AssignmentActivityID == item.ID &&
-                             scores.isDropped == false                             
+                             where scores.AssignmentActivityID == item.ID
                              select scores);
                 
                 double totalAverage = 0;

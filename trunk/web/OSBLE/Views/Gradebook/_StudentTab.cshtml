@@ -131,7 +131,6 @@
                             assignPossible += userScore.AssignmentActivity.PointsPossible;
                         }
                     }
-
                 }
                 totalGrade = (assignPoints / assignPossible) * 100;
 
@@ -166,7 +165,7 @@
                     averagePossible += s.AssignmentActivity.PointsPossible;
                 }
                 double categoryScore = averagePoints / averagePossible;
-                totalAverage += categoryScore * 10;
+                totalAverage += categoryScore * 100;
                 if (oneScore == true)
                 {
                     <td id="averageScore">@totalAverage.ToString(".#")</td>  
@@ -216,6 +215,7 @@
             <td>@cu.LastName, @cu.FirstName</td>
             
             List<Score> scoreList = (from scores in ViewBag.UserScores as IEnumerable<Score>
+                                     where scores.Points >= 0
                                      select scores).ToList();
 
             if (scoreList.Count() > 0)

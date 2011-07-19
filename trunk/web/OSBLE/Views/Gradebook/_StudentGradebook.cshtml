@@ -153,39 +153,75 @@
                 <b>Average Score</b>
             </td>
             
-            @{
-                List<Score> totalScores = (from scores in ViewBag.CategoryTotalPercent as IEnumerable<Score> select scores).ToList();                                       
+            @{                                
                 
                 //Holds the total grade
                 double totalGrade = 0;
                 totalCategoryPoints = 0;
                 double totalCategoryPossible = 0;
-                //Get the total score for the class
-                foreach (Category category in ViewBag.CatsWithWeightsAndScores)
+
+                int studentCount = 0;
+                double categoryTotalWeight = 0;
+                
+                foreach (UserProfile user in ViewBag.Students)
                 {
-                    if (category.Name != Constants.UnGradableCatagory)
+                    studentCount++;
+                    categoryTotalWeight = ViewBag.TotalCategoryWeights;
+                    foreach (Category category in ViewBag.CatsWithWeightsAndScores)
                     {
-                        double categoryPoints = 0;
-                        double categoryPossible = 0;
-                        double categoryTotal = 0;
-                        foreach (Score userScore in totalScores)
+                        if (category.Name != Constants.UnGradableCatagory)
                         {
-                            if (userScore.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
+                            List<Score> userScore = (from score in ViewBag.CategoryTotalPercent as IEnumerable<Score>
+                                                     where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID &&
+                                                     score.Points >= 0 &&
+                                                     score.TeamUserMember.Contains(user)
+                                                     select score).ToList();
+
+                            if (userScore.Count() == 0)
                             {
-                                categoryPoints += userScore.Points;
-                                categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                categoryTotalWeight -= category.Points;
                             }
                         }
-                        categoryTotal = categoryPoints / categoryPossible;
+                    }
+                    
+                    //Get the total score for the class
+                    foreach (Category category in ViewBag.CatsWithWeightsAndScores)
+                    {
+                        if (category.Name != Constants.UnGradableCatagory)
+                        {
+                            double categoryPoints = 0;
+                            double categoryPossible = 0;
+                            double categoryTotal = 0;
+                            
+                            List<Score> totalScores = (from score in ViewBag.CategoryTotalPercent as IEnumerable<Score>
+                                                       where score.TeamUserMember.Contains(user) &&
+                                                       score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID &&
+                                                       score.Points >= 0
+                                                       select score).ToList();
+                            
+                            if (totalScores.Count() > 0)
+                            {              
+                            
+                                foreach (Score userScore in totalScores)
+                                {
+                                    if (userScore.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
+                                    {
+                                        categoryPoints += userScore.Points;
+                                        categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                    }
+                                }
+                                categoryTotal = categoryPoints / categoryPossible;
                         
-                        if (ViewBag.TotalCategoryWeights > 0)
-                        {
-                            totalGrade += categoryTotal * (category.Points / ViewBag.TotalCategoryWeights) * 100;
-                        }
-                        else
-                        {
-                            totalCategoryPoints += categoryPoints;
-                            totalCategoryPossible += categoryPossible;
+                                if (ViewBag.TotalCategoryWeights > 0)
+                                {
+                                    totalGrade += categoryTotal * (category.Points / categoryTotalWeight) * 100;
+                                }
+                                else
+                                {
+                                    totalCategoryPoints += categoryPoints;
+                                    totalCategoryPossible += categoryPossible;
+                                }
+                            }
                         }
                     }
                 }
@@ -193,6 +229,10 @@
                 if (ViewBag.TotalCategoryWeights == 0)
                 {
                     totalGrade = (totalCategoryPoints / totalCategoryPossible) * 100;
+                }
+                else
+                {
+                    totalGrade = (totalGrade / (studentCount * 100) * 100);
                 }
 
                 var letter = "";
@@ -225,9 +265,12 @@
                         {
                             if (score.AssignmentActivity.AbstractAssignment.CategoryID == item.ID)
                             {
-                                oneScore = true;
-                                averagePoints += score.Points;
-                                averagePossible += score.AssignmentActivity.PointsPossible;
+                                if (score.Points >= 0)
+                                {
+                                    oneScore = true;
+                                    averagePoints += score.Points;
+                                    averagePossible += score.AssignmentActivity.PointsPossible;
+                                }
                             }
                         }
                         double categoryScore = averagePoints / averagePossible;
@@ -242,7 +285,7 @@
                         }
                     }
                 }
-            }
+                }
             
         </tr>
         <tr id="categoryHeaders">
@@ -290,8 +333,19 @@
                         {
                             if (userScore.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
                             {
-                                categoryPoints += userScore.Points;
-                                categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                if (userScore.Points >= 0)
+                                {
+                                    categoryPoints += userScore.Points;
+                                    categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                }
+                                else if (userScore.StudentPoints >= 0)
+                                {
+                                    categoryPoints += userScore.StudentPoints;
+                                    categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                }
+                                else
+                                {
+                                }
                             }
                         }
                         categoryTotal = categoryPoints / categoryPossible;
@@ -338,8 +392,19 @@
                             {
                                 if (userScore.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
                                 {
-                                    categoryPoints += userScore.Points;
-                                    categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                    if (userScore.Points >= 0)
+                                    {
+                                        categoryPoints += userScore.Points;
+                                        categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                    }
+                                    else if (userScore.StudentPoints >= 0)
+                                    {
+                                        categoryPoints += userScore.StudentPoints;
+                                        categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                    }
+                                    else
+                                    {
+                                    }
                                 }
                             }
                             double total = (categoryPoints / categoryPossible) * 100;
