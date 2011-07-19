@@ -1849,12 +1849,31 @@ namespace OSBLE.Controllers
            int numDropped = (from cats in categories
                              where cats.ID == categoryId
                              select cats.dropX).FirstOrDefault();
-                             
+
+           int customize = (from op in categories select op.Customize).FirstOrDefault();
+
+           Category.GradeOptions customize_options = new Category.GradeOptions();
+           switch (customize)
+           {
+               case 0:
+                   customize_options = Category.GradeOptions.CompAverage;
+                   break;
+               case 1:
+                   customize_options = Category.GradeOptions.XtoDrop;
+                   break;
+               case 2:
+                   customize_options = Category.GradeOptions.XtoTake;
+                   break;
+               default:
+                   break;
+           };                  
+           
 
            ViewBag.Categories = categories;
            ViewBag.Assignments = assignments;
            ViewBag.CurrentStudent = currentUser;
            ViewBag.NumDropped = numDropped;
+           ViewBag.Customize = customize_options;
            ViewBag.UserScores = userScores;
            ViewBag.TotalScores = totalScores;
        }
@@ -1977,7 +1996,8 @@ namespace OSBLE.Controllers
            //Finally the scores for each student.
            List<Score> scor = (from score in db.Scores
                                where score.AssignmentActivity.AbstractAssignment.CategoryID == currentTab.ID &&
-                               score.Points >= 0
+                               score.Points >= 0 /*&&
+                               score.isDropped == false*/
                                select score).ToList();
 
            var userScore = from scores in scor

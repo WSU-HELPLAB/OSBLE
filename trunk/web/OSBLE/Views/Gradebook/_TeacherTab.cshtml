@@ -981,11 +981,14 @@
 
         $("#grades tr").children("td:nth-child(" + Index + ")").each(function () {
             if ($(this).attr("id") == "averageTotal") {
-                colTotal = parseFloat(colTotal / count).toFixed(2);
+                colTotal = parseFloat(colTotal / count).toFixed(1);
                 $(this).html(colTotal + "%");
             }
             if ($(this).attr("id") == "averageScore") {
-                colTotal = parseFloat(colTotal / count).toFixed(2);
+                colTotal = parseFloat(colTotal / count).toFixed(1);
+                if ((colTotal * 10) % (parseInt(colTotal) * 10) == 0) {
+                    colTotal = parseInt(colTotal);
+                }
                 $(this).html(colTotal);
             }
         });
@@ -1068,7 +1071,7 @@
 
             $(this).find("td").each(function () {
                 if ($(this).attr("id") == "total") {
-                    $(this).text(grade.toFixed(2) + "%");
+                    $(this).text(grade.toFixed(1) + "%");
                 }
             });
         });

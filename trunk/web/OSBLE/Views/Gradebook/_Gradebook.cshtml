@@ -105,7 +105,7 @@
             @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
             {
                 var score = (from scores in ViewBag.Grades as IEnumerable<Score>
-                             where scores.AssignmentActivityID == item.ID
+                             where scores.AssignmentActivityID == item.ID                            
                              select scores);
                 
                 double totalAverage = 0;
@@ -220,7 +220,7 @@
 
                 var gradableQuery = from g in ViewBag.Grades as IEnumerable<Score>
                                     where g.AssignmentActivityID == gradeAssignmentActivity.ID
-                                    && g.TeamUserMember.Contains(user)
+                                    && g.TeamUserMember.Contains(user) 
                                     //&& g.Points >= 0
                                     select g;
                 //use the stored score if possible.  Otherwise, just use a "0"
