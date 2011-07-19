@@ -1875,7 +1875,9 @@ namespace OSBLE.Controllers
                              where cats.ID == categoryId
                              select cats.dropX).FirstOrDefault();
 
-           int customize = (from op in categories select op.Customize).FirstOrDefault();
+           int customize = (from op in categories
+                            where op.ID == categoryId
+                            select op.Customize).FirstOrDefault();
 
            Category.GradeOptions customize_options = new Category.GradeOptions();
            switch (customize)

@@ -506,7 +506,8 @@
             else if (e.keyCode == 9) {
 
                 //prevent the default tab from happening and use our code.
-                e.preventDefault();
+                try { e.preventDefault(); }
+                catch (er) { e.returnValue = false; }
 
                 //cell gets the value in the textbox when tab is pressed
                 cell = $(this).children().val();
@@ -575,7 +576,9 @@
                 });
             }
             else if (e.keyCode == 9) {
-                e.preventDefault();
+                try { e.preventDefault(); }
+                catch (er) { e.returnValue = false; }
+
                 var cell = null;
                 var row = $(this).parent("tr");
                 var colIndex = $(this).prevAll().length;
@@ -917,7 +920,9 @@
         inputText.select();
         lastFocusedCell = someCell;
         $("#lastCell").val(someCell);
-        evt.preventDefault();
+
+        try { evt.preventDefault(); }
+        catch (er) {evt.returnValue = false; }
 
         //Highlights the row and column headers of the selected cell
         selectRowColumnHeaderOfSelected(someCell);
