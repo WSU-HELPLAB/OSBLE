@@ -264,12 +264,12 @@
         $('#rubric_dialog').dialog('open'); return false;
     }
 
-    function CloseRubric() {
+    function CloseRubric(rubricId) {
         $('#rubric_dialog').dialog('close');
         $.ajax({
             type: "POST",
             url: "/BasicAssignment/GetRubrics",
-            data: "",
+            data: {selectedRubric: rubricId},
             success: function (msg) {
                 $('#RubricSelect').html(msg);
             }

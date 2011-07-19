@@ -1429,7 +1429,7 @@ namespace OsbleRubric
         /// <param name="e"></param>
         private void CancelChanges_Click(object sender, RoutedEventArgs e)
         {
-            HtmlPage.Window.Invoke("CloseRubric", "");
+            HtmlPage.Window.Invoke("CloseRubric", selectedRubric.ID.ToString());
         }
 
         /// <summary>

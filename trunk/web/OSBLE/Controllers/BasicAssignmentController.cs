@@ -40,6 +40,16 @@ namespace OSBLE.Controllers
                                     select r).ToList();
             rubrics.Insert(0, new Rubric() { ID = 0, Description = "" });
             ViewBag.Rubrics = rubrics.ToList();
+
+            if (Request.Form.AllKeys.Contains("selectedRubric"))
+            {
+                ViewBag.SelectedRubric = Convert.ToInt32(Request.Form["selectedRubric"]);
+            }
+            else
+            {
+                ViewBag.SelectedRubric = 0;
+            }
+
             return View("_RubricSelect");
         }
 
