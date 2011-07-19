@@ -12,6 +12,7 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
+using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
 using OSBLE.Utility;
@@ -316,6 +317,18 @@ namespace OSBLE.Controllers
                     db.SaveChanges();
                 }
 
+                //send out Events
+                Event e = new Event();
+                e.Approved = true;
+                e.CourseID = activeCourse.AbstractCourse.ID;
+                e.HideDelete = true;
+                e.Title = submission.Name + " Due";
+                e.StartDate = stop.ReleaseDate;
+                e.StartTime = stop.ReleaseDate;
+                e.PosterID = currentUser.ID;
+                e.Description = "https://osble.org/Assignment?id=" + basic.Assignment.ID;
+                db.Events.Add(e);
+                db.SaveChanges();
                 return RedirectToAction("Index", "Assignment");
             }
 
@@ -410,8 +423,6 @@ namespace OSBLE.Controllers
                                  where c.AbstractCourseID == activeCourse.AbstractCourseID
                                  && (c.AbstractRole.ID == (int)CourseRole.CourseRoles.Student)
                                  select c).ToList();
-
-            int i = 0;
 
             if (couresesUsers.Count > 0)
             {

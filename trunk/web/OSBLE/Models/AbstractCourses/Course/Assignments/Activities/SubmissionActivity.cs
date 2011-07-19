@@ -10,7 +10,7 @@ namespace OSBLE.Models.Assignments.Activities
         }
 
         [Required]
-        [Display(Name = "Can Instructor Do A Line By Line Review?")]
+        [Display(Name = "Enable inline comments")]
         public bool InstructorCanReview { get; set; }
 
         //NEED RUBRIC

@@ -124,7 +124,7 @@
 
         //Call any needed functions (note events wont be called on this function so we got to call them manually
 
-        DisplayPreviousAssignment();
+        DisplayRandomTeams();
 
         // Set up add to gradebook checkbox
 
@@ -331,23 +331,10 @@
     </div>
 
     <div class="editor-label">
-        @Html.CheckBoxFor(model => submission.isTeam, new { id = "isTeam" }) @Html.LabelFor(model => submission.isTeam)
+        @Html.CheckBoxFor(model => submission.isTeam, new { id = "isTeam" }) @Html.Label("This is a team assignment")
     </div>
     <div id="Team_Options" class="indented_options" style="display: none">
-        <input type="radio" name="team_generation_options" value="PreviousAssignment" />
-        Use teams defined in previous course assignment
-        <br />
-        <ul id="PreviousAssignmentDiv" style="display: none" class="team_generation_options">
-            <li>
-                @Html.DropDownListFor(m => m.SerializedTeamMembersJSON, ViewBag.PastTeamAssignments as SelectList)
-            </li>
-            <br />
-            <li>
-                <button type="button" onclick="OpenPreviousTeam()">
-                    View Teams</button>
-            </li>
-        </ul>
-        <input type="radio" name="team_generation_options" value="RandomTeams" />
+    <input type="radio" name="team_generation_options" value="RandomTeams" />
         Generate teams randomly
         <br />
         <ul id="RandomTeams" style="display: none" class="team_generation_options">
@@ -369,6 +356,21 @@
                 </button>
             </li>
         </ul>
+    @if (ViewBag.PastTeamAssignments != null && (ViewBag.PastTeamAssignments as SelectList).Count() != 0)
+    { 
+        <input type="radio" name="team_generation_options" value="PreviousAssignment" />
+        <text>Use teams defined in previous course assignment</text>
+        <br />
+        <ul id="PreviousAssignmentDiv" style="display: none" class="team_generation_options">
+            <li>
+            
+                @Html.DropDownListFor(m => m.SerializedTeamMembersJSON, ViewBag.PastTeamAssignments as SelectList)
+                <button type="button" onclick="OpenPreviousTeam()">
+                    View Teams</button>
+           
+            </li>
+        </ul>
+    }
         <input type="radio" name="team_generation_options" value="ManualTeams" />
         Specify teams manually
         <ul id="ManualTeams" style="display: none" class="team_generation_options">
@@ -379,78 +381,6 @@
             </li>
         </ul>
         <!-- in the future generate teams with mixed ability and Generate teams with same-ability will need to go here -->
-    </div>
-    
-    <div class="editor-label">
-        @Html.CheckBoxFor(model => submission.InstructorCanReview, new { id = "InstructorCanReview" }) @Html.LabelFor(model => submission.InstructorCanReview)
-    </div>
-    <div id="line_review_config" class="indented_options" style="display: none;">
-        <input type="radio" name="line_review_options" value="ManualConfig" />Create New Categories<br />
-        <div id="manual_config_options" class="indented_options" style="display: none;" >
-            <p>Category Configuration Name:<input id="category_config_name" name="category_config_name" type="text" /> </p>
-            <p>
-                <a href="#" id="add_new_category" title="Add New Category" style="text-decoration:none;">
-                    <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Category" /> Add a Category
-                </a>
-            </p>
-            <div id="category_data"></div>
-            <br style="clear: both;" />
-        </div>
-        <input type="radio" name="line_review_options" value="AutoConfig" />Use Previous Configuration <br />
-        <div id="auto_config_options" class="indented_options" style="display: none;" >
-            <br /> Select a configuration <br /> 
-            
-            <select id="comment_category_selection" name="comment_category_selection">
-                @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)
-                {
-                    <option value="@ccc.ID" >@ccc.Name</option>
-                }
-            </select>
-        
-            <div id="comment_config_samples" class="indented_options">
-            @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)
-            {
-                string id = "comment_sample_" + @ccc.ID;
-                <div id="@id" style="display:none;"> 
-                    <table>
-                        <tr>
-                            <td style="padding-right:10px;"> <strong>Category</strong> </td> <td> <strong>Options</strong> </td>
-                        </tr>
-                        @foreach (CommentCategory cc in ccc.Categories)
-                        {
-                        <tr>
-                            <td valign="top" style="padding-right:10px;">@cc.Name</td>
-                            <td>
-                                @foreach (CommentCategoryOption cco in cc.Options)
-                                {
-                                    @cco.Name <br />
-                                }
-                            </td>
-                        </tr>
-                        }
-                    </table>
-                </div>
-            }
-            </div>
-        </div>
-        <br />
-    </div>
-
-    <div class="editor-label">
-        @Html.EditorFor(m => Model.UseRubric) @Html.LabelFor(m => Model.UseRubric)
-        @Helpers.CreateToolTip(ToolTips.BasicAssignmentUseRubric)
-    </div>
-    <div id="edit_rubric_div" style="display: none">
-        <ul id="rubic_ul" class="team_generation_options">
-            <li id="RubricSelect">
-                @Html.Partial("_RubricSelect")
-            </li>
-            <li>
-                <button type="button" onclick="OpenRubricDialog()" value="Create Rubric">
-                    Create Rubric
-                </button>
-            </li>
-        </ul>
     </div>
 
     <h3>
@@ -573,35 +503,97 @@
         });       
     </script>
     
-    <h3>Grading</h3>
+    <h3>Grading/Evaluation</h3>
     
         <div class="editor-label">
-        @Html.CheckBoxFor(model => model.isGradable, new { id = "add_to_gradebook" }) @Html.Label("Will This Assignment Be Graded?")@Helpers.CreateToolTip(ToolTips.BasicAssignmentAddToGradebook)
+        @Html.EditorFor(m => Model.UseRubric) @Html.LabelFor(m => Model.UseRubric)@Helpers.CreateToolTip(ToolTips.BasicAssignmentUseRubric)<div id="edit_rubric_div" style="display: none">
+        @Html.Partial("_RubricSelect")
+        <button type="button" onclick="OpenRubricDialog()" value="Create Rubric">
+                    Create/Edit Rubric...
+                </button>
+                </div>
+        
+    </div>
+    
+    <div class="editor-label">
+        @Html.CheckBoxFor(model => submission.InstructorCanReview, new { id = "InstructorCanReview" }) @Html.LabelFor(model => submission.InstructorCanReview)
+    </div>
+    <div id="line_review_config" class="indented_options" style="display: none;">
+        <input type="radio" name="line_review_options" value="ManualConfig" />Create new set of comment categories called <input id="category_config_name" name="category_config_name" type="text" /><br />
+        <div id="manual_config_options" class="indented_options" style="display: none;" >
+            <p>
+                <a href="#" id="add_new_category" title="Add new category" style="text-decoration:none;">
+                    <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add new category" /> Add a category
+                </a>
+            </p>
+            <div id="category_data"></div>
+            <br style="clear: both;" />
+        </div>
+        @if (ViewBag.CommentConfigurations.Count != 0)
+        {
+        <input type="radio" name="line_review_options" value="AutoConfig" /><text>Use previously-defined set of comment categories</text>
+        <select id="comment_category_selection" name="comment_category_selection">
+                @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)
+                {
+                    <option value="@ccc.ID" >@ccc.Name</option>
+                }
+            </select><br />
+        <div id="auto_config_options" class="indented_options" style="display: none;" >            
+            <div id="comment_config_samples" class="indented_options">
+            @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)
+            {
+                string id = "comment_sample_" + @ccc.ID;
+                <div id="@id" style="display:none;"> 
+                    <table>
+                        <tr>
+                            <td style="padding-right:10px;"> <strong>Category</strong> </td> <td> <strong>Options</strong> </td>
+                        </tr>
+                        @foreach (CommentCategory cc in ccc.Categories)
+                        {
+                        <tr>
+                            <td valign="top" style="padding-right:10px;">@cc.Name</td>
+                            <td>
+                                @foreach (CommentCategoryOption cco in cc.Options)
+                                {
+                                    @cco.Name <br />
+                                }
+                            </td>
+                        </tr>
+                        }
+                    </table>
+                </div>
+            }
+            </div>
+        </div>
+        }
+        <br />
+    </div>
+    
+        <div class="editor-label">
+        @Html.CheckBoxFor(model => model.isGradable, new { id = "add_to_gradebook" }) @Html.Label("Count this assignment towards students' grades")@Helpers.CreateToolTip(ToolTips.BasicAssignmentAddToGradebook)
         </div>
     <div id='grading'>    
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Assignment.Category, "Category")
-        </div>
-        <div class="editor-field">
-            @Html.DropDownListFor(model => model.Assignment.CategoryID, ViewBag.Categories as SelectList, new { id = "grade_category" })
-            @Html.ValidationMessageFor(model => model.Assignment.Category)
-        </div>
         <div id="grade_options" class="indented_options">
             <div class="editor-field">
                 Worth
                 @Html.TextBoxFor(model => model.Assignment.PointsPossible, new { id = "points_possible", size = 3 })
-                Points for the entire Assignment in Category <span id="grade_category_label"></span>
-                @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)
+                points toward the
+                @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)  
+            @Html.DropDownListFor(model => model.Assignment.CategoryID, ViewBag.Categories as SelectList, new { id = "grade_category" })
+            @Html.ValidationMessageFor(model => model.Assignment.Category)
+        <span>grading category</span>
             </div>
-            <div class="editor-field">
-                Worth
-                @Html.TextBoxFor(model => model.Submission.PointsPossible, new { id = "submission_points_possible", size = 3 })
-                Points For Submission Activity <span id="grade_category_label"></span>
-                @Html.ValidationMessageFor(model => model.Submission.PointsPossible)
-            </div>
-            <h3>
+            <!--
+                <div class="editor-field">
+                    Worth
+                    @Html.TextBoxFor(model => model.Submission.PointsPossible, new { id = "submission_points_possible", size = 3 })
+                    Points For Submission Activity <span id="grade_category_label"></span>
+                    @Html.ValidationMessageFor(model => model.Submission.PointsPossible)
+                </div>
+            -->
+            <h4>
                 Late Policy @Helpers.CreateToolTip(ToolTips.BasicAssignmentLatePolicy)
-            </h3>
+            </h4>
             <p>
                 Students may submit assignments up to @Html.TextBoxFor(model => model.Submission.MinutesLateWithNoPenalty, new { size = 3 })
                 minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.Submission.PercentPenalty, new { size = 3 })

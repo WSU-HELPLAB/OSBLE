@@ -129,6 +129,12 @@ namespace OSBLE.Controllers
                                     FileSystem.RemoveZipFile(activeCourse.AbstractCourse as Course, activity, teamUser);
                                     var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, teamUser), deliverables[i].Name + extension);
                                     file.SaveAs(path);
+
+                                    DateTime? dueDate = GetDueDate(activity);
+                                    if (dueDate != null && dueDate < DateTime.Now)
+                                    {
+                                        (new NotificationController()).SendFilesSubmittedNotification(activity, teamUser, deliverables[i].Name);
+                                    }
                                 }
                                 else
                                 {

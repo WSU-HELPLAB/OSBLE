@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
-using OSBLE.Models.HomePage;
+using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
+using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
-using System.Net.Mail;
-using System.Configuration;
 
 namespace OSBLE.Controllers
 {
@@ -97,18 +97,19 @@ namespace OSBLE.Controllers
 
             CoursesUsers dpPosterCu = db.CoursesUsers.Where(cu => cu.AbstractCourseID == dp.CourseID && cu.UserProfileID == dp.UserProfileID).FirstOrDefault();
 
-            // Send notification to original thread poster if poster is not anonymized, 
+            // Send notification to original thread poster if poster is not anonymized,
             // are still in the course,
             // and are not the poster of the new reply.
-            if (dpPosterCu != null && !dpPosterCu.AbstractRole.Anonymized && dp.UserProfileID != poster.ID) { 
+            if (dpPosterCu != null && !dpPosterCu.AbstractRole.Anonymized && dp.UserProfileID != poster.ID)
+            {
                 sendToUsers.Add(dp.UserProfileID);
             }
 
             foreach (DashboardReply dr in dp.Replies)
             {
                 CoursesUsers drPosterCu = db.CoursesUsers.Where(cu => cu.AbstractCourseID == dp.CourseID && cu.UserProfileID == dr.UserProfileID).FirstOrDefault();
-                
-                // Send notifications to each participant as long as they are not anonymized, 
+
+                // Send notifications to each participant as long as they are not anonymized,
                 // are still in the course,
                 // and are not the poster of the new reply.
                 // Also checks to make sure a duplicate notification is not sent.
@@ -121,16 +122,15 @@ namespace OSBLE.Controllers
             // Send notification to each valid user.
             foreach (int UserProfileID in sendToUsers)
             {
-                            Notification n = new Notification();
-                            n.ItemType = Notification.Types.Dashboard;
-                            n.ItemID = dp.ID;
-                            n.RecipientID = UserProfileID;
-                            n.SenderID = poster.ID;
-                            n.CourseID = dp.CourseID;
+                Notification n = new Notification();
+                n.ItemType = Notification.Types.Dashboard;
+                n.ItemID = dp.ID;
+                n.RecipientID = UserProfileID;
+                n.SenderID = poster.ID;
+                n.CourseID = dp.CourseID;
 
-                            addNotification(n);
+                addNotification(n);
             }
-
         }
 
         /// <summary>
@@ -157,12 +157,68 @@ namespace OSBLE.Controllers
 
                 addNotification(n);
             }
+        }
 
+        [NonAction]
+        public void SendInlineReviewCompletedNotification(AbstractAssignmentActivity activity, TeamUserMember teamUserMember)
+        {
+            List<UserProfile> users = GetAllUsers(teamUserMember);
+
+            foreach (UserProfile user in users)
+            {
+                Notification n = new Notification();
+                n.ItemType = Notification.Types.InlineReviewCompleted;
+                n.Data = activity.ID.ToString() + ";" + teamUserMember.ID.ToString() + ";" + activity.Name;
+                n.RecipientID = user.ID;
+                n.SenderID = currentUser.ID;
+
+                addNotification(n);
+            }
+        }
+
+        [NonAction]
+        public void SendRubricEvaluationCompletedNotification(AbstractAssignmentActivity activity, TeamUserMember teamUserMember)
+        {
+            List<UserProfile> users = GetAllUsers(teamUserMember);
+
+            foreach (UserProfile user in users)
+            {
+                Notification n = new Notification();
+                n.ItemType = Notification.Types.RubricEvaluationCompleted;
+                n.Data = activity.ID.ToString() + ";" + teamUserMember.ID.ToString() + ";" + activity.Name;
+                n.RecipientID = user.ID;
+                n.SenderID = currentUser.ID;
+
+                addNotification(n);
+            }
+        }
+
+        [NonAction]
+        public void SendFilesSubmittedNotification(AbstractAssignmentActivity activity, TeamUserMember teamUser, string fileName)
+        {
+            if (activity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID)
+            {
+                var canGrade = (from c in db.CoursesUsers
+                                where c.AbstractCourseID == activeCourse.AbstractCourseID
+                                && c.AbstractRole.CanGrade
+                                select c.UserProfile).ToList();
+
+                foreach (UserProfile user in canGrade)
+                {
+                    Notification n = new Notification();
+                    n.ItemType = Notification.Types.FileSubmitted;
+                    n.Data = activity.ID.ToString() + ";" + teamUser.ID.ToString() + ";" + activity.Name + ";" + teamUser.Name + ";" + fileName + ";" + DateTime.Now;
+                    n.RecipientID = user.ID;
+                    n.SenderID = currentUser.ID;
+
+                    addNotification(n);
+                }
+            }
         }
 
         /// <summary>
-        /// Adds notification to the db, 
-        /// and calls emailNotification if recipient's 
+        /// Adds notification to the db,
+        /// and calls emailNotification if recipient's
         /// settings request notification emails.
         /// </summary>
         /// <param name="n">Notification to be added</param>
@@ -194,7 +250,7 @@ namespace OSBLE.Controllers
             UserProfile recipient = db.UserProfiles.Find(n.RecipientID);
 
             AbstractCourse course = db.AbstractCourses.Find(n.CourseID);
-            
+
             string subject = "[OSBLE" + getCourseTag(course) + "] "; // Email subject prefix
 
             string body = "";
@@ -207,7 +263,7 @@ namespace OSBLE.Controllers
                     Mail m = db.Mails.Find(n.ItemID);
 
                     subject += "New private message from " + sender.FirstName + " " + sender.LastName;
-                    
+
                     action = "reply to this message";
 
                     body = sender.FirstName + " " + sender.LastName + " sent this message at " + m.Posted.ToString() + ":\n\n";
@@ -232,10 +288,10 @@ namespace OSBLE.Controllers
 
                     break;
             }
-            
+
             body += "\n\n---\nDo not reply to this email.\nVisit this link to " + action + ": " + getDispatchURL(n.ID);
 
-            MailMessage message = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE"), 
+            MailMessage message = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE"),
                                 new MailAddress(recipient.UserName,recipient.FirstName + " " + recipient.LastName));
 
             message.Subject = subject;
@@ -248,7 +304,7 @@ namespace OSBLE.Controllers
 
         /// <summary>
         /// Returns tags for either a course or a community, if one exists for the notification. Otherwise, empty string.
-        /// 
+        ///
         /// </summary>
         /// <param name="c">The abstract course</param>
         /// <returns>Tag with leading space (" CptS 314") if course or community exists, "" if not.</returns>
@@ -273,7 +329,7 @@ namespace OSBLE.Controllers
 
         /// <summary>
         /// Used to get URL to append to email notifications.
-        /// Based on current host URL requested by the client, so it should work on 
+        /// Based on current host URL requested by the client, so it should work on
         /// any deployment of OSBLE.
         /// </summary>
         /// <param name="id"></param>

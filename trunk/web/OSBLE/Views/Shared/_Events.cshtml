@@ -18,7 +18,7 @@
 
 
         <div class="event_tools">
-            @if (ViewBag.ActiveCourse.Course.AllowEventPosting && e.AllowLinking)
+            @if (ViewBag.ActiveCourse.AbstractCourse.AllowEventPosting)
             {
             <a href="@Url.Action("Create", "Event", new { start = e.StartDate })" title="Add Event At This Time">@Helpers.AddButton()</a>
             }
@@ -28,7 +28,7 @@
             <a title="Modify This Event" href="@Url.Action("Edit", "Event", new { ID = e.ID })">@Helpers.EditButton()</a>
             }
 
-            @if (ViewBag.ActiveCourse.CourseRole.CanModify && !e.HideDelete)
+            @if (ViewBag.ActiveCourse.AbstractRole.CanModify && !e.HideDelete)
             {
                     <form action="@Url.Action("Delete","Event")"
                         style="display: inline;"
@@ -64,13 +64,8 @@
         @if (e.Description != null)
         {
             <div class="event_description">
-            <small>@e.Description</small>
+            <small>@Helpers.Linkify(e.Description)</small>
             </div>
-        }
-        
-        @if ((e.LinkTitle != null) && (e.Link != null))
-        {
-            <small><a href="@e.Link">@e.LinkTitle</a></small>
         }
     </li>
 }

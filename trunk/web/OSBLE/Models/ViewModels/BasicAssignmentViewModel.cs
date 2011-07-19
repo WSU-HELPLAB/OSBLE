@@ -14,7 +14,7 @@ namespace OSBLE.Models.ViewModels
             isGradable = true;
         }
 
-        [DisplayName("Use Rubric?")]
+        [DisplayName("Use OSBLE rubric")]
         public bool UseRubric { get; set; }
 
         public SubmissionActivity Submission { get; set; }

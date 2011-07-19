@@ -46,24 +46,6 @@
             @Html.TextAreaFor(model => model.Description, new { rows = 5, cols = 50 })
             @Html.ValidationMessageFor(model => model.Description)
         </div>
-
-        <div class="editor-label">
-            @Html.LabelFor(model => model.LinkTitle)
-            @Helpers.CreateToolTip(ToolTips.EventLinkTitle) 
-        </div>
-        <div class="editor-field">
-            @Html.EditorFor(model => model.LinkTitle)
-            @Html.ValidationMessageFor(model => model.LinkTitle)
-        </div>
-    
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Link)
-        </div>
-        <div class="editor-field">
-            @Html.EditorFor(model => model.Link)
-            @Html.ValidationMessageFor(model => model.Link)
-        </div>
-
     
         <p>
             <input type="submit" value="Create Event" />

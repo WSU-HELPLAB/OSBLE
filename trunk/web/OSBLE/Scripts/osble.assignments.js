@@ -1,12 +1,10 @@
-﻿
-// ********** DELIVERABLE **********
+﻿// ********** DELIVERABLE **********
 
 // vars
 var deliverableIndex = 0;
 
 // onLoad
 $(function () {
-
     $('#add_new_deliverable').click(function () {
         addNewDeliverable();
         return false;
@@ -19,7 +17,6 @@ $(function () {
     $('#remove_selected_deliverable').click(function () {
         removeSelectedDeliverable();
     });
-
 });
 
 function deliverableFormSubmit(e) {
@@ -29,9 +26,7 @@ function deliverableFormSubmit(e) {
     }
 }
 
-
 function addNewDeliverable(d) {
-
     // validation
     if (d == undefined) {
         d = new Object({
@@ -64,9 +59,8 @@ function addNewDeliverable(d) {
     duplicateExists = false;
 
     $('#deliverable_data').children().each(function () {
-        if ( (d.name.toLowerCase() == $(this).find('.deliverable_name').first().val().toLowerCase()) &&
-            (d.fileType == parseInt($(this).find('.deliverable_type').first().val())) ) {
-
+        if ((d.name.toLowerCase() == $(this).find('.deliverable_name').first().val().toLowerCase()) &&
+            (d.fileType == parseInt($(this).find('.deliverable_type').first().val()))) {
             duplicateExists = true;
             return false;
         }
@@ -76,7 +70,6 @@ function addNewDeliverable(d) {
         alert('You cannot create duplicate deliverables.');
         return false;
     }
-
 
     $('#deliverable_data').append('<div id="deliverable_' + deliverableIndex + '" class="deliverable" />');
 
@@ -98,7 +91,6 @@ function addNewDeliverable(d) {
     newDeliverable.append('<input type="hidden" class="deliverable_name" value="' + d.name + '" />');
     newDeliverable.append('<input type="hidden" class="deliverable_type" value="' + typeVal + '" />');
 
-
     deliverableIndex++;
 
     setDeliverableIndex();
@@ -114,16 +106,14 @@ function removeSelectedDeliverable() {
 }
 
 function setDeliverableIndex() {
-    var i=0;
+    var i = 0;
     $('#deliverable_data').children().each(function () {
-        $(this).find('.deliverable_name').first().attr('name','Assignment.Deliverables[' + i.toString() + '].Name');
+        $(this).find('.deliverable_name').first().attr('name', 'Assignment.Deliverables[' + i.toString() + '].Name');
         $(this).find('.deliverable_type').first().attr('name', 'Assignment.Deliverables[' + i.toString() + '].Type');
 
         i++;
     });
-
 }
-
 
 // ********** LINE REVIEW **********
 
@@ -133,7 +123,7 @@ function setDeliverableIndex() {
 // empty tag text box: do nothing
 // empty category text box: ignore (don't add, don't warn)
 // duplicate category: warning
-//   list of categories, linked to 
+//   list of categories, linked to
 // [saving the deliverable removes all categories and resets vars]
 
 // validation successful --> add deliverable
@@ -144,15 +134,13 @@ var categoryCount = 0; // to check the number of categories
 var categoryOptionIndex = new Array(MAX_CATEGORIES);
 for (var i = 0; i < MAX_CATEGORIES; i++) {
     categoryOptionIndex[i] = 1; // because 0 is required and thus hard-coded
-        // these index variables have no upper limit
+    // these index variables have no upper limit
 }
 
 $(function () {
-
     $('#InstructorCanReview').removeAttr('checked');
     $('#manual_config_options').show();
     $("input[name='line_review_options']:eq(0)").attr('checked', 'checked');
-
 
     $('#InstructorCanReview').change(function () {
         if ($(this).attr('checked')) {
@@ -185,11 +173,9 @@ $(function () {
         }
     });
 
-
     $('#comment_category_selection option:eq(0)').attr('selected', 'selected');
     $('#comment_category_selection').change(switchCommentConfigListener);
-    switchCommentConfig( $('#comment_category_selection option:eq(0)').val() );
-    
+    switchCommentConfig($('#comment_category_selection option:eq(0)').val());
 });
 
 // apply this function in an event listener to every text box to prevent accidental submission of the whole form by the user
@@ -211,115 +197,105 @@ function switchCommentConfig(id) {
 //   commented out rather than deleted to allow for reimplementation
 /*
 function saveConfig() {
+// validate here
 
-    // validate here
-    
-    $.ajax({
-        url: '/BasicAssignment/SaveCommentCollection',
-        data: { name: encodeURI( $("#category_config_name").val() ), data: encodeURI( getNewCategoryData() ) }, 
-        type: "POST",
-        success: function (data) {
+$.ajax({
+url: '/BasicAssignment/SaveCommentCollection',
+data: { name: encodeURI( $("#category_config_name").val() ), data: encodeURI( getNewCategoryData() ) },
+type: "POST",
+success: function (data) {
+//if(){
+loadConfigs();
+// reset name, remove the categories
+$('#category_data').empty();
+$('#new_collection_name').val("");
 
-            //if(){
+$('#category_data').append( decodeURI(data) ); // temp, this will be status to tell whether or not to reset #category_data and #new_collection_name (server side validation)
+}
+});
 
-            loadConfigs();
-            // reset name, remove the categories
-            $('#category_data').empty();
-            $('#new_collection_name').val("");
-
-            $('#category_data').append( decodeURI(data) ); // temp, this will be status to tell whether or not to reset #category_data and #new_collection_name (server side validation)
-        }
-    });
-
-    return false;
+return false;
 }
 function getNewCategoryData(){
+var data = new Array();
+var cur = 0;
 
-    var data = new Array();
-    var cur = 0;
+$("#category_data").children().map( function(){
+cur = data.push( new Array() );
+$(this).find("input").map(function(){
+data[cur-1].push( $(this).val() );
+});
+});
 
-    $("#category_data").children().map( function(){
-        cur = data.push( new Array() );
-        $(this).find("input").map(function(){
-            data[cur-1].push( $(this).val() );
-        });
-    });
-    
-    return JSON.stringify(data);
+return JSON.stringify(data);
 }
 
 function loadConfigs() {
-    
-    // currently, select all
-    $.ajax({
-        url: '/BasicAssignment/GetCollections',
-        type: "POST",
-        success: function (data) {
-            displayConfigs(data);
-        }
-    });
-
+// currently, select all
+$.ajax({
+url: '/BasicAssignment/GetCollections',
+type: "POST",
+success: function (data) {
+displayConfigs(data);
+}
+});
 }
 
 function displayConfigs(data) {
-    $("#comment_category_selection").empty();
-    $("#comment_category_selection").append("<option value='null'>[None Selected]</option>");
-    
-    // loop over data
-    dataArray = JSON.parse(data);
-    for (i=0;i<dataArray.length;i++) {
-        $("#comment_category_selection").append("<option value='" + dataArray[i][0] + "'>" + dataArray[i][1] + "</option>");
-    }
+$("#comment_category_selection").empty();
+$("#comment_category_selection").append("<option value='null'>[None Selected]</option>");
 
+// loop over data
+dataArray = JSON.parse(data);
+for (i=0;i<dataArray.length;i++) {
+$("#comment_category_selection").append("<option value='" + dataArray[i][0] + "'>" + dataArray[i][1] + "</option>");
+}
 }
 
 function switchCommentConfig() {
-    // use this to load the select box onload and after a new category is added
+// use this to load the select box onload and after a new category is added
 
-    //$("#comment_category_selection").attr("disabled", true);
-    // notification of loading
+//$("#comment_category_selection").attr("disabled", true);
+// notification of loading
 
-    $.ajax({
-        url: '/BasicAssignment/GetCollectionContents',
-        data: { inputID: $(this).val() },
-        type: "POST",
-        success: function (data) {
-            displayCommentConfig( decodeURI(data) );
-        }
-    });
-
+$.ajax({
+url: '/BasicAssignment/GetCollectionContents',
+data: { inputID: $(this).val() },
+type: "POST",
+success: function (data) {
+displayCommentConfig( decodeURI(data) );
+}
+});
 }
 
 function displayCommentConfig(data) {
+// defaults
+//$("#comment_category_selection").attr("disabled", false);
+//$('#comment_category_selection option:eq(0)').attr('selected', 'selected')
 
-    // defaults
-    //$("#comment_category_selection").attr("disabled", false);
-    //$('#comment_category_selection option:eq(0)').attr('selected', 'selected')
+$("#saved_config_display").empty();
 
-    $("#saved_config_display").empty();
+// load from database
+//while(data){
+//collectionName = data.name;
+//collectionID = data.ID;
 
-    // load from database
-    //while(data){
-    //collectionName = data.name;
-    //collectionID = data.ID;
+//}
 
-    //}
+//$("#comment_category_selection").append("<option value='" + collectionID + "'>" + collectionName + "</option>");
+//$("#saved_config_display").append("<div id='configID_" + collectionID + "' class='indented_options' style='display:none;'> [TEMPORARY PLACEHOLDER " + collectionID + "] </div>");
+$("#saved_config_display").append(data);
 
-    //$("#comment_category_selection").append("<option value='" + collectionID + "'>" + collectionName + "</option>");
-    //$("#saved_config_display").append("<div id='configID_" + collectionID + "' class='indented_options' style='display:none;'> [TEMPORARY PLACEHOLDER " + collectionID + "] </div>");
-    $("#saved_config_display").append(data);
+//$("#saved_config_display").append("<div id='configID_null' class='indented_options' style='display:none;'></div>");
+//$("#saved_config_display").append("<div id='configID_2' class='indented_options' style='display:none;'> aaa </div>");
+//$("#saved_config_display").append("<div id='configID_5' class='indented_options' style='display:none;'> bbb </div>");
+//$("#saved_config_display").append("<div id='configID_6' class='indented_options' style='display:none;'> ccc </div>");
 
-    //$("#saved_config_display").append("<div id='configID_null' class='indented_options' style='display:none;'></div>");
-    //$("#saved_config_display").append("<div id='configID_2' class='indented_options' style='display:none;'> aaa </div>");
-    //$("#saved_config_display").append("<div id='configID_5' class='indented_options' style='display:none;'> bbb </div>");
-    //$("#saved_config_display").append("<div id='configID_6' class='indented_options' style='display:none;'> ccc </div>");
-
-    //var newCollectionDisplay = $('#display_' + i);
+//var newCollectionDisplay = $('#display_' + i);
 }
 */
 
 function addNewCategory() {
-
     var categoryId = 'category_' + categoryIndex;
     var categoryOptionIdPrefix = 'category_option_' + categoryIndex;
     var dataId = 'option_data_' + categoryIndex;
@@ -336,20 +312,19 @@ function addNewCategory() {
     var newCategory = $('#' + categoryId);
 
     // delete button
-    newCategory.append('<div class="deliverable_tools"><a href="#" title="Delete This Deliverable" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove() }); categoryCount--; return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');
+    newCategory.append('<div class="deliverable_tools"><a href="#" title="Delete this deliverable" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove() }); categoryCount--; return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');
 
     // main layout
     newCategory.append('<table><tr>');
-    newCategory.append('<td>Category Name:</td><td> <input type="text" id="' + categoryId + '" name="' + categoryId + '"> </td>');
+    newCategory.append('<td>Category name:</td><td> <input type="text" id="' + categoryId + '" name="' + categoryId + '"> </td>');
     newCategory.append('</tr><tr>');
     newCategory.append('<td>Options:</td><td></td></tr><tr> ');
 
-    //      
-    newCategory.append('<td><a href="#" id="' + addOptionId + '" title="Add New Option" style="text-decoration:none;"> <img src="/Content/images/add_up.png" alt="(+)" /> Add New Option </a> </td>'); // must be all one line to work
+    //
+    newCategory.append('<td><a href="#" id="' + addOptionId + '" title="Add new option" style="text-decoration:none;"> <img src="/Content/images/add_up.png" alt="(+)" /> Add new option </a> </td>'); // must be all one line to work
     newCategory.append('</tr><tr><td colspan="2"><div id="' + dataId + '"> <input type="text" id="' + categoryOptionIdPrefix + '_0" name="' + categoryOptionIdPrefix + '_0"> <br />');
     // required first option
     newCategory.append('');
-    
 
     newCategory.append('</div><td></tr></table>');
 
@@ -358,7 +333,6 @@ function addNewCategory() {
     $('#' + categoryOptionIdPrefix + '_0').keypress(disableSubmit);
 
     $('#add_option_' + categoryIndex).click(function () {
-
         var i = this.id.substring(11, this.id.length);
         var d = $('#' + dataId);
 
@@ -379,6 +353,4 @@ function addNewCategory() {
     // keep track of indices
     categoryIndex++;
     categoryCount++;
-
 }
-

@@ -135,7 +135,7 @@ function create_and_open_downloading_submission_dialog() {
                     </select>
                 </td>
                 <th>
-                    Team / User:
+                    Student/Team:
                 </th>
                 <td>
                     <select id="@selectedTeam" name="@selectedTeam">
@@ -166,7 +166,7 @@ function create_and_open_downloading_submission_dialog() {
                     @Html.ActionLink("Download Submission Files", "GetSubmissionZip", "FileHandler", new { teamUserID = Model.SelectedTeam.ID, assignmentActivityID = Model.SelectedAssignmentActivity.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
                 </td>
                 <td>
-                    @Html.ActionLink("View Inline Comments", "InlineReview", "Assignment", new { assignmentActivityID = Model.SelectedAssignmentActivity.ID, teamUserID = Model.SelectedTeam.ID }, new { style = "padding-left: 25px;" })
+                    @Html.ActionLink("View/Edit Inline Comments", "InlineReview", "Assignment", new { assignmentActivityID = Model.SelectedAssignmentActivity.ID, teamUserID = Model.SelectedTeam.ID }, new { style = "padding-left: 25px;" })
                 </td>
             </tr>
         </table>

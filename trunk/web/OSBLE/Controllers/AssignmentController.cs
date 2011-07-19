@@ -26,7 +26,7 @@ namespace OSBLE.Controllers
         //
         // GET: /Assignment/
 
-        public ActionResult Index()
+        public ActionResult Index(int? id)
         {
             // These are probably the nastiest set of queries in OSBLE.
             List<StudioAssignment> studioAssignments = db.StudioAssignments.Where(
@@ -129,6 +129,26 @@ namespace OSBLE.Controllers
                         .ToList();
             }
 
+            KeyValuePair<int, int> listWithIndex = new KeyValuePair<int, int>(-1, -1);
+            if (id != null)
+            {
+                int realID = (int)id;
+                var assignment = (from c in studioAssignments where c.ID == realID select c).FirstOrDefault();
+
+                if (pastAssignments.Contains(assignment))
+                {
+                    listWithIndex = new KeyValuePair<int, int>(0, pastAssignments.IndexOf(assignment));
+                }
+                else if (presentAssignments.Contains(assignment))
+                {
+                    listWithIndex = new KeyValuePair<int, int>(1, presentAssignments.IndexOf(assignment));
+                }
+                else if (futureAssignments.Contains(assignment))
+                {
+                    listWithIndex = new KeyValuePair<int, int>(2, futureAssignments.IndexOf(assignment));
+                }
+            }
+            ViewBag.DefaultItemOpened = listWithIndex;
             ViewBag.PastAssignments = pastAssignments;
             ViewBag.PresentAssignments = presentAssignments;
             ViewBag.FutureAssignments = futureAssignments;

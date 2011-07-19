@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Entity;
 using System.Linq;
 using System.Web.Mvc;
-using OSBLE.Models;
 using OSBLE.Attributes;
-using OSBLE.Models.HomePage;
 using OSBLE.Models.Courses;
+using OSBLE.Models.HomePage;
 
 namespace OSBLE.Controllers
-{ 
+{
     [Authorize]
     [RequireActiveCourse]
     public class EventController : OSBLEController
@@ -24,10 +22,13 @@ namespace OSBLE.Controllers
             DateTime StartDate = new DateTime();
             DateTime EndDate = new DateTime();
 
-            if(ActiveCourse.AbstractCourse is Course) {
+            if (ActiveCourse.AbstractCourse is Course)
+            {
                 StartDate = (ActiveCourse.AbstractCourse as Course).StartDate;
                 EndDate = (ActiveCourse.AbstractCourse as Course).EndDate;
-            } else if(ActiveCourse.AbstractCourse is Community) { 
+            }
+            else if (ActiveCourse.AbstractCourse is Community)
+            {
                 // For communities there are no start/end dates, so get earliest and latest events
                 Event firstEvent = db.Events.Where(e => e.CourseID == ActiveCourse.AbstractCourseID).OrderBy(e => e.StartDate).FirstOrDefault();
                 Event lastEvent = db.Events.Where(e => e.CourseID == ActiveCourse.AbstractCourseID).OrderByDescending(e => e.StartDate).FirstOrDefault();
@@ -54,7 +55,7 @@ namespace OSBLE.Controllers
         public ActionResult Create()
         {
             Event e = new Event();
-            
+
             string start = null;
 
             // Start parameter present, use to populate start date.
@@ -103,13 +104,14 @@ namespace OSBLE.Controllers
 
                 if (!e.Approved)
                 {
-                    using (NotificationController nc = new NotificationController()) {
+                    using (NotificationController nc = new NotificationController())
+                    {
                         nc.SendEventApprovalNotification(e);
                     }
 
                     return RedirectToAction("NeedsApproval");
                 }
-                return RedirectToAction("Index");  
+                return RedirectToAction("Index");
             }
 
             return View(e);
@@ -135,7 +137,7 @@ namespace OSBLE.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-            
+
             return View(e);
         }
 
@@ -172,12 +174,11 @@ namespace OSBLE.Controllers
             db.SaveChanges();
 
             return RedirectToAction("Index", "Event");
-
         }
 
         //
         // GET: /Event/Edit/5
- 
+
         [CanModifyCourse]
         [HttpGet]
         public ActionResult Edit(int id)
@@ -217,9 +218,6 @@ namespace OSBLE.Controllers
                 originalEvent.StartDate = e.StartDate.Date;
                 originalEvent.StartDate = originalEvent.StartDate.AddHours(e.StartTime.Hour).AddMinutes(e.StartTime.Minute);
 
-                originalEvent.Link = e.Link;
-                originalEvent.LinkTitle = e.LinkTitle;
-
                 originalEvent.Description = e.Description;
 
                 db.Entry(originalEvent).State = EntityState.Modified;
@@ -228,7 +226,6 @@ namespace OSBLE.Controllers
             }
             return View(e);
         }
-
 
         /// <summary>
         /// Removes an event
@@ -333,7 +330,6 @@ namespace OSBLE.Controllers
                             e.Title = cm.Name + " - " + cm.Location;
                             e.StartDate = current.AddHours((double)cm.StartTime.Hour).AddMinutes((double)cm.StartTime.Minute);
                             e.EndDate = current.AddHours((double)cm.EndTime.Hour).AddMinutes((double)cm.EndTime.Minute);
-                            e.AllowLinking = true;
                             e.HideDelete = true;
 
                             // Do not show Course meetings outside of course start/end date and breaks.
@@ -347,7 +343,7 @@ namespace OSBLE.Controllers
                 }
             }
 
-            return events.OrderBy(e=> e.ID).OrderBy(e => e.StartDate).ToList();
+            return events.OrderBy(e => e.ID).OrderBy(e => e.StartDate).ToList();
         }
 
         protected override void Dispose(bool disposing)

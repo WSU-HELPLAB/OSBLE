@@ -290,11 +290,50 @@ namespace OSBLE.Controllers
             ViewBag.UnreadMessageCount = (int)db.Mails.Where(m => (m.ToUserProfileID == currentUser.ID) && (m.Read == false)).Count();
         }
 
+        public static List<UserProfile> GetAllUsers(TeamUserMember teamUser)
+        {
+            List<UserProfile> users = new List<UserProfile>();
+
+            if (teamUser is UserMember)
+            {
+                users.Add((teamUser as UserMember).UserProfile);
+            }
+            else if (teamUser is TeamMember)
+            {
+                foreach (TeamUserMember member in (teamUser as TeamMember).Team.Members)
+                {
+                    users.AddRange(GetAllUsers(member));
+                }
+            }
+            return users;
+        }
+
         public static TeamUserMember GetTeamUser(AbstractAssignmentActivity activity, UserProfile user)
         {
             var teamUser = (from c in activity.TeamUsers where c.Contains(user) == true select c).FirstOrDefault();
 
             return teamUser;
+        }
+
+        public AbstractAssignmentActivity GetNextActivity(AbstractAssignmentActivity activity)
+        {
+            var list = (from c in activity.AbstractAssignment.AssignmentActivities orderby activity.ReleaseDate select c).ToList();
+            int index = list.IndexOf(activity);
+            if (index + 1 < list.Count)
+            {
+                return list[index + 1];
+            }
+            return null;
+        }
+
+        public DateTime? GetDueDate(AbstractAssignmentActivity activity)
+        {
+            var nextActivity = GetNextActivity(activity);
+            if (nextActivity != null)
+            {
+                return nextActivity.ReleaseDate;
+            }
+            return null;
         }
 
         protected DateTime? GetSubmissionTime(Course course, AbstractAssignmentActivity activity, TeamUserMember teamUser)

@@ -22,7 +22,7 @@ namespace OSBLE.Models.HomePage
         public virtual UserProfile Poster { get; set; }
 
         [Required]
-        [Display(Name="Date")]
+        [Display(Name = "Date")]
         [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
 
@@ -36,21 +36,14 @@ namespace OSBLE.Models.HomePage
 
         [Required]
         [Display(Name = "Event Title")]
+        [StringLength(100)]
         public string Title { get; set; }
 
         [Display(Name = "Description (Optional)")]
+        [StringLength(500)]
         public string Description { get; set; }
 
-        [Display(Name = "Link Title (Optional)")]
-        public string LinkTitle { get; set; }
-
-        [Display(Name = "Link (Optional)")]
-        public string Link { get; set; }
-
         public bool Approved { get; set; }
-
-        [NotMapped]
-        public bool AllowLinking { get; set; }
 
         [NotMapped]
         public bool HideTime { get; set; }
@@ -70,7 +63,6 @@ namespace OSBLE.Models.HomePage
 
             HideDelete = false;
             HideTime = false;
-            AllowLinking = false;
         }
     }
 }

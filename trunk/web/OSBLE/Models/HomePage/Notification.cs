@@ -35,8 +35,8 @@ namespace OSBLE.Models.HomePage
 
         public int ItemID { get; set; }
 
-        [NotMapped]
-        public string Message { get; set; }
+        [StringLength(1000)]
+        public string Data { get; set; }
 
         public Notification()
             : base()
@@ -50,6 +50,9 @@ namespace OSBLE.Models.HomePage
             public const string Mail = "Mail";
             public const string EventApproval = "EventApproval";
             public const string Dashboard = "Dashboard";
+            public const string InlineReviewCompleted = "InlineReviewCompleted";
+            public const string RubricEvaluationCompleted = "RubricEvaluationCompleted";
+            public const string FileSubmitted = "FileSubmitted";
         }
     }
 }

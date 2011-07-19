@@ -1,7 +1,10 @@
 ﻿@using OSBLE.Models.Assignments
 @using OSBLE.Models.Assignments.Activities
 @model List<StudioAssignment>
-<div class="assignment_accordion">
+           
+
+           
+<div id="@(ViewBag.assignmentListID + ViewBag.AssignmentList.ToString())" class="assignment_accordion">
     @{
         int StudioAssignmentCounter = 0;
     }

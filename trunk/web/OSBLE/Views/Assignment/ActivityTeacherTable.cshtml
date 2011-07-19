@@ -56,10 +56,14 @@
 </script>
 <div>
     <p>
-        @ViewBag.NumberOfSubmissions of @ViewBag.ExpectedSubmissionsAndGrades submissions
-        received
-        <br />
-        @ViewBag.NumberGraded of @ViewBag.ExpectedSubmissionsAndGrades submissions graded
+    @if(ViewBag.NumberGraded != 1)
+    {
+        <text>@ViewBag.NumberOfSubmissions of @ViewBag.ExpectedSubmissionsAndGrades submissions, of which @ViewBag.NumberGraded have been graded.</text>
+        }
+        else
+        {
+        <text>@ViewBag.NumberOfSubmissions of @ViewBag.ExpectedSubmissionsAndGrades submissions, of which @ViewBag.NumberGraded has been graded.</text>
+        }
         <br />
         <br />@Html.ActionLink("Download all submissions for this activity", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentActivityID = ViewBag.activityID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
     </p>
@@ -72,19 +76,19 @@
         @if (hasDeliverables)
         { 
             <th>
-                Submitted Time
+                Time Submitted
             </th>
         }
         @if (isGradable)
         { 
         <th>
-            Grading Status
+            Grade
         </th>
         }
         @if (inlineReviewAllowed)
         { 
             <th>
-                Inline Review Interface
+                Inline Comments
             </th>
         }
         @if (hasRubric)
@@ -96,7 +100,7 @@
         @if (hasDeliverables)
         {
             <th>
-                Download Submission
+                Submission
             </th>
         }
     </tr>
@@ -172,7 +176,7 @@
                 <td>
                 @if (hasSubbmitted)
                 {
-                    @Html.ActionLink("Create Inline Comments", "InlineReview", "Assignment", new { assignmentActivityID = ViewBag.activityID, teamUserID = info.SubmitterID }, new { })
+                    @Html.ActionLink("View/Edit...", "InlineReview", "Assignment", new { assignmentActivityID = ViewBag.activityID, teamUserID = info.SubmitterID }, new { })
                 }
                 else
                 {
@@ -192,7 +196,7 @@
                 <td>
                     @if (info.Time != null)
                     { 
-                        @Html.ActionLink("Download Submission", "GetSubmissionZip", "FileHandler", new { teamUserID = info.SubmitterID, assignmentActivityID = ViewBag.activityID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+                        @Html.ActionLink("Download", "GetSubmissionZip", "FileHandler", new { teamUserID = info.SubmitterID, assignmentActivityID = ViewBag.activityID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
                     }
                     else
                     { 

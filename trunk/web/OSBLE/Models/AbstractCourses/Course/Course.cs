@@ -36,7 +36,7 @@ namespace OSBLE.Models.Courses
         [Display(Name = "Allow students to post events in course calendar")]
         public override bool AllowEventPosting { get; set; }
 
-        [Display(Name = "Require instructor to approve student calendar items to appear in the calendar")]
+        [Display(Name = "Require an instructor to approve student(s) calendar events before they appear in the course calendar")]
         public bool RequireInstructorApprovalForEventPosting { get; set; }
 
         [Display(Name = "Course is inactive (only instructors/observers can log in)")]
@@ -85,7 +85,6 @@ namespace OSBLE.Models.Courses
 
         [Display(Name = "Include course meetings and breaks in course calendar")]
         public bool ShowMeetings { get; set; }
-
 
         public Course()
             : base()

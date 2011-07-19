@@ -148,12 +148,14 @@ namespace OSBLE.Controllers
                 category.Name = Constants.UnGradableCatagory;
                 category.Points = 0;
 
+                course.Categories.Add(category);
                 db.Categories.Add(category);
 
                 category = new Category();
                 category.Name = "Assignments";
                 category.Points = 100;
 
+                course.Categories.Add(category);
                 db.Categories.Add(category);
 
                 db.CoursesUsers.Add(cu);
@@ -161,7 +163,7 @@ namespace OSBLE.Controllers
 
                 Session["ActiveCourse"] = course.ID;
 
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "Home");
             }
 
             return View(course);

@@ -57,7 +57,6 @@ namespace TeamCreation
         {
             List<string> teamNames = findAllTeams(teamMembers);
 
-
             membersBySection.Clear();
 
             moderators = (from c in teamMembers where c.IsModerator == true orderby c.Name select c).ToList();
@@ -282,7 +281,7 @@ namespace TeamCreation
 
             js.Invoke("val", Uri.EscapeDataString(JsonConvert.SerializeObject(allMembers)));
 
-            MessageBox.Show("Save Complete");
+            MessageBox.Show("Teams have been saved");
             changedNotSaved = false;
         }
 
