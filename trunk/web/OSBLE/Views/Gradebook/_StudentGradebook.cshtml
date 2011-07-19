@@ -320,7 +320,7 @@
                 totalGrade = 0;
                 totalCategoryPoints = 0;
                 totalCategoryPossible = 0;
-
+                bool studentWhatIf = false;
                 //Get the total score for the class
                 foreach (Category category in ViewBag.CatsWithWeightsAndScores)
                 {
@@ -340,6 +340,7 @@
                                 }
                                 else if (userScore.StudentPoints >= 0)
                                 {
+                                    studentWhatIf = true;
                                     categoryPoints += userScore.StudentPoints;
                                     categoryPossible += userScore.AssignmentActivity.PointsPossible;
                                 }
@@ -377,8 +378,17 @@
                 }
                 
                 <td>@letter</td>
-                <td>@totalGrade.ToString(".#")%</td>
                 
+                if (studentWhatIf == true)
+                {
+                    <td style="color:Red;">@totalGrade.ToString(".#")%</td>
+                }
+                else
+                {
+                    <td>@totalGrade.ToString(".#")%</td>
+                }
+
+
                 if (userScores.Count() > 0)
                 {
                     bool usingWhatIf = false;
