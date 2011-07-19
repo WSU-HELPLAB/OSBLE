@@ -846,12 +846,10 @@ namespace OSBLE.Controllers
                                {
                                    //Find the assignment that corresponds because it wouldn't give me access
                                    //to points possible within the scores.
-                                   var assignmentScore = from a in db.AbstractAssignments
-                                                         where a.ID == score.AssignmentActivity.AbstractAssignmentID
-                                                         select a;
+                                  
                                    // create an ascending list of scores per student
                                    int j = 0;
-                                   double temp = score.Points / assignmentScore.FirstOrDefault().PointsPossible;
+                                   double temp = score.Points / score.AssignmentActivity.PointsPossible;
 
                                    while (lowest.Count() > j && temp > lowest.ElementAt(j))
                                    {
@@ -1894,7 +1892,8 @@ namespace OSBLE.Controllers
            //Finally the scores for each student.
            List<Score> scor = (from score in db.Scores
                                where score.AssignmentActivity.AbstractAssignment.CategoryID == currentTab.ID &&
-                               score.Points >= 0
+                               score.Points >= 0 &&
+                               score.isDropped == false
                                select score).ToList();
 
            var userScore = from scores in scor
