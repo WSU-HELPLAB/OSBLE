@@ -89,8 +89,11 @@
                 {
                     foreach (Score userScore in ViewBag.Grades)
                     {
-                        assignPoints += userScore.Points;
-                        assignPossible += userScore.AssignmentActivity.PointsPossible;
+                        if (userScore.isDropped == false)
+                        {
+                            assignPoints += userScore.Points;
+                            assignPossible += userScore.AssignmentActivity.PointsPossible;
+                        }
                     }
                     
                 }
@@ -102,7 +105,8 @@
             @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
             {
                 var score = (from scores in ViewBag.Grades as IEnumerable<Score>
-                             where scores.AssignmentActivityID == item.ID
+                             where scores.AssignmentActivityID == item.ID &&
+                             scores.isDropped == false                             
                              select scores);
                 
                 double totalAverage = 0;

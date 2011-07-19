@@ -107,41 +107,52 @@
             @{
                 //Holds the total grade
                 double totalGrade = 0;
-                
+
                 //Holds the users total score
                 double totalGradePoints = 0;
-                
+
                 //Holds the category weight / total of all category weights
                 double totalGradePossible = 0;
-                
+
                 //Holds to total of all category weights
                 double catPossibleWeight = 0;
 
                 double assignPoints = 0;
                 double assignPossible = 0;
-                
+
                 //Get the total score for the class
                 foreach (AbstractAssignmentActivity assign in ViewBag.Assignments)
                 {
                     foreach (Score userScore in ViewBag.TotalScores)
                     {
-                        assignPoints += userScore.Points;
-                        assignPossible += userScore.AssignmentActivity.PointsPossible;
+                        if (userScore.Points >= 0)
+                        {
+                            assignPoints += userScore.Points;
+                            assignPossible += userScore.AssignmentActivity.PointsPossible;
+                        }
                     }
-                    
+
                 }
                 totalGrade = (assignPoints / assignPossible) * 100;
+
+                if (totalGrade > 0)
+                {
+                <td id="averageTotal">
+                    @totalGrade.ToString(".#")%
+                </td>
+                }
+                else
+                {
+                    <td id="averageTotal">NG</td>
+                }
             }
-            <td id="averageTotal">
-                @totalGrade.ToString(".#")%
-            </td>
             @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
             {
                 var score = (from scores in ViewBag.TotalScores as IEnumerable<Score>
                              where scores.AssignmentActivityID == item.ID
                              where scores.Points >= 0
                              select scores);
-                
+
                 double totalAverage = 0;
                 double averagePoints = 0;
                 double averagePossible = 0;
@@ -237,7 +248,7 @@
             foreach (AbstractAssignmentActivity assignment in ViewBag.Assignments)
             {
                 var score = (from scores in ViewBag.UserScores as IEnumerable<Score>
-                             where scores.AssignmentActivityID == assignment.ID && 
+                             where scores.AssignmentActivityID == assignment.ID &&
                              scores.Points >= 0
                              select scores);
 
@@ -264,7 +275,7 @@
                     var studentScore = (from scores in ViewBag.UserScores as IEnumerable<Score>
                                         where scores.AssignmentActivityID == assignment.ID
                                         select scores);
-                    
+
                     if (studentScore.Count() > 0)
                     {
                         <td id="@String.Format("{0}-{1}", cu.Identification, assignment.ID)" onclick="cellGainsFocus(this);" style="color:Red;">@studentScore.First().StudentPoints</td>
@@ -274,7 +285,7 @@
                         <td id="@String.Format("{0}-{1}", cu.Identification, assignment.ID)" onclick="cellGainsFocus(this);" style="color:Red;">NG</td>
                     }
                 }
-            
+
             }
         }
         </tr>

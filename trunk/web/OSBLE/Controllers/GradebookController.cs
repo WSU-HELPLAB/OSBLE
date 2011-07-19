@@ -1654,7 +1654,8 @@ namespace OSBLE.Controllers
 
            List<Score> allGrades = (from grades in db.Scores
                                     where grades.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId &&
-                                    grades.Points >= 0
+                                    grades.Points >= 0 &&
+                                    grades.isDropped == false
                                     select grades).ToList();
 
            List<LetterGrade> letterGradeList = ((activeCourse.AbstractCourse as Course).LetterGrades).ToList();
@@ -1663,7 +1664,8 @@ namespace OSBLE.Controllers
 
            List<Score> categoryTotalPercent = (from categoryTotal in db.Scores
                                                where categoryTotal.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId &&
-                                               categoryTotal.Points >= 0
+                                               categoryTotal.Points >= 0 &&
+                                               categoryTotal.isDropped == false
                                                select categoryTotal).ToList();
 
            List<Category> categoriesWithWeightsAndScores = (from cats in categoryTotalPercent
@@ -1955,8 +1957,8 @@ namespace OSBLE.Controllers
            //Finally the scores for each student.
            List<Score> scor = (from score in db.Scores
                                where score.AssignmentActivity.AbstractAssignment.CategoryID == currentTab.ID &&
-                               score.Points >= 0 &&
-                               score.isDropped == false
+                               score.Points >= 0
+                               //score.isDropped == false
                                select score).ToList();
 
            var userScore = from scores in scor
