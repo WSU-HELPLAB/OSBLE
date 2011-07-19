@@ -451,6 +451,9 @@ namespace OSBLE.Services
                                        where p.UserName == userName
                                        select p).First();
 
+                //formally log the user into OSBLE
+                FormsAuthentication.SetAuthCookie(userName, false);
+
                 //build our string to hash
                 string email = profile.UserName;
                 string date = DateTime.Now.ToLongTimeString();

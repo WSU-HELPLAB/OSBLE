@@ -26,7 +26,7 @@ namespace FileUploader
     public partial class UploaderPage : Page
     {
         private string authToken = "";
-        private string OsbleUrl = "http://osble.org";
+        private string OsbleUrl = "http://osble.org"; //"http://localhost:17532"; 
         public string RootPath;
         private const string activityMessageUpdate = "Automated Message: Files & Links have been updated.";
         private RemoteFilesContextMenu remoteContextMenu = new RemoteFilesContextMenu();
