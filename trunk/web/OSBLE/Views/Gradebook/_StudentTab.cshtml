@@ -280,7 +280,8 @@
                 else
                 {
                     var studentScore = (from scores in ViewBag.UserScores as IEnumerable<Score>
-                                        where scores.AssignmentActivityID == assignment.ID
+                                        where scores.AssignmentActivityID == assignment.ID &&
+                                        scores.StudentPoints >= 0
                                         select scores);
 
                     if (studentScore.Count() > 0)
@@ -455,15 +456,20 @@
             var IDs = lastFocusedCell.attr("id").split("-");
             var cellValue = lastFocusedCell.children().val();
 
-            if(cellValue < 0 || isNaN(parseFloat(cellValue)))
+            lastFocusedCell.html("");
+            lastFocusedCell.text(cellValue);
+
+            if (cellValue == "NG") {
+                cellValue = -1;
+            }
+            else if(cellValue < 0 || isNaN(parseFloat(cellValue)))
             {
-                alert("Please enter a possitive integer");
+                alert("Please enter a possitive integer or NG");
                 event.cancelBubble = true;
                 return false;
             }
 
-            lastFocusedCell.html("");
-            lastFocusedCell.text(cellValue);
+            
             lastFocusedCell.attr("onclick", 'cellGainsFocus(event, this)');
             lastFocusedCell.css("color", "Red");
             lastFocusedCell = null;
