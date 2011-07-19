@@ -246,335 +246,360 @@ namespace OSBLE.Controllers
            FileStream fileStream = new FileStream("C:/Users/Andrew/Desktop/newCSV.csv", FileMode.OpenOrCreate, FileAccess.Write);
 
            StreamWriter streamWriter = new StreamWriter(fileStream);
-           
-           //Create a List of strings
-           List<string> stringList = new List<string>();
 
-           string weights = ",Weights,,";
-           string perfectScore = ",Perfect Score,";
-           string averageScore = ",Average Score,";
-           string headerString = "Section,Name,Grade,Total Grade";
-           string averageLetter = "";
-           bool categoryHasWeights = false;
+           //Stores the line for weights
+           string weights = "";
 
-           double totalColumnGrade = 0;
-           double totalPossibleGrade = 0;
-           double categoryTotalPoints = 0;
+           //Stores the line for perfect score
+           string perfect = "";
 
-           List<Category> categories = (from cat in db.Categories
-                                        where cat.CourseID == currentCourseId
-                                        orderby cat.ColumnOrder 
-                                        select cat).ToList();
+           //Stores the line for average score
+           string average = "";
 
-           if (categories.Count() > 0)
+           //Stores the line for the header
+           string header = "";
+
+           //Stores all the lines for the table
+           List<string> table = new List<string>();
+
+           //Store an individual line for the table
+           string tableLine = "";
+
+           string letterGrade = "";
+
+           //Empty holder for section column
+           weights += "";
+           perfect += "";
+           average += "";
+           header += "Section";
+
+           //Category Headers for weight and perfect
+           weights += ",Weight";
+           perfect += ",Perfect Score";
+           average += ",Average Score";
+           header += ",Name";
+
+           List<LetterGrade> letterGrades = ((activeCourse.AbstractCourse as Course).LetterGrades).OrderByDescending(l => l.MinimumRequired).ToList();
+           //Grade is empty for weight and holds the Best grade for perfect score
+           weights += ",";
+           if (letterGrades.Count() > 0)
            {
-               foreach (Category item in categories)
-               {
-                   if (item.Name != Constants.UnGradableCatagory)
-                   {
-                       if (item.Points > 0)
-                       {
-                           categoryHasWeights = true;
-                           List<Score> TotalScores = (from s in db.Scores
-                                                      where s.AssignmentActivity.AbstractAssignment.CategoryID == item.ID
-                                                      select s).ToList();
-                           if (TotalScores.Count > 0)
-                           {
-                               categoryTotalPoints += item.Points;
-                           }
-                       }
+               perfect += "," + letterGrades.FirstOrDefault().Grade;
+           }
+           else
+           {
+               perfect += ",";
+           }
+           header += ",Grade";
 
-                       List<AbstractAssignmentActivity> assignments = (from assignment in db.AbstractAssignmentActivities
-                                                                       where assignment.AbstractAssignment.CategoryID == item.ID &&
-                                                                       (!(assignment is StopActivity))
-                                                                       orderby assignment.ColumnOrder
-                                                                       select assignment).ToList();
-                       if (item.Name != Constants.UnGradableCatagory)
-                       {
-                           headerString += "," + item.Name.ToUpper();
-                           weights += "," + item.Points.ToString();
-                       }
-                       foreach (AbstractAssignmentActivity assign in assignments)
-                       {
-                           headerString += "," + assign.Name;
-                           weights += ",";
-                       }
-                   }
+           List<Category> Category = (from category in db.Categories
+                                      where category.CourseID == currentCourseId &&
+                                      category.Name != Constants.UnGradableCatagory
+                                      select category).ToList();
+
+           //stores the total category weight
+           double totalCategoryWeights = 0;
+           foreach (Category category in Category)
+           {
+               totalCategoryWeights += category.Points;
+           }
+
+           //Adds the total weight and 100% for perfect score
+           weights += "," + totalCategoryWeights.ToString();
+           perfect += ",100%";
+           header += ",Total Grade";
+
+           foreach (Category category in Category)
+           {
+               weights += "," + category.Points.ToString();
+               perfect += ",100%";
+               header += "," + category.Name.ToUpper();
+
+
+               List<AbstractAssignmentActivity> Assignments = (from assignment in db.AbstractAssignmentActivities
+                                                               where assignment.AbstractAssignment.CategoryID == category.ID
+                                                               select assignment).ToList();
+               
+               foreach (AbstractAssignmentActivity assignment in Assignments)
+               {
+                   weights += ",";
+                   perfect += "," + assignment.PointsPossible.ToString();
+                   header += "," + assignment.Name;
                }
            }
 
-           //Add the weights to the string list
-           stringList.Add(weights);
-           //streamWriter.WriteLine(weights);
-           
-           //streamWriter.WriteLine(perfectScore);
-           //streamWriter.WriteLine(averageScore);
-
-           //Add the header string to the string list
-           stringList.Add(headerString);
-           //streamWriter.WriteLine(headerString);
-
-           List<LetterGrade> letterGrades = ((activeCourse.AbstractCourse as Course).LetterGrades).ToList();
-           
-           
+           double totalGrade = 0;
+           double totalCategoryPoints = 0;
+           double totalCategoryPossible = 0;
+           double categoryTotalWeight = 0;
+           int studentCount = 0;
 
            //pull the students in the course.  Each student is a row.
-           List<UserProfile> studentList = (from up in db.UserProfiles
-                                            join cu in db.CoursesUsers on up.ID equals cu.UserProfileID
-                                            where cu.AbstractCourseID == currentCourseId && cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student
-                                            orderby up.LastName, up.FirstName
-                                            select up).ToList();
+           List<UserProfile> students = (from up in db.UserProfiles
+                                         join cu in db.CoursesUsers on up.ID equals cu.UserProfileID
+                                         where cu.AbstractCourseID == currentCourseId && cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student
+                                         orderby up.LastName, up.FirstName
+                                         select up).ToList();
 
+           double TotalCategoryWeights = (from cat in db.Categories
+                                          where cat.CourseID == currentCourseId &&
+                                          cat.Points >= 0
+                                          select cat.Points).Sum();
 
-           double totalScore = 0;
-           double totalPossible = 0;
-           double totalPercent = 0;
-           string totalScoreString = "";
-          
-           foreach (Category category in categories)
+           List<Score> allScores = (from score in db.Scores
+                                    where score.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId &&
+                                    score.Points >= 0 &&
+                                    score.isDropped == false
+                                    select score).ToList();
+
+           foreach (UserProfile up in students)
            {
-               if (category.Name != Constants.UnGradableCatagory)
+               double studentTotalGrade = 0;
+               tableLine = "";
+               CoursesUsers courseUser = (from course in db.CoursesUsers
+                                          where course.UserProfileID == up.ID
+                                          select course).FirstOrDefault();
+
+               //Adding the section the student is in
+               tableLine += courseUser.Section.ToString();
+
+               //Add the name of the student
+               tableLine += "," + up.FirstName + " " + up.LastName;
+
+               studentCount++;
+               categoryTotalWeight = TotalCategoryWeights;
+               foreach (Category category in Category)
                {
-                   double totalCourseScore = 0;
-                   double totalCoursePointsPossible = 0;
+                   
+                   List<Score> userScore = (from score in allScores
+                                            where score.TeamUserMember.Contains(up) &&
+                                            score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
+                                            select score).ToList();
 
-                   var totalCourseScoreQuery = (from score in db.Scores
-                                                where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
-                                                select score);
-
-                   if (totalCourseScoreQuery.Count() > 0)
+                   if (userScore.Count() == 0)
                    {
-                       totalCourseScore = totalCourseScoreQuery.Sum(s => s.Points);
-                       foreach (Score s in totalCourseScoreQuery)
+                       categoryTotalWeight -= category.Points;
+                   }
+               }
+               double studentCategoryPoints = 0;
+               double studentCategoryPossible = 0;   
+               foreach (Category category in Category)
+               {
+                   double categoryPoints = 0;
+                   double categoryPossible = 0;
+                   double categoryTotal = 0;
+                   //studentCategoryPoints = 0;
+                   //studentCategoryPossible = 0;                   
+
+                   List<Score> totalScores = (from score in allScores
+                                              where score.TeamUserMember.Contains(up) &&
+                                              score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
+                                              select score).ToList();
+                   if (totalScores.Count() > 0)
+                   {
+                       foreach (Score score in totalScores)
                        {
-                           totalCoursePointsPossible += s.AssignmentActivity.PointsPossible;
+                           if (score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
+                           {
+                               categoryPoints += score.Points;
+                               categoryPossible += score.AssignmentActivity.PointsPossible;
+                           }
+                       }
+                       categoryTotal = categoryPoints / categoryPossible;
+                       if (TotalCategoryWeights > 0)
+                       {
+                           totalGrade += categoryTotal * (category.Points / categoryTotalWeight) * 100;
+                           studentTotalGrade += categoryTotal * (category.Points / categoryTotalWeight) * 100;
+                       }
+                       else
+                       {
+                           totalCategoryPoints += categoryPoints;
+                           totalCategoryPossible += categoryPossible;
+                           studentCategoryPoints += categoryPoints;
+                           studentCategoryPossible += categoryPossible;
                        }
                    }
-
-                   if (categoryHasWeights == true)
+               }
+               if (TotalCategoryWeights == 0)
+               {
+                   studentTotalGrade = (studentCategoryPoints / studentCategoryPossible) * 100;
+               }
+               if (studentTotalGrade == 0)
+               {
+                   tableLine += ",,NG";
+               }
+               else
+               {
+                   //get the letter grade from the total grade
+                   letterGrade = "";
+                   if (letterGrades.Count() > 0)
                    {
-                       if (totalCourseScoreQuery.Count() > 0)
+                       foreach (LetterGrade letter in letterGrades)
                        {
-                           totalScore = totalCourseScore * (category.Points / categoryTotalPoints);
-                           totalPercent += totalScore / studentList.Count();
-                           totalScoreString = "," + totalPercent.ToString(".##") + "%";
+                           if (studentTotalGrade >= letter.MinimumRequired)
+                           {
+                               letterGrade = letter.Grade;
+                               break;
+                           }
                        }
+                   }
+                   tableLine += "," + letterGrade;
+                   tableLine += "," + studentTotalGrade.ToString(".#") + "%";
+               }
+
+               foreach (Category category in Category)
+               {
+                   double categoryPoints = 0;
+                   double categoryPossible = 0;
+                   double categoryPercent = 0;
+                   List<Score> userScores = (from score in allScores
+                                             where score.TeamUserMember.Contains(up) &&
+                                             score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
+                                             select score).ToList();
+
+                   foreach (Score score in userScores)
+                   {
+                       categoryPoints += score.Points;
+                       categoryPossible += score.AssignmentActivity.PointsPossible;
+                   }
+                   categoryPercent = (categoryPoints / categoryPossible) * 100;
+                   if (categoryPoints == 0 && categoryPossible == 0)
+                   {
+                       tableLine += ",NG";
                    }
                    else
                    {
-                       totalScore += totalCourseScore;
-                       totalPossible += totalCoursePointsPossible;
+                       tableLine += "," + categoryPercent.ToString(".#") + "%";
                    }
-               }
-           }
-           if (categoryHasWeights == false)
-           {
-               totalPercent = (totalScore / totalPossible) * 100;
-               totalScoreString = "," + totalPercent.ToString(".##") + "%";
-           }
 
-           foreach (LetterGrade letter in letterGrades)
-           {
-               if (totalPercent > letter.MinimumRequired)
-               {
-                   averageLetter = letter.Grade;
-                   break;
-               }
-           }
+                   List<AbstractAssignmentActivity> Assignments = (from assignment in db.AbstractAssignmentActivities
+                                                                   where assignment.AbstractAssignment.CategoryID == category.ID
+                                                                   select assignment).ToList();
 
-
-           if (studentList.Count() > 0)
-           {
-               
-               double totalGradePossible = 0;
-               string studentString = "";
-               foreach (UserProfile user in studentList)
-               {
-                   double totalGradePercent = 0;
-                   double totalCategoryPointsPossible = 0;
-
-                   double totalGrade = 0;
-                   double totalPossiblePoints = 0;
-
-                   //Section
-                   string section;
-                   //Name
-                   string name;
-                   //User Letter Grade
-                   string userLetterGrade;
-                   //User Total Grade
-                   string userTotalGrade;
-                   //CategoryTotals
-                   string categoryTotals = "";
-
-                   perfectScore = "";
-                   perfectScore = ",Perfect Score";
-
-                   averageScore = "";
-                   averageScore = ",Average Score" + "," + averageLetter + totalScoreString; 
-
-                   string HighestLetterGrade = letterGrades.First().Grade;
-                   perfectScore += "," + HighestLetterGrade + "," + 100 + "%";
-
-                   int sect = (from sec in db.CoursesUsers
-                                  where sec.AbstractCourseID == currentCourseId &&
-                                  sec.UserProfileID == user.ID
-                                  select sec.Section).FirstOrDefault();
-                   
-                   //Section
-                   section = sect.ToString();
-
-                   //Name
-                   name = "," + user.FirstName + " " + user.LastName;
-                   
-
-                   //Grade
-                   userLetterGrade = ",";
-
-                   //CATEGORY
-                   foreach (Category c in categories)
+                   foreach (AbstractAssignmentActivity assignment in Assignments)
                    {
-                       //Category TOTAL
-                       if (c.Name != Constants.UnGradableCatagory)
-                       {
-                           
-                           List<Score> TotalScores = (from s in db.Scores
-                                                      where s.AssignmentActivity.AbstractAssignment.CategoryID == c.ID
-                                                      select s).ToList();
-
-                           var TotalUserScore = (from scor in TotalScores
-                                                 where scor.TeamUserMember.Contains(user)
-                                                 select scor);
-
-                           var totalCategoryScore = (from score in TotalScores
-                                                     where score.Points >= 0
-                                                     select score.Points).Sum();
-
-                           if (categoryHasWeights == true)
-                           {
-                               totalGradePercent += TotalUserScore.Sum(s => s.Points) * (c.Points / categoryTotalPoints);
-                           }
-                           else
-                           {
-                               totalGradePercent = TotalUserScore.Sum(s => s.Points);
-                               totalGrade += TotalUserScore.Sum(s => s.Points);
-                               foreach (Score score in TotalUserScore)
-                               {
-                                   totalCategoryPointsPossible = score.AssignmentActivity.PointsPossible;
-                                   totalPossiblePoints += score.AssignmentActivity.PointsPossible;
-                               }
-                           }
-
-                           if (totalGradePercent == 0)
-                           {
-                               categoryTotals += ",NG";
-                           }
-                           else
-                           {
-                               //LEFT OFF HERE!
-                               if (categoryHasWeights == false)
-                               {
-                                   categoryTotals += "," + ((totalGradePercent / totalCategoryPointsPossible) * 100).ToString(".##") + "%";
-                               }
-                               else
-                               {
-                                   
-                               }
-                           }
-                           
-                           perfectScore += "," + 100 + "%";
-                           double categoryScore = (Convert.ToDouble(totalCategoryScore) / Convert.ToDouble(totalCategoryPointsPossible * studentList.Count()) * 100);
-                           if (categoryScore == 0)
-                           {
-                               averageScore += ",NG";
-                           }
-                           else
-                           {
-                               averageScore += "," + categoryScore.ToString(".##") + "%";
-                           }
-                           
-                       }
-
-                       //Assignments
-                       List<AbstractAssignmentActivity> assignments = (from assignment in db.AbstractAssignmentActivities
-                                                                       where assignment.AbstractAssignment.CategoryID == c.ID &&
-                                                                       (!(assignment is StopActivity))
-                                                                       select assignment).ToList();
-                      
-                       foreach (AbstractAssignmentActivity assign in assignments)
-                       {
-                           double totalPoints = 0;
-                           double totalPointsPossible = 0;
-
-                           List<Score> scores = (from score in db.Scores
-                                                 where score.AssignmentActivityID == assign.ID &&
-                                                 score.Points >= 0
-                                                 select score).ToList();
-
-                           Score userScore = (from s in scores
-                                              where s.TeamUserMember.Contains(user)
-                                              select s).FirstOrDefault();
-
-                           totalPoints = (from s in scores
-                                          select s.Points).Sum();
-
-                           //Find the points possible of the assignment and multiply that by the
-                           //number of students in the class who have scores
-                           totalPointsPossible = (assign.PointsPossible * scores.Count());
-
-                           if (userScore != null)
-                           {
-                               categoryTotals += "," + userScore.Points;
-                           }
-                           else
-                           {
-                               categoryTotals += ",NG";
-                           }
-
-                           perfectScore += "," + assign.PointsPossible;
-                           if (totalPoints == 0)
-                           {
-                               averageScore += ",NG";
-                           }
-                           else
-                           {
-                               averageScore += "," + ((totalPoints / totalPointsPossible) * 100);
-                           }
-                       }
+                       Score userScore = (from score in userScores
+                                          where score.AssignmentActivityID == assignment.ID
+                                          select score).FirstOrDefault();
                        
+                       if (userScore != null)
+                       {
+                           tableLine += "," + userScore.Points;
+                       }
+                       else
+                       {
+                           tableLine += ",NG";
+                       }
                    }
-                   double total = 0;
-                   if (categoryHasWeights == true)
+               }
+               table.Add(tableLine);
+
+           }
+           if (TotalCategoryWeights == 0)
+           {
+               totalGrade = (totalCategoryPoints / totalCategoryPossible) * 100;
+           }
+           else
+           {
+               totalGrade = (totalGrade / (studentCount * 100) * 100);
+           }
+
+           //get the letter grade from the total grade
+           letterGrade = "";
+           if (letterGrades.Count() > 0)
+           {
+               foreach (LetterGrade letter in letterGrades)
+               {
+                   if (totalGrade >= letter.MinimumRequired)
                    {
-                       total = totalGradePercent;
+                       letterGrade = letter.Grade;
+                       break;
+                   }
+               }
+           }
+
+           average += "," + letterGrade;
+           //Add the average of the Total Grade
+           average += "," + totalGrade.ToString(".#") + "%";
+
+           //Holds the total grade
+           totalGrade = 0;
+
+           double assignPoints = 0;
+           double assignPossible = 0;
+
+           foreach (Category category in Category)
+           {
+               List<Score> Scores = (from score in allScores
+                                     where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
+                                     select score).ToList();
+
+               double totalAverage = 0;
+               double averagePoints = 0;
+               double averagePossible = 0;
+
+               //Make sure there is at least one score in the category
+               bool oneScore = false;
+               foreach (Score score in Scores)
+               {
+                    oneScore = true;
+                    averagePoints += score.Points;
+                    averagePossible += score.AssignmentActivity.PointsPossible;   
+               }
+               double categoryScore = averagePoints / averagePossible;
+               totalAverage += categoryScore * 100;
+               if (oneScore == true)
+               {
+                   average += "," + totalAverage.ToString(".#") + "%";
+               }
+               else
+               {
+                   average += ",NG";
+               }
+
+               List<AbstractAssignmentActivity> Assignments = (from assignment in db.AbstractAssignmentActivities
+                                                               where assignment.AbstractAssignment.CategoryID == category.ID
+                                                               select assignment).ToList();
+
+               foreach (AbstractAssignmentActivity assignment in Assignments)
+               {
+                   var score = (from scores in allScores
+                                where scores.AssignmentActivityID == assignment.ID
+                                select scores);
+
+                   totalAverage = 0;
+                   averagePoints = 0;
+                   averagePossible = 0;
+
+                   //Make sure there is at least one score in the category
+                   oneScore = false;
+                   foreach (Score s in score)
+                   {
+                       oneScore = true;
+                       averagePoints += s.Points;
+                       averagePossible += s.AssignmentActivity.PointsPossible;
+                   }
+                   categoryScore = averagePoints / averagePossible;
+                   totalAverage += categoryScore * 100;
+                   if (oneScore == true)
+                   {
+                       average += "," + totalAverage.ToString(".#");
                    }
                    else
                    {
-                       total = ((totalGrade / totalPossiblePoints) * 100);
+                       average += ",NG";
                    }
-                   userTotalGrade = "," + total.ToString(".##") + "%";
-                   //Add the studentString to the file
-
-                   foreach (LetterGrade min in letterGrades)
-                   {
-                       if (total > min.MinimumRequired)
-                       {
-                           userLetterGrade += min.Grade;
-                           break;
-                       }
-                   }
-
-                   string finalString = string.Concat(section, name, userLetterGrade, userTotalGrade, categoryTotals);
-                   stringList.Add(finalString);
                }
-
-               stringList.Insert(1, averageScore);
-               stringList.Insert(1, perfectScore);
-               
            }
-           for (int i = 0; i < stringList.Count(); i++)
+
+           streamWriter.WriteLine(weights);
+           streamWriter.WriteLine(perfect);
+           streamWriter.WriteLine(average);
+           streamWriter.WriteLine(header);
+
+           foreach (string s in table)
            {
-               streamWriter.WriteLine(stringList.ElementAt(i));
+               streamWriter.WriteLine(s);
            }
 
            streamWriter.Close();
