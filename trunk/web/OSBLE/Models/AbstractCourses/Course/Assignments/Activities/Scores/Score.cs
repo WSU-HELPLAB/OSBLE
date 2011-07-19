@@ -39,12 +39,15 @@ namespace OSBLE.Models.Assignments.Activities.Scores
 
         public virtual AbstractAssignmentActivity AssignmentActivity { get; set; }
 
+        public double StudentPoints { get; set; }
+
         public Score()
         {
             Published = false;
             Points = 0;
             Multiplier = 1.0;
             LatePenaltyPercent = 0;
+            StudentPoints = 0;
         }
     }
 }

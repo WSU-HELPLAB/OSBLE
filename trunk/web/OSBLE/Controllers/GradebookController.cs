@@ -1477,6 +1477,62 @@ namespace OSBLE.Controllers
 
 
        [HttpPost]
+       public ActionResult ModifyStudentScore(string userId, int assignmentId, double value)
+       {
+           if (ModelState.IsValid)
+           {
+               if (assignmentId > 0)
+               {
+                   UserProfile student = (from user in db.UserProfiles
+                                          where user.Identification == userId
+                                          select user).FirstOrDefault();
+                   if (student != null)
+                   {
+                       AbstractAssignmentActivity currentAssignment = (from assignment in db.AbstractAssignmentActivities
+                                                                       where assignment.ID == assignmentId
+                                                                       select assignment).FirstOrDefault();
+
+                       List<Score> assignmentScores = (from scores in db.Scores
+                                                       where scores.AssignmentActivityID == assignmentId
+                                                       select scores).ToList();
+
+                       Score studentScore = (from score in assignmentScores
+                                             where score.TeamUserMember.Contains(student)
+                                             select score).FirstOrDefault();
+
+                       if (studentScore != null)
+                       {
+                           studentScore.StudentPoints = value;
+                           db.SaveChanges();
+                       }
+                       else
+                       {
+                           var teamuser = from c in currentAssignment.TeamUsers where c.Contains(student) select c;
+
+                           Score newScore = new Score()
+                           {
+                               TeamUserMember = teamuser.First(),
+                               Points = -1,
+                               StudentPoints = value,
+                               AssignmentActivityID = currentAssignment.ID,
+                               PublishedDate = DateTime.Now,
+                               isDropped = false
+                           };
+
+                           db.Scores.Add(newScore);
+                           db.SaveChanges();
+                       }
+
+                   }
+               }
+           }
+
+           BuildStudentGradebook((int)Session["categoryId"]);
+           return View();
+       }
+
+
+       [HttpPost]
        public ActionResult ModifyColumn()
        {
            //convert POST params to variables
@@ -1760,8 +1816,7 @@ namespace OSBLE.Controllers
            currentUser.Add(CurrentUser);
 
            List<Score> totalScores = (from scores in db.Scores
-                                      where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId &&
-                                      scores.Points >= 0
+                                      where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
                                       select scores).ToList();
 
            List<Score> userScores = (from score in totalScores

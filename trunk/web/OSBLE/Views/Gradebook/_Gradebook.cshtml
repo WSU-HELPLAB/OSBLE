@@ -45,7 +45,7 @@
     </tr>
 
     <tr id="perfectScore">
-        <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8" width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
+        <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; width:25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
         @{index++;}
         <td id="th2"><b>Perfect Score</b></td>
         <td id="perfectTotal">100%</td>
@@ -239,7 +239,7 @@
                         var teamUser = from tu in gradeAssignmentActivity.TeamUsers where tu.Contains(user) select tu;
                         if (teamUser.Count() > 0)
                         {
-                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink("NG", "Index", "Rubric", new { abstractAssignmentActivityId = gradeAssignmentActivity.ID, teamUserID = teamUser.First().ID }, new { })</td>
+                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink("NG", "Index", "Rubric", new { abstractAssignmentActivityId = gradeAssignmentActivity.ID, teamUserID = teamUser.First().ID}, new { })</td>
                         }
                     }
                     else
@@ -252,6 +252,7 @@
     }
     <script type="text/javascript">
         $(function () {
+            //calculateRows();
             keyControls();
             calculateRows();
         });

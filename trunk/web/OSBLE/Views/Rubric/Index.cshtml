@@ -72,8 +72,7 @@ function create_and_open_downloading_submission_dialog() {
         @{foreach (Criterion crit in Model.Rubric.Criteria)
           {
               string targetId = String.Format("\"#{0}_{1}\"", critInputPrefix, crit.ID);
-            @Html.Raw("\tgrade += $(" + targetId + ").val() / " + maxLevelScore + " * " + crit.Weight / totalRubricPoints + ";\n")
-
+              @Html.Raw("\tgrade += $(" + targetId + ").val() / " + maxLevelScore + " * " + crit.Weight / totalRubricPoints + ";\n")
           }
         }
         $('#@gradeId').html(Math.round(grade * 100) + "%");

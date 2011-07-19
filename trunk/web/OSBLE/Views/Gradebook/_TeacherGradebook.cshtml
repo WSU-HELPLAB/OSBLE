@@ -116,7 +116,7 @@
     #tabHeader #selected
     {
         position: relative;
-        border-bottom:1px solid #fff;
+        border-bottom:1px solid #E8E8E8;
         background: white;
     }
     
@@ -370,22 +370,22 @@
             
             @{var j = 1;
               var r = 0;
-                <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
                 j += 1;
                 r++;
-                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
                 j += 1;
-                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
                 j += 1;
-                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
                 j += 1;
-                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
                 j += 1;
                 foreach (Category item in ViewBag.Categories)
                 {
                     if (item.Name != Constants.UnGradableCatagory)
                     {
-                        <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; text-align:center;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);">
+                        <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8; text-align:center;" onclick="selectColumn(event, this);" onmouseover="showButton(this);" onmouseout="hideButton(this);">
                             <div id="div-@j" style="display: none;">
                                 <img id="imgLeft-@item.ID" src="/Content/images/arrow_left.png" onclick="moveLeft(this);" style="cursor:pointer; float:left; padding-top:1px;"/>
                                 <img id="img-@item.ID" src="/Content/images/arrow_down.png" onclick="ShowHide(event, this);" style="cursor:pointer;" />
@@ -401,7 +401,7 @@
         </tr>
         
         <tr>
-            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; width: 25px;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8; width: 25px;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             @{r++;}
             <td></td>
             <td><b>Weights</b></td>
@@ -416,7 +416,7 @@
             }
         </tr>
         <tr id="weights">
-            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             @{r++;}
             <td id="sectionHolder"></td>
             <td id="catScheme" onclick="cellGainsFocus(event, this);">&nbsp  Weight1</td>
@@ -443,7 +443,7 @@
 
         </tr>
         <tr id="perfectScore">
-            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             @{r++;}
             <td></td>
             <td id="th2"><b>Perfect Score</b></td>
@@ -464,7 +464,7 @@
 
         </tr>
         <tr>
-            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             @{r++;}
             <td></td>
             <td id="th3">
@@ -566,7 +566,7 @@
             
         </tr>
         <tr id="categoryHeaders">
-            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+            <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
             @{r++;}
             <th>Section</th>
             <th>Name</th>
@@ -603,7 +603,7 @@
         @foreach (OSBLE.Models.Users.UserProfile student in ViewBag.Students)
         {        
             <tr id="studentGrades">
-                <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
+                <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
                 @{r++;}
 
             @{

@@ -231,6 +231,12 @@ namespace OSBLE.Controllers
                     //normalize the score with the abstract assignment score
                     studentScore *= vm.Evaluation.AssignmentActivity.PointsPossible;
 
+                    //If a column has added points then we want to add those points to the students score
+                    if (vm.Evaluation.AssignmentActivity.addedPoints > 0)
+                    {
+                        studentScore += vm.Evaluation.AssignmentActivity.addedPoints;
+                    }
+
                     if (grade != null)
                     {
                         grade.Points = studentScore;

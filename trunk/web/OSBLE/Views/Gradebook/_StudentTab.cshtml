@@ -139,6 +139,7 @@
             {
                 var score = (from scores in ViewBag.TotalScores as IEnumerable<Score>
                              where scores.AssignmentActivityID == item.ID
+                             where scores.Points >= 0
                              select scores);
                 
                 double totalAverage = 0;
@@ -190,7 +191,7 @@
                     }
                     else
                     {
-                        <th id="header-@assign.ID">@assign.Name </th>
+                        <th id="header-@assign.ID" onclick="clearLastCellFocus();">@assign.Name </th>
                     }
                     i += 1;
                 }
@@ -236,7 +237,8 @@
             foreach (AbstractAssignmentActivity assignment in ViewBag.Assignments)
             {
                 var score = (from scores in ViewBag.UserScores as IEnumerable<Score>
-                             where scores.AssignmentActivityID == assignment.ID
+                             where scores.AssignmentActivityID == assignment.ID && 
+                             scores.Points >= 0
                              select scores);
 
                 if (score.Count() > 0)
@@ -259,7 +261,18 @@
                 }
                 else
                 {
-                    <td>NG</td>
+                    var studentScore = (from scores in ViewBag.UserScores as IEnumerable<Score>
+                                        where scores.AssignmentActivityID == assignment.ID
+                                        select scores);
+                    
+                    if (studentScore.Count() > 0)
+                    {
+                        <td id="@String.Format("{0}-{1}", cu.Identification, assignment.ID)" onclick="cellGainsFocus(this);" style="color:Red;">@studentScore.First().StudentPoints</td>
+                    }
+                    else
+                    {
+                        <td id="@String.Format("{0}-{1}", cu.Identification, assignment.ID)" onclick="cellGainsFocus(this);" style="color:Red;">NG</td>
+                    }
                 }
             
             }
@@ -271,6 +284,49 @@
 
 <script type="text/javascript">
 
-    
+    var lastFocusedCell = null;    
+
+    function clearLastCellFocus() {
+
+        //if a prior cell has already received focus in the past, we need to turn it back into
+        //a normal table cell
+        if (lastFocusedCell != null) {
+
+            var IDs = lastFocusedCell.attr("id").split("-");
+            var cellValue = lastFocusedCell.children().val();
+
+            lastFocusedCell.html("");
+            lastFocusedCell.text(cellValue);
+            lastFocusedCell.attr("onclick", 'cellGainsFocus(this)');
+            lastFocusedCell.css("color", "Red");
+            lastFocusedCell = null;
+
+            $.ajax({
+                type: "POST",
+                url: "/Gradebook/ModifyStudentScore",
+                data: { userId: IDs[0].toString(), assignmentId: IDs[1], value: parseFloat(cellValue) },
+                success: alert("Succeeded")                
+            });
+        }
+    }
+
+    function cellGainsFocus(someCell) {
+        
+        //clear any previous focus
+        clearLastCellFocus();
+
+        //do this once so we don't have to constantly do it later
+        someCell = $(someCell);
+
+        var textValue = someCell.text();
+        var inputText = $('<input class="cellInput" type="text" value="' + textValue + '" />');
+        //someCell.removeAttr("onclick");
+        someCell.html(inputText);
+        inputText.focus();
+        inputText.select();
+        lastFocusedCell = someCell;
+       // $("#lastCell").val(someCell);
+        //evt.preventDefault();
+    }
 
 </script>
