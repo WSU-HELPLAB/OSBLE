@@ -370,7 +370,7 @@
 
             $(this).find("td").each(function () {
                 var id = $(this).attr("id").split("-");
-                
+
                 if (id[1] == null) {
                 }
                 else if (isNaN(parseFloat($(this).text()))) {
@@ -417,7 +417,12 @@
 
             $(this).find("td").each(function () {
                 if ($(this).attr("id") == "totalAverage") {
-                    $(this).text(grade.toFixed(1) + "%");
+                    if (grade.toString() == "NaN") {
+                        $(this).text("NG");
+                    } else { 
+                        $(this).text(grade.toFixed(1) + "%");
+                    }
+                    
                 }
             });
         });
