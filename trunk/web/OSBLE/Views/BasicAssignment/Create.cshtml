@@ -455,7 +455,7 @@
     <div class="editor-label">
         @Html.EditorFor(m => Model.UseRubric) @Html.LabelFor(m => Model.UseRubric)@Helpers.CreateToolTip(ToolTips.BasicAssignmentUseRubric)<div
             id="edit_rubric_div" style="display: none">
-            @Html.Partial("_RubricSelect")
+            <span id="RubricSelect">@Html.Partial("_RubricSelect")</span>
             <button type="button" onclick="OpenRubricDialog()" value="Create Rubric">
                 Create/Edit Rubric...
             </button>
