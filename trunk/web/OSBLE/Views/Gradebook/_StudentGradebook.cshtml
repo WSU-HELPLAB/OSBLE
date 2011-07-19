@@ -381,7 +381,7 @@
                 
                 if (userScores.Count() > 0)
                 {
-
+                    bool usingWhatIf = false;
                     foreach (Category category in ViewBag.Categories)
                     {
                         if (category.Name != Constants.UnGradableCatagory)
@@ -399,6 +399,7 @@
                                     }
                                     else if (userScore.StudentPoints >= 0)
                                     {
+                                        usingWhatIf = true;
                                         categoryPoints += userScore.StudentPoints;
                                         categoryPossible += userScore.AssignmentActivity.PointsPossible;
                                     }
@@ -410,7 +411,15 @@
                             double total = (categoryPoints / categoryPossible) * 100;
                             if (total >= 0)
                             {
-                                <td>@total.ToString(".#")%</td>
+                                if (usingWhatIf == true)
+                                {
+                                    <td style="color:Red;">@total.ToString(".#")%</td>
+                                    usingWhatIf = false;
+                                }
+                                else
+                                {
+                                    <td>@total.ToString(".#")%</td>
+                                }
                             }
                             else
                             {
