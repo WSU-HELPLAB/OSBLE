@@ -999,16 +999,20 @@
             $(this).find("td").each(function () {
                 var id = $(this).attr("id").split("-");
                 if (id[0] == "pointsPossible") {
-                    temp = parseInt($(this).text());
+                    temp = parseFloat($(this).text());
                     totalArr.push(temp);
                 }
             });
         });
 
         $("#grades #studentGrades").each(function () {
-            var total = [];
+            var gradeArr = [];
+            var indexArr = [];
+            var recieved = [];
+            var total = 0;
             var grade = 0;
             var i = 0;
+            temp = 0;
 
             $(this).find("td").each(function () {
                 var id = $(this).attr("id").split("-");
@@ -1017,16 +1021,19 @@
                 }
                 else if (id[1] == null) {
                 }
-                else if (isNaN(parseInt($(this).text()))) {
+                else if (isNaN(parseFloat($(this).text()))) {
+                    recieved.splice(i, 0, -1);
                     i++;
                 } else {
-                    grade = parseInt($(this).text());
-                    grade /= totalArr[i]
+                    temp = parseFloat($(this).text());
+                    grade = temp / totalArr[i]
                     grade *= 100;
+
                     // making the list of grades a ascending array 
-                    for (var j = 0; j < total.length && grade > total[j]; j++) {
-                    }
-                    total.splice(j, 0, grade);
+                    for (var j = 0; j < gradeArr.length && grade > gradeArr[j]; j++);
+                    gradeArr.splice(j, 0, grade);
+                    recieved.splice(i, 0, temp);
+                    indexArr.splice(j, 0, i);
 
                     i++;
                 }
@@ -1035,18 +1042,29 @@
             // this handles drop x lowest and take x highest
             var dropXIndex = 0;
             if ($("input[name='Customize_radio']:checked").val() == "XtoDrop") {
-                dropXIndex = $("#numDropped").val();
+                if ($("#numDropped").val() > gradeArr.length) {
+                    dropXIndex = gradeArr.length;
+                } else {
+                    dropXIndex = $("#numDropped").val();
+                }
             } else if ($("input[name='Customize_radio']:checked").val() == "XtoTake") {
-                dropXIndex = total.length - ($("#numDropped").val());
+                if ($("#numDropped").val() < gradeArr.length) {
+                    dropXIndex = gradeArr.length - ($("#numDropped").val());
+                } else {
+                }
             }
 
             grade = 0;
             // summing all the grades (not including any drops if there are any)
-            for (var count = dropXIndex; count < total.length; count++) {
-                grade += total[count];
+            for (var count = dropXIndex; count < gradeArr.length; count++) {
+                if (totalArr[indexArr[count]] != -1) { 
+                    grade += recieved[indexArr[count]];
+                    total += totalArr[indexArr[count]];
+                }
             }
 
-            grade /= (total.length - dropXIndex);
+            grade /= total;
+            grade *= 100;
 
             $(this).find("td").each(function () {
                 if ($(this).attr("id") == "total") {

@@ -767,12 +767,15 @@ namespace OSBLE.Controllers
                    {
                        foreach (Score score in studentScores)
                        {
-                            double temp = score.Points / score.AssignmentActivity.AbstractAssignment.PointsPossible;
-                            if (temp < lowest)
-                            {
-                                lowest = temp;
-                                id = score.ID;
-                            }
+                           if(score.Points != -1)
+                           {
+                                double temp = score.Points / score.AssignmentActivity.PointsPossible;
+                                if (temp < lowest)
+                                {
+                                    lowest = temp;
+                                    id = score.ID;
+                                }
+                          }
                        }
                         foreach (Score score in studentScores)
                         {
@@ -846,17 +849,20 @@ namespace OSBLE.Controllers
                                {
                                    //Find the assignment that corresponds because it wouldn't give me access
                                    //to points possible within the scores.
-                                  
-                                   // create an ascending list of scores per student
-                                   int j = 0;
-                                   double temp = score.Points / score.AssignmentActivity.PointsPossible;
 
-                                   while (lowest.Count() > j && temp > lowest.ElementAt(j))
+                                   if (score.Points != -1)
                                    {
-                                       j++;
+                                       // create an ascending list of scores per student
+                                       int j = 0;
+                                       double temp = score.Points / score.AssignmentActivity.PointsPossible;
+
+                                       while (lowest.Count() > j && temp > lowest.ElementAt(j))
+                                       {
+                                           j++;
+                                       }
+                                       lowest.Insert(j, temp);
+                                       id.Insert(j, score.ID);
                                    }
-                                   lowest.Insert(j, temp);
-                                   id.Insert(j, score.ID);
                                }
                                var max = 0;
 
@@ -875,7 +881,9 @@ namespace OSBLE.Controllers
                                else
                                {
                                    // Taking X highest ( if there are less assignments than specified to take, it only takes what is graded)
-                                   max = lowest.Count() - dropX;
+                                   if (dropX < lowest.Count) { 
+                                        max = lowest.Count() - dropX;
+                                   }
                                }
 
                                for (int k = 0; k < max; ++k)
