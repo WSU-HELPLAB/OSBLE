@@ -59,9 +59,12 @@
                 @Helpers.CreateToolTip(ToolTips.AccountLogOnRemember) 
             </div>
 
-            @if (ViewBag.Attempts < 3)
+            @if (ViewBag.UseCaptcha == true)
             { 
             <div>
+            Are you are robot trying to brute force someone's password? Prove it!<br />
+            Forgot your password? @Html.ActionLink("Click Here", "ResetPassword").
+            <br />
             @Html.Partial("_ReCaptcha")
             </div>
             }

@@ -683,6 +683,8 @@
     <Content Include="Views\Gradebook\_StudentTab.cshtml" />
     <Content Include="Views\Gradebook\_TeacherGradebook.cshtml" />
     <Content Include="Views\Gradebook\_TeacherTab.cshtml" />
+    <Content Include="Views\Account\AccountCreated.cshtml" />
+    <Content Include="Views\Account\ActivateAccount.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

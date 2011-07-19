@@ -269,8 +269,11 @@ namespace OSBLE.Controllers
                     activeCourse = activeCoursePool.FirstOrDefault();
                 }
 
-                context.Session["ActiveCourse"] = activeCourse.AbstractCourseID;
-                ViewBag.ActiveCourse = activeCourse;
+                if (activeCourse != null)
+                {
+                    context.Session["ActiveCourse"] = activeCourse.AbstractCourseID;
+                    ViewBag.ActiveCourse = activeCourse;
+                }
             }
             else // User invalid. Logout.
             {

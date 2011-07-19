@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Drawing;
@@ -7,6 +8,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
@@ -35,7 +37,7 @@ namespace OSBLE.Controllers
 
         public ActionResult LogOn()
         {
-            ViewBag.ReCaptchaPublicKey = getReCaptchaPublicKey();
+            setLogOnCaptcha();
 
             return View();
         }
@@ -64,6 +66,7 @@ namespace OSBLE.Controllers
                 }
                 else
                 {
+                    setLogOnCaptcha();
                     ModelState.AddModelError("", "The user name or password provided is incorrect.");
                 }
             }
@@ -126,6 +129,52 @@ namespace OSBLE.Controllers
             return View();
         }
 
+        public ActionResult AccountCreated()
+        {
+            return View();
+        }
+
+        public ActionResult ActivateAccount(string hash)
+        {
+            if (hash == null)
+            {
+                throw new Exception("Hash cannot be null");
+            }
+            ViewBag.Hash = hash;
+
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult ActivateAccount(LogOnModel model)
+        {
+            string hash = Request.Params["hash"];
+
+            if (hash != null && hash != "")
+            {
+                MembershipUser user = Membership.GetUser(model.UserName);
+
+                if (user != null)
+                {
+                    if ((user.Comment as string) == hash)
+                    {
+                        user.IsApproved = true;
+                        Membership.UpdateUser(user);
+                        return RedirectToAction("LogOn");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("hashIsWrong", "Either the e-mail address or the the hash is no long valid");
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("userDoesNotExist", new Exception("The email address provided does not exist"));
+                }
+            }
+            return View();
+        }
+
         //
         // POST: /Account/Register
 
@@ -144,11 +193,20 @@ namespace OSBLE.Controllers
                 {
                     // Attempt to register the user
                     MembershipCreateStatus createStatus;
-                    Membership.CreateUser(model.Email, model.Password, model.Email, null, null, true, null, out createStatus);
+
+                    string randomHash = GenerateRandomString(40);
+
+                    Membership.CreateUser(model.Email, model.Password, model.Email, null, null, isActivited(), out createStatus);
 
                     if (createStatus == MembershipCreateStatus.Success)
                     {
-                        FormsAuthentication.SetAuthCookie(model.Email, false /* createPersistentCookie */);
+                        MembershipUser user = Membership.GetUser(model.Email);
+
+                        user.Comment = randomHash;
+
+                        Membership.UpdateUser(user);
+
+                        //FormsAuthentication.SetAuthCookie(model.Email, false /* createPersistentCookie */);
 
                         try
                         {
@@ -174,7 +232,11 @@ namespace OSBLE.Controllers
                             return ProfessionalRegister();
                         }
 
-                        return RedirectToAction("Index", "Home");
+                        string message = "Thank you for creating an account at osble.org please visit https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }) + " to active your account";
+
+                        Email.Send("Active Your Account", message, new List<MailAddress>() { new MailAddress(model.Email) });
+
+                        return RedirectToAction("AccountCreated");
                     }
                     else
                     {
@@ -218,11 +280,18 @@ namespace OSBLE.Controllers
                 {
                     // Attempt to register the user
                     MembershipCreateStatus createStatus;
-                    Membership.CreateUser(model.Email, model.Password, model.Email, null, null, true, null, out createStatus);
+
+                    string randomHash = GenerateRandomString(40);
+
+                    Membership.CreateUser(model.Email, model.Password, model.Email, null, null, isActivited(), out createStatus);
 
                     if (createStatus == MembershipCreateStatus.Success)
                     {
-                        FormsAuthentication.SetAuthCookie(model.Email, false /* createPersistentCookie */);
+                        MembershipUser user = Membership.GetUser(model.Email);
+                        user.Comment = randomHash;
+                        Membership.UpdateUser(user);
+
+                        //FormsAuthentication.SetAuthCookie(model.Email, false /* createPersistentCookie */);
 
                         try
                         {
@@ -268,7 +337,11 @@ namespace OSBLE.Controllers
                             return AcademiaRegister();
                         }
 
-                        return RedirectToAction("Index", "Home");
+                        string message = "Thank you for creating an account at osble.org please visit https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }) + " to active your account";
+
+                        Email.Send("Active Your Account", message, new List<MailAddress>() { new MailAddress(model.Email) });
+
+                        return RedirectToAction("AccountCreated");
                     }
                     else
                     {
@@ -555,6 +628,54 @@ namespace OSBLE.Controllers
                 key = ConfigurationManager.AppSettings["RecaptchaPrivateKey"];
             }
             return key;
+        }
+
+        private string GenerateRandomString(int size)
+        {
+            Random random = new Random();
+            StringBuilder builder = new StringBuilder();
+            char ch;
+            for (int i = 0; i < size; i++)
+            {
+                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65)));
+                builder.Append(ch);
+            }
+
+            return builder.ToString();
+        }
+
+        private void setLogOnCaptcha()
+        {
+            int attempts = 0;
+            try
+            {
+                attempts = (int)context.Session["attempts"];
+            }
+            catch { }
+
+            context.Session["attempts"] = ++attempts;
+            if (attempts > 3)
+            {
+                ViewBag.UseCaptcha = true;
+                ViewBag.ReCaptchaPublicKey = getReCaptchaPublicKey();
+            }
+            else
+            {
+                ViewBag.UseCaptcha = false;
+            }
+        }
+
+        /// <summary>
+        /// Only if we are in debug does it get activated right away
+        /// </summary>
+        /// <returns>returns true if in debug mode else returns false</returns>
+        private bool isActivited()
+        {
+#if Debug
+                return true;
+#endif
+
+            return false;
         }
     }
 }
