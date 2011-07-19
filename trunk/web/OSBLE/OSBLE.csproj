@@ -490,8 +490,6 @@
     <Folder Include="FileSystem\Courses\1\CourseDocs\" />
     <Folder Include="FileSystem\Courses\4\CourseDocs\" />
     <Folder Include="Validations\" />
-    <Folder Include="Views\IssueVoting\" />
-    <Folder Include="Views\NewFolder1\" />
     <Folder Include="Views\SubbmissionAssignmentActivity\" />
     <Folder Include="Views\SubmissionAssignmentActivity\" />
   </ItemGroup>
@@ -685,7 +683,6 @@
     <Content Include="Views\Gradebook\_StudentTab.cshtml" />
     <Content Include="Views\Gradebook\_TeacherGradebook.cshtml" />
     <Content Include="Views\Gradebook\_TeacherTab.cshtml" />
-    <Content Include="Views\Shared\SubmissionNotification.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

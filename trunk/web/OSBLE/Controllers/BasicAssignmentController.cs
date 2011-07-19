@@ -7,6 +7,8 @@ using Newtonsoft.Json;
 using OSBLE.Attributes;
 using OSBLE.Models;
 using OSBLE.Models.AbstractCourses;
+using OSBLE.Models.AbstractCourses.Course;
+
 //using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
@@ -16,7 +18,6 @@ using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
 using OSBLE.Utility;
-using OSBLE.Models.AbstractCourses.Course;
 
 namespace OSBLE.Controllers
 {
@@ -176,6 +177,7 @@ namespace OSBLE.Controllers
                 SubmissionActivity submission = new SubmissionActivity();
                 StopActivity stop = new StopActivity();
 
+                submission.PointsPossible = 100; //it actually doesn't matter
                 submission.ReleaseDate = basic.Submission.ReleaseDate;
                 submission.Name = basic.Submission.Name;
 
@@ -211,9 +213,8 @@ namespace OSBLE.Controllers
                     }
                     else if (Request.Form["line_review_options"].ToString().CompareTo("AutoConfig") == 0)
                     {
-                        basic.Assignment.CommentCategoryConfigurationID = Convert.ToInt32(Request.Params["comment_category_selection"]); 
+                        basic.Assignment.CommentCategoryConfigurationID = Convert.ToInt32(Request.Params["comment_category_selection"]);
                     }
-
                 }
 
                 if (basic.UseRubric)

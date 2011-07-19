@@ -269,7 +269,7 @@
         $.ajax({
             type: "POST",
             url: "/BasicAssignment/GetRubrics",
-            data: {selectedRubric: rubricId},
+            data: { selectedRubric: rubricId },
             success: function (msg) {
                 $('#RubricSelect').html(msg);
             }
@@ -291,12 +291,14 @@
 
         Html.ValidationSummary(true);
 
+    <!--Hidden fields-->
     @Html.Hidden("newTeams", "", new { id = "newTeams" })
     @Html.HiddenFor(model => submission.ReleaseDate, new { @id = "ReleaseDate" })
     @Html.HiddenFor(model => stop.ReleaseDate, new { @id = "DueDate" })
     @Html.HiddenFor(model => submission.Name, new { @id = "SubmissionName" })
     @Html.HiddenFor(model => stop.Name, new { @id = "StopName" })
         
+    <!--Assignment Name-->
     <div class="editor-label">
         @Html.LabelFor(model => model.Assignment.Name)
     </div>
@@ -304,6 +306,8 @@
         @Html.EditorFor(model => model.Assignment.Name)
         @Html.ValidationMessageFor(model => model.Assignment.Name)
     </div>
+    
+    <!--Assignment Description-->
     <div class="editor-label">
         @Html.LabelFor(model => model.Assignment.Description)
     </div>
@@ -312,6 +316,7 @@
         @Html.ValidationMessageFor(model => model.Assignment.Description)
     </div>
         
+    <!--Submission Release Date-->
     <div class="editor-label">
         @Html.LabelFor(model => submission.ReleaseDate)
         @Helpers.CreateToolTip(ToolTips.BasicAssignmentReleaseDate)
@@ -320,6 +325,7 @@
         @Html.TextBox("ReleaseDate_Date", convertToMonthDayYearFormat(submission.ReleaseDate), new { @id = "ReleaseDate_Date", @class = "date_picker", size = 9 })
         @Html.TextBox("ReleaseDate_Time", convertTime(submission.ReleaseDate), new { @id = "ReleaseDate_Time", @class = "time_picker", size = 9 })
     </div>
+    
     <!--Stop date-->
     <div class="editor-label">
         @Html.Label("Due Date")
@@ -330,11 +336,15 @@
         @Html.TextBox("DueDate_Time", convertTime(stop.ReleaseDate), new { @id = "DueDate_Time", @class = "time_picker", size = 9 })
     </div>
 
+    <!--Is Team-->
     <div class="editor-label">
         @Html.CheckBoxFor(model => submission.isTeam, new { id = "isTeam" }) @Html.Label("This is a team assignment")
     </div>
+    
+    <!-- Team Div-->
     <div id="Team_Options" class="indented_options" style="display: none">
-    <input type="radio" name="team_generation_options" value="RandomTeams" />
+        <!--Radio Button Generate teams randomly-->
+        <input type="radio" name="team_generation_options" value="RandomTeams" />
         Generate teams randomly
         <br />
         <ul id="RandomTeams" style="display: none" class="team_generation_options">
@@ -356,21 +366,23 @@
                 </button>
             </li>
         </ul>
-    @if (ViewBag.PastTeamAssignments != null && (ViewBag.PastTeamAssignments as SelectList).Count() != 0)
-    { 
-        <input type="radio" name="team_generation_options" value="PreviousAssignment" />
-        <text>Use teams defined in previous course assignment</text>
-        <br />
-        <ul id="PreviousAssignmentDiv" style="display: none" class="team_generation_options">
-            <li>
-            
-                @Html.DropDownListFor(m => m.SerializedTeamMembersJSON, ViewBag.PastTeamAssignments as SelectList)
-                <button type="button" onclick="OpenPreviousTeam()">
-                    View Teams</button>
-           
-            </li>
-        </ul>
-    }
+
+        <!--Radio Button Use previous, only shows up if there was a previous team assignment-->
+        @if (ViewBag.PastTeamAssignments != null && (ViewBag.PastTeamAssignments as SelectList).Count() != 0)
+        { 
+            <input type="radio" name="team_generation_options" value="PreviousAssignment" />
+            <text>Use teams defined in previous course assignment</text>
+            <br />
+            <ul id="PreviousAssignmentDiv" style="display: none" class="team_generation_options">
+                <li>
+                    @Html.DropDownListFor(m => m.SerializedTeamMembersJSON, ViewBag.PastTeamAssignments as SelectList)
+                    <button type="button" onclick="OpenPreviousTeam()">
+                        Edit Teams...</button>
+                </li>
+            </ul>
+        }
+        
+        <!--Radio Button Manual Teams-->
         <input type="radio" name="team_generation_options" value="ManualTeams" />
         Specify teams manually
         <ul id="ManualTeams" style="display: none" class="team_generation_options">
@@ -383,79 +395,10 @@
         <!-- in the future generate teams with mixed ability and Generate teams with same-ability will need to go here -->
     </div>
 
+    <!--Deliverables section-->
     <h3>
         Deliverables @Helpers.CreateToolTip(ToolTips.BasicAssignmentDeliverables)
     </h3>
-   
-    <!--
-    <table id="deliverables_table">
-        <tr>
-            <td>
-                <table>
-                    <tr>
-                        <td> File&nbsp;Name </td>
-                        <td> <input type="text" id="new_deliverable_name" /> </td>
-                    </tr>
-                    <tr>
-                        <td> Type </td>
-                        <td>
-                            <select id="new_deliverable_type">
-                                @foreach (SelectListItem dt in ViewBag.DeliverableTypes)
-                                {
-                                    <option value="@dt.Value">@dt.Text</option>
-                                }
-                            </select>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-            <td>
-                <div>
-                    <a href="#" id="add_new_category" title="Add New Category" style="text-decoration:none;">
-                        <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Category" /> Add a Category
-                    </a>
-                </div>
-                <div id="category_data"></div>
-            </td>
-            
-        </tr>
-    </table>        <tr id="_options" style="display: none;">
-            <td> Line Review <br />&nbsp;&nbsp;&nbsp;Configuration </td>
-            <td class="indented_options">
-                <select id="comment_category_selection">
-                    <!-
-                    <option value="null">[None Selected]</option>
-                    <option value="2">Aaaaaaaaaa</option>
-                    <option value="5">Bbbbbbbbbb</option>
-                    <option value="6">Cccccccccc</option> ->
-                </select>
-                <div id="saved_config_display">
-                    <!-<table>
-                        <tr>
-                            <td>Severity</td>
-                            <td>
-                                <select>
-                                    <option value="a">1</option>
-                                    <option value="b">2</option>
-                                    <option value="c">3</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Scope</td>
-                            <td>
-                                <select>
-                                    <option value="a">1</option>
-                                    <option value="b">2</option>
-                                    <option value="c">3</option>
-                                </select>
-                            </td>
-                        </tr>
-                    </table> ->
-                </div>
-            </td>
-        </tr>
--->
     
     <table id="deliverables_table" cellspacing="6px">
         <tr>
@@ -480,6 +423,7 @@
             </td>
         </tr>
     </table>
+    
     <div>
         <a href="#" id="add_new_deliverable" title="Add New Deliverable" style="text-decoration: none;">
             <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Deliverable" />
@@ -503,94 +447,110 @@
         });       
     </script>
     
-    <h3>Grading/Evaluation</h3>
+    <!--Grading Section-->
+    <h3>
+        Grading/Evaluation</h3>
     
-        <div class="editor-label">
-        @Html.EditorFor(m => Model.UseRubric) @Html.LabelFor(m => Model.UseRubric)@Helpers.CreateToolTip(ToolTips.BasicAssignmentUseRubric)<div id="edit_rubric_div" style="display: none">
-        @Html.Partial("_RubricSelect")
-        <button type="button" onclick="OpenRubricDialog()" value="Create Rubric">
-                    Create/Edit Rubric...
-                </button>
-                </div>
-        
-    </div>
-    
+    <!--Use Rubric-->
     <div class="editor-label">
-        @Html.CheckBoxFor(model => submission.InstructorCanReview, new { id = "InstructorCanReview" }) @Html.LabelFor(model => submission.InstructorCanReview)
+        @Html.EditorFor(m => Model.UseRubric) @Html.LabelFor(m => Model.UseRubric)@Helpers.CreateToolTip(ToolTips.BasicAssignmentUseRubric)<div
+            id="edit_rubric_div" style="display: none">
+            @Html.Partial("_RubricSelect")
+            <button type="button" onclick="OpenRubricDialog()" value="Create Rubric">
+                Create/Edit Rubric...
+            </button>
+        </div>
     </div>
+    
+    <!--Inline Review-->
+    <div class="editor-label">
+        @Html.CheckBoxFor(model => submission.InstructorCanReview, new { id = "InstructorCanReview" })
+        @Html.LabelFor(model => submission.InstructorCanReview)
+    </div>
+    
+    <!--Category Options-->
     <div id="line_review_config" class="indented_options" style="display: none;">
-        <input type="radio" name="line_review_options" value="ManualConfig" />Create new set of comment categories called <input id="category_config_name" name="category_config_name" type="text" /><br />
-        <div id="manual_config_options" class="indented_options" style="display: none;" >
+        <input type="radio" name="line_review_options" value="ManualConfig" />Create new
+        set of comment categories called
+        <input id="category_config_name" name="category_config_name" type="text" /><br />
+        <div id="manual_config_options" class="indented_options" style="display: none;">
             <p>
-                <a href="#" id="add_new_category" title="Add new category" style="text-decoration:none;">
-                    <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add new category" /> Add a category
-                </a>
+                <a href="#" id="add_new_category" title="Add new category" style="text-decoration: none;">
+                    <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add new category" />
+                    Add a category </a>
             </p>
-            <div id="category_data"></div>
+            <div id="category_data">
+            </div>
             <br style="clear: both;" />
         </div>
         @if (ViewBag.CommentConfigurations.Count != 0)
         {
-        <input type="radio" name="line_review_options" value="AutoConfig" /><text>Use previously-defined set of comment categories</text>
-        <select id="comment_category_selection" name="comment_category_selection">
+            <input type="radio" name="line_review_options" value="AutoConfig" /><text>Use previously-defined
+            set of comment categories</text>
+            <select id="comment_category_selection" name="comment_category_selection">
                 @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)
                 {
                     <option value="@ccc.ID" >@ccc.Name</option>
                 }
             </select><br />
-        <div id="auto_config_options" class="indented_options" style="display: none;" >            
-            <div id="comment_config_samples" class="indented_options">
-            @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)
-            {
-                string id = "comment_sample_" + @ccc.ID;
-                <div id="@id" style="display:none;"> 
-                    <table>
-                        <tr>
-                            <td style="padding-right:10px;"> <strong>Category</strong> </td> <td> <strong>Options</strong> </td>
-                        </tr>
-                        @foreach (CommentCategory cc in ccc.Categories)
-                        {
-                        <tr>
-                            <td valign="top" style="padding-right:10px;">@cc.Name</td>
-                            <td>
-                                @foreach (CommentCategoryOption cco in cc.Options)
+            <div id="auto_config_options" class="indented_options" style="display: none;">
+                <div id="comment_config_samples" class="indented_options">
+                    @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)
+                    {
+                        string id = "comment_sample_" + @ccc.ID;
+                        <div id="@id" style="display:none;">
+                            <table>
+                                <tr>
+                                    <td style="padding-right: 10px;">
+                                        <strong>Category</strong>
+                                    </td>
+                                    <td>
+                                        <strong>Options</strong>
+                                    </td>
+                                </tr>
+                                @foreach (CommentCategory cc in ccc.Categories)
                                 {
-                                    @cco.Name <br />
+                                    <tr>
+                                        <td valign="top" style="padding-right: 10px;">@cc.Name
+                                        </td>
+                                        <td>
+                                            @foreach (CommentCategoryOption cco in cc.Options)
+                                            {
+                                                @cco.Name <br />
+                                            }
+                                        </td>
+                                    </tr>
                                 }
-                            </td>
-                        </tr>
-                        }
-                    </table>
+                            </table>
+                        </div>
+                    }
                 </div>
-            }
             </div>
-        </div>
         }
         <br />
     </div>
     
-        <div class="editor-label">
+    <!--Can be Graded-->
+    <div class="editor-label">
         @Html.CheckBoxFor(model => model.isGradable, new { id = "add_to_gradebook" }) @Html.Label("Count this assignment towards students' grades")@Helpers.CreateToolTip(ToolTips.BasicAssignmentAddToGradebook)
-        </div>
-    <div id='grading'>    
+    </div>
+    <div id='grading'>
         <div id="grade_options" class="indented_options">
             <div class="editor-field">
                 Worth
                 @Html.TextBoxFor(model => model.Assignment.PointsPossible, new { id = "points_possible", size = 3 })
                 points toward the
-                @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)  
-            @Html.DropDownListFor(model => model.Assignment.CategoryID, ViewBag.Categories as SelectList, new { id = "grade_category" })
-            @Html.ValidationMessageFor(model => model.Assignment.Category)
-        <span>grading category</span>
+                @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)
+                @Html.DropDownListFor(model => model.Assignment.CategoryID, ViewBag.Categories as SelectList, new { id = "grade_category" })
+                @Html.ValidationMessageFor(model => model.Assignment.Category)
+                <span>grading category</span>
             </div>
-            <!--
-                <div class="editor-field">
-                    Worth
-                    @Html.TextBoxFor(model => model.Submission.PointsPossible, new { id = "submission_points_possible", size = 3 })
-                    Points For Submission Activity <span id="grade_category_label"></span>
-                    @Html.ValidationMessageFor(model => model.Submission.PointsPossible)
-                </div>
-            -->
+            <div class="editor-field">
+                Worth
+                @Html.TextBoxFor(model => model.Submission.PointsPossible, new { id = "submission_points_possible", size = 3 })
+                Points For Submission Activity <span id="grade_category_label"></span>
+                @Html.ValidationMessageFor(model => model.Submission.PointsPossible)
+            </div>
             <h4>
                 Late Policy @Helpers.CreateToolTip(ToolTips.BasicAssignmentLatePolicy)
             </h4>
@@ -612,7 +572,8 @@
     </div>
     <p>
         @Html.HiddenFor(model => model.Assignment.IsDraft, new { id = "is_draft" })
-        <input type="submit" value="Create Basic Assignment" /> <input type="submit" value="Save as Draft" id="save_draft" />@Helpers.CreateToolTip(ToolTips.BasicAssignmentIsDraft)
+        <input type="submit" value="Create Basic Assignment" />
+        <input type="submit" value="Save as Draft" id="save_draft" />@Helpers.CreateToolTip(ToolTips.BasicAssignmentIsDraft)
         <script type="text/javascript">
             $(function () {
                 $('#save_draft').click(function () {
