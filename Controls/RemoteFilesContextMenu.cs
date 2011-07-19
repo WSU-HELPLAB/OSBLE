@@ -45,15 +45,12 @@ namespace FileUploader.Controls
             mi.MouseLeftButtonUp += new MouseButtonEventHandler(mi_MouseLeftButtonUp);
             this.Items.Add(mi);
 
-            //Download.  Turned off because a change in OSBLE proper requires that
-            //you be authenticated in OSBLE prior to downloading files.  
-            /*
+            //Download.
             mi = new MenuItem();
             mi.Header = DownloadText;
             mi.Click += new RoutedEventHandler(mi_Click);
             mi.MouseLeftButtonUp += new MouseButtonEventHandler(mi_MouseLeftButtonUp);
             this.Items.Add(mi);
-             * */
 
             //Delete
             mi = new MenuItem();
