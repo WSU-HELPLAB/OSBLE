@@ -213,10 +213,9 @@ namespace OSBLE.Controllers
                 if (vm.Evaluation.IsPublished)
                 {
                     Score grade = (from g in db.Scores
-                                   join a in db.AbstractAssignmentActivities on g.AssignmentActivityID equals a.ID
                                    where g.TeamUserMemberID == vm.Evaluation.RecipientID
                                    &&
-                                   a.ID == vm.Evaluation.AssignmentActivity.AbstractAssignment.ID
+                                   g.AssignmentActivityID == vm.Evaluation.AbstractAssignmentActivityID
                                    select g).FirstOrDefault();
 
                     //figure out the normalized final score.
