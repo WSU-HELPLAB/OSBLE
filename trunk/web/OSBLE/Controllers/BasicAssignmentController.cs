@@ -185,7 +185,7 @@ namespace OSBLE.Controllers
 
             if (Request.Form["line_review_options"].ToString().CompareTo("ManualConfig") == 0)
             {
-                basic.CommentCategories = BuildCommentCategories();
+                basic.CommentCategoryConfiguration = BuildCommentCategories(basic);
             }
 
             if (ModelState.IsValid)
@@ -227,7 +227,7 @@ namespace OSBLE.Controllers
                 {
                     if (Request.Form["line_review_options"].ToString().CompareTo("ManualConfig") == 0)
                     {
-                        CommentCategoryConfiguration config = BuildCommentCategories();
+                        CommentCategoryConfiguration config = BuildCommentCategories(basic);
                         if (config.Categories.Count > 0)
                         {
                             db.CommentCategoryConfigurations.Add(config);
@@ -485,19 +485,16 @@ namespace OSBLE.Controllers
             };
         }
 
-        private CommentCategoryConfiguration BuildCommentCategories()
+        private CommentCategoryConfiguration BuildCommentCategories(BasicAssignmentViewModel vm)
         {
             CommentCategoryConfiguration config = new CommentCategoryConfiguration();
+            config.Name = vm.CommentCategoryConfiguration.Name;
 
             //all keys that we care about start with "category_"
             List<string> keys = (from key in Request.Form.AllKeys
                                  where key.Contains("category_")
                                  select key).ToList();
 
-            //we know this one for sure so no need to loop
-            config.Name = Request.Form["category_config_name"].ToString();
-
-            //but the rest are variable, so we need to loop
             foreach (string key in keys)
             {
                 //All category keys go something like "category_BLAH1_BLAH2_...".  Based on how

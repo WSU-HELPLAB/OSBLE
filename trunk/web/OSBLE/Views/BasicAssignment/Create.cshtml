@@ -171,8 +171,33 @@
         });
 
 
+        //setup prior comment categories
+        @{if(Model.CommentCategoryConfiguration.Categories.Count > 0)
+        {
+            int counter = 0;
+            foreach(CommentCategory cat in Model.CommentCategoryConfiguration.Categories)
+            {
+                string js = string.Format("\n\taddNamedCategory(\"{0}\", \"{1}\");\n", cat.Name, cat.Options[0].Name);
+                @Html.Raw(js)
+                int insideCounter = -1;
+                foreach(CommentCategoryOption option in cat.Options)
+                {
+                    //skip the first item as we added it with the previous JS call
+                    insideCounter++;
+                    if (insideCounter == 0)
+                    {
+                        continue;
+                    }
+                    js = string.Format("\taddNamedCategoryOption(\"{0}\", \"{1}\");\n", counter, option.Name);
+                    @Html.Raw(js)
+                }
+                counter++;
+            }
+        }
+        }
 
-    });                   // end init
+
+    });// end init
 
 
     function UpdateGradeCategory() {
@@ -512,7 +537,8 @@
     <div id="line_review_config" class="indented_options" style="display: none;">
         <input type="radio" name="line_review_options" value="ManualConfig" />Create new
         set of comment categories called
-        <input id="category_config_name" name="category_config_name" type="text" /><br />
+        @Html.EditorFor(m => m.CommentCategoryConfiguration.Name, new {id="category_config_name"})
+        <br />
         <div id="manual_config_options" class="indented_options" style="display: none;">
             <p>
                 <a href="#" id="add_new_category" title="Add new category" style="text-decoration: none;">

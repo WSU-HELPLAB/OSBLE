@@ -13,7 +13,7 @@ namespace OSBLE.Models.ViewModels
             Stop = new StopActivity();
             Assignment = new StudioAssignment();
             isGradable = true;
-            CommentCategories = new CommentCategoryConfiguration();
+            CommentCategoryConfiguration = new CommentCategoryConfiguration();
         }
 
         [DisplayName("Use OSBLE rubric")]
@@ -29,7 +29,7 @@ namespace OSBLE.Models.ViewModels
 
         public SilverlightObject RubricCreation { get; set; }
 
-        public CommentCategoryConfiguration CommentCategories { get; set; }
+        public CommentCategoryConfiguration CommentCategoryConfiguration { get; set; }
 
         public string SerializedTeamMembersJSON { get; set; }
 

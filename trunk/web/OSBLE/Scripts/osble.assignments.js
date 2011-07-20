@@ -197,7 +197,10 @@ function switchCommentConfig(id) {
     $("#comment_sample_" + id).show('blind');
 }
 
-function addCategory(index) {
+function addCategory(index, catName, optionName) {
+    catName = typeof (catName) != 'undefined' ? catName : "";
+    optionName = typeof (optionName) != 'undefined' ? optionName : "";
+
     var categoryId = 'category_' + index;
     var categoryOptionIdPrefix = 'category_option_' + index;
     var dataId = 'option_data_' + index;
@@ -218,13 +221,13 @@ function addCategory(index) {
 
     // main layout
     newCategory.append('<table><tr>');
-    newCategory.append('<td>Category name:</td><td> <input type="text" id="' + categoryId + '" name="' + categoryId + '"> </td>');
+    newCategory.append('<td>Category name:</td><td> <input type="text" id="' + categoryId + '" name="' + categoryId + '" value="' + catName + '"> </td>');
     newCategory.append('</tr><tr>');
     newCategory.append('<td>Options:</td><td></td></tr><tr> ');
 
     //
     newCategory.append('<td><a id="' + addOptionId + '" title="Add new option" style="text-decoration:none;cursor:pointer;"> <img src="/Content/images/add_up.png" alt="(+)" /> Add new option </a> </td>'); // must be all one line to work
-    newCategory.append('</tr><tr><td colspan="2"><div id="' + dataId + '"> <input type="text" id="' + categoryOptionIdPrefix + '_0" name="' + categoryOptionIdPrefix + '_0"> <br />');
+    newCategory.append('</tr><tr><td colspan="2"><div id="' + dataId + '"> <input type="text" id="' + categoryOptionIdPrefix + '_0" name="' + categoryOptionIdPrefix + '_0" value="' + optionName + '"> <br />');
     // required first option
     newCategory.append('');
 
@@ -242,7 +245,8 @@ function addCategory(index) {
     return true;
 }
 
-function addCategoryOption(categoryIndex, optionIndex) {
+function addCategoryOption(categoryIndex, optionIndex, optionName) {
+    optionName = typeof (optionName) != 'undefined' ? optionName : "";
     var dataId = 'option_data_' + categoryIndex;
     var categoryOptionIdPrefix = 'category_option_' + categoryIndex;
 
@@ -251,7 +255,7 @@ function addCategoryOption(categoryIndex, optionIndex) {
     // all one line because append adds closing tags automatically if there isn't a closing tag (ie </div>) within the string it is appending :/
     d.append('<div><input type="text" id="' + categoryOptionIdPrefix + '_' + optionIndex +
              '" name="' + categoryOptionIdPrefix + '_' + optionIndex +
-             '"> <div style="display: inline; position:relative; top:0.25em;"><a href="#" tabindex="9000' +
+             '" value="' + optionName + '"> <div style="display: inline; position:relative; top:0.25em;"><a href="#" tabindex="9000' +
              optionIndex + '" title="Delete This Option" ' +
              'onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove() }); categoryOptionIndex[' + categoryIndex + ']--; return false;"><img src="/Content/images/delete_up.png" alt="Delete" /></a></div> </div>');
 
@@ -259,6 +263,25 @@ function addCategoryOption(categoryIndex, optionIndex) {
     $('#' + categoryOptionIdPrefix + '_' + optionIndex).keypress(disableSubmit);
 
     return true;
+}
+
+function addNamedCategory(catName, optionName) {
+    var result = addCategory(categoryIndex, catName, optionName);
+
+    //false result indicates that the row wasn't created successfully
+    if (!result) {
+        return;
+    }
+
+    // keep track of indices
+    categoryIndex++;
+    categoryCount++;
+}
+
+function addNamedCategoryOption(index, optionName) {
+    var categoryIndex = index;
+    addCategoryOption(categoryIndex, categoryOptionIndex[categoryIndex], optionName);
+    categoryOptionIndex[categoryIndex]++;
 }
 
 function addNewCategory() {

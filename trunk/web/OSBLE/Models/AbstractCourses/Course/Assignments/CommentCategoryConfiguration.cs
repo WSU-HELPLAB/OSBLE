@@ -12,7 +12,7 @@ namespace OSBLE.Models.AbstractCourses.Course
         [Required]
         public string Name { get; set; }
 
-        public virtual ICollection<CommentCategory> Categories { get; set; }
+        public virtual IList<CommentCategory> Categories { get; set; }
 
         public CommentCategoryConfiguration()
         {
