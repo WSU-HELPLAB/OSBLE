@@ -422,7 +422,6 @@
                     } else { 
                         $(this).text(grade.toFixed(1) + "%");
                     }
-                    
                 }
             });
         });
@@ -467,6 +466,11 @@
             else if(cellValue < 0 || isNaN(parseFloat(cellValue)))
             {
                 alert("Please enter a possitive integer or NG");
+               
+                var textValue = lastFocusedCell.text();
+                var inputText = $('<input class="cellInput" type="text" value="' + textValue + '" />');
+                lastFocusedCell.html(inputText);
+                inputText.focus();
                 event.cancelBubble = true;
                 return false;
             }

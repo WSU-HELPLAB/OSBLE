@@ -367,9 +367,6 @@
 
     var currentHeaderCell = null;
 
-    var global_event;
-    var global_cell;
-
     $(function () {
         $("input[name='Customize_radio']").change(function () {
             if ($("input[name='Customize_radio']:checked").val() == 'CompAverage') {
@@ -499,8 +496,6 @@
                     });
                     clearLastCellFocus(e);
                 }
-                global_cell = cell;
-                global_event = e;
             }
 
             //if tab is pressed
@@ -878,7 +873,6 @@
                             }
                             else {
                                 //$("#grades").replaceWith(response);
-
                             }
                         }
                     });
@@ -1080,7 +1074,11 @@
 
             $(this).find("td").each(function () {
                 if ($(this).attr("id") == "total") {
-                    $(this).text(grade.toFixed(1) + "%");
+                    if (grade.toString() == "NaN") {
+                        $(this).text("NG");
+                    } else {
+                        $(this).text(grade.toFixed(1) + "%");
+                    }
                 }
             });
         });
