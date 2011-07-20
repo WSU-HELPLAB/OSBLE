@@ -1,13 +1,17 @@
 ﻿@model OSBLE.Models.ViewModels.BasicAssignmentViewModel
 @using OSBLE.Models.Assignments.Activities
+@using OSBLE.Models.AbstractCourses;
+@using OSBLE.Models.AbstractCourses.Course;
 @using OSBLE.Models
 @{
-    ViewBag.Title = "Edit Basic Assignment";
+    ViewBag.Title = "Create Basic Assignment";
 }
-<h2>Edit Basic Assignment @Helpers.CreateToolTip(ToolTips.BasicAssignmentTitle) </h2>
-
+<h2>
+    Create Basic Assignment @Helpers.CreateToolTip(ToolTips.BasicAssignmentTitle)
+</h2>
 <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/json2.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/osble.assignments.js")" type="text/javascript"></script>
 <script type="text/javascript">
 
@@ -36,23 +40,21 @@
             updateActivitiesName();
         });
 
-        $('#use_rubric').change(function () {
+        $('#UseRubric').change(function () {
             if ($(this).attr('checked')) {
                 $('#edit_rubric_div').show('highlight');
             }
             else {
                 $('#edit_rubric_div').hide('blind');
-
             }
         });
 
+
         $('#isTeam').change(function () {
             if ($(this).attr('checked')) {
-
                 DisplayTeamOptions();
             }
             else {
-
                 HideTeamOptions();
             }
         });
@@ -122,28 +124,18 @@
 
         //Call any needed functions (note events wont be called on this function so we got to call them manually
 
-        DisplayPreviousAssignment();
+        DisplayRandomTeams();
 
         // Set up add to gradebook checkbox
 
-        var oldPointsPossible = parseInt($('#points_possible').val());
-
-        if (parseInt($('#points_possible').val()) == 0) {
-            $('#add_to_gradebook').attr('checked', false);
-            $('#grade_options').css('display', 'none');
-        } else {
-            $('#add_to_gradebook').attr('checked', true);
-            $('#grade_options').css('display', 'block');
-        }
-
         $('#add_to_gradebook').change(function () {
             if ($('#add_to_gradebook').attr('checked')) {
-                $('#grade_options').show('blind');
-                $('#points_possible').val(oldPointsPossible.toString());
+                $('#grading').show('blind');
+                $('html,body').animate({
+                    scrollTop: $("#grading").offset().top
+                }, 2000);
             } else {
-                $('#grade_options').hide();
-                oldPointsPossible = parseInt($('#points_possible').val());
-                $('#points_possible').val('0');
+                $('#grading').hide('blind');
             }
         });
 
@@ -153,10 +145,49 @@
             UpdateGradeCategory();
         });
 
-    });
+
+
+    });  // end init
+
 
     function UpdateGradeCategory() {
         $('#grade_category_label').html($('#grade_category').selectedTexts()[0]);
+    }
+
+    function updateActivitiesName() {
+        $('#SubmissionName').val($('#Assignment_Name').val() + ' Submission');
+        $('#StopName').val($('#Assignment_Name').val() + ' Stop');
+    }
+
+
+    // due date
+
+    function updateDueDate() {
+        $('#DueDate').val($('#DueDate_Date').val() + ' ' + $('#DueDate_Time').val());
+    }
+
+
+    // release date
+
+    function updateReleaseDate() {
+        $('#ReleaseDate').val($('#ReleaseDate_Date').val() + ' ' + $('#ReleaseDate_Time').val());
+    }
+
+
+    // teams
+
+    function DisplayTeamOptions() {
+        $('#Team_Options').show('blind');
+    }
+    function HideTeamOptions() {
+        $('#Team_Options').hide('blind');
+    }
+
+    function OpenTeamGeneration() {
+        $('#team_generation_dialog').dialog('open'); return false;
+    }
+    function CloseTeamGenerationWindow() {
+        $('#team_generation_dialog').dialog('close'); return false;
     }
 
     function DisplayManualTeams() {
@@ -164,45 +195,23 @@
         $('#PreviousAssignmentDiv').hide();
         $('#ManualTeams').show('blind');
     }
-
     function DisplayRandomTeams() {
         $('#PreviousAssignmentDiv').hide();
         $('#ManualTeams').hide();
         $('#RandomTeams').show('blind');
     }
-
     function DisplayPreviousAssignment() {
         $('#RandomTeams').hide();
         $('#ManualTeams').hide();
         $('#PreviousAssignmentDiv').show('blind');
     }
 
-    function DisplayTeamOptions() {
-        $('#Team_Options').show('blind');
-    }
-
-    function HideTeamOptions() {
-        $('#Team_Options').hide('blind');
-    }
-
-    function updateReleaseDate() {
-        $('#ReleaseDate').val($('#ReleaseDate_Date').val() + ' ' + $('#ReleaseDate_Time').val());
-    }
-
-    function updateDueDate() {
-        $('#DueDate').val($('#DueDate_Date').val() + ' ' + $('#DueDate_Time').val());
-    }
-    function updateActivitiesName() {
-        $('#SubmissionName').val($('#Assignment_Name').val() + ' Submission');
-        $('#StopName').val($('#Assignment_Name').val() + ' Stop');
-    }
-
-    function OpenTeamGeneration() {
-        $('#team_generation_dialog').dialog('open'); return false;
-    }
-
-    function OpenRubricDialog() {
-        $('#rubric_dialog').dialog('open'); return false;
+    function OpenPreviousTeam() {
+        OpenTeamGeneration();
+        if (isTeamGenerationReady) {
+            var jsonData = $('#SerializedTeamMembersJSON').val();
+            document.getElementById("team_creation_silverlight").Content.MainPage.SetAvailableTeamMembers(jsonData);
+        }
     }
 
     function GenerateTeamsRandomly() {
@@ -213,7 +222,7 @@
             }
             else {
                 OpenTeamGeneration();
-                if (TeamGenerationReady) {
+                if (isTeamGenerationReady) {
                     document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfTeams(parseInt($('#total_teams').val()));
                 }
             }
@@ -225,19 +234,16 @@
             }
             else {
                 OpenTeamGeneration();
-                if (TeamGenerationReady) {
+                if (isTeamGenerationReady) {
                     document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfPeople(parseInt($('#people_per_team').val()));
                 }
             }
         }
     }
 
-    function CloseTeamGenerationWindow() {
-        $('#team_generation_dialog').dialog('close'); return false;
-    }
-
     function TeamGenerationReady() {
 
+        isTeamGenerationReady = true;
         if ($("input[name='team_generation_options']:checked").val() == 'RandomTeams') {
             if ($("input[name='team_or_people']:checked").val() == 'Teams') {
                 document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfTeams(parseInt($('#total_teams').val()));
@@ -246,10 +252,29 @@
                 document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfPeople(parseInt($('#people_per_team').val()));
             }
         }
+        else if ($("input[name='team_generation_options']:checked").val() == 'PreviousAssignment') {
+            var jsonData = $('#SerializedTeamMembersJSON').val();
+            document.getElementById("team_creation_silverlight").Content.MainPage.SetAvailableTeamMembers(jsonData);
+        }
     }
 
-    function CloseRubric() {
-        $('#rubric_dialog').dialog('close'); return false;
+
+    // rubric
+    function OpenRubricDialog() {
+        $('#rubric_dialog').dialog('open'); return false;
+    }
+
+    function CloseRubric(rubricId) {
+        $('#rubric_dialog').dialog('close');
+        $.ajax({
+            type: "POST",
+            url: "/BasicAssignment/GetRubrics",
+            data: { selectedRubric: rubricId },
+            success: function (msg) {
+                $('#RubricSelect').html(msg);
+            }
+        });
+        return false;
     }
 
 </script>
@@ -266,12 +291,14 @@
 
         Html.ValidationSummary(true);
 
+    <!--Hidden fields-->
     @Html.Hidden("newTeams", "", new { id = "newTeams" })
     @Html.HiddenFor(model => submission.ReleaseDate, new { @id = "ReleaseDate" })
     @Html.HiddenFor(model => stop.ReleaseDate, new { @id = "DueDate" })
     @Html.HiddenFor(model => submission.Name, new { @id = "SubmissionName" })
     @Html.HiddenFor(model => stop.Name, new { @id = "StopName" })
         
+    <!--Assignment Name-->
     <div class="editor-label">
         @Html.LabelFor(model => model.Assignment.Name)
     </div>
@@ -279,6 +306,8 @@
         @Html.EditorFor(model => model.Assignment.Name)
         @Html.ValidationMessageFor(model => model.Assignment.Name)
     </div>
+    
+    <!--Assignment Description-->
     <div class="editor-label">
         @Html.LabelFor(model => model.Assignment.Description)
     </div>
@@ -287,6 +316,7 @@
         @Html.ValidationMessageFor(model => model.Assignment.Description)
     </div>
         
+    <!--Submission Release Date-->
     <div class="editor-label">
         @Html.LabelFor(model => submission.ReleaseDate)
         @Helpers.CreateToolTip(ToolTips.BasicAssignmentReleaseDate)
@@ -295,6 +325,7 @@
         @Html.TextBox("ReleaseDate_Date", convertToMonthDayYearFormat(submission.ReleaseDate), new { @id = "ReleaseDate_Date", @class = "date_picker", size = 9 })
         @Html.TextBox("ReleaseDate_Time", convertTime(submission.ReleaseDate), new { @id = "ReleaseDate_Time", @class = "time_picker", size = 9 })
     </div>
+    
     <!--Stop date-->
     <div class="editor-label">
         @Html.Label("Due Date")
@@ -304,34 +335,15 @@
         @Html.TextBox("DueDate_Date", convertToMonthDayYearFormat(stop.ReleaseDate), new { @id = "DueDate_Date", @class = "date_picker", size = 9 })
         @Html.TextBox("DueDate_Time", convertTime(stop.ReleaseDate), new { @id = "DueDate_Time", @class = "time_picker", size = 9 })
     </div>
-    <div class="editor-label">
-        @Html.LabelFor(model => model.Assignment.IsDraft)
-        @Helpers.CreateToolTip(ToolTips.BasicAssignmentIsDraft)
-    </div>
-    <div class="editor-field">
-        @Html.CheckBoxFor(model => model.Assignment.IsDraft)
-        @Html.ValidationMessageFor(model => model.Assignment.IsDraft)
-    </div>
 
+    <!--Is Team-->
     <div class="editor-label">
-        @Html.LabelFor(model => submission.isTeam)
+        @Html.CheckBoxFor(model => submission.isTeam, new { id = "isTeam" }) @Html.Label("This is a team assignment")
     </div>
-    <div class="editor-field">
-        @Html.CheckBoxFor(model => submission.isTeam, new { id = "isTeam" })
-        @Html.ValidationMessageFor(model => submission.isTeam)
-    </div>
+    
+    <!-- Team Div-->
     <div id="Team_Options" class="indented_options" style="display: none">
-        <input type="radio" name="team_generation_options" value="PreviousAssignment" />
-        Use teams defined in previous course assignment
-        <br />
-        <ul id="PreviousAssignmentDiv" style="display: none" class="team_generation_options">
-            <li>Select box goes here. </li>
-            <br />
-            <li>
-                <button type="button" onclick="OpenTeamGeneration()">
-                    Generate Teams...</button>
-            </li>
-        </ul>
+        <!--Radio Button Generate teams randomly-->
         <input type="radio" name="team_generation_options" value="RandomTeams" />
         Generate teams randomly
         <br />
@@ -354,6 +366,23 @@
                 </button>
             </li>
         </ul>
+
+        <!--Radio Button Use previous, only shows up if there was a previous team assignment-->
+        @if (ViewBag.PastTeamAssignments != null && (ViewBag.PastTeamAssignments as SelectList).Count() != 0)
+        { 
+            <input type="radio" name="team_generation_options" value="PreviousAssignment" />
+            <text>Use teams defined in previous course assignment</text>
+            <br />
+            <ul id="PreviousAssignmentDiv" style="display: none" class="team_generation_options">
+                <li>
+                    @Html.DropDownListFor(m => m.SerializedTeamMembersJSON, ViewBag.PastTeamAssignments as SelectList)
+                    <button type="button" onclick="OpenPreviousTeam()">
+                        Edit Teams...</button>
+                </li>
+            </ul>
+        }
+        
+        <!--Radio Button Manual Teams-->
         <input type="radio" name="team_generation_options" value="ManualTeams" />
         Specify teams manually
         <ul id="ManualTeams" style="display: none" class="team_generation_options">
@@ -365,69 +394,41 @@
         </ul>
         <!-- in the future generate teams with mixed ability and Generate teams with same-ability will need to go here -->
     </div>
-    <div class="editor-label">
-        @Html.LabelFor(model => submission.InstructorCanReview)
-    </div>
-    <div class="editor-field">
-        @Html.EditorFor(model => submission.InstructorCanReview)
-        @Html.ValidationMessageFor(model => submission.InstructorCanReview)
-    </div>
 
-    <div class="editor-label">
-        @Html.Label("Use Rubric?")
-        @Helpers.CreateToolTip(ToolTips.BasicAssignmentUseRubric)
-    </div>
-    <div class="editor-field">
-        @Html.CheckBox("use_rubric", false, new { id = "use_rubric" })
-    </div>
-    <div id="edit_rubric_div" style="display: none">
-        <ul id="rubic_ul" class="team_generation_options">
-            <li>
-                <button type="button" onclick="OpenRubricDialog()">
-                    Edit Rubric...
-                </button>
-            </li>
-        </ul>
-    </div>
-
-    <h3>Deliverables @Helpers.CreateToolTip(ToolTips.BasicAssignmentDeliverables) </h3>
-   
-    <table id="deliverables_table">
+    <!--Deliverables section-->
+    <h3>
+        Deliverables @Helpers.CreateToolTip(ToolTips.BasicAssignmentDeliverables)
+    </h3>
+    
+    <table id="deliverables_table" cellspacing="6px">
         <tr>
             <td>
-                <table>
-                    <tr>
-                        <td>
-                            File Name
-                        </td>
-                        <td>
-                            <input type="text" id="new_deliverable_name" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Type
-                        </td>
-                        <td>
-                            <select id="new_deliverable_type">
-                                @foreach (SelectListItem dt in ViewBag.DeliverableTypes)
-                                {
-                                    <option value="@dt.Value">@dt.Text</option>
-                                }
-                            </select>
-                        </td>
-                    </tr>
-                </table>
+                File&nbsp;Name
+            </td>
+            <td>
+                <input type="text" id="new_deliverable_name" />
             </td>
         </tr>
         <tr>
             <td>
-                <a href="#" id="add_new_deliverable" title="Add New Deliverable">
-                    <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Deliverable" />
-                </a>
+                Type
+            </td>
+            <td>
+                <select id="new_deliverable_type">
+                    @foreach (SelectListItem dt in ViewBag.DeliverableTypes)
+                    {
+                        <option value="@dt.Value">@dt.Text</option>
+                    }
+                </select>
             </td>
         </tr>
     </table>
+    
+    <div>
+        <a href="#" id="add_new_deliverable" title="Add New Deliverable" style="text-decoration: none;">
+            <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Deliverable" />
+            Save Deliverable </a>
+    </div>
     
     <div id="deliverable_data">
     </div>
@@ -446,62 +447,148 @@
         });       
     </script>
     
-    <h3>Grading</h3>
+    <!--Grading Section-->
+    <h3>
+        Grading/Evaluation</h3>
     
-    
+    <!--Use Rubric-->
     <div class="editor-label">
-        @Html.LabelFor(model => model.Assignment.Category, "Category")
-    </div>
-    <div class="editor-field">
-        @Html.DropDownListFor(model => model.Assignment.CategoryID, ViewBag.Categories as SelectList, new { id = "grade_category" })
-        @Html.ValidationMessageFor(model => model.Assignment.Category)
-    </div>
-    
-    
-        
-    <div class="editor-label">
-        Add to Gradebook
-        @Helpers.CreateToolTip(ToolTips.BasicAssignmentAddToGradebook)
-    </div>
-    <div class="editor-field">
-        <input type="checkbox" id="add_to_gradebook" checked="checked" />
-    </div>
-    
-    <div id="grade_options" class="indented_options">
-        <div class="editor-field">
-            Worth
-            @Html.TextBoxFor(model => model.Assignment.PointsPossible, new { id = "points_possible", size = 3 })
-            Points in Category <span id="grade_category_label"></span>
-            @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)
+        @Html.EditorFor(m => Model.UseRubric) @Html.LabelFor(m => Model.UseRubric)@Helpers.CreateToolTip(ToolTips.BasicAssignmentUseRubric)<div
+            id="edit_rubric_div" style="display: none">
+            @Html.Partial("_RubricSelect")
+            <button type="button" onclick="OpenRubricDialog()" value="Create Rubric">
+                Create/Edit Rubric...
+            </button>
         </div>
-
-    <h3>Late Policy @Helpers.CreateToolTip(ToolTips.BasicAssignmentLatePolicy) </h3>
-        <p>
-            Students may submit assignments up to @Html.TextBoxFor(model => model.Submission.MinutesLateWithNoPenalty, new { size = 3 })
-            minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.Submission.PercentPenalty, new { size = 3 })
-            percent per @Html.TextBoxFor(model => model.Submission.HoursLatePerPercentPenalty, new { size = 3 })
-            hours late will be applied.<br />
-            @Html.ValidationMessageFor(model => model.Submission.MinutesLateWithNoPenalty)
-            @Html.ValidationMessageFor(model => model.Submission.PercentPenalty)
-            @Html.ValidationMessageFor(model => model.Submission.HoursLatePerPercentPenalty)
-        </p>
-        <p>
-            Assignments that are submitted more than @Html.TextBoxFor(model => model.Submission.HoursLateUntilZero, new { size = 3 })
-            hours after the due date and time will receive an automatic 0.<br />
-            @Html.ValidationMessageFor(model => model.Submission.HoursLateUntilZero)
-        </p>
     </div>
     
-    <p>
-        <input type="submit" value="Save Changes" />
-    </p>
+    <!--Inline Review-->
+    <div class="editor-label">
+        @Html.CheckBoxFor(model => submission.InstructorCanReview, new { id = "InstructorCanReview" })
+        @Html.LabelFor(model => submission.InstructorCanReview)
+    </div>
+    
+    <!--Category Options-->
+    <div id="line_review_config" class="indented_options" style="display: none;">
+        <input type="radio" name="line_review_options" value="ManualConfig" />Create new
+        set of comment categories called
+        <input id="category_config_name" name="category_config_name" type="text" /><br />
+        <div id="manual_config_options" class="indented_options" style="display: none;">
+            <p>
+                <a href="#" id="add_new_category" title="Add new category" style="text-decoration: none;">
+                    <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add new category" />
+                    Add a category </a>
+            </p>
+            <div id="category_data">
+            </div>
+            <br style="clear: both;" />
+        </div>
+        @if (ViewBag.CommentConfigurations.Count != 0)
+        {
+            <input type="radio" name="line_review_options" value="AutoConfig" /><text>Use previously-defined
+            set of comment categories</text>
+            <select id="comment_category_selection" name="comment_category_selection">
+                @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)
+                {
+                    <option value="@ccc.ID" >@ccc.Name</option>
+                }
+            </select><br />
+            <div id="auto_config_options" class="indented_options" style="display: none;">
+                <div id="comment_config_samples" class="indented_options">
+                    @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)
+                    {
+                        string id = "comment_sample_" + @ccc.ID;
+                        <div id="@id" style="display:none;">
+                            <table>
+                                <tr>
+                                    <td style="padding-right: 10px;">
+                                        <strong>Category</strong>
+                                    </td>
+                                    <td>
+                                        <strong>Options</strong>
+                                    </td>
+                                </tr>
+                                @foreach (CommentCategory cc in ccc.Categories)
+                                {
+                                    <tr>
+                                        <td valign="top" style="padding-right: 10px;">@cc.Name
+                                        </td>
+                                        <td>
+                                            @foreach (CommentCategoryOption cco in cc.Options)
+                                            {
+                                                @cco.Name <br />
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        <br />
+    </div>
+    
+    <!--Can be Graded-->
+    <div class="editor-label">
+        @Html.CheckBoxFor(model => model.isGradable, new { id = "add_to_gradebook" }) @Html.Label("Count this assignment towards students' grades")@Helpers.CreateToolTip(ToolTips.BasicAssignmentAddToGradebook)
+    </div>
+    <div id='grading'>
+        <div id="grade_options" class="indented_options">
+            <div class="editor-field">
+                Worth
+                @Html.TextBoxFor(model => model.Assignment.PointsPossible, new { id = "points_possible", size = 3 })
+                points toward the
+                @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)
+                @Html.DropDownListFor(model => model.Assignment.CategoryID, ViewBag.Categories as SelectList, new { id = "grade_category" })
+                @Html.ValidationMessageFor(model => model.Assignment.Category)
+                <span>grading category</span>
+            </div>
+            <div class="editor-field">
+                Worth
+                @Html.TextBoxFor(model => model.Submission.PointsPossible, new { id = "submission_points_possible", size = 3 })
+                Points For Submission Activity <span id="grade_category_label"></span>
+                @Html.ValidationMessageFor(model => model.Submission.PointsPossible)
+            </div>
+            <h4>
+                Late Policy @Helpers.CreateToolTip(ToolTips.BasicAssignmentLatePolicy)
+            </h4>
+            <p>
+                Students may submit assignments up to @Html.TextBoxFor(model => model.Submission.MinutesLateWithNoPenalty, new { size = 3 })
+                minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.Submission.PercentPenalty, new { size = 3 })
+                percent per @Html.TextBoxFor(model => model.Submission.HoursLatePerPercentPenalty, new { size = 3 })
+                hours late will be applied.<br />
+                @Html.ValidationMessageFor(model => model.Submission.MinutesLateWithNoPenalty)
+                @Html.ValidationMessageFor(model => model.Submission.PercentPenalty)
+                @Html.ValidationMessageFor(model => model.Submission.HoursLatePerPercentPenalty)
+            </p>
+            <p>
+                Assignments that are submitted more than @Html.TextBoxFor(model => model.Submission.HoursLateUntilZero, new { size = 3 })
+                hours after the due date and time will receive an automatic 0.<br />
+                @Html.ValidationMessageFor(model => model.Submission.HoursLateUntilZero)
+            </p>
+        </div>
+    </div>
+    <div>
+        @Html.HiddenFor(model => model.Assignment.IsDraft, new { id = "is_draft" })
+        <input type="submit" value="Create Basic Assignment" />
+        <input type="submit" value="Save as Draft" id="save_draft" />@Helpers.CreateToolTip(ToolTips.BasicAssignmentIsDraft)
+        <script type="text/javascript">
+            $(function () {
+                $('#save_draft').click(function () {
+                    alert('This assignment will be saved as a draft and will not be released even if the release date passes');
+                    $('#is_draft').val('True');
+                });
+            });
+        </script>
+    </div>
     
     }
-    <div>
-        @Html.ActionLink("Back to List", "Index", "Home") <br />
-    </div>
+    <p>
+        @Html.ActionLink("Back to List", "Index", "Home")
+    </p>
 }
-
 <div id="team_generation_dialog" title="Edit Teams">
     @Html.DisplayFor(m => m.TeamCreation)
 </div>

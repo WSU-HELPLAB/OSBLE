@@ -89,16 +89,15 @@ namespace OSBLE.Models
 
             public static string BasicAssignmentReleaseDate = "This is the date and time that the assignment will first show up for users.";
             public static string BasicAssignmentDueDate = "This is the last date and time to turn in the assignment. See the <strong>Late Policy</strong> section below to determine how automatic deductions will be handled for assignments turned in after this date. ";
-            public static string BasicAssignmentIsDraft = "Draft assignments are typically incomplete samples of a final assignment. This is just a mark placed on the assignment and grading is determined in the <strong>Grading</strong> section below.";
-        
-            public static string BasicAssignmentUseRubric = "Check this box to create a rubric that will determine how this assignment is graded. (You have to click <em>Edit Rubric</em> to specify the rubric.)";
-
+            public static string BasicAssignmentIsTeam = "Team assignments allow groups to collaborate on the creation of deliverables. Only a single member of the team must turn in the deliverable and it will be attributed to all members of the team. <br /><br /> Team assignments require teams to be created below.";
             public static string BasicAssignmentDeliverables = "Deliverables are the actual assignment types that are expected to be turned in. Each assignment can have multiple files and file types to turn in.";
 
+            public static string BasicAssignmentUseRubric = "Check this box to create a rubric that will determine how this assignment is graded. (You have to click <em>Edit Rubric</em> to specify the rubric.)";
+            public static string BasicAssignmentEnableInlineComments = "Inline comments are allowed to have up to six categories each with an unlimited number of options. This allows for specific comments to be created using this template on each deliverable associated with this assignment. <br /><br /> Create a new set below or select a previously configured set. When you creat your own custom set, it will be saved for future use once this assignment is created.";
             public static string BasicAssignmentAddToGradebook = "Adding an assignment to the gradebook means that the results of this assignment will affect the final grade of students.";
 
             public static string BasicAssignmentLatePolicy = "Read the following sentences and edit the textboxes to specify the late policy of this individual assignment.";
-
+            public static string BasicAssignmentIsDraft = "Draft assignments are typically incomplete samples of a final assignment. This is just a mark placed on the assignment and grading is determined in the <strong>Grading</strong> section below.";
 
         #endregion
 

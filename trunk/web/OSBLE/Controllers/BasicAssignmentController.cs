@@ -113,7 +113,14 @@ namespace OSBLE.Controllers
                                     join r in db.Rubrics on cr.RubricID equals r.ID
                                     where cr.AbstractCourseID == activeCourse.AbstractCourseID
                                     select r).ToList();
-            rubrics.Insert(0, new Rubric() { ID = 0, Description = "" });
+            if (rubrics.Count() < 1)
+            {
+                rubrics.Insert(0, new Rubric() { ID = 0, Description = "This course has no rubrics" });
+            }
+            else
+            {
+                rubrics.Insert(0, new Rubric() { ID = 0, Description = "" });
+            }
             ViewBag.Rubrics = rubrics.ToList();
 
             var cat = from c in (activeCourse.AbstractCourse as Course).Categories
@@ -172,7 +179,7 @@ namespace OSBLE.Controllers
             if (basic.UseRubric)
             {
                 int rubricId = 0;
-                if (Int32.TryParse(Request.Form["RubricToUse"].ToString(), out rubricId))
+                if ( Int32.TryParse(Request.Form["RubricToUse"].ToString(), out rubricId) && rubricId != 0 )
                 {
                     basic.Assignment.RubricID = rubricId;
                     ViewBag.SelectedRubric = rubricId;
@@ -556,7 +563,7 @@ namespace OSBLE.Controllers
         }
 
         //
-        // GET: /Assignment/Edit/5
+        // GET: /BasicAssignment/Edit/5
 
         [CanModifyCourse]
         public ActionResult Edit(int id)
@@ -595,6 +602,10 @@ namespace OSBLE.Controllers
                     ViewBag.Categories = new SelectList(cat, "ID", "Name");
                     ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
                     ViewBag.Deliverables = Deliverables;
+
+
+                    setupViewBagForEdit();
+
                     return View(viewModel);
                 }
             }
@@ -602,25 +613,53 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Assignment");
         }
 
+        private void setupViewBagForEdit()
+        {
+            
+            List<Rubric> rubrics = (from cr in db.CourseRubrics
+                                    join r in db.Rubrics on cr.RubricID equals r.ID
+                                    where cr.AbstractCourseID == activeCourse.AbstractCourseID
+                                    select r).ToList();
+            rubrics.Insert(0, new Rubric() { ID = 0, Description = "" });
+            ViewBag.Rubrics = rubrics.ToList();
+
+            var cat = from c in (activeCourse.AbstractCourse as Course).Categories
+                      where c.Name != Constants.UnGradableCatagory
+                      select c;
+            ViewBag.Categories = new SelectList(cat, "ID", "Name");
+            ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
+            ViewBag.AllowedFileNames = from c in FileSystem.GetCourseDocumentsFileList(activeCourse.AbstractCourse, includeParentLink: false).Files select c.Name;
+            
+
+            // line by line review configurations
+            List<CommentCategoryConfiguration> configs = (from cc in db.CommentCategoryConfigurations
+                                                          where cc.ID != null
+                                                          select cc).ToList();
+            ViewBag.CommentConfigurations = configs;
+            
+        }
+
+        // POST: /BasicAssignment/Edit/5
         [HttpPost]
         [CanModifyCourse]
         public ActionResult Edit(BasicAssignmentViewModel basic)
         {
-            StudioAssignment assignment = db.StudioAssignments.Find(basic.Assignment.ID);
-
-            // Make sure assignment to update belongs to this course.
-            if (assignment.Category.CourseID != ActiveCourse.AbstractCourseID)
+            /*
+            string serializedTeams = null;
+            try
             {
-                return RedirectToAction("Index", "Home");
+                serializedTeams = Uri.UnescapeDataString(Request.Params["newTeams"]);
+            }
+            catch
+            {
+                serializedTeams = null;
             }
 
-            // If category updated, ensure it belongs to the course as well.
-            if (basic.Assignment.CategoryID != assignment.CategoryID)
+            if (basic.Submission.isTeam)
             {
-                Category c = db.Categories.Find(basic.Assignment.CategoryID);
-                if (c.CourseID != ActiveCourse.AbstractCourseID)
+                if (serializedTeams == null || serializedTeams == "")
                 {
-                    return RedirectToAction("Index", "Home");
+                    ModelState.AddModelError("Team", "Using teams was selected but no teams were created, please create the teams");
                 }
             }
 
@@ -628,22 +667,42 @@ namespace OSBLE.Controllers
             {
                 ModelState.AddModelError("time", "The due date must come after the release date");
             }
+
+            if (Request.Params["isGradable"].ToString() == "false")
+            {
+                basic.Assignment.Category = (from c in (activeCourse.AbstractCourse as Course).Categories
+                                             where c.Name == Constants.UnGradableCatagory
+                                             select c).FirstOrDefault();
+            }
+		
+
+            StudioAssignment assignment = db.StudioAssignments.Find(basic.Assignment.ID);
+
+  
+            //  // Make sure assignment to update belongs to this course.
+            //  if (assignment.Category.CourseID != ActiveCourse.AbstractCourseID)
+            //  {
+            //      return RedirectToAction("Index", "Home");
+            //  }
+            //  
+            //  // If category updated, ensure it belongs to the course as well.
+            //  if (basic.Assignment.CategoryID != assignment.CategoryID)
+            //  {
+            //      Category c = db.Categories.Find(basic.Assignment.CategoryID);
+            //      if (c.CourseID != ActiveCourse.AbstractCourseID)
+            //      {
+            //          return RedirectToAction("Index", "Home");
+            //      }
+            //  }
+
+
             if (ModelState.IsValid)
             {
+                int currentCategoryId = basic.Assignment.CategoryID;
+
                 // Find current submission and stop activities from basic assignment
                 SubmissionActivity submission = assignment.AssignmentActivities.Where(aa => aa is SubmissionActivity).First() as SubmissionActivity;
                 StopActivity stop = assignment.AssignmentActivities.Where(aa => aa is StopActivity).FirstOrDefault() as StopActivity;
-
-                assignment.Deliverables.Clear();
-
-                // Update Basic Assignment fields
-                assignment.CategoryID = basic.Assignment.CategoryID;
-                assignment.Name = basic.Assignment.Name;
-                assignment.Description = basic.Assignment.Description;
-                assignment.PointsPossible = basic.Assignment.PointsPossible;
-                assignment.Deliverables = basic.Assignment.Deliverables;
-
-                // Update Submission Activity fields
 
                 submission.ReleaseDate = basic.Submission.ReleaseDate;
                 submission.Name = basic.Submission.Name;
@@ -654,22 +713,157 @@ namespace OSBLE.Controllers
                 submission.PercentPenalty = basic.Submission.PercentPenalty;
                 submission.MinutesLateWithNoPenalty = basic.Submission.MinutesLateWithNoPenalty;
 
-                // Update Stop Activity fields
+                submission.isTeam = basic.Submission.isTeam;
+                submission.InstructorCanReview = basic.Submission.InstructorCanReview;
 
+                //submission.ColumnOrder = colOrder++;
+
+                stop.Name = basic.Stop.Name;
                 stop.ReleaseDate = basic.Stop.ReleaseDate;
 
-                // Flag models as modified and save to DB
+
+                if (basic.Submission.InstructorCanReview)
+                {
+                    if (Request.Form["line_review_options"].ToString().CompareTo("ManualConfig") == 0)
+                    {
+                        CommentCategoryConfiguration config = BuildCommentCategories();
+                        if (config.Categories.Count > 0)
+                        {
+                            db.CommentCategoryConfigurations.Add(config);
+                            db.SaveChanges();
+                            basic.Assignment.CommentCategoryConfigurationID = config.ID;
+                        }
+                    }
+                    else if (Request.Form["line_review_options"].ToString().CompareTo("AutoConfig") == 0)
+                    {
+                        basic.Assignment.CommentCategoryConfigurationID = Convert.ToInt32(Request.Params["comment_category_selection"]);
+                    }
+
+                }
+
+                if (basic.UseRubric)
+                {
+                    int rubricId = 0;
+                    if (Int32.TryParse(Request.Form["RubricToUse"].ToString(), out rubricId))
+                    {
+                        basic.Assignment.RubricID = rubricId;
+                    }
+                }
+
+
+                assignment.Deliverables.Clear();
+
+                // Update Basic Assignment fields
+                assignment.CategoryID = basic.Assignment.CategoryID;
+                assignment.Name = basic.Assignment.Name;
+                assignment.Description = basic.Assignment.Description;
+                assignment.PointsPossible = basic.Assignment.PointsPossible;
+                assignment.Deliverables = basic.Assignment.Deliverables;
+
 
                 db.Entry(assignment).State = EntityState.Modified;
                 db.Entry(submission).State = EntityState.Modified;
                 db.Entry(stop).State = EntityState.Modified;
 
                 db.SaveChanges();
+
+                // Causes a duplicate entry into the database
+                //db.AbstractAssignmentActivity.Add(submission);
+                //db.AbstractAssignmentActivity.Add(stop);
+                //db.SaveChanges();
+
+                if (basic.Submission.isTeam)
+                {
+                    List<SerializableTeamMember> teamMembers = JsonConvert.DeserializeObject<List<SerializableTeamMember>>(serializedTeams);
+
+                    //(section, teams) : where teams is string and a list of members
+                    Dictionary<int, Dictionary<string, List<SerializableTeamMember>>> membersByTeamBySection = new Dictionary<int, Dictionary<string, List<SerializableTeamMember>>>();
+
+                    var teamMembersBySections = from c in teamMembers group c by c.Section;
+
+                    foreach (var section in teamMembersBySections)
+                    {
+                        Dictionary<string, List<SerializableTeamMember>> membersByTeams = new Dictionary<string, List<SerializableTeamMember>>();
+                        var teams = from c in section group c by c.InTeamName;
+
+                        foreach (var team in teams)
+                        {
+                            membersByTeams.Add(team.Key, team.ToList());
+                        }
+                        membersByTeamBySection.Add(section.Key, membersByTeams);
+                    }
+
+                    //for every section add every team
+                    foreach (var membersBySection in membersByTeamBySection)
+                    {
+                        //for every team create a new team and set the Team Name
+                        foreach (var team in membersBySection.Value)
+                        {
+                            Team team_db = new Team();
+                            team_db.Name = team.Key;
+
+                            //for every member of that team make a new TeamMember
+                            foreach (SerializableTeamMember serializeableMember in team.Value)
+                            {
+                                TeamUserMember teamUser_db;
+                                if (serializeableMember.isUser)
+                                {
+                                    UserMember userMember = new UserMember();
+                                    userMember.UserProfile = (from c in db.UserProfiles
+                                                              where c.ID == serializeableMember.UserID
+                                                              select c).FirstOrDefault();
+                                    userMember.UserProfileID = userMember.UserProfile.ID;
+                                    teamUser_db = userMember;
+                                }
+                                else
+                                {
+                                    TeamMember teamMember = new TeamMember();
+                                    teamMember.Team = (from c in db.Teams
+                                                       where c.ID == serializeableMember.TeamID
+                                                       select c).FirstOrDefault();
+                                    teamMember.TeamID = teamMember.Team.ID;
+
+                                    teamUser_db = teamMember;
+                                }
+                                team_db.Members.Add(teamUser_db);
+                            }
+
+                            TeamMember tm = new TeamMember();
+                            tm.Team = team_db;
+
+                            submission.TeamUsers.Add(tm);
+
+                            db.Teams.Add(team_db);
+                        }
+                    }
+                    db.SaveChanges();
+                }
+                else
+                {
+                    var users = from c in db.CoursesUsers
+                                where c.AbstractCourseID == activeCourse.AbstractCourseID
+                                && c.AbstractRole.CanSubmit
+                                select c.UserProfile;
+
+                    foreach (UserProfile user in users)
+                    {
+                        UserMember um = new UserMember();
+                        um.UserProfile = user;
+
+                        submission.TeamUsers.Add(um);
+                    }
+                    db.SaveChanges();
+                }
+
+                return RedirectToAction("Index", "Assignment");
             }
 
-            ViewBag.Categories = new SelectList(db.Categories, "ID", "Name", basic.Assignment.CategoryID);
-            ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
+            basic.TeamCreation = createTeamCreationSilverlightObject();
+            basic.RubricCreation = createRubricCreationSilverlightObject();
+            setupViewBagForEdit();
 
+            basic.SerializedTeamMembersJSON = basic.TeamCreation.Parameters["teamMembers"] = serializeTeamMemers(getTeamMembers());
+            */
             return View(basic);
         }
 
