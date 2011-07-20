@@ -387,7 +387,6 @@
 
     $(document).ready(function (e) {
         
-        
         var studentId = $("#studentId").val()
         var cell = null;
         if (studentId != "") {
@@ -405,6 +404,8 @@
                 });
             });
         }
+        calculateCols();
+        calculateRows();
 
     });
 
@@ -1324,6 +1325,8 @@
                 data: { categoryId: newCatId[0], dropX: x, customize: ($("input[name='Customize_radio']:checked").val()).toString()},
                 success: function (response) {
                     $("#grades").replaceWith(response);
+                    calculateCols();
+                    calculateRows();
                 }
             });
         }
