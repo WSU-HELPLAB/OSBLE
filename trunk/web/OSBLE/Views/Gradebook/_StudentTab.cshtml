@@ -177,18 +177,17 @@
                 Name
             </th>
             @{
-                
-                if (ViewBag.Customize == Category.GradeOptions.CompAverage || ViewBag.NumDropped == 0)
-                {
-                    <th id="totalCustomize">Total [Average]</th>
-                }
-                else if(ViewBag.Customize == Category.GradeOptions.XtoDrop)
+                if(ViewBag.Customize == Category.GradeOptions.XtoDrop && ViewBag.NumDropped != 0)
                 {
                     <th id="totalCustomize">Total [Drop @ViewBag.NumDropped lowest]</th>
                 }
                 else if (ViewBag.Customize == Category.GradeOptions.XtoTake)
                 {
                     <th id="totalCustomize">Total [Take @ViewBag.NumDropped highest]</th>
+                }
+                else
+                {
+                    <th id="totalCustomize">Total [Average]</th>
                 }
 
                 int i = 2;
