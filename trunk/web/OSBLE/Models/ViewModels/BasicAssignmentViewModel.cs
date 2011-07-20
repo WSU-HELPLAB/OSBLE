@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
+using OSBLE.Models.AbstractCourses.Course;
 
 namespace OSBLE.Models.ViewModels
 {
@@ -12,6 +13,7 @@ namespace OSBLE.Models.ViewModels
             Stop = new StopActivity();
             Assignment = new StudioAssignment();
             isGradable = true;
+            CommentCategories = new CommentCategoryConfiguration();
         }
 
         [DisplayName("Use OSBLE rubric")]
@@ -26,6 +28,8 @@ namespace OSBLE.Models.ViewModels
         public SilverlightObject TeamCreation { get; set; }
 
         public SilverlightObject RubricCreation { get; set; }
+
+        public CommentCategoryConfiguration CommentCategories { get; set; }
 
         public string SerializedTeamMembersJSON { get; set; }
 

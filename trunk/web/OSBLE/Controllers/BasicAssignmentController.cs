@@ -183,6 +183,11 @@ namespace OSBLE.Controllers
                 }
             }
 
+            if (Request.Form["line_review_options"].ToString().CompareTo("ManualConfig") == 0)
+            {
+                basic.CommentCategories = BuildCommentCategories();
+            }
+
             if (ModelState.IsValid)
             {
                 int currentCategoryId = basic.Assignment.CategoryID;
@@ -239,11 +244,6 @@ namespace OSBLE.Controllers
                 db.StudioAssignments.Add(basic.Assignment);
 
                 db.SaveChanges();
-
-                // Causes a duplicate entry into the database
-                //db.AbstractAssignmentActivity.Add(submission);
-                //db.AbstractAssignmentActivity.Add(stop);
-                //db.SaveChanges();
 
                 if (basic.Submission.isTeam)
                 {
@@ -671,95 +671,6 @@ namespace OSBLE.Controllers
 
             return View(basic);
         }
-
-        // ajax handling code for comments
-        //   kept in case ajax wanted to be reimplemented
-        /*
-        [HttpPost]
-        [CanModifyCourse]
-        public string SaveCommentCollection(string name, string data)
-        {
-            JavaScriptSerializer ser = new JavaScriptSerializer();
-            string[][] dataArray = ser.Deserialize<string[][]>(HttpUtility.UrlDecode(data));
-
-            string output = "[" + HttpUtility.UrlDecode(name);
-
-            CommentCollection newCC = new CommentCollection(HttpUtility.UrlDecode(name));
-
-            newCC.Name = HttpUtility.UrlDecode(name);
-
-            for (int i = 0; i < dataArray.Length; i++)
-            {
-                CommentCategory cc = new CommentCategory(dataArray[i][0]);
-                output += "," + dataArray[i][0];
-
-                for (int j = 1; j < dataArray[i].Length; j++)
-                {
-                    output += "," + dataArray[i][j];
-                    cc.CommentCategoryTags.Add( new CommentCategoryTag(dataArray[i][j]) );
-                }
-
-                newCC.CommentCategories.Add( cc );
-            }
-
-            // validate
-
-            //db.CommentCollections.Add(newCC);
-
-            //db.SaveChanges();
-
-            return output + "]";
-        }
-
-        [HttpPost]
-        [CanModifyCourse]
-        public string GetCollectionContents(int inputID)
-        {
-            List<CommentCollection> q1 = (from c in db.CommentCollections
-                                    where c.ID == inputID
-                                    select c).ToList();
-
-            string output = "[";
-            foreach (CommentCollection cc in q1)
-            {
-                output += "." + cc.Name + ".";
-                foreach (CommentCategory c in cc.CommentCategories)
-                {
-                    output += "[" + c.Name;
-
-                    foreach (CommentCategoryTag t in c.CommentCategoryTags)
-                    {
-                        output += "," + t.value;
-                    }
-
-                    output += "],";
-                }
-            }
-            // removes trailing comma and adds ending bracket
-            //output = output.Substring(0, output.Length - 1) + "]";
-
-            string output = "[" + inputID.ToString() + "]";
-            return HttpUtility.UrlEncode(output);
-        }
-
-        [HttpPost]
-        [CanModifyCourse]
-        public string GetCollections()
-        {
-            // add logic for current course here
-            List<CommentCollection> q = (from c in db.CommentCollections where c.Name != null select c).ToList();
-
-            string output = "[";
-            foreach (CommentCollection c in q)
-            {
-                output += "[\"" + c.ID + "\",\"" + c.Name + "\"],";
-            }
-            output = output.Substring(0, output.Length - 1) + "]";
-
-            string output = "[[\"1\",\"Abc\"],[\"2\",\"Def\"]]";
-            return output;
-        }
-        */
 
         protected override void Dispose(bool disposing)
         {
