@@ -101,12 +101,6 @@ namespace OSBLE.Controllers
 
             setupViewBagForCreate();
 
-            // line by line review configurations
-            List<CommentCategoryConfiguration> configs = (from cc in db.CommentCategoryConfigurations
-                                                          where cc.ID != null
-                                                          select cc).ToList();
-            ViewBag.CommentConfigurations = configs;
-
             return View(viewModel);
         }
 
@@ -129,6 +123,12 @@ namespace OSBLE.Controllers
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
             ViewBag.AllowedFileNames = from c in FileSystem.GetCourseDocumentsFileList(activeCourse.AbstractCourse, includeParentLink: false).Files select c.Name;
             ViewBag.NewTeams = "";
+
+            // line by line review configurations
+            List<CommentCategoryConfiguration> configs = (from cc in db.CommentCategoryConfigurations
+                                                          where cc.ID != null
+                                                          select cc).ToList();
+            ViewBag.CommentConfigurations = configs;
             if (Request.Form.AllKeys.Contains("newTeams"))
             {
                 ViewBag.NewTeams = Request.Form["newTeams"];
@@ -185,7 +185,12 @@ namespace OSBLE.Controllers
 
             if (Request.Form["line_review_options"].ToString().CompareTo("ManualConfig") == 0)
             {
-                basic.CommentCategoryConfiguration = BuildCommentCategories(basic);
+                basic.CommentCategoryConfiguration = BuildCommentCategories();
+            }
+            else if (Request.Form["line_review_options"].ToString().CompareTo("AutoConfig") == 0)
+            {
+                basic.Assignment.CommentCategoryConfigurationID = Convert.ToInt32(Request.Params["comment_category_selection"]);
+                basic.CommentCategoryConfiguration.ID = (int)basic.Assignment.CommentCategoryID;
             }
 
             if (ModelState.IsValid)
@@ -227,13 +232,9 @@ namespace OSBLE.Controllers
                 {
                     if (Request.Form["line_review_options"].ToString().CompareTo("ManualConfig") == 0)
                     {
-                        CommentCategoryConfiguration config = BuildCommentCategories(basic);
-                        if (config.Categories.Count > 0)
-                        {
-                            db.CommentCategoryConfigurations.Add(config);
-                            db.SaveChanges();
-                            basic.Assignment.CommentCategoryConfigurationID = config.ID;
-                        }
+                        db.CommentCategoryConfigurations.Add(basic.CommentCategoryConfiguration);
+                        db.SaveChanges();
+                        basic.Assignment.CommentCategoryConfigurationID = basic.CommentCategoryConfiguration.ID;
                     }
                     else if (Request.Form["line_review_options"].ToString().CompareTo("AutoConfig") == 0)
                     {
@@ -485,16 +486,19 @@ namespace OSBLE.Controllers
             };
         }
 
-        private CommentCategoryConfiguration BuildCommentCategories(BasicAssignmentViewModel vm)
+        private CommentCategoryConfiguration BuildCommentCategories()
         {
             CommentCategoryConfiguration config = new CommentCategoryConfiguration();
-            config.Name = vm.CommentCategoryConfiguration.Name;
 
             //all keys that we care about start with "category_"
             List<string> keys = (from key in Request.Form.AllKeys
                                  where key.Contains("category_")
                                  select key).ToList();
 
+            //we know this one for sure so no need to loop
+            config.Name = Request.Form["category_config_name"].ToString();
+
+            //but the rest are variable, so we need to loop
             foreach (string key in keys)
             {
                 //All category keys go something like "category_BLAH1_BLAH2_...".  Based on how

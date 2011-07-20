@@ -156,8 +156,6 @@ $(function () {
         return false;
     });
 
-    $('#category_config_name').val("");
-
     $("input[name='line_review_options']").change(function () {
         if ($("input[name='line_review_options']:checked").val() == 'ManualConfig') {
             $('#auto_config_options').hide();

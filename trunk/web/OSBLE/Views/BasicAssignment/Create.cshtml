@@ -170,7 +170,6 @@
             UpdateGradeCategory();
         });
 
-
         //setup prior comment categories
         @{if(Model.CommentCategoryConfiguration.Categories.Count > 0)
         {
@@ -537,7 +536,7 @@
     <div id="line_review_config" class="indented_options" style="display: none;">
         <input type="radio" name="line_review_options" value="ManualConfig" />Create new
         set of comment categories called
-        @Html.EditorFor(m => m.CommentCategoryConfiguration.Name, new {id="category_config_name"})
+        <input type="text" id="category_config_name" name="category_config_name" value="@Model.CommentCategoryConfiguration.Name" />
         <br />
         <div id="manual_config_options" class="indented_options" style="display: none;">
             <p>
