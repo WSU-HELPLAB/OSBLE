@@ -223,7 +223,7 @@ function addCategory(index) {
     newCategory.append('<td>Options:</td><td></td></tr><tr> ');
 
     //
-    newCategory.append('<td><a href="#" id="' + addOptionId + '" title="Add new option" style="text-decoration:none;"> <img src="/Content/images/add_up.png" alt="(+)" /> Add new option </a> </td>'); // must be all one line to work
+    newCategory.append('<td><a id="' + addOptionId + '" title="Add new option" style="text-decoration:none;cursor:pointer;"> <img src="/Content/images/add_up.png" alt="(+)" /> Add new option </a> </td>'); // must be all one line to work
     newCategory.append('</tr><tr><td colspan="2"><div id="' + dataId + '"> <input type="text" id="' + categoryOptionIdPrefix + '_0" name="' + categoryOptionIdPrefix + '_0"> <br />');
     // required first option
     newCategory.append('');
@@ -234,7 +234,7 @@ function addCategory(index) {
     $('#' + categoryId).keypress(disableSubmit);
     $('#' + categoryOptionIdPrefix + '_0').keypress(disableSubmit);
 
-    $('#add_option_' + categoryIndex).click(alert('no dice for now.'));
+    $('#add_option_' + categoryIndex).click({ catIndex: categoryIndex }, addNewCategoryOption);
 
     // set focus to newly created category
     $('#' + categoryId).focus(); // doesn't work, but I don't want to change any names
@@ -258,8 +258,6 @@ function addCategoryOption(categoryIndex, optionIndex) {
     $('#' + categoryOptionIdPrefix + '_' + optionIndex).focus();
     $('#' + categoryOptionIdPrefix + '_' + optionIndex).keypress(disableSubmit);
 
-    
-
     return true;
 }
 
@@ -276,7 +274,8 @@ function addNewCategory() {
     categoryCount++;
 }
 
-function addNewCategoryOption(categoryIndex) {
+function addNewCategoryOption(e) {
+    var categoryIndex = e.data.catIndex;
     addCategoryOption(categoryIndex, categoryOptionIndex[categoryIndex]);
     categoryOptionIndex[categoryIndex]++;
 }
