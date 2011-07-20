@@ -555,7 +555,12 @@
             <select id="comment_category_selection" name="comment_category_selection">
                 @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)
                 {
-                    <option value="@ccc.ID" >@ccc.Name</option>
+                    string selected = "";
+                    if(@ccc.ID == Model.CommentCategoryConfiguration.ID)
+                     {
+                         selected = "selected=\"selected\"";
+                     }
+                    <option value="@ccc.ID" @selected>@ccc.Name</option>
                 }
             </select><br />
             <div id="auto_config_options" class="indented_options" style="display: none;">
