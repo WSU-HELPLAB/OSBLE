@@ -18,7 +18,14 @@
     var isTeamGenerationReady = false;
 
     $(function () {
+
+        //set default values
+        $('#submission_points_possible').val($("#points_possible").val());
+
         //set up event listeners 
+        $("#points_possible").keyup(function () {
+            $('#submission_points_possible').val($("#points_possible").val());
+        });
 
         $('#ReleaseDate_Date').change(function () {
             updateReleaseDate();
@@ -147,7 +154,7 @@
 
 
 
-    });  // end init
+    });     // end init
 
 
     function UpdateGradeCategory() {
@@ -547,7 +554,7 @@
             </div>
             <div class="editor-field">
                 Worth
-                @Html.TextBoxFor(model => model.Submission.PointsPossible, new { id = "submission_points_possible", size = 3 })
+                @Html.TextBoxFor(model => model.Submission.PointsPossible, new { id = "submission_points_possible", size = 3, disabled = "disabled", value = Model.Assignment.PointsPossible })
                 Points For Submission Activity <span id="grade_category_label"></span>
                 @Html.ValidationMessageFor(model => model.Submission.PointsPossible)
             </div>
