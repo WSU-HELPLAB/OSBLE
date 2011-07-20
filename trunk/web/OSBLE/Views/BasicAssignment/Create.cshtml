@@ -127,11 +127,29 @@
         //Check the first radio button with the name team_or_people aka the one associated with total teams
         $("input[name='team_or_people']:eq(0)").attr('checked', 'checked');
 
-        $('#isTeam').removeAttr('checked');
+        //if we start the program off as having a team assignment (either from a postback or from
+        //loading a previous assignment), display the team generation options.
+        if ($('#isTeam').attr('checked') == 'checked') {
+            $('#isTeam').change();
+
+            //do we have teams previously defined?
+            if ($('#newTeams').val() != "") {
+
+                //check the "specify teams manually" radio button
+                $("input[name='team_generation_options']:eq(1)").attr('checked', 'checked');
+                DisplayManualTeams();
+            }
+            else {
+                DisplayRandomTeams();
+            }
+        } else {
+            DisplayRandomTeams();
+        }
 
         //Call any needed functions (note events wont be called on this function so we got to call them manually
-
-        DisplayRandomTeams();
+        if ($('#UseRubric').attr('checked') == 'checked') {
+            $('#UseRubric').change();
+        }
 
         // Set up add to gradebook checkbox
 
@@ -154,7 +172,7 @@
 
 
 
-    });     // end init
+    });                   // end init
 
 
     function UpdateGradeCategory() {
@@ -221,6 +239,14 @@
         }
     }
 
+    function SpecifyTeamsManually() {
+        OpenTeamGeneration();
+        if (isTeamGenerationReady) {
+            var jsonData = $('#newTeams').val();
+            document.getElementById("team_creation_silverlight").Content.MainPage.SetAvailable(jsonData);
+        }
+    }
+
     function GenerateTeamsRandomly() {
         if ($("input[name='team_or_people']:checked").val() == 'Teams') {
             var teams = parseInt($('#total_teams').val());
@@ -263,6 +289,10 @@
             var jsonData = $('#SerializedTeamMembersJSON').val();
             document.getElementById("team_creation_silverlight").Content.MainPage.SetAvailableTeamMembers(jsonData);
         }
+        else if ($("input[name='team_generation_options']:checked").val() == 'ManualTeams') {
+            var jsonData = $('#newTeams').val();
+            document.getElementById("team_creation_silverlight").Content.MainPage.SetAvailableTeamMembers(jsonData);
+        }
     }
 
 
@@ -292,14 +322,14 @@
     StopActivity stop = Model.Stop;
     submission.isTeam = false;
 
-    Html.ValidationSummary();
     using (Html.BeginForm())
     {
 
-        Html.ValidationSummary(true);
-
+    @Html.ValidationSummary()
+    
     <!--Hidden fields-->
-    @Html.Hidden("newTeams", "", new { id = "newTeams" })
+        string newTeams = ViewBag.NewTeams;
+    @Html.Hidden("newTeams", newTeams, new { id = "newTeams" })
     @Html.HiddenFor(model => submission.ReleaseDate, new { @id = "ReleaseDate" })
     @Html.HiddenFor(model => stop.ReleaseDate, new { @id = "DueDate" })
     @Html.HiddenFor(model => submission.Name, new { @id = "SubmissionName" })
@@ -373,6 +403,17 @@
                 </button>
             </li>
         </ul>
+        
+        <!--Radio Button Manual Teams-->
+        <input type="radio" name="team_generation_options" value="ManualTeams" />
+        Specify teams manually
+        <ul id="ManualTeams" style="display: none" class="team_generation_options">
+            <li>
+                <button type="button" onclick="SpecifyTeamsManually()">
+                    Create Teams...
+                </button>
+            </li>
+        </ul>
 
         <!--Radio Button Use previous, only shows up if there was a previous team assignment-->
         @if (ViewBag.PastTeamAssignments != null && (ViewBag.PastTeamAssignments as SelectList).Count() != 0)
@@ -388,17 +429,7 @@
                 </li>
             </ul>
         }
-        
-        <!--Radio Button Manual Teams-->
-        <input type="radio" name="team_generation_options" value="ManualTeams" />
-        Specify teams manually
-        <ul id="ManualTeams" style="display: none" class="team_generation_options">
-            <li>
-                <button type="button" onclick="OpenTeamGeneration()">
-                    Create Teams...
-                </button>
-            </li>
-        </ul>
+
         <!-- in the future generate teams with mixed ability and Generate teams with same-ability will need to go here -->
     </div>
 
@@ -460,7 +491,9 @@
     
     <!--Use Rubric-->
     <div class="editor-label">
-        @Html.EditorFor(m => Model.UseRubric) @Html.LabelFor(m => Model.UseRubric)@Helpers.CreateToolTip(ToolTips.BasicAssignmentUseRubric)<div
+        @Html.EditorFor(m => Model.UseRubric) 
+        @Html.LabelFor(m => Model.UseRubric)@Helpers.CreateToolTip(ToolTips.BasicAssignmentUseRubric)
+        <div
             id="edit_rubric_div" style="display: none">
             <span id="RubricSelect">@Html.Partial("_RubricSelect")</span>
             <button type="button" onclick="OpenRubricDialog()" value="Create Rubric">
@@ -490,7 +523,7 @@
             </div>
             <br style="clear: both;" />
         </div>
-        @if (ViewBag.CommentConfigurations.Count != 0)
+        @if (ViewBag.CommentConfigurations != null && ViewBag.CommentConfigurations.Count != 0)
         {
             <input type="radio" name="line_review_options" value="AutoConfig" /><text>Use previously-defined
             set of comment categories</text>

@@ -138,7 +138,7 @@ for (var i = 0; i < MAX_CATEGORIES; i++) {
 }
 
 $(function () {
-    $('#InstructorCanReview').removeAttr('checked');
+
     $('#manual_config_options').show();
     $("input[name='line_review_options']:eq(0)").attr('checked', 'checked');
 
@@ -154,7 +154,6 @@ $(function () {
     $('#add_new_category').click(function () {
         addNewCategory();
         return false;
-        //
     });
 
     $('#category_config_name').val("");
@@ -176,6 +175,10 @@ $(function () {
     $('#comment_category_selection option:eq(0)').attr('selected', 'selected');
     $('#comment_category_selection').change(switchCommentConfigListener);
     switchCommentConfig($('#comment_category_selection option:eq(0)').val());
+
+    if ($('#InstructorCanReview').attr('checked') == 'checked') {
+        $('#line_review_config').show('blind');
+    }
 });
 
 // apply this function in an event listener to every text box to prevent accidental submission of the whole form by the user
@@ -193,115 +196,14 @@ function switchCommentConfig(id) {
     $("#comment_config_samples").children().hide();
     $("#comment_sample_" + id).show('blind');
 }
-// ajax code
-//   commented out rather than deleted to allow for reimplementation
-/*
-function saveConfig() {
-// validate here
 
-$.ajax({
-url: '/BasicAssignment/SaveCommentCollection',
-data: { name: encodeURI( $("#category_config_name").val() ), data: encodeURI( getNewCategoryData() ) },
-type: "POST",
-success: function (data) {
-//if(){
-loadConfigs();
-// reset name, remove the categories
-$('#category_data').empty();
-$('#new_collection_name').val("");
+function addCategory(index) {
+    var categoryId = 'category_' + index;
+    var categoryOptionIdPrefix = 'category_option_' + index;
+    var dataId = 'option_data_' + index;
+    var addOptionId = 'add_option_' + index;
 
-$('#category_data').append( decodeURI(data) ); // temp, this will be status to tell whether or not to reset #category_data and #new_collection_name (server side validation)
-}
-});
-
-return false;
-}
-function getNewCategoryData(){
-var data = new Array();
-var cur = 0;
-
-$("#category_data").children().map( function(){
-cur = data.push( new Array() );
-$(this).find("input").map(function(){
-data[cur-1].push( $(this).val() );
-});
-});
-
-return JSON.stringify(data);
-}
-
-function loadConfigs() {
-// currently, select all
-$.ajax({
-url: '/BasicAssignment/GetCollections',
-type: "POST",
-success: function (data) {
-displayConfigs(data);
-}
-});
-}
-
-function displayConfigs(data) {
-$("#comment_category_selection").empty();
-$("#comment_category_selection").append("<option value='null'>[None Selected]</option>");
-
-// loop over data
-dataArray = JSON.parse(data);
-for (i=0;i<dataArray.length;i++) {
-$("#comment_category_selection").append("<option value='" + dataArray[i][0] + "'>" + dataArray[i][1] + "</option>");
-}
-}
-
-function switchCommentConfig() {
-// use this to load the select box onload and after a new category is added
-
-//$("#comment_category_selection").attr("disabled", true);
-// notification of loading
-
-$.ajax({
-url: '/BasicAssignment/GetCollectionContents',
-data: { inputID: $(this).val() },
-type: "POST",
-success: function (data) {
-displayCommentConfig( decodeURI(data) );
-}
-});
-}
-
-function displayCommentConfig(data) {
-// defaults
-//$("#comment_category_selection").attr("disabled", false);
-//$('#comment_category_selection option:eq(0)').attr('selected', 'selected')
-
-$("#saved_config_display").empty();
-
-// load from database
-//while(data){
-//collectionName = data.name;
-//collectionID = data.ID;
-
-//}
-
-//$("#comment_category_selection").append("<option value='" + collectionID + "'>" + collectionName + "</option>");
-//$("#saved_config_display").append("<div id='configID_" + collectionID + "' class='indented_options' style='display:none;'> [TEMPORARY PLACEHOLDER " + collectionID + "] </div>");
-$("#saved_config_display").append(data);
-
-//$("#saved_config_display").append("<div id='configID_null' class='indented_options' style='display:none;'></div>");
-//$("#saved_config_display").append("<div id='configID_2' class='indented_options' style='display:none;'> aaa </div>");
-//$("#saved_config_display").append("<div id='configID_5' class='indented_options' style='display:none;'> bbb </div>");
-//$("#saved_config_display").append("<div id='configID_6' class='indented_options' style='display:none;'> ccc </div>");
-
-//var newCollectionDisplay = $('#display_' + i);
-}
-*/
-
-function addNewCategory() {
-    var categoryId = 'category_' + categoryIndex;
-    var categoryOptionIdPrefix = 'category_option_' + categoryIndex;
-    var dataId = 'option_data_' + categoryIndex;
-    var addOptionId = 'add_option_' + categoryIndex;
-
-    // limit to six
+    // check limit
     if (categoryCount >= MAX_CATEGORIES) {
         alert("The maximum number of categories is " + MAX_CATEGORIES + ".");
         return false;
@@ -332,25 +234,49 @@ function addNewCategory() {
     $('#' + categoryId).keypress(disableSubmit);
     $('#' + categoryOptionIdPrefix + '_0').keypress(disableSubmit);
 
-    $('#add_option_' + categoryIndex).click(function () {
-        var i = this.id.substring(11, this.id.length);
-        var d = $('#' + dataId);
-
-        // all one line because append adds closing tags automatically if there isn't a closing tag (ie </div>) within the string it is appending :/
-        d.append('<div><input type="text" id="' + categoryOptionIdPrefix + '_' + categoryOptionIndex[i] + '" name="' + categoryOptionIdPrefix + '_' + categoryOptionIndex[i] + '"> <div style="display: inline; position:relative; top:0.25em;"><a href="#" tabindex="9000' + categoryOptionIndex[i] + '" title="Delete This Option" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove() }); categoryOptionIndex[' + i + ']--; return false;"><img src="/Content/images/delete_up.png" alt="Delete" /></a></div> </div>');
-
-        $('#' + categoryOptionIdPrefix + '_' + categoryOptionIndex[i]).focus();
-        $('#' + categoryOptionIdPrefix + '_' + categoryOptionIndex[i]).keypress(disableSubmit);
-
-        categoryOptionIndex[i]++;
-
-        return false;
-    });
+    $('#add_option_' + categoryIndex).click(alert('no dice for now.'));
 
     // set focus to newly created category
     $('#' + categoryId).focus(); // doesn't work, but I don't want to change any names
 
+    return true;
+}
+
+function addCategoryOption(categoryIndex, optionIndex) {
+    var dataId = 'option_data_' + categoryIndex;
+    var categoryOptionIdPrefix = 'category_option_' + categoryIndex;
+
+    var d = $('#' + dataId);
+
+    // all one line because append adds closing tags automatically if there isn't a closing tag (ie </div>) within the string it is appending :/
+    d.append('<div><input type="text" id="' + categoryOptionIdPrefix + '_' + optionIndex +
+             '" name="' + categoryOptionIdPrefix + '_' + optionIndex +
+             '"> <div style="display: inline; position:relative; top:0.25em;"><a href="#" tabindex="9000' +
+             optionIndex + '" title="Delete This Option" ' +
+             'onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove() }); categoryOptionIndex[' + categoryIndex + ']--; return false;"><img src="/Content/images/delete_up.png" alt="Delete" /></a></div> </div>');
+
+    $('#' + categoryOptionIdPrefix + '_' + optionIndex).focus();
+    $('#' + categoryOptionIdPrefix + '_' + optionIndex).keypress(disableSubmit);
+
+    
+
+    return true;
+}
+
+function addNewCategory() {
+    var result = addCategory(categoryIndex);
+    
+    //false result indicates that the row wasn't created successfully
+    if (!result) {
+        return;
+    }
+
     // keep track of indices
     categoryIndex++;
     categoryCount++;
+}
+
+function addNewCategoryOption(categoryIndex) {
+    addCategoryOption(categoryIndex, categoryOptionIndex[categoryIndex]);
+    categoryOptionIndex[categoryIndex]++;
 }

@@ -128,6 +128,11 @@ namespace OSBLE.Controllers
             ViewBag.Categories = new SelectList(cat, "ID", "Name");
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
             ViewBag.AllowedFileNames = from c in FileSystem.GetCourseDocumentsFileList(activeCourse.AbstractCourse, includeParentLink: false).Files select c.Name;
+            ViewBag.NewTeams = "";
+            if (Request.Form.AllKeys.Contains("newTeams"))
+            {
+                ViewBag.NewTeams = Request.Form["newTeams"];
+            }
         }
 
         [HttpPost]
@@ -162,6 +167,20 @@ namespace OSBLE.Controllers
                 basic.Assignment.Category = (from c in (activeCourse.AbstractCourse as Course).Categories
                                              where c.Name == Constants.UnGradableCatagory
                                              select c).FirstOrDefault();
+            }
+
+            if (basic.UseRubric)
+            {
+                int rubricId = 0;
+                if (Int32.TryParse(Request.Form["RubricToUse"].ToString(), out rubricId))
+                {
+                    basic.Assignment.RubricID = rubricId;
+                    ViewBag.SelectedRubric = rubricId;
+                }
+                else
+                {
+                    ModelState.AddModelError("rubric", "The use of a rubric was indicated, but no rubric has been selected.");
+                }
             }
 
             if (ModelState.IsValid)
@@ -214,15 +233,6 @@ namespace OSBLE.Controllers
                     else if (Request.Form["line_review_options"].ToString().CompareTo("AutoConfig") == 0)
                     {
                         basic.Assignment.CommentCategoryConfigurationID = Convert.ToInt32(Request.Params["comment_category_selection"]);
-                    }
-                }
-
-                if (basic.UseRubric)
-                {
-                    int rubricId = 0;
-                    if (Int32.TryParse(Request.Form["RubricToUse"].ToString(), out rubricId))
-                    {
-                        basic.Assignment.RubricID = rubricId;
                     }
                 }
 
