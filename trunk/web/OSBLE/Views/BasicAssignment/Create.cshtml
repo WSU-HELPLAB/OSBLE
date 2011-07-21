@@ -538,7 +538,13 @@
     
     <!--Category Options-->
     <div id="line_review_config" class="indented_options" style="display: none;">
-        <input type="radio" name="line_review_options" value="ManualConfig" />Create new
+        @{string CreateNewSelected = "";
+          if(Model.Assignment.CommentCategoryConfigurationID == 0 || Model.Assignment.CommentCategoryConfigurationID == null)
+          {
+              CreateNewSelected = "checked=\"checked\"";
+          }
+          }
+        <input type="radio" name="line_review_options" value="ManualConfig" @Html.Raw(CreateNewSelected) />Create new
         set of comment categories called
         <input type="text" id="category_config_name" name="category_config_name" value="@Model.CommentCategoryConfiguration.Name" />
         <br />
@@ -554,7 +560,13 @@
         </div>
         @if (ViewBag.CommentConfigurations != null && ViewBag.CommentConfigurations.Count != 0)
         {
-            <input type="radio" name="line_review_options" value="AutoConfig" /><text>Use previously-defined
+                 string usePreviousSelected = "";
+                 if(Model.Assignment.CommentCategoryConfigurationID != 0 && Model.Assignment.CommentCategoryConfigurationID != null)
+                 {
+                     usePreviousSelected = "checked=\"checked\"";
+                 }
+             
+            <input type="radio" name="line_review_options" value="AutoConfig" @Html.Raw(usePreviousSelected) /><text>Use previously-defined
             set of comment categories</text>
             <select id="comment_category_selection" name="comment_category_selection">
                 @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)

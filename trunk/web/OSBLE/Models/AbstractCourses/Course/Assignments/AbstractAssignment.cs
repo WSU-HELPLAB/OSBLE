@@ -48,10 +48,6 @@ namespace OSBLE.Models.Assignments
             }
         }
 
-        public int? CommentCategoryID { get; set; }
-
-        public CommentCategory CommentCategory { get; set; }
-
         public bool IsDraft { get; set; }
 
         public int? RubricID { get; set; }
