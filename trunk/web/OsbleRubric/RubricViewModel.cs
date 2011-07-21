@@ -98,10 +98,8 @@ namespace OsbleRubric
             thisView.RubricComboBox.SelectionChanged += new SelectionChangedEventHandler(RubricComboBox_SelectionChanged);
 
             //RIA Magic goes here
-            
             thisView.CourseComboBox.ItemsSource = context.Load(context.GetCoursesQuery()).Entities;
             context.Load(context.GetActiveCourseQuery()).Completed += new EventHandler(GetActiveCourseComplete);
-            
 
             //stash the current course id
             if (App.Current.Resources["courseId"] != null)
@@ -1413,10 +1411,59 @@ namespace OsbleRubric
                 }
             }
         }
+
+        /// <summary>
+        /// Prerequist:  getData() should be run before this 
+        /// Returns: a list of errors that need to be fixed before saving
+        /// </summary>
+        /// <returns></returns>
+        private List<string> generateErrorList()
+        {
+            List<string> errorList = new List<string>();
+            foreach (ICell cell in this.dataFromCells)
+            {
+                if (cell is RubricCell) 
+                {
+                    if (cell.Information == "")
+                    {
+                        if (cell.Column == 0) //Performance Criterion Cell
+                        {
+                            errorList.Add("Need a description for the criteria at row: " + cell.Row.ToString());
+                        }
+                        else if (cell.Column == 1) //Weight cell
+                        {
+                            errorList.Add("Need a weight at row: " + cell.Row.ToString());
+                        }
+                        else //regular rubric cell (Cell description)
+                        {
+                            errorList.Add("Need to add description for the cell at row: " + cell.Row.ToString() + " column: " + cell.Column.ToString());
+                        }
+                    }
+                    else if (cell.Column == 1) //checking for correct weight entry. Using else if so we dont have stacking error messages for the same field
+                    {
+                        double temp;
+                        if (double.TryParse(cell.Information, out temp) == false)
+                        {
+                            errorList.Add("Need a valid weight at row: " + cell.Row.ToString());
+                        }
+                    }
+                }
+                else if (cell is HeaderCell)
+                {
+                    if (cell.Information == "")
+                    {
+                        errorList.Add("Need a level title for column: " + cell.Column.ToString());
+                    }
+                }
+            }
+            return errorList;
+        }
+
+        
+
         /// <summary>
         /// returns the view for a rubric
         /// </summary>
-        /// <returns></returns>
         public RubricView GetView()
         {
             return thisView;
@@ -1437,64 +1484,76 @@ namespace OsbleRubric
         /// <summary>
         /// Called when the user clicks the "Publish" button in the view
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         void PublishChanges_Click(object sender, RoutedEventArgs e)
         {
+            
             this.getData();
-            
-            //will house the final form of the data that we will send to the client
-            Rubric rubric = new Rubric();
-
-            if (selectedRubric.ID > 0 && (currentCourseHasEvaluations==false))
+            List<string> errors = generateErrorList();
+            if (errors.Count != 0)
             {
-                rubric = selectedRubric;
+                RubricChildWindow rcw = new RubricChildWindow(errors);
+                rcw.Show();
             }
             else
             {
-                selectedRubric = rubric;
-            }
-            rubric.HasCriteriaComments = false;
-            rubric.HasGlobalComments = false;
-            rubric.Description = thisView.RubricDescriptionTextBox.Text;
+                //will house the final form of the data that we will send to the client
+                Rubric rubric = new Rubric();
 
-            //loop through all of our data
-            foreach (ICell cell in this.dataFromCells)
-            {
-
-                //there should only be two checkbox values.  One to enable column comments and one
-                //to enable global comments
-                if (cell is CheckBoxCell)
+                if (selectedRubric.ID > 0 && (currentCourseHasEvaluations==false))
                 {
-                    CheckBoxCell cb = cell as CheckBoxCell;
-                    if (cell.Information.CompareTo(CheckboxValues.ColumnComment.ToString()) == 0)
-                    {
-                        selectedRubric.HasCriteriaComments = cb.CheckBoxValue;
-                    }
-                    else if (cell.Information.CompareTo(CheckboxValues.GlobalComment.ToString()) == 0)
-                    {
-                        selectedRubric.HasGlobalComments = cb.CheckBoxValue;
-                    }
-
-                    //Because checkbox cells don't contain any data, we can just continue on
-                    //to the next item in our collection
-                    continue;
+                    rubric = selectedRubric;
                 }
-            }
+                else
+                {
+                    selectedRubric = rubric;
+                }
+                rubric.HasCriteriaComments = false;
+                rubric.HasGlobalComments = false;
+                rubric.Description = thisView.RubricDescriptionTextBox.Text;
 
-            //If its ID is 0(a new rubric), add the rubric to the db, else run clearLevelsAndCrit to clear the db
-            if (rubric.ID < 1)
-            {
-                context.Rubrics.Add(rubric);
-                SubmitChanges(sender, e);
-            }
-            else
-            {
-                //context.clearLevelsAndCrit(rubric.ID); Changed
-                context.clearLevelsAndCrit(rubric.ID).Completed += new EventHandler(SubmitChanges);
-            }
+                //loop through all of our data
+                foreach (ICell cell in this.dataFromCells)
+                {
+
+                    //there should only be two checkbox values.  One to enable column comments and one
+                    //to enable global comments
+                    if (cell is CheckBoxCell)
+                    {
+                        CheckBoxCell cb = cell as CheckBoxCell;
+                        if (cell.Information.CompareTo(CheckboxValues.ColumnComment.ToString()) == 0)
+                        {
+                            selectedRubric.HasCriteriaComments = cb.CheckBoxValue;
+                        }
+                        else if (cell.Information.CompareTo(CheckboxValues.GlobalComment.ToString()) == 0)
+                        {
+                            selectedRubric.HasGlobalComments = cb.CheckBoxValue;
+                        }
+
+                        //Because checkbox cells don't contain any data, we can just continue on
+                        //to the next item in our collection
+                        continue;
+                    }
+                }
+
+                //If its ID is 0(a new rubric), add the rubric to the db, else run clearLevelsAndCrit to clear the db
+                if (rubric.ID < 1)
+                {
+                    context.Rubrics.Add(rubric);
+                    SubmitChanges(sender, e); //Force event since we don't have to wait for clearLEvelsAndCrit to complete
+                }
+                else
+                {
+                    //context.clearLevelsAndCrit(rubric.ID); Changed
+                    context.clearLevelsAndCrit(rubric.ID).Completed += new EventHandler(SubmitChanges);
+                }
             
-           // context.SubmitChanges().Completed += new EventHandler(SaveRubricInternals);
+               // context.SubmitChanges().Completed += new EventHandler(SaveRubricInternals);
+            }
+        }
+
+        void rcw_Closed(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         void SubmitChanges(object sender, EventArgs e)
@@ -1508,8 +1567,6 @@ namespace OsbleRubric
         ///    Criteria
         ///    Cell Descriptions (happens in stage 3)
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         void SaveRubricInternals(object sender, EventArgs e)
         {
             criteria = new List<Criterion>();
@@ -1612,11 +1669,7 @@ namespace OsbleRubric
             cr.RubricID = selectedRubric.ID;
             cr.AbstractCourseID = ActiveCourse.ID;
 
-            context.CourseRubrics.Add(cr);
-            //if (!context.CourseRubrics.Contains(cr))
-            //{
-             
-            //}
+            context.CourseRubrics.Add(cr); 
 
             context.SubmitChanges().Completed += new EventHandler(SaveCellDescriptions);
         }
