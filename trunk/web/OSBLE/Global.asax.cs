@@ -21,10 +21,11 @@ namespace OSBLE
             routes.IgnoreRoute("Scripts/{*pathInfo}");
             routes.IgnoreRoute("ClientBin/{*pathInfo}");
             routes.IgnoreRoute("Services/{*pathInfo}");
+            routes.IgnoreRoute("clientaccesspolicy.xml");
 
             //for debugging in-browser silverlight apps
 #if DEBUG
-            routes.IgnoreRoute("clientaccesspolicy.xml");
+
             routes.IgnoreRoute("crossdomain.xml");
             routes.IgnoreRoute("OsbleRubricTestPage.html");
             routes.IgnoreRoute("OsbleRubricTestPage.aspx");

@@ -215,7 +215,7 @@
     <Compile Include="Models\ViewModels\RubricViewModel.cs" />
     <Compile Include="Models\ViewModels\SerializableTeamMembers.cs" />
     <Compile Include="Models\ViewModels\StudioAssignmentViewModel.cs" />
-    <Compile Include="Services\AuthenticationDomainService.cs" />
+    <Compile Include="Services\AuthenticationDomainService1.cs" />
     <Compile Include="Services\OSBLEService.cs" />
     <Compile Include="Services\ReviewInterfaceDomainService.cs" />
     <Compile Include="Services\RubricRiaService.cs" />
@@ -265,7 +265,9 @@
     <Content Include="App_Code\Libraries\LumenWorks.Framework.IO.dll" />
     <Content Include="App_Data\FirstNames.txt" />
     <Content Include="App_Data\LastNames.txt" />
-    <Content Include="clientaccesspolicy.xml" />
+    <Content Include="clientaccesspolicy.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="ClientBin\EditPeerReview.xap" />
     <Content Include="ClientBin\FileUploader.xap" />
     <Content Include="ClientBin\OsbleRubric.xap" />
@@ -419,36 +421,46 @@
     <Content Include="OsbleRubricTestPage.html" />
     <Content Include="PeerReviewTestPage.aspx" />
     <Content Include="PeerReviewTestPage.html" />
-    <Content Include="Scripts\osble.teacher_activity.js" />
-    <Content Include="Scripts\jquery-tooltip.js" />
-    <Content Include="Scripts\jquery.selectboxes.js" />
-    <Content Include="Scripts\osble.assignments.js" />
-    <Content Include="Scripts\jquery.tmpl.min.js" />
-    <Content Include="Scripts\jquery.ui.timepicker.js" />
     <Content Include="Scripts\jquery-1.5.1-vsdoc.js" />
     <Content Include="Scripts\jquery-1.5.1.js" />
     <Content Include="Scripts\jquery-1.5.1.min.js" />
     <Content Include="Scripts\jquery-1.6.1-vsdoc.js" />
     <Content Include="Scripts\jquery-1.6.1.js" />
     <Content Include="Scripts\jquery-1.6.1.min.js" />
+    <Content Include="Scripts\jquery-tooltip.js" />
     <Content Include="Scripts\jquery-ui-1.8.11.js" />
     <Content Include="Scripts\jquery-ui-1.8.11.min.js" />
     <Content Include="Scripts\jquery.collapse.js" />
     <Content Include="Scripts\jquery.easing.js" />
+    <Content Include="Scripts\jquery.selectboxes.js" />
+    <Content Include="Scripts\jquery.tmpl.min.js" />
+    <Content Include="Scripts\jquery.ui.timepicker.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\json2.min.js" />
+    <Content Include="Scripts\MicrosoftAjax.debug.js" />
+    <Content Include="Scripts\MicrosoftAjax.js" />
+    <Content Include="Scripts\MicrosoftMvcAjax.debug.js" />
+    <Content Include="Scripts\MicrosoftMvcAjax.js" />
+    <Content Include="Scripts\MicrosoftMvcValidation.debug.js" />
+    <Content Include="Scripts\MicrosoftMvcValidation.js" />
     <Content Include="Scripts\modernizr-1.7.js" />
     <Content Include="Scripts\modernizr-1.7.min.js" />
+    <Content Include="Scripts\multifile.js" />
+    <Content Include="Scripts\osble.assignments.js" />
     <Content Include="Scripts\osble.assignment_list.js" />
     <Content Include="Scripts\osble.courses.js" />
     <Content Include="Scripts\osble.js" />
+    <Content Include="Scripts\osble.teacher_activity.js" />
     <Content Include="Scripts\Silverlight.js" />
     <Content Include="Services\RubricService.svc" />
     <Content Include="Services\UploaderWebService.svc" />
     <Content Include="Silverlight.js" />
-    <Content Include="Scripts\multifile.js" />
     <Content Include="SilverlightSandboxTestPage.aspx" />
     <Content Include="SilverlightSandboxTestPage.html" />
     <Content Include="ViewPeerReviewTestPage.aspx" />
@@ -463,16 +475,6 @@
       <DependentUpon>Web.config</DependentUpon>
     </Content>
     <Content Include="Content\Site.css" />
-    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
-    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
-    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
-    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
-    <Content Include="Scripts\MicrosoftAjax.js" />
-    <Content Include="Scripts\MicrosoftAjax.debug.js" />
-    <Content Include="Scripts\MicrosoftMvcAjax.js" />
-    <Content Include="Scripts\MicrosoftMvcAjax.debug.js" />
-    <Content Include="Scripts\MicrosoftMvcValidation.js" />
-    <Content Include="Scripts\MicrosoftMvcValidation.debug.js" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Account\Profile.cshtml" />
     <Content Include="Views\Account\ChangePasswordSuccess.cshtml" />
@@ -508,16 +510,10 @@
     <Content Include="Views\School\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\School\Details.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Views\School\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\School\Edit.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\School\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\CoursesUsers\Index.cshtml" />
@@ -685,6 +681,7 @@
     <Content Include="Views\Gradebook\_TeacherTab.cshtml" />
     <Content Include="Views\Account\AccountCreated.cshtml" />
     <Content Include="Views\Account\ActivateAccount.cshtml" />
+    <Content Include="Views\School\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

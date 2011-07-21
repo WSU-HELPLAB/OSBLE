@@ -1,26 +1,21 @@
-﻿
-namespace OSBLE.Services
+﻿namespace OSBLE.Services
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.ComponentModel.DataAnnotations;
     using System.Data;
     using System.Linq;
-    using System.ServiceModel.DomainServices.EntityFramework;
     using System.ServiceModel.DomainServices.Hosting;
     using System.ServiceModel.DomainServices.Server;
+    using OSBLE.Models.AbstractCourses;
     using OSBLE.Models.Courses;
-using OSBLE.Models.Courses.Rubrics;
-using OSBLE.Models.AbstractCourses;
-
+    using OSBLE.Models.Courses.Rubrics;
 
     // Implements application logic using the OsbleEntities context.
     // TODO: Add your application logic to these methods or in additional methods.
     // TODO: Wire up authentication (Windows/ASP.NET Forms) and uncomment the following to disable anonymous access
     // Also consider adding roles to restrict access as appropriate.
     // [RequiresAuthentication]
-    [EnableClientAccess()]
+    [EnableClientAccess(RequiresSecureEndpoint = true)]
     public class RubricRiaService : OSBLEService
     {
         public Criterion DummyCriterion()
@@ -101,10 +96,10 @@ using OSBLE.Models.AbstractCourses;
         {
             //make sure that the association doesn't already exist
             int count = (from cr in db.CourseRubrics
-                          where cr.RubricID == courseRubric.RubricID
-                          &&
-                          cr.AbstractCourseID == courseRubric.AbstractCourseID
-                          select cr).Count();
+                         where cr.RubricID == courseRubric.RubricID
+                         &&
+                         cr.AbstractCourseID == courseRubric.AbstractCourseID
+                         select cr).Count();
             if (count == 0)
             {
                 db.CourseRubrics.Add(courseRubric);
@@ -141,7 +136,7 @@ using OSBLE.Models.AbstractCourses;
             db.Levels.Add(level);
             db.SaveChanges();
         }
-        
+
         [Insert]
         public void AddRubric(Rubric rubric)
         {
@@ -149,12 +144,11 @@ using OSBLE.Models.AbstractCourses;
             db.SaveChanges();
         }
 
-
         public void clearLevelsAndCrit(int rubricID)
         {
             Rubric rubric = db.Rubrics.Find(rubricID);
 
-            db.Entry(rubric).State = EntityState.Modified; 
+            db.Entry(rubric).State = EntityState.Modified;
 
             //when updating a rubric, we must thow away any existing levels, criteria,
             //and cell descriptions
@@ -167,7 +161,7 @@ using OSBLE.Models.AbstractCourses;
                                               &&
                                               crit.RubricID == rubric.ID
                                               select desc).ToList();
-             
+
             foreach (Level l in levels)
             {
                 db.Levels.Remove(l);
@@ -229,5 +223,3 @@ using OSBLE.Models.AbstractCourses;
         }
     }
 }
-
-
