@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
+using System.Web.Configuration;
 using OSBLE.Attributes;
 using OSBLE.Models;
 using OSBLE.Models.Assignments;
@@ -28,6 +29,8 @@ namespace OSBLE.Controllers
 
         public ActionResult Index(int? id)
         {
+            
+
             // These are probably the nastiest set of queries in OSBLE.
             List<StudioAssignment> studioAssignments = db.StudioAssignments.Where(
                     sa =>

@@ -248,7 +248,6 @@ namespace OSBLE.Models
             public static string IssueVotingEnableIssueVotingDiscussion = "If you would like to enable issue voting discussion on this submission, you must check this box, if checked this will populate another option.";
             public static string IssueVotingReviewerMustCompleteIssueVoting = "If you want to require reviewers to have completed issue voting prior to joining a discussion, you must check this box.";
 
-
         #endregion
 
         /*

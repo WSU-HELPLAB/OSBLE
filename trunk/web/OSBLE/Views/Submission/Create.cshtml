@@ -1,8 +1,10 @@
 ﻿@using OSBLE.Models.Assignments.Activities;
 @using OSBLE.Models;
+@using System.Web.Configuration;
 @{
     Layout = "";
     ViewBag.Title = "Submission";
+    ViewBag.MaxFileSizeMB = ((WebConfigurationManager.GetSection("system.web/httpRuntime") as HttpRuntimeSection).MaxRequestLength / 1024);
 }
 <h2>Submission</h2>
 <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
@@ -130,7 +132,7 @@
                                 @MvcHtmlString.Create(newString);
                             </script>
                                 <input type='file' name='files' onchange="checkFileExension(this, @MvcHtmlString.Create("stringArray" + fileUploadsSoFar.ToString()))"/>
-
+                                <em>Your submission must be less than @(ViewBag.MaxFileSizeMB)mb.</em>
                             @{
                                 
                                 fileUploadsSoFar++;
