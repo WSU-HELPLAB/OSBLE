@@ -179,13 +179,14 @@ namespace ReviewInterfaceBase.ViewModel
 
         private void customTabControlViewModel_SwitchedTabs(object sender, SwitchedTabEventArgs e)
         {
-            if (e.NewTab != null && e.NewTab.Content != null)
-            {
-                (e.NewTab.Content as IDocumentHolderView).GetViewModel().IsDisplayed = true;
-            }
+            //Order matters it could be that oldTab and newTab are the same in that case we what true to come last
             if (e.OldTab != null && e.OldTab.Content != null)
             {
                 (e.OldTab.Content as IDocumentHolderView).GetViewModel().IsDisplayed = false;
+            }
+            if (e.NewTab != null && e.NewTab.Content != null)
+            {
+                (e.NewTab.Content as IDocumentHolderView).GetViewModel().IsDisplayed = true;
             }
         }
 

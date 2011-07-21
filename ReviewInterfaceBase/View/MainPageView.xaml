@@ -14,12 +14,12 @@
                 <!--OLDCODE <RowDefinition Height="200"/>-->
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0">
-                <StackPanel x:Name="ButtonToolbarTop" Orientation="Horizontal">
+                <StackPanel x:Name="ButtonToolbarTop" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button x:Name="PublishTop" Margin="0,0,15,0" MinWidth="75" Content="{Binding PublishButtonContent}" />
                     <Button x:Name="SaveAsDraftTop" MinWidth="75" Content="{Binding SaveAsDraftButtonContent}"/>
                 </StackPanel>
                 <ContentPresenter x:Name="CustomTabControlHolder" />
-                <StackPanel x:Name="ButtonToolbarBottom" Orientation="Horizontal">
+                <StackPanel x:Name="ButtonToolbarBottom" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button x:Name="PublishBottom" Margin="0,0,15,0" MinWidth="75" Content="{Binding PublishButtonContent}" />
                     <Button x:Name="SaveAsDraftBottom" MinWidth="75" Content="{Binding SaveAsDraftButtonContent}"/>
                 </StackPanel>
