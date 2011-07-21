@@ -19,6 +19,7 @@ using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
 using OSBLE.Utility;
 
+//AC: Please try to keep method names in alphabetical order
 namespace OSBLE.Controllers
 {
     [Authorize]
@@ -32,6 +33,27 @@ namespace OSBLE.Controllers
             ViewBag.CurrentTab = "Assignments";
         }
 
+        [CanModifyCourse]
+        public ActionResult Create()
+        {
+            BasicAssignmentViewModel viewModel = SetUpViewModel();
+            SetUpViewBag();
+            return View(viewModel);
+        }
+
+        [CanModifyCourse]
+        public ActionResult Edit(int id)
+        {
+            BasicAssignmentViewModel viewModel = SetUpViewModel(id);
+            SetUpViewBag();
+            return View("Create", viewModel);
+        }
+
+        /// <summary>
+        /// Builds a new list of rubrics after receiving a close event from the
+        /// silverlight rubric creation tool.
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [CanModifyCourse]
         public ActionResult GetRubrics()
@@ -55,60 +77,143 @@ namespace OSBLE.Controllers
             return View("_RubricSelect");
         }
 
-        [HttpPost]
-        [CanModifyCourse]
-        public ActionResult PastTeamsChange()
+        /// <summary>
+        /// Returns a list of students as team members.  The students returned are associated
+        /// with the active course
+        /// </summary>
+        /// <returns></returns>
+        private List<SerializableTeamMember> GetTeamMembers()
         {
-            return View("_TeamSilverlightObject");
+            List<SerializableTeamMember> teamMembmers = new List<SerializableTeamMember>();
+
+            var couresesUsers = (from c in db.CoursesUsers
+                                 where c.AbstractCourseID == activeCourse.AbstractCourseID
+                                 && (c.AbstractRole.ID == (int)CourseRole.CourseRoles.Student)
+                                 select c).ToList();
+
+            if (couresesUsers.Count > 0)
+            {
+                foreach (CoursesUsers cu in couresesUsers)
+                {
+                    SerializableTeamMember teamMember = new SerializableTeamMember();
+                    teamMember.IsModerator = cu.AbstractRole.ID == (int)CourseRole.CourseRoles.Moderator;
+                    teamMember.Name = cu.UserProfile.FirstName + " " + cu.UserProfile.LastName;
+                    teamMember.Section = cu.Section;
+                    teamMember.UserID = cu.UserProfileID;
+                    teamMember.isUser = true;
+
+                    //Need to find if they submitted the previous activity
+                    teamMembmers.Add(teamMember);
+                }
+            }
+            return teamMembmers;
+        }
+        
+        /// <summary>
+        /// Returns a list of team members for the given activity
+        /// </summary>
+        /// <param name="activity"></param>
+        /// <returns></returns>
+        private List<SerializableTeamMember> GetTeamMembers(AbstractAssignmentActivity activity)
+        {
+            List<SerializableTeamMember> teamMembmers = new List<SerializableTeamMember>();
+
+            foreach (TeamUserMember member in activity.TeamUsers)
+            {
+                SerializableTeamMember serializedMember = new SerializableTeamMember();
+                serializedMember.Name = member.Name;
+
+                if (member is UserMember)
+                {
+                    UserMember uMember = member as UserMember;
+
+                    CoursesUsers cu = (from c in db.CoursesUsers
+                                       where
+                                          c.AbstractCourseID == activeCourse.AbstractCourseID
+                                          &&
+                                          c.UserProfileID == uMember.UserProfileID
+                                       select c).FirstOrDefault();
+
+                    if (cu == null)
+                    {
+                        continue;
+                    }
+                    serializedMember.UserID = uMember.UserProfileID;
+                    serializedMember.isUser = true;
+                    serializedMember.IsModerator = cu.AbstractRole.ID == (int)CourseRole.CourseRoles.Moderator;
+                    serializedMember.Section = cu.Section;
+                    teamMembmers.Add(serializedMember);
+                }
+                else if (member is TeamMember)
+                {
+                    TeamMember tMember = member as TeamMember;
+                    foreach (TeamUserMember tum in tMember.Team.Members)
+                    {
+                        if (tum is UserMember)
+                        {
+                            serializedMember = new SerializableTeamMember();
+                            serializedMember.Name = tum.Name;
+
+                            UserMember uMember = tum as UserMember;
+
+                            CoursesUsers cu = (from c in db.CoursesUsers
+                                               where
+                                                  c.AbstractCourseID == activeCourse.AbstractCourseID
+                                                  &&
+                                                  c.UserProfileID == uMember.UserProfileID
+                                               select c).FirstOrDefault();
+
+                            if (cu == null)
+                            {
+                                continue;
+                            }
+                            serializedMember.InTeamName = tMember.Name;
+                            serializedMember.UserID = uMember.UserProfileID;
+                            serializedMember.isUser = true;
+                            serializedMember.IsModerator = cu.AbstractRole.ID == (int)CourseRole.CourseRoles.Moderator;
+                            serializedMember.Section = cu.Section;
+                            teamMembmers.Add(serializedMember);
+                        }
+                    }
+                }
+            }
+
+            return teamMembmers;
         }
 
-        //
-        // GET: /Assignment/Create
-
-        [CanModifyCourse]
-        public ActionResult Create()
+        /// <summary>
+        /// Is a one line function necessary?
+        /// </summary>
+        /// <param name="members"></param>
+        /// <returns></returns>
+        private string SerializeTeamMemers(List<SerializableTeamMember> members)
         {
-            //we create a basic assignment that is a StudioAssignment with a submission and a stop
-            BasicAssignmentViewModel viewModel = new BasicAssignmentViewModel();
+            return Uri.EscapeDataString(JsonConvert.SerializeObject(members));
+        }
 
-            // Copy default Late Policy settings
-            Course active = activeCourse.AbstractCourse as Course;
-            viewModel.Submission.HoursLatePerPercentPenalty = active.HoursLatePerPercentPenalty;
-            viewModel.Submission.HoursLateUntilZero = active.HoursLateUntilZero;
-            viewModel.Submission.PercentPenalty = active.PercentPenalty;
-            viewModel.Submission.MinutesLateWithNoPenalty = active.MinutesLateWithNoPenalty;
-
-            viewModel.TeamCreation = createTeamCreationSilverlightObject();
-            viewModel.RubricCreation = createRubricCreationSilverlightObject();
-
+        private List<object> SetUpPastTeamAssignments()
+        {
             var assignmentActivites = from c in db.AbstractAssignmentActivities
                                       where c.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID
                                       select c;
-
-            //set up past team assignments
             List<object> pastTeamAssignments = new List<object>();
             foreach (var activity in assignmentActivites.ToList())
             {
                 if (activity.isTeam)
                 {
-                    string json = serializeTeamMemers(getTeamMembers(activity));
+                    string json = SerializeTeamMemers(GetTeamMembers(activity));
                     pastTeamAssignments.Add(new { ID = json, Name = activity.Name });
                 }
             }
-            ViewBag.PastTeamAssignments = new SelectList(pastTeamAssignments, "ID", "Name", null);
-
-            viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"] = serializeTeamMemers(getTeamMembers());
-
-            setupViewBagForCreate();
-
-            return View(viewModel);
+            return pastTeamAssignments;
         }
 
-        //
-        // POST: /Assignment/Create
-
-        private void setupViewBagForCreate()
+        /// <summary>
+        /// Place ALL viewbag-related content in this function
+        /// </summary>
+        private void SetUpViewBag()
         {
+            //RUBRICS
             List<Rubric> rubrics = (from cr in db.CourseRubrics
                                     join r in db.Rubrics on cr.RubricID equals r.ID
                                     where cr.AbstractCourseID == activeCourse.AbstractCourseID
@@ -123,24 +228,84 @@ namespace OSBLE.Controllers
             }
             ViewBag.Rubrics = rubrics.ToList();
 
+            //SUBMISSION CATEGORIES
             var cat = from c in (activeCourse.AbstractCourse as Course).Categories
                       where c.Name != Constants.UnGradableCatagory
                       select c;
             ViewBag.Categories = new SelectList(cat, "ID", "Name");
+
+            //DELIVERABLES
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
             ViewBag.AllowedFileNames = from c in FileSystem.GetCourseDocumentsFileList(activeCourse.AbstractCourse, includeParentLink: false).Files select c.Name;
-            ViewBag.NewTeams = "";
 
-            // line by line review configurations
-            List<CommentCategoryConfiguration> configs = (from cc in db.CommentCategoryConfigurations
-                                                          where cc.ID != null
-                                                          select cc).ToList();
-            ViewBag.CommentConfigurations = configs;
+            //TEAM ASSIGNMENTS
+            ViewBag.NewTeams = "";
             if (Request.Form.AllKeys.Contains("newTeams"))
             {
                 ViewBag.NewTeams = Request.Form["newTeams"];
             }
+            ViewBag.PastTeamAssignments = new SelectList(SetUpPastTeamAssignments(), "ID", "Name", null);
+
+            //LINE-BY-LINE
+            List<CommentCategoryConfiguration> configs = (from course in db.Courses
+                                                          join category in db.Categories on course.ID equals category.CourseID
+                                                          join assignment in db.AbstractAssignments on category.ID equals assignment.CategoryID
+                                                          where
+                                                            assignment.CommentCategoryConfigurationID != null
+                                                            &&
+                                                            course.ID == activeCourse.AbstractCourseID
+                                                          select assignment.CommentCategoryConfiguration).ToList();
+            ViewBag.CommentConfigurations = configs;
         }
+
+        private BasicAssignmentViewModel SetUpViewModel()
+        {
+            //we create a basic assignment that is a StudioAssignment with a submission and a stop
+            BasicAssignmentViewModel viewModel = new BasicAssignmentViewModel();
+
+            // Copy default Late Policy settings
+            Course active = activeCourse.AbstractCourse as Course;
+            viewModel.Submission.HoursLatePerPercentPenalty = active.HoursLatePerPercentPenalty;
+            viewModel.Submission.HoursLateUntilZero = active.HoursLateUntilZero;
+            viewModel.Submission.PercentPenalty = active.PercentPenalty;
+            viewModel.Submission.MinutesLateWithNoPenalty = active.MinutesLateWithNoPenalty;
+
+            viewModel.TeamCreation = createTeamCreationSilverlightObject();
+            viewModel.RubricCreation = createRubricCreationSilverlightObject();
+
+            viewModel.TeamCreation.Parameters["teamMembers"] = SerializeTeamMemers(GetTeamMembers());
+            viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"];
+
+            return viewModel;
+        }
+
+        private BasicAssignmentViewModel SetUpViewModel(int courseId)
+        {
+            //TODO: get this working
+            BasicAssignmentViewModel viewModel = new BasicAssignmentViewModel();
+
+            //base assignment data
+            viewModel.Assignment = (from a in db.StudioAssignments
+                                    where a.ID == courseId
+                                    select a).FirstOrDefault();
+
+            //get the submission activity
+            viewModel.Submission = (from sa in db.SubmissionActivities
+                                    where sa.AbstractAssignmentID == courseId
+                                    select sa).FirstOrDefault();
+
+
+            viewModel.TeamCreation = createTeamCreationSilverlightObject();
+            viewModel.RubricCreation = createRubricCreationSilverlightObject();
+
+            return viewModel;
+        }
+
+        //*********
+        ///Everything below this line MAY need to be redone.  Place things that are "okay"
+        //above this line.
+        //*********
+
 
         [HttpPost]
         [CanModifyCourse]
@@ -353,114 +518,16 @@ namespace OSBLE.Controllers
 
             basic.TeamCreation = createTeamCreationSilverlightObject();
             basic.RubricCreation = createRubricCreationSilverlightObject();
-            setupViewBagForCreate();
+            SetUpViewBag();
             //ViewBag.Categories = new SelectList(db.Categories, "ID", "Name", basic.Assignment.CategoryID);
             //ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
 
-            basic.SerializedTeamMembersJSON = basic.TeamCreation.Parameters["teamMembers"] = serializeTeamMemers(getTeamMembers());
+            basic.SerializedTeamMembersJSON = basic.TeamCreation.Parameters["teamMembers"] = SerializeTeamMemers(GetTeamMembers());
 
             return View(basic);
         }
 
-        private string serializeTeamMemers(List<SerializableTeamMember> members)
-        {
-            return Uri.EscapeDataString(JsonConvert.SerializeObject(members));
-        }
-
-        private List<SerializableTeamMember> getTeamMembers(AbstractAssignmentActivity activity)
-        {
-            List<SerializableTeamMember> teamMembmers = new List<SerializableTeamMember>();
-
-            foreach (TeamUserMember member in activity.TeamUsers)
-            {
-                SerializableTeamMember serializedMember = new SerializableTeamMember();
-                serializedMember.Name = member.Name;
-
-                if (member is UserMember)
-                {
-                    UserMember uMember = member as UserMember;
-
-                    CoursesUsers cu = (from c in db.CoursesUsers
-                                       where
-                                          c.AbstractCourseID == activeCourse.AbstractCourseID
-                                          &&
-                                          c.UserProfileID == uMember.UserProfileID
-                                       select c).FirstOrDefault();
-
-                    if (cu == null)
-                    {
-                        continue;
-                    }
-                    serializedMember.UserID = uMember.UserProfileID;
-                    serializedMember.isUser = true;
-                    serializedMember.IsModerator = cu.AbstractRole.ID == (int)CourseRole.CourseRoles.Moderator;
-                    serializedMember.Section = cu.Section;
-                    teamMembmers.Add(serializedMember);
-                }
-                else if (member is TeamMember)
-                {
-                    TeamMember tMember = member as TeamMember;
-                    foreach (TeamUserMember tum in tMember.Team.Members)
-                    {
-                        if (tum is UserMember)
-                        {
-                            serializedMember = new SerializableTeamMember();
-                            serializedMember.Name = tum.Name;
-
-                            UserMember uMember = tum as UserMember;
-
-                            CoursesUsers cu = (from c in db.CoursesUsers
-                                               where
-                                                  c.AbstractCourseID == activeCourse.AbstractCourseID
-                                                  &&
-                                                  c.UserProfileID == uMember.UserProfileID
-                                               select c).FirstOrDefault();
-
-                            if (cu == null)
-                            {
-                                continue;
-                            }
-                            serializedMember.InTeamName = tMember.Name;
-                            serializedMember.UserID = uMember.UserProfileID;
-                            serializedMember.isUser = true;
-                            serializedMember.IsModerator = cu.AbstractRole.ID == (int)CourseRole.CourseRoles.Moderator;
-                            serializedMember.Section = cu.Section;
-                            teamMembmers.Add(serializedMember);
-                        }
-                    }
-                }
-            }
-
-            return teamMembmers;
-        }
-
-        private List<SerializableTeamMember> getTeamMembers()
-        {
-            List<SerializableTeamMember> teamMembmers = new List<SerializableTeamMember>();
-
-            var couresesUsers = (from c in db.CoursesUsers
-                                 where c.AbstractCourseID == activeCourse.AbstractCourseID
-                                 && (c.AbstractRole.ID == (int)CourseRole.CourseRoles.Student)
-                                 select c).ToList();
-
-            if (couresesUsers.Count > 0)
-            {
-                foreach (CoursesUsers cu in couresesUsers)
-                {
-                    SerializableTeamMember teamMember = new SerializableTeamMember();
-                    teamMember.IsModerator = cu.AbstractRole.ID == (int)CourseRole.CourseRoles.Moderator;
-                    teamMember.Name = cu.UserProfile.FirstName + " " + cu.UserProfile.LastName;
-                    teamMember.Section = cu.Section;
-                    teamMember.UserID = cu.UserProfileID;
-                    teamMember.isUser = true;
-
-                    //Need to find if they submitted the previous activity
-
-                    teamMembmers.Add(teamMember);
-                }
-            }
-            return teamMembmers;
-        }
+        
 
         private SilverlightObject createTeamCreationSilverlightObject()
         {
@@ -562,81 +629,12 @@ namespace OSBLE.Controllers
             return category;
         }
 
-        private void setupViewBagForEdit()
-        {
-            
-            List<Rubric> rubrics = (from cr in db.CourseRubrics
-                                    join r in db.Rubrics on cr.RubricID equals r.ID
-                                    where cr.AbstractCourseID == activeCourse.AbstractCourseID
-                                    select r).ToList();
-            rubrics.Insert(0, new Rubric() { ID = 0, Description = "" });
-            ViewBag.Rubrics = rubrics.ToList();
-
-            var cat = from c in (activeCourse.AbstractCourse as Course).Categories
-                      where c.Name != Constants.UnGradableCatagory
-                      select c;
-            ViewBag.Categories = new SelectList(cat, "ID", "Name");
-            ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
-            ViewBag.AllowedFileNames = from c in FileSystem.GetCourseDocumentsFileList(activeCourse.AbstractCourse, includeParentLink: false).Files select c.Name;
-            
-
-            // line by line review configurations
-            List<CommentCategoryConfiguration> configs = (from cc in db.CommentCategoryConfigurations
-                                                          where cc.ID != null
-                                                          select cc).ToList();
-            ViewBag.CommentConfigurations = configs;
-            
-        }
-
         // POST: /BasicAssignment/Edit/5
         [HttpPost]
         [CanModifyCourse]
         public ActionResult Edit(BasicAssignmentViewModel basic)
         {
             return View("Create");
-        }
-
-        [CanModifyCourse]
-        public ActionResult Edit(int id)
-        {
-            //we create a basic assignment that is a StudioAssignment with a submission and a stop
-            BasicAssignmentViewModel viewModel = new BasicAssignmentViewModel();
-
-            //base assignment data
-            viewModel.Assignment = (from a in db.StudioAssignments
-                                    where a.ID == id
-                                    select a).FirstOrDefault();
-            
-            //get the submission activity
-            viewModel.Submission = (from sa in db.SubmissionActivities
-                                    where sa.AbstractAssignmentID == id
-                                    select sa).FirstOrDefault();
-
-            
-            viewModel.TeamCreation = createTeamCreationSilverlightObject();
-            viewModel.RubricCreation = createRubricCreationSilverlightObject();
-
-            var assignmentActivites = from c in db.AbstractAssignmentActivities
-                                      where c.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID
-                                      select c;
-
-            //set up past team assignments
-            List<object> pastTeamAssignments = new List<object>();
-            foreach (var activity in assignmentActivites.ToList())
-            {
-                if (activity.isTeam)
-                {
-                    string json = serializeTeamMemers(getTeamMembers(activity));
-                    pastTeamAssignments.Add(new { ID = json, Name = activity.Name });
-                }
-            }
-            ViewBag.PastTeamAssignments = new SelectList(pastTeamAssignments, "ID", "Name", null);
-
-            viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"] = serializeTeamMemers(getTeamMembers());
-
-            setupViewBagForCreate();
-
-            return View("Create", viewModel);
         }
 
         protected override void Dispose(bool disposing)
