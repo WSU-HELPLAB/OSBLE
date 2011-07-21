@@ -1,4 +1,5 @@
 ﻿@using OSBLE.Models.Assignments.Activities
+@using OSBLE.Models;
 @model AbstractAssignmentActivity
 <script type="text/javascript">
 
@@ -40,7 +41,7 @@
                     <span>End Date</span>
                 </th>
                 <td>
-                        <span>@endDate.ToString()</span>
+                    <span>@endDate.ToString()</span>
                 </td>
             </tr>
             @* Only show grading if points possible are greater than 0 *@
@@ -51,8 +52,7 @@
                         <span>Grading</span>
                     </th>
                     <td>
-                        <span>Worth @Model.PointsPossible points in <em>@Model.AbstractAssignment.Category.Name</em>
-                            category</span>
+                        <span>Worth @Model.PointsPossible points in <em>@Model.AbstractAssignment.Category.Name</em> category</span>
                     </td>
                 </tr>    
 
@@ -60,7 +60,10 @@
         </table>
         <!--<text id="Loading">Please Wait...</text>-->
         <div id="@(tableID)">
-            Loading, please wait...
+            <div style="padding-top:1.5em; padding-bottom:1em;">
+                Loading, please wait... 
+                @Helpers.CreateToolTip(ToolTips.AssignmentLoadingError)
+            </div>
         </div>
         <div class="submission_deliverables_end">
         </div>
