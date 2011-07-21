@@ -599,7 +599,44 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult Edit(int id)
         {
-            return View("Create");
+            //we create a basic assignment that is a StudioAssignment with a submission and a stop
+            BasicAssignmentViewModel viewModel = new BasicAssignmentViewModel();
+
+            //base assignment data
+            viewModel.Assignment = (from a in db.StudioAssignments
+                                    where a.ID == id
+                                    select a).FirstOrDefault();
+            
+            //get the submission activity
+            viewModel.Submission = (from sa in db.SubmissionActivities
+                                    where sa.AbstractAssignmentID == id
+                                    select sa).FirstOrDefault();
+
+            
+            viewModel.TeamCreation = createTeamCreationSilverlightObject();
+            viewModel.RubricCreation = createRubricCreationSilverlightObject();
+
+            var assignmentActivites = from c in db.AbstractAssignmentActivities
+                                      where c.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID
+                                      select c;
+
+            //set up past team assignments
+            List<object> pastTeamAssignments = new List<object>();
+            foreach (var activity in assignmentActivites.ToList())
+            {
+                if (activity.isTeam)
+                {
+                    string json = serializeTeamMemers(getTeamMembers(activity));
+                    pastTeamAssignments.Add(new { ID = json, Name = activity.Name });
+                }
+            }
+            ViewBag.PastTeamAssignments = new SelectList(pastTeamAssignments, "ID", "Name", null);
+
+            viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"] = serializeTeamMemers(getTeamMembers());
+
+            setupViewBagForCreate();
+
+            return View("Create", viewModel);
         }
 
         protected override void Dispose(bool disposing)

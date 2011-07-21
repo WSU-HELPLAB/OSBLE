@@ -346,7 +346,6 @@
     
     SubmissionActivity submission = Model.Submission;
     StopActivity stop = Model.Stop;
-    submission.isTeam = false;
 
     using (Html.BeginForm())
     {
@@ -446,6 +445,7 @@
         <!--Radio Button Use previous, only shows up if there was a previous team assignment-->
         @if (ViewBag.PastTeamAssignments != null && (ViewBag.PastTeamAssignments as SelectList).Count() != 0)
         { 
+            <br />
             <input type="radio" name="team_generation_options" value="PreviousAssignment" />
             <text>Use teams defined in previous course assignment</text>
             <br />
