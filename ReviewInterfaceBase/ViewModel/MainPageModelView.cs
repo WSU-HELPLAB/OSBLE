@@ -7,10 +7,10 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 using System.Xml;
 using OSBLE.Services;
 using ReviewInterfaceBase.HelperClasses;
-using ReviewInterfaceBase.View;
 using ReviewInterfaceBase.View.DocumentHolder;
 using ReviewInterfaceBase.ViewModel.DocumentHolder;
 using ReviewInterfaceBase.ViewModel.FindWindow;
@@ -40,9 +40,9 @@ namespace ReviewInterfaceBase.ViewModel
 
         #region Fields
 
-        private LoadingWindow loadingWindow = null;
-
         private ReviewInterfaceDomainContext ReviewInterfaceDC = new ReviewInterfaceDomainContext();
+
+        private DispatcherTimer autoSaveTimer = new DispatcherTimer();
 
         //OLDCODE
         /// <summary>
@@ -177,6 +177,11 @@ namespace ReviewInterfaceBase.ViewModel
 
         #region Private Event Handlers
 
+        private void autoSaveTimer_Tick(object sender, EventArgs e)
+        {
+            AutoSaveAsDraft();
+        }
+
         private void customTabControlViewModel_SwitchedTabs(object sender, SwitchedTabEventArgs e)
         {
             //Order matters it could be that oldTab and newTab are the same in that case we what true to come last
@@ -244,12 +249,11 @@ namespace ReviewInterfaceBase.ViewModel
             //We fire this because the documents have been updated by the UI thread
             thisView.UpdateLayout();
             OpeningDocumentsComplete(this, EventArgs.Empty);
-        }
 
-        private void DocumentHolder_LayoutUpdated(object sender, EventArgs e)
-        {
-            //We fire this because the documents have been updated by the UI thread
-            //OpeningDocumentsComplete(this, EventArgs.Empty);
+            //Set the timer to tick every 3 minutes
+            autoSaveTimer.Interval = new TimeSpan(0, 3, 0);
+            autoSaveTimer.Tick += new EventHandler(autoSaveTimer_Tick);
+            autoSaveTimer.Start();
         }
 
         private StringBuilder SaveReview()
@@ -281,10 +285,28 @@ namespace ReviewInterfaceBase.ViewModel
 
         private void SaveAsDraft_Click(object sender, RoutedEventArgs e)
         {
+            SaveAsDraft();
+        }
+
+        private void SaveAsDraft()
+        {
             ReviewInterfaceDomainContext ReviewInterfaceDC = new ReviewInterfaceDomainContext();
             //Then we upload the file as well as register an event for when it has been uploaded
             ReviewInterfaceDC.UploadReviewDraft(SaveReview().ToString()).Completed += new EventHandler(FileUploadComplete);
             SaveAsDraftButtonContent = "Saving...";
+        }
+
+        private void AutoSaveAsDraft()
+        {
+            ReviewInterfaceDomainContext ReviewInterfaceDC = new ReviewInterfaceDomainContext();
+            //Then we upload the file as well as register an event for when it has been uploaded
+            ReviewInterfaceDC.UploadReviewDraft(SaveReview().ToString()).Completed += new EventHandler(DraftUploadComplete);
+            SaveAsDraftButtonContent = "Auto Saving...";
+        }
+
+        private void DraftUploadComplete(object sender, EventArgs e)
+        {
+            SaveAsDraftButtonContent = "Save As Draft";
         }
 
         /// <summary>
@@ -509,24 +531,7 @@ namespace ReviewInterfaceBase.ViewModel
         {
             thisView.SaveAsDraftTop.Visibility = Visibility.Collapsed;
             thisView.SaveAsDraftBottom.Visibility = Visibility.Collapsed;
-        }
-
-        public void ShowLoadingWindow()
-        {
-            if (loadingWindow == null)
-            {
-                loadingWindow = new LoadingWindow();
-            }
-            // loadingWindow.Show();
-        }
-
-        public void HideLoadingWindow()
-        {
-            if (loadingWindow != null)
-            {
-                MessageBox.Show("Closing Loading Window");
-                loadingWindow.Close();
-            }
+            autoSaveTimer.Stop();
         }
 
         #endregion Public Methods

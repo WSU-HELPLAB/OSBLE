@@ -131,7 +131,6 @@ namespace ViewPeerReview
                         ReadPeerReview(XDocument.Load(peerReview.Stream), peerReview.Author, peerReview.Role);
                     }
                 }
-                mpVM.HideLoadingWindow();
             }
         }
 
