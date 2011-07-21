@@ -96,8 +96,7 @@ namespace OsbleRubric
             thisView.RubricComboBox.SelectionChanged += new SelectionChangedEventHandler(RubricComboBox_SelectionChanged);
 
             //RIA Magic goes here
-            MessageBox.Show("making RIA request");
-            thisView.CourseComboBox.ItemsSource = context.Load(context.GetCoursesQuery()).Entities;
+            context.Load(context.GetCoursesQuery()).Completed+=new EventHandler(CourseQueryComplete);
             context.Load(context.GetActiveCourseQuery()).Completed += new EventHandler(GetActiveCourseComplete);
 
             //stash the current course id
@@ -122,6 +121,7 @@ namespace OsbleRubric
             //Building the initial grid
             buildGridDefaults();
         }
+
 
         /// <summary>
         /// Builds the default grid (Has 1 crit/1 level (the minimum))
@@ -157,164 +157,6 @@ namespace OsbleRubric
         }
 
         /// <summary>
-        /// Whenever the course combo box changes, we need to update our list of rubrics
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CourseComboBox_SelectionChanged(object sender, EventArgs e)
-        {
-            if (thisView.CourseComboBox.SelectedItem is AbstractCourse)
-            {
-                AbstractCourse course = thisView.CourseComboBox.SelectedItem as AbstractCourse;
-                //Must clear entity container because for some reason context keeps old data after a save
-                context.Rubrics.EntityContainer.Clear();
-                context.Load(context.GetRubricsForCourseQuery(course.ID)).Completed += new EventHandler(GetRubricsComplete);
-            }
-        }
-
-        private void GetRubricsComplete(object sender, EventArgs e)
-        {
-            if (sender is LoadOperation<Rubric>)
-            {
-                thisView.RubricComboBox.Items.Clear();
-                Rubric rubric = new Rubric();
-                rubric.ID = 0;
-                rubric.Description = "--Create New Rubric--";
-                thisView.RubricComboBox.Items.Insert(0, rubric);
-
-                LoadOperation<Rubric> load = sender as LoadOperation<Rubric>;
-                foreach (Rubric r in load.Entities)
-                {
-                    thisView.RubricComboBox.Items.Add(r);
-                }
-                if (selectedRubric.ID == 0)
-                {
-                    thisView.RubricComboBox.SelectedIndex = 0;
-                }
-                else
-                {
-                    foreach (object item in thisView.RubricComboBox.Items)
-                    {
-                        if ((item as Rubric).ID == selectedRubric.ID)
-                        {
-                            thisView.RubricComboBox.SelectedItem = item;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Called after the user changes the current rubric.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void RubricComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (thisView.RubricComboBox.SelectedItem is Rubric)
-            {
-                currentCourseHasEvaluations = false;
-                Rubric rubric = thisView.RubricComboBox.SelectedItem as Rubric;
-                thisView.RubricDescriptionTextBox.Text = rubric.Description;
-                selectedRubric = rubric;
-                context.RubricHasEvaluations(rubric.ID).Completed += new EventHandler(RubricHasEvaluationsComplete);
-                context.Load(context.GetCellDescriptionsQuery(rubric.ID)).Completed += new EventHandler(CellDescriptionsLoaded);
-            }
-        }
-
-        private void CellDescriptionsLoaded(object sender, EventArgs e)
-        {
-            if (sender is LoadOperation<CellDescription>)
-            {
-                LoadOperation<CellDescription> load = sender as LoadOperation<CellDescription>;
-                cellDescriptions.Clear();
-                foreach (CellDescription desc in load.Entities)
-                {
-                    cellDescriptions.Add(desc);
-                }
-
-                BuildGridFromRubric(selectedRubric, cellDescriptions);
-            }
-        }
-
-        /// <summary>
-        /// Rubrics that have evaluations attached to them cannot be edited as it would
-        /// mess up any existing evaluations.  When this is the case, we can rename the
-        /// rubric to xxx (copy) and reset the rubric ID which will cause the system
-        /// to insert a new record rather than updating an existing one.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void RubricHasEvaluationsComplete(object sender, EventArgs e)
-        {
-            if (sender is InvokeOperation<bool>)
-            {
-                InvokeOperation<bool> result = sender as InvokeOperation<bool>;
-
-                if (result.Value)
-                {
-                    currentCourseHasEvaluations = true;
-                    //selectedRubric.ID = 0;
-                    thisView.RubricDescriptionTextBox.Text += " (copy)";
-                }
-            }
-        }
-
-        /// <summary>
-        /// Responsible for setting the "activeCourse" local variable and for
-        /// setting the currently selected course combo box in the view
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void GetActiveCourseComplete(object sender, EventArgs e)
-        {
-            if (sender is LoadOperation<AbstractCourse>)
-            {
-                LoadOperation<AbstractCourse> load = sender as LoadOperation<AbstractCourse>;
-
-                MessageBox.Show("Got response");
-
-                if (load.HasError)
-                {
-                    Exception exception = load.Error;
-                    while (exception != null)
-                    {
-                        MessageBox.Show(exception.Message);
-                        exception = exception.InnerException;
-                    }
-                }
-                else
-                { }
-
-                //there's only one in here, but it's far easier to just do a loop rather than
-                //pull out the item from the enumeration.
-                foreach (OSBLE.Models.Courses.AbstractCourse course in load.Entities)
-                {
-                    ActiveCourse = course;
-                }
-            }
-
-            if (ActiveCourse.ID != null) //Only set the value in the course combobox if a course was found
-            {
-                //set the active course
-                foreach (object item in thisView.CourseComboBox.Items)
-                {
-                    if (item is OSBLE.Models.Courses.AbstractCourse)
-                    {
-                        AbstractCourse course = item as AbstractCourse;
-
-                        if (course.ID == ActiveCourse.ID)
-                        {
-                            thisView.CourseComboBox.SelectedItem = item;
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Models the data grid from the supplied rubric
         /// </summary>
         /// <param name="rubric"></param>
@@ -340,7 +182,7 @@ namespace OsbleRubric
             }
 
             //Adding the add button row back in
-            createAddButtonRow();
+            createAddButtonRow(); 
 
             //removing the last two columns temporarily
             customDataGrid.RemoveColumn(customDataGrid.BaseGrid.ColumnDefinitions.Count - 1);
@@ -1460,11 +1302,12 @@ namespace OsbleRubric
 
         #region Events
 
+
+
+
         /// <summary>
         /// Called when the user clicks on the "Cancel" button in the view
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void CancelChanges_Click(object sender, RoutedEventArgs e)
         {
             HtmlPage.Window.Invoke("CloseRubric", selectedRubric.ID.ToString());
@@ -1475,6 +1318,7 @@ namespace OsbleRubric
         /// </summary>
         private void PublishChanges_Click(object sender, RoutedEventArgs e)
         {
+            //Getting data, generating error list, if errors: show a window, if no errors: continue with save
             this.getData();
             List<string> errors = generateErrorList();
             if (errors.Count != 0)
@@ -1538,11 +1382,6 @@ namespace OsbleRubric
             }
         }
 
-        private void rcw_Closed(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
         private void SubmitChanges(object sender, EventArgs e)
         {
             context.SubmitChanges().Completed += new EventHandler(SaveRubricInternals);
@@ -1554,7 +1393,7 @@ namespace OsbleRubric
         ///    Criteria
         ///    Cell Descriptions (happens in stage 3)
         /// </summary>
-        private void SaveRubricInternals(object sender, EventArgs e)
+        private  void SaveRubricInternals(object sender, EventArgs e)
         {
             criteria = new List<Criterion>();
             levels = new List<Level>();
@@ -1852,6 +1691,171 @@ namespace OsbleRubric
                 setTabIndex();
             }
             adjustArrowIcons();
+        }
+
+        private void CourseQueryComplete(object sender, EventArgs e)
+        {
+            if (sender is LoadOperation<AbstractCourse>)
+            {
+                thisView.CourseComboBox.ItemsSource = (sender as LoadOperation<AbstractCourse>).Entities;
+            }
+            if (ActiveCourse != null)
+            {
+                foreach (AbstractCourse course in thisView.CourseComboBox.Items)
+                {
+                    if (course.ID == ActiveCourse.ID)
+                    {
+                        thisView.CourseComboBox.SelectedItem = course;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Whenever the course combo box changes, we need to update our list of rubrics
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CourseComboBox_SelectionChanged(object sender, EventArgs e)
+        {
+            if (thisView.CourseComboBox.SelectedItem is AbstractCourse)
+            {
+                AbstractCourse course = thisView.CourseComboBox.SelectedItem as AbstractCourse;
+                //Must clear entity container because for some reason context keeps old data after a save
+                context.Rubrics.EntityContainer.Clear();
+                context.Load(context.GetRubricsForCourseQuery(course.ID)).Completed += new EventHandler(GetRubricsComplete);
+            }
+        }
+
+        private void GetRubricsComplete(object sender, EventArgs e)
+        {
+            if (sender is LoadOperation<Rubric>)
+            {
+                thisView.RubricComboBox.Items.Clear();
+                Rubric rubric = new Rubric();
+                rubric.ID = 0;
+                rubric.Description = "--Create New Rubric--";
+                thisView.RubricComboBox.Items.Insert(0, rubric);
+
+                LoadOperation<Rubric> load = sender as LoadOperation<Rubric>;
+                foreach (Rubric r in load.Entities)
+                {
+                    thisView.RubricComboBox.Items.Add(r);
+                }
+                if (selectedRubric.ID == 0)
+                {
+                    thisView.RubricComboBox.SelectedIndex = 0;
+                }
+                else
+                {
+                    foreach (object item in thisView.RubricComboBox.Items)
+                    {
+                        if ((item as Rubric).ID == selectedRubric.ID)
+                        {
+                            thisView.RubricComboBox.SelectedItem = item;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called after the user changes the current rubric.  
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RubricComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (thisView.RubricComboBox.SelectedItem is Rubric)
+            {
+                currentCourseHasEvaluations = false;
+                Rubric rubric = thisView.RubricComboBox.SelectedItem as Rubric;
+                thisView.RubricDescriptionTextBox.Text = rubric.Description;
+                selectedRubric = rubric;
+                context.RubricHasEvaluations(rubric.ID).Completed += new EventHandler(RubricHasEvaluationsComplete);
+                context.Load(context.GetCellDescriptionsQuery(rubric.ID)).Completed += new EventHandler(CellDescriptionsLoaded);
+            }
+        }
+
+        private void CellDescriptionsLoaded(object sender, EventArgs e)
+        {
+            if (sender is LoadOperation<CellDescription>)
+            {
+                LoadOperation<CellDescription> load = sender as LoadOperation<CellDescription>;
+                cellDescriptions.Clear();
+                foreach (CellDescription desc in load.Entities)
+                {
+                    cellDescriptions.Add(desc);
+                }
+
+                BuildGridFromRubric(selectedRubric, cellDescriptions);
+            }
+        }
+
+        /// <summary>
+        /// Rubrics that have evaluations attached to them cannot be edited as it would
+        /// mess up any existing evaluations.  When this is the case, we can rename the
+        /// rubric to xxx (copy) and reset the rubric ID which will cause the system
+        /// to insert a new record rather than updating an existing one.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RubricHasEvaluationsComplete(object sender, EventArgs e)
+        {
+            if (sender is InvokeOperation<bool>)
+            {
+                InvokeOperation<bool> result = sender as InvokeOperation<bool>;
+
+                if (result.Value)
+                {
+                    currentCourseHasEvaluations = true;
+                    //selectedRubric.ID = 0;
+                    thisView.RubricDescriptionTextBox.Text += " (copy)";
+                }
+            }
+        }
+
+        /// <summary>
+        /// Responsible for setting the "activeCourse" local variable and for
+        /// setting the currently selected course combo box in the view
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void GetActiveCourseComplete(object sender, EventArgs e)
+        {
+            if (sender is LoadOperation<AbstractCourse>)
+            {
+                LoadOperation<AbstractCourse> load = sender as LoadOperation<AbstractCourse>;
+
+                //there's only one in here, but it's far easier to just do a loop rather than
+                //pull out the item from the enumeration.
+                foreach (OSBLE.Models.Courses.AbstractCourse course in load.Entities)
+                {
+                    ActiveCourse = course;
+                }
+            }
+
+            if (thisView.CourseComboBox.Items.Count != 0)
+            {
+                if (ActiveCourse.ID != null) //Only set the value in the course combobox if a course was found
+                {
+                    //set the active course
+                    foreach (object item in thisView.CourseComboBox.Items)
+                    {
+                        if (item is OSBLE.Models.Courses.AbstractCourse)
+                        {
+                            AbstractCourse course = item as AbstractCourse;
+
+                            if (course.ID == ActiveCourse.ID)
+                            {
+                                thisView.CourseComboBox.SelectedItem = item;
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         #endregion Events

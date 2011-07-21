@@ -56,7 +56,7 @@
                 return rubric.CellDescriptions.AsQueryable();
             }
             else return null;
-            /*List<CellDescription> cellDesc = (from desc in db.LevelDescriptions
+            /*OLD query method: List<CellDescription> cellDesc = (from desc in db.LevelDescriptions
                                               join level in db.Levels on desc.LevelID equals level.ID
                                               join crit in db.Criteria on desc.CriterionID equals crit.ID
                                               where level.RubricID == rubricId
@@ -182,7 +182,7 @@
         {
             db.Entry(rubric).State = EntityState.Modified;
 
-            /*
+            /* This is now done in clearLevelsAndCrit
             //when updating a rubric, we must thow away any existing levels, criteria,
             //and cell descriptions
             List<Level> levels = (from l in db.Levels where l.RubricID == rubric.ID select l).ToList();
