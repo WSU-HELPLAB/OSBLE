@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PeerReview", "PeerReview\PeerReview.csproj", "{84A7338D-8FD4-4A92-93EA-D02D24704F2E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IssueVoting", "IssueVoting\IssueVoting.csproj", "{1577599E-3904-46A0-86EF-671A79895C26}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7297687F-BF8A-4195-8EA3-A05DA302B24E} = {7297687F-BF8A-4195-8EA3-A05DA302B24E}
@@ -33,28 +31,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLE", "..\..\web\OSBLE\OS
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 7
+		SccNumberOfProjects = 6
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
 		SccLocalPath0 = .
-		SccProjectUniqueName1 = PeerReview\\PeerReview.csproj
-		SccProjectName1 = PeerReview
-		SccLocalPath1 = PeerReview
-		SccProjectUniqueName2 = IssueVoting\\IssueVoting.csproj
-		SccProjectName2 = IssueVoting
-		SccLocalPath2 = IssueVoting
-		SccProjectUniqueName3 = ReviewInterfaceBase\\ReviewInterfaceBase.csproj
-		SccProjectName3 = ReviewInterfaceBase
-		SccLocalPath3 = ReviewInterfaceBase
-		SccProjectUniqueName4 = ViewPeerReview\\ViewPeerReview.csproj
-		SccProjectName4 = ViewPeerReview
-		SccLocalPath4 = ViewPeerReview
-		SccProjectUniqueName5 = EditPeerReview\\EditPeerReview.csproj
-		SccProjectName5 = EditPeerReview
-		SccLocalPath5 = EditPeerReview
-		SccProjectUniqueName6 = ..\\..\\web\\OSBLE\\OSBLE.csproj
-		SccProjectName6 = ../../web/OSBLE
-		SccLocalPath6 = ..\\..\\web\\OSBLE
+		SccProjectUniqueName1 = IssueVoting\\IssueVoting.csproj
+		SccProjectName1 = IssueVoting
+		SccLocalPath1 = IssueVoting
+		SccProjectUniqueName2 = ReviewInterfaceBase\\ReviewInterfaceBase.csproj
+		SccProjectName2 = ReviewInterfaceBase
+		SccLocalPath2 = ReviewInterfaceBase
+		SccProjectUniqueName3 = ViewPeerReview\\ViewPeerReview.csproj
+		SccProjectName3 = ViewPeerReview
+		SccLocalPath3 = ViewPeerReview
+		SccProjectUniqueName4 = EditPeerReview\\EditPeerReview.csproj
+		SccProjectName4 = EditPeerReview
+		SccLocalPath4 = EditPeerReview
+		SccProjectUniqueName5 = ..\\..\\web\\OSBLE\\OSBLE.csproj
+		SccProjectName5 = ../../web/OSBLE
+		SccLocalPath5 = ..\\..\\web\\OSBLE
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,12 +57,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{84A7338D-8FD4-4A92-93EA-D02D24704F2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{84A7338D-8FD4-4A92-93EA-D02D24704F2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{84A7338D-8FD4-4A92-93EA-D02D24704F2E}.OSBLE Deployment|Any CPU.ActiveCfg = Release|Any CPU
-		{84A7338D-8FD4-4A92-93EA-D02D24704F2E}.OSBLE Deployment|Any CPU.Build.0 = Release|Any CPU
-		{84A7338D-8FD4-4A92-93EA-D02D24704F2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{84A7338D-8FD4-4A92-93EA-D02D24704F2E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1577599E-3904-46A0-86EF-671A79895C26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1577599E-3904-46A0-86EF-671A79895C26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1577599E-3904-46A0-86EF-671A79895C26}.OSBLE Deployment|Any CPU.ActiveCfg = Release|Any CPU

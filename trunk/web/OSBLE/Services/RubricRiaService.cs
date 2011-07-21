@@ -15,7 +15,7 @@
     // TODO: Wire up authentication (Windows/ASP.NET Forms) and uncomment the following to disable anonymous access
     // Also consider adding roles to restrict access as appropriate.
     // [RequiresAuthentication]
-    [EnableClientAccess]
+    [EnableClientAccess()]
     public class RubricRiaService : OSBLEService
     {
         public Criterion DummyCriterion()

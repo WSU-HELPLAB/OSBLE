@@ -173,28 +173,28 @@
         });
 
         //setup prior comment categories
-        @{if(Model.CommentCategoryConfiguration.Categories.Count > 0)
-        {
-            int counter = 0;
-            foreach(CommentCategory cat in Model.CommentCategoryConfiguration.Categories)
-            {
-                string js = string.Format("\n\taddNamedCategory(\"{0}\", \"{1}\");\n", cat.Name, cat.Options[0].Name);
+        @{if (Model.CommentCategoryConfiguration.Categories.Count > 0)
+          {
+              int counter = 0;
+              foreach (CommentCategory cat in Model.CommentCategoryConfiguration.Categories)
+              {
+                  string js = string.Format("\n\taddNamedCategory(\"{0}\", \"{1}\");\n", cat.Name, cat.Options[0].Name);
                 @Html.Raw(js)
-                int insideCounter = -1;
-                foreach(CommentCategoryOption option in cat.Options)
-                {
-                    //skip the first item as we added it with the previous JS call
-                    insideCounter++;
-                    if (insideCounter == 0)
-                    {
-                        continue;
-                    }
-                    js = string.Format("\taddNamedCategoryOption(\"{0}\", \"{1}\");\n", counter, option.Name);
+                  int insideCounter = -1;
+                  foreach (CommentCategoryOption option in cat.Options)
+                  {
+                      //skip the first item as we added it with the previous JS call
+                      insideCounter++;
+                      if (insideCounter == 0)
+                      {
+                          continue;
+                      }
+                      js = string.Format("\taddNamedCategoryOption(\"{0}\", \"{1}\");\n", counter, option.Name);
                     @Html.Raw(js)
-                }
-                counter++;
-            }
-        }
+                  }
+                  counter++;
+              }
+          }
         }
 
 
@@ -465,6 +465,11 @@
         Deliverables @Helpers.CreateToolTip(ToolTips.BasicAssignmentDeliverables)
     </h3>
     
+    <div id="deliverable_data">
+    </div>
+    
+    <div id="deliverables_after">
+    </div>
     <table id="deliverables_table" cellspacing="6px">
         <tr>
             <td>
@@ -494,12 +499,6 @@
             <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Deliverable" />
             Save Deliverable 
         </a>
-    </div>
-    
-    <div id="deliverable_data">
-    </div>
-    
-    <div id="deliverables_after">
     </div>
 
     <script type="text/javascript">
@@ -539,7 +538,7 @@
     <!--Category Options-->
     <div id="line_review_config" class="indented_options" style="display: none;">
         @{string CreateNewSelected = "";
-          if(Model.Assignment.CommentCategoryConfigurationID == 0 || Model.Assignment.CommentCategoryConfigurationID == null)
+          if (Model.Assignment.CommentCategoryConfigurationID == 0 || Model.Assignment.CommentCategoryConfigurationID == null)
           {
               CreateNewSelected = "checked=\"checked\"";
           }
@@ -560,11 +559,11 @@
         </div>
         @if (ViewBag.CommentConfigurations != null && ViewBag.CommentConfigurations.Count != 0)
         {
-                 string usePreviousSelected = "";
-                 if(Model.Assignment.CommentCategoryConfigurationID != 0 && Model.Assignment.CommentCategoryConfigurationID != null)
-                 {
-                     usePreviousSelected = "checked=\"checked\"";
-                 }
+            string usePreviousSelected = "";
+            if (Model.Assignment.CommentCategoryConfigurationID != 0 && Model.Assignment.CommentCategoryConfigurationID != null)
+            {
+                usePreviousSelected = "checked=\"checked\"";
+            }
              
             <input type="radio" name="line_review_options" value="AutoConfig" @Html.Raw(usePreviousSelected) /><text>Use previously-defined
             set of comment categories</text>
@@ -572,10 +571,10 @@
                 @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)
                 {
                     string selected = "";
-                    if(@ccc.ID == Model.CommentCategoryConfiguration.ID)
-                     {
-                         selected = "selected=\"selected\"";
-                     }
+                    if (@ccc.ID == Model.CommentCategoryConfiguration.ID)
+                    {
+                        selected = "selected=\"selected\"";
+                    }
                     <option value="@ccc.ID" @selected>@ccc.Name</option>
                 }
             </select><br />

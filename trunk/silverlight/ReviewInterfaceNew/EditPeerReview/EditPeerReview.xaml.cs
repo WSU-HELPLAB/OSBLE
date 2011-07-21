@@ -131,8 +131,6 @@ namespace EditPeerReview
 
             this.LayoutRoot.Children.Add(mpVM.GetView());
 
-            mpVM.ShowLoadingWindow();
-
             if (canSaveAsDraft == false)
             {
                 mpVM.HideDraftButton();

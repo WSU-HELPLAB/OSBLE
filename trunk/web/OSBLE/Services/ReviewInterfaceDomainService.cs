@@ -14,7 +14,7 @@
     using OSBLE.Models.Users;
     using OSBLE.Models.ViewModels.ReviewInterface;
 
-    [EnableClientAccess(RequiresSecureEndpoint = true)]
+    [EnableClientAccess()]
     public class ReviewInterfaceDomainService : OSBLEService
     {
         protected HttpContext context = System.Web.HttpContext.Current;
