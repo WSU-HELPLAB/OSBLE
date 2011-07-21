@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.ServiceModel.DomainServices.Client;
 using System.Windows;
+using System.Windows.Browser;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Collections.Generic;
-using System.Windows.Browser;
-using System.Collections.ObjectModel;
-using OSBLE.Services;
-
-using OSBLE.Models.Courses.Rubrics;
-using OSBLE.Models.Courses;
-
-using System.ServiceModel.DomainServices.Client;
 using OSBLE.Models.AbstractCourses;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Courses.Rubrics;
+using OSBLE.Services;
 
 namespace OsbleRubric
 {
@@ -25,6 +21,7 @@ namespace OsbleRubric
         private CustomDataGrid customDataGrid = new CustomDataGrid();
         private RubricView thisView = new RubricView();
         private List<ICell> dataFromCells = new List<ICell>();
+
         public enum CheckboxValues { ColumnComment, GlobalComment };
 
         private int currentCourseId = 0;
@@ -50,6 +47,7 @@ namespace OsbleRubric
                 activeCourse = value;
             }
         }
+
         private Rubric selectedRubric = new Rubric();
 
         #endregion Attributes
@@ -87,7 +85,7 @@ namespace OsbleRubric
         }
 
         /// <summary>
-        /// Sets up the views listerns/ria/adds the grid to the view/sets properties of 
+        /// Sets up the views listerns/ria/adds the grid to the view/sets properties of
         /// </summary>
         private void init()
         {
@@ -98,6 +96,7 @@ namespace OsbleRubric
             thisView.RubricComboBox.SelectionChanged += new SelectionChangedEventHandler(RubricComboBox_SelectionChanged);
 
             //RIA Magic goes here
+            MessageBox.Show("making RIA request");
             thisView.CourseComboBox.ItemsSource = context.Load(context.GetCoursesQuery()).Entities;
             context.Load(context.GetActiveCourseQuery()).Completed += new EventHandler(GetActiveCourseComplete);
 
@@ -138,7 +137,6 @@ namespace OsbleRubric
             createCriterionRow();
             createAddButtonRow();
 
-
             //setting widths/heights for the table
             //setting heights for rows
             customDataGrid.BaseGrid.RowDefinitions[0].Height = new GridLength(Row0Height);
@@ -150,7 +148,6 @@ namespace OsbleRubric
             //setting widths for columns
             customDataGrid.BaseGrid.ColumnDefinitions[0].Width = new GridLength(Col0Width);
             customDataGrid.BaseGrid.ColumnDefinitions[1].Width = new GridLength(Col1Width);
-
 
             //sets up initial tabIndexes
             setTabIndex();
@@ -164,18 +161,18 @@ namespace OsbleRubric
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void CourseComboBox_SelectionChanged(object sender, EventArgs e)
+        private void CourseComboBox_SelectionChanged(object sender, EventArgs e)
         {
             if (thisView.CourseComboBox.SelectedItem is AbstractCourse)
             {
                 AbstractCourse course = thisView.CourseComboBox.SelectedItem as AbstractCourse;
                 //Must clear entity container because for some reason context keeps old data after a save
-                context.Rubrics.EntityContainer.Clear(); 
+                context.Rubrics.EntityContainer.Clear();
                 context.Load(context.GetRubricsForCourseQuery(course.ID)).Completed += new EventHandler(GetRubricsComplete);
-            }            
+            }
         }
 
-        void GetRubricsComplete(object sender, EventArgs e)
+        private void GetRubricsComplete(object sender, EventArgs e)
         {
             if (sender is LoadOperation<Rubric>)
             {
@@ -209,11 +206,11 @@ namespace OsbleRubric
         }
 
         /// <summary>
-        /// Called after the user changes the current rubric.  
+        /// Called after the user changes the current rubric.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void RubricComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void RubricComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (thisView.RubricComboBox.SelectedItem is Rubric)
             {
@@ -226,17 +223,17 @@ namespace OsbleRubric
             }
         }
 
-        void CellDescriptionsLoaded(object sender, EventArgs e)
+        private void CellDescriptionsLoaded(object sender, EventArgs e)
         {
             if (sender is LoadOperation<CellDescription>)
             {
                 LoadOperation<CellDescription> load = sender as LoadOperation<CellDescription>;
                 cellDescriptions.Clear();
                 foreach (CellDescription desc in load.Entities)
-                { 
+                {
                     cellDescriptions.Add(desc);
                 }
-                
+
                 BuildGridFromRubric(selectedRubric, cellDescriptions);
             }
         }
@@ -249,7 +246,7 @@ namespace OsbleRubric
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void RubricHasEvaluationsComplete(object sender, EventArgs e)
+        private void RubricHasEvaluationsComplete(object sender, EventArgs e)
         {
             if (sender is InvokeOperation<bool>)
             {
@@ -270,12 +267,26 @@ namespace OsbleRubric
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void GetActiveCourseComplete(object sender, EventArgs e)
+        private void GetActiveCourseComplete(object sender, EventArgs e)
         {
-            if(sender is LoadOperation<AbstractCourse>)
+            if (sender is LoadOperation<AbstractCourse>)
             {
                 LoadOperation<AbstractCourse> load = sender as LoadOperation<AbstractCourse>;
-                
+
+                MessageBox.Show("Got response");
+
+                if (load.HasError)
+                {
+                    Exception exception = load.Error;
+                    while (exception != null)
+                    {
+                        MessageBox.Show(exception.Message);
+                        exception = exception.InnerException;
+                    }
+                }
+                else
+                { }
+
                 //there's only one in here, but it's far easier to just do a loop rather than
                 //pull out the item from the enumeration.
                 foreach (OSBLE.Models.Courses.AbstractCourse course in load.Entities)
@@ -292,12 +303,12 @@ namespace OsbleRubric
                     if (item is OSBLE.Models.Courses.AbstractCourse)
                     {
                         AbstractCourse course = item as AbstractCourse;
-                    
-                            if (course.ID == ActiveCourse.ID)
-                            {
-                                thisView.CourseComboBox.SelectedItem = item;
-                                return;
-                            }
+
+                        if (course.ID == ActiveCourse.ID)
+                        {
+                            thisView.CourseComboBox.SelectedItem = item;
+                            return;
+                        }
                     }
                 }
             }
@@ -329,15 +340,14 @@ namespace OsbleRubric
             }
 
             //Adding the add button row back in
-            createAddButtonRow(); 
-
+            createAddButtonRow();
 
             //removing the last two columns temporarily
-            customDataGrid.RemoveColumn(customDataGrid.BaseGrid.ColumnDefinitions.Count - 1); 
+            customDataGrid.RemoveColumn(customDataGrid.BaseGrid.ColumnDefinitions.Count - 1);
             customDataGrid.RemoveColumn(customDataGrid.BaseGrid.ColumnDefinitions.Count - 1);
 
             //Adding empty columns into the grid until the amount of Level columns in the grid is equal to the amount of levels from the rubric
-            //Using (rubric.Levels.Count) because its the real number of levels in the rubric 
+            //Using (rubric.Levels.Count) because its the real number of levels in the rubric
             //Using  (customDataGrid.BaseGrid.ColumnDefinitions.Count - 2) for the number of Levels actually in the grid. (-2 for the columns on the left that are not levels)
             while ((rubric.Levels.Count) > (customDataGrid.BaseGrid.ColumnDefinitions.Count - 2)) //+2 to account for last two rows that were temp removed
             {
@@ -345,7 +355,7 @@ namespace OsbleRubric
             }
 
             //adding the temporarily deleted columns back in
-            createAddButtonColumn(); 
+            createAddButtonColumn();
             createCommentColumn();
 
             //setting tabs, updating last rows textblock position, fixing/adjusting arrow icons
@@ -382,11 +392,11 @@ namespace OsbleRubric
             int colIndex = 0;
             foreach (CellDescription cd in cellDescriptions)
             {
-                ICell ic = new RubricCell(rowIndex + 1, colIndex + 2, cd.Description); 
+                ICell ic = new RubricCell(rowIndex + 1, colIndex + 2, cd.Description);
                 placeICell(ic);
                 colIndex++;
                 //if the colIndex+1 (+1 to account for 0 offset) is greater than the amount of levels (col), then reset it to 0 and increment columns
-                if ((colIndex + 1) > rubric.Levels.Count) 
+                if ((colIndex + 1) > rubric.Levels.Count)
                 {
                     rowIndex++;
                     colIndex = 0;
@@ -402,8 +412,6 @@ namespace OsbleRubric
             ICell enableCommentsCell = new CheckBoxCell(0, customDataGrid.BaseGrid.ColumnDefinitions.Count - 1, rubric.HasCriteriaComments);
             placeICell(globalCommentCell);
             placeICell(enableCommentsCell);
-
-
         }
 
         /// <summary>
@@ -456,11 +464,10 @@ namespace OsbleRubric
                 {
                     bool textBoxAdded = false;
                     bool comboBoxAdded = false;
-                    foreach (UIElement ui in (firstSP as StackPanel).Children) 
+                    foreach (UIElement ui in (firstSP as StackPanel).Children)
                     {
                         if (ui is StackPanel) //looking for the nested stackpanels
                         {
-
                             foreach (UIElement ui2 in (ui as StackPanel).Children) //looking through the nested stackpanels for a combobox or textbox
                             {
                                 if (ui2 is TextBox)
@@ -483,10 +490,9 @@ namespace OsbleRubric
                 }
             }
 
-
             return returnVal;
         }
-        
+
         /// <summary>
         ///  /// returns the number of rows from dataFromCells list
         /// </summary>
@@ -498,7 +504,7 @@ namespace OsbleRubric
             {
                 if (ic.Row > returnVal) returnVal = ic.Row;
             }
-            return (returnVal+1); //+1 to account for the 0 offset
+            return (returnVal + 1); //+1 to account for the 0 offset
         }
 
         /// <summary>
@@ -536,7 +542,7 @@ namespace OsbleRubric
             }
             createAddButtonRow(); //adding add button row back in
 
-            //adding empty columns 
+            //adding empty columns
             customDataGrid.RemoveColumn(customDataGrid.BaseGrid.ColumnDefinitions.Count - 1); //removing two last columns temporarily
             customDataGrid.RemoveColumn(customDataGrid.BaseGrid.ColumnDefinitions.Count - 1);
             while (numofCols > (customDataGrid.BaseGrid.ColumnDefinitions.Count + 2)) //+2 to account for last two rows
@@ -575,7 +581,7 @@ namespace OsbleRubric
                 int col = (int)br.GetValue(Grid.ColumnProperty);
                 if (row == 0) //All cells in row 0 are HeaderCells, except the one that is the last column, which is a CheckBoxCell
                 {
-                    if(br.Child is StackPanel) //if its child is not a stackpanel, don't bother looking at it
+                    if (br.Child is StackPanel) //if its child is not a stackpanel, don't bother looking at it
                     {
                         if (col != customDataGrid.BaseGrid.ColumnDefinitions.Count - 1) //if the column is not the last, must be a HeaderCell at this point
                         {
@@ -606,7 +612,7 @@ namespace OsbleRubric
                         {
                             foreach (UIElement ui in (br.Child as StackPanel).Children) //look through the the stackpanel for a checkbox, add that to dataFromCells
                             {
-                                if (ui is CheckBox) dataFromCells.Add(new CheckBoxCell(row, col, (bool)(ui as CheckBox).IsChecked) {Information = CheckboxValues.ColumnComment.ToString() });
+                                if (ui is CheckBox) dataFromCells.Add(new CheckBoxCell(row, col, (bool)(ui as CheckBox).IsChecked) { Information = CheckboxValues.ColumnComment.ToString() });
                             }
                         }
                     }
@@ -624,7 +630,7 @@ namespace OsbleRubric
                         }
                     }
                 }
-                else //The remaining cells will be between first and last row, all should be RubricCells 
+                else //The remaining cells will be between first and last row, all should be RubricCells
                 {
                     if (br.Child is StackPanel)//Only want to look through br.Child if its a stackpanel
                     {
@@ -658,7 +664,6 @@ namespace OsbleRubric
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(5, 5, 5, 5),
                 Orientation = Orientation.Horizontal,
-                
             };
 
             CheckBox commentsOnCheckBox = new CheckBox()
@@ -680,7 +685,7 @@ namespace OsbleRubric
                 Source = helpIconSource,
                 Height = 16,
                 Width = 16,
-                Margin = new Thickness(5, 0,0,0)
+                Margin = new Thickness(5, 0, 0, 0)
             };
             ToolTipService.SetToolTip(helpIcon, "This checkbox determines if a column for comments is included in the final rubric");
 
@@ -744,7 +749,7 @@ namespace OsbleRubric
             addIcon.MouseLeftButtonDown += new MouseButtonEventHandler(addCol_MouseLeftButtonDown);
 
             //adding column into grid
-            customDataGrid.PlaceUIElement(stackPanel, customDataGrid.BaseGrid.ColumnDefinitions.Count , 0);
+            customDataGrid.PlaceUIElement(stackPanel, customDataGrid.BaseGrid.ColumnDefinitions.Count, 0);
         }
 
         /// <summary>
@@ -753,8 +758,8 @@ namespace OsbleRubric
         private void createAddButtonRow()
         {
             //stack Panel to be added to first column
-            StackPanel addIconSP = new StackPanel() 
-            { 
+            StackPanel addIconSP = new StackPanel()
+            {
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
                 Width = ColWidth,
@@ -762,13 +767,13 @@ namespace OsbleRubric
                 Margin = new Thickness(5, 5, 5, 5)
             };
             //image to be added to addIconSP
-            Image addIcon = new Image() 
-            { 
-                Source = addIconSource, 
+            Image addIcon = new Image()
+            {
+                Source = addIconSource,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
                 Height = 22,
-                Width = 22 
+                Width = 22
             };
 
             //setting tooltip for addIcon
@@ -783,7 +788,7 @@ namespace OsbleRubric
             {
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Bottom,
-                Margin = new Thickness(5,5,5,5),
+                Margin = new Thickness(5, 5, 5, 5),
                 Orientation = Orientation.Horizontal
             };
             //setting the stackpanel to stretch a specific gridlength
@@ -802,7 +807,7 @@ namespace OsbleRubric
                 FontSize = GlobalFontSize,
                 FontWeight = FontWeights.Bold,
                 VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(1,0,0,0)
+                Margin = new Thickness(1, 0, 0, 0)
             };
 
             Image helpIcon = new Image()
@@ -812,7 +817,6 @@ namespace OsbleRubric
                 VerticalAlignment = VerticalAlignment.Center,
             };
             ToolTipService.SetToolTip(helpIcon, "This checkbox determines if a comment block for the\nentire rubric will be included in the final rubric.");
-
 
             //addeding checkbox & textblock to checkBoxSP
             checkBoxSP.Children.Add(globalComments);
@@ -827,19 +831,16 @@ namespace OsbleRubric
                 FontWeight = FontWeights.Bold,
                 HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment = VerticalAlignment.Bottom,
-                Margin = new Thickness(5,5,5,5)
+                Margin = new Thickness(5, 5, 5, 5)
             };
             //setting the textblock to span two columns
             pointsPossible_TextBlock.SetValue(Grid.ColumnSpanProperty, 2);
-
 
             //adding UIelements into the grid
             int rowToAdd = customDataGrid.BaseGrid.RowDefinitions.Count;
             customDataGrid.PlaceUIElement(addIconSP, 0, rowToAdd);
             customDataGrid.PlaceUIElement(checkBoxSP, 1, rowToAdd);
-            customDataGrid.PlaceUIElement(pointsPossible_TextBlock,  customDataGrid.BaseGrid.ColumnDefinitions.Count-2, rowToAdd);
-
-            
+            customDataGrid.PlaceUIElement(pointsPossible_TextBlock, customDataGrid.BaseGrid.ColumnDefinitions.Count - 2, rowToAdd);
         }
 
         /// <summary>
@@ -853,7 +854,7 @@ namespace OsbleRubric
             customDataGrid.PlaceUIElement(createLevelTitleCell(), colIndexToInsert, 0);
 
             //adding the rest of the cells
-            for (int i = 1; i < customDataGrid.BaseGrid.RowDefinitions.Count-1; i++)
+            for (int i = 1; i < customDataGrid.BaseGrid.RowDefinitions.Count - 1; i++)
             {
                 customDataGrid.PlaceUIElement(createLevelCell(), colIndexToInsert, i);
             }
@@ -870,8 +871,8 @@ namespace OsbleRubric
             customDataGrid.PlaceUIElement(createPerformanceCritCell(), 0, rowPlacement);
             customDataGrid.PlaceUIElement(createCritWeightCell(), 1, rowPlacement);
 
-            //adding the rest of the cells 
-            for (int i = 2; i < customDataGrid.BaseGrid.ColumnDefinitions.Count-2; i++)
+            //adding the rest of the cells
+            for (int i = 2; i < customDataGrid.BaseGrid.ColumnDefinitions.Count - 2; i++)
             {
                 customDataGrid.PlaceUIElement(createLevelCell(), i, rowPlacement);
             }
@@ -898,7 +899,6 @@ namespace OsbleRubric
                 Width = returnVal.Width,
                 TextWrapping = TextWrapping.Wrap,
                 AcceptsReturn = true,
-                
             };
 
             returnVal.Children.Add(textbox);
@@ -943,7 +943,6 @@ namespace OsbleRubric
         /// <returns></returns>
         private StackPanel createPerformanceCritCell()
         {
-
             //Overall StackPanel to return
             StackPanel returnVal = new StackPanel()
             {
@@ -978,11 +977,11 @@ namespace OsbleRubric
                 Orientation = Orientation.Vertical,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(0,0,5,0),
+                Margin = new Thickness(0, 0, 5, 0),
             };
             //up/down arrows to be added to arrowStackPanel
             Image upArrow = new Image { Source = upArrowIconSource, Width = 15, Height = 17, Margin = new Thickness(0, 0, 0, 5) };
-            Image downArrow = new Image { Source = downArrowIconSource, Width = 15, Height = 17};
+            Image downArrow = new Image { Source = downArrowIconSource, Width = 15, Height = 17 };
 
             //tying events for up and down arrow
             upArrow.MouseLeftButtonDown += new MouseButtonEventHandler(upArrow_MouseLeftButtonDown);
@@ -1022,9 +1021,6 @@ namespace OsbleRubric
             return returnVal;
         }
 
-        
-
-
         /// <summary>
         /// This method swaps row1 with row2 if its a valid swap
         /// </summary>
@@ -1032,7 +1028,6 @@ namespace OsbleRubric
         /// <param name="row2"></param>
         private void performSwap(int row1, int row2)
         {
-            
             List<UIElement> borderList1 = new List<UIElement>();
             List<UIElement> borderList2 = new List<UIElement>();
             foreach (Border br in customDataGrid.BaseGrid.Children) //removing any borders from the grid and putting them in a list
@@ -1047,7 +1042,6 @@ namespace OsbleRubric
                         borderList1.Add(br.Child);
                         customDataGrid.RemoveUIElement(br.Child);
                     }
-                    
                 }
                 if (row == row2)
                 {
@@ -1059,7 +1053,7 @@ namespace OsbleRubric
                     }
                 }
             }
-            
+
             foreach (UIElement br in borderList1)
             {
                 if (br != null)
@@ -1092,7 +1086,6 @@ namespace OsbleRubric
             //ToolTipService.SetToolTip(Img2, "The criterion weight column is used to set the\nweights of each criterion row. By default the\nweight is evenly distrbuted among the criterion.\nTo set the weight simply input a number between\n1 and 100 in the column below. The weight is\nautomatically recalculated upon input.");
             ToolTipService.SetToolTip(Img2, "The criterion weight column is used to set the weight\nof each criterion row. To set the weight input a number\ninto the column below. The weight of that row will then\nbe the rows point value divided by the overall points\npossible (Shown at the bottom right of the table)");
 
-
             //adding children to returnVal
             returnVal.Children.Add(TBlock2);
             returnVal.Children.Add(Img2);
@@ -1123,7 +1116,7 @@ namespace OsbleRubric
                 Orientation = Orientation.Horizontal,
                 HorizontalAlignment = HorizontalAlignment.Center,
             };
-            
+
             //Textblock to act as label
             TextBlock levelTitleTextBlock = new TextBlock()
             {
@@ -1131,7 +1124,7 @@ namespace OsbleRubric
                 FontWeight = FontWeights.Bold,
                 FontSize = GlobalFontSize,
                 VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(5,0,5,0),
+                Margin = new Thickness(5, 0, 5, 0),
             };
 
             //Textbox for user to enter level title
@@ -1141,14 +1134,14 @@ namespace OsbleRubric
                 Height = 22,
                 Margin = new Thickness(5, 0, 5, 0),
             };
-            
+
             //deleteImage to act as delete column button
             Image deleteImage = new Image()
-            { 
-                Source = deleteIconSource, 
-                Height = 22, 
+            {
+                Source = deleteIconSource,
+                Height = 22,
                 Width = 22,
-                Margin = new Thickness(5,0,5,0)
+                Margin = new Thickness(5, 0, 5, 0)
             };
             //setting tooltip and event for deleteImage
             ToolTipService.SetToolTip(deleteImage, "Click to delete the entire column");
@@ -1163,17 +1156,17 @@ namespace OsbleRubric
             StackPanel bottomStackPanel = new StackPanel()
             {
                 Orientation = Orientation.Horizontal,
-                Margin = new Thickness(0,5,0,0),
+                Margin = new Thickness(0, 5, 0, 0),
             };
-            
+
             //textblock to act as label for pointSpreadComboBox
-            TextBlock pointSpreadTextBlock = new TextBlock() 
-            { 
+            TextBlock pointSpreadTextBlock = new TextBlock()
+            {
                 Text = "Level Point Spread",
-                FontSize = GlobalFontSize, 
-                FontWeight = FontWeights.Bold, 
+                FontSize = GlobalFontSize,
+                FontWeight = FontWeights.Bold,
                 VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(5,0,5,0),
+                Margin = new Thickness(5, 0, 5, 0),
             };
 
             //Created a combobox and populating it with a range of values
@@ -1185,18 +1178,17 @@ namespace OsbleRubric
             {
                 pointSpreadComboBox.Items.Add(i);
             }
-            //setting initial selected item to first item added 
+            //setting initial selected item to first item added
             pointSpreadComboBox.SelectedItem = pointSpreadComboBox.Items[0];
 
             //creating help icon and setting its tooltip
-            Image helpImage = new Image() 
-            { 
-                Source = helpIconSource, 
-                Height = 16, 
-                Width = 16 
+            Image helpImage = new Image()
+            {
+                Source = helpIconSource,
+                Height = 16,
+                Width = 16
             };
             ToolTipService.SetToolTip(helpImage, "The point spread determines the minimum and\n maximum point range for a quality level.\n The system starts at 1 in the first column\n and determines the starting point of other\n columns based on your previous input.");
-
 
             //adding children to bottomStackPanel
             bottomStackPanel.Children.Add(pointSpreadTextBlock);
@@ -1242,7 +1234,7 @@ namespace OsbleRubric
         private int getColumn(MouseEventArgs e)
         {
             int returnVal = -1;
-            
+
             //1- var eles = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(thisView), customDataGrid.BaseGrid);
             var eles = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(Application.Current.RootVisual), thisView);
             foreach (FrameworkElement rd in eles)
@@ -1297,7 +1289,7 @@ namespace OsbleRubric
                     {
                         if (tb is StackPanel) //checking for nested stackpanels
                         {
-                            foreach (UIElement tb2 in (tb as StackPanel).Children) 
+                            foreach (UIElement tb2 in (tb as StackPanel).Children)
                             {
                                 if (tb2 is Control)
                                 {
@@ -1340,7 +1332,7 @@ namespace OsbleRubric
                 int col = (int)br.GetValue(Grid.ColumnProperty);
                 /*The textboxes are contained in a stackpanel in column 2 (1 when considering 0 offset),
                  * so any Textboxes in this field are the ones we want to sum*/
-                if (br.Child is StackPanel && col == 1) 
+                if (br.Child is StackPanel && col == 1)
                 {
                     foreach (UIElement tb in (br.Child as StackPanel).Children)
                     {
@@ -1350,7 +1342,7 @@ namespace OsbleRubric
                             if (double.TryParse((tb as TextBox).Text, out temp))
                             {
                                 returnVal += temp;
-                            }   
+                            }
                         }
                     }
                 }
@@ -1367,11 +1359,10 @@ namespace OsbleRubric
             int lastrow = customDataGrid.BaseGrid.RowDefinitions.Count - 2;
 
             changeUpArrow(firstrow, grayUpArrowIconSource); //changing first arrow to gray
-            changeUpArrow(firstrow+1, upArrowIconSource); //second to normal
+            changeUpArrow(firstrow + 1, upArrowIconSource); //second to normal
 
             changeDownArrow(lastrow, grayDownArrowIconSource); //changing first arrow to gray
             changeDownArrow(lastrow - 1, downArrowIconSource); //second to normal
-            
         }
 
         /// <summary>
@@ -1413,7 +1404,7 @@ namespace OsbleRubric
         }
 
         /// <summary>
-        /// Prerequist:  getData() should be run before this 
+        /// Prerequist:  getData() should be run before this
         /// Returns: a list of errors that need to be fixed before saving
         /// </summary>
         /// <returns></returns>
@@ -1422,7 +1413,7 @@ namespace OsbleRubric
             List<string> errorList = new List<string>();
             foreach (ICell cell in this.dataFromCells)
             {
-                if (cell is RubricCell) 
+                if (cell is RubricCell)
                 {
                     if (cell.Information == "")
                     {
@@ -1459,8 +1450,6 @@ namespace OsbleRubric
             return errorList;
         }
 
-        
-
         /// <summary>
         /// returns the view for a rubric
         /// </summary>
@@ -1484,9 +1473,8 @@ namespace OsbleRubric
         /// <summary>
         /// Called when the user clicks the "Publish" button in the view
         /// </summary>
-        void PublishChanges_Click(object sender, RoutedEventArgs e)
+        private void PublishChanges_Click(object sender, RoutedEventArgs e)
         {
-            
             this.getData();
             List<string> errors = generateErrorList();
             if (errors.Count != 0)
@@ -1499,7 +1487,7 @@ namespace OsbleRubric
                 //will house the final form of the data that we will send to the client
                 Rubric rubric = new Rubric();
 
-                if (selectedRubric.ID > 0 && (currentCourseHasEvaluations==false))
+                if (selectedRubric.ID > 0 && (currentCourseHasEvaluations == false))
                 {
                     rubric = selectedRubric;
                 }
@@ -1514,7 +1502,6 @@ namespace OsbleRubric
                 //loop through all of our data
                 foreach (ICell cell in this.dataFromCells)
                 {
-
                     //there should only be two checkbox values.  One to enable column comments and one
                     //to enable global comments
                     if (cell is CheckBoxCell)
@@ -1546,17 +1533,17 @@ namespace OsbleRubric
                     //context.clearLevelsAndCrit(rubric.ID); Changed
                     context.clearLevelsAndCrit(rubric.ID).Completed += new EventHandler(SubmitChanges);
                 }
-            
-               // context.SubmitChanges().Completed += new EventHandler(SaveRubricInternals);
+
+                // context.SubmitChanges().Completed += new EventHandler(SaveRubricInternals);
             }
         }
 
-        void rcw_Closed(object sender, EventArgs e)
+        private void rcw_Closed(object sender, EventArgs e)
         {
             throw new NotImplementedException();
         }
 
-        void SubmitChanges(object sender, EventArgs e)
+        private void SubmitChanges(object sender, EventArgs e)
         {
             context.SubmitChanges().Completed += new EventHandler(SaveRubricInternals);
         }
@@ -1567,7 +1554,7 @@ namespace OsbleRubric
         ///    Criteria
         ///    Cell Descriptions (happens in stage 3)
         /// </summary>
-        void SaveRubricInternals(object sender, EventArgs e)
+        private void SaveRubricInternals(object sender, EventArgs e)
         {
             criteria = new List<Criterion>();
             levels = new List<Level>();
@@ -1576,7 +1563,6 @@ namespace OsbleRubric
             //loop through all of our data
             foreach (ICell cell in this.dataFromCells)
             {
-
                 if (cell is CheckBoxCell)
                 {
                     continue;
@@ -1669,7 +1655,7 @@ namespace OsbleRubric
             cr.RubricID = selectedRubric.ID;
             cr.AbstractCourseID = ActiveCourse.ID;
 
-            context.CourseRubrics.Add(cr); 
+            context.CourseRubrics.Add(cr);
 
             context.SubmitChanges().Completed += new EventHandler(SaveCellDescriptions);
         }
@@ -1680,7 +1666,7 @@ namespace OsbleRubric
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void SaveCellDescriptions(object sender, EventArgs e)
+        private void SaveCellDescriptions(object sender, EventArgs e)
         {
             foreach (CellDescription desc in cellDescriptions)
             {
@@ -1697,7 +1683,7 @@ namespace OsbleRubric
             context.SubmitChanges().Completed += new EventHandler(FinalizeSaving);
         }
 
-        void FinalizeSaving(object sender, EventArgs e)
+        private void FinalizeSaving(object sender, EventArgs e)
         {
             MessageBox.Show("Your rubric has been saved to OSBLE.");
             CourseComboBox_SelectionChanged(sender, e);
@@ -1717,7 +1703,7 @@ namespace OsbleRubric
 
                 //adjusting the arrow icons since there could be a change to the last or first row
                 adjustArrowIcons();
-            }   
+            }
         }
 
         /// <summary>
@@ -1867,6 +1853,7 @@ namespace OsbleRubric
             }
             adjustArrowIcons();
         }
+
         #endregion Events
     }
 }

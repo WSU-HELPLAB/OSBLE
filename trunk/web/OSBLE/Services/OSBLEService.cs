@@ -13,8 +13,10 @@
     /// as well as database access
     /// for services that inherit from it.
     /// </summary>
-    [EnableClientAccess(RequiresSecureEndpoint = true)]
-    [RequiresAuthentication]
+    [EnableClientAccess]
+
+    //Took this out in hopes that DomainService would work
+    //[RequiresAuthentication]
     public class OSBLEService : DomainService
     {
         protected OSBLEContext db = new OSBLEContext();
