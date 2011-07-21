@@ -30,6 +30,7 @@ namespace OsbleRubric
         private int currentCourseId = 0;
         private RubricRiaContext context = new RubricRiaContext();
         private AbstractCourse activeCourse = null;
+        private bool currentCourseHasEvaluations = false;
 
         //icky global variable needed to store rubric information between
         //asynchronous server callbacks
@@ -97,11 +98,10 @@ namespace OsbleRubric
             thisView.RubricComboBox.SelectionChanged += new SelectionChangedEventHandler(RubricComboBox_SelectionChanged);
 
             //RIA Magic goes here
-            if (thisView.CourseComboBox.ItemsSource == null)
-            {
-                thisView.CourseComboBox.ItemsSource = context.Load(context.GetCoursesQuery()).Entities;
-                context.Load(context.GetActiveCourseQuery()).Completed += new EventHandler(GetActiveCourseComplete);
-            }
+            
+            thisView.CourseComboBox.ItemsSource = context.Load(context.GetCoursesQuery()).Entities;
+            context.Load(context.GetActiveCourseQuery()).Completed += new EventHandler(GetActiveCourseComplete);
+            
 
             //stash the current course id
             if (App.Current.Resources["courseId"] != null)
@@ -171,17 +171,16 @@ namespace OsbleRubric
             if (thisView.CourseComboBox.SelectedItem is AbstractCourse)
             {
                 AbstractCourse course = thisView.CourseComboBox.SelectedItem as AbstractCourse;
+                //Must clear entity container because for some reason context keeps old data after a save
+                context.Rubrics.EntityContainer.Clear(); 
                 context.Load(context.GetRubricsForCourseQuery(course.ID)).Completed += new EventHandler(GetRubricsComplete);
             }            
         }
 
         void GetRubricsComplete(object sender, EventArgs e)
         {
-            //Remove selection changed event
-            thisView.RubricComboBox.SelectionChanged -= new SelectionChangedEventHandler(RubricComboBox_SelectionChanged);
             if (sender is LoadOperation<Rubric>)
             {
-
                 thisView.RubricComboBox.Items.Clear();
                 Rubric rubric = new Rubric();
                 rubric.ID = 0;
@@ -209,9 +208,6 @@ namespace OsbleRubric
                     }
                 }
             }
-
-            //Adding back in selection changed event
-            thisView.RubricComboBox.SelectionChanged += new SelectionChangedEventHandler(RubricComboBox_SelectionChanged);
         }
 
         /// <summary>
@@ -223,6 +219,7 @@ namespace OsbleRubric
         {
             if (thisView.RubricComboBox.SelectedItem is Rubric)
             {
+                currentCourseHasEvaluations = false;
                 Rubric rubric = thisView.RubricComboBox.SelectedItem as Rubric;
                 thisView.RubricDescriptionTextBox.Text = rubric.Description;
                 selectedRubric = rubric;
@@ -242,8 +239,6 @@ namespace OsbleRubric
                     cellDescriptions.Add(desc);
                 }
                 
-                //Only build the rubric if its not a new rubric(assuming ID of 0 means new rubric)
-                //If new rubric (ID of 0) then rebuild the grid as a "fresh" rubric
                 BuildGridFromRubric(selectedRubric, cellDescriptions);
             }
         }
@@ -264,7 +259,8 @@ namespace OsbleRubric
 
                 if (result.Value)
                 {
-                    selectedRubric.ID = 0;
+                    currentCourseHasEvaluations = true;
+                    //selectedRubric.ID = 0;
                     thisView.RubricDescriptionTextBox.Text += " (copy)";
                 }
             }
@@ -290,16 +286,20 @@ namespace OsbleRubric
                 }
             }
 
-            //set the active course
-            foreach (object item in thisView.CourseComboBox.Items)
+            if (ActiveCourse.ID != null) //Only set the value in the course combobox if a course was found
             {
-                if (item is OSBLE.Models.Courses.AbstractCourse)
+                //set the active course
+                foreach (object item in thisView.CourseComboBox.Items)
                 {
-                    AbstractCourse course = item as AbstractCourse;
-                    if (course.ID == ActiveCourse.ID)
+                    if (item is OSBLE.Models.Courses.AbstractCourse)
                     {
-                        thisView.CourseComboBox.SelectedItem = item;
-                        return;
+                        AbstractCourse course = item as AbstractCourse;
+                    
+                            if (course.ID == ActiveCourse.ID)
+                            {
+                                thisView.CourseComboBox.SelectedItem = item;
+                                return;
+                            }
                     }
                 }
             }
@@ -1024,6 +1024,8 @@ namespace OsbleRubric
             return returnVal;
         }
 
+        
+
 
         /// <summary>
         /// This method swaps row1 with row2 if its a valid swap
@@ -1443,7 +1445,8 @@ namespace OsbleRubric
             
             //will house the final form of the data that we will send to the client
             Rubric rubric = new Rubric();
-            if (selectedRubric.ID > 0)
+
+            if (selectedRubric.ID > 0 && (currentCourseHasEvaluations==false))
             {
                 rubric = selectedRubric;
             }
@@ -1479,10 +1482,23 @@ namespace OsbleRubric
                 }
             }
 
+            //If its ID is 0(a new rubric), add the rubric to the db, else run clearLevelsAndCrit to clear the db
             if (rubric.ID < 1)
             {
                 context.Rubrics.Add(rubric);
+                SubmitChanges(sender, e);
             }
+            else
+            {
+                //context.clearLevelsAndCrit(rubric.ID); Changed
+                context.clearLevelsAndCrit(rubric.ID).Completed += new EventHandler(SubmitChanges);
+            }
+            
+           // context.SubmitChanges().Completed += new EventHandler(SaveRubricInternals);
+        }
+
+        void SubmitChanges(object sender, EventArgs e)
+        {
             context.SubmitChanges().Completed += new EventHandler(SaveRubricInternals);
         }
 
@@ -1571,18 +1587,10 @@ namespace OsbleRubric
                 }
             }
 
-            //At the end of all of this, we should have a fully realized rubric with criteria and levels
-            //and a list of cell descriptions for each.  Because I'm using the Row & Column info from 
-            //the data cells, our final rubric will have one empy criterion and two empty levels.  
-            //Remove these manually
-         //   levels.RemoveAt(1);
-          //  levels.RemoveAt(0);
-         //   criteria.RemoveAt(0);
-
             //save the levels and criteria
             foreach (Level l in levels)
             {
-                //This if statement will block any levels that were added to the list as empty placeholder cells
+                //This 'if' statement will block any levels that were added to the list as empty placeholder cells
                 if (l.RangeEnd == 0 && l.RangeStart == 0 && l.LevelTitle == "No Title")
                 {
                     continue;
@@ -1591,7 +1599,7 @@ namespace OsbleRubric
             }
             foreach (Criterion c in criteria)
             {
-                //This if statement will block any criteria that were added to the list as empty placeholder cells
+                //This 'if' statement will block any criteria that were added to the list as empty placeholder cells
                 if (c.CriterionTitle == "No Title" && c.Weight == 0)
                 {
                     continue;
@@ -1603,7 +1611,12 @@ namespace OsbleRubric
             CourseRubric cr = new CourseRubric();
             cr.RubricID = selectedRubric.ID;
             cr.AbstractCourseID = ActiveCourse.ID;
+
             context.CourseRubrics.Add(cr);
+            //if (!context.CourseRubrics.Contains(cr))
+            //{
+             
+            //}
 
             context.SubmitChanges().Completed += new EventHandler(SaveCellDescriptions);
         }

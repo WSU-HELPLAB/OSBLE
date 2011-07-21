@@ -57,7 +57,9 @@ using OSBLE.Models.AbstractCourses;
         {
             Rubric rubric = db.Rubrics.Find(rubricId);
             if (rubric != null)
+            {
                 return rubric.CellDescriptions.AsQueryable();
+            }
             else return null;
             /*List<CellDescription> cellDesc = (from desc in db.LevelDescriptions
                                               join level in db.Levels on desc.LevelID equals level.ID
@@ -93,6 +95,7 @@ using OSBLE.Models.AbstractCourses;
             return rubrics.AsQueryable();
         }
 
+        [Update]
         [Insert]
         public void AddCourseRubric(CourseRubric courseRubric)
         {
@@ -138,11 +141,45 @@ using OSBLE.Models.AbstractCourses;
             db.Levels.Add(level);
             db.SaveChanges();
         }
-
+        
         [Insert]
         public void AddRubric(Rubric rubric)
         {
             db.Rubrics.Add(rubric);
+            db.SaveChanges();
+        }
+
+
+        public void clearLevelsAndCrit(int rubricID)
+        {
+            Rubric rubric = db.Rubrics.Find(rubricID);
+
+            db.Entry(rubric).State = EntityState.Modified; 
+
+            //when updating a rubric, we must thow away any existing levels, criteria,
+            //and cell descriptions
+            List<Level> levels = (from l in db.Levels where l.RubricID == rubric.ID select l).ToList();
+            List<Criterion> criteria = (from c in db.Criteria where c.RubricID == rubric.ID select c).ToList();
+            List<CellDescription> cellDesc = (from desc in db.CellDescriptions
+                                              join level in db.Levels on desc.LevelID equals level.ID
+                                              join crit in db.Criteria on desc.CriterionID equals crit.ID
+                                              where level.RubricID == rubric.ID
+                                              &&
+                                              crit.RubricID == rubric.ID
+                                              select desc).ToList();
+             
+            foreach (Level l in levels)
+            {
+                db.Levels.Remove(l);
+            }
+            foreach (Criterion c in criteria)
+            {
+                db.Criteria.Remove(c);
+            }
+            foreach (CellDescription d in cellDesc)
+            {
+                db.CellDescriptions.Remove(d);
+            }
             db.SaveChanges();
         }
 
@@ -151,6 +188,7 @@ using OSBLE.Models.AbstractCourses;
         {
             db.Entry(rubric).State = EntityState.Modified;
 
+            /*
             //when updating a rubric, we must thow away any existing levels, criteria,
             //and cell descriptions
             List<Level> levels = (from l in db.Levels where l.RubricID == rubric.ID select l).ToList();
@@ -173,7 +211,7 @@ using OSBLE.Models.AbstractCourses;
             foreach (CellDescription d in cellDesc)
             {
                 db.CellDescriptions.Remove(d);
-            }
+            }*/
 
             db.SaveChanges();
         }
