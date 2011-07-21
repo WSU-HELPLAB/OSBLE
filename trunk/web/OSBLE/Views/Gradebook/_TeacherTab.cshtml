@@ -1323,11 +1323,7 @@
                 type: "POST",
                 url: "/Gradebook/AllDropLowest",
                 data: { categoryId: newCatId[0], dropX: x, customize: ($("input[name='Customize_radio']:checked").val()).toString()},
-                success: function (response) {
-                    $("#grades").replaceWith(response);
-                    calculateCols();
-                    calculateRows();
-                }
+                success: window.location.reload(true)
             });
         }
 
