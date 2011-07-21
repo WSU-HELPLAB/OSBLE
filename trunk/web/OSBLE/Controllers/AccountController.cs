@@ -158,9 +158,12 @@ namespace OSBLE.Controllers
                 {
                     if ((user.Comment as string) == hash)
                     {
+                        user.Comment = null;
                         user.IsApproved = true;
                         Membership.UpdateUser(user);
-                        return RedirectToAction("LogOn");
+                        FormsAuthentication.SetAuthCookie(model.UserName, false);
+
+                        return RedirectToAction("Index", "Home");
                     }
                     else
                     {
@@ -206,8 +209,6 @@ namespace OSBLE.Controllers
 
                         Membership.UpdateUser(user);
 
-                        //FormsAuthentication.SetAuthCookie(model.Email, false /* createPersistentCookie */);
-
                         try
                         {
                             UserProfile profile = new UserProfile();
@@ -232,9 +233,7 @@ namespace OSBLE.Controllers
                             return ProfessionalRegister();
                         }
 
-                        string message = "Thank you for creating an account at osble.org please visit https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }) + " to active your account";
-
-                        Email.Send("Active Your Account", message, new List<MailAddress>() { new MailAddress(model.Email) });
+                        sendVerificationEmail(false, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), model.FirstName, model.Email);
 
                         return RedirectToAction("AccountCreated");
                     }
@@ -291,8 +290,6 @@ namespace OSBLE.Controllers
                         user.Comment = randomHash;
                         Membership.UpdateUser(user);
 
-                        //FormsAuthentication.SetAuthCookie(model.Email, false /* createPersistentCookie */);
-
                         try
                         {
                             UserProfile profile = new UserProfile();
@@ -337,9 +334,7 @@ namespace OSBLE.Controllers
                             return AcademiaRegister();
                         }
 
-                        string message = "Thank you for creating an account at osble.org please visit https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }) + " to active your account";
-
-                        Email.Send("Active Your Account", message, new List<MailAddress>() { new MailAddress(model.Email) });
+                        sendVerificationEmail(true, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), model.FirstName, model.Email);
 
                         return RedirectToAction("AccountCreated");
                     }
@@ -676,6 +671,27 @@ namespace OSBLE.Controllers
 #endif
 
             return false;
+        }
+
+        private void sendVerificationEmail(bool acedemia, string link, string firstName, string to)
+        {
+            string subject = "Welcome to OSBLE";
+
+            string message = "Dear " + firstName + @",<br/>
+            <br/>
+            Thank you for creating an account at osble.org. Please go <a href='" + link + @"'>here</a> in order to activate your account.<br/>
+            <br/>
+            ";
+            if (acedemia)
+            {
+                message += @"If you are a teacher and would like to use OSBLE for one or more of your courses, please e-mail instructor_request@osble.org to request an instructor account.  In the e-mail, please include the name of your school and brief descriptions of the courses you'd like to teach using OSBLE.<br/>
+                <br/>
+                ";
+            }
+            message += @"Best regards,<br/>
+            The OSBLE Team in the <a href='www.helplab.org'>HELP lab</a> at <a href='www.wsu.edu'>Washington State University</a>";
+
+            Email.Send(subject, message, new List<MailAddress>() { new MailAddress(to) });
         }
     }
 }

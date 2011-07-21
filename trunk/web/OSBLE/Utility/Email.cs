@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Net.Mail;
+﻿using System.Collections.Generic;
 using System.Configuration;
+using System.Net.Mail;
 
 namespace OSBLE.Utility
 {
@@ -22,6 +19,7 @@ namespace OSBLE.Utility
             mm.To.Add(toFrom);
             mm.Subject = subject;
             mm.Body = message;
+            mm.IsBodyHtml = true;
 
             //add recipients
             foreach (MailAddress address in to)

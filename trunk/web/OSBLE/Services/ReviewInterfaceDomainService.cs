@@ -89,6 +89,19 @@
                 string rawUrl = VirtualPathUtility.ToAbsolute("~/FileHandler/GetTeamUserPeerReview?assignmentActivityID=" + activity.ID.ToString() + "&teamUserID=" + teamUser.ID.ToString());
                 return (new List<DocumentLocation>() { new DocumentLocation(rawUrl, 100, teamUser.Name, AuthorClassification.Instructor, file.Name) }).AsQueryable();
             }
+            else
+            {
+                //no published file is there a draft?
+
+                path = FileSystem.GetTeamUserPeerReviewDraft(false, currentCourse as Course, activity.ID, teamUser.ID);
+                file = new FileInfo(path);
+                if (file.Exists)
+                {
+                    string rawUrl = VirtualPathUtility.ToAbsolute("~/FileHandler/GetTeamUserPeerReview?assignmentActivityID=" + activity.ID.ToString() + "&teamUserID=" + teamUser.ID.ToString());
+                    return (new List<DocumentLocation>() { new DocumentLocation(rawUrl, 100, teamUser.Name, AuthorClassification.Instructor, file.Name) }).AsQueryable();
+                }
+            }
+
             return null;
         }
 
@@ -122,13 +135,27 @@
 
         public IQueryable<CommentCategory> GetCategories(int DocumentID)
         {
-            return activity.AbstractAssignment.CommentCategoryConfiguration.Categories.AsQueryable();
+            try
+            {
+                return activity.AbstractAssignment.CommentCategoryConfiguration.Categories.AsQueryable();
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public IQueryable<CommentCategoryOption> GetCommentCategoryOptions(int CommentCategoryID)
         {
-            CommentCategory cc = db.CommentCategories.Find(CommentCategoryID);
-            return cc.Options.AsQueryable();
+            try
+            {
+                CommentCategory cc = db.CommentCategories.Find(CommentCategoryID);
+                return cc.Options.AsQueryable();
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

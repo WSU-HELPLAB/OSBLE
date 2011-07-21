@@ -155,7 +155,7 @@ int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
                            UpdateTargetId = "submitFiles",
                            OnComplete = "SubmissionLoaded" 
                                 };
-                            @Ajax.ActionLink("Submit Files For This Submission", "Create", "Submission", new { id = submission.ID.ToString() }, options, new object())
+                            @Ajax.ActionLink("Submit...", "Create", "Submission", new { id = submission.ID.ToString() }, options, new object())
                             }
                             else
                             {

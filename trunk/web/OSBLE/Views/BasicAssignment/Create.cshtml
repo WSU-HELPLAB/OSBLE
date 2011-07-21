@@ -610,20 +610,19 @@
     </div>
     <div id='grading'>
         <div id="grade_options" class="indented_options">
+             <div class="editor-field">
+                Number of points possible: 
+                @Html.TextBoxFor(model => model.Submission.PointsPossible, new { id = "submission_points_possible", size = 3, value = Model.Assignment.PointsPossible })
+                @Html.ValidationMessageFor(model => model.Submission.PointsPossible)
+            </div>
             <div class="editor-field">
-                Worth
+                Weighted
                 @Html.TextBoxFor(model => model.Assignment.PointsPossible, new { id = "points_possible", size = 3 })
                 points toward the
                 @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)
                 @Html.DropDownListFor(model => model.Assignment.CategoryID, ViewBag.Categories as SelectList, new { id = "grade_category" })
                 @Html.ValidationMessageFor(model => model.Assignment.Category)
                 <span>grading category</span>
-            </div>
-            <div class="editor-field">
-                Worth
-                @Html.TextBoxFor(model => model.Submission.PointsPossible, new { id = "submission_points_possible", size = 3, disabled = "disabled", value = Model.Assignment.PointsPossible })
-                Points For Submission Activity <span id="grade_category_label"></span>
-                @Html.ValidationMessageFor(model => model.Submission.PointsPossible)
             </div>
             <h4>
                 Late Policy @Helpers.CreateToolTip(ToolTips.BasicAssignmentLatePolicy)

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
+using System.Net.Mail;
 using System.Web.Mvc;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
@@ -292,7 +294,7 @@ namespace OSBLE.Controllers
             body += "\n\n---\nDo not reply to this email.\nVisit this link to " + action + ": " + getDispatchURL(n.ID);
 
             MailMessage message = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE"),
-                                new MailAddress(recipient.UserName,recipient.FirstName + " " + recipient.LastName));
+                                new MailAddress(recipient.UserName, recipient.FirstName + " " + recipient.LastName));
 
             message.Subject = subject;
             message.Body = body;
