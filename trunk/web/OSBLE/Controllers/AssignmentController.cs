@@ -286,6 +286,9 @@ namespace OSBLE.Controllers
                     //if publish file exists then teacher can not save as draft
                     bool canSaveAsDraft = !(new FileInfo(FileSystem.GetTeamUserPeerReview(false, activeCourse.AbstractCourse as Course, assignmentActivityID, teamUserID)).Exists);
 
+                    ViewBag.Activity = activity;
+                    ViewBag.TeamUser = teamUser;
+
                     return View(new InlineReviewViewModel() { ReviewInterface = createEditInlineReviewSilverlightObject(canSaveAsDraft) });
                 }
             }

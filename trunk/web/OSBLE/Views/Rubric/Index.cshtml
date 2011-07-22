@@ -1,5 +1,6 @@
 ﻿@model OSBLE.Models.ViewModels.RubricViewModel
 @using OSBLE.Models.Courses.Rubrics;
+@using OSBLE.Models.Assignments;
 @using OSBLE.Models.Assignments.Activities;
 @using OSBLE.Models.Users;
 @{ViewBag.Title = "Rubric Evaluation";
@@ -162,12 +163,18 @@ function create_and_open_downloading_submission_dialog() {
                 <td id="@gradeId" style="padding-right:25px">
                     0%
                 </td>
+                @if (Model.SelectedAssignmentActivity is SubmissionActivity && (Model.SelectedAssignmentActivity.AbstractAssignment as StudioAssignment).Deliverables.Count() > 0)
+                { 
                 <td>
                     @Html.ActionLink("Download Submission Files", "GetSubmissionZip", "FileHandler", new { teamUserID = Model.SelectedTeam.ID, assignmentActivityID = Model.SelectedAssignmentActivity.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
                 </td>
+                }
+                @if (Model.SelectedAssignmentActivity is SubmissionActivity && (Model.SelectedAssignmentActivity as SubmissionActivity).InstructorCanReview)
+                { 
                 <td>
                     @Html.ActionLink("View/Edit Inline Comments", "InlineReview", "Assignment", new { assignmentActivityID = Model.SelectedAssignmentActivity.ID, teamUserID = Model.SelectedTeam.ID }, new { style = "padding-left: 25px;" })
                 </td>
+                }
             </tr>
         </table>
     </div>

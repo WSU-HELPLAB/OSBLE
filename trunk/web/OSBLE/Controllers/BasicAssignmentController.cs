@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Web.Mvc;
 using Newtonsoft.Json;
@@ -10,7 +9,6 @@ using OSBLE.Models.AbstractCourses;
 using OSBLE.Models.AbstractCourses.Course;
 
 //using OSBLE.Models.AbstractCourses.Course;
-using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
@@ -108,7 +106,7 @@ namespace OSBLE.Controllers
             }
             return teamMembmers;
         }
-        
+
         /// <summary>
         /// Returns a list of team members for the given activity
         /// </summary>
@@ -294,7 +292,6 @@ namespace OSBLE.Controllers
                                     where sa.AbstractAssignmentID == courseId
                                     select sa).FirstOrDefault();
 
-
             viewModel.TeamCreation = createTeamCreationSilverlightObject();
             viewModel.RubricCreation = createRubricCreationSilverlightObject();
 
@@ -305,7 +302,6 @@ namespace OSBLE.Controllers
         ///Everything below this line MAY need to be redone.  Place things that are "okay"
         //above this line.
         //*********
-
 
         [HttpPost]
         [CanModifyCourse]
@@ -344,7 +340,7 @@ namespace OSBLE.Controllers
             if (basic.UseRubric)
             {
                 int rubricId = 0;
-                if ( Int32.TryParse(Request.Form["RubricToUse"].ToString(), out rubricId) && rubricId != 0 )
+                if (Int32.TryParse(Request.Form["RubricToUse"].ToString(), out rubricId) && rubricId != 0)
                 {
                     basic.Assignment.RubricID = rubricId;
                     ViewBag.SelectedRubric = rubricId;
@@ -526,8 +522,6 @@ namespace OSBLE.Controllers
 
             return View(basic);
         }
-
-        
 
         private SilverlightObject createTeamCreationSilverlightObject()
         {

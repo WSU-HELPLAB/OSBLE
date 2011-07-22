@@ -16,7 +16,7 @@
     [EnableClientAccess()]
 
     //Took this out in hopes that DomainService would work
-    [RequiresAuthentication()]
+    //[RequiresAuthentication()]
     public class OSBLEService : DomainService
     {
         protected OSBLEContext db = new OSBLEContext();
