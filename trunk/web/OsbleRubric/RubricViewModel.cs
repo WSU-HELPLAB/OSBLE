@@ -50,6 +50,8 @@ namespace OsbleRubric
 
         private Rubric selectedRubric = new Rubric();
 
+        RubricLoadingChildWindow loadingWindow = new RubricLoadingChildWindow();
+
         #endregion Attributes
 
         #region constants
@@ -80,8 +82,12 @@ namespace OsbleRubric
         /// </summary>
         public RubricViewModel()
         {
-            //initialize();
             init();
+        }
+
+        public void ShowLoadingWindow()
+        {
+            loadingWindow.Show();
         }
 
         /// <summary>
@@ -96,7 +102,7 @@ namespace OsbleRubric
             thisView.RubricComboBox.SelectionChanged += new SelectionChangedEventHandler(RubricComboBox_SelectionChanged);
 
             //RIA Magic goes here
-            context.Load(context.GetCoursesQuery()).Completed+=new EventHandler(CourseQueryComplete);
+            context.Load(context.GetCoursesQuery()).Completed += new EventHandler(CourseQueryComplete);
             context.Load(context.GetActiveCourseQuery()).Completed += new EventHandler(GetActiveCourseComplete);
 
             //stash the current course id
@@ -120,6 +126,7 @@ namespace OsbleRubric
 
             //Building the initial grid
             buildGridDefaults();
+        
         }
 
 
@@ -1695,6 +1702,7 @@ namespace OsbleRubric
 
         private void CourseQueryComplete(object sender, EventArgs e)
         {
+            
             if (sender is LoadOperation<AbstractCourse>)
             {
                 thisView.CourseComboBox.ItemsSource = (sender as LoadOperation<AbstractCourse>).Entities;
@@ -1706,6 +1714,9 @@ namespace OsbleRubric
                     if (course.ID == ActiveCourse.ID)
                     {
                         thisView.CourseComboBox.SelectedItem = course;
+
+                        //Loading complete, close load window
+                        loadingWindow.Close();
                     }
                 }
             }
@@ -1721,6 +1732,8 @@ namespace OsbleRubric
             if (thisView.CourseComboBox.SelectedItem is AbstractCourse)
             {
                 AbstractCourse course = thisView.CourseComboBox.SelectedItem as AbstractCourse;
+                ActiveCourse = course;
+
                 //Must clear entity container because for some reason context keeps old data after a save
                 context.Rubrics.EntityContainer.Clear();
                 context.Load(context.GetRubricsForCourseQuery(course.ID)).Completed += new EventHandler(GetRubricsComplete);
@@ -1755,6 +1768,14 @@ namespace OsbleRubric
                             thisView.RubricComboBox.SelectedItem = item;
                             break;
                         }
+                    }
+                    //If the selectedRubric.ID is non-zero (its not new), 
+                    //but does not match one of the items in the combobox (attempted in the above foreach)
+                    //the rubric combobox should select the item 0
+                    //and set selectedrubric to a new rubric;
+                    if (thisView.RubricComboBox.SelectedItem == null)
+                    {
+                        thisView.RubricComboBox.SelectedIndex = 0;
                     }
                 }
             }
@@ -1850,6 +1871,8 @@ namespace OsbleRubric
                             if (course.ID == ActiveCourse.ID)
                             {
                                 thisView.CourseComboBox.SelectedItem = item;
+                                //Loading complete, close load window and return - Note: due to race conditions, loading can be finished in CourseQueryComplete as well.
+                                loadingWindow.Close();
                                 return;
                             }
                         }

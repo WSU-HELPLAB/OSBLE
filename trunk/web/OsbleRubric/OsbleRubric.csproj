@@ -86,13 +86,13 @@
     <Compile Include="CustomDataGrid.cs" />
     <Compile Include="HeaderCell.cs" />
     <Compile Include="ICell.cs" />
-    <Compile Include="MainPage.xaml.cs">
-      <DependentUpon>MainPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RubricCell.cs" />
     <Compile Include="RubricChildWindow.xaml.cs">
       <DependentUpon>RubricChildWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RubricLoadingChildWindow.xaml.cs">
+      <DependentUpon>RubricLoadingChildWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="RubricView.xaml.cs">
       <DependentUpon>RubricView.xaml</DependentUpon>
@@ -104,11 +104,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
-    <Page Include="MainPage.xaml">
+    <Page Include="RubricChildWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="RubricChildWindow.xaml">
+    <Page Include="RubricLoadingChildWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

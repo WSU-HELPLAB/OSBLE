@@ -12,13 +12,12 @@ using System.Windows.Shapes;
 
 namespace OsbleRubric
 {
-    public partial class MainPage : UserControl
+    public partial class RubricLoadingChildWindow : ChildWindow
     {
-        public MainPage()
+        public RubricLoadingChildWindow()
         {
             InitializeComponent();
-            RubricViewModel j = new RubricViewModel();
-            LayoutRoot.Children.Add(j.GetView());
         }
     }
 }
+

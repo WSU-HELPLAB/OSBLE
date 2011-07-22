@@ -33,7 +33,9 @@ namespace OsbleRubric
                     this.Resources.Add(item.Key, item.Value);
                 }
             }
-            this.RootVisual = new MainPage();
+            RubricViewModel rvm = new RubricViewModel();
+            this.RootVisual = rvm.GetView();
+            rvm.ShowLoadingWindow();
         }
 
         private void Application_Exit(object sender, EventArgs e)
