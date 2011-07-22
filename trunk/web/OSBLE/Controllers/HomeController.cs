@@ -359,10 +359,10 @@ namespace OSBLE.Controllers
                 catch (System.FormatException)
                 {
                     // Non-integer input. Default to false.
-                    context.Session["DashboardSingleCourseMode"] = false;
+                    context.Session["DashboardSingleCourseMode"] = true;
                 }
             }
-
+            
             // Return to Dashboard.
             return RedirectToAction("Index");
         }

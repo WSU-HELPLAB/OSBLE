@@ -183,15 +183,15 @@ namespace OSBLE.Controllers
         /// </summary>
         private void setDashboardDisplayMode()
         {
-            // Validate dashboard display mode setting.
+            // if not set or erroniously set
+            //     set the activity feed to display a single course
+            // otherwise
+            //     do nothing because it has been set by the user (call to HomeController's SetDashboardMode method)
             if ((context.Session["DashboardSingleCourseMode"] == null) || (context.Session["DashboardSingleCourseMode"].GetType() != typeof(Boolean)))
             {
                 context.Session["DashboardSingleCourseMode"] = true;
             }
-            else
-            {
-                context.Session["DashboardSingleCourseMode"] = false;
-            }
+
             DashboardSingleCourseMode = ViewBag.DashboardSingleCourseMode = context.Session["DashboardSingleCourseMode"];
         }
 
