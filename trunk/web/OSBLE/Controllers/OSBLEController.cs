@@ -365,6 +365,16 @@ namespace OSBLE.Controllers
             }
         }
 
+        public TimeSpan? calculateLateness(Course course, AbstractAssignmentActivity activity, TeamUserMember teamUser)
+        {
+            DateTime? dueDate = GetDueDate(activity);
+            DateTime? submissionTime = GetSubmissionTime(course, activity, teamUser);
+
+            TimeSpan? lateness = dueDate - submissionTime;
+
+            return lateness;
+        }
+
         protected double CalcualateLatePenaltyPercent(AbstractAssignmentActivity activity, TimeSpan lateness)
         {
             //Purposefully lose of data being nice

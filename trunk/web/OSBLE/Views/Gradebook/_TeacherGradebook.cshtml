@@ -235,18 +235,9 @@
 </style>
 
 <div>
-        <a href="#" onclick="$('#export_grades_to_csv').toggle('blind'); return false;">Export Gradebook</a>
-    </div>
-    <br />
-    <div id='export_grades_to_csv' title="Exprt Grades" style="display:none;">
-        <div>Export this gradebook to a comma-separated (CSV)<br /><br />
-            <text>Do you want to export the gradebook?</text><br />
-            <input type="button" value="YES" onclick="exportGradesToCSV();" />
-            <input type="button" value="NO" onclick="$('#export_grades_to_csv').toggle('blind'); return false;" />
-        </div><br />
-    </div>
-
-
+    <a href="/Gradebook/ExportToCSV">Export Gradebook</a>
+</div>
+<br />
 @Html.Partial("_Tabs")
 
 <div class="selectMenu" id="selectMenuID" style="display: none; position: absolute;">
@@ -1596,14 +1587,6 @@
             type: "POST",
             url: "/Gradebook/MoveCategoryLeft",
             data: { categoryId: id[1] },
-            success: window.location.reload(true)
-        });
-    }
-
-    function exportGradesToCSV() {
-        $.ajax({
-            type: "POST",
-            url: "/Gradebook/ExportGadesToCSV",
             success: window.location.reload(true)
         });
     }

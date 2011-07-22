@@ -367,6 +367,8 @@
 
     var currentHeaderCell = null;
 
+    var cellValueOnGainsFocus = 0;
+
     $(function () {
         $("input[name='Customize_radio']").change(function () {
             if ($("input[name='Customize_radio']:checked").val() == 'CompAverage') {
@@ -404,8 +406,8 @@
                 });
             });
         }
-        calculateCols();
-        calculateRows();
+        //calculateCols();
+        //calculateRows();
 
     });
 
@@ -471,7 +473,7 @@
                 else if (row.html() == null) {
                     clearLastCellFocus(e);
                     return false;
-                    
+
                 }
 
                 else {
@@ -542,6 +544,11 @@
 
                     //find the next row
                     row = $(this).parent("tr").next("tr");
+
+                    if ($(row).attr("id") == "averageRow") {
+                        clearLastCellFocus(e);
+                        return false;
+                    }
 
                     //set the col Index back to the first editable cell in the table
                     colIndex = 3;
@@ -843,7 +850,16 @@
                 lastFocusedCell.text("NG");
             }
             else {
-                lastFocusedCell.text(cellValue);
+                if (cellValue != cellValueOnGainsFocus) {
+                    cellValue = parseFloat(cellValue);
+                    cellValue += parseFloat($('#addedPoints-' + ajaxIDs[1]).val());
+                    lastFocusedCell.text(cellValue);
+                    cellValue -= parseFloat($('#addedPoints-' + ajaxIDs[1]).val());
+                }
+                else {
+                    lastFocusedCell.text(cellValue);
+                }
+                
             }
             if (navigator.appName == "Microsoft Internet Explorer") {
                 $(lastFocusedCell).attr("onclick", "").click(function () { cellGainsFocus(event, this); });
@@ -880,7 +896,7 @@
                         data: { value: cellValue, userId: ajaxIDs[0], assignmentId: ajaxIDs[1] },
                         success: function (response) {
                             if ($("#numDropped").val() >= 1) {
-                                clearDropLowest(ajaxIDs[0]);
+                                DropLowest(ajaxIDs[0]);
                             }
                             else {
                                 //$("#grades").replaceWith(response);
@@ -922,6 +938,7 @@
         someCell = $(someCell);
 
         var textValue = someCell.text();
+        cellValueOnGainsFocus = textValue;
         var inputText = $('<input class="cellInput" type="text" value="' + textValue + '" />');
         //someCell.removeAttr("onclick");
         someCell.html(inputText);
@@ -1001,14 +1018,24 @@
         $("#grades tr").children("td:nth-child(" + Index + ")").each(function () {
             if ($(this).attr("id") == "averageTotal") {
                 colTotal = parseFloat(colTotal / count).toFixed(1);
-                $(this).html(colTotal + "%");
+                if (colTotal == "NaN") {
+                    $(this).html("NG");
+                }
+                else {
+                    $(this).html(colTotal + "%");
+                }
             }
             if ($(this).attr("id") == "averageScore") {
                 colTotal = parseFloat(colTotal / count).toFixed(1);
                 if ((colTotal * 10) % (parseInt(colTotal) * 10) == 0) {
                     colTotal = parseInt(colTotal);
                 }
-                $(this).html(colTotal);
+                if (colTotal == "NaN") {
+                    $(this).html("NG");
+                }
+                else {
+                    $(this).html(colTotal);
+                }
             }
         });
     }

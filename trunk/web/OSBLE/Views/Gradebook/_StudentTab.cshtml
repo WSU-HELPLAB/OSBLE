@@ -39,6 +39,12 @@
     {
         text-align: left;
     }
+    
+    .gradebook #tipTable
+    {
+        border-color:White;
+    }
+    
     #tabHeader ul
     {
         list-style: none;
@@ -83,6 +89,13 @@
         position: relative;
         border-bottom:1px solid #fff;
         background: white;
+    }
+    
+    .tipTable
+    {
+        width:60%;
+        border:none;
+        font-size:small;
     }
 </style>
 
@@ -251,8 +264,10 @@
                 <td id="totalAverage">NG</td>
             }
 
+            int cols = 2;
             foreach (AbstractAssignmentActivity assignment in ViewBag.Assignments)
             {
+                cols++;
                 var score = (from scores in ViewBag.UserScores as IEnumerable<Score>
                              where scores.AssignmentActivityID == assignment.ID &&
                              scores.Points >= 0
@@ -285,19 +300,28 @@
 
                     if (studentScore.Count() > 0)
                     {
-                        <td id="@String.Format("{0}-{1}", cu.Identification, assignment.ID)" onclick="cellGainsFocus(event, this);" style="color:Red;">@studentScore.First().StudentPoints</td>
+                        <td id="@String.Format("{0}-{1}", cu.Identification, assignment.ID)" onclick="cellGainsFocus(event, this);" style="color:Gray; font-style:italic;">@studentScore.First().StudentPoints</td>
                     }
                     else
                     {
-                        <td id="@String.Format("{0}-{1}", cu.Identification, assignment.ID)" onclick="cellGainsFocus(event, this);" style="color:Red;">NG</td>
+                        <td id="@String.Format("{0}-{1}", cu.Identification, assignment.ID)" onclick="cellGainsFocus(event, this);" style="color:Gray; font-style:italic;">NG</td>
                     }
                 }
 
             }
         }
         </tr>
-
+       
     </table>
+    <br />
+   
+   <table class="tipTable">
+       <tr>
+           <td style="vertical-align:top;"><span class="ui-icon ui-icon-lightbulb"></span></td>
+           <td><b>Tip:</b> Do you want to know what scores you need in order to obtain a certain grade? You can change any score that has not yet been recorded by your instructor in order to do "what if" analyses! To do so, just click and edit any score labeled <i><text style="color:Gray;">NG</text></i> ("No Grade"). Your grades will be automatically updated to reflect the change. Any score that you change will remain editable and in <i><text style="color:Gray;">gray italics</text></i> until your instructor updates it with your actual grade.</td>
+       </tr>
+   </table>
+
 </div>
 
 <script type="text/javascript">
@@ -486,7 +510,7 @@
             lastFocusedCell.html("");
             lastFocusedCell.text(cellValue);
             lastFocusedCell.attr("onclick", 'cellGainsFocus(event, this)');
-            lastFocusedCell.css("color", "Red");
+            lastFocusedCell.css("color", "Gray");
             lastFocusedCell = null;
 
             calculateRows();

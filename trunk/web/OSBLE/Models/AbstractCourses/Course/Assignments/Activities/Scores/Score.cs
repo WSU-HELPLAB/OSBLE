@@ -41,13 +41,18 @@ namespace OSBLE.Models.Assignments.Activities.Scores
 
         public double StudentPoints { get; set; }
 
+        public double AddedPoints { get; set; }
+
         public Score()
         {
             Published = false;
             Points = 0;
             Multiplier = 1.0;
             LatePenaltyPercent = 0;
-            StudentPoints = 0;
+            StudentPoints = -1;
+            AddedPoints = 0;
+            isTake = false;
+            isDropped = false;
         }
     }
 }

@@ -228,6 +228,7 @@
             @foreach (AbstractAssignmentActivity gradeAssignmentActivity in ViewBag.Assignments)
             {
 
+
                 var gradableQuery = from g in ViewBag.Grades as IEnumerable<Score>
                                     where g.AssignmentActivityID == gradeAssignmentActivity.ID
                                     && g.TeamUserMember.Contains(user)
@@ -263,15 +264,21 @@
             }
         </tr>
     }
-    <script type="text/javascript">
-        
-
-        $(document).ready(function () {
-            keyControls();
-            calculateRows();
-            calculateCols();
-        });
-
-    </script>
 </table>
+
+@foreach (AbstractAssignmentActivity assignment in ViewBag.Assignments)
+{
+    <input id="addedPoints-@assignment.ID" type="hidden" value="@assignment.addedPoints" />    
+}
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        keyControls();
+        //calculateRows();
+        //calculateCols();
+    });
+
+</script>
 
