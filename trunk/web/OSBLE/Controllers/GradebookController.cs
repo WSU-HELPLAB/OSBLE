@@ -756,37 +756,46 @@ namespace OSBLE.Controllers
             db.SaveChanges();
         }
 
-        [HttpPost]
-        public void ClearDropLowest(int categoryId, string userId)
-        {
-            if (ModelState.IsValid)
-            {
-                if (categoryId > 0)
-                {
-                    UserProfile user = (from u in db.UserProfiles
-                                        where u.Identification == userId
-                                        select u).FirstOrDefault();
+       [HttpPost]
+       public void ClearDropLowest(int categoryId, string userId)
+       {
+           if (ModelState.IsValid)
+           {
+               //Get student
+               //var user = (from u in db.UserProfiles where u.Identification == userId select u).FirstOrDefault();
 
-                    List<Score> allScores = (from scores in db.Scores
-                                             where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
-                                             && scores.isDropped == true
-                                             select scores).ToList();
+               if (categoryId > 0)
+               {
+                   UserProfile user = (from u in db.UserProfiles
+                                       where u.Identification == userId
+                                       select u).FirstOrDefault();
 
-                    var studentScores = (from score in allScores
-                                         where score.TeamUserMember.Contains(user)
-                                         select score);
+                   List<Score> scoreList = (from scores in db.Scores
+                                            where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
+                                            && scores.isDropped == true
+                                            select scores).ToList();
+                     
+                   var studentScores = (from scores in scoreList
+                                        where scores.TeamUserMember.Name == user.LastName + ", " + user.FirstName
+                                        select scores);
 
-                    if (studentScores.Count() > 0)
-                    {
-                        foreach (Score score in studentScores)
-                        {
-                            score.isDropped = false;
-                        }
-                        db.SaveChanges();
-                    }
-                }
-            }
-        }
+                   //var studentScores = from scores in db.Scores
+                   //                    where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
+                   //                    //&& scores.TeamUserMemberID == userId
+                   //                    && scores.isDropped == true
+                   //                    select scores;
+
+                   if (studentScores.Count() > 0)
+                   {
+                       foreach (Score score in studentScores)
+                       {
+                           score.isDropped = false;
+                       }
+                       db.SaveChanges();
+                   }
+               }
+           }
+       }
 
         [HttpPost]
         public ActionResult ClearAllDropLowest(int categoryId)
@@ -1054,6 +1063,8 @@ namespace OSBLE.Controllers
                     }
                 }
             }
+
+            ViewBag.Categories = (activeCourse.AbstractCourse as Course).Categories;
             return View("_Tabs");
         }
 
@@ -1712,8 +1723,8 @@ namespace OSBLE.Controllers
 
             List<Score> allGrades = (from grades in db.Scores
                                      where grades.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId &&
-                                     grades.Points >= 0 &&
-                                     grades.isDropped == false
+                                     grades.Points >= 0 
+                                     //&& grades.isDropped == false
                                      select grades).ToList();
 
             List<Score> allGradedAssignments = (from grades in allGrades
@@ -1722,8 +1733,6 @@ namespace OSBLE.Controllers
                                                 select grades).ToList();
 
             List<LetterGrade> letterGradeList = ((activeCourse.AbstractCourse as Course).LetterGrades).ToList();
-
-            List<Score> studentScores = new List<Score>();
 
             List<Score> categoryTotalPercent = (from categoryTotal in db.Scores
                                                 where categoryTotal.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId &&
@@ -1743,7 +1752,7 @@ namespace OSBLE.Controllers
                                                                scores.Points >= 0
                                                                select assignment).Distinct().ToList();
 
-
+            List<Score> studentScores = new List<Score>();
 
             foreach (UserProfile up in studentList)
             {

@@ -51,7 +51,7 @@ namespace OSBLE.Models.Assignments.Activities.Scores
             LatePenaltyPercent = 0;
             StudentPoints = -1;
             AddedPoints = 0;
-            isTake = false;
+            //isTake = false;
             isDropped = false;
         }
     }

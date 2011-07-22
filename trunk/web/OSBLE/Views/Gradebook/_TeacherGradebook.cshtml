@@ -238,6 +238,7 @@
     <a href="/Gradebook/ExportToCSV">Export Gradebook</a>
 </div>
 <br />
+
 @Html.Partial("_Tabs")
 
 <div class="selectMenu" id="selectMenuID" style="display: none; position: absolute;">
@@ -466,8 +467,8 @@
             
             @{
                 double totalAverage = 0;
-                
-                
+
+
 
                 //Holds the total grade
                 double totalGrade = 0;
@@ -475,11 +476,11 @@
                 totalCategoryPoints = 0;
                 double totalCategoryPossible = 0;
 
-                double categoryTotalWeight = 0; 
+                double categoryTotalWeight = 0;
                 //Get the total score for the class
 
                 int studentCount = 0;
-                
+
                 foreach (UserProfile user in ViewBag.Students)
                 {
                     studentCount++;
@@ -490,7 +491,8 @@
                         {
                             List<Score> userScore = (from score in ViewBag.AllGrades as IEnumerable<Score>
                                                      where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID &&
-                                                     score.TeamUserMember.Contains(user)
+                                                     score.TeamUserMember.Contains(user) &&
+                                                     score.isDropped == false
                                                      select score).ToList();
 
                             if (userScore.Count() == 0)
@@ -506,13 +508,14 @@
                             double categoryPoints = 0;
                             double categoryPossible = 0;
                             double categoryTotal = 0;
-                            
+
                             List<Score> totalScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
                                                        where score.TeamUserMember.Contains(user) &&
-                                                       score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
+                                                       score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID &&
+                                                       score.isDropped == false
                                                        select score).ToList();
                             if (totalScores.Count() > 0)
-                            {              
+                            {
                                 foreach (Score score in totalScores)
                                 {
                                     if (score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
@@ -664,6 +667,7 @@
                           List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
                                                     where score.TeamUserMember.Contains(student) &&
                                                     score.AssignmentActivity.AbstractAssignment.CategoryID == c.ID
+                                                     && score.isDropped == false
                                                     select score).ToList();
                           if (userScores.Count() == 0)
                           {
@@ -679,6 +683,7 @@
                           List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
                                                     where score.TeamUserMember.Contains(student) &&
                                                     score.AssignmentActivity.AbstractAssignment.CategoryID == c.ID
+                                                    && score.isDropped == false
                                                     select score).ToList();
 
                           double points = 0;
@@ -740,6 +745,7 @@
                           List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
                                                     where score.TeamUserMember.Contains(student) &&
                                                     score.AssignmentActivity.AbstractAssignment.CategoryID == c.ID
+                                                    && score.isDropped == false
                                                     select score).ToList();
 
                           double points = 0;
@@ -771,7 +777,6 @@
                           }
                       }
                   }
-                
             }
             @*@{  
                     
