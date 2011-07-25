@@ -835,12 +835,12 @@
                 if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
                     $(this).css("background-color", "#DCDCDC");
                     $(this).find("div").css("background-color", "#DCDCDC");
-                    if (navigator.appName == "Microsoft Internet Explorer") {
-                        $(this).attr("onmouseout", "").mouseout(function () { hideButton(this); });
-                    }
-                    else {
+//                    if (navigator.appName == "Microsoft Internet Explorer") {
+//                        $(this).attr("onmouseout", "").mouseout(function () { hideButton(this); });
+//                    }
+//                    else {
                         $(this).attr("onmouseout", "hideButton(this);");
-                    }
+//                    }
                 }
                 else {
                 }
@@ -896,12 +896,12 @@
                 }
                 
             }
-            if (navigator.appName == "Microsoft Internet Explorer") {
-                $(lastFocusedCell).attr("onclick", "").click(function () { cellGainsFocus(event, this); });
-            }
-            else {
+//            if (navigator.appName == "Microsoft Internet Explorer") {
+//                $(lastFocusedCell).attr("onclick", "").click(function () { cellGainsFocus(event, this); });
+//            }
+//            else {
                 lastFocusedCell.attr("onclick", "cellGainsFocus(event, this);");
-            }
+//            }
                         
             lastFocusedCell = null;
 
