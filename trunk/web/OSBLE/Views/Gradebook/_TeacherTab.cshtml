@@ -158,8 +158,8 @@
 </style>
 
     @{
-        var studentId = ViewBag.StudentId;  
-        var customize_option = (from co in ViewBag.Customize as IEnumerable<Category.GradeOptions> select co).FirstOrDefault();
+        var studentId = ViewBag.StudentId;
+        var customize_option = (Category.GradeOptions)ViewBag.Customize;
         var numDropped = ViewBag.Dropped;
     }
     <input id="studentId" type="hidden" value="@studentId" />
@@ -1001,13 +1001,13 @@
         cell.css("background-color", "#FFFF84");
         cell.find("div").css("background-color", "#FFFF84");
 
-        if (navigator.appName == "Microsoft Internet Explorer") {
-            //change the mouseout function so we don't change the color and only hide the div
-            cell.attr("onmouseout", "").mouseout(function () { hideOnlyButton(this); });
-        }
-        else {
+//        if (navigator.appName == "Microsoft Internet Explorer") {
+//            //change the mouseout function so we don't change the color and only hide the div
+//            cell.attr("onmouseout", "").mouseout(function () { hideOnlyButton(this); });
+//        }
+//        else {
             cell.attr("onmouseout", "hideOnlyButton(this);");
-        }
+//        }
 
         //find the current rows header
         var cell2 = $("#grades").find("tr:eq(" + row + ")");
@@ -1017,8 +1017,13 @@
         cell2.css("background-color", "#FFFF84");
         cell2.find("div").css("background-color", "#FFFF84");
 
-        //remove the current rows onmouseout function so we it doesn't become unhighlighted
-        cell2.removeAttr("onmouseout");
+        //remove the current rows onmouseout function so it doesn't become unhighlighted
+        if (navigator.appName == "Microsoft Internet Explorer") {
+            cell2.prop("onmouseout", null);
+        }
+        else {
+            cell2.removeAttr("onmouseout");
+        }
     }
 
     function calculateCols() {

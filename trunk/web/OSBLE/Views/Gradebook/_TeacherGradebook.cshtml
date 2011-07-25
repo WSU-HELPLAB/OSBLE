@@ -1216,11 +1216,14 @@
             $.ajax({
                 type: "POST",
                 url: "/Gradebook/ModifyCategoryPoints",
-                data: { value: cellValue, categoryId: catId[1] }
+                data: { value: cellValue, categoryId: catId[1] },
+                success: function (response) {
+                    $("#tabHeader").html(response);
+                }
             });
 
-            //calculateRows();
-            //calculateCols();
+//            calculateRows();
+//            calculateCols();
         }
     }
 
@@ -1342,7 +1345,13 @@
         cell2.find("div").css("background-color", "#FFFF84");
 
         //remove the current rows onmouseout function so we it doesn't become unhighlighted
-        cell2.removeAttr("onmouseout");
+        //remove the current rows onmouseout function so it doesn't become unhighlighted
+        if (navigator.appName == "Microsoft Internet Explorer") {
+            cell2.prop("onmouseout", null);
+        }
+        else {
+            cell2.removeAttr("onmouseout");
+        }
     }
 
     function calculateRows() {

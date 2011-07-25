@@ -1033,7 +1033,7 @@ namespace OSBLE.Controllers
                 }
             }
             TeacherIndex();
-            return View("Index");
+            return View("_Tabs");
         }
 
         [HttpPost]
@@ -1989,8 +1989,7 @@ namespace OSBLE.Controllers
 
             int numDropped = currentTab.dropX;
 
-            List<Category.GradeOptions> customizeOption = new List<Category.GradeOptions>();
-            customizeOption.Add((Category.GradeOptions)currentTab.Customize);
+            var customizeOption = (Category.GradeOptions)currentTab.Customize;
 
             //save to the session.  Needed later for AJAX-related updates.
             Session["CurrentCategoryId"] = currentTab.ID;

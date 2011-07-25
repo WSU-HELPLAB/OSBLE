@@ -11,7 +11,7 @@
 @{
         int numDropped = ViewBag.Dropped;
         <input type="hidden" id="numDropped" value="@numDropped" />
-        var customize_option = (from co in ViewBag.Customize as IEnumerable<Category.GradeOptions> select co).FirstOrDefault();
+        var customize_option = (Category.GradeOptions)ViewBag.Customize;
         <input type="hidden" id="customize_option" value="@customize_option" />
     }
 
