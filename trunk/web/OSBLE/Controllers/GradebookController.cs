@@ -1032,6 +1032,7 @@ namespace OSBLE.Controllers
                     }
                 }
             }
+            TeacherIndex();
             return View("Index");
         }
 
@@ -1056,8 +1057,8 @@ namespace OSBLE.Controllers
                     }
                 }
             }
-
-            ViewBag.Categories = (activeCourse.AbstractCourse as Course).Categories;
+            TeacherIndex();
+            //ViewBag.Categories = (activeCourse.AbstractCourse as Course).Categories;
             return View("_Tabs");
         }
 
@@ -1082,6 +1083,7 @@ namespace OSBLE.Controllers
                     }
                 }
             }
+            BuildGradebook((int)Session["categoryId"]);
             return View("_Gradebook");
         }
 
@@ -1089,7 +1091,6 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult ModifyPossiblePoints(int value, int assignmentId)
         {
-
             if (ModelState.IsValid)
             {
                 if (assignmentId != 0)
@@ -1112,6 +1113,7 @@ namespace OSBLE.Controllers
                     Json("failure");
                 }
             }
+            BuildGradebook((int)Session["categoryId"]);
             return View("_Gradebook");
             //return RedirectToAction("Index");
         }
@@ -1188,6 +1190,7 @@ namespace OSBLE.Controllers
 
             db.Categories.Add(newCategory);
             db.SaveChanges();
+            TeacherIndex();
             return View("Index");
         }
 
@@ -1232,6 +1235,7 @@ namespace OSBLE.Controllers
                     db.SaveChanges();
                 }
             }
+            TeacherIndex();
             return View("Index");
         }
 
@@ -1420,6 +1424,7 @@ namespace OSBLE.Controllers
                     }
                 }
             }
+            TeacherIndex();
             return View("Index");
         }
 
@@ -1456,6 +1461,7 @@ namespace OSBLE.Controllers
                     }
                 }
             }
+            TeacherIndex();
             return View("Index");
         }
 
@@ -1652,6 +1658,7 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult UpdateCells()
         {
+            BuildGradebook((int)Session["categoryId"]);
             return View("_Gradebook");
         }
 
