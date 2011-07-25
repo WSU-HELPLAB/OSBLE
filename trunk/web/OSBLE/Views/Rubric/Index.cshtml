@@ -18,9 +18,14 @@
   string gradeId = "grade";
   int sliderTableLength = 880;
   int textInputLenght = 25;
-  int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;}
+  int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;
+  DateTime? publishTime = Model.Evaluation.DatePublished;
+  }
 <script type="text/javascript">
-
+function test()
+{
+    //$('tr')
+}
 function create_and_open_downloading_submission_dialog() {
 
         //create the div that we will then make into a dialog
@@ -180,14 +185,44 @@ function create_and_open_downloading_submission_dialog() {
     </div>
     @using (Html.BeginForm("Index", "Rubric", FormMethod.Post, new { id = "rubric_form" }))
     {
-        <div style="float: right">
-            <input type="submit" name="@draftButton" value="Save as Draft" />
-            <input type="submit" name="@publishButton" value="Publish to Student" />
-        </div>
+        <table style="float:right">
+            <tr>
+                @if(Model.Evaluation.IsPublished == true)
+                {
+                    <td><input disabled="disabled" type="submit" name="@draftButton" value="Save as Draft" /></td>
+                }
+                else
+                {
+                    <td><input type="submit" name="@draftButton" value="Save as Draft" /></td>
+                }
+                
+                <td><input type="submit" name="@publishButton" value="Publish to Student" /></td>
+            </tr>
+                @if (publishTime.HasValue)
+                {
+                    if (Model.Evaluation.IsPublished == true)
+                    {
+                                <tr><td colspan="2">Published at: @publishTime.Value.ToString("g")</td></tr>
+                    }
+                    else
+                    {
+                                <tr><td colspan="2">Draft saved at: @publishTime.Value.ToString("g")</td></tr>
+                    }
+                }
+            
+        </table>
         
         @Html.Partial("_Display", Model)
         
-        <input type="submit" name="@draftButton" value="Save as Draft" />
+        //Disable the save as draft button if its already published
+        if (Model.Evaluation.IsPublished == true) 
+        {
+            <input disabled="disabled" type="submit" name="@draftButton" value="Save as Draft" />
+        }
+        else
+        {
+            <input type="submit" name="@draftButton" value="Save as Draft" />
+        }
         <input type="submit" name="@publishButton" value="Publish to Student" />
         <input type="hidden" name="@ViewBag.AbstractAssignmentActivityId" value="@Model.SelectedAssignmentActivity.ID" />
         <input type="hidden" name="@ViewBag.TeamUserId" value="@Model.SelectedTeam.ID" />

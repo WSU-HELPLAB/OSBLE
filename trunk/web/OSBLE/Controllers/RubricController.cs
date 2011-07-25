@@ -73,13 +73,21 @@ namespace OSBLE.Controllers
             //that once published, a review cannot be unpublished.  In this case,
             //the "save as draft" and "publish to student" buttons do the same thing.
             //In the future, it might be cool to have the "draft" button grayed out or
-            //something.
+            //something - DONE. 
             string publishKey = ViewBag.PublishButtonId;
             if (Request.Form.AllKeys.Contains(publishKey))
             {
                 viewModel.Evaluation.IsPublished = true;
                 viewModel.Evaluation.DatePublished = DateTime.Now;
             }
+            else 
+            {
+                //Even if the user has selected to save as draft, 
+                //it should store the DatePublished to be displayed when the draft was last saved. 
+                viewModel.Evaluation.IsPublished = false;
+                viewModel.Evaluation.DatePublished = DateTime.Now;
+            }
+
 
             string globalCommentKey = ViewBag.GlobalCommentId;
             if (Request.Form.AllKeys.Contains(globalCommentKey))
