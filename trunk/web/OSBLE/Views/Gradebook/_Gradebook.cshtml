@@ -9,15 +9,13 @@
 }
 
 @{
-        var numDropped = (from drop in ViewBag.Dropped as IEnumerable<int> select drop).FirstOrDefault();
+        int numDropped = ViewBag.Dropped;
         <input type="hidden" id="numDropped" value="@numDropped" />
         var customize_option = (from co in ViewBag.Customize as IEnumerable<Category.GradeOptions> select co).FirstOrDefault();
         <input type="hidden" id="customize_option" value="@customize_option" />
     }
 
 <table id="grades" class="gradebook">
-
-
 
     <tr class="colHeader">
             
@@ -185,11 +183,11 @@
 
             if (a.addedPoints > 0)
             {   
-                    <th id="header-@a.ID" onclick="changeHeaderName(event, this)">@a.Name (Added @a.addedPoints)</th>
+                <th id="header-@a.ID" onclick="changeHeaderName(event, this)">@a.Name (Added @a.addedPoints)</th>
             }
             else
             {
-                    <th id="header-@a.ID" onclick="changeHeaderName(event, this)">@a.Name </th>
+                <th id="header-@a.ID" onclick="changeHeaderName(event, this)">@a.Name </th>
             }
             i += 1;
         }
@@ -220,7 +218,7 @@
               }
               else
               {
-                    <td id="total">@String.Format("{0}", 0)</td>
+                    <td id="total">NG</td>
               }
             }
 

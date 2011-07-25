@@ -160,7 +160,7 @@
     @{
         var studentId = ViewBag.StudentId;  
         var customize_option = (from co in ViewBag.Customize as IEnumerable<Category.GradeOptions> select co).FirstOrDefault();
-        var numDropped = (from drop in ViewBag.Dropped as IEnumerable<int> select drop).First(); 
+        var numDropped = ViewBag.Dropped;
     }
     <input id="studentId" type="hidden" value="@studentId" />
 

@@ -1987,8 +1987,7 @@ namespace OSBLE.Controllers
                 currentTab = (from c in allCategories select c).First();
             }
 
-            List<int> numDropped = new List<int>();
-            numDropped.Add(currentTab.dropX);
+            int numDropped = currentTab.dropX;
 
             List<Category.GradeOptions> customizeOption = new List<Category.GradeOptions>();
             customizeOption.Add((Category.GradeOptions)currentTab.Customize);
