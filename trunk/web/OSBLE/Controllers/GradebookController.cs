@@ -2040,7 +2040,17 @@ namespace OSBLE.Controllers
                 };
                 db.AbstractAssignmentActivities.Add(newActivity);
                 db.SaveChanges();
+
+                //pull the gradables (columns) for the current weight (tab)
+                //Pull the gradeAssignments
+                gradeAssignments = (from ga in db.AbstractAssignmentActivities
+                                    where ga.AbstractAssignment.CategoryID == currentTab.ID &&
+                                    (!(ga is StopActivity))
+                                    orderby ga.ColumnOrder
+                                    select ga).ToList();
+
             }
+
 
             //Pull the dropped lowest
             var droppedCount = from scores in db.Scores
