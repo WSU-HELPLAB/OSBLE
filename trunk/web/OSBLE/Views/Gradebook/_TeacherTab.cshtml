@@ -767,9 +767,6 @@
                 type: "POST",
                 url: "/Gradebook/ModifyAssignmentName",
                 data: { value: cellValue, assignmentId: cellID[1] },
-                success: function (response) {
-                    $("#grades").html(response);
-                }
             });
         }
     }
