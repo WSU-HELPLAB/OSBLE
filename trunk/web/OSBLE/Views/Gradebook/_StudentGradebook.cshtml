@@ -198,7 +198,8 @@
                             List<Score> userScore = (from score in ViewBag.CategoryTotalPercent as IEnumerable<Score>
                                                      where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID &&
                                                      score.Points >= 0 &&
-                                                     score.TeamUserMember.Contains(user)
+                                                     score.TeamUserMember.Contains(user) &&
+                                                     score.isDropped == false
                                                      select score).ToList();
 
                             if (userScore.Count() == 0)
@@ -209,7 +210,7 @@
                     }
 
                     //Get the total score for the class
-                    foreach (Category category in ViewBag.CatsWithWeightsAndScores)
+                    foreach (Category category in ViewBag.Categories)
                     {
                         if (category.Name != Constants.UnGradableCatagory)
                         {
@@ -220,7 +221,8 @@
                             List<Score> totalScores = (from score in ViewBag.CategoryTotalPercent as IEnumerable<Score>
                                                        where score.TeamUserMember.Contains(user) &&
                                                        score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID &&
-                                                       score.Points >= 0
+                                                       score.Points >= 0 &&
+                                                       score.isDropped == false
                                                        select score).ToList();
 
                             if (totalScores.Count() > 0)
@@ -289,7 +291,7 @@
                         {
                             if (score.AssignmentActivity.AbstractAssignment.CategoryID == item.ID)
                             {
-                                if (score.Points >= 0)
+                                if (score.Points >= 0 && score.isDropped == false)
                                 {
                                     oneScore = true;
                                     averagePoints += score.Points;
@@ -380,6 +382,12 @@
                     int customize = category.Customize;
                     if (category.Name != Constants.UnGradableCatagory)
                     {
+                        
+                        if (category.Customize == (int)Category.GradeOptions.XtoTake)
+                        {
+                            numDropped = category.Assignments.Count() - numDropped;
+                        }
+                        
                         double categoryPoints = 0;
                         double categoryPossible = 0;
                         double categoryTotal = 0;
@@ -461,6 +469,11 @@
                         int count = 0;
                         int numDropped = category.dropX;
                         int customize = category.Customize;
+
+                        if (category.Customize == (int)Category.GradeOptions.XtoTake)
+                        {
+                            numDropped = category.Assignments.Count() - numDropped;
+                        }
 
                         if (category.Name != Constants.UnGradableCatagory)
                         {

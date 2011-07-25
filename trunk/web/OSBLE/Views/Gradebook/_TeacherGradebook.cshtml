@@ -491,8 +491,7 @@
                         {
                             List<Score> userScore = (from score in ViewBag.AllGrades as IEnumerable<Score>
                                                      where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID &&
-                                                     score.TeamUserMember.Contains(user) &&
-                                                     score.isDropped == false
+                                                     score.TeamUserMember.Contains(user) 
                                                      select score).ToList();
 
                             if (userScore.Count() == 0)
@@ -511,8 +510,7 @@
 
                             List<Score> totalScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
                                                        where score.TeamUserMember.Contains(user) &&
-                                                       score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID &&
-                                                       score.isDropped == false
+                                                       score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
                                                        select score).ToList();
                             if (totalScores.Count() > 0)
                             {
@@ -660,14 +658,13 @@
                   totalCategoryPoints = 0;
                   totalCategoryPossible = 0;
                   double totalCategoryWeight = ViewBag.TotalCategoryWeights;
-                  foreach (Category c in ViewBag.Categories)
+                  foreach (Category c in ViewBag.CatsWithWeightsAndScores)
                   {
                       if (c.Name != Constants.UnGradableCatagory)
                       {
                           List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
                                                     where score.TeamUserMember.Contains(student) &&
                                                     score.AssignmentActivity.AbstractAssignment.CategoryID == c.ID
-                                                     && score.isDropped == false
                                                     select score).ToList();
                           if (userScores.Count() == 0)
                           {
@@ -683,7 +680,6 @@
                           List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
                                                     where score.TeamUserMember.Contains(student) &&
                                                     score.AssignmentActivity.AbstractAssignment.CategoryID == c.ID
-                                                    && score.isDropped == false
                                                     select score).ToList();
 
                           double points = 0;
@@ -745,7 +741,6 @@
                           List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
                                                     where score.TeamUserMember.Contains(student) &&
                                                     score.AssignmentActivity.AbstractAssignment.CategoryID == c.ID
-                                                    && score.isDropped == false
                                                     select score).ToList();
 
                           double points = 0;

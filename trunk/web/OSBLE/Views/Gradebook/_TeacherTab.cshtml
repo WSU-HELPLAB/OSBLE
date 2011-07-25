@@ -897,6 +897,7 @@
                         success: function (response) {
                             if ($("#numDropped").val() >= 1) {
                                 DropLowest(ajaxIDs[0]);
+                                
                             }
                             else {
                                 //$("#grades").replaceWith(response);
@@ -1357,27 +1358,27 @@
         $("#customizeID").animate({ "height": "hide" }, { duration: 300 });
     }
 
-    function clearDropLowest(id) {
+//    function clearDropLowest(id) {
 
-        //get the pathname so we can use the categoryId
-        var pathname = window.location.toString();
+//        //get the pathname so we can use the categoryId
+//        var pathname = window.location.toString();
 
-        //split the pathname at the "="
-        //catId[1] = categoryId
-        var catId = pathname.split("=");
+//        //split the pathname at the "="
+//        //catId[1] = categoryId
+//        var catId = pathname.split("=");
 
-        //make sure we are on a valid page
-        if (catId[1] != null) {
-            var newCatId = catId[1].split("#");
-            //ajax call to clear the drop lowest
-            $.ajax({
-                type: "POST",
-                url: "/Gradebook/ClearDropLowest",
-                data: { categoryId: newCatId[0], userId: id },
-                success: DropLowest(id)
-            });
-        }
-    }
+//        //make sure we are on a valid page
+//        if (catId[1] != null) {
+//            var newCatId = catId[1].split("#");
+//            //ajax call to clear the drop lowest
+//            $.ajax({
+//                type: "POST",
+//                url: "/Gradebook/ClearDropLowest",
+//                data: { categoryId: newCatId[0], userId: id },
+//                success: DropLowest(id)
+//            });
+//        }
+//    }
 
 //    function clearAllDropLowest() {
 

@@ -776,7 +776,7 @@ namespace OSBLE.Controllers
                                             select scores).ToList();
                      
                    var studentScores = (from scores in scoreList
-                                        where scores.TeamUserMember.Name == user.LastName + ", " + user.FirstName
+                                        where scores.TeamUserMember.Contains(user)
                                         select scores);
 
                    //var studentScores = from scores in db.Scores
@@ -828,8 +828,7 @@ namespace OSBLE.Controllers
             if (ModelState.IsValid)
             {
                 ClearDropLowest(categoryId, userId);
-                double lowest = 10000;
-                int id = 0;
+                
                 if (categoryId > 0)
                 {
                     UserProfile user = (from u in db.UserProfiles
@@ -838,44 +837,38 @@ namespace OSBLE.Controllers
 
                     List<Score> scoreList = (from scores in db.Scores
                                              where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
+                                             orderby (scores.Points / scores.AssignmentActivity.PointsPossible)
                                              select scores).ToList();
 
                     var studentScores = (from scores in scoreList
                                          where scores.TeamUserMember.Contains(user)
                                          select scores);
 
+                    Category currentCategory = (from cat in db.Categories where cat.ID == categoryId select cat).FirstOrDefault();
+
                     if (studentScores.Count() > 0)
-                    {
-                        foreach (Score score in studentScores)
+                    {    
+                        List<Score> scores = studentScores.ToList();
+                        
+                        var max = 0;
+                        int dropX = currentCategory.dropX;
+                        
+                        if (currentCategory.Customize == (int)Category.GradeOptions.XtoTake)
                         {
-                            if (score.Points >= 0)
-                            {
-                                double temp = score.Points / score.AssignmentActivity.PointsPossible;
-                                if (temp < lowest)
-                                {
-                                    lowest = temp;
-                                    id = score.ID;
-                                }
-                            }
-                            //else if (score.StudentPoints >= 0)
-                            //{
-                            //    double temp = score.StudentPoints / score.AssignmentActivity.PointsPossible;
-                            //    if (temp < lowest)
-                            //    {
-                            //        lowest = temp;
-                            //        id = score.ID;
-                            //    }
-                            //}
+                            max = scores.Count() - dropX;
                         }
-                        foreach (Score score in studentScores)
+                        else
                         {
-                            if (score.ID == id)
+                            max = dropX;
+                        }
+                        for (int i = 0; i < max; i++)
+                        {
+                            if (i < scores.Count())
                             {
-                                score.isDropped = true;
+                                scores[i].isDropped = true;
                             }
                         }
                         db.SaveChanges();
-                        lowest = 10000;
                     }
                 }
             }
@@ -1723,8 +1716,8 @@ namespace OSBLE.Controllers
 
             List<Score> allGrades = (from grades in db.Scores
                                      where grades.AssignmentActivity.AbstractAssignment.Category.CourseID == currentCourseId &&
-                                     grades.Points >= 0 
-                                     //&& grades.isDropped == false
+                                     grades.Points >= 0 &&
+                                     grades.isDropped == false
                                      select grades).ToList();
 
             List<Score> allGradedAssignments = (from grades in allGrades
