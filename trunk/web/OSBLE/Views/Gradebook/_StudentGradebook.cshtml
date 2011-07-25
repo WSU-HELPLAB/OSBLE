@@ -385,7 +385,7 @@
                         
                         if (category.Customize == (int)Category.GradeOptions.XtoTake)
                         {
-                            numDropped = category.Assignments.Count() - numDropped;
+                            numDropped = userScores.Count() - numDropped;  
                         }
                         
                         double categoryPoints = 0;
@@ -472,7 +472,7 @@
 
                         if (category.Customize == (int)Category.GradeOptions.XtoTake)
                         {
-                            numDropped = category.Assignments.Count() - numDropped;
+                            numDropped = userScores.Count() - numDropped;
                         }
 
                         if (category.Name != Constants.UnGradableCatagory)

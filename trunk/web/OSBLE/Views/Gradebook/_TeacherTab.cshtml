@@ -251,7 +251,7 @@
     </div>
 
 <div class="customize" id="customizeID" style="display:none" title="Drop Lowest">
-	<form id="dropLowestSubmit" onsubmit="dropAllLowest(); return false;"  >
+	
 
         @if (customize_option == Category.GradeOptions.CompAverage || numDropped == 0)
         {
@@ -296,9 +296,8 @@
             
 		<div id="dropLowest_btns">    
 		    <input id="dropLowestSubmit" type="submit" onclick="hideFunctions();" value="Apply" />
-            <input id="dropLowestCancel" type="button" onclick="hideFunctions();" value="Cancel" />
+            <input id="dropLowestCancel" type="button" onclick="cancelFunctions();" value="Cancel" />
         </div>
-    </form>
 </div>
 
 <div class="addPoints" id="addPointsID" style="display: none;" title="Add Points">
@@ -410,6 +409,7 @@
         //calculateRows();
 
     });
+
 
     $(document).click(function (e) {
 
@@ -704,6 +704,38 @@
     }
 
     function hideFunctions() {
+
+        if ($("input[name='Customize_radio']:checked").val() == 'XtoDrop') {
+            if ($("#XtoDrop").val() == "") {
+                alert("You must type a number in the field");
+            }
+            else {
+                dropAllLowest();
+                $("#customizeID").dialog('close');
+                $("#addPointsID").dialog('close');
+                $("#changeAssignmentCategoryId").dialog('close');
+            }
+        }
+        else if ($("input[name='Customize_radio']:checked").val() == 'XtoTake') {
+            if ($("#XtoTake").val() == "") {
+                alert("You must type a number in the field");
+            }
+            else {
+                dropAllLowest();
+                $("#customizeID").dialog('close');
+                $("#addPointsID").dialog('close');
+                $("#changeAssignmentCategoryId").dialog('close');
+            }
+        }
+        else {
+            dropAllLowest();
+            $("#customizeID").dialog('close');
+            $("#addPointsID").dialog('close');
+            $("#changeAssignmentCategoryId").dialog('close');
+        }
+    }
+
+    function cancelFunctions() {
         $("#customizeID").dialog('close');
         $("#addPointsID").dialog('close');
         $("#changeAssignmentCategoryId").dialog('close');
