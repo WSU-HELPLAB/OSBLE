@@ -372,13 +372,19 @@
         $("input[name='Customize_radio']").change(function () {
             if ($("input[name='Customize_radio']:checked").val() == 'CompAverage') {
                 $('#XtoDrop').val(null);
+                $('#XtoDrop').attr("disabled", true);
                 $('#XtoTake').val(null);
+                $('#XtoTake').attr("disabled", true);
             }
             else if ($("input[name='Customize_radio']:checked").val() == 'XtoDrop') {
+                $('#XtoDrop').attr("disabled", false);
                 $('#XtoTake').val(null);
+                $('#XtoTake').attr("disabled", true);
             }
             else if ($("input[name='Customize_radio']:checked").val() == 'XtoTake') {
+                $('#XtoTake').attr("disabled", false);
                 $('#XtoDrop').val(null);
+                $('#XtoDrop').attr("disabled", true);
             }
             else {
                 throw "Unkown Radio Button Checked: Customize_radio"
