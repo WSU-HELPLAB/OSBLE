@@ -264,12 +264,20 @@
             <td><a style="cursor:pointer">Move Column Left</a></td>
         </tr>
         <tr>
-            <td><a style="cursor:pointer" onclick="deleteCategory();">Delete Category</a></td>
+            <td><a style="cursor:pointer" onclick="displayConfirmDeleteCategory();">Delete Category</a></td>
         </tr>
         <tr>
 			<td id="changeColor" ><a id="changeColorId" style="cursor:pointer" onmouseover="displayColors();">Change Category Color</a></td>
 		</tr>
 	</table>
+</div>
+
+<div id="confirmDeleteCategory" style="display:none" title="Confirm Delete">
+        Are you sure you want to permanently delete this category and all the assignments within it?
+    <div class="yesAndNoDiv">
+        <input value="Yes" type="button" onclick="deleteCategory();" />
+        <input value="No" type="button" onclick="hideConfirmDeleteCategory();" />
+    </div>
 </div>
 
 <div class="displayColors" id="displayColorsID" style="display: none; position: absolute;" onmouseover="displayColors();" onmouseout="hideDisplayColors();">
@@ -1184,6 +1192,38 @@
                 location.href = "/Gradebook/Tab/?categoryId=" + catID;
             }
         });
+        hideTabColors();
+    }
+
+    function displayConfirmDeleteCategory() {
+        $("#confirmDeleteCategory").dialog({
+            modal: true,
+            resizable: false,
+            width: 310,
+            closeOnEscape: false
+        });
+    }
+
+    function hideConfirmDeleteCategory() {
+        $("#confirmDeleteCategory").dialog('close');
+    }
+
+    function showButton(column) {
+        currentHeaderCell = column;
+        var container = column.id;
+
+        $("#div-" + container).animate({ "height": "show" }, { duration: 0 });
+
+        if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)") {
+
+            $("#" + container).css("background-color", "#FFFF84");
+            $("#div-" + container).css("background-color", "#FFFF84");
+        }
+    }
+
+    function hideOnlyButton(column) {
+        var container = column.id;
+        $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
     }
 
     function hideButton(column) {
