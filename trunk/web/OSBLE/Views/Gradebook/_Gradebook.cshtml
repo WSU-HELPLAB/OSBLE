@@ -20,12 +20,12 @@
     <tr class="colHeader">
             
         @{var j = 1;
-            <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8; width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
+            <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color: #E8E8E8; width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
             index++;
             j += 1;
-            <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color:#E8E8E8" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(event, this);"></td>
+            <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(event, this);"></td>
             j += 1;
-            <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2.5px; border-color:#E8E8E8" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(event, this);"></td>
+            <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(event, this);"></td>
             j += 1;
             foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
             {
@@ -237,7 +237,7 @@
                 {
                     if (gradeAssignmentActivity.AbstractAssignment.Rubric != null)
                     {
-                        <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { abstractAssignmentActivityId = gradableQuery.First().AssignmentActivityID, teamUserID = gradableQuery.First().TeamUserMemberID }, new { })</td>
+                        <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { abstractAssignmentActivityId = gradableQuery.First().AssignmentActivityID, teamUserID = gradableQuery.First().TeamUserMemberID }, new { @class = "rubric" })</td>
                     }
                     else
                     {
@@ -251,7 +251,7 @@
                         var teamUser = from tu in gradeAssignmentActivity.TeamUsers where tu.Contains(user) select tu;
                         if (teamUser.Count() > 0)
                         {
-                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink("NG", "Index", "Rubric", new { abstractAssignmentActivityId = gradeAssignmentActivity.ID, teamUserID = teamUser.First().ID }, new { })</td>
+                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink("NG", "Index", "Rubric", new { abstractAssignmentActivityId = gradeAssignmentActivity.ID, teamUserID = teamUser.First().ID }, new { @class = "rubric" })</td>
                         }
                     }
                     else

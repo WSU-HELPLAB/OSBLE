@@ -204,7 +204,7 @@
             </tr>
             <tr>
                 <td>
-                    <a href="#" onclick="setGradableAction('@GradebookController.ColumnAction.Delete.ToString()'); $('#columnOptionsForm').submit();">
+                    <a href="#" onclick="displayDeleteConfirm();">
                         Delete column</a>
                 </td>
             </tr>
@@ -242,6 +242,7 @@
         <script type="text/javascript">
             function setGradableAction(actionName) {
                 $('#actionRequested').val(actionName);
+                $('#deleteConfirm').dialog('close');
             }
             $('#columnOptionsForm').submit(function () {
                 $('#assignmentId').val(currentCol);
@@ -249,6 +250,12 @@
             });
         </script>
     </div>
+
+<div class="confirmDelete" id="deleteConfirm" style="display:none" title="Confrim Delete">
+    Are you sure you want to delete this assignment? <br />
+    <input value="Yes" type="button" onclick="setGradableAction('@GradebookController.ColumnAction.Delete.ToString()'); $('#columnOptionsForm').submit();" />
+    <input value="No" type="button" onclick="hideConfirmDelete();" />
+</div>
 
 <div class="customize" id="customizeID" style="display:none" title="Drop Lowest">
 	
@@ -453,6 +460,10 @@
             //13 means enter is pressed
             if (e.keyCode == 13) {
 
+                if ($(this).children("a").attr("class") == "rubric") {
+                    $(this).html().trigger("click");
+                    return false;
+                }
                 //current cells value when enter is pressed
                 cell = $(this).children().val();
 
@@ -514,8 +525,14 @@
                 try { e.preventDefault(); }
                 catch (er) { e.returnValue = false; }
 
-                //cell gets the value in the textbox when tab is pressed
-                cell = $(this).children().val();
+                if ($(this).children("a").attr("class") == "rubric") {
+                    cell = $(this).text();
+                    //alert($(this).text());
+                }
+                else {
+                    //cell gets the value in the textbox when tab is pressed
+                    cell = $(this).children().val();
+                }
 
                 if (cell.toString() != "NG") {
 
@@ -676,6 +693,19 @@
 
     }
 
+    function displayDeleteConfirm() {
+        $("#deleteConfirm").dialog({
+            modal: true,
+            resizable: false,
+            width: 310,
+            closeOnEscape: false
+        });
+    }
+
+    function hideConfirmDelete() {
+        $("#deleteConfirm").dialog('close');
+    }
+
     function displayAddPoints() {
 
         $("#addPointsID").dialog({
@@ -685,7 +715,6 @@
             height: 120,
             closeOnEscape: false
         });
-
     }
 
     function displayImportGrades() {
@@ -766,7 +795,7 @@
             $.ajax({
                 type: "POST",
                 url: "/Gradebook/ModifyAssignmentName",
-                data: { value: cellValue, assignmentId: cellID[1] },
+                data: { value: cellValue, assignmentId: cellID[1] }
             });
         }
     }
@@ -853,7 +882,6 @@
         //if a prior cell has already received focus in the past, we need to turn it back into
         //a normal table cell
         if (lastFocusedCell != null) {
-
             clearRowColumnHeader();
 
             //The ID's will be stored in ajaxId's array.
@@ -972,7 +1000,13 @@
 
         //do this once so we don't have to constantly do it later
         someCell = $(someCell);
-
+            
+        if (someCell.children("a").attr("class") == "rubric") {
+            //someCell.children("a").focus();
+            someCell.children("a").focus();
+            someCell.children("a").select();
+            return false;
+        }
         var textValue = someCell.text();
         cellValueOnGainsFocus = textValue;
         var inputText = $('<input class="cellInput" type="text" value="' + textValue + '" />');
