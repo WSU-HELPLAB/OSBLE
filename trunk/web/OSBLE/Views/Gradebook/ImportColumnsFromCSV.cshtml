@@ -42,8 +42,15 @@
 
         if ($(this).hasClass("selected")) {
             $(this).removeClass("selected");
-            list.splice(0, list.length, $(this).html());
-            $("#assignmentColumn").val(list);
+            var val = $(this).html();
+            var index =
+            $(list).each(function (index, value) {
+                if (value == val) {
+                    list.splice(index, 1);
+                }
+            });
+            $("#assignment_column").val(list);
+            $("#assignment_column").serializeArray();
         }
         else {
             $(this).addClass("selected");
@@ -61,15 +68,6 @@
         $("#id_column").val($(this).html());
 
     });
-
-//    $('#section_selector > li').click(function () {
-//        if (!$(this).hasClass('none_select')) {
-//            //$('#section_column').val($(this).html());
-//        } else {
-//            $('#section_column').val(null);
-//        }
-//    });
-
 
 </script>
 

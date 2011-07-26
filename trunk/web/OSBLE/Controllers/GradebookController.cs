@@ -88,6 +88,7 @@ namespace OSBLE.Controllers
             List<int> index = new List<int>();
             List<int> positionList = new List<int>();
             string studentId = (0).ToString();
+            int categoryId = Convert.ToInt32(Session["CurrentCategoryID"]);
 
             HttpPostedFileBase file = Session["GradeFile"] as HttpPostedFileBase;
 
@@ -128,53 +129,41 @@ namespace OSBLE.Controllers
                                     {
 
                                         var position = (from pos in db.AbstractAssignmentActivities
-                                                        where pos.ColumnOrder > assign.ColumnOrder
+                                                        where pos.AbstractAssignment.CategoryID == categoryId &&
+                                                        pos.ColumnOrder > assign.ColumnOrder
+                                                        orderby pos.ColumnOrder
                                                         select pos);
 
                                         if (position.FirstOrDefault() != null)
                                         {
-                                            List<AbstractAssignmentActivity> pos = position.ToList();
-                                            foreach (AbstractAssignmentActivity col in position)
-                                            {
-                                                col.ColumnOrder += 1;
-                                            }
-                                            db.SaveChanges();
-
                                             AddColumn(assignment.ToString(), 10, assign.ColumnOrder + assignmentNumber);
                                             positionList.Add(assign.ColumnOrder + assignmentNumber);
                                             index.Add(count);
-                                            currentAssignmentID = (from g in db.AbstractAssignmentActivities where g.ColumnOrder == (assign.ColumnOrder + 1) select g.ID).FirstOrDefault();
                                         }
                                         else
                                         {
                                             AddColumn(assignment.ToString(), 10, assign.ColumnOrder + assignmentNumber);
                                             positionList.Add(assign.ColumnOrder + assignmentNumber);
                                             index.Add(count);
-                                            currentAssignmentID = (from g in db.AbstractAssignmentActivities where g.ColumnOrder == (assign.ColumnOrder + 1) select g.ID).FirstOrDefault();
                                         }
+                                        assignmentNumber++;
 
                                     }
                                     else if (Session["radio"].ToString() == "l")
                                     {
 
                                         var position = from pos in db.AbstractAssignmentActivities
-                                                       where pos.ColumnOrder >= assign.ColumnOrder
+                                                       where pos.AbstractAssignment.CategoryID == categoryId &&
+                                                       pos.ColumnOrder >= assign.ColumnOrder
+                                                       orderby pos.ColumnOrder
                                                        select pos;
 
                                         if (position.Count() > 0)
                                         {
-
-                                            foreach (AbstractAssignmentActivity col in position)
-                                            {
-                                                col.ColumnOrder += 1;
-                                            }
-                                            db.SaveChanges();
-
                                             AddColumn(assignment.ToString(), 10, assign.ColumnOrder);
                                             positionList.Add(assign.ColumnOrder - 1);
                                             index.Add(count);
                                         }
-
                                     }
                                 }
                             }
@@ -199,7 +188,8 @@ namespace OSBLE.Controllers
                                     //            where a.ColumnOrder == col
                                     //            select a;
                                     var assignmentQuery = from a in db.AbstractAssignmentActivities
-                                                          where a.ColumnOrder == col
+                                                          where a.AbstractAssignment.CategoryID == categoryId &&
+                                                          a.ColumnOrder == col
                                                           select a;
 
                                     var currentAssignment = assignmentQuery.FirstOrDefault();
@@ -278,7 +268,7 @@ namespace OSBLE.Controllers
             weights += ",,Weight";
             perfect += ",,Perfect Score";
             average += ",,Average Score";
-            header += ",,Name";
+            header += ",Student ID,Name";
 
             List<LetterGrade> letterGrades = ((activeCourse.AbstractCourse as Course).LetterGrades).OrderByDescending(l => l.MinimumRequired).ToList();
             //Grade is empty for weight and holds the Best grade for perfect score
@@ -308,7 +298,7 @@ namespace OSBLE.Controllers
             //Adds the total weight and 100% for perfect score
             weights += "," + totalCategoryWeights.ToString();
             perfect += ",100%";
-            header += "StudentID,Total Grade";
+            header += ",Total Grade";
 
             foreach (Category category in Category)
             {
@@ -316,14 +306,12 @@ namespace OSBLE.Controllers
                 perfect += ",100%";
                 if (totalCategoryWeights > 0)
                 {
-                    header += "," + category.Name.ToUpper() + " " + "(" + category.Points + "%)";
+                    header += "," + category.Name.ToUpper() + " " + "(" + ((category.Points / totalCategoryWeights) * 100) + "%)";
                 }
                 else
                 {
                     header += "," + category.Name.ToUpper();
                 }
-
-
 
                 List<AbstractAssignmentActivity> Assignments = (from assignment in db.AbstractAssignmentActivities
                                                                 where assignment.AbstractAssignment.CategoryID == category.ID &&
@@ -664,7 +652,7 @@ namespace OSBLE.Controllers
                 //PointsPossible = 100,
                 AssignmentActivities = new List<AbstractAssignmentActivity>(),
                 CategoryID = categoryId,
-                ColumnOrder = 1,
+                ColumnOrder = position,
                 Description = "No description",
                 IsDraft = false
             };
