@@ -39,30 +39,10 @@
     {
         text-align: left;
     }
-    #tabHeader ul
-    {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
     
-    #tabHeader li a
-    {
-        padding: 0 1em;
-    }
     #tabHeader
     {
         border-bottom:1px;
-    }
-    #tableContent
-    {
-        clear: both;
-    }
-    
-    #h3
-    {
-        margin: 0;
-        padding: 0 0 1em 0;
     }
     
     #tabHeader li
@@ -76,6 +56,29 @@
         border-bottom: 1px;
         margin: 0 0.2em -0.1em 0;
         background: silver;
+    }
+    
+    #tabHeader li a
+    {
+        padding: 0 1em;
+    }
+    
+    #tabHeader ul
+    {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    #tableContent
+    {
+        clear: both;
+    }
+    
+    #h3
+    {
+        margin: 0;
+        padding: 0 0 1em 0;
     }
     
     #tabHeader #selected
@@ -150,7 +153,6 @@
                     <td id="weight-@item.ID" onclick="cellGainsFocus(event, this)">@item.Points</td>
                 }
             }
-
         </tr>
         <tr id="perfectScore">
             <td id="sectionHolder"></td>
@@ -160,8 +162,7 @@
             }
             <td>@grade</td>
             <td id="perfectTotal">100%</td>
-            
-
+           
             @foreach (Category item in ViewBag.Categories)
             {
                 if (item.Name != Constants.UnGradableCatagory)
@@ -169,16 +170,13 @@
                     <td id="@item.ID">100%</td>   
                 }
             }
-
         </tr>
         <tr>
             <td></td>
             <td id="th3">
                 <b>Average Score</b>
             </td>
-            
-            @{                                
-                
+            @{    
                 //Holds the total grade
                 double totalGrade = 0;
                 totalCategoryPoints = 0;
@@ -311,8 +309,7 @@
                         }
                     }
                 }
-                }
-            
+            }
         </tr>
         <tr id="categoryHeaders">
             <th>Section</th>
@@ -327,7 +324,6 @@
                     <th id="@item.ID" class="colHeader" onclick="changeAssignmentName(event, this);" style="background:@item.TabColor">@item.Name</th>
                 }
             }
-
         </tr>
         <tr>
             @{
@@ -460,7 +456,6 @@
                     <td>@totalGrade.ToString(".#")%</td>
                 }
 
-
                 if (userScores.Count() > 0)
                 {
                     bool usingWhatIf = false;
@@ -491,7 +486,6 @@
                                         }
                                         else
                                         {
-
                                             if (userScore.Points >= 0)
                                             {
                                                 categoryPoints += userScore.Points;
@@ -502,9 +496,6 @@
                                                 usingWhatIf = true;
                                                 categoryPoints += userScore.StudentPoints;
                                                 categoryPossible += userScore.AssignmentActivity.PointsPossible;
-                                            }
-                                            else
-                                            {
                                             }
                                         }
                                     }
@@ -534,7 +525,6 @@
         </tr>
     </table>
     <br />
-
     <a  onclick="$('#letterGradeTable').toggle('blind'); return false;" style="cursor:pointer;">Show/Hide Letter Grade Table</a>
 </div>
 

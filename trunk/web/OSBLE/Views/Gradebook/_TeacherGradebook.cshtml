@@ -14,6 +14,36 @@
         width: 75px;
         border: none;
     }
+    
+    .displayColors
+    {
+	    display: inline;
+        background-color: #f5f5f5;
+    }
+    
+    .displayColorsTable
+    {
+        border-collapse: collapse;
+        border: 1px solid gray;
+    }
+    
+	.displayColorsTable td
+	{
+	    padding: 3px;
+	}
+	
+	.displayColorsTable td, .displayColorsTable th, .displayColorsTable tr
+    {
+        width: auto;
+        border: 1px solid gray;
+    }
+    
+    .displayColorsTable th
+	{
+	    background-color: #074974;
+	    color: White;
+	}
+	
     .gradebook
     {
         width: auto;
@@ -45,55 +75,9 @@
         left: 50%;
     }
     
-    .thButton
-    {
-        float: right;
-    }
-    
-    .menu
-    {
-        border: 1px solid gray;
-    }
-    
-    .slidingDiv
-    {
-        width: 107px;
-        height: 100px;
-        background-color: white;
-        top: 33px;
-        left: 400px;
-    }
-    
     .dropdown
     {
         float: right;
-    }
-    
-    #letterGrades
-    {
-        border: 1px solid;
-        width:300px;
-        height:500px;
-    }
-    
-    #tabHeader ul
-    {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    
-    #tabHeader li a
-    {
-        padding: 0 1em;
-    }
-    #tabHeader
-    {
-        border-bottom:1px;
-    }
-    #tableContent
-    {
-        clear: both;
     }
     
     #h3
@@ -102,98 +86,11 @@
         padding: 0 0 1em 0;
     }
     
-    #tabHeader li
+    #letterGrades
     {
-        float: left;
-        border: 1px solid gray;
-        border-top-left-radius: 4px 4px;
-        border-top-right-radius: 4px 4px;
-        background-color: #f5f5f5;
-        border-bottom-width: 0;
-        border-bottom: 1px;
-        margin: 0 0.2em -0.1em 0;
-        background: silver;
-    }
-    
-    #tabHeader #selected
-    {
-        position: relative;
-        border-bottom:1px solid #E8E8E8;
-        background: white;
-    }
-    
-    .displayColors
-    {
-	    display: inline;
-        background-color: #f5f5f5;
-    }
-    
-    .displayColorsTable
-    {
-        border-collapse: collapse;
-        border: 1px solid gray;
-    }
-    
-    .displayColorsTable th
-	{
-	    background-color: #074974;
-	    color: White;
-	}
-	
-	.displayColorsTable td
-	{
-	    padding: 3px;
-	}
-	
-	.displayColorsTable td, .displayColorsTable th, .displayColorsTable tr
-    {
-        width: auto;
-        border: 1px solid gray;
-    }
-    
-    .selectMenu
-    {
-        top: 30%;
-	    left: 40%;
-	    display: inline;
-        background-color: #f5f5f5;
-    }
-    
-    
-    .selectMenuTable 
-    {
-    	border-collapse: collapse;
-        border: 1px solid gray;
-    }
-    
-    .selectMenuTable th
-	{
-	    background-color: #074974;
-	    color: White;
-	}
-	
-	.selectMenuTable td
-	{
-	    padding: 3px;
-	}
-	
-	.selectMenuTable td, .selectMenuTable th, .selectMenuTable tr
-    {
-        width: auto;
-        border: 1px solid gray;
-    }
-    
-    #newWeight 
-    {
-        width:500px;
+        border: 1px solid;
+        width:300px;
         height:500px;
-        border: 2px solid;
-        background: #f5f5f5;
-    }
-    
-    #newWeight li
-    {
-        float: left;
     }
     
     .letterGrades
@@ -227,11 +124,116 @@
         border: 1px solid gray;
     }
     
+    .menu
+    {
+        border: 1px solid gray;
+    }
+    
+    #newWeight 
+    {
+        width:500px;
+        height:500px;
+        border: 2px solid;
+        background: #f5f5f5;
+    }
+    
+    #newWeight li
+    {
+        float: left;
+    }
+    
     .rowHeader
     {
         width: 500px;
     } 
 	
+    .selectMenu
+    {
+        top: 30%;
+	    left: 40%;
+	    display: inline;
+        background-color: #f5f5f5;
+    }
+    
+    .selectMenuTable 
+    {
+    	border-collapse: collapse;
+        border: 1px solid gray;
+    }
+    
+    .selectMenuTable th
+	{
+	    background-color: #074974;
+	    color: White;
+	}
+	
+	.selectMenuTable td
+	{
+	    padding: 3px;
+	}
+	
+	.selectMenuTable td, .selectMenuTable th, .selectMenuTable tr
+    {
+        width: auto;
+        border: 1px solid gray;
+    }
+    
+    .slidingDiv
+    {
+        width: 107px;
+        height: 100px;
+        background-color: white;
+        top: 33px;
+        left: 400px;
+    }
+    
+    #tabHeader
+    {
+        border-bottom:1px;
+    }
+    
+    #tabHeader li
+    {
+        float: left;
+        border: 1px solid gray;
+        border-top-left-radius: 4px 4px;
+        border-top-right-radius: 4px 4px;
+        background-color: #f5f5f5;
+        border-bottom-width: 0;
+        border-bottom: 1px;
+        margin: 0 0.2em -0.1em 0;
+        background: silver;
+    }
+    
+    #tabHeader li a
+    {
+        padding: 0 1em;
+    }
+    
+    #tabHeader ul
+    {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    #tabHeader #selected
+    {
+        position: relative;
+        border-bottom:1px solid #E8E8E8;
+        background: white;
+    }
+    
+    #tableContent
+    {
+        clear: both;
+    }
+    
+    .thButton
+    {
+        float: right;
+    }
+    
 </style>
 
 <div>
@@ -388,10 +390,8 @@
                         </td>
                         j += 1;
                     }
-
                 }
             }
-            
         </tr>
         
         <tr>
@@ -434,7 +434,6 @@
                     <td id="weight-@item.ID" onclick="cellGainsFocus(event, this)">@item.Points</td>
                 }
             }
-
         </tr>
         <tr id="perfectScore">
             <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
@@ -446,7 +445,6 @@
             }
             <td>@grade</td>
             <td id="perfectTotal">100%</td>
-            
 
             @foreach (Category item in ViewBag.Categories)
             {
@@ -455,7 +453,6 @@
                     <td id="@item.ID">100%</td>   
                 }
             }
-
         </tr>
         <tr>
             <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
@@ -467,8 +464,6 @@
             
             @{
                 double totalAverage = 0;
-
-
 
                 //Holds the total grade
                 double totalGrade = 0;
@@ -559,7 +554,6 @@
                 <td>@letter</td>
                 <td>@totalGrade.ToString(".#")%</td>
                 
-                
                 int totalStudents = 0;
 
                 foreach (Category item in ViewBag.Categories)
@@ -594,7 +588,6 @@
                     }
                 }
             }
-            
         </tr>
         <tr id="categoryHeaders">
             <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
@@ -611,7 +604,6 @@
                     <th id="@item.ID" class="colHeader" onclick="changeAssignmentName(event, this);" style="background:@item.TabColor">@item.Name</th>
                 }
             }
-
         </tr>
 
         @{
@@ -650,9 +642,7 @@
                       }
                   }                                                   
                 
-
                 <td id="@student.ID" >@student.LastName, @student.FirstName</td>   
-                
                 
                   totalGrade = 0.0;
                   totalCategoryPoints = 0;
@@ -773,124 +763,6 @@
                       }
                   }
             }
-            @*@{  
-                    
-            List<CoursesUsers> courseUser = (from course in ViewBag.CoursesUser as IEnumerable<CoursesUsers>
-                                             where course.UserProfileID == student.ID
-                                             select course).ToList();
-            if (courseUser.Count() > 0)
-            {
-                foreach (CoursesUsers item in courseUser)
-                {
-                                   <td>@item.Section</td>
-                }
-            }                                                   
-            }
-
-                <td id="@student.ID" >@student.LastName, @student.FirstName</td>               
-                
-
-            @{
-            double totalGrade = 0;
-            double totalPossible = 0;
-            var totalPercent = 0.0;
-            List<Score> totalOfCats = (from total in ViewBag.Scores as IEnumerable<Score>
-                                       where total.TeamUserMember.Contains(student) &&
-                                       total.Points >= 0
-                                       select total).ToList();
-            
-
-            if (totalOfCats.Count() > 0)
-            {
-                for (int i = 0; i < totalOfCats.Count(); i++)
-                {
-                    if (categoryHasPoints == false)
-                    {
-                        totalGrade += totalOfCats[i].Points;
-
-                        totalPossible += totalOfCats[i].AssignmentActivity.PointsPossible;
-                    }
-                    else
-                    {
-                        totalGrade += totalOfCats[i].Points * totalOfCats[i].AssignmentActivity.AbstractAssignment.Category.Points;
-                        totalPossible += totalOfCats[i].AssignmentActivity.PointsPossible * totalOfCats[i].AssignmentActivity.AbstractAssignment.Category.Points;
-                    }
-                }
-                
-            }
-            if (categoryHasPoints == false)
-            {
-                totalPercent = (totalGrade / totalPossible) * 100;
-            }
-            else
-            {
-                totalPercent = (totalGrade / totalPossible) * 100;
-            }
-            if (totalPercent > 0)
-            {
-                totalAverage += totalPercent;
-            }
-            totalStudents++;
-            
-
-            var letter = "";
-            foreach (LetterGrade item in letterList)
-            {
-                if (totalPercent >= item.MinimumRequired)
-                {
-                    letter = item.Grade;
-                    break;
-                }
-            }
-                
-                <td id="grade">@letter</td>
-                if (totalPercent > 0)
-                {
-                    <td>@totalPercent.ToString(".##")%</td>
-                }
-                else
-                {
-                    <td>@String.Format("{0}", 0)%</td>
-                }
-                *@
-            @*@{foreach (Category cat in ViewBag.Categories)
-            {
-                List<Score> scoreQuery = (from g in ViewBag.Scores as IEnumerable<Score>
-                                          where g.AssignmentActivity.AbstractAssignment.CategoryID == cat.ID &&
-                                          g.AssignmentActivity.AbstractAssignment.Category.Name != Constants.UnGradableCatagory &&
-                                          g.Points >= 0 &&
-                                          g.TeamUserMember.Contains(student)
-                                          select g).ToList();
-
-                if (scoreQuery.Count() > 0)
-                {
-                    double categoryPoints = 0;
-                    double categoryPointsPossible = 0;
-                    double totalCategoryPercent = 0;
-                    foreach (Score item in scoreQuery)
-                    {
-                        categoryPoints += item.Points;
-                        categoryPointsPossible += item.AssignmentActivity.PointsPossible;
-                    }
-                    totalCategoryPercent = ((categoryPoints / categoryPointsPossible) * 100);
-                    if (totalCategoryPercent > 0)
-                    {
-                        <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID, @student.Identification)" style="cursor:pointer;">@totalCategoryPercent.ToString(".##")%</td>
-                    }
-                    else
-                    {
-                        <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID, @student.Identification)" style="cursor:pointer;">@String.Format("{0}", 0)%</td>
-                    }
-                }
-                else
-                {
-                    if (cat.Name != Constants.UnGradableCatagory)
-                    {
-                        <td id="categoryGrade" onclick="goToCategoryTab(@cat.ID, @student.Identification)" style="cursor:pointer;">NG</td>
-                    }
-                }
-            }
-            }*@
             </tr>
         }
     </table>
@@ -954,25 +826,18 @@
 
 
 <script type="text/javascript">
-    //display if the letter grade menu is showing
-    var isShowing = false;
-    var lastFocusedAssignment = null;
-    var lastFocusedCell = null;
-    var isHighlighted = false;
     var count = 0;
-    var tabShowing = false;
-    var header = false;
     var currentHeader = null;
-
     //holds the index of the header that was clicked to select all
     var currentHeaderCell = null;
-
-    $(document).ready(function () {
-        //calculateRows();
-        //calculateCols();
-        $("#averageLetter").html($("#totalAverageHidden").val());
-    });
-
+    var header = false;
+    //display if the letter grade menu is showing
+    var isShowing = false;
+    var isHighlighted = false;
+    var lastFocusedAssignment = null;
+    var lastFocusedCell = null;
+    var tabShowing = false;
+    
     $(document).click(function () {
         if (isShowing == true) {
             $("#letterGradesID").animate({ "height": "hide" }, { duration: 300 });
@@ -987,37 +852,33 @@
         } else {
             clearLastCellFocus();
         }
-
         resetTableColors();
         hideTabColors();
+    });
 
+    $(document).ready(function () {
+        $("#averageLetter").html($("#totalAverageHidden").val());
     });
 
     $("#grades").keydown(function (e) {
-
         //This means enter was clicked when the header was highlighted
         if (e.keyCode == 13) {
-
             clearLastAssignmentFocus();
             clearLastCellFocus();
-
         }
     });
 
     $("#grades td").keydown(function (e) {
-
         var cell = null;
 
         //13 means enter was pressed
         if (e.keyCode == 13) {
-
             clearLastAssignmentFocus();
             clearLastCellFocus();
         }
 
         //9 means tab was pressed
         if (e.keyCode == 9) {
-
             try { evt.preventDefault(); }
             catch (er) { evt.returnValue = false; }
             var row = $(this).parent("tr");
@@ -1025,13 +886,9 @@
             colIndex = parseInt(colIndex);
             colIndex += 1;
             row.each(function () {
-
                 cell = $(this).find("td:eq(" + colIndex + ")");
-
             });
-
             cellGainsFocus(e, cell);
-
         }
     });
 
@@ -1060,171 +917,63 @@
         var cell = null;
         //13 means entered was clicked
         if (e.keyCode == 13) {
-
             var row = $(this).parent("tr").next("tr");
             var colIndex = $(this).prevAll().length;
             row.each(function () {
                 cell = $(this).find("td:eq(" + colIndex + ")");
-
             });
-
             cellGainsFocus(e, cell);
-
         }
     });
 
+    function calculateCols() {
+        //We start at 3 because rows 1 and 2 are the student names and total
+        var colIndex = 2;
 
-    //    $("#letterGradesID").click(function (e) {
-
-    //        //The div has been clicked on for edit, therefore we don't want to hide it
-    //        //so we set isSHowing to false
-    //        isShowing = false;
-    //    });
-
-    //    $(".colHeader").click(function (e) {
-    //        e.preventDefault();
-    //    });
-
-    //    $("#selectMenuID").click(function (e) {
-    //        e.preventDefault();
-    //    });
-
-    //    $("#displayColorsID").click(function (e) {
-    //        e.preventDefault();
-    //    });
-
-
-    function displayColors() {
-
-        var x = 0;
-        var y = 0;
-
-        //alert(container);
-        //aligning the menu under the buttons
-        x = $("#selectMenuID").position().left;
-        y = $("#selectMenuID").position().top;
-        y += 179;
-        x += 173;
-
-        //Moving the menu to the button that clicked it
-        $("#displayColorsID").css("left", x + "px");
-        $("#displayColorsID").css("top", y + "px");
-
-        //Animation for menu
-        $("#displayColorsID").animate({ "height": "show" }, { duration: 0 });
-        tabShowing = true;
-    }
-
-    function displayLetterGrades() {
-        $("#letterGradesID").animate({ "height": "show" }, { duration: 300 });
-        isShowing = true;
-    }
-
-    function changeColor(color) {
-
-        var cell = $("#categoryHeaders").find("th:nth-child(" + currentHeader + ")");
-        var catId = cell.attr("id");
-        $.ajax({
-            type: "POST",
-            url: "/Gradebook/ChangeTabColor",
-            data: { categoryId: catId, value: color },
-            success: window.location.reload(true)
+        //Starting in the gradebook on the student grade rows
+        //This bypasses the headers so we don't look through them
+        $("#grades #studentGrades").each(function () {
+            $(this).find("td:nth-child(" + colIndex + ")").each(function () {
+                getSum(colIndex);
+            });
+            colIndex += 1;
         });
-        hideTabColors();
     }
 
-    function hideTabColors() {
-        $("#selectMenuID").animate({ "height": "hide" }, { duration: 0 });
-        $("#displayColorsID").animate({ "height": "hide" }, { duration: 0 });
-    }
+    function calculateRows() {
+        var totalPerfect = 0;
+        var totalAverage = 0;
+        var total = 0;
+        var count = 0;
+        var counter = 0;
+        var isTrue = false;
+        var a = [];
 
-    function hideDisplayColors() {
-        $("#displayColorsID").animate({ "height": "hide" }, { duration: 0 });
-    }
-
-    function deleteCategory() {
-        var cell = $("#categoryHeaders").find("th:nth-child(" + currentHeader + ")");
-        var catId = cell.attr("id");
-        $.ajax({
-            type: "POST",
-            url: "/Gradebook/DeleteCategory",
-            data: { categoryId: catId },
-            success: window.location.reload(true)
-        });
-        hideTabColors();
-    }
-
-    function showButton(column) {
-        currentHeaderCell = column;
-        var container = column.id;
-
-        $("#div-" + container).animate({ "height": "show" }, { duration: 0 });
-
-        if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)") {
-
-            $("#" + container).css("background-color", "#FFFF84");
-            $("#div-" + container).css("background-color", "#FFFF84");
-        }
-    }
-
-    function hideOnlyButton(column) {
-        var container = column.id;
-        $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
-    }
-
-    function hideButton(column) {
-        var container = column.id;
-        $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
-
-        if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)") {
-
-            $("#div-" + container).css("background-color", "#DCDCDC");
-            $('#' + container).css("background-color", "#DCDCDC");
-        }
-    }
-
-    function clearRowColumnHeader() {
-        $("#grades tr").each(function () {
+        $("#grades #weights").each(function () {
             $(this).find("td").each(function () {
-                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-                    $(this).css("background-color", "#DCDCDC");
-                    $(this).find("div").css("background-color", "#DCDCDC");
-                    $(this).attr("onmouseout", "hideButton(this);");
+                var id = $(this).attr("id").split("-");
+                if (id[0] == "weight") {
+                    a.push(parseFloat($(this).text()));
+                    total += parseFloat($(this).text());
                 }
-                else {
+            });
 
+            $(this).find("td").each(function () {
+                if ($(this).attr("id") == "categoryTotal") {
+                    $(this).text((total).toFixed(2));
+                }
+                var id = $(this).attr("id").split("-");
+                if (id[0] == "weight") {
+                    if (a[count] > 0) {
+                        a[count] = a[count] / total;
+                    }
+                    else {
+                        counter += 1;
+                    }
+                    count += 1;
                 }
             });
         });
-    }
-
-    function clearLastCellFocus() {
-
-        //if a prior cell has already received focus in the past, we need to turn it back into
-        //a normal table cell
-        if (lastFocusedCell != null) {
-
-            clearRowColumnHeader();
-
-            var catId = lastFocusedCell.attr("id").split("-");
-            var cellValue = lastFocusedCell.children().val();
-            lastFocusedCell.html("");
-            lastFocusedCell.text(cellValue);
-            lastFocusedCell.attr("onclick", 'cellGainsFocus(event, this)');
-            lastFocusedCell = null;
-
-            $.ajax({
-                type: "POST",
-                url: "/Gradebook/ModifyCategoryPoints",
-                data: { value: cellValue, categoryId: catId[1] },
-                success: function (response) {
-                    $("#tabHeader").html(response);
-                }
-            });
-
-//            calculateRows();
-//            calculateCols();
-        }
     }
 
     function cellGainsFocus(evt, someCell) {
@@ -1250,7 +999,6 @@
 
         var textValue = someCell.text();
         var inputText = $('<input class="cellInput" type="text" value="' + textValue + '" />');
-        //someCell.removeAttr("onclick");
         someCell.html(inputText);
         inputText.focus();
         inputText.select();
@@ -1260,31 +1008,6 @@
 
         //Highlights the row and column headers of the selected cell
         selectRowColumnHeaderOfSelected(someCell);
-
-
-    }
-
-    function clearLastAssignmentFocus() {
-        if (lastFocusedAssignment != null) {
-
-            clearRowColumnHeader();
-
-            newCategoryId = lastFocusedAssignment.attr("id");
-            var cellValue = lastFocusedAssignment.children().val();
-            lastFocusedAssignment.html(cellValue);
-            lastFocusedAssignment.attr("onclick", 'changeAssignmentName(event, this)');
-            lastFocusedAssignment = null;
-
-            $.ajax({
-                type: "POST",
-                url: "/Gradebook/ModifyCategoryName",
-                data: { value: cellValue, categoryId: newCategoryId },
-                success: function (response) {
-                    $("#tabHeader").html(response);
-                }
-            });
-
-        }
     }
 
     function changeAssignmentName(evt, someAssignment) {
@@ -1309,7 +1032,6 @@
 
         var textValue = someAssignment.text();
         var inputText = $('<input class="cellInput" type="text" value="' + textValue + '" />');
-        //someAssignment.removeAttr("onclick");
         someAssignment.html(inputText);
         inputText.focus();
         inputText.select();
@@ -1322,123 +1044,220 @@
         selectRowColumnHeaderOfSelected(someAssignment);
     }
 
-    function selectRowColumnHeaderOfSelected(someCell) {
-        var row = $(someCell).parent("tr").prevAll().length;
-        var colIndex = $(someCell).prevAll().length;
+    function changeColor(color) {
+        var cell = $("#categoryHeaders").find("th:nth-child(" + currentHeader + ")");
+        var catId = cell.attr("id");
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/ChangeTabColor",
+            data: { categoryId: catId, value: color },
+            success: window.location.reload(true)
+        });
+        hideTabColors();
+    }
 
-        var cell = $("#grades").find("tr:eq(0)");
-        cell = cell.find("td:eq(" + colIndex + ")");
+    function clearLastAssignmentFocus() {
+        if (lastFocusedAssignment != null) {
 
-        //change the current column headers background to highlighted
-        cell.css("background-color", "#FFFF84");
-        cell.find("div").css("background-color", "#FFFF84");
+            clearRowColumnHeader();
 
-        //change the mouseout function so we don't change the color and only hide the div
-        cell.attr("onmouseout", "hideOnlyButton(this);");
+            newCategoryId = lastFocusedAssignment.attr("id");
+            var cellValue = lastFocusedAssignment.children().val();
+            lastFocusedAssignment.html(cellValue);
+            lastFocusedAssignment.attr("onclick", 'changeAssignmentName(event, this)');
+            lastFocusedAssignment = null;
 
-        //find the current rows header
-        var cell2 = $("#grades").find("tr:eq(" + row + ")");
-        cell2 = cell2.find("td:eq(0)");
-
-        //change the current rows header background to highlighted
-        cell2.css("background-color", "#FFFF84");
-        cell2.find("div").css("background-color", "#FFFF84");
-
-        //remove the current rows onmouseout function so we it doesn't become unhighlighted
-        //remove the current rows onmouseout function so it doesn't become unhighlighted
-        if (navigator.appName == "Microsoft Internet Explorer") {
-            cell2.prop("onmouseout", null);
-        }
-        else {
-            cell2.removeAttr("onmouseout");
+            $.ajax({
+                type: "POST",
+                url: "/Gradebook/ModifyCategoryName",
+                data: { value: cellValue, categoryId: newCategoryId },
+                success: function (response) {
+                    $("#tabHeader").html(response);
+                }
+            });
         }
     }
 
-    function calculateRows() {
+    function clearLastCellFocus() {
+        //if a prior cell has already received focus in the past, we need to turn it back into
+        //a normal table cell
+        if (lastFocusedCell != null) {
+            clearRowColumnHeader();
 
-        var totalPerfect = 0;
-        var totalAverage = 0;
-        var total = 0;
-        var count = 0;
-        var counter = 0;
-        var isTrue = false;
-        var a = [];
+            var catId = lastFocusedCell.attr("id").split("-");
+            var cellValue = lastFocusedCell.children().val();
+            lastFocusedCell.html("");
+            lastFocusedCell.text(cellValue);
+            lastFocusedCell.attr("onclick", 'cellGainsFocus(event, this)');
+            lastFocusedCell = null;
 
-        $("#grades #weights").each(function () {
-            $(this).find("td").each(function () {
-                var id = $(this).attr("id").split("-");
-                if (id[0] == "weight") {
-
-                    a.push(parseFloat($(this).text()));
-                    total += parseFloat($(this).text());
-
+            $.ajax({
+                type: "POST",
+                url: "/Gradebook/ModifyCategoryPoints",
+                data: { value: cellValue, categoryId: catId[1] },
+                success: function (response) {
+                    $("#tabHeader").html(response);
                 }
             });
+        }
+    }
 
+    function clearRowColumnHeader() {
+        $("#grades tr").each(function () {
             $(this).find("td").each(function () {
-                if ($(this).attr("id") == "categoryTotal") {
-                    $(this).text((total).toFixed(2));
-                }
-                var id = $(this).attr("id").split("-");
-                if (id[0] == "weight") {
-                    if (a[count] > 0) {
-                        a[count] = a[count] / total;
-
-                    }
-                    else {
-                        counter += 1;
-                    }
-                    count += 1;
+                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                    $(this).css("background-color", "#DCDCDC");
+                    $(this).find("div").css("background-color", "#DCDCDC");
+                    $(this).attr("onmouseout", "hideButton(this);");
                 }
             });
         });
     }
 
-
-    function calculateCols() {
-
-        //We start at 3 because rows 1 and 2 are the student names and total
-        var colIndex = 2;
-
-        //Starting in the gradebook on the student grade rows
-        //This bypasses the headers so we don't look through them
-        $("#grades #studentGrades").each(function () {
-            $(this).find("td:nth-child(" + colIndex + ")").each(function () {
-                getSum(colIndex);
-            });
-            colIndex += 1;
+    function deleteCategory() {
+        var cell = $("#categoryHeaders").find("th:nth-child(" + currentHeader + ")");
+        var catId = cell.attr("id");
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/DeleteCategory",
+            data: { categoryId: catId },
+            success: window.location.reload(true)
         });
+        hideTabColors();
     }
 
-    function ShowHide(evt, buttonClick) {
-
-        selectColumn(evt, currentHeaderCell);
-
-        evt.cancelBubble = true;
-
-
-
-        //Store which assignment button was clicked so we can use it with Add Points
-        points = buttonClick
+    function displayColors() {
         var x = 0;
         var y = 0;
 
-        var container = buttonClick.id;
-        containerId = container.split("-");
-        currentCol = containerId[1];
-
+        //alert(container);
         //aligning the menu under the buttons
-        x = $("#" + container).position().left;
-        y = $("#" + container).position().top;
-        y += 9;
+        x = $("#selectMenuID").position().left;
+        y = $("#selectMenuID").position().top;
+        y += 179;
+        x += 173;
 
         //Moving the menu to the button that clicked it
-        $("#selectMenuID").css("left", x + "px");
-        $("#selectMenuID").css("top", y + "px");
+        $("#displayColorsID").css("left", x + "px");
+        $("#displayColorsID").css("top", y + "px");
 
         //Animation for menu
-        $("#selectMenuID").animate({ "height": "show" }, { duration: 75 });
+        $("#displayColorsID").animate({ "height": "show" }, { duration: 0 });
+        tabShowing = true;
+    }
 
+    function displayLetterGrades() {
+        $("#letterGradesID").animate({ "height": "show" }, { duration: 300 });
+        isShowing = true;
+    }
+
+    function getSum(Index) {
+        var colTotal = 0;
+        var count = 0;
+        $("#grades #studentGrades").children("td:nth-child(" + Index + ")").each(function () {
+            if ($(this).text() == "NG") {
+            }
+            else {
+                colTotal += parseFloat($(this).text());
+                count += 1;
+            }
+        });
+
+        $("#grades tr").children("td:nth-child(" + Index + ")").each(function () {
+            if ($(this).attr("id") == "averageTotal") {
+                colTotal = parseFloat(colTotal / count).toFixed(2);
+                $(this).html(colTotal + "%");
+            }
+            if ($(this).attr("id") == "averageScore") {
+                colTotal = parseFloat(colTotal / count).toFixed(2);
+                $(this).html(colTotal + "%");
+            }
+        });
+    }
+
+    function goToCategoryTab(catID, stuID) {
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/SetTabStudent",
+            data: { studentId: stuID.toString() },
+            success: function () {
+                location.href = "/Gradebook/Tab/?categoryId=" + catID;
+            }
+        });
+    }
+
+    function hideButton(column) {
+        var container = column.id;
+        $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
+
+        if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)") {
+
+            $("#div-" + container).css("background-color", "#DCDCDC");
+            $('#' + container).css("background-color", "#DCDCDC");
+        }
+    }
+
+    function hideDisplayColors() {
+        $("#displayColorsID").animate({ "height": "hide" }, { duration: 0 });
+    }
+
+    function hideOnlyButton(column) {
+        var container = column.id;
+        $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
+    }
+
+    function hideTabColors() {
+        $("#selectMenuID").animate({ "height": "hide" }, { duration: 0 });
+        $("#displayColorsID").animate({ "height": "hide" }, { duration: 0 });
+    }
+
+    function moveLeft(header) {
+        var id = header.id.split("-");
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/MoveCategoryLeft",
+            data: { categoryId: id[1] },
+            success: window.location.reload(true)
+        });
+    }
+
+    function moveRight(header) {
+        var id = header.id.split("-");
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/MoveCategoryRight",
+            data: { categoryId: id[1] },
+            success: window.location.reload(true)
+        });
+    }
+
+    function newTab() {
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/AddCategory",
+            success: window.location.reload(true)
+        });
+    }
+
+    function resetTableColors() {
+        $("#grades tr").each(function () {
+            $(this).find("td").each(function () {
+                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                    $(this).css("background-color", "#DCDCDC");
+                    $(this).find("div").css("background-color", "#DCDCDC");
+                }
+                else {
+                    $(this).css("background-color", "white");
+                }
+            });
+            $(this).find("th").each(function () {
+                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
+                }
+                else {
+                    $(this).css("background-color", "white");
+                }
+            });
+        });
     }
 
     function selectColumn(evt, col) {
@@ -1478,52 +1297,7 @@
 
     }
 
-    function getSum(Index) {
-        var colTotal = 0;
-        var count = 0;
-        $("#grades #studentGrades").children("td:nth-child(" + Index + ")").each(function () {
-            if ($(this).text() == "NG") {
-            }
-            else {
-                colTotal += parseFloat($(this).text());
-                count += 1;
-            }
-        });
-
-        $("#grades tr").children("td:nth-child(" + Index + ")").each(function () {
-            if ($(this).attr("id") == "averageTotal") {
-                colTotal = parseFloat(colTotal / count).toFixed(2);
-                $(this).html(colTotal + "%");
-            }
-            if ($(this).attr("id") == "averageScore") {
-                colTotal = parseFloat(colTotal / count).toFixed(2);
-                $(this).html(colTotal + "%");
-            }
-        });
-    }
-
-    function newTab() {
-
-        $.ajax({
-            type: "POST",
-            url: "/Gradebook/AddCategory",
-            success: window.location.reload(true)
-        });
-    }
-
-    function goToCategoryTab(catID, stuID) {
-        $.ajax({
-            type: "POST",
-            url: "/Gradebook/SetTabStudent",
-            data: { studentId: stuID.toString() },
-            success: function () {
-                location.href = "/Gradebook/Tab/?categoryId=" + catID;
-            }
-        });
-    }
-
     function selectRow(row, e) {
-
         hideTabColors();
         if (header == true) {
             clearLastAssignmentFocus();
@@ -1531,7 +1305,6 @@
             clearLastCellFocus();
         }
         resetTableColors();
-
 
         e.cancelBubble = true;
 
@@ -1554,50 +1327,78 @@
             }
             count++;
         });
-
     }
 
-    function resetTableColors() {
-        $("#grades tr").each(function () {
-            $(this).find("td").each(function () {
-                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-                    $(this).css("background-color", "#DCDCDC");
-                    $(this).find("div").css("background-color", "#DCDCDC");
-                }
-                else {
-                    $(this).css("background-color", "white");
-                }
-            });
-            $(this).find("th").each(function () {
-                if ($(this).attr("class") == "colHeader" || $(this).attr("class") == "rowHeader") {
-                }
-                else {
-                    $(this).css("background-color", "white");
-                }
-            });
-        });
+    function selectRowColumnHeaderOfSelected(someCell) {
+        var row = $(someCell).parent("tr").prevAll().length;
+        var colIndex = $(someCell).prevAll().length;
+
+        var cell = $("#grades").find("tr:eq(0)");
+        cell = cell.find("td:eq(" + colIndex + ")");
+
+        //change the current column headers background to highlighted
+        cell.css("background-color", "#FFFF84");
+        cell.find("div").css("background-color", "#FFFF84");
+
+        //change the mouseout function so we don't change the color and only hide the div
+        cell.attr("onmouseout", "hideOnlyButton(this);");
+
+        //find the current rows header
+        var cell2 = $("#grades").find("tr:eq(" + row + ")");
+        cell2 = cell2.find("td:eq(0)");
+
+        //change the current rows header background to highlighted
+        cell2.css("background-color", "#FFFF84");
+        cell2.find("div").css("background-color", "#FFFF84");
+
+        //remove the current rows onmouseout function so it doesn't become unhighlighted (for IE removeAttr is not supported)
+        if (navigator.appName == "Microsoft Internet Explorer") {
+            cell2.prop("onmouseout", null);
+        }
+        else {
+            cell2.removeAttr("onmouseout");
+        }
     }
 
-    function moveRight(header) {
+    function showButton(column) {
+        currentHeaderCell = column;
+        var container = column.id;
 
-        var id = header.id.split("-");
-        $.ajax({
-            type: "POST",
-            url: "/Gradebook/MoveCategoryRight",
-            data: { categoryId: id[1] },
-            success: window.location.reload(true)
-        });
+        $("#div-" + container).animate({ "height": "show" }, { duration: 0 });
+
+        if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)") {
+
+            $("#" + container).css("background-color", "#FFFF84");
+            $("#div-" + container).css("background-color", "#FFFF84");
+        }
     }
 
-    function moveLeft(header) {
+    function ShowHide(evt, buttonClick) {
+        selectColumn(evt, currentHeaderCell);
 
-        var id = header.id.split("-");
-        $.ajax({
-            type: "POST",
-            url: "/Gradebook/MoveCategoryLeft",
-            data: { categoryId: id[1] },
-            success: window.location.reload(true)
-        });
+        evt.cancelBubble = true;
+
+        //Store which assignment button was clicked so we can use it with Add Points
+        points = buttonClick
+        var x = 0;
+        var y = 0;
+
+        var container = buttonClick.id;
+        containerId = container.split("-");
+        currentCol = containerId[1];
+
+        //aligning the menu under the buttons
+        x = $("#" + container).position().left;
+        y = $("#" + container).position().top;
+        y += 9;
+
+        //Moving the menu to the button that clicked it
+        $("#selectMenuID").css("left", x + "px");
+        $("#selectMenuID").css("top", y + "px");
+
+        //Animation for menu
+        $("#selectMenuID").animate({ "height": "show" }, { duration: 75 });
+
     }
 
 </script>
