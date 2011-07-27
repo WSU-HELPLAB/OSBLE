@@ -954,20 +954,8 @@ namespace OSBLE.Controllers
                 foreach (Score item in assignmentQuery)
                 {
                     item.Points = -1;
-                    item.AssignmentActivity.PointsPossible = -1;
-                }
-                db.SaveChanges();
-            }
-
-            var assignmentPoints = from a in db.AbstractAssignments
-                                   where a.ID == assignmentId
-                                   select a;
-
-            if (assignmentPoints.Count() > 0)
-            {
-                foreach (AbstractAssignment item in assignmentPoints)
-                {
-                    item.PointsPossible = 0;
+                    item.AssignmentActivity.PointsPossible = 0;
+                    item.AssignmentActivity.AbstractAssignment.PointsPossible = 0;
                 }
                 db.SaveChanges();
             }

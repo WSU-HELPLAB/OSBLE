@@ -1406,6 +1406,45 @@
             clearLastHeaderFocus();
             header = false;
         }
+    }
+
+    function addPoints(points) {
+
+        var num = $("#XtoAdd").val();
+        var id = $(points).attr("id");
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/AddPoints",
+            data: { assignmentId: parseInt(currentCol), number: num },
+            success: function (response) {
+                $("#grades").replaceWith(response);
+            }
+        });
+        $("#addPointsID").animate({ "height": "hide" }, { duration: 300 });
+    }
+
+    function newTab() {
+
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/AddCategory",
+            success: window.location.reload(true)
+        });
+
+    }
+
+    function importGrades() {
+
+        var filename = $("#file").val();
+
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/ImportColumnsFromCSV",
+            data: { file: filename }
+        });
+    }
+
+    function moveRight(header) {
 
         var container = buttonClick.id;
         containerId = container.split("-");
