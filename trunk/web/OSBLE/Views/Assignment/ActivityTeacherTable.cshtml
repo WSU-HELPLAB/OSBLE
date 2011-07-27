@@ -91,12 +91,6 @@
                 Inline Comments
             </th>
         }
-        @if (hasRubric)
-        { 
-            <th>
-                Rubric
-            </th>
-        }
         @if (hasDeliverables)
         {
             <th>
@@ -156,15 +150,30 @@
             }
             @if (isGradable)
             { 
-            <td>
+           <td>
             
                 @if (info.Graded)
                 {
-                    <span>Graded</span>
+                    if (hasRubric)
+                    {   
+                            @Html.ActionLink("Graded", "Index", "Rubric", new { abstractAssignmentActivityId = ViewBag.activityID, teamUserId = info.SubmitterID }, new {})
+                        
+                    }
+                    else
+                    {
+                        <span>Graded</span>
+                    }
                 }
                 else
                 {
-                    <span style="color: Red">Not Graded</span>
+                    if (hasRubric)
+                    {
+                            @Html.ActionLink("Not Graded", "Index", "Rubric", new { abstractAssignmentActivityId = ViewBag.activityID, teamUserId = info.SubmitterID }, new { @style = "color: Red; text-align: center" })
+                    }
+                    else
+                    {
+                        <span style="color: Red">Not Graded</span>
+                    }
                 }
             </td>
             }
@@ -184,12 +193,6 @@
                 }
                 </td>
                 
-            }
-            @if (hasRubric)
-            { 
-                <td>
-                    @Html.ActionLink("Fill out Rubric", "Index", "Rubric", new { abstractAssignmentActivityId = ViewBag.activityID, teamUserId = info.SubmitterID }, new { })
-                </td>
             }
             @if (hasDeliverables)
             {
