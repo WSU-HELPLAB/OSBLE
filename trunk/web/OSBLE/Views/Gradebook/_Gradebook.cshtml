@@ -6,19 +6,15 @@
 @{
     Layout = null;
     var index = 0;
+
+    int numDropped = ViewBag.Dropped;
+    <input type="hidden" id="numDropped" value="@numDropped" />
+    var customize_option = (Category.GradeOptions)ViewBag.Customize;
+    <input type="hidden" id="customize_option" value="@customize_option" />
 }
 
-@{
-        int numDropped = ViewBag.Dropped;
-        <input type="hidden" id="numDropped" value="@numDropped" />
-        var customize_option = (Category.GradeOptions)ViewBag.Customize;
-        <input type="hidden" id="customize_option" value="@customize_option" />
-    }
-
 <table id="grades" class="gradebook">
-
     <tr class="colHeader">
-            
         @{var j = 1;
             <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color: #E8E8E8; width: 25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
             index++;
@@ -39,9 +35,7 @@
                 j += 1;
             }
         }
-            
     </tr>
-
     <tr id="perfectScore">
         <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; width:25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
         @{index++;}
@@ -59,14 +53,6 @@
         <td id="th3">
             <b>Average Score</b>
         </td>
-        @*<td id="averageTotal">
-            0
-        </td>
-        @foreach (AbstractAssignmentActivity item in ViewBag.GradeAssignments)
-        {
-            <td id="averageScore" >0</td>  
-        }*@
-
         @{       //Holds the total grade
                 double totalGrade = 0;
                 
@@ -93,7 +79,6 @@
                             assignPossible += userScore.AssignmentActivity.PointsPossible;
                         }
                     }
-                    
                 }
                 totalGrade = (assignPoints / assignPossible) * 100;
             
@@ -139,59 +124,43 @@
                     <td id="averageScore">NG</td>
                 }
             }
-
     </tr>
-    
     <tr>
-    <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; width:25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
-    @{index++;}
-    @{
-    
-        <th id="th4" >
-            Name
-        </th>
+        <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; width:25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
+        @{index++;}
+        @{
+            <th id="th4" >
+                Name
+            </th>
         
-        if (customize_option == Category.GradeOptions.XtoDrop && numDropped != 0)
-        {
-                <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average [Drop @numDropped lowest]" /> </th>
-        }
-        else if (customize_option == Category.GradeOptions.XtoTake)
-        {
-            <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average [Keep @numDropped highest]" /> </th>
-        }
-        else
-        {
-            <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average" /></th>
-        }
-@*
-        int i = 2;
-        foreach (AbstractAssignmentActivity assign in ViewBag.GradeAssignments)
-        {
-
-            if (assign.addedPoints > 0)
-            {   
-                    <th id="header-@assign.ID" onclick="changeHeaderName(event, this)">@assign.Name (Added @assign.addedPoints)</th>
+            if (customize_option == Category.GradeOptions.XtoDrop && numDropped != 0)
+            {
+                    <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average [Drop @numDropped lowest]" /> </th>
+            }
+            else if (customize_option == Category.GradeOptions.XtoTake)
+            {
+                <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average [Keep @numDropped highest]" /> </th>
             }
             else
             {
-                <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average [Dropped @numDropped]" /> </th>
-            }*@
+                <th id="totalCustomize">Total <input id="dropLowestButton" type="button" onclick="displayCustomizeGrades();" value="Average" /></th>
+            }
         
-        int i = 2;
-        foreach (AbstractAssignmentActivity a in ViewBag.Assignments)
-        {
-
-            if (a.addedPoints > 0)
-            {   
-                <th id="header-@a.ID" onclick="changeHeaderName(event, this)">@a.Name (Added @a.addedPoints)</th>
-            }
-            else
+            int i = 2;
+            foreach (AbstractAssignmentActivity a in ViewBag.Assignments)
             {
-                <th id="header-@a.ID" onclick="changeHeaderName(event, this)">@a.Name </th>
+
+                if (a.addedPoints > 0)
+                {   
+                    <th id="header-@a.ID" onclick="changeHeaderName(event, this)">@a.Name (Added @a.addedPoints)</th>
+                }
+                else
+                {
+                    <th id="header-@a.ID" onclick="changeHeaderName(event, this)">@a.Name </th>
+                }
+                i += 1;
             }
-            i += 1;
         }
-    }
     </tr>
     <!--loop through all users -->
     @foreach (OSBLE.Models.Users.UserProfile user in ViewBag.Users)
@@ -221,12 +190,9 @@
                     <td id="total">NG</td>
               }
             }
-
                 
             @foreach (AbstractAssignmentActivity gradeAssignmentActivity in ViewBag.Assignments)
             {
-
-
                 var gradableQuery = from g in ViewBag.Grades as IEnumerable<Score>
                                     where g.AssignmentActivityID == gradeAssignmentActivity.ID
                                     && g.TeamUserMember.Contains(user)

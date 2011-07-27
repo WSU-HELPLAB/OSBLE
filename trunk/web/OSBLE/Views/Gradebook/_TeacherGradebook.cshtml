@@ -887,8 +887,8 @@
 
         //9 means tab was pressed
         if (e.keyCode == 9) {
-            try { evt.preventDefault(); }
-            catch (er) { evt.returnValue = false; }
+            try { e.preventDefault(); }
+            catch (er) { e.returnValue = false; }
             var row = $(this).parent("tr");
             var colIndex = $(this).prevAll().length;
             colIndex = parseInt(colIndex);
@@ -905,8 +905,8 @@
             clearLastAssignmentFocus();
         }
         else if (e.keyCode == 9) {
-            try { evt.preventDefault(); }
-            catch (er) { evt.returnValue = false; }
+            try { e.preventDefault(); }
+            catch (er) { e.returnValue = false; }
             var cell = null;
             var row = $(this).parent("tr");
             var colIndex = $(this).prevAll().length;

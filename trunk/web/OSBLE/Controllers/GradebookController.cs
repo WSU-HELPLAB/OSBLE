@@ -1281,7 +1281,6 @@ namespace OSBLE.Controllers
                         assignment.ColumnOrder = newCategoryLastAssignment + 1;
                         db.SaveChanges();
                     }
-
                 }
             }
             BuildGradebook((int)Session["categoryId"]);
