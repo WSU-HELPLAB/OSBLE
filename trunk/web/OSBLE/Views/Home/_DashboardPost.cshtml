@@ -137,7 +137,7 @@
                         method="post">
                         <input type="hidden" name="reply_to" value="@Model.ID" />
                         <input type="hidden" name="latest_reply" value="0" id="latest_reply_@(Model.ID)" />
-                        <input id="remCharsReply" name="remainingCharsReply" readonly="true" type="text" value="(@ViewBag.MaxActivityFeedLength) Characters left" /><br />
+                        <text id="remCharsReply" name="remainingCharsReply" readonly="true" value="(@ViewBag.MaxActivityFeedLength) Characters left" /><br />
                         <textarea name="Content" rows="5" cols="40" id="dp_replybox_content_@(Model.ID)" placeholder="Enter reply here..."
                             onkeyup="RemainingCharsReply(@(Model.ID))" onkeydown="RemainingCharsReply(@(Model.ID))" ></textarea><br />
                         <input id="reply @(Model.ID) button" type="submit" name="post_reply" value="Post Reply" onclick="refreshCount()" />
