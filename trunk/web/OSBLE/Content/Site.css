@@ -1283,6 +1283,11 @@ ul.assignment_deliverables, .assignment_deliverables ul
 	vertical-align: top;
 }
 
+.yesAndNoDiv
+{
+    text-align: center;
+}
+
 #file_upload_silverlight_span
 {
 	float: right;
@@ -1338,3 +1343,4 @@ ul.assignment_deliverables, .assignment_deliverables ul
 	border-color: gray;
 	background-color: white;
 }
+
