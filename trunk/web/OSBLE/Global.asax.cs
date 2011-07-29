@@ -19,7 +19,7 @@ namespace OSBLE
 
             //because the file system is exposed to the web, we need to prevent direct
             //file access
-            routes.RouteExistingFiles = false;
+            routes.RouteExistingFiles = true;
 
             //allow direct access to web services.
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
