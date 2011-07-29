@@ -146,8 +146,6 @@
             DisplayRandomTeams();
         }
 
-        $('#UseRubric').removeAttr('checked');
-
         //Call any needed functions (note events wont be called on this function so we got to call them manually
         if ($('#UseRubric').attr('checked') == 'checked') {
             $('#UseRubric').change();
@@ -517,7 +515,7 @@
     
     <!--Use Rubric-->
     <div class="editor-label">
-        @Html.EditorFor(m => Model.UseRubric) 
+        @Html.CheckBoxFor(m => Model.UseRubric) 
         @Html.LabelFor(m => Model.UseRubric)
         @Helpers.CreateToolTip(ToolTips.BasicAssignmentUseRubric)
         <div id="edit_rubric_div" style="display: none">

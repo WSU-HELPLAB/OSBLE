@@ -621,7 +621,6 @@
     <Content Include="Views\BasicAssignment\Index.cshtml" />
     <Content Include="Views\BasicAssignment\Details.cshtml" />
     <Content Include="Views\BasicAssignment\Create.cshtml" />
-    <Content Include="Views\BasicAssignment\Edit.cshtml" />
     <Content Include="Views\BasicAssignment\Delete.cshtml" />
     <Content Include="Views\Course\Create.cshtml" />
     <Content Include="Views\Course\Edit.cshtml" />

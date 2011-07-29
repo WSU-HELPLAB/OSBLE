@@ -39,12 +39,50 @@ namespace OSBLE.Controllers
             return View(viewModel);
         }
 
+        private SilverlightObject CreateRubricCreationSilverlightObject()
+        {
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            parameters.Add("courseId", activeCourse.AbstractCourseID.ToString());
+
+            return new SilverlightObject
+            {
+                CSSId = "rubric_silverlight",
+                XapName = "OsbleRubric",
+                Width = "800",
+                Height = "600",
+                OnLoaded = "SLObjectLoaded",
+                Parameters = parameters
+            };
+        }
+
+        private SilverlightObject CreateTeamCreationSilverlightObject()
+        {
+            return new SilverlightObject
+            {
+                CSSId = "team_creation_silverlight",
+                XapName = "TeamCreation",
+                Width = "800",
+                Height = "580",
+                OnLoaded = "SLObjectLoaded",
+                Parameters = new Dictionary<string, string>()
+                {
+                }
+            };
+        }
+
         [CanModifyCourse]
         public ActionResult Edit(int id)
         {
             BasicAssignmentViewModel viewModel = SetUpViewModel(id);
-            SetUpViewBag();
+            SetUpViewBag(viewModel);
             return View("Create", viewModel);
+        }
+
+        [HttpPost]
+        [CanModifyCourse]
+        public ActionResult Edit(BasicAssignmentViewModel basic)
+        {
+            return View("Create");
         }
 
         /// <summary>
@@ -256,6 +294,25 @@ namespace OSBLE.Controllers
             ViewBag.CommentConfigurations = configs;
         }
 
+        /// <summary>
+        /// Edit-specific viewbag information
+        /// </summary>
+        private void SetUpViewBag(BasicAssignmentViewModel viewModel)
+        {
+            //Make life easier by calling the default setup function.  I'm sure that most of the
+            //important stuff will get overwritten by the code below, but it's always good to
+            //cover your bases.
+            SetUpViewBag();
+
+            //Unlike when doing a CREATE, EDIT teams come from the viewmodel and not a postback
+            string json = SerializeTeamMemers(GetTeamMembers(viewModel.Assignment.AssignmentActivities.ElementAt(0)));
+            ViewBag.NewTeams = json;
+
+            //similarly, the rubric's id doesn't come from a postback
+            ViewBag.SelectedRubric = viewModel.Assignment.RubricID;
+
+        }
+
         private BasicAssignmentViewModel SetUpViewModel()
         {
             //we create a basic assignment that is a StudioAssignment with a submission and a stop
@@ -268,8 +325,8 @@ namespace OSBLE.Controllers
             viewModel.Submission.PercentPenalty = active.PercentPenalty;
             viewModel.Submission.MinutesLateWithNoPenalty = active.MinutesLateWithNoPenalty;
 
-            viewModel.TeamCreation = createTeamCreationSilverlightObject();
-            viewModel.RubricCreation = createRubricCreationSilverlightObject();
+            viewModel.TeamCreation = CreateTeamCreationSilverlightObject();
+            viewModel.RubricCreation = CreateRubricCreationSilverlightObject();
 
             viewModel.TeamCreation.Parameters["teamMembers"] = SerializeTeamMemers(GetTeamMembers());
             viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"];
@@ -292,8 +349,16 @@ namespace OSBLE.Controllers
                                     where sa.AbstractAssignmentID == courseId
                                     select sa).FirstOrDefault();
 
-            viewModel.TeamCreation = createTeamCreationSilverlightObject();
-            viewModel.RubricCreation = createRubricCreationSilverlightObject();
+            viewModel.TeamCreation = CreateTeamCreationSilverlightObject();
+            viewModel.RubricCreation = CreateRubricCreationSilverlightObject();
+
+            //was a rubric specified?
+            if (viewModel.Assignment.RubricID != 0)
+            {
+                viewModel.UseRubric = true;
+            }
+
+            viewModel.CommentCategoryConfiguration = viewModel.Assignment.CommentCategoryConfiguration;
 
             return viewModel;
         }
@@ -307,6 +372,7 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult Create(BasicAssignmentViewModel basic)
         {
+            //TODO: break this code up so that much of it can be resued for the "edit" action
             string serializedTeams = null;
             try
             {
@@ -512,8 +578,8 @@ namespace OSBLE.Controllers
                 return RedirectToAction("Index", "Assignment");
             }
 
-            basic.TeamCreation = createTeamCreationSilverlightObject();
-            basic.RubricCreation = createRubricCreationSilverlightObject();
+            basic.TeamCreation = CreateTeamCreationSilverlightObject();
+            basic.RubricCreation = CreateRubricCreationSilverlightObject();
             SetUpViewBag();
             //ViewBag.Categories = new SelectList(db.Categories, "ID", "Name", basic.Assignment.CategoryID);
             //ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
@@ -521,37 +587,6 @@ namespace OSBLE.Controllers
             basic.SerializedTeamMembersJSON = basic.TeamCreation.Parameters["teamMembers"] = SerializeTeamMemers(GetTeamMembers());
 
             return View(basic);
-        }
-
-        private SilverlightObject createTeamCreationSilverlightObject()
-        {
-            return new SilverlightObject
-            {
-                CSSId = "team_creation_silverlight",
-                XapName = "TeamCreation",
-                Width = "800",
-                Height = "580",
-                OnLoaded = "SLObjectLoaded",
-                Parameters = new Dictionary<string, string>()
-                {
-                }
-            };
-        }
-
-        private SilverlightObject createRubricCreationSilverlightObject()
-        {
-            Dictionary<string, string> parameters = new Dictionary<string, string>();
-            parameters.Add("courseId", activeCourse.AbstractCourseID.ToString());
-
-            return new SilverlightObject
-            {
-                CSSId = "rubric_silverlight",
-                XapName = "OsbleRubric",
-                Width = "800",
-                Height = "600",
-                OnLoaded = "SLObjectLoaded",
-                Parameters = parameters
-            };
         }
 
         private CommentCategoryConfiguration BuildCommentCategories()
@@ -581,7 +616,7 @@ namespace OSBLE.Controllers
                     Int32.TryParse(pieces[1], out catId);
 
                     //does the comment category already exist?
-                    CommentCategory category = GetCategoryOrCreateNew(config, catId);
+                    CommentCategory category = GetOrCreateCategory(config, catId);
                     category.Name = Request.Form[key].ToString();
                 }
                 //length of 4 is a category option
@@ -591,7 +626,7 @@ namespace OSBLE.Controllers
                     int order = 0;
                     Int32.TryParse(pieces[2], out catId);
                     Int32.TryParse(pieces[3], out order);
-                    CommentCategory category = GetCategoryOrCreateNew(config, catId);
+                    CommentCategory category = GetOrCreateCategory(config, catId);
                     CommentCategoryOption option = new CommentCategoryOption();
                     option.Name = Request.Form[key].ToString();
                     category.Options.Insert(order, option);
@@ -608,7 +643,7 @@ namespace OSBLE.Controllers
             return config;
         }
 
-        private CommentCategory GetCategoryOrCreateNew(CommentCategoryConfiguration config, int categoryId)
+        private CommentCategory GetOrCreateCategory(CommentCategoryConfiguration config, int categoryId)
         {
             //does the comment category already exist?
             CommentCategory category = (from c in config.Categories
@@ -621,14 +656,6 @@ namespace OSBLE.Controllers
                 config.Categories.Add(category);
             }
             return category;
-        }
-
-        // POST: /BasicAssignment/Edit/5
-        [HttpPost]
-        [CanModifyCourse]
-        public ActionResult Edit(BasicAssignmentViewModel basic)
-        {
-            return View("Create");
         }
 
         protected override void Dispose(bool disposing)
