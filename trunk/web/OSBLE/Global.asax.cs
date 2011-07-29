@@ -15,8 +15,18 @@ namespace OSBLE
 
         public static void RegisterRoutes(RouteCollection routes)
         {
+            //***When defining routes, be sure to go from specific to generic routes***
+
+            //because the file system is exposed to the web, we need to prevent direct
+            //file access
+            routes.RouteExistingFiles = false;
+
+            //allow direct access to web services.
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
-            routes.RouteExistingFiles = true;
+            routes.IgnoreRoute("{resource}.svc/{*pathInfo}");
+            routes.IgnoreRoute("{filename}.svc/{*pathInfo}");
+
+
             routes.IgnoreRoute("Content/{*pathInfo}");
             routes.IgnoreRoute("Scripts/{*pathInfo}");
             routes.IgnoreRoute("ClientBin/{*pathInfo}");
@@ -36,11 +46,6 @@ namespace OSBLE
             routes.IgnoreRoute("EditPeerReviewTestPage.aspx");
             routes.IgnoreRoute("EditPeerReviewTestPage.html");
 #endif
-            routes.MapRoute(
-                "File System",
-                "FileSystem/{*pathInfo}",
-                new { controller = "Home", action = "NoAccess" }
-            );
 
             routes.MapRoute(
                 "FileHandler-Course",
@@ -53,6 +58,13 @@ namespace OSBLE
                 "Rubric/{AbstractAssignmentActivityId}/{teamUserId}",
                 new { controller = "Rubric", action = "Index" }
                 );
+
+            //very generic.  Make sure that these stay at the bottom.
+            routes.MapRoute(
+                "File System",
+                "FileSystem/{*pathInfo}",
+                new { controller = "Home", action = "NoAccess" }
+            );
 
             routes.MapRoute(
                 "Default", // Route name
