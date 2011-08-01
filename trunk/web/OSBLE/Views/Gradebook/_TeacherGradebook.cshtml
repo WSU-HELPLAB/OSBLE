@@ -275,7 +275,7 @@
 <div id="confirmDeleteCategory" style="display:none" title="Confirm Delete">
         Are you sure you want to permanently delete this category and all the assignments within it?
     <div class="yesAndNoDiv">
-        <input value="Yes" type="button" onclick="deleteCategory();" />
+        <input value="Yes" type="button" onclick="deleteCategory()" />
         <input value="No" type="button" onclick="hideConfirmDeleteCategory();" />
     </div>
 </div>
@@ -1056,11 +1056,12 @@
         var cell = $("#categoryHeaders").find("th:nth-child(" + currentHeader + ")");
         var catId = cell.attr("id");
         $.ajax({
+            async: false,
             type: "POST",
             url: "/Gradebook/ChangeTabColor",
-            data: { categoryId: catId, value: color },
-            success: window.location.reload(true)
+            data: { categoryId: catId, value: color }
         });
+        window.location.reload(true);
         hideTabColors();
     }
 
@@ -1125,13 +1126,14 @@
     function deleteCategory() {
         var cell = $("#categoryHeaders").find("th:nth-child(" + currentHeader + ")");
         var catId = cell.attr("id");
-        alert(catId);
+        catId = parseInt(catId);
         $.ajax({
+            async: false,
             type: "POST",
             url: "/Gradebook/DeleteCategory",
-            data: { categoryId: catId },
-            success: window.location.reload(true)
+            data: { categoryId: catId }            
         });
+        window.location.reload(true)
         hideTabColors();
     }
 
@@ -1255,29 +1257,32 @@
     function moveLeft(header) {
         var id = header.id.split("-");
         $.ajax({
+            async: false,
             type: "POST",
             url: "/Gradebook/MoveCategoryLeft",
-            data: { categoryId: id[1] },
-            success: window.location.reload(true)
+            data: { categoryId: id[1] }
         });
+        window.location.reload(true);
     }
 
     function moveRight(header) {
         var id = header.id.split("-");
         $.ajax({
+            async: false,
             type: "POST",
             url: "/Gradebook/MoveCategoryRight",
-            data: { categoryId: id[1] },
-            success: window.location.reload(true)
+            data: { categoryId: id[1] }
         });
+        window.location.reload(true);
     }
 
     function newTab() {
         $.ajax({
+            async: false,
             type: "POST",
-            url: "/Gradebook/AddCategory",
-            success: window.location.reload(true)
+            url: "/Gradebook/AddCategory"
         });
+        window.location.reload(true);
     }
 
     function resetTableColors() {
