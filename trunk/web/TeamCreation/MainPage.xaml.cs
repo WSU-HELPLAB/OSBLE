@@ -281,8 +281,13 @@ namespace TeamCreation
 
             js.Invoke("val", Uri.EscapeDataString(JsonConvert.SerializeObject(allMembers)));
 
+            //Saving and exiting
+            HtmlPage.Window.Invoke("CloseTeamGenerationWindow", "");
+
+            /* old code
             MessageBox.Show("Teams have been saved");
             changedNotSaved = false;
+             */
         }
 
         private void CancelChanges_Click(object sender, RoutedEventArgs e)

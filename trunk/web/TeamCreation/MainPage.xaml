@@ -48,8 +48,8 @@
             </StackPanel>
 
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button x:Name="PublishChanges" Content="Save Changes" Margin="0,0,20,0"  Click="PublishChanges_Click" Width="133" />
-                <Button x:Name="CancelChanges" Content="Close" Width="133" Click="CancelChanges_Click"  />
+                <Button x:Name="PublishChanges" Content="Save and Close" Margin="0,0,20,0"  Click="PublishChanges_Click" Width="133" />
+                <Button x:Name="CancelChanges" Content="Cancel" Width="133" Click="CancelChanges_Click"  />
             </StackPanel>
 
         </Grid>

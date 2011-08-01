@@ -1317,7 +1317,11 @@ namespace OsbleRubric
         /// </summary>
         private void CancelChanges_Click(object sender, RoutedEventArgs e)
         {
-            HtmlPage.Window.Invoke("CloseRubric", selectedRubric.ID.ToString());
+            MessageBoxResult r = MessageBox.Show("All changes will be lost", "Cancel Changes", MessageBoxButton.OKCancel);
+            if (r == MessageBoxResult.OK)
+            {
+                HtmlPage.Window.Invoke("CloseRubric", selectedRubric.ID.ToString());
+            }
         }
 
         /// <summary>
@@ -1531,8 +1535,10 @@ namespace OsbleRubric
 
         private void FinalizeSaving(object sender, EventArgs e)
         {
-            MessageBox.Show("Your rubric has been saved to OSBLE.");
-            CourseComboBox_SelectionChanged(sender, e);
+            //MessageBox.Show("Your rubric has been saved to OSBLE.");
+            //CourseComboBox_SelectionChanged(sender, e);
+            //Saving and exiting
+            HtmlPage.Window.Invoke("CloseRubric", selectedRubric.ID.ToString());
         }
 
         /// <summary>
