@@ -31,12 +31,124 @@ namespace OSBLE.Controllers
             ViewBag.CurrentTab = "Assignments";
         }
 
+        private CommentCategoryConfiguration BuildCommentCategories()
+        {
+            CommentCategoryConfiguration config = new CommentCategoryConfiguration();
+
+            //all keys that we care about start with "category_"
+            List<string> keys = (from key in Request.Form.AllKeys
+                                 where key.Contains("category_")
+                                 select key).ToList();
+
+            //we know this one for sure so no need to loop
+            config.Name = Request.Form["category_config_name"].ToString();
+
+            //but the rest are variable, so we need to loop
+            foreach (string key in keys)
+            {
+                //All category keys go something like "category_BLAH1_BLAH2_...".  Based on how
+                //many underscores the current key has, we can determine what data it is
+                //providing to us
+                string[] pieces = key.Split('_');
+
+                //length of 2 is a category name
+                if (pieces.Length == 2)
+                {
+                    int catId = 0;
+                    Int32.TryParse(pieces[1], out catId);
+
+                    //does the comment category already exist?
+                    CommentCategory category = GetOrCreateCategory(config, catId);
+                    category.Name = Request.Form[key].ToString();
+                }
+                //length of 4 is a category option
+                else if (pieces.Length == 4)
+                {
+                    int catId = 0;
+                    int order = 0;
+                    Int32.TryParse(pieces[2], out catId);
+                    Int32.TryParse(pieces[3], out order);
+                    CommentCategory category = GetOrCreateCategory(config, catId);
+                    CommentCategoryOption option = new CommentCategoryOption();
+                    option.Name = Request.Form[key].ToString();
+                    category.Options.Insert(order, option);
+                }
+            }
+
+            //when we're all done, zero out the category IDs to ensure that the items get
+            //added to the DB correctly
+            foreach (CommentCategory c in config.Categories)
+            {
+                c.ID = 0;
+            }
+
+            return config;
+        }
+
         [CanModifyCourse]
         public ActionResult Create()
         {
             BasicAssignmentViewModel viewModel = SetUpViewModel();
             SetUpViewBag();
             return View(viewModel);
+        }
+
+
+        [HttpPost]
+        [CanModifyCourse]
+        public ActionResult Create(BasicAssignmentViewModel basic)
+        {
+            //The validation method call should trigger an invalid model state if something
+            //isn't right.
+            ValidateSubmission(basic);
+
+            if (ModelState.IsValid)
+            {
+                //inject any lingering form data into our VM
+                PopulateModelWithFormData(basic);
+
+                int currentCategoryId = basic.Assignment.CategoryID;
+
+                //Get the next column order
+                int colOrder = (from assignment in db.AbstractAssignmentActivities
+                                where assignment.AbstractAssignment.CategoryID == currentCategoryId
+                                orderby assignment.ColumnOrder descending
+                                select assignment.ColumnOrder).FirstOrDefault();
+
+                StopActivity stop = new StopActivity();
+
+                basic.Submission.ColumnOrder = colOrder++;
+
+                stop.Name = basic.Stop.Name;
+                stop.ReleaseDate = basic.Stop.ReleaseDate;
+
+                basic.Assignment.AssignmentActivities.Add(basic.Submission);
+                basic.Assignment.AssignmentActivities.Add(stop);
+                db.StudioAssignments.Add(basic.Assignment);
+
+                db.SaveChanges();
+
+                //send out Events
+                Event e = new Event();
+                e.Approved = true;
+                e.CourseID = activeCourse.AbstractCourse.ID;
+                e.HideDelete = true;
+                e.Title = basic.Submission.Name + " Due";
+                e.StartDate = stop.ReleaseDate;
+                e.StartTime = stop.ReleaseDate;
+                e.PosterID = currentUser.ID;
+                e.Description = "https://osble.org/Assignment?id=" + basic.Assignment.ID;
+                db.Events.Add(e);
+                db.SaveChanges();
+                return RedirectToAction("Index", "Assignment");
+            }
+
+            basic.TeamCreation = CreateTeamCreationSilverlightObject();
+            basic.RubricCreation = CreateRubricCreationSilverlightObject();
+            SetUpViewBag();
+            basic.SerializedTeamMembersJSON = basic.TeamCreation.Parameters["teamMembers"] = SerializeTeamMemers(GetTeamMembers());
+
+            return View(basic);
         }
 
         private SilverlightObject CreateRubricCreationSilverlightObject()
@@ -82,7 +194,63 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult Edit(BasicAssignmentViewModel basic)
         {
-            return View("Create");
+
+            //The validation method call should trigger an invalid model state if something
+            //isn't right.
+            ValidateSubmission(basic);
+
+            if (ModelState.IsValid)
+            {
+                //inject any lingering form data into our VM
+                PopulateModelWithFormData(basic);
+
+                //SubmissionActivity submission = new SubmissionActivity();
+                StopActivity stop = (from activity in db.AbstractAssignmentActivities
+                                     where activity is StopActivity
+                                     &&
+                                     activity.AbstractAssignmentID == basic.Assignment.ID
+                                     select activity).FirstOrDefault() as StopActivity;
+                if (stop == null)
+                {
+                    stop = new StopActivity();
+                    basic.Assignment.AssignmentActivities.Add(stop);
+                }
+
+                stop.Name = basic.Stop.Name;
+                stop.ReleaseDate = basic.Stop.ReleaseDate;
+
+                basic.Submission.AbstractAssignment = basic.Assignment;
+                basic.Submission.AbstractAssignmentID = basic.Assignment.ID;
+
+                db.Entry(basic.Submission).State = System.Data.EntityState.Modified;
+                db.Entry(basic.Assignment).State = System.Data.EntityState.Modified;
+                db.Entry(stop).State = System.Data.EntityState.Modified;
+                db.SaveChanges();
+
+                return RedirectToAction("Index", "Assignment");
+            }
+
+            basic.TeamCreation = CreateTeamCreationSilverlightObject();
+            basic.RubricCreation = CreateRubricCreationSilverlightObject();
+            SetUpViewBag();
+            basic.SerializedTeamMembersJSON = basic.TeamCreation.Parameters["teamMembers"] = SerializeTeamMemers(GetTeamMembers());
+
+            return View(basic);
+        }
+
+        private CommentCategory GetOrCreateCategory(CommentCategoryConfiguration config, int categoryId)
+        {
+            //does the comment category already exist?
+            CommentCategory category = (from c in config.Categories
+                                        where c.ID == categoryId
+                                        select c).FirstOrDefault();
+            if (category == null)
+            {
+                category = new CommentCategory();
+                category.ID = categoryId;
+                config.Categories.Add(category);
+            }
+            return category;
         }
 
         /// <summary>
@@ -218,6 +386,126 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
+        /// EF handles most of the ViewModel binding, but some things still need to be modified.
+        /// This function handles these final modifications.
+        /// </summary>
+        /// <param name="viewModel"></param>
+        private void PopulateModelWithFormData(BasicAssignmentViewModel viewModel)
+        {
+            if (Request.Params["isGradable"].ToString() == "false")
+            {
+                viewModel.Assignment.Category = (from c in (activeCourse.AbstractCourse as Course).Categories
+                                             where c.Name == Constants.UnGradableCatagory
+                                             select c).FirstOrDefault();
+            }
+
+            if (viewModel.Submission.InstructorCanReview)
+            {
+                if (Request.Form["line_review_options"].ToString().CompareTo("ManualConfig") == 0)
+                {
+                    viewModel.Assignment.CommentCategoryConfiguration = BuildCommentCategories();
+                    db.CommentCategoryConfigurations.Add(viewModel.Assignment.CommentCategoryConfiguration);
+                    db.SaveChanges();
+                }
+                else if (Request.Form["line_review_options"].ToString().CompareTo("AutoConfig") == 0)
+                {
+                    viewModel.Assignment.CommentCategoryConfigurationID = Convert.ToInt32(Request.Params["comment_category_selection"]);
+                }
+            }
+            else
+            {
+                //In our SetUpView method, we create a new instance of a CommentCategoryConfiguration.
+                //However, if we end up not needing comment categories and we try to submit DB changes
+                //having an empty CommentCategoryConfiguration throws an error.  As such, we need
+                //to reset it back to null prior to saving.
+                viewModel.Assignment.CommentCategoryConfiguration = null;
+            }
+
+            if (viewModel.Submission.isTeam)
+            {
+                viewModel.Submission.TeamUsers.Clear();
+                List<SerializableTeamMember> teamMembers = JsonConvert.DeserializeObject<List<SerializableTeamMember>>(viewModel.SerializedTeams);
+
+                //(section, teams) : where teams is string and a list of members
+                Dictionary<int, Dictionary<string, List<SerializableTeamMember>>> membersByTeamBySection = new Dictionary<int, Dictionary<string, List<SerializableTeamMember>>>();
+
+                var teamMembersBySections = from c in teamMembers group c by c.Section;
+
+                foreach (var section in teamMembersBySections)
+                {
+                    Dictionary<string, List<SerializableTeamMember>> membersByTeams = new Dictionary<string, List<SerializableTeamMember>>();
+                    var teams = from c in section group c by c.InTeamName;
+
+                    foreach (var team in teams)
+                    {
+                        membersByTeams.Add(team.Key, team.ToList());
+                    }
+                    membersByTeamBySection.Add(section.Key, membersByTeams);
+                }
+
+                //for every section add every team
+                foreach (var membersBySection in membersByTeamBySection)
+                {
+                    //for every team create a new team and set the Team Name
+                    foreach (var team in membersBySection.Value)
+                    {
+                        Team team_db = new Team();
+                        team_db.Name = team.Key;
+
+                        //for every member of that team make a new TeamMember
+                        foreach (SerializableTeamMember serializeableMember in team.Value)
+                        {
+                            TeamUserMember teamUser_db;
+                            if (serializeableMember.isUser)
+                            {
+                                UserMember userMember = new UserMember();
+                                userMember.UserProfile = (from c in db.UserProfiles
+                                                          where c.ID == serializeableMember.UserID
+                                                          select c).FirstOrDefault();
+                                userMember.UserProfileID = userMember.UserProfile.ID;
+                                teamUser_db = userMember;
+                            }
+                            else
+                            {
+                                TeamMember teamMember = new TeamMember();
+                                teamMember.Team = (from c in db.Teams
+                                                   where c.ID == serializeableMember.TeamID
+                                                   select c).FirstOrDefault();
+                                teamMember.TeamID = teamMember.Team.ID;
+
+                                teamUser_db = teamMember;
+                            }
+                            team_db.Members.Add(teamUser_db);
+                        }
+
+                        TeamMember tm = new TeamMember();
+                        tm.Team = team_db;
+                        viewModel.Submission.TeamUsers.Add(tm);
+                        db.Teams.Add(team_db);
+                    }
+                }
+                //db.SaveChanges();
+            }
+            else
+            {
+                viewModel.Submission.TeamUsers.Clear();
+                var users = from c in db.CoursesUsers
+                            where c.AbstractCourseID == activeCourse.AbstractCourseID
+                            && c.AbstractRole.CanSubmit
+                            select c.UserProfile;
+
+                foreach (UserProfile user in users)
+                {
+                    UserMember um = new UserMember();
+                    um.UserProfile = user;
+
+                    viewModel.Submission.TeamUsers.Add(um);
+                }
+                //db.SaveChanges();
+            }
+        }
+
+        /// <summary>
         /// Is a one line function necessary?
         /// </summary>
         /// <param name="members"></param>
@@ -331,84 +619,78 @@ namespace OSBLE.Controllers
             viewModel.TeamCreation.Parameters["teamMembers"] = SerializeTeamMemers(GetTeamMembers());
             viewModel.SerializedTeamMembersJSON = viewModel.TeamCreation.Parameters["teamMembers"];
 
+            //comment categories are null by default.  This doesn't work for us
+            viewModel.Assignment.CommentCategoryConfiguration = new CommentCategoryConfiguration();
+
             return viewModel;
         }
 
-        private BasicAssignmentViewModel SetUpViewModel(int courseId)
+        private BasicAssignmentViewModel SetUpViewModel(int assignmentId)
         {
-            //TODO: get this working
             BasicAssignmentViewModel viewModel = new BasicAssignmentViewModel();
 
             //base assignment data
             viewModel.Assignment = (from a in db.StudioAssignments
-                                    where a.ID == courseId
+                                    where a.ID == assignmentId
                                     select a).FirstOrDefault();
 
             //get the submission activity
-            viewModel.Submission = (from sa in db.SubmissionActivities
-                                    where sa.AbstractAssignmentID == courseId
-                                    select sa).FirstOrDefault();
+            viewModel.Submission = (from sa in viewModel.Assignment.AssignmentActivities
+                                    where sa is SubmissionActivity
+                                    select sa).FirstOrDefault() as SubmissionActivity;
 
             viewModel.TeamCreation = CreateTeamCreationSilverlightObject();
             viewModel.RubricCreation = CreateRubricCreationSilverlightObject();
 
+            //comment categories are null by default.  This doesn't work for us
+            viewModel.Assignment.CommentCategoryConfiguration = new CommentCategoryConfiguration();
+
             //was a rubric specified?
-            if (viewModel.Assignment.RubricID != 0)
+            if (viewModel.Assignment.RubricID != 0 && viewModel.Assignment.Rubric != null)
             {
                 viewModel.UseRubric = true;
             }
 
-            viewModel.CommentCategoryConfiguration = viewModel.Assignment.CommentCategoryConfiguration;
-
             return viewModel;
         }
 
-        //*********
-        ///Everything below this line MAY need to be redone.  Place things that are "okay"
-        //above this line.
-        //*********
-
-        [HttpPost]
-        [CanModifyCourse]
-        public ActionResult Create(BasicAssignmentViewModel basic)
+        /// <summary>
+        /// Performs model validation
+        /// </summary>
+        /// <param name="viewModel"></param>
+        private void ValidateSubmission(BasicAssignmentViewModel viewModel)
         {
-            //TODO: break this code up so that much of it can be resued for the "edit" action
-            string serializedTeams = null;
+            //Team validation.  Note the model change.
+            viewModel.SerializedTeams = null;
             try
             {
-                serializedTeams = Uri.UnescapeDataString(Request.Params["newTeams"]);
+                viewModel.SerializedTeams = Uri.UnescapeDataString(Request.Params["newTeams"]);
             }
             catch
             {
-                serializedTeams = null;
+                viewModel.SerializedTeams = null;
             }
-
-            if (basic.Submission.isTeam)
+            if (viewModel.Submission.isTeam)
             {
-                if (serializedTeams == null || serializedTeams == "")
+                if (viewModel.SerializedTeams == null || viewModel.SerializedTeams == "")
                 {
                     ModelState.AddModelError("Team", "Using teams was selected but no teams were created, please create the teams");
                 }
             }
 
-            if (basic.Submission.ReleaseDate >= basic.Stop.ReleaseDate)
+            //release date validation
+            if (viewModel.Submission.ReleaseDate >= viewModel.Stop.ReleaseDate)
             {
                 ModelState.AddModelError("time", "The due date must come after the release date");
             }
 
-            if (Request.Params["isGradable"].ToString() == "false")
-            {
-                basic.Assignment.Category = (from c in (activeCourse.AbstractCourse as Course).Categories
-                                             where c.Name == Constants.UnGradableCatagory
-                                             select c).FirstOrDefault();
-            }
-
-            if (basic.UseRubric)
+            //rubric.  Note that we're also modifying the ViewModel
+            if (viewModel.UseRubric)
             {
                 int rubricId = 0;
                 if (Int32.TryParse(Request.Form["RubricToUse"].ToString(), out rubricId) && rubricId != 0)
                 {
-                    basic.Assignment.RubricID = rubricId;
+                    viewModel.Assignment.RubricID = rubricId;
                     ViewBag.SelectedRubric = rubricId;
                 }
                 else
@@ -417,245 +699,6 @@ namespace OSBLE.Controllers
                 }
             }
 
-            if (Request.Form["line_review_options"].ToString().CompareTo("ManualConfig") == 0)
-            {
-                basic.CommentCategoryConfiguration = BuildCommentCategories();
-            }
-            else if (Request.Form["line_review_options"].ToString().CompareTo("AutoConfig") == 0)
-            {
-                basic.Assignment.CommentCategoryConfigurationID = Convert.ToInt32(Request.Params["comment_category_selection"]);
-                basic.CommentCategoryConfiguration.ID = (int)basic.Assignment.CommentCategoryConfigurationID;
-            }
-
-            if (ModelState.IsValid)
-            {
-                int currentCategoryId = basic.Assignment.CategoryID;
-
-                //Get the next column order
-                int colOrder = (from assignment in db.AbstractAssignmentActivities
-                                where assignment.AbstractAssignment.CategoryID == currentCategoryId
-                                orderby assignment.ColumnOrder descending
-                                select assignment.ColumnOrder).FirstOrDefault();
-
-                SubmissionActivity submission = new SubmissionActivity();
-                StopActivity stop = new StopActivity();
-
-                submission.PointsPossible = 100; //it actually doesn't matter
-                submission.ReleaseDate = basic.Submission.ReleaseDate;
-                submission.Name = basic.Submission.Name;
-
-                submission.PointsPossible = basic.Submission.PointsPossible;
-
-                submission.HoursLatePerPercentPenalty = basic.Submission.HoursLatePerPercentPenalty;
-                submission.HoursLateUntilZero = basic.Submission.HoursLateUntilZero;
-                submission.PercentPenalty = basic.Submission.PercentPenalty;
-                submission.MinutesLateWithNoPenalty = basic.Submission.MinutesLateWithNoPenalty;
-
-                submission.isTeam = basic.Submission.isTeam;
-                submission.InstructorCanReview = basic.Submission.InstructorCanReview;
-
-                submission.ColumnOrder = colOrder++;
-
-                stop.Name = basic.Stop.Name;
-                stop.ReleaseDate = basic.Stop.ReleaseDate;
-
-                basic.Assignment.AssignmentActivities.Add(submission);
-                basic.Assignment.AssignmentActivities.Add(stop);
-
-                if (basic.Submission.InstructorCanReview)
-                {
-                    if (Request.Form["line_review_options"].ToString().CompareTo("ManualConfig") == 0)
-                    {
-                        db.CommentCategoryConfigurations.Add(basic.CommentCategoryConfiguration);
-                        db.SaveChanges();
-                        basic.Assignment.CommentCategoryConfigurationID = basic.CommentCategoryConfiguration.ID;
-                    }
-                    else if (Request.Form["line_review_options"].ToString().CompareTo("AutoConfig") == 0)
-                    {
-                        basic.Assignment.CommentCategoryConfigurationID = Convert.ToInt32(Request.Params["comment_category_selection"]);
-                    }
-                }
-
-                db.StudioAssignments.Add(basic.Assignment);
-
-                db.SaveChanges();
-
-                if (basic.Submission.isTeam)
-                {
-                    List<SerializableTeamMember> teamMembers = JsonConvert.DeserializeObject<List<SerializableTeamMember>>(serializedTeams);
-
-                    //(section, teams) : where teams is string and a list of members
-                    Dictionary<int, Dictionary<string, List<SerializableTeamMember>>> membersByTeamBySection = new Dictionary<int, Dictionary<string, List<SerializableTeamMember>>>();
-
-                    var teamMembersBySections = from c in teamMembers group c by c.Section;
-
-                    foreach (var section in teamMembersBySections)
-                    {
-                        Dictionary<string, List<SerializableTeamMember>> membersByTeams = new Dictionary<string, List<SerializableTeamMember>>();
-                        var teams = from c in section group c by c.InTeamName;
-
-                        foreach (var team in teams)
-                        {
-                            membersByTeams.Add(team.Key, team.ToList());
-                        }
-                        membersByTeamBySection.Add(section.Key, membersByTeams);
-                    }
-
-                    //for every section add every team
-                    foreach (var membersBySection in membersByTeamBySection)
-                    {
-                        //for every team create a new team and set the Team Name
-                        foreach (var team in membersBySection.Value)
-                        {
-                            Team team_db = new Team();
-                            team_db.Name = team.Key;
-
-                            //for every member of that team make a new TeamMember
-                            foreach (SerializableTeamMember serializeableMember in team.Value)
-                            {
-                                TeamUserMember teamUser_db;
-                                if (serializeableMember.isUser)
-                                {
-                                    UserMember userMember = new UserMember();
-                                    userMember.UserProfile = (from c in db.UserProfiles
-                                                              where c.ID == serializeableMember.UserID
-                                                              select c).FirstOrDefault();
-                                    userMember.UserProfileID = userMember.UserProfile.ID;
-                                    teamUser_db = userMember;
-                                }
-                                else
-                                {
-                                    TeamMember teamMember = new TeamMember();
-                                    teamMember.Team = (from c in db.Teams
-                                                       where c.ID == serializeableMember.TeamID
-                                                       select c).FirstOrDefault();
-                                    teamMember.TeamID = teamMember.Team.ID;
-
-                                    teamUser_db = teamMember;
-                                }
-                                team_db.Members.Add(teamUser_db);
-                            }
-
-                            TeamMember tm = new TeamMember();
-                            tm.Team = team_db;
-
-                            submission.TeamUsers.Add(tm);
-
-                            db.Teams.Add(team_db);
-                        }
-                    }
-                    db.SaveChanges();
-                }
-                else
-                {
-                    var users = from c in db.CoursesUsers
-                                where c.AbstractCourseID == activeCourse.AbstractCourseID
-                                && c.AbstractRole.CanSubmit
-                                select c.UserProfile;
-
-                    foreach (UserProfile user in users)
-                    {
-                        UserMember um = new UserMember();
-                        um.UserProfile = user;
-
-                        submission.TeamUsers.Add(um);
-                    }
-                    db.SaveChanges();
-                }
-
-                //send out Events
-                Event e = new Event();
-                e.Approved = true;
-                e.CourseID = activeCourse.AbstractCourse.ID;
-                e.HideDelete = true;
-                e.Title = submission.Name + " Due";
-                e.StartDate = stop.ReleaseDate;
-                e.StartTime = stop.ReleaseDate;
-                e.PosterID = currentUser.ID;
-                e.Description = "https://osble.org/Assignment?id=" + basic.Assignment.ID;
-                db.Events.Add(e);
-                db.SaveChanges();
-                return RedirectToAction("Index", "Assignment");
-            }
-
-            basic.TeamCreation = CreateTeamCreationSilverlightObject();
-            basic.RubricCreation = CreateRubricCreationSilverlightObject();
-            SetUpViewBag();
-            //ViewBag.Categories = new SelectList(db.Categories, "ID", "Name", basic.Assignment.CategoryID);
-            //ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
-
-            basic.SerializedTeamMembersJSON = basic.TeamCreation.Parameters["teamMembers"] = SerializeTeamMemers(GetTeamMembers());
-
-            return View(basic);
-        }
-
-        private CommentCategoryConfiguration BuildCommentCategories()
-        {
-            CommentCategoryConfiguration config = new CommentCategoryConfiguration();
-
-            //all keys that we care about start with "category_"
-            List<string> keys = (from key in Request.Form.AllKeys
-                                 where key.Contains("category_")
-                                 select key).ToList();
-
-            //we know this one for sure so no need to loop
-            config.Name = Request.Form["category_config_name"].ToString();
-
-            //but the rest are variable, so we need to loop
-            foreach (string key in keys)
-            {
-                //All category keys go something like "category_BLAH1_BLAH2_...".  Based on how
-                //many underscores the current key has, we can determine what data it is
-                //providing to us
-                string[] pieces = key.Split('_');
-
-                //length of 2 is a category name
-                if (pieces.Length == 2)
-                {
-                    int catId = 0;
-                    Int32.TryParse(pieces[1], out catId);
-
-                    //does the comment category already exist?
-                    CommentCategory category = GetOrCreateCategory(config, catId);
-                    category.Name = Request.Form[key].ToString();
-                }
-                //length of 4 is a category option
-                else if (pieces.Length == 4)
-                {
-                    int catId = 0;
-                    int order = 0;
-                    Int32.TryParse(pieces[2], out catId);
-                    Int32.TryParse(pieces[3], out order);
-                    CommentCategory category = GetOrCreateCategory(config, catId);
-                    CommentCategoryOption option = new CommentCategoryOption();
-                    option.Name = Request.Form[key].ToString();
-                    category.Options.Insert(order, option);
-                }
-            }
-
-            //when we're all done, zero out the category IDs to ensure that the items get
-            //added to the DB correctly
-            foreach (CommentCategory c in config.Categories)
-            {
-                c.ID = 0;
-            }
-
-            return config;
-        }
-
-        private CommentCategory GetOrCreateCategory(CommentCategoryConfiguration config, int categoryId)
-        {
-            //does the comment category already exist?
-            CommentCategory category = (from c in config.Categories
-                                        where c.ID == categoryId
-                                        select c).FirstOrDefault();
-            if (category == null)
-            {
-                category = new CommentCategory();
-                category.ID = categoryId;
-                config.Categories.Add(category);
-            }
-            return category;
         }
 
         protected override void Dispose(bool disposing)

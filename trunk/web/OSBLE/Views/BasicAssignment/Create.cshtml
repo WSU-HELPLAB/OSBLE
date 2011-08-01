@@ -171,10 +171,10 @@
         });
 
         //setup prior comment categories
-        @{if (Model.CommentCategoryConfiguration.Categories.Count > 0)
+        @{if (Model.Assignment.CommentCategoryConfiguration.Categories.Count > 0)
           {
               int counter = 0;
-              foreach (CommentCategory cat in Model.CommentCategoryConfiguration.Categories)
+              foreach (CommentCategory cat in Model.Assignment.CommentCategoryConfiguration.Categories)
               {
                   string js = string.Format("\n\taddNamedCategory(\"{0}\", \"{1}\");\n", cat.Name, cat.Options[0].Name);
                 @Html.Raw(js)
@@ -357,7 +357,9 @@
     @Html.HiddenFor(model => stop.ReleaseDate, new { @id = "DueDate" })
     @Html.HiddenFor(model => submission.Name, new { @id = "SubmissionName" })
     @Html.HiddenFor(model => stop.Name, new { @id = "StopName" })
-        
+    @Html.HiddenFor(model => model.Assignment.ID)
+    @Html.HiddenFor(model => model.Submission.ID)
+
     <!--Assignment Name-->
     <div class="editor-label">
         @Html.LabelFor(model => model.Assignment.Name)
@@ -543,7 +545,7 @@
           }
         <input type="radio" name="line_review_options" value="ManualConfig" @Html.Raw(CreateNewSelected) />Create new
         set of comment categories called
-        <input type="text" id="category_config_name" name="category_config_name" value="@Model.CommentCategoryConfiguration.Name" />
+        <input type="text" id="category_config_name" name="category_config_name" value="@Model.Assignment.CommentCategoryConfiguration.Name" />
         <br />
         <div id="manual_config_options" class="indented_options" style="display: none;">
             <p>
@@ -569,7 +571,7 @@
                 @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)
                 {
                     string selected = "";
-                    if (@ccc.ID == Model.CommentCategoryConfiguration.ID)
+                    if (@ccc.ID == Model.Assignment.CommentCategoryConfiguration.ID)
                     {
                         selected = "selected=\"selected\"";
                     }
