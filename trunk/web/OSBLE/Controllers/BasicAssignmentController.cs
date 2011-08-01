@@ -215,14 +215,30 @@ namespace OSBLE.Controllers
                     stop = new StopActivity();
                     basic.Assignment.AssignmentActivities.Add(stop);
                 }
-
                 stop.Name = basic.Stop.Name;
                 stop.ReleaseDate = basic.Stop.ReleaseDate;
 
-                basic.Submission.AbstractAssignment = basic.Assignment;
-                basic.Submission.AbstractAssignmentID = basic.Assignment.ID;
+                //I'm getting a DB reference error when trying to save submission activity
+                //changes.  As a quick hack, I decided to just pull the most recent copy
+                //from the DB, make the changes, then submit that copy back.
+                SubmissionActivity submission = (from sub in db.AbstractAssignmentActivities
+                                                 where sub.ID == basic.Submission.ID
+                                                 select sub).FirstOrDefault() as SubmissionActivity;
 
-                db.Entry(basic.Submission).State = System.Data.EntityState.Modified;
+                submission.addedPoints = basic.Submission.addedPoints;
+                submission.ColumnOrder = basic.Submission.ColumnOrder;
+                submission.HoursLatePerPercentPenalty = basic.Submission.HoursLatePerPercentPenalty;
+                submission.HoursLateUntilZero = basic.Submission.HoursLateUntilZero;
+                submission.InstructorCanReview = basic.Submission.InstructorCanReview;
+                submission.isTeam = basic.Submission.isTeam;
+                submission.MinutesLateWithNoPenalty = basic.Submission.MinutesLateWithNoPenalty;
+                submission.Name = basic.Submission.Name;
+                submission.PercentPenalty = basic.Submission.PercentPenalty;
+                submission.PointsPossible = basic.Submission.PointsPossible;
+                submission.ReleaseDate = basic.Submission.ReleaseDate;
+                submission.TeamUsers = basic.Submission.TeamUsers;
+
+                db.Entry(submission).State = System.Data.EntityState.Modified;
                 db.Entry(basic.Assignment).State = System.Data.EntityState.Modified;
                 db.Entry(stop).State = System.Data.EntityState.Modified;
                 db.SaveChanges();
@@ -235,7 +251,7 @@ namespace OSBLE.Controllers
             SetUpViewBag();
             basic.SerializedTeamMembersJSON = basic.TeamCreation.Parameters["teamMembers"] = SerializeTeamMemers(GetTeamMembers());
 
-            return View(basic);
+            return View("Create", basic);
         }
 
         private CommentCategory GetOrCreateCategory(CommentCategoryConfiguration config, int categoryId)

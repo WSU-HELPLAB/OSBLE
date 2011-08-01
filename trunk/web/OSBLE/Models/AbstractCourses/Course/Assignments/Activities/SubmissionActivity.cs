@@ -7,12 +7,16 @@ namespace OSBLE.Models.Assignments.Activities
         public SubmissionActivity()
             : base()
         {
+            
         }
 
         [Required]
         [Display(Name = "Enable inline comments")]
         public bool InstructorCanReview { get; set; }
 
-        //NEED RUBRIC
+        public SubmissionActivity ShallowCopy()
+        {
+            return this.MemberwiseClone() as SubmissionActivity;
+        }
     }
 }

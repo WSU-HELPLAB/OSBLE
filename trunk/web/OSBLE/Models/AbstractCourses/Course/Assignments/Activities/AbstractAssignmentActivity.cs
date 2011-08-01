@@ -80,5 +80,10 @@ namespace OSBLE.Models.Assignments.Activities
         [Required]
         [Display(Name = "Hours Late Until Zero")]
         public int HoursLateUntilZero { get; set; }
+
+        public AbstractAssignment ShallowCopy()
+        {
+            return this.MemberwiseClone() as AbstractAssignment;
+        }
     }
 }
