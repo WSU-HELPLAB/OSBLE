@@ -924,9 +924,9 @@
                 async: false,
                 type: "POST",
                 url: "/Gradebook/AllDropLowest",
-                data: { categoryId: newCatId[0], dropX: x, customize: ($("input[name='Customize_radio']:checked").val()).toString() },
-                success: window.location.reload(true)
+                data: { categoryId: newCatId[0], dropX: x, customize: ($("input[name='Customize_radio']:checked").val()).toString() }
             });
+            window.location.reload(true)
         }
         $("#customizeID").animate({ "height": "hide" }, { duration: 300 });
     }
@@ -1250,10 +1250,11 @@
 
     function newTab() {
         $.ajax({
+            async: false,
             type: "POST",
-            url: "/Gradebook/AddCategory",
-            success: window.location.reload(true)
+            url: "/Gradebook/AddCategory"
         });
+        window.location.reload(true)
     }
 
     function resetTableColors() {

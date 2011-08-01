@@ -264,7 +264,7 @@
             <td><a style="cursor:pointer">Move Column Left</a></td>
         </tr>
         <tr>
-            <td><a style="cursor:pointer" onclick="displayConfirmDeleteCategory();">Delete Category</a></td>
+            <td><a style="cursor:pointer" onclick="deleteCategory();">Delete Category</a></td>
         </tr>
         <tr>
 			<td id="changeColor" ><a id="changeColorId" style="cursor:pointer" onmouseover="displayColors();">Change Category Color</a></td>
@@ -1126,14 +1126,13 @@
     function deleteCategory() {
         var cell = $("#categoryHeaders").find("th:nth-child(" + currentHeader + ")");
         var catId = cell.attr("id");
-        catId = parseInt(catId);
         $.ajax({
             async: false,
             type: "POST",
             url: "/Gradebook/DeleteCategory",
-            data: { categoryId: catId }            
+            data: { categoryId: catId }
         });
-        window.location.reload(true)
+        window.location.reload(true);
         hideTabColors();
     }
 
@@ -1195,38 +1194,6 @@
                 location.href = "/Gradebook/Tab/?categoryId=" + catID;
             }
         });
-        hideTabColors();
-    }
-
-    function displayConfirmDeleteCategory() {
-        $("#confirmDeleteCategory").dialog({
-            modal: true,
-            resizable: false,
-            width: 310,
-            closeOnEscape: false
-        });
-    }
-
-    function hideConfirmDeleteCategory() {
-        $("#confirmDeleteCategory").dialog('close');
-    }
-
-    function showButton(column) {
-        currentHeaderCell = column;
-        var container = column.id;
-
-        $("#div-" + container).animate({ "height": "show" }, { duration: 0 });
-
-        if ($("#" + container).css("background-color") != "rgb(170, 170, 170)" && $("#div-" + container).css("background-color") != "rgb(170, 170, 170)") {
-
-            $("#" + container).css("background-color", "#FFFF84");
-            $("#div-" + container).css("background-color", "#FFFF84");
-        }
-    }
-
-    function hideOnlyButton(column) {
-        var container = column.id;
-        $("#div-" + container).animate({ "height": "hide" }, { duration: 0 });
     }
 
     function hideButton(column) {
@@ -1271,7 +1238,7 @@
             async: false,
             type: "POST",
             url: "/Gradebook/MoveCategoryRight",
-            data: { categoryId: id[1] }
+            data: { categoryId: id[1] } 
         });
         window.location.reload(true);
     }
