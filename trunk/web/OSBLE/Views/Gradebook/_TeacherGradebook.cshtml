@@ -264,7 +264,7 @@
             <td><a style="cursor:pointer">Move Column Left</a></td>
         </tr>
         <tr>
-            <td><a style="cursor:pointer" onclick="deleteCategory();">Delete Category</a></td>
+            <td><a style="cursor:pointer" onclick="displayConfirmDeleteCategory();">Delete Category</a></td>
         </tr>
         <tr>
 			<td id="changeColor" ><a id="changeColorId" style="cursor:pointer" onmouseover="displayColors();">Change Category Color</a></td>
@@ -1156,6 +1156,15 @@
         tabShowing = true;
     }
 
+    function displayConfirmDeleteCategory() {
+        $("#confirmDeleteCategory").dialog({
+            modal: true,
+            resizable: false,
+            width: 310,
+            closeOnEscape: false
+        });
+    }
+
     function displayLetterGrades() {
         $("#letterGradesID").animate({ "height": "show" }, { duration: 300 });
         isShowing = true;
@@ -1194,6 +1203,7 @@
                 location.href = "/Gradebook/Tab/?categoryId=" + catID;
             }
         });
+        hideTabColors();
     }
 
     function hideButton(column) {
@@ -1205,6 +1215,10 @@
             $("#div-" + container).css("background-color", "#DCDCDC");
             $('#' + container).css("background-color", "#DCDCDC");
         }
+    }
+
+    function hideConfirmDeleteCategory() {
+        $("#confirmDeleteCategory").dialog('close');
     }
 
     function hideDisplayColors() {
