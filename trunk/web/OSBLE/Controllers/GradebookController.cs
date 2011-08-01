@@ -1170,26 +1170,27 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
-        public ActionResult DeleteCategory(int categoryId)
+        public void DeleteCategory(int categoryId)
         {
-            List<AbstractAssignmentActivity> assignmentList = (from assignments in db.AbstractAssignmentActivities
-                                                               where assignments.AbstractAssignment.CategoryID == categoryId
-                                                               select assignments).ToList();
-            for (int i = 0; i < assignmentList.Count(); i++)
+            if (ModelState.IsValid)
             {
-                List<TeamUserMember> teamMember = (from a in assignmentList.ElementAt(i).TeamUsers select a).ToList();
-                foreach (UserMember item in teamMember)
+                List<AbstractAssignmentActivity> assignmentList = (from assignments in db.AbstractAssignmentActivities
+                                                                   where assignments.AbstractAssignment.CategoryID == categoryId
+                                                                   select assignments).ToList();
+                for (int i = 0; i < assignmentList.Count(); i++)
                 {
-                    db.TeamUsers.Remove(item);
+                    List<TeamUserMember> teamMember = (from a in assignmentList.ElementAt(i).TeamUsers select a).ToList();
+                    foreach (UserMember item in teamMember)
+                    {
+                        db.TeamUsers.Remove(item);
+                    }
+                    db.SaveChanges();
                 }
+
+                Category category = db.Categories.Find(categoryId);
+                db.Categories.Remove(category);
                 db.SaveChanges();
             }
-
-            Category category = db.Categories.Find(categoryId);
-            db.Categories.Remove(category);
-            db.SaveChanges();
-
-            return View();
         }
 
         [HttpPost]
@@ -1447,6 +1448,7 @@ namespace OSBLE.Controllers
             //Continue if we have a valid gradable ID
             if (assignmentId != 0)
             {
+                double latePenalty = 0.0;
                 //Get student
                 var user = (from u in db.UserProfiles where u.Identification == userId select u).FirstOrDefault();
 
@@ -1470,7 +1472,13 @@ namespace OSBLE.Controllers
                     if (grades != null)
                     {
                         TimeSpan? lateness = calculateLateness(currentAssignment.AbstractAssignment.Category.Course, currentAssignment, teamuser.First());
-                        CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
+                        if (lateness != null)
+                        {
+                            latePenalty = CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
+                            latePenalty = (100 - latePenalty) / 100;
+                        }
+
+                        value = value * latePenalty;
 
                         if (grades.Points == value)
                         {
@@ -1479,16 +1487,22 @@ namespace OSBLE.Controllers
                         {
                             grades.Points = value;
                             grades.AddedPoints = 0;
+                            grades.LatePenaltyPercent = latePenalty;
                             db.SaveChanges();
                         }
-                        
                     }
                     else
                     {
                         if (teamuser.Count() > 0)
                         {
                             TimeSpan? lateness = calculateLateness(currentAssignment.AbstractAssignment.Category.Course, currentAssignment, teamuser.First());
-                            CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
+                            if (lateness != null)
+                            {
+                                latePenalty = CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
+                                latePenalty = (100 - latePenalty) / 100;
+                            }
+
+                            value = value * latePenalty;
 
                             Score newScore = new Score()
                             {
@@ -1496,7 +1510,8 @@ namespace OSBLE.Controllers
                                 Points = value,
                                 AssignmentActivityID = currentAssignment.ID,
                                 PublishedDate = DateTime.Now,
-                                isDropped = false
+                                isDropped = false,
+                                LatePenaltyPercent = latePenalty
                             };
 
                             db.Scores.Add(newScore);

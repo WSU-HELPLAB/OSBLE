@@ -378,10 +378,10 @@ namespace OSBLE.Controllers
         protected double CalcualateLatePenaltyPercent(AbstractAssignmentActivity activity, TimeSpan lateness)
         {
             //Purposefully lose of data being nice
-            if (activity.MinutesLateWithNoPenalty < (int)lateness.TotalMinutes)
+            if (activity.MinutesLateWithNoPenalty > (int)lateness.TotalMinutes)
             {
                 //Purposefully lose of data as this doesn't come into effect until you have past it
-                if (activity.HoursLateUntilZero > (int)(lateness.TotalHours))
+                if (activity.HoursLateUntilZero < (int)(lateness.TotalHours))
                 {
                     //100 percent of points deducted for being late.... ouch :p
                     return 100.00;
