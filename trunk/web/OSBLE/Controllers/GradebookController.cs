@@ -946,7 +946,7 @@ namespace OSBLE.Controllers
         public void ClearColumn(int assignmentId)
         {
             var assignmentQuery = from s in db.Scores
-                                  where s.AssignmentActivity.AbstractAssignmentID == assignmentId
+                                  where s.AssignmentActivityID == assignmentId
                                   select s;
 
             if (assignmentQuery.Count() > 0)
@@ -955,7 +955,6 @@ namespace OSBLE.Controllers
                 {
                     item.Points = -1;
                     item.AssignmentActivity.PointsPossible = 0;
-                    item.AssignmentActivity.AbstractAssignment.PointsPossible = 0;
                 }
                 db.SaveChanges();
             }
@@ -1466,9 +1465,13 @@ namespace OSBLE.Controllers
                                           select a;
 
                     var currentAssignment = assignmentQuery.FirstOrDefault();
+                    var teamuser = from c in currentAssignment.TeamUsers where c.Contains(user) select c;
 
                     if (grades != null)
                     {
+                        TimeSpan? lateness = calculateLateness(currentAssignment.AbstractAssignment.Category.Course, currentAssignment, teamuser.First());
+                        CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
+
                         if (grades.Points == value)
                         {
                         }
@@ -1482,12 +1485,10 @@ namespace OSBLE.Controllers
                     }
                     else
                     {
-                        var teamuser = from c in currentAssignment.TeamUsers where c.Contains(user) select c;
-
                         if (teamuser.Count() > 0)
                         {
-                            //TimeSpan? lateness = calculateLateness(currentAssignment.AbstractAssignment.Category.Course, currentAssignment, teamuser.First());
-                            //CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
+                            TimeSpan? lateness = calculateLateness(currentAssignment.AbstractAssignment.Category.Course, currentAssignment, teamuser.First());
+                            CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
 
                             Score newScore = new Score()
                             {

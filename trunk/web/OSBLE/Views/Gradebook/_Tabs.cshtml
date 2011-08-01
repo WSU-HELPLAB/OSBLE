@@ -4,6 +4,17 @@
     Layout = null;
 }
 
+<style type="text/css">
+    .menu
+    {
+        width: auto;
+        height: auto;
+        background-color: white;
+        top: 33px;
+        left: 400px;
+    }
+</style>
+
 <div id="tabHeader">
     <ul>
         <li id="selected" class="main"><a href="/Gradebook/Index">Main</a></li>
@@ -20,11 +31,19 @@
                 var displayWeight = (item.Points / totalPoints) * 100;
                 if (item.Points == 0 && item.Name != Constants.UnGradableCatagory )
                 {
-                    <li class="@item.ID" style="background:@item.TabColor;"><a href="/Gradebook/Tab/?categoryId=@item.ID" style="text-decoration:none;">@item.Name (0%)</a></li>
+                    <li class="@item.ID" style="background:@item.TabColor;" onmouseover="displayTabButton(@item.ID);" onmouseout="hideTabButton(@item.ID);"><a href="/Gradebook/Tab/?categoryId=@item.ID" style="text-decoration:none; float:left;">@item.Name (0%)</a>
+                    <div id="tab-@item.ID" style="display: none; float:right;">
+                        <img id="imgDown-@item.ID" src="/Content/images/arrow_down.png" onclick="displayCustomizeCategoryDisplay(event, @item.ID);" style="float:right; cursor:pointer; padding-top:6px; padding-right:3px;"/>
+                    </div>
+                    </li>
                 }
                 else if (item.Name != Constants.UnGradableCatagory)
                 {
-                    <li class="@item.ID" style="background:@item.TabColor;"><a href="/Gradebook/Tab/?categoryId=@item.ID" style="text-decoration:none;">@item.Name (@displayWeight.ToString(".##")%)</a></li>
+                    <li class="@item.ID" style="background:@item.TabColor;" onmouseover="displayTabButton(@item.ID);" onmouseout="hideTabButton(@item.ID);"><a href="/Gradebook/Tab/?categoryId=@item.ID" style="text-decoration:none; float:left;">@item.Name (@displayWeight.ToString(".##")%)</a>
+                    <div id="tab-@item.ID" style="display: none; float:right;">
+                        <img id="imgDown-@item.ID" src="/Content/images/arrow_down.png" onclick="displayCustomizeCategoryDisplay(event, @item.ID);" style="float:right; cursor:pointer; padding-top:6px; padding-right:3px;"/>
+                    </div>
+                    </li>
                 }
                 else
                 {
@@ -41,6 +60,36 @@
     </ul>
 </div> 
 
+<div class="menu" id="customizeCateogryTable" style="display:none; position:absolute; text-decoration:none;">
+    <table>
+        <tr>
+            <th>
+                Customize Category
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <a href="#">Move Category Left</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="#">Move Category Right</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="#">Edit Category Name</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="#">Edit Category Color</a>
+            </td>
+        </tr>
+    </table>
+</div>
+
 <script type="text/javascript">
 
     $(document).ready(function () {
@@ -54,5 +103,30 @@
             $("." + id[1]).css("background", "white");
         }
     });
+
+    $(document).click(function () {
+        $("#customizeCateogryTable").animate({ "height": "hide" }, { duration: 0 });
+    });
+
+    function displayTabButton(id) {
+        $("#tab-" + id).animate({ "height": "show" }, { duration: 0 });
+    }
+
+    function hideTabButton(id) {
+        $("#tab-" + id).animate({ "height": "hide" }, { duration: 0 });
+    }
+
+    function displayCustomizeCategoryDisplay(evt, id) {
+        evt.cancelBubble = true;
+
+        var y = $("#tab-" + id).position().top;
+        var x = $("#tab-" + id).position().left;
+        y += 9;
+
+        $("#customizeCateogryTable").css("left", x + "px");
+        $("#customizeCateogryTable").css("top", y + "px");
+
+        $("#customizeCateogryTable").animate({ "height": "show" }, { duration: 0 });
+    }
     
 </script>
