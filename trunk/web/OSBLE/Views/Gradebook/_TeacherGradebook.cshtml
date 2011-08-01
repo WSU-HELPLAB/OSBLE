@@ -1125,6 +1125,7 @@
     function deleteCategory() {
         var cell = $("#categoryHeaders").find("th:nth-child(" + currentHeader + ")");
         var catId = cell.attr("id");
+        alert(catId);
         $.ajax({
             type: "POST",
             url: "/Gradebook/DeleteCategory",
