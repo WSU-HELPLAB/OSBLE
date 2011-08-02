@@ -11,7 +11,7 @@ namespace OSBLE.Models.Courses
         //should be 2 character array
         [Required]
         [Display(Name = "Letter Grade")]
-        [StringLength(2)]
+        [StringLength(3)]
         public string Grade { get; set; }
 
         [Required]

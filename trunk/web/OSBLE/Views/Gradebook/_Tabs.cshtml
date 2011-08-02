@@ -180,9 +180,10 @@
         var id = pathname.split("=");
 
         if (id[1] != null) {
+            id = id[1].split("#");
             $("#selected").removeAttr("id");
-            $("." + id[1]).attr("id", "selected");
-            $("." + id[1]).css("background", "white");
+            $("." + id[0]).attr("id", "selected");
+            $("." + id[0]).css("background", "white");
         }
     });
 
@@ -363,9 +364,6 @@
             oldName = null;
         }
     }
-
- 
-
 
     function deleteCurrentCategory() {
         $.ajax({

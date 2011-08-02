@@ -208,7 +208,7 @@
                             <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { abstractAssignmentActivityId = gradableQuery.First().AssignmentActivityID, teamUserID = gradableQuery.First().TeamUserMemberID }, new { @class = "rubric", @style = "color:Red;" })</td>
                         }
                         else
-                        {
+                        {                            
                             <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { abstractAssignmentActivityId = gradableQuery.First().AssignmentActivityID, teamUserID = gradableQuery.First().TeamUserMemberID }, new { @class = "rubric" })</td>
                         }
                     }

@@ -224,6 +224,9 @@ function create_and_open_downloading_submission_dialog() {
             <input type="submit" name="@draftButton" value="Save as Draft" />
         }
         <input type="submit" name="@publishButton" value="Publish to Student" />
+        <br />
+        <br />
+        @Html.ActionLink("Return to Gradebook", "Tab", "Gradebook", new { categoryId = @Model.SelectedAssignmentActivity.AbstractAssignment.CategoryID }, new { });
         <input type="hidden" name="@ViewBag.AbstractAssignmentActivityId" value="@Model.SelectedAssignmentActivity.ID" />
         <input type="hidden" name="@ViewBag.TeamUserId" value="@Model.SelectedTeam.ID" />
     }

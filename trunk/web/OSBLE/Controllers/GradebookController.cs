@@ -13,6 +13,7 @@ using System.IO;
 using System.Web;
 using OSBLE.Utility;
 using OSBLE.Models.Courses.Rubrics;
+using OSBLE.Models.ViewModels;
 
 namespace OSBLE.Controllers
 {
@@ -212,7 +213,8 @@ namespace OSBLE.Controllers
                                                     Points = Convert.ToDouble(assignment),
                                                     AssignmentActivityID = currentAssignment.ID,
                                                     PublishedDate = DateTime.Now,
-                                                    isDropped = false
+                                                    isDropped = false,
+                                                    StudentPoints = -1
                                                 };
                                                 db.Scores.Add(newScore);
                                                 db.SaveChanges();
@@ -993,18 +995,16 @@ namespace OSBLE.Controllers
             {
                 if (categoryId != 0)
                 {
-                    var category = from c in db.Categories
-                                   where c.ID == categoryId
-                                   select c;
+                    Category category = (from c in db.Categories
+                                         where c.ID == categoryId
+                                         select c).FirstOrDefault();
 
-                    if (category.Count() > 0)
+                    if (category != null)
                     {
-                        foreach (Category item in category)
-                        {
-                            item.Points = value;
-                        }
+                        category.Points = value;
                         db.SaveChanges();
                     }
+
                 }
             }
             TeacherIndex();
@@ -1487,6 +1487,7 @@ namespace OSBLE.Controllers
                             grades.Points = value;
                             grades.AddedPoints = 0;
                             grades.LatePenaltyPercent = latePenalty;
+                            grades.StudentPoints = -1;
                             db.SaveChanges();
                         }
                     }
@@ -1509,7 +1510,8 @@ namespace OSBLE.Controllers
                                 AssignmentActivityID = currentAssignment.ID,
                                 PublishedDate = DateTime.Now,
                                 isDropped = false,
-                                LatePenaltyPercent = latePenalty
+                                LatePenaltyPercent = latePenalty,
+                                StudentPoints = -1
                             };
 
                             db.Scores.Add(newScore);
@@ -1816,7 +1818,7 @@ namespace OSBLE.Controllers
                                                 select categoryTotal).ToList();
 
             List<Score> userCategoryTotalPercent = (from userCategoryTotal in categoryTotalPercent
-                                                    where userCategoryTotal.TeamUserMember.Contains(CurrentUser)
+                                                    where userCategoryTotal.TeamUserMember.Contains(CurrentUser) 
                                                     select userCategoryTotal).ToList();
 
             List<Category> categoriesWithWeightsAndScores = (from cats in categoryTotalPercent
@@ -2103,8 +2105,7 @@ namespace OSBLE.Controllers
                     }
                 }
             }
-
-
+            
             //save everything that we need to the viewebag
             ViewBag.Categories = allCategories;
             ViewBag.Grades = scor;

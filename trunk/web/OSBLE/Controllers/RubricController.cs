@@ -259,6 +259,7 @@ namespace OSBLE.Controllers
                     {
                         grade.Points = studentScore;
                         grade.LatePenaltyPercent = latePenalty;
+                        grade.StudentPoints = -1;
                         db.SaveChanges();
                     }
                     else
