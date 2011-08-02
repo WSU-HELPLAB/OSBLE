@@ -16,6 +16,9 @@ using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
 using OSBLE.Utility;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
+using OSBLE.Models.Assignments;
 
 //AC: Please try to keep method names in alphabetical order
 namespace OSBLE.Controllers
@@ -221,28 +224,51 @@ namespace OSBLE.Controllers
                 //I'm getting a DB reference error when trying to save submission activity
                 //changes.  As a quick hack, I decided to just pull the most recent copy
                 //from the DB, make the changes, then submit that copy back.
-                SubmissionActivity submission = (from sub in db.AbstractAssignmentActivities
-                                                 where sub.ID == basic.Submission.ID
-                                                 select sub).FirstOrDefault() as SubmissionActivity;
-
-                submission.addedPoints = basic.Submission.addedPoints;
-                submission.ColumnOrder = basic.Submission.ColumnOrder;
-                submission.HoursLatePerPercentPenalty = basic.Submission.HoursLatePerPercentPenalty;
-                submission.HoursLateUntilZero = basic.Submission.HoursLateUntilZero;
-                submission.InstructorCanReview = basic.Submission.InstructorCanReview;
-                submission.isTeam = basic.Submission.isTeam;
-                submission.MinutesLateWithNoPenalty = basic.Submission.MinutesLateWithNoPenalty;
-                submission.Name = basic.Submission.Name;
-                submission.PercentPenalty = basic.Submission.PercentPenalty;
-                submission.PointsPossible = basic.Submission.PointsPossible;
-                submission.ReleaseDate = basic.Submission.ReleaseDate;
-                submission.TeamUsers = basic.Submission.TeamUsers;
-
-                db.Entry(submission).State = System.Data.EntityState.Modified;
-                db.Entry(basic.Assignment).State = System.Data.EntityState.Modified;
-                db.Entry(stop).State = System.Data.EntityState.Modified;
-                db.SaveChanges();
-
+                BasicAssignmentViewModel fakeVm = SetUpViewModel(basic.Assignment.ID);
+                StudioAssignment assignment = (from a in db.StudioAssignments
+                                               where a.ID == basic.Assignment.ID
+                                               select a).FirstOrDefault();
+                /*
+                fakeVm.Submission.addedPoints = basic.Submission.addedPoints;
+                fakeVm.Submission.ColumnOrder = basic.Submission.ColumnOrder;
+                fakeVm.Submission.HoursLatePerPercentPenalty = basic.Submission.HoursLatePerPercentPenalty;
+                fakeVm.Submission.HoursLateUntilZero = basic.Submission.HoursLateUntilZero;
+                fakeVm.Submission.InstructorCanReview = basic.Submission.InstructorCanReview;
+                fakeVm.Submission.isTeam = basic.Submission.isTeam;
+                fakeVm.Submission.MinutesLateWithNoPenalty = basic.Submission.MinutesLateWithNoPenalty;
+                fakeVm.Submission.Name = basic.Submission.Name;
+                fakeVm.Submission.PercentPenalty = basic.Submission.PercentPenalty;
+                fakeVm.Submission.PointsPossible = basic.Submission.PointsPossible;
+                fakeVm.Submission.ReleaseDate = basic.Submission.ReleaseDate;
+                fakeVm.Submission.TeamUsers = basic.Submission.TeamUsers;
+                
+                //Do the same thing for basic.Assignment as I did for submissions
+                fakeVm.Assignment.CategoryID = basic.Assignment.CategoryID;
+                fakeVm.Assignment.CommentCategoryConfigurationID = basic.Assignment.CommentCategoryConfigurationID;
+                fakeVm.Assignment.Deliverables = basic.Assignment.Deliverables;
+                fakeVm.Assignment.Description = basic.Assignment.Description;
+                fakeVm.Assignment.IsDraft = basic.Assignment.IsDraft;
+                //fakeVm.Assignment.Name = basic.Assignment.Name;
+                fakeVm.Assignment.PointsPossible = basic.Assignment.PointsPossible;
+                fakeVm.Assignment.RubricID = basic.Assignment.RubricID;
+                */
+                try
+                {
+                    //db.Entry(fakeVm.Submission).State = System.Data.EntityState.Modified;
+                    db.Entry(assignment).State = System.Data.EntityState.Modified;
+                    //db.Entry(stop).State = System.Data.EntityState.Modified;
+                    db.SaveChanges();
+                }
+                catch (DbEntityValidationException dbEx)
+                {
+                    foreach (var validationErrors in dbEx.EntityValidationErrors)
+                    {
+                        foreach (var validationError in validationErrors.ValidationErrors)
+                        {
+                            Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
+                        }
+                    }
+                }
                 return RedirectToAction("Index", "Assignment");
             }
 
@@ -658,8 +684,11 @@ namespace OSBLE.Controllers
             viewModel.TeamCreation = CreateTeamCreationSilverlightObject();
             viewModel.RubricCreation = CreateRubricCreationSilverlightObject();
 
-            //comment categories are null by default.  This doesn't work for us
-            viewModel.Assignment.CommentCategoryConfiguration = new CommentCategoryConfiguration();
+            //Check for null comment categories.  
+            if (viewModel.Assignment.CommentCategoryConfiguration == null)
+            {
+                viewModel.Assignment.CommentCategoryConfiguration = new CommentCategoryConfiguration();
+            }
 
             //was a rubric specified?
             if (viewModel.Assignment.RubricID != 0 && viewModel.Assignment.Rubric != null)
