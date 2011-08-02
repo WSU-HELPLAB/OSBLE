@@ -225,10 +225,8 @@ namespace OSBLE.Controllers
                 //changes.  As a quick hack, I decided to just pull the most recent copy
                 //from the DB, make the changes, then submit that copy back.
                 BasicAssignmentViewModel fakeVm = SetUpViewModel(basic.Assignment.ID);
-                StudioAssignment assignment = (from a in db.StudioAssignments
-                                               where a.ID == basic.Assignment.ID
-                                               select a).FirstOrDefault();
-                /*
+
+
                 fakeVm.Submission.addedPoints = basic.Submission.addedPoints;
                 fakeVm.Submission.ColumnOrder = basic.Submission.ColumnOrder;
                 fakeVm.Submission.HoursLatePerPercentPenalty = basic.Submission.HoursLatePerPercentPenalty;
@@ -248,15 +246,18 @@ namespace OSBLE.Controllers
                 fakeVm.Assignment.Deliverables = basic.Assignment.Deliverables;
                 fakeVm.Assignment.Description = basic.Assignment.Description;
                 fakeVm.Assignment.IsDraft = basic.Assignment.IsDraft;
-                //fakeVm.Assignment.Name = basic.Assignment.Name;
+                fakeVm.Assignment.Name = basic.Assignment.Name;
                 fakeVm.Assignment.PointsPossible = basic.Assignment.PointsPossible;
                 fakeVm.Assignment.RubricID = basic.Assignment.RubricID;
-                */
+                if (fakeVm.Assignment.CommentCategoryConfiguration != null && fakeVm.Assignment.CommentCategoryConfiguration.ID == 0)
+                {
+                    fakeVm.Assignment.CommentCategoryConfiguration = null;
+                }
                 try
                 {
-                    //db.Entry(fakeVm.Submission).State = System.Data.EntityState.Modified;
-                    db.Entry(assignment).State = System.Data.EntityState.Modified;
-                    //db.Entry(stop).State = System.Data.EntityState.Modified;
+                    db.Entry(fakeVm.Submission).State = System.Data.EntityState.Modified;
+                    db.Entry(fakeVm.Assignment).State = System.Data.EntityState.Modified;
+                    db.Entry(stop).State = System.Data.EntityState.Modified;
                     db.SaveChanges();
                 }
                 catch (DbEntityValidationException dbEx)
@@ -369,28 +370,7 @@ namespace OSBLE.Controllers
                 SerializableTeamMember serializedMember = new SerializableTeamMember();
                 serializedMember.Name = member.Name;
 
-                if (member is UserMember)
-                {
-                    UserMember uMember = member as UserMember;
-
-                    CoursesUsers cu = (from c in db.CoursesUsers
-                                       where
-                                          c.AbstractCourseID == activeCourse.AbstractCourseID
-                                          &&
-                                          c.UserProfileID == uMember.UserProfileID
-                                       select c).FirstOrDefault();
-
-                    if (cu == null)
-                    {
-                        continue;
-                    }
-                    serializedMember.UserID = uMember.UserProfileID;
-                    serializedMember.isUser = true;
-                    serializedMember.IsModerator = cu.AbstractRole.ID == (int)CourseRole.CourseRoles.Moderator;
-                    serializedMember.Section = cu.Section;
-                    teamMembmers.Add(serializedMember);
-                }
-                else if (member is TeamMember)
+                if (member is TeamMember)
                 {
                     TeamMember tMember = member as TeamMember;
                     foreach (TeamUserMember tum in tMember.Team.Members)
