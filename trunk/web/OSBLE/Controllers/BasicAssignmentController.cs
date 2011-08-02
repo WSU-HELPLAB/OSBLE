@@ -101,15 +101,15 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult Create(BasicAssignmentViewModel basic)
         {
+            //inject any lingering form data into our VM
+            PopulateModelWithFormData(basic);
+
             //The validation method call should trigger an invalid model state if something
             //isn't right.
             ValidateSubmission(basic);
 
             if (ModelState.IsValid)
             {
-                //inject any lingering form data into our VM
-                PopulateModelWithFormData(basic);
-
                 int currentCategoryId = basic.Assignment.CategoryID;
 
                 //Get the next column order
@@ -197,6 +197,8 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult Edit(BasicAssignmentViewModel basic)
         {
+            //inject any lingering form data into our VM
+            PopulateModelWithFormData(basic);
 
             //The validation method call should trigger an invalid model state if something
             //isn't right.
@@ -204,9 +206,6 @@ namespace OSBLE.Controllers
 
             if (ModelState.IsValid)
             {
-                //inject any lingering form data into our VM
-                PopulateModelWithFormData(basic);
-
                 //SubmissionActivity submission = new SubmissionActivity();
                 StopActivity stop = (from activity in db.AbstractAssignmentActivities
                                      where activity is StopActivity
@@ -476,14 +475,6 @@ namespace OSBLE.Controllers
                                                                          where ccc.ID == viewModel.Assignment.CommentCategoryConfigurationID
                                                                          select ccc).FirstOrDefault();
                 }
-            }
-            else
-            {
-                //In our SetUpView method, we create a new instance of a CommentCategoryConfiguration.
-                //However, if we end up not needing comment categories and we try to submit DB changes
-                //having an empty CommentCategoryConfiguration throws an error.  As such, we need
-                //to reset it back to null prior to saving.
-                viewModel.Assignment.CommentCategoryConfiguration = null;
             }
 
             if (viewModel.Submission.isTeam)

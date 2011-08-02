@@ -5,6 +5,10 @@
 @using OSBLE.Models
 @{
     ViewBag.Title = "Create Basic Assignment";
+    if(Model.Assignment.CommentCategoryConfiguration == null)
+    {
+        Model.Assignment.CommentCategoryConfiguration = new CommentCategoryConfiguration();
+    }
 }
 <h2>
     Create Basic Assignment @Helpers.CreateToolTip(ToolTips.BasicAssignmentTitle)
