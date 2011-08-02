@@ -29,7 +29,7 @@
                         //instructor
                         <li class="@item.ID" style="background:@item.TabColor;" onmouseover="displayTabButton(@item.ID);" onmouseout="hideTabButton(@item.ID);"><a href="/Gradebook/Tab/?categoryId=@item.ID" id="catName-@item.ID" style="text-decoration:none; float:left;">@item.Name (0%)</a>
                         <div id="tab-@item.ID" style="display: none; float:right;">
-                            <img id="imgDown-@item.ID" src="/Content/images/arrow_down.png" onclick="displayCustomizeCategoryDisplay(event, @item.ID, 0)" style="float:right; cursor:pointer; padding-top:6px; padding-right:3px;"/>
+                            <img id="imgDown-@item.ID" src="/Content/images/arrow_down.png" onclick="displayCustomizeCategoryDisplay(event, @item.ID, 0, @item.Points)" style="float:right; cursor:pointer; padding-top:6px; padding-right:3px;"/>
                         </div>
                         </li>
                     }
@@ -47,7 +47,7 @@
                         //instructor
                         <li class="@item.ID" style="background:@item.TabColor;" onmouseover="displayTabButton(@item.ID);" onmouseout="hideTabButton(@item.ID);"><a href="/Gradebook/Tab/?categoryId=@item.ID" id="catName-@item.ID" style="text-decoration:none; float:left;">@item.Name (@displayWeight.ToString(".##")%)</a>
                         <div id="tab-@item.ID" style="display: none; float:right;">
-                            <img id="imgDown-@item.ID" src="/Content/images/arrow_down.png" onclick="displayCustomizeCategoryDisplay(event, @item.ID, @displayWeight.ToString(".##"))" style="float:right; cursor:pointer; padding-top:6px; padding-right:3px;"/>
+                            <img id="imgDown-@item.ID" src="/Content/images/arrow_down.png" onclick="displayCustomizeCategoryDisplay(event, @item.ID, @displayWeight.ToString(".##"), @item.Points)" style="float:right; cursor:pointer; padding-top:6px; padding-right:3px;"/>
                         </div>
                         </li>
                     }
@@ -103,6 +103,11 @@
                 <a onclick="displayConfirmWindow()">Delete Category</a>
             </td>
         </tr>
+        <tr>
+            <td>
+                <a onclick="displayWeightEditor()">Edit Category Weight</a>
+            </td>
+        </tr>
     </table>
 </div>
 
@@ -112,6 +117,18 @@
         <input value="Yes" type="button" onclick="deleteCurrentCategory()" />
         <input value="No" type="button" onclick="hideConfirmWindow()" />
     </div>
+</div>
+
+<div id="weightEditor" style="display:none;" title="Change Category Weight">
+    <form id="weightEditorForm" onsubmit="modifyWeight(); return false;">
+        <text>Enter the new weight: </text>
+        <input style="width:80px;" type="text" id="weightEditorTextBox"/>
+        <div class="yesAndNoDiv">
+            <input value="Apply" type="submit"/>
+            <input value="Cancel" type="button" onclick="hideWeightEditor()" />
+        </div>
+        <text id="weightEditorErrorText" style="color:Red"></text>
+    </form>
 </div>
 
 <div class="displayColors" id="displayColorsIDMenu" style="display: none; position: absolute;" onmouseover="displayColors2();" onmouseout="hideTabColors2();">
@@ -153,8 +170,9 @@
 <script type="text/javascript">
 
     var ID = null; //last clicked tab's ID
-    var categoryPercent = null; 
+    var categoryPercent = null;
     var oldName = null;
+    var currentCategoryWeight = null;
 
     $(document).ready(function () {
 
@@ -167,6 +185,8 @@
             $("." + id[1]).css("background", "white");
         }
     });
+
+
 
     $(document).click(function () {
         $("#customizeCateogryTable").animate({ "height": "hide" }, { duration: 0 });
@@ -182,7 +202,67 @@
         }
     });
 
+    function displayWeightEditor() {
 
+        $("#weightEditorTextBox").val(currentCategoryWeight);
+        $("#weightEditor").dialog({
+            modal: true,
+            resizable: false,
+            width: 310,
+            height: 135,
+            closeOnEscape: false
+        });
+        $("#weightEditorTextBox").focus();
+        $("#weightEditorTextBox").select();
+    }
+
+    function hideWeightEditor() {
+        $("#weightEditor").dialog('close');
+    }
+
+    function modifyWeight() {
+        var weight = $("#weightEditorTextBox").val();
+        if (isNaN(weight)){
+            var errorMsg = "Error: Please enter a valid weight value";
+            $("#weightEditorErrorText").text(errorMsg);
+        }
+        else {
+            $("#weightEditorErrorText").text("");
+            $.ajax({
+                type: "POST",
+                url: "/Gradebook/ModifyCategoryPoints",
+                data: { value: weight, categoryId: ID }
+            });
+            hideWeightEditor();
+            window.location.reload(true);
+        }
+    }
+
+    function displayCustomizeCategoryDisplay(evt, id, percent, weight) {
+        ID = id;
+        categoryPercent = percent;
+        currentCategoryWeight = weight;
+        evt.cancelBubble = true;
+
+        var selectedID = $("#selected").attr("class");
+
+        if (selectedID == id) {
+            //choosing location for customizeCateogryTable for selected tabs
+            var y = $("#selected").position().top;
+            var x = $("#selected").position().left;
+            y += $("#selected").height() - 9;
+            x += $("#selected").width() - 15;
+        }
+        else {
+            //choosing location for customizeCateogryTable for non-selected tabs 
+            var y = $("#tab-" + id).position().top;
+            var x = $("#tab-" + id).position().left;
+            y += 9;
+        }
+        $("#customizeCateogryTable").css("left", x + "px");
+        $("#customizeCateogryTable").css("top", y + "px");
+        $("#customizeCateogryTable").animate({ "height": "show" }, { duration: 0 });
+    }
 
     function hideTabColors2() {
         //$("#selectMenuID").animate({ "height": "hide" }, { duration: 0 });
@@ -239,22 +319,6 @@
     function hideTabButton(id) {
         $("#tab-" + id).animate({ "height": "hide" }, { duration: 0 });
     }
-
-    function displayCustomizeCategoryDisplay(evt, id, percent) {
-        ID = id;
-        categoryPercent = percent;
-        evt.cancelBubble = true;
-
-        var y = $("#tab-" + id).position().top;
-        var x = $("#tab-" + id).position().left;
-        y += 9;
-
-        $("#customizeCateogryTable").css("left", x + "px");
-        $("#customizeCateogryTable").css("top", y + "px");
-
-        $("#customizeCateogryTable").animate({ "height": "show" }, { duration: 0 });
-    }
-
     function moveCategoryLeft(catID) {
         $.ajax({
             async: false,
@@ -280,6 +344,7 @@
         $("#customizeCateogryTable").animate({ "height": "hide" }, { duration: 0 });
         evt.cancelBubble = true;
         oldName = $("#catName-" + ID).html();
+
         var htmlInput = $('<input type="text" value="'+oldName.toString()+'" />');
         $("#catName-" + ID).html(htmlInput);
         htmlInput.focus();

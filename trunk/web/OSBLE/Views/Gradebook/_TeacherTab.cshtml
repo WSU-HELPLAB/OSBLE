@@ -194,7 +194,10 @@
               data-ajax-mode="REPLACE" data-ajax-update="#grades">
         <input id="actionRequested" name="actionRequested" type="hidden" value="null" />
         <input id="assignmentId" name="assignmentId" type="hidden" value="null" />
-        <table class="menu" id="menuID" onclick="setButtonId(this);">
+        <table class="selectMenuTable" id="menuID" title="Assignment Options" onclick="setButtonId(this);">
+        	<tr>
+		        <th align="center">Assignment Options</th>
+		    </tr>
             <tr>
                 <td>
                     <a href="#" onclick="setGradableAction('@GradebookController.ColumnAction.InsertLeft.ToString()'); $('#columnOptionsForm').submit();">
