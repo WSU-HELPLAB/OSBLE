@@ -664,10 +664,13 @@
                 $('#save_draft').click(function () {
                     alert('This assignment will be saved as a draft and will not be released even if the release date passes');
                     $('#is_draft').val('True');
+                    // this makes it so we dont have to click add deliverable to save it
+                    addNewDeliverable();
                 });
             });
-            //check if they add more inline comment category options then they fill in wont allow them to create the assignment
-            function validation(e){
+            
+            function validation(e) {
+                //check if they add more inline comment category options then they fill in wont allow them to create the assignment
                 $("#category_data :input").each(function () {
                     var prefix = $(this).attr("name").split("_");
                     if (prefix[0] == "category" && prefix[1] == "option") {
@@ -677,6 +680,9 @@
                         }
                     }
                 });
+
+                // this stores the deliverable
+                addNewDeliverable();
             }
         </script>
     </div>
