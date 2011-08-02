@@ -6,7 +6,7 @@ var deliverableIndex = 0;
 // onLoad
 $(function () {
     $('#add_new_deliverable').click(function () {
-        addNewDeliverable();
+        addNewDeliverable(true);
         return false;
     });
 
@@ -21,12 +21,12 @@ $(function () {
 
 function deliverableFormSubmit(e) {
     if (e.which == '13') {
-        addNewDeliverable();
+        addNewDeliverable(true);
         e.preventDefault();
     }
 }
 
-function addNewDeliverable(d) {
+function addNewDeliverable(isAdd, d) {
     // validation
     if (d == undefined) {
         d = new Object({
@@ -38,7 +38,7 @@ function addNewDeliverable(d) {
         $('#new_deliverable_name').focus();
     }
 
-    if (d.name == undefined || d.name == "") {
+    if ((d.name == undefined || d.name == "") && isAdd == true) {
         alert('The deliverable name is required.');
         return false;
     }
@@ -71,29 +71,31 @@ function addNewDeliverable(d) {
         return false;
     }
 
-    $('#deliverable_data').append('<div id="deliverable_' + deliverableIndex + '" class="deliverable" />');
+    if (isAdd) {
+        $('#deliverable_data').append('<div id="deliverable_' + deliverableIndex + '" class="deliverable" />');
 
-    var newDeliverable = $('#deliverable_' + deliverableIndex);
+        var newDeliverable = $('#deliverable_' + deliverableIndex);
 
-    var typeVal = $('#new_deliverable_type').children('option').eq(d.fileType).val();
-    var typeName = $('#new_deliverable_type').children('option').eq(d.fileType).html();
+        var typeVal = $('#new_deliverable_type').children('option').eq(d.fileType).val();
+        var typeName = $('#new_deliverable_type').children('option').eq(d.fileType).html();
 
-    // delete button
-    newDeliverable.append('<div class="deliverable_tools"><a href="#" title="Delete This Deliverable" onclick="$(this).parent().parent().hide(\'highlight\',function(){$(this).remove()}); setDeliverableIndex(); return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');
+        // delete button
+        newDeliverable.append('<div class="deliverable_tools"><a href="#" title="Delete This Deliverable" onclick="$(this).parent().parent().hide(\'highlight\',function(){$(this).remove()}); setDeliverableIndex(); return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');
 
-    // main layout
-    newDeliverable.append('<table><tr>');
-    newDeliverable.append('<td>File Name:</td><td>' + d.name + '</td>');
-    newDeliverable.append('</tr><tr>');
-    newDeliverable.append('<td>Type:</td><td>' + typeName + '</td>');
-    newDeliverable.append('</tr></table>');
+        // main layout
+        newDeliverable.append('<table><tr>');
+        newDeliverable.append('<td>File Name:</td><td>' + d.name + '</td>');
+        newDeliverable.append('</tr><tr>');
+        newDeliverable.append('<td>Type:</td><td>' + typeName + '</td>');
+        newDeliverable.append('</tr></table>');
 
-    newDeliverable.append('<input type="hidden" class="deliverable_name" value="' + d.name + '" />');
-    newDeliverable.append('<input type="hidden" class="deliverable_type" value="' + typeVal + '" />');
+        newDeliverable.append('<input type="hidden" class="deliverable_name" value="' + d.name + '" />');
+        newDeliverable.append('<input type="hidden" class="deliverable_type" value="' + typeVal + '" />');
 
-    deliverableIndex++;
+        deliverableIndex++;
 
-    setDeliverableIndex();
+        setDeliverableIndex();
+    }
 }
 
 function removeSelectedDeliverable() {

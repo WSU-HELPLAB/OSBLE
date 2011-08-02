@@ -665,25 +665,25 @@
                     alert('This assignment will be saved as a draft and will not be released even if the release date passes');
                     $('#is_draft').val('True');
                     // this makes it so we dont have to click add deliverable to save it
-                    addNewDeliverable();
+                    addNewDeliverable(false);
                 });
-            });
             
-            function validation(e) {
-                //check if they add more inline comment category options then they fill in wont allow them to create the assignment
-                $("#category_data :input").each(function () {
-                    var prefix = $(this).attr("name").split("_");
-                    if (prefix[0] == "category" && prefix[1] == "option") {
-                        if ($(this).val() == "") {
-                            alert("You must fill in the name for each inline comment category option.");
-                            e.preventDefault();
+            //function validation(e) {
+                $('#create_assignment').click(function(event){
+                    //check if they add more inline comment category options then they fill in wont allow them to create the assignment
+                    $("#category_data :input").each(function () {
+                        var prefix = $(this).attr("name").split("_");
+                        if (prefix[0] == "category" && prefix[1] == "option") {
+                            if ($(this).val() == "") {
+                                alert("You must fill in the name for each inline comment category option.");
+                                e.preventDefault();
+                            }
                         }
-                    }
-                });
+                    });
 
-                // this stores the deliverable
-                addNewDeliverable();
-            }
+                    // this stores the deliverable
+                    addNewDeliverable(false);
+            });
         </script>
     </div>
     
