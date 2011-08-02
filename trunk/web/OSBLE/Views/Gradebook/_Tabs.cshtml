@@ -73,7 +73,7 @@
     </ul>
 </div> 
 
-<div class="menu" id="customizeCateogryTable" style="display:none; position:absolute; text-decoration:none;">
+<div class="menu" id="customizeCateogryTable" style="display:none; position:absolute; text-decoration:none;" onmouseout="hideTabColors2();">
     <table class="selectMenuTable">
         <tr>
             <th>
@@ -96,7 +96,7 @@
             </td>
         </tr>
         <tr>
-            <td><a style="cursor:pointer" onmouseover="displayColors2();">Edit Category Color</a></td>
+            <td onmouseover="displayColors2();"><a style="cursor:pointer">Edit Category Color</a></td>
         </tr>
          <tr>
             <td>
@@ -114,7 +114,7 @@
     </div>
 </div>
 
-<div class="displayColors" id="displayColorsIDMenu" style="display: none; position: absolute;" onmouseover="displayColors2();" onmouseout="hideDisplayColors();">
+<div class="displayColors" id="displayColorsIDMenu" style="display: none; position: absolute;" onmouseover="displayColors2();" onmouseout="hideTabColors2();">
     <table class="displayColorsTable">
 		<tr>
 		    <th align="center" colspan="3">Colors</th>
@@ -174,7 +174,17 @@
         $("#displayColorsIDMenu").animate({ "height": "hide" }, { duration: 0 });
     });
 
-    function hideTabColors() {
+    $("ul li").keydown(function (e) {
+
+        //13 means enter is pressed
+        if (e.keyCode == 13) {
+            clearFocusOnCell();
+        }
+    });
+
+
+
+    function hideTabColors2() {
         //$("#selectMenuID").animate({ "height": "hide" }, { duration: 0 });
         $("#displayColorsIDMenu").animate({ "height": "hide" }, { duration: 0 });
     }
@@ -206,7 +216,7 @@
             data: { categoryId: ID, value: color }
         });
         window.location.reload(true);
-        hideTabColors();
+        hideTabColors2();
     }
 
     function displayConfirmWindow() {
@@ -289,13 +299,7 @@
         }
     }
 
-    $("ul li").keydown(function (e) {
-
-            //13 means enter is pressed
-            if (e.keyCode == 13) {
-                clearFocusOnCell();
-            }
-        });
+ 
 
 
     function deleteCurrentCategory() {
