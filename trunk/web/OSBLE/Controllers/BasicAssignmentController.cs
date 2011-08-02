@@ -101,12 +101,13 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult Create(BasicAssignmentViewModel basic)
         {
-            //inject any lingering form data into our VM
-            PopulateModelWithFormData(basic);
 
             //The validation method call should trigger an invalid model state if something
             //isn't right.
             ValidateSubmission(basic);
+
+            //inject any lingering form data into our VM
+            PopulateModelWithFormData(basic);
 
             if (ModelState.IsValid)
             {
@@ -197,12 +198,13 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult Edit(BasicAssignmentViewModel basic)
         {
-            //inject any lingering form data into our VM
-            PopulateModelWithFormData(basic);
 
             //The validation method call should trigger an invalid model state if something
             //isn't right.
             ValidateSubmission(basic);
+
+            //inject any lingering form data into our VM
+            PopulateModelWithFormData(basic);
 
             if (ModelState.IsValid)
             {
