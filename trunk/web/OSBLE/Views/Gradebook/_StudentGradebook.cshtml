@@ -415,6 +415,23 @@
                                         }
                                     }
                                 }
+                                else 
+                                {
+                                    if (userScore.Points >= 0)
+                                    {
+                                        categoryPoints += userScore.Points;
+                                        categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                    }
+                                    else if (userScore.StudentPoints >= 0)
+                                    {
+                                        studentWhatIf = true;
+                                        categoryPoints += userScore.StudentPoints;
+                                        categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                    }
+                                    else
+                                    {
+                                    }
+                                }
                             }
                         }
                         categoryTotal = categoryPoints / categoryPossible;
@@ -474,7 +491,7 @@
                         {
                             double categoryPoints = 0;
                             double categoryPossible = 0;
-                            foreach (Score userScore in userScores)
+                            foreach (Score userScore in ViewBag.AllUserGrades)
                             {
                                 if (userScore.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
                                 {
@@ -498,6 +515,23 @@
                                                 categoryPossible += userScore.AssignmentActivity.PointsPossible;
                                             }
                                         }
+                                    }
+                                    else
+                                    {
+                                        if (userScore.Points >= 0)
+                                            {
+                                                categoryPoints += userScore.Points;
+                                                categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                            }
+                                            else if (userScore.StudentPoints >= 0)
+                                            {
+                                                usingWhatIf = true;
+                                                categoryPoints += userScore.StudentPoints;
+                                                categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                            }
+                                            else
+                                            {
+                                            }
                                     }
                                 }
                             }

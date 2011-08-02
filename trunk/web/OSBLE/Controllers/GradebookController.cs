@@ -1476,9 +1476,8 @@ namespace OSBLE.Controllers
                         {
                             latePenalty = CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
                             latePenalty = (100 - latePenalty) / 100;
+                            value = value * latePenalty;
                         }
-
-                        value = value * latePenalty;
 
                         if (grades.Points == value)
                         {
@@ -1500,9 +1499,8 @@ namespace OSBLE.Controllers
                             {
                                 latePenalty = CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
                                 latePenalty = (100 - latePenalty) / 100;
+                                value = value * latePenalty;
                             }
-
-                            value = value * latePenalty;
 
                             Score newScore = new Score()
                             {
@@ -1822,8 +1820,7 @@ namespace OSBLE.Controllers
                                                     select userCategoryTotal).ToList();
 
             List<Category> categoriesWithWeightsAndScores = (from cats in categoryTotalPercent
-                                                             where cats.TeamUserMember.Contains(CurrentUser) &&
-                                                             cats.Points >= 0 ||
+                                                             where cats.Points >= 0 ||
                                                              cats.StudentPoints >= 0
                                                              select cats.AssignmentActivity.AbstractAssignment.Category).Distinct().ToList();
 

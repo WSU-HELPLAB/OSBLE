@@ -273,18 +273,39 @@
                 if (score.Count() > 0)
                 {
                     if (score.First().AssignmentActivity.AbstractAssignment.Rubric != null)
-                    {   
-                        <td id="rubric-@assignment.ID">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { abstractAssignmentActivityId = score.First().AssignmentActivityID, teamUserID = score.First().TeamUserMemberID }, new { })</td>
+                    {
+                        if (score.First().LatePenaltyPercent > 0)
+                        {
+                            <td id="rubric-@assignment.ID" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { abstractAssignmentActivityId = score.First().AssignmentActivityID, teamUserID = score.First().TeamUserMemberID }, new { @style = "color:Red" })</td>                            
+                        }
+                        else
+                        {
+                            <td id="rubric-@assignment.ID">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { abstractAssignmentActivityId = score.First().AssignmentActivityID, teamUserID = score.First().TeamUserMemberID }, new { })</td>
+                        }
                     }
                     else
                     {
                         if (score.First().Points > 0)
                         {
-                            <td id="teacher-@assignment.ID">@score.First().Points.ToString(".#")</td>
+                            if (score.First().LatePenaltyPercent > 0)
+                            {
+                                <td id="teacher-@assignment.ID" style="font-style:italic; color:Red;">@score.First().Points.ToString(".#")</td>
+                            }
+                            else
+                            {
+                                <td id="teacher-@assignment.ID">@score.First().Points.ToString(".#")</td>
+                            }
                         }
                         else
                         {
-                            <td id="teacher-@assignment.ID">@String.Format("{0}", 0)</td>
+                            if (score.First().LatePenaltyPercent > 0)
+                            {
+                                <td id="teacher-@assignment.ID" style="font-style:italic; color:Red">@String.Format("{0}", 0)</td>
+                            }
+                            else
+                            {
+                                <td id="teacher-@assignment.ID">@String.Format("{0}", 0)</td>
+                            }
                         }
                     }
                 }
