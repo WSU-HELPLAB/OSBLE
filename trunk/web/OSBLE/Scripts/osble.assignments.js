@@ -134,6 +134,7 @@ var MAX_CATEGORIES = 6;
 var categoryIndex = 0; // unique identifier
 var categoryCount = 0; // to check the number of categories
 var categoryOptionIndex = new Array(MAX_CATEGORIES);
+
 for (var i = 0; i < MAX_CATEGORIES; i++) {
     categoryOptionIndex[i] = 1; // because 0 is required and thus hard-coded
     // these index variables have no upper limit
@@ -147,10 +148,15 @@ $(function () {
     $('#InstructorCanReview').change(function () {
         if ($(this).attr('checked')) {
             $('#line_review_config').show('blind');
+            // first time it is checked only
+            if (categoryCount == 0) {
+                addNewCategory();
+            }
         }
         else {
             $('#line_review_config').hide('blind');
         }
+        enableInlineFirst = false;
     });
 
     $('#add_new_category').click(function () {
@@ -198,7 +204,6 @@ function addCategory(index, catName, optionName) {
 
     // check limit
     if (categoryCount >= MAX_CATEGORIES) {
-        alert("The maximum number of categories is " + MAX_CATEGORIES + ".");
         return false;
     }
 
@@ -207,7 +212,7 @@ function addCategory(index, catName, optionName) {
     var newCategory = $('#' + categoryId);
 
     // delete button
-    newCategory.append('<div class="deliverable_tools"><a href="#" title="Delete this deliverable" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove() }); categoryCount--; return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');
+    newCategory.append('<div class="deliverable_tools"><a href="#" title="Delete this deliverable" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove(); $(\'#add_new_category_div\').animate({ \'height\': \'show\' }, { duration: 0 }); }); categoryCount--; return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');
 
     // main layout
     newCategory.append('<table><tr>');
@@ -285,6 +290,11 @@ function addNewCategory() {
     // keep track of indices
     categoryIndex++;
     categoryCount++;
+
+    //Hides the addCategory button once you have created the max amount of them
+    if (categoryCount >= MAX_CATEGORIES) {
+        $('#add_new_category_div').animate({ "height": "hide" }, { duration: 0 });
+    }
 }
 
 function addNewCategoryOption(e) {

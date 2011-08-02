@@ -552,13 +552,17 @@
         set of comment categories called
         <input type="text" id="category_config_name" name="category_config_name" value="@Model.Assignment.CommentCategoryConfiguration.Name" />
         <br />
+        <br style="clear: both;" />
         <div id="manual_config_options" class="indented_options" style="display: none;">
-            <p>
-                <a href="#" id="add_new_category" title="Add new category" style="text-decoration: none;">
-                    <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add new category" />
-                    Add a category </a>
-            </p>
             <div id="category_data">
+            </div>
+            <div id="add_new_category_div">
+                <br style="clear: left;" />
+                <p>
+                    <a href="#" id="add_new_category" title="Add new category" style="text-decoration: none;">
+                        <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add new category" />
+                        Add a category </a>
+                </p>
             </div>
             <br style="clear: both;" />
         </div>
