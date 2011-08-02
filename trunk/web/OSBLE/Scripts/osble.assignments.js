@@ -142,7 +142,7 @@ for (var i = 0; i < MAX_CATEGORIES; i++) {
 $(function () {
 
     $('#manual_config_options').show();
-    //$("input[name='line_review_options']:eq(0)").attr('checked', 'checked');
+    $("input[name='line_review_options']:eq(0)").attr('checked', 'checked');
 
     $('#InstructorCanReview').change(function () {
         if ($(this).attr('checked')) {
@@ -157,22 +157,6 @@ $(function () {
         addNewCategory();
         return false;
     });
-
-    /*
-    $("input[name='line_review_options']").change(function () {
-    if ($("input[name='line_review_options']:checked").val() == 'ManualConfig') {
-    $('#auto_config_options').hide();
-    $('#manual_config_options').show('blind');
-    }
-    else if ($("input[name='line_review_options']:checked").val() == 'AutoConfig') {
-    $('#manual_config_options').hide();
-    $('#auto_config_options').show('blind');
-    }
-    else {
-    throw "Unknown Radio Button Checked: line_review_options"
-    }
-    });
-    */
 
     $('#comment_category_selection option:eq(0)').attr('selected', 'selected');
     $('#comment_category_selection').change(switchCommentConfigListener);

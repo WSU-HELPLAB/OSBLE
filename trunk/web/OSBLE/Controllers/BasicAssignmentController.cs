@@ -238,17 +238,19 @@ namespace OSBLE.Controllers
                 fakeVm.Submission.PercentPenalty = basic.Submission.PercentPenalty;
                 fakeVm.Submission.PointsPossible = basic.Submission.PointsPossible;
                 fakeVm.Submission.ReleaseDate = basic.Submission.ReleaseDate;
+                fakeVm.Submission.TeamUsers.Clear();
                 fakeVm.Submission.TeamUsers = basic.Submission.TeamUsers;
                 
                 //Do the same thing for basic.Assignment as I did for submissions
                 fakeVm.Assignment.CategoryID = basic.Assignment.CategoryID;
-                fakeVm.Assignment.CommentCategoryConfigurationID = basic.Assignment.CommentCategoryConfigurationID;
+                fakeVm.Assignment.Deliverables.Clear();
                 fakeVm.Assignment.Deliverables = basic.Assignment.Deliverables;
                 fakeVm.Assignment.Description = basic.Assignment.Description;
                 fakeVm.Assignment.IsDraft = basic.Assignment.IsDraft;
                 fakeVm.Assignment.Name = basic.Assignment.Name;
                 fakeVm.Assignment.PointsPossible = basic.Assignment.PointsPossible;
                 fakeVm.Assignment.RubricID = basic.Assignment.RubricID;
+                fakeVm.Assignment.CommentCategoryConfiguration = basic.Assignment.CommentCategoryConfiguration;
                 if (fakeVm.Assignment.CommentCategoryConfiguration != null && fakeVm.Assignment.CommentCategoryConfiguration.ID == 0)
                 {
                     fakeVm.Assignment.CommentCategoryConfiguration = null;
@@ -365,12 +367,49 @@ namespace OSBLE.Controllers
         {
             List<SerializableTeamMember> teamMembmers = new List<SerializableTeamMember>();
 
-            foreach (TeamUserMember member in activity.TeamUsers)
+            //We want either all users or all teams.  Never both.
+            var teamUserQuery = from tu in activity.TeamUsers
+                                where tu is TeamMember
+                                select tu;
+            List<TeamUserMember> members;
+            if (teamUserQuery.Count() > 0)
+            {
+                members = teamUserQuery.ToList();
+            }
+            else
+            {
+                members = (from tu in activity.TeamUsers
+                           where tu is UserMember
+                           select tu).ToList();
+            }
+
+            foreach (TeamUserMember member in members)
             {
                 SerializableTeamMember serializedMember = new SerializableTeamMember();
                 serializedMember.Name = member.Name;
 
-                if (member is TeamMember)
+                if (member is UserMember)
+                {
+                    UserMember uMember = member as UserMember;
+
+                    CoursesUsers cu = (from c in db.CoursesUsers
+                                       where
+                                          c.AbstractCourseID == activeCourse.AbstractCourseID
+                                          &&
+                                          c.UserProfileID == uMember.UserProfileID
+                                       select c).FirstOrDefault();
+
+                    if (cu == null)
+                    {
+                        continue;
+                    }
+                    serializedMember.UserID = uMember.UserProfileID;
+                    serializedMember.isUser = true;
+                    serializedMember.IsModerator = cu.AbstractRole.ID == (int)CourseRole.CourseRoles.Moderator;
+                    serializedMember.Section = cu.Section;
+                    teamMembmers.Add(serializedMember);
+                }
+                else if (member is TeamMember)
                 {
                     TeamMember tMember = member as TeamMember;
                     foreach (TeamUserMember tum in tMember.Team.Members)
@@ -428,10 +467,14 @@ namespace OSBLE.Controllers
                     viewModel.Assignment.CommentCategoryConfiguration = BuildCommentCategories();
                     db.CommentCategoryConfigurations.Add(viewModel.Assignment.CommentCategoryConfiguration);
                     db.SaveChanges();
+                    viewModel.Assignment.CommentCategoryConfigurationID = viewModel.Assignment.CommentCategoryConfiguration.ID;
                 }
                 else if (Request.Form["line_review_options"].ToString().CompareTo("AutoConfig") == 0)
                 {
                     viewModel.Assignment.CommentCategoryConfigurationID = Convert.ToInt32(Request.Params["comment_category_selection"]);
+                    viewModel.Assignment.CommentCategoryConfiguration = (from ccc in db.CommentCategoryConfigurations
+                                                                         where ccc.ID == viewModel.Assignment.CommentCategoryConfigurationID
+                                                                         select ccc).FirstOrDefault();
                 }
             }
             else
