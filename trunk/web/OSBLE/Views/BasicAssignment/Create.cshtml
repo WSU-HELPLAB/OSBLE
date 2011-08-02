@@ -5,6 +5,10 @@
 @using OSBLE.Models
 @{
     ViewBag.Title = "Create Basic Assignment";
+
+    //Based on various things that can happen in the controller, our CommentCategoryConfiguration
+    //may end up null.  Since our view depends on CommentCategoryConfiguration not being null,
+    //we need to handle such cases. 
     if(Model.Assignment.CommentCategoryConfiguration == null)
     {
         Model.Assignment.CommentCategoryConfiguration = new CommentCategoryConfiguration();
