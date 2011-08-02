@@ -5,14 +5,7 @@
 }
 
 <style type="text/css">
-    .menu
-    {
-        width: auto;
-        height: auto;
-        background-color: white;
-        top: 33px;
-        left: 400px;
-    }
+
 </style>
 
 <div id="tabHeader">
@@ -20,7 +13,7 @@
         <li id="selected" class="main"><a href="/Gradebook/Index">Main</a></li>
         @{
             double totalPoints = 0;
-            
+
             foreach (Category item in ViewBag.Categories)
             {
                 //calculating total points of all categories
@@ -29,21 +22,41 @@
             foreach (Category item in ViewBag.Categories)
             {
                 var displayWeight = (item.Points / totalPoints) * 100;
-                if (item.Points == 0 && item.Name != Constants.UnGradableCatagory )
+                if (item.Points == 0 && item.Name != Constants.UnGradableCatagory)
                 {
-                    <li class="@item.ID" style="background:@item.TabColor;" onmouseover="displayTabButton(@item.ID);" onmouseout="hideTabButton(@item.ID);"><a href="/Gradebook/Tab/?categoryId=@item.ID" style="text-decoration:none; float:left;">@item.Name (0%)</a>
-                    <div id="tab-@item.ID" style="display: none; float:right;">
-                        <img id="imgDown-@item.ID" src="/Content/images/arrow_down.png" onclick="displayCustomizeCategoryDisplay(event, @item.ID);" style="float:right; cursor:pointer; padding-top:6px; padding-right:3px;"/>
-                    </div>
-                    </li>
+                    if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                    {
+                        //instructor
+                        <li class="@item.ID" style="background:@item.TabColor;" onmouseover="displayTabButton(@item.ID);" onmouseout="hideTabButton(@item.ID);"><a href="/Gradebook/Tab/?categoryId=@item.ID" id="catName-@item.ID" style="text-decoration:none; float:left;">@item.Name (0%)</a>
+                        <div id="tab-@item.ID" style="display: none; float:right;">
+                            <img id="imgDown-@item.ID" src="/Content/images/arrow_down.png" onclick="displayCustomizeCategoryDisplay(event, @item.ID, 0)" style="float:right; cursor:pointer; padding-top:6px; padding-right:3px;"/>
+                        </div>
+                        </li>
+                    }
+                    else
+                    {
+                        //Student
+                        <li class="@item.ID" style="background:@item.TabColor;" onmouseover="displayTabButton(@item.ID);" onmouseout="hideTabButton(@item.ID);"><a href="/Gradebook/Tab/?categoryId=@item.ID" id="catName-@item.ID" style="text-decoration:none; float:left;">@item.Name (0%)</a></li>
+                    }
+
                 }
                 else if (item.Name != Constants.UnGradableCatagory)
                 {
-                    <li class="@item.ID" style="background:@item.TabColor;" onmouseover="displayTabButton(@item.ID);" onmouseout="hideTabButton(@item.ID);"><a href="/Gradebook/Tab/?categoryId=@item.ID" style="text-decoration:none; float:left;">@item.Name (@displayWeight.ToString(".##")%)</a>
-                    <div id="tab-@item.ID" style="display: none; float:right;">
-                        <img id="imgDown-@item.ID" src="/Content/images/arrow_down.png" onclick="displayCustomizeCategoryDisplay(event, @item.ID);" style="float:right; cursor:pointer; padding-top:6px; padding-right:3px;"/>
-                    </div>
-                    </li>
+                    if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                    {
+                        //instructor
+                        <li class="@item.ID" style="background:@item.TabColor;" onmouseover="displayTabButton(@item.ID);" onmouseout="hideTabButton(@item.ID);"><a href="/Gradebook/Tab/?categoryId=@item.ID" id="catName-@item.ID" style="text-decoration:none; float:left;">@item.Name (@displayWeight.ToString(".##")%)</a>
+                        <div id="tab-@item.ID" style="display: none; float:right;">
+                            <img id="imgDown-@item.ID" src="/Content/images/arrow_down.png" onclick="displayCustomizeCategoryDisplay(event, @item.ID, @displayWeight.ToString(".##"))" style="float:right; cursor:pointer; padding-top:6px; padding-right:3px;"/>
+                        </div>
+                        </li>
+                    }
+                    else
+                    {
+                        //Student
+                        <li class="@item.ID" style="background:@item.TabColor;" onmouseover="displayTabButton(@item.ID);" onmouseout="hideTabButton(@item.ID);"><a href="/Gradebook/Tab/?categoryId=@item.ID" id="catName-@item.ID" style="text-decoration:none; float:left;">@item.Name (@displayWeight.ToString(".##")%)</a></li>
+                    }
+
                 }
                 else
                 {
@@ -51,7 +64,7 @@
                 }
 
             }
-        }
+            }
         @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
         {
             <li><a href="#" onclick="newTab()">+</a></li>
@@ -61,7 +74,7 @@
 </div> 
 
 <div class="menu" id="customizeCateogryTable" style="display:none; position:absolute; text-decoration:none;">
-    <table>
+    <table class="selectMenuTable">
         <tr>
             <th>
                 Customize Category
@@ -69,28 +82,79 @@
         </tr>
         <tr>
             <td>
-                <a href="#">Move Category Left</a>
+                <a onclick="moveCategoryLeft(ID);">Move Category Left</a>
             </td>
         </tr>
         <tr>
             <td>
-                <a href="#">Move Category Right</a>
+                <a onclick="moveCategoryRight(ID);">Move Category Right</a>
             </td>
         </tr>
         <tr>
             <td>
-                <a href="#">Edit Category Name</a>
+                <a onclick="editCategoryName(event);">Edit Category Name</a>
             </td>
         </tr>
         <tr>
+            <td><a style="cursor:pointer" onmouseover="displayColors2();">Edit Category Color</a></td>
+        </tr>
+         <tr>
             <td>
-                <a href="#">Edit Category Color</a>
+                <a onclick="displayConfirmWindow()">Delete Category</a>
             </td>
         </tr>
     </table>
 </div>
 
+<div id="confirmDeleteDiv" style="display:none" title="Confrim Delete">
+    Are you sure you want to permanently delete this category and all the assignments within it?<br />
+    <div class="yesAndNoDiv">
+        <input value="Yes" type="button" onclick="deleteCurrentCategory()" />
+        <input value="No" type="button" onclick="hideConfirmWindow()" />
+    </div>
+</div>
+
+<div class="displayColors" id="displayColorsIDMenu" style="display: none; position: absolute;" onmouseover="displayColors2();" onmouseout="hideDisplayColors();">
+    <table class="displayColorsTable">
+		<tr>
+		    <th align="center" colspan="3">Colors</th>
+		</tr>
+		<tr>
+			<td style="background:Silver;"><a style="cursor:pointer;" href"#" onclick="changeColor2('Silver');">Silver</a></td>
+		</tr>
+        <tr>
+			<td style="background:Tomato;"><a style="cursor:pointer;" href"#" onclick="changeColor2('Tomato');">Red</a></td>
+		</tr>
+        <tr>
+			<td style="background:LightBlue;"><a style="cursor:pointer;" href"#" onclick="changeColor2('LightBlue');">Blue</a></td>
+		</tr>
+        <tr>
+			<td style="background:SpringGreen;"><a style="cursor:pointer;" href"#" onclick="changeColor2('SpringGreen');">Green</a></td>
+		</tr>
+        <tr>
+			<td style="background:BurlyWood;"><a style="cursor:pointer;" href"#" onclick="changeColor2('BurlyWood');">Brown</a></td>
+		</tr>
+        <tr>
+			<td style="background:Yellow;"><a style="cursor:pointer;" href"#" onclick="changeColor2('Yellow');">Yellow</a></td>
+		</tr>
+        <tr>
+			<td style="background:Plum;"><a style="cursor:pointer;" href"#" onclick="changeColor2('Plum');">Purple</a></td>
+        </tr>
+        <tr>
+			<td style="background:Orange;"><a style="cursor:pointer;" href"#" onclick="changeColor2('Orange');">Orange</a></td>
+        </tr>
+        <tr>
+			<td style="background:Pink;"><a style="cursor:pointer;" href"#" onclick="changeColor2('Pink');">Pink</a></td>
+		</tr>
+	</table>
+</div>
+
+
 <script type="text/javascript">
+
+    var ID = null; //last clicked tab's ID
+    var categoryPercent = null; 
+    var oldName = null;
 
     $(document).ready(function () {
 
@@ -106,7 +170,57 @@
 
     $(document).click(function () {
         $("#customizeCateogryTable").animate({ "height": "hide" }, { duration: 0 });
+        clearFocusOnCell();
+        $("#displayColorsIDMenu").animate({ "height": "hide" }, { duration: 0 });
     });
+
+    function hideTabColors() {
+        //$("#selectMenuID").animate({ "height": "hide" }, { duration: 0 });
+        $("#displayColorsIDMenu").animate({ "height": "hide" }, { duration: 0 });
+    }
+
+    function displayColors2() {
+        var x = 0;
+        var y = 0;
+
+        //alert(container);
+        //aligning the menu under the buttons
+        x = $("#customizeCateogryTable").position().left;
+        y = $("#customizeCateogryTable").position().top;
+        y += $("#customizeCateogryTable").height() - 50; ;
+        x += $("#customizeCateogryTable").width();
+
+        //Moving the menu to the button that clicked it
+        $("#displayColorsIDMenu").css("left", x + "px");
+        $("#displayColorsIDMenu").css("top", y + "px");
+
+        //Animation for menu
+        $("#displayColorsIDMenu").animate({ "height": "show" }, { duration: 0 });
+    }
+
+    function changeColor2(color) {
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "/Gradebook/ChangeTabColor",
+            data: { categoryId: ID, value: color }
+        });
+        window.location.reload(true);
+        hideTabColors();
+    }
+
+    function displayConfirmWindow() {
+        $("#confirmDeleteDiv").dialog({
+            modal: true,
+            resizable: false,
+            width: 310,
+            closeOnEscape: false
+        });
+    }
+
+    function hideConfirmWindow() {
+        $("#confirmDeleteDiv").dialog('close');
+    }
 
     function displayTabButton(id) {
         $("#tab-" + id).animate({ "height": "show" }, { duration: 0 });
@@ -116,7 +230,9 @@
         $("#tab-" + id).animate({ "height": "hide" }, { duration: 0 });
     }
 
-    function displayCustomizeCategoryDisplay(evt, id) {
+    function displayCustomizeCategoryDisplay(evt, id, percent) {
+        ID = id;
+        categoryPercent = percent;
         evt.cancelBubble = true;
 
         var y = $("#tab-" + id).position().top;
@@ -127,6 +243,69 @@
         $("#customizeCateogryTable").css("top", y + "px");
 
         $("#customizeCateogryTable").animate({ "height": "show" }, { duration: 0 });
+    }
+
+    function moveCategoryLeft(catID) {
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "/Gradebook/MoveCategoryLeft",
+            data: { categoryId: catID }
+        });
+        window.location.reload(true);
+    }
+
+    function moveCategoryRight(catID) {
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "/Gradebook/MoveCategoryRight",
+            data: { categoryId: catID }
+        });
+        window.location.reload(true);
+    }
+
+    function editCategoryName(evt) {
+
+        $("#customizeCateogryTable").animate({ "height": "hide" }, { duration: 0 });
+        evt.cancelBubble = true;
+        oldName = $("#catName-" + ID).html();
+        var htmlInput = $('<input type="text" value="'+oldName.toString()+'" />');
+        $("#catName-" + ID).html(htmlInput);
+        htmlInput.focus();
+        htmlInput.select();
+    }
+
+    function clearFocusOnCell(){
+        if (oldName != null) {
+            var input = $("#catName-" + ID).children().val();
+            $("#catName-" + ID).html(input + " (" + categoryPercent + "%)");
+            $.ajax({
+                type: "POST",
+                url: "/Gradebook/ModifyCategoryName",
+                data: { value: input, categoryId: ID }
+            });
+            oldName = null;
+        }
+    }
+
+    $("ul li").keydown(function (e) {
+
+            //13 means enter is pressed
+            if (e.keyCode == 13) {
+                clearFocusOnCell();
+            }
+        });
+
+
+    function deleteCurrentCategory() {
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "/Gradebook/DeleteCategory",
+            data: { categoryId: ID }
+        });
+        window.location.reload(true)
     }
     
 </script>
