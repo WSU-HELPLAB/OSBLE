@@ -38,8 +38,10 @@ function addNewDeliverable(isAdd, d) {
         $('#new_deliverable_name').focus();
     }
 
-    if ((d.name == undefined || d.name == "") && isAdd == true) {
-        alert('The deliverable name is required.');
+    if (d.name == undefined || d.name == "") {
+        if (isAdd) {
+            alert('The deliverable name is required.');
+        }
         return false;
     }
 
@@ -71,9 +73,9 @@ function addNewDeliverable(isAdd, d) {
         return false;
     }
 
-    if (isAdd) {
+//    if (isAdd) {
         $('#deliverable_data').append('<div id="deliverable_' + deliverableIndex + '" class="deliverable" />');
-
+   
         var newDeliverable = $('#deliverable_' + deliverableIndex);
 
         var typeVal = $('#new_deliverable_type').children('option').eq(d.fileType).val();
@@ -88,14 +90,14 @@ function addNewDeliverable(isAdd, d) {
         newDeliverable.append('</tr><tr>');
         newDeliverable.append('<td>Type:</td><td>' + typeName + '</td>');
         newDeliverable.append('</tr></table>');
-
+    
         newDeliverable.append('<input type="hidden" class="deliverable_name" value="' + d.name + '" />');
         newDeliverable.append('<input type="hidden" class="deliverable_type" value="' + typeVal + '" />');
-
+//    }
         deliverableIndex++;
 
         setDeliverableIndex();
-    }
+    
 }
 
 function removeSelectedDeliverable() {
@@ -156,7 +158,6 @@ $(function () {
         else {
             $('#line_review_config').hide('blind');
         }
-        enableInlineFirst = false;
     });
 
     $('#add_new_category').click(function () {

@@ -14,6 +14,7 @@
         Model.Assignment.CommentCategoryConfiguration = new CommentCategoryConfiguration();
     }
 }
+
 <h2>
     Create Basic Assignment @Helpers.CreateToolTip(ToolTips.BasicAssignmentTitle)
 </h2>
@@ -179,28 +180,29 @@
         });
 
         //setup prior comment categories
-        @{if (Model.Assignment.CommentCategoryConfiguration.Categories.Count > 0)
-          {
-              int counter = 0;
-              foreach (CommentCategory cat in Model.Assignment.CommentCategoryConfiguration.Categories)
-              {
-                  string js = string.Format("\n\taddNamedCategory(\"{0}\", \"{1}\");\n", cat.Name, cat.Options[0].Name);
-                @Html.Raw(js)
-                  int insideCounter = -1;
-                  foreach (CommentCategoryOption option in cat.Options)
-                  {
-                      //skip the first item as we added it with the previous JS call
-                      insideCounter++;
-                      if (insideCounter == 0)
-                      {
-                          continue;
-                      }
-                      js = string.Format("\taddNamedCategoryOption(\"{0}\", \"{1}\");\n", counter, option.Name);
+        @{
+            if (Model.Assignment.CommentCategoryConfiguration.Categories.Count > 0)
+            {
+                int counter = 0;
+                foreach (CommentCategory cat in Model.Assignment.CommentCategoryConfiguration.Categories)
+                {
+                    string js = string.Format("\n\taddNamedCategory(\"{0}\", \"{1}\");\n", cat.Name, cat.Options[0].Name);
                     @Html.Raw(js)
-                  }
-                  counter++;
-              }
-          }
+                    int insideCounter = -1;
+                    foreach (CommentCategoryOption option in cat.Options)
+                    {
+                        //skip the first item as we added it with the previous JS call
+                        insideCounter++;
+                        if (insideCounter == 0)
+                        {
+                            continue;
+                        }
+                        js = string.Format("\taddNamedCategoryOption(\"{0}\", \"{1}\");\n", counter, option.Name);
+                        @Html.Raw(js)
+                    }
+                    counter++;
+                }
+            }
         }
 
 
@@ -515,7 +517,7 @@
             @foreach (Deliverable d in Model.Assignment.Deliverables)
             {
                 <text>
-                addNewDeliverable({ name: '@d.Name', fileType: @d.Type });
+                addNewDeliverable(true, { name: '@d.Name', fileType: @d.Type });
                 </text>
             }
         });       
@@ -679,23 +681,23 @@
                     // this makes it so we dont have to click add deliverable to save it
                     addNewDeliverable(false);
                 });
-            
-            //function validation(e) {
-                $('#create_assignment').click(function(event){
-                    //check if they add more inline comment category options then they fill in wont allow them to create the assignment
-                    $("#category_data :input").each(function () {
-                        var prefix = $(this).attr("name").split("_");
-                        if (prefix[0] == "category" && prefix[1] == "option") {
-                            if ($(this).val() == "") {
-                                alert("You must fill in the name for each inline comment category option.");
-                                e.preventDefault();
-                            }
-                        }
-                    });
-
-                    // this stores the deliverable
-                    addNewDeliverable(false);
             });
+            
+            function validation(e) {
+                // this stores the deliverable
+                addNewDeliverable(false);
+                
+                //check if they add more inline comment category options then they fill in wont allow them to create the assignment
+                $("#category_data :input").each(function () {
+                    var prefix = $(this).attr("name").split("_");
+                    if (prefix[0] == "category" && prefix[1] == "option") {
+                        if ($(this).val() == "") {
+                            alert("You must fill in the name for each inline comment category option.");
+                            e.preventDefault();
+                        }
+                    }
+                });
+            }
         </script>
     </div>
     
