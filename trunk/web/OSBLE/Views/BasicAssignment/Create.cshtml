@@ -347,8 +347,9 @@
 
     using (Html.BeginForm())
     {
+        
 
-    @Html.ValidationSummary()
+    @Html.ValidationSummary() 
     
     <!--Hidden fields-->
         string newTeams = ViewBag.NewTeams;
@@ -497,7 +498,7 @@
     <div>
         <a href="#" id="add_new_deliverable" title="Add New Deliverable" style="text-decoration: none;">
             <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Deliverable" />
-            Save Deliverable 
+            Add Deliverable 
         </a>
     </div>
 
@@ -656,7 +657,7 @@
     </div>
     <div>
         @Html.HiddenFor(model => model.Assignment.IsDraft, new { id = "is_draft" })
-        <input type="submit" value="Create Basic Assignment" />
+        <input type="submit" value="Create Basic Assignment" id="create_assignment" onclick="validation(event)"/>
         <input type="submit" value="Save as Draft" id="save_draft" />@Helpers.CreateToolTip(ToolTips.BasicAssignmentIsDraft)
         <script type="text/javascript">
             $(function () {
@@ -665,6 +666,18 @@
                     $('#is_draft').val('True');
                 });
             });
+            //check if they add more inline comment category options then they fill in wont allow them to create the assignment
+            function validation(e){
+                $("#category_data :input").each(function () {
+                    var prefix = $(this).attr("name").split("_");
+                    if (prefix[0] == "category" && prefix[1] == "option") {
+                        if ($(this).val() == "") {
+                            alert("You must fill in the name for each inline comment category option.");
+                            e.preventDefault();
+                        }
+                    }
+                });
+            }
         </script>
     </div>
     
