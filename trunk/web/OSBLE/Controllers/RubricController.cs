@@ -192,6 +192,7 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Index(RubricViewModel viewModel)
         {
+            double latePenalty = 0.0;
             RubricViewModel vm = BuildViewModelFromForm();
 
             ViewBag.isEditable = true;
@@ -246,9 +247,18 @@ namespace OSBLE.Controllers
                         studentScore += vm.Evaluation.AssignmentActivity.addedPoints;
                     }
 
+                    TimeSpan? lateness = calculateLateness(vm.Evaluation.AssignmentActivity.AbstractAssignment.Category.Course, vm.Evaluation.AssignmentActivity, vm.Evaluation.Recipient);
+                    if (lateness != null)
+                    {
+                        latePenalty = CalcualateLatePenaltyPercent(vm.Evaluation.AssignmentActivity, (TimeSpan)lateness);
+                        latePenalty = (100 - latePenalty) / 100;
+                        studentScore = studentScore * latePenalty;
+                    }
+
                     if (grade != null)
                     {
                         grade.Points = studentScore;
+                        grade.LatePenaltyPercent = latePenalty;
                         db.SaveChanges();
                     }
                     else
@@ -260,6 +270,7 @@ namespace OSBLE.Controllers
                             Points = studentScore,
                             AssignmentActivityID = vm.Evaluation.AbstractAssignmentActivityID,
                             PublishedDate = DateTime.Now,
+                            LatePenaltyPercent = latePenalty,
                             isDropped = false
                         };
                         db.Scores.Add(newScore);
