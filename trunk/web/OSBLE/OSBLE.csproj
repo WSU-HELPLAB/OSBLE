@@ -227,9 +227,6 @@
     <Compile Include="Services\OSBLEService.cs" />
     <Compile Include="Services\ReviewInterfaceDomainService.cs" />
     <Compile Include="Services\RubricRiaService.cs" />
-    <Compile Include="Services\RubricService.svc.cs">
-      <DependentUpon>RubricService.svc</DependentUpon>
-    </Compile>
     <Compile Include="Services\SilverlightFaultBehavior.cs" />
     <Compile Include="Services\UploaderWebService.svc.cs">
       <DependentUpon>UploaderWebService.svc</DependentUpon>
@@ -466,7 +463,6 @@
     <Content Include="Scripts\osble.js" />
     <Content Include="Scripts\osble.teacher_activity.js" />
     <Content Include="Scripts\Silverlight.js" />
-    <Content Include="Services\RubricService.svc" />
     <Content Include="Services\UploaderWebService.svc" />
     <Content Include="Silverlight.js" />
     <Content Include="SilverlightSandboxTestPage.aspx" />

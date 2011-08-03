@@ -339,7 +339,7 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult CreateByEmail()
         {
-            if (!(ViewBag.ActiveCourse.AbstractCourse is Community))
+            if (!(activeCourse.AbstractCourse is Community))
             {
                 ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name");
             }
