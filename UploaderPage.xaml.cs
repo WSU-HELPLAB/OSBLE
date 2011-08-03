@@ -186,7 +186,58 @@ namespace FileUploader
 
         void GetFileListCompleted(object sender, GetFileListCompletedEventArgs e)
         {
+            //Whenever we get a new file list, we're get ourselves into a bind.
+            //We need to get rid of the previous context as they may no longer be
+            //relevant.  However, in doing so, we create a potentially jarring user
+            //experience: the user is returned to the root level regardless of their
+            //prior location.  To fix this, we need to store the previous data context 
+            //and use it to reload the last location.
+            DirectoryListing oldListing = RemoteFileList.DataContext;
+
+            //replace happens here
             RemoteFileList.DataContext = e.Result;
+
+            //and forget about everything else
+            RemoteFileList.ClearPreviousDirectories();
+
+            if (oldListing != null)
+            {
+                //pull out all names that we'll traverse
+                List<string> names = new List<string>();
+                DirectoryListing tempListing = oldListing;
+                names.Add(tempListing.Name);
+                while (tempListing.ParentDirectory != null)
+                {
+                    tempListing = tempListing.ParentDirectory;
+                    names.Insert(0, tempListing.Name);
+                }
+
+                int counter = 0;
+                foreach (string name in names)
+                {
+                    DirectoryListing dl = (from d in RemoteFileList.DataContext.Directories
+                                           where d.Name == name
+                                           select d).FirstOrDefault();
+                    if (RemoteFileList.DataContext.Name.CompareTo(name) == 0)
+                    {
+                        counter++;
+                        continue;
+                    }
+                    if (dl != null)
+                    {
+                        RemoteFileList.TraverseToDirectory(dl);
+                        counter++;
+                    }
+                }
+
+                //if we failed anywhere along the way, "counter" should be a different length
+                //than "names".  In this case, revert back to the root directory
+                if (counter != names.Count)
+                {
+                    RemoteFileList.DataContext = e.Result;
+                    RemoteFileList.ClearPreviousDirectories();
+                }
+            }
         }
 
         void GetValidUploadLocationsCompleted(object sender, GetValidUploadLocationsCompletedEventArgs e)
@@ -367,6 +418,7 @@ namespace FileUploader
                 uploader.Listing = dl;
                 uploader.CourseId = course.Key;
                 uploader.AuthToken = authToken;
+                uploader.RelativePath = RemoteFileList.RelativePath;
                 uploader.BeginUpload();
                 uploader.Show();
                 uploader.Closed += new EventHandler(uploader_Closed);
@@ -400,6 +452,7 @@ namespace FileUploader
             uploader.Listing = listing;
             uploader.CourseId = course.Key;
             uploader.AuthToken = authToken;
+            uploader.RelativePath = RemoteFileList.RelativePath;
             uploader.BeginUpload();
             uploader.Show();
             uploader.Closed += new EventHandler(uploader_Closed);

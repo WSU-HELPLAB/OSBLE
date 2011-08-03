@@ -26,6 +26,31 @@ namespace FileUploader.Controls
         }
 
         /// <summary>
+        /// Returns the current DataContext's path relative to the root node.  May not
+        /// work in all cases.
+        /// </summary>
+        public string RelativePath
+        {
+            get
+            {
+                string path = "";
+
+                if (previousDataContexts.Count == 0)
+                {
+                    return path;
+                }
+
+                //-2 to ignore the root data context
+                for (int i = previousDataContexts.Count - 2; i > -1; i--)
+                {
+                    path += "/" + previousDataContexts.ElementAt(i).Name;
+                }
+                path += "/" + DataContext.Name;
+                return path;
+            }
+        }
+
+        /// <summary>
         /// Exposes the currently selected AbstractListing
         /// </summary>
         public AbstractListing SelectedItem
@@ -151,13 +176,54 @@ namespace FileUploader.Controls
             }
         }
 
+        public void TraverseToDirectory(DirectoryListing listing)
+        {
+            //make sure that the listing belongs to the current context
+            int check = (from dl in DataContext.Directories
+                         where dl.Name == listing.Name
+                         select dl).Count();
+            if (check > 0)
+            {
+
+                //is the a "parent" directory
+                if (listing is ParentDirectoryListing)
+                {
+                    //we received a request to move up the folder hierarchy.  Pop the
+                    //last data context off of the stack.
+                    if (previousDataContexts.Count > 0)
+                    {
+                        DirectoryListing lastDataContext = previousDataContexts.Pop();
+                        DataContext = lastDataContext;
+                    }
+                    else
+                    {
+                        //We've reached our limit.  Inform the captain!
+                        ParentDirectoryRequest(this, EventArgs.Empty);
+                    }
+                }
+                else
+                {
+                    //used to prevent constant casting
+                    DirectoryListing newDataContext = listing as DirectoryListing;
+                    newDataContext.ParentDirectory = DataContext;
+
+                    //push the current data context onto the stack
+                    previousDataContexts.Push(DataContext);
+
+                    //replace the data context with the select item's data context
+                    DataContext = newDataContext;
+                }
+
+            }
+        }
+
         /// <summary>
         /// We listen for left mouse button clicks to check for item selection and directory
         /// traversal.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void ListOfFiles_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void ListOfFiles_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             FileListItem selectedItem = (sender as ListBox).SelectedItem as FileListItem;
             if (LastSelectedItem == selectedItem && selectedItem != null)
@@ -165,33 +231,7 @@ namespace FileUploader.Controls
                 //we only care about double clicks on directory listings
                 if (selectedItem.DataContext is DirectoryListing)
                 {
-                    //is the a "parent" directory
-                    if (selectedItem.DataContext is ParentDirectoryListing)
-                    {
-                        //we received a request to move up the folder hierarchy.  Pop the
-                        //last data context off of the stack.
-                        if (previousDataContexts.Count > 0)
-                        {
-                            DirectoryListing lastDataContext = previousDataContexts.Pop();
-                            DataContext = lastDataContext;
-                        }
-                        else
-                        {
-                            //We've reached our limit.  Inform the captain!
-                            ParentDirectoryRequest(this, EventArgs.Empty);
-                        }
-                    }
-                    else
-                    {
-                        //used to prevent constant casting
-                        DirectoryListing newDataContext = selectedItem.DataContext as DirectoryListing;
-
-                        //push the current data context onto the stack
-                        previousDataContexts.Push(DataContext);
-
-                        //replace the data context with the select item's data context
-                        DataContext = newDataContext;
-                    }
+                    TraverseToDirectory(selectedItem.DataContext as DirectoryListing);
                 }
             }
             LastSelectedItem = selectedItem;

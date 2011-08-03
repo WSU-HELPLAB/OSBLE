@@ -24,11 +24,11 @@
   </MetadataSources>
   <Metadata>
     <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="bfc2eaf7-a404-4c73-8fee-b0417403a202" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
-    <MetadataFile FileName="service1.wsdl" MetadataType="Wsdl" ID="5f243b21-ad3c-42a1-898f-cd3ad012f58b" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
+    <MetadataFile FileName="service22.wsdl" MetadataType="Wsdl" ID="9f81a38b-d578-4c07-9b03-f07822e9d856" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
     <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="8e1e16af-51c9-4b89-a465-02e4be2e5399" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
-    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="4b086520-92e1-424a-af5f-28abc5e6e146" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
-    <MetadataFile FileName="OSBLE.Models.Services.Uploader.xsd" MetadataType="Schema" ID="0ff15ec9-da25-4920-9104-c8b624ca7ecd" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
-    <MetadataFile FileName="Arrays.xsd" MetadataType="Schema" ID="e01c4ebb-b2af-4398-804c-0a4c37b18084" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
+    <MetadataFile FileName="service22.xsd" MetadataType="Schema" ID="2a082c29-0f37-4158-a7b9-5fe3e3a6eccd" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
+    <MetadataFile FileName="OSBLE.Models.Services.Uploader12.xsd" MetadataType="Schema" ID="5a4b08b1-1faf-462a-96df-9d6a38ed7d2a" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
+    <MetadataFile FileName="Arrays12.xsd" MetadataType="Schema" ID="a3784e4c-1f44-4bb8-99f4-8e6e740e672f" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
