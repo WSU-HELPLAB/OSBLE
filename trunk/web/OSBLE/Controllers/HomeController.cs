@@ -420,11 +420,6 @@ namespace OSBLE.Controllers
                     {
                         db.DashboardPosts.Add(newDp);
 
-                        //pull all users that have asked to receive activity posts via email
-                        List<UserProfile> usersWantingEmail = (from u in db.UserProfiles
-                                                               where u.EmailAllActivityPosts == true
-                                                               select u).ToList();
-
                         //construct the subject & body
                         string subject = "";
                         string body = "";
@@ -456,16 +451,10 @@ namespace OSBLE.Controllers
                             body += dp.Content;
                         }
 
-                        //add the users to the email list
-                        foreach (UserProfile up in usersWantingEmail)
-                        {
-                            addresses.Add(new MailAddress(up.UserName, up.FirstName + " " + up.LastName));
-                        }
-
                         //If the instructor wanted to email the entire class, add these users as well.
                         //We should be in the clear if adding dupes from above as we're dealing with references
                         //to the same object.
-                        if (c != null && sendEmail && cu.AbstractRole.CanModify)
+                        if ((c != null && sendEmail && cu.AbstractRole.CanModify) || cu.UserProfile.EmailAllActivityPosts)
                         {
                             foreach (CoursesUsers member in db.CoursesUsers.Where(coursesUsers => coursesUsers.AbstractCourseID == c.ID).ToList())
                             {
