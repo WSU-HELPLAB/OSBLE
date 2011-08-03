@@ -1182,15 +1182,18 @@ namespace OSBLE.Controllers
                     List<TeamUserMember> teamMember = (from a in assignmentList.ElementAt(i).TeamUsers select a).ToList();
 
                     var rubricEvals = (from a in db.RubricEvaluations where a.AbstractAssignmentActivityID == assignmentList.ElementAt(i).ID select a);
-
+                    
+                    //if (rubricEvals.Count() > 0)
                     if (rubricEvals.Count() > 0)
                     {
+                        /* I'm pretty sure we don't want to be deleting the criterion
                         var criterion = (from c in db.Criteria where c.RubricID == assignmentList.ElementAt(i).AbstractAssignment.RubricID select c);
                         foreach (Criterion c in criterion)
                         {
                             db.Criteria.Remove(c);
                         }
                         db.SaveChanges();
+                        */
 
                         foreach (RubricEvaluation r in rubricEvals)
                         {
@@ -1208,9 +1211,9 @@ namespace OSBLE.Controllers
 
                     db.AbstractAssignmentActivities.Remove(assignmentList.ElementAt(i));
                     db.SaveChanges();
-
+                    /*removed, was causing an error because the abstract assignment is already removed via entity framework i think?
                     db.AbstractAssignments.Remove(assignmentList.ElementAt(i).AbstractAssignment);
-                    db.SaveChanges();
+                    db.SaveChanges();*/
                 }
 
                 Category category = db.Categories.Find(categoryId);
@@ -1996,12 +1999,22 @@ namespace OSBLE.Controllers
 
             List<Category> allCategories = cats.ToList();
 
-            Category currentTab = (from c in allCategories where c.ID == categoryId select c).First();
-
-            if (currentTab == null)
+            Category currentTab = null;
+            var dbCategories = (from c in allCategories where c.ID == categoryId select c);
+            if (dbCategories.Count() > 0)
             {
+                //Probably only 1 thing will match, take the first.
+                currentTab = dbCategories.First();
+            }
+            else if (dbCategories.Count() == 0)
+            {
+                //If there were no matches, then set currenTab to the main tab
                 currentTab = (from c in allCategories select c).First();
             }
+            //if (currentTab == null)
+            //{
+            //    currentTab = (from c in allCategories select c).First();
+            //}
 
             int numDropped = currentTab.dropX;
 
