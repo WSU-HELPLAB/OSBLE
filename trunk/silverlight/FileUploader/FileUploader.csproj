@@ -200,6 +200,12 @@
     <None Include="Service References\OsbleServices\Arrays1.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\OsbleServices\Arrays11.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleServices\Arrays12.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Service References\OsbleServices\configuration91.svcinfo" />
     <None Include="Service References\OsbleServices\configuration.svcinfo" />
     <None Include="Service References\OsbleServices\FileUploader.OsbleServices.DirectoryListing.datasource">
@@ -214,6 +220,12 @@
     <None Include="Service References\OsbleServices\OSBLE.Models.Services.Uploader1.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\OsbleServices\OSBLE.Models.Services.Uploader11.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleServices\OSBLE.Models.Services.Uploader12.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Service References\OsbleServices\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
@@ -223,16 +235,16 @@
     <None Include="Service References\OsbleServices\service.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OsbleServices\service1.wsdl" />
-    <None Include="Service References\OsbleServices\service1.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="Service References\OsbleServices\service2.wsdl" />
     <None Include="Service References\OsbleServices\service2.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\OsbleServices\service21.wsdl" />
     <None Include="Service References\OsbleServices\service21.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleServices\service22.wsdl" />
+    <None Include="Service References\OsbleServices\service22.xsd">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>

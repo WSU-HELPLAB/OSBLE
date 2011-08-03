@@ -88,6 +88,7 @@
       <xs:sequence>
         <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="courseId" type="xs:int" />
+        <xs:element minOccurs="0" name="relativePath" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="authToken" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
@@ -148,6 +149,7 @@
       <xs:sequence>
         <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/OSBLE.Models.Services.Uploader" minOccurs="0" name="dirList" nillable="true" type="q6:DirectoryListing" />
         <xs:element minOccurs="0" name="courseId" type="xs:int" />
+        <xs:element minOccurs="0" name="relativePathStart" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="authToken" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
@@ -165,6 +167,7 @@
         <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="data" nillable="true" type="xs:base64Binary" />
         <xs:element minOccurs="0" name="courseId" type="xs:int" />
+        <xs:element minOccurs="0" name="relativePath" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="authToken" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>

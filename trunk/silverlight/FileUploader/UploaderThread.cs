@@ -70,6 +70,16 @@ namespace FileUploader
         }
 
         /// <summary>
+        /// Where we should start uploading files.  For example, if we want to upload the file
+        /// "foobar.txt" to the folder "foo/bar", this would be "foo/bar"
+        /// </summary>
+        public string RelativePath
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Used to report upload progress
         /// </summary>
         public int NumberOfUploadsCompleted
@@ -112,7 +122,6 @@ namespace FileUploader
         public UploaderThread()
         {
             //various event handlers
-            client.PrepCurrentPathCompleted += new EventHandler<PrepCurrentPathCompletedEventArgs>(client_PrepCurrentPathCompleted);
             client.SyncFileCompleted += new EventHandler<SyncFileCompletedEventArgs>(client_SyncFileCompleted);
             client.GetLastModifiedDateCompleted += new EventHandler<GetLastModifiedDateCompletedEventArgs>(client_GetLastModifiedDateCompleted);
             client.IsValidKeyCompleted += new EventHandler<IsValidKeyCompletedEventArgs>(client_IsValidKeyCompleted);
@@ -141,26 +150,15 @@ namespace FileUploader
                 return;
             }
 
-            //give the web service a map of what we're planning to upload
-            client.PrepCurrentPathAsync(Listing, CourseId, AuthToken);
-        }
-
-        /// <summary>
-        /// Step 2: Prep file path
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void client_PrepCurrentPathCompleted(object sender, PrepCurrentPathCompletedEventArgs e)
-        {
             //begin directory sync
             SyncListing(Listing);
 
             //tell everyone that we're done
             OnCompleted();
-        }        
+        }      
 
         /// <summary>
-        /// Step 3: Finally begin uploading files to the web service
+        /// Step 2: Finally begin uploading files to the web service
         /// </summary>
         /// <param name="listing"></param>
         /// <param name="basePath"></param>
@@ -188,7 +186,7 @@ namespace FileUploader
                 string fileName = basePath + fl.Name;
 
                 //check to see if the file needs to be updated
-                client.GetLastModifiedDateAsync(fileName, CourseId, AuthToken);
+                client.GetLastModifiedDateAsync(fileName, CourseId, RelativePath, AuthToken);
                 
                 //wait for the call to complete
                 while (!fileLastModifiedCompleted)
@@ -210,7 +208,7 @@ namespace FileUploader
                 stream.Read(data, 0, (int)stream.Length);
 
                 //send the file
-                client.SyncFileAsync(fileName, data, CourseId, AuthToken);
+                client.SyncFileAsync(fileName, data, CourseId, RelativePath, AuthToken);
 
                 //always remember to close the stream
                 stream.Close();
