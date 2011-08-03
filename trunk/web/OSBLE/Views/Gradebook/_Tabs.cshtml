@@ -230,6 +230,7 @@
         else {
             $("#weightEditorErrorText").text("");
             $.ajax({
+                async: false,
                 type: "POST",
                 url: "/Gradebook/ModifyCategoryPoints",
                 data: { value: weight, categoryId: ID }
@@ -278,7 +279,7 @@
         //aligning the menu under the buttons
         x = $("#customizeCateogryTable").position().left;
         y = $("#customizeCateogryTable").position().top;
-        y += $("#customizeCateogryTable").height() - 50; ;
+        y += $("#customizeCateogryTable").height() - 75; ;
         x += $("#customizeCateogryTable").width();
 
         //Moving the menu to the button that clicked it
@@ -342,14 +343,33 @@
 
     function editCategoryName(evt) {
 
+        
         $("#customizeCateogryTable").animate({ "height": "hide" }, { duration: 0 });
         evt.cancelBubble = true;
         oldName = $("#catName-" + ID).html();
 
-        var htmlInput = $('<input type="text" value="'+oldName.toString()+'" />');
+        var tempInput = parseOutPercents(oldName);
+
+        var htmlInput = $('<input type="text" value="' + tempInput + '" />');
         $("#catName-" + ID).html(htmlInput);
         htmlInput.focus();
         htmlInput.select();
+    }
+
+    function parseOutPercents(mString) {
+        var splitArray = mString.split('(');
+        var returnVal = null;
+        $(splitArray).each(function (index, value) {
+            if (index < (splitArray.length - 1)) {
+                if (index == 0) {
+                    returnVal = value;
+                }
+                else {
+                    returnVal += ("(" + value);
+                }
+            }
+        });
+        return returnVal;
     }
 
     function clearFocusOnCell(){
