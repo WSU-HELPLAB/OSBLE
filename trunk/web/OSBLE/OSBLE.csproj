@@ -493,8 +493,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="FileSystem\Courses\1\CourseDocs\" />
-    <Folder Include="FileSystem\Courses\4\CourseDocs\" />
     <Folder Include="Validations\" />
     <Folder Include="Views\SubbmissionAssignmentActivity\" />
     <Folder Include="Views\SubmissionAssignmentActivity\" />
