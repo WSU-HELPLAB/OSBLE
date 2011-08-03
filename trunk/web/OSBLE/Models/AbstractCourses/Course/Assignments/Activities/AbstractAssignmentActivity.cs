@@ -12,7 +12,7 @@ namespace OSBLE.Models.Assignments.Activities
         [Key]
         public int ID { get; set; }
 
-        [Required]
+        [Required(ErrorMessage="Please enter the activity's name")]
         public string Name { get; set; }
 
         public AbstractAssignmentActivity()

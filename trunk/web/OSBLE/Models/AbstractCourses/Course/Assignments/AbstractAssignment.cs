@@ -14,7 +14,7 @@ namespace OSBLE.Models.Assignments
         [Required]
         public int ID { get; set; }
 
-        [Required]
+        [Required(ErrorMessage="Please enter an assignment name")]
         [StringLength(100)]
         [Display(Name = "Name")]
         public string Name { get; set; }

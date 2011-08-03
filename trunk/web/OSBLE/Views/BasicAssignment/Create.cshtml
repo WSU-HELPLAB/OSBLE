@@ -3,6 +3,7 @@
 @using OSBLE.Models.AbstractCourses;
 @using OSBLE.Models.AbstractCourses.Course;
 @using OSBLE.Models
+
 @{
     ViewBag.Title = "Create Basic Assignment";
 
@@ -55,6 +56,9 @@
         $('#Assignment_Name').change(function () {
             updateActivitiesName();
         });
+
+        //call this once for fun (needed for edits)
+        updateActivitiesName();
 
         $('#UseRubric').change(function () {
             if ($(this).attr('checked')) {
