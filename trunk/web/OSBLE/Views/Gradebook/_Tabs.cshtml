@@ -168,9 +168,6 @@
             $("." + id[0]).attr("id", "selected");
             $("." + id[0]).css("background", "white");
         }
-
-
-
     });
 
     $(document).click(function () {
@@ -344,6 +341,7 @@
     function editCategoryName(evt) {
 
         evt.cancelBubble = true;
+
         if (oldName != null) {
             return false;
         }
@@ -351,7 +349,17 @@
         $("#customizeCateogryTable").animate({ "height": "hide" }, { duration: 0 });
         oldName = $("#catName-" + ID).html();
 
-        $("#selected").children("a:first").removeAttr("href");
+        oldName = parseOutPercents(oldName);
+
+        //remove the href attribute so you can select and highlight the text in the cell
+        // removeAttr is not supported for IE
+        if (navigator.appName == "Microsoft Internet Explorer") {
+            $("#selected").children("a:first").attr("href", null);
+        }
+        else {
+            $("#selected").children("a:first").removeAttr("href");
+        }
+
         var htmlInput = $('<input id="categoryNameId" onclick="editCategoryName(event);" type="text" value="' + oldName.toString() + '" />');
         $("#catName-" + ID).html(htmlInput);
         
@@ -385,7 +393,9 @@
                 url: "/Gradebook/ModifyCategoryName",
                 data: { value: input, categoryId: ID }
             });
-            window.location.reload(true);
+
+            // readding the href for the tab, it was removed when you edit category name was selected in the drop down menu
+            $("#catName-" + ID).attr("href", "/Gradebook/Tab/?categoryId=ID");
             oldName = null;
         }
     }
