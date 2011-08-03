@@ -81,6 +81,19 @@ namespace OSBLE.Services
             }
         }
 
+        private string CleanPath(string path)
+        {
+            if (path.Length == 0)
+            {
+                return "";
+            }
+            while (path[0] == '/')
+            {
+                path = path.Substring(1);
+            }
+            return path;
+        }
+
         /// <summary>
         /// Removes the supplied file from the selected course
         /// </summary>
@@ -211,14 +224,14 @@ namespace OSBLE.Services
         /// <param name="authToken"></param>
         /// <returns></returns>
         [OperationContract]
-        public DateTime GetLastModifiedDate(string fileName, int courseId, string authToken)
+        public DateTime GetLastModifiedDate(string fileName, int courseId, string relativePath, string authToken)
         {
             if (!IsValidKey(authToken))
             {
                 return DateTime.FromFileTime(0L);
             }
-
-            string file = Path.Combine(FileSystem.GetCourseDocumentsPath(courseId), fileName);
+            relativePath = CleanPath(relativePath);
+            string file = Path.Combine(FileSystem.GetCourseDocumentsPath(courseId), relativePath, fileName);
             if (File.Exists(file))
             {
                 return File.GetLastWriteTime(file);
@@ -365,13 +378,14 @@ namespace OSBLE.Services
         /// <param name="authToken"></param>
         /// <returns></returns>
         [OperationContract]
-        public bool PrepCurrentPath(DirectoryListing dirList, int courseId, string authToken)
+        public bool PrepCurrentPath(DirectoryListing dirList, int courseId, string relativePathStart, string authToken)
         {
             if (!IsValidKey(authToken))
             {
                 return false;
             }
-            FileSystem.PrepCourseDocuments(dirList, courseId);
+            relativePathStart = CleanPath(relativePathStart);
+            FileSystem.PrepCourseDocuments(dirList, courseId, relativePathStart);
             return true;
         }
 
@@ -384,16 +398,20 @@ namespace OSBLE.Services
         /// <param name="authToken"></param>
         /// <returns></returns>
         [OperationContract]
-        public bool SyncFile(string fileName, byte[] data, int courseId, string authToken)
+        public bool SyncFile(string fileName, byte[] data, int courseId, string relativePath, string authToken)
         {
             if (!IsValidKey(authToken))
             {
                 return false;
             }
-
-            string file = Path.Combine(FileSystem.GetCourseDocumentsPath(courseId), fileName);
-
-            using (FileStream fs = new FileStream(file, FileMode.Create))
+            relativePath = CleanPath(relativePath);
+            string file = Path.Combine(FileSystem.GetCourseDocumentsPath(courseId), relativePath, fileName);
+            string directory = Path.GetDirectoryName(file);
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            using (FileStream fs = new FileStream(file, FileMode.CreateNew))
             {
                 fs.Write(data, 0, (int)data.Length);
             }
