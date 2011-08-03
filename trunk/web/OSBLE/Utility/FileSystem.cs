@@ -534,7 +534,7 @@ namespace OSBLE
             Array.Copy(rawPieces, 5, docPath, 0, rawPieces.Length - 5);
 
             //finally, we can build a web-accessible url
-            string url = String.Format("/FileHandler/CourseDocument/{0}/{1}", courseId, string.Join(",", docPath));
+            string url = String.Format("/FileHandler/CourseDocument/{0}/{1}", courseId, string.Join("@", docPath));
             return url;
         }
 

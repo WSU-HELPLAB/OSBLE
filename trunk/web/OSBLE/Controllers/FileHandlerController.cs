@@ -27,7 +27,7 @@ namespace OSBLE.Controllers
                 //AC: At some point, it might be a good idea to document these hacks
 
                 //assume that commas are used to denote directory hierarchy
-                rootPath += "\\" + filePath.Replace(',', '\\');
+                rootPath += "\\" + filePath.Replace('@', '\\');
 
                 //if the file ends in a ".link", then we need to treat it as a web link
                 if (rootPath.Substring(rootPath.LastIndexOf('.') + 1).ToLower().CompareTo("link") == 0)
