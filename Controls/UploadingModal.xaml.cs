@@ -51,6 +51,22 @@ namespace FileUploader.Controls
         }
 
         /// <summary>
+        /// Where we should start uploading files.  For example, if we want to upload the file
+        /// "foobar.txt" to the folder "foo/bar", this would be "foo/bar"
+        /// </summary>
+        public string RelativePath
+        {
+            get
+            {
+                return uploader.RelativePath;
+            }
+            set
+            {
+                uploader.RelativePath = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the ID of the course whose documents we're syncing
         /// </summary>
         public int CourseId

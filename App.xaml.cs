@@ -35,6 +35,10 @@ namespace FileUploader
             {
                 MessageBox.Show("An update for the OSBLE File Uploader is available.  To install, please restart the application");
             }
+            else if (e.Error != null)
+            {
+                MessageBox.Show("An error occurred while attempting to check for a newer version of the OSBLE File Uploader.");
+            }
         }
 
         public static void Navigate(UserControl newPage)
