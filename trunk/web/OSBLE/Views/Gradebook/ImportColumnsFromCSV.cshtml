@@ -42,8 +42,7 @@
 
         if ($(this).hasClass("selected")) {
             $(this).removeClass("selected");
-            var val = $(this).html();
-            var index =
+            var val = $(this).html();            
             $(list).each(function (index, value) {
                 if (value == val) {
                     list.splice(index, 1);

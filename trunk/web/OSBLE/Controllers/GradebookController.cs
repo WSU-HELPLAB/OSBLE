@@ -1180,10 +1180,36 @@ namespace OSBLE.Controllers
                 for (int i = 0; i < assignmentList.Count(); i++)
                 {
                     List<TeamUserMember> teamMember = (from a in assignmentList.ElementAt(i).TeamUsers select a).ToList();
+
+                    var rubricEvals = (from a in db.RubricEvaluations where a.AbstractAssignmentActivityID == assignmentList.ElementAt(i).ID select a);
+
+                    if (rubricEvals.Count() > 0)
+                    {
+                        var criterion = (from c in db.Criteria where c.RubricID == assignmentList.ElementAt(i).AbstractAssignment.RubricID select c);
+                        foreach (Criterion c in criterion)
+                        {
+                            db.Criteria.Remove(c);
+                        }
+                        db.SaveChanges();
+
+                        foreach (RubricEvaluation r in rubricEvals)
+                        {
+                            db.RubricEvaluations.Remove(r);
+                        }
+                        db.SaveChanges();
+                    }
+
+
                     foreach (UserMember item in teamMember)
                     {
                         db.TeamUsers.Remove(item);
                     }
+                    db.SaveChanges();
+
+                    db.AbstractAssignmentActivities.Remove(assignmentList.ElementAt(i));
+                    db.SaveChanges();
+
+                    db.AbstractAssignments.Remove(assignmentList.ElementAt(i).AbstractAssignment);
                     db.SaveChanges();
                 }
 
