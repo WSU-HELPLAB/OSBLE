@@ -12,7 +12,7 @@
 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
 {
 
-    string accordionHeaderID = Model.ID.ToString(); 
+    string accordionHeaderID = Model.ID.ToString();
     string tableID = "table_" + Model.ID.ToString();
     
     
@@ -20,9 +20,10 @@
     DateTime startDate = Model.ReleaseDate;
 @* Get the activity following the submission's release date as end date *@
     DateTime endDate = ViewBag.EndDate;
-    <div class="activity_header">
-        @Ajax.ActionLink(Model.Name, "ActivityTeacherTable", "Assignment", new { id = Model.ID }, new AjaxOptions() { LoadingElementId = tableID, InsertionMode = InsertionMode.Replace, UpdateTargetId = tableID, OnFailure = "Ajaxfailed" }, new { id = accordionHeaderID })
-    </div>
+    <div class="activity_header" onclick="loadActivityContent(@Model.ID);">
+        
+        <a href="#">@Model.Name</a>
+          </div>
     <div>
         <table>
             <tr>
