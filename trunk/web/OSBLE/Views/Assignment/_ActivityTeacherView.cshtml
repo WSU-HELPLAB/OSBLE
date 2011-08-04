@@ -12,11 +12,8 @@
 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
 {
 
-    int StudioAssignmentCounter = ViewBag.StudioAssignmentCounter;
-    int activityCounter = ViewBag.ActivityCounter;
-
-    string accordionHeaderID = StudioAssignmentCounter.ToString() + "_" + activityCounter.ToString();
-    string tableID = "table_" + StudioAssignmentCounter.ToString() + "_" + activityCounter.ToString();
+    string accordionHeaderID = Model.ID.ToString(); 
+    string tableID = "table_" + Model.ID.ToString();
     
     
 @* Get submission's release date as start date *@

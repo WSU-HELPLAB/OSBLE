@@ -584,7 +584,7 @@
                 usePreviousSelected = "checked=\"checked\"";
             }
              
-            <input type="radio" name="line_review_options" value="AutoConfig" @Html.Raw(usePreviousSelected) /><text>Use previously-defined
+            <input id="UsePreviousCommentCategoryRadio" type="radio" name="line_review_options" value="AutoConfig" @Html.Raw(usePreviousSelected) /><text>Use previously-defined
             set of comment categories</text>
             <select id="comment_category_selection" name="comment_category_selection">
                 @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)
@@ -690,17 +690,21 @@
             function validation(e) {
                 // this stores the deliverable
                 addNewDeliverable(false);
-                
-                //check if they add more inline comment category options then they fill in wont allow them to create the assignment
-                $("#category_data :input").each(function () {
-                    var prefix = $(this).attr("name").split("_");
-                    if (prefix[0] == "category" && prefix[1] == "option") {
-                        if ($(this).val() == "") {
-                            alert("You must fill in the name for each inline comment category option.");
-                            e.preventDefault();
+
+                //only validate comment categories if we're not pulling from a previous assignment
+                if ($('#UsePreviousCommentCategoryRadio').attr("checked") != 'checked') {
+
+                    //check if they add more inline comment category options then they fill in wont allow them to create the assignment
+                    $("#category_data :input").each(function () {
+                        var prefix = $(this).attr("name").split("_");
+                        if (prefix[0] == "category" && prefix[1] == "option") {
+                            if ($(this).val() == "") {
+                                alert("You must fill in the name for each inline comment category option.");
+                                e.preventDefault();
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         </script>
     </div>
