@@ -92,7 +92,7 @@
         </tr>
         <tr>
             <td>
-                <a onclick="editCategoryName(event);">Edit Category Name</a>
+                <a onclick="displayNameEditor();">Edit Category Name</a>
             </td>
         </tr>
         <tr>
@@ -122,6 +122,20 @@
         <text id="weightEditorErrorText" style="color:Red"></text>
     </form>
 </div>
+
+<div id="nameEditor" style="display:none;" title="Change Category Name">
+    <form id="nameEditorForm" onsubmit="modifyCatName(); return false;">
+        <text>Enter the new category name: </text>
+        <input style="width:160px;" type="text" id="nameEditorTextBox"/>
+        <div class="yesAndNoDiv">
+            <input value="Apply" type="submit"/>
+            <input value="Cancel" type="button" onclick="hideNameEditor()" />
+        </div>
+        <text id="nameEditorErrorText" style="color:Red"></text>
+    </form>
+</div>
+
+
 
 <div id="confirmDeleteDiv" style="display:none" title="Confrim Delete">
     Are you sure you want to permanently delete this category and all the assignments within it?<br />
@@ -202,6 +216,24 @@
         }
     });
 
+    function hideNameEditor() {
+        $("#nameEditor").dialog('close');
+    }
+    function displayNameEditor() {
+        var temp = $("#catName-" + ID).text();
+        temp = parseOutPercents(temp);
+        $("#nameEditorTextBox").val(temp);
+        $("#nameEditor").dialog({
+            modal: true,
+            resizable: false,
+            width: 310,
+            height: 135,
+            closeOnEscape: false
+        });
+        $("#nameEditorTextBox").focus();
+        $("#nameEditorTextBox").select();
+    }
+
     function displayWeightEditor() {
 
         $("#weightEditorTextBox").val(currentCategoryWeight);
@@ -220,6 +252,24 @@
         $("#weightEditor").dialog('close');
     }
 
+    function modifyCatName() {
+        var name = $("#nameEditorTextBox").val();
+        if (name == "" || name == null) {
+            var errorMsg = "Error: Please enter a valid name";
+            $("#nameEditorErrorText").text(errorMsg);
+        }
+        else {
+            $("#nameEditorErrorText").text("");
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: "/Gradebook/ModifyCategoryName",
+                data: {value: name, categoryId: ID}
+            });
+            hideNameEditor();
+            window.location.reload(true);
+        }
+    }
     function modifyWeight() {
         var weight = $("#weightEditorTextBox").val();
         if (isNaN(weight)){
@@ -341,42 +391,25 @@
         window.location.reload(true);
     }
 
-    function editCategoryName(evt) {
-
-        evt.cancelBubble = true;
-
-        if (oldName != null) {
-            return false;
-        }
-
-        $("#customizeCateogryTable").animate({ "height": "hide" }, { duration: 0 });
-        oldName = $("#catName-" + ID).html();
-
-        oldName = parseOutPercents(oldName);
-
-        //remove the href attribute so you can select and highlight the text in the cell
-        // removeAttr is not supported for IE
-        if (navigator.appName == "Microsoft Internet Explorer") {
-            $("#selected").children("a:first").attr("href", null);
-        }
-        else {
-            $("#selected").children("a:first").removeAttr("href");
-        }
-
-        var htmlInput = $('<input id="categoryNameId" onclick="editCategoryName(event);" type="text" value="' + oldName.toString() + '" />');
-        $("#catName-" + ID).html(htmlInput);
-        
-        htmlInput.focus();
-        htmlInput.select();
-    }
-
+    //Parsing out the percents from the category name for better editing
     function parseOutPercents(mString) {
         var splitArray = mString.split('(');
         var returnVal = null;
         $(splitArray).each(function (index, value) {
             if (index < (splitArray.length - 1)) {
                 if (index == 0) {
-                    returnVal = value;
+                    if (splitArray.length == 2) {
+                        //Only one word, remove the last character as its a space
+                        returnVal = value.substring(0, value.length - 1);
+                    }
+                    else {
+                        returnVal = value;
+                    }
+
+                }
+                else if (index == splitArray.length - 2) {
+                    //Last entry that will be shown, has an extra space at the end from the percent shown
+                    returnVal += "(" + value.substring(0, value.length - 1);
                 }
                 else {
                     returnVal += ("(" + value);

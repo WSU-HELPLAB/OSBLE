@@ -305,6 +305,9 @@ namespace OSBLE.Controllers
                 AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(abstractAssignmentActivityId);
                 TeamUserMember teamUser = db.TeamUsers.Find(teamUserId);
 
+                ViewBag.activity = activity;
+                ViewBag.TeamUser = teamUser;
+
                 if (activity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourse.ID && teamUser.Contains(currentUser))
                 {
                     Session.Add("CurrentActivityID", activity.ID);
