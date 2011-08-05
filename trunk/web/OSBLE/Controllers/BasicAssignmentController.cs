@@ -226,7 +226,37 @@ namespace OSBLE.Controllers
                 //changes.  As a quick hack, I decided to just pull the most recent copy
                 //from the DB, make the changes, then submit that copy back.
                 BasicAssignmentViewModel fakeVm = SetUpViewModel(basic.Assignment.ID);
-
+                
+                /* AC TODO: Figure out how to get this code working so that we remove orphaned items from the DB.
+                //clear out all previous team users
+                foreach (TeamUserMember teamUser in fakeVm.Submission.TeamUsers.ToList())
+                {
+                    db.Entry(teamUser).State = System.Data.EntityState.Deleted;
+                }
+                fakeVm.Submission.TeamUsers = new 
+                /*
+                //do the same for deliverables
+                foreach (Deliverable deliverable in fakeVm.Assignment.Deliverables)
+                {
+                    db.Entry(deliverable).State = System.Data.EntityState.Deleted;
+                }
+                
+                //submit changes
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch (DbEntityValidationException dbEx)
+                {
+                    foreach (var validationErrors in dbEx.EntityValidationErrors)
+                    {
+                        foreach (var validationError in validationErrors.ValidationErrors)
+                        {
+                            Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
+                        }
+                    }
+                }
+                 * */
 
                 fakeVm.Submission.addedPoints = basic.Submission.addedPoints;
                 fakeVm.Submission.ColumnOrder = basic.Submission.ColumnOrder;
