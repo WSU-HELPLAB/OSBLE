@@ -21,13 +21,6 @@ namespace OSBLE.Controllers
 
         public ActionResult Create(int? id)
         {
-            //This will simulate long load times
-            /*Int64 i = 0;
-            while (i < 1000000000)
-            {
-                i++;
-            }*/
-
             if (id != null)
             {
                 AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(id);
@@ -164,6 +157,7 @@ namespace OSBLE.Controllers
                             j++;
                         } while (delName != null);
 
+                        Session["SubmissionReceived"] = true;
                         return RedirectToAction("Index", "Assignment");
                     }
                 }

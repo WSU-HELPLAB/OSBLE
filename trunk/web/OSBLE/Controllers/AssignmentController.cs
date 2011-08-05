@@ -29,7 +29,17 @@ namespace OSBLE.Controllers
 
         public ActionResult Index(int? id)
         {
-            
+            //did the user just submit something?  If so, set up view to notify user
+            if (Session["SubmissionReceived"] != null && Convert.ToBoolean(Session["SubmissionReceived"]) == true)
+            {
+                ViewBag.SubmissionReceived = true;
+                Session["SubmissionReceived"] = null;
+            }
+            else
+            {
+                ViewBag.SubmissionReceived = false;
+                Session["SubmissionReceived"] = null;
+            }
 
             // These are probably the nastiest set of queries in OSBLE.
             List<StudioAssignment> studioAssignments = db.StudioAssignments.Where(
