@@ -3,19 +3,17 @@
 @using OSBLE.Models.AbstractCourses;
 @using OSBLE.Models.AbstractCourses.Course;
 @using OSBLE.Models
-
 @{
     ViewBag.Title = "Create Basic Assignment";
 
     //Based on various things that can happen in the controller, our CommentCategoryConfiguration
     //may end up null.  Since our view depends on CommentCategoryConfiguration not being null,
     //we need to handle such cases. 
-    if(Model.Assignment.CommentCategoryConfiguration == null)
+    if (Model.Assignment.CommentCategoryConfiguration == null)
     {
         Model.Assignment.CommentCategoryConfiguration = new CommentCategoryConfiguration();
     }
 }
-
 <h2>
     Create Basic Assignment @Helpers.CreateToolTip(ToolTips.BasicAssignmentTitle)
 </h2>
@@ -375,6 +373,18 @@
     @Html.HiddenFor(model => model.Assignment.ID)
     @Html.HiddenFor(model => model.Submission.ID)
 
+
+        if (ViewBag.HasSubmissions == true)
+        {
+    <div style="background: #FFF8B2; color: Red; font-size: 1.1em; border: 1px solid black;
+        width: 700px; margin-left: auto; margin-right: auto; padding: 6px; text-align: justify;">
+        <strong>WARNING:</strong> You are about to make changes to an existing assignment
+        that has been completed by one or more students. Any changes made to this page will
+        clear all existing submissions attached to this assignment. Any students that have
+        submitted their work must resubmit their assignment.
+    </div>
+        }
+    
     <!--Assignment Name-->
     <div class="editor-label">
         @Html.LabelFor(model => model.Assignment.Name)
@@ -415,7 +425,7 @@
 
     <!--Is Team-->
     <div class="editor-label">
-        @Html.CheckBoxFor(model => submission.isTeam, new { id = "isTeam" }) 
+        @Html.CheckBoxFor(model => submission.isTeam, new { id = "isTeam" })
         @Html.Label("This is a team assignment")
         @Helpers.CreateToolTip(ToolTips.BasicAssignmentIsTeam)
     </div>
@@ -445,7 +455,6 @@
                 </button>
             </li>
         </ul>
-        
         <!--Radio Button Manual Teams-->
         <input type="radio" name="team_generation_options" value="ManualTeams" />
         Specify teams manually
@@ -456,7 +465,6 @@
                 </button>
             </li>
         </ul>
-
         <!--Radio Button Use previous, only shows up if there was a previous team assignment-->
         @if (ViewBag.PastTeamAssignments != null && (ViewBag.PastTeamAssignments as SelectList).Count() != 0)
         { 
@@ -467,11 +475,12 @@
             <ul id="PreviousAssignmentDiv" style="display: none" class="team_generation_options">
                 <li>
                     @Html.DropDownListFor(m => m.SerializedTeamMembersJSON, ViewBag.PastTeamAssignments as SelectList)
-                    <button type="button" onclick="OpenPreviousTeam()"> Edit Teams... </button>
+                    <button type="button" onclick="OpenPreviousTeam()">
+                        Edit Teams...
+                    </button>
                 </li>
             </ul>
         }
-
         <!-- in the future generate teams with mixed ability and Generate teams with same-ability will need to go here -->
     </div>
 
@@ -512,8 +521,7 @@
     <div>
         <a href="#" id="add_new_deliverable" title="Add New Deliverable" style="text-decoration: none;">
             <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Deliverable" />
-            Add Deliverable 
-        </a>
+            Add Deliverable </a>
     </div>
 
     <script type="text/javascript">
@@ -528,11 +536,12 @@
     </script>
     
     <!--Grading Section-->
-    <h3>Grading/Evaluation</h3>
+    <h3>
+        Grading/Evaluation</h3>
     
     <!--Use Rubric-->
     <div class="editor-label">
-        @Html.CheckBoxFor(m => Model.UseRubric) 
+        @Html.CheckBoxFor(m => Model.UseRubric)
         @Html.LabelFor(m => Model.UseRubric)
         @Helpers.CreateToolTip(ToolTips.BasicAssignmentUseRubric)
         <div id="edit_rubric_div" style="display: none">
@@ -557,9 +566,9 @@
           {
               CreateNewSelected = "checked=\"checked\"";
           }
-          }
-        <input type="radio" name="line_review_options" value="ManualConfig" @Html.Raw(CreateNewSelected) />Create new
-        set of comment categories called
+        }
+        <input type="radio" name="line_review_options" value="ManualConfig" @Html.Raw(CreateNewSelected) />Create
+        new set of comment categories called
         <input type="text" id="category_config_name" name="category_config_name" value="@Model.Assignment.CommentCategoryConfiguration.Name" />
         <br />
         <br style="clear: both;" />
@@ -584,8 +593,8 @@
                 usePreviousSelected = "checked=\"checked\"";
             }
              
-            <input id="UsePreviousCommentCategoryRadio" type="radio" name="line_review_options" value="AutoConfig" @Html.Raw(usePreviousSelected) /><text>Use previously-defined
-            set of comment categories</text>
+            <input id="UsePreviousCommentCategoryRadio" type="radio" name="line_review_options" value="AutoConfig" @Html.Raw(usePreviousSelected) /><text>Use
+            previously-defined set of comment categories</text>
             <select id="comment_category_selection" name="comment_category_selection">
                 @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)
                 {
@@ -640,8 +649,8 @@
     </div>
     <div id='grading'>
         <div id="grade_options" class="indented_options">
-             <div class="editor-field">
-                Number of points possible: 
+            <div class="editor-field">
+                Number of points possible:
                 @Html.TextBoxFor(model => model.Submission.PointsPossible, new { id = "submission_points_possible", size = 3, value = Model.Assignment.PointsPossible })
                 @Html.ValidationMessageFor(model => model.Submission.PointsPossible)
             </div>
@@ -675,7 +684,7 @@
     </div>
     <div>
         @Html.HiddenFor(model => model.Assignment.IsDraft, new { id = "is_draft" })
-        <input type="submit" value="Create Basic Assignment" id="create_assignment" onclick="validation(event)"/>
+        <input type="submit" value="Create Basic Assignment" id="create_assignment" onclick="validation(event)" />
         <input type="submit" value="Save as Draft" id="save_draft" />@Helpers.CreateToolTip(ToolTips.BasicAssignmentIsDraft)
         <script type="text/javascript">
             $(function () {
@@ -686,7 +695,7 @@
                     addNewDeliverable(false);
                 });
             });
-            
+
             function validation(e) {
                 // this stores the deliverable
                 addNewDeliverable(false);

@@ -638,6 +638,9 @@ namespace OSBLE.Controllers
                                                             course.ID == activeCourse.AbstractCourseID
                                                           select assignment.CommentCategoryConfiguration).ToList();
             ViewBag.CommentConfigurations = configs;
+
+            //a new assignment can't have existing submissions
+            ViewBag.HasSubmissions = false;
         }
 
         /// <summary>
@@ -656,6 +659,24 @@ namespace OSBLE.Controllers
 
             //similarly, the rubric's id doesn't come from a postback
             ViewBag.SelectedRubric = viewModel.Assignment.RubricID;
+
+            //does this assignment have any submissions?
+            bool submissionFound = false;
+            foreach (TeamUserMember teamUser in viewModel.Submission.TeamUsers)
+            {
+                DateTime? submissionTime = GetSubmissionTime(activeCourse.AbstractCourse as Course, viewModel.Submission, teamUser);
+                if (submissionTime != null)
+                {
+                    submissionFound = true;
+                    break;
+                }
+            }
+
+            //if we found something, then we need to inform the view
+            if (submissionFound)
+            {
+                ViewBag.HasSubmissions = true;
+            }
 
         }
 

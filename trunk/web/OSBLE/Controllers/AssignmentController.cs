@@ -179,13 +179,6 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult ActivityTeacherTable(int id)
         {
-            //This can be used to simulate a long load time
-            /*Int64 i = 0;
-            while (i < 2000000000)
-            {
-                i++;
-            }*/
-
             try
             {
                 StudioActivity studioActivity = db.AbstractAssignmentActivities.Find(id) as StudioActivity;
@@ -194,8 +187,6 @@ namespace OSBLE.Controllers
 
                 if (studioActivity.AbstractAssignment.Category.Course == activeCourse.AbstractCourse)
                 {
-                    //FileSystem.GetAssignmentActivitySubmissionFolder(activeCourse.Course as Course, studioActivity.ID);
-
                     ActivityTeacherTableViewModel viewModel = new ActivityTeacherTableViewModel(studioActivity.AbstractAssignment, studioActivity);
 
                     int numberOfSubmissions = 0;
@@ -206,7 +197,6 @@ namespace OSBLE.Controllers
                         ActivityTeacherTableViewModel.SubmissionInfo submissionInfo = new ActivityTeacherTableViewModel.SubmissionInfo();
 
                         //This checks when something was submitted by the folder modify time it is imperative that they don't get modified except when a student submits something to that folder.
-
                         submissionInfo.Time = GetSubmissionTime(activeCourse.AbstractCourse as Course, studioActivity, teamUser);
 
                         if (submissionInfo.Time != null)

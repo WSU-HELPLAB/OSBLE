@@ -343,7 +343,7 @@ namespace OSBLE.Controllers
         {
             DirectoryInfo submissionFolder = new DirectoryInfo(FileSystem.GetTeamUserSubmissionFolder(false, course, activity.ID, teamUser));
 
-            DateTime timeSubmitted;
+            DateTime? timeSubmitted;
 
             if (submissionFolder.Exists)
             {
@@ -357,6 +357,13 @@ namespace OSBLE.Controllers
                         timeSubmitted = file.LastWriteTime;
                     }
                 }
+
+                //if no files, return null
+                if (submissionFolder.GetFiles().Count() == 0)
+                {
+                    timeSubmitted = null;
+                }
+
                 return timeSubmitted;
             }
             else
