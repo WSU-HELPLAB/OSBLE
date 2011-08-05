@@ -14,6 +14,14 @@ int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
 <div class="assignment_header">
             <a id="@StudioAssignmentCounter" href="#">@sa.Name</a>
         </div>
+        @{
+            //The magic number of "2" means that we're looking at a future assignment.  In this case, don't show any details.
+            //This functionality was requested in work item #412
+            if(ViewBag.AssignmentList == 2)
+            {
+                return;
+            }
+            }
         <div>
             <div class="assignment_title">
                 Description</div>
