@@ -362,7 +362,7 @@ namespace OSBLE.Controllers
                     context.Session["DashboardSingleCourseMode"] = true;
                 }
             }
-            
+
             // Return to Dashboard.
             return RedirectToAction("Index");
         }
@@ -451,14 +451,26 @@ namespace OSBLE.Controllers
                             body += dp.Content;
                         }
 
-                        //If the instructor wanted to email the entire class, add these users as well.
-                        //We should be in the clear if adding dupes from above as we're dealing with references
-                        //to the same object.
-                        if ((c != null && sendEmail && cu.AbstractRole.CanModify) || cu.UserProfile.EmailAllActivityPosts)
+                        List<CoursesUsers> courseUsers = db.CoursesUsers.Where(coursesUsers => coursesUsers.AbstractCourseID == c.ID).ToList();
+
+                        //Who gets this email?  If the instructor desires, we send to everyone
+                        if (c != null && sendEmail && cu.AbstractRole.CanModify)
                         {
-                            foreach (CoursesUsers member in db.CoursesUsers.Where(coursesUsers => coursesUsers.AbstractCourseID == c.ID).ToList())
+                            foreach (CoursesUsers member in courseUsers)
                             {
                                 if (member.UserProfile.UserName != null) // Ignore pending users
+                                {
+                                    addresses.Add(new MailAddress(member.UserProfile.UserName, member.UserProfile.FirstName + " " + member.UserProfile.LastName));
+                                }
+                            }
+                        }
+                        //If the instructor didn't want to send to everyone, only send to those
+                        //that want to receive everything
+                        else
+                        {
+                            foreach (CoursesUsers member in courseUsers)
+                            {
+                                if (member.UserProfile.UserName != null && member.UserProfile.EmailAllActivityPosts) // Ignore pending users
                                 {
                                     addresses.Add(new MailAddress(member.UserProfile.UserName, member.UserProfile.FirstName + " " + member.UserProfile.LastName));
                                 }

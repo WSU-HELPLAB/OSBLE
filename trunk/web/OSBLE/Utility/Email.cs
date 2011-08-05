@@ -6,9 +6,15 @@ namespace OSBLE.Utility
 {
     public static class Email
     {
-        public static void Send(string subject, string message, IEnumerable<MailAddress> to)
+        public static void Send(string subject, string message, ICollection<MailAddress> to)
         {
 #if !DEBUG
+            //ignore empty sends
+            if (to.Count == 0)
+            {
+                return;
+            }
+
             SmtpClient mailClient = new SmtpClient();
             mailClient.UseDefaultCredentials = true;
 
