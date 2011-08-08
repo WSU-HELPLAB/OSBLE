@@ -50,6 +50,8 @@ namespace OSBLE.Controllers
         {
             if (ModelState.IsValid)
             {
+                model.UserName = model.UserName.Trim();
+                model.Password = model.Password.Trim();
                 if (Membership.ValidateUser(model.UserName, model.Password))
                 {
                     context.Session.Clear(); // Clear session variables.
