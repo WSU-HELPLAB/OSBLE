@@ -1106,7 +1106,7 @@ namespace OSBLE.Controllers
             string color = null;
             string name = null;
             switch (colorCount)
-            {
+           { 
                 case 1:
                     color = "#74FEF8";
                     name = "Category 1";
@@ -1174,6 +1174,40 @@ namespace OSBLE.Controllers
         {
             if (ModelState.IsValid)
             {
+
+
+                List<AbstractAssignmentActivity> assignmentList = (from assignments in db.AbstractAssignmentActivities
+                                                                   where assignments.AbstractAssignment.CategoryID == categoryId
+                                                                   select assignments).ToList();
+
+
+                foreach(AbstractAssignmentActivity ass in assignmentList)
+                {
+                    DeleteColumn(ass.ID);
+                }
+
+                //List<TeamUserMember> teamMember = (from a in assignmentList[0].TeamUsers select a).ToList();
+
+
+                //foreach(TeamUserMember k in teamMember)
+                //{
+                //    db.TeamUsers.Remove(k);
+                //}
+                //db.SaveChanges();
+                //List<TeamUserMember> teamMember = (from a in assignmentList.ElementAt(i).TeamUsers select a).ToList();
+                //List<TeamUserMember> teamMembers = db.TeamUsers.Find(categoryId);
+
+                Category catToRemove = db.Categories.Find(categoryId);
+                db.Categories.Remove(catToRemove);
+                db.SaveChanges();
+            }
+        }
+        /*
+        [HttpPost]
+        public void DeleteCategory(int categoryId)
+        {
+            if (ModelState.IsValid)
+            {
                 List<AbstractAssignmentActivity> assignmentList = (from assignments in db.AbstractAssignmentActivities
                                                                    where assignments.AbstractAssignment.CategoryID == categoryId
                                                                    select assignments).ToList();
@@ -1186,14 +1220,14 @@ namespace OSBLE.Controllers
                     //if (rubricEvals.Count() > 0)
                     if (rubricEvals.Count() > 0)
                     {
-                        /* I'm pretty sure we don't want to be deleting the criterion
-                        var criterion = (from c in db.Criteria where c.RubricID == assignmentList.ElementAt(i).AbstractAssignment.RubricID select c);
-                        foreach (Criterion c in criterion)
-                        {
-                            db.Criteria.Remove(c);
-                        }
-                        db.SaveChanges();
-                        */
+                        // I'm pretty sure we don't want to be deleting the criterion
+                        //var criterion = (from c in db.Criteria where c.RubricID == assignmentList.ElementAt(i).AbstractAssignment.RubricID select c);
+                        //foreach (Criterion c in criterion)
+                        //{
+                        //    db.Criteria.Remove(c);
+                        //}
+                        //db.SaveChanges();
+                        
 
                         foreach (RubricEvaluation r in rubricEvals)
                         {
@@ -1211,17 +1245,18 @@ namespace OSBLE.Controllers
 
                     db.AbstractAssignmentActivities.Remove(assignmentList.ElementAt(i));
                     db.SaveChanges();
-                    /*removed, was causing an error because the abstract assignment is already removed via entity framework i think?
-                    db.AbstractAssignments.Remove(assignmentList.ElementAt(i).AbstractAssignment);
-                    db.SaveChanges();*/
+                   //removed, was causing an error because the abstract assignment is already removed via entity framework i think?
+                   // db.AbstractAssignments.Remove(assignmentList.ElementAt(i).AbstractAssignment);
+                   // db.SaveChanges();
                 }
 
                 Category category = db.Categories.Find(categoryId);
                 db.Categories.Remove(category);
                 db.SaveChanges();
             }
-        }
+        }*/
 
+        [CanModifyCourse]
         [HttpPost]
         public ActionResult ChangeTabColor(int categoryId, string value)
         {
@@ -2129,9 +2164,7 @@ namespace OSBLE.Controllers
                         currentPoints += a.Points;
                         currentTotal += a.AssignmentActivity.PointsPossible;
                     }
-                    UserMember user = currentUser as UserMember;
-
-                    var teamuser = from c in currentAssignment.TeamUsers where c.Contains(user.UserProfile) select c;
+                    var teamuser = from c in currentAssignment.TeamUsers where c.Name ==currentUser.Name select c;
                     if (teamuser.Count() > 0)
                     {
                         Score newscore = new Score()
