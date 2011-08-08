@@ -1,5 +1,6 @@
 ﻿using System.Web.Mvc;
 using System.Web.Routing;
+using OSBLE.Models;
 
 namespace OSBLE
 {
@@ -53,6 +54,12 @@ namespace OSBLE
                 new { controller = "FileHandler", action = "CourseDocument" }
                 );
 
+            routes.MapRoute("AssignmentWizard",
+                            "Assignments/Wizard/{step}/{assignmentId}",
+                            new { controller = "Wizard", action = "Index", step = "", assignmentId = 0 },
+                            new[] { "OSBLE.Controllers.Assignments" }
+                            );
+
             routes.MapRoute(
                 "Rubric-eval",
                 "Rubric/{AbstractAssignmentActivityId}/{teamUserId}",
@@ -85,6 +92,7 @@ namespace OSBLE
 
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
+            ViewEngines.Engines.Add(new OsbleViewEngine());
         }
 
 

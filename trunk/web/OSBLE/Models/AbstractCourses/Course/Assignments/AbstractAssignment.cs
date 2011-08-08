@@ -14,10 +14,15 @@ namespace OSBLE.Models.Assignments
         [Required]
         public int ID { get; set; }
 
-        [Required(ErrorMessage="Please enter an assignment name")]
+        [Required(ErrorMessage="Please enter an assignment name.")]
         [StringLength(100)]
         [Display(Name = "Name")]
         public string Name { get; set; }
+
+        [Required]
+        [Display(Name = "Description")]
+        [StringLength(4000)]
+        public string Description { get; set; }
 
         [Required]
         public int CategoryID { get; set; }

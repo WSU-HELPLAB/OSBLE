@@ -1,0 +1,23 @@
+﻿@using OSBLE.Models.Assignments;
+@model AbstractAssignment
+<table>
+    <tr>
+        <th>Assignment Name:</th>
+        <td>@Html.EditorFor(m => m.Name)</td>
+    </tr>
+    <tr>
+        <th>Descrption:</th>
+        <td>@Html.EditorFor(m => m.Description)</td>
+    </tr>
+    <tr>
+        <th>Points Possible:</th>
+        <td>@Html.EditorFor(m => m.PointsPossible, new { size = 3 })</td>
+    </tr>
+    <tr>
+        <th>Assignment Category:</th>
+        <td>
+            @Html.DropDownListFor(m => m.CategoryID, ViewBag.Categories as SelectList)
+            @Html.ValidationMessageFor(m => m.Category)
+        </td>
+    </tr>
+</table>

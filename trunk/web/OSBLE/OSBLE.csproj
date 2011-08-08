@@ -152,6 +152,12 @@
     <Compile Include="Attributes\IsCommunity.cs" />
     <Compile Include="Attributes\NotForCommunity.cs" />
     <Compile Include="Controllers\AssignmentController.cs" />
+    <Compile Include="Controllers\Assignments\WizardController.cs" />
+    <Compile Include="Controllers\Assignments\Wizard\BasicsController.cs" />
+    <Compile Include="Controllers\Assignments\Wizard\RubricController.cs" />
+    <Compile Include="Controllers\Assignments\Wizard\TeamController.cs" />
+    <Compile Include="Controllers\Assignments\Wizard\WizardBaseController.cs" />
+    <Compile Include="Controllers\Assignments\Wizard\WizardComponentManager.cs" />
     <Compile Include="Controllers\AsyncIssueVotingController.cs" />
     <Compile Include="Controllers\AuthorRebuttalController.cs" />
     <Compile Include="Controllers\BasicAssignmentController.cs" />
@@ -204,6 +210,7 @@
     <Compile Include="Models\HomePage\Event.cs" />
     <Compile Include="Models\AbstractCourses\Course\Category.cs" />
     <Compile Include="Models\List.cs" />
+    <Compile Include="Models\OsbleViewEngine.cs" />
     <Compile Include="Models\Services\Uploader\ParentDirectoryListing.cs" />
     <Compile Include="Models\Services\Uploader\UserSession.cs" />
     <Compile Include="Models\ToolTips.cs" />
@@ -418,6 +425,8 @@
     <Content Include="Content\themes\base\jquery.ui.slider.css" />
     <Content Include="Content\themes\base\jquery.ui.tabs.css" />
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
+    <Content Include="Controllers\Assignments\README.txt" />
+    <Content Include="Controllers\Assignments\Wizard\README.txt" />
     <Content Include="crossdomain.xml" />
     <Content Include="EditPeerReviewTestPage.aspx" />
     <Content Include="EditPeerReviewTestPage.html" />
@@ -683,6 +692,8 @@
     <Content Include="Views\Account\AccountCreated.cshtml" />
     <Content Include="Views\Account\ActivateAccount.cshtml" />
     <Content Include="Views\School\Delete.cshtml" />
+    <Content Include="Views\Assignments\Wizard\Index.cshtml" />
+    <Content Include="Views\Assignments\Wizard\Basics\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

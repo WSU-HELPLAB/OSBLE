@@ -1,0 +1,32 @@
+﻿@using OSBLE.Controllers.Assignments.Wizard;
+@using System.Collections;
+@model ICollection<WizardBaseController>
+<h1>Create Assignment</h1>
+<p>
+This wizard will guide you through the creation of a new assignment.  To begin, please select the components that will make up this assignment.
+</p>
+@using (Html.BeginForm())
+{
+<fieldset>
+<legend>Components</legend>
+<table>
+@{
+    foreach(WizardBaseController component in Model)
+    {
+        string checkedText = "";
+        
+        //Basics controller must always be checked
+        if(component is BasicsController)
+        {
+            checkedText = "checked=\"checked\" disabled=\"disabled\"";
+        }
+        <tr>
+            <td><input type="checkbox" @checkedText/></td>
+            <td>@component.ControllerDescription</td>
+        </tr>
+    }
+}
+</table>
+</fieldset>
+<input type="submit" value="Begin" name="StartWizardButton" id="StartWizardButton" />
+}

@@ -8,11 +8,6 @@ namespace OSBLE.Models.Assignments
     {
         public virtual ICollection<Deliverable> Deliverables { get; set; }
 
-        [Required]
-        [Display(Name = "Description")]
-        [StringLength(4000)]
-        public string Description { get; set; }
-
         public StudioAssignment()
             : base()
         {
