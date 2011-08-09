@@ -42,11 +42,11 @@ namespace OSBLE.Models.Courses
         [Display(Name = "Course is inactive (only instructors/observers can log in)")]
         public bool Inactive { get; set; }
 
-        [Display(Name = "Start Date")]
+        [Display(Name = "Released:")]
         [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
 
-        [Display(Name = "End Date")]
+        [Display(Name = "Due")]
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
 
