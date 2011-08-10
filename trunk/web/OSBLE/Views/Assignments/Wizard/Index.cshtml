@@ -1,6 +1,8 @@
 ﻿@using OSBLE.Controllers.Assignments.Wizard;
+@using OSBLE.Models.Wizard;
 @using System.Collections;
-@model ICollection<WizardBaseController>
+@model ICollection<WizardComponent>
+@{ViewBag.Title = "Assignment Creation Wizard";}
 <h1>Create Assignment</h1>
 <p>
 This wizard will guide you through the creation of a new assignment.  To begin, please select the components that will make up this assignment.
@@ -11,22 +13,30 @@ This wizard will guide you through the creation of a new assignment.  To begin, 
 <legend>Components</legend>
 <table>
 @{
-    foreach(WizardBaseController component in Model)
+    foreach(WizardComponent component in Model)
     {
-        string checkedText = "";
+        //readonly items are 
         
-        //Basics controller must always be checked
-        if(component is BasicsController)
+        string checkedText = "";
+        if(component.IsSelected)
         {
+            checkedText = "checked=\"checked\" ";
+        }
+        if (component.IsRequired)
+        {
+            //disabled form elements won't get submitted by a POST.  We display the item anyway for
+            //UI consistency but create a hidden element that will actually be responsible for sending
+            //the data to the server.
             checkedText = "checked=\"checked\" disabled=\"disabled\"";
+            <input type="hidden" name="component_@(component.Name)" value="@(component.Name)" />
         }
         <tr>
-            <td><input type="checkbox" @checkedText/></td>
-            <td>@component.ControllerDescription</td>
+            <td><input type="checkbox" id="component_@(component.Name)" name="component_@(component.Name)" value="@(component.Name)" @Html.Raw(checkedText) /></td>
+            <td>@component.Controller.ControllerDescription</td>
         </tr>
     }
 }
 </table>
 </fieldset>
-<input type="submit" value="Begin" name="StartWizardButton" id="StartWizardButton" />
+<input type="submit" value="Begin" name="@ViewBag.BeginWizardButton" id="@ViewBag.BeginWizardButton" />
 }

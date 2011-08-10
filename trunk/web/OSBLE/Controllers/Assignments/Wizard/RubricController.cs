@@ -28,14 +28,14 @@ namespace OSBLE.Controllers.Assignments.Wizard
             }
         }
 
-        protected override object IndexAction(int assignmentId = 0)
+        protected override object IndexAction()
         {
-            throw new NotImplementedException();
+            return new object();
         }
 
-        protected override object IndexActionPostback(object model)
+        protected override object IndexActionPostback(HttpRequestBase request)
         {
-            throw new NotImplementedException();
+            return new object();
         }
     }
 }

@@ -11,6 +11,7 @@ namespace OSBLE.Controllers.Assignments.Wizard
 {
     public class BasicsController : WizardBaseController
     {
+        private HttpRequestBase webRequest;
 
         public override string ControllerName
         {
@@ -34,28 +35,54 @@ namespace OSBLE.Controllers.Assignments.Wizard
             }
         }
 
-        protected override object IndexAction(int assignmentId = 0)
+        protected override object IndexAction()
         {
+
             //SUBMISSION CATEGORIES
             var cat = from c in (activeCourse.AbstractCourse as Course).Categories
                       where c.Name != Constants.UnGradableCatagory
                       select c;
             ViewBag.Categories = new SelectList(cat, "ID", "Name");
+            return Assignment;
+        }
 
-            if (assignmentId != 0)
+        protected override object IndexActionPostback(HttpRequestBase request)
+        {
+            this.webRequest = request;
+            UpdateAssignmentWithFormValues();
+            if (ModelState.IsValid)
             {
-                return db.StudioAssignments.Find(assignmentId);
+                db.Entry(Assignment).State = System.Data.EntityState.Modified;
+                db.SaveChanges();
+                WasUpdateSuccessful = true;
             }
             else
             {
-                return new StudioAssignment();
+                WasUpdateSuccessful = false;
             }
-
+            return new object();
         }
 
-        protected override object IndexActionPostback(object model)
+        private void UpdateAssignmentWithFormValues()
         {
-            return new object();
+            Assignment.Name = webRequest.Form["Name"];
+            Assignment.Description = webRequest.Form["Description"];
+            try
+            {
+                Assignment.PointsPossible = Convert.ToInt32(webRequest.Form["PointsPossible"]);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("pts", "The number of points possible must be a whole number.");
+            }
+            try
+            {
+                Assignment.CategoryID = Convert.ToInt32(webRequest.Form["CategoryID"]);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("pts", "Please select a valid category.");
+            }
         }
     }
 }

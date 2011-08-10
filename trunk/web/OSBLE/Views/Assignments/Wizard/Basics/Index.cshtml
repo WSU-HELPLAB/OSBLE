@@ -1,17 +1,24 @@
-﻿@using OSBLE.Models.Assignments;
+﻿@{
+    Layout = null;
+}
+@using OSBLE.Models.Assignments;
 @model AbstractAssignment
+@Html.ValidationSummary() 
 <table>
     <tr>
         <th>Assignment Name:</th>
         <td>@Html.EditorFor(m => m.Name)</td>
+        <td>@Html.ValidationMessageFor(m => m.Name)</td>
     </tr>
     <tr>
         <th>Descrption:</th>
         <td>@Html.EditorFor(m => m.Description)</td>
+        <td>@Html.ValidationMessageFor(m => m.Description)</td>
     </tr>
     <tr>
         <th>Points Possible:</th>
         <td>@Html.EditorFor(m => m.PointsPossible, new { size = 3 })</td>
+        <td>@Html.ValidationMessageFor(m => m.PointsPossible)</td>
     </tr>
     <tr>
         <th>Assignment Category:</th>

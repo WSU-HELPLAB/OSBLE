@@ -5,9 +5,9 @@
     <title>OSBLE - @ViewBag.Title</title>
     <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/Content/jquery-tooltip.css")" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../Content/jquery-ui-1.8.13.custom.css" />
-    <link rel="stylesheet" type="text/css" href="../../Content/jquery-ui-timepicker.css" />
-    <link rel="shortcut icon" type="text/css" href="../../Content/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="/Content/jquery-ui-1.8.13.custom.css" />
+    <link rel="stylesheet" type="text/css" href="/Content/jquery-ui-timepicker.css" />
+    <link rel="shortcut icon" type="text/css" href="/Content/favicon.ico" />
 
     <script src="@Url.Content("~/Scripts/jquery-1.6.1.min.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.min.js")" type="text/javascript"></script>
@@ -39,16 +39,16 @@
                             @ViewBag.CurrentUser.LastName
                             
                         }</span>
-                        <a href="@Url.Action("Index", "Mail")" title="Mail Messages" class="top_item"><img src="../../Content/images/mail.png" alt="Mail" /> (@ViewBag.UnreadMessageCount)</a>
-                        <a href="@Url.Action("Profile", "Account")" title="View Personal Settings" class="top_item"><img src="../../Content/images/account.png" alt="Account" /></a>
-                    <a href="@Url.Action("LogOff", "Account")" title="Log Off" class="top_item"><img src="../../Content/images/logoff.png" alt="Logoff" /></a>
+                        <a href="@Url.Action("Index", "Mail")" title="Mail Messages" class="top_item"><img src="/Content/images/mail.png" alt="Mail" /> (@ViewBag.UnreadMessageCount)</a>
+                        <a href="@Url.Action("Profile", "Account")" title="View Personal Settings" class="top_item"><img src="/Content/images/account.png" alt="Account" /></a>
+                    <a href="@Url.Action("LogOff", "Account")" title="Log Off" class="top_item"><img src="/Content/images/logoff.png" alt="Logoff" /></a>
                 </div>
             </div>
             <div id="logo">
-                <a href="/"><img src="../../Content/images/logo.png" alt="OSBLE Logo" /></a>
+                <a href="/"><img src="/Content/images/logo.png" alt="OSBLE Logo" /></a>
             </div>
             <div id="logo_text">
-                <a href="/"><img src="../../Content/images/logo_text.png" alt="OSBLE" /></a>
+                <a href="/"><img src="/Content/images/logo_text.png" alt="OSBLE" /></a>
             </div>
             <div id="courses">
                 @Html.Partial("_CourseList")

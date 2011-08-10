@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Reflection;
+using OSBLE.Models.Wizard;
+using OSBLE.Models.Assignments;
 
 namespace OSBLE.Controllers.Assignments.Wizard
 {
@@ -29,8 +31,13 @@ namespace OSBLE.Controllers.Assignments.Wizard
         /// </summary>
         public abstract ICollection<WizardBaseController> Prerequisites { get; }
 
+        public StudioAssignment Assignment { get; set; }
+
+        public bool WasUpdateSuccessful { get; set; }
+
         public WizardBaseController()
         {
+            WasUpdateSuccessful = true;
         }
 
         private string BuildViewPath(string action)
@@ -45,9 +52,9 @@ namespace OSBLE.Controllers.Assignments.Wizard
             return View(BuildViewPath("Index"), model);
         }
 
-        public ActionResult Index(object model)
+        public ActionResult Index(HttpRequestBase request)
         {
-            object modifiedModel = IndexActionPostback(model);
+            object modifiedModel = IndexActionPostback(request);
             return View(BuildViewPath("Index"), modifiedModel);
         }
 
@@ -55,13 +62,13 @@ namespace OSBLE.Controllers.Assignments.Wizard
         /// Put all code needed for your index action into this method
         /// </summary>
         /// <param name="assignmentId"></param>
-        protected abstract object IndexAction(int assignmentId = 0);
+        protected abstract object IndexAction();
 
         /// <summary>
         /// Put all code needed for your index postbacks into this method.
         /// </summary>
         /// <param name="model"></param>
-        protected abstract object IndexActionPostback(object model);
+        protected abstract object IndexActionPostback(HttpRequestBase request);
 
         public int CompareTo(object obj)
         {
