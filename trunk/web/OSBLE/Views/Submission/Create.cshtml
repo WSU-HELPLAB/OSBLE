@@ -29,7 +29,7 @@
             }
 
             if (askedToContinue == false) {
-                var inBrowserTextAreas = $("#file_uploader_form :textarea");
+                var inBrowserTextAreas = $("#file_uploader_form .textAreaClass");
                 for (i = 0; i < inBrowserTextAreas.length; i++) {
                     if (inBrowserTextAreas.value.length == 0) {
                         askedToContinue = true;
@@ -134,7 +134,6 @@
                                 <input type='file' name='files' onchange="checkFileExension(this, @MvcHtmlString.Create("stringArray" + fileUploadsSoFar.ToString()))"/>
                                 <em>Your submission must be less than @(ViewBag.MaxFileSizeMB)mb.</em>
                             @{
-                                
                                 fileUploadsSoFar++;
                             }
                         </td>
@@ -146,7 +145,7 @@
                     <tr>
                         <td colspan="2">
                             <input type="hidden" name="desiredName[@inBrowserCount]" readonly="true" value="@deliverable.Name"/>
-                            <textarea name="inBrowserText[@inBrowserCount]" rows="10" cols = "53" ></textarea>
+                            <textarea class="textAreaClass" name="inBrowserText[@inBrowserCount]" rows="10" cols = "53" ></textarea>
                         </td>
                     </tr>
                         

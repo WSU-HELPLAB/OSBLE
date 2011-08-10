@@ -56,14 +56,7 @@
 </script>
 <div>
     <p>
-    @if(ViewBag.NumberGraded != 1)
-    {
-        <text>@ViewBag.NumberOfSubmissions of @ViewBag.ExpectedSubmissionsAndGrades submissions, of which @ViewBag.NumberGraded have been graded.</text>
-        }
-        else
-        {
-        <text>@ViewBag.NumberOfSubmissions of @ViewBag.ExpectedSubmissionsAndGrades submissions, of which @ViewBag.NumberGraded has been graded.</text>
-        }
+        <text>@ViewBag.NumberOfSubmissions of @ViewBag.ExpectedSubmissionsAndGrades submissions have been recieved.</text>
         <br />
         <br />@Html.ActionLink("Download all submissions for this activity", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentActivityID = ViewBag.activityID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
     </p>
