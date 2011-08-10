@@ -56,14 +56,15 @@ namespace OSBLE
 
             routes.MapRoute("AssignmentWizard",
                             "Assignments/Wizard/{step}/{assignmentId}",
-                            new { controller = "Wizard", action = "Index", step = "", assignmentId = 0 },
+                            new { controller = "Wizard", action = "Index", step = "Start", assignmentId = UrlParameter.Optional },
                             new[] { "OSBLE.Controllers.Assignments" }
                             );
 
             routes.MapRoute(
                 "Rubric-eval",
                 "Rubric/{AbstractAssignmentActivityId}/{teamUserId}",
-                new { controller = "Rubric", action = "Index" }
+                new { controller = "Rubric", action = "Index" },
+                new[]{ "OSBLE.Controllers" }
                 );
 
             //very generic.  Make sure that these stay at the bottom.
