@@ -15,7 +15,6 @@ This wizard will guide you through the creation of a new assignment.  To begin, 
 @{
     foreach(WizardComponent component in Model)
     {
-        //readonly items are 
         
         string checkedText = "";
         if(component.IsSelected)
@@ -32,7 +31,7 @@ This wizard will guide you through the creation of a new assignment.  To begin, 
         }
         <tr>
             <td><input type="checkbox" id="component_@(component.Name)" name="component_@(component.Name)" value="@(component.Name)" @Html.Raw(checkedText) /></td>
-            <td>@component.Controller.ControllerDescription</td>
+            <td><label for="component_@(component.Name)">@component.Controller.ControllerDescription</label></td>
         </tr>
     }
 }

@@ -15,16 +15,17 @@ namespace OSBLE.Models.Assignments
         public int ID { get; set; }
 
         [Required(ErrorMessage="Please enter an assignment name.")]
-        [StringLength(100)]
-        [Display(Name = "Name")]
+        [StringLength(100, ErrorMessage="The assignment's name must be under 100 characters.")]
+        [Display(Name = "Assignment Name")]
         public string Name { get; set; }
 
-        [Required]
+        [Required(ErrorMessage="Please provide a description for this assignment.")]
         [Display(Name = "Description")]
         [StringLength(4000)]
         public string Description { get; set; }
 
         [Required]
+        [Display(Name = "Grading Category")]
         public int CategoryID { get; set; }
 
         public virtual Category Category { get; set; }
@@ -35,6 +36,7 @@ namespace OSBLE.Models.Assignments
         /// <summary>
         /// Grading points possible relative to sibling assignments in the parent category.
         /// </summary>
+        [Display(Name = "Points Possible")]
         public int PointsPossible { get; set; }
 
         /// <summary>

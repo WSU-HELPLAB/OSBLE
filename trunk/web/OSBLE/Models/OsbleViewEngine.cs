@@ -16,10 +16,17 @@ namespace OSBLE.Models
             "~/Views/Assignments/Wizard/{1}/{0}.vbhtml"
         };
 
+        private static string[] PartialViewLocations = new[]
+            {
+                "~/Views/Assignments/{1}/{0}.cshtml",
+                "~/Views/Assignments/{1}/{0}.vbhtml",
+            };
+
         public OsbleViewEngine()
             : base()
         {
             base.ViewLocationFormats = base.ViewLocationFormats.Union(ViewLocations).ToArray();
+            base.PartialViewLocationFormats = base.PartialViewLocationFormats.Union(PartialViewLocations).ToArray();
         }
     }
 }

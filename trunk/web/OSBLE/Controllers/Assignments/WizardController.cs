@@ -12,10 +12,10 @@ namespace OSBLE.Controllers.Assignments
     public class WizardController : OSBLEController
     {
         private WizardComponentManager manager;
-        private const string selectedComponentsKey = "WizardSelectedComponentsKey";
-        private const string beginWizardButton = "StartWizardButton";
-        private const string previousWizardButton = "PreviousWizardButton";
-        private const string nextWizardButton = "NextWizardButton";
+        public static string selectedComponentsKey = "WizardSelectedComponentsKey";
+        public static string beginWizardButton = "StartWizardButton";
+        public static string previousWizardButton = "PreviousWizardButton";
+        public static string nextWizardButton = "NextWizardButton";
 
         public ICollection<WizardBaseController> SelectedComponents
         {
@@ -39,9 +39,15 @@ namespace OSBLE.Controllers.Assignments
         public WizardController()
         {
             manager = WizardComponentManager.GetInstance();
+            BuildViewBag();
+        }
+
+        private void BuildViewBag()
+        {
             ViewBag.BeginWizardButton = beginWizardButton;
             ViewBag.PreviousWizardButton = previousWizardButton;
             ViewBag.NextWizardButton = nextWizardButton;
+            ViewBag.Title = "Assignment Creation Wizard";
         }
 
         public ActionResult Index(string step, int? assignmentId)
@@ -56,19 +62,15 @@ namespace OSBLE.Controllers.Assignments
                 if (assignmentId != null)
                 {
                     int aid = (int)assignmentId;
-                    manager.ActiveAssignment = (from assign in db.StudioAssignments
-                                                where assign.ID == aid
-                                                select assign).FirstOrDefault();
-                    db.Entry(manager.ActiveAssignment).State = System.Data.EntityState.Detached;
+                    manager.ActiveAssignmentId = aid;
                 }
                 return View(manager.AllComponents);
             }
             else
             {
-                component.Controller.Assignment = manager.ActiveAssignment;
-                ActionResult result = component.Controller.Index();
-                ViewBag.Content = result.Capture(ControllerContext);
-                return View("Wizard");
+                BuildViewBag();
+                component.Controller.Assignment = db.StudioAssignments.Find(manager.ActiveAssignmentId);
+                return component.Controller.Index();
             }
         }
 
@@ -103,8 +105,16 @@ namespace OSBLE.Controllers.Assignments
             }
             else
             {
+                manager.ActiveComponent.Controller.Assignment = db.StudioAssignments.Find(manager.ActiveAssignmentId);
                 manager.ActiveComponent.Controller.Index(Request);
-                manager.ActiveAssignment = manager.ActiveComponent.Controller.Assignment;
+                
+                //Not having an ID of 0 indicates that the record previously existed in the DB
+                if (manager.ActiveAssignmentId != 0)
+                {
+                    //Saving goes here (maybe)
+                    //db.Entry(manager.ActiveAssignment).State = System.Data.EntityState.Modified;
+                    //db.SaveChanges();
+                }
                 if (manager.ActiveComponent.Controller.WasUpdateSuccessful)
                 {
                     string errorPath = "";
@@ -134,8 +144,6 @@ namespace OSBLE.Controllers.Assignments
                     return RedirectToRoute("AssignmentWizard", new { step = manager.ActiveComponent.Name });
                 }
             }
-
-            return View();
         }
     }
 }

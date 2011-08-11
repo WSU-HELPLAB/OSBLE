@@ -22,7 +22,7 @@ namespace OSBLE.Controllers.Assignments.Wizard
         {
             get
             {
-                return "Basic Assignment Information";
+                return "Basic assignment information";
             }
         }
 
@@ -37,6 +37,7 @@ namespace OSBLE.Controllers.Assignments.Wizard
 
         protected override object IndexAction()
         {
+            ModelState.Clear();
 
             //SUBMISSION CATEGORIES
             var cat = from c in (activeCourse.AbstractCourse as Course).Categories
@@ -52,8 +53,6 @@ namespace OSBLE.Controllers.Assignments.Wizard
             UpdateAssignmentWithFormValues();
             if (ModelState.IsValid)
             {
-                db.Entry(Assignment).State = System.Data.EntityState.Modified;
-                db.SaveChanges();
                 WasUpdateSuccessful = true;
             }
             else

@@ -155,6 +155,7 @@
     <Compile Include="Controllers\Assignments\WizardController.cs" />
     <Compile Include="Controllers\Assignments\Wizard\BasicsController.cs" />
     <Compile Include="Controllers\Assignments\Wizard\RubricController.cs" />
+    <Compile Include="Controllers\Assignments\Wizard\DeliverablesController.cs" />
     <Compile Include="Controllers\Assignments\Wizard\TeamController.cs" />
     <Compile Include="Controllers\Assignments\Wizard\WizardBaseController.cs" />
     <Compile Include="Controllers\AsyncIssueVotingController.cs" />
@@ -700,6 +701,9 @@
     <Content Include="Views\Assignments\Wizard\Rubric\Index.cshtml" />
     <Content Include="Views\Assignments\Wizard\Team\Index.cshtml" />
     <Content Include="Views\Assignments\Wizard\WizardSummary.cshtml" />
+    <Content Include="Views\Assignments\Wizard\_WizardTopNav.cshtml" />
+    <Content Include="Views\Assignments\Wizard\_WizardBottomNav.cshtml" />
+    <Content Include="Views\Assignments\Wizard\Deliverables\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

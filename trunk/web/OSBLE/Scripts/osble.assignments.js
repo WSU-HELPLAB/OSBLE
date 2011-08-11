@@ -26,19 +26,20 @@ function deliverableFormSubmit(e) {
     }
 }
 
-function addNewDeliverable(isAdd, d) {
+function addNewDeliverable(isAdd, deliverableData) {
     // validation
-    if (d == undefined) {
-        d = new Object({
+    if (deliverableData == undefined) {
+        deliverableData = new Object({
             name: $('#new_deliverable_name').val(),
-            fileType: parseInt($('#new_deliverable_type').val())
+            fileType: parseInt($('#new_deliverable_type').val()),
+            databaseId: 0
         });
 
         $('#new_deliverable_name').val("");
         $('#new_deliverable_name').focus();
     }
 
-    if (d.name == undefined || d.name == "") {
+    if (deliverableData.name == undefined || deliverableData.name == "") {
         if (isAdd) {
             alert('The deliverable name is required.');
         }
@@ -47,22 +48,16 @@ function addNewDeliverable(isAdd, d) {
 
     var validFileRegex = /^[a-z0-9\_\.\-]*$/i;
 
-    if (!(validFileRegex.test(d.name))) {
+    if (!(validFileRegex.test(deliverableData.name))) {
         alert("File names can only contain alphanumerics, '-', '_', and '.'");
         return false;
     }
 
-    // not used...?
-    //function duplicateObject() {
-    //    this.Value = false;
-    //    return this;
-    //}
-
     duplicateExists = false;
 
     $('#deliverable_data').children().each(function () {
-        if ((d.name.toLowerCase() == $(this).find('.deliverable_name').first().val().toLowerCase()) &&
-            (d.fileType == parseInt($(this).find('.deliverable_type').first().val()))) {
+        if ((deliverableData.name.toLowerCase() == $(this).find('.deliverable_name').first().val().toLowerCase()) &&
+            (deliverableData.fileType == parseInt($(this).find('.deliverable_type').first().val()))) {
             duplicateExists = true;
             return false;
         }
@@ -73,27 +68,27 @@ function addNewDeliverable(isAdd, d) {
         return false;
     }
 
-//    if (isAdd) {
         $('#deliverable_data').append('<div id="deliverable_' + deliverableIndex + '" class="deliverable" />');
    
         var newDeliverable = $('#deliverable_' + deliverableIndex);
 
-        var typeVal = $('#new_deliverable_type').children('option').eq(d.fileType).val();
-        var typeName = $('#new_deliverable_type').children('option').eq(d.fileType).html();
+        var typeVal = $('#new_deliverable_type').children('option').eq(deliverableData.fileType).val();
+        var typeName = $('#new_deliverable_type').children('option').eq(deliverableData.fileType).html();
 
         // delete button
         newDeliverable.append('<div class="deliverable_tools"><a href="#" title="Delete This Deliverable" onclick="$(this).parent().parent().hide(\'highlight\',function(){$(this).remove()}); setDeliverableIndex(); return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');
 
         // main layout
         newDeliverable.append('<table><tr>');
-        newDeliverable.append('<td>File Name:</td><td>' + d.name + '</td>');
+        newDeliverable.append('<td>File Name:</td><td>' + deliverableData.name + '</td>');
         newDeliverable.append('</tr><tr>');
         newDeliverable.append('<td>Type:</td><td>' + typeName + '</td>');
         newDeliverable.append('</tr></table>');
-    
-        newDeliverable.append('<input type="hidden" class="deliverable_name" value="' + d.name + '" />');
+
+        newDeliverable.append('<input type="hidden" class="deliverable_name" value="' + deliverableData.name + '" />');
         newDeliverable.append('<input type="hidden" class="deliverable_type" value="' + typeVal + '" />');
-//    }
+        newDeliverable.append('<input type="hidden" class="deliverable_id" value="' + deliverableData.databaseId + '" />');
+
         deliverableIndex++;
 
         setDeliverableIndex();
@@ -114,7 +109,7 @@ function setDeliverableIndex() {
     $('#deliverable_data').children().each(function () {
         $(this).find('.deliverable_name').first().attr('name', 'Assignment.Deliverables[' + i.toString() + '].Name');
         $(this).find('.deliverable_type').first().attr('name', 'Assignment.Deliverables[' + i.toString() + '].Type');
-
+        $(this).find('.deliverable_id').first().attr('name', 'Assignment.Deliverables[' + i.toString() + '].DatabaseId');
         i++;
     });
 }

@@ -38,6 +38,9 @@ namespace OSBLE.Controllers.Assignments.Wizard
         public WizardBaseController()
         {
             WasUpdateSuccessful = true;
+            ViewBag.PreviousWizardButton = WizardController.previousWizardButton;
+            ViewBag.NextWizardButton = WizardController.nextWizardButton;
+            ViewBag.Title = "Assignment Creation Wizard";
         }
 
         private string BuildViewPath(string action)

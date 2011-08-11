@@ -22,17 +22,18 @@ namespace OSBLE.Models.Wizard
 
         public ICollection<WizardComponent> SelectedComponents { get; protected set; }
 
-        public StudioAssignment ActiveAssignment
+        public int ActiveAssignmentId
         {
             get
             {
                 if (HttpContext.Current.Session[studioAssignmentKey] != null)
                 {
-                    return HttpContext.Current.Session[studioAssignmentKey] as StudioAssignment;
+                    return (int)HttpContext.Current.Session[studioAssignmentKey];
                 }
                 else
                 {
-                    return new StudioAssignment();
+                    HttpContext.Current.Session[studioAssignmentKey] = 0;
+                    return 0;
                 }
             }
             set
@@ -103,7 +104,6 @@ namespace OSBLE.Models.Wizard
         {
             AllComponents = new List<WizardComponent>();
             SelectedComponents = new List<WizardComponent>();
-            ActiveAssignment = new StudioAssignment();
             RegisterComponents();
         }
 
@@ -139,6 +139,15 @@ namespace OSBLE.Models.Wizard
                 Controller = new BasicsController(),
                 IsSelected = true,
                 IsRequired = true
+            };
+            AllComponents.Add(comp);
+
+            //SUBMISSIONS
+            comp = new WizardComponent()
+            {
+                Controller = new DeliverablesController(),
+                IsSelected = false,
+                IsRequired = false
             };
             AllComponents.Add(comp);
 

@@ -15,7 +15,7 @@ namespace OSBLE.Controllers.Assignments.Wizard
 
         public override string ControllerDescription
         {
-            get { return "Grading Rubric"; }
+            get { return "The instructor will use a grading rubric"; }
         }
 
         public override ICollection<WizardBaseController> Prerequisites

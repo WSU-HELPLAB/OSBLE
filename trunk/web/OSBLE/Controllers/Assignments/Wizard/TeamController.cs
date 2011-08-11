@@ -16,7 +16,7 @@ namespace OSBLE.Controllers.Assignments.Wizard
 
         public override string ControllerDescription
         {
-            get { return "Team-Based Assignment"; }
+            get { return "The assignment is team-based"; }
         }
 
         public override ICollection<WizardBaseController> Prerequisites
