@@ -16,7 +16,7 @@
         <a id="@StudioAssignmentCounter" href="#">@sa.Name</a>
     </div>
     <div>
-        <a href="#" onclick="displayConfirmEditAssignmentWindow()">Edit Assignment</a>
+        <a href="/BasicAssignment/Edit/@sa.ID">Edit Assignment</a>
         <div class="assignment_title">
             Description</div>
         @* Add links to assignment description *@
@@ -59,28 +59,3 @@
         
     </div>
 }
-<div id="confirmEditAssignmentWindow" style="display:none;" title="Edit Assignment Warning">
-    <form id="confirmEditAssignmentForm" action="/BasicAssignment/Edit/@sa.ID">
-        <text>Warning: Editing the assignment will discard any deliverables or grading associated with the assignment. Are you sure you want to continue? </text>
-        <div class="yesAndNoDiv">
-            <input value="Continue" type="submit"/>
-            <input value="Cancel" type="button" onclick="hideConfirmEditAssignmentWindow()" />
-        </div>
-    </form>
-</div>
-
-<script>
-    function displayConfirmEditAssignmentWindow() {
-        $("#confirmEditAssignmentWindow").dialog({
-            modal: true,
-            resizable: false,
-            width: 350,
-            height: 170,
-            closeOnEscape: false
-        });
-    }
-    function hideConfirmEditAssignmentWindow() {
-        $("#confirmEditAssignmentWindow").dialog('close');
-    }
-
-</script>
