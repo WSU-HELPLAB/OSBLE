@@ -1,1 +1,0 @@
-﻿<%@ ServiceHost Language="C#" Debug="true" Service="sl_uploader.Web.UploaderFileService" CodeBehind="UploaderFileService.svc.cs" %>

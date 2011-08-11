@@ -1,1 +1,0 @@
-﻿<%@ ServiceHost Language="C#" Debug="true" Service="FileUploader.Web.FileSyncService" CodeBehind="FileSyncService.svc.cs" %>
