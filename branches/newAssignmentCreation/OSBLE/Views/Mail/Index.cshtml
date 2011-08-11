@@ -1,0 +1,83 @@
+﻿@model IEnumerable<OSBLE.Models.Users.Mail>
+@using OSBLE.Models
+
+@{
+    ViewBag.Title = "Mail";
+}
+    <h2>New Message</h2>
+    Enter recipient's name to compose message: 
+    @Helpers.CreateToolTip(ToolTips.MailRecipient) <br />
+
+
+        <input id="people_finder" />
+        <script type="text/javascript">
+            $("#people_finder").autocomplete({
+                source: "@(Url.Action("Search"))",
+                select: function(event, ui) {
+                    location.href="@Url.Action("Create")?recipientID=" + ui.item.value;
+                },
+                focus: function(event, ui) {return false;}
+            }).data("autocomplete")._renderItem = function( ul, item ) {
+                return $( "<li></li>" )
+                .data( "item.autocomplete", item )
+                .append( "<a>" + "<img src=\"@Url.Action("ProfilePicture")/" + item.value + "\" class=\"small_profile_picture\" alt=\"Profile Picture\" /> " + item.label+ "</a>" )
+                .appendTo( ul );
+            }
+
+        </script>
+
+
+    @if (ViewBag.BoxHeader == "Inbox")
+    {
+        <h2>Inbox</h2>
+        <p>@Html.ActionLink("Go to Outbox","Outbox")</p>
+    }
+    else
+    {
+        <h2>Outbox</h2>
+        <p>@Html.ActionLink("Go to Inbox", "Index")</p>
+    }
+
+
+<table class="inbox_table">
+    @{
+        bool toggle = false;
+    }
+    @foreach (var item in Model)
+    {
+      
+        <tr id="mail_item_@(item.ID)" class="@if (!item.Read)
+                                             {<text>inbox_unread</text>}">
+            <td class="inbox_time">
+                <small>@item.Posted.ToShortDateString() @item.Posted.ToShortTimeString()</small>
+            </td>
+            <td class="inbox_subject">
+                @if (ViewBag.BoxHeader == "Inbox")
+                {
+                    <small>@item.FromUserProfile.FirstName @item.FromUserProfile.LastName</small>
+                }
+                else
+                {
+                    <small>@item.ToUserProfile.FirstName @item.ToUserProfile.LastName</small>
+                }
+                &nbsp;
+                @Html.ActionLink(item.Subject, "View", new { id = item.ID })
+            </td>
+            <td class="inbox_tools">
+                @if (item.ToUserProfile == ViewBag.CurrentUser)
+                {
+                    <form action="@Url.Action("Delete")"
+                        style="display: inline;"
+                        data-ajax="true"
+                        data-ajax-success="$('#mail_item_@(item.ID)').hide('blind',{},'slow',function(){$(this).remove();})"
+                        data-ajax-confirm="Are you sure you want to delete this message?"
+                        method="post">
+                        <input type="hidden" name="ID" value="@item.ID" />
+                        @Helpers.DeleteSubmit("Delete This Mail Message")
+                    </form>
+
+                }
+            </td>
+        </tr>
+    }
+</table>

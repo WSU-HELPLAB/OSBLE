@@ -1,0 +1,31 @@
+﻿<UserControl
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:TeamCreation"
+    xmlns:toolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
+    xmlns:compMod="clr-namespace:System.ComponentModel;assembly=System.Windows"
+    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
+    x:Class="TeamCreation.Team"
+    >
+
+    <Grid x:Name="LayoutRoot">
+        <toolkit:ListBoxDragDropTarget AllowDrop="True" MinHeight="100" HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="200" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" Margin="0" Width="210">
+            <ListBox x:Name="Members" BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="190"  MinHeight="25" Margin="8,26,8,8" ItemsSource="{Binding Path=MemberList, Mode=OneWay}">
+                <ListBox.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FFB4BEC2" Offset="0"/>
+                        <GradientStop Color="White" Offset="1"/>
+                    </LinearGradientBrush>
+                </ListBox.Background>
+                <ListBox.Effect>
+                    <DropShadowEffect/>
+                </ListBox.Effect>
+            </ListBox>
+        </toolkit:ListBoxDragDropTarget>
+        <Button Content="X" HorizontalAlignment="Left" Height="15" Margin="183,9,0,0" VerticalAlignment="Top" Width="13" Foreground="#FF2D2727" Background="#FFCA4242" Padding="3,0" BorderBrush="#FFB4463B" Name="DeleteList" Click="DeleteList_Click" />
+        <TextBox Height="20" HorizontalAlignment="Left" Margin="12,6,0,0" Name="TeamName" VerticalAlignment="Top" Width="153" Text="Unassigned List" Padding="0" BorderThickness="0" TextChanged="GroupName_TextChanged" />
+    </Grid>
+
+</UserControl>
