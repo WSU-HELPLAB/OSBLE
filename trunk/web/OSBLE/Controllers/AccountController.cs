@@ -531,25 +531,24 @@ namespace OSBLE.Controllers
                 if (ModelState.IsValid)
                 {
                     //ViewBag.ContactUsName = model.Name;
-
-                    using (SmtpClient mailClient = new SmtpClient())
-                    {
-                        mailClient.UseDefaultCredentials = true;
-
-                        using (MailMessage message = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE"),
-                                                                new MailAddress("support@osble.org")))
-                        {
-                            message.ReplyToList.Add(new MailAddress(model.Email));
-                            message.Subject = "[OSBLE] Support Request from " + model.Name;
-                            message.Body = model.Message;
-
 #if !DEBUG
-                            mailClient.Send(message);
-#endif
-                            ViewBag.CUName = model.Name;
-                        }
-                    }
+                    SmtpClient mailClient = new SmtpClient();
+                    mailClient.UseDefaultCredentials = true;
 
+                    using (MailMessage message = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE"),
+                                                            new MailAddress("support@osble.org")))
+                    {
+                        message.ReplyToList.Add(new MailAddress(model.Email));
+                        message.Subject = "[OSBLE] Support Request from " + model.Name;
+                        message.Body = model.Message;
+
+
+                        mailClient.Send(message);
+
+                        ViewBag.CUName = model.Name;
+                    }
+                    mailClient.Dispose();
+#endif
                     return View("ContactUsSuccess");
                 }
             }
