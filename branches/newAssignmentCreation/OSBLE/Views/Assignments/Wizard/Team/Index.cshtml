@@ -1,4 +1,44 @@
-﻿@{
-    Layout = null;
+﻿@using OSBLE.Models.Assignments;
+@using OSBLE.Models;
+@model AbstractAssignment
+@Html.Partial("_WizardTopNav")
+<h1>Team Settings</h1>
+<p>
+@Html.Raw(ToolTips.BasicAssignmentIsTeam)
+</p>
+@using (@Html.BeginForm())
+{
+@Html.ValidationSummary() 
+
+<object 
+    id="team_creation_silverlight"
+    data="data:application/x-silverlight-2,"
+    type="application/x-silverlight-2"
+    width="100%"
+    height="550"
+    >
+        <param name="source"
+            value="/ClientBin/TeamCreation.xap" />
+        <param name="onError"
+            value="onSilverlightError" />
+        <param name="background"
+            value="White" />
+        <param name="minRuntimeVersion"
+            value="4.0.50524.0" />
+        <param name="autoUpgrade"
+            value="True" />
+            <param name="OnLoaded" value="SLObjectLoaded" />
+            <param name="initParams" value="assignmentId=@Model.ID" /></object>
+    
+@Html.Partial("_WizardBottomNav");
 }
-<h1>Team</h1>
+<script type="text/javascript">
+    $(document).ready(documentReady);
+    function documentReady() {
+        $("form").submit(processForm);
+    }
+
+    function processForm(evt) {
+        alert('hello');
+    }
+</script>

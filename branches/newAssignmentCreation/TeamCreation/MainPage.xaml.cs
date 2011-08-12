@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Browser;
 using System.Windows.Controls;
 using Newtonsoft.Json;
+using OSBLE.Services;
 
 namespace TeamCreation
 {
@@ -13,8 +14,10 @@ namespace TeamCreation
     {
         private Dictionary<int, List<SerializableTeamMember>> membersBySection = new Dictionary<int, List<SerializableTeamMember>>();
         private List<SerializableTeamMember> moderators;
-
+        private int assignmentId;
         private bool changedNotSaved = false;
+        private TeamCreationContext teamContext = new TeamCreationContext();
+        private bool teamInformationLoaded = false;
 
         #region INotifyPropertyChanged Members
 
@@ -22,30 +25,33 @@ namespace TeamCreation
 
         #endregion INotifyPropertyChanged Members
 
-        public MainPage(string SerializedTeamMembersJSON)
+        public MainPage()
         {
             InitializeComponent();
-
             this.UnassignedList.DeleteList.Visibility = Visibility.Collapsed;
             this.UnassignedList.TeamName.IsReadOnly = true;
             this.UnassignedList.TeamName.Text = "Unassigned Team";
+            assignmentId = (App.Current as App).AssignmentId;
 
             this.NewTeamBox.AddTeamRequested += new EventHandler(NewTeamBox_AddTeamRequested);
-
-            List<SerializableTeamMember> teamMembers = JsonConvert.DeserializeObject<List<SerializableTeamMember>>(SerializedTeamMembersJSON);
-
-            if (teamMembers == null)
-            {
-                teamMembers = new List<SerializableTeamMember>();
-            }
-            InitilizeTeams(teamMembers);
-
             this.LayoutRoot.Loaded += new RoutedEventHandler(LayoutRoot_Loaded);
+            teamContext.Load(teamContext.GetAssignmentTeamsQuery(assignmentId)).Completed += new EventHandler(GetTeamsCompleted);
+            teamContext.Load(teamContext.GetAssignmentUsersQuery(assignmentId)).Completed += new EventHandler(GetTeamUsersCompleted);
+        }
+
+        void GetTeamsCompleted(object sender, EventArgs e)
+        {
+            
+        }
+
+        void GetTeamUsersCompleted(object sender, EventArgs e)
+        {
+
         }
 
         private void LayoutRoot_Loaded(object sender, RoutedEventArgs e)
         {
-            HtmlPage.Window.Invoke("TeamGenerationReady", "");
+            
         }
 
         private void NewTeamBox_AddTeamRequested(object sender, EventArgs e)

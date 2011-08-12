@@ -237,6 +237,7 @@
     <Compile Include="Services\ReviewInterfaceDomainService.cs" />
     <Compile Include="Services\RubricRiaService.cs" />
     <Compile Include="Services\SilverlightFaultBehavior.cs" />
+    <Compile Include="Services\TeamCreationService.cs" />
     <Compile Include="Services\UploaderWebService.svc.cs">
       <DependentUpon>UploaderWebService.svc</DependentUpon>
     </Compile>

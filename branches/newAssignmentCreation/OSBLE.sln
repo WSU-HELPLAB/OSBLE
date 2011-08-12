@@ -7,6 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamCreation", "TeamCreatio
 	ProjectSection(ProjectDependencies) = postProject
 		{7297687F-BF8A-4195-8EA3-A05DA302B24E} = {7297687F-BF8A-4195-8EA3-A05DA302B24E}
 		{7297687F-BF8A-4195-8EA3-A05DA302B24E} = {7297687F-BF8A-4195-8EA3-A05DA302B24E}
+		{7297687F-BF8A-4195-8EA3-A05DA302B24E} = {7297687F-BF8A-4195-8EA3-A05DA302B24E}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudioTimelineCreation", "StudioTimelineCreation\StudioTimelineCreation.csproj", "{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}"
@@ -41,15 +42,15 @@ Global
 		SccProjectUniqueName3 = StudioTimelineCreation\\StudioTimelineCreation.csproj
 		SccProjectName3 = StudioTimelineCreation
 		SccLocalPath3 = StudioTimelineCreation
-		SccProjectUniqueName4 = ..\\silverlight\\FileUploader\\FileUploader.csproj
-		SccProjectName4 = ../silverlight/FileUploader
-		SccLocalPath4 = ..\\silverlight\\FileUploader
-		SccProjectUniqueName5 = OsbleRubric\\OsbleRubric.csproj
-		SccProjectName5 = OsbleRubric
-		SccLocalPath5 = OsbleRubric
-		SccProjectUniqueName6 = SilverlightSandbox\\SilverlightSandbox.csproj
-		SccProjectName6 = SilverlightSandbox
-		SccLocalPath6 = SilverlightSandbox
+		SccProjectUniqueName4 = OsbleRubric\\OsbleRubric.csproj
+		SccProjectName4 = OsbleRubric
+		SccLocalPath4 = OsbleRubric
+		SccProjectUniqueName5 = SilverlightSandbox\\SilverlightSandbox.csproj
+		SccProjectName5 = SilverlightSandbox
+		SccLocalPath5 = SilverlightSandbox
+		SccProjectUniqueName6 = ..\\silverlight\\FileUploader\\FileUploader.csproj
+		SccProjectName6 = ../silverlight/FileUploader
+		SccLocalPath6 = ..\\silverlight\\FileUploader
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
