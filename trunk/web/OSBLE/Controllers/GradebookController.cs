@@ -1857,7 +1857,8 @@ namespace OSBLE.Controllers
             int currentCourseId = activeCourse.AbstractCourseID;
 
             List<Category> categories = (from category in db.Categories
-                                         where category.CourseID == currentCourseId
+                                         where category.CourseID == currentCourseId &&
+                                         category.Name != Constants.UnGradableCatagory
                                          orderby category.ColumnOrder
                                          select category).ToList();
 

@@ -319,10 +319,7 @@
             
             @foreach (Category item in ViewBag.Categories)
             {
-                if (item.Name != Constants.UnGradableCatagory)
-                {
-                    <th id="@item.ID" class="colHeader" onclick="changeAssignmentName(event, this);" style="background:@item.TabColor">@item.Name</th>
-                }
+                <th id="@item.ID" class="colHeader" onclick="changeAssignmentName(event, this);" style="background:@item.TabColor">@item.Name</th>
             }
         </tr>
         <tr>
@@ -473,10 +470,10 @@
                     <td>@totalGrade.ToString(".#")%</td>
                 }
 
-                if (userScores.Count() > 0)
+                foreach (Category category in ViewBag.Categories)
                 {
                     bool usingWhatIf = false;
-                    foreach (Category category in ViewBag.Categories)
+                    if (userScores.Count() > 0)
                     {
                         int count = 0;
                         int numDropped = category.dropX;
@@ -553,6 +550,10 @@
                                 <td>NG</td>
                             }
                         }
+                    }
+                    else
+                    {
+                        <td>NG</td>
                     }
                 }
             }
