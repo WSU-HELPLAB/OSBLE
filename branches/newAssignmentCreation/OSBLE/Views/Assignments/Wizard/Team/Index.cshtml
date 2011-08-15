@@ -1,44 +1,168 @@
-﻿@using OSBLE.Models.Assignments;
+﻿@using OSBLE.Models.Assignments.Activities;
+@using OSBLE.Models.Assignments;
 @using OSBLE.Models;
-@model AbstractAssignment
+@using OSBLE.Models.Users;
+@using OSBLE.Models.ViewModels;
+@model TeamCreationViewModel          
+@{
+    int activeActivityId = 0;
+}
 @Html.Partial("_WizardTopNav")
-<h1>Team Settings</h1>
+<style type="text/css">
+    #AvailableStudentList
+    {
+        float:left;
+        width:200px;
+        padding-top:15px;
+    }
+    
+    .NoDecoration
+    {
+        text-decoration: none;
+    }
+    
+    #CreateTeamLink
+    {
+        cursor:pointer;
+    }
+    
+    .RemoveTeamIcon
+    {
+        cursor:pointer;
+    }
+    
+    #TeamCreationOptions
+    {
+    }
+    
+    .TeamDiv
+    {
+        float:left;
+        margin:8px;
+        padding:8px;
+        width:200px;
+        border:1px solid #EEF;
+        border-bottom:3px solid #EEF;
+    }
+    
+    #TeamsDiv
+    {
+        float:left;
+        width:800px;
+        padding-top:15px;
+    }
+    
+    .TeamSortable
+    {
+        min-height:25px;
+        cursor:pointer;
+    }
+    
+    .TeamNameTextBox
+    {
+        border:none;
+        width:175px;
+        font-weight:bold;
+    }
+    
+    .ui-state-default
+    {
+        padding:3px;
+        margin-top:2px;
+        margin-bottom:2px;
+    }
+    
+    #WizardContent ul
+    {
+        list-style:none;
+        margin:0;
+        padding:0;
+    }
+    
+</style>
+<h1>
+    Team Settings</h1>
 <p>
-@Html.Raw(ToolTips.BasicAssignmentIsTeam)
+    @Html.Raw(ToolTips.BasicAssignmentIsTeam)
 </p>
 @using (@Html.BeginForm())
 {
-@Html.ValidationSummary() 
+    @Html.ValidationSummary()     
 
-<object 
-    id="team_creation_silverlight"
-    data="data:application/x-silverlight-2,"
-    type="application/x-silverlight-2"
-    width="100%"
-    height="550"
-    >
-        <param name="source"
-            value="/ClientBin/TeamCreation.xap" />
-        <param name="onError"
-            value="onSilverlightError" />
-        <param name="background"
-            value="White" />
-        <param name="minRuntimeVersion"
-            value="4.0.50524.0" />
-        <param name="autoUpgrade"
-            value="True" />
-            <param name="OnLoaded" value="SLObjectLoaded" />
-            <param name="initParams" value="assignmentId=@Model.ID" /></object>
+    <div id="TeamCreationOptions">
+        <select>
+            <option value="-1">Select Activity</option>
+            @foreach (AbstractAssignmentActivity activity in Model.Assignment.AssignmentActivities)
+            {
+                <option value="@activity.ID">@activity.Name</option>    
+            }
+        </select>
+        <a id="CreateTeamLink" class="NoDecoration">
+            <img src="@Url.Content("~/Content/images/add_up.png")" alt="Create New Team" title="Create New Team" />
+            Create New Team </a>
+    </div>
     
-@Html.Partial("_WizardBottomNav");
+    <div id="AvailableStudentList">
+        <h3>
+            Available Students</h3>
+        <ul id="AvailableStudent" class="TeamSortable">
+            @foreach (UserProfile student in Model.Students)
+            {
+                <li class="ui-state-default" value="@student.ID">@student.LastName, @student.FirstName</li>
+            }
+        </ul>
+    </div>
+    
+    <div id="TeamsDiv">
+        <h3>Teams</h3>
+    </div>
+    
+    
+    @Html.Partial("_WizardBottomNav");
 }
 <script type="text/javascript">
     $(document).ready(documentReady);
+
     function documentReady() {
+
+        //set up sortable lists
+        $("#AvailableStudent").sortable({ connectWith: ".TeamSortable" }).disableSelection();
+
+        //various event listeners
         $("form").submit(processForm);
+        $("#CreateTeamLink").click(createTeam);
+        $("#CreateTeamLink").disableSelection();
     }
 
     function processForm(evt) {
         alert('hello');
     }
+
+    var teamCounter = 1;
+    function createTeam(evt) {
+        var divId = "teamDiv_" + teamCounter;
+        var listId = 'team_' + teamCounter;
+        var InputContent = "Team " + teamCounter;
+        var newContent = '<div id="' + divId + '" class="TeamDiv">' +
+                            '<input type="text" class="TeamNameTextBox" value="' + InputContent + '" />' +
+                            '<img class="RemoveTeamIcon" src="@Url.Content("~/Content/images/delete_up.png")" alt="remove team" title="remove team" onclick="removeTeam(\'' + divId + '\')" />' + 
+                            '<ul id="' + listId + '" class="TeamSortable"></ul>' +
+                         '</div>';
+        if (teamCounter % 3 == 0) {
+            newContent += '<div style="clear:both;"></div>';
+        }
+        $("#TeamsDiv").append(newContent);
+        $("#" + listId).sortable({ connectWith: ".TeamSortable" }).disableSelection();
+        teamCounter++;
+    }
+
+    function removeTeam(teamId) {
+        $('#' + teamId).slideUp('slow', hideTeamComplete);
+    }
+
+    function hideTeamComplete() {
+        $("#AvailableStudent").append(jQuery(this).find("li"));
+        $(this).remove();
+    }
+
 </script>

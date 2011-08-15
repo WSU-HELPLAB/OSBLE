@@ -17,6 +17,21 @@ namespace OSBLE.Controllers.Assignments
         public static string previousWizardButton = "PreviousWizardButton";
         public static string nextWizardButton = "NextWizardButton";
 
+        public StudioAssignment ActiveAssignment
+        {
+            get
+            {
+                if (manager.ActiveAssignmentId != 0)
+                {
+                    return db.StudioAssignments.Find(manager.ActiveAssignmentId);
+                }
+                else
+                {
+                    return new StudioAssignment();
+                }
+            }
+        }
+
         public ICollection<WizardBaseController> SelectedComponents
         {
             get
@@ -64,12 +79,16 @@ namespace OSBLE.Controllers.Assignments
                     int aid = (int)assignmentId;
                     manager.ActiveAssignmentId = aid;
                 }
+                else
+                {
+                    manager.ActiveAssignmentId = 0;
+                }
                 return View(manager.AllComponents);
             }
             else
             {
                 BuildViewBag();
-                component.Controller.Assignment = db.StudioAssignments.Find(manager.ActiveAssignmentId);
+                component.Controller.Assignment = ActiveAssignment;
                 return component.Controller.Index();
             }
         }
@@ -105,7 +124,7 @@ namespace OSBLE.Controllers.Assignments
             }
             else
             {
-                manager.ActiveComponent.Controller.Assignment = db.StudioAssignments.Find(manager.ActiveAssignmentId);
+                manager.ActiveComponent.Controller.Assignment = ActiveAssignment;
                 manager.ActiveComponent.Controller.Index(Request);
                 
                 //Not having an ID of 0 indicates that the record previously existed in the DB
