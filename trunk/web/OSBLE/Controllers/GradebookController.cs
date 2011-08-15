@@ -712,11 +712,21 @@ namespace OSBLE.Controllers
         public void DeleteColumn(int assignmentId)
         {
             AbstractAssignmentActivity assignmentActivity = db.AbstractAssignmentActivities.Find(assignmentId);
-            AbstractAssignment assignment = db.AbstractAssignments.Find(assignmentActivity.AbstractAssignmentID);
+            StudioAssignment assignment = db.StudioAssignments.Find(assignmentActivity.AbstractAssignmentID);
             List<TeamUserMember> teamMember = (from a in assignmentActivity.TeamUsers select a).ToList();
 
             var rubricEvals = (from a in db.RubricEvaluations where a.AbstractAssignmentActivityID == assignmentActivity.ID select a);
 
+            List<Deliverable> deliverables = new List<Deliverable>();
+            foreach (Deliverable d in assignment.Deliverables)
+            {
+                deliverables.Add(d);
+            }
+            foreach (Deliverable d in deliverables)
+            {
+                assignment.Deliverables.Remove(d);
+            }
+            db.SaveChanges();
             if (rubricEvals.Count() > 0)
             {
                 var criterion = (from c in db.Criteria where c.RubricID == assignment.RubricID select c);
@@ -742,7 +752,7 @@ namespace OSBLE.Controllers
             db.AbstractAssignmentActivities.Remove(assignmentActivity);
             db.SaveChanges();
 
-            db.AbstractAssignments.Remove(assignment);
+            db.StudioAssignments.Remove(assignment);
             db.SaveChanges();
         }
 
