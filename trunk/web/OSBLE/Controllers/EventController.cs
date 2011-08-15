@@ -25,7 +25,10 @@ namespace OSBLE.Controllers
             if (ActiveCourse.AbstractCourse is Course)
             {
                 StartDate = (ActiveCourse.AbstractCourse as Course).StartDate;
-                EndDate = (ActiveCourse.AbstractCourse as Course).EndDate;
+
+                //AC: ticket #435 asks that events that go beyond the end of the class be displayed.
+                //This is important for displaying final exam notices.
+                EndDate = (ActiveCourse.AbstractCourse as Course).EndDate.Add(new TimeSpan(30, 0, 0, 0, 0));
             }
             else if (ActiveCourse.AbstractCourse is Community)
             {
