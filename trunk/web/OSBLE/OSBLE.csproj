@@ -704,6 +704,7 @@
     <Content Include="Views\Assignments\Wizard\_WizardTopNav.cshtml" />
     <Content Include="Views\Assignments\Wizard\_WizardBottomNav.cshtml" />
     <Content Include="Views\Assignments\Wizard\Deliverables\Index.cshtml" />
+    <Content Include="Views\Assignment\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

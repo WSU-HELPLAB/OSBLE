@@ -464,10 +464,15 @@ namespace OSBLE
             return GetCourseDocumentsPath(c);
         }
 
+        public static string GetAssignmentsFolder(Course course)
+        {
+            return string.Format("{0}\\Assignments", getCoursePath(course));
+        }
+
         public static string GetAssignmentActivityFolder(Course course, int assignmentActivityID)
         {
-            string path = getCoursePath(course);
-            path += "Assignments" + "\\" + assignmentActivityID;
+            string path = GetAssignmentsFolder(course);
+            path += "\\" + assignmentActivityID;
             return path;
         }
 

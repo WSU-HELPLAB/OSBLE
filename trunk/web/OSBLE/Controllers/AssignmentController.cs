@@ -11,6 +11,7 @@ using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
+using OSBLE.Models.HomePage;
 
 namespace OSBLE.Controllers
 {
@@ -22,6 +23,81 @@ namespace OSBLE.Controllers
         public AssignmentController()
         {
             ViewBag.CurrentTab = "Assignments";
+        }
+
+        [CanModifyCourse]
+        public ActionResult Delete(int id)
+        {
+            //verify that the user attempting a delete owns this course
+            if (!activeCourse.AbstractRole.CanModify)
+            {
+                return RedirectToAction("Index");
+            }
+
+            AbstractAssignment assignment = db.StudioAssignments.Find(id);
+            if (assignment == null)
+            {
+                return RedirectToAction("Index");
+            }
+            return View(assignment);
+        }
+
+        [CanModifyCourse]
+        [HttpPost]
+        public ActionResult Delete(StudioAssignment assignment)
+        {
+
+            //verify that the user attempting a delete owns this course
+            if (!activeCourse.AbstractRole.CanModify)
+            {
+                return RedirectToAction("Index");
+            }
+
+            //if the user didn't click "continue" get us out of here
+            if (!Request.Form.AllKeys.Contains("continue"))
+            {
+                return RedirectToAction("Index");
+            }
+
+            assignment = db.StudioAssignments.Find(assignment.ID);
+            if (assignment == null)
+            {
+                return RedirectToAction("Index");
+            }
+            
+            //delete team users from the activities
+            int i = 0;
+            foreach(AbstractAssignmentActivity activity in assignment.AssignmentActivities)
+            {
+                i = 0;
+                while (activity.TeamUsers.Count > 0)
+                {
+                    db.TeamUsers.Remove(activity.TeamUsers.ElementAt(i));
+                }
+            }
+            db.SaveChanges();
+
+            //Delete event data.  Magic string alert (taken from BasicAssignmentController).
+            //Because events don't reference any particular model, we can't just find all
+            //events that relate to the current assignemnt.  As a workaround, I figure that
+            //the Description property of the event data should be specific enough to identify
+            //and delete related elements.
+            string descrption = "https://osble.org/Assignment?id=" + assignment.ID;
+            List<Event> events = (from evt in db.Events
+                                  where evt.Description.Contains(descrption)
+                                  select evt).ToList();
+            foreach(Event evt in events)
+            {
+                db.Events.Remove(evt);
+            }
+
+            //clear all assignments from the file system
+            FileSystem.EmptyFolder(FileSystem.GetAssignmentsFolder(activeCourse.AbstractCourse as Course));
+
+            db.StudioAssignments.Remove(assignment);
+            db.SaveChanges();
+
+            return RedirectToAction("Index");
         }
 
         //
