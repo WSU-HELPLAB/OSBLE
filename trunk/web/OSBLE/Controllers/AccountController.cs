@@ -536,7 +536,7 @@ namespace OSBLE.Controllers
                     List<MailAddress> to = new List<MailAddress>();
                     to.Add(new MailAddress("support@osble.org"));
                     Email.Send(subject, body, to);
-
+                    ViewBag.CUName = model.Name;
                     return View("ContactUsSuccess");
                 }
             }
