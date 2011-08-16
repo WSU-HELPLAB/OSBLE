@@ -17,6 +17,7 @@ using OSBLE.Models;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Utility;
+using System.Reflection;
 
 namespace OSBLE.Controllers
 {
@@ -38,7 +39,12 @@ namespace OSBLE.Controllers
         public ActionResult LogOn()
         {
             setLogOnCaptcha();
-
+            Assembly asm = Assembly.GetExecutingAssembly();
+            if (asm.FullName != null)
+            {
+                AssemblyName assemblyName = new AssemblyName(asm.FullName);
+                ViewBag.VersionNumber = assemblyName.Version.ToString();
+            }
             return View();
         }
 
