@@ -69,6 +69,9 @@ namespace OSBLE.Controllers
                 e.StartTime = e.StartDate;
             }
 
+            e.EndDate = e.StartDate;
+            e.EndTime = e.StartTime.Add(new TimeSpan(0, 1, 0, 0, 0));
+
             return View(e);
         }
 
@@ -79,6 +82,7 @@ namespace OSBLE.Controllers
         [CanPostEvent]
         public ActionResult Create(Event e)
         {
+
             // Set to current user and poster
             e.Course = ActiveCourse.AbstractCourse;
             e.Poster = currentUser;
@@ -89,6 +93,14 @@ namespace OSBLE.Controllers
             // Combine start date and time fields into one field
             e.StartDate = e.StartDate.Date;
             e.StartDate = e.StartDate.AddHours(e.StartTime.Hour).AddMinutes(e.StartTime.Minute);
+            e.EndDate = e.EndDate.Date;
+            e.EndDate = e.EndDate.AddHours(e.EndTime.Hour).AddMinutes(e.EndTime.Minute);
+
+            //make sure that the end date happens after the start
+            if (e.EndDate.Ticks < e.StartDate.Ticks)
+            {
+                ModelState.AddModelError("badDates", "The starting time must occur before the ending time");
+            }
 
             // Approve if instructor/leader, course is community, or approval is not required.
             if (activeCourse.AbstractRole.CanModify ||
@@ -195,6 +207,7 @@ namespace OSBLE.Controllers
             }
 
             e.StartTime = e.StartDate;
+            e.EndTime = e.EndDate;
 
             return View(e);
         }
@@ -206,23 +219,32 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Edit(Event e)
         {
+            // Validate original event. make sure it exists and is part of the active course.
+            Event originalEvent = db.Events.Find(e.ID);
+
+            //make sure that the end date happens after the start
+            if (e.EndDate.Ticks < e.StartDate.Ticks)
+            {
+                ModelState.AddModelError("badDates", "The starting time must occur before the ending time");
+            }
+
+            if ((originalEvent == null) || (originalEvent.CourseID != ActiveCourse.AbstractCourseID))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Update updateable fields
+            originalEvent.Title = e.Title;
+
+            originalEvent.StartDate = e.StartDate.Date;
+            originalEvent.StartDate = originalEvent.StartDate.AddHours(e.StartTime.Hour).AddMinutes(e.StartTime.Minute);
+            originalEvent.EndDate = e.EndDate.Date;
+            originalEvent.EndDate = originalEvent.EndDate.AddHours(e.EndTime.Hour).AddMinutes(e.EndTime.Minute);
+
+            originalEvent.Description = e.Description;
+
             if (ModelState.IsValid)
             {
-                // Validate original event. make sure it exists and is part of the active course.
-                Event originalEvent = db.Events.Find(e.ID);
-                if ((originalEvent == null) || (originalEvent.CourseID != ActiveCourse.AbstractCourseID))
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-
-                // Update updateable fields
-                originalEvent.Title = e.Title;
-
-                originalEvent.StartDate = e.StartDate.Date;
-                originalEvent.StartDate = originalEvent.StartDate.AddHours(e.StartTime.Hour).AddMinutes(e.StartTime.Minute);
-
-                originalEvent.Description = e.Description;
-
                 db.Entry(originalEvent).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");

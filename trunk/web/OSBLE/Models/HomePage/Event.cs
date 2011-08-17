@@ -22,17 +22,23 @@ namespace OSBLE.Models.HomePage
         public virtual UserProfile Poster { get; set; }
 
         [Required]
-        [Display(Name = "Date")]
+        [Display(Name = "Starting date")]
         [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
 
         [NotMapped]
-        [Display(Name = "Time")]
+        [Display(Name = "Starting time")]
         [DataType(DataType.Time)]
         public DateTime StartTime { get; set; }
 
-        [NotMapped]
+        [Display(Name="Ending date")]
+        [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
+
+        [NotMapped]
+        [Display(Name = "Ending time")]
+        [DataType(DataType.Time)]
+        public DateTime EndTime { get; set; }
 
         [Required]
         [Display(Name = "Event Title")]

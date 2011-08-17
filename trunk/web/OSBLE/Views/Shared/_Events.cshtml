@@ -50,7 +50,7 @@
         
         
         @ShowEventTime(e.StartDate, e)
-        @if ((e.ID == 0) && (e.EndDate != null))
+        @if ((e.EndDate != null))
         {
             <text>&mdash; @ShowTime(e.EndDate, e)</text>
         }
