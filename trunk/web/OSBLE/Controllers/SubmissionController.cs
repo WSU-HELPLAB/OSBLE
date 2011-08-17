@@ -89,54 +89,59 @@ namespace OSBLE.Controllers
                         TeamUserMember teamUser = GetTeamUser(activity as SubmissionActivity, currentUser);
 
                         int i = 0;
-                        foreach (var file in files)
+
+                        //the files variable is null when submitting an in-browser text submission
+                        if (files != null)
                         {
-                            if (file != null && file.ContentLength > 0)
+                            foreach (var file in files)
                             {
-                                DeliverableType type = (DeliverableType)deliverables[i].Type;
-
-                                //jump over all DeliverableType.InBrowserText as they will be handled separately
-                                while (type == DeliverableType.InBrowserText)
+                                if (file != null && file.ContentLength > 0)
                                 {
-                                    i++;
-                                    type = (DeliverableType)deliverables[i].Type;
-                                }
-                                string fileName = Path.GetFileName(file.FileName);
-                                string extension = Path.GetExtension(file.FileName);
+                                    DeliverableType type = (DeliverableType)deliverables[i].Type;
 
-                                string[] allowFileExtensions = GetFileExtensions(type);
-
-                                if (allowFileExtensions.Contains(extension))
-                                {
-                                    //If a submission of any extension exists delete it.  This is needed because they could submit a .c file and then a .cs file and the teacher would not know which one is the real one.
-                                    string submission = FileSystem.GetDeliverable(activeCourse.AbstractCourse as Course, activity.ID, teamUser, deliverables[i].Name, allowFileExtensions);
-                                    if (submission != null)
+                                    //jump over all DeliverableType.InBrowserText as they will be handled separately
+                                    while (type == DeliverableType.InBrowserText)
                                     {
-                                        FileInfo oldSubmission = new FileInfo(submission);
+                                        i++;
+                                        type = (DeliverableType)deliverables[i].Type;
+                                    }
+                                    string fileName = Path.GetFileName(file.FileName);
+                                    string extension = Path.GetExtension(file.FileName);
 
-                                        if (oldSubmission.Exists)
+                                    string[] allowFileExtensions = GetFileExtensions(type);
+
+                                    if (allowFileExtensions.Contains(extension))
+                                    {
+                                        //If a submission of any extension exists delete it.  This is needed because they could submit a .c file and then a .cs file and the teacher would not know which one is the real one.
+                                        string submission = FileSystem.GetDeliverable(activeCourse.AbstractCourse as Course, activity.ID, teamUser, deliverables[i].Name, allowFileExtensions);
+                                        if (submission != null)
                                         {
-                                            oldSubmission.Delete();
+                                            FileInfo oldSubmission = new FileInfo(submission);
+
+                                            if (oldSubmission.Exists)
+                                            {
+                                                oldSubmission.Delete();
+                                            }
+                                        }
+                                        FileSystem.RemoveZipFile(activeCourse.AbstractCourse as Course, activity, teamUser);
+                                        var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, teamUser), deliverables[i].Name + extension);
+                                        file.SaveAs(path);
+
+                                        DateTime? dueDate = GetDueDate(activity);
+                                        if (dueDate != null && dueDate < DateTime.Now)
+                                        {
+                                            (new NotificationController()).SendFilesSubmittedNotification(activity, teamUser, deliverables[i].Name);
                                         }
                                     }
-                                    FileSystem.RemoveZipFile(activeCourse.AbstractCourse as Course, activity, teamUser);
-                                    var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, teamUser), deliverables[i].Name + extension);
-                                    file.SaveAs(path);
-
-                                    DateTime? dueDate = GetDueDate(activity);
-                                    if (dueDate != null && dueDate < DateTime.Now)
+                                    else
                                     {
-                                        (new NotificationController()).SendFilesSubmittedNotification(activity, teamUser, deliverables[i].Name);
+                                        ModelState.AddModelError("FileExtensionMatch", "The file " + fileName + " does not have an allowed extension please convert the file to the correct type");
+                                        setViewBagDeliverables((assignment as StudioAssignment).Deliverables);
+                                        return View();
                                     }
                                 }
-                                else
-                                {
-                                    ModelState.AddModelError("FileExtensionMatch", "The file " + fileName + " does not have an allowed extension please convert the file to the correct type");
-                                    setViewBagDeliverables((assignment as StudioAssignment).Deliverables);
-                                    return View();
-                                }
+                                i++;
                             }
-                            i++;
                         }
 
                         // Creates the text files from text boxes
