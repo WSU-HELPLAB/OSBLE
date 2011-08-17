@@ -93,13 +93,22 @@ namespace OSBLE.Controllers
             // Combine start date and time fields into one field
             e.StartDate = e.StartDate.Date;
             e.StartDate = e.StartDate.AddHours(e.StartTime.Hour).AddMinutes(e.StartTime.Minute);
-            e.EndDate = e.EndDate.Date;
-            e.EndDate = e.EndDate.AddHours(e.EndTime.Hour).AddMinutes(e.EndTime.Minute);
 
-            //make sure that the end date happens after the start
-            if (e.EndDate.Ticks < e.StartDate.Ticks)
+            if (Request.Form.AllKeys.Contains("IncludeEndDate"))
             {
-                ModelState.AddModelError("badDates", "The starting time must occur before the ending time");
+                e.EndDate = null;
+            }
+            else
+            {
+                DateTime endDate = (DateTime)e.EndDate;
+                e.EndDate = endDate.Date;
+                e.EndDate = endDate.AddHours(e.EndTime.Hour).AddMinutes(e.EndTime.Minute);
+
+                //make sure that the end date happens after the start
+                if (endDate.Ticks < e.StartDate.Ticks)
+                {
+                    ModelState.AddModelError("badDates", "The starting time must occur before the ending time");
+                }
             }
 
             // Approve if instructor/leader, course is community, or approval is not required.
@@ -205,9 +214,24 @@ namespace OSBLE.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-
+            if (e.EndDate == null)
+            {
+                ViewBag.IncludeEndDate = "checked=\"checked\"";
+            }
+            else
+            {
+                ViewBag.IncludeEndDate = "";
+            }
             e.StartTime = e.StartDate;
-            e.EndTime = e.EndDate;
+            if (e.EndDate != null)
+            {
+                e.EndTime = (DateTime)e.EndDate;
+            }
+            else
+            {
+                e.EndDate = e.StartDate;
+                e.EndTime = e.StartTime;
+            }
 
             return View(e);
         }
@@ -222,10 +246,21 @@ namespace OSBLE.Controllers
             // Validate original event. make sure it exists and is part of the active course.
             Event originalEvent = db.Events.Find(e.ID);
 
-            //make sure that the end date happens after the start
-            if (e.EndDate.Ticks < e.StartDate.Ticks)
+            if (Request.Form.AllKeys.Contains("IncludeEndDate"))
             {
-                ModelState.AddModelError("badDates", "The starting time must occur before the ending time");
+                e.EndDate = null;
+            }
+            else
+            {
+                DateTime endDate = (DateTime)e.EndDate;
+
+                //make sure that the end date happens after the start
+                if (endDate.Ticks < e.StartDate.Ticks)
+                {
+                    ModelState.AddModelError("badDates", "The starting time must occur before the ending time");
+                }
+                originalEvent.EndDate = endDate.Date.AddHours(e.EndTime.Hour).AddMinutes(e.EndTime.Minute);
+
             }
 
             if ((originalEvent == null) || (originalEvent.CourseID != ActiveCourse.AbstractCourseID))
@@ -238,9 +273,7 @@ namespace OSBLE.Controllers
 
             originalEvent.StartDate = e.StartDate.Date;
             originalEvent.StartDate = originalEvent.StartDate.AddHours(e.StartTime.Hour).AddMinutes(e.StartTime.Minute);
-            originalEvent.EndDate = e.EndDate.Date;
-            originalEvent.EndDate = originalEvent.EndDate.AddHours(e.EndTime.Hour).AddMinutes(e.EndTime.Minute);
-
+            
             originalEvent.Description = e.Description;
 
             if (ModelState.IsValid)

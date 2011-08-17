@@ -33,7 +33,7 @@ namespace OSBLE.Models.HomePage
 
         [Display(Name="Ending date")]
         [DataType(DataType.Date)]
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         [NotMapped]
         [Display(Name = "Ending time")]

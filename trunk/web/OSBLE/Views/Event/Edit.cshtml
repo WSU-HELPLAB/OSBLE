@@ -62,6 +62,9 @@
             <td>@Html.ValidationMessageFor(model => model.EndTime)
             </td>
         </tr>
+        <tr>
+            <td colspan="2"><input type="checkbox" name="IncludeEndDate" id="IncludeEndDate" @ViewBag.IncludeEndDate /><label for="IncludeEndDate">Do not include an ending date</label></td>
+        </tr>
     </table>
 
     <div class="editor-label">
