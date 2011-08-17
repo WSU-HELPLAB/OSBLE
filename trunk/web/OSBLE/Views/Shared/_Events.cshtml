@@ -64,7 +64,11 @@
         @if (e.Description != null)
         {
             <div class="event_description">
-            <small>@Helpers.Linkify(e.Description)</small>
+            @{
+                string description = Helpers.Linkify(e.Description).ToHtmlString();
+                description = description.Replace("\n", "<br />");
+              }
+            <small>@Html.Raw(description)</small>
             </div>
         }
     </li>
