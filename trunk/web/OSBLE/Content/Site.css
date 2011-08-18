@@ -407,7 +407,7 @@ body#layoutLogOn
 
 #dashboard_left
 {
-	width: 24%;
+	width: 290px;
 	float: left;
 	padding-right: 1%;
 }
@@ -1125,6 +1125,13 @@ ul.selector
 #past_events
 {
 	display: none;
+}
+
+.event
+{
+    word-wrap: break-word;
+    width: 267px;
+    overflow: auto;
 }
 
 .event_description
