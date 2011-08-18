@@ -5,6 +5,8 @@ using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
+using OSBLE.Models.Users;
+using System.Linq;
 
 namespace OSBLE.Models.Assignments
 {
@@ -55,6 +57,22 @@ namespace OSBLE.Models.Assignments
             }
         }
 
+        [NotMapped]
+        public bool IsTeamAssignment
+        {
+            get
+            {
+                foreach (AbstractAssignmentActivity activity in this.AssignmentActivities)
+                {
+                    if (activity.isTeam)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
         public bool IsDraft { get; set; }
 
         public int? RubricID { get; set; }
@@ -64,5 +82,24 @@ namespace OSBLE.Models.Assignments
         public int? CommentCategoryConfigurationID { get; set; }
 
         public virtual CommentCategoryConfiguration CommentCategoryConfiguration { get; set; }
+
+        public TeamMember GetUsersTeam(UserProfile user)
+        {
+            if (!IsTeamAssignment)
+            {
+                return new TeamMember();
+            }
+            
+            //AC: Kind of dangerous, but for now, we just assume that the first team activity
+            //is the one we want.  This might have to get reworked after we introduce review
+            //activities
+            AbstractAssignmentActivity activity = (from a in AssignmentActivities
+                                                   where a.isTeam == true
+                                                   select a).FirstOrDefault();
+            TeamMember team = (from t in activity.TeamUsers
+                               where t.Contains(user) == true
+                               select t).FirstOrDefault() as TeamMember;
+            return team;
+        }
     }
 }

@@ -68,5 +68,10 @@ namespace OSBLE.Models.Users
             this.Scores = up.Scores;
             this.UserName = up.UserName;
         }
+
+        public override string ToString()
+        {
+            return string.Format("{0} {1}", FirstName, LastName);
+        }
     }
 }

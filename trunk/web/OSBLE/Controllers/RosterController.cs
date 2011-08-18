@@ -15,7 +15,6 @@ namespace OSBLE.Controllers
 {
     [Authorize]
     [RequireActiveCourse]
-    [CanModifyCourse]
     public class RosterController : OSBLEController
     {
         public RosterController()
@@ -76,6 +75,7 @@ namespace OSBLE.Controllers
 
         //
         // GET: /Roster/
+        [CanModifyCourse]
         public ActionResult Index()
         {
             //Get all users for the current class

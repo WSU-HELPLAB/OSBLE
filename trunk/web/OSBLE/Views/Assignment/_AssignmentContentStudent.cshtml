@@ -7,8 +7,8 @@
 @model StudioAssignment
 
 @{
-StudioAssignment sa = Model;
-int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
+    StudioAssignment sa = Model;
+    int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
 }
 
 <div class="assignment_header">
@@ -17,7 +17,7 @@ int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
         @{
             //The magic number of "2" means that we're looking at a future assignment.  In this case, don't show any details.
             //This functionality was requested in work item #412
-            if(ViewBag.AssignmentList == 2)
+            if (ViewBag.AssignmentList == 2)
             {
                 <text><div>Information on this assignment is not yet available.</div></text>
                 return;
@@ -28,6 +28,37 @@ int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
                 Description</div>
             @* Add links to assignment description *@
             <div class="assignment_description">@Helpers.Linkify(sa.Description)</div>
+            @if (sa.IsTeamAssignment)
+            {
+                TeamMember team = sa.GetUsersTeam(ViewBag.CurrentUser);
+                <div class="assignment_title">
+                Team Assignment
+                </div>
+                <div>
+                    You are a member of &quot;@team.Name&quot;.  The team members are:
+                    <br />
+                    <ul class="user_list">
+                    @foreach (TeamUserMember genericMember in team.Team.Members)
+                    {
+                        UserMember member = genericMember as UserMember;
+                        <li>
+                            <div class="user_controls">
+                            @if (member.UserProfile.UserName != null)
+                            {
+                            <a title="Mail This User" href="@Url.Action("Create", "Mail", new { recipientID = member.UserProfile.ID })">@Helpers.MailButton()</a>
+                            }
+                            
+                            </div>
+                        
+                        @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", "Roster", new { userProfile = member.UserProfile.ID }))
+                        <span class="roster_name">@Helpers.DisplayFullNameOrPending(member.UserProfile)</span>
+                        
+                        </li>
+                    }
+                    </ul>
+                </div>
+                
+            }
             @if (sa.Deliverables.Count > 0)
             {
 
@@ -147,32 +178,32 @@ int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
                                         }
                                         </div>
                                     </div>
-                                            deliverablesCounter++;
+                                        deliverablesCounter++;
                                 }
                             </div>
                             <div class="submission_deliverables_end">
                             @{
-                        TeamUserMember teamUser = (OSBLEController.GetTeamUser(submission, ViewBag.CurrentUser as UserProfile));
+                                TeamUserMember teamUser = (OSBLEController.GetTeamUser(submission, ViewBag.CurrentUser as UserProfile));
                                 Score score = (from c in submission.Scores where c.TeamUserMemberID == teamUser.ID select c).FirstOrDefault();
-                            if(score == null)
-                            {
-                                AjaxOptions options = new AjaxOptions() 
-                                { 
-                                    InsertionMode = InsertionMode.Replace,
-                           LoadingElementId="Loading",
-                           HttpMethod = "Get",
-                           UpdateTargetId = "submitFiles",
-                           OnComplete = "SubmissionLoaded" 
-                                };
+                                if (score == null)
+                                {
+                                    AjaxOptions options = new AjaxOptions()
+                                    {
+                                        InsertionMode = InsertionMode.Replace,
+                                        LoadingElementId = "Loading",
+                                        HttpMethod = "Get",
+                                        UpdateTargetId = "submitFiles",
+                                        OnComplete = "SubmissionLoaded"
+                                    };
                             @Ajax.ActionLink("Submit...", "Create", "Submission", new { id = submission.ID.ToString() }, options, new object())
-                            }
-                            else
-                            {
+                                }
+                                else
+                                {
                                 @Html.ActionLink("View Grade", "View", "Rubric", new { abstractAssignmentActivityId = submission.ID, teamUserId = teamUser.ID }, new { })
-                            }
-                            
-                            FileInfo info = new FileInfo(OSBLE.FileSystem.GetTeamUserPeerReview(false, ViewBag.ActiveCourse.AbstractCourse, submission.ID, teamUser.ID));
-                        if (info.Exists)
+                                }
+
+                                FileInfo info = new FileInfo(OSBLE.FileSystem.GetTeamUserPeerReview(false, ViewBag.ActiveCourse.AbstractCourse, submission.ID, teamUser.ID));
+                                if (info.Exists)
                                 {
                                     <br />@Html.ActionLink("View Inline Comments", "ViewInlineReview", new { abstractAssignmentActivityId = submission.ID, teamUserId = teamUser.ID });
                                 }
@@ -203,16 +234,16 @@ int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
                             </div>
                             </div>
                         </li>   
-                        if (ViewBag.CanSubmit && submission.ReleaseDate < DateTime.Now)
-                        {
+                                if (ViewBag.CanSubmit && submission.ReleaseDate < DateTime.Now)
+                                {
                                     
                         
                                     
                                     <!--<button onclick="location.href='@Url.Action("Create", "Submission", new { id = submission.ID.ToString() })'">
                             Submit Files For This Submission</button>   -->
-                        }
+                                }
 
-                        submissionCounter++;
+                                submissionCounter++;
                     }
                                 
                     }
