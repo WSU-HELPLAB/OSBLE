@@ -231,7 +231,7 @@ namespace OSBLE.Controllers
             {
                 db.Entry(updateCourse).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "Home");
             }
             return View(course);
         }
