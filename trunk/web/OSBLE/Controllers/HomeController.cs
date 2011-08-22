@@ -444,8 +444,8 @@ namespace OSBLE.Controllers
                             subject = "OSBLE Activity Post";
                             body = currentUser.FirstName + " " + currentUser.LastName + " sent the following message at " + dp.Posted.ToString() + ":";
                         }
-                        body += "\r\n\r\n";
-                        body += dp.Content.Replace("\n", "\r\n");
+                        body += "<br /><br />";
+                        body += dp.Content.Replace("\n", "<br />");
 
                         List<CoursesUsers> courseUsers = db.CoursesUsers.Where(coursesUsers => coursesUsers.AbstractCourseID == c.ID).ToList();
 
