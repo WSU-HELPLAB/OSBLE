@@ -32,12 +32,6 @@ namespace OSBLE.Models.Assignments.Activities
         [FileExtensions(new string[] { ".doc", ".docx" })]
         WordDocument,
 
-        /// <summary>
-        /// This file type is not supported by the Osble Review process and thus a Review process will not be allowed for this
-        /// file
-        /// </summary>
-        [FileExtensions(new string[] { ".*" })]
-        Other
     }
 
     /// <summary>
