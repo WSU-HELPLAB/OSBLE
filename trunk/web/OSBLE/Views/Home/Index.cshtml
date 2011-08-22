@@ -35,15 +35,6 @@
 
 </div>
 
-<div id="dashboard_middle">
-<h3>Activity Feed</h3>
-
-<div id="activity_feed">
-@Html.Partial("_ActivityFeed")
-</div>
-
-</div>
-
 <div id="dashboard_right">
 <h3>Files &amp; Links 
 @{if(ViewBag.CanEditCourseLinks)
@@ -57,6 +48,15 @@
 </h3>
 <div id="course_links">
 @Html.Partial("_CourseLinks")
+</div>
+
+</div>
+
+<div id="dashboard_middle">
+<h3>Activity Feed</h3>
+
+<div id="activity_feed">
+@Html.Partial("_ActivityFeed")
 </div>
 
 </div>

@@ -414,14 +414,14 @@ body#layoutLogOn
 
 #dashboard_middle
 {
-	width: 54%;
-	float: left;
+	margin-left:310px;
+	margin-right:310px;
 }
 
 #dashboard_right
 {
 	padding-left: 1%;
-	width: 20%;
+	width: 290px;
 	float: right;
 }
 
