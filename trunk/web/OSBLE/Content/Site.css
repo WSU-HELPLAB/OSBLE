@@ -1587,3 +1587,18 @@ ul.assignment_deliverables, .assignment_deliverables ul
         top: 33px;
         left: 400px;
     }
+
+#WarningMessages
+{
+    margin:5px;
+    padding:10px;
+    text-align:justify;
+    background: #FFF8B2; 
+    color: Red; 
+    border: 1px solid black;
+}
+
+#WarningMessages a
+{
+    color:Black;
+}

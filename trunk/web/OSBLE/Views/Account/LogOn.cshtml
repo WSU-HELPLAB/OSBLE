@@ -24,16 +24,26 @@
 
         $('#sign_up_link').click(function () {
             $('#sign_up_dialog').dialog('open');
-            
+
             //This is to remove the focus from the create_academia_account so it doesn't have the box around it
             $('#create_academia_account').blur();
             return false;
         });
 
+        if ($.browser.msie) {
+            if ($.browser.version < 9.0) {
+                $("#WarningMessages").html('You appear to be running an older version of Internet Explorer.  While we strive to make this site as compatible on as many browsers as possible, we do not have the resources needed to test older configurations.  If possible, please consider downloading the latest version of <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home">Internet Explorer</a>, <a href="http://www.mozilla.com/en-US/firefox/new/">Firefox</a>, or <a href="http://www.google.com/chrome">Chrome</a>.');
+                $("#WarningMessages").css("display", "block");
+            }
+        }
+
     });
 
 </script>
 <div>Online Studio-Based Learning Environment</div>
+
+<div id="WarningMessages" style="display:none;">
+</div>
 
 @Html.ValidationSummary(true, "Login was unsuccessful. Please correct the errors and try again.")
 
