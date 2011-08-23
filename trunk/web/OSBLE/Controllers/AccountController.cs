@@ -539,6 +539,7 @@ namespace OSBLE.Controllers
                     //craft & send the email
                     string subject = "[OSBLE] Support Request from " + model.Name;
                     string body = model.Message;
+                    body += "<br />reply to: " + model.Email;
                     List<MailAddress> to = new List<MailAddress>();
                     to.Add(new MailAddress("support@osble.org"));
                     Email.Send(subject, body, to);
