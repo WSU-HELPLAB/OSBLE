@@ -12,7 +12,7 @@ namespace OSBLE.Models.AbstractCourses.Course
         [Key]
         public int ID { get; set; }
 
-        [Required]
+        [Required (ErrorMessage="The category option must have a name")]
         public string Name { get; set; }
     }
 }

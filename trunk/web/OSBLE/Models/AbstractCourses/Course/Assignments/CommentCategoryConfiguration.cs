@@ -9,7 +9,7 @@ namespace OSBLE.Models.AbstractCourses.Course
         [Key]
         public int ID { get; set; }
 
-        [Required]
+        [Required(ErrorMessage="The comment category configuration must have a name")]
         public string Name { get; set; }
 
         public virtual IList<CommentCategory> Categories { get; set; }

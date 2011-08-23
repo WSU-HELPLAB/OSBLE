@@ -89,7 +89,7 @@ namespace OSBLE.Models.Assignments
             {
                 return new TeamMember();
             }
-            
+
             //AC: Kind of dangerous, but for now, we just assume that the first team activity
             //is the one we want.  This might have to get reworked after we introduce review
             //activities
@@ -99,6 +99,11 @@ namespace OSBLE.Models.Assignments
             TeamMember team = (from t in activity.TeamUsers
                                where t.Contains(user) == true
                                select t).FirstOrDefault() as TeamMember;
+            if (team == null)
+            {
+                team = new TeamMember() { Team = new Team()};
+                team.Team.Name = "Empty Team";
+            }
             return team;
         }
     }

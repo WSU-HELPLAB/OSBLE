@@ -97,7 +97,7 @@ namespace OSBLE.Models
 
     public class ContactUsModel
     {
-        [Required(ErrorMessage = "Name Required")]
+        [Required(ErrorMessage = "Your name is required")]
         [Display(Name = "Name")]
         public string Name { get; set; }
 

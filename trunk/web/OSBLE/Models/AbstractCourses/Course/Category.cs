@@ -29,7 +29,7 @@ namespace OSBLE.Models.Courses
 
         public virtual Course Course { get; set; }
 
-        [Required]
+        [Required (ErrorMessage="The category must have a name")]
         [Display(Name = "Name")]
         [StringLength(50)]
         public string Name { get; set; }

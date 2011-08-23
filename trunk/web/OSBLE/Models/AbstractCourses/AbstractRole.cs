@@ -8,7 +8,7 @@ namespace OSBLE.Models.Courses
         [Key]
         public int ID { get; set; }
 
-        [Required]
+        [Required(ErrorMessage="The role must have a name")]
         [StringLength(50)]
         public string Name { get; set; }
 

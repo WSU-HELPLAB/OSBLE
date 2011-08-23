@@ -65,7 +65,7 @@ namespace OSBLE.Models.Assignments.Activities
         [Display(Name = "Type")]
         public int Type { get; set; }
 
-        [Required]
+        [Required(ErrorMessage="The deliverable must have a name")]
         [Display(Name = "File Name")]
         [RegularExpression(@"^[a-zA-Z0-9\._\-]*$",
             ErrorMessage = "File names can only contain alphanumerics, '-', '_', and '.'")]

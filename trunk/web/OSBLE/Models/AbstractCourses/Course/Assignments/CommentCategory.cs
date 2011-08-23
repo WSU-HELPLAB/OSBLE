@@ -10,7 +10,7 @@ namespace OSBLE.Models.AbstractCourses
         [Required]
         public int ID { get; set; }
 
-        [Required]
+        [Required(ErrorMessage="The comment category must have a name")]
         public string Name { get; set; }
 
         [Required]

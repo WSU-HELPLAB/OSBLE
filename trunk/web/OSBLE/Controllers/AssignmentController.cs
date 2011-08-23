@@ -12,6 +12,8 @@ using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
 using OSBLE.Models.HomePage;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
 
 namespace OSBLE.Controllers
 {
@@ -145,7 +147,27 @@ namespace OSBLE.Controllers
                     List<Tuple<bool, DateTime>> submitted = new List<Tuple<bool, DateTime>>();
 
                     TeamUserMember teamUser = GetTeamUser(activity, currentUser);
-
+                    if (teamUser == null)
+                    {
+                        //null teamUser must be because the student didn't exist when the assignment was created (hopefully)
+                        teamUser = new UserMember() { UserProfileID = currentUser.ID };
+                        activity.TeamUsers.Add(teamUser);
+                        try
+                        {
+                            db.SaveChanges();
+                        }
+                        catch (DbEntityValidationException dbEx)
+                        {
+                            foreach (var validationErrors in dbEx.EntityValidationErrors)
+                            {
+                                foreach (var validationError in validationErrors.ValidationErrors)
+                                {
+                                    Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
+                                }
+                            }
+                        }
+                        
+                    }
                     string folderLocation = FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, activity.ID, teamUser);
 
                     foreach (Deliverable deliverable in (activity.AbstractAssignment as StudioAssignment).Deliverables)

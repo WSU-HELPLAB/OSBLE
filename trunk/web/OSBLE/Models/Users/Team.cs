@@ -14,7 +14,7 @@ namespace OSBLE.Models.Users
         [Required]
         public int ID { get; set; }
 
-        [Required]
+        [Required(ErrorMessage="A team name is required")]
         public string Name { get; set; }
 
         [Required]
