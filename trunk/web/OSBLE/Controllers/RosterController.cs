@@ -563,6 +563,7 @@ namespace OSBLE.Controllers
             //This will return one if they exist already or null if they don't
             var user = (from c in db.UserProfiles
                         where c.Identification == courseuser.UserProfile.Identification
+                        && c.SchoolID == activeCourse.UserProfile.SchoolID
                         select c).FirstOrDefault();
             if (user == null)
             {
@@ -573,6 +574,8 @@ namespace OSBLE.Controllers
                 up.IsAdmin = false;
                 up.SchoolID = currentUser.SchoolID;
                 up.Identification = courseuser.UserProfile.Identification;
+                up.FirstName = "Pending User";
+                up.LastName = string.Format("({0})", up.Identification);
                 db.UserProfiles.Add(up);
                 db.SaveChanges();
 
