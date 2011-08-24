@@ -104,7 +104,11 @@
 
             @* Post Content *@
             <div class="dp_content">
-            @Helpers.Linkify(Model.Content)
+             @{
+                 string content = Helpers.Linkify(Model.Content).ToHtmlString();
+                 content = content.Replace("\n", "<br />");
+                    }
+                    @Html.Raw(content)
             </div>
 
             @if (Model is DashboardPost)

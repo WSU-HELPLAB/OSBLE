@@ -492,7 +492,6 @@ body#layoutLogOn
 	padding: 3px;
 	width: 96%;
 	margin-left: 20px;
-	white-space: pre-line;
 	word-wrap: break-word;
 }
 
@@ -501,7 +500,6 @@ body#layoutLogOn
 	display: block;
 	margin-left: 20px;
 	padding: 3px;
-	clear: both;
 }
 
 .dp_replylink
