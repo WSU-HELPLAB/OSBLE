@@ -653,7 +653,7 @@ namespace OSBLE.Controllers
             SetUpViewBag();
 
             //Unlike when doing a CREATE, EDIT teams come from the viewmodel and not a postback
-            string json = SerializeTeamMemers(GetTeamMembers(viewModel.Assignment.AssignmentActivities.ElementAt(0)));
+            string json = SerializeTeamMemers(GetTeamMembers(viewModel.Assignment.AssignmentActivities.Where(a => a.TeamUsers.Count > 0).FirstOrDefault()));
             ViewBag.NewTeams = json;
 
             //similarly, the rubric's id doesn't come from a postback
