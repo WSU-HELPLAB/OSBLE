@@ -97,11 +97,20 @@
         border:none;
         font-size:small;
     }
+    
+    #latePenalty
+    {
+        border: 1px solid black;
+        width: 300px;
+        background: White;
+    }
+    
 </style>
 
 @{
     <input id="customize_option" type="hidden" value="@ViewBag.Customize" />
     <input id="numDropped" type="hidden" value="@ViewBag.NumDropped" />
+    double latePercentPenalty = 0.0;
 }
 
 @Html.Partial("_Tabs")
@@ -272,11 +281,12 @@
 
                 if (score.Count() > 0)
                 {
+                    latePercentPenalty = (1 - score.First().LatePenaltyPercent) * 100;
                     if (score.First().AssignmentActivity.AbstractAssignment.Rubric != null)
                     {
                         if (score.First().LatePenaltyPercent > 0)
                         {
-                            <td id="rubric-@assignment.ID" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { abstractAssignmentActivityId = score.First().AssignmentActivityID, teamUserID = score.First().TeamUserMemberID }, new { @style = "color:Red" })</td>                            
+                            <td id="rubric-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" abbr style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { abstractAssignmentActivityId = score.First().AssignmentActivityID, teamUserID = score.First().TeamUserMemberID }, new { @style = "color:Red" }) @Helpers.CreateToolTip("This assignment was late")</td>                            
                         }
                         else
                         {
@@ -288,8 +298,8 @@
                         if (score.First().Points > 0)
                         {
                             if (score.First().LatePenaltyPercent > 0)
-                            {
-                                <td id="teacher-@assignment.ID" style="font-style:italic; color:Red;">@score.First().Points.ToString(".#")</td>
+                            {   
+                                <td id="teacher-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" style="font-style:italic; color:Red;">@score.First().Points.ToString(".#")</td>
                             }
                             else
                             {
@@ -300,7 +310,7 @@
                         {
                             if (score.First().LatePenaltyPercent > 0)
                             {
-                                <td id="teacher-@assignment.ID" style="font-style:italic; color:Red">@String.Format("{0}", 0)</td>
+                                <td id="teacher-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" style="font-style:italic; color:Red">@String.Format("{0}", 0)</td>
                             }
                             else
                             {
@@ -338,8 +348,19 @@
    </table>
 </div>
 
+<div id="latePenalty" style="display:none; position:absolute;">
+    <table>
+        <tr>
+            <td>
+                This assignment was graded <b>@latePercentPenalty%</b> off because it was submitted late.
+            </td>
+        </tr>
+    </table>
+</div>
+
 <script type="text/javascript">
     var lastFocusedCell = null;
+
 
     $(document).click(function (e) {
         clearLastCellFocus(e);
@@ -347,6 +368,21 @@
 
     $(document).ready(function (e) {
         calculateRows();
+    });
+
+    $(document).bind('mousemove', function (e) {
+        //$("#log").text("e.pageX: " + e.pageX + ", e.pageY: " + e.pageY);
+
+        var x = e.pageX;
+        var y = e.pageY;
+
+        x = parseFloat(x);
+        y = parseFloat(y);
+
+        y -= 100;
+
+        $("#latePenalty").css("left", x + "px");
+        $("#latePenalty").css("top", y + "px");
     });
 
     $("#grades td").keydown(function (e) {
@@ -380,6 +416,14 @@
             }
         }
     });
+
+    function showLatePenalty() {
+        $("#latePenalty").animate({ "height": "show" }, { duration: 75 });
+    }
+
+    function hideLatePenalty() {
+        $("#latePenalty").animate({ "height": "hide" }, { duration: 0 });
+    }
 
      function calculateRows() {
         var totalArr = [];
