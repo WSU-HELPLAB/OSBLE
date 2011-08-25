@@ -141,7 +141,7 @@ namespace OSBLE.Models
         
         #region MailToolTips
 
-            public static string MailRecipient = "Type in some letters in the user's name and a list of users that match that search term will pop up. Select the desired user from that list to continue and compose your message.";
+            public static string MailRecipient = "Type in some letters in the user's name and a list of users that match that search term will pop up. Select the desired user from that list to continue and compose your message.  Note: If you change the recipient it removes all data in other fields";
 
             public static string MailCreateTo = "This is the person this message will be sent to. If you want to change the recipient, you must create a new message.";
 

@@ -4,28 +4,7 @@
 @{
     ViewBag.Title = "Mail";
 }
-    <h2>New Message</h2>
-    Enter recipient's name to compose message: 
-    @Helpers.CreateToolTip(ToolTips.MailRecipient) <br />
-
-
-        <input id="people_finder" />
-        <script type="text/javascript">
-            $("#people_finder").autocomplete({
-                source: "@(Url.Action("Search"))",
-                select: function(event, ui) {
-                    location.href="@Url.Action("Create")?recipientID=" + ui.item.value;
-                },
-                focus: function(event, ui) {return false;}
-            }).data("autocomplete")._renderItem = function( ul, item ) {
-                return $( "<li></li>" )
-                .data( "item.autocomplete", item )
-                .append( "<a>" + "<img src=\"@Url.Action("ProfilePicture")/" + item.value + "\" class=\"small_profile_picture\" alt=\"Profile Picture\" /> " + item.label+ "</a>" )
-                .appendTo( ul );
-            }
-
-        </script>
-
+    <p>@Html.ActionLink("Compose new message", "Create")</p>
 
     @if (ViewBag.BoxHeader == "Inbox")
     {

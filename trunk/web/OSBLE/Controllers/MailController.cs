@@ -92,34 +92,38 @@ namespace OSBLE.Controllers
         public ActionResult Create()
         {
             int id = Convert.ToInt32(Request.Params["recipientID"]);
-            if (!canMail(id))
-            {
-                return RedirectToAction("Index");
-            }
 
             Mail mail = new Mail();
 
-            // Handle replies if necessary
-            if (Request.Params["replyTo"] != null)
+            // if there is a recipient entered
+            if (id != 0)
             {
-                int replyto = Convert.ToInt32(Request.Params["replyTo"]);
-                Mail reply = db.Mails.Find(replyto);
-                // Ensure valid reply user
-                if ((reply != null) && (reply.ToUserProfile == currentUser))
+                if (!canMail(id))
                 {
-                    mail.Subject = "Re: " + reply.Subject;
-                    // Prefix each line with a '> '
-                    mail.Message = "\n\nOriginal Message at " + reply.Posted.ToString() + ":\n" +
-                        Regex.Replace(reply.Message, "^.*$", "> $&",
-                        RegexOptions.Multiline);
+                    return RedirectToAction("Index");
                 }
+
+                // Handle replies if necessary
+                if (Request.Params["replyTo"] != null)
+                {
+                    int replyto = Convert.ToInt32(Request.Params["replyTo"]);
+                    Mail reply = db.Mails.Find(replyto);
+                    // Ensure valid reply user
+                    if ((reply != null) && (reply.ToUserProfile == currentUser))
+                    {
+                        mail.Subject = "Re: " + reply.Subject;
+                        // Prefix each line with a '> '
+                        mail.Message = "\n\nOriginal Message at " + reply.Posted.ToString() + ":\n" +
+                            Regex.Replace(reply.Message, "^.*$", "> $&",
+                            RegexOptions.Multiline);
+                    }
+                }
+
+                UserProfile u = db.UserProfiles.Find(id);
+                mail.ToUserProfile = u;
+                mail.ToUserProfileID = u.ID;
             }
-
-            UserProfile u = db.UserProfiles.Find(id);
-            mail.ToUserProfile = u;
-            mail.ToUserProfileID = u.ID;
-
-            return View(mail);
+                return View(mail);
         }
 
         //
