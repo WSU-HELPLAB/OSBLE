@@ -58,6 +58,7 @@ namespace OSBLE.Controllers
             {
                 model.UserName = model.UserName.Trim();
                 model.Password = model.Password.Trim();
+                MembershipUser user = Membership.GetUser(model.UserName);
                 if (Membership.ValidateUser(model.UserName, model.Password))
                 {
                     context.Session.Clear(); // Clear session variables.
@@ -71,6 +72,14 @@ namespace OSBLE.Controllers
                     {
                         return RedirectToAction("Index", "Home");
                     }
+                }
+                else if (!user.IsApproved)
+                {
+                    setLogOnCaptcha();
+                    ModelState.AddModelError("", "This account has not been activated.  An additional verification letter has been sent to your email address.");
+                    string randomHash = GenerateRandomString(40);
+                    UserProfile up = db.UserProfiles.Where(m => m.UserName == user.UserName).FirstOrDefault();
+                    sendVerificationEmail(true, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), up.FirstName, up.UserName);
                 }
                 else
                 {
