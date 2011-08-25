@@ -262,7 +262,16 @@
 
                 <div class="assignment_grading">
                     Worth @sa.PointsPossible points in <em>@sa.Category.Name</em> category
-                </div>          
-
+                </div>
+            
             }
+            
+            @{AbstractAssignmentActivity saa = sa.AssignmentActivities.Where(aa => aa is SubmissionActivity).FirstOrDefault();} 
+            <div class="assignment_title">
+                    Late Penalty</div>
+                
+            <div class="assignment_grading">
+                Students may submit assignments up to <b>@saa.MinutesLateWithNoPenalty</b> minutes late at no penalty, after which a penalty of <b>@saa.PercentPenalty</b> percent per <b>@saa.HoursLatePerPercentPenalty</b> hours late will be applied.
+                Assignments that are submitted more than <b>@saa.HoursLateUntilZero</b> hours after the due date and time will receive an automatic <b>0</b>.
+            </div>
         </div>
