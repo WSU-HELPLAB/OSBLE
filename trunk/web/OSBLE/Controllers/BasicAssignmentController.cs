@@ -594,6 +594,9 @@ namespace OSBLE.Controllers
         /// </summary>
         private void SetUpViewBag()
         {
+            // changes the Page title and button to "Create Basic Assignment"
+            ViewBag.AssignmentLabel = "Create Basic Assignment";
+
             //RUBRICS
             List<Rubric> rubrics = (from cr in db.CourseRubrics
                                     join r in db.Rubrics on cr.RubricID equals r.ID
@@ -651,6 +654,9 @@ namespace OSBLE.Controllers
             //important stuff will get overwritten by the code below, but it's always good to
             //cover your bases.
             SetUpViewBag();
+
+            // changes the Page title and button to "Modify Assignment"
+            ViewBag.AssignmentLabel = "Modify Assignment";
 
             //Unlike when doing a CREATE, EDIT teams come from the viewmodel and not a postback
             string json = SerializeTeamMemers(GetTeamMembers(viewModel.Assignment.AssignmentActivities.Where(a => a.TeamUsers.Count > 0).FirstOrDefault()));
