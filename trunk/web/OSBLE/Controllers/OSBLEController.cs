@@ -395,10 +395,31 @@ namespace OSBLE.Controllers
                 }
                 else
                 {
-                    //rounded up as it should be
-                    int numberOfTimePenatlyIsDeducted = (int)lateness.TotalHours + 1 % activity.HoursLatePerPercentPenalty;
+                    //If the lateness is a negative number we need to find the absolute value of 
+                    //that number for our calculations
+                    if (lateness.TotalHours < 0)
+                    {
+                        lateness = lateness.Negate();
+                    }
 
-                    return activity.PercentPenalty * numberOfTimePenatlyIsDeducted;
+                    if (lateness.TotalHours < activity.HoursLatePerPercentPenalty)
+                    {
+                        return activity.PercentPenalty;
+                    }
+
+                    else
+                    {
+                        //Double the hours late per percent penalty and loop through until the lateness is 
+                        //less than the hours.
+                        int hoursLatePerPercentPenalty = activity.HoursLatePerPercentPenalty + activity.HoursLatePerPercentPenalty;
+                        while (lateness.TotalHours > hoursLatePerPercentPenalty)
+                        {
+                            hoursLatePerPercentPenalty += activity.HoursLatePerPercentPenalty;
+                        }
+
+                        //return the percent penalty times the number of hours late.
+                        return activity.PercentPenalty * (hoursLatePerPercentPenalty / activity.HoursLatePerPercentPenalty);
+                    }                    
                 }
             }
             return 0;
