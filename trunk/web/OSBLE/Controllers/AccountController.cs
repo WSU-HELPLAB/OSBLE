@@ -79,6 +79,9 @@ namespace OSBLE.Controllers
                     ModelState.AddModelError("", "This account has not been activated.  An additional verification letter has been sent to your email address.");
                     string randomHash = GenerateRandomString(40);
                     UserProfile up = db.UserProfiles.Where(m => m.UserName == user.UserName).FirstOrDefault();
+                    MembershipUser mu = Membership.GetUser(up.UserName);
+                    mu.Comment = randomHash;
+                    Membership.UpdateUser(mu);
                     sendVerificationEmail(true, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), up.FirstName, up.UserName);
                 }
                 else

@@ -6,7 +6,9 @@
 
 <h2>Activate Account</h2>
 
+
 @using (Html.BeginForm()) {
+    @Html.ValidationSummary() 
     <div>
             <div class="editor-label">
                 @Html.LabelFor(m => m.UserName, "Email Address")
