@@ -11,6 +11,7 @@ using OSBLE.Models;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
+using OSBLE.Models.Assignments;
 
 namespace OSBLE.Controllers
 {
@@ -488,5 +489,53 @@ namespace OSBLE.Controllers
 
             return fileTypes;
         }
+
+        /// <summary>
+        /// Removes the provided user from the active course
+        /// </summary>
+        /// <param name="user"></param>
+        public void RemoveUserFromCourse(UserProfile user)
+        {
+            //The relationship between users and courses is expressed in CoursesUsers, but
+            //there exists plenty of other relationships between users and other course
+            //particulars.  Perhaps this isn't good design, but we're kind of stuck at this point.
+            //In order to keep the course from having a bunch of orphaned items, we must manually
+            //delete some additional information.
+
+            //might as well delete the big daddy to start
+            CoursesUsers cu =  (from c in db.CoursesUsers
+                    where c.AbstractCourseID == activeCourse.AbstractCourseID
+                    && c.UserProfileID == user.ID
+                    select c).FirstOrDefault();
+            if (cu != null)
+            {
+                db.CoursesUsers.Remove(cu);
+            }
+
+            /* AC TODO: Complete this code segment
+
+            //remove this user from any assignments.
+            var activities = from category in db.Categories
+                        join assignment in db.AbstractAssignments on category.ID equals assignment.CategoryID
+                        join activity in db.AbstractAssignmentActivities on assignment.ID equals activity.AbstractAssignmentID
+                        where category.CourseID == activeCourse.AbstractCourseID
+                        select activity;
+            foreach (AbstractAssignmentActivity activity in activities)
+            {
+                foreach (TeamUserMember tum in activity.TeamUsers)
+                {
+                    if (tum is TeamMember)
+                    {
+                        TeamMember tm = tum as TeamMember;
+                        if (tm.Contains(user))
+                        {
+                            tm.Team.Remove(user);
+                        }
+                    }
+                }
+            }
+             * */
+        }
+
     }
 }

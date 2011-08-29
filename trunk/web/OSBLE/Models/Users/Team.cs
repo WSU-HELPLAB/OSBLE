@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models.Users
@@ -30,6 +31,26 @@ namespace OSBLE.Models.Users
                 }
             }
             return false;
+        }
+
+        public void Remove(UserProfile user)
+        {
+            //the user should only be on the team once
+            TeamUserMember memberToRemove = (from member in Members
+                                             where member is UserMember
+                                             && (member as UserMember).UserProfileID == user.ID
+                                             select member).FirstOrDefault();
+            Members.Remove(memberToRemove);
+
+            //recursively make the call for all TeamMembers as well
+            var query = from member in Members
+                        where member is TeamMember
+                        select member as TeamMember;
+            foreach (var item in query)
+            {
+                item.Team.Remove(user);
+            }
+
         }
     }
 }
