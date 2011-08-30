@@ -73,5 +73,10 @@ namespace OSBLE.Models.Users
         {
             return string.Format("{0} {1}", FirstName, LastName);
         }
+
+        public string LastAndFirst()
+        {
+            return string.Format("{0}, {1}", LastName, FirstName);
+        }
     }
 }
