@@ -512,29 +512,29 @@ namespace OSBLE.Controllers
                 db.CoursesUsers.Remove(cu);
             }
 
-            /* AC TODO: Complete this code segment
-
             //remove this user from any assignments.
-            var activities = from category in db.Categories
+            var activities = (from category in db.Categories
                         join assignment in db.AbstractAssignments on category.ID equals assignment.CategoryID
                         join activity in db.AbstractAssignmentActivities on assignment.ID equals activity.AbstractAssignmentID
                         where category.CourseID == activeCourse.AbstractCourseID
-                        select activity;
-            foreach (AbstractAssignmentActivity activity in activities)
+                        select activity).SelectMany(a => a.TeamUsers).ToList();
+            
+            foreach (TeamUserMember teamUser in activities)
             {
-                foreach (TeamUserMember tum in activity.TeamUsers)
+                if (teamUser is TeamMember)
                 {
-                    if (tum is TeamMember)
+                    TeamMember member = teamUser as TeamMember;
+                    member.Team.Remove(user);
+                }
+                else
+                {
+                    if (teamUser.Contains(user))
                     {
-                        TeamMember tm = tum as TeamMember;
-                        if (tm.Contains(user))
-                        {
-                            tm.Team.Remove(user);
-                        }
+                        db.TeamUsers.Remove(teamUser);
                     }
                 }
             }
-             * */
+            db.SaveChanges();
         }
 
     }

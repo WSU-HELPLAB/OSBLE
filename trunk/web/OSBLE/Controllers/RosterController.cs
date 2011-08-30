@@ -432,8 +432,7 @@ namespace OSBLE.Controllers
             CoursesUsers coursesusers = getCoursesUsers(userProfileID);
             if ((coursesusers != null) && CanModifyOwnLink(coursesusers))
             {
-                db.CoursesUsers.Remove(coursesusers);
-                db.SaveChanges();
+                RemoveUserFromCourse(coursesusers.UserProfile);
             }
             else
             {
