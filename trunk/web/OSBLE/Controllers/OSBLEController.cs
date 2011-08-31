@@ -525,6 +525,10 @@ namespace OSBLE.Controllers
                 {
                     TeamMember member = teamUser as TeamMember;
                     member.Team.Remove(user);
+
+                    //AC: What should be done if that team is now empty?
+                    //    I initially tried to remove the team, but that seemed to cause
+                    //    some sort of runtime error.
                 }
                 else
                 {

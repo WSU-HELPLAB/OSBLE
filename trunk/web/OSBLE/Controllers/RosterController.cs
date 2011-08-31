@@ -258,13 +258,16 @@ namespace OSBLE.Controllers
                         }
                     }
 
-                    // No duplicate IDs, so we can remove the current course links to add the new ones.
-                    var students = from c in db.CoursesUsers where c.AbstractCourseID == activeCourse.AbstractCourseID && c.AbstractRoleID == (int)CourseRole.CourseRoles.Student select c;
-                    foreach (CoursesUsers student in students)
-                    {
-                        db.CoursesUsers.Remove(student);
-                    }
-                    db.SaveChanges();
+                    //Use the list of our old students to track changes between the current and new class roster.
+                    //Students that exist on the old roster but do not appear on the new roster will
+                    //be removed from the course
+                    var oldRoster = from c in db.CoursesUsers 
+                                    where c.AbstractCourseID == activeCourse.AbstractCourseID 
+                                    && 
+                                    c.AbstractRoleID == (int)CourseRole.CourseRoles.Student 
+                                    select c;
+                    List<UserProfile> orphans = oldRoster.Select(cu => cu.UserProfile).ToList();
+                    List<CoursesUsers> newRoster = new List<CoursesUsers>();
 
                     // Attach to users or add new user profile stubs.
                     foreach (RosterEntry entry in rosterEntries)
@@ -274,15 +277,15 @@ namespace OSBLE.Controllers
                         courseUser.Section = entry.Section;
                         courseUser.UserProfile = new UserProfile();
                         courseUser.UserProfile.Identification = entry.Identification;
-                        try
-                        {
-                            createCourseUser(courseUser);
-                        }
-                        catch (Exception e)
-                        {
-                            ViewBag.Error = e.Message;
-                            return View("RosterError");
-                        }
+                        newRoster.Add(courseUser);
+                        createCourseUser(courseUser);
+                        orphans.Remove(courseUser.UserProfile);
+                    }
+
+                    //remove all orphans
+                    foreach (UserProfile orphan in orphans)
+                    {
+                        RemoveUserFromCourse(orphan);
                     }
                 }
             }
@@ -596,10 +599,6 @@ namespace OSBLE.Controllers
             {
                 db.CoursesUsers.Add(courseuser);
                 db.SaveChanges();
-            }
-            else
-            {
-                throw new Exception("Attempted to add a student with the same School ID as a non-student (Instructor, TA, etc.) already in the class. Please check your roster and try again.");
             }
         }
 
