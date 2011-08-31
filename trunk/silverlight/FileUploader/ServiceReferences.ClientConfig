@@ -3,7 +3,7 @@
         <bindings>
             <basicHttpBinding>
                 <binding name="BasicHttpBinding_UploaderWebService" maxBufferSize="2147483647"
-                    maxReceivedMessageSize="2147483647">
+                    maxReceivedMessageSize="2147483647" sendTimeout="00:15:00">
                     <security mode="Transport" />
                 </binding>
             </basicHttpBinding>
