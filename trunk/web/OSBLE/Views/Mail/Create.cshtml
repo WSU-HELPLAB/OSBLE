@@ -1,11 +1,13 @@
 ﻿@model OSBLE.Models.Users.Mail
 @using OSBLE.Models
+@using OSBLE.Models.Users
 
 @{
     ViewBag.Title = "Create";
+    List<UserProfile> recipients = Session["mail_recipients"] as List<UserProfile>;
 }
 
-<h2>New Message</h2>
+<h2>@ViewBag.MailHeader</h2>
 
 <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
@@ -14,9 +16,11 @@
 {
     @Html.ValidationSummary(true)
 
-         <a>To:</a>
+    <a>To:</a>
+    if (ViewBag.MailHeader == "New Message")
+    {
         <input id="people_finder" />
-        @Helpers.CreateToolTip(ToolTips.MailRecipient) <br />
+        @Helpers.CreateToolTip(ToolTips.MailRecipient) 
         <script type="text/javascript">
 
             $("#people_finder").autocomplete({
@@ -32,18 +36,31 @@
                 .appendTo( ul );
             }
         </script>
+    }
+    <br />
 
-        if (Model.ToUserProfile != null)
+    if (recipients != null)
+    {
+        foreach (UserProfile up in recipients)
         {
-                @Helpers.ProfilePicture(@Url.Action("ProfilePicture", new { ID = Model.ToUserProfileID }))
+            <div id="recipient + @up.ID" class="recipient">
+                <div class="recipient_tools">
+                    @if (ViewBag.MailHeader == "New Message")
+                    {
+                        <a id="@up.ID" href="#" title="Delete this recipient" onclick="removeRecipient(@up.ID);" ><img src="/Content/images/delete_up.png" alt="Delete Button" /></a>
+                    }
+                </div>
+                @Helpers.ProfilePicture(@Url.Action("ProfilePicture", new { ID = up.ID }))
 
                 <div class="editor-field">
-                    @Model.ToUserProfile.FirstName @Model.ToUserProfile.LastName
+                    @up.FirstName @up.LastName
                     @Html.HiddenFor(model => model.FromUserProfileID)
                     @Html.ValidationMessageFor(model => model.ToUserProfileID)
                 </div>
+            </div>
         }
-        //<br />
+    }
+    //<br />
         <div class="editor-field" style="clear: both;">
             @Html.LabelFor(model => model.Subject): @Html.EditorFor(model => model.Subject)<br />
             @Html.ValidationMessageFor(model => model.Subject)
@@ -65,3 +82,11 @@
 <div>
     @Html.ActionLink("Back to Inbox", "Index")
 </div>
+
+<script type="text/javascript">
+
+    function removeRecipient(recip) {
+        location.href="@Url.Action("Create")?recipientID=" + -recip;
+    }
+
+</script>

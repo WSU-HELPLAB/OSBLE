@@ -6,13 +6,13 @@
 }
 <h2>@Model.Subject</h2>
     <div class="mail_user">
-        @Helpers.ProfilePicture(@Url.Action("ProfilePicture",new { ID=Model.FromUserProfileID }))
         <b>From:</b><br />
+        @Helpers.ProfilePicture(@Url.Action("ProfilePicture",new { ID=Model.FromUserProfileID }))
         @Model.FromUserProfile.FirstName @Model.FromUserProfile.LastName
     </div>
     <div class="mail_user">
-        @Helpers.ProfilePicture(@Url.Action("ProfilePicture",new { ID=Model.ToUserProfileID }))
         <b>To:</b><br />
+        @Helpers.ProfilePicture(@Url.Action("ProfilePicture",new { ID=Model.ToUserProfileID }))
         @Model.ToUserProfile.FirstName @Model.ToUserProfile.LastName
     </div>
 

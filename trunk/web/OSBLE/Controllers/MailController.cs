@@ -91,16 +91,21 @@ namespace OSBLE.Controllers
 
         public ActionResult Create()
         {
+            ViewBag.MailHeader = "New Message";
+
             int id = Convert.ToInt32(Request.Params["recipientID"]);
-
             Mail mail = new Mail();
+            List<UserProfile> userprofiles = new List<UserProfile>();
 
-            // if there is a recipient entered
-            if (id != 0)
+            if (id == 0) // creating a new email, no recipients yet
+            {
+                Session["mail_recipients"] = userprofiles;
+            }
+            else if (id > 0)// if there is a recipient entered or is a reply
             {
                 if (!canMail(id))
                 {
-                    return RedirectToAction("Index");
+                    return View(mail);
                 }
 
                 // Handle replies if necessary
@@ -111,54 +116,84 @@ namespace OSBLE.Controllers
                     // Ensure valid reply user
                     if ((reply != null) && (reply.ToUserProfile == currentUser))
                     {
-                        mail.Subject = "Re: " + reply.Subject;
+                        Session["mail_recipients"] = userprofiles;
+
+                        ViewBag.MailHeader = mail.Subject = "Re: " + reply.Subject;
                         // Prefix each line with a '> '
                         mail.Message = "\n\nOriginal Message at " + reply.Posted.ToString() + ":\n" +
                             Regex.Replace(reply.Message, "^.*$", "> $&",
                             RegexOptions.Multiline);
+                        userprofiles.Add(reply.FromUserProfile);
                     }
                 }
+                else  // not a reply, adding recipients
+                {
+                    userprofiles = Session["mail_recipients"] as List<UserProfile>;
+                    UserProfile u = db.UserProfiles.Find(id);
 
-                UserProfile u = db.UserProfiles.Find(id);
-                mail.ToUserProfile = u;
-                mail.ToUserProfileID = u.ID;
+                    foreach (UserProfile p in userprofiles)
+                    {
+                        // if you have already entered that recipient
+                        if (p.ID == u.ID)
+                        {
+                            return View(mail);
+                        }
+                    }
+                    userprofiles.Add(u);
+                }
+                Session["mail_recipients"] = userprofiles;
             }
-                return View(mail);
+            else if(id < 0) // remove a recipient
+            {
+                userprofiles = Session["mail_recipients"] as List<UserProfile>;
+
+                foreach (UserProfile u in userprofiles)
+                {
+                    if (-id == u.ID)
+                    {
+                        userprofiles.Remove(u);
+                        Session["mail_recipients"] = userprofiles;
+                        return View(mail);
+                    }
+                }
+            }
+            return View(mail);
         }
 
         //
         // POST: /Mail/Create
-
         [HttpPost]
         public ActionResult Create(Mail mail)
         {
-            if (!canMail(mail.ToUserProfileID))
-            {
-                return RedirectToAction("Index");
-            }
-
             if (ModelState.IsValid)
             {
-                mail.FromUserProfileID = CurrentUser.ID;
-                mail.FromUserProfile = CurrentUser;
-                mail.Read = false;
+                List<UserProfile> recipients = new List<UserProfile>(); 
+                recipients = Session["mail_recipients"] as List<UserProfile>;
 
-                db.Mails.Add(mail);
-                db.SaveChanges();
-                using (NotificationController nc = new NotificationController())
+                foreach (UserProfile up in recipients)
                 {
-                    nc.SendMailNotification(mail);
-                }
+                    Mail newMail = new Mail();
+                    newMail.FromUserProfileID = CurrentUser.ID;
+                    newMail.Read = false;
+                    newMail.ToUserProfileID = up.ID;
+                    newMail.Subject = mail.Subject;
+                    newMail.Message = mail.Message;
 
+                    using (NotificationController nc = new NotificationController())
+                    {
+                        nc.SendMailNotification(newMail);
+                    }
+
+                    db.Mails.Add(newMail);
+                    db.SaveChanges();
+                }
                 return RedirectToAction("Index");
             }
-
             return View(mail);
         }
 
         //
         // GET: /Mail/Delete/5
-
         [HttpPost]
         public ActionResult Delete(int id)
         {
