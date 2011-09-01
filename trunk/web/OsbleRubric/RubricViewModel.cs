@@ -1027,8 +1027,8 @@ namespace OsbleRubric
             {
                 pointSpreadComboBox.Items.Add(i);
             }
-            //setting initial selected item to first item added
-            pointSpreadComboBox.SelectedItem = pointSpreadComboBox.Items[0];
+            //setting initial selected item to the 5th element, so the default choice is 5
+            pointSpreadComboBox.SelectedItem = pointSpreadComboBox.Items[4];
 
             //creating help icon and setting its tooltip
             Image helpImage = new Image()
