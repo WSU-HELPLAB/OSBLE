@@ -318,7 +318,7 @@ namespace OSBLE.Controllers
                             submissionInfo.Name = (teamUser as UserMember).UserProfile.LastName + ", " + (teamUser as UserMember).UserProfile.FirstName;
                         }
 
-                        if ((from c in studioActivity.Scores where c.TeamUserMemberID == teamUser.ID select c).FirstOrDefault() != null)
+                        if ((from c in studioActivity.Scores where c.TeamUserMemberID == teamUser.ID && c.Points >= 0 select c).FirstOrDefault() != null)
                         {
                             submissionInfo.Graded = true;
                             numberGraded++;

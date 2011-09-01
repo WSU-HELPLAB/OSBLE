@@ -717,16 +717,21 @@ namespace OSBLE.Controllers
 
             var rubricEvals = (from a in db.RubricEvaluations where a.AbstractAssignmentActivityID == assignmentActivity.ID select a);
 
+            //Linq won't let me delete from the iCollection so I made a List<Deliverable> to 
+            //store the deliverables and then looping through the list to delete them.
             List<Deliverable> deliverables = new List<Deliverable>();
+
             foreach (Deliverable d in assignment.Deliverables)
             {
                 deliverables.Add(d);
             }
+
             foreach (Deliverable d in deliverables)
             {
                 assignment.Deliverables.Remove(d);
             }
             db.SaveChanges();
+
             if (rubricEvals.Count() > 0)
             {
                 var criterion = (from c in db.Criteria where c.RubricID == assignment.RubricID select c);
@@ -1178,93 +1183,38 @@ namespace OSBLE.Controllers
             TeacherIndex();
             return View("Index");
         }
-
+        
         [HttpPost]
         public void DeleteCategory(int categoryId)
         {
             if (ModelState.IsValid)
             {
-
-
-                List<AbstractAssignmentActivity> assignmentList = (from assignments in db.AbstractAssignmentActivities
-                                                                   where assignments.AbstractAssignment.CategoryID == categoryId
-                                                                   select assignments).ToList();
-
-
-                foreach(AbstractAssignmentActivity ass in assignmentList)
+                int currentCourseId = ActiveCourse.AbstractCourseID;
+                List<AbstractAssignmentActivity> activities = (from a in db.AbstractAssignmentActivities 
+                                                               where a.AbstractAssignment.CategoryID == categoryId
+                                                               select a).ToList();
+                for (int i = 0; i < activities.Count(); i++)
                 {
-                    DeleteColumn(ass.ID);
-                }
-
-                //List<TeamUserMember> teamMember = (from a in assignmentList[0].TeamUsers select a).ToList();
-
-
-                //foreach(TeamUserMember k in teamMember)
-                //{
-                //    db.TeamUsers.Remove(k);
-                //}
-                //db.SaveChanges();
-                //List<TeamUserMember> teamMember = (from a in assignmentList.ElementAt(i).TeamUsers select a).ToList();
-                //List<TeamUserMember> teamMembers = db.TeamUsers.Find(categoryId);
-
-                Category catToRemove = db.Categories.Find(categoryId);
-                db.Categories.Remove(catToRemove);
-                db.SaveChanges();
-            }
-        }
-        /*
-        [HttpPost]
-        public void DeleteCategory(int categoryId)
-        {
-            if (ModelState.IsValid)
-            {
-                List<AbstractAssignmentActivity> assignmentList = (from assignments in db.AbstractAssignmentActivities
-                                                                   where assignments.AbstractAssignment.CategoryID == categoryId
-                                                                   select assignments).ToList();
-                for (int i = 0; i < assignmentList.Count(); i++)
-                {
-                    List<TeamUserMember> teamMember = (from a in assignmentList.ElementAt(i).TeamUsers select a).ToList();
-
-                    var rubricEvals = (from a in db.RubricEvaluations where a.AbstractAssignmentActivityID == assignmentList.ElementAt(i).ID select a);
-                    
-                    //if (rubricEvals.Count() > 0)
-                    if (rubricEvals.Count() > 0)
+                    List<TeamUserMember> teamMember = (from a in activities[i].TeamUsers select a).ToList();
+                    foreach (TeamUserMember item in teamMember)
                     {
-                        // I'm pretty sure we don't want to be deleting the criterion
-                        //var criterion = (from c in db.Criteria where c.RubricID == assignmentList.ElementAt(i).AbstractAssignment.RubricID select c);
-                        //foreach (Criterion c in criterion)
-                        //{
-                        //    db.Criteria.Remove(c);
-                        //}
-                        //db.SaveChanges();
-                        
-
-                        foreach (RubricEvaluation r in rubricEvals)
+                        if (item is UserMember)
                         {
-                            db.RubricEvaluations.Remove(r);
+                            db.TeamUsers.Remove(item);
                         }
-                        db.SaveChanges();
-                    }
-
-
-                    foreach (UserMember item in teamMember)
-                    {
-                        db.TeamUsers.Remove(item);
+                        else if (item is TeamUserMember)
+                        {
+                            db.TeamUsers.Remove(item);
+                        }
                     }
                     db.SaveChanges();
-
-                    db.AbstractAssignmentActivities.Remove(assignmentList.ElementAt(i));
-                    db.SaveChanges();
-                   //removed, was causing an error because the abstract assignment is already removed via entity framework i think?
-                   // db.AbstractAssignments.Remove(assignmentList.ElementAt(i).AbstractAssignment);
-                   // db.SaveChanges();
-                }
+                }                    
 
                 Category category = db.Categories.Find(categoryId);
                 db.Categories.Remove(category);
                 db.SaveChanges();
             }
-        }*/
+        }
 
         [CanModifyCourse]
         [HttpPost]
