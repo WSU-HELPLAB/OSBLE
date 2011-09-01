@@ -1,0 +1,14 @@
+<OutOfBrowserSettings ShortName="OSBLE File Uploader" EnableGPUAcceleration="False" ShowInstallMenuItem="True">
+    <OutOfBrowserSettings.Blurb>A handy way to upload files to your OSBLE courses.</OutOfBrowserSettings.Blurb>
+    <OutOfBrowserSettings.WindowSettings>
+        <WindowSettings Title="OSBLE File Uploader" />
+    </OutOfBrowserSettings.WindowSettings>
+    <OutOfBrowserSettings.SecuritySettings>
+        <SecuritySettings ElevatedPermissions="Required" />
+    </OutOfBrowserSettings.SecuritySettings>
+    <OutOfBrowserSettings.Icons>
+        <Icon Size="16,16">Images/logo_16.png</Icon>
+        <Icon Size="32,32">Images/logo_32.png</Icon>
+        <Icon Size="48,48">Images/logo_48.png</Icon>
+    </OutOfBrowserSettings.Icons>
+</OutOfBrowserSettings>

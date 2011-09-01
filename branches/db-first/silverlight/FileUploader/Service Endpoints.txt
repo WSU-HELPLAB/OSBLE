@@ -1,0 +1,2 @@
+﻿web url: https://www.osble.org/Services/UploaderWebService.svc/mex
+local url: http://localhost:17532/Services/UploaderWebService.svc

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="08ee4ad5-f81d-44fb-9919-4b6f1c09a010" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>true</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings>
+      <CollectionMapping TypeName="System.Collections.ObjectModel.ObservableCollection`1" Category="List" />
+    </CollectionMappings>
+    <GenerateSerializableTypes>false</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="https://www.osble.org/Services/UploaderWebService.svc/mex" Protocol="mex" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="bfc2eaf7-a404-4c73-8fee-b0417403a202" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
+    <MetadataFile FileName="service22.wsdl" MetadataType="Wsdl" ID="9f81a38b-d578-4c07-9b03-f07822e9d856" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
+    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="8e1e16af-51c9-4b89-a465-02e4be2e5399" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
+    <MetadataFile FileName="service22.xsd" MetadataType="Schema" ID="2a082c29-0f37-4158-a7b9-5fe3e3a6eccd" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
+    <MetadataFile FileName="OSBLE.Models.Services.Uploader12.xsd" MetadataType="Schema" ID="5a4b08b1-1faf-462a-96df-9d6a38ed7d2a" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
+    <MetadataFile FileName="Arrays12.xsd" MetadataType="Schema" ID="a3784e4c-1f44-4bb8-99f4-8e6e740e672f" SourceId="1" SourceUrl="https://www.osble.org/Services/UploaderWebService.svc/mex" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>
