@@ -283,6 +283,8 @@ namespace OSBLE.Controllers
 
                 StudioAssignment assignment = studioActivity.AbstractAssignment as StudioAssignment;
 
+
+
                 if (studioActivity.AbstractAssignment.Category.Course == activeCourse.AbstractCourse)
                 {
                     ActivityTeacherTableViewModel viewModel = new ActivityTeacherTableViewModel(studioActivity.AbstractAssignment, studioActivity);
@@ -300,6 +302,7 @@ namespace OSBLE.Controllers
                         if (submissionInfo.Time != null)
                         {
                             numberOfSubmissions++;
+                            submissionInfo.LatePenaltyPercent = CalcualateLatePenaltyPercent(studioActivity, (TimeSpan)calculateLateness(studioActivity.AbstractAssignment.Category.Course, studioActivity, teamUser));
                         }
 
                         //if team
@@ -308,9 +311,10 @@ namespace OSBLE.Controllers
                             submissionInfo.isTeam = true;
                             submissionInfo.SubmitterID = teamUser.ID;
                             submissionInfo.Name = (teamUser as TeamMember).Team.Name;
+                            submissionInfo.TeamList = createStringOfTeamMemebers((teamUser as TeamMember).Team.Members);
                         }
 
-                            //if student
+                        //else student
                         else
                         {
                             submissionInfo.isTeam = false;
@@ -337,6 +341,7 @@ namespace OSBLE.Controllers
 
                     ViewBag.ExpectedSubmissionsAndGrades = studioActivity.TeamUsers.Count;
                     ViewBag.activityID = studioActivity.ID;
+                    ViewBag.CurrentCourseID = studioActivity.AbstractAssignment.Category.Course.ID;
 
                     var activities = (from c in assignment.AssignmentActivities orderby c.ReleaseDate select c).ToList();
 
@@ -354,6 +359,52 @@ namespace OSBLE.Controllers
             {
                 throw new Exception("Failed ActivityTeacherTable", e);
             }
+        }
+
+        /// <summary>
+        /// Takes the Icollectionof TeamUserMembers and returns a string with those members, sorted alphabetically in the format:
+        /// "firstName1 lastName1, firstName2 lastName2 & firstName3 lastName3"
+        /// </summary>
+        private string createStringOfTeamMemebers(ICollection<TeamUserMember> members)
+        {
+            string returnVal = "";
+
+            //Putting names in a list
+            List<string> nameList = new List<string>();
+            foreach (TeamUserMember tm in members)
+            {
+                nameList.Add(tm.Name);
+            }
+            //Sorting the list of names alphabetically
+            nameList.Sort();
+
+            //putting the names in "FirstName LastName" order
+            for (int i = 0; i < nameList.Count; i++)
+            {
+                string[] name = nameList[i].Split(',');
+                if (name.Count() == 2) //Only going to rearrange name if there was only 1 ','; otherwise i dont know how to handle them
+                {
+                    nameList[i] = name[1] + " " + name[0];
+                }
+            }
+
+            //Compiling all the names into one string
+            foreach (string s in nameList)
+            {
+                if (nameList.IndexOf(s) == nameList.Count() - 1) //Last name
+                {
+                    returnVal += s;
+                }
+                else if (nameList.IndexOf(s) == nameList.Count() - 2) //Second to last name
+                {
+                    returnVal += s + " & ";
+                }
+                else //Other names
+                {
+                    returnVal += s + ", ";
+                }
+            }
+            return returnVal;
         }
 
         public ActionResult GetTeamMembers(int teamID)
