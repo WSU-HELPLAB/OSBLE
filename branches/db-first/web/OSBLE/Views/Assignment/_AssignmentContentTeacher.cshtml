@@ -1,0 +1,62 @@
+﻿@using OSBLE.Models.Assignments
+@using OSBLE.Models.Assignments.Activities
+@model StudioAssignment
+           
+           <script src="@Url.Content("~/Scripts/osble.teacher_activity.js")" type="text/javascript" ></script>
+
+@{
+    StudioAssignment sa = Model;
+    int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
+}
+@*This page is for teachers only*@
+@if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+{ 
+
+    <div class="assignment_header">
+        <a id="@StudioAssignmentCounter" href="#">@sa.Name</a>
+    </div>
+    <div>
+        <a href="/BasicAssignment/Edit/@sa.ID">Edit Assignment</a>
+        @Html.ActionLink("Delete Assignment", "Delete", new { id = sa.ID }, new { style = "margin-left:8px;" })
+        <div class="assignment_title">
+            Description</div>
+        @* Add links to assignment description *@
+        <div class="assignment_description">@Helpers.Linkify(sa.Description)</div>
+        
+
+            @if (sa.AssignmentActivities.Where(aa => aa is SubmissionActivity).Count() > 0)
+            {
+            <div class="assignment_title">
+                Activities
+            </div>
+
+            <div class="activity_accordion">
+            @{
+                /* First get full list of assignment activities. This is to later get the assignment activity
+                                Immediately following each submission activity. The controller's responsibility is to send
+                                this view only lists of assignment activities where there are at least 2 activities and the last
+                                is a stop, which guarantees that if there are submission activities, there will be an activity
+                                after it to define an end date. */
+                List<AbstractAssignmentActivity> assignmentActivities = sa.AssignmentActivities.OrderBy(aa => aa.ReleaseDate).ToList();
+                /* Now get each submission activity. */
+                List<AbstractAssignmentActivity> submissionActivities = assignmentActivities.Where(aa => aa is SubmissionActivity).OrderBy(aa => aa.ReleaseDate).ToList();
+
+                int activityCounter = 0;
+                
+                foreach (AbstractAssignmentActivity activity in assignmentActivities)
+                {
+                    if (!(activity is StopActivity))
+                    {
+                        ViewBag.ActivityCounter = activityCounter;
+                        ViewBag.EndDate = assignmentActivities[assignmentActivities.IndexOf(activity) + 1].ReleaseDate;
+
+                        Html.RenderPartial("_ActivityTeacherView", activity);
+                        activityCounter++;
+                    }
+                }
+                }
+                </div>
+            }
+        
+    </div>
+}

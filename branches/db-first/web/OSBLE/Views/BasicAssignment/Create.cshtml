@@ -1,0 +1,788 @@
+﻿@model OSBLE.Models.ViewModels.BasicAssignmentViewModel
+@using OSBLE.Models.Assignments.Activities
+@using OSBLE.Models.AbstractCourses;
+@using OSBLE.Models.AbstractCourses.Course;
+@using OSBLE.Models
+@{
+    ViewBag.Title = "Create Basic Assignment";
+
+    //Based on various things that can happen in the controller, our CommentCategoryConfiguration
+    //may end up null.  Since our view depends on CommentCategoryConfiguration not being null,
+    //we need to handle such cases. 
+    if (Model.Assignment.CommentCategoryConfiguration == null)
+    {
+        Model.Assignment.CommentCategoryConfiguration = new CommentCategoryConfiguration();
+    }
+}
+<h2>
+    @ViewBag.AssignmentLabel @Helpers.CreateToolTip(ToolTips.BasicAssignmentTitle)
+</h2>
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/json2.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/osble.assignments.js")" type="text/javascript"></script>
+<script type="text/javascript">
+
+    var isTeamGenerationReady = false;
+
+    $(function () {
+
+        //set default values
+        $('#submission_points_possible').val($("#points_possible").val());
+
+        //set up event listeners 
+        $("#points_possible").keyup(function () {
+            $('#submission_points_possible').val($("#points_possible").val());
+        });
+
+        $('#ReleaseDate_Date').change(function () {
+            updateReleaseDate();
+        });
+
+        $('#ReleaseDate_Time').change(function () {
+            updateReleaseDate();
+        });
+
+        $('#DueDate_Date').change(function () {
+            updateDueDate();
+        });
+
+        $('#DueDate_Time').change(function () {
+            updateDueDate();
+        });
+
+        $('#Assignment_Name').change(function () {
+            updateActivitiesName();
+        });
+
+        //call this once for fun (needed for edits)
+        updateActivitiesName();
+
+        $('#UseRubric').change(function () {
+            if ($(this).attr('checked')) {
+                $('#edit_rubric_div').show('highlight');
+            }
+            else {
+                $('#edit_rubric_div').hide('blind');
+            }
+        });
+
+
+        $('#isTeam').change(function () {
+            if ($(this).attr('checked')) {
+                DisplayTeamOptions();
+            }
+            else {
+                HideTeamOptions();
+            }
+        });
+
+        $("input[name='team_generation_options']").change(function () {
+            if ($("input[name='team_generation_options']:checked").val() == 'PreviousAssignment') {
+                DisplayPreviousAssignment();
+            }
+            else if ($("input[name='team_generation_options']:checked").val() == 'RandomTeams') {
+                DisplayRandomTeams();
+            }
+            else if ($("input[name='team_generation_options']:checked").val() == 'ManualTeams') {
+                DisplayManualTeams();
+            }
+            else {
+                throw "Unknown Radio Button Checked: team_generation_options"
+            }
+        });
+
+        $('#total_teams').focus(function () {
+            //Uncheck everything that is checked
+            $("input[name='team_or_people']:checked").removeAttr('checked');
+            //Check the first radio button with the name team_or_people aka the one associated with total teams
+            $("input[name='team_or_people']:eq(0)").attr('checked', 'checked');
+        });
+
+        $('#people_per_team').focus(function () {
+            //Uncheck everything that is checked
+            $("input[name='team_or_people']:checked").removeAttr('checked');
+            //Check the second radio button with the name team_or_people aka the one associated with people_per_team
+            $("input[name='team_or_people']:eq(1)").attr('checked', 'checked');
+        });
+
+        //Create the Silverlight dialog box
+        $('#team_generation_dialog').dialog({
+            modal: true,
+            autoOpen: false,
+            resizable: false,
+            draggable: false,
+            width: 850,
+            height: 650
+        });
+
+        //Create the Silverlight dialog box
+        $('#rubric_dialog').dialog({
+            modal: true,
+            autoOpen: false,
+            resizable: false,
+            draggable: false,
+            width: 850,
+            height: 650
+        });
+
+        //set up default radio buttons
+
+        //Uncheck everything that is checked
+        $("input[name='team_generation_options']:checked").removeAttr('checked');
+        //Check the first radio button with the name team_generation_options
+        $("input[name='team_generation_options']:eq(0)").attr('checked', 'checked');
+
+        //Uncheck everything that is checked
+        $("input[name='team_or_people']:checked").removeAttr('checked');
+        //Check the first radio button with the name team_or_people aka the one associated with total teams
+        $("input[name='team_or_people']:eq(0)").attr('checked', 'checked');
+
+        //if we start the program off as having a team assignment (either from a postback or from
+        //loading a previous assignment), display the team generation options.
+        if ($('#isTeam').attr('checked') == 'checked') {
+            $('#isTeam').change();
+
+            //do we have teams previously defined?
+            if ($('#newTeams').val() != "") {
+
+                //check the "specify teams manually" radio button
+                $("input[name='team_generation_options']:eq(1)").attr('checked', 'checked');
+                DisplayManualTeams();
+            }
+            else {
+                DisplayRandomTeams();
+            }
+        } else {
+            DisplayRandomTeams();
+        }
+
+        //Call any needed functions (note events wont be called on this function so we got to call them manually
+        if ($('#UseRubric').attr('checked') == 'checked') {
+            $('#UseRubric').change();
+        }
+
+        // Set up add to gradebook checkbox
+
+        $('#add_to_gradebook').change(function () {
+            if ($('#add_to_gradebook').attr('checked')) {
+                $('#grading').show('blind');
+                $('html,body').animate({
+                    scrollTop: $("#grading").offset().top
+                }, 2000);
+            } else {
+                $('#grading').hide('blind');
+            }
+        });
+
+        UpdateGradeCategory();
+
+        $('#grade_category').change(function () {
+            UpdateGradeCategory();
+        });
+
+        //setup prior comment categories
+        @{
+            if (Model.Assignment.CommentCategoryConfiguration.Categories.Count > 0)
+            {
+                int counter = 0;
+                foreach (CommentCategory cat in Model.Assignment.CommentCategoryConfiguration.Categories)
+                {
+                    string js = string.Format("\n\taddNamedCategory(\"{0}\", \"{1}\");\n", cat.Name, cat.Options[0].Name);
+                    @Html.Raw(js)
+                    int insideCounter = -1;
+                    foreach (CommentCategoryOption option in cat.Options)
+                    {
+                        //skip the first item as we added it with the previous JS call
+                        insideCounter++;
+                        if (insideCounter == 0)
+                        {
+                            continue;
+                        }
+                        js = string.Format("\taddNamedCategoryOption(\"{0}\", \"{1}\");\n", counter, option.Name);
+                        @Html.Raw(js)
+                    }
+                    counter++;
+                }
+            }
+        }
+
+
+    });// end init
+
+
+    function UpdateGradeCategory() {
+        $('#grade_category_label').html($('#grade_category').selectedTexts()[0]);
+    }
+
+    function updateActivitiesName() {
+        $('#SubmissionName').val($('#Assignment_Name').val() + ' Submission');
+        $('#StopName').val($('#Assignment_Name').val() + ' Stop');
+    }
+
+
+    // due date
+
+    function updateDueDate() {
+        $('#DueDate').val($('#DueDate_Date').val() + ' ' + $('#DueDate_Time').val());
+    }
+
+
+    // release date
+
+    function updateReleaseDate() {
+        $('#ReleaseDate').val($('#ReleaseDate_Date').val() + ' ' + $('#ReleaseDate_Time').val());
+    }
+
+
+    // teams
+
+    function DisplayTeamOptions() {
+        $('#Team_Options').show('blind');
+    }
+    function HideTeamOptions() {
+        $('#Team_Options').hide('blind');
+    }
+
+    function OpenTeamGeneration() {
+        $('#team_generation_dialog').dialog('open'); return false;
+    }
+    function CloseTeamGenerationWindow() {
+        $('#team_generation_dialog').dialog('close'); return false;
+    }
+
+    function DisplayManualTeams() {
+        $('#RandomTeams').hide();
+        $('#PreviousAssignmentDiv').hide();
+        $('#ManualTeams').show('blind');
+    }
+    function DisplayRandomTeams() {
+        $('#PreviousAssignmentDiv').hide();
+        $('#ManualTeams').hide();
+        $('#RandomTeams').show('blind');
+    }
+    function DisplayPreviousAssignment() {
+        $('#RandomTeams').hide();
+        $('#ManualTeams').hide();
+        $('#PreviousAssignmentDiv').show('blind');
+    }
+
+    function OpenPreviousTeam() {
+        OpenTeamGeneration();
+        if (isTeamGenerationReady) {
+            var jsonData = $('#SerializedTeamMembersJSON').val();
+            document.getElementById("team_creation_silverlight").Content.MainPage.SetAvailableTeamMembers(jsonData);
+        }
+    }
+
+    function SpecifyTeamsManually() {
+        OpenTeamGeneration();
+        if (isTeamGenerationReady) {
+            var jsonData = $('#newTeams').val();
+            document.getElementById("team_creation_silverlight").Content.MainPage.SetAvailable(jsonData);
+        }
+    }
+
+    function GenerateTeamsRandomly() {
+        if ($("input[name='team_or_people']:checked").val() == 'Teams') {
+            var teams = parseInt($('#total_teams').val());
+            if (isNaN(teams) || teams == 0) {
+                alert('Specify number of total teams, must be a number');
+            }
+            else {
+                OpenTeamGeneration();
+                if (isTeamGenerationReady) {
+                    document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfTeams(parseInt($('#total_teams').val()));
+                }
+            }
+        }
+        else {
+            var teams = parseInt($('#people_per_team').val());
+            if (isNaN(teams) || teams == 0) {
+                alert('Specify number of people per team, must be a number');
+            }
+            else {
+                OpenTeamGeneration();
+                if (isTeamGenerationReady) {
+                    document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfPeople(parseInt($('#people_per_team').val()));
+                }
+            }
+        }
+    }
+
+    function TeamGenerationReady() {
+
+        isTeamGenerationReady = true;
+        if ($("input[name='team_generation_options']:checked").val() == 'RandomTeams') {
+            if ($("input[name='team_or_people']:checked").val() == 'Teams') {
+                document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfTeams(parseInt($('#total_teams').val()));
+            }
+            else {
+                document.getElementById("team_creation_silverlight").Content.MainPage.GenerateTeamsFromNumberOfPeople(parseInt($('#people_per_team').val()));
+            }
+        }
+        else if ($("input[name='team_generation_options']:checked").val() == 'PreviousAssignment') {
+            var jsonData = $('#SerializedTeamMembersJSON').val();
+            document.getElementById("team_creation_silverlight").Content.MainPage.SetAvailableTeamMembers(jsonData);
+        }
+        else if ($("input[name='team_generation_options']:checked").val() == 'ManualTeams') {
+            var jsonData = $('#newTeams').val();
+            document.getElementById("team_creation_silverlight").Content.MainPage.SetAvailableTeamMembers(jsonData);
+        }
+    }
+
+
+    // rubric
+    function OpenRubricDialog() {
+        $('#rubric_dialog').dialog('open'); return false;
+    }
+
+    function CloseRubric(rubricId) {
+        $('#rubric_dialog').dialog('close');
+        $.ajax({
+            type: "POST",
+            url: "/BasicAssignment/GetRubrics",
+            data: { selectedRubric: rubricId },
+            success: function (msg) {
+                $('#RubricSelect').html(msg);
+            }
+        });
+        return false;
+    }
+
+</script>
+@{
+    
+    
+    SubmissionActivity submission = Model.Submission;
+    StopActivity stop = Model.Stop;
+
+    using (Html.BeginForm())
+    {
+        
+
+    @Html.ValidationSummary() 
+    
+    <!--Hidden fields-->
+        string newTeams = ViewBag.NewTeams;
+    @Html.Hidden("newTeams", newTeams, new { id = "newTeams" })
+    @Html.HiddenFor(model => submission.ReleaseDate, new { @id = "ReleaseDate" })
+    @Html.HiddenFor(model => stop.ReleaseDate, new { @id = "DueDate" })
+    @Html.HiddenFor(model => submission.Name, new { @id = "SubmissionName" })
+    @Html.HiddenFor(model => stop.Name, new { @id = "StopName" })
+    @Html.HiddenFor(model => model.Assignment.ID)
+    @Html.HiddenFor(model => model.Submission.ID)
+
+
+        if (ViewBag.HasSubmissions == true)
+        {
+    <div style="background: #FFF8B2; color: Red; font-size: 1.1em; border: 1px solid black;
+        width: 700px; margin-left: auto; margin-right: auto; padding: 6px; text-align: justify;">
+        <strong>WARNING:</strong> You are about to make changes to an existing assignment
+        that has been completed by one or more students. Any changes made to this page will
+        clear all existing submissions attached to this assignment. Any students that have
+        submitted their work must resubmit their assignment.
+    </div>
+        }
+    
+    <!--Assignment Name-->
+    <div class="editor-label">
+        @Html.LabelFor(model => model.Assignment.Name)
+    </div>
+    <div class="editor-field">
+        @Html.EditorFor(model => model.Assignment.Name)
+        @Html.ValidationMessageFor(model => model.Assignment.Name)
+    </div>
+    
+    <!--Assignment Description-->
+    <div class="editor-label">
+        @Html.LabelFor(model => model.Assignment.Description)
+    </div>
+    <div class="editor-field">
+        @Html.TextAreaFor(model => model.Assignment.Description, new { rows = 5, cols = 65 })
+        @Html.ValidationMessageFor(model => model.Assignment.Description)
+    </div>
+        
+    <!--Submission Release Date-->
+    <div class="editor-label">
+        @Html.LabelFor(model => submission.ReleaseDate)
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentReleaseDate)
+    </div>
+    <div class="editor-label">
+        @Html.TextBox("ReleaseDate_Date", convertToMonthDayYearFormat(submission.ReleaseDate), new { @id = "ReleaseDate_Date", @class = "date_picker", size = 9 })
+        @Html.TextBox("ReleaseDate_Time", convertTime(submission.ReleaseDate), new { @id = "ReleaseDate_Time", @class = "time_picker", size = 9 })
+    </div>
+    
+    <!--Stop date-->
+    <div class="editor-label">
+        @Html.Label("Due Date")
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentDueDate)
+    </div>
+    <div class="editor-label">
+        @Html.TextBox("DueDate_Date", convertToMonthDayYearFormat(stop.ReleaseDate), new { @id = "DueDate_Date", @class = "date_picker", size = 9 })
+        @Html.TextBox("DueDate_Time", convertTime(stop.ReleaseDate), new { @id = "DueDate_Time", @class = "time_picker", size = 9 })
+    </div>
+
+    <!--Is Team-->
+    <div class="editor-label">
+        @Html.CheckBoxFor(model => submission.isTeam, new { id = "isTeam" })
+        @Html.Label("This is a team assignment")
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentIsTeam)
+    </div>
+    
+    <!-- Team Div-->
+    <div id="Team_Options" class="indented_options" style="display: none">
+        <!--Radio Button Generate teams randomly-->
+        <input type="radio" name="team_generation_options" value="RandomTeams" />
+        Generate teams randomly
+        <br />
+        <ul id="RandomTeams" style="display: none" class="team_generation_options">
+            <li>
+                <input type="radio" name="team_or_people" value="Teams" />
+                Specify the number of total teams
+                <input type="text" id="total_teams" size="3" />
+            </li>
+            <br />
+            <li>
+                <input type="radio" name="team_or_people" value="People" />
+                Specify the number of people per team
+                <input type="text" id="people_per_team" size="3" />
+            </li>
+            <br />
+            <li>
+                <button type="button" onclick="GenerateTeamsRandomly()">
+                    Generate Teams...
+                </button>
+            </li>
+        </ul>
+        <!--Radio Button Manual Teams-->
+        <input type="radio" name="team_generation_options" value="ManualTeams" />
+        Specify teams manually
+        <ul id="ManualTeams" style="display: none" class="team_generation_options">
+            <li>
+                <button type="button" onclick="SpecifyTeamsManually()">
+                    Create Teams...
+                </button>
+            </li>
+        </ul>
+        <!--Radio Button Use previous, only shows up if there was a previous team assignment-->
+        @if (ViewBag.PastTeamAssignments != null && (ViewBag.PastTeamAssignments as SelectList).Count() != 0)
+        { 
+            <br />
+            <input type="radio" name="team_generation_options" value="PreviousAssignment" />
+            <text>Use teams defined in previous course assignment</text>
+            <br />
+            <ul id="PreviousAssignmentDiv" style="display: none" class="team_generation_options">
+                <li>
+                    @Html.DropDownListFor(m => m.SerializedTeamMembersJSON, ViewBag.PastTeamAssignments as SelectList)
+                    <button type="button" onclick="OpenPreviousTeam()">
+                        Edit Teams...
+                    </button>
+                </li>
+            </ul>
+        }
+        <!-- in the future generate teams with mixed ability and Generate teams with same-ability will need to go here -->
+    </div>
+
+    <!--Deliverables section-->
+    <h3>
+        Deliverables @Helpers.CreateToolTip(ToolTips.BasicAssignmentDeliverables)
+    </h3>
+    
+    <div id="deliverable_data">
+    </div>
+    
+    <div id="deliverables_after">
+    </div>
+    <table id="deliverables_table" cellspacing="6px">
+        <tr>
+            <td>
+                File&nbsp;Name
+            </td>
+            <td>
+                <input type="text" id="new_deliverable_name" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Type
+            </td>
+            <td>
+                <select id="new_deliverable_type">
+                    @foreach (SelectListItem dt in ViewBag.DeliverableTypes)
+                    {
+                        <option value="@dt.Value">@dt.Text</option>
+                    }
+                </select>
+            </td>
+        </tr>
+    </table>
+    
+    <div>
+        <a href="#" id="add_new_deliverable" title="Add New Deliverable" style="text-decoration: none;">
+            <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Deliverable" />
+            Add Deliverable </a>
+    </div>
+
+    <script type="text/javascript">
+        $(function () {
+            @foreach (Deliverable d in Model.Assignment.Deliverables)
+            {
+                <text>
+                addNewDeliverable(true, { name: '@d.Name', fileType: @d.Type });
+                </text>
+            }
+        });       
+    </script>
+    
+    <!--Grading Section-->
+    <h3>
+        Grading/Evaluation</h3>
+    
+    <!--Use Rubric-->
+    <div class="editor-label">
+        @Html.CheckBoxFor(m => Model.UseRubric)
+        @Html.LabelFor(m => Model.UseRubric)
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentUseRubric)
+        <div id="edit_rubric_div" style="display: none">
+            <span id="RubricSelect">@Html.Partial("_RubricSelect")</span>
+            <button type="button" onclick="OpenRubricDialog()" value="Create Rubric">
+                Create/Edit Rubric...
+            </button>
+        </div>
+    </div>
+    
+    <!--Inline Review-->
+    <div class="editor-label">
+        @Html.CheckBoxFor(model => submission.InstructorCanReview, new { id = "InstructorCanReview" })
+        @Html.LabelFor(model => submission.InstructorCanReview)
+        @Helpers.CreateToolTip(ToolTips.BasicAssignmentEnableInlineComments)
+    </div>
+    
+    <!--Category Options-->
+    <div id="line_review_config" class="indented_options" style="display: none;">
+        @{string CreateNewSelected = "";
+          if (Model.Assignment.CommentCategoryConfigurationID == 0 || Model.Assignment.CommentCategoryConfigurationID == null)
+          {
+              CreateNewSelected = "checked=\"checked\"";
+          }
+        }
+        <input type="radio" name="line_review_options" value="ManualConfig" @Html.Raw(CreateNewSelected) />Create
+        new set of comment categories called
+        <input type="text" id="category_config_name" name="category_config_name" value="@Model.Assignment.CommentCategoryConfiguration.Name" />
+        <br />
+        <br style="clear: both;" />
+        <div id="manual_config_options" class="indented_options" style="display: none;">
+            <div id="category_data">
+            </div>
+            <div id="add_new_category_div">
+                <br style="clear: left;" />
+                <p>
+                    <a href="#" id="add_new_category" title="Add new category" style="text-decoration: none;">
+                        <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add new category" />
+                        Add a category </a>
+                </p>
+            </div>
+            <br style="clear: both;" />
+        </div>
+        @if (ViewBag.CommentConfigurations != null && ViewBag.CommentConfigurations.Count != 0)
+        {
+            string usePreviousSelected = "";
+            if (Model.Assignment.CommentCategoryConfigurationID != 0 && Model.Assignment.CommentCategoryConfigurationID != null)
+            {
+                usePreviousSelected = "checked=\"checked\"";
+            }
+             
+            <input id="UsePreviousCommentCategoryRadio" type="radio" name="line_review_options" value="AutoConfig" @Html.Raw(usePreviousSelected) /><text>Use
+            previously-defined set of comment categories</text>
+            <select id="comment_category_selection" name="comment_category_selection">
+                @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)
+                {
+                    string selected = "";
+                    if (@ccc.ID == Model.Assignment.CommentCategoryConfiguration.ID)
+                    {
+                        selected = "selected=\"selected\"";
+                    }
+                    <option value="@ccc.ID" @selected>@ccc.Name</option>
+                }
+            </select><br />
+            <div id="auto_config_options" class="indented_options" style="display: none;">
+                <div id="comment_config_samples" class="indented_options">
+                    @foreach (CommentCategoryConfiguration ccc in ViewBag.CommentConfigurations)
+                    {
+                        string id = "comment_sample_" + @ccc.ID;
+                        <div id="@id" style="display:none;">
+                            <table>
+                                <tr>
+                                    <td style="padding-right: 10px;">
+                                        <strong>Category</strong>
+                                    </td>
+                                    <td>
+                                        <strong>Options</strong>
+                                    </td>
+                                </tr>
+                                @foreach (CommentCategory cc in ccc.Categories)
+                                {
+                                    <tr>
+                                        <td valign="top" style="padding-right: 10px;">@cc.Name
+                                        </td>
+                                        <td>
+                                            @foreach (CommentCategoryOption cco in cc.Options)
+                                            {
+                                                @cco.Name <br />
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        <br />
+    </div>
+    
+    <!--Can be Graded-->
+    <div class="editor-label">
+        @Html.CheckBoxFor(model => model.isGradable, new { id = "add_to_gradebook" }) @Html.Label("Count this assignment towards students' grades")@Helpers.CreateToolTip(ToolTips.BasicAssignmentAddToGradebook)
+    </div>
+    <div id='grading'>
+        <div id="grade_options" class="indented_options">
+            <div class="editor-field">
+                Number of points possible:
+                @Html.TextBoxFor(model => model.Submission.PointsPossible, new { id = "submission_points_possible", size = 3, value = Model.Assignment.PointsPossible })
+                @Html.ValidationMessageFor(model => model.Submission.PointsPossible)
+            </div>
+            <div class="editor-field">
+                Weighted
+                @Html.TextBoxFor(model => model.Assignment.PointsPossible, new { id = "points_possible", size = 3 })
+                points toward the
+                @Html.ValidationMessageFor(model => model.Assignment.PointsPossible)
+                @Html.DropDownListFor(model => model.Assignment.CategoryID, ViewBag.Categories as SelectList, new { id = "grade_category" })
+                @Html.ValidationMessageFor(model => model.Assignment.Category)
+                <span>grading category</span>
+            </div>
+            <h4>
+                Late Policy @Helpers.CreateToolTip(ToolTips.BasicAssignmentLatePolicy)
+            </h4>
+            <p>
+                Students may submit assignments up to @Html.TextBoxFor(model => model.Submission.MinutesLateWithNoPenalty, new { size = 3 })
+                minutes late at no penalty, after which a penalty of @Html.TextBoxFor(model => model.Submission.PercentPenalty, new { size = 3 })
+                percent per @Html.TextBoxFor(model => model.Submission.HoursLatePerPercentPenalty, new { size = 3 })
+                hours late will be applied.<br />
+                @Html.ValidationMessageFor(model => model.Submission.MinutesLateWithNoPenalty)
+                @Html.ValidationMessageFor(model => model.Submission.PercentPenalty)
+                @Html.ValidationMessageFor(model => model.Submission.HoursLatePerPercentPenalty)
+            </p>
+            <p>
+                Assignments that are submitted more than @Html.TextBoxFor(model => model.Submission.HoursLateUntilZero, new { size = 3 })
+                hours after the due date and time will receive an automatic 0.<br />
+                @Html.ValidationMessageFor(model => model.Submission.HoursLateUntilZero)
+            </p>
+        </div>
+    </div>
+    <div>
+        @Html.HiddenFor(model => model.Assignment.IsDraft, new { id = "is_draft" })
+        <input type="submit" value="@ViewBag.AssignmentLabel" id="create_assignment" onclick="validation(event)" />
+        <input type="submit" value="Save as Draft" id="save_draft" />@Helpers.CreateToolTip(ToolTips.BasicAssignmentIsDraft)
+        <script type="text/javascript">
+            $(function () {
+                $('#save_draft').click(function () {
+                    alert('This assignment will be saved as a draft and will not be released even if the release date passes');
+                    $('#is_draft').val('True');
+                    // this makes it so we dont have to click add deliverable to save it
+                    addNewDeliverable(false);
+                });
+            });
+
+            function validation(e) {
+                // this stores the deliverable
+                addNewDeliverable(false);
+
+                //only validate comment categories if we're not pulling from a previous assignment
+                if ($('#UsePreviousCommentCategoryRadio').attr("checked") != 'checked') {
+
+                    //check if they add more inline comment category options then they fill in wont allow them to create the assignment
+                    $("#category_data :input").each(function () {
+                        var prefix = $(this).attr("name").split("_");
+                        if (prefix[0] == "category" && prefix[1] == "option") {
+                            if ($(this).val() == "") {
+                                alert("You must fill in the name for each inline comment category option.");
+                                e.preventDefault();
+                            }
+                        }
+                    });
+                }
+            }
+        </script>
+    </div>
+    
+    }
+    <p>
+        @Html.ActionLink("Back to List", "Index", "Home")
+    </p>
+}
+<div id="team_generation_dialog" title="Edit Teams">
+    @Html.DisplayFor(m => m.TeamCreation)
+</div>
+<div id="rubric_dialog" title="Edit Rubric">
+    @Html.DisplayFor(m => m.RubricCreation)
+</div>
+@functions
+{
+    public string convertToMonthDayYearFormat(DateTime date)
+    {
+        return addLostZeros(date.Month.ToString(), 2, true) + "/" + addLostZeros(date.Day.ToString(), 2, true) + "/" + addLostZeros(date.Year.ToString(), 4, true);
+    }
+
+    public string convertTime(DateTime time)
+    {
+        string timeStr;
+        bool isAM = true;
+        string hr;
+        string min;
+        if (time.Hour > 12)
+        {
+            isAM = false;
+            hr = (time.Hour - 12).ToString();
+        }
+        else
+        {
+            hr = time.Hour.ToString();
+        }
+        min = time.Minute.ToString();
+
+        hr = addLostZeros(hr, 2, true);
+        min = addLostZeros(min, 2, true);
+
+        timeStr = hr + ":" + min;
+        if (isAM)
+        {
+            timeStr += " AM";
+        }
+        else
+        {
+            timeStr += " PM";
+        }
+        return timeStr;
+    }
+
+    public string addLostZeros(string s, int desiredDigits, bool addToFront)
+    {
+        int i = desiredDigits - s.Count();
+        while (i > 0)
+        {
+            if (addToFront)
+            {
+                s = s.Insert(0, "0");
+            }
+            else
+            {
+                s += "0";
+            }
+            i--;
+        }
+        return s;
+    }
+}

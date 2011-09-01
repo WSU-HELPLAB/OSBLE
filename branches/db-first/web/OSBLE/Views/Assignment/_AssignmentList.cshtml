@@ -1,0 +1,24 @@
+﻿@using OSBLE.Models.Assignments
+@using OSBLE.Models.Assignments.Activities
+@model List<StudioAssignment>
+           
+
+           
+<div id="@(ViewBag.assignmentListID + ViewBag.AssignmentList.ToString())" class="assignment_accordion">
+    @{
+        int StudioAssignmentCounter = 0;
+    }
+    @foreach (StudioAssignment sa in Model)
+    {
+        ViewBag.StudioAssignmentCounter = StudioAssignmentCounter;
+        if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+        {
+            Html.RenderPartial("_AssignmentContentTeacher", sa);
+        }
+        else
+        {
+            Html.RenderPartial("_AssignmentContentStudent", sa);
+        }
+        StudioAssignmentCounter++;
+    }
+</div>

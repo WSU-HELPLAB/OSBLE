@@ -1,0 +1,44 @@
+@using OSBLE.Models.Services.Uploader;
+@using OSBLE.Models;
+		<script type="text/javascript">
+
+		    $(function () {
+
+		        $('#collapser').jqcollapse({
+		            slide: true,
+		            speed: 1000,
+		            easing: 'easeOutCubic'
+		        });
+
+		    });
+			
+		</script>
+<ul id="collapser">
+        @{
+            DirectoryListing root = ViewBag.CourseLinks as DirectoryListing;
+       }
+       @BuildDirectoryListing(root, true)
+</ul>
+
+@helper BuildDirectoryListing(DirectoryListing listing, bool isFirstRun = false)
+{
+    if(!isFirstRun)
+    {
+    @:<li>@listing.Name
+        @:<ul>
+    }
+        foreach(DirectoryListing subListing in listing.Directories)
+        {
+            @BuildDirectoryListing(subListing)
+        }
+        foreach(FileListing file in listing.Files)
+        {
+            <li><a href="@file.FileUrl" title="Last uploaded on: @file.LastModified">@file.Name.Substring(0, file.Name.LastIndexOf('.'))</a></li>
+        }
+    if(!isFirstRun)
+    {
+        @:</ul>
+    @:</li>
+    }
+    
+}

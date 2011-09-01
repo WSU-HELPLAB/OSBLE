@@ -1,0 +1,22 @@
+﻿@using OSBLE.Controllers;
+@using OSBLE.Models.Courses;
+@using OSBLE.Models.Assignments;
+@using OSBLE.Models.Assignments.Activities.Scores;
+@using OSBLE.Utility;
+@{
+    ViewBag.Title = "Index";
+}
+
+
+<h3>Gradebook</h3>
+
+@if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+{
+    @Html.Partial("_TeacherGradebook");
+}
+else
+{
+    @Html.Partial("_StudentGradebook");
+}
+
+    

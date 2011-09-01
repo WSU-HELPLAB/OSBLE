@@ -1,0 +1,13 @@
+﻿@using OSBLE.Models.HomePage;
+
+@{
+    Layout = null;
+}
+
+@foreach (DashboardReply dr in ViewBag.DashboardReplies)
+{
+    @Html.Partial("_DashboardPost",dr);                                    
+}
+
+
+

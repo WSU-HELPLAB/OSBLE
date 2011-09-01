@@ -1,0 +1,62 @@
+﻿@using OSBLE.Models.Assignments;
+@using OSBLE.Models.Assignments.Activities;
+@using OSBLE.Models;
+@model StudioAssignment
+@Html.Partial("_WizardTopNav")
+<script src="@Url.Content("~/Scripts/osble.assignments.js")" type="text/javascript"></script>
+<h1>Assignment Deliverables</h1>
+<p>@ToolTips.BasicAssignmentDeliverables</p>
+@using (@Html.BeginForm())
+{
+@Html.ValidationSummary() 
+
+    <table id="deliverables_table" cellspacing="6px">
+        <tr>
+            <td>
+                File&nbsp;Name
+            </td>
+            <td>
+                <input type="text" id="new_deliverable_name" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Type
+            </td>
+            <td>
+                <select id="new_deliverable_type">
+                    @foreach (SelectListItem dt in ViewBag.DeliverableTypes)
+                    {
+                        <option value="@dt.Value">@dt.Text</option>
+                    }
+                </select>
+            </td>
+        </tr>
+    </table>
+    
+    <div>
+        <a href="#" id="add_new_deliverable" title="Add New Deliverable" style="text-decoration: none;">
+            <img src="@Url.Content("~/Content/images/add_up.png")" alt="Add New Deliverable" />
+            Add Deliverable </a>
+    </div>
+
+    <div id="deliverable_data">
+    </div>
+    
+    <div id="deliverables_after">
+    </div>
+    
+    <script type="text/javascript">
+        $(function () {
+            @foreach (Deliverable d in Model.Deliverables)
+            {
+                <text>
+                addNewDeliverable(true, { name: '@d.Name', fileType: @d.Type, databaseId: @d.ID });
+                </text>
+            }
+        });       
+    </script>
+
+    
+@Html.Partial("_WizardBottomNav");
+}

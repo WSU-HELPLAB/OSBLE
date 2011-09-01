@@ -1,0 +1,83 @@
+﻿@using OSBLE.Models.Assignments
+@model List<OSBLE.Models.Assignments.AbstractAssignment>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table>
+    <tr>
+        <th>
+            Name
+        </th>
+        <th>
+            ReleaseDate
+        </th>
+        <th>
+            DueDate
+        </th>
+        <th>
+            isGradeable
+        </th>
+        <th>
+            isTeam
+        </th>
+        <th>
+            PossiblePoints
+        </th>
+        <th>
+            InstructorCanReview
+        </th>
+        <th>
+            Weight
+        </th>
+        <th>
+            Points
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var abstractItem in Model) {
+    if(abstractItem is SubmissionActivitySettings)
+    {
+        SubmissionActivitySettings item = abstractItem as SubmissionActivitySettings;
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ReleaseDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.isGradeable)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.isTeam)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PossiblePoints)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.InstructorCanReview)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Weight.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PossiblePoints)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
+            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
+        </td>
+    </tr>
+    }
+}
+
+</table>
