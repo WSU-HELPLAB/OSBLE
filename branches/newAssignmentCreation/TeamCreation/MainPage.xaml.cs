@@ -6,7 +6,6 @@ using System.Windows;
 using System.Windows.Browser;
 using System.Windows.Controls;
 using Newtonsoft.Json;
-using OSBLE.Services;
 
 namespace TeamCreation
 {
@@ -16,7 +15,6 @@ namespace TeamCreation
         private List<SerializableTeamMember> moderators;
         private int assignmentId;
         private bool changedNotSaved = false;
-        private TeamCreationContext teamContext = new TeamCreationContext();
         private bool teamInformationLoaded = false;
 
         #region INotifyPropertyChanged Members
@@ -35,8 +33,6 @@ namespace TeamCreation
 
             this.NewTeamBox.AddTeamRequested += new EventHandler(NewTeamBox_AddTeamRequested);
             this.LayoutRoot.Loaded += new RoutedEventHandler(LayoutRoot_Loaded);
-            teamContext.Load(teamContext.GetAssignmentTeamsQuery(assignmentId)).Completed += new EventHandler(GetTeamsCompleted);
-            teamContext.Load(teamContext.GetAssignmentUsersQuery(assignmentId)).Completed += new EventHandler(GetTeamUsersCompleted);
         }
 
         void GetTeamsCompleted(object sender, EventArgs e)

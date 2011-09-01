@@ -108,7 +108,7 @@
         <ul id="AvailableStudent" class="TeamSortable">
             @foreach (UserProfile student in Model.Students)
             {
-                <li class="ui-state-default" value="@student.ID">@student.LastName, @student.FirstName</li>
+                <li id="student_@(student.ID)" class="ui-state-default">@student.LastName, @student.FirstName</li>
             }
         </ul>
     </div>
@@ -139,10 +139,13 @@
     }
 
     var teamCounter = 1;
-    function createTeam(evt) {
+    function createTeam(evt, teamName) {
         var divId = "teamDiv_" + teamCounter;
         var listId = 'team_' + teamCounter;
         var InputContent = "Team " + teamCounter;
+        if (teamName != undefined) {
+            InputContent = teamName;
+        }
         var newContent = '<div id="' + divId + '" class="TeamDiv">' +
                             '<input type="text" class="TeamNameTextBox" value="' + InputContent + '" />' +
                             '<img class="RemoveTeamIcon" src="@Url.Content("~/Content/images/delete_up.png")" alt="remove team" title="remove team" onclick="removeTeam(\'' + divId + '\')" />' + 
@@ -154,6 +157,11 @@
         $("#TeamsDiv").append(newContent);
         $("#" + listId).sortable({ connectWith: ".TeamSortable" }).disableSelection();
         teamCounter++;
+        return divId;
+    }
+
+    function addStudentToTeam(studentId, teamDivId) {
+        $("#" + teamDivId).find("ul").append($("#" + studentId));
     }
 
     function removeTeam(teamId) {
