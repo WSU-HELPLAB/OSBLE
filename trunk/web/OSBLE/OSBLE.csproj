@@ -152,12 +152,6 @@
     <Compile Include="Attributes\IsCommunity.cs" />
     <Compile Include="Attributes\NotForCommunity.cs" />
     <Compile Include="Controllers\AssignmentController.cs" />
-    <Compile Include="Controllers\Assignments\WizardController.cs" />
-    <Compile Include="Controllers\Assignments\Wizard\BasicsController.cs" />
-    <Compile Include="Controllers\Assignments\Wizard\RubricController.cs" />
-    <Compile Include="Controllers\Assignments\Wizard\DeliverablesController.cs" />
-    <Compile Include="Controllers\Assignments\Wizard\TeamController.cs" />
-    <Compile Include="Controllers\Assignments\Wizard\WizardBaseController.cs" />
     <Compile Include="Controllers\AsyncIssueVotingController.cs" />
     <Compile Include="Controllers\AuthorRebuttalController.cs" />
     <Compile Include="Controllers\BasicAssignmentController.cs" />
@@ -230,8 +224,6 @@
     <Compile Include="Models\ViewModels\RubricViewModel.cs" />
     <Compile Include="Models\ViewModels\SerializableTeamMembers.cs" />
     <Compile Include="Models\ViewModels\StudioAssignmentViewModel.cs" />
-    <Compile Include="Models\Wizard\WizardComponent.cs" />
-    <Compile Include="Models\Wizard\WizardComponentManager.cs" />
     <Compile Include="Services\AuthenticationDomainService1.cs" />
     <Compile Include="Services\OSBLEService.cs" />
     <Compile Include="Services\ReviewInterfaceDomainService.cs" />
@@ -428,8 +420,6 @@
     <Content Include="Content\themes\base\jquery.ui.slider.css" />
     <Content Include="Content\themes\base\jquery.ui.tabs.css" />
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
-    <Content Include="Controllers\Assignments\README.txt" />
-    <Content Include="Controllers\Assignments\Wizard\README.txt" />
     <Content Include="crossdomain.xml" />
     <Content Include="EditPeerReviewTestPage.aspx" />
     <Content Include="EditPeerReviewTestPage.html" />

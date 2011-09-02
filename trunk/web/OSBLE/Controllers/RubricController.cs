@@ -216,11 +216,11 @@ namespace OSBLE.Controllers
                 }
                 db.SaveChanges();
 
-                (new NotificationController()).SendRubricEvaluationCompletedNotification(vm.Evaluation.AssignmentActivity, vm.Evaluation.Recipient);
-
                 //if the evaluation has been published, update the scores in the gradebook
                 if (vm.Evaluation.IsPublished)
                 {
+                    (new NotificationController()).SendRubricEvaluationCompletedNotification(vm.Evaluation.AssignmentActivity, vm.Evaluation.Recipient);
+
                     Score grade = (from g in db.Scores
                                    where g.TeamUserMemberID == vm.Evaluation.RecipientID
                                    &&
