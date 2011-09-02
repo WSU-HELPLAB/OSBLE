@@ -7,12 +7,12 @@
 <h2>@Model.Subject</h2>
     <div class="mail_user">
         <b>From:</b><br />
-        @Helpers.ProfilePicture(@Url.Action("ProfilePicture",new { ID=Model.FromUserProfileID }))
+        @Helpers.ProfilePicture(@Url.Action("ProfilePicture", new { ID = Model.FromUserProfileID }))
         @Model.FromUserProfile.FirstName @Model.FromUserProfile.LastName
     </div>
     <div class="mail_user">
         <b>To:</b><br />
-        @Helpers.ProfilePicture(@Url.Action("ProfilePicture",new { ID=Model.ToUserProfileID }))
+        @Helpers.ProfilePicture(@Url.Action("ProfilePicture", new { ID = Model.ToUserProfileID }))
         @Model.ToUserProfile.FirstName @Model.ToUserProfile.LastName
     </div>
 
@@ -22,14 +22,24 @@
 <p>
 @if (ViewBag.CurrentUser == Model.ToUserProfile)
 {
-    using(Html.BeginForm("Create","Mail",FormMethod.Get)) {
+    using (Html.BeginForm("Create", "Mail", FormMethod.Get))
+    {
         <input type="hidden" name="recipientID" value="@Model.FromUserProfileID" />
         <input type="hidden" name="replyTo" value="@Model.ID" />
         <input type="submit" value="Reply to Message" />  
        @Helpers.CreateToolTip(ToolTips.MailReply)  
     }
     <br />
-
+    
+    using (Html.BeginForm("Create", "Mail", FormMethod.Get))
+    {
+        <input type="hidden" name="recipientID" value="0" />
+        <input type="hidden" name="replyTo" value="@Model.ID" />
+        <input type="submit" value="Forward Message" />  
+       @Helpers.CreateToolTip(ToolTips.MailReply)  
+    }
+    <br />
+    
     using (Html.BeginForm("Delete", "Mail", FormMethod.Post))
     {
         <input type="hidden" name="ID" value=@Model.ID />

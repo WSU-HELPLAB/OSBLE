@@ -17,26 +17,27 @@
     @Html.ValidationSummary(true)
 
     <a>To:</a>
-    if (ViewBag.MailHeader == "New Message")
+    <input id="people_finder" />
+    // only need this tool tip on new mail creation
+    if (Session["mail_isreply"] == null) 
     {
-        <input id="people_finder" />
         @Helpers.CreateToolTip(ToolTips.MailRecipient) 
-        <script type="text/javascript">
-
-            $("#people_finder").autocomplete({
-                source: "@(Url.Action("Search"))",
-                select: function(event, ui) {
-                    location.href="@Url.Action("Create")?recipientID=" + ui.item.value;
-                },
-                focus: function(event, ui) {return false;}
-            }).data("autocomplete")._renderItem = function( ul, item ) {
-                return $( "<li></li>" )
-                .data( "item.autocomplete", item )
-                .append( "<a>" + "<img src=\"@Url.Action("ProfilePicture")/" + item.value + "\" class=\"small_profile_picture\" alt=\"Profile Picture\" /> " + item.label+ "</a>" )
-                .appendTo( ul );
-            }
-        </script>
     }
+    <script type="text/javascript">
+
+        $("#people_finder").autocomplete({
+            source: "@(Url.Action("Search"))",
+            select: function(event, ui) {
+                location.href="@Url.Action("Create")?recipientID=" + ui.item.value;
+            },
+            focus: function(event, ui) {return false;}
+        }).data("autocomplete")._renderItem = function( ul, item ) {
+            return $( "<li></li>" )
+            .data( "item.autocomplete", item )
+            .append( "<a>" + "<img src=\"@Url.Action("ProfilePicture")/" + item.value + "\" class=\"small_profile_picture\" alt=\"Profile Picture\" /> " + item.label+ "</a>" )
+            .appendTo( ul );
+        }
+    </script>
     <br />
 
     if (recipients != null)
@@ -45,10 +46,7 @@
         {
             <div id="recipient + @up.ID" class="recipient">
                 <div class="recipient_tools">
-                    @if (ViewBag.MailHeader == "New Message")
-                    {
-                        <a id="@up.ID" href="#" title="Delete this recipient" onclick="removeRecipient(@up.ID);" ><img src="/Content/images/delete_up.png" alt="Delete Button" /></a>
-                    }
+                    <a id="@up.ID" href="#" title="Delete this recipient" onclick="removeRecipient(@up.ID);" ><img src="/Content/images/delete_up.png" alt="Delete Button" /></a>
                 </div>
                 @Helpers.ProfilePicture(@Url.Action("ProfilePicture", new { ID = up.ID }))
 

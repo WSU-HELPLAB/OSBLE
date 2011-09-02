@@ -95,43 +95,58 @@ namespace OSBLE.Controllers
 
             int id = Convert.ToInt32(Request.Params["recipientID"]);
             Mail mail = new Mail();
-            List<UserProfile> userprofiles = new List<UserProfile>();
+            List<UserProfile> recipientList = new List<UserProfile>();
 
-            if (id == 0) // creating a new email, no recipients yet
+            if (id == 0 || Session["mail_recipients"] == null) // creating a new email, no recipients yet, or replying
             {
-                Session["mail_recipients"] = userprofiles;
+                Session["mail_recipients"] = recipientList;
             }
-            else if (id > 0)// if there is a recipient entered or is a reply
+            else // adding recipients
             {
-                if (!canMail(id))
+                recipientList = Session["mail_recipients"] as List<UserProfile>;
+            }
+
+            if (id > 0 || Request.Params["replyTo"] != null)// if there is a recipient entered or is a reply/forward
+            {
+                // Handle replies/forward if necessary
+                int replyto = -1;
+                if (Request.Params["replyTo"] != null) // first reply/forward
                 {
-                    return View(mail);
+                    replyto = Convert.ToInt32(Request.Params["replyTo"]);
+                    Session["mail_isreply"] = replyto;
+                }
+                else if( Session["mail_isreply"] != null) // reply/forward with added recipients
+                {
+                    replyto = (int)Session["mail_isreply"];
                 }
 
-                // Handle replies if necessary
-                if (Request.Params["replyTo"] != null)
+                if(replyto != -1)
                 {
-                    int replyto = Convert.ToInt32(Request.Params["replyTo"]);
                     Mail reply = db.Mails.Find(replyto);
                     // Ensure valid reply user
                     if ((reply != null) && (reply.ToUserProfile == currentUser))
                     {
-                        Session["mail_recipients"] = userprofiles;
-
-                        ViewBag.MailHeader = mail.Subject = "Re: " + reply.Subject;
+                        string suffix = "RE: ";
+                        if (id == 0 || Session["mail_isforward"] != null) // forward
+                        {
+                            Session["mail_isforward"] = Session["mail_isreply"];
+                            suffix = "FW: ";
+                        }
+                        ViewBag.MailHeader = mail.Subject = suffix + reply.Subject;
                         // Prefix each line with a '> '
-                        mail.Message = "\n\nOriginal Message at " + reply.Posted.ToString() + ":\n" +
-                            Regex.Replace(reply.Message, "^.*$", "> $&",
-                            RegexOptions.Multiline);
-                        userprofiles.Add(reply.FromUserProfile);
+                        mail.Message = "\n\nOriginal Message \nFrom: " + reply.FromUserProfile.FirstName + " " +
+                                        reply.FromUserProfile.LastName + "\nSent at: " + reply.Posted.ToString() + "\n\n" +
+                                        Regex.Replace(reply.Message, "^.*$", "> $&",
+                                        RegexOptions.Multiline);
+                        
                     }
                 }
-                else  // not a reply, adding recipients
+                if(id > 0 && canMail(id))
                 {
-                    userprofiles = Session["mail_recipients"] as List<UserProfile>;
+                    //adding recipients
                     UserProfile u = db.UserProfiles.Find(id);
 
-                    foreach (UserProfile p in userprofiles)
+                    foreach (UserProfile p in recipientList)
                     {
                         // if you have already entered that recipient
                         if (p.ID == u.ID)
@@ -139,20 +154,19 @@ namespace OSBLE.Controllers
                             return View(mail);
                         }
                     }
-                    userprofiles.Add(u);
+                    recipientList.Add(u);
+                    
+                    Session["mail_recipients"] = recipientList;
                 }
-                Session["mail_recipients"] = userprofiles;
             }
             else if(id < 0) // remove a recipient
             {
-                userprofiles = Session["mail_recipients"] as List<UserProfile>;
-
-                foreach (UserProfile u in userprofiles)
+                foreach (UserProfile u in recipientList)
                 {
                     if (-id == u.ID)
                     {
-                        userprofiles.Remove(u);
-                        Session["mail_recipients"] = userprofiles;
+                        recipientList.Remove(u);
+                        Session["mail_recipients"] = recipientList;
                         return View(mail);
                     }
                 }
@@ -169,6 +183,8 @@ namespace OSBLE.Controllers
             {
                 List<UserProfile> recipients = new List<UserProfile>(); 
                 recipients = Session["mail_recipients"] as List<UserProfile>;
+                Session["mail_recipients"] = null;
+                Session["mail_isreply"] = null;
 
                 foreach (UserProfile up in recipients)
                 {
