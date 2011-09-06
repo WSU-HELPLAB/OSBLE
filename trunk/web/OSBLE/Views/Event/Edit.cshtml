@@ -41,9 +41,6 @@
             <td>@Html.ValidationMessageFor(model => model.StartTime)
             </td>
         </tr>
-    </table>
-    
-    <table>
         <tr>
             <td class="editor-label">@Html.LabelFor(model => model.EndDate)
             </td>
@@ -63,7 +60,7 @@
             </td>
         </tr>
         <tr>
-            <td colspan="2"><input type="checkbox" name="IncludeEndDate" id="IncludeEndDate" @ViewBag.IncludeEndDate /><label for="IncludeEndDate">Do not include an ending date</label></td>
+            <td colspan="2"><input type="checkbox" name="IncludeEndDate" id="IncludeEndDate" @ViewBag.IncludeEndDate /><label for="IncludeEndDate">Show end date and time in calendar</label></td>
         </tr>
     </table>
 

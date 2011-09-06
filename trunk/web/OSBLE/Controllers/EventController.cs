@@ -94,7 +94,7 @@ namespace OSBLE.Controllers
             e.StartDate = e.StartDate.Date;
             e.StartDate = e.StartDate.AddHours(e.StartTime.Hour).AddMinutes(e.StartTime.Minute);
 
-            if (Request.Form.AllKeys.Contains("IncludeEndDate"))
+            if (!Request.Form.AllKeys.Contains("IncludeEndDate"))
             {
                 e.EndDate = null;
             }
@@ -246,7 +246,7 @@ namespace OSBLE.Controllers
             // Validate original event. make sure it exists and is part of the active course.
             Event originalEvent = db.Events.Find(e.ID);
 
-            if (Request.Form.AllKeys.Contains("IncludeEndDate"))
+            if (!Request.Form.AllKeys.Contains("IncludeEndDate"))
             {
                 e.EndDate = null;
             }
