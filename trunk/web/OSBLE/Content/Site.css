@@ -145,6 +145,12 @@ a img
 	top: 3px;
 }
 
+.course_modify_buttons img
+{
+    position: relative;
+	top: 3px;
+}
+
 #tabs
 {
 	position: absolute;

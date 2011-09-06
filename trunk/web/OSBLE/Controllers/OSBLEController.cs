@@ -124,7 +124,7 @@ namespace OSBLE.Controllers
 
                 setCurrentUserProfile();
 
-                getEnrolledCourses();
+                GetEnrolledCourses();
 
                 setCourseListTitle();
 
@@ -219,7 +219,7 @@ namespace OSBLE.Controllers
         /// courses/communities they are enrolled in or have access to.
         /// Also, if a user is invalid, it will clear their session and log them out.
         /// </summary>
-        private void getEnrolledCourses()
+        protected void GetEnrolledCourses()
         {
             // If current user is valid, get course list for user.
             if (currentUser != null)

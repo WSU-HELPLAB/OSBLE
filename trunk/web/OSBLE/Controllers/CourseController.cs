@@ -1,10 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Web.Mvc;
+using System.Web.Configuration;
+using OSBLE.Attributes;
+using OSBLE.Models;
+using OSBLE.Models.Assignments;
+using OSBLE.Models.Assignments.Activities;
+using OSBLE.Models.Courses;
+using OSBLE.Models.Users;
+using OSBLE.Models.ViewModels;
+using OSBLE.Models.HomePage;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
 using System.Collections.Specialized;
 using System.Data;
-using System.Web.Mvc;
-using OSBLE.Attributes;
-using OSBLE.Models.Courses;
 using OSBLE.Utility;
 
 namespace OSBLE.Controllers
@@ -234,6 +245,29 @@ namespace OSBLE.Controllers
                 return RedirectToAction("Index", "Home");
             }
             return View(course);
+        }
+
+        [HttpGet]
+        [CanModifyCourse]
+        public ActionResult Delete()
+        {
+            //our parent already supplies the active course information so we don't
+            //have much to do here
+            return View(activeCourse);
+        }
+
+        [HttpPost]
+        [CanModifyCourse]
+        public ActionResult Delete(CoursesUsers cu)
+        {
+            //if the user clicked continue, then we should continue
+            if (Request.Form.AllKeys.Contains("continue"))
+            {
+                db.AbstractCourses.Remove(activeCourse.AbstractCourse);
+                db.SaveChanges();
+            }
+
+            return RedirectToAction("Index", "Home"); 
         }
 
         protected override void Dispose(bool disposing)
