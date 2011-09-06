@@ -13,6 +13,7 @@ using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
 using OSBLE.Utility;
+using System.Data.Entity.Infrastructure;
 
 namespace OSBLE.Models
 {
@@ -141,6 +142,10 @@ namespace OSBLE.Models
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+#if !DEBUG
+            modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
+#endif
 
             modelBuilder.Entity<Notification>()
                 .HasRequired(n => n.Sender)
