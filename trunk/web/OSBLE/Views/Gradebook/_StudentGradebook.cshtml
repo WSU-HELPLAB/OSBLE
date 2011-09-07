@@ -111,6 +111,13 @@
         border: 1px solid gray;
     }
     
+    .tipTable
+    {
+        width:60%;
+        border:none;
+        font-size:small;
+    }
+    
 </style>
 
 @Html.Partial("_Tabs")
@@ -560,11 +567,17 @@
         </tr>
     </table>
     <br />
+    <table class="tipTable">
+       <tr>
+           <td style="vertical-align:top;"><span class="ui-icon ui-icon-lightbulb"></span></td>
+           <td><b>Tip:</b> Click on on a color-coded category tab at the top to switch to a detailed view of your grades in that category.</td>
+       </tr>
+   </table>
     <a  onclick="$('#letterGradeTable').toggle('blind'); return false;" style="cursor:pointer;">Show/Hide Letter Grade Table</a>
 </div>
 
 <div id="letterGradeTable" style="display:none;">
-    <table id="letterGrades" >
+    <table id="letterGrades">
         <tr>
             <th>Letter Grade</th>
             <th>Minimum % Required</th>
