@@ -105,6 +105,13 @@
         background: White;
     }
     
+    #rubricToolTip
+    {
+        border: 1px solid black;
+        width: 300px;
+        background: White;
+    }
+    
 </style>
 
 @{
@@ -290,7 +297,7 @@
                         }
                         else
                         {
-                            <td id="rubric-@assignment.ID">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { abstractAssignmentActivityId = score.First().AssignmentActivityID, teamUserID = score.First().TeamUserMemberID }, new { })</td>
+                            <td id="rubric-@assignment.ID" onmouseover="showRubricToolTip();" onmouseout="hideRubricToolTip();">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { abstractAssignmentActivityId = score.First().AssignmentActivityID, teamUserID = score.First().TeamUserMemberID }, new { })</td>
                         }
                     }
                     else
@@ -358,6 +365,16 @@
     </table>
 </div>
 
+<div id="rubricToolTip" style="display:none; position:absolute;">
+    <table>
+        <tr>
+            <td>
+                Click to view evaluation rubric on which this score is based.
+            </td>
+        </tr>
+    </table>
+</div>
+
 <script type="text/javascript">
     var lastFocusedCell = null;
 
@@ -383,6 +400,9 @@
 
         $("#latePenalty").css("left", x + "px");
         $("#latePenalty").css("top", y + "px");
+
+        $("#rubricToolTip").css("left", x + "px");
+        $("#rubricToolTip").css("top", y + "px");
     });
 
     $("#grades td").keydown(function (e) {
@@ -424,6 +444,15 @@
     function hideLatePenalty() {
         $("#latePenalty").animate({ "height": "hide" }, { duration: 0 });
     }
+
+    function showRubricToolTip() {
+        $("#rubricToolTip").animate({ "height": "show" }, { duration: 75 });
+    }
+
+    function hideRubricToolTip() {
+        $("#rubricToolTip").animate({ "height": "hide" }, { duration: 0 });
+    }
+
 
      function calculateRows() {
         var totalArr = [];
