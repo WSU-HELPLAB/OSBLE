@@ -105,7 +105,7 @@ namespace OSBLE.Controllers
                 e.EndDate = endDate.AddHours(e.EndTime.Hour).AddMinutes(e.EndTime.Minute);
 
                 //make sure that the end date happens after the start
-                if (endDate.Ticks < e.StartDate.Ticks)
+                if ((DateTime)e.EndDate < e.StartDate)
                 {
                     ModelState.AddModelError("badDates", "The starting time must occur before the ending time");
                 }
@@ -214,7 +214,7 @@ namespace OSBLE.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-            if (e.EndDate == null)
+            if (e.EndDate != null)
             {
                 ViewBag.IncludeEndDate = "checked=\"checked\"";
             }
@@ -246,20 +246,26 @@ namespace OSBLE.Controllers
             // Validate original event. make sure it exists and is part of the active course.
             Event originalEvent = db.Events.Find(e.ID);
 
+            originalEvent.StartDate = e.StartDate.Date;
+            originalEvent.StartDate = originalEvent.StartDate.AddHours(e.StartTime.Hour).AddMinutes(e.StartTime.Minute);
+            originalEvent.Title = e.Title;
+            originalEvent.Description = e.Description;
+
             if (!Request.Form.AllKeys.Contains("IncludeEndDate"))
             {
-                e.EndDate = null;
+                originalEvent.EndDate = null;
             }
             else
             {
                 DateTime endDate = (DateTime)e.EndDate;
+                originalEvent.EndDate = endDate.Date.AddHours(e.EndTime.Hour).AddMinutes(e.EndTime.Minute);
 
                 //make sure that the end date happens after the start
-                if (endDate.Ticks < e.StartDate.Ticks)
+                if ((DateTime)originalEvent.EndDate < originalEvent.StartDate)
                 {
                     ModelState.AddModelError("badDates", "The starting time must occur before the ending time");
                 }
-                originalEvent.EndDate = endDate.Date.AddHours(e.EndTime.Hour).AddMinutes(e.EndTime.Minute);
+                
 
             }
 
@@ -267,14 +273,6 @@ namespace OSBLE.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-
-            // Update updateable fields
-            originalEvent.Title = e.Title;
-
-            originalEvent.StartDate = e.StartDate.Date;
-            originalEvent.StartDate = originalEvent.StartDate.AddHours(e.StartTime.Hour).AddMinutes(e.StartTime.Minute);
-            
-            originalEvent.Description = e.Description;
 
             if (ModelState.IsValid)
             {
