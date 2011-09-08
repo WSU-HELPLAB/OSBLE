@@ -17,17 +17,17 @@ namespace OSBLE.Controllers.Assignments
         public static string previousWizardButton = "PreviousWizardButton";
         public static string nextWizardButton = "NextWizardButton";
 
-        public StudioAssignment ActiveAssignment
+        public Assignment ActiveAssignment
         {
             get
             {
                 if (manager.ActiveAssignmentId != 0)
                 {
-                    return db.StudioAssignments.Find(manager.ActiveAssignmentId);
+                    return db.Assignments.Find(manager.ActiveAssignmentId);
                 }
                 else
                 {
-                    return new StudioAssignment();
+                    return new Assignment();
                 }
             }
         }
@@ -124,18 +124,24 @@ namespace OSBLE.Controllers.Assignments
             }
             else
             {
-                manager.ActiveComponent.Controller.Assignment = ActiveAssignment;
-                manager.ActiveComponent.Controller.Index(Request);
-                
-                //Not having an ID of 0 indicates that the record previously existed in the DB
-                if (manager.ActiveAssignmentId != 0)
+                //The following throws an error when the SESSION state gets wiped
+                try
                 {
-                    //Saving goes here (maybe)
-                    //db.Entry(manager.ActiveAssignment).State = System.Data.EntityState.Modified;
-                    //db.SaveChanges();
+                    manager.ActiveComponent.Controller.Assignment = ActiveAssignment;
+                    manager.ActiveComponent.Controller.Index(Request);
                 }
+                catch (Exception ex)
+                {
+                    //if we lost our session data, just return to the base wizard screen
+                    return RedirectToRoute("AssignmentWizard", new { step = "Start" });
+                }
+
                 if (manager.ActiveComponent.Controller.WasUpdateSuccessful)
                 {
+                    //update the assignment ID.  Probably not necessary when working
+                    //with existing assignments, but needed for new assignments.
+                    manager.ActiveAssignmentId = manager.ActiveComponent.Controller.Assignment.ID;
+
                     string errorPath = "";
                     WizardComponent comp = null;
                     if(Request.Form.AllKeys.Contains(previousWizardButton))

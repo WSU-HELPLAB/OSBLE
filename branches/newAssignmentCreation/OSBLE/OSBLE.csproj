@@ -198,6 +198,8 @@
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\StopActivity.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\StudioAssignment.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\RubricEvaluation.cs" />
+    <Compile Include="Models\Assignments\Assignment.cs" />
+    <Compile Include="Models\Assignments\AssignmentType.cs" />
     <Compile Include="Models\HomePage\AbstractDashboard.cs" />
     <Compile Include="Models\AbstractCourses\AbstractRole.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\AbstractAssignmentActivity.cs" />
@@ -206,7 +208,7 @@
     <Compile Include="Models\AbstractCourses\Community\CommunityRole.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseBreak.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseMeeting.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\Deliverable.cs" />
+    <Compile Include="Models\Assignments\Deliverable.cs" />
     <Compile Include="Models\HomePage\Event.cs" />
     <Compile Include="Models\AbstractCourses\Course\Category.cs" />
     <Compile Include="Models\List.cs" />

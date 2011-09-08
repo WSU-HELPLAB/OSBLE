@@ -1577,3 +1577,9 @@ ul.assignment_deliverables, .assignment_deliverables ul
         top: 33px;
         left: 400px;
     }
+
+/* Wizard components */
+.wizard_entry_table th
+{
+    text-align:left;
+}

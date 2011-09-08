@@ -7,6 +7,7 @@ using OSBLE.Attributes;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
+using OSBLE.Models.Assignments;
 
 namespace OSBLE.Controllers
 {

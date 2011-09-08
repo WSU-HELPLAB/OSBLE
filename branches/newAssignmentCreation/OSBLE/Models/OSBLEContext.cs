@@ -13,6 +13,7 @@ using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
 using OSBLE.Utility;
+using System.Data.Entity.Infrastructure;
 
 namespace OSBLE.Models
 {
@@ -52,6 +53,10 @@ namespace OSBLE.Models
 
         public DbSet<CommentCategoryOption> CommentCategoryOptions { get; set; }
 
+        public DbSet<Assignment> Assignments { get; set; }
+
+        public DbSet<AssignmentType> AssignmentTypes { get; set; }
+
         // Assignments.Activities
 
         public DbSet<AbstractAssignmentActivity> AbstractAssignmentActivities { get; set; }
@@ -69,12 +74,6 @@ namespace OSBLE.Models
         public DbSet<Score> Scores { get; set; }
 
         public DbSet<RubricScore> RubricScores { get; set; }
-
-        // Assignments.Activities.CommentCategories
-
-        //public DbSet<CommentCategory> CommentCategories { get; set; }
-
-        //public DbSet<CommentCategoryTag> CommentCategoryTags { get; set; }
 
         // Courses
 
@@ -141,6 +140,8 @@ namespace OSBLE.Models
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
 
             modelBuilder.Entity<Notification>()
                 .HasRequired(n => n.Sender)

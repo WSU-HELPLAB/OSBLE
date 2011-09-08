@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace OSBLE.Models.Assignments.Activities
+namespace OSBLE.Models.Assignments
 {
     public enum DeliverableType
     {
@@ -59,7 +59,7 @@ namespace OSBLE.Models.Assignments.Activities
     {
         [Key]
         [Required]
-        public int ID { get; set; }
+        public int AssignmentID { get; set; }
 
         [Required]
         [Display(Name = "Type")]
@@ -70,11 +70,5 @@ namespace OSBLE.Models.Assignments.Activities
         [RegularExpression(@"^[a-zA-Z0-9\._\-]*$",
             ErrorMessage = "File names can only contain alphanumerics, '-', '_', and '.'")]
         public string Name { get; set; }
-
-        //TODO: Make required later.
-        //[Required]
-        //[Display(Name = "Comment Categories")]
-        //[MaxLength(6)]
-        //public ICollection<CommentCategory> CommentCategories { get; set; }
     }
 }

@@ -1,25 +1,25 @@
 ﻿@using OSBLE.Models.Assignments;
-@model AbstractAssignment
+@model Assignment
 @Html.Partial("_WizardTopNav")
 <h1>Basic Assignment Information</h1>
 @using (@Html.BeginForm())
 {
 @Html.ValidationSummary() 
-<table>
+<table class="wizard_entry_table">
     <tr>
-        <th>@Html.LabelFor(m => m.Name):</th>
-        <td>@Html.EditorFor(m => m.Name)</td>
-        <td>@Html.ValidationMessageFor(m => m.Name)</td>
+        <th>@Html.LabelFor(m => m.AssignmentName):</th>
+        <td>@Html.EditorFor(m => m.AssignmentName)</td>
+        <td>@Html.ValidationMessageFor(m => m.AssignmentName)</td>
     </tr>
     <tr>
-        <th>@Html.LabelFor(m => m.Description):</th>
-        <td>@Html.EditorFor(m => m.Description)</td>
-        <td>@Html.ValidationMessageFor(m => m.Description)</td>
+        <th>@Html.LabelFor(m => m.AssignmentDescription):</th>
+        <td>@Html.EditorFor(m => m.AssignmentDescription)</td>
+        <td>@Html.ValidationMessageFor(m => m.AssignmentDescription)</td>
     </tr>
     <tr>
-        <th>@Html.LabelFor(m => m.PointsPossible):</th>
-        <td>@Html.EditorFor(m => m.PointsPossible, new { size = 3 })</td>
-        <td>@Html.ValidationMessageFor(m => m.PointsPossible)</td>
+        <th>@Html.LabelFor(m => m.AssignmentType):</th>
+        <td>@Html.EditorFor(m => m.AssignmentType)</td>
+        <td>@Html.ValidationMessageFor(m => m.AssignmentType)</td>
     </tr>
     <tr>
         <th>@Html.LabelFor(m => m.CategoryID):</th>
@@ -29,6 +29,36 @@
         <td>
             @Html.ValidationMessageFor(m => m.CategoryID)
         </td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.PointsPossible):</th>
+        <td>@Html.EditorFor(m => m.PointsPossible, new { size = 3 })</td>
+        <td>@Html.ValidationMessageFor(m => m.PointsPossible)</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.ReleaseDate):</th>
+        <td>@Html.EditorFor(m => m.ReleaseDate) at @Html.EditorFor(m => m.ReleaseTime)</td>
+        <td>@Html.ValidationMessageFor(m => m.ReleaseDate)</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.DueDate):</th>
+        <td>@Html.EditorFor(m => m.DueDate) at @Html.EditorFor(m => m.DueTime)</td>
+        <td>@Html.ValidationMessageFor(m => m.DueDate)</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.HoursLateWindow):</th>
+        <td>@Html.EditorFor(m => m.HoursLateWindow)</td>
+        <td>@Html.ValidationMessageFor(m => m.HoursLateWindow)</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.DeductionPerHourLate):</th>
+        <td>@Html.EditorFor(m => m.DeductionPerHourLate)</td>
+        <td>@Html.ValidationMessageFor(m => m.DeductionPerHourLate)</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.IsDraft):</th>
+        <td>@Html.EditorFor(m => m.IsDraft)</td>
+        <td>@Html.ValidationMessageFor(m => m.IsDraft)</td>
     </tr>
 </table>
 @Html.Partial("_WizardBottomNav");

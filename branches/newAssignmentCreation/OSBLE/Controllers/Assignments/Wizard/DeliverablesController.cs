@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models.Assignments.Activities;
+using OSBLE.Models.Assignments;
 
 namespace OSBLE.Controllers.Assignments.Wizard
 {
@@ -75,7 +76,7 @@ namespace OSBLE.Controllers.Assignments.Wizard
 
                     if (deliverableId != 0)
                     {
-                        Deliverable previousDeliverable = Assignment.Deliverables.Where(d => d.ID == deliverableId).FirstOrDefault();
+                        Deliverable previousDeliverable = Assignment.Deliverables.Where(d => d.AssignmentID == deliverableId).FirstOrDefault();
                         if (previousDeliverable != null)
                         {
                             deliverables.Add(previousDeliverable);
@@ -85,7 +86,7 @@ namespace OSBLE.Controllers.Assignments.Wizard
                     {
                         //build the new deliverable
                         Deliverable deliverable = new Deliverable();
-                        deliverable.ID = 0;
+                        deliverable.AssignmentID = 0;
                         deliverable.Name = webRequest.Form[deliverableNameKey];
                         deliverable.Type = Convert.ToInt32(webRequest.Form[deliverableTypeKey]);
                         deliverables.Add(deliverable);

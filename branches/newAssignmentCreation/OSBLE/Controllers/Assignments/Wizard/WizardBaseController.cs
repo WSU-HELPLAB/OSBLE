@@ -31,7 +31,7 @@ namespace OSBLE.Controllers.Assignments.Wizard
         /// </summary>
         public abstract ICollection<WizardBaseController> Prerequisites { get; }
 
-        public StudioAssignment Assignment { get; set; }
+        public Assignment Assignment { get; set; }
 
         public bool WasUpdateSuccessful { get; set; }
 

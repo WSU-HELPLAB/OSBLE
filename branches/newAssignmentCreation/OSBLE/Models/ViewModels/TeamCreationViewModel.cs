@@ -9,7 +9,7 @@ namespace OSBLE.Models.ViewModels
 {
     public class TeamCreationViewModel
     {
-        public StudioAssignment Assignment { get; set; }
+        public Assignment Assignment { get; set; }
         public List<UserProfile> Students { get; set; }
     }
 }

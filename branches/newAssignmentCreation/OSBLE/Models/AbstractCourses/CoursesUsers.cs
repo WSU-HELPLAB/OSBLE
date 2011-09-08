@@ -5,16 +5,19 @@ namespace OSBLE.Models.Courses
 {
     public class CoursesUsers
     {
-        [Required]
         [Key]
+        [Required]
         [Column(Order = 0)]
+        public int ID { get; set; }
+
+        [Required]
+        [Column(Order = 1)]
         public int UserProfileID { get; set; }
 
         public virtual UserProfile UserProfile { get; set; }
 
         [Required]
-        [Key]
-        [Column(Order = 1)]
+        [Column(Order = 2)]
         public int AbstractCourseID { get; set; }
 
         public virtual AbstractCourse AbstractCourse { get; set; }
