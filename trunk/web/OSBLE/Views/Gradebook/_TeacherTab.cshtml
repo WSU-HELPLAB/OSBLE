@@ -521,13 +521,13 @@
             // this handles drop x lowest and take x highest
             var dropXIndex = 0;
             if ($("input[name='Customize_radio']:checked").val() == "XtoDrop") {
-                if ($("#numDropped").val() > gradeArr.length) {
-                    dropXIndex = gradeArr.length;
+                if ($("#numDropped").val() > gradeArr.length - 1) {
+                    dropXIndex = gradeArr.length - 1;
                 } else {
                     dropXIndex = $("#numDropped").val();
                 }
             } else if ($("input[name='Customize_radio']:checked").val() == "XtoTake") {
-                if ($("#numDropped").val() < gradeArr.length) {
+                if ($("#numDropped").val() < gradeArr.length ) {
                     dropXIndex = gradeArr.length - ($("#numDropped").val());
                 } else {
                 }

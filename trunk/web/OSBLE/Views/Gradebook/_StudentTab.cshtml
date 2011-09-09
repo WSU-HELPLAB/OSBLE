@@ -502,8 +502,8 @@
             // this handles drop x lowest and take x highest
             var dropXIndex = 0;
             if ($("#customize_option").val() == "XtoDrop") {
-                if ($("#numDropped").val() > gradeArr.length) {
-                    dropXIndex = gradeArr.length;
+                if ($("#numDropped").val() > gradeArr.length - 1) {
+                    dropXIndex = gradeArr.length - 1;
                 } else {
                     dropXIndex = $("#numDropped").val();
                 }

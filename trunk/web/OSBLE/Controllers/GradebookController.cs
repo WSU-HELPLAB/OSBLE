@@ -868,7 +868,9 @@ namespace OSBLE.Controllers
                         }
                         for (int i = 0; i < max; i++)
                         {
-                            if (i < scores.Count())
+                            //if there are less assignments than you want to drop
+                            // changed so that it will always show one grade per Chris
+                            if (i < scores.Count() - 1)
                             {
                                 scores[i].isDropped = true;
                             }
