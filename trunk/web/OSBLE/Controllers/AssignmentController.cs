@@ -14,6 +14,7 @@ using OSBLE.Models.ViewModels;
 using OSBLE.Models.HomePage;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
+using OSBLE.Models.Assignments.Activities.Scores;
 
 namespace OSBLE.Controllers
 {
@@ -341,7 +342,15 @@ namespace OSBLE.Controllers
 
                     ViewBag.ExpectedSubmissionsAndGrades = studioActivity.TeamUsers.Count;
                     ViewBag.activityID = studioActivity.ID;
-                    ViewBag.CurrentCourseID = studioActivity.AbstractAssignment.Category.Course.ID;
+                    ViewBag.CategoryID = studioActivity.AbstractAssignment.CategoryID;
+
+
+                    List<Score> studentScores = (from scores in db.Scores
+                                                 where scores.AssignmentActivityID == studioActivity.ID
+                                                 select scores).ToList();
+
+                    ViewBag.StudentScores = studentScores;
+
 
                     var activities = (from c in assignment.AssignmentActivities orderby c.ReleaseDate select c).ToList();
 
