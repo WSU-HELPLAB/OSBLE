@@ -738,10 +738,13 @@ namespace OSBLE.Controllers
             viewModel.Submission = (from sa in viewModel.Assignment.AssignmentActivities
                                     where sa is SubmissionActivity
                                     select sa).FirstOrDefault() as SubmissionActivity;
+            viewModel.Stop = (from sa in viewModel.Assignment.AssignmentActivities
+                              where sa is StopActivity
+                              select sa).FirstOrDefault() as StopActivity;
 
             viewModel.TeamCreation = CreateTeamCreationSilverlightObject();
             viewModel.RubricCreation = CreateRubricCreationSilverlightObject();
-
+            
             //Check for null comment categories.  
             if (viewModel.Assignment.CommentCategoryConfiguration == null)
             {
