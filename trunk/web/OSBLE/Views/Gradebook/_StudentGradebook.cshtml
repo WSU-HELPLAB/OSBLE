@@ -191,6 +191,7 @@
 
                 int studentCount = 0;
                 double categoryTotalWeight = 0;
+                double userCategoryTotalWeight = ViewBag.UserTotalCategoryWeights;
 
                 foreach (UserProfile user in ViewBag.Students)
                 {
@@ -438,15 +439,18 @@
                                 }
                             }
                         }
-                        categoryTotal = categoryPoints / categoryPossible;
-                        if (ViewBag.TotalCategoryWeights > 0)
+                        if (categoryPossible > 0)
                         {
-                            totalGrade += categoryTotal * (category.Points / ViewBag.TotalCategoryWeights) * 100;
-                        }
-                        else
-                        {
-                            totalCategoryPoints += categoryPoints;
-                            totalCategoryPossible += categoryPossible;
+                            categoryTotal = categoryPoints / categoryPossible;
+                            if (ViewBag.TotalCategoryWeights > 0)
+                            {
+                                totalGrade += categoryTotal * (category.Points / userCategoryTotalWeight) * 100;
+                            }
+                            else
+                            {
+                                totalCategoryPoints += categoryPoints;
+                                totalCategoryPossible += categoryPossible;
+                            }
                         }
                     }
                 }
@@ -495,7 +499,7 @@
                         {
                             double categoryPoints = 0;
                             double categoryPossible = 0;
-                            foreach (Score userScore in ViewBag.AllUserGrades)
+                            foreach (Score userScore in userScores)
                             {
                                 if (userScore.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
                                 {
@@ -570,7 +574,7 @@
     <table class="tipTable">
        <tr>
            <td style="vertical-align:top;"><span class="ui-icon ui-icon-lightbulb"></span></td>
-           <td><b>Tip:</b> Click on on a color-coded category tab at the top to switch to a detailed view of your grades in that category.</td>
+           <td><b>Tip:</b> Click on a color-coded category tab at the top to switch to a detailed view of your grades in that category.</td>
        </tr>
    </table>
     <a  onclick="$('#letterGradeTable').toggle('blind'); return false;" style="cursor:pointer;">Show/Hide Letter Grade Table</a>

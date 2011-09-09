@@ -76,6 +76,7 @@ namespace OSBLE.Controllers
             file.InputStream.Seek(0, SeekOrigin.Begin);
             file.InputStream.Position = 0;
 
+            ViewBag.File = file.FileName;
 
             return View();
         }
@@ -185,9 +186,7 @@ namespace OSBLE.Controllers
                                 {
                                     int col = positionList.ElementAt(currentColOrder);
                                     currentColOrder++;
-                                    //var assign = from a in db.AbstractAssignments
-                                    //            where a.ColumnOrder == col
-                                    //            select a;
+                                    
                                     var assignmentQuery = from a in db.AbstractAssignmentActivities
                                                           where a.AbstractAssignment.CategoryID == categoryId &&
                                                           a.ColumnOrder == col
@@ -1850,11 +1849,19 @@ namespace OSBLE.Controllers
 
             List<Category> categoriesWithWeightsAndScores = (from cats in categoryTotalPercent
                                                              where cats.Points >= 0 ||
+                                                             cats.StudentPoints >= 0                                                             
+                                                             select cats.AssignmentActivity.AbstractAssignment.Category).Distinct().ToList();
+
+            List<Category> userCatsWithWeightsAndScores = (from cats in userCategoryTotalPercent
+                                                             where cats.Points >= 0 ||
                                                              cats.StudentPoints >= 0
                                                              select cats.AssignmentActivity.AbstractAssignment.Category).Distinct().ToList();
 
             double totalCategoryWeights = (from cat in categoriesWithWeightsAndScores
-                                           select cat.Points).Sum();                            
+                                           select cat.Points).Sum();
+
+            double userTotalCategoryWeights = (from cat in userCatsWithWeightsAndScores
+                                               select cat.Points).Sum();
 
 
             ViewBag.Categories = categories;
@@ -1863,6 +1870,7 @@ namespace OSBLE.Controllers
             ViewBag.SectionNumber = sectionNumber;
             ViewBag.AllUserGrades = userCategoryTotalPercent;
             ViewBag.TotalCategoryWeights = totalCategoryWeights;
+            ViewBag.UserTotalCategoryWeights = userTotalCategoryWeights;
             ViewBag.CatsWithWeightsAndScores = categoriesWithWeightsAndScores;
             ViewBag.CategoryTotalPercent = categoryTotalPercent;
             ViewBag.Students = studentList;
