@@ -22,14 +22,11 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("414b5e41-60bb-4374-9973-1a3a4bc66209")]
 
-// Version information for an assembly consists of the following four values:
+// OSBLE uses the following scheme for assembly information:
 //
 //      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Revision and Build Numbers 
-// by using the '*' as shown below:
-[assembly: AssemblyVersion("0.11.9.2")]
-[assembly: AssemblyFileVersion("0.11.9.2")]
+//      Build Year
+//      Build Month
+//      Codeplex Check-in Number
+[assembly: AssemblyVersion("0.11.9.9690")]
+[assembly: AssemblyFileVersion("0.11.9.9690")]
