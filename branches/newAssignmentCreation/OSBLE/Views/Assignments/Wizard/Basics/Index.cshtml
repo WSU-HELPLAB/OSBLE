@@ -18,7 +18,7 @@
     </tr>
     <tr>
         <th>@Html.LabelFor(m => m.AssignmentType):</th>
-        <td>@Html.EditorFor(m => m.AssignmentType)</td>
+        <td>@Html.DropDownListFor(m => m.AssignmentType, ViewBag.AssignmentTypes as SelectList)</td>
         <td>@Html.ValidationMessageFor(m => m.AssignmentType)</td>
     </tr>
     <tr>

@@ -61,6 +61,24 @@ namespace OSBLE.Controllers.Assignments.Wizard
             return View(BuildViewPath("Index"), modifiedModel);
         }
 
+        protected object ParseFormValues(dynamic store, HttpRequestBase webRequest)
+        {
+            //There's a small possibility that our store doesn't support the
+            //GetType method.
+            try
+            {
+                Type storeType = store.GetType();
+            }
+            catch (Exception ex)
+            {
+                return store;
+            }
+            
+            
+
+            return store;
+        }
+
         /// <summary>
         /// Put all code needed for your index action into this method
         /// </summary>

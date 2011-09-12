@@ -46,6 +46,10 @@ namespace OSBLE.Controllers.Assignments.Wizard
                       where c.Name != Constants.UnGradableCatagory
                       select c;
             ViewBag.Categories = new SelectList(cat, "ID", "Name");
+
+            //ASSIGNMENT TYPES
+            var types = db.AssignmentTypes.ToList();
+            ViewBag.AssignmentTypes = new SelectList(types, "Type", "Type");
             return Assignment;
         }
 
@@ -56,6 +60,7 @@ namespace OSBLE.Controllers.Assignments.Wizard
             if (ModelState.IsValid)
             {
                 WasUpdateSuccessful = true;
+                ParseFormValues(Assignment, request);
 
                 //update our DB
                 if (Assignment.ID == 0)
