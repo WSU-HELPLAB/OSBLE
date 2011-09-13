@@ -53,14 +53,13 @@ namespace OSBLE.Controllers.Assignments.Wizard
             return Assignment;
         }
 
-        protected override object IndexActionPostback(HttpRequestBase request)
+        protected override object IndexActionPostback()
         {
-            this.webRequest = request;
-            UpdateAssignmentWithFormValues();
+            this.webRequest = Requeset;
+            ParseFormValues(Assignment);
             if (ModelState.IsValid)
             {
                 WasUpdateSuccessful = true;
-                ParseFormValues(Assignment, request);
 
                 //update our DB
                 if (Assignment.ID == 0)
@@ -90,7 +89,7 @@ namespace OSBLE.Controllers.Assignments.Wizard
             {
                 WasUpdateSuccessful = false;
             }
-            return new object();
+            return Assignment;
         }
 
         private void UpdateAssignmentWithFormValues()

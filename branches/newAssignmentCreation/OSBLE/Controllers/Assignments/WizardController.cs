@@ -108,7 +108,7 @@ namespace OSBLE.Controllers.Assignments
         }
 
         [HttpPost]
-        public ActionResult Index(object model)
+        public ActionResult Index(dynamic model)
         {
             //Three possibilities:
             // 1: The user clicked the "Begin" button at which we must now figure out what 
@@ -166,7 +166,8 @@ namespace OSBLE.Controllers.Assignments
                 }
                 else
                 {
-                    return RedirectToRoute("AssignmentWizard", new { step = manager.ActiveComponent.Name });
+                    //AC: Seems a bit ugly to call this twice.  Might want to rethink.
+                    return manager.ActiveComponent.Controller.Index(Request);
                 }
             }
         }

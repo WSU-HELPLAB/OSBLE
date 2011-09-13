@@ -37,13 +37,13 @@ namespace OSBLE.Controllers.Assignments.Wizard
             return Assignment;
         }
 
-        protected override object IndexActionPostback(HttpRequestBase request)
+        protected override object IndexActionPostback()
         {
-            ParseFormValues(request);
+            ParseFormValues();
             return new object();
         }
 
-        private void ParseFormValues(HttpRequestBase webRequest)
+        private void ParseFormValues()
         {
             int i = 0;
             bool hasMoreElements = true;
@@ -63,12 +63,12 @@ namespace OSBLE.Controllers.Assignments.Wizard
                 deliverableTypeKey = string.Format("{0}[{1}].Type", prefix, i);
                 databaseIdKey = string.Format("{0}[{1}].DatabaseId", prefix, i);
 
-                if (webRequest.Form.AllKeys.Contains(deliverableNameKey))
+                if (Requeset.Form.AllKeys.Contains(deliverableNameKey))
                 {
 
                     //first, start with the ID
                     int deliverableId = 0;
-                    if (!Int32.TryParse(webRequest.Form[databaseIdKey].ToString(), out deliverableId))
+                    if (!Int32.TryParse(Requeset.Form[databaseIdKey].ToString(), out deliverableId))
                     {
                         //something bad happened, get us out of here
                         continue;
@@ -87,8 +87,8 @@ namespace OSBLE.Controllers.Assignments.Wizard
                         //build the new deliverable
                         Deliverable deliverable = new Deliverable();
                         deliverable.AssignmentID = 0;
-                        deliverable.Name = webRequest.Form[deliverableNameKey];
-                        deliverable.Type = Convert.ToInt32(webRequest.Form[deliverableTypeKey]);
+                        deliverable.Name = Requeset.Form[deliverableNameKey];
+                        deliverable.Type = Convert.ToInt32(Requeset.Form[deliverableTypeKey]);
                         deliverables.Add(deliverable);
                     }
                 }

@@ -15,14 +15,15 @@ namespace OSBLE.Models.Assignments
         {
             ReleaseDate = DateTime.Now;
             DueDate = DateTime.Now.AddDays(7.0);
+            ColumnOrder = 0;
         }
 
         [Key]
         public int ID { get; set; }
 
-        [Required(ErrorMessage="Please specify this assignment's type")]
-        [Display(Name="Assignment Type")]
-        public AssignmentType AssignmentType {get; set;}
+        [Required(ErrorMessage = "Please specify this assignment's type")]
+        [Display(Name = "Assignment Type")]
+        public string AssignmentType { get; set; }
 
         [Required(ErrorMessage = "Please specify an assignment name")]
         [Display(Name = "Assignment Name")]
@@ -107,6 +108,8 @@ namespace OSBLE.Models.Assignments
         public virtual CommentCategoryConfiguration CommentCategory { get; set; }
 
         public int? PrecededBy  { get; set; }
+
+        [Association("PrecedingAssignment", "PrecededBy", "ID")]
         public virtual Assignment PrecedingAssignment { get; set; }
 
         [Association("Deliverables", "ID", "AssignmentID")]

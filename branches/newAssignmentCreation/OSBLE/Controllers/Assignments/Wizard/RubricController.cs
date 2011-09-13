@@ -33,7 +33,7 @@ namespace OSBLE.Controllers.Assignments.Wizard
             return new object();
         }
 
-        protected override object IndexActionPostback(HttpRequestBase request)
+        protected override object IndexActionPostback()
         {
             return new object();
         }

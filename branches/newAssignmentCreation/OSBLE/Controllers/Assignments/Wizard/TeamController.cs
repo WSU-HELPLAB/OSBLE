@@ -50,7 +50,7 @@ namespace OSBLE.Controllers.Assignments.Wizard
             return BuildViewModel();
         }
 
-        protected override object IndexActionPostback(HttpRequestBase request)
+        protected override object IndexActionPostback()
         {
             return new object();
         }
