@@ -366,12 +366,11 @@ body#layoutLogOn
 
 #contentLogOn
 {
-	position: absolute;
-	text-align: center;
-	top: 50px;
-	left: 50%;
-	width: 500px;
-	margin-left: -250px;
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:50px;
+	text-align:center;
+	width:615px;
 }
 
 #contentLogOn .input-validation-error

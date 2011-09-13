@@ -73,7 +73,7 @@ namespace OSBLE.Controllers
                         return RedirectToAction("Index", "Home");
                     }
                 }
-                else if (!user.IsApproved)
+                else if(user != null && !user.IsApproved)
                 {
                     setLogOnCaptcha();
                     ModelState.AddModelError("", "This account has not been activated.  An additional verification letter has been sent to your email address.");
