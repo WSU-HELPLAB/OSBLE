@@ -145,12 +145,6 @@ a img
 	top: 3px;
 }
 
-.course_modify_buttons img
-{
-    position: relative;
-	top: 3px;
-}
-
 #tabs
 {
 	position: absolute;
@@ -1102,6 +1096,11 @@ ul.selector
 .deliverable
 {
 	width: 380px;
+}
+
+.recipient
+{
+    margin-top: 1em;
 }
 
 .meeting_time .meeting_time_tools, .break .break_tools, .deliverable .deliverable_tools, .recipient .recipient_tools

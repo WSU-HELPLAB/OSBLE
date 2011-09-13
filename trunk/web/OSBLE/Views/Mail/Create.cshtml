@@ -16,75 +16,119 @@
 {
     @Html.ValidationSummary(true)
 
+    <input type="hidden" id="recipient_list" name="recipientlist" />
+    
     <a>To:</a>
     <input id="people_finder" />
-    // only need this tool tip on new mail creation
-    if (Session["mail_isreply"] == null) 
-    {
-        @Helpers.CreateToolTip(ToolTips.MailRecipient) 
-    }
+    @Helpers.CreateToolTip(ToolTips.MailRecipient) 
+    
     <script type="text/javascript">
-
+        
+        var list = new Array();
+        var selection_state = false;
+        
         $("#people_finder").autocomplete({
             source: "@(Url.Action("Search"))",
             select: function(event, ui) {
-                location.href="@Url.Action("Create")?recipientID=" + ui.item.value;
+                $(this).val("");
+
+                // repeat entry error checking
+                var repeat = false;
+                $(list).each(function (index, value) { 
+                    if(value == ui.item.value){
+                        repeat = true;
+                    }
+                });
+                
+                if(repeat != true)
+                {
+                    list.push(ui.item.value);
+                    var id = ui.item.value;
+
+                    // create new item
+                    $('#recipients_data').append('<div id="' + id + '" class="recipient" />');
+                    var newRecipient = $('#' + id);
+
+                    // delete button  
+                    newRecipient.append('<div class="recipient_tools"><a href="#" title="Delete this recipient" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove(); removeRecipient(this); });"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');                                                                                                                                                                                                  
+                    
+                    // main layout
+                    newRecipient.append("<a>");
+                    newRecipient.append('<img src="@Url.Action("ProfilePicture")/' + ui.item.value + '" class="small_profile_picture" alt="Profile Picture" />' + ui.item.label + "</a>");
+                
+                    $('#recipient_list').val(list);
+                    $('#recipient_list').serializeArray();
+                }
+                else
+                {
+                    repeat = false;
+                }
+
+                alert("a" + $('#recipient_list').val());
+                return false;
             },
             focus: function(event, ui) {return false;}
         }).data("autocomplete")._renderItem = function( ul, item ) {
             return $( "<li></li>" )
             .data( "item.autocomplete", item )
-            .append( "<a>" + "<img src=\"@Url.Action("ProfilePicture")/" + item.value + "\" class=\"small_profile_picture\" alt=\"Profile Picture\" /> " + item.label+ "</a>" )
+            .append( "<a>" + '<img src="@Url.Action("ProfilePicture")/' + item.value + '" class="small_profile_picture" alt="Profile Picture" /> ' + item.label + '</a>')
             .appendTo( ul );
+        }
+
+
+        function removeRecipient(div) {
+            var id = $(div).attr("id");
+
+            $(list).each(function (index, value) { 
+                if(value == id){
+                    list.splice(index, 1);
+                }
+            });
+
+            $('#recipient_list').val(list);
+            $('#recipient_list').serializeArray();
+            alert("d" + $('#recipient_list').val());
         }
     </script>
     <br />
-
-    if (recipients != null)
-    {
-        foreach (UserProfile up in recipients)
+    <div id="recipients_data">
+        @if (recipients != null)
         {
-            <div id="recipient + @up.ID" class="recipient">
-                <div class="recipient_tools">
-                    <a id="@up.ID" href="#" title="Delete this recipient" onclick="removeRecipient(@up.ID);" ><img src="/Content/images/delete_up.png" alt="Delete Button" /></a>
+            foreach (UserProfile up in recipients)
+            {
+                <div id="@up.ID" class="recipient" >
+                    <div class="recipient_tools">
+                        <a href="#" title="Delete this recipient" onclick="$(this).parent().hide(\'highlight\', function () { $(this).remove(); removeRecipient(this); });">
+                            <img src="/Content/images/delete_up.png" alt="Delete Button" />
+                        </a>
+                    </div>
+                    <a>
+                        <img src="@Url.Action("ProfilePicture")/@up.ID" class="small_profile_picture" alt="Profile Picture" />
+                        @up.FirstName @up.LastName
+                    </a>
                 </div>
-                @Helpers.ProfilePicture(@Url.Action("ProfilePicture", new { ID = up.ID }))
-
-                <div class="editor-field">
-                    @up.FirstName @up.LastName
-                    @Html.HiddenFor(model => model.FromUserProfileID)
-                    @Html.ValidationMessageFor(model => model.ToUserProfileID)
-                </div>
-            </div>
+            }
         }
-    }
-    //<br />
-        <div class="editor-field" style="clear: both;">
-            @Html.LabelFor(model => model.Subject): @Html.EditorFor(model => model.Subject)<br />
-            @Html.ValidationMessageFor(model => model.Subject)
-        </div>
+    </div>
+    <div class="editor-field" style="clear: both;">
+        @Html.LabelFor(model => model.Subject): @Html.EditorFor(model => model.Subject)<br />
+        @Html.ValidationMessageFor(model => model.Subject)
+    </div>
 
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Message)
-        </div>
-        <div class="editor-field">
-            @Html.TextAreaFor(model => model.Message, new { @id = "send_mail_textarea" })<br />
-            @Html.ValidationMessageFor(model => model.Message)
-        </div>
+    <div class="editor-label">
+        @Html.LabelFor(model => model.Message)
+    </div>
+    <div class="editor-field">
+        @Html.TextAreaFor(model => model.Message, new { @id = "send_mail_textarea" })<br />
+        @Html.ValidationMessageFor(model => model.Message)
+    </div>
 
-        <p>
-            <input type="submit" value="Send Message" />
-        </p>
+    <p>
+        <input type="submit" value="Send Message" />
+    </p>
 }
 
 <div>
     @Html.ActionLink("Back to Inbox", "Index")
 </div>
 
-<script type="text/javascript">
-
-    function removeRecipient(recip) {
-        location.href="@Url.Action("Create")?recipientID=" + -recip;
-    }
-
-</script>

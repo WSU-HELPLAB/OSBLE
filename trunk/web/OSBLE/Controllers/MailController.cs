@@ -97,79 +97,35 @@ namespace OSBLE.Controllers
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            if (id == 0 || Session["mail_recipients"] == null) // creating a new email, no recipients yet, or replying
+            // Handles Reply and Forward
+            if (Request.Params["replyTo"] != null)
             {
+                var replyto = Convert.ToInt32(Request.Params["replyTo"]);
+                Mail reply = db.Mails.Find(replyto);
+                // Ensure valid reply user
+                if ((reply != null) && (reply.ToUserProfile == currentUser))
+                {
+                    string suffix = "RE: ";
+                    if (id == 0 ) // forward 0 is passed for the recipientid on forwards
+                    {
+                        suffix = "FW: ";
+                    }
+                    ViewBag.MailHeader = mail.Subject = suffix + reply.Subject;
+                    // Prefix each line with a '> '
+                    mail.Message = "\n\nOriginal Message \nFrom: " + reply.FromUserProfile.FirstName + " " +
+                                    reply.FromUserProfile.LastName + "\nSent at: " + reply.Posted.ToString() + "\n\n" +
+                                    Regex.Replace(reply.Message, "^.*$", "> $&",
+                                    RegexOptions.Multiline);
+
+                }
+            }
+            if (id > 0 && canMail(id))
+            {
+                //adding recipients
+                UserProfile u = db.UserProfiles.Find(id);
+                recipientList.Add(u);
+
                 Session["mail_recipients"] = recipientList;
-            }
-            else // adding recipients
-            {
-                recipientList = Session["mail_recipients"] as List<UserProfile>;
-            }
-
-            if (id > 0 || Request.Params["replyTo"] != null)// if there is a recipient entered or is a reply/forward
-            {
-                // Handle replies/forward if necessary
-                int replyto = -1;
-                if (Request.Params["replyTo"] != null) // first reply/forward
-                {
-                    replyto = Convert.ToInt32(Request.Params["replyTo"]);
-                    Session["mail_isreply"] = replyto;
-                }
-                else if( Session["mail_isreply"] != null) // reply/forward with added recipients
-                {
-                    replyto = (int)Session["mail_isreply"];
-                }
-
-                if(replyto != -1)
-                {
-                    Mail reply = db.Mails.Find(replyto);
-                    // Ensure valid reply user
-                    if ((reply != null) && (reply.ToUserProfile == currentUser))
-                    {
-                        string suffix = "RE: ";
-                        if (id == 0 || Session["mail_isforward"] != null) // forward
-                        {
-                            Session["mail_isforward"] = Session["mail_isreply"];
-                            suffix = "FW: ";
-                        }
-                        ViewBag.MailHeader = mail.Subject = suffix + reply.Subject;
-                        // Prefix each line with a '> '
-                        mail.Message = "\n\nOriginal Message \nFrom: " + reply.FromUserProfile.FirstName + " " +
-                                        reply.FromUserProfile.LastName + "\nSent at: " + reply.Posted.ToString() + "\n\n" +
-                                        Regex.Replace(reply.Message, "^.*$", "> $&",
-                                        RegexOptions.Multiline);
-                        
-                    }
-                }
-                if(id > 0 && canMail(id))
-                {
-                    //adding recipients
-                    UserProfile u = db.UserProfiles.Find(id);
-
-                    foreach (UserProfile p in recipientList)
-                    {
-                        // if you have already entered that recipient
-                        if (p.ID == u.ID)
-                        {
-                            return View(mail);
-                        }
-                    }
-                    recipientList.Add(u);
-                    
-                    Session["mail_recipients"] = recipientList;
-                }
-            }
-            else if(id < 0) // remove a recipient
-            {
-                foreach (UserProfile u in recipientList)
-                {
-                    if (-id == u.ID)
-                    {
-                        recipientList.Remove(u);
-                        Session["mail_recipients"] = recipientList;
-                        return View(mail);
-                    }
-                }
             }
             return View(mail);
         }
@@ -181,29 +137,53 @@ namespace OSBLE.Controllers
         {
             if (ModelState.IsValid)
             {
-                List<UserProfile> recipients = new List<UserProfile>(); 
-                recipients = Session["mail_recipients"] as List<UserProfile>;
-                Session["mail_recipients"] = null;
-                Session["mail_isreply"] = null;
+                string recipient_string = Request.Params["recipientlist"];
+                string[] recipients;
+                List<int> reply_ids = new List<int>();
 
-                foreach (UserProfile up in recipients)
+                // If it is a reply
+                if (Session["mail_recipients"] != null)
                 {
-                    Mail newMail = new Mail();
-                    newMail.FromUserProfileID = CurrentUser.ID;
-                    newMail.Read = false;
-                    newMail.ToUserProfileID = up.ID;
-                    newMail.Subject = mail.Subject;
-                    newMail.Message = mail.Message;
-
-                    using (NotificationController nc = new NotificationController())
+                    List<UserProfile> recipientList = new List<UserProfile>();
+                    recipientList = Session["mail_recipients"] as List<UserProfile>;
+                    Session["mail_recipients"] = null;
+                    foreach (UserProfile up in recipientList)
                     {
-                        nc.SendMailNotification(newMail);
+                        if (recipient_string != "")
+                        {
+                            recipient_string += "," + up.ID.ToString();
+                        }
+                        else
+                        {
+                            recipient_string = up.ID.ToString();
+                        }
+                    }
+                }
+                if (recipient_string != null)
+                {
+                    recipients = recipient_string.Split(',');
+
+                    foreach (string id in recipients)
+                    {
+                        Mail newMail = new Mail();
+                        newMail.FromUserProfileID = CurrentUser.ID;
+                        newMail.Read = false;
+                        newMail.ToUserProfileID = Convert.ToInt32(id);
+                        newMail.Subject = mail.Subject;
+                        newMail.Message = mail.Message;
+                        newMail.ThreadID = mail.ID;
+
+                        using (NotificationController nc = new NotificationController())
+                        {
+                            nc.SendMailNotification(newMail);
+                        }
+
+                        db.Mails.Add(newMail);
+                        db.SaveChanges();
                     }
 
-                    db.Mails.Add(newMail);
-                    db.SaveChanges();
+                    return RedirectToAction("Index");
                 }
-                return RedirectToAction("Index");
             }
             return View(mail);
         }

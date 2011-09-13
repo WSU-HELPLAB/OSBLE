@@ -11,6 +11,9 @@ namespace OSBLE.Models.Users
         public int ID { get; set; }
 
         [Required]
+        public int ThreadID { get; set; }
+
+        [Required]
         public int FromUserProfileID { get; set; }
 
         public virtual UserProfile FromUserProfile { get; set; }
