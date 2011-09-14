@@ -173,13 +173,16 @@ namespace OSBLE.Controllers
                         newMail.Message = mail.Message;
                         newMail.ThreadID = mail.ID;
 
+                        //need to create the mail before we can send the notification
+                        db.Mails.Add(newMail);
+                        db.SaveChanges();
+
                         using (NotificationController nc = new NotificationController())
                         {
                             nc.SendMailNotification(newMail);
                         }
 
-                        db.Mails.Add(newMail);
-                        db.SaveChanges();
+                        
                     }
 
                     return RedirectToAction("Index");
