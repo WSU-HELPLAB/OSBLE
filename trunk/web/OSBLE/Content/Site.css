@@ -141,7 +141,11 @@ a img
 
 #course_create_button img
 {
-	position: relative;
+}
+
+.course_modify_buttons img
+{
+    position: relative;
 	top: 3px;
 }
 
