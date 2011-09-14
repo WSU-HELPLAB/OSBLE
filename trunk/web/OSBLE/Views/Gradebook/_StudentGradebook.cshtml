@@ -100,11 +100,6 @@
         color: White;
     }
     
-    #letterGrades td
-    {
-        padding: 3px
-    }
-    
     #letterGrades tr, #letterGrades td, #letterGrades th
     {
         width: auto;
@@ -339,13 +334,13 @@
                 
                 List<Score> userScores = (from scores in ViewBag.AllUserGrades as IEnumerable<Score>
                                           where scores.Points >= 0
-                                          orderby scores.Points
-                                          select scores).ToList();
+                                          //orderby scores.Points
+                                          select scores).OrderBy(s => (s.Points/s.AssignmentActivity.PointsPossible)).ThenByDescending(s => s.Points).ToList();
 
                 List<Score> studentScores = (from scores in ViewBag.AllUserGrades as IEnumerable<Score>
                                              where scores.StudentPoints >= 0
                                              orderby scores.StudentPoints
-                                             select scores).ToList();
+                                             select scores).OrderBy(s => s.StudentPoints).ThenByDescending(s => s.StudentPoints).ToList();
 
                 double temp = 0;
                 for (int i = 0; i < userScores.Count(); i++)
@@ -365,6 +360,8 @@
                     userScores.Add(studentScores[0]);
                     studentScores.Remove(studentScores[0]);
                 }
+
+             
 
                 List<Category> categoryWeights = (from cats in ViewBag.Categories as IEnumerable<Category>
                                                   where cats.Points > 0
@@ -499,6 +496,9 @@
                         {
                             double categoryPoints = 0;
                             double categoryPossible = 0;
+                            
+                            //If there are multiple scores
+                            double categoryPercentSmallestNumber = 0;
                             foreach (Score userScore in userScores)
                             {
                                 if (userScore.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
