@@ -1,0 +1,65 @@
+﻿@using OSBLE.Models.HomePage
+@using OSBLE.Models
+
+@{
+    ViewBag.Title = "Dashboard";
+}
+
+<div id="dashboard_left">
+<h3>Notifications</h3>
+  
+<div id="notifications">
+@if (ViewBag.Notifications.Count == 0)
+{
+    <p>No Unread Notifications!</p>
+}
+
+@{ViewBag.ShowNotificationDelete = true;}
+@Html.Partial("_Notifications")
+
+<p>@Html.ActionLink("Show All Notifications", "Index", "Notification")</p>
+</div>
+
+<h3>Events &amp; Deadlines 
+@if (@ViewBag.ActiveCourse.AbstractRole.CanModify || @ViewBag.ActiveCourse.AbstractCourse.AllowEventPosting)
+{
+<a href="@Url.Action("Create","Event")" title="Add New Event or Deadline">@Helpers.AddButton()</a>
+}
+</h3>
+
+<div id="important_dates">
+<p>Next @ViewBag.ActiveCourse.AbstractCourse.CalendarWindowOfTime Weeks</p>
+@Html.Partial("_Events",(List<Event>)ViewBag.Events)
+<p>@Html.ActionLink("Show All Events", "Index", "Event")</p>
+</div>
+
+</div>
+
+<div id="dashboard_right">
+<h3>Files &amp; Links 
+@{if(ViewBag.CanEditCourseLinks)
+  {
+      <span id="file_upload_silverlight_span">
+      @{ SilverlightObject so = ViewBag.Uploader as SilverlightObject; }
+      @Html.DisplayFor(m => so, "SilverlightObject")
+      </span>
+  }
+}
+</h3>
+<div id="course_links">
+@Html.Partial("_CourseLinks")
+</div>
+
+</div>
+
+<div id="dashboard_middle">
+<h3>Activity Feed</h3>
+
+<div id="activity_feed">
+@Html.Partial("_ActivityFeed")
+</div>
+
+</div>
+
+<p>
+</p>

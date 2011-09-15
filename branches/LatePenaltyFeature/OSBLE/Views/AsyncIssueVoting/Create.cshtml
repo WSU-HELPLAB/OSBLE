@@ -1,0 +1,147 @@
+﻿@model OSBLE.Models.Assignments.Activities.AsyncIssueVotingActivity
+@using OSBLE.Models.Assignments.Activities
+@using OSBLE.Models
+@{
+    ViewBag.Title = "Create Async Issue Voting";
+}
+
+<h2>Create Async Issue Voting</h2>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+<script type="text/javascript">
+    $(function () {
+        $('#enable_issue_voting_discussion').change(function () {
+            if ($(this).attr('checked')) {
+                DisplayReviewerMustCompleteIssueVotingOptions();
+            } else {
+                HideReviewerMustCompleteIssueVotingOptions();
+            }
+        });
+    });
+
+    function DisplayReviewerMustCompleteIssueVotingOptions() {
+        $('#EnableIssueVotingDiscussion_options').show('blind');
+    }
+
+    function HideReviewerMustCompleteIssueVotingOptions() {
+        $('#EnableIssueVotingDiscussion_options').hide('blind');
+        $('#reviewer_must_complete_issue_voting').removeAttr('checked');
+    }
+
+</script>
+@{
+   
+    using (Html.BeginForm("Create","AsyncIssueVoting",FormMethod.Post,new { id="issue_voting_form" }))
+    {
+   
+        @Html.ValidationSummary(true)
+        <fieldset>
+            <legend>AsyncIssueVotingActivity</legend>
+
+            <div class="editor-label">
+                @Html.LabelFor(model => model.Name)
+                @Helpers.CreateToolTip(ToolTips.IssueVotingName)
+            </div>
+            <div class="editor-field">
+                @Html.EditorFor(model => model.Name)
+                @Html.ValidationMessageFor(model => model.Name)
+            </div>
+
+            <div class="editor-label">
+                @Html.LabelFor(model => model.AbstractAssignmentID, "Abstract Assignment")
+                @Helpers.CreateToolTip(ToolTips.IssueVotingAbstractAssignmentID)
+            </div>
+            <div class="editor-field">
+                @Html.DropDownList("AbstractAssignmentID", String.Empty)
+                @Html.ValidationMessageFor(model => model.AbstractAssignmentID)
+            </div>
+
+            <h2>Settings</h2>
+
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.UseOnlyStudentsWhoCompletedPeerReview, new { id = "use_only_students_who_completed_peer_review" })
+                @Html.LabelFor(model => model.UseOnlyStudentsWhoCompletedPeerReview)
+                @Helpers.CreateToolTip(ToolTips.IssueVotingUseOnlyStudentWhoCompletedPeerReview)
+                @Html.ValidationMessageFor(model => model.UseOnlyStudentsWhoCompletedPeerReview)
+            </div>
+
+            <h3>Anonymity of Review</h3>
+
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.peerReviewActivity.IsAuthorAnonymous, new { id = "is_author_anonymous" })
+                @Html.LabelFor(model => model.peerReviewActivity.IsAuthorAnonymous)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewIsAuthorAnonymous)
+                @Html.ValidationMessageFor(model => model.peerReviewActivity.IsAuthorAnonymous)
+            </div>
+
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.peerReviewActivity.IsReviewersAnonymous, new { id = "is_reviewer_anonymous" })
+                @Html.LabelFor(model => model.peerReviewActivity.IsReviewersAnonymous)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewIsReviewersAnonymous)
+                @Html.ValidationMessageFor(model => model.peerReviewActivity.IsReviewersAnonymous)
+            </div>
+
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.peerReviewActivity.IsReviewersRoleAnonymous, new { id = "is_reviewers_role_anonymous" })
+                @Html.LabelFor(model => model.peerReviewActivity.IsReviewersRoleAnonymous)
+                @Helpers.CreateToolTip(ToolTips.PeerReviewIsReviewersRoleAnonymous)
+                @Html.ValidationMessageFor(model => model.peerReviewActivity.IsReviewersRoleAnonymous)
+            </div>
+
+            <h4>Issue Voting</h4>
+
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.EnableIssueVotingDiscussion, new { id = "enable_issue_voting_discussion" })
+                @Html.LabelFor(model => model.EnableIssueVotingDiscussion)
+                @Helpers.CreateToolTip(ToolTips.IssueVotingEnableIssueVotingDiscussion)
+                @Html.ValidationMessageFor(model => model.EnableIssueVotingDiscussion)
+            </div>
+            <div id="EnableIssueVotingDiscussion_options" class="indented_options" style="display: none">
+                <div class="editor-field">
+                    @Html.CheckBoxFor(model => model.ReviewerMustCompleteIssueVoting, new { id = "reviewer_must_complete_issue_voting" })
+                    @Html.LabelFor(model => model.ReviewerMustCompleteIssueVoting)
+                    @Helpers.CreateToolTip(ToolTips.IssueVotingReviewerMustCompleteIssueVoting)
+                    @Html.ValidationMessageFor(model => model.ReviewerMustCompleteIssueVoting)
+                </div>
+            </div>
+
+            <h4>Grading</h4>
+
+            <div>
+                <input type="radio" name="SetGrade" value="PercentOfIssues" />
+                Set Grade to percentage of issues voted on
+                @Helpers.CreateToolTip(ToolTips.IssueVotingSetGradePercentOfIssues)
+                <br />
+           </div>
+
+           <div>
+                <input type="radio" name="SetGrade" value="PercentAgreementWModerator" />
+                Set grade to percent in agreement with moderator
+                @Helpers.CreateToolTip(ToolTips.IssueVotingSetGradePercentAgreementWModerator)
+                <br />
+           </div>
+
+           <div>
+                <input type="radio" name="SetGrade" value="Manually" />
+                Manually enter grade
+                @Helpers.CreateToolTip(ToolTips.IssueVotingSetGradeManually)
+                <br />
+           </div>
+
+           <div>
+                @Html.Partial("_AddToGradebook")
+            </div>
+
+            <p>
+                <input type="submit" value="Create Async Issue Voting" id="Submit"/>
+            </p>
+        </fieldset>
+    }
+
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+    
+}

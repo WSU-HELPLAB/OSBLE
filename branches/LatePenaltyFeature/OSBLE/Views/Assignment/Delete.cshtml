@@ -1,0 +1,16 @@
+﻿@model OSBLE.Models.Assignments.StudioAssignment
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h1>Delete Assignment Confirmation</h1>
+<p>
+You are about to delete the assignment &quot;@Model.Name&quot; from OSBLE.  Deleting an assignment is permanent and cannot be undone.  Any submissions, grades, and event data associated with the assignment will also be removed from the system. 
+</p>
+@using (Html.BeginForm())
+{
+    @Html.HiddenFor(m => m.ID)
+    <input type="submit" name="continue" value="Continue" />
+    <input type="submit" name="cancel" value="Cancel" />
+}
