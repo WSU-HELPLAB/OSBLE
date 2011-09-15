@@ -1,0 +1,449 @@
+﻿@using OSBLE.Models.Courses
+@using OSBLE.Utility
+@{
+    Layout = null;
+}
+
+<style type="text/css">
+
+</style>
+
+<div id="tabHeader">
+    <ul>
+        <li id="selected" class="main"><a href="/Gradebook/Index">Main</a></li>
+        @{
+            double totalPoints = 0;
+
+            foreach (Category item in ViewBag.Categories)
+            {
+                //calculating total points of all categories
+                totalPoints += (item.Points);
+            }
+            foreach (Category item in ViewBag.Categories)
+            {
+                var displayWeight = (item.Points / totalPoints) * 100;
+                if (item.Points == 0 && item.Name != Constants.UnGradableCatagory)
+                {
+                    if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                    {
+                        //instructor
+                        <li id="li-@item.ID" class="@item.ID" style="background:@item.TabColor;" onmouseover="displayTabButton(@item.ID);" onmouseout="hideTabButton(@item.ID);"><a href="/Gradebook/Tab/?categoryId=@item.ID" id="catName-@item.ID" style="text-decoration:none; float:left;">@item.Name (0%)</a>
+                        <div id="tab-@item.ID" style="display: none; float:right;">
+                            <img id="imgDown-@item.ID" src="/Content/images/arrow_down.png" onclick="displayCustomizeCategoryDisplay(event, @item.ID, 0, @item.Points)" style="float:right; cursor:pointer; padding-top:6px; padding-right:3px;"/>
+                        </div>
+                        </li>
+                    }
+                    else
+                    {
+                        //Student
+                        <li class="@item.ID" style="background:@item.TabColor;" onmouseover="displayTabButton(@item.ID);" onmouseout="hideTabButton(@item.ID);"><a href="/Gradebook/Tab/?categoryId=@item.ID" id="catName-@item.ID" style="text-decoration:none; float:left;">@item.Name (0%)</a></li>
+                    }
+
+                }
+                else if (item.Name != Constants.UnGradableCatagory)
+                {
+                    if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                    {
+                        //instructor
+                        <li class="@item.ID" style="background:@item.TabColor;" onmouseover="displayTabButton(@item.ID);" onmouseout="hideTabButton(@item.ID);"><a href="/Gradebook/Tab/?categoryId=@item.ID" id="catName-@item.ID" style="text-decoration:none; float:left;">@item.Name (@displayWeight.ToString(".##")%)</a>
+                        <div id="tab-@item.ID" style="display: none; float:right;">
+                            <img id="imgDown-@item.ID" src="/Content/images/arrow_down.png" onclick="displayCustomizeCategoryDisplay(event, @item.ID, @displayWeight.ToString(".##"),  @item.Points)" style="float:right; cursor:pointer; padding-top:6px; padding-right:3px;"/>
+                        </div>
+                        </li>
+                    }
+                    else
+                    {
+                        //Student
+                        <li class="@item.ID" style="background:@item.TabColor;" onmouseover="displayTabButton(@item.ID);" onmouseout="hideTabButton(@item.ID);"><a href="/Gradebook/Tab/?categoryId=@item.ID" id="catName-@item.ID" style="text-decoration:none; float:left;">@item.Name (@displayWeight.ToString(".##")%)</a></li>
+                    }
+
+                }
+                else
+                {
+                    //Do nothing because we don't want to show category Constants.UnGradableCategory
+                }
+
+            }
+            }
+        @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+        {
+            <li><a href="#" onclick="newTab()">+</a></li>
+        }
+        
+    </ul>
+</div> 
+
+<div class="menu" id="customizeCateogryTable" style="display:none; position:absolute; text-decoration:none;" onmouseout="hideTabColors2();">
+    <table class="selectMenuTable">
+        <tr>
+            <th>
+                Customize Category
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <a onclick="moveCategoryLeft(ID);">Move Category Left</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a onclick="moveCategoryRight(ID);">Move Category Right</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a onclick="displayNameEditor();">Edit Category Name</a>
+            </td>
+        </tr>
+        <tr>
+            <td onmouseover="displayColors2();"><a style="cursor:pointer">Edit Category Color</a></td>
+        </tr>
+         <tr>
+            <td>
+                <a onclick="displayConfirmWindow()">Delete Category</a>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a onclick="displayWeightEditor()">Edit Category Weight</a>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="weightEditor" style="display:none;" title="Change Category Weight">
+    <form id="weightEditorForm" onsubmit="modifyWeight(); return false;">
+        <text>Enter the new weight: </text>
+        <input style="width:80px;" type="text" id="weightEditorTextBox"/>
+        <div class="yesAndNoDiv">
+            <input value="Apply" type="submit"/>
+            <input value="Cancel" type="button" onclick="hideWeightEditor()" />
+        </div>
+        <text id="weightEditorErrorText" style="color:Red"></text>
+    </form>
+</div>
+
+<div id="nameEditor" style="display:none;" title="Change Category Name">
+    <form id="nameEditorForm" onsubmit="modifyCatName(); return false;">
+        <text>Enter the new category name: </text>
+        <input style="width:160px;" type="text" id="nameEditorTextBox"/>
+        <div class="yesAndNoDiv">
+            <input value="Apply" type="submit"/>
+            <input value="Cancel" type="button" onclick="hideNameEditor()" />
+        </div>
+        <text id="nameEditorErrorText" style="color:Red"></text>
+    </form>
+</div>
+
+
+
+<div id="confirmDeleteDiv" style="display:none" title="Confrim Delete">
+    Are you sure you want to permanently delete this category and all the assignments within it?<br />
+    <div class="yesAndNoDiv">
+        <input value="Yes" type="button" onclick="deleteCurrentCategory()" />
+        <input value="No" type="button" onclick="hideConfirmWindow()" />
+    </div>
+</div>
+
+<div class="displayColors" id="displayColorsIDMenu" style="display: none; position: absolute;" onmouseover="displayColors2();" onmouseout="hideTabColors2();">
+    <table class="displayColorsTable">
+		<tr>
+		    <th align="center" colspan="3">Colors</th>
+		</tr>
+		<tr>
+			<td style="background:Silver;"><a style="cursor:pointer;" href"#" onclick="changeColor2('Silver');">Silver</a></td>
+		</tr>
+        <tr>
+			<td style="background:Tomato;"><a style="cursor:pointer;" href"#" onclick="changeColor2('Tomato');">Red</a></td>
+		</tr>
+        <tr>
+			<td style="background:LightBlue;"><a style="cursor:pointer;" href"#" onclick="changeColor2('LightBlue');">Blue</a></td>
+		</tr>
+        <tr>
+			<td style="background:SpringGreen;"><a style="cursor:pointer;" href"#" onclick="changeColor2('SpringGreen');">Green</a></td>
+		</tr>
+        <tr>
+			<td style="background:BurlyWood;"><a style="cursor:pointer;" href"#" onclick="changeColor2('BurlyWood');">Brown</a></td>
+		</tr>
+        <tr>
+			<td style="background:Yellow;"><a style="cursor:pointer;" href"#" onclick="changeColor2('Yellow');">Yellow</a></td>
+		</tr>
+        <tr>
+			<td style="background:Plum;"><a style="cursor:pointer;" href"#" onclick="changeColor2('Plum');">Purple</a></td>
+        </tr>
+        <tr>
+			<td style="background:Orange;"><a style="cursor:pointer;" href"#" onclick="changeColor2('Orange');">Orange</a></td>
+        </tr>
+        <tr>
+			<td style="background:Pink;"><a style="cursor:pointer;" href"#" onclick="changeColor2('Pink');">Pink</a></td>
+		</tr>
+	</table>
+</div>
+
+
+<script type="text/javascript">
+
+    var ID = null; //last clicked tab's ID
+    var categoryPercent = null;
+    var oldName = null;
+    var currentCategoryWeight = null;
+
+    $(document).ready(function () {
+        
+
+        var pathname = window.location.toString();
+        var id = pathname.split("=");
+
+        if (id[1] != null) {
+            id = id[1].split("#");
+            $("#selected").removeAttr("id");
+            $("." + id[0]).attr("id", "selected");
+            $("." + id[0]).css("background", "white");
+        }
+    });
+
+    $(document).click(function () {
+        $("#customizeCateogryTable").animate({ "height": "hide" }, { duration: 0 });
+        clearFocusOnCell();
+        $("#displayColorsIDMenu").animate({ "height": "hide" }, { duration: 0 });
+    });
+    
+    $("ul li").keydown(function (e) {
+
+        //13 means enter is pressed
+        if (e.keyCode == 13) {
+            clearFocusOnCell();
+        }
+    });
+
+    function hideNameEditor() {
+        $("#nameEditor").dialog('close');
+    }
+    function displayNameEditor() {
+        var temp = $("#catName-" + ID).text();
+        temp = parseOutPercents(temp);
+        $("#nameEditorTextBox").val(temp);
+        $("#nameEditor").dialog({
+            modal: true,
+            resizable: false,
+            width: 310,
+            height: 135,
+            closeOnEscape: false
+        });
+        $("#nameEditorTextBox").focus();
+        $("#nameEditorTextBox").select();
+    }
+
+    function displayWeightEditor() {
+
+        $("#weightEditorTextBox").val(currentCategoryWeight);
+        $("#weightEditor").dialog({
+            modal: true,
+            resizable: false,
+            width: 310,
+            height: 135,
+            closeOnEscape: false
+        });
+        $("#weightEditorTextBox").focus();
+        $("#weightEditorTextBox").select();
+    }
+
+    function hideWeightEditor() {
+        $("#weightEditor").dialog('close');
+    }
+
+    function modifyCatName() {
+        var name = $("#nameEditorTextBox").val();
+        if (name == "" || name == null) {
+            var errorMsg = "Error: Please enter a valid name";
+            $("#nameEditorErrorText").text(errorMsg);
+        }
+        else {
+            $("#nameEditorErrorText").text("");
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: "/Gradebook/ModifyCategoryName",
+                data: {value: name, categoryId: ID}
+            });
+            hideNameEditor();
+            window.location.reload(true);
+        }
+    }
+    function modifyWeight() {
+        var weight = $("#weightEditorTextBox").val();
+        if (isNaN(weight)){
+            var errorMsg = "Error: Please enter a valid weight value";
+            $("#weightEditorErrorText").text(errorMsg);
+        }
+        else {
+            $("#weightEditorErrorText").text("");
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: "/Gradebook/ModifyCategoryPoints",
+                data: { value: weight, categoryId: ID }
+            });
+            hideWeightEditor();
+            window.location.reload(true);
+        }
+    }
+
+    function displayCustomizeCategoryDisplay(evt, id, percent, weight) {
+        ID = id;
+        categoryPercent = percent;
+        currentCategoryWeight = weight;
+        evt.cancelBubble = true;
+        var selectedID = $("#selected").attr("class");
+        var y = null
+        var x = null
+        if (selectedID == id) {
+            //choosing location for customizeCateogryTable for selected tabs
+            y = $("#selected").position().top;
+            x = $("#selected").position().left;
+            y += $("#selected").height() - 9;
+            x += $("#selected").width() - 15;
+        }
+        else {
+            //choosing location for customizeCateogryTable for non-selected tabs 
+            y = $("#tab-" + id).position().top;
+            x = $("#tab-" + id).position().left;
+            y += 9;
+        }
+        $("#customizeCateogryTable").css("left", x + "px");
+        $("#customizeCateogryTable").css("top", y + "px");
+        $("#customizeCateogryTable").animate({ "height": "show" }, { duration: 0 });
+    }
+
+    function hideTabColors2() {
+        //$("#selectMenuID").animate({ "height": "hide" }, { duration: 0 });
+        $("#displayColorsIDMenu").animate({ "height": "hide" }, { duration: 0 });
+    }
+
+    function displayColors2() {
+        var x = 0;
+        var y = 0;
+
+        //alert(container);
+        //aligning the menu under the buttons
+        x = $("#customizeCateogryTable").position().left;
+        y = $("#customizeCateogryTable").position().top;
+        y += $("#customizeCateogryTable").height() - 75; ;
+        x += $("#customizeCateogryTable").width();
+
+        //Moving the menu to the button that clicked it
+        $("#displayColorsIDMenu").css("left", x + "px");
+        $("#displayColorsIDMenu").css("top", y + "px");
+
+        //Animation for menu
+        $("#displayColorsIDMenu").animate({ "height": "show" }, { duration: 0 });
+    }
+
+    function changeColor2(color) {
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "/Gradebook/ChangeTabColor",
+            data: { categoryId: ID, value: color }
+        });
+        window.location.reload(true);
+        hideTabColors2();
+    }
+
+    function displayConfirmWindow() {
+        $("#confirmDeleteDiv").dialog({
+            modal: true,
+            resizable: false,
+            width: 310,
+            closeOnEscape: false
+        });
+    }
+
+    function hideConfirmWindow() {
+        $("#confirmDeleteDiv").dialog('close');
+    }
+
+    function displayTabButton(id) {
+        $("#tab-" + id).animate({ "height": "show" }, { duration: 0 });
+    }
+
+    function hideTabButton(id) {
+        $("#tab-" + id).animate({ "height": "hide" }, { duration: 0 });
+    }
+
+    function moveCategoryLeft(catID) {
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "/Gradebook/MoveCategoryLeft",
+            data: { categoryId: catID }
+        });
+        window.location.reload(true);
+    }
+
+    function moveCategoryRight(catID) {
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "/Gradebook/MoveCategoryRight",
+            data: { categoryId: catID }
+        });
+        window.location.reload(true);
+    }
+
+    //Parsing out the percents from the category name for better editing
+    function parseOutPercents(mString) {
+        var splitArray = mString.split('(');
+        var returnVal = null;
+        $(splitArray).each(function (index, value) {
+            if (index < (splitArray.length - 1)) {
+                if (index == 0) {
+                    if (splitArray.length == 2) {
+                        //Only one word, remove the last character as its a space
+                        returnVal = value.substring(0, value.length - 1);
+                    }
+                    else {
+                        returnVal = value;
+                    }
+
+                }
+                else if (index == splitArray.length - 2) {
+                    //Last entry that will be shown, has an extra space at the end from the percent shown
+                    returnVal += "(" + value.substring(0, value.length - 1);
+                }
+                else {
+                    returnVal += ("(" + value);
+                }
+            }
+        });
+        return returnVal;
+    }
+
+    function clearFocusOnCell(){
+        if (oldName != null) {
+            var input = $("#catName-" + ID).children().val();
+            $("#catName-" + ID).html(input + " (" + categoryPercent + "%)");
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: "/Gradebook/ModifyCategoryName",
+                data: { value: input, categoryId: ID }
+            });
+
+            // readding the href for the tab, it was removed when you edit category name was selected in the drop down menu
+            $("#catName-" + ID).attr("href", "/Gradebook/Tab/?categoryId=ID");
+            oldName = null;
+        }
+    }
+
+    function deleteCurrentCategory() {
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: "/Gradebook/DeleteCategory",
+            data: { categoryId: ID }
+        });
+        window.location.reload(true)
+    }
+    
+</script>

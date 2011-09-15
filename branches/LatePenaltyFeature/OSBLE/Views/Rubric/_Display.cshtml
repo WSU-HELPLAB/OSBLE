@@ -1,0 +1,236 @@
+﻿@model OSBLE.Models.ViewModels.RubricViewModel
+
+@using OSBLE.Models.Courses.Rubrics;
+@using OSBLE.Models.Assignments.Activities;
+@using OSBLE.Models.Users;
+
+@{
+    string critInputPrefix = ViewBag.CritInputPrefix;
+string critSliderPrefix = ViewBag.CritSliderPrefix;
+string critCommentPrefix = ViewBag.CritCommentPrefix;
+int sliderTableLength = 880;
+int maxLevelScore = (from c in Model.Rubric.Levels
+                     select c.RangeEnd).Sum();
+int textInputLenght = 25;
+int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;
+string selectedActivity = ViewBag.ActivitySelectId;
+string selectedTeam = ViewBag.TeamSelectId;
+bool isEditable = ViewBag.isEditable;
+string textBoxDisabled = "";
+
+if (!isEditable)
+{
+    textBoxDisabled = "disabled=disabled";
+}
+
+}
+
+<script type="text/javascript">
+//loads all sliders after document load
+    function loadSliders() {
+    @{foreach (CriterionEvaluation critEval in Model.Evaluation.CriterionEvaluations)
+      {
+          string sliderUpdateFunction = "";
+          string disabledOption = "";
+          if (isEditable)
+          {
+              sliderUpdateFunction = "slide: updateSlider ";
+          }
+          else
+          { 
+          disabledOption = "disabled: true";
+          }
+
+          string sliderId = String.Format("\"#{0}_{1}\"", critSliderPrefix, critEval.Criterion.ID);
+          string js = String.Concat("\t$(", sliderId, ").slider({",
+                          "value: " + critEval.Score + ", ",
+                          "min: 0, ",
+                          "max: ", maxLevelScore, ", ",
+                          "step: 1, ",
+                          sliderUpdateFunction,
+                          disabledOption,
+                              "});\n");
+        @Html.Raw(js)
+      }    
+    }
+        if(@(isEditable.ToString().ToLower()))
+        {
+        $('#@selectedActivity').change(switchEvaluation);
+        $('#@selectedTeam').change(switchEvaluation);
+        updateGrade();
+        }
+    }
+
+    $(document).ready(loadSliders);
+
+</script>
+
+<style type="text/css">
+
+.criterion_div
+{
+    background: #9BB7C4;
+    margin-bottom:15px;
+    padding:15px;
+    font-size:12px;
+}
+
+.criterion_header
+{
+    font-size:18px;
+    font-weight:bold;
+}
+
+.level_header
+{
+    font-size:14px;
+    font-weight:bold;
+}
+
+.selector_table
+{
+    width:@(sliderTableLength)px;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.selector_table th
+{
+    padding:3px;
+    margin:0;
+}
+
+.text_input_score
+{
+    width: @(textInputLenght)px;
+    background: #9BB7C4;
+}
+
+.zero_score
+{
+    width:@(sliderTableCellWidth)px;
+    background: #CFCFCF;
+}
+
+.level_1
+{
+    background: #FF8991;
+}
+
+.level_2
+{
+    background: #FF9335;
+}
+
+.level_3
+{
+    background: #00DD04;
+}
+
+.level_4
+{
+    background: #75BAFF;
+}
+
+</style>
+
+        <div style="clear: both">
+            @{foreach (CriterionEvaluation critEval in Model.Evaluation.CriterionEvaluations)
+              {
+                <div class="criterion_div">
+                    <div class="criterion_header">@critEval.Criterion.CriterionTitle (Weight: @critEval.Criterion.Weight)</div>
+                    @{List<CellDescription> descriptions = (from d in Model.Rubric.CellDescriptions
+                                                            where d.CriterionID == critEval.Criterion.ID
+                                                            select d).ToList();
+                    }
+                    <ul>
+                        @{int previousMax = 1;}
+                        @{foreach (CellDescription desc in descriptions)
+                          {
+                            <li><span class="level_header"><em>@(desc.Level.LevelTitle)</em> (@previousMax - @(previousMax + desc.Level.RangeEnd - 1))</span>
+                                @{previousMax += desc.Level.RangeEnd;}
+                                <br />
+                                @Html.Raw(desc.Description.Replace("\r\n", "\n").Replace("\r", "<br />").Replace("\n", "<br />"))
+                            </li>
+                          }
+                        }
+                    </ul>
+                    <table class="selector_table">
+                        <tr>
+                            <th class="zero_score">
+                                0
+                            </th>
+                            @{previousMax = 1;}
+                            @{int counter = 0;}
+                            @{foreach (Level level in Model.Rubric.Levels)
+                              {
+                                  counter++;
+                                  string cssClass = "level_4";
+                                  if (counter < 5)
+                                  {
+                                      cssClass = "level_" + counter.ToString();
+                                  } 
+                                <th class="@cssClass" style="width:@(sliderTableCellWidth * level.RangeEnd)px;">@level.LevelTitle
+                                    (@previousMax - @(previousMax + level.RangeEnd - 1))
+                                </th>
+                                  previousMax += level.RangeEnd;
+                              }
+                            }
+                            <th class="text_input_score">
+                            </th>
+                        </tr>
+                        <tr>
+                            <td colspan="@(Model.Rubric.Levels.Count + 1)">
+                                <div id="@(String.Format("{0}_{1}", critSliderPrefix, critEval.Criterion.ID))">
+                                </div>
+                            </td>
+                            <td class="text_input_score">
+                                <input class="text_input_score" id="@(String.Format("{0}_{1}", critInputPrefix, critEval.Criterion.ID))" name="@(String.Format("{0}_{1}", critInputPrefix, critEval.Criterion.ID))" type="text" value="@critEval.Score" style="border:0; padding-left:7px;" size="1" @textBoxDisabled />
+                            </td>
+                        </tr>
+                        @{if (Model.Rubric.HasCriteriaComments)
+                          {
+                            <tr>
+                                <td colspan="@(Model.Rubric.Levels.Count + 2)" >
+                                    &nbsp;
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="@(Model.Rubric.Levels.Count + 2)" >
+                                    Comments:
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="@(Model.Rubric.Levels.Count + 2)" >
+                                    <textarea 
+                                id="@(String.Format("{0}_{1}", critCommentPrefix, critEval.Criterion.ID))"
+                                name="@(String.Format("{0}_{1}", critCommentPrefix, critEval.Criterion.ID))"
+                                rows="10"
+                                cols="80"
+                                style="width:95%; height:75px; margin-left:auto; margin-right:auto;"
+                                @textBoxDisabled
+                                >@critEval.Comment</textarea>
+                                </td>
+                            </tr>
+                          }
+                        }
+                    </table>
+                </div>
+              }
+            }
+        </div>
+
+              @if (Model.Rubric.HasGlobalComments)
+              {
+        <div class="criterion_div">
+            <div class="criterion_header">
+                Overall Comments</div>
+            <textarea 
+                    id="@ViewBag.GlobalCommentId"
+                    name="@ViewBag.GlobalCommentId"
+                    rows="10"
+                    cols="80"
+                    style="width:95%; height:75px; margin-left:auto; margin-right:auto;"
+                    >@Model.Evaluation.GlobalComment</textarea>
+        </div>
+              }

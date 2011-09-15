@@ -1,0 +1,123 @@
+﻿@using OSBLE.Models.Courses
+@if (ViewBag.CurrentCourses.Count > 0) {
+<text>@(ViewBag.CourseListTitle): </text><br />
+using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_course" }))
+{
+    
+    <select name="course" id="course_select">
+        @{
+        bool courseOptGroup = false;
+        bool communityOptGroup = false;
+        }
+
+        @foreach (OSBLE.Models.Courses.CoursesUsers cu in ViewBag.CurrentCourses)
+        {
+            // Skip hidden courses
+            if(cu.Hidden) {
+                continue;
+            }
+
+            string courseDisplay = @Helpers.CourseTag(cu.AbstractCourse) + " - " + cu.AbstractCourse.Name + " (" + cu.AbstractRole.Name + ")";
+
+            if ((cu.AbstractCourse is Course) && (cu.AbstractCourse as Course).Inactive)
+            {
+                courseDisplay += " [INACTIVE]";
+            }
+
+            CoursesUsers ac = ViewBag.ActiveCourse as CoursesUsers;
+            
+            if(cu.AbstractCourse is Course && !courseOptGroup) {
+                courseOptGroup = true;
+                @:<optgroup label="Courses">
+            }
+
+            if (cu.AbstractCourse is Community && !communityOptGroup)
+            {
+                communityOptGroup = true;
+                if(courseOptGroup) {
+                @:</optgroup>
+                }
+                @:<optgroup label="Communities">
+            }
+
+            if ((ac != null) && (ac.AbstractCourseID == cu.AbstractCourseID))
+            {
+            <option value=@cu.AbstractCourseID selected="selected">@courseDisplay</option>
+            }
+            else
+            {
+            <option value=@cu.AbstractCourseID>@courseDisplay</option>
+            }
+
+        }
+        @{
+            if(courseOptGroup || communityOptGroup) {
+            @:</optgroup>   
+        }
+    }
+    </select>
+    <input type="hidden" name="redirect" value="@Request.Path" />
+}
+@*
+    When select box changes, change our active course.
+*@
+<script type="text/javascript">
+    $('#course_select').change(function () {
+        $('#set_course').submit();
+    });
+</script>
+}
+else
+{
+     <text>No Courses!</text>
+}
+    @if (ViewBag.CurrentUser.CanCreateCourses)
+    {
+    <a href="#" onclick="create_and_open_course_create_dialog()" title="Create Course or Community" id="course_create_button" class="course_modify_buttons" >@Helpers.AddButton()</a>
+        if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+        {
+           <a href="/Course/Delete" title="Delete current course / community" class="course_modify_buttons">@Helpers.DeleteButton()</a>
+        }
+    <script type="text/javascript">
+
+        function create_and_open_course_create_dialog() {
+
+        //create the div that we will then make into a dialog
+
+        $('body').append(
+       '<div id="course_create_dialog" title="Create Course"> \
+        <p>Would you like to create a Course or a Community?</p> \
+        @Html.ActionLink("Create Course", "Create", "Course") | @Html.ActionLink("Create Community", "Create", "Community") \
+    </div>');
+
+        //make the div we just created into a dialog box
+
+        $('#course_create_dialog').dialog({
+            modal: true,
+            autoOpen: true,
+            resizable: false,
+            width: 350,
+            height: 200,
+            closeOnEscape: true,
+            close: remove_course_create_dialog
+        });
+
+
+
+        $('#course_create_dialog').dialog('open');
+        
+        return false;
+
+        }
+
+        function remove_course_create_dialog() {
+
+        //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
+            $('#course_create_dialog').dialog("destroy");
+
+            //then remove the div
+            $('#course_create_dialog').remove();
+        }
+            </script>
+    
+    }

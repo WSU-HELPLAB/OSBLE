@@ -1,0 +1,187 @@
+﻿@model OSBLE.Models.Assignments.Activities.AuthorRebuttalActivity
+@using OSBLE.Models.Assignments.Activities
+@using OSBLE.Models
+@{
+    ViewBag.Title = "Create Author Rebuttal";
+}
+<h2>Create Author Rebuttal</h2>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/osble.assignments.js")" type="text/javascript"></script>
+
+<script type="text/javascript">
+    $(function () {
+        $('#author_must_accept_or_refute_each_issue').change(function () {
+            if ($(this).attr('checked')) {
+                DisplayAuthorMustAcceptorRefuteEachIssueOptions();
+            }
+            else {
+                HideAuthorMustAcceptorRefuteEachIssueOptions();
+            }
+        });
+        $('#author_must_say_if_issue_was_addressed').change(function () {
+            if ($(this).attr('checked')) {
+                DisplayAuthorMustSayIfIssueAddressedOptions();
+            }
+            else {
+                HideAuthorMustSayIfIssueAddressedOptions();
+            }
+        });
+
+        $("input[name='Presentation']").change(function () {
+            if ($("input[name='Presentation']:checked").val() == 'PresentIssuesXLogged') {
+                DisplayPresentIssuesXLoggedOptions();
+            }
+            else if ($("input[name='Presentation']:checked").val() == 'PresentAllIssuesLogged') {
+                HidePresentIssuesXLoggedOptions();
+            }
+            else if ($("input[name='Presentation']:checked").val() == 'PresentOnlyIssuesModeratorVoted') {
+                HidePresentIssuesXLoggedOptions();
+            }
+            else if ($("input[name='Presentation']:checked").val() == 'PresentIssuesXPercentLogged') {
+                $('#x_logged').val(0);
+                $('#x_percent').val(null);
+            }
+            else {
+                throw "Unknown Radio Button Checked: Presentation"
+            }
+        });
+
+    });
+
+    function DisplayAuthorMustAcceptorRefuteEachIssueOptions() {
+        $('#author_must_accept_or_refute_each_issue_options').show('highlight');
+    }
+
+    function HideAuthorMustAcceptorRefuteEachIssueOptions() {
+        $('#author_must_accept_or_refute_each_issue_options').hide('highlight');
+        $('#author_must_describe_how_addressed').removeAttr('checked');
+    }
+
+    function DisplayAuthorMustSayIfIssueAddressedOptions() {
+        $('#author_must_say_if_issue_was_addressed_options').show('highlight');
+    }
+
+    function HideAuthorMustSayIfIssueAddressedOptions() {
+        $('#author_must_say_if_issue_was_addressed_options').hide('highlight');
+    }
+    function DisplayPresentIssuesXLoggedOptions(){
+        $('#PresentIssuesXLogged_options').show('hightlight');
+        $('#x_logged').val(null);
+        $('#x_percent').val(0);
+    }
+    
+    function HidePresentIssuesXLoggedOptions(){
+        $('#PresentIssuesXLogged_options').hide('hightlight');
+        $('#x_logged').val(0);
+        $('#x_percent').val(0);
+    }
+</script>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+    <fieldset>
+        <legend>AuthorRebuttalActivity</legend>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Name)
+            @Helpers.CreateToolTip(ToolTips.AuthorRebuttalName)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Name)
+            @Html.ValidationMessageFor(model => model.Name)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.AbstractAssignmentID, "Abstract Assignment")
+            @Helpers.CreateToolTip(ToolTips.AuthorRebuttalAbstractAssignmentID)
+        </div>
+        <div class="editor-field">
+            @Html.DropDownList("AbstractAssignmentID", String.Empty)
+            @Html.ValidationMessageFor(model => model.AbstractAssignmentID)
+        </div>
+
+        <h2>Settings</h2>
+
+        <h4>Issue Presentation</h4>
+
+       <div>
+            <input type="radio" name="Presentation" value="PresentAllIssuesLogged" />
+            Present all issues logged by team members, irrespective of voting results
+            @Helpers.CreateToolTip(ToolTips.AuthorRebuttalPresentationOptionsPresentAllIssuesLogged)
+            <br />
+        </div>
+
+        <div>
+            <input type="radio" name="Presentation" value="PresentIssuesXLogged" />
+            Present only issues that received at least @Html.TextBoxFor(model => model.xlogged, new { size = 3, id = "x_logged" })@Helpers.CreateToolTip(ToolTips.AuthorRebuttalxlogged) number of votes
+            @Helpers.CreateToolTip(ToolTips.AuthorRebuttalPresentationOptionsPresentIssuesXLogged)
+            <br />
+        </div>
+        <div id="PresentIssuesXLogged_options" class="indented_options" style="display: none">
+            <div>
+                <input type="radio" name="Presentation" value="PresentIssuesXPercentLogged" />
+                Present only issues for which @Html.TextBoxFor(model => model.xpercent, new { size = 3, id = "x_percent" })@Helpers.CreateToolTip(ToolTips.AuthorRebuttalxpercent) percent of team members voted
+                @Helpers.CreateToolTip(ToolTips.AuthorRebuttalPresentationOptionsPresentIssuesXPercentLogged)
+                <br />
+            </div>
+        </div>
+
+        @*Need to check whether team moderators are enabled*@
+
+        <div>
+            <input type="radio" name="Presentation" value="PresentOnlyIssuesModeratorVoted" />
+            Present only issues for which team moderator voted
+            @Helpers.CreateToolTip(ToolTips.AuthorRebuttalPresentationOptionsPresentOnlyModeratorVoted)
+            <br />
+        </div>
+
+        <h4>Author Response</h4>
+
+        <div class="editor-field">
+            @Html.CheckBoxFor(model => model.AuthorMustAcceptorRefuteEachIssue, new { id = "author_must_accept_or_refute_each_issue" })
+            @Html.LabelFor(model => model.AuthorMustAcceptorRefuteEachIssue)
+            @Helpers.CreateToolTip(ToolTips.AuthorRebuttalAuthorMustAcceptorRefuteEachIssue)
+            @Html.ValidationMessageFor(model => model.AuthorMustAcceptorRefuteEachIssue)
+        </div>
+        <div id="author_must_accept_or_refute_each_issue_options" class="indented_options" style="display: none">
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.AuthorMustProvideRationale, new { id = "author_must_provide_rationale" })
+                @Html.LabelFor(model => model.AuthorMustProvideRationale)
+                @Helpers.CreateToolTip(ToolTips.AuthorRebuttalAuthorMustProvideRationale)
+                @Html.ValidationMessageFor(model => model.AuthorMustProvideRationale)
+            </div>
+        </div>
+
+        <div class="editor-field">
+            @Html.CheckBoxFor(model => model.AuthorMustSayIfIssueWasAddressed, new { id = "author_must_say_if_issue_was_addressed" })
+            @Html.LabelFor(model => model.AuthorMustSayIfIssueWasAddressed)
+            @Helpers.CreateToolTip(ToolTips.AuthorRebuttalAuthorMustSayIfIssueWasAddressed)
+            @Html.ValidationMessageFor(model => model.AuthorMustSayIfIssueWasAddressed)
+        </div>
+        <div id="author_must_say_if_issue_was_addressed_options" class="indented_options" style="display: none">
+            <div class="editor-field">
+                @Html.CheckBoxFor(model => model.AuthorMustDescribeHowAddressed, new { id = "author_must_describe_how_addressed" })
+                @Html.LabelFor(model => model.AuthorMustDescribeHowAddressed)
+                @Helpers.CreateToolTip(ToolTips.AuthorRebuttalAuthorMustDescribeHowAddressed)
+                @Html.ValidationMessageFor(model => model.AuthorMustDescribeHowAddressed)
+            </div>
+        </div>
+
+        <h4>Grades</h4>
+
+        <div>
+            @Html.Partial("_AddToGradebook")
+        </div>
+
+        <p>
+            <input type="submit" value="Create Author Rebuttal"/>
+        </p>
+    </fieldset>
+}
+
+<div>
+   @Html.ActionLink("Back to List", "Index", "Home")
+</div>
+

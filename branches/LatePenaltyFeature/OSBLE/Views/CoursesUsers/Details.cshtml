@@ -1,0 +1,20 @@
+﻿@model OSBLE.Models.Courses.CoursesUsers
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>CoursesUsers</legend>
+
+    <div class="display-label">CourseRole</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.AbstractRole.Name)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { /* id=Model.PrimaryKey */ }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
