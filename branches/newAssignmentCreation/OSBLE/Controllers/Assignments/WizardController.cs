@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using OSBLE.Controllers.Assignments.Wizard;
-using OSBLE.Models.Wizard;
 using OSBLE.Models.Assignments;
+using OSBLE.Areas.AssignmentWizard.Models;
+using OSBLE.Areas.AssignmentWizard.Controllers;
 
 namespace OSBLE.Controllers.Assignments
 {
@@ -110,6 +110,7 @@ namespace OSBLE.Controllers.Assignments
         [HttpPost]
         public ActionResult Index(dynamic model)
         {
+            /*
             //Three possibilities:
             // 1: The user clicked the "Begin" button at which we must now figure out what 
             //    our assignment will contain and begin our process.
@@ -170,6 +171,8 @@ namespace OSBLE.Controllers.Assignments
                     return manager.ActiveComponent.Controller.Index(Request);
                 }
             }
+             * */
+            return View();
         }
     }
 }

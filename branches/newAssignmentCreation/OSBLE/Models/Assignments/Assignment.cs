@@ -23,7 +23,7 @@ namespace OSBLE.Models.Assignments
 
         [Required(ErrorMessage = "Please specify this assignment's type")]
         [Display(Name = "Assignment Type")]
-        public string AssignmentType { get; set; }
+        public AssignmentType AssignmentType { get; set; }
 
         [Required(ErrorMessage = "Please specify an assignment name")]
         [Display(Name = "Assignment Name")]

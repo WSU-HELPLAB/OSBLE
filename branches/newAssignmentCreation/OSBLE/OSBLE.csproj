@@ -147,17 +147,19 @@
     <Reference Include="WebMatrix.WebData, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
     <Compile Include="Attributes\CanPostEvent.cs" />
     <Compile Include="Attributes\FileCacheAttribute.cs" />
     <Compile Include="Attributes\IsCommunity.cs" />
     <Compile Include="Attributes\NotForCommunity.cs" />
     <Compile Include="Controllers\AssignmentController.cs" />
     <Compile Include="Controllers\Assignments\WizardController.cs" />
-    <Compile Include="Controllers\Assignments\Wizard\BasicsController.cs" />
-    <Compile Include="Controllers\Assignments\Wizard\RubricController.cs" />
-    <Compile Include="Controllers\Assignments\Wizard\DeliverablesController.cs" />
-    <Compile Include="Controllers\Assignments\Wizard\TeamController.cs" />
-    <Compile Include="Controllers\Assignments\Wizard\WizardBaseController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\BasicsController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\RubricController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\DeliverablesController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\HomeController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\TeamController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\WizardBaseController.cs" />
     <Compile Include="Controllers\AsyncIssueVotingController.cs" />
     <Compile Include="Controllers\AuthorRebuttalController.cs" />
     <Compile Include="Controllers\BasicAssignmentController.cs" />
@@ -212,7 +214,7 @@
     <Compile Include="Models\HomePage\Event.cs" />
     <Compile Include="Models\AbstractCourses\Course\Category.cs" />
     <Compile Include="Models\List.cs" />
-    <Compile Include="Models\OsbleViewEngine.cs" />
+    <Compile Include="EntityFramework\OsbleViewEngine.cs" />
     <Compile Include="Models\Services\Uploader\ParentDirectoryListing.cs" />
     <Compile Include="Models\Services\Uploader\UserSession.cs" />
     <Compile Include="Models\ToolTips.cs" />
@@ -233,8 +235,8 @@
     <Compile Include="Models\ViewModels\SerializableTeamMembers.cs" />
     <Compile Include="Models\ViewModels\StudioAssignmentViewModel.cs" />
     <Compile Include="Models\ViewModels\TeamCreationViewModel.cs" />
-    <Compile Include="Models\Wizard\WizardComponent.cs" />
-    <Compile Include="Models\Wizard\WizardComponentManager.cs" />
+    <Compile Include="Areas\AssignmentWizard\Models\WizardComponent.cs" />
+    <Compile Include="Areas\AssignmentWizard\Models\WizardComponentManager.cs" />
     <Compile Include="Services\AuthenticationDomainService1.cs" />
     <Compile Include="Services\OSBLEService.cs" />
     <Compile Include="Services\ReviewInterfaceDomainService.cs" />
@@ -433,7 +435,7 @@
     <Content Include="Content\themes\base\jquery.ui.tabs.css" />
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
     <Content Include="Controllers\Assignments\README.txt" />
-    <Content Include="Controllers\Assignments\Wizard\README.txt" />
+    <Content Include="Areas\AssignmentWizard\Controllers\README.txt" />
     <Content Include="crossdomain.xml" />
     <Content Include="EditPeerReviewTestPage.aspx" />
     <Content Include="EditPeerReviewTestPage.html" />
@@ -509,7 +511,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Controllers\Assignments\Wizard\" />
+    <Folder Include="Models\Wizard\" />
     <Folder Include="Validations\" />
+    <Folder Include="Views\Assignments\Wizard\" />
     <Folder Include="Views\SubbmissionAssignmentActivity\" />
     <Folder Include="Views\SubmissionAssignmentActivity\" />
   </ItemGroup>
@@ -621,6 +626,7 @@
     <Content Include="Views\Home\_AjaxEmpty.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Areas\AssignmentWizard\Views\Web.config" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />
@@ -699,15 +705,15 @@
     <Content Include="Views\Account\AccountCreated.cshtml" />
     <Content Include="Views\Account\ActivateAccount.cshtml" />
     <Content Include="Views\School\Delete.cshtml" />
-    <Content Include="Views\Assignments\Wizard\Index.cshtml" />
-    <Content Include="Views\Assignments\Wizard\Basics\Index.cshtml" />
-    <Content Include="Views\Assignments\Wizard\Wizard.cshtml" />
-    <Content Include="Views\Assignments\Wizard\Rubric\Index.cshtml" />
-    <Content Include="Views\Assignments\Wizard\Team\Index.cshtml" />
-    <Content Include="Views\Assignments\Wizard\WizardSummary.cshtml" />
-    <Content Include="Views\Assignments\Wizard\_WizardTopNav.cshtml" />
-    <Content Include="Views\Assignments\Wizard\_WizardBottomNav.cshtml" />
-    <Content Include="Views\Assignments\Wizard\Deliverables\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Home\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Basics\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Wizard.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Rubric\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Team\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\WizardSummary.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Shared\_WizardTopNav.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Shared\_WizardBottomNav.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Deliverables\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

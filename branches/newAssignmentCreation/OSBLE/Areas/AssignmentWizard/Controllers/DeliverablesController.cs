@@ -6,7 +6,7 @@ using System.Web.Mvc;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments;
 
-namespace OSBLE.Controllers.Assignments.Wizard
+namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
     public class DeliverablesController : WizardBaseController
     {
@@ -30,14 +30,14 @@ namespace OSBLE.Controllers.Assignments.Wizard
             }
         }
 
-        protected override object IndexAction()
+        protected object IndexAction()
         {
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
             ViewBag.AllowedFileNames = from c in FileSystem.GetCourseDocumentsFileList(activeCourse.AbstractCourse, includeParentLink: false).Files select c.Name;
             return Assignment;
         }
 
-        protected override object IndexActionPostback()
+        protected object IndexActionPostback(dynamic model)
         {
             ParseFormValues();
             return new object();
@@ -63,6 +63,7 @@ namespace OSBLE.Controllers.Assignments.Wizard
                 deliverableTypeKey = string.Format("{0}[{1}].Type", prefix, i);
                 databaseIdKey = string.Format("{0}[{1}].DatabaseId", prefix, i);
 
+                /*
                 if (Requeset.Form.AllKeys.Contains(deliverableNameKey))
                 {
 
@@ -98,6 +99,7 @@ namespace OSBLE.Controllers.Assignments.Wizard
                 }
 
                 i++;
+                 * */
             }
 
             //clear out old deliverables and reassign

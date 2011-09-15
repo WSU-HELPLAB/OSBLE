@@ -4,15 +4,21 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Reflection;
-using OSBLE.Models.Wizard;
 using OSBLE.Models.Assignments;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Remoting;
+using OSBLE.Controllers;
+using OSBLE.Areas.AssignmentWizard.Models;
+using OSBLE.Controllers.Assignments;
 
-namespace OSBLE.Controllers.Assignments.Wizard
+namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
     public abstract class WizardBaseController : OSBLEController, IComparable
     {
+        public static string previousWizardButton = "PreviousWizardButton";
+        public static string nextWizardButton = "NextWizardButton";
+        private WizardComponentManager manager;
+
         /// <summary>
         /// Returns the controller's name.  Must be unique.  The GET method should
         /// return a static string.
@@ -24,8 +30,6 @@ namespace OSBLE.Controllers.Assignments.Wizard
         /// page
         /// </summary>
         public abstract string ControllerDescription { get; }
-
-        protected HttpRequestBase Requeset { get; set; }
 
         /// <summary>
         /// Returns a list of WizardBaseControllers that must preceed the current controller.  
@@ -47,25 +51,73 @@ namespace OSBLE.Controllers.Assignments.Wizard
             ViewBag.Title = "Assignment Creation Wizard";
         }
 
-        private string BuildViewPath(string action)
+        public virtual ActionResult Index()
         {
-            string name = ControllerName.Replace("Controller", "");
-            return string.Format("{0}/{1}", name, action);
+            Assignment = new Assignment();
+            manager = WizardComponentManager.GetInstance();
+
+            if (manager.ActiveAssignmentId != 0)
+            {
+                Assignment = db.Assignments.Find(manager.ActiveAssignmentId);
+            }
+            else
+            {
+                Assignment = new Assignment();
+            }
+            return View();
         }
 
-        public ActionResult Index()
+        /*
+        [HttpPost]
+        public ActionResult Index(dynamic model)
         {
-            object model = IndexAction();
-            return View(BuildViewPath("Index"), model);
+            if (WasUpdateSuccessful)
+            {
+                //update the assignment ID.  Probably not necessary when working
+                //with existing assignments, but needed for new assignments.
+                manager.ActiveAssignmentId = Assignment.ID;
+
+                string errorPath = "";
+                WizardComponent comp = null;
+                if (Request.Form.AllKeys.Contains(previousWizardButton))
+                {
+                    comp = manager.GetPreviousComponent();
+                    errorPath = "Start";
+                }
+                else
+                {
+                    comp = manager.GetNextComponent();
+                    errorPath = "WizardSummary";
+                }
+
+                if (comp != null)
+                {
+                    return RedirectToRoute("AssignmentWizard", new { controller = manager.ActiveComponent.Name });
+                }
+                else
+                {
+                    return RedirectToRoute("AssignmentWizard", new { controller = errorPath });
+                }
+            }
+
+            return View(modifiedModel);
+        }
+         * */
+
+        public int CompareTo(object obj)
+        {
+            return this.ToString().CompareTo(obj.ToString());   
         }
 
-        public ActionResult Index(HttpRequestBase request)
+        public override string ToString()
         {
-            Requeset = request;
-            object modifiedModel = IndexActionPostback();
-            return View(BuildViewPath("Index"), modifiedModel);
+            return string.Format("{0}: {1}", this.ControllerName, this.ControllerDescription);
         }
 
+
+        #region scheduled_for_removal
+
+        /*
         /// <summary>
         /// Uses reflection to inject values from a web request into the supplied data
         /// store.
@@ -102,25 +154,8 @@ namespace OSBLE.Controllers.Assignments.Wizard
 
             return store;
         }
-
-        /// <summary>
-        /// Put all code needed for your index action into this method
-        /// </summary>
-        /// <param name="assignmentId"></param>
-        protected abstract object IndexAction();
-
-        /// <summary>
-        /// Put all code needed for your index postbacks into this method.
-        /// </summary>
-        /// <param name="model"></param>
-        protected abstract object IndexActionPostback();
-
-        public int CompareTo(object obj)
-        {
-            return this.ToString().CompareTo(obj.ToString());   
-        }
-
-        /// <summary>
+         * 
+         * /// <summary>
         /// Will attempt to cast the supplied value into the correct data type
         /// as defined by the supplied property
         /// </summary>
@@ -174,10 +209,8 @@ namespace OSBLE.Controllers.Assignments.Wizard
                 //property = null;
             }
         }
+        */
+        #endregion
 
-        public override string ToString()
-        {
-            return string.Format("{0}: {1}", this.ControllerName, this.ControllerDescription);
-        }
     }
 }

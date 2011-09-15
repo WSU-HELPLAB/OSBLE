@@ -1,8 +1,11 @@
-﻿@using OSBLE.Controllers.Assignments.Wizard;
-@using OSBLE.Models.Wizard;
+﻿@using OSBLE.Areas.AssignmentWizard.Controllers;
+@using OSBLE.Areas.AssignmentWizard.Models;
 @using System.Collections;
 @model ICollection<WizardComponent>
-@{ViewBag.Title = "Assignment Creation Wizard";}
+@{
+    ViewBag.Title = "Assignment Creation Wizard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    }
 <h1>Create Assignment</h1>
 <p>
 This wizard will guide you through the creation of a new assignment.  To begin, please select the components that will make up this assignment.

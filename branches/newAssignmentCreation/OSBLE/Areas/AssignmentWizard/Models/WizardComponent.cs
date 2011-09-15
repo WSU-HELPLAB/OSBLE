@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using OSBLE.Controllers.Assignments.Wizard;
+using OSBLE.Areas.AssignmentWizard.Controllers;
 
-namespace OSBLE.Models.Wizard
+namespace OSBLE.Areas.AssignmentWizard.Models
 {
     public class WizardComponent
     {

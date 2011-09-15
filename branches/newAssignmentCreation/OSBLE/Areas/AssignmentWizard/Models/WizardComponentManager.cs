@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using OSBLE.Controllers.Assignments.Wizard;
 using OSBLE.Models.Assignments;
+using OSBLE.Areas.AssignmentWizard.Controllers;
 
-namespace OSBLE.Models.Wizard
+namespace OSBLE.Areas.AssignmentWizard.Models
 {
     public class WizardComponentManager
     {
 
-        private const string studioAssignmentKey = "ComponentManagerStudioAssignmentKey";
+        private const string assignmentKey = "ComponentManagerStudioAssignmentKey";
         private const string activeComponentIndexKey = "ComponentManagerActiveComponentIndex";
         private const string instance = "_wcm_instance";
 
@@ -26,19 +26,19 @@ namespace OSBLE.Models.Wizard
         {
             get
             {
-                if (HttpContext.Current.Session[studioAssignmentKey] != null)
+                if (HttpContext.Current.Session[assignmentKey] != null)
                 {
-                    return (int)HttpContext.Current.Session[studioAssignmentKey];
+                    return (int)HttpContext.Current.Session[assignmentKey];
                 }
                 else
                 {
-                    HttpContext.Current.Session[studioAssignmentKey] = 0;
+                    HttpContext.Current.Session[assignmentKey] = 0;
                     return 0;
                 }
             }
             set
             {
-                HttpContext.Current.Session[studioAssignmentKey] = value;
+                HttpContext.Current.Session[assignmentKey] = value;
             }
         }
 

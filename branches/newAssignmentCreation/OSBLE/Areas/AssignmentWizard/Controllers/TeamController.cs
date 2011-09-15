@@ -7,7 +7,7 @@ using OSBLE.Models.ViewModels;
 using OSBLE.Models.Users;
 using OSBLE.Models.Courses;
 
-namespace OSBLE.Controllers.Assignments.Wizard
+namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
     public class TeamController : WizardBaseController
     {
@@ -45,14 +45,5 @@ namespace OSBLE.Controllers.Assignments.Wizard
             }
         }
 
-        protected override object IndexAction()
-        {
-            return BuildViewModel();
-        }
-
-        protected override object IndexActionPostback()
-        {
-            return new object();
-        }
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
-namespace OSBLE.Controllers.Assignments.Wizard
+namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
     public class RubricController : WizardBaseController
     {
@@ -26,16 +26,6 @@ namespace OSBLE.Controllers.Assignments.Wizard
                 prereqs.Add(new BasicsController());
                 return prereqs;
             }
-        }
-
-        protected override object IndexAction()
-        {
-            return new object();
-        }
-
-        protected override object IndexActionPostback()
-        {
-            return new object();
         }
     }
 }
