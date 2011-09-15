@@ -185,7 +185,7 @@
                             @{
                                 TeamUserMember teamUser = (OSBLEController.GetTeamUser(submission, ViewBag.CurrentUser as UserProfile));
                                 Score score = (from c in submission.Scores where c.TeamUserMemberID == teamUser.ID select c).FirstOrDefault();
-                                if (score == null)
+                                if ((score == null) || (score.Points < 0))
                                 {
                                     AjaxOptions options = new AjaxOptions()
                                     {
