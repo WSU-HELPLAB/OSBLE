@@ -35,11 +35,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
-        public override ActionResult Index()
+        private void BuildViewBag()
         {
-            base.Index();
-            ModelState.Clear();
-
             //SUBMISSION CATEGORIES
             var cat = from c in (activeCourse.AbstractCourse as Course).Categories
                       where c.Name != Constants.UnGradableCatagory
@@ -49,7 +46,13 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             //ASSIGNMENT TYPES
             var types = db.AssignmentTypes.ToList();
             ViewBag.AssignmentTypes = new SelectList(types, "Type", "Type");
+        }
 
+        public override ActionResult Index()
+        {
+            base.Index();
+            ModelState.Clear();
+            BuildViewBag();
             return View(Assignment);
         }
 
@@ -89,6 +92,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 WasUpdateSuccessful = false;
             }
+            BuildViewBag();
             return View(Assignment);
         }
     }

@@ -23,7 +23,7 @@ namespace OSBLE.Models.Assignments
 
         [Required(ErrorMessage = "Please specify this assignment's type")]
         [Display(Name = "Assignment Type")]
-        public AssignmentType AssignmentType { get; set; }
+        public string AssignmentType { get; set; }
 
         [Required(ErrorMessage = "Please specify an assignment name")]
         [Display(Name = "Assignment Name")]
@@ -103,16 +103,39 @@ namespace OSBLE.Models.Assignments
 
         public int? RubricID { get; set; }
         public virtual Rubric Rubric { get; set; }
-
+        
         public int? CommentCategoryID { get; set; }
         public virtual CommentCategoryConfiguration CommentCategory { get; set; }
 
-        public int? PrecededBy  { get; set; }
+        public int? PrecededingAssignmentID  { get; set; }
 
-        [Association("PrecedingAssignment", "PrecededBy", "ID")]
-        public virtual Assignment PrecedingAssignment { get; set; }
+        [ForeignKey("PrecededingAssignmentID")]
+        public virtual Assignment PreceedingAssignment { get; set; }
 
         [Association("Deliverables", "ID", "AssignmentID")]
         public virtual IList<Deliverable> Deliverables { get; set; }
+
+        /* AC: From edmx code generation for use as a reference.
+         * 
+         * public int ID { get; set; }
+        public string AssignmentType { get; set; }
+        public string AssignmentName { get; set; }
+        public string AssignmentDescription { get; set; }
+        public int CategoryID { get; set; }
+        public int PointsPossible { get; set; }
+        public System.DateTime ReleaseDate { get; set; }
+        public System.DateTime DueDate { get; set; }
+        public int HoursLateWindow { get; set; }
+        public decimal DeductionPerHourLate { get; set; }
+        public int ColumnOrder { get; set; }
+        public bool IsDraft { get; set; }
+        public Nullable<int> RubricID { get; set; }
+        public Nullable<int> CommentCategoryID { get; set; }
+        public Nullable<int> PrecededBy { get; set; }
+    
+        public virtual ICollection<Assignment> Assignments1 { get; set; }
+        public virtual Assignment Assignment1 { get; set; }
+        public virtual AssignmentType AssignmentType1 { get; set; }
+         * */
     }
 }

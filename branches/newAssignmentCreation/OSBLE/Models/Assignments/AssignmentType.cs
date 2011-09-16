@@ -15,5 +15,6 @@ namespace OSBLE.Models.Assignments
         {
             return Type;
         }
+
     }
 }
