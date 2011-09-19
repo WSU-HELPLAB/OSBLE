@@ -869,7 +869,7 @@ body#layoutLogOn
 .inbox_table
 {
 	border-collapse: collapse;
-	width: 100%;
+	width: 750px;
 }
 
 .inbox_table td
@@ -935,6 +935,7 @@ body#layoutLogOn
 	padding: 5px;
 	white-space: pre-line;
 	word-wrap: break-word;
+	width: 750px;
 }
 
 #add_update_users

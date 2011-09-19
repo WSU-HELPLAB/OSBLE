@@ -97,18 +97,33 @@ namespace OSBLE.Controllers
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            // Handles Reply and Forward
-            if (Request.Params["replyTo"] != null)
+            // Handles Reply, ReplyAll and Forward
+            if (Request.Params["replyTo"] != null || Request.Params["replyAll"] != null)
             {
-                var replyto = Convert.ToInt32(Request.Params["replyTo"]);
+                int replyto;
+                if (Request.Params["replyTo"] != null)
+                {
+                    replyto = Convert.ToInt32(Request.Params["replyTo"]);
+                }
+                else
+                {
+                    replyto = Convert.ToInt32(Request.Params["replyAll"]);
+                    recipientList = (from m in db.Mails
+                                     where m.ThreadID == replyto && m.ToUserProfileID != currentUser.ID
+                                     select m.ToUserProfile).ToList<UserProfile>();
+                }
+
                 Mail reply = db.Mails.Find(replyto);
+                
                 // Ensure valid reply user
                 if ((reply != null) && (reply.ToUserProfile == currentUser))
                 {
+                    recipientList.Add(reply.FromUserProfile); //Adds the sender to the reply list
                     string suffix = "RE: ";
-                    if (id == 0 ) // forward 0 is passed for the recipientid on forwards
+                    if (id == 0) // forward 0 is passed for the recipientid on forwards
                     {
                         suffix = "FW: ";
+                        recipientList.Clear(); // clears the recipients if it is a forward
                     }
                     ViewBag.MailHeader = mail.Subject = suffix + reply.Subject;
                     // Prefix each line with a '> '
@@ -116,17 +131,14 @@ namespace OSBLE.Controllers
                                     reply.FromUserProfile.LastName + "\nSent at: " + reply.Posted.ToString() + "\n\n" +
                                     Regex.Replace(reply.Message, "^.*$", "> $&",
                                     RegexOptions.Multiline);
-
+                }
+                else
+                {
+                    recipientList.Clear();
                 }
             }
-            if (id > 0 && canMail(id))
-            {
-                //adding recipients
-                UserProfile u = db.UserProfiles.Find(id);
-                recipientList.Add(u);
 
-                Session["mail_recipients"] = recipientList;
-            }
+            Session["mail_recipients"] = recipientList;
             return View(mail);
         }
 
@@ -162,6 +174,8 @@ namespace OSBLE.Controllers
                 if (recipient_string != null)
                 {
                     recipients = recipient_string.Split(',');
+                    int count = 0;
+                    int threadID = 0;
 
                     foreach (string id in recipients)
                     {
@@ -171,18 +185,26 @@ namespace OSBLE.Controllers
                         newMail.ToUserProfileID = Convert.ToInt32(id);
                         newMail.Subject = mail.Subject;
                         newMail.Message = mail.Message;
-                        newMail.ThreadID = mail.ID;
+                        newMail.ThreadID = threadID;
 
-                        //need to create the mail before we can send the notification
+                        //need to create the mail before we can send the notification and set the threadID
                         db.Mails.Add(newMail);
                         db.SaveChanges();
+
+                        if (count == 0)
+                        {
+                            threadID = newMail.ID;
+                            newMail.ThreadID = newMail.ID;
+
+                            db.Mails.Add(newMail);
+                            db.SaveChanges();
+                        }
 
                         using (NotificationController nc = new NotificationController())
                         {
                             nc.SendMailNotification(newMail);
                         }
-
-                        
+                        ++count;
                     }
 
                     return RedirectToAction("Index");
