@@ -101,20 +101,22 @@ namespace OSBLE.Controllers
             if (Request.Params["replyTo"] != null || Request.Params["replyAll"] != null)
             {
                 int replyto;
-                if (Request.Params["replyTo"] != null)
-                {
-                    replyto = Convert.ToInt32(Request.Params["replyTo"]);
-                }
-                else
+                
+                
+                if (Request.Params["replyAll"] != null)
                 {
                     replyto = Convert.ToInt32(Request.Params["replyAll"]);
                     recipientList = (from m in db.Mails
                                      where m.ThreadID == replyto && m.ToUserProfileID != currentUser.ID
                                      select m.ToUserProfile).ToList<UserProfile>();
                 }
+                else
+                {
+                    replyto = Convert.ToInt32(Request.Params["replyTo"]);
+                }
 
                 Mail reply = db.Mails.Find(replyto);
-                
+
                 // Ensure valid reply user
                 if ((reply != null) && (reply.ToUserProfile == currentUser))
                 {
