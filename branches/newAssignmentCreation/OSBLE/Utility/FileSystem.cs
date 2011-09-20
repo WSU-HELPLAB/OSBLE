@@ -46,7 +46,7 @@ namespace OSBLE
     {
         private static string getRootPath()
         {
-            return HttpContext.Current.Server.MapPath("\\FileSystem\\");
+            return HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
         }
 
         private static string getCoursePath(AbstractCourse course)
