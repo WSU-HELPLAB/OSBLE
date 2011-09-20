@@ -25,6 +25,9 @@ namespace OSBLE.Models.Assignments
         [Display(Name = "Assignment Type")]
         public string AssignmentType { get; set; }
 
+        [ForeignKey("AssignmentType")]
+        public AssignmentType Type { get; set; }
+
         [Required(ErrorMessage = "Please specify an assignment name")]
         [Display(Name = "Assignment Name")]
         public string AssignmentName { get; set; }

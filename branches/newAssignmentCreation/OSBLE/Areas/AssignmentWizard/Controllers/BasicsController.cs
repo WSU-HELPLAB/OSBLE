@@ -57,7 +57,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         }
 
         [HttpPost]
-        public ActionResult Index(Assignment model)
+        public new ActionResult Index(Assignment model)
         {
             Assignment = model;
             if (ModelState.IsValid)
@@ -93,7 +93,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 WasUpdateSuccessful = false;
             }
             BuildViewBag();
-            return View(Assignment);
+            return base.Index(Assignment);
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using OSBLE.Controllers;
 using OSBLE.Areas.AssignmentWizard.Models;
+using OSBLE.Models.Assignments;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -26,6 +27,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 int aid = (int)assignmentId;
                 manager.ActiveAssignmentId = aid;
+                ActivateAssignmentComponents(db.Assignments.Find(aid));
             }
             else
             {
@@ -39,11 +41,21 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public ActionResult Index(ICollection<WizardComponent> components)
         {
             ActivateSelectedComponents();
-            return RedirectToRoute("AssignmentWizard_default", new { controller = manager.ActiveComponent.Name });
+            return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute, new { controller = manager.ActiveComponent.Name });
+        }
+
+        private void ActivateAssignmentComponents(Assignment assignment)
+        {
+            manager.DeactivateAllComponents();
+            if (assignment.RubricID != null)
+            {
+                manager.GetComponentByType(typeof(RubricController)).IsSelected = true;
+            }
         }
 
         private void ActivateSelectedComponents()
         {
+            manager.DeactivateAllComponents();
             string componentPrefix = "component_";
             foreach (string key in Request.Form.AllKeys)
             {

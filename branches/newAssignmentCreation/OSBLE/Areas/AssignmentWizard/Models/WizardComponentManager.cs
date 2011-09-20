@@ -100,6 +100,14 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             return component;
         }
 
+        public WizardComponent GetComponentByType(Type type)
+        {
+            WizardComponent component = (from c in AllComponents
+                                         where c.Controller.GetType() == type
+                                         select c).FirstOrDefault();
+            return component;
+        }
+
         private WizardComponentManager()
         {
             AllComponents = new List<WizardComponent>();
@@ -122,6 +130,17 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             else
             {
                 return HttpContext.Current.Session[instance] as WizardComponentManager;
+            }
+        }
+
+        /// <summary>
+        /// Deactivates (set's IsSelected to false) all components.
+        /// </summary>
+        public void DeactivateAllComponents()
+        {
+            foreach (WizardComponent component in AllComponents)
+            {
+                component.IsSelected = false;
             }
         }
 

@@ -19,10 +19,6 @@ namespace OSBLE
         {
             //***When defining routes, be sure to go from specific to generic routes***
 
-            //because the file system is exposed to the web, we need to prevent direct
-            //file access
-            routes.RouteExistingFiles = true;
-
             //allow direct access to web services.
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             routes.IgnoreRoute("{resource}.svc/{*pathInfo}");

@@ -30,17 +30,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
-        protected object IndexAction()
+        public override ActionResult Index()
         {
-            ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
-            ViewBag.AllowedFileNames = from c in FileSystem.GetCourseDocumentsFileList(activeCourse.AbstractCourse, includeParentLink: false).Files select c.Name;
-            return Assignment;
-        }
-
-        protected object IndexActionPostback(dynamic model)
-        {
-            ParseFormValues();
-            return new object();
+            base.Index();
+            ModelState.Clear();
+            return View(new List<Deliverable>());
         }
 
         private void ParseFormValues()

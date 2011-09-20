@@ -5,6 +5,7 @@
 @using (@Html.BeginForm())
 {
 @Html.ValidationSummary() 
+@Html.HiddenFor(m => m.ID)
 <table class="wizard_entry_table">
     <tr>
         <th>@Html.LabelFor(m => m.AssignmentName):</th>
