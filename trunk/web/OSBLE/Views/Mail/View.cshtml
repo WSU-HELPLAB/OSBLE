@@ -18,11 +18,16 @@
         @Helpers.ProfilePicture(@Url.Action("ProfilePicture", new { ID = Model.FromUserProfileID }))
         @Model.FromUserProfile.FirstName @Model.FromUserProfile.LastName
     </div>
-    <div class="mail_user">
-        <b>To:</b><br />
-        @Helpers.ProfilePicture(@Url.Action("ProfilePicture", new { ID = Model.ToUserProfileID }))
-        @Model.ToUserProfile.FirstName @Model.ToUserProfile.LastName
+    <div id="mail_recipients" class="mail_user">
+        <div class="mail_user">
+            <b>To:</b><br />
+            @Helpers.ProfilePicture(@Url.Action("ProfilePicture", new { ID = Model.ToUserProfileID }))
+            @Model.ToUserProfile.FirstName @Model.ToUserProfile.LastName
+        </div>
     </div>
+    @{
+        
+    }
 
     <div style="margin-top: 115px">
     <p>
