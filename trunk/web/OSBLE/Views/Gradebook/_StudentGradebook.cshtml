@@ -376,14 +376,22 @@
                 foreach (Category category in ViewBag.CatsWithWeightsAndScores)
                 {
                     int count = 0;
-                    int numDropped = category.dropX;
+                    int numDropped;
                     int customize = category.Customize;
                     if (category.Name != Constants.UnGradableCatagory)
                     {
                         
                         if (category.Customize == (int)Category.GradeOptions.XtoTake)
                         {
-                            numDropped = userScores.Count() - numDropped;  
+                            numDropped = userScores.Count() - category.dropX;  
+                        }
+                        else if( category.dropX >= userScores.Count())
+                        {
+                            numDropped = userScores.Count() - 1;
+                        }
+                        else
+                        {
+                            numDropped = category.dropX;
                         }
                         
                         double categoryPoints = 0;
@@ -484,12 +492,20 @@
                     if (userScores.Count() > 0)
                     {
                         int count = 0;
-                        int numDropped = category.dropX;
+                        int numDropped;
                         int customize = category.Customize;
 
                         if (category.Customize == (int)Category.GradeOptions.XtoTake)
                         {
-                            numDropped = userScores.Count() - numDropped;
+                            numDropped = userScores.Count() - category.dropX;
+                        }
+                        else if (category.dropX >= userScores.Count())
+                        {
+                            numDropped = userScores.Count() - 1;
+                        }
+                        else 
+                        {
+                            numDropped = category.dropX;
                         }
 
                         if (category.Name != Constants.UnGradableCatagory)

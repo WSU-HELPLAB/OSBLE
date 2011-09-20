@@ -178,6 +178,7 @@
                 double totalAverage = 0;
                 double averagePoints = 0;
                 double averagePossible = 0;
+                int numStudents = 0;
 
                 //Make sure there is at least one score in the category
                 bool oneScore = false;
@@ -185,10 +186,11 @@
                 {
                     oneScore = true;
                     averagePoints += s.Points;
-                    averagePossible += s.AssignmentActivity.PointsPossible;
+                    //averagePossible += s.AssignmentActivity.PointsPossible;
+                    numStudents++;
                 }
-                double categoryScore = averagePoints / averagePossible;
-                totalAverage += categoryScore * 100;
+                double categoryScore = averagePoints / numStudents;
+                totalAverage += categoryScore;
                 if (oneScore == true)
                 {
                     <td id="averageScore">@totalAverage.ToString(".#")</td>  

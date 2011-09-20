@@ -936,7 +936,15 @@ namespace OSBLE.Controllers
                                 }
                                 else
                                 {
-                                    max = dropX;
+                                    // if dropx is more or equal to the number of assignments, it keeps the last one to calculate off of.
+                                    if (dropX >= scores.Count())
+                                    {
+                                        max = scores.Count() - 1;
+                                    }
+                                    else
+                                    {
+                                        max = dropX;
+                                    }
                                 }
                                 for (int j = 0; j < max; j++)
                                 {                                    
