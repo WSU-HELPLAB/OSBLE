@@ -8,7 +8,6 @@ using OSBLE.Models;
 using OSBLE.Models.AbstractCourses;
 using OSBLE.Models.AbstractCourses.Course;
 
-//using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
@@ -19,6 +18,7 @@ using OSBLE.Utility;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
 using OSBLE.Models.Assignments;
+using OSBLE.Models.Assignments.Activities.Scores;
 
 //AC: Please try to keep method names in alphabetical order
 namespace OSBLE.Controllers
@@ -130,6 +130,51 @@ namespace OSBLE.Controllers
                 basic.Assignment.AssignmentActivities.Add(stop);
                 db.StudioAssignments.Add(basic.Assignment);
 
+                db.SaveChanges();
+
+                //getting current assignment
+                AbstractAssignmentActivity currentActivity = (from a in db.AbstractAssignmentActivities
+                                                               where a.AbstractAssignment.ID == basic.Assignment.ID
+                                                               select a).First();
+
+                //Getting all the team users for the current assignment
+                ICollection<TeamUserMember> currentTeamUsers = (from a in db.AbstractAssignmentActivities
+                                                     where a.ID == currentActivity.ID
+                                                     select a.TeamUsers).First();
+
+                //creating a list called newscores and populating it with only 1 unique score per team or individual
+                List<Score> newScores = new List<Score>();
+                foreach(TeamUserMember tu in currentTeamUsers)
+                {
+                    bool alreadyInList = false;
+                    foreach(Score s in newScores) //looking through scores to see if there is already a teamUserMember with a score in the list
+                    {
+                        if (tu.ID == s.TeamUserMemberID)
+                        {
+                            alreadyInList = true;
+                            break; //Break out once weve found a match
+                        }
+                    }
+                    if (alreadyInList == false) //Only adding scores that are not added
+                    {
+                        Score newScore = new Score()
+                        {
+                            TeamUserMember = tu,
+                            Points = -1,
+                            AssignmentActivityID = currentActivity.ID,
+                            PublishedDate = DateTime.Now,
+                            isDropped = false,
+                            StudentPoints = -1
+                        };
+                        newScores.Add(newScore);
+                    }
+                }
+
+                //Now all the scores are compiled into a list. Add them into the db and save
+                foreach (Score s in newScores)
+                {
+                    db.Scores.Add(s);
+                }
                 db.SaveChanges();
 
                 //send out Events

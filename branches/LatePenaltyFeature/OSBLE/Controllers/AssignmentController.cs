@@ -300,6 +300,11 @@ namespace OSBLE.Controllers
                         //This checks when something was submitted by the folder modify time it is imperative that they don't get modified except when a student submits something to that folder.
                         submissionInfo.Time = GetSubmissionTime(activeCourse.AbstractCourse as Course, studioActivity, teamUser);
 
+                        //Getting the manual LatePenaltyPercent
+                       submissionInfo.ManualLatePenaltyPercent = (from s in db.Scores
+                                                                   where s.TeamUserMemberID == teamUser.ID
+                                                                   select s.ManualLatePenaltyPercent).First();
+
                         if (submissionInfo.Time != null)
                         {
                             numberOfSubmissions++;
@@ -313,6 +318,7 @@ namespace OSBLE.Controllers
                             submissionInfo.SubmitterID = teamUser.ID;
                             submissionInfo.Name = (teamUser as TeamMember).Team.Name;
                             submissionInfo.TeamList = createStringOfTeamMemebers((teamUser as TeamMember).Team.Members);
+
                         }
 
                         //else student
@@ -509,6 +515,25 @@ namespace OSBLE.Controllers
                 OnLoaded = "SLObjectLoaded",
                 Parameters = parameters
             };
+        }
+
+        /// <summary>
+        /// Changes ManaulLatePenalty value into the value passed in, for the user(s) corrisponding to the ID sent in.
+        /// </summary>
+        /// <param name="value"></param>
+        public void changeManualLatePenalty(double value, int teamUserMemeberID)
+        {
+            if (ModelState.IsValid)
+            {
+                Score mScore = (from s in db.Scores
+                                        where s.TeamUserMemberID == teamUserMemeberID
+                                        select s).FirstOrDefault();
+                if (mScore != null)
+                {
+                    mScore.ManualLatePenaltyPercent = value;
+                    db.SaveChanges();
+                }
+            }
         }
     }
 }

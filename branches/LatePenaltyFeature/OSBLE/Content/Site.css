@@ -1593,6 +1593,17 @@ ul.assignment_deliverables, .assignment_deliverables ul
         top: 33px;
         left: 400px;
     }
+    
+    .editButtonHidden
+    {
+        float: right;
+        font-size: small;
+        color: Blue; 
+        text-decoration: underline;
+        display:none;
+        cursor: pointer;
+        
+    }
 
 #WarningMessages
 {
