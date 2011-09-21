@@ -1,0 +1,10 @@
+﻿Things that need to be modified before merge:
+SubmissionController
+
+Things that need to be modified after merge:
+DB:
+    Assignments
+    AssignmentTypes
+    Deliverables
+    Teams
+    TeamMembers

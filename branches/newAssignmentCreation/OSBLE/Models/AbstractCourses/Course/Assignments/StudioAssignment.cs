@@ -6,7 +6,7 @@ namespace OSBLE.Models.Assignments
 {
     public class StudioAssignment : AbstractAssignment
     {
-        public virtual ICollection<Deliverable> Deliverables { get; set; }
+        public virtual ICollection<dynamic> Deliverables { get; set; }
 
         public StudioAssignment()
             : base()
@@ -15,7 +15,7 @@ namespace OSBLE.Models.Assignments
 
             if (Deliverables == null)
             {
-                Deliverables = new List<Deliverable>();
+                Deliverables = new List<dynamic>();
             }
         }
     }

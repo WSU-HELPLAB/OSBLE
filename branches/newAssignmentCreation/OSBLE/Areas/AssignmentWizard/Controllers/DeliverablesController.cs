@@ -30,11 +30,19 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
+        private void SetUpViewBag()
+        {
+            ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
+            ViewBag.AllowedFileNames = from c in FileSystem.GetCourseDocumentsFileList(activeCourse.AbstractCourse, includeParentLink: false).Files select c.Name;
+        }
+
         public override ActionResult Index()
         {
             base.Index();
             ModelState.Clear();
-            return View(new List<Deliverable>());
+            SetUpViewBag();
+
+            return View(Assignment);
         }
 
         private void ParseFormValues()

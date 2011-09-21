@@ -41,7 +41,7 @@ namespace OSBLE.Controllers
             throw new Exception();
         }
 
-        private void setViewBagDeliverables(ICollection<Deliverable> deliverables)
+        private void setViewBagDeliverables(ICollection<dynamic> deliverables)
         {
             Dictionary<Deliverable, string[]> allowedFileExtensions = new Dictionary<Deliverable, string[]>();
 
@@ -82,7 +82,7 @@ namespace OSBLE.Controllers
                 {
                     AbstractAssignment assignment = db.AbstractAssignments.Find(activity.AbstractAssignmentID);
 
-                    List<Deliverable> deliverables = new List<Deliverable>((assignment as StudioAssignment).Deliverables);
+                    List<dynamic> deliverables = new List<dynamic>((assignment as StudioAssignment).Deliverables);
 
                     if (assignment != null && assignment.Category.CourseID == activeCourse.AbstractCourseID && activeCourse.AbstractRole.CanSubmit == true && assignment is StudioAssignment)
                     {

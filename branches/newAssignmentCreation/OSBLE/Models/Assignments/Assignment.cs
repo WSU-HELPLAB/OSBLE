@@ -16,6 +16,7 @@ namespace OSBLE.Models.Assignments
             ReleaseDate = DateTime.Now;
             DueDate = DateTime.Now.AddDays(7.0);
             ColumnOrder = 0;
+            Deliverables = new List<Deliverable>();
         }
 
         [Key]
@@ -115,7 +116,7 @@ namespace OSBLE.Models.Assignments
         [ForeignKey("PrecededingAssignmentID")]
         public virtual Assignment PreceedingAssignment { get; set; }
 
-        [Association("Deliverables", "ID", "AssignmentID")]
+        [Association("FK_Deliverables_Assignments", "ID", "AssignmentID")]
         public virtual IList<Deliverable> Deliverables { get; set; }
 
         /* AC: From edmx code generation for use as a reference.

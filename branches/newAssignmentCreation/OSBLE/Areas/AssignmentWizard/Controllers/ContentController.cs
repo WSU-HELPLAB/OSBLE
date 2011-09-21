@@ -24,23 +24,17 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         /// </summary>
         /// <param name="pathInfo"></param>
         /// <returns></returns>
-        public string Index(string pathInfo)
+        public ActionResult Index(string pathInfo)
         {
             string path = Request.PhysicalApplicationPath + areaPath + pathInfo;
-            string content = "";
             try
             {
-                using (StreamReader reader = new StreamReader(path))
-                {
-                    content = reader.ReadToEnd();
-                }
+                return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream");
             }
             catch (Exception ex)
             {
-                return "File not found.";
+                return View();
             }
-            return content;
         }
-
     }
 }

@@ -288,6 +288,7 @@
     <Content Include="App_Data\FirstNames.txt" />
     <Content Include="App_Data\LastNames.txt" />
     <Content Include="Areas\AssignmentWizard\Content\Js\deliverables.js" />
+    <Content Include="Areas\AssignmentWizard\Modifications.txt" />
     <Content Include="clientaccesspolicy.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -630,6 +631,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\AssignmentWizard\Views\Web.config" />
+    <Content Include="Areas\AssignmentWizard\Views\Content\Index.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />
