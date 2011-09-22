@@ -3,7 +3,7 @@ using OSBLE.Models.Users;
 
 namespace OSBLE.Models.Courses
 {
-    public class CoursesUsers
+    public class CourseUsers
     {
         [Key]
         [Required]
@@ -32,7 +32,7 @@ namespace OSBLE.Models.Courses
 
         public bool Hidden { get; set; }
 
-        public CoursesUsers()
+        public CourseUsers()
             : base()
         {
             Hidden = false;
