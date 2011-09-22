@@ -1,5 +1,6 @@
 ﻿@model OSBLE.Models.Users.Mail
 @using OSBLE.Models
+@using OSBLE.Models.Users
 
 @{
     ViewBag.Title = "Mail";
@@ -18,16 +19,31 @@
         @Helpers.ProfilePicture(@Url.Action("ProfilePicture", new { ID = Model.FromUserProfileID }))
         @Model.FromUserProfile.FirstName @Model.FromUserProfile.LastName
     </div>
-    <div id="mail_recipients" class="mail_user">
-        <div class="mail_user">
-            <b>To:</b><br />
+
+    <div class="mail_user">
+        <b>To:</b><br />
+        @if (ViewBag.AllRecipients == null)
+        {
             @Helpers.ProfilePicture(@Url.Action("ProfilePicture", new { ID = Model.ToUserProfileID }))
             @Model.ToUserProfile.FirstName @Model.ToUserProfile.LastName
-        </div>
-    </div>
-    @{
+        }
+        else
+        {
+            foreach (UserProfile p in ViewBag.AllRecipients)
+            {
+                var id = p.ID;
+                var name = p.FirstName + " " + p.LastName;
         
-    }
+                <div id="@p.ID" class="recipient" >
+                    <a>
+                        <img src="@Url.Action("ProfilePicture")/@p.ID" class="small_profile_picture" alt="Profile Picture" />
+                        @p.FirstName @p.LastName
+                    </a>
+                </div>
+            }
+        }
+    </div>
+    <br />
 
     <div style="margin-top: 115px">
     <p>
@@ -39,7 +55,7 @@
                 <input type="hidden" name="recipientID" value="@Model.FromUserProfileID" />
                 <input type="hidden" name="replyTo" value="@Model.ID" />
                 <input type="submit" value="Reply" />  
-               //@Helpers.CreateToolTip(ToolTips.MailReply)  
+                //@Helpers.CreateToolTip(ToolTips.MailReply)  
             }
 
             //Reply all

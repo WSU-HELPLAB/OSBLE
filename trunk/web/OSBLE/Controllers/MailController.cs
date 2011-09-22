@@ -52,6 +52,13 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
                 SetUnreadMessageCount();
             }
+
+            // getting all recipients of the mail
+            List<UserProfile> recipients = (from m in db.Mails
+                                            where m.ThreadID == id 
+                                            select m.ToUserProfile).ToList();
+
+            ViewBag.AllRecipients = recipients;
             return View(mail);
         }
 
@@ -198,7 +205,6 @@ namespace OSBLE.Controllers
                             threadID = newMail.ID;
                             newMail.ThreadID = newMail.ID;
 
-                            db.Mails.Add(newMail);
                             db.SaveChanges();
                         }
 
@@ -208,7 +214,6 @@ namespace OSBLE.Controllers
                         }
                         ++count;
                     }
-
                     return RedirectToAction("Index");
                 }
             }

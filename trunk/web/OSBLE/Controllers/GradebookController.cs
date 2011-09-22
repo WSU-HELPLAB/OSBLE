@@ -780,8 +780,10 @@ namespace OSBLE.Controllers
                                             select scores).ToList();
                      
                    var studentScores = (from scores in scoreList
-                                        where scores.TeamUserMember.Contains(user)
+                                        where scores.TeamUserMember.Contains(user) &&
+                                        scores.isDropped == true
                                         select scores);
+                   
 
                    //var studentScores = from scores in db.Scores
                    //                    where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
@@ -929,26 +931,15 @@ namespace OSBLE.Controllers
                             for (int i = 0; i < studentScores.Count(); i++)
                             {
                                 List<Score> scores = studentScores.AsEnumerable().ElementAt(i).ToList();
-                                var max = 0;
+                                var max = dropX;
                                 if (customize == "XtoTake")
                                 {
                                     max = scores.Count() - dropX;
                                 }
-                                else
-                                {
-                                    // if dropx is more or equal to the number of assignments, it keeps the last one to calculate off of.
-                                    if (dropX >= scores.Count())
-                                    {
-                                        max = scores.Count() - 1;
-                                    }
-                                    else
-                                    {
-                                        max = dropX;
-                                    }
-                                }
+
                                 for (int j = 0; j < max; j++)
                                 {                                    
-                                    if (j < scores.Count())
+                                    if (j < scores.Count() - 1)
                                     {
                                         scores[j].isDropped = true;
                                     }
