@@ -5,6 +5,8 @@ using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -41,8 +43,22 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             base.Index();
             ModelState.Clear();
             SetUpViewBag();
-
             return View(Assignment);
+        }
+
+        [HttpPost]
+        public ActionResult Index(Assignment model)
+        {
+            Assignment = db.Assignments.Find(model.ID);
+            ParseFormValues();
+            WasUpdateSuccessful = true;
+
+            //update our DB.  Note that we don't have logic for inserting new assignments
+            //as we require that the basics controller come first and that handles new
+            //assignment creation.
+            db.Entry(Assignment).State = System.Data.EntityState.Modified;
+            db.SaveChanges();
+            return base.Index(model);
         }
 
         private void ParseFormValues()
@@ -64,36 +80,15 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 deliverableNameKey = string.Format("{0}[{1}].Name", prefix, i);
                 deliverableTypeKey = string.Format("{0}[{1}].Type", prefix, i);
                 databaseIdKey = string.Format("{0}[{1}].DatabaseId", prefix, i);
-
-                /*
-                if (Requeset.Form.AllKeys.Contains(deliverableNameKey))
+                
+                if (Request.Form.AllKeys.Contains(deliverableNameKey))
                 {
-
-                    //first, start with the ID
-                    int deliverableId = 0;
-                    if (!Int32.TryParse(Requeset.Form[databaseIdKey].ToString(), out deliverableId))
-                    {
-                        //something bad happened, get us out of here
-                        continue;
-                    }
-
-                    if (deliverableId != 0)
-                    {
-                        Deliverable previousDeliverable = Assignment.Deliverables.Where(d => d.AssignmentID == deliverableId).FirstOrDefault();
-                        if (previousDeliverable != null)
-                        {
-                            deliverables.Add(previousDeliverable);
-                        }
-                    }
-                    else
-                    {
-                        //build the new deliverable
-                        Deliverable deliverable = new Deliverable();
-                        deliverable.AssignmentID = 0;
-                        deliverable.Name = Requeset.Form[deliverableNameKey];
-                        deliverable.Type = Convert.ToInt32(Requeset.Form[deliverableTypeKey]);
-                        deliverables.Add(deliverable);
-                    }
+                    //build the new deliverable
+                    Deliverable deliverable = new Deliverable();
+                    deliverable.AssignmentID = Assignment.ID;
+                    deliverable.Name = Request.Form[deliverableNameKey];
+                    deliverable.Type = Convert.ToInt32(Request.Form[deliverableTypeKey]);
+                    deliverables.Add(deliverable);
                 }
                 else
                 {
@@ -101,7 +96,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 }
 
                 i++;
-                 * */
             }
 
             //clear out old deliverables and reassign

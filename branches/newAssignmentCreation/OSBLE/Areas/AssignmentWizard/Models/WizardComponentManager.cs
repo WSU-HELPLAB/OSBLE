@@ -92,8 +92,6 @@ namespace OSBLE.Areas.AssignmentWizard.Models
 
         public WizardComponent GetComponentByName(string name)
         {
-            //display start page if we're not on any particular step or if the step provided is
-            //invalid
             WizardComponent component = (from c in AllComponents
                                          where c.Name.CompareTo(name) == 0
                                          select c).FirstOrDefault();
@@ -134,7 +132,8 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         }
 
         /// <summary>
-        /// Deactivates (set's IsSelected to false) all components.
+        /// Deactivates (set's IsSelected to false) all components.  Returns the manager
+        /// to the default state.
         /// </summary>
         public void DeactivateAllComponents()
         {
@@ -142,6 +141,8 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             {
                 component.IsSelected = false;
             }
+            ActiveComponentIndex = 0;
+            SelectedComponents.Clear();
         }
 
         /// <summary>

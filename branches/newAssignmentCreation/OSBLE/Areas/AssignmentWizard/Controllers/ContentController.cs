@@ -18,8 +18,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         private string areaPath = "/Areas/AssignmentWizard/Content/";
 
         /// <summary>
-        /// Handles the translation of a web url to a file.  Presently just returns raw
-        /// text.  I'm not sure if this will work in all cases.  Also, I'm not using
+        /// Handles the translation of a web url to a file.  I'm not using
         /// any OSBLE authentication, which might want to be examined at some point.
         /// </summary>
         /// <param name="pathInfo"></param>
