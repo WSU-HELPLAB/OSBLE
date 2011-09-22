@@ -138,7 +138,7 @@ namespace OSBLE.Controllers
                 saveLetterGrades(course);
 
                 // Make current user an instructor on new course.
-                CoursesUsers cu = new CoursesUsers();
+                CourseUsers cu = new CourseUsers();
                 cu.AbstractCourseID = course.ID;
                 cu.UserProfileID = currentUser.ID;
                 cu.AbstractRoleID = (int)CourseRole.CourseRoles.Instructor;

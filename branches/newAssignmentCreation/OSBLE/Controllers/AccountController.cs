@@ -105,7 +105,7 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult UpdateMenu()
         {
-            foreach (CoursesUsers cu in currentCourses)
+            foreach (CourseUsers cu in currentCourses)
             {
                 bool newHidden = Convert.ToBoolean(Request.Params["cu_hidden_" + cu.AbstractCourseID]);
                 if (newHidden != cu.Hidden)

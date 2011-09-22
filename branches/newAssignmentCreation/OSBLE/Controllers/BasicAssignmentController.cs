@@ -342,7 +342,7 @@ namespace OSBLE.Controllers
 
             if (couresesUsers.Count > 0)
             {
-                foreach (CoursesUsers cu in couresesUsers)
+                foreach (CourseUsers cu in couresesUsers)
                 {
                     SerializableTeamMember teamMember = new SerializableTeamMember();
                     teamMember.IsModerator = cu.AbstractRole.ID == (int)CourseRole.CourseRoles.Moderator;
@@ -369,7 +369,7 @@ namespace OSBLE.Controllers
 
             //We want either all users or all teams.  Never both.
             var teamUserQuery = from tu in activity.TeamUsers
-                                where tu is TeamMember
+                                where tu is OldTeamMember
                                 select tu;
             List<TeamUserMember> members;
             if (teamUserQuery.Count() > 0)
@@ -392,7 +392,7 @@ namespace OSBLE.Controllers
                 {
                     UserMember uMember = member as UserMember;
 
-                    CoursesUsers cu = (from c in db.CoursesUsers
+                    CourseUsers cu = (from c in db.CoursesUsers
                                        where
                                           c.AbstractCourseID == activeCourse.AbstractCourseID
                                           &&
@@ -409,9 +409,9 @@ namespace OSBLE.Controllers
                     serializedMember.Section = cu.Section;
                     teamMembmers.Add(serializedMember);
                 }
-                else if (member is TeamMember)
+                else if (member is OldTeamMember)
                 {
-                    TeamMember tMember = member as TeamMember;
+                    OldTeamMember tMember = member as OldTeamMember;
                     foreach (TeamUserMember tum in tMember.Team.Members)
                     {
                         if (tum is UserMember)
@@ -421,7 +421,7 @@ namespace OSBLE.Controllers
 
                             UserMember uMember = tum as UserMember;
 
-                            CoursesUsers cu = (from c in db.CoursesUsers
+                            CourseUsers cu = (from c in db.CoursesUsers
                                                where
                                                   c.AbstractCourseID == activeCourse.AbstractCourseID
                                                   &&
@@ -506,7 +506,7 @@ namespace OSBLE.Controllers
                     //for every team create a new team and set the Team Name
                     foreach (var team in membersBySection.Value)
                     {
-                        Team team_db = new Team();
+                        OldTeam team_db = new OldTeam();
                         team_db.Name = team.Key;
 
                         //for every member of that team make a new TeamMember
@@ -524,8 +524,8 @@ namespace OSBLE.Controllers
                             }
                             else
                             {
-                                TeamMember teamMember = new TeamMember();
-                                teamMember.Team = (from c in db.Teams
+                                OldTeamMember teamMember = new OldTeamMember();
+                                teamMember.Team = (from c in db.OldTeams
                                                    where c.ID == serializeableMember.TeamID
                                                    select c).FirstOrDefault();
                                 teamMember.TeamID = teamMember.Team.ID;
@@ -535,10 +535,10 @@ namespace OSBLE.Controllers
                             team_db.Members.Add(teamUser_db);
                         }
 
-                        TeamMember tm = new TeamMember();
+                        OldTeamMember tm = new OldTeamMember();
                         tm.Team = team_db;
                         viewModel.Submission.TeamUsers.Add(tm);
-                        db.Teams.Add(team_db);
+                        db.OldTeams.Add(team_db);
                     }
                 }
                 //db.SaveChanges();

@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models.Users
 {
-    public class Team
+    public class OldTeam
     {
-        public Team()
+        public OldTeam()
         {
             Members = new List<TeamUserMember>();
         }

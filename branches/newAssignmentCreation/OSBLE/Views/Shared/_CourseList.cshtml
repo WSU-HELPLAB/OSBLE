@@ -10,7 +10,7 @@ using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_cour
         bool communityOptGroup = false;
         }
 
-        @foreach (OSBLE.Models.Courses.CoursesUsers cu in ViewBag.CurrentCourses)
+        @foreach (OSBLE.Models.Courses.CourseUsers cu in ViewBag.CurrentCourses)
         {
             // Skip hidden courses
             if(cu.Hidden) {
@@ -24,7 +24,7 @@ using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_cour
                 courseDisplay += " [INACTIVE]";
             }
 
-            CoursesUsers ac = ViewBag.ActiveCourse as CoursesUsers;
+            CourseUsers ac = ViewBag.ActiveCourse as CourseUsers;
             
             if(cu.AbstractCourse is Course && !courseOptGroup) {
                 courseOptGroup = true;

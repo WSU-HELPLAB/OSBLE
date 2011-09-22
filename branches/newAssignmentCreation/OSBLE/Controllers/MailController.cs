@@ -73,11 +73,11 @@ namespace OSBLE.Controllers
             }
             else
             {
-                foreach (CoursesUsers cu in currentCourses)
+                foreach (CourseUsers cu in currentCourses)
                 {
                     int courseID = cu.AbstractCourseID;
-                    CoursesUsers ourCu = currentCourses.Where(c => c.AbstractCourseID == courseID).FirstOrDefault();
-                    CoursesUsers theirCu = db.CoursesUsers.Where(c => (c.AbstractCourseID == courseID) && (c.UserProfileID == u.ID)).FirstOrDefault();
+                    CourseUsers ourCu = currentCourses.Where(c => c.AbstractCourseID == courseID).FirstOrDefault();
+                    CourseUsers theirCu = db.CoursesUsers.Where(c => (c.AbstractCourseID == courseID) && (c.UserProfileID == u.ID)).FirstOrDefault();
 
                     if ((ourCu != null) && (theirCu != null) && (!(ourCu.AbstractRole.Anonymized) || (theirCu.AbstractRole.CanGrade == true)))
                     {

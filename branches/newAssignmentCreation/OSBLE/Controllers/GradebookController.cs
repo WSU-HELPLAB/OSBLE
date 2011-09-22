@@ -356,7 +356,7 @@ namespace OSBLE.Controllers
             {
                 double studentTotalGrade = 0;
                 tableLine = "";
-                CoursesUsers courseUser = (from course in db.CoursesUsers
+                CourseUsers courseUser = (from course in db.CoursesUsers
                                            where course.UserProfileID == up.ID
                                            select course).FirstOrDefault();
 
@@ -618,11 +618,11 @@ namespace OSBLE.Controllers
             List<TeamUserMember> userMembers = new List<TeamUserMember>();
 
             int currentCourseId = ActiveCourse.AbstractCourseID;
-            List<CoursesUsers> Users = (from user in db.CoursesUsers
+            List<CourseUsers> Users = (from user in db.CoursesUsers
                                         where user.AbstractCourseID == currentCourseId
                                         select user).ToList();
 
-            foreach (CoursesUsers u in Users)
+            foreach (CourseUsers u in Users)
             {
                 UserMember userMember = new UserMember()
                 {
@@ -1763,7 +1763,7 @@ namespace OSBLE.Controllers
                                 select s).ToList();
 
 
-            List<CoursesUsers> courseUsers = (from users in db.CoursesUsers
+            List<CourseUsers> courseUsers = (from users in db.CoursesUsers
                                               where users.AbstractCourseID == currentCourseId
                                               select users).ToList();
 
@@ -2068,11 +2068,11 @@ namespace OSBLE.Controllers
 
             if (gradeAssignments.Count() == 0)
             {
-                List<CoursesUsers> Users = (from user in db.CoursesUsers
+                List<CourseUsers> Users = (from user in db.CoursesUsers
                                             where user.AbstractCourseID == currentCourseId
                                             select user).ToList();
 
-                foreach (CoursesUsers u in Users)
+                foreach (CourseUsers u in Users)
                 {
                     UserMember userMember = new UserMember()
                     {
@@ -2230,11 +2230,11 @@ namespace OSBLE.Controllers
                 db.Categories.Add(newCategory);
                 db.SaveChanges();
 
-                List<CoursesUsers> Users = (from user in db.CoursesUsers
+                List<CourseUsers> Users = (from user in db.CoursesUsers
                                             where user.AbstractCourseID == currentCourseId
                                             select user).ToList();
 
-                foreach (CoursesUsers u in Users)
+                foreach (CourseUsers u in Users)
                 {
                     UserMember userMember = new UserMember()
                     {

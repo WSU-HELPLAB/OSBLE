@@ -191,6 +191,7 @@
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\StudioActivity.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\SyncIssueVotingActivity.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\CommentCategoryOption.cs" />
+    <Compile Include="Models\AbstractCourses\Course\CourseUsers.cs" />
     <Compile Include="Models\AbstractCourses\Course\GradebookOptions\LetterGrade.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\CriteriaEvaluation.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Criterion.cs" />
@@ -202,7 +203,10 @@
     <Compile Include="Models\AbstractCourses\Course\Assignments\StudioAssignment.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\RubricEvaluation.cs" />
     <Compile Include="Models\Assignments\Assignment.cs" />
+    <Compile Include="Models\Assignments\AssignmentTeam.cs" />
     <Compile Include="Models\Assignments\AssignmentType.cs" />
+    <Compile Include="Models\Assignments\Team.cs" />
+    <Compile Include="Models\Assignments\TeamMember.cs" />
     <Compile Include="Models\HomePage\AbstractDashboard.cs" />
     <Compile Include="Models\AbstractCourses\AbstractRole.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\AbstractAssignmentActivity.cs" />
@@ -243,7 +247,6 @@
     <Compile Include="Services\ReviewInterfaceDomainService.cs" />
     <Compile Include="Services\RubricRiaService.cs" />
     <Compile Include="Services\SilverlightFaultBehavior.cs" />
-    <Compile Include="Services\TeamCreationService.cs" />
     <Compile Include="Services\UploaderWebService.svc.cs">
       <DependentUpon>UploaderWebService.svc</DependentUpon>
     </Compile>
@@ -274,7 +277,6 @@
     <Compile Include="Models\Users\Mail.cs" />
     <Compile Include="Models\AbstractCourses\Course\Course.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseRole.cs" />
-    <Compile Include="Models\AbstractCourses\CoursesUsers.cs" />
     <Compile Include="Models\HomePage\DashboardPost.cs" />
     <Compile Include="Models\HomePage\DashboardReply.cs" />
     <Compile Include="Models\HomePage\Notification.cs" />

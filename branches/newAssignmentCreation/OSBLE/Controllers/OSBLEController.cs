@@ -27,15 +27,15 @@ namespace OSBLE.Controllers
             get { return currentUser; }
         }
 
-        protected CoursesUsers activeCourse = null;
+        protected CourseUsers activeCourse = null;
 
-        public CoursesUsers ActiveCourse
+        public CourseUsers ActiveCourse
         {
             get { return activeCourse; }
         }
 
         protected HttpContext context = System.Web.HttpContext.Current;
-        protected List<CoursesUsers> currentCourses = new List<CoursesUsers>();
+        protected List<CourseUsers> currentCourses = new List<CourseUsers>();
 
         protected bool DashboardSingleCourseMode;
 
@@ -226,7 +226,7 @@ namespace OSBLE.Controllers
             {
                 // Sends the ViewBag the amount of unread mail messages the user has.
                 SetUnreadMessageCount();
-                List<CoursesUsers> allUsersCourses = db.CoursesUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
+                List<CourseUsers> allUsersCourses = db.CoursesUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
 
                 // Get list of courses this user is connected to. Remove inactive (for anyone other than instructors or observers) or hidden (for all) courses.
                 currentCourses = allUsersCourses.Where(cu => (cu.AbstractCourse is Course) &&
@@ -242,7 +242,7 @@ namespace OSBLE.Controllers
                 currentCourses = currentCourses.Concat(allUsersCourses.Where(cu => cu.AbstractCourse is Community).OrderBy(cu => cu.AbstractCourse.Name).ToList()).ToList();
 
                 // Only consider non-hidden courses as the active course.
-                List<CoursesUsers> activeCoursePool = currentCourses.Where(cu => cu.Hidden == false).ToList();
+                List<CourseUsers> activeCoursePool = currentCourses.Where(cu => cu.Hidden == false).ToList();
 
                 int activeCourseID;
 
@@ -302,9 +302,9 @@ namespace OSBLE.Controllers
             {
                 users.Add((teamUser as UserMember).UserProfile);
             }
-            else if (teamUser is TeamMember)
+            else if (teamUser is OldTeamMember)
             {
-                foreach (TeamUserMember member in (teamUser as TeamMember).Team.Members)
+                foreach (TeamUserMember member in (teamUser as OldTeamMember).Team.Members)
                 {
                     users.AddRange(GetAllUsers(member));
                 }

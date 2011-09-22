@@ -2,12 +2,12 @@
 
 namespace OSBLE.Models.Users
 {
-    public class TeamMember : TeamUserMember
+    public class OldTeamMember : TeamUserMember
     {
         [Required]
         public int TeamID { get; set; }
 
-        public virtual Team Team { get; set; }
+        public virtual OldTeam Team { get; set; }
 
         public override bool Contains(UserProfile user)
         {

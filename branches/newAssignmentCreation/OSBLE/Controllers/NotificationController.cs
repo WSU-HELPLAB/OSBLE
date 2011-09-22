@@ -97,7 +97,7 @@ namespace OSBLE.Controllers
         {
             List<int> sendToUsers = new List<int>();
 
-            CoursesUsers dpPosterCu = db.CoursesUsers.Where(cu => cu.AbstractCourseID == dp.CourseID && cu.UserProfileID == dp.UserProfileID).FirstOrDefault();
+            CourseUsers dpPosterCu = db.CoursesUsers.Where(cu => cu.AbstractCourseID == dp.CourseID && cu.UserProfileID == dp.UserProfileID).FirstOrDefault();
 
             // Send notification to original thread poster if poster is not anonymized,
             // are still in the course,
@@ -109,7 +109,7 @@ namespace OSBLE.Controllers
 
             foreach (DashboardReply dr in dp.Replies)
             {
-                CoursesUsers drPosterCu = db.CoursesUsers.Where(cu => cu.AbstractCourseID == dp.CourseID && cu.UserProfileID == dr.UserProfileID).FirstOrDefault();
+                CourseUsers drPosterCu = db.CoursesUsers.Where(cu => cu.AbstractCourseID == dp.CourseID && cu.UserProfileID == dr.UserProfileID).FirstOrDefault();
 
                 // Send notifications to each participant as long as they are not anonymized,
                 // are still in the course,

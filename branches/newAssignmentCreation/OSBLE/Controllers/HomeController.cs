@@ -184,7 +184,7 @@ namespace OSBLE.Controllers
         /// <param name="courseList"></param>
         private void setupPostDisplay(AbstractDashboard post)
         {
-            List<CoursesUsers> courseList = new List<CoursesUsers>();
+            List<CourseUsers> courseList = new List<CourseUsers>();
 
             // Get list of users in course, either from the root post or its parent in the case of a reply.
             if (post is DashboardPost)
@@ -199,10 +199,10 @@ namespace OSBLE.Controllers
             }
 
             // Get Course/User link for current user.
-            CoursesUsers currentCu = courseList.Where(c => c.UserProfileID == currentUser.ID).FirstOrDefault();
+            CourseUsers currentCu = courseList.Where(c => c.UserProfileID == currentUser.ID).FirstOrDefault();
 
             // " " for poster of post/reply.
-            CoursesUsers posterCu = courseList.Where(c => c.UserProfileID == post.UserProfileID).FirstOrDefault();
+            CourseUsers posterCu = courseList.Where(c => c.UserProfileID == post.UserProfileID).FirstOrDefault();
 
             // Setup Display Name/Display Title/Profile Picture/Mail Button/Delete Button
 
@@ -388,7 +388,7 @@ namespace OSBLE.Controllers
             dp.UserProfile = currentUser;
             dp.Posted = DateTime.Now;
 
-            List<CoursesUsers> CoursesToPost = new List<CoursesUsers>();
+            List<CourseUsers> CoursesToPost = new List<CourseUsers>();
 
             bool sendEmail = Convert.ToBoolean(Request.Form["send_email"]);
 
@@ -401,7 +401,7 @@ namespace OSBLE.Controllers
                 CoursesToPost = currentCourses.Where(cu => cu.AbstractCourse is Course && cu.AbstractRole.CanModify && !cu.Hidden).ToList();
             }
 
-            foreach (CoursesUsers cu in CoursesToPost)
+            foreach (CourseUsers cu in CoursesToPost)
             {
                 AbstractCourse c = null;
                 if (cu.AbstractCourse is AbstractCourse)
@@ -451,12 +451,12 @@ namespace OSBLE.Controllers
                             body += dp.Content;
                         }
 
-                        List<CoursesUsers> courseUsers = db.CoursesUsers.Where(coursesUsers => coursesUsers.AbstractCourseID == c.ID).ToList();
+                        List<CourseUsers> courseUsers = db.CoursesUsers.Where(coursesUsers => coursesUsers.AbstractCourseID == c.ID).ToList();
 
                         //Who gets this email?  If the instructor desires, we send to everyone
                         if (c != null && sendEmail && cu.AbstractRole.CanModify)
                         {
-                            foreach (CoursesUsers member in courseUsers)
+                            foreach (CourseUsers member in courseUsers)
                             {
                                 if (member.UserProfile.UserName != null) // Ignore pending users
                                 {
@@ -468,7 +468,7 @@ namespace OSBLE.Controllers
                         //that want to receive everything
                         else
                         {
-                            foreach (CoursesUsers member in courseUsers)
+                            foreach (CourseUsers member in courseUsers)
                             {
                                 if (member.UserProfile.UserName != null && member.UserProfile.EmailAllActivityPosts) // Ignore pending users
                                 {
@@ -509,7 +509,7 @@ namespace OSBLE.Controllers
             if (replyToPost != null)
             { // Does the post we're replying to exist?
                 // Are we a member of the course we're replying to?
-                CoursesUsers cu = (from c in currentCourses
+                CourseUsers cu = (from c in currentCourses
                                    where c.AbstractCourseID == replyToPost.CourseID
                                    select c).FirstOrDefault();
 
@@ -568,7 +568,7 @@ namespace OSBLE.Controllers
 
             if (dp != null)
             {
-                CoursesUsers cu = currentCourses.Where(c => c.AbstractCourse == dp.Course).FirstOrDefault();
+                CourseUsers cu = currentCourses.Where(c => c.AbstractCourse == dp.Course).FirstOrDefault();
                 if ((dp.UserProfileID == currentUser.ID) || ((cu != null) && (cu.AbstractRole.CanGrade)))
                 {
                     dp.Replies.Clear();
@@ -601,7 +601,7 @@ namespace OSBLE.Controllers
 
             if (dr != null)
             {
-                CoursesUsers cu = currentCourses.Where(c => c.AbstractCourse == dr.Parent.Course).FirstOrDefault();
+                CourseUsers cu = currentCourses.Where(c => c.AbstractCourse == dr.Parent.Course).FirstOrDefault();
                 if ((dr.UserProfileID == currentUser.ID) || ((cu != null) && (cu.AbstractRole.CanGrade)))
                 {
                     db.DashboardReplies.Remove(dr);
