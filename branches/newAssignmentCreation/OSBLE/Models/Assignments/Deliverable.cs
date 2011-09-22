@@ -25,13 +25,6 @@ namespace OSBLE.Models.Assignments
 
         [FileExtensions(new string[] { ".txt" })]
         InBrowserText,
-
-        /// <summary>
-        /// This file type is not supported by the Osble Review process and thus a Review process will not be allowed for this
-        /// file
-        /// </summary>
-        [FileExtensions(new string[] { ".*" })]
-        Other
     }
 
     /// <summary>
@@ -59,16 +52,21 @@ namespace OSBLE.Models.Assignments
     {
         [Key]
         [Required]
+        [Column(Order = 0)]
         public int AssignmentID { get; set; }
+        public Assignment Assignment { get; set; }
+
+        [Required]
+        [Key]
+        [Column(Order = 1)]
+        [Display(Name = "File Name")]
+        [RegularExpression(@"^[a-zA-Z0-9\._\-]*$",
+            ErrorMessage = "File names can only contain alphanumerics, '-', '_', and '.'")]
+        public string Name { get; set; }
 
         [Required]
         [Display(Name = "Type")]
         public int Type { get; set; }
 
-        [Required]
-        [Display(Name = "File Name")]
-        [RegularExpression(@"^[a-zA-Z0-9\._\-]*$",
-            ErrorMessage = "File names can only contain alphanumerics, '-', '_', and '.'")]
-        public string Name { get; set; }
     }
 }
