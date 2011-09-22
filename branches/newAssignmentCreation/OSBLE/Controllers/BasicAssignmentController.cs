@@ -335,7 +335,7 @@ namespace OSBLE.Controllers
         {
             List<SerializableTeamMember> teamMembmers = new List<SerializableTeamMember>();
 
-            var couresesUsers = (from c in db.CoursesUsers
+            var couresesUsers = (from c in db.CourseUsers
                                  where c.AbstractCourseID == activeCourse.AbstractCourseID
                                  && (c.AbstractRole.ID == (int)CourseRole.CourseRoles.Student)
                                  select c).ToList();
@@ -392,7 +392,7 @@ namespace OSBLE.Controllers
                 {
                     UserMember uMember = member as UserMember;
 
-                    CourseUsers cu = (from c in db.CoursesUsers
+                    CourseUsers cu = (from c in db.CourseUsers
                                        where
                                           c.AbstractCourseID == activeCourse.AbstractCourseID
                                           &&
@@ -421,7 +421,7 @@ namespace OSBLE.Controllers
 
                             UserMember uMember = tum as UserMember;
 
-                            CourseUsers cu = (from c in db.CoursesUsers
+                            CourseUsers cu = (from c in db.CourseUsers
                                                where
                                                   c.AbstractCourseID == activeCourse.AbstractCourseID
                                                   &&
@@ -546,7 +546,7 @@ namespace OSBLE.Controllers
             else
             {
                 viewModel.Submission.TeamUsers.Clear();
-                var users = from c in db.CoursesUsers
+                var users = from c in db.CourseUsers
                             where c.AbstractCourseID == activeCourse.AbstractCourseID
                             && c.AbstractRole.CanSubmit
                             select c.UserProfile;

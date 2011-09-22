@@ -226,7 +226,7 @@ namespace OSBLE.Controllers
             {
                 // Sends the ViewBag the amount of unread mail messages the user has.
                 SetUnreadMessageCount();
-                List<CourseUsers> allUsersCourses = db.CoursesUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
+                List<CourseUsers> allUsersCourses = db.CourseUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
 
                 // Get list of courses this user is connected to. Remove inactive (for anyone other than instructors or observers) or hidden (for all) courses.
                 currentCourses = allUsersCourses.Where(cu => (cu.AbstractCourse is Course) &&

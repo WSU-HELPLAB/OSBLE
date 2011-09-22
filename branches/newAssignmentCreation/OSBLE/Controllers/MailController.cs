@@ -77,7 +77,7 @@ namespace OSBLE.Controllers
                 {
                     int courseID = cu.AbstractCourseID;
                     CourseUsers ourCu = currentCourses.Where(c => c.AbstractCourseID == courseID).FirstOrDefault();
-                    CourseUsers theirCu = db.CoursesUsers.Where(c => (c.AbstractCourseID == courseID) && (c.UserProfileID == u.ID)).FirstOrDefault();
+                    CourseUsers theirCu = db.CourseUsers.Where(c => (c.AbstractCourseID == courseID) && (c.UserProfileID == u.ID)).FirstOrDefault();
 
                     if ((ourCu != null) && (theirCu != null) && (!(ourCu.AbstractRole.Anonymized) || (theirCu.AbstractRole.CanGrade == true)))
                     {
@@ -207,7 +207,7 @@ namespace OSBLE.Controllers
                 .Select(c => c.AbstractCourseID)
                 .ToList();
 
-            List<UserProfile> authorizedUsers = db.CoursesUsers
+            List<UserProfile> authorizedUsers = db.CourseUsers
                 .Where(c => authorizedCourses.Contains(c.AbstractCourseID))
                 .Select(c => c.UserProfile)
                 .ToList();
@@ -220,7 +220,7 @@ namespace OSBLE.Controllers
                 .Select(c => c.AbstractCourseID)
                 .ToList();
 
-            List<UserProfile> addedUsers = db.CoursesUsers
+            List<UserProfile> addedUsers = db.CourseUsers
                 .Where(c => addedCourses.Contains(c.AbstractCourseID) && ((c.UserProfileID == currentUser.ID) || (c.AbstractRole.CanGrade == true)))
                 .Select(c => c.UserProfile)
                 .ToList();

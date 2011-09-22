@@ -3,27 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using OSBLE.Models.ViewModels;
-using OSBLE.Models.Users;
+using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
     public class TeamController : WizardBaseController
     {
-
-        private TeamCreationViewModel BuildViewModel()
-        {
-            TeamCreationViewModel viewModel = new TeamCreationViewModel();
-            viewModel.Assignment = Assignment;
-            viewModel.Students = (from cu in db.CoursesUsers
-                                  join up in db.UserProfiles on cu.UserProfileID equals up.ID
-                                  where cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student
-                                  && cu.AbstractCourseID == activeCourse.AbstractCourseID
-                                  orderby up.LastName, up.FirstName
-                                  select up).ToList();
-            return viewModel;
-        }
 
         public override string ControllerName
         {
@@ -45,9 +31,38 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
+        private void SetUpViewBag()
+        {
+            //Guaranteed to pull all people enrolled in the course that can submit files
+            //(probably students).
+            List<CourseUsers> users = (from cu in db.CourseUsers
+                                       where cu.ID == activeCourse.ID
+                                       && cu.AbstractRole.CanSubmit
+                                       select cu).ToList();
+
+            //We'll need to cross the current teams with the list of course users
+            List<AssignmentTeam> teams = (from t in db.AssignmentTeams
+                                         where t.AssignmentID == Assignment.ID
+                                         select t).ToList();
+
+            //remove students currently on the team list from our complete user list
+            foreach (AssignmentTeam team in teams)
+            {
+                foreach (TeamMember member in team.Team.TeamMembers)
+                {
+                    users.Remove(member.CourseUser);
+                }
+            }
+
+            //place items into the viewbag
+            ViewBag.UnassignedUsers = users;
+            ViewBag.Teams = teams;
+        }
+
         public override ActionResult Index() 
         {
             base.Index();
+            SetUpViewBag();
             return View(Assignment);
         }
 

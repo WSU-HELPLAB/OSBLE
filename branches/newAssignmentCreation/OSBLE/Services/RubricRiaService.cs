@@ -69,7 +69,7 @@
         public IQueryable<AbstractCourse> GetCourses()
         {
             var courses = from course in db.AbstractCourses
-                          join cu in db.CoursesUsers on course.ID equals cu.AbstractCourseID
+                          join cu in db.CourseUsers on course.ID equals cu.AbstractCourseID
                           where cu.UserProfileID == currentUserProfile.ID
                           &&
                           (

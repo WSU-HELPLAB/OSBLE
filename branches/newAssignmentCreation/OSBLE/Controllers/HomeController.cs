@@ -190,12 +190,12 @@ namespace OSBLE.Controllers
             if (post is DashboardPost)
             {
                 DashboardPost dp = post as DashboardPost;
-                courseList = db.CoursesUsers.Where(c => c.AbstractCourseID == dp.CourseID).ToList();
+                courseList = db.CourseUsers.Where(c => c.AbstractCourseID == dp.CourseID).ToList();
             }
             else if (post is DashboardReply)
             {
                 DashboardReply dr = post as DashboardReply;
-                courseList = db.CoursesUsers.Where(c => c.AbstractCourseID == dr.Parent.CourseID).ToList();
+                courseList = db.CourseUsers.Where(c => c.AbstractCourseID == dr.Parent.CourseID).ToList();
             }
 
             // Get Course/User link for current user.
@@ -451,7 +451,7 @@ namespace OSBLE.Controllers
                             body += dp.Content;
                         }
 
-                        List<CourseUsers> courseUsers = db.CoursesUsers.Where(coursesUsers => coursesUsers.AbstractCourseID == c.ID).ToList();
+                        List<CourseUsers> courseUsers = db.CourseUsers.Where(CourseUsers => CourseUsers.AbstractCourseID == c.ID).ToList();
 
                         //Who gets this email?  If the instructor desires, we send to everyone
                         if (c != null && sendEmail && cu.AbstractRole.CanModify)
@@ -631,7 +631,7 @@ namespace OSBLE.Controllers
             // A role for both our current user and
             // the one we're trying to see
             AbstractRole ourRole = currentCourses.Where(c => c.AbstractCourseID == course).Select(c => c.AbstractRole).FirstOrDefault();
-            AbstractRole theirRole = db.CoursesUsers.Where(c => (c.AbstractCourseID == course) && (c.UserProfileID == userProfile)).Select(c => c.AbstractRole).FirstOrDefault();
+            AbstractRole theirRole = db.CourseUsers.Where(c => (c.AbstractCourseID == course) && (c.UserProfileID == userProfile)).Select(c => c.AbstractRole).FirstOrDefault();
 
             // Show picture if user is requesting their own profile picture or they have the right to view the profile picture
             if (userProfile == currentUser.ID ||

@@ -41,7 +41,7 @@
                                  where c.ID == activeCourse
                                  select c).FirstOrDefault();
 
-                currentCourseUser = (from c in db.CoursesUsers
+                currentCourseUser = (from c in db.CourseUsers
                                      where c.AbstractCourseID == currentCourse.ID
                                      && c.UserProfileID == currentUserProfile.ID
                                      select c).FirstOrDefault();

@@ -1,11 +1,11 @@
-﻿@using OSBLE.Models.Assignments.Activities;
+﻿@using OSBLE.Models.Courses;
 @using OSBLE.Models.Assignments;
+@using System.Collections.Generic;
 @using OSBLE.Models;
-@using OSBLE.Models.Users;
-@using OSBLE.Models.ViewModels;
-@model TeamCreationViewModel          
+@model Assignment          
 @{
-    int activeActivityId = 0;
+    List<CourseUsers> unassignedUsers = ViewBag.UnassignedUsers;
+    List<AssignmentTeam> teams = ViewBag.Teams;
 }
 @Html.Partial("_WizardTopNav")
 <style type="text/css">
@@ -90,13 +90,6 @@
     @Html.ValidationSummary()     
 
     <div id="TeamCreationOptions">
-        <select>
-            <option value="-1">Select Activity</option>
-            @foreach (AbstractAssignmentActivity activity in Model.Assignment.AssignmentActivities)
-            {
-                <option value="@activity.ID">@activity.Name</option>    
-            }
-        </select>
         <a id="CreateTeamLink" class="NoDecoration">
             <img src="@Url.Content("~/Content/images/add_up.png")" alt="Create New Team" title="Create New Team" />
             Create New Team </a>
@@ -104,11 +97,11 @@
     
     <div id="AvailableStudentList">
         <h3>
-            Available Students</h3>
+            Unassigned Students</h3>
         <ul id="AvailableStudent" class="TeamSortable">
-            @foreach (UserProfile student in Model.Students)
+            @foreach (CourseUsers cu in unassignedUsers)
             {
-                <li id="student_@(student.ID)" class="ui-state-default">@student.LastName, @student.FirstName</li>
+                <li id="cu_@(cu.ID)" class="ui-state-default">@cu.UserProfile.LastName, @cu.UserProfile.FirstName</li>
             }
         </ul>
     </div>

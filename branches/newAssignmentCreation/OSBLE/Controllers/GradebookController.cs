@@ -56,7 +56,7 @@ namespace OSBLE.Controllers
             List<int> doNotAdd = new List<int>();
             int currentCourseId = ActiveCourse.AbstractCourseID;
 
-            var students = from student in db.CoursesUsers
+            var students = from student in db.CourseUsers
                            where student.AbstractCourseID == currentCourseId
                            group student by student.UserProfile.ID into studentList
                            select studentList;
@@ -177,7 +177,7 @@ namespace OSBLE.Controllers
                             }
                             else if (index.Contains(count))
                             {
-                                var student = from stu in db.CoursesUsers
+                                var student = from stu in db.CourseUsers
                                               where stu.UserProfile.Identification == studentId
                                               select stu;
 
@@ -336,7 +336,7 @@ namespace OSBLE.Controllers
 
             //pull the students in the course.  Each student is a row.
             List<UserProfile> students = (from up in db.UserProfiles
-                                          join cu in db.CoursesUsers on up.ID equals cu.UserProfileID
+                                          join cu in db.CourseUsers on up.ID equals cu.UserProfileID
                                           where cu.AbstractCourseID == currentCourseId && cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student
                                           orderby up.LastName, up.FirstName
                                           select up).ToList();
@@ -356,7 +356,7 @@ namespace OSBLE.Controllers
             {
                 double studentTotalGrade = 0;
                 tableLine = "";
-                CourseUsers courseUser = (from course in db.CoursesUsers
+                CourseUsers courseUser = (from course in db.CourseUsers
                                            where course.UserProfileID == up.ID
                                            select course).FirstOrDefault();
 
@@ -618,7 +618,7 @@ namespace OSBLE.Controllers
             List<TeamUserMember> userMembers = new List<TeamUserMember>();
 
             int currentCourseId = ActiveCourse.AbstractCourseID;
-            List<CourseUsers> Users = (from user in db.CoursesUsers
+            List<CourseUsers> Users = (from user in db.CourseUsers
                                         where user.AbstractCourseID == currentCourseId
                                         select user).ToList();
 
@@ -1753,7 +1753,7 @@ namespace OSBLE.Controllers
 
             //pull the students in the course.  Each student is a row.
             List<UserProfile> studentList = (from up in db.UserProfiles
-                                             join cu in db.CoursesUsers on up.ID equals cu.UserProfileID
+                                             join cu in db.CourseUsers on up.ID equals cu.UserProfileID
                                              where cu.AbstractCourseID == currentCourseId && cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student
                                              orderby up.LastName, up.FirstName
                                              select up).ToList();
@@ -1763,7 +1763,7 @@ namespace OSBLE.Controllers
                                 select s).ToList();
 
 
-            List<CourseUsers> courseUsers = (from users in db.CoursesUsers
+            List<CourseUsers> courseUsers = (from users in db.CourseUsers
                                               where users.AbstractCourseID == currentCourseId
                                               select users).ToList();
 
@@ -1862,7 +1862,7 @@ namespace OSBLE.Controllers
                                          select category).ToList();
 
             List<UserProfile> studentList = (from up in db.UserProfiles
-                                             join cu in db.CoursesUsers on up.ID equals cu.UserProfileID
+                                             join cu in db.CourseUsers on up.ID equals cu.UserProfileID
                                              where cu.AbstractCourseID == currentCourseId && cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student
                                              orderby up.LastName, up.FirstName
                                              select up).ToList();
@@ -1873,7 +1873,7 @@ namespace OSBLE.Controllers
             List<UserProfile> currentUser = new List<UserProfile>();
             currentUser.Add(CurrentUser);
 
-            int sectionNumber = (from section in db.CoursesUsers
+            int sectionNumber = (from section in db.CourseUsers
                                  where section.UserProfileID == CurrentUser.ID
                                  select section.Section).FirstOrDefault();
 
@@ -2068,7 +2068,7 @@ namespace OSBLE.Controllers
 
             if (gradeAssignments.Count() == 0)
             {
-                List<CourseUsers> Users = (from user in db.CoursesUsers
+                List<CourseUsers> Users = (from user in db.CourseUsers
                                             where user.AbstractCourseID == currentCourseId
                                             select user).ToList();
 
@@ -2129,7 +2129,7 @@ namespace OSBLE.Controllers
 
             //pull the students in the course.  Each student is a row.
             List<UserProfile> students = (from up in db.UserProfiles
-                                          join cu in db.CoursesUsers on up.ID equals cu.UserProfileID
+                                          join cu in db.CourseUsers on up.ID equals cu.UserProfileID
                                           where cu.AbstractCourseID == currentCourseId && cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student
                                           orderby up.LastName, up.FirstName
                                           select up).ToList();
@@ -2230,7 +2230,7 @@ namespace OSBLE.Controllers
                 db.Categories.Add(newCategory);
                 db.SaveChanges();
 
-                List<CourseUsers> Users = (from user in db.CoursesUsers
+                List<CourseUsers> Users = (from user in db.CourseUsers
                                             where user.AbstractCourseID == currentCourseId
                                             select user).ToList();
 

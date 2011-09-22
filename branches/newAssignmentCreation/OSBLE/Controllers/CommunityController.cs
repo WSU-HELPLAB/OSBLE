@@ -43,7 +43,7 @@ namespace OSBLE.Controllers
                 cu.UserProfileID = currentUser.ID;
                 cu.AbstractRoleID = (int)CommunityRole.OSBLERoles.Leader;
 
-                db.CoursesUsers.Add(cu);
+                db.CourseUsers.Add(cu);
                 db.SaveChanges();
 
                 Session["ActiveCourse"] = community.ID;

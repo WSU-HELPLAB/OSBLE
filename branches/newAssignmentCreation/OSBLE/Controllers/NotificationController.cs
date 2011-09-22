@@ -97,7 +97,7 @@ namespace OSBLE.Controllers
         {
             List<int> sendToUsers = new List<int>();
 
-            CourseUsers dpPosterCu = db.CoursesUsers.Where(cu => cu.AbstractCourseID == dp.CourseID && cu.UserProfileID == dp.UserProfileID).FirstOrDefault();
+            CourseUsers dpPosterCu = db.CourseUsers.Where(cu => cu.AbstractCourseID == dp.CourseID && cu.UserProfileID == dp.UserProfileID).FirstOrDefault();
 
             // Send notification to original thread poster if poster is not anonymized,
             // are still in the course,
@@ -109,7 +109,7 @@ namespace OSBLE.Controllers
 
             foreach (DashboardReply dr in dp.Replies)
             {
-                CourseUsers drPosterCu = db.CoursesUsers.Where(cu => cu.AbstractCourseID == dp.CourseID && cu.UserProfileID == dr.UserProfileID).FirstOrDefault();
+                CourseUsers drPosterCu = db.CourseUsers.Where(cu => cu.AbstractCourseID == dp.CourseID && cu.UserProfileID == dr.UserProfileID).FirstOrDefault();
 
                 // Send notifications to each participant as long as they are not anonymized,
                 // are still in the course,
@@ -144,7 +144,7 @@ namespace OSBLE.Controllers
         public void SendEventApprovalNotification(Event e)
         {
             // Get all instructors in the course.
-            List<UserProfile> instructors = db.CoursesUsers.Where(c => (c.AbstractCourseID == e.CourseID)
+            List<UserProfile> instructors = db.CourseUsers.Where(c => (c.AbstractCourseID == e.CourseID)
                 && (c.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor))
                 .Select(c => c.UserProfile).ToList();
 
@@ -200,7 +200,7 @@ namespace OSBLE.Controllers
         {
             if (activity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID)
             {
-                var canGrade = (from c in db.CoursesUsers
+                var canGrade = (from c in db.CourseUsers
                                 where c.AbstractCourseID == activeCourse.AbstractCourseID
                                 && c.AbstractRole.CanGrade
                                 select c.UserProfile).ToList();

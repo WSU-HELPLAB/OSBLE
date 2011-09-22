@@ -17,6 +17,6 @@ namespace OSBLE.Models.Assignments
         [Key]
         [Column(Order=1)]
         public int CourseUserID { get; set; }
-        public CourseUsers CourseUser;
+        public CourseUsers CourseUser { get; set; }
     }
 }

@@ -158,7 +158,7 @@ namespace OSBLE.Controllers
                 course.Categories.Add(category);
                 db.Categories.Add(category);
 
-                db.CoursesUsers.Add(cu);
+                db.CourseUsers.Add(cu);
                 db.SaveChanges();
 
                 Session["ActiveCourse"] = course.ID;
