@@ -383,15 +383,11 @@
                         
                         if (category.Customize == (int)Category.GradeOptions.XtoTake)
                         {
-                            numDropped = userScores.Count() - category.dropX;  
-                        }
-                        else if( category.dropX >= userScores.Count())
-                        {
-                            numDropped = userScores.Count() - 1;
-                        }
-                        else
-                        {
-                            numDropped = category.dropX;
+                            int categoryScoreCount = (from score in userScores
+                                                      where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
+                                                      select score).Count();
+                            
+                            numDropped = categoryScoreCount - numDropped;  
                         }
                         
                         double categoryPoints = 0;
@@ -497,15 +493,11 @@
 
                         if (category.Customize == (int)Category.GradeOptions.XtoTake)
                         {
-                            numDropped = userScores.Count() - category.dropX;
-                        }
-                        else if (category.dropX >= userScores.Count())
-                        {
-                            numDropped = userScores.Count() - 1;
-                        }
-                        else 
-                        {
-                            numDropped = category.dropX;
+                            int categoryScoreCount = (from score in userScores
+                                                      where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
+                                                      select score).Count();
+                            
+                            numDropped = categoryScoreCount - numDropped;                            
                         }
 
                         if (category.Name != Constants.UnGradableCatagory)
