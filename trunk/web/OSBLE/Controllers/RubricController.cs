@@ -262,9 +262,9 @@ namespace OSBLE.Controllers
 
                     if (categoryMaxPoints >= 0)
                     {
-                        if (studentScore > categoryMaxPoints)
+                        if (((studentScore/vm.SelectedAssignmentActivity.PointsPossible)*100) > categoryMaxPoints)
                         {
-                            studentScore = categoryMaxPoints;
+                            studentScore = (vm.SelectedAssignmentActivity.PointsPossible * (categoryMaxPoints / 100));
                         }
                     }
                     if (grade != null)

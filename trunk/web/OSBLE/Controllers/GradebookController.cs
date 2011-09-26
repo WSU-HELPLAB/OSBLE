@@ -208,9 +208,9 @@ namespace OSBLE.Controllers
                                             var teamuser = from c in currentAssignment.TeamUsers where c.Contains(user) select c;
                                             if (categoryMaxPoints >= 0)
                                             {
-                                                if (points > categoryMaxPoints)
+                                                if (((points/currentAssignment.PointsPossible)*100) > categoryMaxPoints)
                                                 {
-                                                    points = categoryMaxPoints;
+                                                    points = (currentAssignment.PointsPossible * (categoryMaxPoints / 100));
                                                 }
                                             }
                                             if (teamuser.Count() > 0)
@@ -1498,14 +1498,45 @@ namespace OSBLE.Controllers
 
                     foreach (Score score in scores)
                     {
-                        if (score.Points > value)
+                        if (((score.Points/score.AssignmentActivity.PointsPossible)*100) > value)
                         {
-                            score.Points = value;
+                            score.Points = (score.AssignmentActivity.PointsPossible * (value / 100));
                         }
-                        if (score.StudentPoints > value)
+                        if (((score.StudentPoints/score.AssignmentActivity.PointsPossible)*100) > value)
                         {
-                            score.StudentPoints = value;
+                            score.StudentPoints = (score.AssignmentActivity.PointsPossible * (value / 100));
                         }
+                    }
+                    db.SaveChanges();
+                }
+            }
+            return View("_Gradebook");
+        }
+
+        [HttpPost]
+        public ActionResult RemoveModifyMaxPoints()
+        {
+            if (ModelState.IsValid)
+            {
+                //Get the current category
+                int currentCategoryId = (int)Session["categoryId"];
+                Category currentCategory = db.Categories.Find(currentCategoryId);
+
+                //Set the current categories max assignment score to -1
+                currentCategory.MaxAssignmentScore = -1;
+                db.SaveChanges();
+
+                List<Score> scores = (from score in db.Scores
+                                      where score.AssignmentActivity.AbstractAssignment.CategoryID == currentCategoryId
+                                      select score).ToList();
+
+                //If there are scores, set the student scores to their raw scores and 
+                //save the database.
+                if (scores.Count() > 0)
+                {
+                    foreach (Score score in scores)
+                    {
+                        score.Points = score.RawPoints;
                     }
                     db.SaveChanges();
                 }
@@ -1588,9 +1619,9 @@ namespace OSBLE.Controllers
 
                             if (currentCategory.MaxAssignmentScore > 0)
                             {
-                                if (value > currentCategory.MaxAssignmentScore)
+                                if (((value/currentAssignment.PointsPossible)*100) > currentCategory.MaxAssignmentScore)
                                 {
-                                    value = currentCategory.MaxAssignmentScore;
+                                    value = (currentAssignment.PointsPossible * (currentCategory.MaxAssignmentScore / 100));
                                 }
                             }
 
@@ -1659,9 +1690,9 @@ namespace OSBLE.Controllers
                             var teamuser = from c in currentAssignment.TeamUsers where c.Contains(student) select c;
                             if (currentCategory.MaxAssignmentScore > 0)
                             {
-                                if (value > currentCategory.MaxAssignmentScore)
+                                if (((value/currentAssignment.PointsPossible)*100) > currentCategory.MaxAssignmentScore)
                                 {
-                                    value = currentCategory.MaxAssignmentScore;
+                                    value = (currentAssignment.PointsPossible * (currentCategory.MaxAssignmentScore / 100));
                                 }
                             }
 
