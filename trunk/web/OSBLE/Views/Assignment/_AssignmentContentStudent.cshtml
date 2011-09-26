@@ -45,7 +45,7 @@
                             <div class="user_controls">
                             @if (member.UserProfile.UserName != null)
                             {
-                            <a title="Mail This User" href="@Url.Action("Create", "Mail", new { recipientID = member.UserProfile.ID })">@Helpers.MailButton()</a>
+                            <a title="Mail This User" href="@Url.Action("Create", "Mail", new { id = member.UserProfile.ID })">@Helpers.MailButton()</a>
                             }
                             
                             </div>
@@ -57,6 +57,9 @@
                     }
                     </ul>
                 </div>
+                @*<div>
+                    <a title="Email whole team" href="@Url.Action("Create", "Mail", new { id = -4, teamID = team.Team.ID })">Email the whole team</a>
+                </div>*@
                 
             }
             @if (sa.Deliverables.Count > 0)

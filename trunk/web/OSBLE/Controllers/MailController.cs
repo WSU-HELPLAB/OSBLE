@@ -97,7 +97,7 @@ namespace OSBLE.Controllers
             return false;
         }
 
-        public ActionResult Create(int? id)
+        public ActionResult Create(int? id, int? teamID)
         {
             ViewBag.MailHeader = "New Message";
             
@@ -114,37 +114,51 @@ namespace OSBLE.Controllers
             if (id.HasValue)
             {
                 int whoTo = (int)id;
-                // Instructor or Instructor and TA(s)
+                // Instructor or Instructor and TA(s) or Whole team
                 if (whoTo < 0)
                 {
-                    if (whoTo == -1 || whoTo == -3)
+                    if(whoTo == -4)
                     {
-                        List<CoursesUsers> instructors = db.CoursesUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "Instructor")).ToList();
-                        if (instructors != null)
+                        if(teamID.HasValue)
                         {
-                            foreach (CoursesUsers cu in instructors)
-                            {
-                                recipientList.Add(cu.UserProfile);
-                            }
+                            // this returns an empty list for some reason, must investigate.
+                            recipientList = (from t in db.Teams
+                                            where t.ID == teamID
+                                            select t.Members) as List<UserProfile>;
+                            recipientList.Remove(currentUser);
                         }
                     }
-                    // TA(s) or Instructor and TA(s)
-                    if (whoTo == -2 || whoTo == -3)
+                    else if( whoTo >= -3 && whoTo <= -1)// Instructor or Instructor and TA(s)
                     {
-                        List<CoursesUsers> tas = db.CoursesUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "TA")).ToList();
-
-                        if (tas != null)
+                        if (whoTo == -1 || whoTo == -3)
                         {
-                            foreach (CoursesUsers cu in tas)
+                            List<CoursesUsers> instructors = db.CoursesUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "Instructor")).ToList();
+                            if (instructors != null)
                             {
-                                recipientList.Add(cu.UserProfile);
+                                foreach (CoursesUsers cu in instructors)
+                                {
+                                    recipientList.Add(cu.UserProfile);
+                                }
+                            }
+                        }
+                        // TA(s) or Instructor and TA(s)
+                        if (whoTo == -2 || whoTo == -3)
+                        {
+                            List<CoursesUsers> tas = db.CoursesUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "TA")).ToList();
+
+                            if (tas != null)
+                            {
+                                foreach (CoursesUsers cu in tas)
+                                {
+                                    recipientList.Add(cu.UserProfile);
+                                }
                             }
                         }
                     }
                 }
                 else // Student Id
                 {
-                    CoursesUsers studentRec = db.CoursesUsers.Where(c => c.UserProfileID == whoTo).FirstOrDefault();
+                    CoursesUsers studentRec = db.CoursesUsers.Where(c => (c.UserProfileID == whoTo) && (c.AbstractCourseID == aCourseID)).FirstOrDefault();
                     if (studentRec != null)
                     {
                         recipientList.Add(studentRec.UserProfile);
