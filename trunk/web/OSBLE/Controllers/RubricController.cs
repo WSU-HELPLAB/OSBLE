@@ -234,8 +234,8 @@ namespace OSBLE.Controllers
                                                 select c.Weight).Sum();
                     double studentScore = 0.0;
                     double rawStudentScore = -1;
-                    double categoryMaxPoints = grade.AssignmentActivity.AbstractAssignment.Category.MaxAssignmentScore;
-
+                    double categoryMaxPoints = vm.SelectedAssignmentActivity.AbstractAssignment.Category.MaxAssignmentScore;
+                    
                     foreach (CriterionEvaluation critEval in vm.Evaluation.CriterionEvaluations)
                     {
                         studentScore += (double)critEval.Score / maxLevelScore * (critEval.Criterion.Weight / totalRubricPoints);
