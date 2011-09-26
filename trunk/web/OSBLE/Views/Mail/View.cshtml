@@ -62,7 +62,7 @@
             using (Html.BeginForm("Create", "Mail", FormMethod.Get))
             {
                 <input type="hidden" name="recipientID" value="@Model.FromUserProfileID" />
-                <input type="hidden" name="replyAll" value="@Model.ID" />
+                <input type="hidden" name="replyAll" value="@Model.ThreadID" />
                 <input type="submit" value="Reply All" />  
                 //@Helpers.CreateToolTip(ToolTips.MailReply)  
             }
@@ -106,7 +106,7 @@
     using (Html.BeginForm("Create", "Mail", FormMethod.Get))
     {
         <input type="hidden" name="recipientID" value="@Model.FromUserProfileID" />
-        <input type="hidden" name="replyTo" value="@Model.ID" />
+        <input type="hidden" name="replyAll" value="@Model.ThreadID" />
         <input type="submit" value="Reply All" />  
         //@Helpers.CreateToolTip(ToolTips.MailReply)  
     }

@@ -53,6 +53,7 @@ namespace OSBLE.Controllers
                 SetUnreadMessageCount();
             }
 
+            id = mail.ThreadID;
             // getting all recipients of the mail
             List<UserProfile> recipients = (from m in db.Mails
                                             where m.ThreadID == id 
@@ -96,54 +97,101 @@ namespace OSBLE.Controllers
             return false;
         }
 
-        public ActionResult Create()
+        public ActionResult Create(int? id)
         {
             ViewBag.MailHeader = "New Message";
-
-            int id = Convert.ToInt32(Request.Params["recipientID"]);
+            
+            int ID = Convert.ToInt32(Request.Params["recipientID"]);
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            // Handles Reply, ReplyAll and Forward
-            if (Request.Params["replyTo"] != null || Request.Params["replyAll"] != null)
+            // gets the current courseid
+            int aCourseID = (int)context.Session["ActiveCourse"];
+
+            mail.ContextID = aCourseID;
+
+            // mail for instructors or TA(S)
+            if (id.HasValue)
             {
-                int replyto;
-                
-                
-                if (Request.Params["replyAll"] != null)
+                int whoTo = (int)id;
+                // Instructor or Instructor and TA(s)
+                if (whoTo == 1 || whoTo == 3)
                 {
-                    replyto = Convert.ToInt32(Request.Params["replyAll"]);
-                    recipientList = (from m in db.Mails
-                                     where m.ThreadID == replyto && m.ToUserProfileID != currentUser.ID
-                                     select m.ToUserProfile).ToList<UserProfile>();
-                }
-                else
-                {
-                    replyto = Convert.ToInt32(Request.Params["replyTo"]);
-                }
-
-                Mail reply = db.Mails.Find(replyto);
-
-                // Ensure valid reply user
-                if ((reply != null) && (reply.ToUserProfile == currentUser))
-                {
-                    recipientList.Add(reply.FromUserProfile); //Adds the sender to the reply list
-                    string suffix = "RE: ";
-                    if (id == 0) // forward 0 is passed for the recipientid on forwards
+                    List<CoursesUsers> instructors = db.CoursesUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "Instructor")).ToList();
+                    if (instructors != null)
                     {
-                        suffix = "FW: ";
-                        recipientList.Clear(); // clears the recipients if it is a forward
+                        foreach (CoursesUsers cu in instructors)
+                        {
+                            recipientList.Add(cu.UserProfile);
+                        }
                     }
-                    ViewBag.MailHeader = mail.Subject = suffix + reply.Subject;
-                    // Prefix each line with a '> '
-                    mail.Message = "\n\nOriginal Message \nFrom: " + reply.FromUserProfile.FirstName + " " +
-                                    reply.FromUserProfile.LastName + "\nSent at: " + reply.Posted.ToString() + "\n\n" +
-                                    Regex.Replace(reply.Message, "^.*$", "> $&",
-                                    RegexOptions.Multiline);
                 }
-                else
+                // TA(s) or Instructor and TA(s)
+                if (whoTo == 2 || whoTo == 3)
                 {
-                    recipientList.Clear();
+                    List<CoursesUsers> tas = db.CoursesUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "TA")).ToList();
+
+                    if (tas != null)
+                    {
+                        foreach (CoursesUsers cu in tas)
+                        {
+                            recipientList.Add(cu.UserProfile);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Handles Reply, ReplyAll and Forward
+                if (Request.Params["replyTo"] != null || Request.Params["replyAll"] != null)
+                {
+                    int replyto;
+
+                    if (Request.Params["replyAll"] != null)
+                    {
+                        replyto = Convert.ToInt32(Request.Params["replyAll"]);
+                        recipientList = (from m in db.Mails
+                                         where m.ThreadID == replyto 
+                                         select m.ToUserProfile).ToList<UserProfile>();
+                    }
+                    else
+                    {
+                        replyto = Convert.ToInt32(Request.Params["replyTo"]);
+                    }
+
+                    // need to query for mail.id not thread id in the case of reply all
+                    Mail reply = (from m in db.Mails
+                                  where m.ThreadID == replyto &&
+                                  m.ToUserProfile.ID == currentUser.ID
+                                  select m).FirstOrDefault();
+                        
+                        //db.Mails.Find(replyto);
+
+                    // Ensure valid reply user
+                    if (reply != null)
+                    {
+                        // if replyAll we dont not need to add the from user profile
+                        if (!recipientList.Contains(reply.FromUserProfile))
+                        {
+                            recipientList.Add(reply.FromUserProfile); //Adds the sender to the reply list
+                        }
+                        string suffix = "RE: ";
+                        if (ID == 0) // forward 0 is passed for the recipientid on forwards
+                        {
+                            suffix = "FW: ";
+                            recipientList.Clear(); // clears the recipients if it is a forward
+                        }
+                        ViewBag.MailHeader = mail.Subject = suffix + reply.Subject;
+                        // Prefix each line with a '> '
+                        mail.Message = "\n\nOriginal Message \nFrom: " + reply.FromUserProfile.FirstName + " " +
+                                        reply.FromUserProfile.LastName + "\nSent at: " + reply.Posted.ToString() + "\n\n" +
+                                        Regex.Replace(reply.Message, "^.*$", "> $&",
+                                        RegexOptions.Multiline);
+                    }
+                    else
+                    {
+                        recipientList.Clear();
+                    }
                 }
             }
 
@@ -161,6 +209,9 @@ namespace OSBLE.Controllers
                 string recipient_string = Request.Params["recipientlist"];
                 string[] recipients;
                 List<int> reply_ids = new List<int>();
+
+                // gets the current course
+                mail.Context = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
 
                 // If it is a reply
                 if (Session["mail_recipients"] != null)
@@ -195,6 +246,8 @@ namespace OSBLE.Controllers
                         newMail.Subject = mail.Subject;
                         newMail.Message = mail.Message;
                         newMail.ThreadID = threadID;
+                        newMail.ContextID = mail.ContextID;
+                        newMail.Context = mail.Context;
 
                         //need to create the mail before we can send the notification and set the threadID
                         db.Mails.Add(newMail);

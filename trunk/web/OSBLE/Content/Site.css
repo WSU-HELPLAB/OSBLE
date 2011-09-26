@@ -909,6 +909,11 @@ body#layoutLogOn
 	width: 130px;
 }
 
+.inbox_context
+{
+    width: 75px;
+}
+
 .inbox_subject
 {
 }
