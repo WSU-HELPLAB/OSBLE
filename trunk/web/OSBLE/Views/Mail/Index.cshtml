@@ -6,9 +6,9 @@
 }
     <p>
         @Html.ActionLink("Compose new message", "Create")&nbsp &nbsp
-        @Html.ActionLink("Compose message to Instructor", "Create", new { id = 1 }, null)&nbsp &nbsp
-        @Html.ActionLink("Compose message to TA(s)", "Create", new { id = 2 }, null)&nbsp &nbsp
-        @Html.ActionLink("Compose message to Instructor and TA(s)", "Create", new { id = 3 }, null)
+        @Html.ActionLink("Compose message to Instructor", "Create", new { id = -1 }, null)&nbsp &nbsp
+        @Html.ActionLink("Compose message to TA(s)", "Create", new { id = -2 }, null)&nbsp &nbsp
+        @Html.ActionLink("Compose message to Instructor and TA(s)", "Create", new { id = -3 }, null)
     </p>
 
     @if (ViewBag.BoxHeader == "Inbox")

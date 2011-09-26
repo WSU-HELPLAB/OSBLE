@@ -115,28 +115,39 @@ namespace OSBLE.Controllers
             {
                 int whoTo = (int)id;
                 // Instructor or Instructor and TA(s)
-                if (whoTo == 1 || whoTo == 3)
+                if (whoTo < 0)
                 {
-                    List<CoursesUsers> instructors = db.CoursesUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "Instructor")).ToList();
-                    if (instructors != null)
+                    if (whoTo == -1 || whoTo == -3)
                     {
-                        foreach (CoursesUsers cu in instructors)
+                        List<CoursesUsers> instructors = db.CoursesUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "Instructor")).ToList();
+                        if (instructors != null)
                         {
-                            recipientList.Add(cu.UserProfile);
+                            foreach (CoursesUsers cu in instructors)
+                            {
+                                recipientList.Add(cu.UserProfile);
+                            }
+                        }
+                    }
+                    // TA(s) or Instructor and TA(s)
+                    if (whoTo == -2 || whoTo == -3)
+                    {
+                        List<CoursesUsers> tas = db.CoursesUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "TA")).ToList();
+
+                        if (tas != null)
+                        {
+                            foreach (CoursesUsers cu in tas)
+                            {
+                                recipientList.Add(cu.UserProfile);
+                            }
                         }
                     }
                 }
-                // TA(s) or Instructor and TA(s)
-                if (whoTo == 2 || whoTo == 3)
+                else // Student Id
                 {
-                    List<CoursesUsers> tas = db.CoursesUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "TA")).ToList();
-
-                    if (tas != null)
+                    CoursesUsers studentRec = db.CoursesUsers.Where(c => c.UserProfileID == whoTo).FirstOrDefault();
+                    if (studentRec != null)
                     {
-                        foreach (CoursesUsers cu in tas)
-                        {
-                            recipientList.Add(cu.UserProfile);
-                        }
+                        recipientList.Add(studentRec.UserProfile);
                     }
                 }
             }
