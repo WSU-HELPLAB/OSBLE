@@ -233,6 +233,9 @@ namespace OSBLE.Controllers
                     double totalRubricPoints = (from c in vm.Rubric.Criteria
                                                 select c.Weight).Sum();
                     double studentScore = 0.0;
+                    double rawStudentScore = -1;
+                    double categoryMaxPoints = grade.AssignmentActivity.AbstractAssignment.Category.MaxAssignmentScore;
+
                     foreach (CriterionEvaluation critEval in vm.Evaluation.CriterionEvaluations)
                     {
                         studentScore += (double)critEval.Score / maxLevelScore * (critEval.Criterion.Weight / totalRubricPoints);
@@ -255,11 +258,21 @@ namespace OSBLE.Controllers
                         studentScore = studentScore * latePenalty;
                     }
 
+                    rawStudentScore = studentScore;
+
+                    if (categoryMaxPoints >= 0)
+                    {
+                        if (studentScore > categoryMaxPoints)
+                        {
+                            studentScore = categoryMaxPoints;
+                        }
+                    }
                     if (grade != null)
                     {
                         grade.Points = studentScore;
                         grade.LatePenaltyPercent = latePenalty;
                         grade.StudentPoints = -1;
+                        grade.RawPoints = rawStudentScore;
                         db.SaveChanges();
                     }
                     else
@@ -272,7 +285,8 @@ namespace OSBLE.Controllers
                             AssignmentActivityID = vm.Evaluation.AbstractAssignmentActivityID,
                             PublishedDate = DateTime.Now,
                             LatePenaltyPercent = latePenalty,
-                            isDropped = false
+                            isDropped = false,
+                            RawPoints = rawStudentScore
                         };
                         db.Scores.Add(newScore);
                         db.SaveChanges();
