@@ -1492,7 +1492,14 @@ namespace OSBLE.Controllers
                 {
                     foreach (Score score in scores)
                     {
-                        score.Points = score.RawPoints;
+                        if (score.RawPoints < 0)
+                        {
+                            score.RawPoints = score.Points;
+                        }
+                        else
+                        {
+                            score.Points = score.RawPoints;
+                        }
                     }
                     db.SaveChanges();
 
@@ -1523,22 +1530,29 @@ namespace OSBLE.Controllers
                 Category currentCategory = db.Categories.Find(currentCategoryId);
 
                 //Set the current categories max assignment score to -1
-                currentCategory.MaxAssignmentScore = -1;
-                db.SaveChanges();
 
-                List<Score> scores = (from score in db.Scores
-                                      where score.AssignmentActivity.AbstractAssignment.CategoryID == currentCategoryId
-                                      select score).ToList();
-
-                //If there are scores, set the student scores to their raw scores and 
-                //save the database.
-                if (scores.Count() > 0)
+                if (currentCategory.MaxAssignmentScore > -1)
                 {
-                    foreach (Score score in scores)
-                    {
-                        score.Points = score.RawPoints;
-                    }
+                    currentCategory.MaxAssignmentScore = -1;
                     db.SaveChanges();
+
+                    List<Score> scores = (from score in db.Scores
+                                          where score.AssignmentActivity.AbstractAssignment.CategoryID == currentCategoryId
+                                          select score).ToList();
+
+                    //If there are scores, set the student scores to their raw scores and 
+                    //save the database.
+                    if (scores.Count() > 0)
+                    {
+                        foreach (Score score in scores)
+                        {
+                            score.Points = score.RawPoints;
+                        }
+                        db.SaveChanges();
+                    }
+                }
+                else
+                {
                 }
             }
             return View("_Gradebook");
