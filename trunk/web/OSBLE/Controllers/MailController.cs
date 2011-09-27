@@ -121,11 +121,19 @@ namespace OSBLE.Controllers
                     {
                         if(teamID.HasValue)
                         {
+                            int tID = (int)teamID;
                             // this returns an empty list for some reason, must investigate.
-                            recipientList = (from t in db.Teams
-                                            where t.ID == teamID
-                                            select t.Members) as List<UserProfile>;
-                            recipientList.Remove(currentUser);
+                            var team = (from t in db.Teams
+                                        where t.ID == tID
+                                        select t.Members).FirstOrDefault().ToList();
+
+                            foreach (UserMember t in team)
+                            {
+                                if (t.UserProfile != currentUser)
+                                {
+                                    recipientList.Add(t.UserProfile);
+                                }
+                            }
                         }
                     }
                     else if( whoTo >= -3 && whoTo <= -1)// Instructor or Instructor and TA(s)
@@ -176,7 +184,8 @@ namespace OSBLE.Controllers
                     {
                         replyto = Convert.ToInt32(Request.Params["replyAll"]);
                         recipientList = (from m in db.Mails
-                                         where m.ThreadID == replyto 
+                                         where m.ThreadID == replyto &&
+                                         m.ToUserProfileID != currentUser.ID
                                          select m.ToUserProfile).ToList<UserProfile>();
                     }
                     else
