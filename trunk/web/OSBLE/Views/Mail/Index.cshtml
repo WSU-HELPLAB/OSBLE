@@ -36,7 +36,10 @@
                 <small>@item.Posted.ToShortDateString() @item.Posted.ToShortTimeString()</small>
             </td>
             <td class="inbox_context">
-                <small>@item.Context.Prefix @item.Context.Number</small>
+                @if (item.Context != null)
+                {
+                    <small>@item.Context.Prefix @item.Context.Number</small>
+                }
             </td>
             <td class="inbox_subject">
                 @if (ViewBag.BoxHeader == "Inbox")
