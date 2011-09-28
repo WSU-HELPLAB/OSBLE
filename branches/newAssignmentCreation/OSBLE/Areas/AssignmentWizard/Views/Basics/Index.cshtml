@@ -1,9 +1,13 @@
 ﻿@using OSBLE.Models.Assignments;
 @model Assignment
-@Html.Partial("_WizardTopNav")
+@{
+    ViewBag.Title = "Assignment Creation Wizard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    }
 <h1>Basic Assignment Information</h1>
 @using (@Html.BeginForm())
 {
+@Html.Partial("_WizardTopNav")
 @Html.ValidationSummary() 
 @Html.HiddenFor(m => m.ID)
 <table class="wizard_entry_table">

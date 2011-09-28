@@ -36,7 +36,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             //Guaranteed to pull all people enrolled in the course that can submit files
             //(probably students).
             List<CourseUsers> users = (from cu in db.CourseUsers
-                                       where cu.ID == activeCourse.ID
+                                       where cu.AbstractCourseID == activeCourse.AbstractCourseID
                                        && cu.AbstractRole.CanSubmit
                                        select cu).ToList();
 
