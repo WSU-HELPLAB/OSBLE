@@ -1602,7 +1602,7 @@ namespace OSBLE.Controllers
                         {
                             if (((value/grades.AssignmentActivity.PointsPossible)*100) > currentCategory.MaxAssignmentScore)
                             {
-                                value = currentCategory.MaxAssignmentScore;
+                                value = (currentAssignment.PointsPossible * (currentCategory.MaxAssignmentScore / 100));
                             }
                         }
 
