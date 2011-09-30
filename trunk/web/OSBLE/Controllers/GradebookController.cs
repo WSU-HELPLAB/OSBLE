@@ -1490,19 +1490,17 @@ namespace OSBLE.Controllers
 
                 if (scores.Count() > 0)
                 {
+                    //First, we need to set the scores back to the raw total to do the new calculations.
                     foreach (Score score in scores)
                     {
-                        if (score.RawPoints < 0)
-                        {
-                            score.RawPoints = score.Points;
-                        }
-                        else
-                        {
-                            score.Points = score.RawPoints;
-                        }
+                        score.Points = score.RawPoints;
                     }
                     db.SaveChanges();
 
+                    //If the values percent is greater than the maximum percent, we need to set the value to the 
+                    //maximum percent. We give the score the total points possible for the assignment 
+                    //multiplied by the (max value / 100). This will give us the total percent for the assignment
+                    //the student can receive. We need to check both points and student points.
                     foreach (Score score in scores)
                     {
                         if (((score.Points/score.AssignmentActivity.PointsPossible)*100) > value)
