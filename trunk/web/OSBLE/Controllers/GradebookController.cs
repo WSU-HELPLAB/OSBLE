@@ -1605,6 +1605,10 @@ namespace OSBLE.Controllers
 
                         if (grades.Points == value)
                         {
+                            //Don't do anything to the points because our value coming in equals the points in the db.
+                            //However, we do need to set the raw value in case that changed.
+                            grades.RawPoints = rawValue;
+                            db.SaveChanges();
                         }
                         else
                         {
