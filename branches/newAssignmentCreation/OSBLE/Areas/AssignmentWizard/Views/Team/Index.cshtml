@@ -101,7 +101,7 @@
     <ul>
         <li>
             Create a layout with <input type="text" id="AutoGenByStudentTextBox" size="3" /> students per team
-            <button type="button" id="AutoGenByStudentButton">Go</button>
+            <button type="button" id="AutoGenByStudentButton" onclick="generateTeamsByNumberOfStudents()">Go</button>
         </li>
         <li>
             Create a layout with <input type="text" id="AutoGenByteamTextBox" size="3" /> total teams
@@ -142,6 +142,7 @@
 <script type="text/javascript">
     $(document).ready(documentReady);
 
+    //Called when the document has finished loading and is safe to make DOM calls
     function documentReady() {
 
         //set up sortable lists
@@ -153,11 +154,15 @@
         $("#CreateTeamLink").disableSelection();
     }
 
+    //Right now, just a placehoder function that gets called when we try to postback
     function processForm(evt) {
         alert('hello');
     }
 
+    //Used to give each new team a unique name (see createTeam function)
     var teamCounter = 1;
+
+    //Creates a new team div and places it on the 
     function createTeam(evt, teamName) {
         var divId = "teamDiv_" + teamCounter;
         var listId = 'team_' + teamCounter;
@@ -180,18 +185,89 @@
         return divId;
     }
 
-    function addStudentToTeam(studentId, teamDivId) {
-        $("#" + teamDivId).find("ul").append($("#" + studentId));
+    //Resets the page to its null state:
+    //      clears all teams that have been created
+    //      returns all students to the available students pool
+    //      resets the teamCounter variable back to 1
+    //      removes all HTML in TeamsDiv
+    function clearAllTeams(callback) {
+
+        //find all teams and remove them
+        var allTeams = $("#TeamsDiv").find('div');
+        allTeams.each(function (index) {
+            var id = $(this).context.id;
+            if (id != undefined && id != "") {
+                removeTeam(id);
+            }
+            else {
+                $(this).remove();
+            }
+        });
+
+        //reset the team counter
+        teamCounter = 1;
+
     }
 
+    //Auto generates a team configuration doing its best to create teams using
+    //the size stored inside the "AutoGenByStudentTextBox"    
+    function generateTeamsByNumberOfStudents() {
+        var studentsPerTeam = $('#AutoGenByStudentTextBox').val();
+
+        //clear out any pre-existing layout
+        clearAllTeams();
+
+        //create the appropriate number of teams needed
+        var numStudents = $('#AvailableStudentList').find('li').length;
+        var numTeams = Math.floor(numStudents / studentsPerTeam);
+        for (var i = 0; i < numTeams; i++) {
+            createTeam(undefined, undefined);
+        }
+
+        //randomly add students to each team
+        var allTeams = $("#TeamsDiv").find('div');
+        for(var i = 0; i < $('#AvailableStudentList').find('li').length; i++){
+
+            //find the team with the smallest number of students
+            var smallestTeamId = 0;
+            var smallestTeamSize = 0;
+            allTeams.each(function (index) {
+                var id = $(this).context.id;
+                if (id != undefined && id != "") {
+                    var size = $(this).find('li').length;
+                    if (smallestTeamSize >= size) {
+                        smallestTeamSize = size;
+                        smallestTeamId = $(this).find('ul')[0].id;
+                    }
+                }
+            });
+
+            //pick a random student
+            var index = Math.floor(Math.random() * ($('#AvailableStudentList').find('li').length - 1));
+            addStudentToTeam($('#AvailableStudentList').find('li')[index].id, smallestTeamId);
+        }
+    }
+
+    //Adds a student (li element's ID, ex: "cu_1") 
+    //to the supplied team list (ul element's ID, ex "team_1")
+    function addStudentToTeam(studentId, teamId) {
+        $("#" + studentId).slideUp('slow', function () {
+            $('#' + teamId).append($("#" + studentId));
+            $("#" + studentId).slideDown('slow');
+        });
+    }
+
+    //Called when the user clicks the remove button on a particular team div
     function removeTeam(teamId) {
         $('#' + teamId).slideUp('slow', hideTeamComplete);
     }
 
+    //Called after removeTeam().  Places any students that were on the removed team
+    //back into the pool of available students.
     function hideTeamComplete() {
-        //jQuery(this).find("li").css("display", "none");
+        jQuery(this).find("li").css("display", "none");
         $("#AvailableStudent").append(jQuery(this).find("li"));
-        //jQuery(this).find("li").fadeIn('slow');
+        $("#AvailableStudent").find(':hidden').slideDown('slow');
         $(this).remove();
     }
 
