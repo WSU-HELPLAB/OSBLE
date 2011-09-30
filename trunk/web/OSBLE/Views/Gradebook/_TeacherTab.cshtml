@@ -324,7 +324,7 @@
             <input type="checkbox" id="MaxCheckBox"/>
             <text>Set the maximum percentage a student can receive for this category.</text>
             
-            <div id="MaxPointsInputBox"><input id="MaxPoints" /></div>
+            <div id="MaxPointsInputBox"><input id="MaxPoints" disabled="disabled"/></div>
         }
         <br />
             
@@ -461,6 +461,17 @@
                 throw "Unkown Radio Button Checked: Customize_radio"
             }
         });
+    });
+
+    $("#MaxCheckBox").click(function () {
+        if ($("#MaxCheckBox").attr("checked")) {
+            //alert($('#MaxPointsInputBox').attr('disabled'));
+            $('#MaxPoints').attr("disabled", false);
+        }
+        else {
+            $('#MaxPoints').val(null);
+            $('#MaxPoints').attr("disabled", true);
+        }
     });
 
     function addPoints(points) {

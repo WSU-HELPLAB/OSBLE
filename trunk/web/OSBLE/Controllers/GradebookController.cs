@@ -1528,7 +1528,6 @@ namespace OSBLE.Controllers
                 Category currentCategory = db.Categories.Find(currentCategoryId);
 
                 //Set the current categories max assignment score to -1
-
                 if (currentCategory.MaxAssignmentScore > -1)
                 {
                     currentCategory.MaxAssignmentScore = -1;
