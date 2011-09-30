@@ -117,7 +117,14 @@
                 totalAverage += categoryScore;
                 if (oneScore == true)
                 {
-                    <td id="averageScore">@totalAverage.ToString(".#")</td>  
+                    if (totalAverage > 0)
+                    {
+                        <td id="averageScore">@totalAverage.ToString(".#")</td>  
+                    }
+                    else
+                    {
+                        <td id="averageScore">0</td>
+                    }
                 }
                 else
                 {

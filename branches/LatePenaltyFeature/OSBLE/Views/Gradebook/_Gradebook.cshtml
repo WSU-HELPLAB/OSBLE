@@ -203,7 +203,7 @@
                 {
                     if (gradeAssignmentActivity.AbstractAssignment.Rubric != null)
                     {
-                        if (gradableQuery.First().LatePenaltyPercent > 0)
+                        if (gradableQuery.First().LatePenaltyPercent > 0 || gradableQuery.First().ManualLatePenaltyPercent >= 0)
                         {
                             <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { abstractAssignmentActivityId = gradableQuery.First().AssignmentActivityID, teamUserID = gradableQuery.First().TeamUserMemberID }, new { @class = "rubric", @style = "color:Red;" })</td>
                         }
@@ -214,7 +214,7 @@
                     }
                     else
                     {
-                        if (gradableQuery.First().LatePenaltyPercent > 0)
+                        if (gradableQuery.First().LatePenaltyPercent > 0 || gradableQuery.First().ManualLatePenaltyPercent >= 0)
                         { 
                             <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic; color:Red;"  onclick="cellGainsFocus(event, this)">@gradableQuery.First().Points</td>
                         }

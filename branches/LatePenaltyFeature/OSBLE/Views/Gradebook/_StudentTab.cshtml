@@ -117,7 +117,8 @@
 @{
     <input id="customize_option" type="hidden" value="@ViewBag.Customize" />
     <input id="numDropped" type="hidden" value="@ViewBag.NumDropped" />
-    double latePercentPenalty = 0.0;
+    double latePercentPenalty = 0.0; 
+    double displayLatePenaltyPercent = 0;
 }
 
 @Html.Partial("_Tabs")
@@ -291,8 +292,16 @@
                     latePercentPenalty = (1 - score.First().LatePenaltyPercent) * 100;
                     if (score.First().AssignmentActivity.AbstractAssignment.Rubric != null)
                     {
-                        if (score.First().LatePenaltyPercent > 0)
+                        if (score.First().LatePenaltyPercent > 0 || score.First().ManualLatePenaltyPercent >= 0)
                         {
+                            if (score.First().ManualLatePenaltyPercent >= 0)
+                            {
+                                displayLatePenaltyPercent = score.First().ManualLatePenaltyPercent;
+                            }
+                            else
+                            {
+                                displayLatePenaltyPercent = score.First().LatePenaltyPercent;
+                            }
                             <td id="rubric-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" abbr style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { abstractAssignmentActivityId = score.First().AssignmentActivityID, teamUserID = score.First().TeamUserMemberID }, new { @style = "color:Red" }) @Helpers.CreateToolTip("This assignment was late")</td>                            
                         }
                         else
@@ -304,8 +313,16 @@
                     {
                         if (score.First().Points > 0)
                         {
-                            if (score.First().LatePenaltyPercent > 0)
-                            {   
+                            if (score.First().LatePenaltyPercent > 0 || score.First().ManualLatePenaltyPercent >= 0)
+                            {
+                                if (score.First().ManualLatePenaltyPercent >= 0)
+                                {
+                                    displayLatePenaltyPercent = score.First().ManualLatePenaltyPercent;
+                                }
+                                else
+                                {
+                                    displayLatePenaltyPercent = score.First().LatePenaltyPercent;
+                                }
                                 <td id="teacher-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" style="font-style:italic; color:Red;">@score.First().Points.ToString(".#")</td>
                             }
                             else
@@ -315,8 +332,17 @@
                         }
                         else
                         {
-                            if (score.First().LatePenaltyPercent > 0)
+                            if (score.First().LatePenaltyPercent > 0 || score.First().ManualLatePenaltyPercent >= 0)
                             {
+                                
+                                if (score.First().ManualLatePenaltyPercent >= 0)
+                                {
+                                    displayLatePenaltyPercent = score.First().ManualLatePenaltyPercent;
+                                }
+                                else
+                                {
+                                    displayLatePenaltyPercent = score.First().LatePenaltyPercent;
+                                }
                                 <td id="teacher-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" style="font-style:italic; color:Red">@String.Format("{0}", 0)</td>
                             }
                             else
@@ -359,7 +385,7 @@
     <table>
         <tr>
             <td>
-                This assignment was graded <b>@latePercentPenalty%</b> off because it was submitted late.
+                This assignment was graded <b>@displayLatePenaltyPercent%</b> off because it was submitted late.
             </td>
         </tr>
     </table>

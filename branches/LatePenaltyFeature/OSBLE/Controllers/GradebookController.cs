@@ -1496,29 +1496,11 @@ namespace OSBLE.Controllers
 
                     if (grades != null)
                     {
-                        TimeSpan? lateness = calculateLateness(currentAssignment.AbstractAssignment.Category.Course, currentAssignment, teamuser.First());
-                        if (lateness != null)
+                        if (grades.ManualLatePenaltyPercent >= 0)
                         {
-                            latePenalty = CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
-                            latePenalty = (100 - latePenalty) / 100;
-                            value = value * latePenalty;
-                        }
-
-                        if (grades.Points == value)
-                        {
+                            value = value * (grades.ManualLatePenaltyPercent / 100);
                         }
                         else
-                        {
-                            grades.Points = value;
-                            grades.AddedPoints = 0;
-                            grades.LatePenaltyPercent = latePenalty;
-                            grades.StudentPoints = -1;
-                            db.SaveChanges();
-                        }
-                    }
-                    else
-                    {
-                        if (teamuser.Count() > 0)
                         {
                             TimeSpan? lateness = calculateLateness(currentAssignment.AbstractAssignment.Category.Course, currentAssignment, teamuser.First());
                             if (lateness != null)
@@ -1527,20 +1509,72 @@ namespace OSBLE.Controllers
                                 latePenalty = (100 - latePenalty) / 100;
                                 value = value * latePenalty;
                             }
-
-                            Score newScore = new Score()
+                        }
+                        //Only change grade if value is different
+                        if (grades.Points == value)
+                        {
+                        }
+                        else
+                        {
+                            if (grades.ManualLatePenaltyPercent >= 0)
                             {
-                                TeamUserMember = teamuser.First(),
-                                Points = value,
-                                AssignmentActivityID = currentAssignment.ID,
-                                PublishedDate = DateTime.Now,
-                                isDropped = false,
-                                LatePenaltyPercent = latePenalty,
-                                StudentPoints = -1
-                            };
-
-                            db.Scores.Add(newScore);
+                            }
+                            else
+                            {
+                                grades.LatePenaltyPercent = latePenalty;
+                            }
+                            
+                            grades.Points = value;
+                            grades.AddedPoints = 0;
+                            grades.StudentPoints = -1;
                             db.SaveChanges();
+                        }
+                    }
+                    else
+                    {
+                        if (teamuser.Count() > 0)
+                        {
+                            if (grades.ManualLatePenaltyPercent >= 0)
+                            {
+                                value = value * (grades.ManualLatePenaltyPercent / 100);
+                            }
+                            TimeSpan? lateness = calculateLateness(currentAssignment.AbstractAssignment.Category.Course, currentAssignment, teamuser.First());
+                            if (lateness != null)
+                            {
+                                latePenalty = CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
+                                latePenalty = (100 - latePenalty) / 100;
+                                value = value * latePenalty;
+                            }
+
+                            if (grades.ManualLatePenaltyPercent >= 0)
+                            {
+                                Score newScore = new Score()
+                                {
+                                    TeamUserMember = teamuser.First(),
+                                    Points = value,
+                                    AssignmentActivityID = currentAssignment.ID,
+                                    PublishedDate = DateTime.Now,
+                                    isDropped = false,
+                                    StudentPoints = -1
+                                };
+                                db.Scores.Add(newScore);
+                                db.SaveChanges();
+                            }
+                            else
+                            {
+                                Score newScore = new Score()
+                                {
+                                    TeamUserMember = teamuser.First(),
+                                    Points = value,
+                                    AssignmentActivityID = currentAssignment.ID,
+                                    PublishedDate = DateTime.Now,
+                                    isDropped = false,
+                                    LatePenaltyPercent = latePenalty,
+                                    StudentPoints = -1
+                                };
+                                db.Scores.Add(newScore);
+                                db.SaveChanges();
+                            }
                         }
                     }
                     if (currentAssignment.addedPoints > 0)
