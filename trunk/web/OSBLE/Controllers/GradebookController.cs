@@ -1600,7 +1600,7 @@ namespace OSBLE.Controllers
 
                         if (currentCategory.MaxAssignmentScore >= 0)
                         {
-                            if (value > currentCategory.MaxAssignmentScore)
+                            if (((value/grades.AssignmentActivity.PointsPossible)*100) > currentCategory.MaxAssignmentScore)
                             {
                                 value = currentCategory.MaxAssignmentScore;
                             }
@@ -1617,7 +1617,7 @@ namespace OSBLE.Controllers
                             grades.StudentPoints = -1;
                             grades.RawPoints = rawValue;
                             db.SaveChanges();
-                        }
+                       } 
                     }
                     else
                     {
@@ -1696,6 +1696,14 @@ namespace OSBLE.Controllers
 
                         if (studentScore != null)
                         {
+                            if (currentCategory.MaxAssignmentScore > 0)
+                            {
+                                if (((value / currentAssignment.PointsPossible) * 100) > currentCategory.MaxAssignmentScore)
+                                {
+                                    value = (currentAssignment.PointsPossible * (currentCategory.MaxAssignmentScore / 100));
+                                }
+                            }
+
                             studentScore.StudentPoints = value;
                             db.SaveChanges();
                         }
