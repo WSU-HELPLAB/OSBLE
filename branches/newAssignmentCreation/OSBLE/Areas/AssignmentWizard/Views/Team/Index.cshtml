@@ -127,7 +127,7 @@
         <ul id="AvailableStudent" class="TeamSortable">
             @foreach (CourseUsers cu in unassignedUsers)
             {
-                <li id="cu_@(cu.ID)" class="ui-state-default">@cu.UserProfile.LastName, @cu.UserProfile.FirstName</li>
+                <li id="cu_@(cu.ID)" class="ui-state-default Student">@cu.UserProfile.LastName, @cu.UserProfile.FirstName</li>
             }
         </ul>
     </div>
@@ -190,10 +190,11 @@
     //      returns all students to the available students pool
     //      resets the teamCounter variable back to 1
     //      removes all HTML in TeamsDiv
-    function clearAllTeams(callback) {
+    function clearAllTeams() {
 
         //find all teams and remove them
         var allTeams = $("#TeamsDiv").find('div');
+        var numberOfTeams = allTeams.length;
         allTeams.each(function (index) {
             var id = $(this).context.id;
             if (id != undefined && id != "") {
@@ -217,35 +218,64 @@
         //clear out any pre-existing layout
         clearAllTeams();
 
-        //create the appropriate number of teams needed
-        var numStudents = $('#AvailableStudentList').find('li').length;
-        var numTeams = Math.floor(numStudents / studentsPerTeam);
-        for (var i = 0; i < numTeams; i++) {
-            createTeam(undefined, undefined);
-        }
+        //wait for all teams to be removed before continuing
+        $(".TeamDiv").promise().done(function () {
 
-        //randomly add students to each team
-        var allTeams = $("#TeamsDiv").find('div');
-        for(var i = 0; i < $('#AvailableStudentList').find('li').length; i++){
+            //create the appropriate number of teams needed
+            var numStudents = $.find('.Student').length;
+            var numTeams = Math.floor(numStudents / studentsPerTeam);
+            for (var i = 0; i < numTeams; i++) {
+                createTeam(undefined, undefined);
+            }
 
-            //find the team with the smallest number of students
-            var smallestTeamId = 0;
-            var smallestTeamSize = 0;
-            allTeams.each(function (index) {
-                var id = $(this).context.id;
-                if (id != undefined && id != "") {
-                    var size = $(this).find('li').length;
-                    if (smallestTeamSize >= size) {
-                        smallestTeamSize = size;
-                        smallestTeamId = $(this).find('ul')[0].id;
+            //again, we need to wait for team creation to finish before we continue
+            $(".TeamDiv").promise().done(function () {
+
+                //build a team and student array
+                var unassignedStudents = Array();
+                var teamCounter = Array();
+                var allStudents = $.find('.Student');
+                var allTeams = $.find('.TeamDiv');
+
+                //prime the arrays
+                for (var i = 0; i < numTeams; i++) {
+                    teamCounter[i] = { id: allTeams[i].id, count: 0 };
+                }
+                for (var i = 0; i < numStudents; i++) {
+                    unassignedStudents[i] = allStudents[i].id;
+                }
+
+                //assign students to teams
+                while (unassignedStudents.length > 0) {
+
+                    //pick a random student
+                    var studentIndex = Math.floor(Math.random() * unassignedStudents.length);
+                    var student = unassignedStudents[studentIndex];
+
+                    //pick the smallest team
+                    var smallestTeamId = 0;
+                    var smallestTeamSize = numStudents + 1;
+                    var smallestTeamIndex = 0;
+                    for (var i = 0; i < teamCounter.length; i++) {
+                        if (teamCounter[i].count <= smallestTeamSize) {
+                            smallestTeamSize = teamCounter[i].count;
+                            smallestTeamId = teamCounter[i].id;
+                            smallestTeamIndex = i;
+                        }
                     }
+
+                    teamCounter[smallestTeamIndex].count++;
+
+                    //assign the student to the team
+                    addStudentToTeam(student, smallestTeamId);
+
+                    //remove students from the list of possible students
+                    unassignedStudents = unassignedStudents.slice(0, studentIndex).concat(unassignedStudents.slice(studentIndex + 1, unassignedStudents.length));
                 }
             });
 
-            //pick a random student
-            var index = Math.floor(Math.random() * ($('#AvailableStudentList').find('li').length - 1));
-            addStudentToTeam($('#AvailableStudentList').find('li')[index].id, smallestTeamId);
-        }
+        });
+        
     }
 
     //Adds a student (li element's ID, ex: "cu_1") 
@@ -259,7 +289,7 @@
 
     //Called when the user clicks the remove button on a particular team div
     function removeTeam(teamId) {
-        $('#' + teamId).slideUp('slow', hideTeamComplete);
+        $('#' + teamId).fadeOut('slow', hideTeamComplete);
     }
 
     //Called after removeTeam().  Places any students that were on the removed team
