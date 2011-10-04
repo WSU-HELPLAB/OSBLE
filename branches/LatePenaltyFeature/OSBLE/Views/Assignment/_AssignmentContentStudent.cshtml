@@ -45,7 +45,7 @@
                             <div class="user_controls">
                             @if (member.UserProfile.UserName != null)
                             {
-                            <a title="Mail This User" href="@Url.Action("Create", "Mail", new { recipientID = member.UserProfile.ID })">@Helpers.MailButton()</a>
+                            <a title="Mail This User" href="@Url.Action("Create", "Mail", new { id = member.UserProfile.ID })">@Helpers.MailButton()</a>
                             }
                             
                             </div>
@@ -57,6 +57,10 @@
                     }
                     </ul>
                 </div>
+                <div>
+                    <a title="Email whole team" href="@Url.Action("Create", "Mail", new { id = -4, teamID = team.Team.ID })">Email the whole team</a>
+                </div>
+                <br />
                 
             }
             @if (sa.Deliverables.Count > 0)
@@ -185,7 +189,7 @@
                             @{
                                 TeamUserMember teamUser = (OSBLEController.GetTeamUser(submission, ViewBag.CurrentUser as UserProfile));
                                 Score score = (from c in submission.Scores where c.TeamUserMemberID == teamUser.ID select c).FirstOrDefault();
-                                if (score == null)
+                                if ((score == null) || (score.Points < 0))
                                 {
                                     AjaxOptions options = new AjaxOptions()
                                     {

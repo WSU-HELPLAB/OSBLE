@@ -146,7 +146,6 @@ namespace OSBLE.Models
 #if !DEBUG
             modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
 #endif
-
             modelBuilder.Entity<Notification>()
                 .HasRequired(n => n.Sender)
                 .WithMany()

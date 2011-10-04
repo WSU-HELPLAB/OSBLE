@@ -300,10 +300,20 @@ namespace OSBLE.Controllers
                         //This checks when something was submitted by the folder modify time it is imperative that they don't get modified except when a student submits something to that folder.
                         submissionInfo.Time = GetSubmissionTime(activeCourse.AbstractCourse as Course, studioActivity, teamUser);
 
+
                         //Getting the manual LatePenaltyPercent
-                       submissionInfo.ManualLatePenaltyPercent = (from s in db.Scores
-                                                                   where s.TeamUserMemberID == teamUser.ID
-                                                                   select s.ManualLatePenaltyPercent).First();
+                        var tempScore = (from s in db.Scores
+                                         where s.TeamUserMemberID == teamUser.ID
+                                         select s.ManualLatePenaltyPercent);
+
+                        if (tempScore.Count() == 1) //Only giving ManualLatePenaltyPercent a value if there is something there, otherwise it gets -1 (the default)
+                        {
+                            submissionInfo.ManualLatePenaltyPercent = tempScore.FirstOrDefault();
+                        }
+                        else
+                        {
+                            submissionInfo.ManualLatePenaltyPercent = -1;
+                        }
 
                         if (submissionInfo.Time != null)
                         {
@@ -521,15 +531,30 @@ namespace OSBLE.Controllers
         /// Changes ManaulLatePenalty value into the value passed in, for the user(s) corrisponding to the ID sent in.
         /// </summary>
         /// <param name="value"></param>
-        public void changeManualLatePenalty(double value, int teamUserMemeberID)
+        public void changeManualLatePenalty(double value, int teamUserMemeberID, int assignmentActivityID)
         {
             if (ModelState.IsValid)
             {
-                Score mScore = (from s in db.Scores
-                                        where s.TeamUserMemberID == teamUserMemeberID
-                                        select s).FirstOrDefault();
-                if (mScore != null)
+                //Look up score given the ID. If there is one adust it appropriately, otherwise create a new one
+                var tempScore = (from s in db.Scores
+                                 where s.TeamUserMemberID == teamUserMemeberID
+                                 select s);
+
+                Score mScore = null;
+                if (tempScore.Count() == 0) //No score
                 {
+                    mScore = new Score();
+                    mScore.PublishedDate = DateTime.Now;
+                    mScore.AssignmentActivityID = assignmentActivityID;
+                    mScore.Points = -1;
+                    mScore.TeamUserMemberID = teamUserMemeberID;
+                    mScore.ManualLatePenaltyPercent = value;
+                    db.Scores.Add(mScore);
+                    db.SaveChanges();
+                }
+                else //Score already in place
+                {
+                    mScore = tempScore.FirstOrDefault();
                     mScore.ManualLatePenaltyPercent = value;
                     db.SaveChanges();
                 }

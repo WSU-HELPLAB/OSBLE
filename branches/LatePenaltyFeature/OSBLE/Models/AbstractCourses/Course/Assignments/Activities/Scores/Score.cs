@@ -45,6 +45,8 @@ namespace OSBLE.Models.Assignments.Activities.Scores
 
         public double AddedPoints { get; set; }
 
+        public double RawPoints { get; set; }
+
         public Score()
         {
             Published = false;
@@ -56,6 +58,7 @@ namespace OSBLE.Models.Assignments.Activities.Scores
             //isTake = false;
             isDropped = false;
             ManualLatePenaltyPercent = -1;
+            RawPoints = -1;
         }
     }
 }

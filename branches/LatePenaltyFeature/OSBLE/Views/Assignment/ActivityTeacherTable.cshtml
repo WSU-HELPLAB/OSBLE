@@ -52,28 +52,37 @@
     }
 
     /*BEGIN: Functions/events for editing late penalty*/
+
     var tempID = -1;
     var tempDefaultPerc = -1;
     var tempHasSubmitted = -1;
-    function openLateEditor(mID, mManualLatePerc, mDefaultPerc, mHasSubmitted) {
-        //set globals to mID and mManualLatePerc
+    var spanToEdit = null;
+    var currentAssignmentActID = -1
+    function openLateEditor(mID, mManualLatePerc, mDefaultPerc, mHasSubmitted, thisDOM, mAssignmentActivityID) {
+        
+        //setting globals 
         tempID = mID;
         tempDefaultPerc = mDefaultPerc;
         tempHasSubmitted = mHasSubmitted;
-        //alert(tempHasSubmitted);
-
-
+        currentAssignmentActID = mAssignmentActivityID;
+        spanToEdit = $(thisDOM).parent().find('span');
+        
         //clearing value out of textbox, then displaying the window
         $("#customLatePen").val("");
         $('#latePenErrorText').text("");
         $('#EditLatePercentWindowID').dialog('open'); 
 
         //Based off the current late penalty, it will either automatically select default or manual
-        if (mManualLatePerc < 0) //Not man penalty, select default
+        if (mManualLatePerc < 0) {
+            //Not man penalty, select default
             $('#radioBtn1').attr('checked', 'checked');
+            $("#customLatePen").attr('disabled', 'disabled');
+        }
         else {
             $('#radioBtn2').attr('checked', 'checked');
-            $("#customLatePen").val(mManualLatePerc);
+            var valueForBox = $(thisDOM).parent().find('span').html().toString();
+            valueForBox = valueForBox.slice(0, -1);
+            $("#customLatePen").val(valueForBox);
             $("#customLatePen").focus();
             $("#customLatePen").select();
         }
@@ -92,10 +101,9 @@
         closeOnEscape: false
     });
 
-    var spanToEdit = null;
+
     $('.LatePenTD').mouseenter(function () {
-        spanToEdit = $(this).find('span');
-        $(this).parent().find('a').show();
+        $(this).find('a').show();
 
     });
 
@@ -107,29 +115,30 @@
         var button1Result = $('#radioBtn1').attr('checked');
         var button2Result = $('#radioBtn2').attr('checked');
 
+        //if button 1 was checked, theyre using default. Changing manual late penalty in the db to -1 (off)
         if (button1Result == "checked") {
             $.ajax({
                 async: true,
                 type: "POST",
                 url: "/Assignment/changeManualLatePenalty",
-                data: { value: -1 , teamUserMemeberID: tempID }
+                data: { value: -1, teamUserMemeberID: tempID, assignmentActivityID: currentAssignmentActID }
             });
             closeLateEditor();
             if (tempHasSubmitted == 0) //They have not submitted, display not submitted
             {
                 $(spanToEdit).html("Not Submitted");
             }
-            else //use default late pen
+            else //use default late pen for display
             {
                 $(spanToEdit).html(tempDefaultPerc.toString() + "%");
             }
-            
-            //edit span to edit
-            //we want default value. Need to have that sent in. 
+
         }
+
+        //button 2 was checked, take the value from the box, if its valid change manual late penalty in the db to their value
         else if(button2Result =="checked"){
             var latePen = $("#customLatePen").val();
-            if (isNaN(latePen)) {
+            if (isNaN(latePen) || latePen.indexOf(' ') != -1 || latePen == "") {
                 var errorMsg = "Error: Invalid value"
                 $('#latePenErrorText').text(errorMsg);
             }
@@ -138,18 +147,29 @@
                     async: true,
                     type: "POST",
                     url: "/Assignment/changeManualLatePenalty",
-                    data: { value: latePen, teamUserMemeberID: tempID }
+                    data: { value: latePen, teamUserMemeberID: tempID, assignmentActivityID :currentAssignmentActID }
                 });
                 closeLateEditor();
+
+                //Changing the value displayed
                 $(spanToEdit).html(latePen.toString() + "%");
-                //edit span to edit
 
             }
 
         }
     }
 
+    $('#radioBtn1').change(function () {
+        $("#customLatePen").attr('disabled', 'disabled');
+    });
+
+    $('#radioBtn2').change(function () {
+        $("#customLatePen").removeAttr('disabled');
+    });
+
     /*END: Functions/events for editing late penalty*/
+
+
 
 </script>
 
@@ -209,6 +229,7 @@
     </tr>
     @foreach (ActivityTeacherTableViewModel.SubmissionInfo info in Model.SubmissionsInfo)
     {
+        
         string nameID = "TeamUserID_" + info.SubmitterID.ToString();
         bool hasSubbmitted = info.Time != null;
         <tr>
@@ -291,17 +312,6 @@
                 }
             </td>
                 
-           
-            <!-- Late penalty TD
-            The purpose of this TD is to hold and display the late penalty percent, as well as the interface to change the late penalty
-            if the manual late percent penalty is >= 0, display that (its defualt at -1)
-            else
-                if there is a late penalty percent that is >0, display it
-                else
-                    if the assignment has been turned in, display 0% (not handled by above if check)
-                    else
-                        display Not Submitted
-            -->
             <td class="LatePenTD">
                 <div>
                 @if (info.ManualLatePenaltyPercent >= 0)
@@ -322,11 +332,11 @@
                 }
                 @if (hasSubbmitted)
                 {
-                    <a class="editButtonHidden" onclick="openLateEditor(@info.SubmitterID, @info.ManualLatePenaltyPercent, @info.LatePenaltyPercent, 1 )">Edit</a>
+                    <a class="editButtonHidden" onclick="openLateEditor(@info.SubmitterID, @info.ManualLatePenaltyPercent, @info.LatePenaltyPercent, 1, this, @Model.Activity.ID )">Edit</a>
                 }
                 else
                 {
-                    <a class="editButtonHidden" onclick="openLateEditor(@info.SubmitterID, @info.ManualLatePenaltyPercent, @info.LatePenaltyPercent, 0 )">Edit</a>
+                    <a class="editButtonHidden" onclick="openLateEditor(@info.SubmitterID, @info.ManualLatePenaltyPercent, @info.LatePenaltyPercent, 0, this, @Model.Activity.ID )">Edit</a>
                 }
                     
                 </div>

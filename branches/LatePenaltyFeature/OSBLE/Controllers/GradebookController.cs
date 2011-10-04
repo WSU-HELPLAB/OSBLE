@@ -193,6 +193,7 @@ namespace OSBLE.Controllers
                                                           select a;
 
                                     var currentAssignment = assignmentQuery.FirstOrDefault();
+                                    double categoryMaxPoints = db.Categories.Find(categoryId).MaxAssignmentScore;
 
                                     UserProfile user = (from u in db.UserProfiles
                                                         where u.Identification == studentId
@@ -202,18 +203,27 @@ namespace OSBLE.Controllers
                                     {
                                         if (user != null)
                                         {
+                                            double points = Convert.ToDouble(assignment);
+                                            double rawPoints = points;
                                             var teamuser = from c in currentAssignment.TeamUsers where c.Contains(user) select c;
-
+                                            if (categoryMaxPoints >= 0)
+                                            {
+                                                if (((points/currentAssignment.PointsPossible)*100) > categoryMaxPoints)
+                                                {
+                                                    points = (currentAssignment.PointsPossible * (categoryMaxPoints / 100));
+                                                }
+                                            }
                                             if (teamuser.Count() > 0)
                                             {
                                                 Score newScore = new Score()
                                                 {
                                                     TeamUserMember = teamuser.First(),
-                                                    Points = Convert.ToDouble(assignment),
+                                                    Points = points,
                                                     AssignmentActivityID = currentAssignment.ID,
                                                     PublishedDate = DateTime.Now,
                                                     isDropped = false,
-                                                    StudentPoints = -1
+                                                    StudentPoints = -1,
+                                                    RawPoints = rawPoints
                                                 };
                                                 db.Scores.Add(newScore);
                                                 db.SaveChanges();
@@ -780,8 +790,10 @@ namespace OSBLE.Controllers
                                             select scores).ToList();
                      
                    var studentScores = (from scores in scoreList
-                                        where scores.TeamUserMember.Contains(user)
+                                        where scores.TeamUserMember.Contains(user) &&
+                                        scores.isDropped == true
                                         select scores);
+                   
 
                    //var studentScores = from scores in db.Scores
                    //                    where scores.AssignmentActivity.AbstractAssignment.CategoryID == categoryId
@@ -929,18 +941,15 @@ namespace OSBLE.Controllers
                             for (int i = 0; i < studentScores.Count(); i++)
                             {
                                 List<Score> scores = studentScores.AsEnumerable().ElementAt(i).ToList();
-                                var max = 0;
+                                var max = dropX;
                                 if (customize == "XtoTake")
                                 {
                                     max = scores.Count() - dropX;
                                 }
-                                else
-                                {
-                                    max = dropX;
-                                }
+
                                 for (int j = 0; j < max; j++)
                                 {                                    
-                                    if (j < scores.Count())
+                                    if (j < scores.Count() - 1)
                                     {
                                         scores[j].isDropped = true;
                                     }
@@ -1464,7 +1473,87 @@ namespace OSBLE.Controllers
             TeacherIndex();
             return View("Index");
         }
+        [HttpPost]
+        public ActionResult ModifyMaxPoints(double value)
+        {
+            if (ModelState.IsValid)
+            {
+                int currentCategoryId = (int)Session["categoryId"];
+                Category currentCategory = db.Categories.Find(currentCategoryId);
 
+                currentCategory.MaxAssignmentScore = value;
+                db.SaveChanges();
+
+                List<Score> scores = (from score in db.Scores
+                                      where score.AssignmentActivity.AbstractAssignment.CategoryID == currentCategoryId
+                                      select score).ToList();
+
+                if (scores.Count() > 0)
+                {
+                    //First, we need to set the scores back to the raw total to do the new calculations.
+                    foreach (Score score in scores)
+                    {
+                        score.Points = score.RawPoints;
+                    }
+                    db.SaveChanges();
+
+                    //If the values percent is greater than the maximum percent, we need to set the value to the 
+                    //maximum percent. We give the score the total points possible for the assignment 
+                    //multiplied by the (max value / 100). This will give us the total percent for the assignment
+                    //the student can receive. We need to check both points and student points.
+                    foreach (Score score in scores)
+                    {
+                        if (((score.Points/score.AssignmentActivity.PointsPossible)*100) > value)
+                        {
+                            score.Points = (score.AssignmentActivity.PointsPossible * (value / 100));
+                        }
+                        if (((score.StudentPoints/score.AssignmentActivity.PointsPossible)*100) > value)
+                        {
+                            score.StudentPoints = (score.AssignmentActivity.PointsPossible * (value / 100));
+                        }
+                    }
+                    db.SaveChanges();
+                }
+            }
+            return View("_Gradebook");
+        }
+
+        [HttpPost]
+        public ActionResult RemoveModifyMaxPoints()
+        {
+            if (ModelState.IsValid)
+            {
+                //Get the current category
+                int currentCategoryId = (int)Session["categoryId"];
+                Category currentCategory = db.Categories.Find(currentCategoryId);
+
+                //Set the current categories max assignment score to -1
+                if (currentCategory.MaxAssignmentScore > -1)
+                {
+                    currentCategory.MaxAssignmentScore = -1;
+                    db.SaveChanges();
+
+                    List<Score> scores = (from score in db.Scores
+                                          where score.AssignmentActivity.AbstractAssignment.CategoryID == currentCategoryId
+                                          select score).ToList();
+
+                    //If there are scores, set the student scores to their raw scores and 
+                    //save the database.
+                    if (scores.Count() > 0)
+                    {
+                        foreach (Score score in scores)
+                        {
+                            score.Points = score.RawPoints;
+                        }
+                        db.SaveChanges();
+                    }
+                }
+                else
+                {
+                }
+            }
+            return View("_Gradebook");
+        }
 
         [HttpPost]
         public ActionResult ModifyCell(double value, string userId, int assignmentId)
@@ -1479,6 +1568,7 @@ namespace OSBLE.Controllers
 
                 if (user != null)
                 {
+                    double rawValue = value;
                     List<Score> gradableQuery = (from g in db.Scores
                                                  where g.AssignmentActivityID == assignmentId
                                                  select g).ToList();
@@ -1493,51 +1583,47 @@ namespace OSBLE.Controllers
 
                     var currentAssignment = assignmentQuery.FirstOrDefault();
                     var teamuser = from c in currentAssignment.TeamUsers where c.Contains(user) select c;
+                    Category currentCategory = currentAssignment.AbstractAssignment.Category;
 
                     if (grades != null)
                     {
-                        if (grades.ManualLatePenaltyPercent >= 0)
+                        TimeSpan? lateness = calculateLateness(currentAssignment.AbstractAssignment.Category.Course, currentAssignment, teamuser.First());
+                        if (lateness != null)
                         {
-                            value = value * (grades.ManualLatePenaltyPercent / 100);
+                            latePenalty = CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
+                            latePenalty = (100 - latePenalty) / 100;
+                            value = value * latePenalty;
                         }
-                        else
+
+                        if (currentCategory.MaxAssignmentScore >= 0)
                         {
-                            TimeSpan? lateness = calculateLateness(currentAssignment.AbstractAssignment.Category.Course, currentAssignment, teamuser.First());
-                            if (lateness != null)
+                            if (((value/grades.AssignmentActivity.PointsPossible)*100) > currentCategory.MaxAssignmentScore)
                             {
-                                latePenalty = CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
-                                latePenalty = (100 - latePenalty) / 100;
-                                value = value * latePenalty;
+                                value = (currentAssignment.PointsPossible * (currentCategory.MaxAssignmentScore / 100));
                             }
                         }
-                        //Only change grade if value is different
+
                         if (grades.Points == value)
                         {
+                            //Don't do anything to the points because our value coming in equals the points in the db.
+                            //However, we do need to set the raw value in case that changed.
+                            grades.RawPoints = rawValue;
+                            db.SaveChanges();
                         }
                         else
                         {
-                            if (grades.ManualLatePenaltyPercent >= 0)
-                            {
-                            }
-                            else
-                            {
-                                grades.LatePenaltyPercent = latePenalty;
-                            }
-                            
                             grades.Points = value;
                             grades.AddedPoints = 0;
+                            grades.LatePenaltyPercent = latePenalty;
                             grades.StudentPoints = -1;
+                            grades.RawPoints = rawValue;
                             db.SaveChanges();
-                        }
+                       } 
                     }
                     else
                     {
                         if (teamuser.Count() > 0)
                         {
-                            if (grades.ManualLatePenaltyPercent >= 0)
-                            {
-                                value = value * (grades.ManualLatePenaltyPercent / 100);
-                            }
                             TimeSpan? lateness = calculateLateness(currentAssignment.AbstractAssignment.Category.Course, currentAssignment, teamuser.First());
                             if (lateness != null)
                             {
@@ -1546,35 +1632,28 @@ namespace OSBLE.Controllers
                                 value = value * latePenalty;
                             }
 
-                            if (grades.ManualLatePenaltyPercent >= 0)
+                            if (currentCategory.MaxAssignmentScore > 0)
                             {
-                                Score newScore = new Score()
+                                if (((value/currentAssignment.PointsPossible)*100) > currentCategory.MaxAssignmentScore)
                                 {
-                                    TeamUserMember = teamuser.First(),
-                                    Points = value,
-                                    AssignmentActivityID = currentAssignment.ID,
-                                    PublishedDate = DateTime.Now,
-                                    isDropped = false,
-                                    StudentPoints = -1
-                                };
-                                db.Scores.Add(newScore);
-                                db.SaveChanges();
+                                    value = (currentAssignment.PointsPossible * (currentCategory.MaxAssignmentScore / 100));
+                                }
                             }
-                            else
+
+                            Score newScore = new Score()
                             {
-                                Score newScore = new Score()
-                                {
-                                    TeamUserMember = teamuser.First(),
-                                    Points = value,
-                                    AssignmentActivityID = currentAssignment.ID,
-                                    PublishedDate = DateTime.Now,
-                                    isDropped = false,
-                                    LatePenaltyPercent = latePenalty,
-                                    StudentPoints = -1
-                                };
-                                db.Scores.Add(newScore);
-                                db.SaveChanges();
-                            }
+                                TeamUserMember = teamuser.First(),
+                                Points = value,
+                                AssignmentActivityID = currentAssignment.ID,
+                                PublishedDate = DateTime.Now,
+                                isDropped = false,
+                                LatePenaltyPercent = latePenalty,
+                                StudentPoints = -1,
+                                RawPoints = rawValue
+                            };
+
+                            db.Scores.Add(newScore);
+                            db.SaveChanges();
                         }
                     }
                     if (currentAssignment.addedPoints > 0)
@@ -1601,6 +1680,7 @@ namespace OSBLE.Controllers
                                            select user).FirstOrDefault();
                     if (student != null)
                     {
+                        double rawValue = value;
                         AbstractAssignmentActivity currentAssignment = (from assignment in db.AbstractAssignmentActivities
                                                                         where assignment.ID == assignmentId
                                                                         select assignment).FirstOrDefault();
@@ -1613,14 +1693,31 @@ namespace OSBLE.Controllers
                                               where score.TeamUserMember.Contains(student)
                                               select score).FirstOrDefault();
 
+                        Category currentCategory = currentAssignment.AbstractAssignment.Category;
+
                         if (studentScore != null)
                         {
+                            if (currentCategory.MaxAssignmentScore > 0)
+                            {
+                                if (((value / currentAssignment.PointsPossible) * 100) > currentCategory.MaxAssignmentScore)
+                                {
+                                    value = (currentAssignment.PointsPossible * (currentCategory.MaxAssignmentScore / 100));
+                                }
+                            }
+
                             studentScore.StudentPoints = value;
                             db.SaveChanges();
                         }
                         else
                         {
                             var teamuser = from c in currentAssignment.TeamUsers where c.Contains(student) select c;
+                            if (currentCategory.MaxAssignmentScore > 0)
+                            {
+                                if (((value/currentAssignment.PointsPossible)*100) > currentCategory.MaxAssignmentScore)
+                                {
+                                    value = (currentAssignment.PointsPossible * (currentCategory.MaxAssignmentScore / 100));
+                                }
+                            }
 
                             Score newScore = new Score()
                             {
@@ -1629,7 +1726,8 @@ namespace OSBLE.Controllers
                                 StudentPoints = value,
                                 AssignmentActivityID = currentAssignment.ID,
                                 PublishedDate = DateTime.Now,
-                                isDropped = false
+                                isDropped = false,
+                                RawPoints = rawValue
                             };
 
                             db.Scores.Add(newScore);
@@ -2051,10 +2149,6 @@ namespace OSBLE.Controllers
                 //If there were no matches, then set currenTab to the main tab
                 currentTab = (from c in allCategories select c).First();
             }
-            //if (currentTab == null)
-            //{
-            //    currentTab = (from c in allCategories select c).First();
-            //}
 
             int numDropped = currentTab.dropX;
 
@@ -2191,6 +2285,7 @@ namespace OSBLE.Controllers
             ViewBag.Percents = studentScores;
             ViewBag.Dropped = numDropped;
             ViewBag.Customize = customizeOption;
+            ViewBag.MaxPoints = currentTab.MaxAssignmentScore;
 
             Session["isTab"] = 1;
         }

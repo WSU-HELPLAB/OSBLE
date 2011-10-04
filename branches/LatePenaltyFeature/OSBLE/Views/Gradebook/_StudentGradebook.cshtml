@@ -375,6 +375,9 @@
                 //Get the total score for the class
                 foreach (Category category in ViewBag.CatsWithWeightsAndScores)
                 {
+                    int categoryScoreCount = (from score in userScores
+                                              where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
+                                              select score).Count();
                     int count = 0;
                     int numDropped = category.dropX;
                     int customize = category.Customize;
@@ -383,7 +386,11 @@
                         
                         if (category.Customize == (int)Category.GradeOptions.XtoTake)
                         {
-                            numDropped = userScores.Count() - numDropped;  
+                            numDropped = categoryScoreCount - numDropped;  
+                        }
+                        else if (numDropped >= categoryScoreCount)
+                        {
+                            numDropped = categoryScoreCount - 1;
                         }
                         
                         double categoryPoints = 0;
@@ -480,6 +487,9 @@
 
                 foreach (Category category in ViewBag.Categories)
                 {
+                    int categoryScoreCount = (from score in userScores
+                                              where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
+                                              select score).Count();
                     bool usingWhatIf = false;
                     if (userScores.Count() > 0)
                     {
@@ -489,7 +499,11 @@
 
                         if (category.Customize == (int)Category.GradeOptions.XtoTake)
                         {
-                            numDropped = userScores.Count() - numDropped;
+                            numDropped = categoryScoreCount - numDropped;
+                        }
+                        else if (numDropped >= categoryScoreCount)
+                        {
+                            numDropped = categoryScoreCount - 1;
                         }
 
                         if (category.Name != Constants.UnGradableCatagory)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Models.Users
 {
@@ -12,6 +13,11 @@ namespace OSBLE.Models.Users
 
         [Required]
         public int ThreadID { get; set; }
+
+        [Required]
+        public int ContextID { get; set; }
+
+        public virtual Course Context { get; set; }
 
         [Required]
         public int FromUserProfileID { get; set; }

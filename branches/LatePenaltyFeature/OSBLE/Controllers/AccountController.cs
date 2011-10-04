@@ -59,6 +59,12 @@ namespace OSBLE.Controllers
                 model.UserName = model.UserName.Trim();
                 model.Password = model.Password.Trim();
                 MembershipUser user = Membership.GetUser(model.UserName);
+
+                //remove any locks.  A little unsecure as it allows a constant brute-force 
+                //attack, but it seems to annoy users much more regularly.  Consider
+                //removing is OSBLE ever gets to the point that user accounts start getting
+                //hacked.
+                user.UnlockUser();
                 if (Membership.ValidateUser(model.UserName, model.Password))
                 {
                     context.Session.Clear(); // Clear session variables.
@@ -399,6 +405,9 @@ namespace OSBLE.Controllers
                 try
                 {
                     MembershipUser currentUser = Membership.GetUser(User.Identity.Name, true /* userIsOnline */);
+                    
+                    //never lock out users
+                    currentUser.UnlockUser();
                     changePasswordSucceeded = currentUser.ChangePassword(model.OldPassword, model.NewPassword);
                 }
                 catch (Exception)

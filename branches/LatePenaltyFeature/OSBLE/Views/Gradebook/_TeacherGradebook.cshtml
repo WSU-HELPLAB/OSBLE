@@ -194,7 +194,7 @@
 
                 foreach (UserProfile user in ViewBag.Students)
                 {
-                    studentCount++;
+                    
                     categoryTotalWeight = ViewBag.TotalCategoryWeights;
                     foreach (Category category in ViewBag.CatsWithWeightsAndScores)
                     {
@@ -225,8 +225,10 @@
                                                        select score).ToList();
                             if (totalScores.Count() > 0)
                             {
+                                studentCount++;
                                 foreach (Score score in totalScores)
                                 {
+                                    
                                     if (score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
                                     {
                                         categoryPoints += score.Points;
@@ -360,7 +362,7 @@
                 
                 <td id="@student.ID" >@student.LastName, @student.FirstName</td>   
                 
-                  totalGrade = 0.0;
+                  totalGrade = -1;
                   totalCategoryPoints = 0;
                   totalCategoryPossible = 0;
                   double totalCategoryWeight = ViewBag.TotalCategoryWeights;
@@ -429,14 +431,19 @@
                           break;
                       }
                   }
-                <td>@letter</td>
+                  <td>@letter</td>
+                
                   if (totalGrade > 0)
                   {
                     <td>@totalGrade.ToString(".#")%</td>
                   }
-                  else
+                  else if (totalGrade == 0)
                   {
                     <td>@String.Format("{0}", 0)%</td>
+                  }
+                  else
+                  {
+                      <td>NG</td>
                   }
                   totalGrade = 0;
 

@@ -16,6 +16,8 @@
 {
     @Html.ValidationSummary(true)
 
+    @Html.HiddenFor(model => model.ContextID)
+
     <input type="hidden" id="recipient_list" name="recipientlist" />
     
     <a>To:</a>
@@ -44,6 +46,15 @@
                 {
                     list.push(ui.item.value);
                     var id = ui.item.value;
+
+                    if( list == null)
+                    {
+                        $('#NoRecipient').show();
+                    }
+                    else
+                    {
+                        $('#NoRecipient').hide();
+                    }
 
                     // create new item
                     $('#recipients_data').append('<div id="' + id + '" class="recipient" />');
@@ -89,7 +100,7 @@
     </script>
     <br />
     <div id="recipients_data">
-        @if (recipients != null)
+        @if (recipients.Count > 0)
         {
             foreach (UserProfile up in recipients)
             {
@@ -106,7 +117,17 @@
                 </div>
             }
         }
+        else
+        {
+            <div id="NoRecipient" class="recipient">
+                <div class="recipient_tools">
+                </div>
+                    <a>No Reciepients Entered</a>
+            </div>
+            
+        }
     </div>
+    
     <div class="editor-field" style="clear: both;">
         @Html.LabelFor(model => model.Subject): @Html.EditorFor(model => model.Subject)<br />
         @Html.ValidationMessageFor(model => model.Subject)
