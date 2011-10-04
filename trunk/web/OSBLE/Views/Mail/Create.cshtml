@@ -5,6 +5,7 @@
 @{
     ViewBag.Title = "Create";
     List<UserProfile> recipients = Session["mail_recipients"] as List<UserProfile>;
+    string ids = "";
 }
 
 <h2>@ViewBag.MailHeader</h2>
@@ -18,15 +19,61 @@
 
     @Html.HiddenFor(model => model.ContextID)
 
-    <input type="hidden" id="recipient_list" name="recipientlist" />
-    
     <a>To:</a>
     <input id="people_finder" />
     @Helpers.CreateToolTip(ToolTips.MailRecipient) 
+   
+    <br />
+    <div id="recipients_data">
+        @if (recipients.Count > 0)
+        {
+            var numRec = 0;
+            foreach (UserProfile up in recipients)
+            {
+                if(numRec == 0)
+                {
+                    ids += up.ID;
+                }
+                else
+                {
+                    ids += "," + up.ID;
+                }
+                ++numRec;
+                <div id="@up.ID" class="recipient" >
+                    <div class="recipient_tools">
+                        <a href="#" title="Delete this recipient" onclick="removeRecipient(this)">
+                            <img src="/Content/images/delete_up.png" alt="Delete Button" />
+                        </a>
+                    </div>
+                    <a>
+                        <img src="@Url.Action("ProfilePicture")/@up.ID" class="small_profile_picture" alt="Profile Picture" />
+                        @up.FirstName @up.LastName
+                    </a>
+                </div>
+            }
+        }
+        else
+        {
+            <div id="NoRecipient" class="recipient">
+                <div class="recipient_tools">
+                </div>
+                    <a>No Reciepients Entered</a>
+            </div>
+           
+        }
+    </div>
+    <input type="hidden" id="recipient_list" name="recipientlist" value="@ids" />
     
     <script type="text/javascript">
-        
+        var strids = $('#recipient_list').val();
+        var temp = strids.split(',');
         var list = new Array();
+        var i = 0;
+        for(i = 0; i < temp.length; ++i)
+        {
+            list.push(temp[i]);
+        }
+
         var selection_state = false;
         
         $("#people_finder").autocomplete({
@@ -61,7 +108,7 @@
                     var newRecipient = $('#' + id);
 
                     // delete button  
-                    newRecipient.append('<div class="recipient_tools"><a href="#" title="Delete this recipient" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove(); removeRecipient(this); });"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');                                                                                                                                                                                                  
+                    newRecipient.append('<div class="recipient_tools"><a href="#" title="Delete this recipient" onclick="removeRecipient(this)"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');                                                                                                                                                                                                  
                     
                     // main layout
                     newRecipient.append("<a>");
@@ -86,8 +133,9 @@
 
 
         function removeRecipient(div) {
-            var id = $(div).attr("id");
-
+            var id = $(div).parent().parent().attr("id");
+            $(div).parent().parent().hide('highlight');
+            $(div).remove();
             $(list).each(function (index, value) { 
                 if(value == id){
                     list.splice(index, 1);
@@ -98,35 +146,6 @@
             $('#recipient_list').serializeArray();
         }
     </script>
-    <br />
-    <div id="recipients_data">
-        @if (recipients.Count > 0)
-        {
-            foreach (UserProfile up in recipients)
-            {
-                <div id="@up.ID" class="recipient" >
-                    <div class="recipient_tools">
-                        <a href="#" title="Delete this recipient" onclick="$(this).parent().hide(\'highlight\', function () { $(this).remove(); removeRecipient(this); });">
-                            <img src="/Content/images/delete_up.png" alt="Delete Button" />
-                        </a>
-                    </div>
-                    <a>
-                        <img src="@Url.Action("ProfilePicture")/@up.ID" class="small_profile_picture" alt="Profile Picture" />
-                        @up.FirstName @up.LastName
-                    </a>
-                </div>
-            }
-        }
-        else
-        {
-            <div id="NoRecipient" class="recipient">
-                <div class="recipient_tools">
-                </div>
-                    <a>No Reciepients Entered</a>
-            </div>
-            
-        }
-    </div>
     
     <div class="editor-field" style="clear: both;">
         @Html.LabelFor(model => model.Subject): @Html.EditorFor(model => model.Subject)<br />
@@ -150,3 +169,7 @@
     @Html.ActionLink("Back to Inbox", "Index")
 </div>
 
+<script type="text/javascript">
+   
+
+</script>

@@ -53,10 +53,9 @@ namespace OSBLE.Controllers
                 SetUnreadMessageCount();
             }
 
-            id = mail.ThreadID;
             // getting all recipients of the mail
             List<UserProfile> recipients = (from m in db.Mails
-                                            where m.ThreadID == id 
+                                            where m.ThreadID == mail.ThreadID 
                                             select m.ToUserProfile).ToList();
 
             ViewBag.AllRecipients = recipients;
@@ -93,7 +92,6 @@ namespace OSBLE.Controllers
                     }
                 }
             }
-
             return false;
         }
 
@@ -117,12 +115,13 @@ namespace OSBLE.Controllers
                 // Instructor or Instructor and TA(s) or Whole team
                 if (whoTo < 0)
                 {
+                    // email the whole team
                     if(whoTo == -4)
                     {
                         if(teamID.HasValue)
                         {
+                            ViewBag.MailHeader = "New Message to whole team";
                             int tID = (int)teamID;
-                            // this returns an empty list for some reason, must investigate.
                             var team = (from t in db.Teams
                                         where t.ID == tID
                                         select t.Members).FirstOrDefault().ToList();
@@ -138,8 +137,16 @@ namespace OSBLE.Controllers
                     }
                     else if( whoTo >= -3 && whoTo <= -1)// Instructor or Instructor and TA(s)
                     {
-                        if (whoTo == -1 || whoTo == -3)
+                        if (whoTo == -3)
                         {
+                            ViewBag.MailHeader = "New Message to Instructor and TA(s)";
+                        }
+                        if (whoTo == -1 || whoTo == -3) // Instructors 
+                        {
+                            if(whoTo == -1)
+                            {
+                                ViewBag.MailHeader = "New Message to Instructor";
+                            }
                             List<CoursesUsers> instructors = db.CoursesUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "Instructor")).ToList();
                             if (instructors != null)
                             {
@@ -152,6 +159,10 @@ namespace OSBLE.Controllers
                         // TA(s) or Instructor and TA(s)
                         if (whoTo == -2 || whoTo == -3)
                         {
+                            if (whoTo == -2)
+                            {
+                                ViewBag.MailHeader = "New Message to TA(s)";
+                            }
                             List<CoursesUsers> tas = db.CoursesUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "TA")).ToList();
 
                             if (tas != null)
@@ -164,11 +175,12 @@ namespace OSBLE.Controllers
                         }
                     }
                 }
-                else // Student Id
+                else // Email team member Id is passed as team member user id
                 {
                     CoursesUsers studentRec = db.CoursesUsers.Where(c => (c.UserProfileID == whoTo) && (c.AbstractCourseID == aCourseID)).FirstOrDefault();
                     if (studentRec != null)
                     {
+                        ViewBag.MailHeader = "New Message to Team Member";
                         recipientList.Add(studentRec.UserProfile);
                     }
                 }
@@ -179,36 +191,30 @@ namespace OSBLE.Controllers
                 if (Request.Params["replyTo"] != null || Request.Params["replyAll"] != null)
                 {
                     int replyto;
+                    Mail reply = new Mail();
 
+                    //Reply All
                     if (Request.Params["replyAll"] != null)
                     {
                         replyto = Convert.ToInt32(Request.Params["replyAll"]);
+                        reply = db.Mails.Find(replyto);
                         recipientList = (from m in db.Mails
                                          where m.ThreadID == replyto &&
                                          m.ToUserProfileID != currentUser.ID
                                          select m.ToUserProfile).ToList<UserProfile>();
                     }
-                    else
+                    else // Reply
                     {
                         replyto = Convert.ToInt32(Request.Params["replyTo"]);
-                    }
-
-                    // need to query for mail.id not thread id in the case of reply all
-                    Mail reply = (from m in db.Mails
-                                  where m.ThreadID == replyto &&
-                                  m.ToUserProfile.ID == currentUser.ID
-                                  select m).FirstOrDefault();
-                        
-                        //db.Mails.Find(replyto);
-
-                    // Ensure valid reply user
-                    if (reply != null)
-                    {
-                        // if replyAll we dont not need to add the from user profile
-                        if (!recipientList.Contains(reply.FromUserProfile))
+                        reply = db.Mails.Find(replyto);
+                        if (reply != null)
                         {
                             recipientList.Add(reply.FromUserProfile); //Adds the sender to the reply list
                         }
+                    }
+
+                    if(recipientList != null && reply != null)
+                    {
                         string suffix = "RE: ";
                         if (ID == 0) // forward 0 is passed for the recipientid on forwards
                         {
@@ -222,13 +228,8 @@ namespace OSBLE.Controllers
                                         Regex.Replace(reply.Message, "^.*$", "> $&",
                                         RegexOptions.Multiline);
                     }
-                    else
-                    {
-                        recipientList.Clear();
-                    }
                 }
             }
-
             Session["mail_recipients"] = recipientList;
             return View(mail);
         }
@@ -242,29 +243,10 @@ namespace OSBLE.Controllers
             {
                 string recipient_string = Request.Params["recipientlist"];
                 string[] recipients;
-                List<int> reply_ids = new List<int>();
 
                 // gets the current course
                 mail.Context = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
 
-                // If it is a reply
-                if (Session["mail_recipients"] != null)
-                {
-                    List<UserProfile> recipientList = new List<UserProfile>();
-                    recipientList = Session["mail_recipients"] as List<UserProfile>;
-                    Session["mail_recipients"] = null;
-                    foreach (UserProfile up in recipientList)
-                    {
-                        if (recipient_string != "")
-                        {
-                            recipient_string += "," + up.ID.ToString();
-                        }
-                        else
-                        {
-                            recipient_string = up.ID.ToString();
-                        }
-                    }
-                }
                 if (recipient_string != null)
                 {
                     recipients = recipient_string.Split(',');
@@ -287,6 +269,7 @@ namespace OSBLE.Controllers
                         db.Mails.Add(newMail);
                         db.SaveChanges();
 
+                        // need to have an email created to get a valid id to set the thread ids to.
                         if (count == 0)
                         {
                             threadID = newMail.ID;
