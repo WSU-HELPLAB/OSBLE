@@ -26,13 +26,30 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public ActionResult Index(string pathInfo)
         {
             string path = Request.PhysicalApplicationPath + areaPath + pathInfo;
+            string extension = Path.GetExtension(path);
             try
             {
-                return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream");
+                return new FileStreamResult(FileSystem.GetDocumentForRead(path), GetMimeType(extension));
             }
             catch (Exception ex)
             {
                 return View();
+            }
+        }
+
+        private string GetMimeType(string extension)
+        {
+            if (extension.CompareTo(".css") == 0)
+            {
+                return "text/css";
+            }
+            else if (extension.CompareTo(".js") == 0)
+            {
+                return "application/x-javascript";
+            }
+            else
+            {
+                return "application/octet-stream";
             }
         }
     }

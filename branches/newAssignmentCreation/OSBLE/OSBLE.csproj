@@ -289,8 +289,9 @@
     <Content Include="App_Code\Libraries\LumenWorks.Framework.IO.dll" />
     <Content Include="App_Data\FirstNames.txt" />
     <Content Include="App_Data\LastNames.txt" />
-    <Content Include="Areas\AssignmentWizard\Content\Css\Team.css" />
-    <Content Include="Areas\AssignmentWizard\Content\Js\deliverables.js" />
+    <Content Include="Areas\AssignmentWizard\Content\css\team.css" />
+    <Content Include="Areas\AssignmentWizard\Content\js\deliverables.js" />
+    <Content Include="Areas\AssignmentWizard\Content\js\team.js" />
     <Content Include="Areas\AssignmentWizard\Modifications.txt" />
     <Content Include="clientaccesspolicy.xml">
       <SubType>Designer</SubType>
@@ -634,6 +635,8 @@
   <ItemGroup>
     <Content Include="Areas\AssignmentWizard\Views\Web.config" />
     <Content Include="Areas\AssignmentWizard\Views\Content\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\_ViewStart.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />
@@ -718,8 +721,6 @@
     <Content Include="Areas\AssignmentWizard\Views\Rubric\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Team\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\WizardSummary.cshtml" />
-    <Content Include="Areas\AssignmentWizard\Views\Shared\_WizardTopNav.cshtml" />
-    <Content Include="Areas\AssignmentWizard\Views\Shared\_WizardBottomNav.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Deliverables\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
