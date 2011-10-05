@@ -1833,7 +1833,7 @@ namespace OSBLE.Controllers
 
         }
 
-
+        [OutputCache(Duration=3600)]
         public ActionResult TeacherIndex()
         {
             //LINQ complains when we use this directly in our queries,so pull it beforehand

@@ -1612,6 +1612,18 @@ namespace OSBLE.Controllers
                         }
                         else
                         {
+                            if (grades.ManualLatePenaltyPercent >= 0)
+                            {
+                                if (grades.ManualLatePenaltyPercent > 1)
+                                {
+                                    grades.Points = (value * ((100 - grades.ManualLatePenaltyPercent) / 100));
+                                }
+                                else
+                                {
+                                    grades.Points = (value * (1 - grades.ManualLatePenaltyPercent));
+                                }
+                            }
+
                             grades.Points = value;
                             grades.AddedPoints = 0;
                             grades.LatePenaltyPercent = latePenalty;
@@ -1639,21 +1651,46 @@ namespace OSBLE.Controllers
                                     value = (currentAssignment.PointsPossible * (currentCategory.MaxAssignmentScore / 100));
                                 }
                             }
-
-                            Score newScore = new Score()
+                            if (grades.ManualLatePenaltyPercent >= 0)
                             {
-                                TeamUserMember = teamuser.First(),
-                                Points = value,
-                                AssignmentActivityID = currentAssignment.ID,
-                                PublishedDate = DateTime.Now,
-                                isDropped = false,
-                                LatePenaltyPercent = latePenalty,
-                                StudentPoints = -1,
-                                RawPoints = rawValue
-                            };
-
-                            db.Scores.Add(newScore);
-                            db.SaveChanges();
+                                if (grades.ManualLatePenaltyPercent > 1)
+                                {
+                                    value *= ((100 - grades.ManualLatePenaltyPercent) / 100);
+                                }
+                                else
+                                {
+                                    value *= (1 - grades.ManualLatePenaltyPercent);
+                                }
+                                Score newScore = new Score()
+                                {
+                                    TeamUserMember = teamuser.First(),
+                                    Points = value,
+                                    AssignmentActivityID = currentAssignment.ID,
+                                    PublishedDate = DateTime.Now,
+                                    isDropped = false,
+                                    LatePenaltyPercent = latePenalty,
+                                    StudentPoints = -1,
+                                    RawPoints = rawValue
+                                };
+                                db.Scores.Add(newScore);
+                                db.SaveChanges();
+                            }
+                            else
+                            {
+                                Score newScore = new Score()
+                                {
+                                    TeamUserMember = teamuser.First(),
+                                    Points = value,
+                                    AssignmentActivityID = currentAssignment.ID,
+                                    PublishedDate = DateTime.Now,
+                                    isDropped = false,
+                                    LatePenaltyPercent = latePenalty,
+                                    StudentPoints = -1,
+                                    RawPoints = rawValue
+                                };
+                                db.Scores.Add(newScore);
+                                db.SaveChanges();
+                            }
                         }
                     }
                     if (currentAssignment.addedPoints > 0)
