@@ -39,6 +39,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                                        where cu.AbstractCourseID == activeCourse.AbstractCourseID
                                        && cu.AbstractRole.CanSubmit
                                        select cu).ToList();
+            List<CourseUsers> allUsers = users.ToList();
 
             //We'll need to cross the current teams with the list of course users
             List<AssignmentTeam> teams = Assignment.AssignmentTeams.ToList();
@@ -48,12 +49,18 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 foreach (TeamMember member in team.Team.TeamMembers)
                 {
+                    //If we're in a postback condition, our list of teams will include little more than the CourseUserId
+                    //As such, we can't access member.CourseUser
                     CourseUsers user = users.Find(u => u.ID == member.CourseUserID);
                     users.Remove(user);
+
+                    //add the more detailed CourseUsers info to the member
+                    member.CourseUser = user;
                 }
             }
 
             //place items into the viewbag
+            ViewBag.AllUsers = allUsers;
             ViewBag.UnassignedUsers = users;
             ViewBag.Teams = teams;
         }

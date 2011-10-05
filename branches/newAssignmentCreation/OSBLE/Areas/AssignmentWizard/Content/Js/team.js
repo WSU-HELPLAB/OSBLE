@@ -4,12 +4,11 @@
 function documentReady() {
 
     //set up sortable lists
-    $("#AvailableStudent").sortable(
+    $(".TeamSortable").sortable(
             {
                 connectWith: ".TeamSortable",
                 forcePlaceholderSize: true
             }).disableSelection();
-
 
 
     //various event listeners

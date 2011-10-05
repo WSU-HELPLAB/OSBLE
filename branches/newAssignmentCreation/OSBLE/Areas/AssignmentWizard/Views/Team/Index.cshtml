@@ -5,7 +5,8 @@
 @model Assignment          
 @{
     List<CourseUsers> unassignedUsers = ViewBag.UnassignedUsers;
-    List<AssignmentTeam> teams = ViewBag.Teams;    
+    List<AssignmentTeam> teams = ViewBag.Teams;
+    List<CourseUsers> allUsers = ViewBag.AllUsers;
     ViewBag.Title = "Assignment Creation Wizard";
 }
 
@@ -60,14 +61,29 @@
 <div id="TeamsDiv">
     <h3>Teams</h3>
 
-    @foreach (AssignmentTeam aTeam in teams)
+    @{int counter = 0;}
+    @foreach (AssignmentTeam aTeam in teams.OrderBy(t => t.Team.Name))
     {
-        
+        counter++;
+        <div id="teamDiv_@(counter)" class="TeamDiv">
+            <input type="text" class="TeamNameTextBox" value="@aTeam.Team.Name" />
+            <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" alt="remove team" title="remove team" onclick="removeTeam('teamDiv_@(counter)')" />
+            <ul id="team_(@counter)" class="TeamSortable">
+                @foreach (TeamMember member in aTeam.Team.TeamMembers)
+                {
+                    <li id="cu_@(member.CourseUserID)" class="ui-state-default Student">@member.CourseUser.UserProfile.LastName, @member.CourseUser.UserProfile.FirstName</li>
+                }
+            </ul>
+        </div>
+        if (counter % 3 == 0)
+        {
+            <div style="clear:both;"></div>
+        }
     }
 </div>
 
 <!-- hidden form values needed for team assignment -->
-@foreach (CourseUsers cu in unassignedUsers)
+@foreach (CourseUsers cu in allUsers)
 {
     <input type="hidden" id="student_@(cu.ID)" name="student_@(cu.ID)" value="@(cu.UserProfile.FirstName) @(cu.UserProfile.LastName)" />
 }
