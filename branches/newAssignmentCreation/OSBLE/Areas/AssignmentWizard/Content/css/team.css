@@ -35,13 +35,11 @@
     width:200px;
     border:1px solid #EEF;
     border-bottom:3px solid #EEF;
-
 }
     
 #TeamsDiv
 {
     float:left;
-    width:800px;
     padding-top:15px;
     padding-left:15px;
 }

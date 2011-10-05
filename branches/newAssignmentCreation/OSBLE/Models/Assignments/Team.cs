@@ -13,7 +13,7 @@ namespace OSBLE.Models.Assignments
         public string Name { get; set; }
 
         [Association("AssignmentTeam_Team", "ID", "TeamID")]
-        public IList<TeamMember> TeamMembers { get; set; }
+        public virtual IList<TeamMember> TeamMembers { get; set; }
 
         public Team()
         {

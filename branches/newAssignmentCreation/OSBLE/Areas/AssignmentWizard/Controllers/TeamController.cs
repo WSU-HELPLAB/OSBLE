@@ -31,7 +31,13 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
-        private void SetUpViewBag()
+        /// <summary>
+        /// Sets up the viewbag for various controller actions.
+        /// </summary>
+        /// <param name="assignmentWithTeams">Supply the assignment that you want pull the teams from.
+        /// This is used for pulling team configurations from other assignments
+        /// </param>
+        private void SetUpViewBag(Assignment assignmentWithTeams)
         {
             //Guaranteed to pull all people enrolled in the course that can submit files
             //(probably students).
@@ -42,7 +48,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             List<CourseUsers> allUsers = users.ToList();
 
             //We'll need to cross the current teams with the list of course users
-            List<AssignmentTeam> teams = Assignment.AssignmentTeams.ToList();
+            List<AssignmentTeam> teams = assignmentWithTeams.AssignmentTeams.ToList();
 
             //remove students currently on the team list from our complete user list
             foreach (AssignmentTeam team in teams)
@@ -59,10 +65,26 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 }
             }
 
+            //pull previous team configurations
+            List<Assignment> previousTeamAssignments = (from assignment in db.Assignments
+                                                        where assignment.Category.Course.ID == activeCourse.AbstractCourseID
+                                                        where assignment.AssignmentTeams.Count > 0
+                                                        select assignment).ToList();
+
             //place items into the viewbag
             ViewBag.AllUsers = allUsers;
             ViewBag.UnassignedUsers = users;
             ViewBag.Teams = teams;
+            ViewBag.PreviousTeamAssignments = previousTeamAssignments;
+        }
+
+        /// <summary>
+        /// Sets up the viewbag for various controller actions.  Will pull team information from
+        /// the assignment currently being edited.
+        /// </summary>
+        private void SetUpViewBag()
+        {
+            SetUpViewBag(Assignment);
         }
 
         public override ActionResult Index() 
@@ -77,13 +99,31 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             //reset our assignment
             Assignment = db.Assignments.Find(model.ID);
-            ParseFormValues();
-            db.SaveChanges();
 
-            //We need to force the update as our model validation fails by default because
-            //we're not guaranteeing that the Assignment will be fully represented in our view.
-            WasUpdateSuccessful = true;
-            SetUpViewBag();
+            //two postback options: 
+            //   Load a prior team configuraiton.  This will be donoted by the presence of the
+            //      "AutoGenFromPastButton" key in postback.
+            //   Save team configuration.  If we don't have the above key, then we must be
+            //      wanting to do that.
+            if (Request.Form.AllKeys.Contains("AutoGenFromPastButton"))
+            {
+                //we don't want to continue so force success to be false
+                WasUpdateSuccessful = false;
+                int assignmentId = Assignment.ID;
+                Int32.TryParse(Request.Form["AutoGenFromPastSelect"].ToString(), out assignmentId);
+                Assignment otherAssignment = db.Assignments.Find(assignmentId);
+                SetUpViewBag(otherAssignment);
+            }
+            else
+            {
+                ParseFormValues();
+                db.SaveChanges();
+
+                //We need to force the update as our model validation fails by default because
+                //we're not guaranteeing that the Assignment will be fully represented in our view.
+                WasUpdateSuccessful = true;
+                SetUpViewBag();
+            }
             return base.Index(Assignment);
         }
 

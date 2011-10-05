@@ -7,6 +7,7 @@
     List<CourseUsers> unassignedUsers = ViewBag.UnassignedUsers;
     List<AssignmentTeam> teams = ViewBag.Teams;
     List<CourseUsers> allUsers = ViewBag.AllUsers;
+    List<Assignment> previousTeamAssignments = ViewBag.PreviousTeamAssignments;
     ViewBag.Title = "Assignment Creation Wizard";
 }
 
@@ -35,9 +36,13 @@
     </li>
     <li>
         Use a layout from the previous assignment: 
-        <select id="AutoGenFromPastSelect">
+        <select id="AutoGenFromPastSelect" name="AutoGenFromPastSelect">
+            @foreach (Assignment assignment in previousTeamAssignments)
+            {
+                <option value="@assignment.ID">@assignment.AssignmentName</option>
+            }
         </select>
-        <button type="button" id="AutoGenFromPastButton">Go</button>
+        <button type="submit" name="AutoGenFromPastButton" id="AutoGenFromPastButton">Go</button>
     </li>
 </ul>
 </div>
