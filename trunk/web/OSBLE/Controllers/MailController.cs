@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using OSBLE.Attributes;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
+using OSBLE.Models.HomePage;
 
 namespace OSBLE.Controllers
 {
@@ -49,6 +50,18 @@ namespace OSBLE.Controllers
             else if ((mail.ToUserProfile == currentUser) && (mail.Read == false))
             {
                 mail.Read = true;
+                
+                // Removes the notification once the email is read.
+                Notification n = db.Notifications.Find(id);
+
+                // Notification exists and belongs to current user.
+                if ((n != null) && (n.RecipientID == currentUser.ID))
+                {
+                    // Mark notification as read.
+                    n.Read = true;
+                    db.SaveChanges();
+                }
+
                 db.SaveChanges();
                 SetUnreadMessageCount();
             }
