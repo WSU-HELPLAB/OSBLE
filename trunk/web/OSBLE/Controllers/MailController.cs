@@ -336,8 +336,8 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public ActionResult Search()
         {
-            string term = Request.Params["term"];
-
+            string term = Request.Params["term"].ToString().ToLower();
+            
             // If we are not anonymous in a course, allow search of all users.
             List<int> authorizedCourses = currentCourses
                 .Where(c => c.AbstractRole.Anonymized == false)
