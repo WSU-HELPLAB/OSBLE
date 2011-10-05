@@ -73,14 +73,16 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         }
 
         [HttpPost]
-        public new ActionResult Index(Assignment model)
+        public ActionResult Index(Assignment model)
         {
             //reset our assignment
             Assignment = db.Assignments.Find(model.ID);
             ParseFormValues();
+            db.SaveChanges();
 
-            //remove forced fail once we're ready for action
-            WasUpdateSuccessful = false;
+            //We need to force the update as our model validation fails by default because
+            //we're not guaranteeing that the Assignment will be fully represented in our view.
+            WasUpdateSuccessful = true;
             SetUpViewBag();
             return base.Index(Assignment);
         }

@@ -12,11 +12,11 @@ namespace OSBLE.Models.Assignments
         [Key]
         [Column(Order=0)]
         public int TeamID { get; set; }
-        public Team Team { get; set; }
+        public virtual Team Team { get; set; }
 
         [Key]
         [Column(Order=1)]
         public int CourseUserID { get; set; }
-        public CourseUsers CourseUser { get; set; }
+        public virtual CourseUsers CourseUser { get; set; }
     }
 }
