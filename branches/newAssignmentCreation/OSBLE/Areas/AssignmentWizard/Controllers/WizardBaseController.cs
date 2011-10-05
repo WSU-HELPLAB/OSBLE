@@ -82,7 +82,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 if (Request.Form.AllKeys.Contains(previousWizardButton))
                 {
                     comp = manager.GetPreviousComponent();
-                    errorPath = "Start";
+                    errorPath = "Home";
                 }
                 else
                 {
