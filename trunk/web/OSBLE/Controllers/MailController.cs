@@ -200,34 +200,33 @@ namespace OSBLE.Controllers
             }
             else
             {
-                // Handles Reply, ReplyAll and Forward
+                // Handles Reply, ReplyAll and Forward 
                 if (Request.Params["replyTo"] != null || Request.Params["replyAll"] != null)
                 {
                     int replyto;
                     Mail reply = new Mail();
 
-                    //Reply All
+                    //Reply All gets the mail thread id
                     if (Request.Params["replyAll"] != null)
                     {
                         replyto = Convert.ToInt32(Request.Params["replyAll"]);
-                        reply = db.Mails.Find(replyto);
                         recipientList = (from m in db.Mails
                                          where m.ThreadID == replyto &&
                                          m.ToUserProfileID != currentUser.ID
                                          select m.ToUserProfile).ToList<UserProfile>();
                     }
-                    else // Reply
+                    else // Reply  gets the mail id
                     {
                         replyto = Convert.ToInt32(Request.Params["replyTo"]);
-                        reply = db.Mails.Find(replyto);
-                        if (reply != null)
+                    }
+
+                    reply = db.Mails.Find(replyto);
+                    if (reply != null)
+                    {
+                        if(!recipientList.Contains(reply.FromUserProfile))
                         {
                             recipientList.Add(reply.FromUserProfile); //Adds the sender to the reply list
                         }
-                    }
-
-                    if(recipientList != null && reply != null)
-                    {
                         string suffix = "RE: ";
                         if (ID == 0) // forward 0 is passed for the recipientid on forwards
                         {

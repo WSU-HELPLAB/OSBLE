@@ -30,15 +30,14 @@
             var numRec = 0;
             foreach (UserProfile up in recipients)
             {
-                if (numRec == 0)
+                // injecting a comma in between id's
+                if (numRec > 0) 
                 {
-                    ids += up.ID;
+                    ids += ",";
                 }
-                else
-                {
-                    ids += "," + up.ID;
-                }
+                ids += up.ID;
                 ++numRec;
+                
                 <div id="@up.ID" class="recipient" >
                     <div class="recipient_tools">
                         <a href="#" title="Delete this recipient" onclick="removeRecipient(this)">
@@ -101,16 +100,8 @@
             source: "@(Url.Action("Search"))",
             select: function(event, ui) {
                 $(this).val("");
-
-                // repeat entry error checking
-                var repeat = false;
-                $(list).each(function (index, value) { 
-                    if(value == ui.item.value){
-                        repeat = true;
-                    }
-                });
-                
-                if(repeat != true)
+                // repeat entry error checking                             
+                if($.inArray(ui.item.value, list) != -1)
                 {
                     list.push(ui.item.value);
                     var id = ui.item.value;
@@ -132,10 +123,6 @@
                     $('#recipient_list').val(list);
                     $('#recipient_list').serializeArray();
                 }
-                else
-                {
-                    repeat = false;
-                }
                 return false;
             },
             focus: function(event, ui) {return false;}
@@ -149,18 +136,14 @@
 
         function removeRecipient(div) {
             var id = $(div).parent().parent().attr("id");
-            $(div).parent().parent().hide('highlight');
-            $(div).remove();
-            $(list).each(function (index, value) { 
-                if(value == id){
-                    list.splice(index, 1);
-                }
-            });
+            $(div).parent().parent().remove();
+
+            list.splice($.inArray(id, list), 1);
 
             $('#recipient_list').val(list);
             $('#recipient_list').serializeArray();
 
-            if(list.length == 0)
+            if(list.length < 1)
             {
                 $('#recipients_data').append('<div id="NoRecipient" class="recipient" />');
                 var NoRecipient = $('#NoRecipient');
