@@ -27,5 +27,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 return prereqs;
             }
         }
+
+        public override ActionResult Index()
+        {
+            base.Index();
+            return View(Assignment);
+        }
     }
 }
