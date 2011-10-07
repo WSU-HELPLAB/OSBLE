@@ -218,6 +218,7 @@ namespace OSBLE.Controllers
                     else // Reply  gets the mail id
                     {
                         replyto = Convert.ToInt32(Request.Params["replyTo"]);
+                        recipientList.Add(reply.FromUserProfile); //Adds the sender to the reply list
                     }
 
                     reply = db.Mails.Find(replyto);

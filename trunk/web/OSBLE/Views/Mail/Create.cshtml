@@ -101,7 +101,7 @@
             select: function(event, ui) {
                 $(this).val("");
                 // repeat entry error checking                             
-                if($.inArray(ui.item.value, list) != -1)
+                if($.inArray(ui.item.value, list) == -1)
                 {
                     list.push(ui.item.value);
                     var id = ui.item.value;
