@@ -367,23 +367,19 @@ namespace OSBLE.Controllers
         {
             List<SerializableTeamMember> teamMembmers = new List<SerializableTeamMember>();
 
-            //We want either all users or all teams.  Never both.
-            var teamUserQuery = from tu in activity.TeamUsers
-                                where tu is OldTeamMember
-                                select tu;
-            List<TeamUserMember> members;
-            if (teamUserQuery.Count() > 0)
-            {
-                members = teamUserQuery.ToList();
-            }
-            else
-            {
-                members = (from tu in activity.TeamUsers
-                           where tu is UserMember
-                           select tu).ToList();
-            }
+            //Because an assignment might have been created before some students were added
+            //to the course, we cannot look at just the current activity's team users.
+            //We also need to pull orphaned (not around at assignment creation) students
+            //into the team creation tool.
+            //
+            //Start with the assumption that all students in the course are orphans.  When we
+            //find a student in a team, we can remove him or her from the list of orphans.
+            List<CourseUsers> orphans = db.CourseUsers
+                                            .Where(cu => cu.AbstractCourseID == activeCourse.AbstractCourseID)
+                                            .Where(cu => cu.AbstractRole.CanSubmit == true)
+                                            .ToList();
 
-            foreach (TeamUserMember member in members)
+            foreach (TeamUserMember member in activity.TeamUsers)
             {
                 SerializableTeamMember serializedMember = new SerializableTeamMember();
                 serializedMember.Name = member.Name;
@@ -403,6 +399,10 @@ namespace OSBLE.Controllers
                     {
                         continue;
                     }
+
+                    //remove the user member from the list of orphans
+                    orphans.Remove(cu);
+
                     serializedMember.UserID = uMember.UserProfileID;
                     serializedMember.isUser = true;
                     serializedMember.IsModerator = cu.AbstractRole.ID == (int)CourseRole.CourseRoles.Moderator;
@@ -432,6 +432,10 @@ namespace OSBLE.Controllers
                             {
                                 continue;
                             }
+
+                            //remove the user member from the list of orphans
+                            orphans.Remove(cu);
+
                             serializedMember.InTeamName = tMember.Name;
                             serializedMember.UserID = uMember.UserProfileID;
                             serializedMember.isUser = true;
@@ -441,6 +445,18 @@ namespace OSBLE.Controllers
                         }
                     }
                 }
+            }
+
+            //when we're all done with the activity's teams, we must now add the orphans back to the list
+            foreach (CourseUsers user in orphans)
+            {
+                SerializableTeamMember serializedMember = new SerializableTeamMember();
+                serializedMember.Name = user.UserProfile.LastAndFirst();
+                serializedMember.UserID = user.UserProfileID;
+                serializedMember.isUser = true;
+                serializedMember.IsModerator = user.AbstractRole.ID == (int)CourseRole.CourseRoles.Moderator;
+                serializedMember.Section = user.Section;
+                teamMembmers.Add(serializedMember);
             }
 
             return teamMembmers;
@@ -594,6 +610,9 @@ namespace OSBLE.Controllers
         /// </summary>
         private void SetUpViewBag()
         {
+            // changes the Page title and button to "Create Basic Assignment"
+            ViewBag.AssignmentLabel = "Create Basic Assignment";
+
             //RUBRICS
             List<Rubric> rubrics = (from cr in db.CourseRubrics
                                     join r in db.Rubrics on cr.RubricID equals r.ID
@@ -652,8 +671,11 @@ namespace OSBLE.Controllers
             //cover your bases.
             SetUpViewBag();
 
+            // changes the Page title and button to "Modify Assignment"
+            ViewBag.AssignmentLabel = "Modify Assignment";
+
             //Unlike when doing a CREATE, EDIT teams come from the viewmodel and not a postback
-            string json = SerializeTeamMemers(GetTeamMembers(viewModel.Assignment.AssignmentActivities.ElementAt(0)));
+            string json = SerializeTeamMemers(GetTeamMembers(viewModel.Assignment.AssignmentActivities.Where(a => a.TeamUsers.Count > 0).FirstOrDefault()));
             ViewBag.NewTeams = json;
 
             //similarly, the rubric's id doesn't come from a postback
@@ -716,10 +738,13 @@ namespace OSBLE.Controllers
             viewModel.Submission = (from sa in viewModel.Assignment.AssignmentActivities
                                     where sa is SubmissionActivity
                                     select sa).FirstOrDefault() as SubmissionActivity;
+            viewModel.Stop = (from sa in viewModel.Assignment.AssignmentActivities
+                              where sa is StopActivity
+                              select sa).FirstOrDefault() as StopActivity;
 
             viewModel.TeamCreation = CreateTeamCreationSilverlightObject();
             viewModel.RubricCreation = CreateRubricCreationSilverlightObject();
-
+            
             //Check for null comment categories.  
             if (viewModel.Assignment.CommentCategoryConfiguration == null)
             {

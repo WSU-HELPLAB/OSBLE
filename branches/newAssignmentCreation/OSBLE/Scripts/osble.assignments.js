@@ -152,6 +152,8 @@ $(function () {
         }
         else {
             $('#line_review_config').hide('blind');
+            // when unchecking inline comments should remove all contents
+            clearInLineCategories();
         }
     });
 
@@ -166,10 +168,6 @@ $(function () {
 
     if ($("input[name='line_review_options']:eq(1)").attr('checked') != 'checked') {
         $("input[name='line_review_options']:eq(0)").attr('checked', 'checked');
-    }
-
-    if ($('#InstructorCanReview').attr('checked') == 'checked') {
-        $('#line_review_config').show('blind');
     }
 });
 
@@ -290,6 +288,8 @@ function addNewCategory() {
     //Hides the addCategory button once you have created the max amount of them
     if (categoryCount >= MAX_CATEGORIES) {
         $('#add_new_category_div').animate({ "height": "hide" }, { duration: 0 });
+    } else {
+        $('#add_new_category_div').animate({ "height": "show" }, { duration: 0 });
     }
 }
 
@@ -297,4 +297,18 @@ function addNewCategoryOption(e) {
     var categoryIndex = e.data.catIndex;
     addCategoryOption(categoryIndex, categoryOptionIndex[categoryIndex]);
     categoryOptionIndex[categoryIndex]++;
+}
+
+// when unselect the inline checkbox clears all the categories in the drop down.
+function clearInLineCategories() {
+    var count = 0;
+    var categoryId;
+    do {
+        categoryId = 'category_' + count;
+        $('#' + categoryId).remove();
+    } while (++count < categoryCount);
+
+    // reseting the counters
+    categoryIndex = 0;
+    categoryCount = 0;
 }

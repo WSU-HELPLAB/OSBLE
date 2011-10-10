@@ -4,28 +4,12 @@
 @{
     ViewBag.Title = "Mail";
 }
-    <h2>New Message</h2>
-    Enter recipient's name to compose message: 
-    @Helpers.CreateToolTip(ToolTips.MailRecipient) <br />
-
-
-        <input id="people_finder" />
-        <script type="text/javascript">
-            $("#people_finder").autocomplete({
-                source: "@(Url.Action("Search"))",
-                select: function(event, ui) {
-                    location.href="@Url.Action("Create")?recipientID=" + ui.item.value;
-                },
-                focus: function(event, ui) {return false;}
-            }).data("autocomplete")._renderItem = function( ul, item ) {
-                return $( "<li></li>" )
-                .data( "item.autocomplete", item )
-                .append( "<a>" + "<img src=\"@Url.Action("ProfilePicture")/" + item.value + "\" class=\"small_profile_picture\" alt=\"Profile Picture\" /> " + item.label+ "</a>" )
-                .appendTo( ul );
-            }
-
-        </script>
-
+    <p>
+        @Html.ActionLink("Compose new message", "Create")&nbsp &nbsp
+        @Html.ActionLink("Compose new message to Instructor(s)", "Create", new { id = -1 }, null)&nbsp &nbsp
+        @Html.ActionLink("Compose new message to TA(s)", "Create", new { id = -2 }, null)&nbsp &nbsp
+        @Html.ActionLink("Compose new message to Instructor(s) and TA(s)", "Create", new { id = -3 }, null)
+    </p>
 
     @if (ViewBag.BoxHeader == "Inbox")
     {
@@ -50,6 +34,12 @@
                                              {<text>inbox_unread</text>}">
             <td class="inbox_time">
                 <small>@item.Posted.ToShortDateString() @item.Posted.ToShortTimeString()</small>
+            </td>
+            <td class="inbox_context">
+                @if (item.Context != null)
+                {
+                    <small>@item.Context.Prefix @item.Context.Number</small>
+                }
             </td>
             <td class="inbox_subject">
                 @if (ViewBag.BoxHeader == "Inbox")

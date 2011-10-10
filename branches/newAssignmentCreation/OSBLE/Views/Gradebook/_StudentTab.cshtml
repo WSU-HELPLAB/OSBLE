@@ -97,11 +97,27 @@
         border:none;
         font-size:small;
     }
+    
+    #latePenalty
+    {
+        border: 1px solid black;
+        width: 300px;
+        background: White;
+    }
+    
+    #rubricToolTip
+    {
+        border: 1px solid black;
+        width: 300px;
+        background: White;
+    }
+    
 </style>
 
 @{
     <input id="customize_option" type="hidden" value="@ViewBag.Customize" />
     <input id="numDropped" type="hidden" value="@ViewBag.NumDropped" />
+    double latePercentPenalty = 0.0;
 }
 
 @Html.Partial("_Tabs")
@@ -162,6 +178,7 @@
                 double totalAverage = 0;
                 double averagePoints = 0;
                 double averagePossible = 0;
+                int numStudents = 0;
 
                 //Make sure there is at least one score in the category
                 bool oneScore = false;
@@ -169,10 +186,11 @@
                 {
                     oneScore = true;
                     averagePoints += s.Points;
-                    averagePossible += s.AssignmentActivity.PointsPossible;
+                    //averagePossible += s.AssignmentActivity.PointsPossible;
+                    numStudents++;
                 }
-                double categoryScore = averagePoints / averagePossible;
-                totalAverage += categoryScore * 100;
+                double categoryScore = averagePoints / numStudents;
+                totalAverage += categoryScore;
                 if (oneScore == true)
                 {
                     <td id="averageScore">@totalAverage.ToString(".#")</td>  
@@ -272,15 +290,16 @@
 
                 if (score.Count() > 0)
                 {
+                    latePercentPenalty = (1 - score.First().LatePenaltyPercent) * 100;
                     if (score.First().AssignmentActivity.AbstractAssignment.Rubric != null)
                     {
                         if (score.First().LatePenaltyPercent > 0)
                         {
-                            <td id="rubric-@assignment.ID" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { abstractAssignmentActivityId = score.First().AssignmentActivityID, teamUserID = score.First().TeamUserMemberID }, new { @style = "color:Red" })</td>                            
+                            <td id="rubric-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { abstractAssignmentActivityId = score.First().AssignmentActivityID, teamUserID = score.First().TeamUserMemberID }, new { @style = "color:Red" }) @Helpers.CreateToolTip("This assignment was late")</td>                            
                         }
                         else
                         {
-                            <td id="rubric-@assignment.ID">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { abstractAssignmentActivityId = score.First().AssignmentActivityID, teamUserID = score.First().TeamUserMemberID }, new { })</td>
+                            <td id="rubric-@assignment.ID" onmouseover="showRubricToolTip();" onmouseout="hideRubricToolTip();">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { abstractAssignmentActivityId = score.First().AssignmentActivityID, teamUserID = score.First().TeamUserMemberID }, new { })</td>
                         }
                     }
                     else
@@ -288,8 +307,8 @@
                         if (score.First().Points > 0)
                         {
                             if (score.First().LatePenaltyPercent > 0)
-                            {
-                                <td id="teacher-@assignment.ID" style="font-style:italic; color:Red;">@score.First().Points.ToString(".#")</td>
+                            {   
+                                <td id="teacher-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" style="font-style:italic; color:Red;">@score.First().Points.ToString(".#")</td>
                             }
                             else
                             {
@@ -300,7 +319,7 @@
                         {
                             if (score.First().LatePenaltyPercent > 0)
                             {
-                                <td id="teacher-@assignment.ID" style="font-style:italic; color:Red">@String.Format("{0}", 0)</td>
+                                <td id="teacher-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" style="font-style:italic; color:Red">@String.Format("{0}", 0)</td>
                             }
                             else
                             {
@@ -338,8 +357,29 @@
    </table>
 </div>
 
+<div id="latePenalty" style="display:none; position:absolute;">
+    <table>
+        <tr>
+            <td>
+                This assignment was graded <b>@latePercentPenalty%</b> off because it was submitted late.
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="rubricToolTip" style="display:none; position:absolute;">
+    <table>
+        <tr>
+            <td>
+                Click to view evaluation rubric on which this score is based.
+            </td>
+        </tr>
+    </table>
+</div>
+
 <script type="text/javascript">
     var lastFocusedCell = null;
+
 
     $(document).click(function (e) {
         clearLastCellFocus(e);
@@ -347,6 +387,24 @@
 
     $(document).ready(function (e) {
         calculateRows();
+    });
+
+    $(document).bind('mousemove', function (e) {
+        //$("#log").text("e.pageX: " + e.pageX + ", e.pageY: " + e.pageY);
+
+        var x = e.pageX;
+        var y = e.pageY;
+
+        x = parseFloat(x);
+        y = parseFloat(y);
+
+        y -= 100;
+
+        $("#latePenalty").css("left", x + "px");
+        $("#latePenalty").css("top", y + "px");
+
+        $("#rubricToolTip").css("left", x + "px");
+        $("#rubricToolTip").css("top", y + "px");
     });
 
     $("#grades td").keydown(function (e) {
@@ -380,6 +438,23 @@
             }
         }
     });
+
+    function showLatePenalty() {
+        $("#latePenalty").animate({ "height": "show" }, { duration: 0 });
+    }
+
+    function hideLatePenalty() {
+        $("#latePenalty").animate({ "height": "hide" }, { duration: 0 });
+    }
+
+    function showRubricToolTip() {
+        $("#rubricToolTip").animate({ "height": "show" }, { duration: 0 });
+    }
+
+    function hideRubricToolTip() {
+        $("#rubricToolTip").animate({ "height": "hide" }, { duration: 0 });
+    }
+
 
      function calculateRows() {
         var totalArr = [];
@@ -429,8 +504,8 @@
             // this handles drop x lowest and take x highest
             var dropXIndex = 0;
             if ($("#customize_option").val() == "XtoDrop") {
-                if ($("#numDropped").val() > gradeArr.length) {
-                    dropXIndex = gradeArr.length;
+                if ($("#numDropped").val() > gradeArr.length - 1) {
+                    dropXIndex = gradeArr.length - 1;
                 } else {
                     dropXIndex = $("#numDropped").val();
                 }

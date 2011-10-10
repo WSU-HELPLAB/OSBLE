@@ -155,6 +155,11 @@
         width: 45px;
     }
     
+    #MaxPoints
+    {
+        width: 45px;
+    }
+    
     .rubric1
     {
         color:Red;
@@ -306,6 +311,22 @@
         }
         <text>from category.</text>
         <br />
+        <hr />
+        @if (ViewBag.MaxPoints >= 0)
+        {
+            <input type="checkbox" id="MaxCheckBox" checked="checked"/>
+            <text>Set the maximum percentage a student can receive for this category.</text>
+        
+            <div id="MaxPointsInputBox"><input id="MaxPoints" value="@ViewBag.MaxPoints"/> %</div>
+        }
+        else
+        {
+            <input type="checkbox" id="MaxCheckBox"/>
+            <text>Set the maximum percentage a student can receive for this category.</text>
+            
+            <div id="MaxPointsInputBox"><input id="MaxPoints" disabled="disabled"/> %</div>
+        }
+        <br />
             
 		<div id="dropLowest_btns">    
 		    <input id="dropLowestSubmit" type="submit" onclick="hideFunctions();" value="Apply" />
@@ -442,6 +463,17 @@
         });
     });
 
+    $("#MaxCheckBox").click(function () {
+        if ($("#MaxCheckBox").attr("checked")) {
+            //alert($('#MaxPointsInputBox').attr('disabled'));
+            $('#MaxPoints').attr("disabled", false);
+        }
+        else {
+            $('#MaxPoints').val(null);
+            $('#MaxPoints').attr("disabled", true);
+        }
+    });
+
     function addPoints(points) {
         var num = $("#XtoAdd").val();
         var id = $(points).attr("id");
@@ -521,13 +553,13 @@
             // this handles drop x lowest and take x highest
             var dropXIndex = 0;
             if ($("input[name='Customize_radio']:checked").val() == "XtoDrop") {
-                if ($("#numDropped").val() > gradeArr.length) {
-                    dropXIndex = gradeArr.length;
+                if ($("#numDropped").val() >= gradeArr.length) {
+                    dropXIndex = gradeArr.length - 1;
                 } else {
                     dropXIndex = $("#numDropped").val();
                 }
             } else if ($("input[name='Customize_radio']:checked").val() == "XtoTake") {
-                if ($("#numDropped").val() < gradeArr.length) {
+                if ($("#numDropped").val() < gradeArr.length ) {
                     dropXIndex = gradeArr.length - ($("#numDropped").val());
                 } else {
                 }
@@ -1017,6 +1049,35 @@
     }
 
     function hideFunctions() {
+        //If the max value checkbox is checked and there is a value 
+        //in the Max points box that is not a number we are going 
+        //to ajax to the db and set max points for the assignment
+        if ($("#MaxCheckBox").attr("checked")) {
+            if ($("#MaxPoints").val() != "") {
+                if (isNaN($("#MaxPoints").val())) {
+                    alert("Max Points must be a number.");
+                    return false;
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "/Gradebook/ModifyMaxPoints",
+                    data: { value: $("#MaxPoints").val() },
+                    success: function (response) {
+                        $("#grades").replaceWith(response);
+                    }
+                });
+            }
+        }
+        else {
+            $.ajax({
+                type: "POST",
+                url: "/Gradebook/RemoveModifyMaxPoints",
+                success: function (response) {
+                    $("#grades").replaceWith(response);
+                }
+            });
+        }
+
         if ($("input[name='Customize_radio']:checked").val() == 'XtoDrop') {
             if ($("#XtoDrop").val() == "") {
                 alert("You must type a number in the field");
@@ -1135,7 +1196,7 @@
 
                 if ($(this).children("a").attr("class") == "rubric") {
                     cell = $(this).text();
-                    //alert($(this).text());
+                    alert($(this).text());
                 }
                 else {
                     //cell gets the value in the textbox when tab is pressed
@@ -1166,6 +1227,12 @@
                     cell = $(this).find("td:eq(" + colIndex + ")");
                 });
 
+                if (cell.children().attr('class') == "rubric") {
+                    clearLastCellFocus(e);
+                    cell.children().select();
+                    cell.children().focus();
+                    return false;
+                }
                 //If the next cell does not exist because it is off the table
                 if (cell.html() == null) {
 

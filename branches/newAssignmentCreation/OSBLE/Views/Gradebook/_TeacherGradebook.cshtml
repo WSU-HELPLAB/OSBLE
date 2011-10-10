@@ -23,27 +23,12 @@
     <table class="selectMenuTable" title="Options">
 		<tr>
 		    <th align="center">Options</th>
-		</tr>
-        <tr>
-            <td><a style="cursor:pointer">Insert Category Left</a></td>
-        </tr>
-        <tr>
-            <td><a style="cursor:pointer">Insert Category Right</a></td>
-        </tr>
-        <tr>
-            <td><a style="cursor:pointer">Import Grades Here...</a></td>
-        </tr>
-        <tr>
-            <td><a style="cursor:pointer">Move Column Right</a></td>
-        </tr>
-        <tr>
-            <td><a style="cursor:pointer">Move Column Left</a></td>
-        </tr>
+		</tr>        
         <tr>
             <td><a style="cursor:pointer" onclick="displayConfirmDeleteCategory();">Delete Category</a></td>
         </tr>
         <tr>
-			<td id="changeColor" ><a id="changeColorId" style="cursor:pointer" onmouseover="displayColors();">Change Category Color</a></td>
+			<td id="changeColor" onmouseover="displayColors();"><a id="changeColorId" style="cursor:pointer" >Change Category Color</a></td>
 		</tr>
 	</table>
 </div>
@@ -209,7 +194,7 @@
 
                 foreach (UserProfile user in ViewBag.Students)
                 {
-                    studentCount++;
+                    
                     categoryTotalWeight = ViewBag.TotalCategoryWeights;
                     foreach (Category category in ViewBag.CatsWithWeightsAndScores)
                     {
@@ -240,8 +225,10 @@
                                                        select score).ToList();
                             if (totalScores.Count() > 0)
                             {
+                                studentCount++;
                                 foreach (Score score in totalScores)
                                 {
+                                    
                                     if (score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
                                     {
                                         categoryPoints += score.Points;
@@ -375,7 +362,7 @@
                 
                 <td id="@student.ID" >@student.LastName, @student.FirstName</td>   
                 
-                  totalGrade = 0.0;
+                  totalGrade = -1;
                   totalCategoryPoints = 0;
                   totalCategoryPossible = 0;
                   double totalCategoryWeight = ViewBag.TotalCategoryWeights;
@@ -444,14 +431,19 @@
                           break;
                       }
                   }
-                <td>@letter</td>
+                  <td>@letter</td>
+                
                   if (totalGrade > 0)
                   {
                     <td>@totalGrade.ToString(".#")%</td>
                   }
-                  else
+                  else if (totalGrade == 0)
                   {
                     <td>@String.Format("{0}", 0)%</td>
+                  }
+                  else
+                  {
+                      <td>NG</td>
                   }
                   totalGrade = 0;
 
@@ -867,8 +859,8 @@
         //aligning the menu under the buttons
         x = $("#selectMenuID").position().left;
         y = $("#selectMenuID").position().top;
-        y += 179;
-        x += 173;
+        y += 49;
+        x += 172;
 
         //Moving the menu to the button that clicked it
         $("#displayColorsID").css("left", x + "px");

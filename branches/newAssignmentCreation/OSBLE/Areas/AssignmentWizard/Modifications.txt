@@ -8,4 +8,4 @@ DB:
     Deliverables
     Teams
     TeamMembers
-    CoursesUsers => CourseUsers
+    CourseUsers => CourseUsers

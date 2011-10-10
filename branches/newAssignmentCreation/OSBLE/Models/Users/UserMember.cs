@@ -19,5 +19,10 @@ namespace OSBLE.Models.Users
         {
             return String.Format("{0}, {1}", UserProfile.LastName, UserProfile.FirstName);
         }
+
+        public override string ToString()
+        {
+            return UserProfile.ToString();
+        }
     }
 }

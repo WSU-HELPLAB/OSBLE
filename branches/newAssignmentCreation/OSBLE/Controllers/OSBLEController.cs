@@ -124,7 +124,7 @@ namespace OSBLE.Controllers
 
                 setCurrentUserProfile();
 
-                getEnrolledCourses();
+                GetEnrolledCourses();
 
                 setCourseListTitle();
 
@@ -219,7 +219,7 @@ namespace OSBLE.Controllers
         /// courses/communities they are enrolled in or have access to.
         /// Also, if a user is invalid, it will clear their session and log them out.
         /// </summary>
-        private void getEnrolledCourses()
+        protected void GetEnrolledCourses()
         {
             // If current user is valid, get course list for user.
             if (currentUser != null)
@@ -396,10 +396,31 @@ namespace OSBLE.Controllers
                 }
                 else
                 {
-                    //rounded up as it should be
-                    int numberOfTimePenatlyIsDeducted = (int)lateness.TotalHours + 1 % activity.HoursLatePerPercentPenalty;
+                    //If the lateness is a negative number we need to find the absolute value of 
+                    //that number for our calculations
+                    if (lateness.TotalHours < 0)
+                    {
+                        lateness = lateness.Negate();
+                    }
 
-                    return activity.PercentPenalty * numberOfTimePenatlyIsDeducted;
+                    if (lateness.TotalHours < activity.HoursLatePerPercentPenalty)
+                    {
+                        return activity.PercentPenalty;
+                    }
+
+                    else
+                    {
+                        //Double the hours late per percent penalty and loop through until the lateness is 
+                        //less than the hours.
+                        int hoursLatePerPercentPenalty = activity.HoursLatePerPercentPenalty + activity.HoursLatePerPercentPenalty;
+                        while (lateness.TotalHours > hoursLatePerPercentPenalty)
+                        {
+                            hoursLatePerPercentPenalty += activity.HoursLatePerPercentPenalty;
+                        }
+
+                        //return the percent penalty times the number of hours late.
+                        return activity.PercentPenalty * (hoursLatePerPercentPenalty / activity.HoursLatePerPercentPenalty);
+                    }                    
                 }
             }
             return 0;
@@ -468,5 +489,57 @@ namespace OSBLE.Controllers
 
             return fileTypes;
         }
+
+        /// <summary>
+        /// Removes the provided user from the active course
+        /// </summary>
+        /// <param name="user"></param>
+        public void RemoveUserFromCourse(UserProfile user)
+        {
+            //The relationship between users and courses is expressed in CourseUsers, but
+            //there exists plenty of other relationships between users and other course
+            //particulars.  Perhaps this isn't good design, but we're kind of stuck at this point.
+            //In order to keep the course from having a bunch of orphaned items, we must manually
+            //delete some additional information.
+
+            //might as well delete the big daddy to start
+            CourseUsers cu =  (from c in db.CourseUsers
+                    where c.AbstractCourseID == activeCourse.AbstractCourseID
+                    && c.UserProfileID == user.ID
+                    select c).FirstOrDefault();
+            if (cu != null)
+            {
+                db.CourseUsers.Remove(cu);
+            }
+
+            //remove this user from any assignments.
+            var activities = (from category in db.Categories
+                        join assignment in db.AbstractAssignments on category.ID equals assignment.CategoryID
+                        join activity in db.AbstractAssignmentActivities on assignment.ID equals activity.AbstractAssignmentID
+                        where category.CourseID == activeCourse.AbstractCourseID
+                        select activity).SelectMany(a => a.TeamUsers).ToList();
+            
+            foreach (TeamUserMember teamUser in activities)
+            {
+                if (teamUser is OldTeamMember)
+                {
+                    OldTeamMember member = teamUser as OldTeamMember;
+                    member.Team.Remove(user);
+
+                    //AC: What should be done if that team is now empty?
+                    //    I initially tried to remove the team, but that seemed to cause
+                    //    some sort of runtime error.
+                }
+                else
+                {
+                    if (teamUser.Contains(user))
+                    {
+                        db.TeamUsers.Remove(teamUser);
+                    }
+                }
+            }
+            db.SaveChanges();
+        }
+
     }
 }

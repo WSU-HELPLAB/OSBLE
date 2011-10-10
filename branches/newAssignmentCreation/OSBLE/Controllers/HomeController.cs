@@ -429,27 +429,23 @@ namespace OSBLE.Controllers
                         if (c is Course)
                         {
                             Course course = c as Course;
-                            subject = "[OSBLE " + course.Prefix + " " + course.Number + "] Notice from Instructor " + currentUser.FirstName + " " + currentUser.LastName;
+                            subject = "[" + course.Prefix + " " + course.Number + "] Notice from " + currentUser.FirstName + " " + currentUser.LastName;
                             body = currentUser.FirstName + " " + currentUser.LastName + " sent the following message to the class at " + dp.Posted.ToString() + ":";
-                            body += "\n\n";
-                            body += dp.Content;
                         }
                         else if (c is Community)
                         {
                             Community community = c as Community;
-                            subject = "[OSBLE " + community.Name + "] Notice from " + currentUser.FirstName + " " + currentUser.LastName;
+                            subject = "[" + community.Nickname + "] Notice from " + currentUser.FirstName + " " + currentUser.LastName;
                             body = currentUser.FirstName + " " + currentUser.LastName + " sent the following message to the community at " + dp.Posted.ToString() + ":";
-                            body += "\n\n";
-                            body += dp.Content;
                         }
                         else
                         {
                             //this should never execute, but just in case...
                             subject = "OSBLE Activity Post";
                             body = currentUser.FirstName + " " + currentUser.LastName + " sent the following message at " + dp.Posted.ToString() + ":";
-                            body += "\n\n";
-                            body += dp.Content;
                         }
+                        body += "<br /><br />";
+                        body += dp.Content.Replace("\n", "<br />");
 
                         List<CourseUsers> courseUsers = db.CourseUsers.Where(CourseUsers => CourseUsers.AbstractCourseID == c.ID).ToList();
 

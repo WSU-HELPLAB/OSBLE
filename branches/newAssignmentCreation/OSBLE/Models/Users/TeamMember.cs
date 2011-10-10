@@ -17,6 +17,6 @@ namespace OSBLE.Models.Users
         public override string GetName()
         {
             return Team.Name;
-        } 
+        }
     }
 }

@@ -18,23 +18,23 @@ namespace OSBLE.Utility
             SmtpClient mailClient = new SmtpClient();
             mailClient.UseDefaultCredentials = true;
 
-            MailAddress toFrom = new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE");
-            MailMessage mm = new MailMessage();
+            MailAddress fromAddress = new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE");
 
-            mm.From = toFrom;
-            mm.To.Add(toFrom);
-            mm.Subject = subject;
-            mm.Body = message;
-            mm.IsBodyHtml = true;
-
-            //add recipients
-            foreach (MailAddress address in to)
+            foreach (MailAddress recipient in to)
             {
-                mm.Bcc.Add(address);
-            }
+                MailMessage mm = new MailMessage();
 
-            //bomb's away!
-            mailClient.Send(mm);
+                mm.From = fromAddress;
+                mm.To.Add(recipient);
+                mm.Subject = subject;
+                mm.Body = message;
+                mm.IsBodyHtml = true;
+
+                //bomb's away!
+                mailClient.Send(mm);
+            }
+            
+            mailClient.Dispose();
 #endif
         }
     }

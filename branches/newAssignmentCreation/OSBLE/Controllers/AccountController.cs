@@ -17,6 +17,7 @@ using OSBLE.Models;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Utility;
+using System.Reflection;
 
 namespace OSBLE.Controllers
 {
@@ -38,7 +39,12 @@ namespace OSBLE.Controllers
         public ActionResult LogOn()
         {
             setLogOnCaptcha();
-
+            Assembly asm = Assembly.GetExecutingAssembly();
+            if (asm.FullName != null)
+            {
+                AssemblyName assemblyName = new AssemblyName(asm.FullName);
+                ViewBag.VersionNumber = assemblyName.Version.ToString();
+            }
             return View();
         }
 
@@ -52,6 +58,13 @@ namespace OSBLE.Controllers
             {
                 model.UserName = model.UserName.Trim();
                 model.Password = model.Password.Trim();
+                MembershipUser user = Membership.GetUser(model.UserName);
+
+                //remove any locks.  A little unsecure as it allows a constant brute-force 
+                //attack, but it seems to annoy users much more regularly.  Consider
+                //removing is OSBLE ever gets to the point that user accounts start getting
+                //hacked.
+                user.UnlockUser();
                 if (Membership.ValidateUser(model.UserName, model.Password))
                 {
                     context.Session.Clear(); // Clear session variables.
@@ -65,6 +78,17 @@ namespace OSBLE.Controllers
                     {
                         return RedirectToAction("Index", "Home");
                     }
+                }
+                else if(user != null && !user.IsApproved)
+                {
+                    setLogOnCaptcha();
+                    ModelState.AddModelError("", "This account has not been activated.  An additional verification letter has been sent to your email address.");
+                    string randomHash = GenerateRandomString(40);
+                    UserProfile up = db.UserProfiles.Where(m => m.UserName == user.UserName).FirstOrDefault();
+                    MembershipUser mu = Membership.GetUser(up.UserName);
+                    mu.Comment = randomHash;
+                    Membership.UpdateUser(mu);
+                    sendVerificationEmail(true, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), up.FirstName, up.UserName);
                 }
                 else
                 {
@@ -381,6 +405,9 @@ namespace OSBLE.Controllers
                 try
                 {
                     MembershipUser currentUser = Membership.GetUser(User.Identity.Name, true /* userIsOnline */);
+                    
+                    //never lock out users
+                    currentUser.UnlockUser();
                     changePasswordSucceeded = currentUser.ChangePassword(model.OldPassword, model.NewPassword);
                 }
                 catch (Exception)
@@ -530,26 +557,14 @@ namespace OSBLE.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    //ViewBag.ContactUsName = model.Name;
-
-                    using (SmtpClient mailClient = new SmtpClient())
-                    {
-                        mailClient.UseDefaultCredentials = true;
-
-                        using (MailMessage message = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE"),
-                                                                new MailAddress("support@osble.org")))
-                        {
-                            message.ReplyToList.Add(new MailAddress(model.Email));
-                            message.Subject = "[OSBLE] Support Request from " + model.Name;
-                            message.Body = model.Message;
-
-#if !DEBUG
-                            mailClient.Send(message);
-#endif
-                            ViewBag.CUName = model.Name;
-                        }
-                    }
-
+                    //craft & send the email
+                    string subject = "[OSBLE] Support Request from " + model.Name;
+                    string body = model.Message;
+                    body += "<br />reply to: " + model.Email;
+                    List<MailAddress> to = new List<MailAddress>();
+                    to.Add(new MailAddress("support@osble.org"));
+                    Email.Send(subject, body, to);
+                    ViewBag.CUName = model.Name;
                     return View("ContactUsSuccess");
                 }
             }

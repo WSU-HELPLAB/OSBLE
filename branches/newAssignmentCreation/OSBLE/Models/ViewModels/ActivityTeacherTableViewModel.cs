@@ -24,6 +24,8 @@ namespace OSBLE.Models.ViewModels
         {
             public bool isTeam { get; set; }
 
+            public string TeamList { get; set; }
+
             public int SubmitterID { get; set; }
 
             public string Name { get; set; }
@@ -31,6 +33,8 @@ namespace OSBLE.Models.ViewModels
             public DateTime? Time { get; set; }
 
             public bool Graded { get; set; }
+
+            public double LatePenaltyPercent { get; set; }
         }
     }
 }

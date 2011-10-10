@@ -141,10 +141,8 @@ namespace OSBLE.Models
         
         #region MailToolTips
 
-            public static string MailRecipient = "Type in some letters in the user's name and a list of users that match that search term will pop up. Select the desired user from that list to continue and compose your message.";
-
+            public static string MailRecipient = "Type in a few letters of the recipient's name. You will be presented with a list of possible matches. Select the desired recipient from the list to add that recipient. You can repeat this process to add multiple recipients.";
             public static string MailCreateTo = "This is the person this message will be sent to. If you want to change the recipient, you must create a new message.";
-
             public static string MailDelete = "Click here to permanently delete this message. <em>Note: This action cannot be undone.</em>";
             public static string MailReply = "Click here to reply to this message. The previous message will be quoted in the message body. If you do not want to quote the original message, you can delete it while editing the message.";
 

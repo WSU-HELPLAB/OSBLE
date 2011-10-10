@@ -68,7 +68,7 @@
                 <span class="dp_tools">
                 @if (Model.CanMail)
                 {
-                    <a title="Mail This User" href="@Url.Action("Create", "Mail", new { recipientID = Model.UserProfileID })">@Helpers.MailButton()</a>
+                    <a title="Mail This User" href="@Url.Action("Create", "Mail", new { id = Model.UserProfileID })">@Helpers.MailButton()</a>
                 }
                 @if (Model.CanDelete)
                 {
@@ -104,7 +104,11 @@
 
             @* Post Content *@
             <div class="dp_content">
-            @Helpers.Linkify(Model.Content)
+             @{
+                 string content = Helpers.Linkify(Model.Content).ToHtmlString();
+                 content = content.Replace("\n", "<br />");
+                    }
+                    @Html.Raw(content)
             </div>
 
             @if (Model is DashboardPost)

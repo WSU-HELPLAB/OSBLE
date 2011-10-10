@@ -411,7 +411,7 @@ namespace OSBLE.Services
             {
                 Directory.CreateDirectory(directory);
             }
-            using (FileStream fs = new FileStream(file, FileMode.CreateNew))
+            using (FileStream fs = new FileStream(file, FileMode.Create))
             {
                 fs.Write(data, 0, (int)data.Length);
             }

@@ -25,6 +25,13 @@ namespace OSBLE.Models.Assignments
 
         [FileExtensions(new string[] { ".txt" })]
         InBrowserText,
+
+        [FileExtensions(new string[] {".ppt", ".pptx"})]
+        PowerPoint,
+
+        [FileExtensions(new string[] { ".doc", ".docx" })]
+        WordDocument,
+
     }
 
     /// <summary>
@@ -56,8 +63,7 @@ namespace OSBLE.Models.Assignments
         public int AssignmentID { get; set; }
         public Assignment Assignment { get; set; }
 
-        [Required]
-        [Key]
+        [Required(ErrorMessage = "The deliverable must have a name")]
         [Column(Order = 1)]
         [Display(Name = "File Name")]
         [RegularExpression(@"^[a-zA-Z0-9\._\-]*$",
@@ -68,5 +74,10 @@ namespace OSBLE.Models.Assignments
         [Display(Name = "Type")]
         public int Type { get; set; }
 
+        //TODO: Make required later.
+        //[Required]
+        //[Display(Name = "Comment Categories")]
+        //[MaxLength(6)]
+        //public ICollection<CommentCategory> CommentCategories { get; set; }
     }
 }

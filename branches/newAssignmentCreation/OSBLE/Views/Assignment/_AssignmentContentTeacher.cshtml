@@ -16,6 +16,8 @@
         <a id="@StudioAssignmentCounter" href="#">@sa.Name</a>
     </div>
     <div>
+        <a href="/BasicAssignment/Edit/@sa.ID">Edit Assignment</a>
+        @Html.ActionLink("Delete Assignment", "Delete", new { id = sa.ID }, new { style = "margin-left:8px;" })
         <a href="/Assignments/Wizard/Start/@sa.ID">Edit Assignment</a>
         <div class="assignment_title">
             Description</div>

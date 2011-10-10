@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using OSBLE.Attributes;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
+using OSBLE.Models.HomePage;
 
 namespace OSBLE.Controllers
 {
@@ -49,9 +50,28 @@ namespace OSBLE.Controllers
             else if ((mail.ToUserProfile == currentUser) && (mail.Read == false))
             {
                 mail.Read = true;
+                
+                // Removes the notification once the email is read.
+                Notification n = db.Notifications.Find(id);
+
+                // Notification exists and belongs to current user.
+                if ((n != null) && (n.RecipientID == currentUser.ID))
+                {
+                    // Mark notification as read.
+                    n.Read = true;
+                    db.SaveChanges();
+                }
+
                 db.SaveChanges();
                 SetUnreadMessageCount();
             }
+
+            // getting all recipients of the mail
+            List<UserProfile> recipients = (from m in db.Mails
+                                            where m.ThreadID == mail.ThreadID 
+                                            select m.ToUserProfile).ToList();
+
+            ViewBag.AllRecipients = recipients;
             return View(mail);
         }
 
@@ -85,76 +105,206 @@ namespace OSBLE.Controllers
                     }
                 }
             }
-
             return false;
         }
 
-        public ActionResult Create()
+        public ActionResult Create(int? id, int? teamID)
         {
-            int id = Convert.ToInt32(Request.Params["recipientID"]);
-            if (!canMail(id))
-            {
-                return RedirectToAction("Index");
-            }
-
+            ViewBag.MailHeader = "New Message";
+            
+            int ID = Convert.ToInt32(Request.Params["recipientID"]);
             Mail mail = new Mail();
+            List<UserProfile> recipientList = new List<UserProfile>();
 
-            // Handle replies if necessary
-            if (Request.Params["replyTo"] != null)
+            // gets the current courseid
+            int aCourseID = (int)context.Session["ActiveCourse"];
+
+            mail.ContextID = aCourseID;
+
+            // mail for instructors or TA(S)
+            if (id.HasValue)
             {
-                int replyto = Convert.ToInt32(Request.Params["replyTo"]);
-                Mail reply = db.Mails.Find(replyto);
-                // Ensure valid reply user
-                if ((reply != null) && (reply.ToUserProfile == currentUser))
+                int whoTo = (int)id;
+                // Instructor or Instructor and TA(s) or Whole team
+                if (whoTo < 0)
                 {
-                    mail.Subject = "Re: " + reply.Subject;
-                    // Prefix each line with a '> '
-                    mail.Message = "\n\nOriginal Message at " + reply.Posted.ToString() + ":\n" +
-                        Regex.Replace(reply.Message, "^.*$", "> $&",
-                        RegexOptions.Multiline);
+                    // email the whole team
+                    if(whoTo == -4)
+                    {
+                        if(teamID.HasValue)
+                        {
+                            ViewBag.MailHeader = "New Message to whole team";
+                            int tID = (int)teamID;
+                            var team = (from t in db.OldTeams
+                                        where t.ID == tID
+                                        select t.Members).FirstOrDefault().ToList();
+
+                            foreach (UserMember t in team)
+                            {
+                                if (t.UserProfile != currentUser)
+                                {
+                                    recipientList.Add(t.UserProfile);
+                                }
+                            }
+                        }
+                    }
+                    else if( whoTo >= -3 && whoTo <= -1)// Instructor or Instructor and TA(s)
+                    {
+                        if (whoTo == -3)
+                        {
+                            ViewBag.MailHeader = "New Message to Instructor and TA(s)";
+                        }
+                        if (whoTo == -1 || whoTo == -3) // Instructors 
+                        {
+                            if(whoTo == -1)
+                            {
+                                ViewBag.MailHeader = "New Message to Instructor";
+                            }
+                            List<CourseUsers> instructors = db.CourseUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "Instructor")).ToList();
+                            if (instructors != null)
+                            {
+                                foreach (CourseUsers cu in instructors)
+                                {
+                                    recipientList.Add(cu.UserProfile);
+                                }
+                            }
+                        }
+                        // TA(s) or Instructor and TA(s)
+                        if (whoTo == -2 || whoTo == -3)
+                        {
+                            if (whoTo == -2)
+                            {
+                                ViewBag.MailHeader = "New Message to TA(s)";
+                            }
+                            List<CourseUsers> tas = db.CourseUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "TA")).ToList();
+
+                            if (tas != null)
+                            {
+                                foreach (CourseUsers cu in tas)
+                                {
+                                    recipientList.Add(cu.UserProfile);
+                                }
+                            }
+                        }
+                    }
+                }
+                else // Email team member Id is passed as team member user id
+                {
+                    CourseUsers studentRec = db.CourseUsers.Where(c => (c.UserProfileID == whoTo) && (c.AbstractCourseID == aCourseID)).FirstOrDefault();
+                    if (studentRec != null)
+                    {
+                        ViewBag.MailHeader = "New Message to Team Member";
+                        recipientList.Add(studentRec.UserProfile);
+                    }
                 }
             }
+            else
+            {
+                // Handles Reply, ReplyAll and Forward 
+                if (Request.Params["replyTo"] != null || Request.Params["replyAll"] != null)
+                {
+                    int replyto;
+                    Mail reply = new Mail();
 
-            UserProfile u = db.UserProfiles.Find(id);
-            mail.ToUserProfile = u;
-            mail.ToUserProfileID = u.ID;
+                    //Reply All gets the mail thread id
+                    if (Request.Params["replyAll"] != null)
+                    {
+                        replyto = Convert.ToInt32(Request.Params["replyAll"]);
+                        recipientList = (from m in db.Mails
+                                         where m.ThreadID == replyto &&
+                                         m.ToUserProfileID != currentUser.ID
+                                         select m.ToUserProfile).ToList<UserProfile>();
+                    }
+                    else // Reply  gets the mail id
+                    {
+                        replyto = Convert.ToInt32(Request.Params["replyTo"]);
+                        recipientList.Add(reply.FromUserProfile); //Adds the sender to the reply list
+                    }
 
+                    reply = db.Mails.Find(replyto);
+                    if (reply != null)
+                    {
+                        if(!recipientList.Contains(reply.FromUserProfile))
+                        {
+                            recipientList.Add(reply.FromUserProfile); //Adds the sender to the reply list
+                        }
+                        string suffix = "RE: ";
+                        if (ID == 0) // forward 0 is passed for the recipientid on forwards
+                        {
+                            suffix = "FW: ";
+                            recipientList.Clear(); // clears the recipients if it is a forward
+                        }
+                        ViewBag.MailHeader = mail.Subject = suffix + reply.Subject;
+                        // Prefix each line with a '> '
+                        mail.Message = "\n\nOriginal Message \nFrom: " + reply.FromUserProfile.FirstName + " " +
+                                        reply.FromUserProfile.LastName + "\nSent at: " + reply.Posted.ToString() + "\n\n" +
+                                        Regex.Replace(reply.Message, "^.*$", "> $&",
+                                        RegexOptions.Multiline);
+                    }
+                }
+            }
+            Session["mail_recipients"] = recipientList;
             return View(mail);
         }
 
         //
         // POST: /Mail/Create
-
         [HttpPost]
         public ActionResult Create(Mail mail)
         {
-            if (!canMail(mail.ToUserProfileID))
-            {
-                return RedirectToAction("Index");
-            }
-
             if (ModelState.IsValid)
             {
-                mail.FromUserProfileID = CurrentUser.ID;
-                mail.FromUserProfile = CurrentUser;
-                mail.Read = false;
+                string recipient_string = Request.Params["recipientlist"];
+                string[] recipients;
 
-                db.Mails.Add(mail);
-                db.SaveChanges();
-                using (NotificationController nc = new NotificationController())
+                // gets the current course
+                mail.Context = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
+
+                if (recipient_string != null)
                 {
-                    nc.SendMailNotification(mail);
+                    recipients = recipient_string.Split(',');
+                    int count = 0;
+                    int threadID = 0;
+
+                    foreach (string id in recipients)
+                    {
+                        Mail newMail = new Mail();
+                        newMail.FromUserProfileID = CurrentUser.ID;
+                        newMail.Read = false;
+                        newMail.ToUserProfileID = Convert.ToInt32(id);
+                        newMail.Subject = mail.Subject;
+                        newMail.Message = mail.Message;
+                        newMail.ThreadID = threadID;
+                        newMail.ContextID = mail.ContextID;
+                        newMail.Context = mail.Context;
+
+                        //need to create the mail before we can send the notification and set the threadID
+                        db.Mails.Add(newMail);
+                        db.SaveChanges();
+
+                        // need to have an email created to get a valid id to set the thread ids to.
+                        if (count == 0)
+                        {
+                            threadID = newMail.ID;
+                            newMail.ThreadID = newMail.ID;
+
+                            db.SaveChanges();
+                        }
+
+                        using (NotificationController nc = new NotificationController())
+                        {
+                            nc.SendMailNotification(newMail);
+                        }
+                        ++count;
+                    }
+                    return RedirectToAction("Index");
                 }
-
-                return RedirectToAction("Index");
             }
-
             return View(mail);
         }
 
         //
         // GET: /Mail/Delete/5
-
         [HttpPost]
         public ActionResult Delete(int id)
         {
@@ -199,8 +349,8 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public ActionResult Search()
         {
-            string term = Request.Params["term"];
-
+            string term = Request.Params["term"].ToString().ToLower();
+            
             // If we are not anonymous in a course, allow search of all users.
             List<int> authorizedCourses = currentCourses
                 .Where(c => c.AbstractRole.Anonymized == false)

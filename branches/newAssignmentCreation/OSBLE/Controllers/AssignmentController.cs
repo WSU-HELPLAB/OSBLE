@@ -11,6 +11,10 @@ using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
+using OSBLE.Models.HomePage;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
+using OSBLE.Models.Assignments.Activities.Scores;
 
 namespace OSBLE.Controllers
 {
@@ -22,6 +26,81 @@ namespace OSBLE.Controllers
         public AssignmentController()
         {
             ViewBag.CurrentTab = "Assignments";
+        }
+
+        [CanModifyCourse]
+        public ActionResult Delete(int id)
+        {
+            //verify that the user attempting a delete owns this course
+            if (!activeCourse.AbstractRole.CanModify)
+            {
+                return RedirectToAction("Index");
+            }
+
+            AbstractAssignment assignment = db.StudioAssignments.Find(id);
+            if (assignment == null)
+            {
+                return RedirectToAction("Index");
+            }
+            return View(assignment);
+        }
+
+        [CanModifyCourse]
+        [HttpPost]
+        public ActionResult Delete(StudioAssignment assignment)
+        {
+
+            //verify that the user attempting a delete owns this course
+            if (!activeCourse.AbstractRole.CanModify)
+            {
+                return RedirectToAction("Index");
+            }
+
+            //if the user didn't click "continue" get us out of here
+            if (!Request.Form.AllKeys.Contains("continue"))
+            {
+                return RedirectToAction("Index");
+            }
+
+            assignment = db.StudioAssignments.Find(assignment.ID);
+            if (assignment == null)
+            {
+                return RedirectToAction("Index");
+            }
+            
+            //delete team users from the activities
+            int i = 0;
+            foreach(AbstractAssignmentActivity activity in assignment.AssignmentActivities)
+            {
+                i = 0;
+                while (activity.TeamUsers.Count > 0)
+                {
+                    db.TeamUsers.Remove(activity.TeamUsers.ElementAt(i));
+                }
+            }
+            db.SaveChanges();
+
+            //Delete event data.  Magic string alert (taken from BasicAssignmentController).
+            //Because events don't reference any particular model, we can't just find all
+            //events that relate to the current assignemnt.  As a workaround, I figure that
+            //the Description property of the event data should be specific enough to identify
+            //and delete related elements.
+            string descrption = "https://osble.org/Assignment?id=" + assignment.ID;
+            List<Event> events = (from evt in db.Events
+                                  where evt.Description.Contains(descrption)
+                                  select evt).ToList();
+            foreach(Event evt in events)
+            {
+                db.Events.Remove(evt);
+            }
+
+            //clear all assignments from the file system
+            FileSystem.EmptyFolder(FileSystem.GetAssignmentsFolder(activeCourse.AbstractCourse as Course));
+
+            db.StudioAssignments.Remove(assignment);
+            db.SaveChanges();
+
+            return RedirectToAction("Index");
         }
 
         //
@@ -69,7 +148,27 @@ namespace OSBLE.Controllers
                     List<Tuple<bool, DateTime>> submitted = new List<Tuple<bool, DateTime>>();
 
                     TeamUserMember teamUser = GetTeamUser(activity, currentUser);
-
+                    if (teamUser == null)
+                    {
+                        //null teamUser must be because the student didn't exist when the assignment was created (hopefully)
+                        teamUser = new UserMember() { UserProfileID = currentUser.ID };
+                        activity.TeamUsers.Add(teamUser);
+                        try
+                        {
+                            db.SaveChanges();
+                        }
+                        catch (DbEntityValidationException dbEx)
+                        {
+                            foreach (var validationErrors in dbEx.EntityValidationErrors)
+                            {
+                                foreach (var validationError in validationErrors.ValidationErrors)
+                                {
+                                    Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
+                                }
+                            }
+                        }
+                        
+                    }
                     string folderLocation = FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, activity.ID, teamUser);
 
                     foreach (Deliverable deliverable in (activity.AbstractAssignment as StudioAssignment).Deliverables)
@@ -185,6 +284,8 @@ namespace OSBLE.Controllers
 
                 StudioAssignment assignment = studioActivity.AbstractAssignment as StudioAssignment;
 
+
+
                 if (studioActivity.AbstractAssignment.Category.Course == activeCourse.AbstractCourse)
                 {
                     ActivityTeacherTableViewModel viewModel = new ActivityTeacherTableViewModel(studioActivity.AbstractAssignment, studioActivity);
@@ -202,6 +303,7 @@ namespace OSBLE.Controllers
                         if (submissionInfo.Time != null)
                         {
                             numberOfSubmissions++;
+                            submissionInfo.LatePenaltyPercent = CalcualateLatePenaltyPercent(studioActivity, (TimeSpan)calculateLateness(studioActivity.AbstractAssignment.Category.Course, studioActivity, teamUser));
                         }
 
                         //if team
@@ -212,7 +314,7 @@ namespace OSBLE.Controllers
                             submissionInfo.Name = (teamUser as OldTeamMember).Team.Name;
                         }
 
-                            //if student
+                        //else student
                         else
                         {
                             submissionInfo.isTeam = false;
@@ -220,7 +322,7 @@ namespace OSBLE.Controllers
                             submissionInfo.Name = (teamUser as UserMember).UserProfile.LastName + ", " + (teamUser as UserMember).UserProfile.FirstName;
                         }
 
-                        if ((from c in studioActivity.Scores where c.TeamUserMemberID == teamUser.ID select c).FirstOrDefault() != null)
+                        if ((from c in studioActivity.Scores where c.TeamUserMemberID == teamUser.ID && c.Points >= 0 select c).FirstOrDefault() != null)
                         {
                             submissionInfo.Graded = true;
                             numberGraded++;
@@ -239,6 +341,15 @@ namespace OSBLE.Controllers
 
                     ViewBag.ExpectedSubmissionsAndGrades = studioActivity.TeamUsers.Count;
                     ViewBag.activityID = studioActivity.ID;
+                    ViewBag.CategoryID = studioActivity.AbstractAssignment.CategoryID;
+
+
+                    List<Score> studentScores = (from scores in db.Scores
+                                                 where scores.AssignmentActivityID == studioActivity.ID
+                                                 select scores).ToList();
+
+                    ViewBag.StudentScores = studentScores;
+
 
                     var activities = (from c in assignment.AssignmentActivities orderby c.ReleaseDate select c).ToList();
 
@@ -256,6 +367,52 @@ namespace OSBLE.Controllers
             {
                 throw new Exception("Failed ActivityTeacherTable", e);
             }
+        }
+
+        /// <summary>
+        /// Takes the Icollectionof TeamUserMembers and returns a string with those members, sorted alphabetically in the format:
+        /// "firstName1 lastName1, firstName2 lastName2 & firstName3 lastName3"
+        /// </summary>
+        private string createStringOfTeamMemebers(ICollection<TeamUserMember> members)
+        {
+            string returnVal = "";
+
+            //Putting names in a list
+            List<string> nameList = new List<string>();
+            foreach (TeamUserMember tm in members)
+            {
+                nameList.Add(tm.Name);
+            }
+            //Sorting the list of names alphabetically
+            nameList.Sort();
+
+            //putting the names in "FirstName LastName" order
+            for (int i = 0; i < nameList.Count; i++)
+            {
+                string[] name = nameList[i].Split(',');
+                if (name.Count() == 2) //Only going to rearrange name if there was only 1 ','; otherwise i dont know how to handle them
+                {
+                    nameList[i] = name[1] + " " + name[0];
+                }
+            }
+
+            //Compiling all the names into one string
+            foreach (string s in nameList)
+            {
+                if (nameList.IndexOf(s) == nameList.Count() - 1) //Last name
+                {
+                    returnVal += s;
+                }
+                else if (nameList.IndexOf(s) == nameList.Count() - 2) //Second to last name
+                {
+                    returnVal += s + " & ";
+                }
+                else //Other names
+                {
+                    returnVal += s + ", ";
+                }
+            }
+            return returnVal;
         }
 
         public ActionResult GetTeamMembers(int teamID)

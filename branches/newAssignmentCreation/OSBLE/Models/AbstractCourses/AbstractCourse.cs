@@ -13,7 +13,7 @@ namespace OSBLE.Models.Courses
         [Key]
         public int ID { get; set; }
 
-        [Required]
+        [Required(ErrorMessage="The course must have a name")]
         [Display(Name = "Name")]
         [StringLength(100)]
         public string Name { get; set; }
