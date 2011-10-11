@@ -133,7 +133,6 @@ namespace OSBLE.Controllers
                     {
                         if(teamID.HasValue)
                         {
-                            ViewBag.MailHeader = "New Message to whole team";
                             int tID = (int)teamID;
                             var team = (from t in db.Teams
                                         where t.ID == tID
