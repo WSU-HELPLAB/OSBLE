@@ -19,7 +19,7 @@
                 <Grid x:Name="LayoutRoot" Background="White">
                 </Grid>
             </ScrollViewer>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button x:Name="PublishChanges" Content="Save Rubric" Margin="0,0,20,0" Width="133" />
                 <Button x:Name="CancelChanges" Content="Cancel" Width="133" Visibility="Collapsed" />
             </StackPanel>

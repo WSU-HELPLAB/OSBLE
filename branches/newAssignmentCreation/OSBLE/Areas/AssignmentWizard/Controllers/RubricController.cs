@@ -31,6 +31,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public override ActionResult Index()
         {
             base.Index();
+            ViewBag.ActiveCourse = activeCourse;
             return View(Assignment);
         }
     }

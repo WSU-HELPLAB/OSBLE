@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.Windows.Browser;
 
 namespace OsbleRubric
 {
@@ -36,6 +37,7 @@ namespace OsbleRubric
             RubricViewModel rvm = new RubricViewModel();
             this.RootVisual = rvm.GetView();
             rvm.ShowLoadingWindow();
+            HtmlPage.RegisterScriptableObject("Rubric", rvm);
         }
 
         private void Application_Exit(object sender, EventArgs e)

@@ -150,7 +150,7 @@ namespace OSBLE.Models
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
+            //modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
 
             modelBuilder.Entity<Notification>()
                 .HasRequired(n => n.Sender)
