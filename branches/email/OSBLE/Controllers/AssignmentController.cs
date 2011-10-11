@@ -311,6 +311,7 @@ namespace OSBLE.Controllers
                         {
                             submissionInfo.isTeam = true;
                             submissionInfo.SubmitterID = teamUser.ID;
+                            submissionInfo.TeamID = (teamUser as TeamMember).TeamID;
                             submissionInfo.Name = (teamUser as TeamMember).Team.Name;
                             submissionInfo.TeamList = createStringOfTeamMemebers((teamUser as TeamMember).Team.Members);
                         }

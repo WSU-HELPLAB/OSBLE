@@ -28,6 +28,8 @@ namespace OSBLE.Models.ViewModels
 
             public int SubmitterID { get; set; }
 
+            public int TeamID { get; set; }
+
             public string Name { get; set; }
 
             public DateTime? Time { get; set; }
