@@ -1,0 +1,231 @@
+﻿@model OSBLE.Models.ViewModels.RubricViewModel
+@using OSBLE.Models.Courses.Rubrics;
+@using OSBLE.Models.Assignments;
+@using OSBLE.Models.Assignments.Activities;
+@using OSBLE.Models.Users;
+@{ViewBag.Title = "Rubric Evaluation";
+  int maxLevelScore = (from c in Model.Rubric.Levels
+                       select c.RangeEnd).Sum();
+  double totalRubricPoints = (from c in Model.Rubric.Criteria
+                              select c.Weight).Sum();
+  string critInputPrefix = ViewBag.CritInputPrefix;
+  string critSliderPrefix = ViewBag.CritSliderPrefix;
+  string critCommentPrefix = ViewBag.CritCommentPrefix;
+  string selectedActivity = ViewBag.ActivitySelectId;
+  string selectedTeam = ViewBag.TeamSelectId;
+  string draftButton = ViewBag.DraftButtonId;
+  string publishButton = ViewBag.PublishButtonId;
+  string gradeId = "grade";
+  int sliderTableLength = 880;
+  int textInputLenght = 25;
+  int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;
+  DateTime? publishTime = Model.Evaluation.DatePublished;
+  }
+<script type="text/javascript">
+function test()
+{
+    //$('tr')
+}
+function create_and_open_downloading_submission_dialog() {
+
+        //create the div that we will then make into a dialog
+
+        $('body').append(
+       '<div id="downloading_submission_dialog" title="Download Submission"> \
+        <p>The zip is being generated and will automatically start downloading when it is ready, please do not leave the page or click the link again</p> \
+    </div>');
+
+        //make the div we just created into a dialog box
+
+        $('#downloading_submission_dialog').dialog({
+            modal: false,
+            autoOpen: true,
+            resizable: true,
+            width: 350,
+            height: 300,
+            closeOnEscape: true,
+            close: remove_downloading_submission_dialog,
+            buttons: {"OK": remove_downloading_submission_dialog}
+        });
+
+
+
+        $('#downloading_submission_dialog').dialog('open');
+
+        return false;
+
+    }
+
+    function remove_downloading_submission_dialog() {
+
+        //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
+        $('#downloading_submission_dialog').dialog("destroy");
+
+        //then remove the div
+        $('#downloading_submission_dialog').remove();
+    }
+
+    function switchEvaluation()
+    {
+        var activity = $('#@selectedActivity').val();
+        var team = $('#@selectedTeam').val();
+        window.location.replace("/Rubric/" + activity + "/" + team);
+    }
+
+    function updateGrade()
+    {
+        var grade = 0.0;
+        @{foreach (Criterion crit in Model.Rubric.Criteria)
+          {
+              string targetId = String.Format("\"#{0}_{1}\"", critInputPrefix, crit.ID);
+              @Html.Raw("\tgrade += $(" + targetId + ").val() / " + maxLevelScore + " * " + crit.Weight / totalRubricPoints + ";\n")
+          }
+        }
+        $('#@gradeId').html(Math.round(grade * 100) + "%");
+    }
+
+    //updates individual sliders with new values
+    function updateSlider(event, ui) {
+        var pieces = event.target.id.split('_');
+        var target = pieces[2];
+        var targetId = "#@(critInputPrefix)_" + target;
+        $(targetId).val(ui.value);
+        updateGrade();
+    }
+</script>
+<style type="text/css">
+    .dashboard
+    {
+        float: left;
+    }
+    
+    .dashboard table th
+    {
+        text-align: left;
+    }
+    
+    .dashboard table th, .dashboard table th
+    {
+        padding: 4px;
+    }
+    
+    #rubric_evaluator
+    {
+        width: 900px;
+    }
+</style>
+<div id="rubric_evaluator">
+    <h1>
+        Rubric Evaluation of @Model.SelectedAssignmentActivity.Name for @Model.Evaluation.Recipient.GetName()</h1>
+    <div class="dashboard">
+        <table>
+            <tr>
+                <th>
+                    Activity:
+                </th>
+                <td>
+                    <select id="@selectedActivity" name="@selectedActivity">
+                        @{foreach (AbstractAssignmentActivity activity in Model.AssignmentActivities)
+                          {
+                              string optionText = "<option value=\"{0}\" {1}>{2}</option>";
+                              string selectedValue = "";
+                              if (activity.ID == Model.SelectedAssignmentActivity.ID)
+                              {
+                                  selectedValue = "selected=\"selected\"";
+                              }
+                            @Html.Raw(String.Format(optionText, activity.ID, selectedValue, activity.Name));
+                          }
+                        }
+                    </select>
+                </td>
+                <th>
+                    Student/Team:
+                </th>
+                <td>
+                    <select id="@selectedTeam" name="@selectedTeam">
+                        @{foreach (TeamUserMember user in Model.TeamUsers)
+                          {
+                              string optionText = "<option value=\"{0}\" {1}>{2}</option>";
+                              string selectedValue = "";
+                              if (user.ID == Model.SelectedTeam.ID)
+                              {
+                                  selectedValue = "selected=\"selected\"";
+                              }
+                            @Html.Raw(String.Format(optionText, user.ID, selectedValue, user.GetName()));
+                          }
+                        }
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <th>
+                    Grade:
+                </th>
+                <td id="@gradeId" style="padding-right:25px">
+                    0%
+                </td>
+                @if (Model.SelectedAssignmentActivity is SubmissionActivity && (Model.SelectedAssignmentActivity.AbstractAssignment as StudioAssignment).Deliverables.Count() > 0)
+                { 
+                <td>
+                    @Html.ActionLink("Download Submission Files", "GetSubmissionZip", "FileHandler", new { teamUserID = Model.SelectedTeam.ID, assignmentActivityID = Model.SelectedAssignmentActivity.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+                </td>
+                }
+                @if (Model.SelectedAssignmentActivity is SubmissionActivity && (Model.SelectedAssignmentActivity as SubmissionActivity).InstructorCanReview)
+                { 
+                <td>
+                    @Html.ActionLink("View/Edit Inline Comments", "InlineReview", "Assignment", new { assignmentActivityID = Model.SelectedAssignmentActivity.ID, teamUserID = Model.SelectedTeam.ID }, new { style = "padding-left: 25px;" })
+                </td>
+                }
+            </tr>
+        </table>
+    </div>
+    @using (Html.BeginForm("Index", "Rubric", FormMethod.Post, new { id = "rubric_form" }))
+    {
+        <table style="float:right">
+            <tr>
+                @if(Model.Evaluation.IsPublished == true)
+                {
+                    <td><input disabled="disabled" type="submit" name="@draftButton" value="Save as Draft" /></td>
+                }
+                else
+                {
+                    <td><input type="submit" name="@draftButton" value="Save as Draft" /></td>
+                }
+                
+                <td><input type="submit" name="@publishButton" value="Publish to Student" /></td>
+            </tr>
+                @if (publishTime.HasValue)
+                {
+                    if (Model.Evaluation.IsPublished == true)
+                    {
+                                <tr><td colspan="2">Published at: @publishTime.Value.ToString("g")</td></tr>
+                    }
+                    else
+                    {
+                                <tr><td colspan="2">Draft saved at: @publishTime.Value.ToString("g")</td></tr>
+                    }
+                }
+            
+        </table>
+        
+        @Html.Partial("_Display", Model)
+        
+        //Disable the save as draft button if its already published
+        if (Model.Evaluation.IsPublished == true) 
+        {
+            <input disabled="disabled" type="submit" name="@draftButton" value="Save as Draft" />
+        }
+        else
+        {
+            <input type="submit" name="@draftButton" value="Save as Draft" />
+        }
+        <input type="submit" name="@publishButton" value="Publish to Student" />
+        <br />
+        <br />
+        @Html.ActionLink("Return to Gradebook", "Tab", "Gradebook", new { categoryId = @Model.SelectedAssignmentActivity.AbstractAssignment.CategoryID }, new { });
+        <input type="hidden" name="@ViewBag.AbstractAssignmentActivityId" value="@Model.SelectedAssignmentActivity.ID" />
+        <input type="hidden" name="@ViewBag.TeamUserId" value="@Model.SelectedTeam.ID" />
+    }
+</div>

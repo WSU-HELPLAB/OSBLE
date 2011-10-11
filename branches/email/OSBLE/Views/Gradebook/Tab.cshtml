@@ -1,0 +1,22 @@
+﻿@using OSBLE.Controllers;
+@using OSBLE.Models.Courses;
+@using OSBLE.Controllers;
+@using OSBLE.Utility;
+@{
+    ViewBag.Title = "Tab";
+}
+
+
+<div id="tabHeader">
+<h3>Gradebook</h3>
+
+    @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+    {
+        @Html.Partial("_TeacherTab");
+    }
+    else
+    {
+        @Html.Partial("_StudentTab");
+    }
+    
+</div>

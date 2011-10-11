@@ -1,0 +1,60 @@
+﻿@model OSBLE.Models.Gradables.StudioAssignment.SubmissionActivitySettings
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>Assignment</legend>
+
+    <div class="display-label">Name</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Name)
+    </div>
+
+    <div class="display-label">ReleaseDate</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.ReleaseDate)
+    </div>
+
+    <div class="display-label">DueDate</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.DueDate)
+    </div>
+
+    <div class="display-label">isGradeable</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.isGradeable)
+    </div>
+
+    <div class="display-label">isTeam</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.isTeam)
+    </div>
+
+    <div class="display-label">PossiblePoints</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.PossiblePoints)
+    </div>
+
+    <div class="display-label">InstructorCanReview</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.InstructorCanReview)
+    </div>
+
+    <div class="display-label">Weight</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Weight.Name)
+    </div>
+
+    <div class="display-label">Points</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.PossiblePoints)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

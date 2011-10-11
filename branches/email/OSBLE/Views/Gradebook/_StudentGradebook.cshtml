@@ -1,0 +1,611 @@
+﻿@using OSBLE.Controllers;
+@using OSBLE.Models.Courses;
+@using OSBLE.Models.Assignments;
+@using OSBLE.Models.Assignments.Activities.Scores;
+@using OSBLE.Models.Users
+@using OSBLE.Utility;
+@{
+    Layout = null;
+}
+
+<style type="text/css">
+    .cellInput
+    {
+        width: 75px;
+        border: none;
+    }
+    .gradebook
+    {
+        width: auto;
+        border-collapse: collapse;
+        border: 1px solid #D0D0D0;
+    }
+    
+    .gradebook td
+    {
+        padding: 3px;
+        width: auto;
+        height: 25px;
+    }
+    
+    .gradebook td, .gradebook th, .gradebook tr
+    {
+        min-width: 50px;
+        width: auto;
+        border: 1px solid #D0D0D0;
+    }
+    
+    .gradebook th
+    {
+        text-align: left;
+    }
+    
+    #tabHeader
+    {
+        border-bottom:1px;
+    }
+    
+    #tabHeader li
+    {
+        float: left;
+        border: 1px solid gray;
+        border-top-left-radius: 4px 4px;
+        border-top-right-radius: 4px 4px;
+        background-color: #f5f5f5;
+        border-bottom-width: 0;
+        border-bottom: 1px;
+        margin: 0 0.2em -0.1em 0;
+        background: silver;
+    }
+    
+    #tabHeader li a
+    {
+        padding: 0 1em;
+    }
+    
+    #tabHeader ul
+    {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    #tableContent
+    {
+        clear: both;
+    }
+    
+    #h3
+    {
+        margin: 0;
+        padding: 0 0 1em 0;
+    }
+    
+    #tabHeader #selected
+    {
+        position: relative;
+        border-bottom:1px solid #fff;
+        background: white;
+    }
+    
+    #letterGrades
+    {
+        border-collapse: collapse;
+        border: 1px solid gray;
+    }
+    
+    #letterGrades th
+    {
+        background-color: #074974;
+        color: White;
+    }
+    
+    #letterGrades tr, #letterGrades td, #letterGrades th
+    {
+        width: auto;
+        border: 1px solid gray;
+    }
+    
+    .tipTable
+    {
+        width:60%;
+        border:none;
+        font-size:small;
+    }
+    
+</style>
+
+@Html.Partial("_Tabs")
+
+<div id="tableContent">
+    <table id="grades" class="gradebook">
+         <tr>
+            <td></td>
+            <td><b>Weights</b></td>
+            <td></td>
+            <td></td>
+            @foreach (Category item in ViewBag.Categories)
+            {
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <td></td>
+                }
+            }
+        </tr>
+        <tr id="weights">
+            <td id="sectionHolder"></td>
+            <td id="catScheme" onclick="cellGainsFocus(event, this);">&nbsp  Weight1</td>
+            <td id="grade"></td>
+            @{
+                double totalCategoryPoints = 0;
+                foreach (Category item in ViewBag.Categories)
+                {
+                    if (item.Name != Constants.UnGradableCatagory)
+                    {
+                        totalCategoryPoints += item.Points;
+                    }
+                }
+            }
+            <td id="categoryTotal">@totalCategoryPoints</td>
+            
+            @foreach (Category item in ViewBag.Categories)
+            {
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <td id="weight-@item.ID" onclick="cellGainsFocus(event, this)">@item.Points</td>
+                }
+            }
+        </tr>
+        <tr id="perfectScore">
+            <td id="sectionHolder"></td>
+            <td id="th2"><b>Perfect Score</b></td>
+            @{string grade = (from lg in ViewBag.LetterGrades as IEnumerable<LetterGrade>
+                              select lg.Grade).FirstOrDefault();
+            }
+            <td>@grade</td>
+            <td id="perfectTotal">100%</td>
+           
+            @foreach (Category item in ViewBag.Categories)
+            {
+                if (item.Name != Constants.UnGradableCatagory)
+                {
+                    <td id="@item.ID">100%</td>   
+                }
+            }
+        </tr>
+        <tr>
+            <td></td>
+            <td id="th3">
+                <b>Average Score</b>
+            </td>
+            @{    
+                //Holds the total grade
+                double totalGrade = 0;
+                totalCategoryPoints = 0;
+                double totalCategoryPossible = 0;
+
+                int studentCount = 0;
+                double categoryTotalWeight = 0;
+                double userCategoryTotalWeight = ViewBag.UserTotalCategoryWeights;
+
+                foreach (UserProfile user in ViewBag.Students)
+                {
+                    studentCount++;
+                    categoryTotalWeight = ViewBag.TotalCategoryWeights;
+                    foreach (Category category in ViewBag.CatsWithWeightsAndScores)
+                    {
+                        if (category.Name != Constants.UnGradableCatagory)
+                        {
+                            List<Score> userScore = (from score in ViewBag.CategoryTotalPercent as IEnumerable<Score>
+                                                     where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID &&
+                                                     score.Points >= 0 &&
+                                                     score.TeamUserMember.Contains(user) &&
+                                                     score.isDropped == false
+                                                     select score).ToList();
+
+                            if (userScore.Count() == 0)
+                            {
+                                categoryTotalWeight -= category.Points;
+                            }
+                        }
+                    }
+
+                    //Get the total score for the class
+                    foreach (Category category in ViewBag.Categories)
+                    {
+                        if (category.Name != Constants.UnGradableCatagory)
+                        {
+                            double categoryPoints = 0;
+                            double categoryPossible = 0;
+                            double categoryTotal = 0;
+
+                            List<Score> totalScores = (from score in ViewBag.CategoryTotalPercent as IEnumerable<Score>
+                                                       where score.TeamUserMember.Contains(user) &&
+                                                       score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID &&
+                                                       score.Points >= 0 &&
+                                                       score.isDropped == false
+                                                       select score).ToList();
+
+                            if (totalScores.Count() > 0)
+                            {
+
+                                foreach (Score userScore in totalScores)
+                                {
+                                    if (userScore.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
+                                    {
+                                        categoryPoints += userScore.Points;
+                                        categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                    }
+                                }
+                                categoryTotal = categoryPoints / categoryPossible;
+
+                                if (ViewBag.TotalCategoryWeights > 0)
+                                {
+                                    totalGrade += categoryTotal * (category.Points / categoryTotalWeight) * 100;
+                                }
+                                else
+                                {
+                                    totalCategoryPoints += categoryPoints;
+                                    totalCategoryPossible += categoryPossible;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (ViewBag.TotalCategoryWeights == 0)
+                {
+                    totalGrade = (totalCategoryPoints / totalCategoryPossible) * 100;
+                }
+                else
+                {
+                    totalGrade = (totalGrade / (studentCount * 100) * 100);
+                }
+
+                var letter = "";
+                foreach (LetterGrade item in ViewBag.LetterGrades)
+                {
+                    if (totalGrade >= item.MinimumRequired)
+                    {
+                        letter = item.Grade;
+                        break;
+                    }
+                }
+                
+                <td>@letter</td>
+                <td>@totalGrade.ToString(".#")%</td>
+                
+                
+                int totalStudents = 0;
+
+                foreach (Category item in ViewBag.Categories)
+                {
+                    if (item.Name != Constants.UnGradableCatagory)
+                    {
+                        double totalAverage = 0;
+                        double averagePoints = 0;
+                        double averagePossible = 0;
+
+                        //Make sure there is at least one score in the category
+                        bool oneScore = false;
+                        foreach (Score score in ViewBag.CategoryTotalPercent)
+                        {
+                            if (score.AssignmentActivity.AbstractAssignment.CategoryID == item.ID)
+                            {
+                                if (score.Points >= 0 && score.isDropped == false)
+                                {
+                                    oneScore = true;
+                                    averagePoints += score.Points;
+                                    averagePossible += score.AssignmentActivity.PointsPossible;
+                                }
+                            }
+                        }
+                        double categoryScore = averagePoints / averagePossible;
+                        totalAverage += categoryScore * 100;
+                        if (oneScore == true)
+                        {
+                            <td id="averageScore">@totalAverage.ToString(".#")%</td>  
+                        }
+                        else
+                        {
+                            <td id="averageScore">NG</td>
+                        }
+                    }
+                }
+            }
+        </tr>
+        <tr id="categoryHeaders">
+            <th>Section</th>
+            <th>Name</th>
+            <th id="gradeHeader" ondblclick="displayLetterGrades();">Grade</th>
+            <th>Total Grade</th>
+            
+            @foreach (Category item in ViewBag.Categories)
+            {
+                <th id="@item.ID" class="colHeader" onclick="changeAssignmentName(event, this);" style="background:@item.TabColor">@item.Name</th>
+            }
+        </tr>
+        <tr>
+            @{
+                UserProfile cu = (from user in ViewBag.CurrentStudent as IEnumerable<UserProfile> select user).FirstOrDefault();
+                <td>@ViewBag.SectionNumber</td>
+                <td>@cu.LastName, @cu.FirstName</td>
+               
+                
+                List<Score> userScores = (from scores in ViewBag.AllUserGrades as IEnumerable<Score>
+                                          where scores.Points >= 0
+                                          //orderby scores.Points
+                                          select scores).OrderBy(s => (s.Points/s.AssignmentActivity.PointsPossible)).ThenByDescending(s => s.Points).ToList();
+
+                List<Score> studentScores = (from scores in ViewBag.AllUserGrades as IEnumerable<Score>
+                                             where scores.StudentPoints >= 0
+                                             orderby scores.StudentPoints
+                                             select scores).OrderBy(s => s.StudentPoints).ThenByDescending(s => s.StudentPoints).ToList();
+
+                double temp = 0;
+                for (int i = 0; i < userScores.Count(); i++)
+                {
+                    for (int j = 0; j < studentScores.Count(); j++)
+                    {
+                        if (studentScores[j].StudentPoints < userScores[i].Points && studentScores[j].StudentPoints > temp)
+                        {
+                            userScores.Insert(i, studentScores[j]);
+                            studentScores.Remove(studentScores[j]);
+                        }
+                    }
+                    temp = userScores[i].Points;
+                }
+                while (studentScores.Count() > 0)
+                {
+                    userScores.Add(studentScores[0]);
+                    studentScores.Remove(studentScores[0]);
+                }
+
+             
+
+                List<Category> categoryWeights = (from cats in ViewBag.Categories as IEnumerable<Category>
+                                                  where cats.Points > 0
+                                                  select cats).ToList();
+
+                //Holds the total grade
+                totalGrade = 0;
+                totalCategoryPoints = 0;
+                totalCategoryPossible = 0;
+                bool studentWhatIf = false;
+                //Get the total score for the class
+                foreach (Category category in ViewBag.CatsWithWeightsAndScores)
+                {
+                    int categoryScoreCount = (from score in userScores
+                                              where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
+                                              select score).Count();
+                    int count = 0;
+                    int numDropped = category.dropX;
+                    int customize = category.Customize;
+                    if (category.Name != Constants.UnGradableCatagory)
+                    {
+                        
+                        if (category.Customize == (int)Category.GradeOptions.XtoTake)
+                        {
+                            numDropped = categoryScoreCount - numDropped;  
+                        }
+                        else if (numDropped >= categoryScoreCount)
+                        {
+                            numDropped = categoryScoreCount - 1;
+                        }
+                        
+                        double categoryPoints = 0;
+                        double categoryPossible = 0;
+                        double categoryTotal = 0;
+                        foreach (Score userScore in userScores)
+                        {
+                            if (userScore.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
+                            {
+                                if (numDropped > 0)
+                                {
+                                    if (count < numDropped)
+                                    {
+                                        count++;
+                                    }
+                                    else
+                                    {
+                                        if (userScore.Points >= 0)
+                                        {
+                                            categoryPoints += userScore.Points;
+                                            categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                        }
+                                        else if (userScore.StudentPoints >= 0)
+                                        {
+                                            studentWhatIf = true;
+                                            categoryPoints += userScore.StudentPoints;
+                                            categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                        }
+                                        else
+                                        {
+                                        }
+                                    }
+                                }
+                                else 
+                                {
+                                    if (userScore.Points >= 0)
+                                    {
+                                        categoryPoints += userScore.Points;
+                                        categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                    }
+                                    else if (userScore.StudentPoints >= 0)
+                                    {
+                                        studentWhatIf = true;
+                                        categoryPoints += userScore.StudentPoints;
+                                        categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                    }
+                                    else
+                                    {
+                                    }
+                                }
+                            }
+                        }
+                        if (categoryPossible > 0)
+                        {
+                            categoryTotal = categoryPoints / categoryPossible;
+                            if (ViewBag.TotalCategoryWeights > 0)
+                            {
+                                totalGrade += categoryTotal * (category.Points / userCategoryTotalWeight) * 100;
+                            }
+                            else
+                            {
+                                totalCategoryPoints += categoryPoints;
+                                totalCategoryPossible += categoryPossible;
+                            }
+                        }
+                    }
+                }
+
+                if (ViewBag.TotalCategoryWeights == 0)
+                {
+                    totalGrade = (totalCategoryPoints / totalCategoryPossible) * 100;
+                }
+
+                letter = "";
+                foreach (LetterGrade item in ViewBag.LetterGrades)
+                {
+                    if (totalGrade >= item.MinimumRequired)
+                    {
+                        letter = item.Grade;
+                        break;
+                    }
+                }
+
+                if (studentWhatIf == true)
+                {
+                    <td style="color:Gray; font-style:italic;">@letter</td>
+                    <td style="color:Gray; font-style:italic;">@totalGrade.ToString(".#")%</td>
+                }
+                else
+                {
+                    <td>@letter</td>
+                    <td>@totalGrade.ToString(".#")%</td>
+                }
+
+                foreach (Category category in ViewBag.Categories)
+                {
+                    int categoryScoreCount = (from score in userScores
+                                              where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
+                                              select score).Count();
+                    bool usingWhatIf = false;
+                    if (userScores.Count() > 0)
+                    {
+                        int count = 0;
+                        int numDropped = category.dropX;
+                        int customize = category.Customize;
+
+                        if (category.Customize == (int)Category.GradeOptions.XtoTake)
+                        {
+                            numDropped = categoryScoreCount - numDropped;
+                        }
+                        else if (numDropped >= categoryScoreCount)
+                        {
+                            numDropped = categoryScoreCount - 1;
+                        }
+
+                        if (category.Name != Constants.UnGradableCatagory)
+                        {
+                            double categoryPoints = 0;
+                            double categoryPossible = 0;
+                            
+                            //If there are multiple scores
+                            double categoryPercentSmallestNumber = 0;
+                            foreach (Score userScore in userScores)
+                            {
+                                if (userScore.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
+                                {
+                                    if (numDropped > 0)
+                                    {
+                                        if (count < numDropped)
+                                        {
+                                            count++;
+                                        }
+                                        else
+                                        {
+                                            if (userScore.Points >= 0)
+                                            {
+                                                categoryPoints += userScore.Points;
+                                                categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                            }
+                                            else if (userScore.StudentPoints >= 0)
+                                            {
+                                                usingWhatIf = true;
+                                                categoryPoints += userScore.StudentPoints;
+                                                categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (userScore.Points >= 0)
+                                            {
+                                                categoryPoints += userScore.Points;
+                                                categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                            }
+                                            else if (userScore.StudentPoints >= 0)
+                                            {
+                                                usingWhatIf = true;
+                                                categoryPoints += userScore.StudentPoints;
+                                                categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                            }
+                                            else
+                                            {
+                                            }
+                                    }
+                                }
+                            }
+                            double total = (categoryPoints / categoryPossible) * 100;
+                            if (total >= 0)
+                            {
+                                if (usingWhatIf == true)
+                                {
+                                    <td style="color:Gray; font-style:italic;">@total.ToString(".#")%</td>
+                                    usingWhatIf = false;
+                                }
+                                else
+                                {
+                                    <td>@total.ToString(".#")%</td>
+                                }
+                            }
+                            else
+                            {
+                                <td>NG</td>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <td>NG</td>
+                    }
+                }
+            }
+        </tr>
+    </table>
+    <br />
+    <table class="tipTable">
+       <tr>
+           <td style="vertical-align:top;"><span class="ui-icon ui-icon-lightbulb"></span></td>
+           <td><b>Tip:</b> Click on a color-coded category tab at the top to switch to a detailed view of your grades in that category.</td>
+       </tr>
+   </table>
+    <a  onclick="$('#letterGradeTable').toggle('blind'); return false;" style="cursor:pointer;">Show/Hide Letter Grade Table</a>
+</div>
+
+<div id="letterGradeTable" style="display:none;">
+    <table id="letterGrades">
+        <tr>
+            <th>Letter Grade</th>
+            <th>Minimum % Required</th>
+        </tr>
+        @foreach (LetterGrade l in ViewBag.LetterGrades)
+        {
+            <tr>
+                <td>@l.Grade</td>
+                <td>@l.MinimumRequired</td>
+            </tr>
+        }
+    </table>
+</div>

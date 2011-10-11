@@ -1,0 +1,23 @@
+﻿@using OSBLE.Models.Courses;
+@model CoursesUsers
+@{
+    ViewBag.Title = "Delete";
+    CoursesUsers courseUser = ViewBag.ActiveCourse as CoursesUsers;
+    string courseType = "course";
+    if(courseUser.AbstractCourse is Community)
+    {
+        courseType = "community";
+    }
+}
+
+<h1>Delete @courseType</h1>
+<p>
+You are about to delete the @courseType titled &quot;@courseUser.AbstractCourse.Name&quot;.  Deleting a @courseType is 
+permanent and cannot be undone.  Any assignments, submissions, grades, and event data 
+associated with this @courseType will also be removed from the system.  If you would like to 
+continue, please click the &quot;Continue&quot; button below.
+</p>
+@using (Html.BeginForm()) {
+    <input type="submit" name="continue" value="Continue" />
+    <input type="submit" name="cancel" value="Cancel" />
+}

@@ -1,0 +1,16 @@
+﻿@model OSBLE.Models.ViewModels.RubricViewModel
+@using OSBLE.Models.Courses.Rubrics;
+@using OSBLE.Models.Assignments.Activities.Scores;
+
+@{
+    ViewBag.Title = "Rubric Evaluation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Rubric Evaluation of @((ViewBag.Score as Score).AssignmentActivity.Name)</h2>
+
+<h3>Grade: @(Math.Round((ViewBag.Score as Score).Points / ViewBag.PossiblePoints * 100, 2))%</h3>
+          
+@Html.Partial("_Display", Model)
+@Html.ActionLink("Return to assignment list", "Index", "Assignment")
+          
