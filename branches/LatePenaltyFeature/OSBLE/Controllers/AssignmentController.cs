@@ -556,6 +556,8 @@ namespace OSBLE.Controllers
                 {
                     mScore = tempScore.FirstOrDefault();
                     mScore.ManualLatePenaltyPercent = value;
+                    //ManualLatePenalty is set, now we need to adjust the points for the score
+                    mScore.Points = mScore.RawPoints * ((100.0 - mScore.ManualLatePenaltyPercent) / 100.0);
                     db.SaveChanges();
                 }
             }

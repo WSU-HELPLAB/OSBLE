@@ -1614,14 +1614,7 @@ namespace OSBLE.Controllers
                         {
                             if (grades.ManualLatePenaltyPercent >= 0)
                             {
-                                if (grades.ManualLatePenaltyPercent > 1)
-                                {
-                                    grades.Points = (value * ((100 - grades.ManualLatePenaltyPercent) / 100));
-                                }
-                                else
-                                {
-                                    grades.Points = (value * (1 - grades.ManualLatePenaltyPercent));
-                                }
+                                value = (value * ((100 - grades.ManualLatePenaltyPercent) / 100));
                             }
 
                             grades.Points = value;

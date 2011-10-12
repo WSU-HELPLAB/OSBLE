@@ -297,45 +297,18 @@ namespace OSBLE.Controllers
                     else
                     {
                         //create
-                        if (grade.ManualLatePenaltyPercent >= 0)
+                        Score newScore = new Score()
                         {
-                            if (grade.ManualLatePenaltyPercent > 1)
-                            {
-                                studentScore *= ((100 - grade.ManualLatePenaltyPercent) / 100);
-                            }
-                            else
-                            {
-                                studentScore *= (100 - grade.ManualLatePenaltyPercent);
-                            }
-
-                            Score newScore = new Score()
-                            {
-                                TeamUserMemberID = vm.Evaluation.RecipientID,
-                                Points = studentScore,
-                                AssignmentActivityID = vm.Evaluation.AbstractAssignmentActivityID,
-                                PublishedDate = DateTime.Now,
-                                LatePenaltyPercent = latePenalty,
-                                isDropped = false,
-                                RawPoints = rawStudentScore
-                            };
-                            db.Scores.Add(newScore);
-                            db.SaveChanges();
-                        }
-                        else
-                        {
-                            Score newScore = new Score()
-                            {
-                                TeamUserMemberID = vm.Evaluation.RecipientID,
-                                Points = studentScore,
-                                AssignmentActivityID = vm.Evaluation.AbstractAssignmentActivityID,
-                                PublishedDate = DateTime.Now,
-                                LatePenaltyPercent = latePenalty,
-                                isDropped = false,
-                                RawPoints = rawStudentScore
-                            };
-                            db.Scores.Add(newScore);
-                            db.SaveChanges();
-                        }
+                            TeamUserMemberID = vm.Evaluation.RecipientID,
+                            Points = studentScore,
+                            AssignmentActivityID = vm.Evaluation.AbstractAssignmentActivityID,
+                            PublishedDate = DateTime.Now,
+                            LatePenaltyPercent = latePenalty,
+                            isDropped = false,
+                            RawPoints = rawStudentScore
+                        };
+                        db.Scores.Add(newScore);
+                        db.SaveChanges();
                     }
                 }
             }

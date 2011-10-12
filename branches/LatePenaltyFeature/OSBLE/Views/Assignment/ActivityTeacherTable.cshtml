@@ -314,9 +314,13 @@
                 
             <td class="LatePenTD">
                 <div>
-                @if (info.ManualLatePenaltyPercent >= 0)
+                @if (info.ManualLatePenaltyPercent > 0)
                 {
                     <span>@info.ManualLatePenaltyPercent.ToString(".##")%</span>
+                }
+                else if (info.ManualLatePenaltyPercent == 0)
+                {
+                    <span>0.0%</span>
                 }
                 else if (info.LatePenaltyPercent != 0)
                 {
