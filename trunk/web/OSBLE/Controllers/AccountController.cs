@@ -64,7 +64,10 @@ namespace OSBLE.Controllers
                 //attack, but it seems to annoy users much more regularly.  Consider
                 //removing is OSBLE ever gets to the point that user accounts start getting
                 //hacked.
-                user.UnlockUser();
+                if(user != null)
+                {
+                    user.UnlockUser();
+                }
                 if (Membership.ValidateUser(model.UserName, model.Password))
                 {
                     context.Session.Clear(); // Clear session variables.
