@@ -4,6 +4,7 @@
     ViewBag.Title = "Assignment Creation Wizard";
 }
 <h1>Rubric Creation</h1>
+@Html.HiddenFor(m => m.ID)
 @Html.Hidden("RubricID", "0")
 <script type="text/javascript">
     $(document).ready(documentReady);
@@ -11,6 +12,7 @@
     //Called when the document has finished loading and is safe to make DOM calls
     function documentReady() {
 
+        //AC: Commented out for now, but might reimplement later
         //$("#silverlightControlHost").height($(window).height() - 230);
 
         //listen to form submit requests

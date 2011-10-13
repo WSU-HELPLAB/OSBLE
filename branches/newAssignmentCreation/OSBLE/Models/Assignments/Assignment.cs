@@ -18,6 +18,7 @@ namespace OSBLE.Models.Assignments
             ColumnOrder = 0;
             Deliverables = new List<Deliverable>();
             AssignmentTeams = new List<AssignmentTeam>();
+            IsDraft = true;
         }
 
         [Key]

@@ -78,16 +78,20 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 manager.ActiveAssignmentId = Assignment.ID;
 
                 string errorPath = "";
+                string action = "";
+                int id = Assignment.ID;
                 WizardComponent comp = null;
                 if (Request.Form.AllKeys.Contains(previousWizardButton))
                 {
                     comp = manager.GetPreviousComponent();
                     errorPath = "Home";
+                    action = "Index";
                 }
                 else
                 {
                     comp = manager.GetNextComponent();
-                    errorPath = "WizardSummary";
+                    errorPath = "Home";
+                    action = "Summary";
                 }
 
                 if (comp != null)
@@ -102,7 +106,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 {
                     return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute, 
                                           new { 
-                                              controller = errorPath 
+                                              controller = errorPath,
+                                              action = action,
+                                              assignmentId = id
                                               }
                                           );
                 }

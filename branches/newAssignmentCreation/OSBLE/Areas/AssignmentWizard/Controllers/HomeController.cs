@@ -19,6 +19,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             manager = WizardComponentManager.GetInstance();
         }
 
+        #region action results
+
         public ActionResult Index(int? assignmentId)
         {
             //if our assignmentId isn't null, then we need to pull that assignment
@@ -44,6 +46,23 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute, new { controller = manager.ActiveComponent.Name });
         }
 
+        public ActionResult Summary(int? assignmentId)
+        {
+            Assignment assignment = new Assignment();
+            if (assignmentId != null)
+            {
+                assignment = db.Assignments.Find((int)assignmentId);
+            }
+            else
+            {
+                assignment = db.Assignments.Find(manager.ActiveAssignmentId);
+            }
+            return View(assignment);
+        }
+
+        #endregion
+
+        #region helper methods
         private void ActivateAssignmentComponents(Assignment assignment)
         {
             manager.DeactivateAllComponents();
@@ -67,5 +86,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 }
             }
         }
+        #endregion
     }
 }
