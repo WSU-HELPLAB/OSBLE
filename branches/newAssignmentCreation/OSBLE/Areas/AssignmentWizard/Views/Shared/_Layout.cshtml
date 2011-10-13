@@ -1,4 +1,6 @@
-﻿@{
+﻿@using OSBLE.Areas.AssignmentWizard.Controllers
+@using OSBLE.Areas.AssignmentWizard.Models
+@{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @section Header
@@ -9,7 +11,31 @@
     @RenderSection("Header", false)
 }
 <div id="WizardContent">
-@using (Html.BeginForm())
+<h1>@ViewBag.ComponentName</h1>
+@using (Html.BeginForm("QuickNav", null, FormMethod.Post, new {id = "QuickNavForm" }))
+{
+    if (ViewBag.Assignment.ID != 0)
+    {
+        <text>Navigate to section:</text>
+        <select id="ComponentNameNavSelect" name="ComponentName">
+        @foreach (WizardComponent component in ViewBag.Components)
+        {
+            string selectedText = "";
+            if (component.Name.CompareTo(ViewBag.ActiveComponent.Name) == 0)
+            {
+                selectedText = "selected=\"selected\"";
+            }
+            <option value="@component.Name" @Html.Raw(selectedText)>@component.Name</option>    
+        }
+        </select>
+        <script type="text/javascript">
+            $('#ComponentNameNavSelect').change(function () { $('#QuickNavForm').submit(); });
+        </script>
+        <br />
+        <br />
+    }
+}
+@using (Html.BeginForm("Index", null, FormMethod.Post, new { id = "WizardForm" }))
 {
 @RenderBody()
 <div id="WizardBottomNav" style="clear:both;">

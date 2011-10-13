@@ -46,6 +46,13 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public WizardBaseController()
         {
             WasUpdateSuccessful = true;
+        }
+
+        public void SetUpViewBag()
+        {
+            ViewBag.Components = manager.SelectedComponents;
+            ViewBag.ActiveComponent = manager.ActiveComponent;
+            ViewBag.Assignment = Assignment;
             ViewBag.PreviousWizardButton = WizardController.previousWizardButton;
             ViewBag.NextWizardButton = WizardController.nextWizardButton;
             ViewBag.Title = "Assignment Creation Wizard";
@@ -55,7 +62,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             Assignment = new Assignment();
             manager = WizardComponentManager.GetInstance();
-
             if (manager.ActiveAssignmentId != 0)
             {
                 Assignment = db.Assignments.Find(manager.ActiveAssignmentId);
@@ -64,6 +70,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 Assignment = new Assignment();
             }
+            SetUpViewBag();
             return View();
         }
 
@@ -113,8 +120,42 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                                           );
                 }
             }
-
+            SetUpViewBag();
             return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult QuickNav()
+        {
+            string componentName = Request.Form["ComponentName"];
+            manager = WizardComponentManager.GetInstance();
+            WizardComponent componentToFind = manager.GetComponentByName(componentName);
+
+            //start at the beginning
+            while (manager.GetPreviousComponent() != null) ;
+
+            //from the beginning, find the component that we want to jump to
+            bool found = false;
+            while (!found)
+            {
+                WizardComponent currentComponent = manager.GetNextComponent();
+                if (currentComponent == null)
+                {
+                    found = true;
+                }
+                else if (currentComponent.Name.CompareTo(componentToFind.Name) == 0)
+                {
+                    found = true;
+                }
+            }
+
+            //redirect to the component
+            return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute,
+                                    new
+                                    {
+                                        controller = componentToFind.Name
+                                    }
+                                  );
         }
 
         public int CompareTo(object obj)

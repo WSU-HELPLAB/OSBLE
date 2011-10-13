@@ -2,8 +2,8 @@
 @model Assignment
 @{
     ViewBag.Title = "Assignment Creation Wizard";
+    ViewBag.ComponentName = "Rubric Creation";
 }
-<h1>Rubric Creation</h1>
 @Html.HiddenFor(m => m.ID)
 @Html.Hidden("RubricID", "0")
 <script type="text/javascript">
@@ -16,7 +16,7 @@
         //$("#silverlightControlHost").height($(window).height() - 230);
 
         //listen to form submit requests
-        $("form").submit(processForm);
+        $("#WizardForm").submit(processForm);
     }
 
     var lastRubricId = 0;

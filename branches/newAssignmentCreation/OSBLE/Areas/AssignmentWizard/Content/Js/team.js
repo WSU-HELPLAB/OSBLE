@@ -12,7 +12,7 @@ function documentReady() {
 
 
     //various event listeners
-    $("form").submit(processForm);
+    $("#WizardForm").submit(processForm);
     $("#CreateTeamLink").click(createTeam);
 
     //turn off selection as it ruins the UI experience

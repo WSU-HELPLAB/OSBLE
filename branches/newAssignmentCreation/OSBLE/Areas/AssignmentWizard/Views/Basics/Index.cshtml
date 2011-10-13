@@ -2,10 +2,13 @@
 @model Assignment
 @{
     ViewBag.Title = "Assignment Creation Wizard";
+    ViewBag.ComponentName = "Basic Assignment Information";
 }
-<h1>Basic Assignment Information</h1>
 @Html.ValidationSummary() 
 @Html.HiddenFor(m => m.ID)
+@Html.HiddenFor(m => m.RubricID)
+@Html.HiddenFor(m => m.PrecededingAssignmentID)
+@Html.HiddenFor(m => m.CommentCategoryID)
 <table class="wizard_entry_table">
 <tr>
     <th>@Html.LabelFor(m => m.AssignmentName):</th>
