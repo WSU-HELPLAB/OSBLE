@@ -34,6 +34,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             else
             {
                 manager.ActiveAssignmentId = 0;
+                manager.DeactivateAllComponents();
             }
             ViewBag.BeginWizardButton = beginWizardButton;
             return View(manager.AllComponents);
@@ -66,9 +67,29 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         private void ActivateAssignmentComponents(Assignment assignment)
         {
             manager.DeactivateAllComponents();
+            
+            //RUBRICS
             if (assignment.RubricID != null)
             {
                 manager.GetComponentByType(typeof(RubricController)).IsSelected = true;
+            }
+            
+            //COMMENT CATEGORIES
+            if (assignment.CommentCategoryID != null)
+            {
+                //TODO: Add comment category component
+            }
+
+            //TEAM ASSIGNMENTS
+            if (assignment.AssignmentTeams.Count > 0)
+            {
+                manager.GetComponentByType(typeof(TeamController)).IsSelected = true;
+            }
+
+            //DELIVERABLES
+            if (assignment.Deliverables.Count > 0)
+            {
+                manager.GetComponentByType(typeof(DeliverablesController)).IsSelected = true;
             }
         }
 

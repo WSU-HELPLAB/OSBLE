@@ -32,7 +32,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
-        private void SetUpViewBag()
+        private new void SetUpViewBag()
         {
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
             ViewBag.AllowedFileNames = from c in FileSystem.GetCourseDocumentsFileList(activeCourse.AbstractCourse, includeParentLink: false).Files select c.Name;

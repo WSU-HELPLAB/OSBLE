@@ -164,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\ContentController.cs" />
     <Compile Include="Attributes\CanPostEvent.cs" />
     <Compile Include="Attributes\FileCacheAttribute.cs" />
@@ -306,6 +307,7 @@
     <Content Include="App_Data\FirstNames.txt" />
     <Content Include="App_Data\LastNames.txt" />
     <Content Include="Areas\AssignmentWizard\Content\css\team.css" />
+    <Content Include="Areas\AssignmentWizard\Content\js\commentCategories.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\deliverables.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\team.js" />
     <Content Include="Areas\AssignmentWizard\Modifications.txt" />
@@ -654,6 +656,7 @@
     <Content Include="Areas\AssignmentWizard\Views\Shared\_Layout.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\_ViewStart.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Home\Summary.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\CommentCategory\Index.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />

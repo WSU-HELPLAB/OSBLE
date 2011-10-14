@@ -189,6 +189,15 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             };
             AllComponents.Add(comp);
 
+            //LINE BY LINE REVIEWS (COMMENT CATEGOIRES)
+            comp = new WizardComponent()
+            {
+                Controller = new CommentCategoryController(),
+                IsSelected = false,
+                IsRequired = false
+            };
+            AllComponents.Add(comp); 
+
         }
     }
 }
