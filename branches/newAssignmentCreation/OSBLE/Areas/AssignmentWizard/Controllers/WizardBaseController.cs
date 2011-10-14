@@ -138,14 +138,17 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             bool found = false;
             while (!found)
             {
-                WizardComponent currentComponent = manager.GetNextComponent();
-                if (currentComponent == null)
+                if (manager.ActiveComponent == null)
                 {
                     found = true;
                 }
-                else if (currentComponent.Name.CompareTo(componentToFind.Name) == 0)
+                else if (manager.ActiveComponent.Name.CompareTo(componentToFind.Name) == 0)
                 {
                     found = true;
+                }
+                else
+                {
+                    manager.GetNextComponent();
                 }
             }
 
@@ -153,7 +156,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute,
                                     new
                                     {
-                                        controller = componentToFind.Name
+                                        controller = componentToFind.Name,
+                                        action = "Index"
                                     }
                                   );
         }
