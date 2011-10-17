@@ -10,7 +10,12 @@
 {
     <script src="@Url.Content("~/AssignmentWizard/Content/js/commentCategories.js")" type="text/javascript"></script>
 }
+@Html.HiddenFor(m => m.ID)
 <div id="manual_config_options" class="indented_options">
+    Create a new set of comment categories called
+        <input type="text" id="category_config_name" name="category_config_name" value="@Model.CommentCategory.Name" />
+        <br />
+        <br style="clear: both;" />
     <div id="category_data">
     </div>
     <div id="add_new_category_div">

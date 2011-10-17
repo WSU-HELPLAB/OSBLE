@@ -1101,6 +1101,7 @@ ul.selector
 	margin-bottom: 1em;
 	margin-right: 1em;
 	float: left;
+	clear:both;
 }
 
 .deliverable

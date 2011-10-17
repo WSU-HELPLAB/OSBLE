@@ -30,6 +30,14 @@ $(function () {
 
 });
 
+// apply this function in an event listener to every text box to prevent accidental submission of the whole form by the user
+function disableSubmit(e) {
+    // if the return key is pressed, do nothing
+    if (e.which == 13) {
+        return false;
+    }
+}
+
 function addCategory(index, catName, optionName) {
     catName = typeof (catName) != 'undefined' ? catName : "";
     optionName = typeof (optionName) != 'undefined' ? optionName : "";
