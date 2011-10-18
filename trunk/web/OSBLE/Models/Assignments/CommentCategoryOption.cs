@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
-namespace OSBLE.Models.AbstractCourses.Course
+namespace OSBLE.Models.Assignments
 {
     public class CommentCategoryOption
     {

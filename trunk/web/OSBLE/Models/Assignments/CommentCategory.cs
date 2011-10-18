@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.AbstractCourses.Course;
 
-namespace OSBLE.Models.AbstractCourses
+namespace OSBLE.Models.Assignments
 {
     public class CommentCategory
     {
