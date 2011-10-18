@@ -194,7 +194,7 @@
 
                 foreach (UserProfile user in ViewBag.Students)
                 {
-                    
+                    studentCount++;
                     categoryTotalWeight = ViewBag.TotalCategoryWeights;
                     foreach (Category category in ViewBag.CatsWithWeightsAndScores)
                     {
@@ -225,7 +225,7 @@
                                                        select score).ToList();
                             if (totalScores.Count() > 0)
                             {
-                                studentCount++;
+                                
                                 foreach (Score score in totalScores)
                                 {
                                     
