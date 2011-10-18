@@ -20,7 +20,7 @@
     public class OSBLEService : DomainService
     {
         protected OSBLEContext db = new OSBLEContext();
-        protected CoursesUsers currentCourseUser = null;
+        protected CourseUsers currentCourseUser = null;
         protected UserProfile currentUserProfile = null;
         protected AbstractCourse currentCourse = null;
 
@@ -41,7 +41,7 @@
                                  where c.ID == activeCourse
                                  select c).FirstOrDefault();
 
-                currentCourseUser = (from c in db.CoursesUsers
+                currentCourseUser = (from c in db.CourseUsers
                                      where c.AbstractCourseID == currentCourse.ID
                                      && c.UserProfileID == currentUserProfile.ID
                                      select c).FirstOrDefault();

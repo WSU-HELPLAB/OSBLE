@@ -1,7 +1,7 @@
 ﻿@using OSBLE.Models.Courses
 @if (ViewBag.CurrentCourses.Count > 0) {
 <text>@(ViewBag.CourseListTitle): </text><br />
-using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_course" }))
+    using (Html.BeginForm("SetCourse", "Home", new { area = "" }, FormMethod.Post, new { id = "set_course" }))
 {
     
     <select name="course" id="course_select">
@@ -10,7 +10,7 @@ using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_cour
         bool communityOptGroup = false;
         }
 
-        @foreach (OSBLE.Models.Courses.CoursesUsers cu in ViewBag.CurrentCourses)
+        @foreach (OSBLE.Models.Courses.CourseUsers cu in ViewBag.CurrentCourses)
         {
             // Skip hidden courses
             if(cu.Hidden) {
@@ -24,7 +24,7 @@ using (Html.BeginForm("SetCourse", "Home", FormMethod.Post, new { id = "set_cour
                 courseDisplay += " [INACTIVE]";
             }
 
-            CoursesUsers ac = ViewBag.ActiveCourse as CoursesUsers;
+            CourseUsers ac = ViewBag.ActiveCourse as CourseUsers;
             
             if(cu.AbstractCourse is Course && !courseOptGroup) {
                 courseOptGroup = true;
@@ -87,7 +87,7 @@ else
         $('body').append(
        '<div id="course_create_dialog" title="Create Course"> \
         <p>Would you like to create a Course or a Community?</p> \
-        @Html.ActionLink("Create Course", "Create", "Course") | @Html.ActionLink("Create Community", "Create", "Community") \
+        @Html.ActionLink("Create Course", "Create", "Course", new {area = ""}, null) | @Html.ActionLink("Create Community", "Create", "Community", new {area = ""}, null) \
     </div>');
 
         //make the div we just created into a dialog box

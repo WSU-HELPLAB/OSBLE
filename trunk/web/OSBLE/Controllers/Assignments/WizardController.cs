@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using OSBLE.Controllers.Assignments.Wizard;
-using OSBLE.Models.Wizard;
 using OSBLE.Models.Assignments;
+using OSBLE.Areas.AssignmentWizard.Models;
+using OSBLE.Areas.AssignmentWizard.Controllers;
 
 namespace OSBLE.Controllers.Assignments
 {
@@ -16,6 +16,21 @@ namespace OSBLE.Controllers.Assignments
         public static string beginWizardButton = "StartWizardButton";
         public static string previousWizardButton = "PreviousWizardButton";
         public static string nextWizardButton = "NextWizardButton";
+
+        public Assignment ActiveAssignment
+        {
+            get
+            {
+                if (manager.ActiveAssignmentId != 0)
+                {
+                    return db.Assignments.Find(manager.ActiveAssignmentId);
+                }
+                else
+                {
+                    return new Assignment();
+                }
+            }
+        }
 
         public ICollection<WizardBaseController> SelectedComponents
         {
@@ -64,12 +79,16 @@ namespace OSBLE.Controllers.Assignments
                     int aid = (int)assignmentId;
                     manager.ActiveAssignmentId = aid;
                 }
+                else
+                {
+                    manager.ActiveAssignmentId = 0;
+                }
                 return View(manager.AllComponents);
             }
             else
             {
                 BuildViewBag();
-                component.Controller.Assignment = db.StudioAssignments.Find(manager.ActiveAssignmentId);
+                component.Controller.Assignment = ActiveAssignment;
                 return component.Controller.Index();
             }
         }
@@ -89,8 +108,9 @@ namespace OSBLE.Controllers.Assignments
         }
 
         [HttpPost]
-        public ActionResult Index(object model)
+        public ActionResult Index(dynamic model)
         {
+            /*
             //Three possibilities:
             // 1: The user clicked the "Begin" button at which we must now figure out what 
             //    our assignment will contain and begin our process.
@@ -105,18 +125,24 @@ namespace OSBLE.Controllers.Assignments
             }
             else
             {
-                manager.ActiveComponent.Controller.Assignment = db.StudioAssignments.Find(manager.ActiveAssignmentId);
-                manager.ActiveComponent.Controller.Index(Request);
-                
-                //Not having an ID of 0 indicates that the record previously existed in the DB
-                if (manager.ActiveAssignmentId != 0)
+                //The following throws an error when the SESSION state gets wiped
+                try
                 {
-                    //Saving goes here (maybe)
-                    //db.Entry(manager.ActiveAssignment).State = System.Data.EntityState.Modified;
-                    //db.SaveChanges();
+                    manager.ActiveComponent.Controller.Assignment = ActiveAssignment;
+                    manager.ActiveComponent.Controller.Index(Request);
                 }
+                catch (Exception ex)
+                {
+                    //if we lost our session data, just return to the base wizard screen
+                    return RedirectToRoute("AssignmentWizard", new { step = "Start" });
+                }
+
                 if (manager.ActiveComponent.Controller.WasUpdateSuccessful)
                 {
+                    //update the assignment ID.  Probably not necessary when working
+                    //with existing assignments, but needed for new assignments.
+                    manager.ActiveAssignmentId = manager.ActiveComponent.Controller.Assignment.ID;
+
                     string errorPath = "";
                     WizardComponent comp = null;
                     if(Request.Form.AllKeys.Contains(previousWizardButton))
@@ -141,9 +167,12 @@ namespace OSBLE.Controllers.Assignments
                 }
                 else
                 {
-                    return RedirectToRoute("AssignmentWizard", new { step = manager.ActiveComponent.Name });
+                    //AC: Seems a bit ugly to call this twice.  Might want to rethink.
+                    return manager.ActiveComponent.Controller.Index(Request);
                 }
             }
+             * */
+            return View();
         }
     }
 }

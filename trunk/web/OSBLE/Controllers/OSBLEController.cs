@@ -27,15 +27,15 @@ namespace OSBLE.Controllers
             get { return currentUser; }
         }
 
-        protected CoursesUsers activeCourse = null;
+        protected CourseUsers activeCourse = null;
 
-        public CoursesUsers ActiveCourse
+        public CourseUsers ActiveCourse
         {
             get { return activeCourse; }
         }
 
         protected HttpContext context = System.Web.HttpContext.Current;
-        protected List<CoursesUsers> currentCourses = new List<CoursesUsers>();
+        protected List<CourseUsers> currentCourses = new List<CourseUsers>();
 
         protected bool DashboardSingleCourseMode;
 
@@ -226,7 +226,7 @@ namespace OSBLE.Controllers
             {
                 // Sends the ViewBag the amount of unread mail messages the user has.
                 SetUnreadMessageCount();
-                List<CoursesUsers> allUsersCourses = db.CoursesUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
+                List<CourseUsers> allUsersCourses = db.CourseUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
 
                 // Get list of courses this user is connected to. Remove inactive (for anyone other than instructors or observers) or hidden (for all) courses.
                 currentCourses = allUsersCourses.Where(cu => (cu.AbstractCourse is Course) &&
@@ -242,7 +242,7 @@ namespace OSBLE.Controllers
                 currentCourses = currentCourses.Concat(allUsersCourses.Where(cu => cu.AbstractCourse is Community).OrderBy(cu => cu.AbstractCourse.Name).ToList()).ToList();
 
                 // Only consider non-hidden courses as the active course.
-                List<CoursesUsers> activeCoursePool = currentCourses.Where(cu => cu.Hidden == false).ToList();
+                List<CourseUsers> activeCoursePool = currentCourses.Where(cu => cu.Hidden == false).ToList();
 
                 int activeCourseID;
 
@@ -302,9 +302,9 @@ namespace OSBLE.Controllers
             {
                 users.Add((teamUser as UserMember).UserProfile);
             }
-            else if (teamUser is TeamMember)
+            else if (teamUser is OldTeamMember)
             {
-                foreach (TeamUserMember member in (teamUser as TeamMember).Team.Members)
+                foreach (TeamUserMember member in (teamUser as OldTeamMember).Team.Members)
                 {
                     users.AddRange(GetAllUsers(member));
                 }
@@ -496,20 +496,20 @@ namespace OSBLE.Controllers
         /// <param name="user"></param>
         public void RemoveUserFromCourse(UserProfile user)
         {
-            //The relationship between users and courses is expressed in CoursesUsers, but
+            //The relationship between users and courses is expressed in CourseUsers, but
             //there exists plenty of other relationships between users and other course
             //particulars.  Perhaps this isn't good design, but we're kind of stuck at this point.
             //In order to keep the course from having a bunch of orphaned items, we must manually
             //delete some additional information.
 
             //might as well delete the big daddy to start
-            CoursesUsers cu =  (from c in db.CoursesUsers
+            CourseUsers cu =  (from c in db.CourseUsers
                     where c.AbstractCourseID == activeCourse.AbstractCourseID
                     && c.UserProfileID == user.ID
                     select c).FirstOrDefault();
             if (cu != null)
             {
-                db.CoursesUsers.Remove(cu);
+                db.CourseUsers.Remove(cu);
             }
 
             //remove this user from any assignments.
@@ -521,9 +521,9 @@ namespace OSBLE.Controllers
             
             foreach (TeamUserMember teamUser in activities)
             {
-                if (teamUser is TeamMember)
+                if (teamUser is OldTeamMember)
                 {
-                    TeamMember member = teamUser as TeamMember;
+                    OldTeamMember member = teamUser as OldTeamMember;
                     member.Team.Remove(user);
 
                     //AC: What should be done if that team is now empty?

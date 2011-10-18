@@ -1,4 +1,4 @@
-﻿@model OSBLE.Models.Courses.CoursesUsers
+﻿@model OSBLE.Models.Courses.CourseUsers
 
 @{
     ViewBag.Title = "Create";
@@ -12,7 +12,7 @@
 @using (Html.BeginForm()) {
     @Html.ValidationSummary(true)
     <fieldset>
-        <legend>CoursesUsers</legend>
+        <legend>CourseUsers</legend>
 
         <div class="editor-label">
             @Html.LabelFor(model => model.AbstractRoleID, "CourseRole")

@@ -526,7 +526,7 @@
 
     <script type="text/javascript">
         $(function () {
-            @foreach (Deliverable d in Model.Assignment.Deliverables)
+            @foreach (dynamic d in Model.Assignment.Deliverables)
             {
                 <text>
                 addNewDeliverable(true, { name: '@d.Name', fileType: @d.Type });

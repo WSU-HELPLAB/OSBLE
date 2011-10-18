@@ -7,6 +7,7 @@ using OSBLE.Attributes;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
+using OSBLE.Models.Assignments;
 
 namespace OSBLE.Controllers
 {
@@ -16,7 +17,7 @@ namespace OSBLE.Controllers
     {
         public ActionResult CourseDocument(int courseId, string filePath)
         {
-            var course = (from c in db.CoursesUsers
+            var course = (from c in db.CourseUsers
                           where c.UserProfileID == currentUser.ID && c.AbstractCourseID == courseId
                           select c).FirstOrDefault();
 

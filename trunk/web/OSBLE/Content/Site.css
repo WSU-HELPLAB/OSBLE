@@ -1101,6 +1101,7 @@ ul.selector
 	margin-bottom: 1em;
 	margin-right: 1em;
 	float: left;
+	clear:both;
 }
 
 .deliverable
@@ -1613,4 +1614,10 @@ ul.assignment_deliverables, .assignment_deliverables ul
 #WarningMessages a
 {
     color:Black;
+}
+
+/* Wizard components */
+.wizard_entry_table th
+{
+    text-align:left;
 }

@@ -53,6 +53,19 @@ namespace OSBLE.Models
 
         public DbSet<CommentCategoryOption> CommentCategoryOptions { get; set; }
 
+        // **NEW** Assignment Tables
+
+        public DbSet<Assignment> Assignments { get; set; }
+
+        public DbSet<AssignmentType> AssignmentTypes { get; set; }
+
+        public DbSet<AssignmentTeam> AssignmentTeams { get; set; }
+
+        public DbSet<Team> Teams { get; set; }
+
+        public DbSet<TeamMember> TeamMembers { get; set; }
+
+
         // Assignments.Activities
 
         public DbSet<AbstractAssignmentActivity> AbstractAssignmentActivities { get; set; }
@@ -70,12 +83,6 @@ namespace OSBLE.Models
         public DbSet<Score> Scores { get; set; }
 
         public DbSet<RubricScore> RubricScores { get; set; }
-
-        // Assignments.Activities.CommentCategories
-
-        //public DbSet<CommentCategory> CommentCategories { get; set; }
-
-        //public DbSet<CommentCategoryTag> CommentCategoryTags { get; set; }
 
         // Courses
 
@@ -95,7 +102,7 @@ namespace OSBLE.Models
 
         public DbSet<CourseRole> CourseRoles { get; set; }
 
-        public DbSet<CoursesUsers> CoursesUsers { get; set; }
+        public DbSet<CourseUsers> CourseUsers { get; set; }
 
         public DbSet<Category> Categories { get; set; }
 
@@ -131,7 +138,7 @@ namespace OSBLE.Models
 
         // Users
 
-        public DbSet<Team> Teams { get; set; }
+        public DbSet<OldTeam> OldTeams { get; set; }
 
         public DbSet<Mail> Mails { get; set; }
 
@@ -143,9 +150,8 @@ namespace OSBLE.Models
         {
             base.OnModelCreating(modelBuilder);
 
-#if !DEBUG
-            modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
-#endif
+            //modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
+
             modelBuilder.Entity<Notification>()
                 .HasRequired(n => n.Sender)
                 .WithMany()
@@ -165,6 +171,8 @@ namespace OSBLE.Models
                 .HasRequired(re => re.Recipient)
                 .WithMany()
                 .WillCascadeOnDelete(false);
+
+            
         }
 
         private void createSampleUser(string username, string password, string firstname, string lastname, string ident, int school, bool isAdmin, bool canCreateCourses)
@@ -354,167 +362,167 @@ namespace OSBLE.Models
 
             #region add course users
 
-            CoursesUsers cu = new CoursesUsers();
+            CourseUsers cu = new CourseUsers();
             cu.AbstractCourseID = 1;
             cu.UserProfileID = 1;
             cu.AbstractRoleID = (int)CourseRole.CourseRoles.Instructor;
             cu.Section = 0;
 
-            CoursesUsers cu2 = new CoursesUsers();
+            CourseUsers cu2 = new CourseUsers();
             cu2.AbstractCourseID = 2;
             cu2.UserProfileID = 1;
             cu2.AbstractRoleID = (int)CourseRole.CourseRoles.Observer;
             cu2.Section = 0;
 
-            CoursesUsers cu3 = new CoursesUsers();
+            CourseUsers cu3 = new CourseUsers();
             cu3.AbstractCourseID = 1;
             cu3.UserProfileID = 2;
             cu3.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
             cu3.Section = 1;
 
-            CoursesUsers cu4 = new CoursesUsers();
+            CourseUsers cu4 = new CourseUsers();
             cu4.AbstractCourseID = 2;
             cu4.UserProfileID = 3;
             cu4.AbstractRoleID = (int)CourseRole.CourseRoles.Instructor;
             cu4.Section = 0;
 
-            CoursesUsers cu5 = new CoursesUsers();
+            CourseUsers cu5 = new CourseUsers();
             cu5.AbstractCourseID = 2;
             cu5.UserProfileID = 2;
             cu5.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
             cu5.Section = 2;
 
-            CoursesUsers cu6 = new CoursesUsers();
+            CourseUsers cu6 = new CourseUsers();
             cu6.AbstractCourseID = 3;
             cu6.UserProfileID = 1;
             cu6.AbstractRoleID = (int)CommunityRole.OSBLERoles.Leader;
             cu6.Section = 0;
 
-            CoursesUsers cu7 = new CoursesUsers();
+            CourseUsers cu7 = new CourseUsers();
             cu7.AbstractCourseID = 3;
             cu7.UserProfileID = 2;
             cu7.AbstractRoleID = (int)CommunityRole.OSBLERoles.Participant;
             cu7.Section = 0;
 
-            CoursesUsers cu8 = new CoursesUsers();
+            CourseUsers cu8 = new CourseUsers();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 4;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
             cu8.Section = 0;
-            this.CoursesUsers.Add(cu8);
+            this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CoursesUsers();
+            cu8 = new CourseUsers();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 5;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
             cu8.Section = 0;
-            this.CoursesUsers.Add(cu8);
+            this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CoursesUsers();
+            cu8 = new CourseUsers();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 1;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Instructor;
             cu8.Section = 0;
-            this.CoursesUsers.Add(cu8);
+            this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CoursesUsers();
+            cu8 = new CourseUsers();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 6;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
             cu8.Section = 0;
-            this.CoursesUsers.Add(cu8);
+            this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CoursesUsers();
+            cu8 = new CourseUsers();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 7;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
             cu8.Section = 0;
-            this.CoursesUsers.Add(cu8);
+            this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CoursesUsers();
+            cu8 = new CourseUsers();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 8;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
             cu8.Section = 0;
-            this.CoursesUsers.Add(cu8);
+            this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CoursesUsers();
+            cu8 = new CourseUsers();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 9;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
             cu8.Section = 0;
-            this.CoursesUsers.Add(cu8);
+            this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CoursesUsers();
+            cu8 = new CourseUsers();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 10;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
             cu8.Section = 0;
-            this.CoursesUsers.Add(cu8);
+            this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CoursesUsers();
+            cu8 = new CourseUsers();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 11;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
             cu8.Section = 0;
-            this.CoursesUsers.Add(cu8);
+            this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CoursesUsers();
+            cu8 = new CourseUsers();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 12;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
             cu8.Section = 0;
-            this.CoursesUsers.Add(cu8);
+            this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CoursesUsers();
+            cu8 = new CourseUsers();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 13;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
             cu8.Section = 0;
-            this.CoursesUsers.Add(cu8);
+            this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CoursesUsers();
+            cu8 = new CourseUsers();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 14;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
             cu8.Section = 0;
-            this.CoursesUsers.Add(cu8);
+            this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CoursesUsers();
+            cu8 = new CourseUsers();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 15;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
             cu8.Section = 0;
-            this.CoursesUsers.Add(cu8);
+            this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CoursesUsers();
+            cu8 = new CourseUsers();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 16;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
             cu8.Section = 0;
-            this.CoursesUsers.Add(cu8);
+            this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            this.CoursesUsers.Add(cu);
-            this.CoursesUsers.Add(cu2);
-            this.CoursesUsers.Add(cu3);
-            this.CoursesUsers.Add(cu4);
-            this.CoursesUsers.Add(cu5);
-            this.CoursesUsers.Add(cu6);
-            this.CoursesUsers.Add(cu7);
+            this.CourseUsers.Add(cu);
+            this.CourseUsers.Add(cu2);
+            this.CourseUsers.Add(cu3);
+            this.CourseUsers.Add(cu4);
+            this.CourseUsers.Add(cu5);
+            this.CourseUsers.Add(cu6);
+            this.CourseUsers.Add(cu7);
 
             this.SaveChanges();
 

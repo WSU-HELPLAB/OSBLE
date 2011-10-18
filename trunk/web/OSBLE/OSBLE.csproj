@@ -19,7 +19,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <UseIISExpress>false</UseIISExpress>
-    <SilverlightApplicationList>{AB420045-1365-43D9-A243-EB735E776BEC}|..\TeamCreation\TeamCreation.csproj|ClientBin|False,{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}|..\StudioTimelineCreation\StudioTimelineCreation.csproj|ClientBin|False,{79706350-C34D-4A51-B22F-273EC8289E5D}|..\..\silverlight\FileUploader\FileUploader.csproj|ClientBin|False,{4196777B-69DF-4B8C-95CF-D4487C34F03F}|..\OsbleRubric\OsbleRubric.csproj|ClientBin|False,{D7C51CF9-3BB2-44CF-9880-E35EF83A1F85}|..\SilverlightSandbox\SilverlightSandbox.csproj|ClientBin|False,{D7E4F1AB-379C-4AD4-BBCF-A0002F44811C}|..\..\silverlight\ReviewInterfaceNew\ViewPeerReview\ViewPeerReview.csproj|ClientBin|False,{172F41E1-B3F6-4519-9DBE-E08B2EE2BC1B}|..\..\silverlight\ReviewInterfaceNew\EditPeerReview\EditPeerReview.csproj|ClientBin|False</SilverlightApplicationList>
+    <SilverlightApplicationList>{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}|..\StudioTimelineCreation\StudioTimelineCreation.csproj|ClientBin|False,{4196777B-69DF-4B8C-95CF-D4487C34F03F}|..\OsbleRubric\OsbleRubric.csproj|ClientBin|False,{D7C51CF9-3BB2-44CF-9880-E35EF83A1F85}|..\SilverlightSandbox\SilverlightSandbox.csproj|ClientBin|False,{D7E4F1AB-379C-4AD4-BBCF-A0002F44811C}|..\..\silverlight\ReviewInterfaceNew\ViewPeerReview\ViewPeerReview.csproj|ClientBin|False,{172F41E1-B3F6-4519-9DBE-E08B2EE2BC1B}|..\..\silverlight\ReviewInterfaceNew\EditPeerReview\EditPeerReview.csproj|ClientBin|False</SilverlightApplicationList>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -163,11 +163,21 @@
     <Reference Include="WebMatrix.WebData, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\ContentController.cs" />
     <Compile Include="Attributes\CanPostEvent.cs" />
     <Compile Include="Attributes\FileCacheAttribute.cs" />
     <Compile Include="Attributes\IsCommunity.cs" />
     <Compile Include="Attributes\NotForCommunity.cs" />
     <Compile Include="Controllers\AssignmentController.cs" />
+    <Compile Include="Controllers\Assignments\WizardController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\BasicsController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\RubricController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\DeliverablesController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\HomeController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\TeamController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\WizardBaseController.cs" />
     <Compile Include="Controllers\AsyncIssueVotingController.cs" />
     <Compile Include="Controllers\AuthorRebuttalController.cs" />
     <Compile Include="Controllers\BasicAssignmentController.cs" />
@@ -198,6 +208,7 @@
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\StudioActivity.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\SyncIssueVotingActivity.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\CommentCategoryOption.cs" />
+    <Compile Include="Models\AbstractCourses\Course\CourseUsers.cs" />
     <Compile Include="Models\AbstractCourses\Course\GradebookOptions\LetterGrade.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\CriteriaEvaluation.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Criterion.cs" />
@@ -208,6 +219,11 @@
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\StopActivity.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\StudioAssignment.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\RubricEvaluation.cs" />
+    <Compile Include="Models\Assignments\Assignment.cs" />
+    <Compile Include="Models\Assignments\AssignmentTeam.cs" />
+    <Compile Include="Models\Assignments\AssignmentType.cs" />
+    <Compile Include="Models\Assignments\Team.cs" />
+    <Compile Include="Models\Assignments\TeamMember.cs" />
     <Compile Include="Models\HomePage\AbstractDashboard.cs" />
     <Compile Include="Models\AbstractCourses\AbstractRole.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\AbstractAssignmentActivity.cs" />
@@ -216,11 +232,11 @@
     <Compile Include="Models\AbstractCourses\Community\CommunityRole.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseBreak.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseMeeting.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\Deliverable.cs" />
+    <Compile Include="Models\Assignments\Deliverable.cs" />
     <Compile Include="Models\HomePage\Event.cs" />
     <Compile Include="Models\AbstractCourses\Course\Category.cs" />
     <Compile Include="Models\List.cs" />
-    <Compile Include="Models\OsbleViewEngine.cs" />
+    <Compile Include="EntityFramework\OsbleViewEngine.cs" />
     <Compile Include="Models\Services\Uploader\ParentDirectoryListing.cs" />
     <Compile Include="Models\Services\Uploader\UserSession.cs" />
     <Compile Include="Models\ToolTips.cs" />
@@ -240,6 +256,9 @@
     <Compile Include="Models\ViewModels\RubricViewModel.cs" />
     <Compile Include="Models\ViewModels\SerializableTeamMembers.cs" />
     <Compile Include="Models\ViewModels\StudioAssignmentViewModel.cs" />
+    <Compile Include="Models\ViewModels\TeamCreationViewModel.cs" />
+    <Compile Include="Areas\AssignmentWizard\Models\WizardComponent.cs" />
+    <Compile Include="Areas\AssignmentWizard\Models\WizardComponentManager.cs" />
     <Compile Include="Services\AuthenticationDomainService1.cs" />
     <Compile Include="Services\OSBLEService.cs" />
     <Compile Include="Services\ReviewInterfaceDomainService.cs" />
@@ -275,7 +294,6 @@
     <Compile Include="Models\Users\Mail.cs" />
     <Compile Include="Models\AbstractCourses\Course\Course.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseRole.cs" />
-    <Compile Include="Models\AbstractCourses\CoursesUsers.cs" />
     <Compile Include="Models\HomePage\DashboardPost.cs" />
     <Compile Include="Models\HomePage\DashboardReply.cs" />
     <Compile Include="Models\HomePage\Notification.cs" />
@@ -288,6 +306,11 @@
     <Content Include="App_Code\Libraries\LumenWorks.Framework.IO.dll" />
     <Content Include="App_Data\FirstNames.txt" />
     <Content Include="App_Data\LastNames.txt" />
+    <Content Include="Areas\AssignmentWizard\Content\css\team.css" />
+    <Content Include="Areas\AssignmentWizard\Content\js\commentCategories.js" />
+    <Content Include="Areas\AssignmentWizard\Content\js\deliverables.js" />
+    <Content Include="Areas\AssignmentWizard\Content\js\team.js" />
+    <Content Include="Areas\AssignmentWizard\Modifications.txt" />
     <Content Include="clientaccesspolicy.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -436,6 +459,8 @@
     <Content Include="Content\themes\base\jquery.ui.slider.css" />
     <Content Include="Content\themes\base\jquery.ui.tabs.css" />
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
+    <Content Include="Controllers\Assignments\README.txt" />
+    <Content Include="Areas\AssignmentWizard\Controllers\README.txt" />
     <Content Include="crossdomain.xml" />
     <Content Include="EditPeerReviewTestPage.aspx" />
     <Content Include="EditPeerReviewTestPage.html" />
@@ -511,7 +536,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Controllers\Assignments\Wizard\" />
+    <Folder Include="Models\Wizard\" />
     <Folder Include="Validations\" />
+    <Folder Include="Views\Assignments\Wizard\" />
     <Folder Include="Views\SubbmissionAssignmentActivity\" />
     <Folder Include="Views\SubmissionAssignmentActivity\" />
   </ItemGroup>
@@ -623,6 +651,12 @@
     <Content Include="Views\Home\_AjaxEmpty.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Areas\AssignmentWizard\Views\Web.config" />
+    <Content Include="Areas\AssignmentWizard\Views\Content\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Home\Summary.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\CommentCategory\Index.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />
@@ -701,16 +735,13 @@
     <Content Include="Views\Account\AccountCreated.cshtml" />
     <Content Include="Views\Account\ActivateAccount.cshtml" />
     <Content Include="Views\School\Delete.cshtml" />
-    <Content Include="Views\Assignments\Wizard\Index.cshtml" />
-    <Content Include="Views\Assignments\Wizard\Basics\Index.cshtml" />
-    <Content Include="Views\Assignments\Wizard\Wizard.cshtml" />
-    <Content Include="Views\Assignments\Wizard\Rubric\Index.cshtml" />
-    <Content Include="Views\Assignments\Wizard\Team\Index.cshtml" />
-    <Content Include="Views\Assignments\Wizard\WizardSummary.cshtml" />
-    <Content Include="Views\Assignments\Wizard\_WizardTopNav.cshtml" />
-    <Content Include="Views\Assignments\Wizard\_WizardBottomNav.cshtml" />
-    <Content Include="Views\Assignments\Wizard\Deliverables\Index.cshtml" />
-    <Content Include="Views\Assignment\Delete.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Home\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Basics\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Wizard.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Rubric\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Team\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\WizardSummary.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Deliverables\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />
@@ -729,6 +760,9 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

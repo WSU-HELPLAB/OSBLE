@@ -296,7 +296,7 @@ namespace OSBLE.Controllers
 
             if (e != null)
             {
-                CoursesUsers cu = currentCourses.Where(c => c.AbstractCourse == e.Course).FirstOrDefault();
+                CourseUsers cu = currentCourses.Where(c => c.AbstractCourse == e.Course).FirstOrDefault();
                 if (((cu != null) && (cu.AbstractRole.CanModify)))
                 {
                     db.Events.Remove(e);

@@ -1,7 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 
 namespace OSBLE.Models.Users
 {
+    [KnownType(typeof(OldTeamMember))]
+    [KnownType(typeof(UserMember))]
     public abstract class TeamUserMember
     {
         [Key]

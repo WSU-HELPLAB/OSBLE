@@ -83,11 +83,11 @@ namespace OSBLE.Models.Assignments
 
         public virtual CommentCategoryConfiguration CommentCategoryConfiguration { get; set; }
 
-        public TeamMember GetUsersTeam(UserProfile user)
+        public OldTeamMember GetUsersTeam(UserProfile user)
         {
             if (!IsTeamAssignment)
             {
-                return new TeamMember();
+                return new OldTeamMember();
             }
 
             //AC: Kind of dangerous, but for now, we just assume that the first team activity
@@ -96,12 +96,12 @@ namespace OSBLE.Models.Assignments
             AbstractAssignmentActivity activity = (from a in AssignmentActivities
                                                    where a.isTeam == true
                                                    select a).FirstOrDefault();
-            TeamMember team = (from t in activity.TeamUsers
+            OldTeamMember team = (from t in activity.TeamUsers
                                where t.Contains(user) == true
-                               select t).FirstOrDefault() as TeamMember;
+                               select t).FirstOrDefault() as OldTeamMember;
             if (team == null)
             {
-                team = new TeamMember() { Team = new Team()};
+                team = new OldTeamMember() { Team = new OldTeam()};
                 team.Team.Name = "Empty Team";
             }
             return team;

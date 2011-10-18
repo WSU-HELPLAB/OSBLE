@@ -1,6 +1,7 @@
 ﻿using System.Web.Mvc;
 using System.Web.Routing;
 using OSBLE.Models;
+using OSBLE.EntityFramework;
 
 namespace OSBLE
 {
@@ -17,10 +18,6 @@ namespace OSBLE
         public static void RegisterRoutes(RouteCollection routes)
         {
             //***When defining routes, be sure to go from specific to generic routes***
-
-            //because the file system is exposed to the web, we need to prevent direct
-            //file access
-            routes.RouteExistingFiles = true;
 
             //allow direct access to web services.
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
@@ -53,13 +50,7 @@ namespace OSBLE
                 "FileHandler/CourseDocument/{courseId}/{filePath}",
                 new { controller = "FileHandler", action = "CourseDocument" }
                 );
-
-            routes.MapRoute("AssignmentWizard",
-                            "Assignments/Wizard/{step}/{assignmentId}",
-                            new { controller = "Wizard", action = "Index", step = "Start", assignmentId = UrlParameter.Optional },
-                            new[] { "OSBLE.Controllers.Assignments" }
-                            );
-
+ 
             routes.MapRoute(
                 "Rubric-eval",
                 "Rubric/{AbstractAssignmentActivityId}/{teamUserId}",
@@ -77,7 +68,8 @@ namespace OSBLE
             routes.MapRoute(
                 "Default", // Route name
                 "{controller}/{action}/{id}", // URL with parameters
-                new { controller = "Home", action = "Index", id = UrlParameter.Optional } // Parameter defaults
+                new { controller = "Home", action = "Index", id = UrlParameter.Optional }, // Parameter defaults
+                new[] { "OSBLE.Controllers" }
             );
         }
 
@@ -93,7 +85,6 @@ namespace OSBLE
 
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
-            ViewEngines.Engines.Add(new OsbleViewEngine());
         }
 
 

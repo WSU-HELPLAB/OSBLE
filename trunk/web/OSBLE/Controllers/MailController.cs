@@ -93,11 +93,11 @@ namespace OSBLE.Controllers
             }
             else
             {
-                foreach (CoursesUsers cu in currentCourses)
+                foreach (CourseUsers cu in currentCourses)
                 {
                     int courseID = cu.AbstractCourseID;
-                    CoursesUsers ourCu = currentCourses.Where(c => c.AbstractCourseID == courseID).FirstOrDefault();
-                    CoursesUsers theirCu = db.CoursesUsers.Where(c => (c.AbstractCourseID == courseID) && (c.UserProfileID == u.ID)).FirstOrDefault();
+                    CourseUsers ourCu = currentCourses.Where(c => c.AbstractCourseID == courseID).FirstOrDefault();
+                    CourseUsers theirCu = db.CourseUsers.Where(c => (c.AbstractCourseID == courseID) && (c.UserProfileID == u.ID)).FirstOrDefault();
 
                     if ((ourCu != null) && (theirCu != null) && (!(ourCu.AbstractRole.Anonymized) || (theirCu.AbstractRole.CanGrade == true)))
                     {
@@ -134,7 +134,7 @@ namespace OSBLE.Controllers
                         if(teamID.HasValue)
                         {
                             int tID = (int)teamID;
-                            var team = (from t in db.Teams
+                            var team = (from t in db.OldTeams
                                         where t.ID == tID
                                         select t.Members).FirstOrDefault().ToList();
 
@@ -159,10 +159,10 @@ namespace OSBLE.Controllers
                             {
                                 ViewBag.MailHeader = "New Message to Instructor";
                             }
-                            List<CoursesUsers> instructors = db.CoursesUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "Instructor")).ToList();
+                            List<CourseUsers> instructors = db.CourseUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "Instructor")).ToList();
                             if (instructors != null)
                             {
-                                foreach (CoursesUsers cu in instructors)
+                                foreach (CourseUsers cu in instructors)
                                 {
                                     recipientList.Add(cu.UserProfile);
                                 }
@@ -175,11 +175,11 @@ namespace OSBLE.Controllers
                             {
                                 ViewBag.MailHeader = "New Message to TA(s)";
                             }
-                            List<CoursesUsers> tas = db.CoursesUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "TA")).ToList();
+                            List<CourseUsers> tas = db.CourseUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "TA")).ToList();
 
                             if (tas != null)
                             {
-                                foreach (CoursesUsers cu in tas)
+                                foreach (CourseUsers cu in tas)
                                 {
                                     recipientList.Add(cu.UserProfile);
                                 }
@@ -189,7 +189,7 @@ namespace OSBLE.Controllers
                 }
                 else // Email team member Id is passed as team member user id
                 {
-                    CoursesUsers studentRec = db.CoursesUsers.Where(c => (c.UserProfileID == whoTo) && (c.AbstractCourseID == aCourseID)).FirstOrDefault();
+                    CourseUsers studentRec = db.CourseUsers.Where(c => (c.UserProfileID == whoTo) && (c.AbstractCourseID == aCourseID)).FirstOrDefault();
                     if (studentRec != null)
                     {
                         ViewBag.MailHeader = "New Message to Team Member";
@@ -356,7 +356,7 @@ namespace OSBLE.Controllers
                 .Select(c => c.AbstractCourseID)
                 .ToList();
 
-            List<UserProfile> authorizedUsers = db.CoursesUsers
+            List<UserProfile> authorizedUsers = db.CourseUsers
                 .Where(c => authorizedCourses.Contains(c.AbstractCourseID))
                 .Select(c => c.UserProfile)
                 .ToList();
@@ -369,7 +369,7 @@ namespace OSBLE.Controllers
                 .Select(c => c.AbstractCourseID)
                 .ToList();
 
-            List<UserProfile> addedUsers = db.CoursesUsers
+            List<UserProfile> addedUsers = db.CourseUsers
                 .Where(c => addedCourses.Contains(c.AbstractCourseID) && ((c.UserProfileID == currentUser.ID) || (c.AbstractRole.CanGrade == true)))
                 .Select(c => c.UserProfile)
                 .ToList();

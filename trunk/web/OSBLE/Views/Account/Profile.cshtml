@@ -109,12 +109,12 @@
     @{
     bool firstCourse = true;
     }
-    @foreach (CoursesUsers cu in ViewBag.CurrentCourses)
+    @foreach (CourseUsers cu in ViewBag.CurrentCourses)
     {
         
         <tr>
             <td class="coursemenu_option">
-                <input type="radio" name="defaultCourse" value="@cu.AbstractCourseID" @if ((cu.AbstractCourseID == ViewBag.CurrentUser.DefaultCourse) || ((ViewBag.CurrentCourses as List<CoursesUsers>).Where(c => c.AbstractCourseID == ViewBag.CurrentUser.DefaultCourse).Count() == 0 && firstCourse))
+                <input type="radio" name="defaultCourse" value="@cu.AbstractCourseID" @if ((cu.AbstractCourseID == ViewBag.CurrentUser.DefaultCourse) || ((ViewBag.CurrentCourses as List<CourseUsers>).Where(c => c.AbstractCourseID == ViewBag.CurrentUser.DefaultCourse).Count() == 0 && firstCourse))
                                                                               {
                     <text>checked="checked"</text>
                                                                               } />

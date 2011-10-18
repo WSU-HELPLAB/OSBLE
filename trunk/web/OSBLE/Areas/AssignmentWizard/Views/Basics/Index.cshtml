@@ -1,0 +1,67 @@
+﻿@using OSBLE.Models.Assignments;
+@model Assignment
+@{
+    ViewBag.Title = "Assignment Creation Wizard";
+    ViewBag.ComponentName = "Basic Assignment Information";
+}
+@Html.ValidationSummary() 
+@Html.HiddenFor(m => m.ID)
+@Html.HiddenFor(m => m.RubricID)
+@Html.HiddenFor(m => m.PrecededingAssignmentID)
+@Html.HiddenFor(m => m.CommentCategoryID)
+<table class="wizard_entry_table">
+<tr>
+    <th>@Html.LabelFor(m => m.AssignmentName):</th>
+    <td>@Html.EditorFor(m => m.AssignmentName)</td>
+    <td>@Html.ValidationMessageFor(m => m.AssignmentName)</td>
+</tr>
+<tr>
+    <th>@Html.LabelFor(m => m.AssignmentDescription):</th>
+    <td>@Html.EditorFor(m => m.AssignmentDescription)</td>
+    <td>@Html.ValidationMessageFor(m => m.AssignmentDescription)</td>
+</tr>
+<tr>
+    <th>@Html.LabelFor(m => m.AssignmentType):</th>
+    <td>@Html.DropDownListFor(m => m.AssignmentType, ViewBag.AssignmentTypes as SelectList)</td>
+    <td>@Html.ValidationMessageFor(m => m.AssignmentType)</td>
+</tr>
+<tr>
+    <th>@Html.LabelFor(m => m.CategoryID):</th>
+    <td>
+        @Html.DropDownListFor(m => m.CategoryID, ViewBag.Categories as SelectList)
+    </td>
+    <td>
+        @Html.ValidationMessageFor(m => m.CategoryID)
+    </td>
+</tr>
+<tr>
+    <th>@Html.LabelFor(m => m.PointsPossible):</th>
+    <td>@Html.EditorFor(m => m.PointsPossible, new { size = 3 })</td>
+    <td>@Html.ValidationMessageFor(m => m.PointsPossible)</td>
+</tr>
+<tr>
+    <th>@Html.LabelFor(m => m.ReleaseDate):</th>
+    <td>@Html.EditorFor(m => m.ReleaseDate) at @Html.EditorFor(m => m.ReleaseTime)</td>
+    <td>@Html.ValidationMessageFor(m => m.ReleaseDate)</td>
+</tr>
+<tr>
+    <th>@Html.LabelFor(m => m.DueDate):</th>
+    <td>@Html.EditorFor(m => m.DueDate) at @Html.EditorFor(m => m.DueTime)</td>
+    <td>@Html.ValidationMessageFor(m => m.DueDate)</td>
+</tr>
+<tr>
+    <th>@Html.LabelFor(m => m.HoursLateWindow):</th>
+    <td>@Html.EditorFor(m => m.HoursLateWindow)</td>
+    <td>@Html.ValidationMessageFor(m => m.HoursLateWindow)</td>
+</tr>
+<tr>
+    <th>@Html.LabelFor(m => m.DeductionPerHourLate):</th>
+    <td>@Html.EditorFor(m => m.DeductionPerHourLate)</td>
+    <td>@Html.ValidationMessageFor(m => m.DeductionPerHourLate)</td>
+</tr>
+<tr>
+    <th>@Html.LabelFor(m => m.IsDraft):</th>
+    <td>@Html.EditorFor(m => m.IsDraft)</td>
+    <td>@Html.ValidationMessageFor(m => m.IsDraft)</td>
+</tr>
+</table>

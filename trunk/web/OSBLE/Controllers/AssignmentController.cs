@@ -307,13 +307,11 @@ namespace OSBLE.Controllers
                         }
 
                         //if team
-                        if (teamUser is TeamMember)
+                        if (teamUser is OldTeamMember)
                         {
                             submissionInfo.isTeam = true;
                             submissionInfo.SubmitterID = teamUser.ID;
-                            submissionInfo.TeamID = (teamUser as TeamMember).TeamID;
-                            submissionInfo.Name = (teamUser as TeamMember).Team.Name;
-                            submissionInfo.TeamList = createStringOfTeamMemebers((teamUser as TeamMember).Team.Members);
+                            submissionInfo.Name = (teamUser as OldTeamMember).Team.Name;
                         }
 
                         //else student
@@ -423,7 +421,7 @@ namespace OSBLE.Controllers
             {
                 //This is a nice way to just return a text as the view
                 return this.Content(String.Join("; ", (
-                    (from c in (db.TeamUsers.Find(teamID) as TeamMember).Team.Members select c.Name).ToArray())));
+                    (from c in (db.TeamUsers.Find(teamID) as OldTeamMember).Team.Members select c.Name).ToArray())));
             }
             catch { }
 

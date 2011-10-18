@@ -149,7 +149,7 @@ namespace OSBLE.Controllers
                 saveLetterGrades(course);
 
                 // Make current user an instructor on new course.
-                CoursesUsers cu = new CoursesUsers();
+                CourseUsers cu = new CourseUsers();
                 cu.AbstractCourseID = course.ID;
                 cu.UserProfileID = currentUser.ID;
                 cu.AbstractRoleID = (int)CourseRole.CourseRoles.Instructor;
@@ -169,7 +169,7 @@ namespace OSBLE.Controllers
                 course.Categories.Add(category);
                 db.Categories.Add(category);
 
-                db.CoursesUsers.Add(cu);
+                db.CourseUsers.Add(cu);
                 db.SaveChanges();
 
                 Session["ActiveCourse"] = course.ID;
@@ -258,7 +258,7 @@ namespace OSBLE.Controllers
 
         [HttpPost]
         [CanModifyCourse]
-        public ActionResult Delete(CoursesUsers cu)
+        public ActionResult Delete(CourseUsers cu)
         {
             //if the user clicked continue, then we should continue
             if (Request.Form.AllKeys.Contains("continue"))

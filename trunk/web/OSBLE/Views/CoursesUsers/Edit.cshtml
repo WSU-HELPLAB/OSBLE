@@ -1,4 +1,4 @@
-﻿@model OSBLE.Models.Courses.CoursesUsers
+﻿@model OSBLE.Models.Courses.CourseUsers
 @{
     ViewBag.Title = "Edit";
 }
@@ -11,7 +11,7 @@
 @using (Html.BeginForm()) {
     @Html.ValidationSummary(true)
     <fieldset>
-        <legend>CoursesUsers</legend>
+        <legend>CourseUsers</legend>
 
         @Html.HiddenFor(model => model.UserProfileID)
 

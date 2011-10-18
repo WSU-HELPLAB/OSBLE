@@ -56,20 +56,12 @@
                 return rubric.CellDescriptions.AsQueryable();
             }
             else return null;
-            /*OLD query method: List<CellDescription> cellDesc = (from desc in db.LevelDescriptions
-                                              join level in db.Levels on desc.LevelID equals level.ID
-                                              join crit in db.Criteria on desc.CriterionID equals crit.ID
-                                              where level.RubricID == rubricId
-                                              &&
-                                              crit.RubricID == rubricId
-                                              select desc).ToList();
-            return cellDesc.AsQueryable();*/
         }
 
         public IQueryable<AbstractCourse> GetCourses()
         {
             var courses = from course in db.AbstractCourses
-                          join cu in db.CoursesUsers on course.ID equals cu.AbstractCourseID
+                          join cu in db.CourseUsers on course.ID equals cu.AbstractCourseID
                           where cu.UserProfileID == currentUserProfile.ID
                           &&
                           (
@@ -181,32 +173,6 @@
         public void UpdateRubric(Rubric rubric)
         {
             db.Entry(rubric).State = EntityState.Modified;
-
-            /* This is now done in clearLevelsAndCrit
-            //when updating a rubric, we must thow away any existing levels, criteria,
-            //and cell descriptions
-            List<Level> levels = (from l in db.Levels where l.RubricID == rubric.ID select l).ToList();
-            List<Criterion> criteria = (from c in db.Criteria where c.RubricID == rubric.ID select c).ToList();
-            List<CellDescription> cellDesc = (from desc in db.CellDescriptions
-                                              join level in db.Levels on desc.LevelID equals level.ID
-                                              join crit in db.Criteria on desc.CriterionID equals crit.ID
-                                              where level.RubricID == rubric.ID
-                                              &&
-                                              crit.RubricID == rubric.ID
-                                              select desc).ToList();
-            foreach (Level l in levels)
-            {
-                db.Levels.Remove(l);
-            }
-            foreach (Criterion c in criteria)
-            {
-                db.Criteria.Remove(c);
-            }
-            foreach (CellDescription d in cellDesc)
-            {
-                db.CellDescriptions.Remove(d);
-            }*/
-
             db.SaveChanges();
         }
 

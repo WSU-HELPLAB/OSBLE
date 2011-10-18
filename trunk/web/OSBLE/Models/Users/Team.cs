@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models.Users
 {
-    public class Team
+    public class OldTeam
     {
-        public Team()
+        public OldTeam()
         {
             Members = new List<TeamUserMember>();
         }
@@ -44,8 +44,8 @@ namespace OSBLE.Models.Users
 
             //recursively make the call for all TeamMembers as well
             var query = from member in Members
-                        where member is TeamMember
-                        select member as TeamMember;
+                        where member is OldTeamMember
+                        select member as OldTeamMember;
             foreach (var item in query)
             {
                 item.Team.Remove(user);

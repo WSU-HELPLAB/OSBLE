@@ -126,7 +126,6 @@ namespace OsbleRubric
 
             //Building the initial grid
             buildGridDefaults();
-        
         }
 
 
@@ -1327,7 +1326,8 @@ namespace OsbleRubric
         /// <summary>
         /// Called when the user clicks the "Publish" button in the view
         /// </summary>
-        private void PublishChanges_Click(object sender, RoutedEventArgs e)
+        [ScriptableMember()]
+        public void PublishChanges_Click(object sender, RoutedEventArgs e)
         {
             //Getting data, generating error list, if errors: show a window, if no errors: continue with save
             this.getData();
@@ -1385,11 +1385,9 @@ namespace OsbleRubric
                 }
                 else
                 {
-                    //context.clearLevelsAndCrit(rubric.ID); Changed
                     context.clearLevelsAndCrit(rubric.ID).Completed += new EventHandler(SubmitChanges);
                 }
 
-                // context.SubmitChanges().Completed += new EventHandler(SaveRubricInternals);
             }
         }
 
@@ -1535,10 +1533,8 @@ namespace OsbleRubric
 
         private void FinalizeSaving(object sender, EventArgs e)
         {
-            //MessageBox.Show("Your rubric has been saved to OSBLE.");
-            //CourseComboBox_SelectionChanged(sender, e);
             //Saving and exiting
-            HtmlPage.Window.Invoke("CloseRubric", selectedRubric.ID.ToString());
+            HtmlPage.Window.Invoke("rubricSaveComplete", selectedRubric.ID.ToString());
         }
 
         /// <summary>
@@ -1802,6 +1798,7 @@ namespace OsbleRubric
                 selectedRubric = rubric;
                 context.RubricHasEvaluations(rubric.ID).Completed += new EventHandler(RubricHasEvaluationsComplete);
                 context.Load(context.GetCellDescriptionsQuery(rubric.ID)).Completed += new EventHandler(CellDescriptionsLoaded);
+                HtmlPage.Window.Invoke("rubricSelected", selectedRubric.ID);
             }
         }
 
