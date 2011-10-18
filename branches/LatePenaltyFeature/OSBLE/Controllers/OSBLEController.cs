@@ -575,8 +575,13 @@ namespace OSBLE.Controllers
 
                     if (grades != null) //there is a score in the db for the userId
                     {
+                        //attempt to apply a manual late penalty if there is one, otherwise use regular late penalty
                         TimeSpan? lateness = calculateLateness(currentAssignment.AbstractAssignment.Category.Course, currentAssignment, teamuser.First());
-                        if (lateness != null) //asigning late penalty if there is lateness
+                        if (grades.ManualLatePenaltyPercent >= 0) 
+                        {
+                            value = (value * ((100 - grades.ManualLatePenaltyPercent) / 100));
+                        }
+                        else if (lateness != null) //asigning late penalty if there is lateness
                         {
                             latePenalty = CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
                             latePenalty = (100 - latePenalty) / 100;
@@ -591,28 +596,14 @@ namespace OSBLE.Controllers
                             }
                         }
 
-                        if (grades.Points == value)
-                        {
-                            //Don't do anything to the points because our value coming in equals the points in the db.
-                            //However, we do need to set the raw value in case that changed.
-                            grades.RawPoints = rawValue;
-                            db.SaveChanges();
-                        }
-                        else
-                        {
-                            if (grades.ManualLatePenaltyPercent >= 0) //assinging late penalty again...?
-                            {
-                                value = (value * ((100 - grades.ManualLatePenaltyPercent) / 100));
-                            }
-
-                            grades.Points = value;
-                            grades.AddedPoints = 0;
-                            grades.LatePenaltyPercent = latePenalty;
-                            grades.StudentPoints = -1;
-                            grades.RawPoints = rawValue;
-                            db.SaveChanges();
-                        }
+                        grades.Points = value;
+                        grades.AddedPoints = 0;
+                        grades.LatePenaltyPercent = latePenalty;
+                        grades.StudentPoints = -1;
+                        grades.RawPoints = rawValue;
+                        db.SaveChanges();
                     }
+                    
 
 
                     else //there was no Score in the db for the userId. Creating a new one and assigning value.

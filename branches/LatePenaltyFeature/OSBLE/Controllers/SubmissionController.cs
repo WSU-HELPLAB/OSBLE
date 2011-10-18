@@ -74,7 +74,8 @@ namespace OSBLE.Controllers
 
                 if (score != null)
                 {
-                    throw new Exception("Cannot submit to an assignmentActivity that already has a score");
+                    if(score.Points != -1)
+                        throw new Exception("Cannot submit to an assignmentActivity that already has a score");
                 }
 
                 //purposefully not using the is statement as we also want to make sure it is not a null SubmissionActivity

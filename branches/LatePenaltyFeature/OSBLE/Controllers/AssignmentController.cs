@@ -570,10 +570,33 @@ namespace OSBLE.Controllers
                                where tumember.ID == teamUserMemeberID
                                select tumember).FirstOrDefault();
 
+                    string userIdentification = "";
+                    if (assignmentActivity.isTeam) //handle like team
+                    {
+                        TeamMember tm = tum as TeamMember;
+                        //tm.TeamID;
+                        if (tm.Team.Members.Count() > 0)
+                        {
+                            UserMember um = tm.Team.Members.First() as UserMember;
+                            int userID = um.UserProfileID;
+                            UserProfile up = (from UP in db.UserProfiles
+                                              where UP.ID == userID
+                                              select UP).FirstOrDefault();
+                            userIdentification = up.Identification;
+                            
+                        }
+                    }
+                    else
+                    {
+                        UserMember um = tum as UserMember;
+                        int userID = um.UserProfileID;
+                        UserProfile up = (from UP in db.UserProfiles
+                                          where UP.ID == userID
+                                          select UP).FirstOrDefault();
+                        userIdentification = up.Identification;
+                    }
 
-                    
-
-                    ModifyGrade(mScore.RawPoints, teamUserMemeberID.ToString(), assignmentActivityID); //Update the grade
+                    ModifyGrade(mScore.RawPoints, userIdentification, assignmentActivityID); //Update the grade
                 }
             }
         }
