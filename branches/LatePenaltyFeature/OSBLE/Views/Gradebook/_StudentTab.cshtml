@@ -149,10 +149,13 @@
                 {
                     foreach (Score userScore in ViewBag.TotalScores)
                     {
-                        if (userScore.Points >= 0)
+                        if (userScore.isDropped == false)
                         {
-                            assignPoints += userScore.Points;
-                            assignPossible += userScore.AssignmentActivity.PointsPossible;
+                            if (userScore.Points >= 0)
+                            {
+                                assignPoints += userScore.Points;
+                                assignPossible += userScore.AssignmentActivity.PointsPossible;
+                            }
                         }
                     }
                 }
