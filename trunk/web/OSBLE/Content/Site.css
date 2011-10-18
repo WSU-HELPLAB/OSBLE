@@ -1101,7 +1101,11 @@ ul.selector
 	margin-bottom: 1em;
 	margin-right: 1em;
 	float: left;
-	clear:both;
+}
+
+.meeting_time, .break, .deliverable
+{
+    clear:both;
 }
 
 .deliverable

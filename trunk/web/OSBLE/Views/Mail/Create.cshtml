@@ -100,8 +100,16 @@
             source: "@(Url.Action("Search"))",
             select: function(event, ui) {
                 $(this).val("");
-                // repeat entry error checking                             
-                if($.inArray(ui.item.value, list) == -1)
+                var repeat = 0; // false
+                // repeat entry error checking   
+                for(var i = 0; i < list.length; ++i)
+                {
+                    if(list[i] == ui.item.value)
+                    {
+                        repeat = 1; // true
+                    }
+                }                          
+                if(repeat == 0)
                 {
                     list.push(ui.item.value);
                     var id = ui.item.value;
@@ -122,6 +130,10 @@
 
                     $('#recipient_list').val(list);
                     $('#recipient_list').serializeArray();
+                }
+                else
+                {
+                    repeat = 1;
                 }
                 return false;
             },
