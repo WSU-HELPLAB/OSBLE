@@ -4,7 +4,6 @@ using System.Linq;
 using System.Web;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
-using OSBLE.Models.AbstractCourses.Course;
 using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models.Assignments

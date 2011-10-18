@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.AbstractCourses;
 
@@ -50,7 +49,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             Assignment.CommentCategoryID = 0;
             db.SaveChanges();
             WasUpdateSuccessful = false;
-            return base.Index();
+            return base.Index(Assignment);
         }
 
         private CommentCategoryConfiguration BuildCommentCategories()

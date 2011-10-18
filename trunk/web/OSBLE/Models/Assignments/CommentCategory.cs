@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using OSBLE.Models.AbstractCourses.Course;
 
 namespace OSBLE.Models.Assignments
 {

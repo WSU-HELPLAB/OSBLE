@@ -8,11 +8,11 @@
     using System.Web;
     using OSBLE.Controllers;
     using OSBLE.Models.AbstractCourses;
-    using OSBLE.Models.AbstractCourses.Course;
     using OSBLE.Models.Assignments.Activities;
     using OSBLE.Models.Courses;
     using OSBLE.Models.Users;
     using OSBLE.Models.ViewModels.ReviewInterface;
+    using OSBLE.Models.Assignments;
 
     [EnableClientAccess()]
     public class ReviewInterfaceDomainService : OSBLEService

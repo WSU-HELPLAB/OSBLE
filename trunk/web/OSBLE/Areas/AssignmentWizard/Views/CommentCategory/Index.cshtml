@@ -17,6 +17,27 @@
         <br />
         <br style="clear: both;" />
     <div id="category_data">
+    @{int counter = 0;
+      
+    /*
+    foreach (CommentCategory category in Model.CommentCategory.Categories)
+    {
+        string categoryId = "category_" + counter;
+        string categoryOptionIdPrefix = "category_option_" + counter;
+        string dataId = "option_data_" + counter;
+        string addOptionId = "add_option_" + counter;
+        
+        <div id="@categoryId" class="deliverable">
+            <div class="deliverable_tools">
+                <div class="deliverable_tools">
+                    <a href="#" title="Delete this deliverable" onclick="deleteDeliverable()">
+                        <img src="/Content/images/delete_up.png" alt="Delete Button" />
+                    </a>
+               </div>
+        </div>
+    }
+    */
+    }
     </div>
     <div id="add_new_category_div">
         <br style="clear: left;" />
@@ -28,3 +49,11 @@
     </div>
     <br style="clear: both;" />
 </div>
+<script type="text/javascript">
+    $(document).ready(documentReady);
+
+    //Called when the document has finished loading and is safe to make DOM calls
+    function documentReady() {
+        
+    }
+</script>

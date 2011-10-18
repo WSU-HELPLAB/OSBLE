@@ -38,6 +38,18 @@ function disableSubmit(e) {
     }
 }
 
+function deleteDeliverable() {
+    $(this).parent().parent().hide('highlight', function () { 
+        $(this).remove(); 
+        $('#add_new_category_div').animate(
+            { 'height': 'show' },
+            { duration: 0 }
+            );
+    });
+    categoryCount--; 
+    return false;
+}
+
 function addCategory(index, catName, optionName) {
     catName = typeof (catName) != 'undefined' ? catName : "";
     optionName = typeof (optionName) != 'undefined' ? optionName : "";
@@ -57,7 +69,7 @@ function addCategory(index, catName, optionName) {
     var newCategory = $('#' + categoryId);
 
     // delete button
-    newCategory.append('<div class="deliverable_tools"><a href="#" title="Delete this deliverable" onclick="$(this).parent().parent().hide(\'highlight\', function () { $(this).remove(); $(\'#add_new_category_div\').animate({ \'height\': \'show\' }, { duration: 0 }); }); categoryCount--; return false;"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');
+    newCategory.append('<div class="deliverable_tools"><a href="#" title="Delete this deliverable" onclick="deleteDeliverable()"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');
 
     // main layout
     newCategory.append('<table><tr>');

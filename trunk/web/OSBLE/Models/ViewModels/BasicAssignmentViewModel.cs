@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
-using OSBLE.Models.AbstractCourses.Course;
 
 namespace OSBLE.Models.ViewModels
 {

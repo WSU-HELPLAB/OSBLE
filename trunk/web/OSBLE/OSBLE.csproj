@@ -194,8 +194,8 @@
     <Compile Include="Controllers\StudioAssignmentController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="EntityFramework\DbContextExtensions.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\CommentCategory.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\CommentCategoryConfiguration.cs" />
+    <Compile Include="Models\Assignments\CommentCategory.cs" />
+    <Compile Include="Models\Assignments\CommentCategoryConfiguration.cs" />
     <Compile Include="Models\AbstractCourses\CourseRubric.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\AbstractAssignment.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\AsyncIssueVotingActivity.cs" />
@@ -207,7 +207,7 @@
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\Scores\Score.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\StudioActivity.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\SyncIssueVotingActivity.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\CommentCategoryOption.cs" />
+    <Compile Include="Models\Assignments\CommentCategoryOption.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseUsers.cs" />
     <Compile Include="Models\AbstractCourses\Course\GradebookOptions\LetterGrade.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\CriteriaEvaluation.cs" />

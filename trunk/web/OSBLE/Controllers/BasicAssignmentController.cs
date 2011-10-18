@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using OSBLE.Attributes;
 using OSBLE.Models;
 using OSBLE.Models.AbstractCourses;
-using OSBLE.Models.AbstractCourses.Course;
 
 //using OSBLE.Models.AbstractCourses.Course;
 using OSBLE.Models.Assignments.Activities;
