@@ -48,7 +48,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             Assignment.CommentCategory = config;
             Assignment.CommentCategoryID = 0;
             db.SaveChanges();
-            WasUpdateSuccessful = false;
+            WasUpdateSuccessful = true;
             return base.Index(Assignment);
         }
 

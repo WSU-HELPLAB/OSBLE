@@ -38,9 +38,9 @@ function disableSubmit(e) {
     }
 }
 
-function deleteDeliverable() {
-    $(this).parent().parent().hide('highlight', function () { 
-        $(this).remove(); 
+function deleteCategory(item) {
+    $(item).parent().parent().hide('highlight', function () {
+        $(item).remove(); 
         $('#add_new_category_div').animate(
             { 'height': 'show' },
             { duration: 0 }
@@ -69,7 +69,7 @@ function addCategory(index, catName, optionName) {
     var newCategory = $('#' + categoryId);
 
     // delete button
-    newCategory.append('<div class="deliverable_tools"><a href="#" title="Delete this deliverable" onclick="deleteDeliverable()"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');
+    newCategory.append('<div class="deliverable_tools"><a href="#" title="Delete this deliverable" onclick="deleteCategory(this)"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');
 
     // main layout
     newCategory.append('<table><tr>');

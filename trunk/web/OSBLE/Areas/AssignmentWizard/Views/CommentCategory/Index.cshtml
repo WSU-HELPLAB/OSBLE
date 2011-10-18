@@ -17,27 +17,6 @@
         <br />
         <br style="clear: both;" />
     <div id="category_data">
-    @{int counter = 0;
-      
-    /*
-    foreach (CommentCategory category in Model.CommentCategory.Categories)
-    {
-        string categoryId = "category_" + counter;
-        string categoryOptionIdPrefix = "category_option_" + counter;
-        string dataId = "option_data_" + counter;
-        string addOptionId = "add_option_" + counter;
-        
-        <div id="@categoryId" class="deliverable">
-            <div class="deliverable_tools">
-                <div class="deliverable_tools">
-                    <a href="#" title="Delete this deliverable" onclick="deleteDeliverable()">
-                        <img src="/Content/images/delete_up.png" alt="Delete Button" />
-                    </a>
-               </div>
-        </div>
-    }
-    */
-    }
     </div>
     <div id="add_new_category_div">
         <br style="clear: left;" />
@@ -55,5 +34,31 @@
     //Called when the document has finished loading and is safe to make DOM calls
     function documentReady() {
         
+        //setup prior comment categories
+        @{
+            if (Model.CommentCategory.Categories.Count > 0)
+            {
+                int counter = 0;
+                foreach (CommentCategory cat in Model.CommentCategory.Categories)
+                {
+                    string js = string.Format("\n\taddNamedCategory(\"{0}\", \"{1}\");\n", cat.Name, cat.Options[0].Name);
+                    @Html.Raw(js)
+                    int insideCounter = -1;
+                    foreach (CommentCategoryOption option in cat.Options)
+                    {
+                        //skip the first item as we added it with the previous JS call
+                        insideCounter++;
+                        if (insideCounter == 0)
+                        {
+                            continue;
+                        }
+                        js = string.Format("\taddNamedCategoryOption(\"{0}\", \"{1}\");\n", counter, option.Name);
+                        @Html.Raw(js)
+                    }
+                    counter++;
+                }
+            }
+        }
+
     }
 </script>
