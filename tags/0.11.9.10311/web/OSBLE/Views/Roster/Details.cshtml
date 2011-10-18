@@ -1,0 +1,35 @@
+﻿@model OSBLE.Models.CoursesUsers
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>CoursesUsers</legend>
+
+    <div class="display-label">UserProfile</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.UserProfile.UserName)
+    </div>
+
+    <div class="display-label">Course</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Course.Prefix)
+    </div>
+
+    <div class="display-label">CourseRole</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.CourseRole.Name)
+    </div>
+
+    <div class="display-label">Section</div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Section)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

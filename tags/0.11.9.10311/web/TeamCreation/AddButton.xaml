@@ -1,0 +1,23 @@
+﻿<UserControl
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	x:Class="TeamCreation.AddButton"
+    >
+
+    <Grid x:Name="LayoutRoot">
+        <Border BorderBrush="Black" BorderThickness="0" MinHeight="100" Width="210">
+            <Button Content="+ Add Team" Height="23" VerticalAlignment="Center" HorizontalAlignment="Center" Width="80" Background="#FF1A6425" Click="Button_Click">
+                <Button.BorderBrush>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FFA4B9A3" Offset="0"/>
+                        <GradientStop Color="#FF8399A9" Offset="0.375"/>
+                        <GradientStop Color="#FF718597" Offset="0.375"/>
+                        <GradientStop Color="#FF3BA925" Offset="1"/>
+                    </LinearGradientBrush>
+                </Button.BorderBrush>
+            </Button>
+        </Border>
+    </Grid>
+</UserControl>
