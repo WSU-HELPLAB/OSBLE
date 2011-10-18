@@ -38,54 +38,7 @@ if(ViewBag.SubmissionReceived)
 
 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
 {
-
-    <a href="#" class="add_link" id="assignment_create_button">@Helpers.AddButton() Create New Assignment</a>
-        <script type="text/javascript">
-            $(function () {
-                $('#assignment_create_dialog').dialog({
-                    modal: true,
-                    autoOpen: false,
-                    resizable: false,
-                    width: 550,
-                    height: 400,
-                    closeOnEscape: true
-                });
-
-                $('#assignment_create_button').click(function () { $('#assignment_create_dialog').dialog('open'); });
-            });
-    </script>
-        
-    <div id="assignment_create_dialog" title="Create New Assignment">
-        <p>Select an assignment type to create:</p>
-        <div>
-        <table>
-        <tr>
-        <th>
-        @Html.ActionLink("Basic Assignment", "Create", "BasicAssignment")
-        </th>
-        <td style="padding-bottom:10px;">
-        <em>Allow students or teams to submit deliverables, which instructors can evaluate using inline comments and/or rubrics</em>
-        </td>
-        </tr>
-        <tr>
-        <th>
-        @Html.ActionLink("Studio Assignment", "SilverlightTest", "StudioAssignment")
-        </th>
-        <td style="padding-bottom:10px;">
-        <em>Allow students or teams to iteratively submit deliverables, participate in peer reviews, vote on issues raised in peer reviews, and participate in author rebuttals.</em>
-        </td>
-        </tr>
-                <tr>
-        <th>
-        @Html.ActionLink("Discussion Assignment", "NoWhere", "NoWhere")
-        </th>
-        <td style="padding-bottom:10px;">
-        <em>Allow students to make online posts and participate in online discussions</em>
-        </td>
-        </tr>
-        </table></div>
-        
-    </div>
+    <a href="@Url.Action("Index", "Home", new { area="AssignmentWizard" })" class="add_link" id="assignment_create_button">@Helpers.AddButton() Create New Assignment</a>
 }
 
 <p></p>

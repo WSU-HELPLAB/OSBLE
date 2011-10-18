@@ -527,6 +527,10 @@ namespace OSBLE.Models
             this.SaveChanges();
 
             #endregion add course users
+
+            //Assignment Types
+            this.AssignmentTypes.Add(new AssignmentType() { Type="Basic Assignment" });
+            this.SaveChanges();
         }
 
         public DbSet<PeerReviewActivity> PeerReviewActivities { get; set; }
