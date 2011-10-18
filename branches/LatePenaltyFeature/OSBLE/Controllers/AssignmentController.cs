@@ -15,6 +15,7 @@ using OSBLE.Models.HomePage;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
 using OSBLE.Models.Assignments.Activities.Scores;
+using OSBLE.Controllers;
 
 namespace OSBLE.Controllers
 {
@@ -326,6 +327,7 @@ namespace OSBLE.Controllers
                         {
                             submissionInfo.isTeam = true;
                             submissionInfo.SubmitterID = teamUser.ID;
+                            submissionInfo.TeamID = (teamUser as TeamMember).TeamID;
                             submissionInfo.Name = (teamUser as TeamMember).Team.Name;
                             submissionInfo.TeamList = createStringOfTeamMemebers((teamUser as TeamMember).Team.Members);
 
@@ -530,7 +532,6 @@ namespace OSBLE.Controllers
         /// <summary>
         /// Changes ManaulLatePenalty value into the value passed in, for the user(s) corrisponding to the ID sent in.
         /// </summary>
-        /// <param name="value"></param>
         public void changeManualLatePenalty(double value, int teamUserMemeberID, int assignmentActivityID)
         {
             if (ModelState.IsValid)
@@ -541,7 +542,7 @@ namespace OSBLE.Controllers
                                  select s);
 
                 Score mScore = null;
-                if (tempScore.Count() == 0) //No score
+                if (tempScore.Count() == 0) //No score. Adding a new one to the db
                 {
                     mScore = new Score();
                     mScore.PublishedDate = DateTime.Now;
@@ -554,11 +555,25 @@ namespace OSBLE.Controllers
                 }
                 else //Score already in place
                 {
+                    //Assigning mScore the score from the db. Adjusting the late penalty, saving the changes to
+                    //db, and finally updating the grade by running  ModifyGrade on the rawpoints. 
                     mScore = tempScore.FirstOrDefault();
-                    mScore.ManualLatePenaltyPercent = value;
-                    //ManualLatePenalty is set, now we need to adjust the points for the score
-                    mScore.Points = mScore.RawPoints * ((100.0 - mScore.ManualLatePenaltyPercent) / 100.0);
-                    db.SaveChanges();
+                    mScore.ManualLatePenaltyPercent = value; 
+                    db.SaveChanges(); //save mScore changes
+
+                    //might not need
+                    AbstractAssignmentActivity assignmentActivity = (from aa in db.AbstractAssignmentActivities
+                                             where aa.ID == assignmentActivityID
+                                             select aa).FirstOrDefault();
+
+                    var tum = (from tumember in db.TeamUsers
+                               where tumember.ID == teamUserMemeberID
+                               select tumember).FirstOrDefault();
+
+
+                    
+
+                    ModifyGrade(mScore.RawPoints, teamUserMemeberID.ToString(), assignmentActivityID); //Update the grade
                 }
             }
         }

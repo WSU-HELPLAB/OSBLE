@@ -18,7 +18,7 @@ namespace OSBLE.Controllers
         // GET: /Notification/
         public ActionResult Index()
         {
-            ViewBag.Notifications = db.Notifications.Where(n => n.RecipientID == currentUser.ID).OrderByDescending(n => n.Posted).ToList();
+            ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == currentUser.ID)).OrderByDescending(n => n.Posted).ToList();
             return View();
         }
 

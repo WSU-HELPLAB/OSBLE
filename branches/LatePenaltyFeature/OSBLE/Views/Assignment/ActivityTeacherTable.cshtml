@@ -236,8 +236,11 @@
             <td>
                 @if (isTeam)
                 { 
-                    <span style="text-decoration: underline">@info.Name</span><br/>
-                    @info.TeamList
+                    <span style="text-decoration: underline">@info.Name</span>
+                    <a title="Email this team" href="@Url.Action("Create", "Mail", new { id = -4, teamID = info.TeamID })">@Helpers.MailButton()</a>
+                    <br/>
+                    @info.TeamList            
+                    
                 }
                 else
                 { 
@@ -290,7 +293,7 @@
                     if (hasRubric)
                     {  
                         
-                            @Html.ActionLink(userScore.Points.ToString() + "%", "Index", "Rubric", new { abstractAssignmentActivityId = ViewBag.activityID, teamUserId = info.SubmitterID }, new {})
+                            @Html.ActionLink(userScore.Points.ToString() + "%", "Index", "Rubric", new { abstractAssignmentActivityId = ViewBag.activityID, teamUserId = info.SubmitterID }, new { })
                         
                     }
                     else

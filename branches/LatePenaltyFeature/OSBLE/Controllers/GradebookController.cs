@@ -1253,36 +1253,7 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult AddPoints(int assignmentId, double number)
         {
-            if (ModelState.IsValid)
-            {
-                if (assignmentId > 0)
-                {
-                    List<Score> grades = (from grade in db.Scores
-                                          where grade.AssignmentActivityID == assignmentId &&
-                                          grade.Points >= 0 
-                                          select grade).ToList();
-
-                    var assignment = (from assigns in db.AbstractAssignmentActivities
-                                      where assigns.ID == assignmentId
-                                      orderby assigns.ColumnOrder
-                                      select assigns).FirstOrDefault();
-
-                    if (grades.Count() > 0)
-                    {
-                        foreach (Score item in grades)
-                        {
-                            if (item.AddedPoints > 0)
-                            {
-                                item.Points -= assignment.addedPoints;
-                            }
-                            item.Points += number;
-                            item.AddedPoints = number;
-                        }
-                        assignment.addedPoints = number;
-                        db.SaveChanges();
-                    }
-                }
-            }
+            ApplyAddPoints(assignmentId, number);
             BuildGradebook((int)Session["categoryId"]);
             return View("_Gradebook");
         }
@@ -1555,147 +1526,19 @@ namespace OSBLE.Controllers
             return View("_Gradebook");
         }
 
+        
+
         [HttpPost]
         public ActionResult ModifyCell(double value, string userId, int assignmentId)
         {
 
-            //Continue if we have a valid gradable ID
-            if (assignmentId != 0)
-            {
-                double latePenalty = 0.0;
-                //Get student
-                var user = (from u in db.UserProfiles where u.Identification == userId select u).FirstOrDefault();
-
-                if (user != null)
-                {
-                    double rawValue = value;
-                    List<Score> gradableQuery = (from g in db.Scores
-                                                 where g.AssignmentActivityID == assignmentId
-                                                 select g).ToList();
-
-                    Score grades = (from grade in gradableQuery
-                                    where grade.TeamUserMember.Contains(user)
-                                    select grade).FirstOrDefault();
-
-                    var assignmentQuery = from a in db.AbstractAssignmentActivities
-                                          where a.ID == assignmentId
-                                          select a;
-
-                    var currentAssignment = assignmentQuery.FirstOrDefault();
-                    var teamuser = from c in currentAssignment.TeamUsers where c.Contains(user) select c;
-                    Category currentCategory = currentAssignment.AbstractAssignment.Category;
-
-                    if (grades != null)
-                    {
-                        TimeSpan? lateness = calculateLateness(currentAssignment.AbstractAssignment.Category.Course, currentAssignment, teamuser.First());
-                        if (lateness != null)
-                        {
-                            latePenalty = CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
-                            latePenalty = (100 - latePenalty) / 100;
-                            value = value * latePenalty;
-                        }
-
-                        if (currentCategory.MaxAssignmentScore >= 0)
-                        {
-                            if (((value/grades.AssignmentActivity.PointsPossible)*100) > currentCategory.MaxAssignmentScore)
-                            {
-                                value = (currentAssignment.PointsPossible * (currentCategory.MaxAssignmentScore / 100));
-                            }
-                        }
-
-                        if (grades.Points == value)
-                        {
-                            //Don't do anything to the points because our value coming in equals the points in the db.
-                            //However, we do need to set the raw value in case that changed.
-                            grades.RawPoints = rawValue;
-                            db.SaveChanges();
-                        }
-                        else
-                        {
-                            if (grades.ManualLatePenaltyPercent >= 0)
-                            {
-                                value = (value * ((100 - grades.ManualLatePenaltyPercent) / 100));
-                            }
-
-                            grades.Points = value;
-                            grades.AddedPoints = 0;
-                            grades.LatePenaltyPercent = latePenalty;
-                            grades.StudentPoints = -1;
-                            grades.RawPoints = rawValue;
-                            db.SaveChanges();
-                       } 
-                    }
-                    else
-                    {
-                        if (teamuser.Count() > 0)
-                        {
-                            TimeSpan? lateness = calculateLateness(currentAssignment.AbstractAssignment.Category.Course, currentAssignment, teamuser.First());
-                            if (lateness != null)
-                            {
-                                latePenalty = CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
-                                latePenalty = (100 - latePenalty) / 100;
-                                value = value * latePenalty;
-                            }
-
-                            if (currentCategory.MaxAssignmentScore > 0)
-                            {
-                                if (((value/currentAssignment.PointsPossible)*100) > currentCategory.MaxAssignmentScore)
-                                {
-                                    value = (currentAssignment.PointsPossible * (currentCategory.MaxAssignmentScore / 100));
-                                }
-                            }
-                            if (grades.ManualLatePenaltyPercent >= 0)
-                            {
-                                if (grades.ManualLatePenaltyPercent > 1)
-                                {
-                                    value *= ((100 - grades.ManualLatePenaltyPercent) / 100);
-                                }
-                                else
-                                {
-                                    value *= (1 - grades.ManualLatePenaltyPercent);
-                                }
-                                Score newScore = new Score()
-                                {
-                                    TeamUserMember = teamuser.First(),
-                                    Points = value,
-                                    AssignmentActivityID = currentAssignment.ID,
-                                    PublishedDate = DateTime.Now,
-                                    isDropped = false,
-                                    LatePenaltyPercent = latePenalty,
-                                    StudentPoints = -1,
-                                    RawPoints = rawValue
-                                };
-                                db.Scores.Add(newScore);
-                                db.SaveChanges();
-                            }
-                            else
-                            {
-                                Score newScore = new Score()
-                                {
-                                    TeamUserMember = teamuser.First(),
-                                    Points = value,
-                                    AssignmentActivityID = currentAssignment.ID,
-                                    PublishedDate = DateTime.Now,
-                                    isDropped = false,
-                                    LatePenaltyPercent = latePenalty,
-                                    StudentPoints = -1,
-                                    RawPoints = rawValue
-                                };
-                                db.Scores.Add(newScore);
-                                db.SaveChanges();
-                            }
-                        }
-                    }
-                    if (currentAssignment.addedPoints > 0)
-                    {
-                        AddPoints(assignmentId, currentAssignment.addedPoints);
-                    }
-                }
-            }
+            ModifyGrade(value, userId, assignmentId);
 
             BuildGradebook((int)Session["categoryId"]);
             return View("_Gradebook");
         }
+
+
 
 
         [HttpPost]
@@ -1863,7 +1706,7 @@ namespace OSBLE.Controllers
 
         }
 
-
+        [OutputCache(Duration=3600)]
         public ActionResult TeacherIndex()
         {
             //LINQ complains when we use this directly in our queries,so pull it beforehand
