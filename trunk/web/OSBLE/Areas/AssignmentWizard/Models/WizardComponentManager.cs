@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using OSBLE.Models.Assignments;
 using OSBLE.Areas.AssignmentWizard.Controllers;
+using System.ComponentModel;
 
 namespace OSBLE.Areas.AssignmentWizard.Models
 {
@@ -20,7 +21,15 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             protected set;
         }
 
+        /// <summary>
+        /// A list of the currently selected wizard components.  DO NOT directly modify this list.
+        /// </summary>
         public ICollection<WizardComponent> SelectedComponents { get; protected set; }
+
+        /// <summary>
+        /// A list of unselected wizard components.  DO NOT directly modify this list.
+        /// </summary>
+        public ICollection<WizardComponent> UnselectedComponents { get; protected set; }
 
         public int ActiveAssignmentId
         {
@@ -110,6 +119,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         {
             AllComponents = new List<WizardComponent>();
             SelectedComponents = new List<WizardComponent>();
+            UnselectedComponents = new List<WizardComponent>();
             RegisterComponents();
         }
 
@@ -143,6 +153,42 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             }
             ActiveComponentIndex = 0;
             SelectedComponents.Clear();
+        }
+
+        /// <summary>
+        /// Fired whenever a component property's value gets changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ComponentPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            //presently, we only care about selection change
+            if (e.PropertyName.CompareTo("IsSelected") == 0)
+            {
+                WizardComponent component = sender as WizardComponent;
+                if (component.IsSelected)
+                {
+                    if (UnselectedComponents.Contains(component))
+                    {
+                        UnselectedComponents.Remove(component);
+                    }
+                    if (!SelectedComponents.Contains(component))
+                    {
+                        SelectedComponents.Add(component);
+                    }
+                }
+                else
+                {
+                    if (SelectedComponents.Contains(component))
+                    {
+                        SelectedComponents.Remove(component);
+                    }
+                    if (!UnselectedComponents.Contains(component))
+                    {
+                        UnselectedComponents.Add(component);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -198,6 +244,12 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             };
             AllComponents.Add(comp); 
 
+            //attach event listeners to selection change
+            foreach (WizardComponent component in AllComponents)
+            {
+                UnselectedComponents.Add(component);
+                component.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(ComponentPropertyChanged);
+            }
         }
     }
 }

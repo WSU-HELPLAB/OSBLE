@@ -77,7 +77,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             //COMMENT CATEGORIES
             if (assignment.CommentCategoryID != null)
             {
-                //TODO: Add comment category component
+                manager.GetComponentByType(typeof(CommentCategoryController)).IsSelected = true;
             }
 
             //TEAM ASSIGNMENTS
@@ -103,8 +103,43 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 {
                     WizardComponent comp = manager.GetComponentByName(Request.Form[key]);
                     comp.IsSelected = true;
-                    manager.SelectedComponents.Add(comp);
                 }
+            }
+
+            //if we're loading a previous assignment, we need to go through and 
+            //remove links to any unselected items
+            if (manager.ActiveAssignmentId != 0)
+            {
+                Assignment assignment = db.Assignments.Find(manager.ActiveAssignmentId);
+
+                //RUBRICS
+                if (manager.UnselectedComponents.Contains(manager.GetComponentByType(typeof(RubricController))))
+                {
+                    assignment.Rubric = null;
+                    assignment.RubricID = null;
+                }
+
+                //COMMENT CATEGORIES
+                if (manager.UnselectedComponents.Contains(manager.GetComponentByType(typeof(CommentCategoryController))))
+                {
+                    assignment.CommentCategory = null;
+                    assignment.CommentCategoryID = null;
+                }
+
+                //TEAM ASSIGNMENTS
+                if (manager.UnselectedComponents.Contains(manager.GetComponentByType(typeof(TeamController))))
+                {
+                    assignment.AssignmentTeams = null;
+                }
+
+                //DELIVERABLES
+                if (manager.UnselectedComponents.Contains(manager.GetComponentByType(typeof(DeliverablesController))))
+                {
+                    assignment.Deliverables = null;
+                }
+
+                db.Entry(assignment).State = System.Data.EntityState.Modified;
+                db.SaveChanges();
             }
         }
         #endregion
