@@ -235,7 +235,6 @@
     <Compile Include="Models\Assignments\Deliverable.cs" />
     <Compile Include="Models\HomePage\Event.cs" />
     <Compile Include="Models\AbstractCourses\Course\Category.cs" />
-    <Compile Include="Models\List.cs" />
     <Compile Include="EntityFramework\OsbleViewEngine.cs" />
     <Compile Include="Models\Services\Uploader\ParentDirectoryListing.cs" />
     <Compile Include="Models\Services\Uploader\UserSession.cs" />
