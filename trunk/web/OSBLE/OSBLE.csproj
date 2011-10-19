@@ -208,7 +208,7 @@
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\StudioActivity.cs" />
     <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\SyncIssueVotingActivity.cs" />
     <Compile Include="Models\Assignments\CommentCategoryOption.cs" />
-    <Compile Include="Models\AbstractCourses\Course\CourseUsers.cs" />
+    <Compile Include="Models\AbstractCourses\Course\CourseUser.cs" />
     <Compile Include="Models\AbstractCourses\Course\GradebookOptions\LetterGrade.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\CriteriaEvaluation.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Criterion.cs" />
