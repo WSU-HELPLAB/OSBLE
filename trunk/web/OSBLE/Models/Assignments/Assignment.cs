@@ -99,7 +99,7 @@ namespace OSBLE.Models.Assignments
         {
             get
             {
-                return Rubric.ID != null;
+                return RubricID != null;
             }
         }
 
