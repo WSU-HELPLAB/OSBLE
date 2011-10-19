@@ -91,6 +91,54 @@ namespace OSBLE.Models.Assignments
             }
         }
 
+        /// <summary>
+        /// Returns true if the Assignment has an associated Rubric
+        /// </summary>
+        [NotMapped]
+        public bool HasRubric
+        {
+            get
+            {
+                return Rubric.ID != null;
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the assignment is team-based
+        /// </summary>
+        [NotMapped]
+        public bool HasTeams
+        {
+            get
+            {
+                return AssignmentTeams.Count > 0;
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the assignment has comment categories
+        /// </summary>
+        [NotMapped]
+        public bool HasCommentCategories
+        {
+            get
+            {
+                return CommentCategory != null;
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the assignment has one or more deliverables
+        /// </summary>
+        [NotMapped]
+        public bool HasDeliverables
+        {
+            get
+            {
+                return Deliverables.Count > 0;
+            }
+        }
+
         [Required(ErrorMessage = "Please specify for how long OSBLE should accept late submissions")]
         [Display(Name = "Late Assignment Window (Hours)")]
         public int HoursLateWindow { get; set; }
