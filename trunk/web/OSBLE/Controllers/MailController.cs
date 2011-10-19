@@ -93,11 +93,11 @@ namespace OSBLE.Controllers
             }
             else
             {
-                foreach (CourseUsers cu in currentCourses)
+                foreach (CourseUser cu in currentCourses)
                 {
                     int courseID = cu.AbstractCourseID;
-                    CourseUsers ourCu = currentCourses.Where(c => c.AbstractCourseID == courseID).FirstOrDefault();
-                    CourseUsers theirCu = db.CourseUsers.Where(c => (c.AbstractCourseID == courseID) && (c.UserProfileID == u.ID)).FirstOrDefault();
+                    CourseUser ourCu = currentCourses.Where(c => c.AbstractCourseID == courseID).FirstOrDefault();
+                    CourseUser theirCu = db.CourseUsers.Where(c => (c.AbstractCourseID == courseID) && (c.UserProfileID == u.ID)).FirstOrDefault();
 
                     if ((ourCu != null) && (theirCu != null) && (!(ourCu.AbstractRole.Anonymized) || (theirCu.AbstractRole.CanGrade == true)))
                     {
@@ -159,10 +159,10 @@ namespace OSBLE.Controllers
                             {
                                 ViewBag.MailHeader = "New Message to Instructor";
                             }
-                            List<CourseUsers> instructors = db.CourseUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "Instructor")).ToList();
+                            List<CourseUser> instructors = db.CourseUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "Instructor")).ToList();
                             if (instructors != null)
                             {
-                                foreach (CourseUsers cu in instructors)
+                                foreach (CourseUser cu in instructors)
                                 {
                                     recipientList.Add(cu.UserProfile);
                                 }
@@ -175,11 +175,11 @@ namespace OSBLE.Controllers
                             {
                                 ViewBag.MailHeader = "New Message to TA(s)";
                             }
-                            List<CourseUsers> tas = db.CourseUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "TA")).ToList();
+                            List<CourseUser> tas = db.CourseUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "TA")).ToList();
 
                             if (tas != null)
                             {
-                                foreach (CourseUsers cu in tas)
+                                foreach (CourseUser cu in tas)
                                 {
                                     recipientList.Add(cu.UserProfile);
                                 }
@@ -189,7 +189,7 @@ namespace OSBLE.Controllers
                 }
                 else // Email team member Id is passed as team member user id
                 {
-                    CourseUsers studentRec = db.CourseUsers.Where(c => (c.UserProfileID == whoTo) && (c.AbstractCourseID == aCourseID)).FirstOrDefault();
+                    CourseUser studentRec = db.CourseUsers.Where(c => (c.UserProfileID == whoTo) && (c.AbstractCourseID == aCourseID)).FirstOrDefault();
                     if (studentRec != null)
                     {
                         ViewBag.MailHeader = "New Message to Team Member";

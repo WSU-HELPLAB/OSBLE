@@ -113,7 +113,7 @@ namespace OSBLE.Services
             UserProfile currentUser = activeSessions[authToken].UserProfile;
 
             //make sure that the selected user has write privileges for the supplied course
-            CourseUsers currentCourse = (from cu in db.CourseUsers
+            CourseUser currentCourse = (from cu in db.CourseUsers
                                           where cu.AbstractCourseID == courseId && cu.UserProfileID == currentUser.ID
                                           select cu).FirstOrDefault();
 
@@ -195,7 +195,7 @@ namespace OSBLE.Services
             UserProfile currentUser = activeSessions[authToken].UserProfile;
 
             //find the current course
-            CourseUsers cu = (from c in db.CourseUsers
+            CourseUser cu = (from c in db.CourseUsers
                                where c.AbstractCourseID == courseId && c.UserProfileID == currentUser.ID
                                select c).FirstOrDefault();
             if (cu != null)
@@ -264,7 +264,7 @@ namespace OSBLE.Services
             UserProfile currentUser = activeSessions[authToken].UserProfile;
 
             //find all courses that the users is associated with
-            List<CourseUsers> courses = (from course in db.AbstractCourses
+            List<CourseUser> courses = (from course in db.AbstractCourses
                                           join cu in db.CourseUsers on course.ID equals cu.AbstractCourseID
                                           where
                                             cu.Hidden == false
@@ -276,7 +276,7 @@ namespace OSBLE.Services
                                                )
                                           select cu).ToList();
             
-            foreach (CourseUsers cu in courses)
+            foreach (CourseUser cu in courses)
             {
                 if (cu.AbstractCourse is Course)
                 {
@@ -437,7 +437,7 @@ namespace OSBLE.Services
             UserProfile currentUser = activeSessions[authToken].UserProfile;
 
             //make sure that the selected user has write privileges for the supplied course
-            CourseUsers currentCourse = (from cu in db.CourseUsers
+            CourseUser currentCourse = (from cu in db.CourseUsers
                                           where cu.AbstractCourseID == courseId && cu.UserProfileID == currentUser.ID
                                           select cu).FirstOrDefault();
 

@@ -83,7 +83,7 @@ namespace OSBLE.Controllers
                          where c.AbstractCourseID == activeCourse.AbstractCourseID
                          select c);
 
-            var usersGroupedBySection = users.GroupBy(CourseUsers => CourseUsers.Section).OrderBy(CourseUsers => CourseUsers.Key).ToList();
+            var usersGroupedBySection = users.GroupBy(CourseUser => CourseUser.Section).OrderBy(CourseUser => CourseUser.Key).ToList();
 
             List<UsersBySection> usersBySections = new List<UsersBySection>();
 
@@ -248,8 +248,8 @@ namespace OSBLE.Controllers
                     }
 
                     // Make sure no student has the same ID as existing non-student members.
-                    List<CourseUsers> otherMembers = db.CourseUsers.Where(c => c.AbstractCourseID == activeCourse.AbstractCourseID && c.AbstractRoleID != (int)CourseRole.CourseRoles.Student).ToList();
-                    foreach (CourseUsers member in otherMembers)
+                    List<CourseUser> otherMembers = db.CourseUsers.Where(c => c.AbstractCourseID == activeCourse.AbstractCourseID && c.AbstractRoleID != (int)CourseRole.CourseRoles.Student).ToList();
+                    foreach (CourseUser member in otherMembers)
                     {
                         if (usedIdentifications.Contains(member.UserProfile.Identification))
                         {
@@ -267,12 +267,12 @@ namespace OSBLE.Controllers
                                     c.AbstractRoleID == (int)CourseRole.CourseRoles.Student 
                                     select c;
                     List<UserProfile> orphans = oldRoster.Select(cu => cu.UserProfile).ToList();
-                    List<CourseUsers> newRoster = new List<CourseUsers>();
+                    List<CourseUser> newRoster = new List<CourseUser>();
 
                     // Attach to users or add new user profile stubs.
                     foreach (RosterEntry entry in rosterEntries)
                     {
-                        CourseUsers courseUser = new CourseUsers();
+                        CourseUser courseUser = new CourseUser();
                         courseUser.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
                         courseUser.Section = entry.Section;
                         courseUser.UserProfile = new UserProfile();
@@ -318,7 +318,7 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         [NotForCommunity]
         [HttpPost]
-        public ActionResult Create(CourseUsers courseuser)
+        public ActionResult Create(CourseUser courseuser)
         {
             //if modelState isValid
             if (ModelState.IsValid && courseuser.AbstractRoleID != 0)
@@ -358,7 +358,7 @@ namespace OSBLE.Controllers
 
         [HttpPost]
         [CanModifyCourse]
-        public ActionResult CreateByEmail(CourseUsers courseuser)
+        public ActionResult CreateByEmail(CourseUser courseuser)
         {
             //if modelState isValid
             if (ModelState.IsValid && courseuser.AbstractRoleID != 0)
@@ -385,19 +385,19 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult Edit(int userProfileID)
         {
-            CourseUsers CourseUsers = getCourseUsers(userProfileID);
-            if (CanModifyOwnLink(CourseUsers))
+            CourseUser CourseUser = getCourseUser(userProfileID);
+            if (CanModifyOwnLink(CourseUser))
             {
-                ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", CourseUsers.UserProfileID);
+                ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", CourseUser.UserProfileID);
                 if (activeCourse.AbstractCourse is Course)
                 {
-                    ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name", CourseUsers.AbstractRoleID);
+                    ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name", CourseUser.AbstractRoleID);
                 }
                 else // Community Roles
                 {
                     ViewBag.AbstractRoleID = new SelectList(db.CommunityRoles, "ID", "Name");
                 }
-                return View(CourseUsers);
+                return View(CourseUser);
             }
             return RedirectToAction("Index");
         }
@@ -407,20 +407,20 @@ namespace OSBLE.Controllers
 
         [HttpPost]
         [CanModifyCourse]
-        public ActionResult Edit(CourseUsers CourseUsers)
+        public ActionResult Edit(CourseUser CourseUser)
         {
-            if (CanModifyOwnLink(CourseUsers))
+            if (CanModifyOwnLink(CourseUser))
             {
                 if (ModelState.IsValid)
                 {
-                    db.Entry(CourseUsers).State = EntityState.Modified;
+                    db.Entry(CourseUser).State = EntityState.Modified;
                     db.SaveChanges();
                     return RedirectToAction("Index");
                 }
-                ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", CourseUsers.UserProfileID);
-                ViewBag.AbstractCourse = new SelectList(db.Courses, "ID", "Prefix", CourseUsers.AbstractCourseID);
-                ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name", CourseUsers.AbstractRoleID);
-                return View(CourseUsers);
+                ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", CourseUser.UserProfileID);
+                ViewBag.AbstractCourse = new SelectList(db.Courses, "ID", "Prefix", CourseUser.AbstractCourseID);
+                ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name", CourseUser.AbstractRoleID);
+                return View(CourseUser);
             }
             return RedirectToAction("Index");
         }
@@ -432,10 +432,10 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult Delete(int userProfileID)
         {
-            CourseUsers CourseUsers = getCourseUsers(userProfileID);
-            if ((CourseUsers != null) && CanModifyOwnLink(CourseUsers))
+            CourseUser CourseUser = getCourseUser(userProfileID);
+            if ((CourseUser != null) && CanModifyOwnLink(CourseUser))
             {
-                RemoveUserFromCourse(CourseUsers.UserProfile);
+                RemoveUserFromCourse(CourseUser.UserProfile);
             }
             else
             {
@@ -450,7 +450,7 @@ namespace OSBLE.Controllers
             base.Dispose(disposing);
         }
 
-        private CourseUsers getCourseUsers(int userProfileId)
+        private CourseUser getCourseUser(int userProfileId)
         {
             return (from c in db.CourseUsers
                     where c.AbstractCourseID == activeCourse.AbstractCourseID
@@ -464,7 +464,7 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="courseUser"></param>
         /// <returns></returns>
-        private bool CanModifyOwnLink(CourseUsers courseUser)
+        private bool CanModifyOwnLink(CourseUser courseUser)
         {
             var diffTeacher = (from c in db.CourseUsers
                                where (c.AbstractCourseID == courseUser.AbstractCourseID
@@ -538,7 +538,7 @@ namespace OSBLE.Controllers
             }
             else
             {
-                CourseUsers cu = db.CourseUsers.Where(c => (c.AbstractCourseID == activeCourse.AbstractCourseID) && (c.UserProfileID == userProfile)).FirstOrDefault();
+                CourseUser cu = db.CourseUsers.Where(c => (c.AbstractCourseID == activeCourse.AbstractCourseID) && (c.UserProfileID == userProfile)).FirstOrDefault();
 
                 if (cu != null)
                 {
@@ -560,7 +560,7 @@ namespace OSBLE.Controllers
         /// This sets up everything for the courseUser and will create a new UserProfile if it doesn't not exist.
         /// </summary>
         /// <param name="courseuser">It must have section, role set, and a reference to UserProfile with Identification set</param>
-        private void createCourseUser(CourseUsers courseuser)
+        private void createCourseUser(CourseUser courseuser)
         {
             //This will return one if they exist already or null if they don't
             var user = (from c in db.UserProfiles
@@ -606,7 +606,7 @@ namespace OSBLE.Controllers
         /// Attempts to find an email address to match requested, and adds them to the course if it is found.
         /// </summary>
         /// <param name="courseUser"></param>
-        private void attachCourseUserByEmail(CourseUsers courseuser)
+        private void attachCourseUserByEmail(CourseUser courseuser)
         {
             UserProfile up = db.UserProfiles.Where(u => u.UserName == courseuser.UserProfile.UserName).FirstOrDefault();
 

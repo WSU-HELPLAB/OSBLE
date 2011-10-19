@@ -27,15 +27,15 @@ namespace OSBLE.Controllers
             get { return currentUser; }
         }
 
-        protected CourseUsers activeCourse = null;
+        protected CourseUser activeCourse = null;
 
-        public CourseUsers ActiveCourse
+        public CourseUser ActiveCourse
         {
             get { return activeCourse; }
         }
 
         protected HttpContext context = System.Web.HttpContext.Current;
-        protected List<CourseUsers> currentCourses = new List<CourseUsers>();
+        protected List<CourseUser> currentCourses = new List<CourseUser>();
 
         protected bool DashboardSingleCourseMode;
 
@@ -226,7 +226,7 @@ namespace OSBLE.Controllers
             {
                 // Sends the ViewBag the amount of unread mail messages the user has.
                 SetUnreadMessageCount();
-                List<CourseUsers> allUsersCourses = db.CourseUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
+                List<CourseUser> allUsersCourses = db.CourseUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
 
                 // Get list of courses this user is connected to. Remove inactive (for anyone other than instructors or observers) or hidden (for all) courses.
                 currentCourses = allUsersCourses.Where(cu => (cu.AbstractCourse is Course) &&
@@ -242,7 +242,7 @@ namespace OSBLE.Controllers
                 currentCourses = currentCourses.Concat(allUsersCourses.Where(cu => cu.AbstractCourse is Community).OrderBy(cu => cu.AbstractCourse.Name).ToList()).ToList();
 
                 // Only consider non-hidden courses as the active course.
-                List<CourseUsers> activeCoursePool = currentCourses.Where(cu => cu.Hidden == false).ToList();
+                List<CourseUser> activeCoursePool = currentCourses.Where(cu => cu.Hidden == false).ToList();
 
                 int activeCourseID;
 
@@ -496,14 +496,14 @@ namespace OSBLE.Controllers
         /// <param name="user"></param>
         public void RemoveUserFromCourse(UserProfile user)
         {
-            //The relationship between users and courses is expressed in CourseUsers, but
+            //The relationship between users and courses is expressed in CourseUser, but
             //there exists plenty of other relationships between users and other course
             //particulars.  Perhaps this isn't good design, but we're kind of stuck at this point.
             //In order to keep the course from having a bunch of orphaned items, we must manually
             //delete some additional information.
 
             //might as well delete the big daddy to start
-            CourseUsers cu =  (from c in db.CourseUsers
+            CourseUser cu =  (from c in db.CourseUsers
                     where c.AbstractCourseID == activeCourse.AbstractCourseID
                     && c.UserProfileID == user.ID
                     select c).FirstOrDefault();

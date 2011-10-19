@@ -4,9 +4,9 @@
 @using OSBLE.Models;
 @model Assignment          
 @{
-    List<CourseUsers> unassignedUsers = ViewBag.UnassignedUsers;
+    List<CourseUser> unassignedUsers = ViewBag.UnassignedUsers;
     List<AssignmentTeam> teams = ViewBag.Teams;
-    List<CourseUsers> allUsers = ViewBag.AllUsers;
+    List<CourseUser> allUsers = ViewBag.AllUsers;
     List<Assignment> previousTeamAssignments = ViewBag.PreviousTeamAssignments;
     ViewBag.Title = "Assignment Creation Wizard";
     ViewBag.ComponentName = "Team Settings";
@@ -54,7 +54,7 @@
     <h3>
         Unassigned Students</h3>
     <ul id="AvailableStudent" class="TeamSortable">
-        @foreach (CourseUsers cu in unassignedUsers)
+        @foreach (CourseUser cu in unassignedUsers)
         {
             <li id="cu_@(cu.ID)" class="ui-state-default Student">@cu.UserProfile.LastName, @cu.UserProfile.FirstName</li>
         }
@@ -86,7 +86,7 @@
 </div>
 
 <!-- hidden form values needed for team assignment -->
-@foreach (CourseUsers cu in allUsers)
+@foreach (CourseUser cu in allUsers)
 {
     <input type="hidden" id="student_@(cu.ID)" name="student_@(cu.ID)" value="@(cu.UserProfile.FirstName) @(cu.UserProfile.LastName)" />
 }

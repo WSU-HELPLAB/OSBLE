@@ -349,12 +349,12 @@
 
             @{
                 
-                  List<CourseUsers> courseUser = (from course in ViewBag.CoursesUser as IEnumerable<CourseUsers>
+                  List<CourseUser> courseUser = (from course in ViewBag.CoursesUser as IEnumerable<CourseUser>
                                                    where course.UserProfileID == student.ID
                                                    select course).ToList();
                   if (courseUser.Count() > 0)
                   {
-                      foreach (CourseUsers item in courseUser)
+                      foreach (CourseUser item in courseUser)
                       {
                            <td>@item.Section</td>
                       }

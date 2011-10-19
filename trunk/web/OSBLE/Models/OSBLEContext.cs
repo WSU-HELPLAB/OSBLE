@@ -101,7 +101,7 @@ namespace OSBLE.Models
 
         public DbSet<CourseRole> CourseRoles { get; set; }
 
-        public DbSet<CourseUsers> CourseUsers { get; set; }
+        public DbSet<CourseUser> CourseUsers { get; set; }
 
         public DbSet<Category> Categories { get; set; }
 
@@ -361,49 +361,49 @@ namespace OSBLE.Models
 
             #region add course users
 
-            CourseUsers cu = new CourseUsers();
+            CourseUser cu = new CourseUser();
             cu.AbstractCourseID = 1;
             cu.UserProfileID = 1;
             cu.AbstractRoleID = (int)CourseRole.CourseRoles.Instructor;
             cu.Section = 0;
 
-            CourseUsers cu2 = new CourseUsers();
+            CourseUser cu2 = new CourseUser();
             cu2.AbstractCourseID = 2;
             cu2.UserProfileID = 1;
             cu2.AbstractRoleID = (int)CourseRole.CourseRoles.Observer;
             cu2.Section = 0;
 
-            CourseUsers cu3 = new CourseUsers();
+            CourseUser cu3 = new CourseUser();
             cu3.AbstractCourseID = 1;
             cu3.UserProfileID = 2;
             cu3.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
             cu3.Section = 1;
 
-            CourseUsers cu4 = new CourseUsers();
+            CourseUser cu4 = new CourseUser();
             cu4.AbstractCourseID = 2;
             cu4.UserProfileID = 3;
             cu4.AbstractRoleID = (int)CourseRole.CourseRoles.Instructor;
             cu4.Section = 0;
 
-            CourseUsers cu5 = new CourseUsers();
+            CourseUser cu5 = new CourseUser();
             cu5.AbstractCourseID = 2;
             cu5.UserProfileID = 2;
             cu5.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
             cu5.Section = 2;
 
-            CourseUsers cu6 = new CourseUsers();
+            CourseUser cu6 = new CourseUser();
             cu6.AbstractCourseID = 3;
             cu6.UserProfileID = 1;
             cu6.AbstractRoleID = (int)CommunityRole.OSBLERoles.Leader;
             cu6.Section = 0;
 
-            CourseUsers cu7 = new CourseUsers();
+            CourseUser cu7 = new CourseUser();
             cu7.AbstractCourseID = 3;
             cu7.UserProfileID = 2;
             cu7.AbstractRoleID = (int)CommunityRole.OSBLERoles.Participant;
             cu7.Section = 0;
 
-            CourseUsers cu8 = new CourseUsers();
+            CourseUser cu8 = new CourseUser();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 4;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
@@ -411,7 +411,7 @@ namespace OSBLE.Models
             this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CourseUsers();
+            cu8 = new CourseUser();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 5;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
@@ -419,7 +419,7 @@ namespace OSBLE.Models
             this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CourseUsers();
+            cu8 = new CourseUser();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 1;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Instructor;
@@ -427,7 +427,7 @@ namespace OSBLE.Models
             this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CourseUsers();
+            cu8 = new CourseUser();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 6;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
@@ -435,7 +435,7 @@ namespace OSBLE.Models
             this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CourseUsers();
+            cu8 = new CourseUser();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 7;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
@@ -443,7 +443,7 @@ namespace OSBLE.Models
             this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CourseUsers();
+            cu8 = new CourseUser();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 8;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
@@ -451,7 +451,7 @@ namespace OSBLE.Models
             this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CourseUsers();
+            cu8 = new CourseUser();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 9;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
@@ -459,7 +459,7 @@ namespace OSBLE.Models
             this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CourseUsers();
+            cu8 = new CourseUser();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 10;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
@@ -467,7 +467,7 @@ namespace OSBLE.Models
             this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CourseUsers();
+            cu8 = new CourseUser();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 11;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
@@ -475,7 +475,7 @@ namespace OSBLE.Models
             this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CourseUsers();
+            cu8 = new CourseUser();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 12;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
@@ -483,7 +483,7 @@ namespace OSBLE.Models
             this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CourseUsers();
+            cu8 = new CourseUser();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 13;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
@@ -491,7 +491,7 @@ namespace OSBLE.Models
             this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CourseUsers();
+            cu8 = new CourseUser();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 14;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
@@ -499,7 +499,7 @@ namespace OSBLE.Models
             this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CourseUsers();
+            cu8 = new CourseUser();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 15;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;
@@ -507,7 +507,7 @@ namespace OSBLE.Models
             this.CourseUsers.Add(cu8);
             this.SaveChanges();
 
-            cu8 = new CourseUsers();
+            cu8 = new CourseUser();
             cu8.AbstractCourseID = 4;
             cu8.UserProfileID = 16;
             cu8.AbstractRoleID = (int)CourseRole.CourseRoles.Student;

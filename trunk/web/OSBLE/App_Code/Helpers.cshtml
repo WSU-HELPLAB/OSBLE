@@ -18,7 +18,7 @@
         }
 }
 @* Only use this helper in a place that requires an active course (uses [RequireActiveCourse] attribute) *@
-@helper DisplayName(UserProfile user, CourseUsers activeCourse, bool show = false)
+@helper DisplayName(UserProfile user, CourseUser activeCourse, bool show = false)
     {
         if (!activeCourse.AbstractRole.Anonymized && (activeCourse.AbstractRole.CanGrade || (user.ID == activeCourse.UserProfileID) || show))
         {

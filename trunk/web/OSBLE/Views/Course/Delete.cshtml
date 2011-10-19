@@ -1,8 +1,8 @@
 ﻿@using OSBLE.Models.Courses;
-@model CourseUsers
+@model CourseUser
 @{
     ViewBag.Title = "Delete";
-    CourseUsers courseUser = ViewBag.ActiveCourse as CourseUsers;
+    CourseUser courseUser = ViewBag.ActiveCourse as CourseUser;
     string courseType = "course";
     if(courseUser.AbstractCourse is Community)
     {

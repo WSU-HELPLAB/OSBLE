@@ -10,7 +10,7 @@
         bool communityOptGroup = false;
         }
 
-        @foreach (OSBLE.Models.Courses.CourseUsers cu in ViewBag.CurrentCourses)
+        @foreach (OSBLE.Models.Courses.CourseUser cu in ViewBag.CurrentCourses)
         {
             // Skip hidden courses
             if(cu.Hidden) {
@@ -24,7 +24,7 @@
                 courseDisplay += " [INACTIVE]";
             }
 
-            CourseUsers ac = ViewBag.ActiveCourse as CourseUsers;
+            CourseUser ac = ViewBag.ActiveCourse as CourseUser;
             
             if(cu.AbstractCourse is Course && !courseOptGroup) {
                 courseOptGroup = true;

@@ -41,11 +41,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             //Guaranteed to pull all people enrolled in the course that can submit files
             //(probably students).
-            List<CourseUsers> users = (from cu in db.CourseUsers
+            List<CourseUser> users = (from cu in db.CourseUsers
                                        where cu.AbstractCourseID == activeCourse.AbstractCourseID
                                        && cu.AbstractRole.CanSubmit
                                        select cu).ToList();
-            List<CourseUsers> allUsers = users.ToList();
+            List<CourseUser> allUsers = users.ToList();
 
             //We'll need to cross the current teams with the list of course users
             List<AssignmentTeam> teams = assignmentWithTeams.AssignmentTeams.ToList();
@@ -57,10 +57,10 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 {
                     //If we're in a postback condition, our list of teams will include little more than the CourseUserId
                     //As such, we can't access member.CourseUser
-                    CourseUsers user = users.Find(u => u.ID == member.CourseUserID);
+                    CourseUser user = users.Find(u => u.ID == member.CourseUserID);
                     users.Remove(user);
 
-                    //add the more detailed CourseUsers info to the member
+                    //add the more detailed CourseUser info to the member
                     member.CourseUser = user;
                 }
             }

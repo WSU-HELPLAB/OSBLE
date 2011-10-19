@@ -20,7 +20,7 @@
     public class OSBLEService : DomainService
     {
         protected OSBLEContext db = new OSBLEContext();
-        protected CourseUsers currentCourseUser = null;
+        protected CourseUser currentCourseUser = null;
         protected UserProfile currentUserProfile = null;
         protected AbstractCourse currentCourse = null;
 

@@ -341,7 +341,7 @@ namespace OSBLE.Controllers
 
             if (couresesUsers.Count > 0)
             {
-                foreach (CourseUsers cu in couresesUsers)
+                foreach (CourseUser cu in couresesUsers)
                 {
                     SerializableTeamMember teamMember = new SerializableTeamMember();
                     teamMember.IsModerator = cu.AbstractRole.ID == (int)CourseRole.CourseRoles.Moderator;
@@ -373,7 +373,7 @@ namespace OSBLE.Controllers
             //
             //Start with the assumption that all students in the course are orphans.  When we
             //find a student in a team, we can remove him or her from the list of orphans.
-            List<CourseUsers> orphans = db.CourseUsers
+            List<CourseUser> orphans = db.CourseUsers
                                             .Where(cu => cu.AbstractCourseID == activeCourse.AbstractCourseID)
                                             .Where(cu => cu.AbstractRole.CanSubmit == true)
                                             .ToList();
@@ -387,7 +387,7 @@ namespace OSBLE.Controllers
                 {
                     UserMember uMember = member as UserMember;
 
-                    CourseUsers cu = (from c in db.CourseUsers
+                    CourseUser cu = (from c in db.CourseUsers
                                        where
                                           c.AbstractCourseID == activeCourse.AbstractCourseID
                                           &&
@@ -420,7 +420,7 @@ namespace OSBLE.Controllers
 
                             UserMember uMember = tum as UserMember;
 
-                            CourseUsers cu = (from c in db.CourseUsers
+                            CourseUser cu = (from c in db.CourseUsers
                                                where
                                                   c.AbstractCourseID == activeCourse.AbstractCourseID
                                                   &&
@@ -447,7 +447,7 @@ namespace OSBLE.Controllers
             }
 
             //when we're all done with the activity's teams, we must now add the orphans back to the list
-            foreach (CourseUsers user in orphans)
+            foreach (CourseUser user in orphans)
             {
                 SerializableTeamMember serializedMember = new SerializableTeamMember();
                 serializedMember.Name = user.UserProfile.LastAndFirst();

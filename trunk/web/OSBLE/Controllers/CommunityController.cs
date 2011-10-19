@@ -38,7 +38,7 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
 
                 // Make current user a leader on new community.
-                CourseUsers cu = new CourseUsers();
+                CourseUser cu = new CourseUser();
                 cu.AbstractCourseID = community.ID;
                 cu.UserProfileID = currentUser.ID;
                 cu.AbstractRoleID = (int)CommunityRole.OSBLERoles.Leader;
