@@ -50,7 +50,7 @@
         @if (ViewBag.CurrentUser == Model.ToUserProfile)
         {
             //Replying
-            using (Html.BeginForm("Create", "Mail", FormMethod.Get))
+            using (Html.BeginForm("CreateReply", "Mail", FormMethod.Get))
             {
                 <input type="hidden" name="recipientID" value="@Model.FromUserProfileID" />
                 <input type="hidden" name="replyTo" value="@Model.ID" />
@@ -59,7 +59,7 @@
             }
 
             //Reply all
-            using (Html.BeginForm("Create", "Mail", FormMethod.Get))
+            using (Html.BeginForm("CreateReplyAll", "Mail", FormMethod.Get))
             {
                 <input type="hidden" name="recipientID" value="@Model.FromUserProfileID" />
                 <input type="hidden" name="replyAll" value="@Model.ThreadID" />
@@ -68,10 +68,10 @@
             }
 
             //Forwarding
-            using (Html.BeginForm("Create", "Mail", FormMethod.Get))
+            using (Html.BeginForm("CreateForward", "Mail", FormMethod.Get))
             {
                 <input type="hidden" name="recipientID" value="0" />
-                <input type="hidden" name="replyTo" value="@Model.ID" />
+                <input type="hidden" name="forwardTo" value="@Model.ID" />
                 <input type="submit" value="Forward" />  
                 //@Helpers.CreateToolTip(ToolTips.MailReply)  
             }
@@ -94,29 +94,29 @@
 @if (ViewBag.CurrentUser == Model.ToUserProfile)
 {
     //Replying
-    using (Html.BeginForm("Create", "Mail", FormMethod.Get))
+    using (Html.BeginForm("CreateReply", "Mail", FormMethod.Get))
     {
-        <input type="hidden" name="recipientID" value="@Model.FromUserProfileID" />
-        <input type="hidden" name="replyTo" value="@Model.ID" />
-        <input type="submit" value="Reply" />  
+                <input type="hidden" name="recipientID" value="@Model.FromUserProfileID" />
+                <input type="hidden" name="replyTo" value="@Model.ID" />
+                <input type="submit" value="Reply" />  
         //@Helpers.CreateToolTip(ToolTips.MailReply)  
     }
 
     //Reply all
-    using (Html.BeginForm("Create", "Mail", FormMethod.Get))
+    using (Html.BeginForm("CreateReplyAll", "Mail", FormMethod.Get))
     {
-        <input type="hidden" name="recipientID" value="@Model.FromUserProfileID" />
-        <input type="hidden" name="replyAll" value="@Model.ThreadID" />
-        <input type="submit" value="Reply All" />  
+                <input type="hidden" name="recipientID" value="@Model.FromUserProfileID" />
+                <input type="hidden" name="replyAll" value="@Model.ThreadID" />
+                <input type="submit" value="Reply All" />  
         //@Helpers.CreateToolTip(ToolTips.MailReply)  
     }
 
     //Forwarding
-    using (Html.BeginForm("Create", "Mail", FormMethod.Get))
+    using (Html.BeginForm("CreateForward", "Mail", FormMethod.Get))
     {
-        <input type="hidden" name="recipientID" value="0" />
-        <input type="hidden" name="replyTo" value="@Model.ID" />
-        <input type="submit" value="Forward" />  
+                <input type="hidden" name="recipientID" value="0" />
+                <input type="hidden" name="forwardTo" value="@Model.ID" />
+                <input type="submit" value="Forward" />  
         //@Helpers.CreateToolTip(ToolTips.MailReply)  
     }
 

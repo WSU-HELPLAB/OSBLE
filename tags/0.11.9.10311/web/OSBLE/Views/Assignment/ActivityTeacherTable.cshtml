@@ -111,7 +111,7 @@
                 @if (isTeam)
                 { 
                     <span style="text-decoration: underline">@info.Name</span>
-                    <a title="Email this team" href="@Url.Action("Create", "Mail", new { id = -4, teamID = info.TeamID })">@Helpers.MailButton()</a>
+                    <a title="Email this team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = info.TeamID })">@Helpers.MailButton()</a>
                     <br/>
                     @info.TeamList            
                     

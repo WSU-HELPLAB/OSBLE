@@ -99,7 +99,7 @@ else
                         {
                             <div class="user_controls">
                             @if(user.UserName != null) {
-                            <a title="Mail This User" href="@Url.Action("Create", "Mail", new { id = user.ID })">@Helpers.MailButton()</a>
+                            <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = user.ID })">@Helpers.MailButton()</a>
                             }
                             
                             @if(ViewBag.ActiveCourse.AbstractRole.CanModify) {
