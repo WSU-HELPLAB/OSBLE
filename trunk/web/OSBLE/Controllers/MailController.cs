@@ -108,142 +108,160 @@ namespace OSBLE.Controllers
             return false;
         }
 
-        public ActionResult Create(int? id, int? teamID)
+        public ActionResult Create()
         {
             ViewBag.MailHeader = "New Message";
-            
-            int ID = Convert.ToInt32(Request.Params["recipientID"]);
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
             // gets the current courseid
-            int aCourseID = (int)context.Session["ActiveCourse"];
+            mail.ContextID = (int)context.Session["ActiveCourse"];
 
-            mail.ContextID = aCourseID;
+            Session["mail_recipients"] = recipientList;
+            return View("Create", mail);
+        }
 
-            // mail for instructors or TA(S)
-            if (id.HasValue)
+        public ActionResult CreateInstructor()
+        {
+            ViewBag.MailHeader = "New Instructor Message";
+
+            Mail mail = new Mail();
+            List<UserProfile> recipientList = new List<UserProfile>();
+
+            // gets the current courseid
+            mail.ContextID = (int)context.Session["ActiveCourse"];
+
+            List<CourseUser> instructors = db.CourseUsers.Where(c => (c.AbstractCourseID == mail.ContextID) && (c.AbstractRole.Name == "Instructor")).ToList();
+            if (instructors != null)
             {
-                int whoTo = (int)id;
-                // Instructor or Instructor and TA(s) or Whole team
-                if (whoTo < 0)
+                foreach (CourseUser cu in instructors)
                 {
-                    // email the whole team
-                    if(whoTo == -4)
-                    {
-                        if(teamID.HasValue)
-                        {
-                            int tID = (int)teamID;
-                            var team = (from t in db.OldTeams
-                                        where t.ID == tID
-                                        select t.Members).FirstOrDefault().ToList();
-
-                            foreach (UserMember t in team)
-                            {
-                                if (t.UserProfile != currentUser)
-                                {
-                                    recipientList.Add(t.UserProfile);
-                                }
-                            }
-                        }
-                    }
-                    else if( whoTo >= -3 && whoTo <= -1)// Instructor or Instructor and TA(s)
-                    {
-                        if (whoTo == -3)
-                        {
-                            ViewBag.MailHeader = "New Message to Instructor and TA(s)";
-                        }
-                        if (whoTo == -1 || whoTo == -3) // Instructors 
-                        {
-                            if(whoTo == -1)
-                            {
-                                ViewBag.MailHeader = "New Message to Instructor";
-                            }
-                            List<CourseUser> instructors = db.CourseUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "Instructor")).ToList();
-                            if (instructors != null)
-                            {
-                                foreach (CourseUser cu in instructors)
-                                {
-                                    recipientList.Add(cu.UserProfile);
-                                }
-                            }
-                        }
-                        // TA(s) or Instructor and TA(s)
-                        if (whoTo == -2 || whoTo == -3)
-                        {
-                            if (whoTo == -2)
-                            {
-                                ViewBag.MailHeader = "New Message to TA(s)";
-                            }
-                            List<CourseUser> tas = db.CourseUsers.Where(c => (c.AbstractCourseID == aCourseID) && (c.AbstractRole.Name == "TA")).ToList();
-
-                            if (tas != null)
-                            {
-                                foreach (CourseUser cu in tas)
-                                {
-                                    recipientList.Add(cu.UserProfile);
-                                }
-                            }
-                        }
-                    }
-                }
-                else // Email team member Id is passed as team member user id
-                {
-                    CourseUser studentRec = db.CourseUsers.Where(c => (c.UserProfileID == whoTo) && (c.AbstractCourseID == aCourseID)).FirstOrDefault();
-                    if (studentRec != null)
-                    {
-                        ViewBag.MailHeader = "New Message to Team Member";
-                        recipientList.Add(studentRec.UserProfile);
-                    }
-                }
-            }
-            else
-            {
-                // Handles Reply, ReplyAll and Forward 
-                if (Request.Params["replyTo"] != null || Request.Params["replyAll"] != null)
-                {
-                    int replyto;
-                    Mail reply = new Mail();
-
-                    //Reply All gets the mail thread id
-                    if (Request.Params["replyAll"] != null)
-                    {
-                        replyto = Convert.ToInt32(Request.Params["replyAll"]);
-                        recipientList = (from m in db.Mails
-                                         where m.ThreadID == replyto &&
-                                         m.ToUserProfileID != currentUser.ID
-                                         select m.ToUserProfile).ToList<UserProfile>();
-                    }
-                    else // Reply  gets the mail id
-                    {
-                        replyto = Convert.ToInt32(Request.Params["replyTo"]);
-                        recipientList.Add(reply.FromUserProfile); //Adds the sender to the reply list
-                    }
-
-                    reply = db.Mails.Find(replyto);
-                    if (reply != null)
-                    {
-                        if(!recipientList.Contains(reply.FromUserProfile))
-                        {
-                            recipientList.Add(reply.FromUserProfile); //Adds the sender to the reply list
-                        }
-                        string suffix = "RE: ";
-                        if (ID == 0) // forward 0 is passed for the recipientid on forwards
-                        {
-                            suffix = "FW: ";
-                            recipientList.Clear(); // clears the recipients if it is a forward
-                        }
-                        ViewBag.MailHeader = mail.Subject = suffix + reply.Subject;
-                        // Prefix each line with a '> '
-                        mail.Message = "\n\nOriginal Message \nFrom: " + reply.FromUserProfile.FirstName + " " +
-                                        reply.FromUserProfile.LastName + "\nSent at: " + reply.Posted.ToString() + "\n\n" +
-                                        Regex.Replace(reply.Message, "^.*$", "> $&",
-                                        RegexOptions.Multiline);
-                    }
+                    recipientList.Add(cu.UserProfile);
                 }
             }
             Session["mail_recipients"] = recipientList;
-            return View(mail);
+            return View("Create", mail);
+        }
+
+        public ActionResult CreateTA()
+        {
+            ViewBag.MailHeader = "New TA(s) Message";
+
+            Mail mail = new Mail();
+            List<UserProfile> recipientList = new List<UserProfile>();
+
+            // gets the current courseid
+            mail.ContextID = (int)context.Session["ActiveCourse"];
+
+            List<CourseUser> tas = db.CourseUsers.Where(c => (c.AbstractCourseID == mail.ContextID) && (c.AbstractRole.Name == "TA")).ToList();
+            if (tas != null)
+            {
+                foreach (CourseUser cu in tas)
+                {
+                    recipientList.Add(cu.UserProfile);
+                }
+            }
+
+            Session["mail_recipients"] = recipientList;
+            return View("Create", mail);
+        }
+
+        public ActionResult CreateInstructorTA()
+        {
+            ViewBag.MailHeader = "New Instructor and TA(s) Message";
+
+            Mail mail = new Mail();
+            List<UserProfile> recipientList = new List<UserProfile>();
+
+            // gets the current courseid
+            mail.ContextID = (int)context.Session["ActiveCourse"];
+
+            List<CourseUser> instructorTA = db.CourseUsers.Where(c => (c.AbstractCourseID == mail.ContextID) && (c.AbstractRole.Name == "Instructor" || c.AbstractRole.Name == "TA")).ToList();
+            if (instructorTA != null)
+            {
+                foreach (CourseUser cu in instructorTA)
+                {
+                    recipientList.Add(cu.UserProfile);
+                }
+            }
+
+            Session["mail_recipients"] = recipientList;
+            return View("Create", mail);
+        }
+
+        public ActionResult CreateUser(int id)
+        {
+            ViewBag.MailHeader = "New Message";
+
+            Mail mail = new Mail();
+            List<UserProfile> recipientList = new List<UserProfile>();
+
+            // gets the current courseid
+            mail.ContextID = (int)context.Session["ActiveCourse"];
+
+            CourseUser studentRec = db.CourseUsers.Where(c => (c.UserProfileID == id) && (c.AbstractCourseID == mail.ContextID)).FirstOrDefault();
+            if (studentRec != null)
+            {
+                recipientList.Add(studentRec.UserProfile);
+            }
+
+            Session["mail_recipients"] = recipientList;
+            return View("Create", mail);
+        }
+
+        public ActionResult CreateTeamMember(int id)
+        {
+            ViewBag.MailHeader = "New Team Member Message";
+
+            Mail mail = new Mail();
+            List<UserProfile> recipientList = new List<UserProfile>();
+
+            // gets the current courseid
+            mail.ContextID = (int)context.Session["ActiveCourse"];
+
+
+/*****************************************************************************************************
+            // might need to be changed to get from teams, ill 
+*****************************************************************************************************/
+
+            CourseUser studentRec = db.CourseUsers.Where(c => (c.UserProfileID == id) && (c.AbstractCourseID == mail.ContextID)).FirstOrDefault();
+            if (studentRec != null)
+            {
+                recipientList.Add(studentRec.UserProfile);
+            }
+
+            Session["mail_recipients"] = recipientList;
+            return View("Create", mail);
+        }
+
+        public ActionResult CreateEntireTeam(int teamID)
+        {
+            ViewBag.MailHeader = "New Team Message";
+
+            Mail mail = new Mail();
+            List<UserProfile> recipientList = new List<UserProfile>();
+
+            // gets the current courseid
+            mail.ContextID = (int)context.Session["ActiveCourse"];
+
+            var team_ids = (from t in db.TeamMembers
+                            where t.TeamID == teamID
+                            select t.CourseUserID).ToList();
+
+            foreach (int id in team_ids)
+            {
+                if (id != currentUser.ID)
+                {
+                    var up = (from u in db.UserProfiles
+                              where u.ID == id
+                              select u).FirstOrDefault();
+
+                    recipientList.Add(up);
+                }
+            }
+
+            Session["mail_recipients"] = recipientList;
+            return View("Create", mail);
         }
 
         //

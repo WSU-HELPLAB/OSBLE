@@ -231,7 +231,7 @@ namespace OSBLE.Controllers
 
             // Find recipient profile and check notification settings
             UserProfile recipient = db.UserProfiles.Find(n.RecipientID);
-            if (n.Recipient.UserProfile.EmailAllNotifications && !n.Recipient.UserProfile.EmailAllActivityPosts)
+            if (recipient.EmailAllNotifications && !recipient.EmailAllActivityPosts)
             {
                 emailNotification(n);
             }
