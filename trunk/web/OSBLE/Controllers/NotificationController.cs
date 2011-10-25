@@ -144,7 +144,7 @@ namespace OSBLE.Controllers
         public void SendEventApprovalNotification(Event e)
         {
             // Get all instructors in the course.
-            List<UserProfile> instructors = db.CourseUsers.Where(c => (c.AbstractCourseID == e.CourseID)
+            List<UserProfile> instructors = db.CourseUsers.Where(c => (c.AbstractCourseID == e.Poster.AbstractCourseID)
                 && (c.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor))
                 .Select(c => c.UserProfile).ToList();
 
@@ -153,7 +153,7 @@ namespace OSBLE.Controllers
                 Notification n = new Notification();
                 n.ItemType = Notification.Types.EventApproval;
                 n.ItemID = e.ID;
-                n.CourseID = e.CourseID;
+                n.CourseID = e.Poster.AbstractCourseID;
                 n.RecipientID = instructor.ID;
                 n.SenderID = e.PosterID;
 

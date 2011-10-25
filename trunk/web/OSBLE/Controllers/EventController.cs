@@ -33,8 +33,8 @@ namespace OSBLE.Controllers
             else if (ActiveCourse.AbstractCourse is Community)
             {
                 // For communities there are no start/end dates, so get earliest and latest events
-                Event firstEvent = db.Events.Where(e => e.CourseID == ActiveCourse.AbstractCourseID).OrderBy(e => e.StartDate).FirstOrDefault();
-                Event lastEvent = db.Events.Where(e => e.CourseID == ActiveCourse.AbstractCourseID).OrderByDescending(e => e.StartDate).FirstOrDefault();
+                Event firstEvent = db.Events.Where(e => e.Poster.AbstractCourseID == ActiveCourse.AbstractCourseID).OrderBy(e => e.StartDate).FirstOrDefault();
+                Event lastEvent = db.Events.Where(e => e.Poster.AbstractCourseID == ActiveCourse.AbstractCourseID).OrderByDescending(e => e.StartDate).FirstOrDefault();
 
                 // If either event is null, return an empty list to the view.
                 if ((firstEvent == null) || (lastEvent == null))
@@ -84,7 +84,6 @@ namespace OSBLE.Controllers
         {
 
             // Set to current user and poster
-            e.Course = ActiveCourse.AbstractCourse;
             e.Poster = ActiveCourse;
 
             // Default to not Approved.
@@ -157,7 +156,7 @@ namespace OSBLE.Controllers
                 return View("AlreadyApproved");
             }
 
-            if (e.Course != ActiveCourse.AbstractCourse)
+            if (e.Poster.AbstractCourse != ActiveCourse.AbstractCourse)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -171,7 +170,7 @@ namespace OSBLE.Controllers
         {
             Event e = db.Events.Find(id);
 
-            if (e.Course != ActiveCourse.AbstractCourse)
+            if (e.Poster.AbstractCourseID != ActiveCourse.AbstractCourseID)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -189,7 +188,7 @@ namespace OSBLE.Controllers
         {
             Event e = db.Events.Find(id);
 
-            if (e.Course != ActiveCourse.AbstractCourse)
+            if (e.Poster.AbstractCourse != ActiveCourse.AbstractCourse)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -210,7 +209,7 @@ namespace OSBLE.Controllers
             Event e = db.Events.Find(id);
 
             // Event not part of this course
-            if (e.CourseID != ActiveCourse.AbstractCourseID)
+            if (e.Poster.AbstractCourseID != ActiveCourse.AbstractCourseID)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -269,7 +268,7 @@ namespace OSBLE.Controllers
 
             }
 
-            if ((originalEvent == null) || (originalEvent.CourseID != ActiveCourse.AbstractCourseID))
+            if ((originalEvent == null) || (originalEvent.Poster.AbstractCourseID != ActiveCourse.AbstractCourseID))
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -296,7 +295,7 @@ namespace OSBLE.Controllers
 
             if (e != null)
             {
-                CourseUser cu = currentCourses.Where(c => c.AbstractCourse == e.Course).FirstOrDefault();
+                CourseUser cu = currentCourses.Where(c => c.AbstractCourse.ID == e.Poster.AbstractCourseID).FirstOrDefault();
                 if (((cu != null) && (cu.AbstractRole.CanModify)))
                 {
                     db.Events.Remove(e);

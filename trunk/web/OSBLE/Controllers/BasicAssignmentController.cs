@@ -134,12 +134,11 @@ namespace OSBLE.Controllers
                 //send out Events
                 Event e = new Event();
                 e.Approved = true;
-                e.CourseID = activeCourse.AbstractCourse.ID;
+                e.Poster = activeCourse;
                 e.HideDelete = true;
                 e.Title = basic.Submission.Name + " Due";
                 e.StartDate = stop.ReleaseDate;
                 e.StartTime = stop.ReleaseDate;
-                e.PosterID = currentUser.ID;
                 e.Description = "https://osble.org/Assignment?id=" + basic.Assignment.ID;
                 db.Events.Add(e);
                 db.SaveChanges();

@@ -12,11 +12,6 @@ namespace OSBLE.Models.HomePage
         public int ID { get; set; }
 
         [Required]
-        public int CourseID { get; set; }
-
-        public virtual AbstractCourse Course { get; set; }
-
-        // User who created the event. Optional.
         public int PosterID { get; set; }
 
         public virtual CourseUser Poster { get; set; }
