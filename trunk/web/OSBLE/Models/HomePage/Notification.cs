@@ -14,11 +14,11 @@ namespace OSBLE.Models.HomePage
         [Required]
         public int RecipientID { get; set; }
 
-        public virtual UserProfile Recipient { get; set; }
+        public virtual CourseUser Recipient { get; set; }
 
         public int? SenderID { get; set; }
 
-        public virtual UserProfile Sender { get; set; }
+        public virtual CourseUser Sender { get; set; }
 
         public int? CourseID { get; set; }
 

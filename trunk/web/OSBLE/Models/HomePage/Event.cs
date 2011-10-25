@@ -19,7 +19,7 @@ namespace OSBLE.Models.HomePage
         // User who created the event. Optional.
         public int PosterID { get; set; }
 
-        public virtual UserProfile Poster { get; set; }
+        public virtual CourseUser Poster { get; set; }
 
         [Required]
         [Display(Name = "Starting date")]

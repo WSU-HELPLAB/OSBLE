@@ -85,7 +85,7 @@ namespace OSBLE.Controllers
 
             // Set to current user and poster
             e.Course = ActiveCourse.AbstractCourse;
-            e.Poster = currentUser;
+            e.Poster = ActiveCourse;
 
             // Default to not Approved.
             e.Approved = false;
