@@ -122,13 +122,6 @@ namespace OSBLE.Controllers
                         return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
                     }
 
-                    //This can be used to simulate a long load time
-                    Int64 i = 0;
-                    while (i < 2000000000)
-                    {
-                        i++;
-                    }
-
                     string submissionfolder = FileSystem.GetAssignmentActivitySubmissionFolder(acitivity.AbstractAssignment.Category.Course, acitivity.ID);
 
                     using (ZipFile zipfile = new ZipFile())
@@ -143,7 +136,16 @@ namespace OSBLE.Controllers
                         {
                             foreach (DirectoryInfo submissionDirectory in acitvityDirectory.GetDirectories())
                             {
-                                zipfile.AddDirectory(submissionDirectory.FullName, (from c in acitivity.TeamUsers where c.ID.ToString() == submissionDirectory.Name select c).FirstOrDefault().Name);
+                                TeamUserMember tum = (from c in acitivity.TeamUsers where c.ID.ToString() == submissionDirectory.Name select c).FirstOrDefault();
+
+                                //AC: Codeplex ticket #589 documents an error in downloading files.  This appears to happen
+                                //when the TeamUserMember is null.  I haven't looked into why this is happening, but 
+                                //checking for a null reference will at least prevent the error from occurring.
+                                if (tum != null)
+                                {
+                                    String fileName = tum.Name;
+                                    zipfile.AddDirectory(submissionDirectory.FullName, fileName);
+                                }
                             }
 
                             FileSystem.CreateZipFolder(activeCourse.AbstractCourse as Course, zipfile, acitivity);
