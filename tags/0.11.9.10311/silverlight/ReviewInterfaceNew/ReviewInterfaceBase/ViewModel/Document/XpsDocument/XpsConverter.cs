@@ -107,6 +107,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
 
                     //it is no longer xps so got to change the xmlns
                     translatedXaml = translatedXaml.Replace("xmlns=\"http://schemas.microsoft.com/xps/2005/06\"", "xmlns=\"http://schemas.microsoft.com/client/2007\"");
+                    translatedXaml = translatedXaml.Replace("FixedPage.NavigateUri", "Tag");
 
                     Canvas canvas = null;
 

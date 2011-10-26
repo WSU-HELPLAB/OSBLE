@@ -29,9 +29,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EditPeerReview", "EditPeerR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLE", "..\..\web\OSBLE\OSBLE.csproj", "{7297687F-BF8A-4195-8EA3-A05DA302B24E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReviewInterfaceBase.Web", "ReviewInterfaceBase.Web\ReviewInterfaceBase.Web.csproj", "{1BA20974-0C7B-4E07-B2B3-752B3C32B6D2}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 6
+		SccNumberOfProjects = 7
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
 		SccLocalPath0 = .
@@ -50,6 +52,9 @@ Global
 		SccProjectUniqueName5 = ..\\..\\web\\OSBLE\\OSBLE.csproj
 		SccProjectName5 = ../../web/OSBLE
 		SccLocalPath5 = ..\\..\\web\\OSBLE
+		SccProjectUniqueName6 = ReviewInterfaceBase.Web\\ReviewInterfaceBase.Web.csproj
+		SccProjectName6 = ReviewInterfaceBase.Web
+		SccLocalPath6 = ReviewInterfaceBase.Web
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +92,12 @@ Global
 		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.OSBLE Deployment|Any CPU.Build.0 = OSBLE Deployment|Any CPU
 		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BA20974-0C7B-4E07-B2B3-752B3C32B6D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BA20974-0C7B-4E07-B2B3-752B3C32B6D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BA20974-0C7B-4E07-B2B3-752B3C32B6D2}.OSBLE Deployment|Any CPU.ActiveCfg = Release|Any CPU
+		{1BA20974-0C7B-4E07-B2B3-752B3C32B6D2}.OSBLE Deployment|Any CPU.Build.0 = Release|Any CPU
+		{1BA20974-0C7B-4E07-B2B3-752B3C32B6D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BA20974-0C7B-4E07-B2B3-752B3C32B6D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
