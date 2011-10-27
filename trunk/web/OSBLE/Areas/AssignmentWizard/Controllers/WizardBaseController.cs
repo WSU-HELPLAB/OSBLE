@@ -84,6 +84,15 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 //with existing assignments, but needed for new assignments.
                 manager.ActiveAssignmentId = Assignment.ID;
 
+                //Check manager context.  If for some reason the user lost their
+                //SESSION context, we need to detect this and redirect them
+                //to a safe place.  Otherwise, they will get an error when we
+                //try to redirect them to a non-existant page
+                if (manager.SelectedComponents.Count == 0)
+                {
+                    return RedirectToRoute(new { controller = "Home", action = "ContextLost", assignmentId = Assignment.ID });
+                }
+
                 string errorPath = "";
                 string action = "";
                 int id = Assignment.ID;

@@ -656,6 +656,7 @@
     <Content Include="Areas\AssignmentWizard\Views\_ViewStart.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Home\Summary.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\CommentCategory\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Home\ContextLost.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />

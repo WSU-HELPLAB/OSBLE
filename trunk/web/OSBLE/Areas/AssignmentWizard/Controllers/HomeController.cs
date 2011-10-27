@@ -61,6 +61,16 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             return View(assignment);
         }
 
+        public ActionResult ContextLost(int? assignmentId)
+        {
+            Assignment model = new Assignment();
+            if (assignmentId != null)
+            {
+                model = db.Assignments.Find((int)assignmentId);
+            }
+            return View(model);
+        }
+
         #endregion
 
         #region helper methods
@@ -69,25 +79,25 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             manager.DeactivateAllComponents();
             
             //RUBRICS
-            if (assignment.RubricID != null)
+            if (assignment.HasRubric)
             {
                 manager.GetComponentByType(typeof(RubricController)).IsSelected = true;
             }
             
             //COMMENT CATEGORIES
-            if (assignment.CommentCategoryID != null)
+            if (assignment.HasCommentCategories)
             {
                 manager.GetComponentByType(typeof(CommentCategoryController)).IsSelected = true;
             }
 
             //TEAM ASSIGNMENTS
-            if (assignment.AssignmentTeams.Count > 0)
+            if (assignment.HasTeams)
             {
                 manager.GetComponentByType(typeof(TeamController)).IsSelected = true;
             }
 
             //DELIVERABLES
-            if (assignment.Deliverables.Count > 0)
+            if (assignment.HasDeliverables)
             {
                 manager.GetComponentByType(typeof(DeliverablesController)).IsSelected = true;
             }
