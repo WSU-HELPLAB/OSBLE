@@ -129,11 +129,34 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
         private void ParseFormValues()
         {
-            //clear any previous team configuration as we'll be creating a new one
+            //our new list of teams
+            List<Team> teams = Assignment.AssignmentTeams.Select(at => at.Team).ToList();
+
+            //Now that we've captured any existing teams, wipe out the old association
             Assignment.AssignmentTeams.Clear();
 
-            //our new list of teams
-            List<Team> teams = new List<Team>();
+            //update all prior teams (those already stored in the DB)
+            string[] teamKeys = Request.Form.AllKeys.Where(k => k.Contains("team_")).ToArray();
+            foreach (string key in teamKeys)
+            {
+                string teamName = Request.Form[key];
+                int teamId = 0;
+
+                //skip any bad apples
+                if (!Int32.TryParse(key.Split('_')[1], out teamId))
+                {
+                    continue;
+                }
+
+                //update the team name
+                Team team = teams.Find(t => t.ID == teamId);
+                team.Name = teamName;
+
+                //clear any existing team members
+                team.TeamMembers.Clear();
+
+                db.Entry(team).State = System.Data.EntityState.Modified;
+            }
 
             //get all relevant form keys
             string[] keys = Request.Form.AllKeys.Where(k => k.Contains("student_")).ToArray();
@@ -145,6 +168,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 {
                     continue;
                 }
+
+                //if the team doesn't exist, create it before continuing
                 if (teams.Count(t => t.Name.CompareTo(TeamName) == 0) == 0)
                 {
                     Team newTeam = new Team()
@@ -160,6 +185,22 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     Team = team
                 };
                 team.TeamMembers.Add(tm);
+            }
+
+            //Remove any empty teams.  This is a possibility when a team was loaded from
+            //the database and then removed using the team creation tool.  Because we
+            //retrieved it from the DB and added it to our list of teams, it will exist
+            //but it won't have anyone assigned to it.
+            Team[] emptyTeams = teams.Where(tm => tm.TeamMembers.Count == 0).ToArray();
+            foreach (Team team in emptyTeams)
+            {
+                teams.Remove(team);
+
+                //remove from the db
+                if (team.ID > 0)
+                {
+                    db.Teams.Remove(team);
+                }
             }
 
             //attach the new teams to the assignment

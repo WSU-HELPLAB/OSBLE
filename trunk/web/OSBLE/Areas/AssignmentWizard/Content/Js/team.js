@@ -29,6 +29,14 @@ function processForm(evt) {
         //find the team's name
         var teamName = $(teams[i]).find('.TeamNameTextBox').val();
 
+        //find the team's DB ID
+        var teamId = parseInt($(teams[i]).context.id.split('_')[2]);
+
+        //set the team name if the DB ID isn't 0
+        if (teamId > 0) {
+            $('#team_' + teamId).val(teamName);
+        }
+
         //find all students on this team
         $(teams[i]).find(".Student").each(function (index) {
 
@@ -47,8 +55,8 @@ var teamCounter = 1;
 
 //Creates a new team div and places it on the 
 function createTeam(evt, teamName) {
-    var divId = "teamDiv_" + teamCounter;
-    var listId = 'team_' + teamCounter;
+    var divId = "teamDiv_" + teamCounter + "_0";
+    var listId = 'team_' + teamCounter + "_0";
     var InputContent = "Team " + teamCounter;
     if (teamName != undefined) {
         InputContent = teamName;
@@ -185,7 +193,7 @@ function generateTeamsByNumberOfTeams() {
 }
 
 //Adds a student (li element's ID, ex: "cu_1") 
-//to the supplied team list (ul element's ID, ex "team_1")
+//to the supplied team list (ul element's ID, ex "team_1_0")
 function addStudentToTeam(studentId, teamId) {
     $("#" + studentId).slideUp('slow', function () {
         $('#' + teamId).find('.TeamSortable').append($("#" + studentId));
