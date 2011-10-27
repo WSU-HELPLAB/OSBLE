@@ -107,7 +107,7 @@ namespace ReviewInterfaceBase.ViewModel.Document.XpsDocument
 
                     //it is no longer xps so got to change the xmlns
                     translatedXaml = translatedXaml.Replace("xmlns=\"http://schemas.microsoft.com/xps/2005/06\"", "xmlns=\"http://schemas.microsoft.com/client/2007\"");
-
+                    translatedXaml = translatedXaml.Replace("FixedPage.NavigateUri", "Tag");
                     Canvas canvas = null;
 
                     //since all xps docs have a canvas and this spits out a canvas no reason in having a canvas which holds a canvas which holds the documents so instead we get the 'real canvas'
