@@ -16,6 +16,7 @@ using System.Data.Entity.Validation;
 using System.Diagnostics;
 using OSBLE.Models.Assignments.Activities.Scores;
 using OSBLE.Controllers;
+using OSBLE.Models.Courses.Rubrics;
 
 namespace OSBLE.Controllers
 {
@@ -275,6 +276,33 @@ namespace OSBLE.Controllers
             return View();
         }
 
+
+        [CanModifyCourse]
+        public void ConvertAllDrafts(int assignmentActivityID)
+        {
+            var activity = (from a in db.AbstractAssignmentActivities
+                           where a.ID == assignmentActivityID
+                           select a).FirstOrDefault();
+
+            if (activity != null) //Turning all IsPublished values to true and changing their publish time
+            {
+                List<RubricEvaluation> reList = (from re in db.RubricEvaluations
+                                                 where re.AbstractAssignmentActivityID == assignmentActivityID
+                                                 select re as RubricEvaluation).ToList();
+
+                foreach (RubricEvaluation re in reList)
+                {
+                    if (re.IsPublished == false) //Only publish if its not already published
+                    {
+                        re.IsPublished = true;
+                        re.DatePublished = DateTime.Now;
+                        PublishGrade(assignmentActivityID, re.RecipientID);
+                    }
+                }
+                db.SaveChanges();
+            }
+        }
+
         //This is to be used with Ajax
         [CanModifyCourse]
         public ActionResult ActivityTeacherTable(int id)
@@ -285,7 +313,7 @@ namespace OSBLE.Controllers
 
                 StudioAssignment assignment = studioActivity.AbstractAssignment as StudioAssignment;
 
-
+                bool hasRubric = studioActivity is SubmissionActivity && assignment.RubricID != null && assignment.RubricID != 0;
 
                 if (studioActivity.AbstractAssignment.Category.Course == activeCourse.AbstractCourse)
                 {
@@ -293,10 +321,31 @@ namespace OSBLE.Controllers
 
                     int numberOfSubmissions = 0;
                     int numberGraded = 0;
+                    int numberOfDrafts = 0;
+                    int numberOfPublish = 0;
 
                     foreach (TeamUserMember teamUser in studioActivity.TeamUsers)
                     {
                         ActivityTeacherTableViewModel.SubmissionInfo submissionInfo = new ActivityTeacherTableViewModel.SubmissionInfo();
+                        if (hasRubric) //Setting the publish time of the draft, if there is one.
+                        {
+                            var temp = (from re in db.RubricEvaluations
+                                              where re.RecipientID == teamUser.ID &&
+                                              re.AbstractAssignmentActivityID == studioActivity.ID
+                                              select re).FirstOrDefault();
+                            if (temp != null) //There is a RE. 
+                            {
+                                if ((temp as RubricEvaluation).IsPublished == false) //not a published RE, so its  a draft
+                                {
+                                    submissionInfo.DraftSaveTime = (temp as RubricEvaluation).DatePublished;
+                                    numberOfDrafts++;
+                                }
+                                else
+                                {
+                                    numberOfPublish++;
+                                }
+                            }
+                        }
 
                         //This checks when something was submitted by the folder modify time it is imperative that they don't get modified except when a student submits something to that folder.
                         submissionInfo.Time = GetSubmissionTime(activeCourse.AbstractCourse as Course, studioActivity, teamUser);
@@ -360,11 +409,23 @@ namespace OSBLE.Controllers
                         viewModel.SubmissionsInfo.Add(submissionInfo);
                     }
 
+                    if (studioActivity.isTeam == true)
+                    {
+                        //"Grades for x of y students have been saved in draft [publish all]"
+                        //"Grades for x of y students have been published."
+                        ViewBag.DraftMsg1 = "Grades for " + numberOfDrafts.ToString() + " of " + studioActivity.TeamUsers.Count.ToString() + " teams have been saved in draft.";
+                        ViewBag.DraftMsg2 = "Grades for " + numberOfPublish.ToString() + " of " + studioActivity.TeamUsers.Count.ToString() + " teams have been published.";
+                    }
+                    else //not a team
+                    {
+                        ViewBag.DraftMsg1 = "Grades for " + numberOfDrafts.ToString() + " of " + studioActivity.TeamUsers.Count.ToString() + " students have been saved in draft.";
+                        ViewBag.DraftMsg2 = "Grades for " + numberOfPublish.ToString() + " of " + studioActivity.TeamUsers.Count.ToString() + " students have been published.";
+                    }
+
                     //This orders the list into alphabetical order
                     viewModel.SubmissionsInfo = (from c in viewModel.SubmissionsInfo orderby c.Name select c).ToList();
                     ViewBag.NumberOfSubmissions = numberOfSubmissions;
                     ViewBag.NumberGraded = numberGraded;
-
                     ViewBag.ExpectedSubmissionsAndGrades = studioActivity.TeamUsers.Count;
                     ViewBag.activityID = studioActivity.ID;
                     ViewBag.CategoryID = studioActivity.AbstractAssignment.CategoryID;

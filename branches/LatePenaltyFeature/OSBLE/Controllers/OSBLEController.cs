@@ -13,6 +13,7 @@ using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities.Scores;
+using OSBLE.Models.Courses.Rubrics;
 
 namespace OSBLE.Controllers
 {
@@ -543,6 +544,52 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
+        /// This function will publish the draft and notify the student.
+        /// </summary>
+        public void PublishGrade(int activityID, int teamUserMemberID)
+        {
+            AbstractAssignmentActivity activity = (from a in db.AbstractAssignmentActivities
+                                                   where a.ID == activityID
+                                                   select a as AbstractAssignmentActivity).FirstOrDefault();
+
+            TeamUserMember tum = (from t in db.TeamUsers
+                                  where t.ID == teamUserMemberID
+                                  select t as TeamUserMember).FirstOrDefault();
+
+
+            (new NotificationController()).SendRubricEvaluationCompletedNotification(activity, tum);
+
+            //figure out the normalized final score.
+            double maxLevelScore = 0.0;
+            double totalRubricPoints = 0.0;
+            if (activity.AbstractAssignment.Rubric != null)
+            {
+                maxLevelScore = (from c in activity.AbstractAssignment.Rubric.Levels
+                                 select c.RangeEnd).Sum();
+                totalRubricPoints = (from c in activity.AbstractAssignment.Rubric.Criteria
+                                     select c.Weight).Sum();
+            }
+
+            double studentScore = 0.0;
+
+            //getting rubric evaluation
+            RubricEvaluation RE = (from re in db.RubricEvaluations
+                                   where re.RecipientID == teamUserMemberID &&
+                                   re.AbstractAssignmentActivityID == activityID
+                                   select re as RubricEvaluation).FirstOrDefault();
+            foreach (CriterionEvaluation critEval in RE.CriterionEvaluations)
+            {
+                studentScore += (double)critEval.Score / maxLevelScore * (critEval.Criterion.Weight / totalRubricPoints);
+            }
+
+            //normalize the score with the abstract assignment score
+            studentScore *= activity.PointsPossible;
+            string userID = getUserIdentification(activityID, teamUserMemberID);
+            //At this point we have the raw students points. Before added points for a category, or lateness, or max is considered.
+            ModifyGrade(studentScore, userID, activityID);
+        }
+
+        /// <summary>
         /// Changes userId's grade for the given assignmentId to value. Note: Value is the pre-modified value for the grade.
         /// </summary>
         public void ModifyGrade(double value, string userId, int assignmentActivityId)
@@ -585,7 +632,7 @@ namespace OSBLE.Controllers
                         {
                             latePenalty = CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
                             latePenalty = (100 - latePenalty) / 100;
-                            value = value * latePenalty;
+                            value = (value * ((100 - latePenalty) / 100));
                         }
 
                         if (currentCategory.MaxAssignmentScore >= 0) //capping to max score if there is a cap
@@ -618,7 +665,7 @@ namespace OSBLE.Controllers
                             {
                                 latePenalty = CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
                                 latePenalty = (100 - latePenalty) / 100;
-                                value = value * latePenalty;
+                                value = (value * ((100 - latePenalty) / 100));
                             }
 
 
@@ -653,6 +700,47 @@ namespace OSBLE.Controllers
                     }
                 }
             }
+        }
+
+        //given a team user ID, this function returns the Identification number of a member of the team or that user. 
+        //returns "" if it fails to get the users Idenfitifcation number
+        public string getUserIdentification(int activityID, int teamUserMemberID)
+        {
+            string returnVal = "";
+            //getting assignment activity
+            AbstractAssignmentActivity assignmentActivity = (from aa in db.AbstractAssignmentActivities
+                                        where aa.ID == activityID
+                                        select aa).FirstOrDefault();
+
+            //getting the team user member's user ID
+            var tum = (from tumember in db.TeamUsers
+                        where tumember.ID == teamUserMemberID
+                        select tumember).FirstOrDefault();
+
+            if (assignmentActivity.isTeam) //handle like team
+            {
+                TeamMember tm = tum as TeamMember;
+                if (tm.Team.Members.Count() > 0)
+                {
+                    UserMember um = tm.Team.Members.First() as UserMember;
+                    int userID = um.UserProfileID;
+                    UserProfile up = (from UP in db.UserProfiles
+                                      where UP.ID == userID
+                                      select UP).FirstOrDefault();
+                    returnVal = up.Identification;
+
+                }
+            }
+            else
+            {
+                UserMember um = tum as UserMember;
+                int userID = um.UserProfileID;
+                UserProfile up = (from UP in db.UserProfiles
+                                  where UP.ID == userID
+                                  select UP).FirstOrDefault();
+                returnVal = up.Identification;
+            }
+            return returnVal;
         }
 
         /// <summary>
