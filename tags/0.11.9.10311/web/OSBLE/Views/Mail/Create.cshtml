@@ -62,7 +62,7 @@
     <div class="editor-label">
         @Html.LabelFor(model => model.Message)
     </div>
-    <div class="editor-field">
+    <div class="editor-field" id="message_area">
         @Html.TextAreaFor(model => model.Message, new { @id = "send_mail_textarea" })<br />
         @Html.ValidationMessageFor(model => model.Message)
     </div>
@@ -75,7 +75,7 @@
     <script type="text/javascript">
         var strids = $('#recipient_list').val();
         var list = new Array();
-       
+
         if(strids != "")
         {
             var temp = strids.split(',');
@@ -86,12 +86,16 @@
                 list.push(temp[i]);
             }
             document.getElementById("send_btn").disabled = false;
+            // if there are recipients setting the focus to the message area.
+            document.getElementById("send_mail_textarea").focus();
         }
         else
         {
             $('#recipients_data').append('<div id="NoRecipient" class="recipient" />');
             var NoRecipient = $('#NoRecipient');
             NoRecipient.append('<div class="recipient_tools"/><a><< No Recipients >></a>');
+            // if no recipients then set focus to the To field.
+            document.getElementById("people_finder").focus();
         }
 
         var selection_state = false;
