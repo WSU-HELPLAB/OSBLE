@@ -15,6 +15,8 @@ using OSBLE.Models.HomePage;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
 using OSBLE.Models.Assignments.Activities.Scores;
+using OSBLE.Controllers;
+using OSBLE.Models.Courses.Rubrics;
 
 namespace OSBLE.Controllers
 {
@@ -274,6 +276,33 @@ namespace OSBLE.Controllers
             return View();
         }
 
+
+        [CanModifyCourse]
+        public void ConvertAllDrafts(int assignmentActivityID)
+        {
+            var activity = (from a in db.AbstractAssignmentActivities
+                           where a.ID == assignmentActivityID
+                           select a).FirstOrDefault();
+
+            if (activity != null) //Turning all IsPublished values to true and changing their publish time
+            {
+                List<RubricEvaluation> reList = (from re in db.RubricEvaluations
+                                                 where re.AbstractAssignmentActivityID == assignmentActivityID
+                                                 select re as RubricEvaluation).ToList();
+
+                foreach (RubricEvaluation re in reList)
+                {
+                    if (re.IsPublished == false) //Only publish if its not already published
+                    {
+                        re.IsPublished = true;
+                        re.DatePublished = DateTime.Now;
+                        PublishGrade(assignmentActivityID, re.RecipientID);
+                    }
+                }
+                db.SaveChanges();
+            }
+        }
+
         //This is to be used with Ajax
         [CanModifyCourse]
         public ActionResult ActivityTeacherTable(int id)
@@ -284,7 +313,7 @@ namespace OSBLE.Controllers
 
                 StudioAssignment assignment = studioActivity.AbstractAssignment as StudioAssignment;
 
-
+                bool hasRubric = studioActivity is SubmissionActivity && assignment.RubricID != null && assignment.RubricID != 0;
 
                 if (studioActivity.AbstractAssignment.Category.Course == activeCourse.AbstractCourse)
                 {
@@ -292,18 +321,61 @@ namespace OSBLE.Controllers
 
                     int numberOfSubmissions = 0;
                     int numberGraded = 0;
+                    int numberOfDrafts = 0;
+                    int numberOfPublish = 0;
 
                     foreach (TeamUserMember teamUser in studioActivity.TeamUsers)
                     {
                         ActivityTeacherTableViewModel.SubmissionInfo submissionInfo = new ActivityTeacherTableViewModel.SubmissionInfo();
+                        if (hasRubric) //Setting the publish time of the draft, if there is one.
+                        {
+                            var temp = (from re in db.RubricEvaluations
+                                              where re.RecipientID == teamUser.ID &&
+                                              re.AbstractAssignmentActivityID == studioActivity.ID
+                                              select re).FirstOrDefault();
+                            if (temp != null) //There is a RE. 
+                            {
+                                if ((temp as RubricEvaluation).IsPublished == false) //not a published RE, so its  a draft
+                                {
+                                    submissionInfo.DraftSaveTime = (temp as RubricEvaluation).DatePublished;
+                                    numberOfDrafts++;
+                                }
+                                else
+                                {
+                                    numberOfPublish++;
+                                }
+                            }
+                        }
 
                         //This checks when something was submitted by the folder modify time it is imperative that they don't get modified except when a student submits something to that folder.
                         submissionInfo.Time = GetSubmissionTime(activeCourse.AbstractCourse as Course, studioActivity, teamUser);
+
+
+                        //Getting the score in the db manual LatePenaltyPercent
+                        var tempScore = (from s in db.Scores
+                                         where s.TeamUserMemberID == teamUser.ID
+                                         select s).FirstOrDefault();
+
+                        if (tempScore != null) //Only giving ManualLatePenaltyPercent a value if there is something there, otherwise it gets -1 (the default)
+                        {
+                            submissionInfo.ManualLatePenaltyPercent = (tempScore as Score).ManualLatePenaltyPercent;
+                        }
+                        else
+                        {
+                            submissionInfo.ManualLatePenaltyPercent = -1;
+                        }
 
                         if (submissionInfo.Time != null)
                         {
                             numberOfSubmissions++;
                             submissionInfo.LatePenaltyPercent = CalcualateLatePenaltyPercent(studioActivity, (TimeSpan)calculateLateness(studioActivity.AbstractAssignment.Category.Course, studioActivity, teamUser));
+                            //Calculated the late penalty percent, should save to DB if there is a difference.
+                            if ((tempScore as Score).LatePenaltyPercent != submissionInfo.LatePenaltyPercent)
+                            {
+                                (tempScore as Score).LatePenaltyPercent = submissionInfo.LatePenaltyPercent;
+                                db.SaveChanges();
+                            }
+
                         }
 
                         //if team
@@ -336,11 +408,23 @@ namespace OSBLE.Controllers
                         viewModel.SubmissionsInfo.Add(submissionInfo);
                     }
 
+                    if (studioActivity.isTeam == true)
+                    {
+                        //"Grades for x of y students have been saved in draft [publish all]"
+                        //"Grades for x of y students have been published."
+                        ViewBag.DraftMsg1 = "Grades for " + numberOfDrafts.ToString() + " of " + studioActivity.TeamUsers.Count.ToString() + " teams have been saved in draft.";
+                        ViewBag.DraftMsg2 = "Grades for " + numberOfPublish.ToString() + " of " + studioActivity.TeamUsers.Count.ToString() + " teams have been published.";
+                    }
+                    else //not a team
+                    {
+                        ViewBag.DraftMsg1 = "Grades for " + numberOfDrafts.ToString() + " of " + studioActivity.TeamUsers.Count.ToString() + " students have been saved in draft.";
+                        ViewBag.DraftMsg2 = "Grades for " + numberOfPublish.ToString() + " of " + studioActivity.TeamUsers.Count.ToString() + " students have been published.";
+                    }
+
                     //This orders the list into alphabetical order
                     viewModel.SubmissionsInfo = (from c in viewModel.SubmissionsInfo orderby c.Name select c).ToList();
                     ViewBag.NumberOfSubmissions = numberOfSubmissions;
                     ViewBag.NumberGraded = numberGraded;
-
                     ViewBag.ExpectedSubmissionsAndGrades = studioActivity.TeamUsers.Count;
                     ViewBag.activityID = studioActivity.ID;
                     ViewBag.CategoryID = studioActivity.AbstractAssignment.CategoryID;
@@ -510,6 +594,82 @@ namespace OSBLE.Controllers
                 OnLoaded = "SLObjectLoaded",
                 Parameters = parameters
             };
+        }
+
+        /// <summary>
+        /// Changes ManaulLatePenalty value into the value passed in, for the user(s) corrisponding to the ID sent in.
+        /// </summary>
+        public void changeManualLatePenalty(double value, int teamUserMemeberID, int assignmentActivityID)
+        {
+            if (ModelState.IsValid)
+            {
+                //Look up score given the ID. If there is one adust it appropriately, otherwise create a new one
+                var tempScore = (from s in db.Scores
+                                 where s.TeamUserMemberID == teamUserMemeberID
+                                 select s);
+
+                Score mScore = null;
+                if (tempScore.Count() == 0) //No score. Adding a new one to the db
+                {
+                    mScore = new Score();
+                    mScore.PublishedDate = DateTime.Now;
+                    mScore.AssignmentActivityID = assignmentActivityID;
+                    mScore.Points = -1;
+                    mScore.TeamUserMemberID = teamUserMemeberID;
+                    mScore.ManualLatePenaltyPercent = value;
+                    db.Scores.Add(mScore);
+                    db.SaveChanges();
+                }
+                else //Score already in place
+                {
+                    //Assigning mScore the score from the db. Adjusting the late penalty, saving the changes to
+                    //db, and finally updating the grade by running  ModifyGrade on the rawpoints. 
+                    mScore = tempScore.FirstOrDefault();
+                    mScore.ManualLatePenaltyPercent = value; 
+                    db.SaveChanges(); //save mScore changes
+
+                    //getting assignment activity
+                    AbstractAssignmentActivity assignmentActivity = (from aa in db.AbstractAssignmentActivities
+                                             where aa.ID == assignmentActivityID
+                                             select aa).FirstOrDefault();
+
+                    //getting the team user member's user ID to use with ModifiyGrade further down
+                    var tum = (from tumember in db.TeamUsers
+                               where tumember.ID == teamUserMemeberID
+                               select tumember).FirstOrDefault();
+
+                    string userIdentification = ""; //string for holdign the user identification
+                    if (assignmentActivity.isTeam) //handle like team
+                    {
+                        TeamMember tm = tum as TeamMember;
+                        if (tm.Team.Members.Count() > 0)
+                        {
+                            UserMember um = tm.Team.Members.First() as UserMember;
+                            int userID = um.UserProfileID;
+                            UserProfile up = (from UP in db.UserProfiles
+                                              where UP.ID == userID
+                                              select UP).FirstOrDefault();
+                            userIdentification = up.Identification;
+                            
+                        }
+                    }
+                    else
+                    {
+                        UserMember um = tum as UserMember;
+                        int userID = um.UserProfileID;
+                        UserProfile up = (from UP in db.UserProfiles
+                                          where UP.ID == userID
+                                          select UP).FirstOrDefault();
+                        userIdentification = up.Identification;
+                    }
+
+                    if (mScore.RawPoints != -1) //Only actually modifiy their grade if their raw points has a value. 
+                    {
+                        ModifyGrade(mScore.RawPoints, userIdentification, assignmentActivityID); //Update the grade
+                    }
+                    
+                }
+            }
         }
     }
 }

@@ -142,7 +142,7 @@ namespace OSBLE.Models
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
+            modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
 #if !DEBUG
             modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
 #endif

@@ -50,20 +50,188 @@
         //then remove the div
         $('#downloading_submission_dialog').remove();
     }
+
+    /*BEGIN: Functions/events for editing late penalty*/
+
+    var tempID = -1;
+    var tempDefaultPerc = -1;
+    var tempHasSubmitted = -1;
+    var spanToEdit = null;
+    var currentAssignmentActID = -1
+    function openLateEditor(mID, mManualLatePerc, mDefaultPerc, mHasSubmitted, thisDOM, mAssignmentActivityID) {
+        
+        //setting globals 
+        tempID = mID;
+        tempDefaultPerc = mDefaultPerc;
+        tempHasSubmitted = mHasSubmitted;
+        currentAssignmentActID = mAssignmentActivityID;
+        spanToEdit = $(thisDOM).parent().find('span');
+        
+        //clearing value out of textbox, then displaying the window
+        $("#customLatePen").val("");
+        $('#latePenErrorText').text("");
+        $('#EditLatePercentWindowID').dialog('open'); 
+
+        //Based off the current late penalty, it will either automatically select default or manual
+        if (mManualLatePerc < 0) {
+            //Not man penalty, select default
+            $('#radioBtn1').attr('checked', 'checked');
+            $("#customLatePen").attr('disabled', 'disabled');
+        }
+        else {
+            $('#radioBtn2').attr('checked', 'checked');
+            var valueForBox = $(thisDOM).parent().find('span').html().toString();
+            valueForBox = valueForBox.slice(0, -1);
+            $("#customLatePen").val(valueForBox);
+            $("#customLatePen").focus();
+            $("#customLatePen").select();
+        }
+    }
+
+    function closeLateEditor() {
+        $('#EditLatePercentWindowID').dialog('close');
+    }
+
+    $('#EditLatePercentWindowID').dialog({
+        autoOpen: false,
+        modal: true,
+        resizable: false,
+        width: 350,
+        height: 130,
+        closeOnEscape: false
+    });
+
+
+    $('.LatePenTD').mouseenter(function () {
+        $(this).find('a').show();
+
+    });
+
+    $('.LatePenTD').mouseleave(function () {
+        $('.editButtonHidden').hide();
+    });
+
+    function modifyLatePen() {
+        var button1Result = $('#radioBtn1').attr('checked');
+        var button2Result = $('#radioBtn2').attr('checked');
+
+        //if button 1 was checked, theyre using default. Changing manual late penalty in the db to -1 (off)
+        if (button1Result == "checked") {
+            $.ajax({
+                async: true,
+                type: "POST",
+                url: "/Assignment/changeManualLatePenalty",
+                data: { value: -1, teamUserMemeberID: tempID, assignmentActivityID: currentAssignmentActID }
+            });
+            closeLateEditor();
+            if (tempHasSubmitted == 0) //They have not submitted, display not submitted
+            {
+                $(spanToEdit).html("Not Submitted");
+            }
+            else //use default late pen for display
+            {
+                $(spanToEdit).html(tempDefaultPerc.toString() + "%");
+            }
+
+        }
+
+        //button 2 was checked, take the value from the box, if its valid change manual late penalty in the db to their value
+        else if(button2Result =="checked"){
+            var latePen = $("#customLatePen").val();
+            if (isNaN(latePen) || latePen.indexOf(' ') != -1 || latePen == "") {
+                var errorMsg = "Error: Invalid value"
+                $('#latePenErrorText').text(errorMsg);
+            }
+            else {
+                $.ajax({
+                    async: true,
+                    type: "POST",
+                    url: "/Assignment/changeManualLatePenalty",
+                    data: { value: latePen, teamUserMemeberID: tempID, assignmentActivityID :currentAssignmentActID }
+                });
+                closeLateEditor();
+
+                //Changing the value displayed
+                $(spanToEdit).html(latePen.toString() + "%");
+
+            }
+
+        }
+    }
+
+    $('#radioBtn1').change(function () {
+        $("#customLatePen").attr('disabled', 'disabled');
+    });
+
+    $('#radioBtn2').change(function () {
+        $("#customLatePen").removeAttr('disabled');
+    });
+
+    /*END: Functions/events for editing late penalty*/
+
+    function openPublishWindow() {
+        $('#publishConfirmWindow').dialog('open');
+    }
+
+    function closePublishWindow() {
+        $('#publishConfirmWindow').dialog('close');
+    }
+
+    function publishAll() {
+        var actID = @ViewBag.activityID;
+            $.ajax({
+            async: true,
+            url: "/Assignment/ConvertAllDrafts",
+            data: { assignmentActivityID: actID }
+        });
+        closePublishWindow();
+        window.location.reload(true);
+    }
+
+
+    $('#publishConfirmWindow').dialog({
+        autoOpen: false,
+        modal: true,
+        resizable: false,
+        width: 350,
+        height: 130,
+        closeOnEscape: false
+    });
+
+
+
 </script>
 
 <!-- Pop-up window for editing late percentage -->
 <div id="EditLatePercentWindowID" style="display: none;" title="Edit Score">
-	<text>Adjust Score:</text>
-	<input id="newScoreValue"/>
-    <td align="right" colspan="3"><input type="button" onclick="adjustLatePenalty(1);" value="Apply Changes" /></td>
-    <td align="right" colspan="3"><input type="button" onclick="hideEditLatePercentWindow();" value="Cancel" /></td>
-    <td align="right" colspan="3"><input type="button" onclick="adjustLatePenalty(2);" value="Restore Default Value" /></td>
+    <input type="radio" id="radioBtn1" name="group1"/> Use default late penalty<br />
+    <input type="radio" id="radioBtn2" name="group1"/> Use a custom late penalty of <input size="5" id="customLatePen"/>%<br />
+    <td>
+        <text id="latePenErrorText" style="color:Red; float:left; font-size:smaller"></text>
+        <div style="float:right">
+            <input type="button" onclick="modifyLatePen();" value="Apply Changes" />
+            <input type="button" onclick="closeLateEditor();" value="Cancel" />
+        </div>
+    </td>
 </div>
+
+<!-- Pop-up window for confirming publishing all drafts-->
+<div id="publishConfirmWindow" style="display: none;" title="Confirm">
+    <text>Are you sure you want to publish all drafts?</text>
+    <div>
+        <input type="button" onclick="publishAll();" value="Publish All" />
+        <input type="button" onclick="closePublishWindow();" value="Cancel" />    
+    </div>
+</div>
+
 
 <div>
     <p>
-        <text>@ViewBag.NumberOfSubmissions of @ViewBag.ExpectedSubmissionsAndGrades submissions have been recieved.</text>
+        <text>@ViewBag.NumberOfSubmissions of @ViewBag.ExpectedSubmissionsAndGrades submissions have been recieved.</text> <br />
+        <text>@ViewBag.DraftMsg1</text><a onclick=openPublishWindow(); style="text-decoration: underline">Publish All</a>
+        
+        <br />
+        <text>@ViewBag.DraftMsg2</text>
         <br />
         <br />@Html.ActionLink("Download all submissions for this activity", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentActivityID = ViewBag.activityID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
     </p>
@@ -104,6 +272,7 @@
     </tr>
     @foreach (ActivityTeacherTableViewModel.SubmissionInfo info in Model.SubmissionsInfo)
     {
+        
         string nameID = "TeamUserID_" + info.SubmitterID.ToString();
         bool hasSubbmitted = info.Time != null;
         <tr>
@@ -111,7 +280,7 @@
                 @if (isTeam)
                 { 
                     <span style="text-decoration: underline">@info.Name</span>
-                    <a title="Email this team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = info.TeamID })">@Helpers.MailButton()</a>
+                    <a title="Email this team" href="@Url.Action("Create", "Mail", new { id = -4, teamID = info.TeamID })">@Helpers.MailButton()</a>
                     <br/>
                     @info.TeamList            
                     
@@ -168,6 +337,7 @@
                     {  
                         
                             @Html.ActionLink(userScore.Points.ToString() + "%", "Index", "Rubric", new { abstractAssignmentActivityId = ViewBag.activityID, teamUserId = info.SubmitterID }, new { })
+                            //Here we have a graded rubric, display as norm
                         
                     }
                     else
@@ -180,7 +350,18 @@
                 {
                     if (hasRubric)
                     {
+                        if (info.DraftSaveTime == null) 
+                        {
+                            //not a draft
                             @Html.ActionLink("Not Graded", "Index", "Rubric", new { abstractAssignmentActivityId = ViewBag.activityID, teamUserId = info.SubmitterID }, new { @style = "color: Red; text-align: center" })
+                        }
+                        else
+                        {
+                            //Display "Draft Saved"
+                            @Html.ActionLink("Draft Saved", "Index", "Rubric", new { abstractAssignmentActivityId = ViewBag.activityID, teamUserId = info.SubmitterID }, new { @style = "color: Red; text-align: center" });
+                        }
+
+
                     }
                     else
                     {
@@ -189,24 +370,39 @@
                 }
             </td>
                 
-            <td class="LPClass">
-                @if (info.LatePenaltyPercent != 0)
+            <td class="LatePenTD">
+                <div>
+                @if (info.ManualLatePenaltyPercent > 0)
+                {
+                    <span>@info.ManualLatePenaltyPercent.ToString(".##")%</span>
+                }
+                else if (info.ManualLatePenaltyPercent == 0)
+                {
+                    <span>0.0%</span>
+                }
+                else if (info.LatePenaltyPercent != 0)
                 {
                     <span>@info.LatePenaltyPercent.ToString(".##")%</span>
                     //This will not be commented out with future checkin <a class="editLatePercentText" onclick="showEditLatePercentWindow(@info.SubmitterID);">Edit</a>
                 }
+                else if (hasSubbmitted)
+                {
+                    <span>0.0%</span>
+                }
                 else
                 {
-                    if (hasSubbmitted)
-                    {
-                        <span>0.0%</span>
-                        //This will not be commented out with future checkin a class="editLatePercentText" onclick="showEditLatePercentWindow(@info.SubmitterID);">Edit</a>
-                    }
-                    else
-                    {
-                        <span>Not Submitted</span>
-                    }
+                    <span>Not Submitted</span>
                 }
+                @if (hasSubbmitted)
+                {
+                    <a class="editButtonHidden" onclick="openLateEditor(@info.SubmitterID, @info.ManualLatePenaltyPercent, @info.LatePenaltyPercent, 1, this, @Model.Activity.ID )">Edit</a>
+                }
+                else
+                {
+                    <a class="editButtonHidden" onclick="openLateEditor(@info.SubmitterID, @info.ManualLatePenaltyPercent, @info.LatePenaltyPercent, 0, this, @Model.Activity.ID )">Edit</a>
+                }
+                    
+                </div>
             </td>
             }
             

@@ -219,82 +219,13 @@ namespace OSBLE.Controllers
                 //if the evaluation has been published, update the scores in the gradebook
                 if (vm.Evaluation.IsPublished)
                 {
-                    (new NotificationController()).SendRubricEvaluationCompletedNotification(vm.Evaluation.AssignmentActivity, vm.Evaluation.Recipient);
-
-                    Score grade = (from g in db.Scores
-                                   where g.TeamUserMemberID == vm.Evaluation.RecipientID
-                                   &&
-                                   g.AssignmentActivityID == vm.Evaluation.AbstractAssignmentActivityID
-                                   select g).FirstOrDefault();
-
-                    //figure out the normalized final score.
-                    double maxLevelScore = (from c in vm.Rubric.Levels
-                                            select c.RangeEnd).Sum();
-                    double totalRubricPoints = (from c in vm.Rubric.Criteria
-                                                select c.Weight).Sum();
-                    double studentScore = 0.0;
-                    double rawStudentScore = -1;
-                    double categoryMaxPoints = vm.SelectedAssignmentActivity.AbstractAssignment.Category.MaxAssignmentScore;
-                    
-                    foreach (CriterionEvaluation critEval in vm.Evaluation.CriterionEvaluations)
-                    {
-                        studentScore += (double)critEval.Score / maxLevelScore * (critEval.Criterion.Weight / totalRubricPoints);
-                    }
-
-                    //normalize the score with the abstract assignment score
-                    studentScore *= vm.Evaluation.AssignmentActivity.PointsPossible;
-
-                    //If a column has added points then we want to add those points to the students score
-                    if (vm.Evaluation.AssignmentActivity.addedPoints > 0)
-                    {
-                        studentScore += vm.Evaluation.AssignmentActivity.addedPoints;
-                    }
-
-                    TimeSpan? lateness = calculateLateness(vm.Evaluation.AssignmentActivity.AbstractAssignment.Category.Course, vm.Evaluation.AssignmentActivity, vm.Evaluation.Recipient);
-                    if (lateness != null)
-                    {
-                        latePenalty = CalcualateLatePenaltyPercent(vm.Evaluation.AssignmentActivity, (TimeSpan)lateness);
-                        latePenalty = (100 - latePenalty) / 100;
-                        studentScore = studentScore * latePenalty;
-                    }
-
-                    rawStudentScore = studentScore;
-
-                    if (categoryMaxPoints >= 0)
-                    {
-                        if (((studentScore/vm.SelectedAssignmentActivity.PointsPossible)*100) > categoryMaxPoints)
-                        {
-                            studentScore = (vm.SelectedAssignmentActivity.PointsPossible * (categoryMaxPoints / 100));
-                        }
-                    }
-                    if (grade != null)
-                    {
-                        grade.Points = studentScore;
-                        grade.LatePenaltyPercent = latePenalty;
-                        grade.StudentPoints = -1;
-                        grade.RawPoints = rawStudentScore;
-                        db.SaveChanges();
-                    }
-                    else
-                    {
-                        //create
-                        Score newScore = new Score()
-                        {
-                            TeamUserMemberID = vm.Evaluation.RecipientID,
-                            Points = studentScore,
-                            AssignmentActivityID = vm.Evaluation.AbstractAssignmentActivityID,
-                            PublishedDate = DateTime.Now,
-                            LatePenaltyPercent = latePenalty,
-                            isDropped = false,
-                            RawPoints = rawStudentScore
-                        };
-                        db.Scores.Add(newScore);
-                        db.SaveChanges();
-                    }
+                    PublishGrade(vm.Evaluation.AbstractAssignmentActivityID, vm.Evaluation.Recipient.ID);
                 }
             }
             return View(vm);
         }
+
+       
 
         [CanGradeCourse]
         public ActionResult Index(int abstractAssignmentActivityId, int teamUserId)

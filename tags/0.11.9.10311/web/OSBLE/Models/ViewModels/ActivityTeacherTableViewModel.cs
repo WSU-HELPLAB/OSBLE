@@ -37,6 +37,11 @@ namespace OSBLE.Models.ViewModels
             public bool Graded { get; set; }
 
             public double LatePenaltyPercent { get; set; }
+
+            public double ManualLatePenaltyPercent { get; set; }
+
+            //This member will hold the time a draft was saved for a rubric type assignment. It will be null if it's a non-rubric assignment or if there was no draft.
+            public DateTime? DraftSaveTime { get; set; }
         }
     }
 }

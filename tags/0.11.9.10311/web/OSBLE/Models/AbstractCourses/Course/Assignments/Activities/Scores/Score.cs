@@ -26,6 +26,8 @@ namespace OSBLE.Models.Assignments.Activities.Scores
         [Required]
         public double LatePenaltyPercent { get; set; }
 
+        public double ManualLatePenaltyPercent { get; set; }
+
         [Required]
         public int TeamUserMemberID { get; set; }
 
@@ -55,6 +57,7 @@ namespace OSBLE.Models.Assignments.Activities.Scores
             AddedPoints = 0;
             //isTake = false;
             isDropped = false;
+            ManualLatePenaltyPercent = -1;
             RawPoints = -1;
         }
     }
