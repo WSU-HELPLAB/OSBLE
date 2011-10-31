@@ -1,0 +1,22 @@
+﻿@using OSBLE.Models.Courses
+<div id="tabs">
+    @using OSBLE.Controllers
+    @foreach (OSBLEController.MenuItem m in ViewBag.Menu)
+    {
+        if ( ((ViewBag.CurrentUser != null) && (!m.AdminOnly || ViewBag.CurrentUser.IsAdmin))
+           &&
+           (!m.ModifierOnly || ((ViewBag.ActiveCourse != null) && ViewBag.ActiveCourse.AbstractRole.CanModify))
+           &&
+           (!m.GraderOnly || ((ViewBag.ActiveCourse != null) && ViewBag.ActiveCourse.AbstractRole.CanGrade))
+           &&
+           (!m.ViewerOnly || ((ViewBag.ActiveCourse != null) && ViewBag.ActiveCourse.AbstractRole.CanSeeAll))
+           &&
+           ((!m.CommunityOnlyPage && !m.NotInCommunityPage) ||
+           (m.NotInCommunityPage && ViewBag.ActiveCourse != null && !(ViewBag.ActiveCourse.AbstractCourse is Community)
+           || (m.CommunityOnlyPage && ViewBag.ActiveCourse != null && ViewBag.ActiveCourse.AbstractCourse is Community)))
+          ) 
+        {
+        @Html.ActionLink(@m.Name, @m.Action, @m.Controller, null, new { Class = ViewBag.CurrentTab == @m.Name ? "tab_current" : "" })
+        }
+    }
+</div>

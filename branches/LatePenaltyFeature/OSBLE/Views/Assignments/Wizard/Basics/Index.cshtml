@@ -1,0 +1,35 @@
+﻿@using OSBLE.Models.Assignments;
+@model AbstractAssignment
+@Html.Partial("_WizardTopNav")
+<h1>Basic Assignment Information</h1>
+@using (@Html.BeginForm())
+{
+@Html.ValidationSummary() 
+<table>
+    <tr>
+        <th>@Html.LabelFor(m => m.Name):</th>
+        <td>@Html.EditorFor(m => m.Name)</td>
+        <td>@Html.ValidationMessageFor(m => m.Name)</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.Description):</th>
+        <td>@Html.EditorFor(m => m.Description)</td>
+        <td>@Html.ValidationMessageFor(m => m.Description)</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.PointsPossible):</th>
+        <td>@Html.EditorFor(m => m.PointsPossible, new { size = 3 })</td>
+        <td>@Html.ValidationMessageFor(m => m.PointsPossible)</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.CategoryID):</th>
+        <td>
+            @Html.DropDownListFor(m => m.CategoryID, ViewBag.Categories as SelectList)
+        </td>
+        <td>
+            @Html.ValidationMessageFor(m => m.CategoryID)
+        </td>
+    </tr>
+</table>
+@Html.Partial("_WizardBottomNav");
+}

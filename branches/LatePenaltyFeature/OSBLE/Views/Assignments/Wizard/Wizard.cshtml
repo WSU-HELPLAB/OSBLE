@@ -1,0 +1,14 @@
+﻿@{
+    ViewBag.Title = "Wizard";
+}
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/json2.min.js")" type="text/javascript"></script>
+@using (Html.BeginForm())
+{
+    @Html.Raw(ViewBag.Content)
+    <div id="WizardBottomNav">
+        <input type="submit" value="Previous" name="@ViewBag.PreviousWizardButton" />
+        <input type="submit" value="Next" name="@ViewBag.NextWizardButton" />
+    </div>
+}

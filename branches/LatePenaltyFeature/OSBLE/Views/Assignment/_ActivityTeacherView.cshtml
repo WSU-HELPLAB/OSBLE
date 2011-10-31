@@ -1,0 +1,69 @@
+﻿@using OSBLE.Models.Assignments.Activities
+@using OSBLE.Models;
+@model AbstractAssignmentActivity
+<script type="text/javascript">
+
+    function Ajaxfailed() {
+        alert('Failed to get information from the server try to refresh the page');
+    }
+
+</script>
+@*This page is for teachers only*@
+@if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+{
+
+    string accordionHeaderID = Model.ID.ToString();
+    string tableID = "table_" + Model.ID.ToString();
+    
+    
+@* Get submission's release date as start date *@
+    DateTime startDate = Model.ReleaseDate;
+@* Get the activity following the submission's release date as end date *@
+    DateTime endDate = ViewBag.EndDate;
+    <div class="activity_header" onclick="loadActivityContent(@Model.ID);">
+        
+        <a href="#">@Model.Name</a>
+          </div>
+    <div>
+        <table>
+            <tr>
+                <th>
+                    <span>Start Date</span>
+                </th>
+                <td>
+                    <span>@startDate.ToString()</span>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span>End Date</span>
+                </th>
+                <td>
+                    <span>@endDate.ToString()</span>
+                </td>
+            </tr>
+            @* Only show grading if points possible are greater than 0 *@
+            @if (Model.PointsPossible > 0)
+            {
+                <tr>
+                    <th>
+                        <span>Grading</span>
+                    </th>
+                    <td>
+                        <span>Worth @Model.PointsPossible points in <em>@Model.AbstractAssignment.Category.Name</em> category</span>
+                    </td>
+                </tr>    
+
+            }
+        </table>
+        <!--<text id="Loading">Please Wait...</text>-->
+        <div id="@(tableID)">
+            <div style="padding-top:1.5em; padding-bottom:1em;">
+                Loading, please wait... 
+                @Helpers.CreateToolTip(ToolTips.AssignmentLoadingError)
+            </div>
+        </div>
+        <div class="submission_deliverables_end">
+        </div>
+    </div>
+}
