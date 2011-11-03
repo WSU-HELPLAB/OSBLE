@@ -52,7 +52,9 @@ namespace OSBLE.Controllers
                 mail.Read = true;
                 
                 // Removes the notification once the email is read.
-                Notification n = db.Notifications.Find(id);
+                Notification n = (from notification in db.Notifications
+                                  where notification.ItemID == id
+                                  select notification).FirstOrDefault();
 
                 // Notification exists and belongs to current user.
                 if ((n != null) && (n.RecipientID == currentUser.ID))
