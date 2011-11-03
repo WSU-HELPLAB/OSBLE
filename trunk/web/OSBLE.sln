@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLE", "OSBLE\OSBLE.csproj", "{7297687F-BF8A-4195-8EA3-A05DA302B24E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudioTimelineCreation", "StudioTimelineCreation\StudioTimelineCreation.csproj", "{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsbleRubric", "OsbleRubric\OsbleRubric.csproj", "{4196777B-69DF-4B8C-95CF-D4487C34F03F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7297687F-BF8A-4195-8EA3-A05DA302B24E} = {7297687F-BF8A-4195-8EA3-A05DA302B24E}
@@ -17,22 +15,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SilverlightSandbox", "Silve
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
+		SccNumberOfProjects = 4
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = OSBLE\\OSBLE.csproj
 		SccProjectName1 = OSBLE
 		SccLocalPath1 = OSBLE
-		SccProjectUniqueName2 = StudioTimelineCreation\\StudioTimelineCreation.csproj
-		SccProjectName2 = StudioTimelineCreation
-		SccLocalPath2 = StudioTimelineCreation
-		SccProjectUniqueName3 = OsbleRubric\\OsbleRubric.csproj
-		SccProjectName3 = OsbleRubric
-		SccLocalPath3 = OsbleRubric
-		SccProjectUniqueName4 = SilverlightSandbox\\SilverlightSandbox.csproj
-		SccProjectName4 = SilverlightSandbox
-		SccLocalPath4 = SilverlightSandbox
+		SccProjectUniqueName2 = OsbleRubric\\OsbleRubric.csproj
+		SccProjectName2 = OsbleRubric
+		SccLocalPath2 = OsbleRubric
+		SccProjectUniqueName3 = SilverlightSandbox\\SilverlightSandbox.csproj
+		SccProjectName3 = SilverlightSandbox
+		SccLocalPath3 = SilverlightSandbox
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,14 +44,6 @@ Global
 		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.OSBLE Dev Server|Any CPU.Build.0 = Osble Dev Server|Any CPU
 		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}.OSBLE Deployment|Any CPU.ActiveCfg = OSBLE Deployment|Any CPU
-		{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}.OSBLE Deployment|Any CPU.Build.0 = OSBLE Deployment|Any CPU
-		{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}.OSBLE Dev Server|Any CPU.ActiveCfg = Osble Dev Server|Any CPU
-		{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}.OSBLE Dev Server|Any CPU.Build.0 = Osble Dev Server|Any CPU
-		{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9938AC1C-F9DD-4BC6-8B02-B970E9DAE90B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4196777B-69DF-4B8C-95CF-D4487C34F03F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4196777B-69DF-4B8C-95CF-D4487C34F03F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4196777B-69DF-4B8C-95CF-D4487C34F03F}.OSBLE Deployment|Any CPU.ActiveCfg = Release|Any CPU
