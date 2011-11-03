@@ -370,12 +370,14 @@ namespace OSBLE.Controllers
                             numberOfSubmissions++;
                             submissionInfo.LatePenaltyPercent = CalcualateLatePenaltyPercent(studioActivity, (TimeSpan)calculateLateness(studioActivity.AbstractAssignment.Category.Course, studioActivity, teamUser));
                             //Calculated the late penalty percent, should save to DB if there is a difference.
-                            if ((tempScore as Score).LatePenaltyPercent != submissionInfo.LatePenaltyPercent)
+                            if (tempScore != null)
                             {
-                                (tempScore as Score).LatePenaltyPercent = submissionInfo.LatePenaltyPercent;
-                                db.SaveChanges();
+                                if ((tempScore as Score).LatePenaltyPercent != submissionInfo.LatePenaltyPercent)
+                                {
+                                    (tempScore as Score).LatePenaltyPercent = submissionInfo.LatePenaltyPercent;
+                                    db.SaveChanges();
+                                }
                             }
-
                         }
 
                         //if team
