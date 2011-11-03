@@ -12,6 +12,7 @@ using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.Assignments;
+using System.Configuration;
 
 namespace OSBLE.Controllers
 {
@@ -114,21 +115,34 @@ namespace OSBLE.Controllers
         /// </summary>
         public OSBLEController()
         {
+            Initialize();
+        }
+
+        public OSBLEController(OSBLEContext context)
+        {
+            db = context;
+            Initialize();
+        }
+
+        private void Initialize()
+        {
             // If logged in, feed user profile to view.
-
-            if (context.User.Identity.IsAuthenticated)
+            if (Convert.ToBoolean(ConfigurationManager.AppSettings["RequireLoginValidation"]) == true)
             {
-                setupInitialDatabaseData();
+                if (context.User.Identity.IsAuthenticated)
+                {
+                    setupInitialDatabaseData();
 
-                setupMenu();
+                    setupMenu();
 
-                setCurrentUserProfile();
+                    setCurrentUserProfile();
 
-                GetEnrolledCourses();
+                    GetEnrolledCourses();
 
-                setCourseListTitle();
+                    setCourseListTitle();
 
-                setDashboardDisplayMode();
+                    setDashboardDisplayMode();
+                }
             }
         }
 
