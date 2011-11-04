@@ -368,7 +368,7 @@ namespace OSBLE.Controllers
                         if (submissionInfo.Time != null)
                         {
                             numberOfSubmissions++;
-                            submissionInfo.LatePenaltyPercent = CalcualateLatePenaltyPercent(studioActivity, (TimeSpan)calculateLateness(studioActivity.AbstractAssignment.Category.Course, studioActivity, teamUser));
+                            submissionInfo.LatePenaltyPercent = CalcualateLatePenaltyPercent(studioActivity, (TimeSpan?)calculateLateness(studioActivity.AbstractAssignment.Category.Course, studioActivity, teamUser));
                             //Calculated the late penalty percent, should save to DB if there is a difference.
                             if (tempScore != null)
                             {
@@ -635,12 +635,16 @@ namespace OSBLE.Controllers
                                              where aa.ID == assignmentActivityID
                                              select aa).FirstOrDefault();
 
-                    //getting the team user member's user ID to use with ModifiyGrade further down
+                    
+                    //Getting the team user member. Which will then be casted as a TeamMember or UserMember depending on whether or not 
+                    //it was a team assignment
                     var tum = (from tumember in db.TeamUsers
                                where tumember.ID == teamUserMemeberID
                                select tumember).FirstOrDefault();
 
                     string userIdentification = ""; //string for holdign the user identification
+
+                    //The if/else gets the user identification. Either for the TeamMember or UserMember based off wheather its a team
                     if (assignmentActivity.isTeam) //handle like team
                     {
                         TeamMember tm = tum as TeamMember;
@@ -655,7 +659,7 @@ namespace OSBLE.Controllers
                             
                         }
                     }
-                    else
+                    else //handle as individual
                     {
                         UserMember um = tum as UserMember;
                         int userID = um.UserProfileID;

@@ -380,18 +380,31 @@ namespace OSBLE.Controllers
             DateTime? dueDate = GetDueDate(activity);
             DateTime? submissionTime = GetSubmissionTime(course, activity, teamUser);
 
+            if (submissionTime < dueDate) //If the submission was before the due date. There is no lateness.
+                return null;
+
             TimeSpan? lateness = dueDate - submissionTime;
+
 
             return lateness;
         }
 
-        protected double CalcualateLatePenaltyPercent(AbstractAssignmentActivity activity, TimeSpan lateness)
+        protected double CalcualateLatePenaltyPercent(AbstractAssignmentActivity activity, TimeSpan? lateness)
         {
+            TimeSpan realLateness;
+            if (lateness == null)
+            {
+                return 0;
+            }
+            else
+            {
+                realLateness = (TimeSpan)lateness;  //Casting lateness into a TimeSpan so we can easily access its members
+            }
             //If the lateness is within the minutes late with no penlaty threshold, it will return 0 for LatePenaltyPercent. Otherwise continuing
-            if (activity.MinutesLateWithNoPenalty < Math.Abs((int)lateness.TotalMinutes))
+            if (activity.MinutesLateWithNoPenalty < Math.Abs((int)realLateness.TotalMinutes))
             {
                 //The hours late has surpassed the horsLateUntilZero, returning 100% late penalty
-                if (activity.HoursLateUntilZero < Math.Abs((int)(lateness.TotalHours)))
+                if (activity.HoursLateUntilZero < Math.Abs((int)(realLateness.TotalHours)))
                 {
                     //100 percent of points deducted for being late.... ouch :p
                     return 100.00;
@@ -400,12 +413,12 @@ namespace OSBLE.Controllers
                 {
                     //If the lateness is a negative number we need to find the absolute value of 
                     //that number for our calculations
-                    if (lateness.TotalHours < 0)
+                    if (realLateness.TotalHours < 0)
                     {
-                        lateness = lateness.Negate();
+                        realLateness = realLateness.Negate();
                     }
 
-                    if (lateness.TotalHours < activity.HoursLatePerPercentPenalty)
+                    if (realLateness.TotalHours < activity.HoursLatePerPercentPenalty)
                     {
                         return activity.PercentPenalty;
                     }
@@ -415,7 +428,7 @@ namespace OSBLE.Controllers
                         //Double the hours late per percent penalty and loop through until the lateness is 
                         //less than the hours.
                         int hoursLatePerPercentPenalty = activity.HoursLatePerPercentPenalty + activity.HoursLatePerPercentPenalty;
-                        while (lateness.TotalHours > hoursLatePerPercentPenalty)
+                        while (realLateness.TotalHours > hoursLatePerPercentPenalty)
                         {
                             hoursLatePerPercentPenalty += activity.HoursLatePerPercentPenalty;
                         }
@@ -631,7 +644,6 @@ namespace OSBLE.Controllers
                         else if (lateness != null) //asigning late penalty if there is lateness
                         {
                             latePenalty = CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
-                            latePenalty = (100 - latePenalty) / 100;
                             value = (value * ((100 - latePenalty) / 100));
                         }
 
@@ -664,7 +676,6 @@ namespace OSBLE.Controllers
                             if (lateness != null) //calculating late penalty if there is lateness
                             {
                                 latePenalty = CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
-                                latePenalty = (100 - latePenalty) / 100;
                                 value = (value * ((100 - latePenalty) / 100));
                             }
 

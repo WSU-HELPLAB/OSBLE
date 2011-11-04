@@ -180,7 +180,7 @@
     function publishAll() {
         var actID = @ViewBag.activityID;
             $.ajax({
-            async: true,
+            async: false,
             url: "/Assignment/ConvertAllDrafts",
             data: { assignmentActivityID: actID }
         });
@@ -227,8 +227,8 @@
 
 <div>
     <p>
-        <text>@ViewBag.NumberOfSubmissions of @ViewBag.ExpectedSubmissionsAndGrades submissions have been recieved.</text> <br />
-        <text>@ViewBag.DraftMsg1</text><a onclick=openPublishWindow(); style="text-decoration: underline">Publish All</a>
+        <text>@ViewBag.NumberOfSubmissions of @ViewBag.ExpectedSubmissionsAndGrades submissions have been recieved. </text> <br />
+        <text>@ViewBag.DraftMsg1</text><a onclick=openPublishWindow(); style="text-decoration: underline; cursor: pointer">Publish All</a>
         
         <br />
         <text>@ViewBag.DraftMsg2</text>
