@@ -131,7 +131,8 @@
                                 //we create our JavaScript string this is where it runs the code it just generated.
                                 @MvcHtmlString.Create(newString);
                             </script>
-                                <input type='file' name='files' onchange="checkFileExension(this, @MvcHtmlString.Create("stringArray" + fileUploadsSoFar.ToString()))"/>
+                                <input type="hidden" name="MAX_FILE_SIZE" value="@(ViewBag.MaxFileSizeMB * 1024)" />
+                                <input type="file" name="files" onchange="checkFileExension(this, @MvcHtmlString.Create("stringArray" + fileUploadsSoFar.ToString()))"/>
                                 <em>Your submission must be less than @(ViewBag.MaxFileSizeMB)mb.</em>
                             @{
                                 fileUploadsSoFar++;
