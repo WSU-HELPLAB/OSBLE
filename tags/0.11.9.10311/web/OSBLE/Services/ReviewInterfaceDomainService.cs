@@ -44,11 +44,6 @@
         //This needs to get the document locations and return their real location that the client side can open
         public IQueryable<DocumentLocation> GetDocumentLocations()
         {
-            /*Int64 temp = 0;
-            while (temp < 1000000000)
-            {
-                temp++;
-            }*/
             string path = FileSystem.GetTeamUserSubmissionFolder(false, currentCourse as Course, activity.ID, teamUser);
 
             List<DocumentLocation> documentsToBeReviewed = new List<DocumentLocation>();
@@ -75,11 +70,6 @@
 
         public IQueryable<DocumentLocation> GetPeerReviewLocations()
         {
-            /*Int64 i = 0;
-            while (i < 1000000000)
-            {
-                i++;
-            }*/
             string path = FileSystem.GetTeamUserPeerReview(false, currentCourse as Course, activity.ID, teamUser.ID);
 
             FileInfo file = new FileInfo(path);
