@@ -292,9 +292,7 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="ClientBin\EditPeerReview.xap" />
-    <Content Include="ClientBin\FileUploader.xap" />
     <Content Include="ClientBin\OsbleRubric.xap" />
-    <Content Include="ClientBin\PeerReview.xap" />
     <Content Include="ClientBin\SilverlightSandbox.xap" />
     <Content Include="ClientBin\StudioTimelineCreation.xap" />
     <Content Include="ClientBin\TeamCreation.xap" />
