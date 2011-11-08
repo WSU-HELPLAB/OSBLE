@@ -28,5 +28,5 @@ using System.Runtime.InteropServices;
 //      Build Year
 //      Build Month
 //      Codeplex Check-in Number
-[assembly: AssemblyVersion("0.11.9.10311")]
-[assembly: AssemblyFileVersion("0.11.9.10311")]
+[assembly: AssemblyVersion("0.11.9.10888")]
+[assembly: AssemblyFileVersion("0.11.9.10888")]
