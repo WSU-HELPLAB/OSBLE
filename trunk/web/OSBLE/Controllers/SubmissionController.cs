@@ -9,6 +9,7 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
+using Ionic.Zip;
 
 namespace OSBLE.Controllers
 {
@@ -74,7 +75,8 @@ namespace OSBLE.Controllers
 
                 if (score != null)
                 {
-                    throw new Exception("Cannot submit to an assignmentActivity that already has a score");
+                    if(score.Points != -1)
+                        throw new Exception("Cannot submit to an assignmentActivity that already has a score");
                 }
 
                 //purposefully not using the is statement as we also want to make sure it is not a null SubmissionActivity
@@ -124,8 +126,23 @@ namespace OSBLE.Controllers
                                             }
                                         }
                                         FileSystem.RemoveZipFile(activeCourse.AbstractCourse as Course, activity, teamUser);
-                                        var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, teamUser), deliverables[i].Name + extension);
+                                        string path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, teamUser), deliverables[i].Name + extension);
                                         file.SaveAs(path);
+
+                                        //unzip and rezip xps files because some XPS generators don't do it right
+                                        if (extension.ToLower().CompareTo(".xps") == 0)
+                                        {
+                                            string extractPath = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, teamUser), "extract");
+                                            using (ZipFile oldZip = ZipFile.Read(path))
+                                            {
+                                                oldZip.ExtractAll(extractPath, ExtractExistingFileAction.OverwriteSilently);
+                                            }
+                                            using (ZipFile newZip = new ZipFile())
+                                            {
+                                                newZip.AddDirectory(extractPath);
+                                                newZip.Save(path);
+                                            }
+                                        }
 
                                         DateTime? dueDate = GetDueDate(activity);
                                         if (dueDate != null && dueDate < DateTime.Now)
