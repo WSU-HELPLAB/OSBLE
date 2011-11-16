@@ -221,11 +221,6 @@ namespace OSBLE.Controllers
             // gets the current courseid
             mail.ContextID = (int)context.Session["ActiveCourse"];
 
-
-/*****************************************************************************************************
-            // might need to be changed to get from teams, ill 
-*****************************************************************************************************/
-
             CourseUser studentRec = db.CourseUsers.Where(c => (c.UserProfileID == id) && (c.AbstractCourseID == mail.ContextID)).FirstOrDefault();
             if (studentRec != null)
             {

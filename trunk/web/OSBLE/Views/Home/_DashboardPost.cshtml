@@ -68,7 +68,7 @@
                 <span class="dp_tools">
                 @if (Model.CanMail)
                 {
-                    <a title="Mail This User" href="@Url.Action("Create", "Mail", new { id = Model.UserProfileID })">@Helpers.MailButton()</a>
+                    <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = Model.UserProfileID })">@Helpers.MailButton()</a>
                 }
                 @if (Model.CanDelete)
                 {
