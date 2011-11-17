@@ -20,6 +20,24 @@ namespace OSBLE.Controllers
         {
             ViewBag.BoxHeader = "Inbox";
             var mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID).OrderByDescending(m => m.Posted);
+            // This is only needed for repopulating the database after the context is changed from a virtual Course to a string
+            foreach (Mail mail in mails)
+            {
+                // gets the current course or community
+                Course course = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
+                if (course == null)
+                {
+                    Community community = db.Communities.Where(c => c.ID == mail.ContextID).FirstOrDefault();
+                    if (community != null)
+                    {
+                        mail.Context = community.Nickname;
+                    }
+                }
+                else
+                {
+                    mail.Context = course.Prefix + " " + course.Number;
+                }
+            }
             return View(mails.ToList());
         }
 
@@ -118,9 +136,6 @@ namespace OSBLE.Controllers
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            // gets the current courseid
-            mail.ContextID = (int)context.Session["ActiveCourse"];
-
             Session["mail_recipients"] = recipientList;
             return View(mail);
         }
@@ -135,9 +150,6 @@ namespace OSBLE.Controllers
             {
                 if ((mail = db.Mails.Find(replyto)) != null)
                 {
-                    // gets the current courseid
-                    mail.ContextID = (int)context.Session["ActiveCourse"];
-
                     recipientList.Add(mail.FromUserProfile); //Adds the sender to the reply list
                     ViewBag.MailHeader = mail.Subject = "RE: " + mail.Subject;
                     // Prefix each line with a '> '
@@ -161,8 +173,6 @@ namespace OSBLE.Controllers
             {
                 if ((mail = db.Mails.Find(replyto)) != null)
                 {
-                    // gets the current courseid
-                    mail.ContextID = (int)context.Session["ActiveCourse"];
                     recipientList = (from m in db.Mails
                                      where m.ThreadID == replyto &&
                                      m.ToUserProfileID != currentUser.ID
@@ -193,9 +203,6 @@ namespace OSBLE.Controllers
             {
                 if ((mail = db.Mails.Find(forwardto)) != null)
                 {
-                    // gets the current courseid
-                    mail.ContextID = (int)context.Session["ActiveCourse"];
-
                     ViewBag.MailHeader = mail.Subject = "FW: " + mail.Subject;
                     // Prefix each line with a '> '
                     mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
@@ -215,9 +222,6 @@ namespace OSBLE.Controllers
 
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
-
-            // gets the current courseid
-            mail.ContextID = (int)context.Session["ActiveCourse"];
 
             List<CoursesUsers> instructors = db.CoursesUsers.Where(c => (c.AbstractCourseID == mail.ContextID) && (c.AbstractRole.Name == "Instructor")).ToList();
             if (instructors != null)
@@ -239,9 +243,6 @@ namespace OSBLE.Controllers
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            // gets the current courseid
-            mail.ContextID = (int)context.Session["ActiveCourse"];
-
             List<CoursesUsers> tas = db.CoursesUsers.Where(c => (c.AbstractCourseID == mail.ContextID) && (c.AbstractRole.Name == "TA")).ToList();
             if (tas != null)
             {
@@ -261,9 +262,6 @@ namespace OSBLE.Controllers
 
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
-
-            // gets the current courseid
-            mail.ContextID = (int)context.Session["ActiveCourse"];
 
             List<CoursesUsers> instructorTA = db.CoursesUsers.Where(c => (c.AbstractCourseID == mail.ContextID) && (c.AbstractRole.Name == "Instructor" || c.AbstractRole.Name == "TA")).ToList();
             if (instructorTA != null)
@@ -285,9 +283,6 @@ namespace OSBLE.Controllers
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            // gets the current courseid
-            mail.ContextID = (int)context.Session["ActiveCourse"];
-
             CoursesUsers studentRec = db.CoursesUsers.Where(c => (c.UserProfileID == id) && (c.AbstractCourseID == mail.ContextID)).FirstOrDefault();
             if (studentRec != null)
             {
@@ -305,9 +300,6 @@ namespace OSBLE.Controllers
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            // gets the current courseid
-            mail.ContextID = (int)context.Session["ActiveCourse"];
-
             CoursesUsers studentRec = db.CoursesUsers.Where(c => (c.UserProfileID == id) && (c.AbstractCourseID == mail.ContextID)).FirstOrDefault();
             if (studentRec != null)
             {
@@ -324,9 +316,6 @@ namespace OSBLE.Controllers
 
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
-
-            // gets the current courseid
-            mail.ContextID = (int)context.Session["ActiveCourse"];
 
             var team = (from t in db.Teams
                         where t.ID == teamID
@@ -354,8 +343,22 @@ namespace OSBLE.Controllers
                 string recipient_string = Request.Params["recipientlist"];
                 string[] recipients;
 
-                // gets the current course
-                mail.Context = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
+                mail.ContextID = activeCourse.AbstractCourseID;
+
+                // gets the current course or community
+                Course course = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
+                if (course == null)
+                {
+                    Community community = db.Communities.Where(c => c.ID == mail.ContextID).FirstOrDefault();
+                    if (community != null)
+                    {
+                        mail.Context = community.Nickname;
+                    }
+                }
+                else
+                {
+                    mail.Context = course.Prefix + " " + course.Number;
+                }
 
                 if (recipient_string != null)
                 {

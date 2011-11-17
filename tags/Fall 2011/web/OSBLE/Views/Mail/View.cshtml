@@ -14,6 +14,7 @@
 </style>
 
 <h2>Subject:  @Model.Subject</h2>
+<p>Sent at: @Model.Posted.ToString()</p>
     <div class="mail_user">
         <b>From:</b><br />
         @Helpers.ProfilePicture(@Url.Action("ProfilePicture", new { ID = Model.FromUserProfileID }))
