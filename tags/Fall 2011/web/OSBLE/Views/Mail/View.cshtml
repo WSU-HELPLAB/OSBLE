@@ -130,7 +130,9 @@
     }
     <br /><br />
     
-    @Html.ActionLink("Back to Inbox", "Index")
+    @Html.ActionLink("Previous Message", "View", new { id = Model.ID - 1 }) <a>&nbsp;</a>
+    @Html.ActionLink("Back to Inbox\t", "Index") <a>&nbsp;</a>
+    @Html.ActionLink("Next Message", "View", new { id = Model.ID + 1 })
 }
 else
 {
