@@ -395,6 +395,7 @@ namespace OSBLE.Controllers
                         {
                             submissionInfo.isTeam = false;
                             submissionInfo.SubmitterID = teamUser.ID;
+                            submissionInfo.TeamID = (teamUser as UserMember).UserProfileID;
                             submissionInfo.Name = (teamUser as UserMember).UserProfile.LastName + ", " + (teamUser as UserMember).UserProfile.FirstName;
                         }
 

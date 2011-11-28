@@ -287,6 +287,7 @@
                 }
                 else
                 { 
+                    <a title="Email to" href="@Url.Action("CreateUser", "Mail", new { id = info.TeamID })">@Helpers.MailButton()</a>
                     @info.Name
                 }
                 <div id="@nameID">
@@ -337,8 +338,8 @@
                     {  
                         
                             @Html.ActionLink(userScore.Points.ToString() + "%", "Index", "Rubric", new { abstractAssignmentActivityId = ViewBag.activityID, teamUserId = info.SubmitterID }, new { })
-                            //Here we have a graded rubric, display as norm
-                        
+                        //Here we have a graded rubric, display as norm
+
                     }
                     else
                     {
@@ -350,7 +351,7 @@
                 {
                     if (hasRubric)
                     {
-                        if (info.DraftSaveTime == null) 
+                        if (info.DraftSaveTime == null)
                         {
                             //not a draft
                             @Html.ActionLink("Not Graded", "Index", "Rubric", new { abstractAssignmentActivityId = ViewBag.activityID, teamUserId = info.SubmitterID }, new { @style = "color: Red; text-align: center" })
