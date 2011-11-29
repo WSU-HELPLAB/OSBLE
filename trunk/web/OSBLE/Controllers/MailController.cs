@@ -130,10 +130,7 @@ namespace OSBLE.Controllers
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            // gets the current courseid
-            mail.ContextID = (int)context.Session["ActiveCourse"];
-
-            List<CourseUser> instructors = db.CourseUsers.Where(c => (c.AbstractCourseID == mail.ContextID) && (c.AbstractRole.Name == "Instructor")).ToList();
+            List<CourseUser> instructors = db.CourseUsers.Where(c => (c.AbstractRole.Name == "Instructor")).ToList();
             if (instructors != null)
             {
                 foreach (CourseUser cu in instructors)
@@ -152,10 +149,7 @@ namespace OSBLE.Controllers
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            // gets the current courseid
-            mail.ContextID = (int)context.Session["ActiveCourse"];
-
-            List<CourseUser> tas = db.CourseUsers.Where(c => (c.AbstractCourseID == mail.ContextID) && (c.AbstractRole.Name == "TA")).ToList();
+            List<CourseUser> tas = db.CourseUsers.Where(c => (c.AbstractRole.Name == "TA")).ToList();
             if (tas != null)
             {
                 foreach (CourseUser cu in tas)
@@ -175,10 +169,7 @@ namespace OSBLE.Controllers
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            // gets the current courseid
-            mail.ContextID = (int)context.Session["ActiveCourse"];
-
-            List<CourseUser> instructorTA = db.CourseUsers.Where(c => (c.AbstractCourseID == mail.ContextID) && (c.AbstractRole.Name == "Instructor" || c.AbstractRole.Name == "TA")).ToList();
+            List<CourseUser> instructorTA = db.CourseUsers.Where(c => (c.AbstractRole.Name == "Instructor" || c.AbstractRole.Name == "TA")).ToList();
             if (instructorTA != null)
             {
                 foreach (CourseUser cu in instructorTA)
@@ -198,10 +189,7 @@ namespace OSBLE.Controllers
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            // gets the current courseid
-            mail.ContextID = (int)context.Session["ActiveCourse"];
-
-            CourseUser studentRec = db.CourseUsers.Where(c => (c.UserProfileID == id) && (c.AbstractCourseID == mail.ContextID)).FirstOrDefault();
+            CourseUser studentRec = db.CourseUsers.Where(c => (c.UserProfileID == id)).FirstOrDefault();
             if (studentRec != null)
             {
                 recipientList.Add(studentRec.UserProfile);
@@ -218,10 +206,7 @@ namespace OSBLE.Controllers
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            // gets the current courseid
-            mail.ContextID = (int)context.Session["ActiveCourse"];
-
-            CourseUser studentRec = db.CourseUsers.Where(c => (c.UserProfileID == id) && (c.AbstractCourseID == mail.ContextID)).FirstOrDefault();
+            CourseUser studentRec = db.CourseUsers.Where(c => (c.UserProfileID == id)).FirstOrDefault();
             if (studentRec != null)
             {
                 recipientList.Add(studentRec.UserProfile);
@@ -237,9 +222,6 @@ namespace OSBLE.Controllers
 
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
-
-            // gets the current courseid
-            mail.ContextID = (int)context.Session["ActiveCourse"];
 
             var team_ids = (from t in db.TeamMembers
                             where t.TeamID == teamID

@@ -253,7 +253,7 @@ namespace OSBLE.Controllers
 
             AbstractCourse course = db.AbstractCourses.Find(n.CourseID);
 
-            string subject = "[OSBLE" + getCourseTag(course) + "] "; // Email subject prefix
+            string subject = "[" + getCourseTag(course) + "] "; // Email subject prefix
 
             string body = "";
 
