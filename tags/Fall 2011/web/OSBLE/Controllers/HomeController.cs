@@ -408,7 +408,7 @@ namespace OSBLE.Controllers
                 {
                     c = (AbstractCourse)cu.AbstractCourse;
                 }
-                if (cu.AbstractRole.CanGrade || ((c != null) && (c.AllowDashboardPosts)))
+                if ((cu.AbstractRole.CanGrade || ((c != null) && (c.AllowDashboardPosts))) && !cu.AbstractRole.Anonymized)
                 {
                     DashboardPost newDp = new DashboardPost();
                     newDp.Content = dp.Content;
