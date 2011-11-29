@@ -276,19 +276,49 @@ namespace OSBLE.Controllers
                 case Notification.Types.EventApproval:
                     subject += "Event approval request from " + sender.FirstName + " " + sender.LastName;
 
-                    body = sender.FirstName + " " + sender.LastName + " is requesting a course event posting to be approved.";
+                    body = sender.FirstName + " " + sender.LastName + " has requested your approval of an event posting.";
 
                     action = "approve/reject this event.";
 
                     break;
                 case Notification.Types.Dashboard:
-                    subject += "Dashboard Message Reply from " + sender.FirstName + " " + sender.LastName;
+                    subject += "Activity Feed Reply from " + sender.FirstName + " " + sender.LastName;
 
-                    body = sender.FirstName + " " + sender.LastName + " has posted in a dashboard thread that you have participated in.";
+                    body = sender.FirstName + " " + sender.LastName + " has posted to an activity feed thread in which you have participated.";
 
-                    action = "view this dashboard thread.";
+                    action = "view this activity feed thread.";
 
                     break;
+                case Notification.Types.FileSubmitted:
+                    subject += "New Assignment Submmission from " + sender.FirstName + " " + sender.LastName;
+
+                    body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
+
+                    action = "view this assignment submission.";
+
+                    break;
+                case Notification.Types.RubricEvaluationCompleted:
+                    subject += sender.FirstName + " " + sender.LastName + "has published a rubric  Assignment Submmission from ";
+
+                    body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
+
+                    action = "view this assignment submission.";
+
+                    break;
+                case Notification.Types.InlineReviewCompleted:
+                    subject += sender.FirstName + " " + sender.LastName + "has published a rubric  Assignment Submmission from ";
+
+                    body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
+
+                    action = "view this assignment submission.";
+
+                    break;
+                default:
+                    subject += "No Email set up for this type of notification";
+
+                    body = "No Email set up for this type of notification";
+                    break;
+
             }
 
             body += "\n\n---\nDo not reply to this email.\nVisit this link to " + action + ": " + getDispatchURL(n.ID);

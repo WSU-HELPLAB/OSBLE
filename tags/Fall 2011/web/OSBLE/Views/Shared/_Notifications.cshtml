@@ -3,7 +3,7 @@
     @foreach (Notification n in ViewBag.Notifications)
     {
         <li id="notification_@(n.ID)" @if (n.Read)
-                                      {<text>class="read"</text>}><small>@n.Posted.ToShortDateString() @n.Posted.ToShortTimeString() @n.Read</small>&nbsp;
+                                      {<text>class="read"</text>}><small>@n.Posted.ToShortDateString() @n.Posted.ToShortTimeString()</small>&nbsp;
             @if (ViewBag.ShowNotificationDelete == true)
             {
                 <div class="notification_tools">

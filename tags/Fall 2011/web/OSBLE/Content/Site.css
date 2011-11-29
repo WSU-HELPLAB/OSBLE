@@ -872,7 +872,7 @@ body#layoutLogOn
 	width: 950px;
 }
 
-.inbox_table td
+.inbox_table td, .inbox_table th
 {
 	text-align: left;
 }
@@ -904,25 +904,42 @@ body#layoutLogOn
 	font-weight: bold;
 }
 
-.inbox_time
+.inbox_time, .inbox_time_header
 {
-	width: 130px;
+	width: 140px;
 }
 
-.inbox_context
+.inbox_context, .inbox_context_header
 {
-    width: 75px;
+    width: 85px;
 }
 
-.inbox_subject
+.inbox_from, .inbox_from_header
+{
+    width: 180px;
+}
+
+.inbox_subject, .inbox_subject_header
 {
 }
 
-.inbox_table td.inbox_tools
+.inbox_table td.inbox_tools, .inbox_table td.inbox_tools_header
 {
 	width: 50px;
 	text-align: right;
 	padding-right: 5px;
+}
+
+.inbox_time_header, .inbox_context_header, .inbox_from_header, .inbox_subject_header, .inbox_tools_header
+{
+    font-weight: bold;
+    background-color:Silver;
+}
+
+.inbox_time_header:hover, .inbox_context_header:hover, .inbox_from_header:hover, .inbox_subject_header:hover
+{
+    background-color:#cacaca;
+    cursor:pointer;
 }
 
 .mail_user

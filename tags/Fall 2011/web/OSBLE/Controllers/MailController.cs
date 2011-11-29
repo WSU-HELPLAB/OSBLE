@@ -21,23 +21,23 @@ namespace OSBLE.Controllers
             ViewBag.BoxHeader = "Inbox";
             var mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID).OrderByDescending(m => m.Posted);
             // This is only needed for repopulating the database after the context is changed from a virtual Course to a string
-            foreach (Mail mail in mails)
-            {
-                // gets the current course or community
-                Course course = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
-                if (course == null)
-                {
-                    Community community = db.Communities.Where(c => c.ID == mail.ContextID).FirstOrDefault();
-                    if (community != null)
-                    {
-                        mail.Context = community.Nickname;
-                    }
-                }
-                else
-                {
-                    mail.Context = course.Prefix + " " + course.Number;
-                }
-            }
+            //foreach (Mail mail in mails)
+            //{
+            //    // gets the current course or community
+            //    Course course = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
+            //    if (course == null)
+            //    {
+            //        Community community = db.Communities.Where(c => c.ID == mail.ContextID).FirstOrDefault();
+            //        if (community != null)
+            //        {
+            //            mail.Context = community.Nickname;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        mail.Context = course.Prefix + " " + course.Number;
+            //    }
+            //}
             return View(mails.ToList());
         }
 
