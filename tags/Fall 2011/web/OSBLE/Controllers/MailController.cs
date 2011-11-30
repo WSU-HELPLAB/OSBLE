@@ -20,6 +20,7 @@ namespace OSBLE.Controllers
         {
             ViewBag.BoxHeader = "Inbox";
             var mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID).OrderByDescending(m => m.Posted);
+
             // This is only needed for repopulating the database after the context is changed from a virtual Course to a string
             //foreach (Mail mail in mails)
             //{
@@ -34,6 +35,7 @@ namespace OSBLE.Controllers
             //        mail.Context = (course as Course).Prefix + " " + (course as Course).Number;
             //    }
             //}
+
             return View(mails.ToList());
         }
 
