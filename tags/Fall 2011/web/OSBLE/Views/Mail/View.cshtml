@@ -130,7 +130,7 @@
     }
     <br /><br />
     //will need to pass something in view bag to indicate
-    if (Model.ID - 1 != null)
+    if (ViewBag.IsOlder == true)
     {
         @Html.ActionLink("Older", "View", new { id = Model.ID - 1 }) <a>&nbsp;</a>
     }
@@ -139,7 +139,7 @@
     }
     @Html.ActionLink("Back to Inbox\t", "Index") <a>&nbsp;</a>
     //will need to pass something in view bag to indicate
-    if (Model.ID + 1 != null)  
+    if (ViewBag.IsNewer == true)  
     {
         @Html.ActionLink("Newer", "View", new { id = Model.ID + 1 })
     }

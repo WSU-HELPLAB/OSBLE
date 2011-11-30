@@ -87,6 +87,19 @@ namespace OSBLE.Controllers
             List<UserProfile> recipients = (from m in db.Mails
                                             where m.ThreadID == mail.ThreadID 
                                             select m.ToUserProfile).ToList();
+            var isNewer = true;
+            if (db.Mails.Find(id + 1) == null)
+            {
+                isNewer = false;
+            }
+            ViewBag.IsNewer = isNewer;
+
+            var isOlder = true;
+            if (db.Mails.Find(id - 1) == null)
+            {
+                isOlder = false;
+            }
+            ViewBag.IsOlder = isOlder;
 
             ViewBag.AllRecipients = recipients;
             return View(mail);
