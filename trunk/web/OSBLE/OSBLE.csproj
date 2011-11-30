@@ -171,7 +171,6 @@
     <Compile Include="Attributes\IsCommunity.cs" />
     <Compile Include="Attributes\NotForCommunity.cs" />
     <Compile Include="Controllers\AssignmentController.cs" />
-    <Compile Include="Controllers\Assignments\WizardController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\BasicsController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\RubricController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\DeliverablesController.cs" />
@@ -458,7 +457,6 @@
     <Content Include="Content\themes\base\jquery.ui.slider.css" />
     <Content Include="Content\themes\base\jquery.ui.tabs.css" />
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
-    <Content Include="Controllers\Assignments\README.txt" />
     <Content Include="Areas\AssignmentWizard\Controllers\README.txt" />
     <Content Include="crossdomain.xml" />
     <Content Include="EditPeerReviewTestPage.aspx" />
@@ -535,7 +533,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Controllers\Assignments\Wizard\" />
     <Folder Include="Models\Wizard\" />
     <Folder Include="Validations\" />
     <Folder Include="Views\Assignments\Wizard\" />
