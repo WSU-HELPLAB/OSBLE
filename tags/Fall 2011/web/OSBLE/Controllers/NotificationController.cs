@@ -251,9 +251,13 @@ namespace OSBLE.Controllers
             UserProfile sender = db.UserProfiles.Find(n.SenderID);
             UserProfile recipient = db.UserProfiles.Find(n.RecipientID);
 
-            AbstractCourse course = db.AbstractCourses.Find(n.CourseID);
+            AbstractCourse course = db.AbstractCourses.Where(b => b.ID == n.CourseID).FirstOrDefault();
 
-            string subject = "[" + getCourseTag(course) + "] "; // Email subject prefix
+            string subject = "";
+            if (getCourseTag(course) != null)
+            {
+                subject = "[" + getCourseTag(course) + "] "; // Email subject prefix
+            }
 
             string body = "";
 
