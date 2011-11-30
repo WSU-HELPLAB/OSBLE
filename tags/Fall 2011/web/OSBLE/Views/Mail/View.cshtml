@@ -129,10 +129,23 @@
         //@Helpers.CreateToolTip(ToolTips.MailDelete)
     }
     <br /><br />
-    
-    @Html.ActionLink("Previous Message", "View", new { id = Model.ID - 1 }) <a>&nbsp;</a>
+    //will need to pass something in view bag to indicate
+    if (Model.ID - 1 != null)
+    {
+        @Html.ActionLink("Older", "View", new { id = Model.ID - 1 }) <a>&nbsp;</a>
+    }
+    else{
+        <a>Older &nbsp;</a>
+    }
     @Html.ActionLink("Back to Inbox\t", "Index") <a>&nbsp;</a>
-    @Html.ActionLink("Next Message", "View", new { id = Model.ID + 1 })
+    //will need to pass something in view bag to indicate
+    if (Model.ID + 1 != null)  
+    {
+        @Html.ActionLink("Newer", "View", new { id = Model.ID + 1 })
+    }
+    else{
+        <a>Newer &nbsp;</a>
+    }
 }
 else
 {

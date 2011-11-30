@@ -24,18 +24,14 @@ namespace OSBLE.Controllers
             //foreach (Mail mail in mails)
             //{
             //    // gets the current course or community
-            //    Course course = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
-            //    if (course == null)
+            //    AbstractCourse course = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
+            //    if ((course as Course).Prefix == null)
             //    {
-            //        Community community = db.Communities.Where(c => c.ID == mail.ContextID).FirstOrDefault();
-            //        if (community != null)
-            //        {
-            //            mail.Context = community.Nickname;
-            //        }
+            //        mail.Context = (course as Community).Nickname;
             //    }
             //    else
             //    {
-            //        mail.Context = course.Prefix + " " + course.Number;
+            //        mail.Context = (course as Course).Prefix + " " + (course as Course).Number;
             //    }
             //}
             return View(mails.ToList());
@@ -346,18 +342,14 @@ namespace OSBLE.Controllers
                 mail.ContextID = activeCourse.AbstractCourseID;
 
                 // gets the current course or community
-                Course course = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
-                if (course == null)
+                AbstractCourse course = db.AbstractCourses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
+                if ((course as Course).Prefix == null)
                 {
-                    Community community = db.Communities.Where(c => c.ID == mail.ContextID).FirstOrDefault();
-                    if (community != null)
-                    {
-                        mail.Context = community.Nickname;
-                    }
+                    mail.Context = (course as Community).Nickname;
                 }
                 else
                 {
-                    mail.Context = course.Prefix + " " + course.Number;
+                    mail.Context = (course as Course).Prefix + " " + (course as Course).Number;
                 }
 
                 if (recipient_string != null)
