@@ -24,7 +24,7 @@ namespace OSBLE.Controllers
             //foreach (Mail mail in mails)
             //{
             //    // gets the current course or community
-            //    AbstractCourse course = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
+            //    var course = db.AbstractCourses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
             //    if ((course as Course).Prefix == null)
             //    {
             //        mail.Context = (course as Community).Nickname;
