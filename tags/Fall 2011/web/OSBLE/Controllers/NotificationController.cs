@@ -42,6 +42,14 @@ namespace OSBLE.Controllers
                         return RedirectToAction("Approval", "Event", new { ID = n.ItemID });
                     case Notification.Types.Dashboard:
                         return RedirectToAction("ViewThread", "Home", new { ID = n.ItemID });
+                    case Notification.Types.FileSubmitted:
+                        // need to return to the file submitted.
+                        break;
+                    case Notification.Types.InlineReviewCompleted:
+                        return RedirectToAction("Details", "PeerReview", new { ID = n.ItemID });
+                    case Notification.Types.RubricEvaluationCompleted:
+                        return RedirectToAction("View", "Rubric", new { abstractAssignmentActivityId = n.ItemID, teamUserId = n.SenderID });
+
                 }
             }
 
@@ -318,7 +326,7 @@ namespace OSBLE.Controllers
 
                     break;
                 default:
-                    subject += "No Email set up for this type of notification";
+                    subject += "No Email set up for this type of notification type: " + n.ItemType;
 
                     body = "No Email set up for this type of notification";
                     break;

@@ -129,7 +129,6 @@
         //@Helpers.CreateToolTip(ToolTips.MailDelete)
     }
     <br /><br />
-    //will need to pass something in view bag to indicate
     if (ViewBag.IsOlder == true)
     {
         @Html.ActionLink("Older", "View", new { id = Model.ID - 1 }) <a>&nbsp;</a>
@@ -138,7 +137,6 @@
         <a>Older &nbsp;</a>
     }
     @Html.ActionLink("Back to Inbox\t", "Index") <a>&nbsp;</a>
-    //will need to pass something in view bag to indicate
     if (ViewBag.IsNewer == true)  
     {
         @Html.ActionLink("Newer", "View", new { id = Model.ID + 1 })
