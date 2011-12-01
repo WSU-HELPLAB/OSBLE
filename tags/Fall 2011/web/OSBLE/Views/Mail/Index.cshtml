@@ -1,5 +1,6 @@
 ﻿@model IEnumerable<OSBLE.Models.Users.Mail>
 @using OSBLE.Models
+@using OSBLE.Models.Courses
 
 @{
     ViewBag.Title = "Mail";
@@ -44,7 +45,16 @@
             <td id="1" class="inbox_context">
                 @if (item.Context != null)
                 {
-                    <small>@item.Context</small>
+                    if (item.Context is Course)
+                    {
+                        Course c = item.Context as Course;
+                        <small>@String.Format("{0} {1}", c.Prefix, c.Number)</small>
+                    }
+                    else if (item.Context is Community)
+                    {
+                        Community comm = item.Context as Community;
+                        <small>@comm.Nickname</small>
+                    }
                 }
             </td>
             <td id="2" class="inbox_from">

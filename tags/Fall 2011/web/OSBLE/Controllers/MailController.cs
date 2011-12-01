@@ -20,22 +20,6 @@ namespace OSBLE.Controllers
         {
             ViewBag.BoxHeader = "Inbox";
             var mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID).OrderByDescending(m => m.Posted);
-
-            // This is only needed for repopulating the database after the context is changed from a virtual Course to a string
-            //foreach (Mail mail in mails)
-            //{
-            //    // gets the current course or community
-            //    var course = db.AbstractCourses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
-            //    if ((course as Course).Prefix == null)
-            //    {
-            //        mail.Context = (course as Community).Nickname;
-            //    }
-            //    else
-            //    {
-            //        mail.Context = (course as Course).Prefix + " " + (course as Course).Number;
-            //    }
-            //}
-
             return View(mails.ToList());
         }
 
@@ -356,17 +340,6 @@ namespace OSBLE.Controllers
 
                 mail.ContextID = activeCourse.AbstractCourseID;
 
-                // gets the current course or community
-                AbstractCourse course = db.AbstractCourses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
-                if ((course as Course).Prefix == null)
-                {
-                    mail.Context = (course as Community).Nickname;
-                }
-                else
-                {
-                    mail.Context = (course as Course).Prefix + " " + (course as Course).Number;
-                }
-
                 if (recipient_string != null)
                 {
                     recipients = recipient_string.Split(',');
@@ -383,7 +356,6 @@ namespace OSBLE.Controllers
                         newMail.Message = mail.Message;
                         newMail.ThreadID = threadID;
                         newMail.ContextID = mail.ContextID;
-                        newMail.Context = mail.Context;
 
                         //need to create the mail before we can send the notification and set the threadID
                         db.Mails.Add(newMail);

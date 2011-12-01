@@ -17,7 +17,7 @@ namespace OSBLE.Models.Users
         [Required]
         public int ContextID { get; set; }
 
-        public string Context { get; set; }
+        public virtual AbstractCourse Context { get; set; }
 
         [Required]
         public int FromUserProfileID { get; set; }
