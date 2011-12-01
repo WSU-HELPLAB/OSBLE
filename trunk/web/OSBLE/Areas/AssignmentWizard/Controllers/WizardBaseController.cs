@@ -9,7 +9,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.Remoting;
 using OSBLE.Controllers;
 using OSBLE.Areas.AssignmentWizard.Models;
-using OSBLE.Controllers.Assignments;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -53,8 +52,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             ViewBag.Components = manager.SelectedComponents;
             ViewBag.ActiveComponent = manager.ActiveComponent;
             ViewBag.Assignment = Assignment;
-            ViewBag.PreviousWizardButton = WizardController.previousWizardButton;
-            ViewBag.NextWizardButton = WizardController.nextWizardButton;
+            ViewBag.PreviousWizardButton = WizardBaseController.previousWizardButton;
+            ViewBag.NextWizardButton = WizardBaseController.nextWizardButton;
             ViewBag.Title = "Assignment Creation Wizard";
         }
 
