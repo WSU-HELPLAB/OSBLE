@@ -123,7 +123,23 @@
     }
     <br /><br />
     
-    @Html.ActionLink("Back to Inbox", "Index")
+    if (ViewBag.IsOlder == true)
+    {
+        @Html.ActionLink("Older", "View", new { id = Model.ID - 1 }) <a>&nbsp;</a>
+    }
+    else{
+        <a>Older &nbsp;</a>
+    }
+    
+    @Html.ActionLink("Back to Inbox\t", "Index") <a>&nbsp;</a>
+    
+    if (ViewBag.IsNewer == true)  
+    {
+        @Html.ActionLink("Newer", "View", new { id = Model.ID + 1 })
+    }
+    else{
+        <a>Newer &nbsp;</a>
+    }
 }
 else
 {

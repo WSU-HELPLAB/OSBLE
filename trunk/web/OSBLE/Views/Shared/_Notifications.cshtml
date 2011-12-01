@@ -2,7 +2,6 @@
 <ul id="notifications_list">
     @foreach (Notification n in ViewBag.Notifications)
     {
-    
         <li id="notification_@(n.ID)" @if (n.Read)
                                       {<text>class="read"</text>}><small>@n.Posted.ToShortDateString() @n.Posted.ToShortTimeString()</small>&nbsp;
             @if (ViewBag.ShowNotificationDelete == true)
@@ -23,40 +22,40 @@
                 @switch (n.ItemType)
                 {
                     case Notification.Types.Mail:
-                        { 
-                    <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> sent you a @NotificationLink(n.ID, "message")</text>
+                        {
+                            <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> sent you a @NotificationLink(n.ID, "message")</text>
                             break;
                         }
                     case Notification.Types.EventApproval:
-                        {                                            
-                    <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> submitted an @NotificationLink(n.ID, "event for approval")</text>
+                        {                                     
+                            <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> submitted an @NotificationLink(n.ID, "event for approval")</text>
                             break;
                         }
                     case Notification.Types.Dashboard:
-                        { 
-                    <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> posted in a @NotificationLink(n.ID, "dashboard thread")
-                    that you participated in</text>
+                        {
+                            <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> posted in a @NotificationLink(n.ID, "dashboard thread")
+                            that you participated in</text>
                             break;
                         }
                     case Notification.Types.InlineReviewCompleted:
                         {
                             string[] args = n.Data.Split(new char[] { ';' });
-                    <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> has published an
-                    @Html.ActionLink("inline review", "ViewInlineReview", "Assignment", new { abstractAssignmentActivityId = args[0], teamUserID = args[1] }, new { }) of your @args[2]</text>
+                            <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> has published an
+                            @Html.ActionLink("inline review", "ViewInlineReview", "Assignment", new { abstractAssignmentActivityId = args[0], teamUserID = args[1] }, new { }) of your @args[2]</text>
                             break;
                         }
                     case Notification.Types.RubricEvaluationCompleted:
                         {
-                            string[] args = n.Data.Split(new char[] { ';' });
-                    <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> completed an @Html.ActionLink("evaluation rubric", "View", "Rubric", new { abstractAssignmentActivityId = args[0], teamUserID = args[1] }, new { }) of your @args[2]
-                    </text>
+                            string[] args1 = n.Data.Split(new char[] { ';' });
+                            <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> completed an @Html.ActionLink("evaluation rubric", "View", "Rubric", new { abstractAssignmentActivityId = args1[0], teamUserID = args1[1] }, new { }) of your @args1[2]
+                            </text>
                             break;
                         }
                     case Notification.Types.FileSubmitted:
                         {
-                            string[] args = n.Data.Split(new char[] { ';' });
-                    <text><em>@args[3]</em> submitted the file @args[4] for the activity '@args[2]' at @args[5] download it
-                    @Html.ActionLink("here", "GetSubmissionZip", "FileHandler", new { teamUserID = args[1], assignmentActivityID = args[0] }, new { })</text>
+                            string[] args2 = n.Data.Split(new char[] { ';' });
+                            <text><em>@args2[3]</em> submitted the file @args2[4] for the activity '@args2[2]' at @args2[5] download it
+                            @Html.ActionLink("here", "GetSubmissionZip", "FileHandler", new { teamUserID = args2[1], assignmentActivityID = args2[0] }, new { })</text>
                             break;
                         }
                 }

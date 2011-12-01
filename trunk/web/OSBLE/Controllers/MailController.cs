@@ -73,6 +73,21 @@ namespace OSBLE.Controllers
                                             where m.ThreadID == mail.ThreadID 
                                             select m.ToUserProfile).ToList();
 
+            // for the older message and newer message links
+            var isNewer = true;
+            if (db.Mails.Find(id + 1) == null)
+            {
+                isNewer = false;
+            }
+            ViewBag.IsNewer = isNewer;
+
+            var isOlder = true;
+            if (db.Mails.Find(id - 1) == null)
+            {
+                isOlder = false;
+            }
+            ViewBag.IsOlder = isOlder;
+
             ViewBag.AllRecipients = recipients;
             return View(mail);
         }
@@ -272,7 +287,6 @@ namespace OSBLE.Controllers
                         newMail.Message = mail.Message;
                         newMail.ThreadID = threadID;
                         newMail.ContextID = mail.ContextID;
-                        newMail.Context = mail.Context;
 
                         //need to create the mail before we can send the notification and set the threadID
                         db.Mails.Add(newMail);

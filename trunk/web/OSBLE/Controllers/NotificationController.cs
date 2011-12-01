@@ -42,6 +42,12 @@ namespace OSBLE.Controllers
                         return RedirectToAction("Approval", "Event", new { ID = n.ItemID });
                     case Notification.Types.Dashboard:
                         return RedirectToAction("ViewThread", "Home", new { ID = n.ItemID });
+                    case Notification.Types.FileSubmitted:
+                        return RedirectToAction("GetSubmissionZip", "FileHandler", new { teamUserID = n.SenderID, assignmentActivityID = n.ItemID });
+                    case Notification.Types.InlineReviewCompleted:
+                        return RedirectToAction("Details", "PeerReview", new { ID = n.ItemID });
+                    case Notification.Types.RubricEvaluationCompleted:
+                        return RedirectToAction("View", "Rubric", new { abstractAssignmentActivityId = n.ItemID, teamUserId = n.SenderID });
                 }
             }
 
@@ -81,8 +87,8 @@ namespace OSBLE.Controllers
             Notification n = new Notification();
             n.ItemType = Notification.Types.Mail;
             n.ItemID = mail.ID;
-            n.RecipientID = mail.ToUserProfileID;
-            n.SenderID = mail.FromUserProfileID;
+            n.RecipientID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.ToUserProfileID).FirstOrDefault().ID;
+            n.SenderID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.FromUserProfileID).FirstOrDefault().ID;
 
             addNotification(n);
         }
@@ -251,9 +257,13 @@ namespace OSBLE.Controllers
             UserProfile sender = db.UserProfiles.Find(n.SenderID);
             UserProfile recipient = db.UserProfiles.Find(n.RecipientID);
 
-            AbstractCourse course = db.AbstractCourses.Find(n.CourseID);
+            AbstractCourse course = db.AbstractCourses.Where(b => b.ID == n.CourseID).FirstOrDefault();
 
-            string subject = "[" + getCourseTag(course) + "] "; // Email subject prefix
+            string subject = "";
+            if(getCourseTag(course) != null)
+            {
+                subject = "[" + getCourseTag(course) + "] "; // Email subject prefix
+            }
 
             string body = "";
 
@@ -276,18 +286,47 @@ namespace OSBLE.Controllers
                 case Notification.Types.EventApproval:
                     subject += "Event approval request from " + sender.FirstName + " " + sender.LastName;
 
-                    body = sender.FirstName + " " + sender.LastName + " is requesting a course event posting to be approved.";
+                    body = sender.FirstName + " " + sender.LastName + " has requested your approval of an event posting.";
 
                     action = "approve/reject this event.";
 
                     break;
                 case Notification.Types.Dashboard:
-                    subject += "Dashboard Message Reply from " + sender.FirstName + " " + sender.LastName;
+                    subject += "Activity Feed Reply from " + sender.FirstName + " " + sender.LastName;
 
-                    body = sender.FirstName + " " + sender.LastName + " has posted in a dashboard thread that you have participated in.";
+                    body = sender.FirstName + " " + sender.LastName + " has posted to an activity feed thread in which you have participated.";
 
-                    action = "view this dashboard thread.";
+                    action = "view this activity feed thread.";
 
+                    break;
+                case Notification.Types.FileSubmitted:
+                    subject += "New Assignment Submmission from " + sender.FirstName + " " + sender.LastName;
+
+                    body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
+
+                    action = "view this assignment submission.";
+
+                    break;
+                case Notification.Types.RubricEvaluationCompleted:
+                    subject += sender.FirstName + " " + sender.LastName + "has published a rubric  Assignment Submmission from ";
+
+                    body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
+
+                    action = "view this assignment submission.";
+
+                    break;
+                case Notification.Types.InlineReviewCompleted:
+                    subject += sender.FirstName + " " + sender.LastName + "has published a rubric  Assignment Submmission from ";
+
+                    body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
+
+                    action = "view this assignment submission.";
+
+                    break;
+                default:
+                    subject += "No Email set up for this type of notification";
+
+                    body = "No Email set up for this type of notification of type: " + n.ItemType;
                     break;
             }
 
