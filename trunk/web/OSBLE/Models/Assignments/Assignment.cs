@@ -5,6 +5,7 @@ using System.Web;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
 using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.Assignments.Activities.Scores;
 
 namespace OSBLE.Models.Assignments
 {
@@ -18,6 +19,7 @@ namespace OSBLE.Models.Assignments
             Deliverables = new List<Deliverable>();
             AssignmentTeams = new List<AssignmentTeam>();
             IsDraft = true;
+            addedPoints = 0;
         }
 
         [Key]
@@ -170,5 +172,9 @@ namespace OSBLE.Models.Assignments
 
         [Association("AssignmentTeams_Assignments", "ID", "AssignmentID")]
         public virtual IList<AssignmentTeam> AssignmentTeams { get; set; }
+
+        public virtual ICollection<Score> Scores { get; set; }
+
+        public double addedPoints { get; set; }
     }
 }

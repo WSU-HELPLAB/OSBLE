@@ -23,7 +23,7 @@
             j += 1;
             <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(event, this);"></td>
             j += 1;
-            foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
+            foreach (Assignment item in ViewBag.Assignments)
             {
                 <td id="@j" class="colHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; text-align:center; min-width: 45px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectColumn(event, this);">  
                 <div id="div-@j" style="display: none; margin:0 auto;">
@@ -41,7 +41,7 @@
         @{index++;}
         <td id="th2"><b>Perfect Score</b></td>
         <td id="perfectTotal">100%</td>
-        @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
+        @foreach (Assignment item in ViewBag.Assignments)
         {
             <td id="pointsPossible-@item.ID" onclick="cellGainsFocus(event, this)">@item.PointsPossible</td>
         }
@@ -69,14 +69,14 @@
                 double assignPossible = 0;
                 
                 //Get the total score for the class
-                foreach (AbstractAssignmentActivity assign in ViewBag.Assignments)
+                foreach (Assignment assign in ViewBag.Assignments)
                 {
                     foreach (Score userScore in ViewBag.Grades)
                     {
                         if (userScore.isDropped == false)
                         {
                             assignPoints += userScore.Points;
-                            assignPossible += userScore.AssignmentActivity.PointsPossible;
+                            assignPossible += userScore.Assignment.PointsPossible;
                         }
                     }
                 }
@@ -95,10 +95,10 @@
                     </td>
                 }
             }
-            @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
+            @foreach (Assignment item in ViewBag.Assignments)
             {
                 var score = (from scores in ViewBag.Grades as IEnumerable<Score>
-                             where scores.AssignmentActivityID == item.ID
+                             where scores.AsssignmentID == item.ID
                              select scores);
 
                 double totalAverage = 0;
@@ -154,16 +154,16 @@
             }
         
             int i = 2;
-            foreach (AbstractAssignmentActivity a in ViewBag.Assignments)
+            foreach (Assignment a in ViewBag.Assignments)
             {
-
+                //COMMENTED OUT FOR TESTING PURPOSES
                 if (a.addedPoints > 0)
                 {   
-                    <th id="header-@a.ID" onclick="changeHeaderName(event, this)">@a.Name (Added @a.addedPoints)</th>
+                    <th id="header-@a.ID" onclick="changeHeaderName(event, this)">@a.AssignmentName (Added @a.addedPoints)</th>
                 }
                 else
                 {
-                    <th id="header-@a.ID" onclick="changeHeaderName(event, this)">@a.Name </th>
+                    <th id="header-@a.ID" onclick="changeHeaderName(event, this)">@a.AssignmentName </th>
                 }
                 i += 1;
             }
@@ -179,7 +179,7 @@
                     
             @{
               var percent = from p in ViewBag.Percents as IEnumerable<Score>
-                            where p.TeamUserMember.Contains(user)
+                            where p.TeamMember.CourseUser.UserProfileID == user.ID
                             select p;
               if (percent.Count() > 0)
               {
@@ -198,25 +198,25 @@
               }
             }
                 
-            @foreach (AbstractAssignmentActivity gradeAssignmentActivity in ViewBag.Assignments)
+            @foreach (Assignment gradeAssignmentActivity in ViewBag.Assignments)
             {
                 var gradableQuery = from g in ViewBag.Grades as IEnumerable<Score>
-                                    where g.AssignmentActivityID == gradeAssignmentActivity.ID
-                                    && g.TeamUserMember.Contains(user)
+                                    where g.AsssignmentID == gradeAssignmentActivity.ID
+                                    && g.TeamMember.CourseUser.UserProfileID == user.ID
                                     //&& g.Points >= 0
                                     select g;
                 //use the stored score if possible.  Otherwise, just use a "0"
                 if (gradableQuery.Count() > 0)
                 {
-                    if (gradeAssignmentActivity.AbstractAssignment.Rubric != null)
+                    if (gradeAssignmentActivity.Rubric != null)
                     {
                         if (gradableQuery.First().LatePenaltyPercent > 0)
                         {
-                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { abstractAssignmentActivityId = gradableQuery.First().AssignmentActivityID, teamUserID = gradableQuery.First().TeamUserMemberID }, new { @class = "rubric", @style = "color:Red;" })</td>
+                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { abstractAssignmentActivityId = gradableQuery.First().AsssignmentID, teamUserID = gradableQuery.First().TeamMemberID }, new { @class = "rubric", @style = "color:Red;" })</td>
                         }
                         else
                         {                            
-                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { abstractAssignmentActivityId = gradableQuery.First().AssignmentActivityID, teamUserID = gradableQuery.First().TeamUserMemberID }, new { @class = "rubric" })</td>
+                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { abstractAssignmentActivityId = gradableQuery.First().AsssignmentID, teamUserID = gradableQuery.First().TeamMemberID }, new { @class = "rubric" })</td>
                         }
                     }
                     else
@@ -233,13 +233,14 @@
                 }
                 else
                 {
-                    if (gradeAssignmentActivity.AbstractAssignment.Rubric != null)
+                    if (gradeAssignmentActivity.Rubric != null)
                     {
-                        var teamUser = from tu in gradeAssignmentActivity.TeamUsers where tu.Contains(user) select tu;
+                        //COMMENTED OUT FOR TESTING PURPOSES
+                        @*var teamUser = from tu in gradeAssignmentActivity.AssignmentTeams where tu.Team.TeamMembers.Contains(user) select tu;
                         if (teamUser.Count() > 0)
                         {
                             <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink("NG", "Index", "Rubric", new { abstractAssignmentActivityId = gradeAssignmentActivity.ID, teamUserID = teamUser.First().ID }, new { @class = "rubric" })</td>
-                        }
+                        }*@
                     }
                     else
                     {
@@ -250,12 +251,12 @@
         </tr>
     }
 </table>
-
-@foreach (AbstractAssignmentActivity assignment in ViewBag.Assignments)
+@*COMMENTED OUT FOR TESTING PURPOSES
+@foreach (Assignment assignment in ViewBag.Assignments)
 {
     <input id="addedPoints-@assignment.ID" type="hidden" value="@assignment.addedPoints" />    
 }
-
+*@
 <script type="text/javascript">
 
     $(document).ready(function () {

@@ -322,15 +322,16 @@ namespace OSBLE.Controllers
                             submissionInfo.Name = (teamUser as UserMember).UserProfile.LastName + ", " + (teamUser as UserMember).UserProfile.FirstName;
                         }
 
-                        if ((from c in studioActivity.Scores where c.TeamUserMemberID == teamUser.ID && c.Points >= 0 select c).FirstOrDefault() != null)
-                        {
-                            submissionInfo.Graded = true;
-                            numberGraded++;
-                        }
-                        else
-                        {
-                            submissionInfo.Graded = false;
-                        }
+                        //COMMENTED OUT JUST FOR TESTING PURPOSES (AH)
+                        //if ((from c in studioActivity.Scores where c.TeamUserMemberID == teamUser.ID && c.Points >= 0 select c).FirstOrDefault() != null)
+                        //{
+                        //    submissionInfo.Graded = true;
+                        //    numberGraded++;
+                        //}
+                        //else
+                        //{
+                        //    submissionInfo.Graded = false;
+                        //}
                         viewModel.SubmissionsInfo.Add(submissionInfo);
                     }
 
@@ -343,12 +344,12 @@ namespace OSBLE.Controllers
                     ViewBag.activityID = studioActivity.ID;
                     ViewBag.CategoryID = studioActivity.AbstractAssignment.CategoryID;
 
+                    //COMMENTED OUT JUST FOR TESTING PURPOSES (AH)
+                    //List<Score> studentScores = (from scores in db.Scores
+                    //                             where scores.AssignmentActivityID == studioActivity.ID
+                    //                             select scores).ToList();
 
-                    List<Score> studentScores = (from scores in db.Scores
-                                                 where scores.AssignmentActivityID == studioActivity.ID
-                                                 select scores).ToList();
-
-                    ViewBag.StudentScores = studentScores;
+                    //ViewBag.StudentScores = studentScores;
 
 
                     var activities = (from c in assignment.AssignmentActivities orderby c.ReleaseDate select c).ToList();

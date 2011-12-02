@@ -26,18 +26,30 @@ namespace OSBLE.Models.Assignments.Activities.Scores
         [Required]
         public double LatePenaltyPercent { get; set; }
 
+        /*
         [Required]
         public int TeamUserMemberID { get; set; }
 
         public virtual TeamUserMember TeamUserMember { get; set; }
+   
+         * [Required]
+        public int AssignmentTeamID { get; set; }
 
-        [Required]
-        public int AssignmentActivityID { get; set; }
+        public virtual AssignmentTeam AssignmentTeam { get; set; }
+ */
+        public int TeamMemberID { get; set; }
+
+        public virtual TeamMember TeamMember { get; set; }    
+
+
 
         [Required]
         public bool isDropped { get; set; }
 
-        public virtual AbstractAssignmentActivity AssignmentActivity { get; set; }
+        [Required]
+        public int AsssignmentID { get; set; }
+
+        public virtual Assignment Assignment { get; set; }
 
         public double StudentPoints { get; set; }
 

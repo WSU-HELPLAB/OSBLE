@@ -201,8 +201,8 @@
                         if (category.Name != Constants.UnGradableCatagory)
                         {
                             List<Score> userScore = (from score in ViewBag.AllGrades as IEnumerable<Score>
-                                                     where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID &&
-                                                     score.TeamUserMember.Contains(user) 
+                                                     where score.Assignment.CategoryID == category.ID &&
+                                                     score.TeamMember.CourseUser.UserProfileID == user.ID
                                                      select score).ToList();
 
                             if (userScore.Count() == 0)
@@ -220,8 +220,8 @@
                             double categoryTotal = 0;
 
                             List<Score> totalScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
-                                                       where score.TeamUserMember.Contains(user) &&
-                                                       score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
+                                                       where score.TeamMember.CourseUser.UserProfileID == user.ID &&
+                                                       score.Assignment.CategoryID == category.ID
                                                        select score).ToList();
                             if (totalScores.Count() > 0)
                             {
@@ -229,10 +229,10 @@
                                 foreach (Score score in totalScores)
                                 {
                                     
-                                    if (score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
+                                    if (score.Assignment.CategoryID == category.ID)
                                     {
                                         categoryPoints += score.Points;
-                                        categoryPossible += score.AssignmentActivity.PointsPossible;
+                                        categoryPossible += score.Assignment.PointsPossible;
                                     }
                                 }
                                 categoryTotal = categoryPoints / categoryPossible;
@@ -286,11 +286,11 @@
                         bool oneScore = false;
                         foreach (Score score in ViewBag.CategoryTotalPercent)
                         {
-                            if (score.AssignmentActivity.AbstractAssignment.CategoryID == item.ID)
+                            if (score.Assignment.CategoryID == item.ID)
                             {
                                 oneScore = true;
                                 averagePoints += score.Points;
-                                averagePossible += score.AssignmentActivity.PointsPossible;
+                                averagePossible += score.Assignment.PointsPossible;
                             }
                         }
                         double categoryScore = averagePoints / averagePossible;
@@ -371,8 +371,8 @@
                       if (c.Name != Constants.UnGradableCatagory)
                       {
                           List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
-                                                    where score.TeamUserMember.Contains(student) &&
-                                                    score.AssignmentActivity.AbstractAssignment.CategoryID == c.ID
+                                                    where score.TeamMember.CourseUser.UserProfileID == student.ID &&
+                                                    score.Assignment.CategoryID == c.ID
                                                     select score).ToList();
                           if (userScores.Count() == 0)
                           {
@@ -386,8 +386,8 @@
                       if (c.Name != Constants.UnGradableCatagory)
                       {
                           List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
-                                                    where score.TeamUserMember.Contains(student) &&
-                                                    score.AssignmentActivity.AbstractAssignment.CategoryID == c.ID
+                                                    where score.TeamMember.CourseUser.UserProfileID == student.ID &&
+                                                    score.Assignment.CategoryID == c.ID
                                                     select score).ToList();
 
                           double points = 0;
@@ -398,7 +398,7 @@
                               foreach (Score score in userScores)
                               {
                                   points += score.Points;
-                                  possible += score.AssignmentActivity.PointsPossible;
+                                  possible += score.Assignment.PointsPossible;
                               }
 
                               totalCategoryGrade = (points / possible);
@@ -452,8 +452,8 @@
                       if (c.Name != Constants.UnGradableCatagory)
                       {
                           List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
-                                                    where score.TeamUserMember.Contains(student) &&
-                                                    score.AssignmentActivity.AbstractAssignment.CategoryID == c.ID
+                                                    where score.TeamMember.CourseUser.UserProfileID == student.ID &&
+                                                    score.Assignment.CategoryID == c.ID
                                                     select score).ToList();
 
                           double points = 0;
@@ -462,7 +462,7 @@
                           foreach (Score score in userScores)
                           {
                               points += score.Points;
-                              possible += score.AssignmentActivity.PointsPossible;
+                              possible += score.Assignment.PointsPossible;
                           }
 
                           totalCategoryGrade = (points / possible) * 100;

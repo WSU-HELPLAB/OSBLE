@@ -68,6 +68,37 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 if (Assignment.ID == 0)
                 {
                     db.Assignments.Add(Assignment);
+                    db.SaveChanges();
+                    int currentCourseId = ActiveCourse.AbstractCourseID;
+                    List<CourseUser> Users = (from user in db.CourseUsers
+                                              where user.AbstractCourseID == currentCourseId
+                                              select user).ToList();
+
+                    foreach (CourseUser u in Users)
+                    {
+                        TeamMember userMember = new TeamMember()
+                        {
+                            CourseUser = u,
+                            CourseUserID = u.ID,
+                        };
+
+                        Team team = new Team();
+                        team.Name = userMember.CourseUser.UserProfile.LastName + "," + userMember.CourseUser.UserProfile.FirstName;
+                        team.TeamMembers.Add(userMember);
+
+                        db.Teams.Add(team);
+                        db.SaveChanges();
+
+                        AssignmentTeam assignmentTeam = new AssignmentTeam()
+                        {
+                            AssignmentID = Assignment.ID,
+                            Team = team,
+                            TeamID = team.ID,
+                        };
+
+                        db.AssignmentTeams.Add(assignmentTeam);
+                        db.SaveChanges();
+                    }
                 }
                 else
                 {

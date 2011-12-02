@@ -760,9 +760,9 @@
             else {
                 if (cellValue != cellValueOnGainsFocus) {
                     cellValue = parseFloat(cellValue);
-                    cellValue += parseFloat($('#addedPoints-' + ajaxIDs[1]).val());
+                    //cellValue += parseFloat($('#addedPoints-' + ajaxIDs[1]).val());
                     lastFocusedCell.text(cellValue);
-                    cellValue -= parseFloat($('#addedPoints-' + ajaxIDs[1]).val());
+                    //cellValue -= parseFloat($('#addedPoints-' + ajaxIDs[1]).val());
                 }
                 else {
                     lastFocusedCell.text(cellValue);
