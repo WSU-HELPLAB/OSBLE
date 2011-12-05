@@ -47,7 +47,10 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             }
             set
             {
-                HttpContext.Current.Session[assignmentKey] = value;
+                if (HttpContext.Current != null)
+                {
+                    HttpContext.Current.Session[assignmentKey] = value;
+                }
             }
         }
 
@@ -67,7 +70,10 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             }
             set
             {
-                HttpContext.Current.Session[activeComponentIndexKey] = value;
+                if (HttpContext.Current != null)
+                {
+                    HttpContext.Current.Session[activeComponentIndexKey] = value;
+                }
             }
         }
 
@@ -129,15 +135,24 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         /// <returns></returns>
         public static WizardComponentManager GetInstance()
         {
-            if (HttpContext.Current.Session[instance] == null)
+            //HttpContext will be null when we're not running this code in a web context,
+            //I.E. testing
+            if (HttpContext.Current == null)
             {
-                WizardComponentManager mgr = new WizardComponentManager();
-                HttpContext.Current.Session[instance] = mgr;
-                return mgr;
+                return new WizardComponentManager();
             }
             else
             {
-                return HttpContext.Current.Session[instance] as WizardComponentManager;
+                if (HttpContext.Current.Session[instance] == null)
+                {
+                    WizardComponentManager mgr = new WizardComponentManager();
+                    HttpContext.Current.Session[instance] = mgr;
+                    return mgr;
+                }
+                else
+                {
+                    return HttpContext.Current.Session[instance] as WizardComponentManager;
+                }
             }
         }
 

@@ -37,11 +37,16 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
         private void BuildViewBag()
         {
-            //SUBMISSION CATEGORIES
-            var cat = from c in (activeCourse.AbstractCourse as Course).Categories
-                      where c.Name != Constants.UnGradableCatagory
-                      select c;
-            ViewBag.Categories = new SelectList(cat, "ID", "Name");
+            IEnumerable<Category> categories = new List<Category>();
+            //activeCourse should only be null when testing
+            if (activeCourse != null)
+            {
+                //SUBMISSION CATEGORIES
+                categories = from c in (activeCourse.AbstractCourse as Course).Categories
+                              where c.Name != Constants.UnGradableCatagory
+                              select c;
+            }
+            ViewBag.Categories = new SelectList(categories, "ID", "Name");
 
             //ASSIGNMENT TYPES
             var types = db.AssignmentTypes.ToList();

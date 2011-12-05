@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using OSBLE.Models;
 using System.Web;
 using System.Data.Entity;
+using OSBLE.Controllers;
 
 namespace OSBLE.UnitTests.Areas.AssignmentWizard.Controllers
 {
@@ -44,9 +45,6 @@ namespace OSBLE.UnitTests.Areas.AssignmentWizard.Controllers
         [ClassInitialize()]
         public static void MyClassInitialize(TestContext testContext)
         {
-            //Database.SetInitializer<OSBLEContext>(new OSBLEContextAlwaysCreateInitializer());
-            //OSBLEContext context = new OSBLEContext();
-            //context.Database.Initialize(force: true);
         }
 
         #region Additional test attributes
@@ -88,7 +86,7 @@ namespace OSBLE.UnitTests.Areas.AssignmentWizard.Controllers
                 AssignmentDescription = "asdf",
                 AssignmentType = "Basic Assignment",
                 AssignmentName = "foo",
-                CategoryID = 0                
+                CategoryID = 8
             };
             controller.Index(someAssignment);
 
