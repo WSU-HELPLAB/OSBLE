@@ -71,7 +71,8 @@
                 @Html.ActionLink(item.Subject, "View", new { id = item.ID })
             </td>
             <td id="4" class="inbox_tools">
-                @if (item.ToUserProfile == ViewBag.CurrentUser)
+                            @*inbox deletion                                 outbox deletion*@
+                @if (item.ToUserProfile == ViewBag.CurrentUser || item.FromUserProfile == ViewBag.CurrentUser)
                 {
                     <form action="@Url.Action("Delete")"
                         style="display: inline;"

@@ -356,6 +356,8 @@ namespace OSBLE.Controllers
                         newMail.Message = mail.Message;
                         newMail.ThreadID = threadID;
                         newMail.ContextID = mail.ContextID;
+                        newMail.DeleteFromInbox = false;
+                        newMail.DeleteFromOutbox = false;
 
                         //need to create the mail before we can send the notification and set the threadID
                         db.Mails.Add(newMail);
@@ -391,8 +393,29 @@ namespace OSBLE.Controllers
 
             if (mail.ToUserProfile == currentUser)
             {
-                db.Mails.Remove(mail);
-                db.SaveChanges();
+                if (mail.DeleteFromOutbox == true)
+                {
+                    db.Mails.Remove(mail);
+                    db.SaveChanges();
+                }
+                else
+                {
+                    mail.DeleteFromInbox = true;
+                    db.SaveChanges();
+                }
+            }
+            else if (mail.FromUserProfile == currentUser)
+            {
+                if (mail.DeleteFromInbox == true)
+                {
+                    db.Mails.Remove(mail);
+                    db.SaveChanges();
+                }
+                else
+                {
+                    mail.DeleteFromOutbox = true;
+                    db.SaveChanges();
+                }
             }
             else
             {
