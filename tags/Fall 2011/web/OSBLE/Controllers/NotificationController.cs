@@ -244,7 +244,8 @@ namespace OSBLE.Controllers
 
             // Find recipient profile and check notification settings
             UserProfile recipient = db.UserProfiles.Find(n.RecipientID);
-            if (n.Recipient.EmailAllNotifications /*&& !n.Recipient.EmailAllActivityPosts*/)
+            // email forwarding is handled in the home controler for Dashboard posts, no need to 
+            if (n.Recipient.EmailAllNotifications && !(n.Recipient.EmailAllActivityPosts && n.ItemType == Notification.Types.Dashboard))
             {
                 emailNotification(n);
             }
