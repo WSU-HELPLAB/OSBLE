@@ -571,7 +571,6 @@ namespace OSBLE.Controllers
 
                         foreach (DashboardReply r in replys)
                         {
-                            r.UserProfileID
                             setupPostDisplay(r);
                         }
 
