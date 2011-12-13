@@ -552,11 +552,12 @@ namespace OSBLE.Controllers
                         body += "<br /><br />";
                         body += dr.Content.Replace("\n", "<br />");
 
-                        List<CoursesUsers> courseUsers = db.CoursesUsers.Where(c => (c.AbstractCourseID == ac.ID && c.UserProfile.EmailAllActivityPosts)).ToList();
-                        /*List<CoursesUsers> courseUsers = (from c in db.CoursesUsers
+                        //List<CoursesUsers> courseUsers = db.CoursesUsers.Where(c => (c.AbstractCourseID == ac.ID && c.UserProfile.EmailAllActivityPosts)).ToList();
+                        List<CoursesUsers> courseUsers = (from c in db.CoursesUsers
                                                           where c.AbstractCourseID == ac.ID &&
                                                           c.UserProfile.EmailAllActivityPosts &&
-                                                          c.UserProfileID == replys.*/
+                                                          c.UserProfileID != currentUser.ID
+                                                          select c).ToList();
 
                         foreach (CoursesUsers member in courseUsers)
                         {
