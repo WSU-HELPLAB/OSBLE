@@ -486,40 +486,96 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult NewReply(DashboardReply dr)
         {
-            dr.UserProfile = currentUser;
-            dr.Posted = DateTime.Now;
-
-            int replyTo = 0;
-            if (Request.Form["reply_to"] != null)
+            if (ModelState.IsValid)
             {
-                replyTo = Convert.ToInt32(Request.Form["reply_to"]);
-            }
+                dr.UserProfile = currentUser;
+                dr.Posted = DateTime.Now;
 
-            int latestReply = 0;
-            if (Request.Form["latest_reply"] != null)
-            {
-                latestReply = Convert.ToInt32(Request.Form["latest_reply"]);
-            }
-
-            DashboardPost replyToPost = db.DashboardPosts.Find(replyTo);
-            if (replyToPost != null)
-            { // Does the post we're replying to exist?
-                // Are we a member of the course we're replying to?
-                CourseUser cu = (from c in currentCourses
-                                   where c.AbstractCourseID == replyToPost.CourseID
-                                   select c).FirstOrDefault();
-
-                Course course = null;
-                if (cu.AbstractCourse is Course)
+                int replyTo = 0;
+                if (Request.Form["reply_to"] != null)
                 {
-                    course = (Course)cu.AbstractCourse;
+                    replyTo = Convert.ToInt32(Request.Form["reply_to"]);
                 }
-                if ((cu != null) && (cu.AbstractRole.CanGrade || ((course != null) && (course.AllowDashboardReplies))))
+
+                int latestReply = 0;
+                if (Request.Form["latest_reply"] != null)
                 {
-                    if (ModelState.IsValid)
+                    latestReply = Convert.ToInt32(Request.Form["latest_reply"]);
+                }
+
+                DashboardPost replyToPost = db.DashboardPosts.Find(replyTo);
+                if (replyToPost != null)
+                { // Does the post we're replying to exist?
+                    // Are we a member of the course we're replying to?
+                    CourseUser cu = (from c in currentCourses
+                                       where c.AbstractCourseID == replyToPost.CourseID
+                                       select c).FirstOrDefault();
+
+                    AbstractCourse ac = null;
+                    if (cu.AbstractCourse is AbstractCourse)
                     {
+                        ac = (AbstractCourse)cu.AbstractCourse;
+                    }
+                    if ((cu != null) && (cu.AbstractRole.CanGrade || ((ac != null) && (ac.AllowDashboardPosts))))
+                    {
+
                         replyToPost.Replies.Add(dr);
                         db.SaveChanges();
+
+                        //construct the subject & body
+                        string subject = "";
+                        string body = "";
+                        List<MailAddress> addresses = new List<MailAddress>();
+
+                        ViewBag.dp = replyToPost;
+                        List<DashboardReply> replys = replyToPost.Replies.Where(r => r.ID > latestReply).ToList();
+
+                        //slightly different messages depending on course type
+                        if (ac is Course && (ac as Course).AllowDashboardReplies)
+                        {
+                            Course course = (Course)ac;
+                            subject = "[" + course.Prefix + " " + course.Number + "] Reply from " + currentUser.FirstName + " " + currentUser.LastName;
+                            body = currentUser.FirstName + " " + currentUser.LastName + " sent the following reply to the Dashboard post " + replyToPost.DisplayTitle + " at " + dr.Posted.ToString() + ":";
+                        }
+                        else if (ac is Community)
+                        {
+                            Community community = ac as Community;
+                            subject = "[" + community.Nickname + "] Reply from " + currentUser.FirstName + " " + currentUser.LastName;
+                            body = currentUser.FirstName + " " + currentUser.LastName + " sent the following reply to the Dashboard post " + replyToPost.DisplayTitle + " at " + dr.Posted.ToString() + ":";
+                        }
+                        else
+                        {
+                            //this should never execute, but just in case...
+                            subject = "OSBLE Activity Post";
+                            body = currentUser.FirstName + " " + currentUser.LastName + " sent the following message at " + dr.Posted.ToString() + ":";
+                        }
+                        body += "<br /><br />";
+                        body += dr.Content.Replace("\n", "<br />");
+
+                        //List<CoursesUsers> courseUsers = db.CoursesUsers.Where(c => (c.AbstractCourseID == ac.ID && c.UserProfile.EmailAllActivityPosts)).ToList();
+                        List<CourseUser> courseUsers = (from c in db.CourseUsers
+                                                          where c.AbstractCourseID == ac.ID &&
+                                                          c.UserProfile.EmailAllActivityPosts &&
+                                                          c.UserProfileID != currentUser.ID
+                                                          select c).ToList();
+
+                        foreach (CourseUser member in courseUsers)
+                        {
+                            if (member.UserProfile.UserName != null) // Ignore pending users
+                            {
+                                addresses.Add(new MailAddress(member.UserProfile.UserName, member.UserProfile.FirstName + " " + member.UserProfile.LastName));
+                            }
+                        }
+
+                        //Send the message
+                        Email.Send(subject, body, addresses);
+
+                        foreach (DashboardReply r in replys)
+                        {
+                            setupPostDisplay(r);
+                        }
+
+                        ViewBag.DashboardReplies = replys;
 
                         // Post notification to other thread participants
                         using (NotificationController nc = new NotificationController())
@@ -527,25 +583,15 @@ namespace OSBLE.Controllers
                             nc.SendDashboardNotification(dr.Parent, dr.UserProfile);
                         }
                     }
+                    else
+                    {
+                        Response.StatusCode = 403;
+                    }
                 }
                 else
                 {
                     Response.StatusCode = 403;
                 }
-
-                ViewBag.dp = replyToPost;
-                List<DashboardReply> replys = replyToPost.Replies.Where(r => r.ID > latestReply).ToList();
-
-                foreach (DashboardReply r in replys)
-                {
-                    setupPostDisplay(r);
-                }
-
-                ViewBag.DashboardReplies = replys;
-            }
-            else
-            {
-                Response.StatusCode = 403;
             }
 
             return View("_SubDashboardReply");
