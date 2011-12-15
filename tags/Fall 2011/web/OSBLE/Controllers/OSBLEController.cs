@@ -611,14 +611,20 @@ namespace OSBLE.Controllers
         public void ModifyGrade(double value, string userId, int assignmentActivityId)
         {
             //Get student
-            var user = (from u in db.UserProfiles where u.Identification == userId select u).FirstOrDefault();
+            UserProfile user = (from u in db.UserProfiles where u.Identification == userId select u).FirstOrDefault();
 
-            var query = (from grade in db.Scores
-                         where grade.AssignmentActivityID == assignmentActivityId
-                         &&
-                         grade.TeamUserMember.Contains(user)
-                         select grade).FirstOrDefault();
-            ModifyGrade(value, userId, assignmentActivityId, query.TeamUserMemberID);
+            //and activity
+            AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(assignmentActivityId);
+
+            List<Score> gradableQuery = (from g in db.Scores
+                                         where g.AssignmentActivityID == assignmentActivityId
+                                         select g).ToList();
+
+            Score grades = (from grade in gradableQuery
+                            where grade.TeamUserMember.Contains(user)
+                            select grade).FirstOrDefault();
+
+            ModifyGrade(value, userId, assignmentActivityId, grades.TeamUserMemberID);
         }
 
         /// <summary>
