@@ -672,7 +672,7 @@ namespace OSBLE.Controllers
 
                     if (mScore.RawPoints != -1) //Only actually modifiy their grade if their raw points has a value. 
                     {
-                        ModifyGrade(mScore.RawPoints, userIdentification, assignmentActivityID); //Update the grade
+                        ModifyGrade(mScore.RawPoints, userIdentification, assignmentActivityID, teamUserMemeberID); //Update the grade
                     }
                     
                 }

@@ -435,7 +435,7 @@ namespace OSBLE.Controllers
 
                         //return the percent penalty times the number of hours late.
                         return activity.PercentPenalty * (hoursLatePerPercentPenalty / activity.HoursLatePerPercentPenalty);
-                    }                    
+                    }
                 }
             }
             return 0;
@@ -518,10 +518,10 @@ namespace OSBLE.Controllers
             //delete some additional information.
 
             //might as well delete the big daddy to start
-            CoursesUsers cu =  (from c in db.CoursesUsers
-                    where c.AbstractCourseID == activeCourse.AbstractCourseID
-                    && c.UserProfileID == user.ID
-                    select c).FirstOrDefault();
+            CoursesUsers cu = (from c in db.CoursesUsers
+                               where c.AbstractCourseID == activeCourse.AbstractCourseID
+                               && c.UserProfileID == user.ID
+                               select c).FirstOrDefault();
             if (cu != null)
             {
                 db.CoursesUsers.Remove(cu);
@@ -529,11 +529,11 @@ namespace OSBLE.Controllers
 
             //remove this user from any assignments.
             var activities = (from category in db.Categories
-                        join assignment in db.AbstractAssignments on category.ID equals assignment.CategoryID
-                        join activity in db.AbstractAssignmentActivities on assignment.ID equals activity.AbstractAssignmentID
-                        where category.CourseID == activeCourse.AbstractCourseID
-                        select activity).SelectMany(a => a.TeamUsers).ToList();
-            
+                              join assignment in db.AbstractAssignments on category.ID equals assignment.CategoryID
+                              join activity in db.AbstractAssignmentActivities on assignment.ID equals activity.AbstractAssignmentID
+                              where category.CourseID == activeCourse.AbstractCourseID
+                              select activity).SelectMany(a => a.TeamUsers).ToList();
+
             foreach (TeamUserMember teamUser in activities)
             {
                 if (teamUser is TeamMember)
@@ -599,13 +599,32 @@ namespace OSBLE.Controllers
             studentScore *= activity.PointsPossible;
             string userID = getUserIdentification(activityID, teamUserMemberID);
             //At this point we have the raw students points. Before added points for a category, or lateness, or max is considered.
-            ModifyGrade(studentScore, userID, activityID);
+            ModifyGrade(studentScore, userID, activityID, teamUserMemberID);
+        }
+
+        /// <summary>
+        /// Changes userId's grade for the given assignmentId to value. Note: Value is the pre-modified value for the grade.
+        /// 
+        /// AC: This version of ModifyGrade probably doesn't work.  Use at your peril.
+        /// </summary>
+        [Obsolete("If possible, use ModifyGrade with 4 parameters")]
+        public void ModifyGrade(double value, string userId, int assignmentActivityId)
+        {
+            //Get student
+            var user = (from u in db.UserProfiles where u.Identification == userId select u).FirstOrDefault();
+
+            var query = (from grade in db.Scores
+                         where grade.AssignmentActivityID == assignmentActivityId
+                         &&
+                         grade.TeamUserMember.Contains(user)
+                         select grade).FirstOrDefault();
+            ModifyGrade(value, userId, assignmentActivityId, query.TeamUserMemberID);
         }
 
         /// <summary>
         /// Changes userId's grade for the given assignmentId to value. Note: Value is the pre-modified value for the grade.
         /// </summary>
-        public void ModifyGrade(double value, string userId, int assignmentActivityId)
+        public void ModifyGrade(double value, string userId, int assignmentActivityId, int teamUserMemberId)
         {
             //Continue if we have a valid gradable ID
             if (assignmentActivityId != 0)
@@ -617,14 +636,10 @@ namespace OSBLE.Controllers
                 if (user != null)
                 {
                     double rawValue = value;
-                    List<Score> gradableQuery = (from g in db.Scores
-                                                 where g.AssignmentActivityID == assignmentActivityId
-                                                 select g).ToList();
-
-                    Score grades = (from grade in gradableQuery
-                                    where grade.TeamUserMember.Contains(user)
-                                    select grade).FirstOrDefault();
-
+                    Score grades = (from g in db.Scores
+                                    where g.AssignmentActivityID == assignmentActivityId
+                                    && g.TeamUserMemberID == teamUserMemberId
+                                    select g).FirstOrDefault();
                     var assignmentQuery = from a in db.AbstractAssignmentActivities
                                           where a.ID == assignmentActivityId
                                           select a;
@@ -637,7 +652,7 @@ namespace OSBLE.Controllers
                     {
                         //attempt to apply a manual late penalty if there is one, otherwise use regular late penalty
                         TimeSpan? lateness = calculateLateness(currentAssignment.AbstractAssignment.Category.Course, currentAssignment, teamuser.First());
-                        if (grades.ManualLatePenaltyPercent >= 0) 
+                        if (grades.ManualLatePenaltyPercent >= 0)
                         {
                             value = (value * ((100 - grades.ManualLatePenaltyPercent) / 100));
                         }
@@ -662,9 +677,6 @@ namespace OSBLE.Controllers
                         grades.RawPoints = rawValue;
                         db.SaveChanges();
                     }
-                    
-
-
                     else //there was no Score in the db for the userId. Creating a new one and assigning value.
                     {
                         /*We dont have to consider
@@ -720,13 +732,13 @@ namespace OSBLE.Controllers
             string returnVal = "";
             //getting assignment activity
             AbstractAssignmentActivity assignmentActivity = (from aa in db.AbstractAssignmentActivities
-                                        where aa.ID == activityID
-                                        select aa).FirstOrDefault();
+                                                             where aa.ID == activityID
+                                                             select aa).FirstOrDefault();
 
             //getting the team user member's user ID
             var tum = (from tumember in db.TeamUsers
-                        where tumember.ID == teamUserMemberID
-                        select tumember).FirstOrDefault();
+                       where tumember.ID == teamUserMemberID
+                       select tumember).FirstOrDefault();
 
             if (assignmentActivity.isTeam) //handle like team
             {
