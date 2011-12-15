@@ -623,8 +623,12 @@ namespace OSBLE.Controllers
             Score grades = (from grade in gradableQuery
                             where grade.TeamUserMember.Contains(user)
                             select grade).FirstOrDefault();
-
-            ModifyGrade(value, userId, assignmentActivityId, grades.TeamUserMemberID);
+            int teamUserId = -1;
+            if (grades != null)
+            {
+                teamUserId = grades.TeamUserMemberID;
+            }
+            ModifyGrade(value, userId, assignmentActivityId, teamUserId);
         }
 
         /// <summary>
