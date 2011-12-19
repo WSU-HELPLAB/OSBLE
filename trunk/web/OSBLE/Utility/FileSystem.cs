@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using Ionic.Zip;
-using OSBLE.Models.Assignments.Activities;
+using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Services.Uploader;
 using OSBLE.Models.Users;
@@ -28,14 +28,14 @@ using OSBLE.Models.Users;
  *  {course docs}      |              \
  *                     |       Records.txt { %random number%.zip}
  *                     |
- *           [AssignmentActivityId]
+ *              [AssignmentId]
  *           /       \          \
  *          /         \          \
  *       AADocs   Submissions    Reviews
  *          |          |             \
- *      {aa docs}      |      [TeamuserMemberId]
+ *      {aa docs}      |            [TeamMemberId]
  *                     |                 |
- *            [TeamUserMemberId]         |
+ *              [TeamMemberId]           |
  *                     |             {reviews}
  *            {team submissions}
  * */
@@ -313,36 +313,37 @@ namespace OSBLE
             new FileInfo(path).Delete();
         }
 
-        private static string getRealFileZipName(AbstractAssignmentActivity activity, TeamUserMember member = null)
+        private static string getRealFileZipName(Assignment assignment, TeamMember teamMember = null)
         {
-            string s = "activityID = " + activity.ID.ToString();
-            if (member != null)
+            string s = "activityID = " + assignment.ID.ToString();
+            if (teamMember != null)
             {
-                s += " TeamuserMemberID = " + member.ID;
+                s += " TeamMemberID = " + teamMember.CourseUser.UserProfileID; // not sure if this should just be CourseUserId, 
+                                                                                //but i ran into issues with that already so i did it this way
             }
             return s;
         }
 
-        public static void RemoveZipFile(Course course, AbstractAssignmentActivity activity, TeamUserMember teamUser)
+        public static void RemoveZipFile(Course course, Assignment assignment, TeamMember teamMember)
         {
-            bool foundTeamUserZip = false, foundActivityZip = false;
-            string pathTeamUser = FindZipFileLocation(course, getRealFileZipName(activity, teamUser));
+            bool foundTeamMemberZip = false, foundAssignmentZip = false;
+            string pathTeamMember = FindZipFileLocation(course, getRealFileZipName(assignment, teamMember));
 
-            if (pathTeamUser != null)
+            if (pathTeamMember != null)
             {
-                foundTeamUserZip = true;
-                deleteFile(pathTeamUser);
+                foundTeamMemberZip = true;
+                deleteFile(pathTeamMember);
             }
 
-            string pathActivity = FindZipFileLocation(course, getRealFileZipName(activity));
+            string pathActivity = FindZipFileLocation(course, getRealFileZipName(assignment));
 
             if (pathActivity != null)
             {
-                foundActivityZip = true;
+                foundAssignmentZip = true;
                 deleteFile(pathActivity);
             }
 
-            if (foundActivityZip || foundTeamUserZip)
+            if (foundAssignmentZip || foundTeamMemberZip)
             {
                 //we deleted a file so we got to update the records
 
@@ -354,8 +355,8 @@ namespace OSBLE
 
                 deleteFile(getZipFilesRecords(course));
 
-                string activityRealname = getRealFileZipName(activity);
-                string teamUserRealname = getRealFileZipName(activity, teamUser);
+                string assignmentRealname = getRealFileZipName(assignment);
+                string teamMemberRealname = getRealFileZipName(assignment, teamMember);
 
                 using (StreamWriter sw = new StreamWriter(getZipFilesRecords(course)))
                 {
@@ -364,7 +365,7 @@ namespace OSBLE
                         if (line.Trim() != "")
                         {
                             string realName = line.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)[1];
-                            if (realName != activityRealname && realName != teamUserRealname)
+                            if (realName != assignmentRealname && realName != teamMemberRealname)
                             {
                                 sw.WriteLine(line);
                             }
@@ -374,9 +375,9 @@ namespace OSBLE
             }
         }
 
-        public static string GetReviewFolderLocation(Course course, int abstractAssignmentActivityID)
+        public static string GetReviewFolderLocation(Course course, int AssignmentID)
         {
-            return GetAssignmentActivityFolder(course, abstractAssignmentActivityID);
+            return GetAssignmentFolder(course, AssignmentID);
         }
 
         /// <summary>
@@ -386,9 +387,9 @@ namespace OSBLE
         /// <param name="abstractAssignmentActivityID"></param>
         /// <param name="teamUserID"></param>
         /// <returns></returns>
-        public static string GetTeamUserReviewFolderLocation(bool createPathIfNotExists, Course course, int abstractAssignmentActivityID, int teamUserID)
+        public static string GetTeamMemberReviewFolderLocation(bool createPathIfNotExists, Course course, int AssignmentID, int teamMemberID)
         {
-            string path = GetReviewFolderLocation(course, abstractAssignmentActivityID) + "\\Reviews\\" + teamUserID;
+            string path = GetReviewFolderLocation(course, AssignmentID) + "\\Reviews\\" + teamMemberID;
             DirectoryInfo info = new DirectoryInfo(path);
 
             if (!info.Exists && createPathIfNotExists)
@@ -398,21 +399,21 @@ namespace OSBLE
             return path;
         }
 
-        public static string GetTeamUserPeerReviewDraft(bool createPathIfNotExists, Course course, int abstractAssignmentActivityID, int teamUserID)
+        public static string GetTeamMemberPeerReviewDraft(bool createPathIfNotExists, Course course, int AssignmentID, int teamMemberID)
         {
-            return GetTeamUserReviewFolderLocation(createPathIfNotExists, course, abstractAssignmentActivityID, teamUserID) + "\\PeerReviewDraft.xml";
+            return GetTeamMemberReviewFolderLocation(createPathIfNotExists, course, AssignmentID, teamMemberID) + "\\PeerReviewDraft.xml";
         }
 
-        public static string GetTeamUserPeerReview(bool createPathIfNotExists, Course course, int abstractAssignmentActivityID, int teamUserID)
+        public static string GetTeamUserPeerReview(bool createPathIfNotExists, Course course, int AssignmentID, int teamMemberID)
         {
-            string path = GetTeamUserReviewFolderLocation(createPathIfNotExists, course, abstractAssignmentActivityID, teamUserID);
+            string path = GetTeamMemberReviewFolderLocation(createPathIfNotExists, course, AssignmentID, teamMemberID);
             path += "\\PeerReview.xml";
             return path;
         }
 
-        public static FileStream FindZipFile(Course course, AbstractAssignmentActivity activity, TeamUserMember teamUser = null)
+        public static FileStream FindZipFile(Course course, Assignment assignment, TeamMember teamMember = null)
         {
-            string location = FindZipFileLocation(course, getRealFileZipName(activity, teamUser));
+            string location = FindZipFileLocation(course, getRealFileZipName(assignment, teamMember));
             if (location != null)
             {
                 return GetDocumentForRead(location);
@@ -420,7 +421,7 @@ namespace OSBLE
             return null;
         }
 
-        public static bool CreateZipFolder(Course course, ZipFile zipFile, AbstractAssignmentActivity activity, TeamUserMember teamUser = null)
+        public static bool CreateZipFolder(Course course, ZipFile zipFile, Assignment assignment, TeamMember teamMember = null)
         {
             RemoveOldZipFiles(course);
             string path = getZipFolderLocation(course);
@@ -429,7 +430,7 @@ namespace OSBLE
 
             zipFile.Save(zipFileName);
 
-            AddEntryToZipRecords(course, zipFileName, getRealFileZipName(activity, teamUser), DateTime.Now);
+            AddEntryToZipRecords(course, zipFileName, getRealFileZipName(assignment, teamMember), DateTime.Now);
 
             return true;
         }
@@ -469,22 +470,22 @@ namespace OSBLE
             return string.Format("{0}\\Assignments", getCoursePath(course));
         }
 
-        public static string GetAssignmentActivityFolder(Course course, int assignmentActivityID)
+        public static string GetAssignmentFolder(Course course, int assignmentID)
         {
             string path = GetAssignmentsFolder(course);
-            path += "\\" + assignmentActivityID;
+            path += "\\" + assignmentID;
             return path;
         }
 
-        public static string GetAssignmentActivitySubmissionFolder(Course course, int assignmentActivityID)
+        public static string GetAssignmentSubmissionFolder(Course course, int assignmentID)
         {
-            return GetAssignmentActivityFolder(course, assignmentActivityID) + "\\Submissions";
+            return GetAssignmentFolder(course, assignmentID) + "\\Submissions";
         }
 
-        public static string GetTeamUserSubmissionFolder(bool createPathIfNotExists, Course course, int assignmentActivityID, TeamUserMember subbmitter)
+        public static string GetTeamMemberSubmissionFolder(bool createPathIfNotExists, Course course, int assignmentID, TeamMember subbmitter)
         {
-            string path = GetAssignmentActivitySubmissionFolder(course, assignmentActivityID);
-            path += "\\" + subbmitter.ID;
+            string path = GetAssignmentSubmissionFolder(course, assignmentID);
+            path += "\\" + subbmitter.CourseUser.UserProfileID; // CourseUserID might be all that is needed but i ran into issues.
 
             if (!Directory.Exists(path) && createPathIfNotExists)
             {
@@ -494,14 +495,14 @@ namespace OSBLE
             return path;
         }
 
-        public static string GetDeliverable(Course course, int assignmentActivityID, TeamUserMember subbmitter, string fileName)
+        public static string GetDeliverable(Course course, int assignmentID, TeamMember submitter, string fileName)
         {
-            return GetTeamUserSubmissionFolder(false, course, assignmentActivityID, subbmitter) + "\\" + fileName;
+            return GetTeamMemberSubmissionFolder(false, course, assignmentID, submitter) + "\\" + fileName;
         }
 
-        public static string GetDeliverable(Course course, int assignmentActivityID, TeamUserMember subbmitter, string fileName, string[] possibleFileExtensions)
+        public static string GetDeliverable(Course course, int assignmentID, TeamMember submitter, string fileName, string[] possibleFileExtensions)
         {
-            string path = GetTeamUserSubmissionFolder(false, course, assignmentActivityID, subbmitter) + "\\";
+            string path = GetTeamMemberSubmissionFolder(false, course, assignmentID, submitter) + "\\";
 
             if (Directory.Exists(path))
             {

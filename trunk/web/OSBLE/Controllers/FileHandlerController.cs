@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web.Mvc;
 using Ionic.Zip;
 using OSBLE.Attributes;
-using OSBLE.Models.Assignments.Activities;
+//using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.Assignments;
@@ -55,17 +55,17 @@ namespace OSBLE.Controllers
         }
 
         [NotForCommunity]
-        public ActionResult GetSubmissionDeliverable(int assignmentActivityID, int teamUserID, string fileName)
+        public ActionResult GetSubmissionDeliverable(int assignmentID, int teamMemberID, string fileName)
         {
             try
             {
-                AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(assignmentActivityID);
-                TeamUserMember teamUser = db.TeamUsers.Find(teamUserID);
+                Assignment assignment = db.Assignments.Find(assignmentID);
+                TeamMember teamMember = db.TeamMembers.Find(teamMemberID);
 
                 //make sure assignmentActivity is part of the activeCourse and (the person can grade  or is allowed access to it)
-                if (activity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID && (activeCourse.AbstractRole.CanGrade || teamUser.Contains(currentUser)))
+                if (assignment.Category.CourseID == activeCourse.AbstractCourseID && (activeCourse.AbstractRole.CanGrade || teamMember.CourseUser.UserProfileID == currentUser.ID))
                 {
-                    string path = FileSystem.GetDeliverable(activeCourse.AbstractCourse as Course, assignmentActivityID, teamUser, fileName);
+                    string path = FileSystem.GetDeliverable(activeCourse.AbstractCourse as Course, assignmentID, teamMember, fileName);
                     return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
                 }
             }
@@ -76,19 +76,27 @@ namespace OSBLE.Controllers
         }
 
         [NotForCommunity]
-        public ActionResult GetSubmissionDeliverableByType(int assignmentActivityID, int userProfileID, string fileName, DeliverableType type)
+        public ActionResult GetSubmissionDeliverableByType(int assignmentID, int userProfileID, string fileName, DeliverableType type)
         {
-            AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(assignmentActivityID);
+            Assignment assignment = db.Assignments.Find(assignmentID);
 
             //rather then checking every step try catch will take care of it
             try
             {
                 //If u are looking at the activeCourse and you can either see all or looking at your own let it pass
-                if (activeCourse.AbstractCourseID == activity.AbstractAssignment.Category.CourseID && (activeCourse.AbstractRole.CanSeeAll || currentUser.ID == userProfileID))
+                if (activeCourse.AbstractCourseID == assignment.Category.CourseID && (activeCourse.AbstractRole.CanSeeAll || currentUser.ID == userProfileID))
                 {
-                    var teamUser = (from c in activity.TeamUsers where c.Contains(db.UserProfiles.Find(userProfileID)) select c).FirstOrDefault();
-
-                    string path = FileSystem.GetDeliverable(activeCourse.AbstractCourse as Course, assignmentActivityID, teamUser, fileName, GetFileExtensions(type));
+                    //was this
+                    //var teamUser = (from c in activity.TeamUsers where c.Contains(db.UserProfiles.Find(userProfileID)) select c).FirstOrDefault();
+                    
+                    
+                    ///////////////////////////////////ADDED but dont think it will work
+                    TeamMember member = db.TeamMembers.Find(userProfileID);
+                    var teamMembers = (from c in assignment.AssignmentTeams where c.Team.TeamMembers.Contains(member) select c.Team.TeamMembers).FirstOrDefault(); // this need to be a TeamMember not assnTeams
+                    //////////////////////////
+                    
+                    //   Member needs to be changed to team member, made it this way so it will compile
+                    string path = FileSystem.GetDeliverable(activeCourse.AbstractCourse as Course, assignmentID, member, fileName, GetFileExtensions(type));
 
                     if (path != null)
                     {
@@ -106,17 +114,17 @@ namespace OSBLE.Controllers
 
         [CanGradeCourse]
         [NotForCommunity]
-        public ActionResult GetAllSubmissionsForActivity(int assignmentActivityID)
+        public ActionResult GetAllSubmissionsForAssignment(int assignmentID)
         {
-            AbstractAssignmentActivity acitivity = db.AbstractAssignmentActivities.Find(assignmentActivityID);
+            Assignment assignment = db.Assignments.Find(assignmentID);
 
             try
             {
-                if (acitivity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID)
+                if (assignment.Category.CourseID == activeCourse.AbstractCourseID) 
                 {
-                    Stream stream = FileSystem.FindZipFile(activeCourse.AbstractCourse as Course, acitivity);
+                    Stream stream = FileSystem.FindZipFile(activeCourse.AbstractCourse as Course, assignment);
 
-                    string zipFileName = acitivity.Name + ".zip";
+                    string zipFileName = assignment.AssignmentName + ".zip";
 
                     if (stream != null)
                     {
@@ -130,7 +138,7 @@ namespace OSBLE.Controllers
                         i++;
                     }
 
-                    string submissionfolder = FileSystem.GetAssignmentActivitySubmissionFolder(acitivity.AbstractAssignment.Category.Course, acitivity.ID);
+                    string submissionfolder = FileSystem.GetAssignmentSubmissionFolder(assignment.Category.Course, assignment.ID);
 
                     using (ZipFile zipfile = new ZipFile())
                     {
@@ -138,16 +146,16 @@ namespace OSBLE.Controllers
 
                         if (!acitvityDirectory.Exists)
                         {
-                            FileSystem.CreateZipFolder(activeCourse.AbstractCourse as Course, zipfile, acitivity);
+                            FileSystem.CreateZipFolder(activeCourse.AbstractCourse as Course, zipfile, assignment);
                         }
                         else
                         {
                             foreach (DirectoryInfo submissionDirectory in acitvityDirectory.GetDirectories())
                             {
-                                zipfile.AddDirectory(submissionDirectory.FullName, (from c in acitivity.TeamUsers where c.ID.ToString() == submissionDirectory.Name select c).FirstOrDefault().Name);
+                                zipfile.AddDirectory(submissionDirectory.FullName, (from c in assignment.AssignmentTeams where c.TeamID.ToString() == submissionDirectory.Name select c).FirstOrDefault().Team.Name);
                             }
 
-                            FileSystem.CreateZipFolder(activeCourse.AbstractCourse as Course, zipfile, acitivity);
+                            FileSystem.CreateZipFolder(activeCourse.AbstractCourse as Course, zipfile, assignment);
                         }
                         stream = FileSystem.GetDocumentForRead(zipfile.Name);
 
@@ -163,36 +171,36 @@ namespace OSBLE.Controllers
         }
 
         [NotForCommunity]
-        public ActionResult GetTeamUserPeerReview(int assignmentActivityID, int teamUserID)
+        public ActionResult GetTeamUserPeerReview(int assignmentID, int teamMemberID)
         {
             try
             {
-                AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(assignmentActivityID);
-                TeamUserMember teamUser = db.TeamUsers.Find(teamUserID);
+                Assignment assignment = db.Assignments.Find(assignmentID);
+                TeamMember teamMember = db.TeamMembers.Find(teamMemberID);
 
-                if ((activity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID))
+                if ((assignment.Category.CourseID == activeCourse.AbstractCourseID))
                 {
                     if (activeCourse.AbstractRole.CanGrade)
                     {
                         //if we are dealing with a teacher first give them the published but if it doesn't exists give them a draft if that doesn't exist give em nothing
-                        string path = FileSystem.GetTeamUserPeerReview(false, activeCourse.AbstractCourse as Course, assignmentActivityID, teamUser.ID);
+                        string path = FileSystem.GetTeamUserPeerReview(false, activeCourse.AbstractCourse as Course, assignmentID, teamMember.CourseUser.UserProfileID);
                         if (new FileInfo(path).Exists)
                         {
                             return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
                         }
                         else
                         {
-                            path = FileSystem.GetTeamUserPeerReviewDraft(false, activeCourse.AbstractCourse as Course, assignmentActivityID, teamUser.ID);
+                            path = FileSystem.GetTeamMemberPeerReviewDraft(false, activeCourse.AbstractCourse as Course, assignmentID, teamMember.CourseUser.UserProfileID);
                             if (new FileInfo(path).Exists)
                             {
                                 return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
                             }
                         }
                     }
-                    else if (activeCourse.AbstractRole.CanSubmit && teamUser.Contains(currentUser))
+                    else if (activeCourse.AbstractRole.CanSubmit && teamMember.CourseUser.UserProfileID == currentUser.ID)
                     {
                         //if we are dealing with student try to give them the published one but if that doesn't exist give them nothing
-                        string path = FileSystem.GetTeamUserPeerReview(false, activeCourse.AbstractCourse as Course, assignmentActivityID, teamUser.ID);
+                        string path = FileSystem.GetTeamUserPeerReview(false, activeCourse.AbstractCourse as Course, assignmentID, teamMember.CourseUser.UserProfileID);
                         return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
                     }
                 }
@@ -205,7 +213,7 @@ namespace OSBLE.Controllers
 
         [CanGradeCourse]
         [NotForCommunity]
-        public ActionResult GetSubmissionZip(int assignmentActivityID, int teamUserID)
+        public ActionResult GetSubmissionZip(int assignmentID, int teamMemberID)
         {
             //This can be used to simulate a long load time
             /*Int64 i = 0;
@@ -214,16 +222,19 @@ namespace OSBLE.Controllers
                 i++;
             }*/
 
-            AbstractAssignmentActivity acitivity = db.AbstractAssignmentActivities.Find(assignmentActivityID);
+            Assignment assignment = db.Assignments.Find(assignmentID);
 
             try
             {
-                TeamUserMember teamUser = db.TeamUsers.Find(teamUserID);
-                if (acitivity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID && acitivity.TeamUsers.Contains(teamUser))
-                {
-                    Stream stream = FileSystem.FindZipFile(activeCourse.AbstractCourse as Course, acitivity, teamUser);
+                TeamMember teamMember = db.TeamMembers.Find(teamMemberID);
+                Team team = db.Teams.Find(teamMember);
+                AssignmentTeam assignmentTeam = db.AssignmentTeams.Find(team);
 
-                    string zipFileName = acitivity.Name + " by " + teamUser.Name + ".zip";
+                if (assignment.Category.CourseID == activeCourse.AbstractCourseID && assignment.AssignmentTeams.Contains(assignmentTeam))
+                {
+                    Stream stream = FileSystem.FindZipFile(activeCourse.AbstractCourse as Course, assignment, teamMember);
+
+                    string zipFileName = assignment.AssignmentName + " by " + teamMember.CourseUser.UserProfile.LastAndFirst() + ".zip";
 
                     if (stream != null)
                     {
@@ -237,7 +248,7 @@ namespace OSBLE.Controllers
                         i++;
                     }*/
 
-                    string submissionfolder = FileSystem.GetTeamUserSubmissionFolder(false, (activeCourse.AbstractCourse as Course), assignmentActivityID, db.TeamUsers.Find(teamUserID));
+                    string submissionfolder = FileSystem.GetTeamMemberSubmissionFolder(false, (activeCourse.AbstractCourse as Course), assignmentID, db.TeamMembers.Find(teamMember));
 
                     using (ZipFile zipfile = new ZipFile())
                     {
@@ -245,7 +256,7 @@ namespace OSBLE.Controllers
                         {
                             zipfile.AddDirectory(submissionfolder);
                         }
-                        FileSystem.CreateZipFolder(activeCourse.AbstractCourse as Course, zipfile, acitivity, teamUser);
+                        FileSystem.CreateZipFolder(activeCourse.AbstractCourse as Course, zipfile, assignment, teamMember);
 
                         stream = FileSystem.GetDocumentForRead(zipfile.Name);
 
