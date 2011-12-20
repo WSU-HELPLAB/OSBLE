@@ -60,27 +60,38 @@ if(ViewBag.SubmissionReceived)
     <table>
     @foreach (Assignment a in pastAssignments)
     {
-        <tr>@a.AssignmentName</tr>
+        <tr><td>@Html.ActionLink(a.AssignmentName, "AssignmentView", "Assignment", new { a.ID }, null)</td></tr>
     }
     </table>
     
 }
 
-@*@if (ViewBag.PresentAssignments.Count > 0)
+@if (ViewBag.PresentAssignments.Count > 0)
 {
     ViewBag.AssignmentList = 1;
-<h4>Present Assignments @(ViewBag.PresentAssignments.Count)</h4>
-
-@Html.Partial("_AssignmentList", ViewBag.PresentAssignments as List<Assignment>)
-    
+<h4>Present Assignments (@ViewBag.PresentAssignments.Count)</h4>
+    List<Assignment> presentAssignments = (from a in ViewBag.PresentAssignments as ICollection<Assignment>
+                                           select a).ToList();
+    <table>
+    @foreach (Assignment a in presentAssignments)
+    {
+        <tr><td>@Html.ActionLink(a.AssignmentName, "AssignmentView", "Assignment", new { a.ID }, null)</td></tr>
+    }
+    </table>
 }
 
 @if (ViewBag.FutureAssignments.Count > 0)
 {
     ViewBag.AssignmentList = 2;
 <h4>Future Assignments (@ViewBag.FutureAssignments.Count)</h4>
-
-@Html.Partial("_AssignmentList", ViewBag.FutureAssignments as List<Assignment>)
+List<Assignment> futureAssignments = (from a in ViewBag.FutureAssignments as ICollection<Assignment>
+                                        select a).ToList();
+    <table>
+    @foreach (Assignment a in futureAssignments)
+    {
+        <tr><td>@Html.ActionLink(a.AssignmentName, "AssignmentView", "Assignment", new { a.ID }, null)</td></tr>
+    }
+    </table>
     
 }
 
@@ -89,7 +100,13 @@ if(ViewBag.SubmissionReceived)
 {
     ViewBag.AssignmentList = 4;
 <h4>Draft Assignments (@ViewBag.DraftAssignments.Count)</h4>    
+    List<Assignment> draftAssignments = (from a in ViewBag.DraftAssignments as ICollection<Assignment>
+                                        select a).ToList();
+    <table>
+    @foreach (Assignment a in draftAssignments)
+    {
+        <tr><td>@Html.ActionLink(a.AssignmentName, "AssignmentView", "Assignment", new { a.ID }, null)</td></tr>
+    }
+    </table>
     
-@Html.Partial("_AssignmentList", ViewBag.DraftAssignments as List<Assignment>)
-    
-}*@
+}

@@ -113,7 +113,14 @@ namespace OSBLE.Models.Assignments
         {
             get
             {
-                return AssignmentTeams.Count > 0;
+                foreach (AssignmentTeam at in AssignmentTeams)
+                {
+                    if (at.Team.TeamMembers.Count() > 1)
+                    {
+                        return true;
+                    }
+                }
+                return false;
             }
         }
 

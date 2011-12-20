@@ -139,13 +139,6 @@ namespace OSBLE.Controllers
                         return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
                     }
 
-                    //This can be used to simulate a long load time
-                    Int64 i = 0;
-                    while (i < 2000000000)
-                    {
-                        i++;
-                    }
-
                     string submissionfolder = FileSystem.GetAssignmentSubmissionFolder(assignment.Category.Course, assignment.ID);
 
                     using (ZipFile zipfile = new ZipFile())

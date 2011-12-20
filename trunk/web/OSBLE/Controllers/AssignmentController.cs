@@ -206,21 +206,25 @@ namespace OSBLE.Controllers
             
             // Past assignments are non-draft assignments whose final stop date has already passed.
             List<Assignment> pastAssignments = (from assignment in db.Assignments
-                                                where !assignment.IsDraft
-                                                orderby assignment.DueDate <= DateTime.Now descending
+                                                where !assignment.IsDraft &&
+                                                assignment.DueDate <= DateTime.Now
+                                                orderby assignment.DueDate
                                                 select assignment).ToList();
 
             //(AH): Not sure this query is going to work. Make sure to check it!
             // Present assignments are any (non-draft) for which we are between the first start date and last end date.
             List<Assignment> presentAssignments = (from assignment in db.Assignments
-                                                   where !assignment.IsDraft
-                                                   orderby assignment.ReleaseDate <= DateTime.Now, assignment.DueDate > DateTime.Now
+                                                   where !assignment.IsDraft &&
+                                                   assignment.DueDate > DateTime.Now &&
+                                                   assignment.ReleaseDate <= DateTime.Now
+                                                   orderby assignment.DueDate
                                                    select assignment).ToList();
 
             // Future assignments are non-draft assignments whose start date has not yet happened.
             List<Assignment> futureAssignments = (from assignment in db.Assignments
-                                                  where !assignment.IsDraft
-                                                  orderby assignment.ReleaseDate > DateTime.Now
+                                                  where !assignment.IsDraft &&
+                                                  assignment.ReleaseDate > DateTime.Now
+                                                  orderby assignment.ReleaseDate
                                                   select assignment).ToList();
 
             List<Assignment> draftAssignments = new List<Assignment>();
@@ -499,6 +503,34 @@ namespace OSBLE.Controllers
                 OnLoaded = "SLObjectLoaded",
                 Parameters = parameters
             };
+        }
+        
+        public ActionResult AssignmentView (int id)
+        {
+            Assignment assignment = db.Assignments.Find(id);
+            List<Score> scores = assignment.Scores.ToList();
+            List<Tuple<string, AssignmentTeam>> scoreAndTeam = new List<Tuple<string, AssignmentTeam>>();
+
+            List<AssignmentTeam> teams = assignment.AssignmentTeams.ToList();
+            foreach (AssignmentTeam team in teams)
+            {
+                bool foundMatch = false;
+                foreach (Score score in scores)
+                {
+                    if (score.AssignmentTeamID == team.TeamID)
+                    {
+                        scoreAndTeam.Add(new Tuple<string, AssignmentTeam>(score.Points.ToString(), team));
+                        foundMatch = true;
+                    }
+                }
+                if (!foundMatch)
+                {
+                    scoreAndTeam.Add(new Tuple<string, AssignmentTeam>("NG", team));
+                }
+            }
+
+            ViewBag.ScoresAndTeams = scoreAndTeam;
+            return View(assignment);
         }
     }
 }
