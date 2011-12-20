@@ -9,6 +9,7 @@
 @Html.HiddenFor(m => m.RubricID)
 @Html.HiddenFor(m => m.PrecededingAssignmentID)
 @Html.HiddenFor(m => m.CommentCategoryID)
+@Html.HiddenFor(m => m.IsDraft)
 <table class="wizard_entry_table">
 <tr>
     <th>@Html.LabelFor(m => m.AssignmentName):</th>
@@ -58,10 +59,5 @@
     <th>@Html.LabelFor(m => m.DeductionPerHourLate):</th>
     <td>@Html.EditorFor(m => m.DeductionPerHourLate)</td>
     <td>@Html.ValidationMessageFor(m => m.DeductionPerHourLate)</td>
-</tr>
-<tr>
-    <th>@Html.LabelFor(m => m.IsDraft):</th>
-    <td>@Html.EditorFor(m => m.IsDraft)</td>
-    <td>@Html.ValidationMessageFor(m => m.IsDraft)</td>
 </tr>
 </table>

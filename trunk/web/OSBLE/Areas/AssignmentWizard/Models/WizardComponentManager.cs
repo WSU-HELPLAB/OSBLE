@@ -223,19 +223,19 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             };
             AllComponents.Add(comp);
 
-            //SUBMISSIONS
-            comp = new WizardComponent()
-            {
-                Controller = new DeliverablesController(),
-                IsSelected = false,
-                IsRequired = false
-            };
-            AllComponents.Add(comp);
-
             //TEAM ASSIGNMENTS
             comp = new WizardComponent()
             {
                 Controller = new TeamController(),
+                IsSelected = true,
+                IsRequired = true
+            };
+            AllComponents.Add(comp);
+
+            //SUBMISSIONS
+            comp = new WizardComponent()
+            {
+                Controller = new DeliverablesController(),
                 IsSelected = false,
                 IsRequired = false
             };

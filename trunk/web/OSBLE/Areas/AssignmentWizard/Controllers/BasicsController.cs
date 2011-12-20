@@ -62,59 +62,22 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         }
 
         [HttpPost]
-        public new ActionResult Index(Assignment model)
+        public ActionResult Index(Assignment model)
         {
             Assignment = model;
             if (ModelState.IsValid)
             {
                 WasUpdateSuccessful = true;
-                int lastColumnNumber = (from assignments in db.Assignments 
-                                        orderby assignments.ColumnOrder descending
-                                        select assignments.ColumnOrder).FirstOrDefault();
 
-                if (lastColumnNumber != null)
-                {
-                    Assignment.ColumnOrder = (lastColumnNumber + 1);
-                }
-                else
-                {
-                    Assignment.ColumnOrder = 1;
-                }
                 //update our DB
                 if (Assignment.ID == 0)
                 {
+                    //calcuate column order for gradebook organization
+                    int lastColumnNumber = (from assignments in db.Assignments
+                                            orderby assignments.ColumnOrder descending
+                                            select assignments.ColumnOrder).FirstOrDefault();
+                    Assignment.ColumnOrder = (lastColumnNumber + 1);
                     db.Assignments.Add(Assignment);
-                    db.SaveChanges();
-                    int currentCourseId = ActiveCourse.AbstractCourseID;
-                    List<CourseUser> Users = (from user in db.CourseUsers
-                                              where user.AbstractCourseID == currentCourseId
-                                              select user).ToList();
-
-                    foreach (CourseUser u in Users)
-                    {
-                        TeamMember userMember = new TeamMember()
-                        {
-                            CourseUser = u,
-                            CourseUserID = u.ID,
-                        };
-
-                        Team team = new Team();
-                        team.Name = userMember.CourseUser.UserProfile.LastName + "," + userMember.CourseUser.UserProfile.FirstName;
-                        team.TeamMembers.Add(userMember);
-
-                        db.Teams.Add(team);
-                        db.SaveChanges();
-
-                        AssignmentTeam assignmentTeam = new AssignmentTeam()
-                        {
-                            AssignmentID = Assignment.ID,
-                            Team = team,
-                            TeamID = team.ID,
-                        };
-
-                        db.AssignmentTeams.Add(assignmentTeam);
-                        db.SaveChanges();
-                    }
                 }
                 else
                 {

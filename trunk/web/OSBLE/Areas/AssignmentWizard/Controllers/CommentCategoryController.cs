@@ -26,6 +26,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 List<WizardBaseController> prereqs = new List<WizardBaseController>();
                 prereqs.Add(new BasicsController());
+                prereqs.Add(new TeamController());
                 return prereqs;
             }
         }
