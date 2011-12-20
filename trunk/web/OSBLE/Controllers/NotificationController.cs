@@ -301,32 +301,32 @@ namespace OSBLE.Controllers
                     break;
                 case Notification.Types.FileSubmitted:
                     subject += "New Assignment Submmission from " + sender.FirstName + " " + sender.LastName;
-
-                    body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
+                    string[] args = n.Data.Split(new char[] { ';' });
+                    body = sender.FirstName + " " + sender.LastName + " has submitted the assignment \"" + args[2] + "\"."; //Can we get name of assignment?
 
                     action = "view this assignment submission.";
 
                     break;
                 case Notification.Types.RubricEvaluationCompleted:
                     subject += sender.FirstName + " " + sender.LastName + "has published a rubric  Assignment Submmission from ";
-
-                    body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
+                    string[] args2 = n.Data.Split(new char[] { ';' });
+                    body = sender.FirstName + " " + sender.LastName + " has submitted a Rubric Evaluation for the assignment, \"" + args2[2] + "\"."; //Can we get name of assignment?
 
                     action = "view this assignment submission.";
 
                     break;
                 case Notification.Types.InlineReviewCompleted:
                     subject += sender.FirstName + " " + sender.LastName + "has published a rubric  Assignment Submmission from ";
-
-                    body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
+                    string[] args3 = n.Data.Split(new char[] { ';' });
+                    body = sender.FirstName + " " + sender.LastName + " has submitted an inline review of, \"" + args3[2] + "\"."; //Can we get name of assignment?
 
                     action = "view this assignment submission.";
 
                     break;
                 default:
-                    subject += "No Email set up for this type of notification";
+                    subject += "No Email set up for this type of notification type: " + n.ItemType;
 
-                    body = "No Email set up for this type of notification of type: " + n.ItemType;
+                    body = "No Email set up for this type of notification" + n.ItemType;
                     break;
             }
 

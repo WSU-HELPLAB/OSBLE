@@ -74,19 +74,37 @@ namespace OSBLE.Controllers
                                             select m.ToUserProfile).ToList();
 
             // for the older message and newer message links
-            var isNewer = true;
-            if (db.Mails.Find(id + 1) == null)
-            {
-                isNewer = false;
-            }
-            ViewBag.IsNewer = isNewer;
+            int i = 1, j = 1;
+            var lastMail = (from m in db.Mails
+                            where m.ToUserProfileID == currentUser.ID
+                            orderby m.ID descending
+                            select m).FirstOrDefault();
 
-            var isOlder = true;
-            if (db.Mails.Find(id - 1) == null)
+            var next = id;
+            // == null handles deleted emails
+            // toUserProfile handes the issue of switching to the outbox
+            while ((db.Mails.Find(id + i) == null || db.Mails.Find(id + i).ToUserProfileID != currentUser.ID) && ((id + i) <= lastMail.ID))
             {
-                isOlder = false;
+                i++;
             }
-            ViewBag.IsOlder = isOlder;
+            if (id + i <= lastMail.ID)
+            {
+                next = id + i;
+            }
+            ViewBag.Next = next;
+
+            var prev = id;
+            // == null handles deleted emails
+            // toUserProfile handes the issue of switching to the outbox
+            while ((db.Mails.Find(id - j) == null || db.Mails.Find(id - j).ToUserProfileID != currentUser.ID) && j < id)
+            {
+                j++;
+            }
+            if (j < id)
+            {
+                prev = id - j;
+            }
+            ViewBag.Prev = prev;
 
             ViewBag.AllRecipients = recipients;
             return View(mail);

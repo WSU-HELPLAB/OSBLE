@@ -124,23 +124,31 @@
     }
     <br /><br />
     
-    if (ViewBag.IsOlder == true)
-    {
-        @Html.ActionLink("Older", "View", new { id = Model.ID - 1 }) <a>&nbsp;</a>
-    }
-    else{
-        <a>Older &nbsp;</a>
-    }
-    
-    @Html.ActionLink("Back to Inbox\t", "Index") <a>&nbsp;</a>
-    
-    if (ViewBag.IsNewer == true)  
-    {
-        @Html.ActionLink("Newer", "View", new { id = Model.ID + 1 })
-    }
-    else{
-        <a>Newer &nbsp;</a>
-    }
+    <table>
+        <tr>
+            <td class="email_view_links">
+            @if (ViewBag.Prev < Model.ID)
+            {
+                @Html.ActionLink("Older", "View", new { id = ViewBag.Prev }) <a>&nbsp;</a>
+            }
+            else
+            {
+            }
+            </td>
+            <td class="email_view_links">
+            @Html.ActionLink("Back to Inbox\t", "Index") <a>&nbsp;</a>
+            </td>
+            <td class="email_view_links">
+            @if (ViewBag.Next > Model.ID)
+            {
+                @Html.ActionLink("Newer", "View", new { id = ViewBag.Next })
+            }
+            else
+            {
+            }
+            </td>
+        </tr>
+    </table>
 }
 else
 {

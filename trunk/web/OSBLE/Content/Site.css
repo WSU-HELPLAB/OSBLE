@@ -942,6 +942,11 @@ body#layoutLogOn
     cursor:pointer;
 }
 
+.email_view_links
+{
+    width: 350px;
+}
+
 .mail_user
 {
 	display: block;
