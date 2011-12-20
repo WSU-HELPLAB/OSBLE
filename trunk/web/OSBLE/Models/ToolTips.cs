@@ -90,7 +90,12 @@ namespace OSBLE.Models
 
             public static string BasicAssignmentReleaseDate = "This is the date and time that the assignment will first show up for users.";
             public static string BasicAssignmentDueDate = "This is the last date and time to turn in the assignment. See the <strong>Late Policy</strong> section below to determine how automatic deductions will be handled for assignments turned in after this date. ";
-            public static string BasicAssignmentIsTeam = "Team assignments allow groups to collaborate on the creation of deliverables. Only a single member of the team must turn in the deliverable and it will be attributed to all members of the team. <br /><br /> Team assignments require teams to be created below.";
+            public static string BasicAssignmentIsTeam = "Team assignments allow groups to collaborate on " +
+                "the creation of deliverables. Only a single member of the team must turn in the deliverable " +
+                "and it will be attributed to all members of the team. <br /><br /> OSBLE assumes that all " +
+                "assignments are team-based.  If this assignment is not team-based, click the &quot;Next&quot; " +
+                "button at the bottom of the screen.  Unassigned students will automatically be placed into " +
+                "separate, individual teams.";
             public static string BasicAssignmentDeliverables = "Deliverables are the actual assignment types that are expected to be turned in. Each assignment can have multiple files and file types to turn in.";
 
             public static string BasicAssignmentUseRubric = "Check this box to create a rubric that will determine how this assignment is graded. (You have to click <em>Edit Rubric</em> to specify the rubric.)";
