@@ -1,11 +1,11 @@
 ﻿@using OSBLE.Models.Assignments
 @using OSBLE.Models.Assignments.Activities
-@model StudioAssignment
+@model Assignment
            
            <script src="@Url.Content("~/Scripts/osble.teacher_activity.js")" type="text/javascript" ></script>
 
 @{
-    StudioAssignment sa = Model;
+    Assignment a = Model;
     int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
 }
 @*This page is for teachers only*@
@@ -13,23 +13,16 @@
 { 
 
     <div class="assignment_header">
-        <a id="@StudioAssignmentCounter" href="#">@sa.Name</a>
+        <a id="@StudioAssignmentCounter" href="#">@a.AssignmentName</a>
     </div>
     <div>
-        <a href="/BasicAssignment/Edit/@sa.ID">Edit Assignment</a>
-        @Html.ActionLink("Delete Assignment", "Delete", new { id = sa.ID }, new { style = "margin-left:8px;" })
-        <a href="/Assignments/Wizard/Start/@sa.ID">Edit Assignment</a>
+        <a href="/BasicAssignment/Edit/@a.ID">Edit Assignment</a>
+        @Html.ActionLink("Delete Assignment", "Delete", new { id = a.ID }, new { style = "margin-left:8px;" })
+        <a href="/Assignments/Wizard/Start/@a.ID">Edit Assignment</a>
         <div class="assignment_title">
             Description</div>
         @* Add links to assignment description *@
-        <div class="assignment_description">@Helpers.Linkify(sa.Description)</div>
-        
-
-            @if (sa.AssignmentActivities.Where(aa => aa is SubmissionActivity).Count() > 0)
-            {
-            <div class="assignment_title">
-                Activities
-            </div>
+        <div class="assignment_description">@Helpers.Linkify(a.AssignmentDescription)</div>
 
             <div class="activity_accordion">
             @{

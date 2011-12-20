@@ -683,12 +683,13 @@ namespace OSBLE.Controllers
             bool submissionFound = false;
             foreach (TeamUserMember teamUser in viewModel.Submission.TeamUsers)
             {
-                DateTime? submissionTime = GetSubmissionTime(activeCourse.AbstractCourse as Course, viewModel.Submission, teamUser);
-                if (submissionTime != null)
-                {
-                    submissionFound = true;
-                    break;
-                }
+                //(AH)Commenting out for testing purposes
+                //DateTime? submissionTime = GetSubmissionTime(activeCourse.AbstractCourse as Course, viewModel.Submission, teamUser);
+                //if (submissionTime != null)
+                //{
+                //    submissionFound = true;
+                //    break;
+                //}
             }
 
             //if we found something, then we need to inform the view

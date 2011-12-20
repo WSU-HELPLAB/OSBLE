@@ -7,16 +7,15 @@ namespace OSBLE.Models.ViewModels
 {
     public class ActivityTeacherTableViewModel
     {
-        public ActivityTeacherTableViewModel(AbstractAssignment assignment, AbstractAssignmentActivity activity)
+        public ActivityTeacherTableViewModel(Assignment assignment)
         {
             Assignment = assignment;
-            Activity = activity;
             SubmissionsInfo = new List<SubmissionInfo>();
         }
 
-        public AbstractAssignment Assignment { get; set; }
+        public Assignment Assignment { get; set; }
 
-        public AbstractAssignmentActivity Activity { get; set; }
+        //public AbstractAssignmentActivity Activity { get; set; }
 
         public List<SubmissionInfo> SubmissionsInfo { get; set; }
 

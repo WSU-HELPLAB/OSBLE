@@ -68,7 +68,18 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             if (ModelState.IsValid)
             {
                 WasUpdateSuccessful = true;
+                int lastColumnNumber = (from assignments in db.Assignments 
+                                        orderby assignments.ColumnOrder descending
+                                        select assignments.ColumnOrder).FirstOrDefault();
 
+                if (lastColumnNumber != null)
+                {
+                    Assignment.ColumnOrder = (lastColumnNumber + 1);
+                }
+                else
+                {
+                    Assignment.ColumnOrder = 1;
+                }
                 //update our DB
                 if (Assignment.ID == 0)
                 {

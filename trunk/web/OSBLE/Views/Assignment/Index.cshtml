@@ -54,16 +54,24 @@ if(ViewBag.SubmissionReceived)
 {
     ViewBag.AssignmentList = 0;
 <h4>Past Assignments (@ViewBag.PastAssignments.Count)</h4>
-@Html.Partial("_AssignmentList", ViewBag.PastAssignments as List<StudioAssignment>)
+//@Html.Partial("_AssignmentList", ViewBag.PastAssignments as List<Assignment>)
+    List<Assignment> pastAssignments = (from a in ViewBag.PastAssignments as ICollection<Assignment>
+                                        select a).ToList();
+    <table>
+    @foreach (Assignment a in pastAssignments)
+    {
+        <tr>@a.AssignmentName</tr>
+    }
+    </table>
     
 }
 
-@if (ViewBag.PresentAssignments.Count > 0)
+@*@if (ViewBag.PresentAssignments.Count > 0)
 {
     ViewBag.AssignmentList = 1;
 <h4>Present Assignments @(ViewBag.PresentAssignments.Count)</h4>
 
-@Html.Partial("_AssignmentList", ViewBag.PresentAssignments as List<StudioAssignment>)
+@Html.Partial("_AssignmentList", ViewBag.PresentAssignments as List<Assignment>)
     
 }
 
@@ -72,7 +80,7 @@ if(ViewBag.SubmissionReceived)
     ViewBag.AssignmentList = 2;
 <h4>Future Assignments (@ViewBag.FutureAssignments.Count)</h4>
 
-@Html.Partial("_AssignmentList", ViewBag.FutureAssignments as List<StudioAssignment>)
+@Html.Partial("_AssignmentList", ViewBag.FutureAssignments as List<Assignment>)
     
 }
 
@@ -82,6 +90,6 @@ if(ViewBag.SubmissionReceived)
     ViewBag.AssignmentList = 4;
 <h4>Draft Assignments (@ViewBag.DraftAssignments.Count)</h4>    
     
-@Html.Partial("_AssignmentList", ViewBag.DraftAssignments as List<StudioAssignment>)
+@Html.Partial("_AssignmentList", ViewBag.DraftAssignments as List<Assignment>)
     
-}
+}*@

@@ -18,24 +18,37 @@
     public class ReviewInterfaceDomainService : OSBLEService
     {
         protected HttpContext context = System.Web.HttpContext.Current;
-        protected AbstractAssignmentActivity activity;
-        protected TeamUserMember teamUser;
+        protected Assignment assignment;
+        protected AssignmentTeam team;
+        protected TeamMember teamMember;
 
         public ReviewInterfaceDomainService()
         {
-            activity = db.AbstractAssignmentActivities.Find((int)context.Session["CurrentActivityID"]);
-            teamUser = db.TeamUsers.Find((int)context.Session["TeamUserID"]);
+            assignment = db.Assignments.Find((int)context.Session["CurrentActivityID"]);
+            team = db.AssignmentTeams.Find((int)context.Session["TeamID"]);
+
+            //Find the team member
+            foreach (AssignmentTeam at in assignment.AssignmentTeams)
+            {
+                foreach (TeamMember tm in at.Team.TeamMembers)
+                {
+                    if (tm.CourseUser.UserProfileID == currentUserProfile.ID)
+                    {
+                        teamMember = tm;
+                    }
+                }
+            }
 
             //Giant if statement
             if (
                 //First make sure we have no nulls
-                activity == null || teamUser == null || currentCourse as Course == null || currentCourseUser == null
+                assignment == null || team == null || currentCourse as Course == null || currentCourseUser == null
 
                 //then make sure that activity is of the current course and the activity contains the teamUser
-                || activity.AbstractAssignment.Category.Course != currentCourse || !activity.TeamUsers.Contains(teamUser)
+                || assignment.Category.Course != currentCourse || !assignment.AssignmentTeams.Contains(team)
 
                 //then make sure they have the right role either can grade or they are student looking at their own work
-                || (!((currentCourseUser.AbstractRole.CanGrade) || (currentCourseUser.AbstractRole.CanSubmit && teamUser.Contains(currentUserProfile)))))
+                || (!((currentCourseUser.AbstractRole.CanGrade) || (currentCourseUser.AbstractRole.CanSubmit && team.Team.TeamMembers.Contains(teamMember)))))
             {
                 throw new Exception("Session did not contain valid IDs for activity or teamUser or currentCourse is not a Course");
             }
@@ -49,7 +62,7 @@
             {
                 temp++;
             }*/
-            string path = FileSystem.GetTeamUserSubmissionFolder(false, currentCourse as Course, activity.ID, teamUser);
+            string path = FileSystem.GetTeamUserSubmissionFolder(false, currentCourse as Course, assignment.ID, team);
 
             List<DocumentLocation> documentsToBeReviewed = new List<DocumentLocation>();
             int i = 0;
@@ -63,9 +76,9 @@
                     string filePath = file.FullName;
 
                     //get the raw url (not web accessible due to MVC restrictions)
-                    string rawUrl = VirtualPathUtility.ToAbsolute("~/" + "FileHandler/GetSubmissionDeliverable?assignmentActivityID=" + activity.ID.ToString() + "&teamUserID=" + teamUser.ID.ToString() + "&fileName=" + file.Name);
+                    string rawUrl = VirtualPathUtility.ToAbsolute("~/" + "FileHandler/GetSubmissionDeliverable?assignmentActivityID=" + assignment.ID.ToString() + "&teamUserID=" + team.TeamID.ToString() + "&fileName=" + file.Name);
 
-                    DocumentLocation location = new DocumentLocation(rawUrl, i, teamUser.Name, AuthorClassification.Student, file.Name);
+                    DocumentLocation location = new DocumentLocation(rawUrl, i, team.Team.Name, AuthorClassification.Student, file.Name);
                     documentsToBeReviewed.Add(location);
                     i++;
                 }
@@ -80,25 +93,25 @@
             {
                 i++;
             }*/
-            string path = FileSystem.GetTeamUserPeerReview(false, currentCourse as Course, activity.ID, teamUser.ID);
+            string path = FileSystem.GetTeamUserPeerReview(false, currentCourse as Course, assignment.ID, team.TeamID);
 
             FileInfo file = new FileInfo(path);
 
             if (file.Exists)
             {
-                string rawUrl = VirtualPathUtility.ToAbsolute("~/FileHandler/GetTeamUserPeerReview?assignmentActivityID=" + activity.ID.ToString() + "&teamUserID=" + teamUser.ID.ToString());
-                return (new List<DocumentLocation>() { new DocumentLocation(rawUrl, 100, teamUser.Name, AuthorClassification.Instructor, file.Name) }).AsQueryable();
+                string rawUrl = VirtualPathUtility.ToAbsolute("~/FileHandler/GetTeamUserPeerReview?assignmentActivityID=" + assignment.ID.ToString() + "&teamUserID=" + team.TeamID.ToString());
+                return (new List<DocumentLocation>() { new DocumentLocation(rawUrl, 100, team.Team.Name, AuthorClassification.Instructor, file.Name) }).AsQueryable();
             }
             else
             {
                 //no published file is there a draft?
 
-                path = FileSystem.GetTeamUserPeerReviewDraft(false, currentCourse as Course, activity.ID, teamUser.ID);
+                path = FileSystem.GetTeamUserPeerReviewDraft(false, currentCourse as Course, assignment.ID, team.TeamID);
                 file = new FileInfo(path);
                 if (file.Exists)
                 {
-                    string rawUrl = VirtualPathUtility.ToAbsolute("~/FileHandler/GetTeamUserPeerReview?assignmentActivityID=" + activity.ID.ToString() + "&teamUserID=" + teamUser.ID.ToString());
-                    return (new List<DocumentLocation>() { new DocumentLocation(rawUrl, 100, teamUser.Name, AuthorClassification.Instructor, file.Name) }).AsQueryable();
+                    string rawUrl = VirtualPathUtility.ToAbsolute("~/FileHandler/GetTeamUserPeerReview?assignmentActivityID=" + assignment.ID.ToString() + "&teamUserID=" + team.TeamID.ToString());
+                    return (new List<DocumentLocation>() { new DocumentLocation(rawUrl, 100, team.Team.Name, AuthorClassification.Instructor, file.Name) }).AsQueryable();
                 }
             }
 
@@ -114,11 +127,11 @@
         {
             if (currentCourseUser.AbstractRole.CanGrade)
             {
-                using (StreamWriter sw = new StreamWriter(FileSystem.GetTeamUserPeerReview(true, currentCourse as Course, activity.ID, teamUser.ID)))
+                using (StreamWriter sw = new StreamWriter(FileSystem.GetTeamUserPeerReview(true, currentCourse as Course, assignment.ID, team.TeamID)))
                 {
                     sw.Write(str);
                 }
-                new NotificationController().SendInlineReviewCompletedNotification(activity, teamUser);
+                new NotificationController().SendInlineReviewCompletedNotification(assignment, team);
             }
         }
 
@@ -126,7 +139,7 @@
         {
             if (currentCourseUser.AbstractRole.CanGrade)
             {
-                using (StreamWriter sw = new StreamWriter(FileSystem.GetTeamUserPeerReviewDraft(true, currentCourse as Course, activity.ID, teamUser.ID)))
+                using (StreamWriter sw = new StreamWriter(FileSystem.GetTeamUserPeerReviewDraft(true, currentCourse as Course, assignment.ID, team.TeamID)))
                 {
                     sw.Write(str);
                 }
@@ -137,7 +150,7 @@
         {
             try
             {
-                return activity.AbstractAssignment.CommentCategoryConfiguration.Categories.AsQueryable();
+                return assignment.CommentCategory.Categories.AsQueryable();
             }
             catch
             {

@@ -8,6 +8,7 @@ using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
+using OSBLE.Models.Assignments;
 
 namespace OSBLE.Controllers
 {
@@ -168,15 +169,15 @@ namespace OSBLE.Controllers
         }
 
         [NonAction]
-        public void SendInlineReviewCompletedNotification(AbstractAssignmentActivity activity, TeamUserMember teamUserMember)
+        public void SendInlineReviewCompletedNotification(Assignment assignment, AssignmentTeam team)
         {
-            List<UserProfile> users = GetAllUsers(teamUserMember);
+            List<UserProfile> users = GetAllUsers(team);
 
             foreach (UserProfile user in users)
             {
                 Notification n = new Notification();
                 n.ItemType = Notification.Types.InlineReviewCompleted;
-                n.Data = activity.ID.ToString() + ";" + teamUserMember.ID.ToString() + ";" + activity.Name;
+                n.Data = assignment.ID.ToString() + ";" + team.TeamID.ToString() + ";" + assignment.AssignmentName;
                 n.RecipientID = user.ID;
                 n.SenderID = currentUser.ID;
 
@@ -185,15 +186,15 @@ namespace OSBLE.Controllers
         }
 
         [NonAction]
-        public void SendRubricEvaluationCompletedNotification(AbstractAssignmentActivity activity, TeamUserMember teamUserMember)
+        public void SendRubricEvaluationCompletedNotification(Assignment assignment, AssignmentTeam team)
         {
-            List<UserProfile> users = GetAllUsers(teamUserMember);
+            List<UserProfile> users = GetAllUsers(team);
 
             foreach (UserProfile user in users)
             {
                 Notification n = new Notification();
                 n.ItemType = Notification.Types.RubricEvaluationCompleted;
-                n.Data = activity.ID.ToString() + ";" + teamUserMember.ID.ToString() + ";" + activity.Name;
+                n.Data = assignment.ID.ToString() + ";" + team.TeamID.ToString() + ";" + assignment.AssignmentName;
                 n.RecipientID = user.ID;
                 n.SenderID = currentUser.ID;
 
@@ -301,32 +302,32 @@ namespace OSBLE.Controllers
                     break;
                 case Notification.Types.FileSubmitted:
                     subject += "New Assignment Submmission from " + sender.FirstName + " " + sender.LastName;
-                    string[] args = n.Data.Split(new char[] { ';' });
-                    body = sender.FirstName + " " + sender.LastName + " has submitted the assignment \"" + args[2] + "\"."; //Can we get name of assignment?
+
+                    body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
 
                     action = "view this assignment submission.";
 
                     break;
                 case Notification.Types.RubricEvaluationCompleted:
                     subject += sender.FirstName + " " + sender.LastName + "has published a rubric  Assignment Submmission from ";
-                    string[] args2 = n.Data.Split(new char[] { ';' });
-                    body = sender.FirstName + " " + sender.LastName + " has submitted a Rubric Evaluation for the assignment, \"" + args2[2] + "\"."; //Can we get name of assignment?
+
+                    body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
 
                     action = "view this assignment submission.";
 
                     break;
                 case Notification.Types.InlineReviewCompleted:
                     subject += sender.FirstName + " " + sender.LastName + "has published a rubric  Assignment Submmission from ";
-                    string[] args3 = n.Data.Split(new char[] { ';' });
-                    body = sender.FirstName + " " + sender.LastName + " has submitted an inline review of, \"" + args3[2] + "\"."; //Can we get name of assignment?
+
+                    body = n.Data; //sender.FirstName + " " + sender.LastName + " has submitted an assignment."; //Can we get name of assignment?
 
                     action = "view this assignment submission.";
 
                     break;
                 default:
-                    subject += "No Email set up for this type of notification type: " + n.ItemType;
+                    subject += "No Email set up for this type of notification";
 
-                    body = "No Email set up for this type of notification" + n.ItemType;
+                    body = "No Email set up for this type of notification of type: " + n.ItemType;
                     break;
             }
 

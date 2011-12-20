@@ -308,20 +308,14 @@ namespace OSBLE.Controllers
             ViewBag.UnreadMessageCount = (int)db.Mails.Where(m => (m.ToUserProfileID == currentUser.ID) && (m.Read == false)).Count();
         }
 
-        public static List<UserProfile> GetAllUsers(TeamUserMember teamUser)
+        public static List<UserProfile> GetAllUsers(AssignmentTeam team)
         {
             List<UserProfile> users = new List<UserProfile>();
 
-            if (teamUser is UserMember)
+            //Searching through the Assignment teams and adding all the Users
+            foreach (TeamMember tm in team.Team.TeamMembers)
             {
-                users.Add((teamUser as UserMember).UserProfile);
-            }
-            else if (teamUser is OldTeamMember)
-            {
-                foreach (TeamUserMember member in (teamUser as OldTeamMember).Team.Members)
-                {
-                    users.AddRange(GetAllUsers(member));
-                }
+                users.Add(tm.CourseUser.UserProfile);
             }
             return users;
         }
@@ -331,6 +325,28 @@ namespace OSBLE.Controllers
             var teamUser = (from c in activity.TeamUsers where c.Contains(user) == true select c).FirstOrDefault();
 
             return teamUser;
+        }
+
+        /// <summary>
+        /// Returns the Assignment team or null if a team does not exist
+        /// </summary>
+        /// <param name="assignment"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public static AssignmentTeam GetAssignmentTeam(Assignment assignment, UserProfile user)
+        {
+            AssignmentTeam returnValue = new AssignmentTeam();
+            foreach (AssignmentTeam at in assignment.AssignmentTeams)
+            {
+                foreach (TeamMember tm in at.Team.TeamMembers)
+                {
+                    if (tm.CourseUser.UserProfileID == user.ID)
+                    {
+                        returnValue = at;
+                    }
+                }
+            }
+            return returnValue;
         }
 
         public AbstractAssignmentActivity GetNextActivity(AbstractAssignmentActivity activity)
@@ -344,19 +360,19 @@ namespace OSBLE.Controllers
             return null;
         }
 
-        public DateTime? GetDueDate(AbstractAssignmentActivity activity)
+        public DateTime? GetDueDate(Assignment assignment)
         {
-            var nextActivity = GetNextActivity(activity);
-            if (nextActivity != null)
-            {
-                return nextActivity.ReleaseDate;
-            }
+            //var nextActivity = GetNextActivity(activity);
+            //if (nextActivity != null)
+            //{
+            //    return nextActivity.ReleaseDate;
+            //}
             return null;
         }
 
-        protected DateTime? GetSubmissionTime(Course course, AbstractAssignmentActivity activity, TeamUserMember teamUser)
+        protected DateTime? GetSubmissionTime(Course course, Assignment assignment, AssignmentTeam team)
         {
-            DirectoryInfo submissionFolder = new DirectoryInfo(FileSystem.GetTeamUserSubmissionFolder(false, course, activity.ID, teamUser));
+            DirectoryInfo submissionFolder = new DirectoryInfo(FileSystem.GetTeamUserSubmissionFolder(false, course, assignment.ID, team));
 
             DateTime? timeSubmitted;
 
@@ -387,17 +403,18 @@ namespace OSBLE.Controllers
             }
         }
 
-        public TimeSpan? calculateLateness(Course course, AbstractAssignmentActivity activity, TeamUserMember teamUser)
+        public TimeSpan? calculateLateness(Course course, Assignment assignment, AssignmentTeam teamMember)
         {
-            DateTime? dueDate = GetDueDate(activity);
-            DateTime? submissionTime = GetSubmissionTime(course, activity, teamUser);
+            DateTime? dueDate = assignment.DueDate;
+            
+            DateTime? submissionTime = assignment.DueTime;
 
             TimeSpan? lateness = dueDate - submissionTime;
 
             return lateness;
         }
 
-        protected double CalcualateLatePenaltyPercent(AbstractAssignmentActivity activity, TimeSpan lateness)
+        public double CalcualateLatePenaltyPercent(AbstractAssignmentActivity activity, TimeSpan lateness)
         {
             //Purposefully lose of data being nice
             if (activity.MinutesLateWithNoPenalty > (int)lateness.TotalMinutes)

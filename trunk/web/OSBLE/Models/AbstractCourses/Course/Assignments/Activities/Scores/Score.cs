@@ -31,15 +31,17 @@ namespace OSBLE.Models.Assignments.Activities.Scores
         public int TeamUserMemberID { get; set; }
 
         public virtual TeamUserMember TeamUserMember { get; set; }
-   
-         * [Required]
+    */
+
+        [Required]
         public int AssignmentTeamID { get; set; }
 
         public virtual AssignmentTeam AssignmentTeam { get; set; }
- */
+
+
         public int TeamMemberID { get; set; }
 
-        public virtual TeamMember TeamMember { get; set; }    
+        public virtual TeamMember TeamMember { get; set; } 
 
 
 

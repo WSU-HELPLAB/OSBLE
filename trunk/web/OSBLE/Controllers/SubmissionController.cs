@@ -24,15 +24,13 @@ namespace OSBLE.Controllers
         {
             if (id != null)
             {
-                AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(id);
+                Assignment assignment = db.Assignments.Find(id);
 
-                if (activity != null)
+                if (assignment != null)
                 {
-                    AbstractAssignment assignment = db.AbstractAssignments.Find(activity.AbstractAssignmentID);
-
-                    if (assignment != null && assignment.Category.CourseID == activeCourse.AbstractCourseID && activeCourse.AbstractRole.CanSubmit == true && assignment is StudioAssignment)
+                    if (assignment.Category.CourseID == activeCourse.AbstractCourseID && activeCourse.AbstractRole.CanSubmit == true)
                     {
-                        setViewBagDeliverables((assignment as StudioAssignment).Deliverables);
+                        setViewBagDeliverables((assignment).Deliverables);
 
                         return View();
                     }
@@ -42,7 +40,7 @@ namespace OSBLE.Controllers
             throw new Exception();
         }
 
-        private void setViewBagDeliverables(ICollection<dynamic> deliverables)
+        private void setViewBagDeliverables(IList<Deliverable> deliverables)
         {
             Dictionary<Deliverable, string[]> allowedFileExtensions = new Dictionary<Deliverable, string[]>();
 
@@ -67,9 +65,11 @@ namespace OSBLE.Controllers
         {
             if (id != null)
             {
-                AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(id);
+                Assignment assignment = db.Assignments.Find(id);
+                AssignmentTeam at;
 
-                TeamUserMember teamUserMember = GetTeamUser(activity, currentUser);
+                //AH: Not sure how to approach this, we might not need anymore.
+                //TeamMember teamMember = GetTeamUser(assignment, currentUser);
 
                 //var score = (from c in activity.Scores where c.TeamUserMemberID == teamUserMember.ID select c).FirstOrDefault();
 
@@ -80,16 +80,16 @@ namespace OSBLE.Controllers
                 //}
 
                 //purposefully not using the is statement as we also want to make sure it is not a null SubmissionActivity
-                if (activity as SubmissionActivity != null)
+                if (assignment != null && assignment.HasDeliverables == true)
                 {
-                    AbstractAssignment assignment = db.AbstractAssignments.Find(activity.AbstractAssignmentID);
+                    List<dynamic> deliverables = new List<dynamic>((assignment).Deliverables);
 
-                    List<dynamic> deliverables = new List<dynamic>((assignment as StudioAssignment).Deliverables);
-
-                    if (assignment != null && assignment.Category.CourseID == activeCourse.AbstractCourseID && activeCourse.AbstractRole.CanSubmit == true && assignment is StudioAssignment)
+                    if (assignment.Category.CourseID == activeCourse.AbstractCourseID && activeCourse.AbstractRole.CanSubmit == true)
                     {
-                        TeamUserMember teamUser = GetTeamUser(activity as SubmissionActivity, currentUser);
-
+                        //AH: might not need this
+                        //TeamUserMember teamUser = GetTeamUser(activity as SubmissionActivity, currentUser);
+                        AssignmentTeam assignmentTeam = GetAssignmentTeam(assignment, currentUser);
+                        
                         int i = 0;
 
                         //the files variable is null when submitting an in-browser text submission
@@ -115,7 +115,7 @@ namespace OSBLE.Controllers
                                     if (allowFileExtensions.Contains(extension))
                                     {
                                         //If a submission of any extension exists delete it.  This is needed because they could submit a .c file and then a .cs file and the teacher would not know which one is the real one.
-                                        string submission = FileSystem.GetDeliverable(activeCourse.AbstractCourse as Course, activity.ID, teamUser, deliverables[i].Name, allowFileExtensions);
+                                        string submission = FileSystem.GetDeliverable(activeCourse.AbstractCourse as Course, assignment.ID, assignmentTeam, deliverables[i].Name, allowFileExtensions);
                                         if (submission != null)
                                         {
                                             FileInfo oldSubmission = new FileInfo(submission);
@@ -125,14 +125,14 @@ namespace OSBLE.Controllers
                                                 oldSubmission.Delete();
                                             }
                                         }
-                                        FileSystem.RemoveZipFile(activeCourse.AbstractCourse as Course, activity, teamUser);
-                                        string path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, teamUser), deliverables[i].Name + extension);
+                                        FileSystem.RemoveZipFile(activeCourse.AbstractCourse as Course, assignment, assignmentTeam);
+                                        string path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, assignmentTeam), deliverables[i].Name + extension);
                                         file.SaveAs(path);
 
                                         //unzip and rezip xps files because some XPS generators don't do it right
                                         if (extension.ToLower().CompareTo(".xps") == 0)
                                         {
-                                            string extractPath = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, teamUser), "extract");
+                                            string extractPath = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, assignmentTeam), "extract");
                                             using (ZipFile oldZip = ZipFile.Read(path))
                                             {
                                                 oldZip.ExtractAll(extractPath, ExtractExistingFileAction.OverwriteSilently);
@@ -144,16 +144,16 @@ namespace OSBLE.Controllers
                                             }
                                         }
 
-                                        DateTime? dueDate = GetDueDate(activity);
-                                        if (dueDate != null && dueDate < DateTime.Now)
-                                        {
-                                            (new NotificationController()).SendFilesSubmittedNotification(activity, teamUser, deliverables[i].Name);
-                                        }
+                                        //DateTime? dueDate = GetDueDate(activity);
+                                        //if (dueDate != null && dueDate < DateTime.Now)
+                                        //{
+                                        //    (new NotificationController()).SendFilesSubmittedNotification(activity, teamUser, deliverables[i].Name);
+                                        //}
                                     }
                                     else
                                     {
                                         ModelState.AddModelError("FileExtensionMatch", "The file " + fileName + " does not have an allowed extension please convert the file to the correct type");
-                                        setViewBagDeliverables((assignment as StudioAssignment).Deliverables);
+                                        setViewBagDeliverables(assignment.Deliverables);
                                         return View();
                                     }
                                 }
@@ -172,7 +172,7 @@ namespace OSBLE.Controllers
                                 string inbrowser = Request.Params["inBrowserText[" + j + "]"];
                                 if (inbrowser.Length > 0)
                                 {
-                                    var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, teamUser), delName + ".txt");
+                                    var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, assignmentTeam), delName + ".txt");
                                     System.IO.File.WriteAllText(path, inbrowser);
                                 }
                             }

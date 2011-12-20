@@ -120,8 +120,9 @@ namespace OSBLE.Controllers
                 Session["SubmissionReceived"] = null;
             }
 
+            //(AH) No Longer need but keeping commented for reference.
             // These are probably the nastiest set of queries in OSBLE.
-            List<StudioAssignment> studioAssignments = db.StudioAssignments.Where(
+            /*List<StudioAssignment> studioAssignments = db.StudioAssignments.Where(
                     sa =>
                         // Assignments must be from the active course
                         sa.Category.CourseID == ActiveCourse.AbstractCourseID &&
@@ -132,46 +133,52 @@ namespace OSBLE.Controllers
                         // The last activity must be a stop activity
                         (sa.AssignmentActivities.OrderByDescending(aa => aa.ReleaseDate).FirstOrDefault() is StopActivity)
                 ).ToList();
+             */
+
+            List<Assignment> Assignments = (from assignment in db.Assignments
+                                            where assignment.Category.CourseID == ActiveCourse.AbstractCourseID
+                                            orderby assignment.ReleaseDate
+                                            select assignment).ToList();
 
             Dictionary<int, List<Tuple<bool, DateTime>>> submissionDictionary = new Dictionary<int, List<Tuple<bool, DateTime>>>();
 
             if (activeCourse.AbstractRole.CanSubmit)
             {
                 //Get whether or not the students (CanSubmit) have submitted each deliverable for each submission activity
-                var submissionActivities = (from c in studioAssignments
-                                            from d in c.AssignmentActivities
-                                            where d is SubmissionActivity
-                                            select d as SubmissionActivity);
+                var submissionAssignments = (from c in Assignments
+                                             where c.HasDeliverables == true
+                                             select c);
 
-                foreach (SubmissionActivity activity in submissionActivities)
+                foreach (Assignment assignment in submissionAssignments)
                 {
                     List<Tuple<bool, DateTime>> submitted = new List<Tuple<bool, DateTime>>();
 
-                    TeamUserMember teamUser = GetTeamUser(activity, currentUser);
-                    if (teamUser == null)
+                    AssignmentTeam assignmentTeam = GetAssignmentTeam(assignment, currentUser);
+                    if (assignmentTeam == null)
                     {
+                        //(AH) Figure out how we want to handle this situation.
                         //null teamUser must be because the student didn't exist when the assignment was created (hopefully)
-                        teamUser = new UserMember() { UserProfileID = currentUser.ID };
-                        activity.TeamUsers.Add(teamUser);
-                        try
-                        {
-                            db.SaveChanges();
-                        }
-                        catch (DbEntityValidationException dbEx)
-                        {
-                            foreach (var validationErrors in dbEx.EntityValidationErrors)
-                            {
-                                foreach (var validationError in validationErrors.ValidationErrors)
-                                {
-                                    Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
-                                }
-                            }
-                        }
+                        //teamUser = new UserMember() { UserProfileID = currentUser.ID };
+                        //activity.TeamUsers.Add(teamUser);
+                        //try
+                        //{
+                        //    db.SaveChanges();
+                        //}
+                        //catch (DbEntityValidationException dbEx)
+                        //{
+                        //    foreach (var validationErrors in dbEx.EntityValidationErrors)
+                        //    {
+                        //        foreach (var validationError in validationErrors.ValidationErrors)
+                        //        {
+                        //            Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
+                        //        }
+                        //    }
+                        //}
                         
                     }
-                    string folderLocation = FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, activity.ID, teamUser);
+                    string folderLocation = FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, assignment.ID, assignmentTeam);
 
-                    foreach (Deliverable deliverable in (activity.AbstractAssignment as StudioAssignment).Deliverables)
+                    foreach (Deliverable deliverable in (assignment.Deliverables))
                     {
                         string[] allowedExtensions = GetFileExtensions((DeliverableType)deliverable.Type);
 
@@ -192,60 +199,46 @@ namespace OSBLE.Controllers
                         submitted.Add(new Tuple<bool, DateTime>(found, timeSubmitted));
                     }
 
-                    submissionDictionary.Add(activity.ID, submitted);
+                    submissionDictionary.Add(assignment.ID, submitted);
                 }
             }
 
+            
             // Past assignments are non-draft assignments whose final stop date has already passed.
-            List<StudioAssignment> pastAssignments = studioAssignments.Where(
-                    sa =>
-                        !sa.IsDraft &&
-                        sa.AssignmentActivities.OrderByDescending(aa => aa.ReleaseDate).FirstOrDefault().ReleaseDate <= DateTime.Now
-                    )
-                    .OrderBy(sa =>
-                                sa.AssignmentActivities.OrderBy(aa => aa.ReleaseDate).FirstOrDefault().ReleaseDate)
-                    .ToList();
+            List<Assignment> pastAssignments = (from assignment in db.Assignments
+                                                where !assignment.IsDraft
+                                                orderby assignment.DueDate <= DateTime.Now descending
+                                                select assignment).ToList();
 
+            //(AH): Not sure this query is going to work. Make sure to check it!
             // Present assignments are any (non-draft) for which we are between the first start date and last end date.
-            List<StudioAssignment> presentAssignments = studioAssignments.Where(
-                     sa =>
-                        !sa.IsDraft &&
-                        sa.AssignmentActivities.OrderBy(aa => aa.ReleaseDate).FirstOrDefault().ReleaseDate <= DateTime.Now &&
-                        sa.AssignmentActivities.OrderByDescending(aa => aa.ReleaseDate).FirstOrDefault().ReleaseDate > DateTime.Now
-                    )
-                    .OrderBy(sa =>
-                                sa.AssignmentActivities.OrderBy(aa => aa.ReleaseDate).FirstOrDefault().ReleaseDate)
-                    .ToList();
+            List<Assignment> presentAssignments = (from assignment in db.Assignments
+                                                   where !assignment.IsDraft
+                                                   orderby assignment.ReleaseDate <= DateTime.Now, assignment.DueDate > DateTime.Now
+                                                   select assignment).ToList();
 
             // Future assignments are non-draft assignments whose start date has not yet happened.
-            List<StudioAssignment> futureAssignments = studioAssignments.Where(
-                    sa =>
-                        !sa.IsDraft &&
-                        sa.AssignmentActivities.OrderBy(aa => aa.ReleaseDate).FirstOrDefault().ReleaseDate > DateTime.Now
-                    )
-                    .OrderBy(sa =>
-                            sa.AssignmentActivities.OrderBy(aa => aa.ReleaseDate).FirstOrDefault().ReleaseDate)
-                    .ToList();
+            List<Assignment> futureAssignments = (from assignment in db.Assignments
+                                                  where !assignment.IsDraft
+                                                  orderby assignment.ReleaseDate > DateTime.Now
+                                                  select assignment).ToList();
 
-            List<StudioAssignment> draftAssignments = new List<StudioAssignment>();
+            List<Assignment> draftAssignments = new List<Assignment>();
 
             if (ActiveCourse.AbstractRole.CanModify)
             {
                 // Draft assignments (viewable by instructor only) are assignments that have not yet been published to students
-                draftAssignments = studioAssignments.Where(
-                        sa =>
-                            sa.IsDraft
-                        )
-                        .OrderBy(sa =>
-                                sa.AssignmentActivities.OrderBy(aa => aa.ReleaseDate).FirstOrDefault().ReleaseDate)
-                        .ToList();
+                draftAssignments = (from assignment in db.Assignments
+                                    where assignment.IsDraft
+                                    orderby assignment.ReleaseDate
+                                    select assignment).ToList();
             }
 
             KeyValuePair<int, int> listWithIndex = new KeyValuePair<int, int>(-1, -1);
             if (id != null)
             {
                 int realID = (int)id;
-                var assignment = (from c in studioAssignments where c.ID == realID select c).FirstOrDefault();
+                var assignment = (from c in Assignments where c.ID == realID select c).FirstOrDefault();
 
                 if (pastAssignments.Contains(assignment))
                 {
@@ -280,58 +273,59 @@ namespace OSBLE.Controllers
         {
             try
             {
-                StudioActivity studioActivity = db.AbstractAssignmentActivities.Find(id) as StudioActivity;
-
-                StudioAssignment assignment = studioActivity.AbstractAssignment as StudioAssignment;
+                Assignment assignment = db.Assignments.Find(id);
 
 
 
-                if (studioActivity.AbstractAssignment.Category.Course == activeCourse.AbstractCourse)
+                if (assignment.Category.Course == activeCourse.AbstractCourse)
                 {
-                    ActivityTeacherTableViewModel viewModel = new ActivityTeacherTableViewModel(studioActivity.AbstractAssignment, studioActivity);
+                    ActivityTeacherTableViewModel viewModel = new ActivityTeacherTableViewModel(assignment);
 
                     int numberOfSubmissions = 0;
                     int numberGraded = 0;
 
-                    foreach (TeamUserMember teamUser in studioActivity.TeamUsers)
+                    foreach (AssignmentTeam team in assignment.AssignmentTeams)
                     {
                         ActivityTeacherTableViewModel.SubmissionInfo submissionInfo = new ActivityTeacherTableViewModel.SubmissionInfo();
 
                         //This checks when something was submitted by the folder modify time it is imperative that they don't get modified except when a student submits something to that folder.
-                        submissionInfo.Time = GetSubmissionTime(activeCourse.AbstractCourse as Course, studioActivity, teamUser);
+                        submissionInfo.Time = GetSubmissionTime(activeCourse.AbstractCourse as Course, assignment, team);
 
                         if (submissionInfo.Time != null)
                         {
                             numberOfSubmissions++;
-                            submissionInfo.LatePenaltyPercent = CalcualateLatePenaltyPercent(studioActivity, (TimeSpan)calculateLateness(studioActivity.AbstractAssignment.Category.Course, studioActivity, teamUser));
+                            //submissionInfo.LatePenaltyPercent = CalcualateLatePenaltyPercent(studioActivity, (TimeSpan)calculateLateness(studioActivity.AbstractAssignment.Category.Course, studioActivity, teamUser));
                         }
+
+                        //Getting the student: only valid for non-team.
+                        TeamMember student = (from a in team.Team.TeamMembers
+                                              select a).FirstOrDefault();
 
                         //if team
-                        if (teamUser is OldTeamMember)
+                        if (assignment.HasTeams == true)
                         {
                             submissionInfo.isTeam = true;
-                            submissionInfo.SubmitterID = teamUser.ID;
-                            submissionInfo.Name = (teamUser as OldTeamMember).Team.Name;
+                            submissionInfo.SubmitterID = team.TeamID;
+                            submissionInfo.Name = team.Team.Name;
                         }
-
+                        
                         //else student
                         else
                         {
                             submissionInfo.isTeam = false;
-                            submissionInfo.SubmitterID = teamUser.ID;
-                            submissionInfo.Name = (teamUser as UserMember).UserProfile.LastName + ", " + (teamUser as UserMember).UserProfile.FirstName;
+                            submissionInfo.SubmitterID = team.TeamID;
+                            submissionInfo.Name = student.CourseUser.UserProfile.LastName + ", " + student.CourseUser.UserProfile.FirstName;
                         }
 
-                        //COMMENTED OUT JUST FOR TESTING PURPOSES (AH)
-                        //if ((from c in studioActivity.Scores where c.TeamUserMemberID == teamUser.ID && c.Points >= 0 select c).FirstOrDefault() != null)
-                        //{
-                        //    submissionInfo.Graded = true;
-                        //    numberGraded++;
-                        //}
-                        //else
-                        //{
-                        //    submissionInfo.Graded = false;
-                        //}
+                        if ((from c in assignment.Scores where c.AssignmentTeamID == team.TeamID && c.Points >= 0 select c).FirstOrDefault() != null)
+                        {
+                            submissionInfo.Graded = true;
+                            numberGraded++;
+                        }
+                        else
+                        {
+                            submissionInfo.Graded = false;
+                        }
                         viewModel.SubmissionsInfo.Add(submissionInfo);
                     }
 
@@ -340,21 +334,17 @@ namespace OSBLE.Controllers
                     ViewBag.NumberOfSubmissions = numberOfSubmissions;
                     ViewBag.NumberGraded = numberGraded;
 
-                    ViewBag.ExpectedSubmissionsAndGrades = studioActivity.TeamUsers.Count;
-                    ViewBag.activityID = studioActivity.ID;
-                    ViewBag.CategoryID = studioActivity.AbstractAssignment.CategoryID;
+                    ViewBag.ExpectedSubmissionsAndGrades = assignment.AssignmentTeams.Count;
+                    //Was ViewBag.activityID
+                    ViewBag.assignmentID = assignment.ID;
+                    ViewBag.CategoryID = assignment.CategoryID;
 
                     //COMMENTED OUT JUST FOR TESTING PURPOSES (AH)
-                    //List<Score> studentScores = (from scores in db.Scores
-                    //                             where scores.AssignmentActivityID == studioActivity.ID
-                    //                             select scores).ToList();
+                    List<Score> studentScores = assignment.Scores.ToList();
 
-                    //ViewBag.StudentScores = studentScores;
+                    ViewBag.StudentScores = studentScores;
 
-
-                    var activities = (from c in assignment.AssignmentActivities orderby c.ReleaseDate select c).ToList();
-
-                    ViewBag.DueDate = activities[activities.IndexOf(studioActivity) + 1].ReleaseDate;
+                    ViewBag.DueDate = assignment.DueDate;
 
                     return View(viewModel);
                 }
@@ -430,22 +420,22 @@ namespace OSBLE.Controllers
         }
 
         [CanGradeCourse]
-        public ActionResult InlineReview(int assignmentActivityID, int teamUserID)
+        public ActionResult InlineReview(int assignmentID, int teamID)
         {
             try
             {
-                AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(assignmentActivityID);
-                TeamUserMember teamUser = db.TeamUsers.Find(teamUserID);
-                if (activity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID && activity.TeamUsers.Contains(teamUser))
+                Assignment assignment = db.Assignments.Find(assignmentID);
+                AssignmentTeam team = db.AssignmentTeams.Find(teamID);
+                if (assignment.Category.CourseID == activeCourse.AbstractCourseID && assignment.AssignmentTeams.Contains(team))
                 {
-                    Session.Add("CurrentActivityID", assignmentActivityID);
-                    Session.Add("TeamUserID", teamUserID);
+                    Session.Add("CurrentAssignmentID", assignmentID);
+                    Session.Add("TeamID", teamID);
 
                     //if publish file exists then teacher can not save as draft
-                    bool canSaveAsDraft = !(new FileInfo(FileSystem.GetTeamUserPeerReview(false, activeCourse.AbstractCourse as Course, assignmentActivityID, teamUserID)).Exists);
+                    bool canSaveAsDraft = !(new FileInfo(FileSystem.GetTeamUserPeerReview(false, activeCourse.AbstractCourse as Course, assignmentID, teamID)).Exists);
 
-                    ViewBag.Activity = activity;
-                    ViewBag.TeamUser = teamUser;
+                    ViewBag.Assignment = assignment;
+                    ViewBag.Team = team;
 
                     return View(new InlineReviewViewModel() { ReviewInterface = createEditInlineReviewSilverlightObject(canSaveAsDraft) });
                 }
