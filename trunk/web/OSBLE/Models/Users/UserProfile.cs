@@ -40,6 +40,16 @@ namespace OSBLE.Models.Users
         /// </summary>
         public bool EmailAllActivityPosts { get; set; }
 
+        public enum sortEmailBy
+        {
+            POSTED = 0,
+            CONTEXT = 1,
+            FROM = 2,
+            SUBJECT = 3
+        }
+
+        public int SortBy { get; set; }
+
         public UserProfile()
             : base()
         {
@@ -67,6 +77,7 @@ namespace OSBLE.Models.Users
             this.SchoolID = up.SchoolID;
             this.Scores = up.Scores;
             this.UserName = up.UserName;
+            this.SortBy = up.SortBy;
         }
 
         public override string ToString()
