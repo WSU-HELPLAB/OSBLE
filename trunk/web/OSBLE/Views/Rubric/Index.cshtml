@@ -11,7 +11,7 @@
   string critInputPrefix = ViewBag.CritInputPrefix;
   string critSliderPrefix = ViewBag.CritSliderPrefix;
   string critCommentPrefix = ViewBag.CritCommentPrefix;
-  string selectedActivity = ViewBag.ActivitySelectId;
+  string selectedAssignment = ViewBag.AssignmentSelectId;
   string selectedTeam = ViewBag.TeamSelectId;
   string draftButton = ViewBag.DraftButtonId;
   string publishButton = ViewBag.PublishButtonId;
@@ -67,9 +67,10 @@ function create_and_open_downloading_submission_dialog() {
 
     function switchEvaluation()
     {
-        var activity = $('#@selectedActivity').val();
-        var team = $('#@selectedTeam').val();
-        window.location.replace("/Rubric/" + activity + "/" + team);
+        var assignmentID = $('#@selectedAssignment').val();
+        var teamID = $('#@selectedTeam').val();
+        window.location.replace("/Rubric?assignmentId=" + assignmentID + "&teamId=" + teamID);
+        //Html.ActionLink("S: View Rubric", "Index", "Rubric", new { assignmentId = (int)assignmentID, teamId = teamID }, new { })
     }
 
     function updateGrade()
@@ -116,7 +117,7 @@ function create_and_open_downloading_submission_dialog() {
 </style>
 <div id="rubric_evaluator">
     <h1>
-        Rubric Evaluation of @Model.SelectedAssignmentActivity.Name for @Model.Evaluation.Recipient.GetName()</h1>
+        Rubric Evaluation of @Model.SelectedAssignment.AssignmentName for @Model.Evaluation.Recipient.Team.Name</h1>
     <div class="dashboard">
         <table>
             <tr>
@@ -124,16 +125,16 @@ function create_and_open_downloading_submission_dialog() {
                     Activity:
                 </th>
                 <td>
-                    <select id="@selectedActivity" name="@selectedActivity">
-                        @{foreach (AbstractAssignmentActivity activity in Model.AssignmentActivities)
+                    <select id="@selectedAssignment" name="@selectedAssignment">
+                        @{foreach (Assignment assignment in Model.AssignmentList)
                           {
                               string optionText = "<option value=\"{0}\" {1}>{2}</option>";
                               string selectedValue = "";
-                              if (activity.ID == Model.SelectedAssignmentActivity.ID)
+                              if (assignment.ID == Model.SelectedAssignment.ID)
                               {
                                   selectedValue = "selected=\"selected\"";
                               }
-                            @Html.Raw(String.Format(optionText, activity.ID, selectedValue, activity.Name));
+                            @Html.Raw(String.Format(optionText, assignment.ID, selectedValue, assignment.AssignmentName));
                           }
                         }
                     </select>
@@ -143,15 +144,15 @@ function create_and_open_downloading_submission_dialog() {
                 </th>
                 <td>
                     <select id="@selectedTeam" name="@selectedTeam">
-                        @{foreach (TeamUserMember user in Model.TeamUsers)
+                        @{foreach (AssignmentTeam team in Model.TeamList)
                           {
                               string optionText = "<option value=\"{0}\" {1}>{2}</option>";
                               string selectedValue = "";
-                              if (user.ID == Model.SelectedTeam.ID)
+                              if (team.TeamID == Model.SelectedTeam.TeamID)
                               {
                                   selectedValue = "selected=\"selected\"";
                               }
-                            @Html.Raw(String.Format(optionText, user.ID, selectedValue, user.GetName()));
+                            @Html.Raw(String.Format(optionText, team.TeamID, selectedValue, team.Team.Name));
                           }
                         }
                     </select>
@@ -166,16 +167,16 @@ function create_and_open_downloading_submission_dialog() {
                 <td id="@gradeId" style="padding-right:25px">
                     0%
                 </td>
-                @if (Model.SelectedAssignmentActivity is SubmissionActivity && (Model.SelectedAssignmentActivity.AbstractAssignment as StudioAssignment).Deliverables.Count() > 0)
+                @if (Model.SelectedAssignment.HasDeliverables)
                 { 
                 <td>
-                    @Html.ActionLink("Download Submission Files", "GetSubmissionZip", "FileHandler", new { teamUserID = Model.SelectedTeam.ID, assignmentActivityID = Model.SelectedAssignmentActivity.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+                    @Html.ActionLink("Download Submission Files", "GetSubmissionZip", "FileHandler", new { assignmentID = Model.SelectedAssignment.ID, teamID = Model.SelectedTeam.TeamID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
                 </td>
                 }
-                @if (Model.SelectedAssignmentActivity is SubmissionActivity && (Model.SelectedAssignmentActivity as SubmissionActivity).InstructorCanReview)
+                @if (Model.SelectedAssignment.HasCommentCategories)
                 { 
                 <td>
-                    @Html.ActionLink("View/Edit Inline Comments", "InlineReview", "Assignment", new { assignmentActivityID = Model.SelectedAssignmentActivity.ID, teamUserID = Model.SelectedTeam.ID }, new { style = "padding-left: 25px;" })
+                    @Html.ActionLink("View/Edit Inline Comments", "InlineReview", "Assignment", new { assignmentID = Model.SelectedAssignment.ID, teamID = Model.SelectedTeam.TeamID }, new { style = "padding-left: 25px;" })
                 </td>
                 }
             </tr>
@@ -224,8 +225,8 @@ function create_and_open_downloading_submission_dialog() {
         <input type="submit" name="@publishButton" value="Publish to Student" />
         <br />
         <br />
-        @Html.ActionLink("Return to Gradebook", "Tab", "Gradebook", new { categoryId = @Model.SelectedAssignmentActivity.AbstractAssignment.CategoryID }, new { });
-        <input type="hidden" name="@ViewBag.AbstractAssignmentActivityId" value="@Model.SelectedAssignmentActivity.ID" />
-        <input type="hidden" name="@ViewBag.TeamUserId" value="@Model.SelectedTeam.ID" />
+        @Html.ActionLink("Return to Gradebook", "Tab", "Gradebook", new { categoryId = @Model.SelectedAssignment.CategoryID }, new { });
+        <input type="hidden" name="@ViewBag.AssignmentId" value="@Model.SelectedAssignment.ID" />
+        <input type="hidden" name="@ViewBag.TeamId" value="@Model.SelectedTeam.TeamID" />
     }
 </div>

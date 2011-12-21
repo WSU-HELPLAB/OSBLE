@@ -66,18 +66,16 @@ namespace OSBLE.Controllers
             if (id != null)
             {
                 Assignment assignment = db.Assignments.Find(id);
-                AssignmentTeam at;
 
-                //AH: Not sure how to approach this, we might not need anymore.
-                //TeamMember teamMember = GetTeamUser(assignment, currentUser);
+                TeamMember teamMember = GetTeamUser(assignment, currentUser);
 
-                //var score = (from c in activity.Scores where c.TeamUserMemberID == teamUserMember.ID select c).FirstOrDefault();
+                var score = (from c in assignment.Scores where c.TeamMember.CourseUserID == teamMember.CourseUserID select c).FirstOrDefault();
 
-                //if (score != null)
-                //{
-                //    if(score.Points != -1)
-                //        throw new Exception("Cannot submit to an assignmentActivity that already has a score");
-                //}
+                if (score != null)
+                {
+                    if (score.Points != -1)
+                        throw new Exception("Cannot submit to an assignmentActivity that already has a score");
+                }
 
                 //purposefully not using the is statement as we also want to make sure it is not a null SubmissionActivity
                 if (assignment != null && assignment.HasDeliverables == true)
@@ -86,8 +84,8 @@ namespace OSBLE.Controllers
 
                     if (assignment.Category.CourseID == activeCourse.AbstractCourseID && activeCourse.AbstractRole.CanSubmit == true)
                     {
-                        //AH: might not need this
-                        //TeamUserMember teamUser = GetTeamUser(activity as SubmissionActivity, currentUser);
+
+
                         AssignmentTeam assignmentTeam = GetAssignmentTeam(assignment, currentUser);
                         
                         int i = 0;
@@ -144,11 +142,11 @@ namespace OSBLE.Controllers
                                             }
                                         }
 
-                                        //DateTime? dueDate = GetDueDate(activity);
-                                        //if (dueDate != null && dueDate < DateTime.Now)
-                                        //{
-                                        //    (new NotificationController()).SendFilesSubmittedNotification(activity, teamUser, deliverables[i].Name);
-                                        //}
+                                        DateTime? dueDate = assignment.DueDate;
+                                        if (dueDate != null && dueDate < DateTime.Now)
+                                        {
+                                            (new NotificationController()).SendFilesSubmittedNotification(assignment, assignmentTeam, deliverables[i].Name);
+                                        }
                                     }
                                     else
                                     {

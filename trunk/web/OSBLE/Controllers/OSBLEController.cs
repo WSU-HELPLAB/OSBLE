@@ -320,11 +320,22 @@ namespace OSBLE.Controllers
             return users;
         }
 
-        public static TeamUserMember GetTeamUser(AbstractAssignmentActivity activity, UserProfile user)
+        public static TeamMember GetTeamUser(Assignment assignment, UserProfile user)
         {
-            var teamUser = (from c in activity.TeamUsers where c.Contains(user) == true select c).FirstOrDefault();
+            TeamMember teamMember = new TeamMember();
+            List<AssignmentTeam> assignmentTeams = assignment.AssignmentTeams.ToList();
+            foreach (AssignmentTeam at in assignmentTeams)
+            {
+                foreach (TeamMember tm in at.Team.TeamMembers)
+                {
+                    if (tm.CourseUser.UserProfileID == user.ID)
+                    {
+                        teamMember = tm;
+                    }
+                }
+            }
 
-            return teamUser;
+            return teamMember;
         }
 
         /// <summary>
@@ -403,58 +414,44 @@ namespace OSBLE.Controllers
             }
         }
 
-        public TimeSpan? calculateLateness(Course course, Assignment assignment, AssignmentTeam teamMember)
+        public TimeSpan? calculateLateness(Course course, Assignment assignment, AssignmentTeam team)
         {
             DateTime? dueDate = assignment.DueDate;
             
-            DateTime? submissionTime = assignment.DueTime;
+            DateTime? submissionTime = GetSubmissionTime(course, assignment, team);
+
+            if (submissionTime == null)
+            {
+                return null;
+            }
 
             TimeSpan? lateness = dueDate - submissionTime;
-
+            if (lateness.Value.TotalMinutes >= 0)
+            {
+                return null;
+            }
             return lateness;
         }
 
-        public double CalcualateLatePenaltyPercent(AbstractAssignmentActivity activity, TimeSpan lateness)
+        //Returns the positive percentage to deduct from the students grade.
+        public double CalcualateLatePenaltyPercent(Assignment assignment, TimeSpan lateness)
         {
-            //Purposefully lose of data being nice
-            if (activity.MinutesLateWithNoPenalty > (int)lateness.TotalMinutes)
+            double returnVal;
+            if (lateness.TotalHours < assignment.HoursLateWindow)
             {
-                //Purposefully lose of data as this doesn't come into effect until you have past it
-                if (activity.HoursLateUntilZero < (int)(lateness.TotalHours))
+                returnVal = lateness.TotalHours * assignment.DeductionPerHourLate;
+
+                if (returnVal > 100)
                 {
-                    //100 percent of points deducted for being late.... ouch :p
-                    return 100.00;
+                    returnVal = 100;
                 }
-                else
-                {
-                    //If the lateness is a negative number we need to find the absolute value of 
-                    //that number for our calculations
-                    if (lateness.TotalHours < 0)
-                    {
-                        lateness = lateness.Negate();
-                    }
-
-                    if (lateness.TotalHours < activity.HoursLatePerPercentPenalty)
-                    {
-                        return activity.PercentPenalty;
-                    }
-
-                    else
-                    {
-                        //Double the hours late per percent penalty and loop through until the lateness is 
-                        //less than the hours.
-                        int hoursLatePerPercentPenalty = activity.HoursLatePerPercentPenalty + activity.HoursLatePerPercentPenalty;
-                        while (lateness.TotalHours > hoursLatePerPercentPenalty)
-                        {
-                            hoursLatePerPercentPenalty += activity.HoursLatePerPercentPenalty;
-                        }
-
-                        //return the percent penalty times the number of hours late.
-                        return activity.PercentPenalty * (hoursLatePerPercentPenalty / activity.HoursLatePerPercentPenalty);
-                    }                    
-                }
+                return Math.Abs(returnVal);
             }
-            return 0;
+            //The assignment is automatic 0.
+            else
+            {
+                return 100;
+            }            
         }
 
         protected string[] GetFileExtensions(DeliverableType deliverableType)

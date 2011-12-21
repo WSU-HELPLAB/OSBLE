@@ -203,9 +203,9 @@ namespace OSBLE.Controllers
         }
 
         [NonAction]
-        public void SendFilesSubmittedNotification(AbstractAssignmentActivity activity, TeamUserMember teamUser, string fileName)
+        public void SendFilesSubmittedNotification(Assignment assignment, AssignmentTeam team, string fileName)
         {
-            if (activity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID)
+            if (assignment.Category.CourseID == activeCourse.AbstractCourseID)
             {
                 var canGrade = (from c in db.CourseUsers
                                 where c.AbstractCourseID == activeCourse.AbstractCourseID
@@ -216,7 +216,7 @@ namespace OSBLE.Controllers
                 {
                     Notification n = new Notification();
                     n.ItemType = Notification.Types.FileSubmitted;
-                    n.Data = activity.ID.ToString() + ";" + teamUser.ID.ToString() + ";" + activity.Name + ";" + teamUser.Name + ";" + fileName + ";" + DateTime.Now;
+                    n.Data = assignment.ID.ToString() + ";" + team.TeamID.ToString() + ";" + assignment.AssignmentName + ";" + team.Team.Name + ";" + fileName + ";" + DateTime.Now;
                     n.RecipientID = user.ID;
                     n.SenderID = currentUser.ID;
 

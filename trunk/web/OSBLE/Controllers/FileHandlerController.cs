@@ -227,7 +227,9 @@ namespace OSBLE.Controllers
 
             try
             {
-                AssignmentTeam assignmentTeam = db.AssignmentTeams.Find(teamID);
+                AssignmentTeam assignmentTeam = (from a in db.AssignmentTeams
+                                                 where a.TeamID == teamID
+                                                 select a).FirstOrDefault();//db.AssignmentTeams.Find(teamID);
                 if (assignment.Category.CourseID == activeCourse.AbstractCourseID && assignment.AssignmentTeams.Contains(assignmentTeam))
                 {
                     Stream stream = FileSystem.FindZipFile(activeCourse.AbstractCourse as Course, assignment, assignmentTeam);

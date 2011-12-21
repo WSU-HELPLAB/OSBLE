@@ -21,10 +21,10 @@ namespace OSBLE.Models.ViewModels
 
         public Rubric Rubric { get; set; }
         public RubricEvaluation Evaluation { get; set; }
-        public AbstractAssignmentActivity SelectedAssignmentActivity { get; set; }
-        public List<AbstractAssignmentActivity> AssignmentActivities { get; set; }
-        public List<TeamUserMember> TeamUsers { get; set; }
-        public TeamUserMember SelectedTeam { get; set; }
+        public Assignment SelectedAssignment { get; set; }
+        public AssignmentTeam SelectedTeam { get; set; }
+        public List<Assignment> AssignmentList { get; set; }
+        public List<AssignmentTeam> TeamList { get; set; }
         public SelectList Sections { get; set; }
         public int SelectedSection { get; set; }
     }

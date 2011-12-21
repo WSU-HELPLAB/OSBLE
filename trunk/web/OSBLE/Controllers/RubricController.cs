@@ -24,9 +24,9 @@ namespace OSBLE.Controllers
             ViewBag.CritInputPrefix = "crit_amount";
             ViewBag.CritSliderPrefix = "crit_slider";
             ViewBag.CritCommentPrefix = "crit_comment";
-            ViewBag.AbstractAssignmentActivityId = "abstractAssignmentActivityId";
-            ViewBag.TeamUserId = "teamUserId";
-            ViewBag.ActivitySelectId = "selected_activity";
+            ViewBag.AssignmentId = "AssignmentId";
+            ViewBag.TeamId = "teamId";
+            ViewBag.AssignmentSelectId = "selected_assignment";
             ViewBag.TeamSelectId = "selected_team";
             ViewBag.GlobalCommentId = ViewBag.CritCommentPrefix + "_global";
             ViewBag.DraftButtonId = "save_as_draft";
@@ -40,15 +40,15 @@ namespace OSBLE.Controllers
         private RubricViewModel BuildViewModelFromForm()
         {
             RubricViewModel viewModel = new RubricViewModel();
-            int abstractId = 0;
+            int assignmentId = 0;
             int teamId = 0;
-            Int32.TryParse(Request.Form[ViewBag.AbstractAssignmentActivityId].ToString(), out abstractId);
-            Int32.TryParse(Request.Form[ViewBag.TeamUserId].ToString(), out teamId);
+            Int32.TryParse(Request.Form[ViewBag.AssignmentId].ToString(), out assignmentId);
+            Int32.TryParse(Request.Form[ViewBag.TeamId].ToString(), out teamId);
 
             //before we populate with FORM values, fill in the basic stuff
-            if (abstractId > 0 && teamId > 0)
+            if (assignmentId > 0 && teamId > 0)
             {
-                viewModel = GetRubricViewModel(abstractId, teamId);
+                viewModel = GetRubricViewModel(assignmentId, teamId);
             }
 
             //now, change the view model based on what we were passed through the form
@@ -101,13 +101,13 @@ namespace OSBLE.Controllers
         private bool HasValidViewModel(RubricViewModel viewModel)
         {
             //make sure that we found a rubric and that we have an activity to grade
-            if (viewModel.Rubric == null || viewModel.AssignmentActivities == null || viewModel.AssignmentActivities.Count == 0)
+            if (viewModel.Rubric == null || viewModel.AssignmentList == null || viewModel.AssignmentList.Count == 0)
             {
                 return false;
             }
 
             //Make sure that the current activity is attached to the active course
-            if (viewModel.SelectedAssignmentActivity.AbstractAssignment.Category.CourseID != activeCourse.AbstractCourseID)
+            if (viewModel.SelectedAssignment.Category.CourseID != activeCourse.AbstractCourseID)
             {
                 return false;
             }
@@ -120,30 +120,30 @@ namespace OSBLE.Controllers
         /// <param name="abstractAssignmentActivityId"></param>
         /// <param name="teamUserId"></param>
         /// <returns></returns>
-        private RubricViewModel GetRubricViewModel(int abstractAssignmentActivityId, int teamUserId)
+        private RubricViewModel GetRubricViewModel(int assignmentId, int teamId)
         {
             RubricViewModel viewModel = new RubricViewModel();
 
-            AbstractAssignmentActivity activity = (from aa in db.AbstractAssignmentActivities
-                                                   where aa.ID == abstractAssignmentActivityId
-                                                   select aa).FirstOrDefault();
-            TeamUserMember teamUser = (from tu in db.TeamUsers
-                                       where tu.ID == teamUserId
-                                       select tu).FirstOrDefault();
-            if (activity == null || teamUser == null)
+            Assignment assignment = db.Assignments.Find(assignmentId);
+
+            AssignmentTeam assignmentTeam = (from at in db.AssignmentTeams
+                                             where at.TeamID == teamId
+                                             select at).FirstOrDefault();
+
+            if (assignment == null || assignmentTeam == null)
             {
                 return viewModel;
             }
 
             //assigns the rubric to our view model
-            Rubric rubric = activity.AbstractAssignment.Rubric;
+            Rubric rubric = assignment.Rubric;
             viewModel.Rubric = rubric;
-            viewModel.SelectedAssignmentActivity = activity;
-            viewModel.SelectedTeam = teamUser;
+            viewModel.SelectedAssignment = assignment;
+            viewModel.SelectedTeam = assignmentTeam;
 
             //pull a prior evaluation if it exists
             RubricEvaluation eval = (from e in db.RubricEvaluations
-                                     where e.RecipientID == teamUserId
+                                     where e.RecipientID == assignmentTeam.TeamID
                                      select e).FirstOrDefault();
             if (eval != null)
             {
@@ -152,8 +152,8 @@ namespace OSBLE.Controllers
             else
             {
                 //if nothing exists, we need to build a dummy eval for the view to process
-                viewModel.Evaluation.Recipient = teamUser;
-                viewModel.Evaluation.AbstractAssignmentActivityID = activity.ID;
+                viewModel.Evaluation.Recipient = assignmentTeam;
+                viewModel.Evaluation.AssignmentID = assignment.ID;
                 viewModel.Evaluation.EvaluatorID = CurrentUser.ID;
                 foreach (Criterion crit in rubric.Criteria)
                 {
@@ -168,23 +168,20 @@ namespace OSBLE.Controllers
 
             //assignments are storied within categories, which are found within
             //the active course.
-            List<AbstractAssignmentActivity> activities = new List<AbstractAssignmentActivity>();
+            List<Assignment> rubricAssignmentList = new List<Assignment>();
             foreach (Category cat in (activeCourse.AbstractCourse as Course).Categories)
             {
-                foreach (AbstractAssignment assignment in cat.Assignments)
+                foreach (Assignment a in cat.Assignments)
                 {
-                    List<SubmissionActivity> submissions = (from aa in assignment.AssignmentActivities
-                                                            where aa is SubmissionActivity
-                                                            select aa as SubmissionActivity).ToList();
-                    foreach (SubmissionActivity submission in submissions)
+                    if (a.HasRubric)
                     {
-                        activities.Add(submission);
+                        rubricAssignmentList.Add(a);
                     }
                 }
             }
 
-            viewModel.AssignmentActivities = activities;
-            viewModel.TeamUsers = activity.TeamUsers.OrderBy(t => t.Name).ToList();
+            viewModel.AssignmentList = rubricAssignmentList;
+            viewModel.TeamList = assignment.AssignmentTeams.OrderBy(t => t.Team.Name).ToList();
             return viewModel;
         }
 
@@ -192,116 +189,63 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Index(RubricViewModel viewModel)
         {
-            //double latePenalty = 0.0;
-            //RubricViewModel vm = BuildViewModelFromForm();
+            double latePenalty = 0.0;
+            RubricViewModel vm = BuildViewModelFromForm();
 
-            //ViewBag.isEditable = true;
+            ViewBag.isEditable = true;
 
-            //if (!HasValidViewModel(vm))
-            //{
-            //    return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
-            //}
+            if (!HasValidViewModel(vm))
+            {
+                return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
+            }
 
-            ////if we've gotten this far, then it's probably okay to save to the DB
-            //if (ModelState.IsValid)
-            //{
-            //    //save to the rubric evaluations table
-            //    if (vm.Evaluation.ID != 0)
-            //    {
-            //        db.Entry(vm.Evaluation).State = EntityState.Modified;
-            //    }
-            //    else
-            //    {
-            //        db.RubricEvaluations.Add(vm.Evaluation);
-            //    }
-            //    db.SaveChanges();
+            //if we've gotten this far, then it's probably okay to save to the DB
+            if (ModelState.IsValid)
+            {
+                //save to the rubric evaluations table
+                if (vm.Evaluation.ID != 0)
+                {
+                    db.Entry(vm.Evaluation).State = EntityState.Modified;
+                }
+                else
+                {
+                    db.RubricEvaluations.Add(vm.Evaluation);
+                }
+                db.SaveChanges();
 
-            //    //if the evaluation has been published, update the scores in the gradebook
-            //    if (vm.Evaluation.IsPublished)
-            //    {
-            //        (new NotificationController()).SendRubricEvaluationCompletedNotification(vm.Evaluation.AssignmentActivity, vm.Evaluation.Recipient);
+                //if the evaluation has been published, update the scores in the gradebook
+                if (vm.Evaluation.IsPublished)
+                {
+                    (new NotificationController()).SendRubricEvaluationCompletedNotification(vm.Evaluation.Assignment, vm.Evaluation.Recipient);
+                    GradebookController gradebook = new GradebookController();
 
-            //        Score grade = (from g in db.Scores
-            //                       where g.TeamUserMemberID == vm.Evaluation.RecipientID
-            //                       &&
-            //                       g.AssignmentActivityID == vm.Evaluation.AbstractAssignmentActivityID
-            //                       select g).FirstOrDefault();
+                    //figure out the normalized final score.
+                    double maxLevelScore = (from c in vm.Rubric.Levels
+                                            select c.RangeEnd).Sum();
+                    double totalRubricPoints = (from c in vm.Rubric.Criteria
+                                                select c.Weight).Sum();
+                    double studentScore = 0.0;
 
-            //        //figure out the normalized final score.
-            //        double maxLevelScore = (from c in vm.Rubric.Levels
-            //                                select c.RangeEnd).Sum();
-            //        double totalRubricPoints = (from c in vm.Rubric.Criteria
-            //                                    select c.Weight).Sum();
-            //        double studentScore = 0.0;
-            //        double rawStudentScore = -1;
-            //        double categoryMaxPoints = vm.SelectedAssignmentActivity.AbstractAssignment.Category.MaxAssignmentScore;
-                    
-            //        foreach (CriterionEvaluation critEval in vm.Evaluation.CriterionEvaluations)
-            //        {
-            //            studentScore += (double)critEval.Score / maxLevelScore * (critEval.Criterion.Weight / totalRubricPoints);
-            //        }
+                    foreach (CriterionEvaluation critEval in vm.Evaluation.CriterionEvaluations)
+                    {
+                        studentScore += (double)critEval.Score / maxLevelScore * (critEval.Criterion.Weight / totalRubricPoints);
+                    }
 
-            //        //normalize the score with the abstract assignment score
-            //        studentScore *= vm.Evaluation.AssignmentActivity.PointsPossible;
+                    //normalize the score with the abstract assignment score
+                    studentScore *= vm.Evaluation.Assignment.PointsPossible;
 
-            //        //If a column has added points then we want to add those points to the students score
-            //        if (vm.Evaluation.AssignmentActivity.addedPoints > 0)
-            //        {
-            //            studentScore += vm.Evaluation.AssignmentActivity.addedPoints;
-            //        }
+                    gradebook.ModifyTeamGrade(studentScore, vm.SelectedAssignment.ID, vm.Evaluation.Recipient.TeamID);
 
-            //        TimeSpan? lateness = calculateLateness(vm.Evaluation.AssignmentActivity.AbstractAssignment.Category.Course, vm.Evaluation.AssignmentActivity, vm.Evaluation.Recipient);
-            //        if (lateness != null)
-            //        {
-            //            latePenalty = CalcualateLatePenaltyPercent(vm.Evaluation.AssignmentActivity, (TimeSpan)lateness);
-            //            latePenalty = (100 - latePenalty) / 100;
-            //            studentScore = studentScore * latePenalty;
-            //        }
 
-            //        rawStudentScore = studentScore;
-
-            //        if (categoryMaxPoints >= 0)
-            //        {
-            //            if (((studentScore/vm.SelectedAssignmentActivity.PointsPossible)*100) > categoryMaxPoints)
-            //            {
-            //                studentScore = (vm.SelectedAssignmentActivity.PointsPossible * (categoryMaxPoints / 100));
-            //            }
-            //        }
-            //        if (grade != null)
-            //        {
-            //            grade.Points = studentScore;
-            //            grade.LatePenaltyPercent = latePenalty;
-            //            grade.StudentPoints = -1;
-            //            grade.RawPoints = rawStudentScore;
-            //            db.SaveChanges();
-            //        }
-            //        else
-            //        {
-            //            //create
-            //            Score newScore = new Score()
-            //            {
-            //                TeamUserMemberID = vm.Evaluation.RecipientID,
-            //                Points = studentScore,
-            //                AssignmentActivityID = vm.Evaluation.AbstractAssignmentActivityID,
-            //                PublishedDate = DateTime.Now,
-            //                LatePenaltyPercent = latePenalty,
-            //                isDropped = false,
-            //                RawPoints = rawStudentScore
-            //            };
-            //            db.Scores.Add(newScore);
-            //            db.SaveChanges();
-            //        }
-            //    }
-            //}
-            //return View(vm);
-            return View();
-
+                }
+            }
+            return View(vm);
         }
 
         [CanGradeCourse]
-        public ActionResult Index(int abstractAssignmentActivityId, int teamUserId)
+        public ActionResult Index(int assignmentId, int teamId)
         {
-            RubricViewModel viewModel = GetRubricViewModel(abstractAssignmentActivityId, teamUserId);
+            RubricViewModel viewModel = GetRubricViewModel(assignmentId, teamId);
 
             if (!HasValidViewModel(viewModel))
             {
@@ -312,9 +256,9 @@ namespace OSBLE.Controllers
             return View(viewModel);
         }
 
-        public ActionResult View(int abstractAssignmentActivityId, int teamUserId)
+        public ActionResult View(int assignmentId, int teamId)
         {
-            RubricViewModel viewModel = GetRubricViewModel(abstractAssignmentActivityId, teamUserId);
+            RubricViewModel viewModel = GetRubricViewModel(assignmentId, teamId);
 
             if (HasValidViewModel(viewModel))
             {
@@ -322,9 +266,10 @@ namespace OSBLE.Controllers
 
                 if (activeCourse.AbstractRole.CanSubmit)
                 {
-                    TeamUserMember teamUser = db.TeamUsers.Find(teamUserId);
-
-                    if (teamUser.Contains(currentUser))
+                    
+                    Assignment assignment = db.Assignments.Find(assignmentId);
+                    AssignmentTeam team = GetAssignmentTeam(assignment, currentUser);
+                    if (team != null)
                     {
                         isOwnAssignment = true;
                     }
@@ -332,13 +277,13 @@ namespace OSBLE.Controllers
 
                 if (activeCourse.AbstractRole.CanGrade || isOwnAssignment)
                 {
-                    //AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(abstractAssignmentActivityId);
+                    Assignment assignment = db.Assignments.Find(assignmentId);
 
-                    //ViewBag.PossiblePoints = activity.PointsPossible;
-                    //ViewBag.Score = (from c in activity.Scores where c.TeamUserMemberID == teamUserId select c).FirstOrDefault();
-                    //ViewBag.isEditable = false;
+                    ViewBag.PossiblePoints = assignment.PointsPossible;
+                    ViewBag.Score = (from c in assignment.Scores where c.AssignmentTeam.TeamID == teamId select c).FirstOrDefault();
+                    ViewBag.isEditable = false;
 
-                    //return View(viewModel);
+                    return View(viewModel);
                 }
             }
             return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));

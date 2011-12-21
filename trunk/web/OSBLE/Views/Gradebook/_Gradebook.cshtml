@@ -223,11 +223,11 @@
                     {
                         if (gradableQuery.First().LatePenaltyPercent > 0)
                         { 
-                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic; color:Red;"  onclick="cellGainsFocus(event, this)">@gradableQuery.First().Points</td>
+                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic; color:Red;"  onclick="cellGainsFocus(event, this)">@gradableQuery.First().Points.ToString(".#")</td>
                         }
                         else
                         {
-                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" onclick="cellGainsFocus(event, this)">@gradableQuery.First().Points</td>
+                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" onclick="cellGainsFocus(event, this)">@gradableQuery.First().Points.ToString(".#")</td>
                         }
                     }
                 }
@@ -251,12 +251,11 @@
         </tr>
     }
 </table>
-@*COMMENTED OUT FOR TESTING PURPOSES
 @foreach (Assignment assignment in ViewBag.Assignments)
 {
     <input id="addedPoints-@assignment.ID" type="hidden" value="@assignment.addedPoints" />    
 }
-*@
+
 <script type="text/javascript">
 
     $(document).ready(function () {

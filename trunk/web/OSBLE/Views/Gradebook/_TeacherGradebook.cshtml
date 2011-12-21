@@ -194,7 +194,7 @@
 
                 foreach (UserProfile user in ViewBag.Students)
                 {
-                    
+                    studentCount++;
                     categoryTotalWeight = ViewBag.TotalCategoryWeights;
                     foreach (Category category in ViewBag.CatsWithWeightsAndScores)
                     {
@@ -362,7 +362,7 @@
                 
                 <td id="@student.ID" >@student.LastName, @student.FirstName</td>   
                 
-                  totalGrade = -1;
+                  totalGrade = 0;
                   totalCategoryPoints = 0;
                   totalCategoryPossible = 0;
                   double totalCategoryWeight = ViewBag.TotalCategoryWeights;

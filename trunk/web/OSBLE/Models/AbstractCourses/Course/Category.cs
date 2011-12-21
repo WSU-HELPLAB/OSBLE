@@ -15,7 +15,7 @@ namespace OSBLE.Models.Courses
         public Category()
         {
             ColumnOrder = 0;
-            Assignments = new List<AbstractAssignment>();
+            Assignments = new List<Assignment>();
             dropX = 0;
             MaxAssignmentScore = -1;
         }
@@ -52,7 +52,7 @@ namespace OSBLE.Models.Courses
 
         [Required]
         [Display(Name = "Gradables")]
-        public ICollection<AbstractAssignment> Assignments { get; set; }
+        public ICollection<Assignment> Assignments { get; set; }
 
         public int dropX { get; set; }
 

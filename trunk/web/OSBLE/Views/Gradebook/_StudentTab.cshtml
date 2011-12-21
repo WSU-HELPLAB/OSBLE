@@ -127,7 +127,7 @@
         <tr id="perfectScore">
                 <td id="th2"><b>Perfect Score</b></td>
                 <td id="perfectTotal">100%</td>
-                @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
+                @foreach (Assignment item in ViewBag.Assignments)
                 {
                     <td id="pointsPossible-@item.ID">@item.PointsPossible</td>
                 }
@@ -144,7 +144,7 @@
                 double assignPossible = 0;
 
                 //Get the total score for the class
-                foreach (AbstractAssignmentActivity assign in ViewBag.Assignments)
+                foreach (Assignment assign in ViewBag.Assignments)
                 {
                     foreach (Score userScore in ViewBag.TotalScores)
                     {
@@ -153,7 +153,7 @@
                             if (userScore.Points >= 0)
                             {
                                 assignPoints += userScore.Points;
-                                assignPossible += userScore.AssignmentActivity.PointsPossible;
+                                assignPossible += userScore.Assignment.PointsPossible;
                             }
                         }
                     }
@@ -171,10 +171,10 @@
                     <td id="averageTotal">NG</td>
                 }
             }
-            @foreach (AbstractAssignmentActivity item in ViewBag.Assignments)
+            @foreach (Assignment item in ViewBag.Assignments)
             {
                 var score = (from scores in ViewBag.TotalScores as IEnumerable<Score>
-                             where scores.AssignmentActivityID == item.ID
+                             where scores.AsssignmentID == item.ID
                              where scores.Points >= 0
                              select scores);
 
@@ -189,7 +189,6 @@
                 {
                     oneScore = true;
                     averagePoints += s.Points;
-                    //averagePossible += s.AssignmentActivity.PointsPossible;
                     numStudents++;
                 }
                 double categoryScore = averagePoints / numStudents;
@@ -223,16 +222,16 @@
                 }
 
                 int i = 2;
-                foreach (AbstractAssignmentActivity assign in ViewBag.Assignments)
+                foreach (Assignment assign in ViewBag.Assignments)
                 {
 
                     if (assign.addedPoints > 0)
                     {   
-                        <th id="header-@assign.ID">@assign.Name (Added @assign.addedPoints)</th>
+                        <th id="header-@assign.ID">@assign.AssignmentName (Added @assign.addedPoints)</th>
                     }
                     else
                     {
-                        <th id="header-@assign.ID" onclick="clearLastCellFocus();">@assign.Name </th>
+                        <th id="header-@assign.ID" onclick="clearLastCellFocus();">@assign.AssignmentName </th>
                     }
                     i += 1;
                 }
@@ -240,9 +239,9 @@
         </tr>
         <tr id="studentGrades">
         @{
-            UserProfile cu = (from user in ViewBag.CurrentStudent as IEnumerable<UserProfile> select user).FirstOrDefault();
+            CourseUser cu = ViewBag.CurrentStudent;
             
-            <td id="name">@cu.LastName, @cu.FirstName</td>
+            <td id="name">@cu.UserProfile.LastName, @cu.UserProfile.FirstName</td>
             
             List<Score> scoreList = (from scores in ViewBag.UserScores as IEnumerable<Score>
                                      where scores.Points >= 0
@@ -263,7 +262,7 @@
                     if (s.isDropped == false)
                     {
                         totalPoints += s.Points;
-                        totalPossible += s.AssignmentActivity.PointsPossible;
+                        totalPossible += s.Assignment.PointsPossible;
                     }
                 }
 
@@ -283,26 +282,26 @@
             }
 
             int cols = 2;
-            foreach (AbstractAssignmentActivity assignment in ViewBag.Assignments)
+            foreach (Assignment assignment in ViewBag.Assignments)
             {
                 cols++;
                 var score = (from scores in ViewBag.UserScores as IEnumerable<Score>
-                             where scores.AssignmentActivityID == assignment.ID &&
+                             where scores.AsssignmentID == assignment.ID &&
                              scores.Points >= 0
                              select scores);
 
                 if (score.Count() > 0)
                 {
                     latePercentPenalty = (1 - score.First().LatePenaltyPercent) * 100;
-                    if (score.First().AssignmentActivity.AbstractAssignment.Rubric != null)
+                    if (score.First().Assignment.Rubric != null)
                     {
                         if (score.First().LatePenaltyPercent > 0)
                         {
-                            <td id="rubric-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { abstractAssignmentActivityId = score.First().AssignmentActivityID, teamUserID = score.First().TeamUserMemberID }, new { @style = "color:Red" }) @Helpers.CreateToolTip("This assignment was late")</td>                            
+                            <td id="rubric-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AsssignmentID, teamID = score.First().AssignmentTeamID}, new { @style = "color:Red" }) @Helpers.CreateToolTip("This assignment was late")</td>                            
                         }
                         else
                         {
-                            <td id="rubric-@assignment.ID" onmouseover="showRubricToolTip();" onmouseout="hideRubricToolTip();">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { abstractAssignmentActivityId = score.First().AssignmentActivityID, teamUserID = score.First().TeamUserMemberID }, new { })</td>
+                            <td id="rubric-@assignment.ID" onmouseover="showRubricToolTip();" onmouseout="hideRubricToolTip();">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AsssignmentID, teamID = score.First().AsssignmentID }, new { })</td>
                         }
                     }
                     else
@@ -334,17 +333,17 @@
                 else
                 {
                     var studentScore = (from scores in ViewBag.UserScores as IEnumerable<Score>
-                                        where scores.AssignmentActivityID == assignment.ID &&
+                                        where scores.AsssignmentID == assignment.ID &&
                                         scores.StudentPoints >= 0
                                         select scores);
 
                     if (studentScore.Count() > 0)
                     {
-                        <td id="@String.Format("{0}-{1}", cu.Identification, assignment.ID)" onclick="cellGainsFocus(event, this);" style="color:Gray; font-style:italic;">@studentScore.First().StudentPoints</td>
+                        <td id="@String.Format("{0}-{1}", cu.UserProfile.Identification, assignment.ID)" onclick="cellGainsFocus(event, this);" style="color:Gray; font-style:italic;">@studentScore.First().StudentPoints</td>
                     }
                     else
                     {
-                        <td id="@String.Format("{0}-{1}", cu.Identification, assignment.ID)" onclick="cellGainsFocus(event, this);" style="color:Gray; font-style:italic;">NG</td>
+                        <td id="@String.Format("{0}-{1}", cu.UserProfile.Identification, assignment.ID)" onclick="cellGainsFocus(event, this);" style="color:Gray; font-style:italic;">NG</td>
                     }
                 }
             }

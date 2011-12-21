@@ -38,7 +38,14 @@
                     UpdateTargetId = "submitFiles",
                     OnComplete = "SubmissionLoaded"
                 };
-                <td>@(Ajax.ActionLink("Submit...", "Create", "Submission", new { id = assignment.ID }, options, new object()))</td>
+                <td>@(Html.ActionLink("Download", "GetSubmissionZip", "FileHandler", new { assignmentID = assignment.ID, teamID = da.Item2.TeamID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))</td>
+                <td>@Ajax.ActionLink("Submit...", "Create", "Submission", new { id = assignment.ID }, options, new object())</td>
+                
+            }
+            if (assignment.HasRubric)
+            {
+                <td>@Html.ActionLink("T: View Rubric", "Index", "Rubric", new { assignmentId = da.Item2.AssignmentID, teamId = da.Item2.TeamID }, new { })</td>
+                <td>@Html.ActionLink("S: View Rubric", "View", "Rubric", new { assignmentId = da.Item2.AssignmentID, teamId = da.Item2.TeamID }, new { })</td>
             }
         }
     </tr>

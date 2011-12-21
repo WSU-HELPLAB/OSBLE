@@ -179,7 +179,7 @@
         public bool RubricHasEvaluations(int rubricId)
         {
             int items = (from e in db.RubricEvaluations
-                         where e.AssignmentActivity.AbstractAssignment.Rubric.ID == rubricId
+                         where e.Assignment.Rubric.ID == rubricId
                          select e).Count();
             if (items > 0)
             {

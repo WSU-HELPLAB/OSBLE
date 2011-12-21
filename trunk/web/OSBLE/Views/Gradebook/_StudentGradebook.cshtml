@@ -188,7 +188,7 @@
                 double categoryTotalWeight = 0;
                 double userCategoryTotalWeight = ViewBag.UserTotalCategoryWeights;
 
-                foreach (UserProfile user in ViewBag.Students)
+                foreach (CourseUser user in ViewBag.Students)
                 {
                     studentCount++;
                     categoryTotalWeight = ViewBag.TotalCategoryWeights;
@@ -197,9 +197,9 @@
                         if (category.Name != Constants.UnGradableCatagory)
                         {
                             List<Score> userScore = (from score in ViewBag.CategoryTotalPercent as IEnumerable<Score>
-                                                     where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID &&
+                                                     where score.Assignment.CategoryID == category.ID &&
                                                      score.Points >= 0 &&
-                                                     score.TeamUserMember.Contains(user) &&
+                                                     score.TeamMember.CourseUserID == user.ID &&
                                                      score.isDropped == false
                                                      select score).ToList();
 
@@ -220,8 +220,8 @@
                             double categoryTotal = 0;
 
                             List<Score> totalScores = (from score in ViewBag.CategoryTotalPercent as IEnumerable<Score>
-                                                       where score.TeamUserMember.Contains(user) &&
-                                                       score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID &&
+                                                       where score.TeamMember.CourseUserID == user.ID &&
+                                                       score.Assignment.CategoryID == category.ID &&
                                                        score.Points >= 0 &&
                                                        score.isDropped == false
                                                        select score).ToList();
@@ -231,10 +231,10 @@
 
                                 foreach (Score userScore in totalScores)
                                 {
-                                    if (userScore.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
+                                    if (userScore.Assignment.CategoryID == category.ID)
                                     {
                                         categoryPoints += userScore.Points;
-                                        categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                        categoryPossible += userScore.Assignment.PointsPossible;
                                     }
                                 }
                                 categoryTotal = categoryPoints / categoryPossible;
@@ -290,13 +290,13 @@
                         bool oneScore = false;
                         foreach (Score score in ViewBag.CategoryTotalPercent)
                         {
-                            if (score.AssignmentActivity.AbstractAssignment.CategoryID == item.ID)
+                            if (score.Assignment.CategoryID == item.ID)
                             {
                                 if (score.Points >= 0 && score.isDropped == false)
                                 {
                                     oneScore = true;
                                     averagePoints += score.Points;
-                                    averagePossible += score.AssignmentActivity.PointsPossible;
+                                    averagePossible += score.Assignment.PointsPossible;
                                 }
                             }
                         }
@@ -327,15 +327,14 @@
         </tr>
         <tr>
             @{
-                UserProfile cu = (from user in ViewBag.CurrentStudent as IEnumerable<UserProfile> select user).FirstOrDefault();
+                CourseUser cu = ViewBag.CurrentStudent;
                 <td>@ViewBag.SectionNumber</td>
-                <td>@cu.LastName, @cu.FirstName</td>
+                <td>@cu.UserProfile.LastName, @cu.UserProfile.FirstName</td>
                
                 
                 List<Score> userScores = (from scores in ViewBag.AllUserGrades as IEnumerable<Score>
                                           where scores.Points >= 0
-                                          //orderby scores.Points
-                                          select scores).OrderBy(s => (s.Points/s.AssignmentActivity.PointsPossible)).ThenByDescending(s => s.Points).ToList();
+                                          select scores).OrderBy(s => (s.Points/s.Assignment.PointsPossible)).ThenByDescending(s => s.Points).ToList();
 
                 List<Score> studentScores = (from scores in ViewBag.AllUserGrades as IEnumerable<Score>
                                              where scores.StudentPoints >= 0
@@ -376,7 +375,7 @@
                 foreach (Category category in ViewBag.CatsWithWeightsAndScores)
                 {
                     int categoryScoreCount = (from score in userScores
-                                              where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
+                                              where score.Assignment.CategoryID == category.ID
                                               select score).Count();
                     int count = 0;
                     int numDropped = category.dropX;
@@ -398,7 +397,7 @@
                         double categoryTotal = 0;
                         foreach (Score userScore in userScores)
                         {
-                            if (userScore.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
+                            if (userScore.Assignment.CategoryID == category.ID)
                             {
                                 if (numDropped > 0)
                                 {
@@ -411,13 +410,13 @@
                                         if (userScore.Points >= 0)
                                         {
                                             categoryPoints += userScore.Points;
-                                            categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                            categoryPossible += userScore.Assignment.PointsPossible;
                                         }
                                         else if (userScore.StudentPoints >= 0)
                                         {
                                             studentWhatIf = true;
                                             categoryPoints += userScore.StudentPoints;
-                                            categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                            categoryPossible += userScore.Assignment.PointsPossible;
                                         }
                                         else
                                         {
@@ -429,13 +428,13 @@
                                     if (userScore.Points >= 0)
                                     {
                                         categoryPoints += userScore.Points;
-                                        categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                        categoryPossible += userScore.Assignment.PointsPossible;
                                     }
                                     else if (userScore.StudentPoints >= 0)
                                     {
                                         studentWhatIf = true;
                                         categoryPoints += userScore.StudentPoints;
-                                        categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                        categoryPossible += userScore.Assignment.PointsPossible;
                                     }
                                     else
                                     {
@@ -488,7 +487,7 @@
                 foreach (Category category in ViewBag.Categories)
                 {
                     int categoryScoreCount = (from score in userScores
-                                              where score.AssignmentActivity.AbstractAssignment.CategoryID == category.ID
+                                              where score.Assignment.CategoryID == category.ID
                                               select score).Count();
                     bool usingWhatIf = false;
                     if (userScores.Count() > 0)
@@ -515,7 +514,7 @@
                             double categoryPercentSmallestNumber = 0;
                             foreach (Score userScore in userScores)
                             {
-                                if (userScore.AssignmentActivity.AbstractAssignment.CategoryID == category.ID)
+                                if (userScore.Assignment.CategoryID == category.ID)
                                 {
                                     if (numDropped > 0)
                                     {
@@ -528,13 +527,13 @@
                                             if (userScore.Points >= 0)
                                             {
                                                 categoryPoints += userScore.Points;
-                                                categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                                categoryPossible += userScore.Assignment.PointsPossible;
                                             }
                                             else if (userScore.StudentPoints >= 0)
                                             {
                                                 usingWhatIf = true;
                                                 categoryPoints += userScore.StudentPoints;
-                                                categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                                categoryPossible += userScore.Assignment.PointsPossible;
                                             }
                                         }
                                     }
@@ -543,13 +542,13 @@
                                         if (userScore.Points >= 0)
                                             {
                                                 categoryPoints += userScore.Points;
-                                                categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                                categoryPossible += userScore.Assignment.PointsPossible;
                                             }
                                             else if (userScore.StudentPoints >= 0)
                                             {
                                                 usingWhatIf = true;
                                                 categoryPoints += userScore.StudentPoints;
-                                                categoryPossible += userScore.AssignmentActivity.PointsPossible;
+                                                categoryPossible += userScore.Assignment.PointsPossible;
                                             }
                                             else
                                             {

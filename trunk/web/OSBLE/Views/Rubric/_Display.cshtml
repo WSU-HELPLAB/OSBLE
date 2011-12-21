@@ -13,7 +13,7 @@ int maxLevelScore = (from c in Model.Rubric.Levels
                      select c.RangeEnd).Sum();
 int textInputLenght = 25;
 int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;
-string selectedActivity = ViewBag.ActivitySelectId;
+string selectedAssignment = ViewBag.AssignmentSelectId;
 string selectedTeam = ViewBag.TeamSelectId;
 bool isEditable = ViewBag.isEditable;
 string textBoxDisabled = "";
@@ -55,7 +55,7 @@ if (!isEditable)
     }
         if(@(isEditable.ToString().ToLower()))
         {
-        $('#@selectedActivity').change(switchEvaluation);
+        $('#@selectedAssignment').change(switchEvaluation);
         $('#@selectedTeam').change(switchEvaluation);
         updateGrade();
         }

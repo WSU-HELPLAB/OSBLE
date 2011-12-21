@@ -120,21 +120,6 @@ namespace OSBLE.Controllers
                 Session["SubmissionReceived"] = null;
             }
 
-            //(AH) No Longer need but keeping commented for reference.
-            // These are probably the nastiest set of queries in OSBLE.
-            /*List<StudioAssignment> studioAssignments = db.StudioAssignments.Where(
-                    sa =>
-                        // Assignments must be from the active course
-                        sa.Category.CourseID == ActiveCourse.AbstractCourseID &&
-                        // There must be at least two activities in the assignment
-                        sa.AssignmentActivities.Count() >= 2 &&
-                        // The first activity must be a studio activity
-                        (sa.AssignmentActivities.OrderBy(aa => aa.ReleaseDate).FirstOrDefault() is StudioActivity) &&
-                        // The last activity must be a stop activity
-                        (sa.AssignmentActivities.OrderByDescending(aa => aa.ReleaseDate).FirstOrDefault() is StopActivity)
-                ).ToList();
-             */
-
             List<Assignment> Assignments = (from assignment in db.Assignments
                                             where assignment.Category.CourseID == ActiveCourse.AbstractCourseID
                                             orderby assignment.ReleaseDate
@@ -156,24 +141,41 @@ namespace OSBLE.Controllers
                     AssignmentTeam assignmentTeam = GetAssignmentTeam(assignment, currentUser);
                     if (assignmentTeam == null)
                     {
-                        //(AH) Figure out how we want to handle this situation.
-                        //null teamUser must be because the student didn't exist when the assignment was created (hopefully)
-                        //teamUser = new UserMember() { UserProfileID = currentUser.ID };
-                        //activity.TeamUsers.Add(teamUser);
-                        //try
-                        //{
-                        //    db.SaveChanges();
-                        //}
-                        //catch (DbEntityValidationException dbEx)
-                        //{
-                        //    foreach (var validationErrors in dbEx.EntityValidationErrors)
-                        //    {
-                        //        foreach (var validationError in validationErrors.ValidationErrors)
-                        //        {
-                        //            Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
-                        //        }
-                        //    }
-                        //}
+                        //null assignmentTeam must be because the student didn't exist when the assignment was created (hopefully)
+                        CourseUser courseUser = (from user in db.CourseUsers
+                                                 where user.UserProfileID == currentUser.ID
+                                                 select user).FirstOrDefault();
+                        
+                        TeamMember userMember = new TeamMember()
+                        {
+                            CourseUser = courseUser,
+                            CourseUserID = courseUser.ID,
+                        };
+
+                        Team team = new Team();
+                        team.Name = userMember.CourseUser.UserProfile.LastName + "," + userMember.CourseUser.UserProfile.FirstName;
+                        team.TeamMembers.Add(userMember);
+
+                        db.Teams.Add(team);
+                        db.SaveChanges();
+
+                        assignmentTeam = new AssignmentTeam() { AssignmentID = assignment.ID, Assignment = assignment, Team = team, TeamID = team.ID };
+
+                        assignment.AssignmentTeams.Add(assignmentTeam);
+                        try
+                        {
+                            db.SaveChanges();
+                        }
+                        catch (DbEntityValidationException dbEx)
+                        {
+                            foreach (var validationErrors in dbEx.EntityValidationErrors)
+                            {
+                                foreach (var validationError in validationErrors.ValidationErrors)
+                                {
+                                    Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
+                                }
+                            }
+                        }
                         
                     }
                     string folderLocation = FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, assignment.ID, assignmentTeam);
@@ -211,7 +213,6 @@ namespace OSBLE.Controllers
                                                 orderby assignment.DueDate
                                                 select assignment).ToList();
 
-            //(AH): Not sure this query is going to work. Make sure to check it!
             // Present assignments are any (non-draft) for which we are between the first start date and last end date.
             List<Assignment> presentAssignments = (from assignment in db.Assignments
                                                    where !assignment.IsDraft &&
@@ -339,11 +340,10 @@ namespace OSBLE.Controllers
                     ViewBag.NumberGraded = numberGraded;
 
                     ViewBag.ExpectedSubmissionsAndGrades = assignment.AssignmentTeams.Count;
-                    //Was ViewBag.activityID
+
                     ViewBag.assignmentID = assignment.ID;
                     ViewBag.CategoryID = assignment.CategoryID;
 
-                    //COMMENTED OUT JUST FOR TESTING PURPOSES (AH)
                     List<Score> studentScores = assignment.Scores.ToList();
 
                     ViewBag.StudentScores = studentScores;
@@ -517,10 +517,11 @@ namespace OSBLE.Controllers
                 bool foundMatch = false;
                 foreach (Score score in scores)
                 {
-                    if (score.AssignmentTeamID == team.TeamID)
+                    if (score.AssignmentTeam.TeamID == team.TeamID)
                     {
                         scoreAndTeam.Add(new Tuple<string, AssignmentTeam>(score.Points.ToString(), team));
                         foundMatch = true;
+                        break;
                     }
                 }
                 if (!foundMatch)

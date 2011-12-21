@@ -27,12 +27,12 @@ namespace OSBLE.Models.Courses.Rubrics
         [Required]
         public int RecipientID { get; set; }
 
-        public virtual TeamUserMember Recipient { get; set; }
+        public virtual AssignmentTeam Recipient { get; set; }
 
         [Required]
-        public int AbstractAssignmentActivityID { get; set; }
+        public int AssignmentID { get; set; }
 
-        public virtual AbstractAssignmentActivity AssignmentActivity { get; set; }
+        public virtual Assignment Assignment { get; set; }
 
         [Required]
         public bool IsPublished { get; set; }
