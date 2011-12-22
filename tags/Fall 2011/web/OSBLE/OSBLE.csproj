@@ -709,6 +709,7 @@
     <Content Include="Views\Assignments\Wizard\_WizardBottomNav.cshtml" />
     <Content Include="Views\Assignments\Wizard\Deliverables\Index.cshtml" />
     <Content Include="Views\Assignment\Delete.cshtml" />
+    <Content Include="Views\Gradebook\ExportToCSV.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />
