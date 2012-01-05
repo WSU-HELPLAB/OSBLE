@@ -792,7 +792,7 @@
                     $.ajax({
                         type: "POST",
                         url: "/Gradebook/ModifyCell",
-                        data: { value: cellValue, userId: ajaxIDs[0], assignmentId: ajaxIDs[1] },
+                        data: { value: cellValue, userIdentification: ajaxIDs[0], assignmentId: ajaxIDs[1] },
                         success: function (response) {
                             if ($("#numDropped").val() >= 1) {
                                 DropLowest(ajaxIDs[0]);

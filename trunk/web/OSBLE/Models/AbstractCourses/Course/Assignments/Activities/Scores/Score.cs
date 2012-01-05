@@ -26,12 +26,32 @@ namespace OSBLE.Models.Assignments.Activities.Scores
         [Required]
         public double LatePenaltyPercent { get; set; }
 
-        /*
         [Required]
-        public int TeamUserMemberID { get; set; }
+        public double CustomLatePenaltyPercent { get; set; }
 
-        public virtual TeamUserMember TeamUserMember { get; set; }
-    */
+        /// <summary>
+        /// Returns the currently applied late penalty. If the CustomLatePenalty is >0, then CustomLatePenalty is the late penalty. Else it is always LatePenaltyPercent
+        /// </summary>
+        /// <returns></returns>
+        public double getAppliedLatePenaltyAsDecimal()
+        {
+            if (this.CustomLatePenaltyPercent >= 0)
+                return this.CustomLatePenaltyPercent/100.0;
+            else
+                return this.LatePenaltyPercent/100.0;
+        }
+
+        /// <summary>
+        /// Returns the grade percentage as a string, or as "NG" if there is no grade(points == -1) or points possible is 0
+        /// </summary>
+        /// <returns></returns>
+        public string getGradeAsPercent(int assignmentPossiblePoints)
+        {
+            if (this.Points == -1 || assignmentPossiblePoints == 0)
+                return "NG";
+            else
+                return ((this.Points / (double)assignmentPossiblePoints)).ToString("P");
+        }
 
         [Required]
         public int AssignmentTeamID { get; set; }
@@ -67,7 +87,7 @@ namespace OSBLE.Models.Assignments.Activities.Scores
             LatePenaltyPercent = 0;
             StudentPoints = -1;
             AddedPoints = 0;
-            //isTake = false;
+            CustomLatePenaltyPercent = -1;
             isDropped = false;
             RawPoints = -1;
         }

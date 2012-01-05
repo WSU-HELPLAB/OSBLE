@@ -233,6 +233,7 @@ namespace OSBLE.Controllers
                                             Score newScore = new Score()
                                             {
                                                 TeamMember = currentUser,
+                                                CustomLatePenaltyPercent = -1,
                                                 AssignmentTeam = currentTeam,
                                                 Points = points,
                                                 AsssignmentID = currentAssignment.ID,
@@ -1694,6 +1695,7 @@ namespace OSBLE.Controllers
                             Score newScore = new Score()
                             {
                                 AssignmentTeam = userAssignmentTeam,
+                                CustomLatePenaltyPercent = -1,
                                 TeamMember = userTeamMember,
                                 Points = value,
                                 AsssignmentID = currentAssignment.ID,
@@ -1794,6 +1796,7 @@ namespace OSBLE.Controllers
                             Score newScore = new Score()
                             {
                                 AssignmentTeam = currentAssignmentTeam,
+                                CustomLatePenaltyPercent = -1,
                                 TeamMember = currentTeamMember,
                                 Points = -1,
                                 AsssignmentID = currentAssignment.ID,
@@ -2351,6 +2354,7 @@ namespace OSBLE.Controllers
                     {
                         Score newscore = new Score()
                         {
+                            CustomLatePenaltyPercent = -1,
                             AssignmentTeam = currentTeam,
                             TeamMember = currentMember,
                             Points = ((currentPoints / currentTotal) * 100),
@@ -2363,6 +2367,7 @@ namespace OSBLE.Controllers
                         Score newscore = new Score()
                         {
                             AssignmentTeam = currentTeam,
+                            CustomLatePenaltyPercent = -1,
                             TeamMember = currentMember,
                             Points = ((currentPoints / currentTotal) * 100),
                             isDropped = false

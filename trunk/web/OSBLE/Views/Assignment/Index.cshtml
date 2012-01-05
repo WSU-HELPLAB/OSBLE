@@ -5,40 +5,25 @@
 <script src="@Url.Content("~/Scripts/osble.assignment_list.js")" type="text/javascript"></script>
 <script type="text/javascript">
 @{
-//Chris wanted some sort of notification that a student's submission was received (ticket #406).  Pretty ugly at the moment,
-//but it'll do
-if(ViewBag.SubmissionReceived)
-{
-    @Html.Raw("alert(\"Your submission was successfully received.\");");
-}
+    //Chris wanted some sort of notification that a student's submission was received (ticket #406).  Pretty ugly at the moment,
+    //but it'll do
+    if (ViewBag.SubmissionReceived)
+    {
+        @Html.Raw("alert(\"Your submission was successfully received.\");");
+    }
+
+    ViewBag.Title = "Assignments";
 }
 </script>
 
-@{    
-    ViewBag.assignmentListID = "assignmentListID_";
-    ViewBag.Title = "Assignments";
-    KeyValuePair<int, int> defaultItemOpened;
 
-    if (ViewBag.DefaultItemOpened.Key != -1)
-    {
-        defaultItemOpened = ViewBag.DefaultItemOpened;
-        <script type="text/javascript">
 
-            $(function () {
-
-            $('#@(ViewBag.assignmentListID + defaultItemOpened.Key.ToString())').accordion( "activate" , @(defaultItemOpened.Value));
-
-            });
-        
-        </script>
-    }
-}
 
 <h2>Assignments @Helpers.CreateToolTip(ToolTips.AssignmentTitle) </h2>
 
 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
 {
-    <a href="@Url.Action("Index", "Home", new { area="AssignmentWizard" })" class="add_link" id="assignment_create_button">@Helpers.AddButton() Create New Assignment</a>
+    <a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard"})" class="add_link" id="assignment_create_button">@Helpers.AddButton() Create New Assignment</a>
 }
 
 <p></p>
@@ -53,15 +38,73 @@ if(ViewBag.SubmissionReceived)
 @if (ViewBag.PastAssignments.Count > 0)
 {
     ViewBag.AssignmentList = 0;
-<h4>Past Assignments (@ViewBag.PastAssignments.Count)</h4>
-//@Html.Partial("_AssignmentList", ViewBag.PastAssignments as List<Assignment>)
+    <h4>Past Assignments (@ViewBag.PastAssignments.Count)</h4>
     List<Assignment> pastAssignments = (from a in ViewBag.PastAssignments as ICollection<Assignment>
                                         select a).ToList();
-    <table>
-    @foreach (Assignment a in pastAssignments)
-    {
-        <tr><td>@Html.ActionLink(a.AssignmentName, "AssignmentView", "Assignment", new { a.ID }, null)</td></tr>
-    }
+                                        
+    <table class="assignTable">
+        <th>Assignment</th>
+        @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+        {
+            <th>Mode</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        }
+        <th>Release Date</th>
+        <th>Due Date</th>
+        @if (ViewBag.ActiveCourse.AbstractRole.CanSubmit)
+        {
+            <th>Latest Submission</th>
+        }
+        <th>Submissions</th>
+        @foreach (Assignment a in pastAssignments)
+        {
+            <tr>
+                <td>@Html.ActionLink(a.AssignmentName, "AssignmentDetails", "Assignment", new { a.ID }, null)</td>
+                @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                {
+                    <td class="draftTD" id="@a.ID" style="cursor:pointer; text-decoration:underline;"><a>Active</a></td>
+                    <td><a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">Edit Assignment</a></td>
+                    <td><a>Delete Assignment</a></td>
+                }
+                <td>@a.ReleaseDate.ToShortDateString()</td>
+                <td>@a.DueDate.ToShortDateString()</td>
+                @if (ViewBag.ActiveCourse.AbstractRole.CanSubmit)
+                {
+                    //if a student, allow to view last submission
+                    if (ViewBag.SubmissionDictionary[a.ID] != "No Submission")
+                    {
+                        String display = ViewBag.SubmissionDictionary[a.ID];
+                        <td>@(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))</td>
+                    }
+                    else
+                    {
+                        <td>Nothing Submitted</td>
+                    }
+                }
+                @if (a.HasDeliverables && ViewBag.ActiveCourse.AbstractRole.CanModify)
+                {
+                    //Teacher with deliverables, download all option should be here
+                    <td>@Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })</td>
+                }
+                else if (a.HasDeliverables && ViewBag.ActiveCourse.AbstractRole.CanSubmit)
+                {
+                    //Student with deliverables. Can submit
+                    AjaxOptions options = new AjaxOptions()
+                    {
+                        LoadingElementId = "Loading",
+                        HttpMethod = "Get",
+                        UpdateTargetId = "submitFiles",
+                        OnComplete = "SubmissionLoaded"
+                    };
+                    <td>@Ajax.ActionLink("Submit...", "Create", "Submission", new { id = a.ID }, options, new object())</td>
+                }
+                else
+                {
+                    <td>No Deliverables</td>
+                }
+            </tr>
+        }
     </table>
     
 }
@@ -69,44 +112,225 @@ if(ViewBag.SubmissionReceived)
 @if (ViewBag.PresentAssignments.Count > 0)
 {
     ViewBag.AssignmentList = 1;
-<h4>Present Assignments (@ViewBag.PresentAssignments.Count)</h4>
+    <h4>Present Assignments (@ViewBag.PresentAssignments.Count)</h4>
     List<Assignment> presentAssignments = (from a in ViewBag.PresentAssignments as ICollection<Assignment>
                                            select a).ToList();
-    <table>
-    @foreach (Assignment a in presentAssignments)
-    {
-        <tr><td>@Html.ActionLink(a.AssignmentName, "AssignmentView", "Assignment", new { a.ID }, null)</td></tr>
-    }
+    <table class="assignTable">
+        @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+        {
+            //Blank header so icons dont have anything above them        
+            <th></th>
+        }
+        <th>Assignment</th>
+        <th>Release Date</th>c
+        <th>Due Date</th>
+        @if (ViewBag.ActiveCourse.AbstractRole.CanSubmit)
+        {
+            <th>Latest Submission</th>
+        }
+        <th>Submissions</th>
+        @foreach (Assignment a in presentAssignments)
+        {
+            
+            <tr>
+                @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                {
+                    <td style="padding-right:0"><!--Cell for icons-->
+                    <a title="Click to unpublish" onclick="toggleDraft(@a.ID)">@Helpers.PublishedIcon()</a>
+                    <a title="Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">@Helpers.EditButton()</a>
+                    <a title="Delete" href="@Url.Action("Delete", "Assignment", new { id = a.ID })">@Helpers.DeleteButton()</a>
+                    </td>
+                }
+                <td> <!--Cell for name-->
+                    @Html.ActionLink(a.AssignmentName, "AssignmentDetails", "Assignment", new { a.ID }, null)
+                </td>
+                <td>@a.ReleaseDate.ToShortDateString()</td>
+                <td>@a.DueDate.ToShortDateString()</td>
+                @if (ViewBag.ActiveCourse.AbstractRole.CanSubmit)
+                {
+                    //if a student, allow to view last submission
+                    if (ViewBag.SubmissionDictionary[a.ID] != "No Submission")
+                    {
+                        String display = ViewBag.SubmissionDictionary[a.ID];
+                        <td>@(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))</td>
+                    }
+                    else
+                    {
+                        <td>Nothing Submitted</td>
+                    }
+                }
+                @if (a.HasDeliverables && ViewBag.ActiveCourse.AbstractRole.CanModify)
+                {
+                    //Teacher with deliverables, download all option should be here
+                    <td>@Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })</td>
+                }
+                else if (a.HasDeliverables && ViewBag.ActiveCourse.AbstractRole.CanSubmit)
+                {
+                    //Student with deliverables. Can submit
+                    AjaxOptions options = new AjaxOptions()
+                    {
+                        LoadingElementId = "Loading",
+                        HttpMethod = "Get",
+                        UpdateTargetId = "submitFiles",
+                        OnComplete = "SubmissionLoaded"
+                    };
+                    <td>@Ajax.ActionLink("Submit...", "Create", "Submission", new { id = a.ID }, options, new object())</td>
+                }
+                else
+                {
+                    <td>No Deliverables</td>
+                }
+            </tr>
+        }
     </table>
 }
 
 @if (ViewBag.FutureAssignments.Count > 0)
 {
     ViewBag.AssignmentList = 2;
-<h4>Future Assignments (@ViewBag.FutureAssignments.Count)</h4>
-List<Assignment> futureAssignments = (from a in ViewBag.FutureAssignments as ICollection<Assignment>
-                                        select a).ToList();
-    <table>
-    @foreach (Assignment a in futureAssignments)
-    {
-        <tr><td>@Html.ActionLink(a.AssignmentName, "AssignmentView", "Assignment", new { a.ID }, null)</td></tr>
-    }
+    <h4>Future Assignments (@ViewBag.FutureAssignments.Count)</h4>
+    List<Assignment> futureAssignments = (from a in ViewBag.FutureAssignments as ICollection<Assignment>
+                                          select a).ToList();
+    <table class="assignTable">
+        <th>Assignment</th>
+        @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+        {
+            <th>Mode</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        }
+        <th>Release Date</th>
+        <th>Due Date</th>
+        @foreach (Assignment a in futureAssignments)
+        {
+            <tr>
+                @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                {
+                    <td>@Html.ActionLink(a.AssignmentName, "AssignmentDetails", "Assignment", new { a.ID }, null)</td>
+                    <td class="draftTD" id="@a.ID" style="cursor:pointer; text-decoration:underline;"><a>Active</a></td>
+                    <td><a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">Edit Assignment</a></td>
+                    <td><a>Delete Assignment</a></td>
+                }
+                else
+                { 
+                    <td>@a.AssignmentName</td>
+                }
+                <td>@a.ReleaseDate.ToShortDateString()</td>
+                <td>@a.DueDate.ToShortDateString()</td>
+            </tr>
+        }
     </table>
     
 }
 
 
-@if (ViewBag.DraftAssignments.Count > 0)
+@if (ViewBag.DraftAssignments.Count > 0 && ViewBag.ActiveCourse.AbstractRole.CanModify)
 {
     ViewBag.AssignmentList = 4;
-<h4>Draft Assignments (@ViewBag.DraftAssignments.Count)</h4>    
+    <h4>Draft Assignments (@ViewBag.DraftAssignments.Count)</h4>    
     List<Assignment> draftAssignments = (from a in ViewBag.DraftAssignments as ICollection<Assignment>
-                                        select a).ToList();
-    <table>
-    @foreach (Assignment a in draftAssignments)
-    {
-        <tr><td>@Html.ActionLink(a.AssignmentName, "AssignmentView", "Assignment", new { a.ID }, null)</td></tr>
-    }
+                                         select a).ToList();
+    <table class="assignTable">
+        <th>Assignment</th>
+        <th>Mode</th>
+        <th>Edit</th>
+        <th>Delete</th>
+        <th>Release Date</th>
+        <th>Due Date</th>
+        @foreach (Assignment a in draftAssignments)
+        {
+            <tr>
+                <td>@Html.ActionLink(a.AssignmentName, "AssignmentDetails", "Assignment", new { a.ID }, null)</td>
+                <td class="draftTD" id="@a.ID" style="cursor:pointer; text-decoration:underline;"><a>Inactive</a></td>
+                <td><a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">Edit Assignment</a></td>
+                <td><a>Delete Assignment</a></td>
+                <td>@a.ReleaseDate.ToShortDateString()</td>
+                <td>@a.DueDate.ToShortDateString()</td>
+            </tr>    
+        }
     </table>
-    
 }
+
+<script type="text/javascript">
+
+    function toggleDraft(id){
+        $.ajax({
+            async: false,
+            url: "/Assignment/ToggleDraft",
+            data: { assignmentID: id },
+        });
+        window.location.reload(true);
+    }
+
+    //Everytime a toggle draft button is clicked, it toggles the draft mode using the ToggleDraft controller function and refreshes the page
+    $(".draftTD").click(function (e) {
+        $.ajax({
+            async: false,
+            url: "/Assignment/ToggleDraft",
+            data: { assignmentID: $(this).attr('id') },
+        });
+        window.location.reload(true);
+    });
+
+    function create_and_open_downloading_submission_dialog() {
+
+        //create the div that we will then make into a dialog
+
+        $('body').append(
+      '<div id="downloading_submission_dialog" title="Download Submission"> \
+       <p>The zip is being generated and will automatically start downloading when it is ready, please do not leave the page or click the link again</p> \
+   </div>');
+
+        //make the div we just created into a dialog box
+
+        $('#downloading_submission_dialog').dialog({
+            modal: false,
+            autoOpen: true,
+            resizable: true,
+            width: 350,
+            height: 300,
+            closeOnEscape: true,
+            close: remove_downloading_submission_dialog,
+            buttons: { "OK": remove_downloading_submission_dialog }
+        });
+
+        $('#downloading_submission_dialog').dialog('open');
+        return false;
+    }
+
+    function remove_downloading_submission_dialog() {
+
+        //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
+        $('#downloading_submission_dialog').dialog("destroy");
+
+        //then remove the div
+        $('#downloading_submission_dialog').remove();
+    }
+
+
+    function SubmissionLoaded() {
+        $('#submit_files_dialog').dialog('open');
+
+    }
+</script>
+<style type="text/css">
+
+</style>
+
+<!--Elements for loading screen-->
+<text id="Loading" style="display:none"> <br />Please Wait...</text>
+<div id="submit_files_dialog" style="display:none">
+    <div id= "submitFiles"></div>
+    <script type="text/javascript">
+        $(function () {
+            $('#submit_files_dialog').dialog(
+            {
+                modal: true,
+                autoOpen: false,
+                height: 600,
+                width: 500
+            });
+        });
+    </script>
+    </div>
+</div>

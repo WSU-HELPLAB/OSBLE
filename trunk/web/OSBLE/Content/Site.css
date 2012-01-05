@@ -1647,3 +1647,20 @@ ul.assignment_deliverables, .assignment_deliverables ul
 {
     text-align:left;
 }
+
+/*assignment view table formatting*/
+.assignTable th
+{
+    text-align:left;
+    color: #074974;
+}
+.assignTable td
+{
+    padding-right:50px;
+}
+
+.osbleColorBold
+{
+    color: #074974;
+    font-weight:bold;
+}

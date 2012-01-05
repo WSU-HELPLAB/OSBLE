@@ -31,75 +31,20 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult Delete(int id)
         {
-            //verify that the user attempting a delete owns this course
+            //verify that the user attempting a delete owns this course and that the id is valid
             if (!activeCourse.AbstractRole.CanModify)
             {
                 return RedirectToAction("Index");
             }
 
-            AbstractAssignment assignment = db.StudioAssignments.Find(id);
+            Assignment assignment = db.Assignments.Find(id);
             if (assignment == null)
             {
                 return RedirectToAction("Index");
             }
-            return View(assignment);
-        }
 
-        [CanModifyCourse]
-        [HttpPost]
-        public ActionResult Delete(StudioAssignment assignment)
-        {
-
-            //verify that the user attempting a delete owns this course
-            if (!activeCourse.AbstractRole.CanModify)
-            {
-                return RedirectToAction("Index");
-            }
-
-            //if the user didn't click "continue" get us out of here
-            if (!Request.Form.AllKeys.Contains("continue"))
-            {
-                return RedirectToAction("Index");
-            }
-
-            assignment = db.StudioAssignments.Find(assignment.ID);
-            if (assignment == null)
-            {
-                return RedirectToAction("Index");
-            }
-            
-            //delete team users from the activities
-            int i = 0;
-            foreach(AbstractAssignmentActivity activity in assignment.AssignmentActivities)
-            {
-                i = 0;
-                while (activity.TeamUsers.Count > 0)
-                {
-                    db.TeamUsers.Remove(activity.TeamUsers.ElementAt(i));
-                }
-            }
+            db.Assignments.Remove(assignment);
             db.SaveChanges();
-
-            //Delete event data.  Magic string alert (taken from BasicAssignmentController).
-            //Because events don't reference any particular model, we can't just find all
-            //events that relate to the current assignemnt.  As a workaround, I figure that
-            //the Description property of the event data should be specific enough to identify
-            //and delete related elements.
-            string descrption = "https://osble.org/Assignment?id=" + assignment.ID;
-            List<Event> events = (from evt in db.Events
-                                  where evt.Description.Contains(descrption)
-                                  select evt).ToList();
-            foreach(Event evt in events)
-            {
-                db.Events.Remove(evt);
-            }
-
-            //clear all assignments from the file system
-            FileSystem.EmptyFolder(FileSystem.GetAssignmentsFolder(activeCourse.AbstractCourse as Course));
-
-            db.StudioAssignments.Remove(assignment);
-            db.SaveChanges();
-
             return RedirectToAction("Index");
         }
 
@@ -119,96 +64,11 @@ namespace OSBLE.Controllers
                 ViewBag.SubmissionReceived = false;
                 Session["SubmissionReceived"] = null;
             }
-
-            List<Assignment> Assignments = (from assignment in db.Assignments
-                                            where assignment.Category.CourseID == ActiveCourse.AbstractCourseID
-                                            orderby assignment.ReleaseDate
-                                            select assignment).ToList();
-
-            Dictionary<int, List<Tuple<bool, DateTime>>> submissionDictionary = new Dictionary<int, List<Tuple<bool, DateTime>>>();
-
-            if (activeCourse.AbstractRole.CanSubmit)
-            {
-                //Get whether or not the students (CanSubmit) have submitted each deliverable for each submission activity
-                var submissionAssignments = (from c in Assignments
-                                             where c.HasDeliverables == true
-                                             select c);
-
-                foreach (Assignment assignment in submissionAssignments)
-                {
-                    List<Tuple<bool, DateTime>> submitted = new List<Tuple<bool, DateTime>>();
-
-                    AssignmentTeam assignmentTeam = GetAssignmentTeam(assignment, currentUser);
-                    if (assignmentTeam == null)
-                    {
-                        //null assignmentTeam must be because the student didn't exist when the assignment was created (hopefully)
-                        CourseUser courseUser = (from user in db.CourseUsers
-                                                 where user.UserProfileID == currentUser.ID
-                                                 select user).FirstOrDefault();
-                        
-                        TeamMember userMember = new TeamMember()
-                        {
-                            CourseUser = courseUser,
-                            CourseUserID = courseUser.ID,
-                        };
-
-                        Team team = new Team();
-                        team.Name = userMember.CourseUser.UserProfile.LastName + "," + userMember.CourseUser.UserProfile.FirstName;
-                        team.TeamMembers.Add(userMember);
-
-                        db.Teams.Add(team);
-                        db.SaveChanges();
-
-                        assignmentTeam = new AssignmentTeam() { AssignmentID = assignment.ID, Assignment = assignment, Team = team, TeamID = team.ID };
-
-                        assignment.AssignmentTeams.Add(assignmentTeam);
-                        try
-                        {
-                            db.SaveChanges();
-                        }
-                        catch (DbEntityValidationException dbEx)
-                        {
-                            foreach (var validationErrors in dbEx.EntityValidationErrors)
-                            {
-                                foreach (var validationError in validationErrors.ValidationErrors)
-                                {
-                                    Trace.TraceInformation("Property: {0} Error: {1}", validationError.PropertyName, validationError.ErrorMessage);
-                                }
-                            }
-                        }
-                        
-                    }
-                    string folderLocation = FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, assignment.ID, assignmentTeam);
-
-                    foreach (Deliverable deliverable in (assignment.Deliverables))
-                    {
-                        string[] allowedExtensions = GetFileExtensions((DeliverableType)deliverable.Type);
-
-                        bool found = false;
-
-                        DateTime timeSubmitted = new DateTime();
-
-                        foreach (string extension in allowedExtensions)
-                        {
-                            FileInfo fileInfo = new FileInfo(Path.Combine(folderLocation, deliverable.Name + extension));
-                            if (fileInfo.Exists)
-                            {
-                                found = true;
-                                timeSubmitted = fileInfo.LastWriteTime;
-                                break;
-                            }
-                        }
-                        submitted.Add(new Tuple<bool, DateTime>(found, timeSubmitted));
-                    }
-
-                    submissionDictionary.Add(assignment.ID, submitted);
-                }
-            }
-
             
             // Past assignments are non-draft assignments whose final stop date has already passed.
             List<Assignment> pastAssignments = (from assignment in db.Assignments
                                                 where !assignment.IsDraft &&
+                                                assignment.Category.CourseID == activeCourse.AbstractCourseID &&
                                                 assignment.DueDate <= DateTime.Now
                                                 orderby assignment.DueDate
                                                 select assignment).ToList();
@@ -216,6 +76,7 @@ namespace OSBLE.Controllers
             // Present assignments are any (non-draft) for which we are between the first start date and last end date.
             List<Assignment> presentAssignments = (from assignment in db.Assignments
                                                    where !assignment.IsDraft &&
+                                                   assignment.Category.CourseID == activeCourse.AbstractCourseID &&
                                                    assignment.DueDate > DateTime.Now &&
                                                    assignment.ReleaseDate <= DateTime.Now
                                                    orderby assignment.DueDate
@@ -224,47 +85,53 @@ namespace OSBLE.Controllers
             // Future assignments are non-draft assignments whose start date has not yet happened.
             List<Assignment> futureAssignments = (from assignment in db.Assignments
                                                   where !assignment.IsDraft &&
+                                                  assignment.Category.CourseID == activeCourse.AbstractCourseID &&
                                                   assignment.ReleaseDate > DateTime.Now
                                                   orderby assignment.ReleaseDate
                                                   select assignment).ToList();
 
             List<Assignment> draftAssignments = new List<Assignment>();
-
             if (ActiveCourse.AbstractRole.CanModify)
             {
                 // Draft assignments (viewable by instructor only) are assignments that have not yet been published to students
                 draftAssignments = (from assignment in db.Assignments
-                                    where assignment.IsDraft
+                                    where assignment.IsDraft &&
+                                    assignment.Category.CourseID == activeCourse.AbstractCourseID
                                     orderby assignment.ReleaseDate
                                     select assignment).ToList();
             }
-
-            KeyValuePair<int, int> listWithIndex = new KeyValuePair<int, int>(-1, -1);
-            if (id != null)
+            else if(ActiveCourse.AbstractRole.CanSubmit)
             {
-                int realID = (int)id;
-                var assignment = (from c in Assignments where c.ID == realID select c).FirstOrDefault();
-
-                if (pastAssignments.Contains(assignment))
+                /*MG: gathering a list of assignments for that course that are non-draft. Then creating a dictionary<assignmentID, submissionTime> 
+                 * to be used in the view. This is only done for the students view. 
+                 */
+                List<Assignment> assignmentList = (from assignment in db.Assignments
+                                                      where !assignment.IsDraft &&
+                                                      assignment.Category.CourseID == activeCourse.AbstractCourseID
+                                                      select assignment).ToList();
+                Dictionary<int, string> submissionPairs = new Dictionary<int, string>();
+                foreach (Assignment a in assignmentList)
                 {
-                    listWithIndex = new KeyValuePair<int, int>(0, pastAssignments.IndexOf(assignment));
+                    AssignmentTeam at = OSBLEController.GetAssignmentTeam(a, currentUser);
+                    DateTime? subTime = GetSubmissionTime(a.Category.Course, a, at);
+                    if (subTime != null)
+                    {
+                        submissionPairs.Add(a.ID, subTime.Value.ToString());
+                    }
+                    else
+                    {
+                        submissionPairs.Add(a.ID, "No Submission");
+                    }
                 }
-                else if (presentAssignments.Contains(assignment))
-                {
-                    listWithIndex = new KeyValuePair<int, int>(1, presentAssignments.IndexOf(assignment));
-                }
-                else if (futureAssignments.Contains(assignment))
-                {
-                    listWithIndex = new KeyValuePair<int, int>(2, futureAssignments.IndexOf(assignment));
-                }
+                ViewBag.SubmissionDictionary= submissionPairs; 
             }
-            ViewBag.DefaultItemOpened = listWithIndex;
+
+            
             ViewBag.PastAssignments = pastAssignments;
             ViewBag.PresentAssignments = presentAssignments;
             ViewBag.FutureAssignments = futureAssignments;
             ViewBag.DraftAssignments = draftAssignments;
             ViewBag.CanSubmit = activeCourse.AbstractRole.CanSubmit;
-            ViewBag.SubmissionDictionary = submissionDictionary;
 
             ViewBag.DeliverableTypes = GetListOfDeliverableTypes();
             ViewBag.Submitted = false;
@@ -505,33 +372,84 @@ namespace OSBLE.Controllers
             };
         }
         
-        public ActionResult AssignmentView (int id)
+
+
+        public ActionResult AssignmentDetails (int id)
         {
             Assignment assignment = db.Assignments.Find(id);
             List<Score> scores = assignment.Scores.ToList();
-            List<Tuple<string, AssignmentTeam>> scoreAndTeam = new List<Tuple<string, AssignmentTeam>>();
-
+            List<Tuple<Score, AssignmentTeam, string>> scoreAndTeam = new List<Tuple<Score, AssignmentTeam, string>>();
             List<AssignmentTeam> teams = assignment.AssignmentTeams.ToList();
+
+            //Sorting teams by team name or by last name if non-team assignment
+            if (assignment.HasTeams)
+            {
+                teams.Sort((x, y) => string.Compare(x.Team.Name, y.Team.Name));
+            }
+            else
+            {
+                teams.Sort((x, y) => string.Compare(x.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName, y.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName));
+            }
+            
+            string submissionTime;
+            /*MG Going through each team in the assignment and for each team going through the scores until a match is found
+             * the match will then be used for display information. 
+             *Conflict: There can multiple scores with the same team ID as each individual gets a Score in the DB. So this will only pick up first score found
+             */
             foreach (AssignmentTeam team in teams)
             {
+                //Grabbing the submission time for the assignment
+                DateTime? subTime = GetSubmissionTime(team.Assignment.Category.Course, team.Assignment, team);
+                if (subTime != null)
+                {
+                    submissionTime = subTime.Value.ToString();
+                }
+                else
+                {
+                    submissionTime = "No Submission";
+                }
+                
+                //Checking for matched score, if there is none - add a null entry
                 bool foundMatch = false;
                 foreach (Score score in scores)
                 {
                     if (score.AssignmentTeam.TeamID == team.TeamID)
                     {
-                        scoreAndTeam.Add(new Tuple<string, AssignmentTeam>(score.Points.ToString(), team));
+                        scoreAndTeam.Add(new Tuple<Score, AssignmentTeam, string>(score, team, submissionTime));
                         foundMatch = true;
                         break;
                     }
                 }
                 if (!foundMatch)
                 {
-                    scoreAndTeam.Add(new Tuple<string, AssignmentTeam>("NG", team));
+
+                    scoreAndTeam.Add(new Tuple<Score, AssignmentTeam, string>(null, team, submissionTime));
                 }
             }
 
+            List<string[]> fileTypes = new List<string[]>();
+            foreach(Deliverable d in assignment.Deliverables)
+            {
+                fileTypes.Add(GetFileExtensions((DeliverableType)d.Type));
+            }
+            ViewBag.filetypeList = fileTypes;
             ViewBag.ScoresAndTeams = scoreAndTeam;
             return View(assignment);
         }
+
+        /// <summary>
+        /// Toggles an assignment between draft and regular assignment. Draft assignments are not shown to students, and not
+        /// used to calculate grades. 
+        /// </summary>
+        /// <param name="assignmentID"></param>
+        [CanModifyCourse]
+        public void ToggleDraft(int assignmentID)
+        {
+            //MG: Pulling the assignment from the DB, toggling its IsDraft parameter. and saving it back to the DB. 
+            Assignment assignment = db.Assignments.Find(assignmentID);
+            assignment.IsDraft = !assignment.IsDraft;
+            db.SaveChanges();
+        }
     }
 }
+

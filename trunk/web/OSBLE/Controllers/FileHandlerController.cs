@@ -216,13 +216,6 @@ namespace OSBLE.Controllers
         [NotForCommunity]
         public ActionResult GetSubmissionZip(int assignmentID, int teamID)
         {
-            //This can be used to simulate a long load time
-            /*Int64 i = 0;
-            while (i < 2000000000)
-            {
-                i++;
-            }*/
-
             Assignment assignment = db.Assignments.Find(assignmentID);
 
             try
@@ -241,12 +234,53 @@ namespace OSBLE.Controllers
                         return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
                     }
 
-                    //This can be used to simulate a long load time
-                    /*Int64 i = 0;
-                    while (i < 2000000000)
+
+                    string submissionfolder = FileSystem.GetTeamUserSubmissionFolder(false, (activeCourse.AbstractCourse as Course), assignmentID, assignmentTeam);
+
+                    using (ZipFile zipfile = new ZipFile())
                     {
-                        i++;
-                    }*/
+                        if (new DirectoryInfo(submissionfolder).Exists)
+                        {
+                            zipfile.AddDirectory(submissionfolder);
+                        }
+                        FileSystem.CreateZipFolder(activeCourse.AbstractCourse as Course, zipfile, assignment, assignmentTeam);
+
+                        stream = FileSystem.GetDocumentForRead(zipfile.Name);
+
+                        return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error in GetSubmissionZip", e);
+            }
+            return RedirectToAction("Index", "Home");
+        }
+
+        
+        [NotForCommunity]
+        public ActionResult getCurrentUsersZip(int assignmentID)
+        {
+            Assignment assignment = db.Assignments.Find(assignmentID);
+
+            AssignmentTeam at = OSBLEController.GetAssignmentTeam(assignment, currentUser);
+
+            try
+            {
+                AssignmentTeam assignmentTeam = (from a in db.AssignmentTeams
+                                                 where a.TeamID == at.TeamID
+                                                 select a).FirstOrDefault();//db.AssignmentTeams.Find(teamID);
+                if (assignment.Category.CourseID == activeCourse.AbstractCourseID && assignment.AssignmentTeams.Contains(assignmentTeam))
+                {
+                    Stream stream = FileSystem.FindZipFile(activeCourse.AbstractCourse as Course, assignment, assignmentTeam);
+
+                    string zipFileName = assignment.AssignmentName + " by " + assignmentTeam.Team.Name + ".zip";
+
+                    if (stream != null)
+                    {
+                        return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
+                    }
 
                     string submissionfolder = FileSystem.GetTeamUserSubmissionFolder(false, (activeCourse.AbstractCourse as Course), assignmentID, assignmentTeam);
 
