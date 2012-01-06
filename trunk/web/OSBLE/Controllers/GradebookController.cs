@@ -661,6 +661,7 @@ namespace OSBLE.Controllers
             Assignment newAssignment = new Assignment()
             {
                 AssignmentName = "Untitled",
+                IsWizardAssignment = false,
                 CategoryID = categoryId,
                 ColumnOrder = position,
                 AssignmentDescription = "No description",
@@ -2257,6 +2258,7 @@ namespace OSBLE.Controllers
                 Assignment newAssignment = new Assignment()
                 {
                     AssignmentName = "Untitled",
+                    IsWizardAssignment = false,
                     CategoryID = categoryId,
                     ColumnOrder = 1,
                     AssignmentDescription = "No description",

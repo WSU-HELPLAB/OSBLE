@@ -69,6 +69,7 @@ namespace OSBLE.Controllers
             List<Assignment> pastAssignments = (from assignment in db.Assignments
                                                 where !assignment.IsDraft &&
                                                 assignment.Category.CourseID == activeCourse.AbstractCourseID &&
+                                                assignment.IsWizardAssignment &&
                                                 assignment.DueDate <= DateTime.Now
                                                 orderby assignment.DueDate
                                                 select assignment).ToList();
@@ -77,6 +78,7 @@ namespace OSBLE.Controllers
             List<Assignment> presentAssignments = (from assignment in db.Assignments
                                                    where !assignment.IsDraft &&
                                                    assignment.Category.CourseID == activeCourse.AbstractCourseID &&
+                                                   assignment.IsWizardAssignment &&
                                                    assignment.DueDate > DateTime.Now &&
                                                    assignment.ReleaseDate <= DateTime.Now
                                                    orderby assignment.DueDate
@@ -86,6 +88,7 @@ namespace OSBLE.Controllers
             List<Assignment> futureAssignments = (from assignment in db.Assignments
                                                   where !assignment.IsDraft &&
                                                   assignment.Category.CourseID == activeCourse.AbstractCourseID &&
+                                                  assignment.IsWizardAssignment == true &&
                                                   assignment.ReleaseDate > DateTime.Now
                                                   orderby assignment.ReleaseDate
                                                   select assignment).ToList();
@@ -96,6 +99,7 @@ namespace OSBLE.Controllers
                 // Draft assignments (viewable by instructor only) are assignments that have not yet been published to students
                 draftAssignments = (from assignment in db.Assignments
                                     where assignment.IsDraft &&
+                                    assignment.IsWizardAssignment &&
                                     assignment.Category.CourseID == activeCourse.AbstractCourseID
                                     orderby assignment.ReleaseDate
                                     select assignment).ToList();
@@ -107,23 +111,34 @@ namespace OSBLE.Controllers
                  */
                 List<Assignment> assignmentList = (from assignment in db.Assignments
                                                       where !assignment.IsDraft &&
+                                                      assignment.IsWizardAssignment &&
                                                       assignment.Category.CourseID == activeCourse.AbstractCourseID
                                                       select assignment).ToList();
-                Dictionary<int, string> submissionPairs = new Dictionary<int, string>();
+                //This will hold the assignment ID, the date submitted in string format, the grade in string format, and the team ID
+                Dictionary<int, Tuple<string, string, int>> submissionInfo = new Dictionary<int, Tuple<string, string, int>>();
                 foreach (Assignment a in assignmentList)
                 {
                     AssignmentTeam at = OSBLEController.GetAssignmentTeam(a, currentUser);
                     DateTime? subTime = GetSubmissionTime(a.Category.Course, a, at);
-                    if (subTime != null)
+                    string submissionTime = "No Submission";
+                    string scoreString = "No Grade";
+                    if (subTime != null) //found a submission time, Reassign submissionTime
                     {
-                        submissionPairs.Add(a.ID, subTime.Value.ToString());
+                        submissionTime = subTime.Value.ToString();
                     }
-                    else
+
+
+                    //Finding score match based of UserPrfileID to avoid grabbing another team members grade (as they are potentially different)
+                    var score = (from assScore in a.Scores
+                                 where assScore.TeamMember.CourseUser.UserProfileID == CurrentUser.ID
+                                 select assScore).FirstOrDefault();
+                    if (score != null) //found matching score. Reassign scoreString
                     {
-                        submissionPairs.Add(a.ID, "No Submission");
+                        scoreString = (score as Score).getGradeAsPercent(a.PointsPossible);
                     }
+                    submissionInfo.Add(a.ID, new Tuple<string, string, int>(submissionTime, scoreString, at.TeamID));
                 }
-                ViewBag.SubmissionDictionary= submissionPairs; 
+                ViewBag.SubmissionInfoDictionary = submissionInfo; 
             }
 
             
@@ -131,11 +146,8 @@ namespace OSBLE.Controllers
             ViewBag.PresentAssignments = presentAssignments;
             ViewBag.FutureAssignments = futureAssignments;
             ViewBag.DraftAssignments = draftAssignments;
-            ViewBag.CanSubmit = activeCourse.AbstractRole.CanSubmit;
-
             ViewBag.DeliverableTypes = GetListOfDeliverableTypes();
             ViewBag.Submitted = false;
-
             return View();
         }
 

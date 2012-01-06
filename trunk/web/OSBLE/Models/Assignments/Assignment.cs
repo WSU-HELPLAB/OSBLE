@@ -20,6 +20,7 @@ namespace OSBLE.Models.Assignments
             AssignmentTeams = new List<AssignmentTeam>();
             IsDraft = true;
             addedPoints = 0;
+            IsWizardAssignment = true;
         }
 
         [Key]
@@ -183,5 +184,11 @@ namespace OSBLE.Models.Assignments
         public virtual ICollection<Score> Scores { get; set; }
 
         public double addedPoints { get; set; }
+
+        
+        /// <summary>
+        /// used to distinguish wizard created assignments versus gradebook created assignments
+        /// </summary>
+        public bool IsWizardAssignment { get; set; }
     }
 }

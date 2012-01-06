@@ -17,7 +17,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
         public override string ControllerDescription
         {
-            get { return "This assignment will employ a line-by-line review"; }
+            get { return "The instructor can mark-up student submissions with annotations"; }
         }
 
         public override ICollection<WizardBaseController> Prerequisites

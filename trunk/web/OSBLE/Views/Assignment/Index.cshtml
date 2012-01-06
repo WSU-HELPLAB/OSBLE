@@ -23,10 +23,9 @@
 
 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
 {
-    <a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard"})" class="add_link" id="assignment_create_button">@Helpers.AddButton() Create New Assignment</a>
+    <a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard"})" class="add_link" id="assignment_create_button">@Helpers.AddButton() Create New Assignment</a><br /><br />
 }
 
-<p></p>
 
 @if (ViewBag.PastAssignments.Count == 0 &&
      ViewBag.PresentAssignments.Count == 0 &&
@@ -35,110 +34,49 @@
     <h4>No Active Assignments</h4>
 }
 
-@if (ViewBag.PastAssignments.Count > 0)
+@if((ViewBag.PastAssignments.Count > 0 ||
+     ViewBag.PresentAssignments.Count > 0 ||
+     ViewBag.FutureAssignments.Count > 0) || ViewBag.ActiveCourse.AbstractRole.CanModify && ViewBag.DraftAssignments.Count > 0) 
 {
-    ViewBag.AssignmentList = 0;
-    <h4>Past Assignments (@ViewBag.PastAssignments.Count)</h4>
-    List<Assignment> pastAssignments = (from a in ViewBag.PastAssignments as ICollection<Assignment>
-                                        select a).ToList();
-                                        
+    ViewBag.AssignmentList = 1;
     <table class="assignTable">
-        <th>Assignment</th>
+
         @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
         {
-            <th>Mode</th>
-            <th>Edit</th>
-            <th>Delete</th>
+            <th colspan="2">Assignment</th>
         }
+        else
+        {
+            <th>Assignment</th>
+        }
+        
         <th>Release Date</th>
         <th>Due Date</th>
         @if (ViewBag.ActiveCourse.AbstractRole.CanSubmit)
         {
+            <th>Grade</th>
             <th>Latest Submission</th>
         }
-        <th>Submissions</th>
-        @foreach (Assignment a in pastAssignments)
+        else
         {
-            <tr>
-                <td>@Html.ActionLink(a.AssignmentName, "AssignmentDetails", "Assignment", new { a.ID }, null)</td>
-                @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
-                {
-                    <td class="draftTD" id="@a.ID" style="cursor:pointer; text-decoration:underline;"><a>Active</a></td>
-                    <td><a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">Edit Assignment</a></td>
-                    <td><a>Delete Assignment</a></td>
-                }
-                <td>@a.ReleaseDate.ToShortDateString()</td>
-                <td>@a.DueDate.ToShortDateString()</td>
-                @if (ViewBag.ActiveCourse.AbstractRole.CanSubmit)
-                {
-                    //if a student, allow to view last submission
-                    if (ViewBag.SubmissionDictionary[a.ID] != "No Submission")
-                    {
-                        String display = ViewBag.SubmissionDictionary[a.ID];
-                        <td>@(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))</td>
-                    }
-                    else
-                    {
-                        <td>Nothing Submitted</td>
-                    }
-                }
-                @if (a.HasDeliverables && ViewBag.ActiveCourse.AbstractRole.CanModify)
-                {
-                    //Teacher with deliverables, download all option should be here
-                    <td>@Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })</td>
-                }
-                else if (a.HasDeliverables && ViewBag.ActiveCourse.AbstractRole.CanSubmit)
-                {
-                    //Student with deliverables. Can submit
-                    AjaxOptions options = new AjaxOptions()
-                    {
-                        LoadingElementId = "Loading",
-                        HttpMethod = "Get",
-                        UpdateTargetId = "submitFiles",
-                        OnComplete = "SubmissionLoaded"
-                    };
-                    <td>@Ajax.ActionLink("Submit...", "Create", "Submission", new { id = a.ID }, options, new object())</td>
-                }
-                else
-                {
-                    <td>No Deliverables</td>
-                }
-            </tr>
+            <th>Submissions</th>
         }
-    </table>
-    
-}
-
-@if (ViewBag.PresentAssignments.Count > 0)
-{
-    ViewBag.AssignmentList = 1;
-    <h4>Present Assignments (@ViewBag.PresentAssignments.Count)</h4>
-    List<Assignment> presentAssignments = (from a in ViewBag.PresentAssignments as ICollection<Assignment>
-                                           select a).ToList();
-    <table class="assignTable">
-        @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+        @if (ViewBag.PastAssignments.Count > 0)
         {
-            //Blank header so icons dont have anything above them        
-            <th></th>
+            //Needed a way to put blank space in a table, only when the previous assignment category had
+            <tr><td style="padding-bottom:10px"></td></tr>
+            <tr><td colspan="100%" style="padding-right:0" class="osbleColorBold">Past (@ViewBag.PastAssignments.Count)</td></tr>
         }
-        <th>Assignment</th>
-        <th>Release Date</th>c
-        <th>Due Date</th>
-        @if (ViewBag.ActiveCourse.AbstractRole.CanSubmit)
-        {
-            <th>Latest Submission</th>
-        }
-        <th>Submissions</th>
-        @foreach (Assignment a in presentAssignments)
+        @foreach (Assignment a in ViewBag.PastAssignments)
         {
             
             <tr>
                 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
                     <td style="padding-right:0"><!--Cell for icons-->
-                    <a title="Click to unpublish" onclick="toggleDraft(@a.ID)">@Helpers.PublishedIcon()</a>
+                    <a title="Click to unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.PublishedIcon()</a>
                     <a title="Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">@Helpers.EditButton()</a>
-                    <a title="Delete" href="@Url.Action("Delete", "Assignment", new { id = a.ID })">@Helpers.DeleteButton()</a>
+                    <a title="Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@a.ID)">@Helpers.DeleteButton()</a>
                     </td>
                 }
                 <td> <!--Cell for name-->
@@ -148,33 +86,231 @@
                 <td>@a.DueDate.ToShortDateString()</td>
                 @if (ViewBag.ActiveCourse.AbstractRole.CanSubmit)
                 {
+                    <td><!--Td for grade-->
+                        @if (a.HasRubric)
+                        {
+                            string gradeToDisplay = ViewBag.SubmissionInfoDictionary[a.ID].Item2;
+                            @Html.ActionLink(gradeToDisplay, "View", "Rubric", new { assignmentId = a.ID, teamId = ViewBag.SubmissionInfoDictionary[a.ID].Item3 }, new { });
+                        }
+                        else
+                        {
+                            @ViewBag.SubmissionInfoDictionary[a.ID].Item2
+                        }
+                    </td>
                     //if a student, allow to view last submission
-                    if (ViewBag.SubmissionDictionary[a.ID] != "No Submission")
+                    if (ViewBag.SubmissionInfoDictionary[a.ID].Item1 != "No Submission" && a.HasDeliverables)
                     {
-                        String display = ViewBag.SubmissionDictionary[a.ID];
-                        <td>@(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))</td>
+                        String display = ViewBag.SubmissionInfoDictionary[a.ID].Item1;
+                        AjaxOptions options = new AjaxOptions()
+                        {
+                            LoadingElementId = "Loading",
+                            HttpMethod = "Get",
+                            UpdateTargetId = "submitFiles",
+                            OnComplete = "SubmissionLoaded"
+                        };    
+                    <td> <!--TD for displaying latest submission and resubmit-->
+                        @(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))  
+                        @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = a.ID }, options, new object())
+                    </td>
+                    }
+                    else if (a.HasDeliverables)
+                    {
+                        <td>No Submission Received</td>
                     }
                     else
                     {
-                        <td>Nothing Submitted</td>
+                        <td>No Deliverables</td>
                     }
                 }
+                @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                {
+                    if (a.HasDeliverables)
+                    {
+                        //Teacher with deliverables, download all option should be here
+                        <td>@Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })</td>
+                    }
+                    else
+                    {
+                        <td>No Deliverables</td>
+                    }
+                }
+            </tr>
+        }
+        
+        @if (ViewBag.PresentAssignments.Count > 0)
+        {
+            if (ViewBag.PastAssignments.Count > 0)
+            {
+                //Needed a way to put blank space in a table, only when the previous assignment category had
+                <tr><td style="padding-bottom:10px"></td></tr>
+            }
+            <tr><td colspan="100%" class="osbleColorBold">Present (@ViewBag.PresentAssignments.Count)</td></tr>
+        }
+        @foreach (Assignment a in ViewBag.PresentAssignments)
+        {
+            
+            <tr>
+                @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                {
+                    <td style="padding-right:0"><!--Cell for icons-->
+                    <a title="Click to unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.PublishedIcon()</a>
+                    <a title="Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">@Helpers.EditButton()</a>
+                    <a title="Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@a.ID)">@Helpers.DeleteButton()</a>
+                    </td>
+                }
+                <td> <!--Cell for name-->
+                    @Html.ActionLink(a.AssignmentName, "AssignmentDetails", "Assignment", new { a.ID }, null)
+                </td>
+                <td>@a.ReleaseDate.ToShortDateString()</td>
+                <td>@a.DueDate.ToShortDateString()</td>
+                @if (ViewBag.ActiveCourse.AbstractRole.CanSubmit)
+                {
+                    <td><!--Td for grade-->
+                        @if (a.HasRubric)
+                        {
+                            string gradeToDisplay = ViewBag.SubmissionInfoDictionary[a.ID].Item2;
+                            @Html.ActionLink(gradeToDisplay, "View", "Rubric", new { assignmentId = a.ID, teamId = ViewBag.SubmissionInfoDictionary[a.ID].Item3 }, new { });
+                        }
+                        else
+                        {
+                            @ViewBag.SubmissionInfoDictionary[a.ID].Item2
+                        }
+                    </td>
+                        //if a student, allow to view last submission
+                        if (ViewBag.SubmissionInfoDictionary[a.ID].Item1 != "No Submission" && a.HasDeliverables)
+                        {
+
+                            String display = ViewBag.SubmissionInfoDictionary[a.ID].Item1;
+                            AjaxOptions options = new AjaxOptions()
+                            {
+                                LoadingElementId = "Loading",
+                                HttpMethod = "Get",
+                                UpdateTargetId = "submitFiles",
+                                OnComplete = "SubmissionLoaded"
+                            };    
+                        <td> <!--TD for displaying latest submission and resubmit-->
+                            @(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))  
+                            @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = a.ID }, options, new object())
+                        </td>
+                        }
+                        else if (a.HasDeliverables)
+                        {
+
+                            AjaxOptions options = new AjaxOptions()
+                            {
+                                LoadingElementId = "Loading",
+                                HttpMethod = "Get",
+                                UpdateTargetId = "submitFiles",
+                                OnComplete = "SubmissionLoaded"
+                            }; 
+                         <!--TD for first submission-->
+                        <td>
+                        None.
+                        @Ajax.ActionLink("Submit Here", "Create", "Submission", new { id = a.ID }, options, new object())
+                        </td>
+                        }
+                        else
+                        {
+                        <td>No Deliverables</td>
+                        }
+                }
+                @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                {
+                    if (a.HasDeliverables)
+                    {
+                        //Teacher with deliverables, download all option should be here
+                        <td>@Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })</td>
+                    }
+                    else
+                    {
+                        <td>No Deliverables</td>
+                    }
+                }
+            </tr>
+        }
+        @if (ViewBag.FutureAssignments.Count > 0)
+        {
+            if (ViewBag.PastAssignments.Count > 0 || ViewBag.PresentAssignments.Count > 0)
+            {
+                //Needed a way to put blank space in a table, only when the previous assignment category had
+                <tr><td style="padding-bottom:10px"></td></tr>
+            }
+            <tr><td colspan="100%" style="padding-right:0" class="osbleColorBold">Future (@ViewBag.FutureAssignments.Count)</td></tr>
+        }
+        @foreach (Assignment a in ViewBag.FutureAssignments)
+        {
+            
+            <tr>
+                @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                {
+                    <td style="padding-right:0"><!--Cell for icons-->
+                    <a title="Click to unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.PublishedIcon()</a>
+                    <a title="Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">@Helpers.EditButton()</a>
+                    <a title="Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@a.ID)">@Helpers.DeleteButton()</a>
+                    </td>
+                }
+                <td> <!--Cell for name-->
+                    @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                    {
+                        @Html.ActionLink(a.AssignmentName, "AssignmentDetails", "Assignment", new { a.ID }, null)
+                    }
+                    else
+                    {
+                        @:@a.AssignmentName
+                    }
+                </td>
+                <td>@a.ReleaseDate.ToShortDateString()</td>
+                <td>@a.DueDate.ToShortDateString()</td>
+                @if (ViewBag.ActiveCourse.AbstractRole.CanSubmit)
+                {
+                    //Blank cell. Students should not see submission state
+                    <td></td>
+                }
+                @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                {
+                    if (a.HasDeliverables)
+                    {
+                        //Teacher with deliverables, download all option should be here
+                        <td>@Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })</td>
+                    }
+                    else
+                    {
+                        <td>No Deliverables</td>
+                    }
+                }
+            </tr>
+        }
+        @if (ViewBag.DraftAssignments.Count > 0)
+        {
+            if (ViewBag.PastAssignments.Count > 0 || ViewBag.PresentAssignments.Count > 0 || ViewBag.FutureAssignments.Count > 0)
+            {
+                //Needed a way to put blank space in a table, only when the previous assignment category had
+                <tr><td style="padding-bottom:10px"></td></tr>
+            }
+            <tr><td colspan="100%" style="padding-right:0" class="osbleColorBold">Draft (@ViewBag.DraftAssignments.Count)</td></tr>
+        }
+        
+        @foreach (Assignment a in ViewBag.DraftAssignments)
+        {
+            
+            <tr>
+                @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                {
+                    <td style="padding-right:0"><!--Cell for icons-->
+                    <a title="Click to Publish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.PublishedIcon()</a>
+                    <a title="Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">@Helpers.EditButton()</a>
+                    <a title="Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@a.ID)">@Helpers.DeleteButton()</a>
+                    </td>
+                }
+                <td> <!--Cell for name-->
+                    @Html.ActionLink(a.AssignmentName, "AssignmentDetails", "Assignment", new { a.ID }, null)
+                </td>
+                <td>@a.ReleaseDate.ToShortDateString()</td>
+                <td>@a.DueDate.ToShortDateString()</td>
                 @if (a.HasDeliverables && ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
                     //Teacher with deliverables, download all option should be here
                     <td>@Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })</td>
-                }
-                else if (a.HasDeliverables && ViewBag.ActiveCourse.AbstractRole.CanSubmit)
-                {
-                    //Student with deliverables. Can submit
-                    AjaxOptions options = new AjaxOptions()
-                    {
-                        LoadingElementId = "Loading",
-                        HttpMethod = "Get",
-                        UpdateTargetId = "submitFiles",
-                        OnComplete = "SubmissionLoaded"
-                    };
-                    <td>@Ajax.ActionLink("Submit...", "Create", "Submission", new { id = a.ID }, options, new object())</td>
                 }
                 else
                 {
@@ -185,71 +321,6 @@
     </table>
 }
 
-@if (ViewBag.FutureAssignments.Count > 0)
-{
-    ViewBag.AssignmentList = 2;
-    <h4>Future Assignments (@ViewBag.FutureAssignments.Count)</h4>
-    List<Assignment> futureAssignments = (from a in ViewBag.FutureAssignments as ICollection<Assignment>
-                                          select a).ToList();
-    <table class="assignTable">
-        <th>Assignment</th>
-        @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
-        {
-            <th>Mode</th>
-            <th>Edit</th>
-            <th>Delete</th>
-        }
-        <th>Release Date</th>
-        <th>Due Date</th>
-        @foreach (Assignment a in futureAssignments)
-        {
-            <tr>
-                @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
-                {
-                    <td>@Html.ActionLink(a.AssignmentName, "AssignmentDetails", "Assignment", new { a.ID }, null)</td>
-                    <td class="draftTD" id="@a.ID" style="cursor:pointer; text-decoration:underline;"><a>Active</a></td>
-                    <td><a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">Edit Assignment</a></td>
-                    <td><a>Delete Assignment</a></td>
-                }
-                else
-                { 
-                    <td>@a.AssignmentName</td>
-                }
-                <td>@a.ReleaseDate.ToShortDateString()</td>
-                <td>@a.DueDate.ToShortDateString()</td>
-            </tr>
-        }
-    </table>
-    
-}
-
-
-@if (ViewBag.DraftAssignments.Count > 0 && ViewBag.ActiveCourse.AbstractRole.CanModify)
-{
-    ViewBag.AssignmentList = 4;
-    <h4>Draft Assignments (@ViewBag.DraftAssignments.Count)</h4>    
-    List<Assignment> draftAssignments = (from a in ViewBag.DraftAssignments as ICollection<Assignment>
-                                         select a).ToList();
-    <table class="assignTable">
-        <th>Assignment</th>
-        <th>Mode</th>
-        <th>Edit</th>
-        <th>Delete</th>
-        <th>Release Date</th>
-        <th>Due Date</th>
-        @foreach (Assignment a in draftAssignments)
-        {
-            <tr>
-                <td>@Html.ActionLink(a.AssignmentName, "AssignmentDetails", "Assignment", new { a.ID }, null)</td>
-                <td class="draftTD" id="@a.ID" style="cursor:pointer; text-decoration:underline;"><a>Inactive</a></td>
-                <td><a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">Edit Assignment</a></td>
-                <td><a>Delete Assignment</a></td>
-                <td>@a.ReleaseDate.ToShortDateString()</td>
-                <td>@a.DueDate.ToShortDateString()</td>
-            </tr>    
-        }
-    </table>
-}
 
 <script type="text/javascript">
 
@@ -262,20 +333,9 @@
         window.location.reload(true);
     }
 
-    //Everytime a toggle draft button is clicked, it toggles the draft mode using the ToggleDraft controller function and refreshes the page
-    $(".draftTD").click(function (e) {
-        $.ajax({
-            async: false,
-            url: "/Assignment/ToggleDraft",
-            data: { assignmentID: $(this).attr('id') },
-        });
-        window.location.reload(true);
-    });
-
     function create_and_open_downloading_submission_dialog() {
 
         //create the div that we will then make into a dialog
-
         $('body').append(
       '<div id="downloading_submission_dialog" title="Download Submission"> \
        <p>The zip is being generated and will automatically start downloading when it is ready, please do not leave the page or click the link again</p> \
@@ -312,12 +372,46 @@
         $('#submit_files_dialog').dialog('open');
 
     }
+
+    var assignmentToDeleteID = -1;
+    function openConfirmDeleteWindow(assignmentID) {
+        assignmentToDeleteID = assignmentID;
+        $("#confirmDeleteWindow").dialog({
+            modal: true,
+            resizable: false,
+            width: 310,
+            height: 135,
+            closeOnEscape: false
+        });
+    }
+   
+    function deleteAssignment()
+    {
+        $.ajax({
+            async: false,
+            url: "/Assignment/Delete",
+            data: { id: assignmentToDeleteID },
+        });
+        window.location.reload(true);             
+    }
+
+   function hideConfirmDeleteWindow() {
+        $("#confirmDeleteWindow").dialog('close');
+    }
 </script>
-<style type="text/css">
 
-</style>
+<!--Element for modal confirmation box-->
+<div id="confirmDeleteWindow" style="display:none;" title="Change Category Weight">
+    <form id="confirmForm" onsubmit="deleteAssignment();">
+        <text>Are you sure you want to delete that assignment?</text>
+        <div class="yesAndNoDiv">
+            <input value="Delete" type="submit"/>
+            <input value="Cancel" type="button" onclick="hideConfirmDeleteWindow()" />
+        </div>
+    </form>
+</div>
 
-<!--Elements for loading screen-->
+<!--Elements for submission modal box and loading message-->
 <text id="Loading" style="display:none"> <br />Please Wait...</text>
 <div id="submit_files_dialog" style="display:none">
     <div id= "submitFiles"></div>
