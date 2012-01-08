@@ -7,6 +7,7 @@ using OSBLE.Attributes;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.HomePage;
+using OSBLE.Models.Assignments;
 
 namespace OSBLE.Controllers
 {
@@ -322,22 +323,13 @@ namespace OSBLE.Controllers
             ViewBag.MailHeader = "New Team Message";
 
             Mail mail = new Mail();
+            mail.ContextID = activeCourse.ID;
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            var team_ids = (from t in db.TeamMembers
-                            where t.TeamID == teamID
-                            select t.CourseUserID).ToList();
-
-            foreach (int id in team_ids)
+            Team team = db.Teams.Find(teamID);
+            foreach (TeamMember tm in team.TeamMembers)
             {
-                if (id != currentUser.ID)
-                {
-                    var up = (from u in db.UserProfiles
-                              where u.ID == id
-                              select u).FirstOrDefault();
-
-                    recipientList.Add(up);
-                }
+                recipientList.Add(tm.CourseUser.UserProfile);
             }
 
             Session["mail_recipients"] = recipientList;

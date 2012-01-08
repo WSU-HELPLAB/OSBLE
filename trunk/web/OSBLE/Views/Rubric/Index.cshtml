@@ -70,7 +70,6 @@ function create_and_open_downloading_submission_dialog() {
         var assignmentID = $('#@selectedAssignment').val();
         var teamID = $('#@selectedTeam').val();
         window.location.replace("/Rubric?assignmentId=" + assignmentID + "&teamId=" + teamID);
-        //Html.ActionLink("S: View Rubric", "Index", "Rubric", new { assignmentId = (int)assignmentID, teamId = teamID }, new { })
     }
 
     function updateGrade()
@@ -225,7 +224,6 @@ function create_and_open_downloading_submission_dialog() {
         <input type="submit" name="@publishButton" value="Publish to Student" />
         <br />
         <br />
-        @Html.ActionLink("Return to Gradebook", "Tab", "Gradebook", new { categoryId = @Model.SelectedAssignment.CategoryID }, new { });
         <input type="hidden" name="@ViewBag.AssignmentId" value="@Model.SelectedAssignment.ID" />
         <input type="hidden" name="@ViewBag.TeamId" value="@Model.SelectedTeam.TeamID" />
     }

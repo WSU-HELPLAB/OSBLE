@@ -45,7 +45,7 @@ namespace OSBLE.Controllers
 
             db.Assignments.Remove(assignment);
             db.SaveChanges();
-            return RedirectToAction("Index");
+            return Index(id);
         }
 
         //
@@ -390,62 +390,78 @@ namespace OSBLE.Controllers
         {
             Assignment assignment = db.Assignments.Find(id);
             List<Score> scores = assignment.Scores.ToList();
-            List<Tuple<Score, AssignmentTeam, string>> scoreAndTeam = new List<Tuple<Score, AssignmentTeam, string>>();
-            List<AssignmentTeam> teams = assignment.AssignmentTeams.ToList();
 
-            //Sorting teams by team name or by last name if non-team assignment
-            if (assignment.HasTeams)
+            if (activeCourse.AbstractRole.CanModify) //Instructor setup
             {
-                teams.Sort((x, y) => string.Compare(x.Team.Name, y.Team.Name));
-            }
-            else
-            {
-                teams.Sort((x, y) => string.Compare(x.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName, y.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName));
-            }
-            
-            string submissionTime;
-            /*MG Going through each team in the assignment and for each team going through the scores until a match is found
-             * the match will then be used for display information. 
-             *Conflict: There can multiple scores with the same team ID as each individual gets a Score in the DB. So this will only pick up first score found
-             */
-            foreach (AssignmentTeam team in teams)
-            {
-                //Grabbing the submission time for the assignment
-                DateTime? subTime = GetSubmissionTime(team.Assignment.Category.Course, team.Assignment, team);
-                if (subTime != null)
+                List<Tuple<Score, AssignmentTeam, string>> scoreAndTeam = new List<Tuple<Score, AssignmentTeam, string>>();
+                List<AssignmentTeam> teams = assignment.AssignmentTeams.ToList();
+
+                //Sorting teams by team name or by last name if non-team assignment
+                if (assignment.HasTeams)
                 {
-                    submissionTime = subTime.Value.ToString();
+                    teams.Sort((x, y) => string.Compare(x.Team.Name, y.Team.Name));
                 }
                 else
                 {
-                    submissionTime = "No Submission";
+                    teams.Sort((x, y) => string.Compare(x.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName, y.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName));
                 }
-                
-                //Checking for matched score, if there is none - add a null entry
-                bool foundMatch = false;
-                foreach (Score score in scores)
+
+                string submissionTime;
+                /*MG Going through each team in the assignment and for each team going through the scores until a match is found
+                 * the match will then be used for display information. 
+                 *Conflict: There can multiple scores with the same team ID as each individual gets a Score in the DB. So this will only pick up first score found
+                 */
+                foreach (AssignmentTeam team in teams)
                 {
-                    if (score.AssignmentTeam.TeamID == team.TeamID)
+                    //Grabbing the submission time for the assignment
+                    DateTime? subTime = GetSubmissionTime(team.Assignment.Category.Course, team.Assignment, team);
+                    if (subTime != null)
                     {
-                        scoreAndTeam.Add(new Tuple<Score, AssignmentTeam, string>(score, team, submissionTime));
-                        foundMatch = true;
-                        break;
+                        submissionTime = subTime.Value.ToString();
+                    }
+                    else
+                    {
+                        submissionTime = "No Submission";
+                    }
+
+                    //Checking for matched score, if there is none - add a null entry
+                    bool foundMatch = false;
+                    foreach (Score score in scores)
+                    {
+                        if (score.AssignmentTeam.TeamID == team.TeamID)
+                        {
+                            scoreAndTeam.Add(new Tuple<Score, AssignmentTeam, string>(score, team, submissionTime));
+                            foundMatch = true;
+                            break;
+                        }
+                    }
+                    if (!foundMatch)
+                    {
+
+                        scoreAndTeam.Add(new Tuple<Score, AssignmentTeam, string>(null, team, submissionTime));
                     }
                 }
-                if (!foundMatch)
-                {
+                ViewBag.ScoresAndTeams = scoreAndTeam;
 
-                    scoreAndTeam.Add(new Tuple<Score, AssignmentTeam, string>(null, team, submissionTime));
-                }
+                //Just giving the first or defaults teams ID, the instructor link to the rubric won't be specific.
+                ViewBag.TeamID = assignment.AssignmentTeams.FirstOrDefault().TeamID;
+            }
+            if (activeCourse.AbstractRole.CanSubmit)//STudent setup
+            {
+                ViewBag.TeamID = GetAssignmentTeam(assignment, currentUser).TeamID;
+
             }
 
+            
+
+            //MG: getting a list of the deliverables to list for assignment details. 
             List<string[]> fileTypes = new List<string[]>();
             foreach(Deliverable d in assignment.Deliverables)
             {
                 fileTypes.Add(GetFileExtensions((DeliverableType)d.Type));
             }
+
             ViewBag.filetypeList = fileTypes;
-            ViewBag.ScoresAndTeams = scoreAndTeam;
             return View(assignment);
         }
 

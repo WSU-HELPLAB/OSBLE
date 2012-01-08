@@ -279,8 +279,11 @@ namespace OSBLE.Controllers
                 {
                     Assignment assignment = db.Assignments.Find(assignmentId);
 
+                    ViewBag.AssignmentName = assignment.AssignmentName;
                     ViewBag.PossiblePoints = assignment.PointsPossible;
                     ViewBag.Score = (from c in assignment.Scores where c.AssignmentTeam.TeamID == teamId select c).FirstOrDefault();
+                    if (ViewBag.Score != null && ViewBag.Score.Points == -1) //If the score is currently a NG, dont display score (doing this by giving score a null value, handled by view)
+                        ViewBag.Score = null;
                     ViewBag.isEditable = false;
 
                     return View(viewModel);

@@ -67,8 +67,8 @@ namespace OSBLE.Models.Assignments
             {
                 //first, zero out the release date's time component
                 ReleaseDate = DateTime.Parse(ReleaseDate.ToShortDateString());
-                ReleaseDate.AddHours(value.Hour);
-                ReleaseDate.AddMinutes(value.Minute);
+                ReleaseDate = ReleaseDate.AddHours(value.Hour);
+                ReleaseDate = ReleaseDate.AddMinutes(value.Minute);
             }
         }
 
@@ -89,8 +89,9 @@ namespace OSBLE.Models.Assignments
             {
                 //first, zero out the date's time component
                 DueDate = DateTime.Parse(DueDate.ToShortDateString());
-                DueDate.AddHours(value.Hour);
-                DueDate.AddMinutes(value.Minute);
+                
+                DueDate = DueDate.AddHours(value.Hour);
+                DueDate = DueDate.AddMinutes(value.Minute);
             }
         }
 

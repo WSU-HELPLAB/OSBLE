@@ -373,6 +373,7 @@
 
     }
 
+    /*Functions and variables for deleteAssignment modal box*/
     var assignmentToDeleteID = -1;
     function openConfirmDeleteWindow(assignmentID) {
         assignmentToDeleteID = assignmentID;
@@ -392,7 +393,7 @@
             url: "/Assignment/Delete",
             data: { id: assignmentToDeleteID },
         });
-        window.location.reload(true);             
+        window.location.reload(true);
     }
 
    function hideConfirmDeleteWindow() {
