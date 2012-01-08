@@ -2242,8 +2242,8 @@ namespace OSBLE.Controllers
             //pull the gradables (columns) for the current weight (tab)
             //Pull the gradeAssignments
             List<Assignment> assignments = (from assignment in db.Assignments
-                                            where assignment.CategoryID == currentTab.ID
-                                            //(!(ga is StopActivity))
+                                            where assignment.CategoryID == currentTab.ID &&
+                                            !(assignment.IsDraft)
                                             orderby assignment.ColumnOrder
                                             select assignment).ToList();
 
@@ -2299,7 +2299,8 @@ namespace OSBLE.Controllers
                 //pull the gradables (columns) for the current weight (tab)
                 //Pull the gradeAssignments
                 assignments = (from assignment in db.Assignments
-                               where assignment.CategoryID == currentTab.ID
+                               where assignment.CategoryID == currentTab.ID &&
+                               !(assignment.IsDraft)
                                orderby assignment.ColumnOrder
                                select assignment).ToList();
 
