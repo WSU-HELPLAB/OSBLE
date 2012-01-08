@@ -81,6 +81,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 }
                 else
                 {
+
                     db.Entry(Assignment).State = System.Data.EntityState.Modified;
                 }
                 try
