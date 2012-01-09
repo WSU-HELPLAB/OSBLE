@@ -74,7 +74,7 @@ else
     @if (ViewBag.CurrentUser.CanCreateCourses)
     {
     <a href="#" onclick="create_and_open_course_create_dialog()" title="Create Course or Community" id="course_create_button" class="course_modify_buttons" >@Helpers.AddButton()</a>
-        if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+        if (ViewBag.ActiveCourse != null && ViewBag.ActiveCourse.AbstractRole.CanModify)
         {
            <a href="/Course/Delete" title="Delete current course / community" class="course_modify_buttons">@Helpers.DeleteButton()</a>
         }
