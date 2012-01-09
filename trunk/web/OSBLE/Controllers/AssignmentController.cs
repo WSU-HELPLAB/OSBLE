@@ -308,7 +308,9 @@ namespace OSBLE.Controllers
             try
             {
                 Assignment assignment = db.Assignments.Find(assignmentID);
-                AssignmentTeam team = db.AssignmentTeams.Find(teamID);
+                AssignmentTeam team = (from a in assignment.AssignmentTeams
+                                       where a.TeamID == teamID
+                                       select a).FirstOrDefault();
                 if (assignment.Category.CourseID == activeCourse.AbstractCourseID && assignment.AssignmentTeams.Contains(team))
                 {
                     Session.Add("CurrentAssignmentID", assignmentID);
@@ -318,7 +320,7 @@ namespace OSBLE.Controllers
                     bool canSaveAsDraft = !(new FileInfo(FileSystem.GetTeamUserPeerReview(false, activeCourse.AbstractCourse as Course, assignmentID, teamID)).Exists);
 
                     ViewBag.Assignment = assignment;
-                    ViewBag.Team = team;
+                    ViewBag.AssignmentTeam = team;
 
                     return View(new InlineReviewViewModel() { ReviewInterface = createEditInlineReviewSilverlightObject(canSaveAsDraft) });
                 }
@@ -329,21 +331,33 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        public ActionResult ViewInlineReview(int abstractAssignmentActivityId, int teamUserId)
+        public ActionResult ViewInlineReview(int assignmentID, int teamID)
         {
             try
             {
-                AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(abstractAssignmentActivityId);
-                TeamUserMember teamUser = db.TeamUsers.Find(teamUserId);
+                //AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(abstractAssignmentActivityId);
+                //TeamUserMember teamUser = db.TeamUsers.Find(teamUserId);
+                Assignment assignment = db.Assignments.Find(assignmentID);
+                AssignmentTeam at = db.AssignmentTeams.Find(assignmentID, teamID);
 
-                ViewBag.activity = activity;
-                ViewBag.TeamUser = teamUser;
+                ViewBag.assignment = assignment;
+                ViewBag.assignmentTeam = at;
+                //ViewBag.activity = activity;
+                //ViewBag.TeamUser = teamUser;
 
-                if (activity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourse.ID && teamUser.Contains(currentUser))
+                if (assignment.Category.CourseID == activeCourse.AbstractCourse.ID)
                 {
-                    Session.Add("CurrentActivityID", activity.ID);
-                    Session.Add("TeamUserID", teamUser.ID);
-                    return View("InlineReview", new InlineReviewViewModel() { ReviewInterface = ViewInlineReviewSilverlightObject() });
+                    foreach (TeamMember tm in at.Team.TeamMembers)
+                    {
+                        if (tm.CourseUser.UserProfileID == currentUser.ID)
+                        {
+                           // Session.Add("CurrentActivityID", activity.ID);
+                            Session.Add("CurrentAssignmentID", assignment.ID);
+                            //Session.Add("TeamUserID", teamUser.ID);
+                            Session.Add("TeamID", at.TeamID);
+                            return View("InlineReview", new InlineReviewViewModel() { ReviewInterface = ViewInlineReviewSilverlightObject() });
+                        }
+                    }
                 }
             }
             catch

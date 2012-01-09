@@ -247,16 +247,10 @@ else
             closeOnEscape: false
         });
     }
-   
-    function deleteAssignment() {
-   
-        $.ajax({
-            async: false,
-            url: "/Assignment/Delete",
-            data: { id: assignmentToDeleteID },
-        });          
 
-        //Need code here to redirect to assignment list
+    function deleteAssignment() {
+        window.location.assign("http://www.google.com");
+        hideConfirmDeleteWindow();
     }
 
    function hideConfirmDeleteWindow() {
@@ -269,7 +263,7 @@ else
     <form id="confirmForm" onsubmit="deleteAssignment();">
         <text>Are you sure you want to delete that assignment?</text>
         <div class="yesAndNoDiv">
-            <input value="Delete" type="submit"/>
+            <input value="Delete" type="button"  onclick="deleteAssignment()"/>
             <input value="Cancel" type="button" onclick="hideConfirmDeleteWindow()" />
         </div>
     </form>

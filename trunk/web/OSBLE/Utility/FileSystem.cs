@@ -387,9 +387,9 @@ namespace OSBLE
         /// <param name="abstractAssignmentActivityID"></param>
         /// <param name="teamUserID"></param>
         /// <returns></returns>
-        public static string GetTeamUserReviewFolderLocation(bool createPathIfNotExists, Course course, int abstractAssignmentActivityID, int teamUserID)
+        public static string GetTeamUserReviewFolderLocation(bool createPathIfNotExists, Course course, int assignmentID, int teamID)
         {
-            string path = GetReviewFolderLocation(course, abstractAssignmentActivityID) + "\\Reviews\\" + teamUserID;
+            string path = GetReviewFolderLocation(course, assignmentID) + "\\Reviews\\" + teamID;
             DirectoryInfo info = new DirectoryInfo(path);
 
             if (!info.Exists && createPathIfNotExists)
@@ -399,14 +399,14 @@ namespace OSBLE
             return path;
         }
 
-        public static string GetTeamUserPeerReviewDraft(bool createPathIfNotExists, Course course, int abstractAssignmentActivityID, int teamUserID)
+        public static string GetTeamUserPeerReviewDraft(bool createPathIfNotExists, Course course, int assignmentID, int teamID)
         {
-            return GetTeamUserReviewFolderLocation(createPathIfNotExists, course, abstractAssignmentActivityID, teamUserID) + "\\PeerReviewDraft.xml";
+            return GetTeamUserReviewFolderLocation(createPathIfNotExists, course, assignmentID, teamID) + "\\PeerReviewDraft.xml";
         }
 
-        public static string GetTeamUserPeerReview(bool createPathIfNotExists, Course course, int abstractAssignmentActivityID, int teamUserID)
+        public static string GetTeamUserPeerReview(bool createPathIfNotExists, Course course, int assignmentID, int teamID)
         {
-            string path = GetTeamUserReviewFolderLocation(createPathIfNotExists, course, abstractAssignmentActivityID, teamUserID);
+            string path = GetTeamUserReviewFolderLocation(createPathIfNotExists, course, assignmentID, teamID);
             path += "\\PeerReview.xml";
             return path;
         }

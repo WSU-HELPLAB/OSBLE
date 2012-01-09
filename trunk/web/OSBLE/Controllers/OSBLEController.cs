@@ -320,6 +320,21 @@ namespace OSBLE.Controllers
             return users;
         }
 
+
+        /// <summary>
+        /// Returns a list of all the course users in the team
+        /// </summary>
+        public static List<CourseUser> GetAllCourseUsers(AssignmentTeam team)
+        {
+            List<CourseUser> users = new List<CourseUser>();
+
+            foreach (TeamMember tm in team.Team.TeamMembers)
+            {
+                users.Add(tm.CourseUser);
+            }
+            return users;
+        }
+
         public static TeamMember GetTeamUser(Assignment assignment, UserProfile user)
         {
             TeamMember teamMember = new TeamMember();

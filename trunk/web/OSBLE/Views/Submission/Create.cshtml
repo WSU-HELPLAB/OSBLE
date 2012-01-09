@@ -81,7 +81,7 @@
     int fileUploadsSoFar = 0;
     int inBrowserCount = 0;
 }
-@using (Html.BeginForm("Create", "Submission", FormMethod.Post, new { id = "file_uploader_form", enctype = "multipart/form-data" }))
+@using (Html.BeginForm("Create", "Submission", FormMethod.Post, new { id = "file_uploader_form", enctype = "multipart/form-data", userprofile = ViewBag.userToSubmitFor }))
 {
     @Html.ValidationSummary(true)
     <fieldset>

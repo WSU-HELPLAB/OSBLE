@@ -47,15 +47,15 @@
                     case Notification.Types.RubricEvaluationCompleted:
                         {
                             string[] args1 = n.Data.Split(new char[] { ';' });
-                            <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> completed an @Html.ActionLink("evaluation rubric", "View", "Rubric", new { abstractAssignmentActivityId = args1[0], teamUserID = args1[1] }, new { }) of your @args1[2]
+                            <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> completed an @Html.ActionLink("evaluation rubric", "View", "Rubric", new { assignmentId = args1[0], teamId = args1[1] }, new { }) of your @args1[2]
                             </text>
                             break;
                         }
                     case Notification.Types.FileSubmitted:
                         {
                             string[] args2 = n.Data.Split(new char[] { ';' });
-                            <text><em>@args2[3]</em> submitted the file @args2[4] for the activity '@args2[2]' at @args2[5] download it
-                            @Html.ActionLink("here", "GetSubmissionZip", "FileHandler", new { teamUserID = args2[1], assignmentActivityID = args2[0] }, new { })</text>
+                            <text><em>@args2[3]</em> submitted the file @args2[4] for the assignment '@args2[2]' at @args2[5] download it
+                            @Html.ActionLink("here", "GetSubmissionZip", "FileHandler", new { assignmentID = args2[0], teamID = args2[1] }, new { })</text>
                             break;
                         }
                 }

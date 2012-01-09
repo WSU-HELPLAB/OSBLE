@@ -24,8 +24,8 @@
 
         public ReviewInterfaceDomainService()
         {
-            assignment = db.Assignments.Find((int)context.Session["CurrentActivityID"]);
-            team = db.AssignmentTeams.Find((int)context.Session["TeamID"]);
+            assignment = db.Assignments.Find((int)context.Session["CurrentAssignmentID"]);
+            team = db.AssignmentTeams.Find(assignment.ID, (int)context.Session["TeamID"]);
 
             //Find the team member
             foreach (AssignmentTeam at in assignment.AssignmentTeams)
@@ -76,7 +76,7 @@
                     string filePath = file.FullName;
 
                     //get the raw url (not web accessible due to MVC restrictions)
-                    string rawUrl = VirtualPathUtility.ToAbsolute("~/" + "FileHandler/GetSubmissionDeliverable?assignmentActivityID=" + assignment.ID.ToString() + "&teamUserID=" + team.TeamID.ToString() + "&fileName=" + file.Name);
+                    string rawUrl = VirtualPathUtility.ToAbsolute("~/" + "FileHandler/GetSubmissionDeliverable?assignmentID=" + assignment.ID.ToString() + "&teamID=" + team.TeamID.ToString() + "&fileName=" + file.Name);
 
                     DocumentLocation location = new DocumentLocation(rawUrl, i, team.Team.Name, AuthorClassification.Student, file.Name);
                     documentsToBeReviewed.Add(location);
@@ -99,7 +99,7 @@
 
             if (file.Exists)
             {
-                string rawUrl = VirtualPathUtility.ToAbsolute("~/FileHandler/GetTeamUserPeerReview?assignmentActivityID=" + assignment.ID.ToString() + "&teamUserID=" + team.TeamID.ToString());
+                string rawUrl = VirtualPathUtility.ToAbsolute("~/FileHandler/GetTeamUserPeerReview?assignmentID=" + assignment.ID.ToString() + "&teamID=" + team.TeamID.ToString());
                 return (new List<DocumentLocation>() { new DocumentLocation(rawUrl, 100, team.Team.Name, AuthorClassification.Instructor, file.Name) }).AsQueryable();
             }
             else
@@ -110,7 +110,7 @@
                 file = new FileInfo(path);
                 if (file.Exists)
                 {
-                    string rawUrl = VirtualPathUtility.ToAbsolute("~/FileHandler/GetTeamUserPeerReview?assignmentActivityID=" + assignment.ID.ToString() + "&teamUserID=" + team.TeamID.ToString());
+                    string rawUrl = VirtualPathUtility.ToAbsolute("~/FileHandler/GetTeamUserPeerReview?assignmentID=" + assignment.ID.ToString() + "&teamID=" + team.TeamID.ToString());
                     return (new List<DocumentLocation>() { new DocumentLocation(rawUrl, 100, team.Team.Name, AuthorClassification.Instructor, file.Name) }).AsQueryable();
                 }
             }

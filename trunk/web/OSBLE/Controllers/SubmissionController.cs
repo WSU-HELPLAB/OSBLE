@@ -14,13 +14,13 @@ using Ionic.Zip;
 namespace OSBLE.Controllers
 {
     [Authorize]
-    [CanSubmitAssignments]
+    //[CanSubmitAssignments]
     public class SubmissionController : OSBLEController
     {
         //
         // GET: /Submission/Create
 
-        public ActionResult Create(int? id)
+        public ActionResult Create(int? id, UserProfile up)
         {
             if (id != null)
             {
@@ -31,7 +31,12 @@ namespace OSBLE.Controllers
                     if (assignment.Category.CourseID == activeCourse.AbstractCourseID && activeCourse.AbstractRole.CanSubmit == true)
                     {
                         setViewBagDeliverables((assignment).Deliverables);
-
+                        return View();
+                    }
+                    else if(activeCourse.AbstractRole.CanGrade == true) 
+                    {
+                        ViewBag.userToSubmitFor = up;
+                        setViewBagDeliverables((assignment).Deliverables);
                         return View();
                     }
                 }
@@ -61,13 +66,20 @@ namespace OSBLE.Controllers
         // POST: /Submission/Create
 
         [HttpPost]
-        public ActionResult Create(int? id, IEnumerable<HttpPostedFileBase> files)
+        public ActionResult Create(int? id, IEnumerable<HttpPostedFileBase> files, UserProfile userprofile)
         {
             if (id != null)
             {
                 Assignment assignment = db.Assignments.Find(id);
-
-                TeamMember teamMember = GetTeamUser(assignment, currentUser);
+                TeamMember teamMember;
+                if (userprofile == null)
+                {
+                    teamMember = GetTeamUser(assignment, currentUser);
+                }
+                else
+                {
+                    teamMember = GetTeamUser(assignment, userprofile);
+                }
 
                 var score = (from c in assignment.Scores where c.TeamMember.CourseUserID == teamMember.CourseUserID select c).FirstOrDefault();
 
@@ -143,7 +155,7 @@ namespace OSBLE.Controllers
                                         }
 
                                         DateTime? dueDate = assignment.DueDate;
-                                        if (dueDate != null && dueDate < DateTime.Now)
+                                        if (dueDate != null)
                                         {
                                             (new NotificationController()).SendFilesSubmittedNotification(assignment, assignmentTeam, deliverables[i].Name);
                                         }
@@ -183,7 +195,7 @@ namespace OSBLE.Controllers
                 }
             }
 
-            return Create(id);
+            return Create(id, userprofile);
         }
 
         protected override void Dispose(bool disposing)

@@ -61,7 +61,7 @@ namespace OSBLE.Controllers
             {
                 int currentUserID = currentUser.ID;
                 Assignment assignment = db.Assignments.Find(assignmentID);
-                AssignmentTeam team = db.AssignmentTeams.Find(teamID);
+                AssignmentTeam team = db.AssignmentTeams.Find(assignmentID, teamID);
                 TeamMember teamMember = (from teamMembers in team.Team.TeamMembers
                                          where teamMembers.CourseUser.UserProfileID == currentUser.ID
                                          select teamMembers).FirstOrDefault();
@@ -172,37 +172,49 @@ namespace OSBLE.Controllers
         }
 
         [NotForCommunity]
-        public ActionResult GetTeamUserPeerReview(int assignmentActivityID, int teamUserID)
+        public ActionResult GetTeamUserPeerReview(int assignmentID, int teamID)
         {
             try
             {
-                AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(assignmentActivityID);
-                TeamUserMember teamUser = db.TeamUsers.Find(teamUserID);
+                //AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(assignmentActivityID);
+                Assignment assignment = db.Assignments.Find(assignmentID);
+                //TeamUserMember teamUser = db.TeamUsers.Find(teamUserID);
+                AssignmentTeam at = (from a in db.AssignmentTeams
+                                     where a.TeamID == teamID &&
+                                     a.AssignmentID == assignment.ID
+                                     select a).FirstOrDefault();
 
-                if ((activity.AbstractAssignment.Category.CourseID == activeCourse.AbstractCourseID))
+                if ((assignment.Category.CourseID == activeCourse.AbstractCourseID))
                 {
                     if (activeCourse.AbstractRole.CanGrade)
                     {
                         //if we are dealing with a teacher first give them the published but if it doesn't exists give them a draft if that doesn't exist give em nothing
-                        string path = FileSystem.GetTeamUserPeerReview(false, activeCourse.AbstractCourse as Course, assignmentActivityID, teamUser.ID);
+                        string path = FileSystem.GetTeamUserPeerReview(false, activeCourse.AbstractCourse as Course, assignment.ID, at.TeamID);
                         if (new FileInfo(path).Exists)
                         {
                             return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
                         }
                         else
                         {
-                            path = FileSystem.GetTeamUserPeerReviewDraft(false, activeCourse.AbstractCourse as Course, assignmentActivityID, teamUser.ID);
+                            path = FileSystem.GetTeamUserPeerReviewDraft(false, activeCourse.AbstractCourse as Course, assignment.ID, at.TeamID);
                             if (new FileInfo(path).Exists)
                             {
                                 return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
                             }
                         }
                     }
-                    else if (activeCourse.AbstractRole.CanSubmit && teamUser.Contains(currentUser))
+                    else if (activeCourse.AbstractRole.CanSubmit)
                     {
-                        //if we are dealing with student try to give them the published one but if that doesn't exist give them nothing
-                        string path = FileSystem.GetTeamUserPeerReview(false, activeCourse.AbstractCourse as Course, assignmentActivityID, teamUser.ID);
-                        return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
+                        foreach(TeamMember tm in at.Team.TeamMembers)
+                        {
+                            if (tm.CourseUser.UserProfileID == currentUser.ID)
+                            {
+                                //if we are dealing with student try to give them the published one but if that doesn't exist give them nothing
+                                string path = FileSystem.GetTeamUserPeerReview(false, activeCourse.AbstractCourse as Course, assignment.ID, at.TeamID);
+                                return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
+                            }
+                        }
+                        
                     }
                 }
             }
@@ -221,7 +233,8 @@ namespace OSBLE.Controllers
             try
             {
                 AssignmentTeam assignmentTeam = (from a in db.AssignmentTeams
-                                                 where a.TeamID == teamID
+                                                 where a.TeamID == teamID &&
+                                                 a.AssignmentID == assignment.ID
                                                  select a).FirstOrDefault();//db.AssignmentTeams.Find(teamID);
                 if (assignment.Category.CourseID == activeCourse.AbstractCourseID && assignment.AssignmentTeams.Contains(assignmentTeam))
                 {
@@ -269,7 +282,8 @@ namespace OSBLE.Controllers
             try
             {
                 AssignmentTeam assignmentTeam = (from a in db.AssignmentTeams
-                                                 where a.TeamID == at.TeamID
+                                                 where a.TeamID == at.TeamID &&
+                                                 a.AssignmentID == assignment.ID
                                                  select a).FirstOrDefault();//db.AssignmentTeams.Find(teamID);
                 if (assignment.Category.CourseID == activeCourse.AbstractCourseID && assignment.AssignmentTeams.Contains(assignmentTeam))
                 {

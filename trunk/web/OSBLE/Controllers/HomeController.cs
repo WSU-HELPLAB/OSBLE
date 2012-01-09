@@ -160,7 +160,7 @@ namespace OSBLE.Controllers
         private void setupNotifications()
         {
             // Load all unread notifications for the current user to display on the dashboard.
-            ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == currentUser.ID) && (n.Read == false)).OrderByDescending(n => n.Posted).ToList();
+            ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == activeCourse.ID) && (n.Read == false)).OrderByDescending(n => n.Posted).ToList();
         }
 
         private void setupEvents()

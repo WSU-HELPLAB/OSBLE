@@ -6,7 +6,7 @@
     ViewBag.Title = "InlineReview";
 }
 
-<h2>Inline Review of @(ViewBag.activity.Name) for @(ViewBag.TeamUser.Name)</h2>
+<h2>Inline Review of @(ViewBag.Assignment.AssignmentName) for @(ViewBag.AssignmentTeam.Team.Name)</h2>
 
 <div style="width:99%; height:1000px">
 @Html.DisplayFor(m=>m.ReviewInterface)

@@ -127,7 +127,8 @@ namespace OSBLE.Controllers
             Assignment assignment = db.Assignments.Find(assignmentId);
 
             AssignmentTeam assignmentTeam = (from at in db.AssignmentTeams
-                                             where at.TeamID == teamId
+                                             where at.TeamID == teamId &&
+                                             at.AssignmentID == assignment.ID
                                              select at).FirstOrDefault();
 
             if (assignment == null || assignmentTeam == null)
