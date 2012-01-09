@@ -88,6 +88,17 @@
     <text><em>Pending @Helpers.DisplayLastFourID(user.Identification) </em></text>
         }
 }
+@helper DisplayFullNameOrPending(CourseUser cu)
+    {
+        if (cu.UserProfile.UserName != null)
+        {
+    <text>@cu.UserProfile.FirstName @cu.UserProfile.LastName</text>
+        }
+        else
+        {
+    <text><em>Pending @Helpers.DisplayLastFourID(cu.UserProfile.Identification) </em></text>
+        }
+}
 @* Standard wrapper for profile pic *@
 @helper ProfilePicture(string url)
     {

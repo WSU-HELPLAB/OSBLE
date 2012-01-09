@@ -88,6 +88,7 @@ namespace OSBLE.Controllers
 
             // Default to not Approved.
             e.Approved = false;
+            //e.AbstractCourseID = activeCourse.AbstractCourse.ID;
 
             // Combine start date and time fields into one field
             e.StartDate = e.StartDate.Date;
@@ -316,7 +317,14 @@ namespace OSBLE.Controllers
         [NonAction]
         public List<Event> GetActiveCourseEvents(DateTime StartDate, DateTime EndDate)
         {
-            List<Event> events = ActiveCourse.AbstractCourse.Events.Where(e => e.Approved && (e.StartDate >= StartDate) && (e.StartDate <= EndDate)).ToList();
+            //MG:Pulling all events for this course that approved and have a startdate that 
+            //lies within the StartDate and EndDate parameters. 
+            List<Event> events = (from e in db.Events
+                                   where e.Poster.AbstractCourseID == activeCourse.AbstractCourseID
+                                   && e.StartDate >= StartDate
+                                   && e.StartDate <= EndDate
+                                   && e.Approved
+                                   select e).ToList();
 
             // Add course meeting times and breaks.
             if (ActiveCourse.AbstractCourse is Course && ((ActiveCourse.AbstractCourse as Course).ShowMeetings == true))

@@ -20,8 +20,6 @@ namespace OSBLE.Models.Courses
 
         public abstract bool AllowEventPosting { get; set; }
 
-        public virtual ICollection<Event> Events { get; set; }
-
         [Display(Name = "Allow students to post new threads in activity feed")]
         public bool AllowDashboardPosts { get; set; }
 
