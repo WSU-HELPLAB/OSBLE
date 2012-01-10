@@ -458,7 +458,11 @@ namespace OSBLE.Controllers
                 ViewBag.ScoresAndTeams = scoreAndTeam;
 
                 //Just giving the first or defaults teams ID, the instructor link to the rubric won't be specific.
-                ViewBag.TeamID = assignment.AssignmentTeams.FirstOrDefault().TeamID;
+                ViewBag.TeamID = 0;
+                if(assignment.AssignmentTeams.Count > 0)
+                {
+                    ViewBag.TeamID = assignment.AssignmentTeams.FirstOrDefault().TeamID;
+                }
             }
             if (activeCourse.AbstractRole.CanSubmit)//STudent setup
             {
