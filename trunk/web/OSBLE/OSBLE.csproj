@@ -535,7 +535,6 @@
   <ItemGroup>
     <Folder Include="Models\Wizard\" />
     <Folder Include="Validations\" />
-    <Folder Include="Views\Assignments\Wizard\" />
     <Folder Include="Views\SubbmissionAssignmentActivity\" />
     <Folder Include="Views\SubmissionAssignmentActivity\" />
   </ItemGroup>

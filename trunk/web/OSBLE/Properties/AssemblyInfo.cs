@@ -25,8 +25,8 @@ using System.Runtime.InteropServices;
 // OSBLE uses the following scheme for assembly information:
 //
 //      Major Version
-//      Build Year
-//      Build Month
+//      Minor
+//      Patch
 //      Codeplex Check-in Number
-[assembly: AssemblyVersion("0.11.9.9888")]
-[assembly: AssemblyFileVersion("0.11.9.9888")]
+[assembly: AssemblyVersion("1.0.1.12268")]
+[assembly: AssemblyFileVersion("1.0.1.12268")]
