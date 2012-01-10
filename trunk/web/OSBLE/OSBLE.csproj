@@ -739,6 +739,7 @@
     <Content Include="Areas\AssignmentWizard\Views\Team\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\WizardSummary.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Deliverables\Index.cshtml" />
+    <Content Include="Views\Assignment\AssignmentDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />
