@@ -50,5 +50,9 @@ namespace OSBLE.Models.Users
         {
             Posted = DateTime.Now;
         }
+
+
+        public bool DeleteFromOutbox { get; set; }
+        public bool DeleteFromInbox { get; set; }
     }
 }

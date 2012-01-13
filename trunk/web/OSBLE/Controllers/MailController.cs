@@ -43,41 +43,41 @@ namespace OSBLE.Controllers
                 case UserProfile.sortEmailBy.POSTED:
                     if (!reverse)
                     {
-                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID).OrderByDescending(m => m.Posted).ToList();
+                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && !m.DeleteFromInbox).OrderByDescending(m => m.Posted).ToList();
                     }
                     else // reverse
                     {
-                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID).OrderBy(m => m.Posted).ToList();
+                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && !m.DeleteFromInbox).OrderBy(m => m.Posted).ToList();
                     }
                     break;
                 case UserProfile.sortEmailBy.CONTEXT:
                     if (!reverse)
                     {
-                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID).OrderBy(m => m.Context.Name).ToList();
+                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && !m.DeleteFromInbox).OrderBy(m => m.Context.Name).ToList();
                     }
                     else // reverse
                     {
-                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID).OrderByDescending(m => m.Context.Name).ToList();
+                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && !m.DeleteFromInbox).OrderByDescending(m => m.Context.Name).ToList();
                     }
                     break;
                 case UserProfile.sortEmailBy.FROM:
                     if (!reverse)
                     {
-                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID).OrderBy(m => m.FromUserProfile.FirstName).ToList();
+                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && !m.DeleteFromInbox).OrderBy(m => m.FromUserProfile.FirstName).ToList();
                     }
                     else // reverse
                     {
-                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID).OrderByDescending(m => m.FromUserProfile.FirstName).ToList();
+                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && !m.DeleteFromInbox).OrderByDescending(m => m.FromUserProfile.FirstName).ToList();
                     }
                     break;
                 case UserProfile.sortEmailBy.SUBJECT:
                     if (!reverse)
                     {
-                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID).OrderBy(m => m.Subject).ToList();
+                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && !m.DeleteFromInbox).OrderBy(m => m.Subject).ToList();
                     }
                     else // reverse
                     {
-                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID).OrderByDescending(m => m.Subject).ToList();
+                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && !m.DeleteFromInbox).OrderByDescending(m => m.Subject).ToList();
                     }
                     break;
                 default:
@@ -95,7 +95,7 @@ namespace OSBLE.Controllers
         public ViewResult Outbox()
         {
             ViewBag.BoxHeader = "Outbox";
-            var mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID).OrderByDescending(m => m.Posted);
+            var mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderByDescending(m => m.Posted);
             return View("Index", mails.ToList());
         }
 
@@ -365,6 +365,8 @@ namespace OSBLE.Controllers
                         newMail.Message = mail.Message;
                         newMail.ThreadID = threadID;
                         newMail.ContextID = mail.ContextID;
+                        newMail.DeleteFromInbox = false;
+                        newMail.DeleteFromOutbox = false;
 
                         //need to create the mail before we can send the notification and set the threadID
                         db.Mails.Add(newMail);
@@ -389,27 +391,6 @@ namespace OSBLE.Controllers
                 }
             }
             return View(mail);
-        }
-
-        //
-        // GET: /Mail/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int id)
-        {
-            Mail mail = db.Mails.Find(id);
-
-            if (mail.ToUserProfile == currentUser)
-            {
-                db.Mails.Remove(mail);
-                db.SaveChanges();
-            }
-            else
-            {
-                Response.StatusCode = 403;
-                return View("_AjaxEmpty");
-            }
-
-            return RedirectToAction("Index");
         }
 
         protected override void Dispose(bool disposing)
@@ -493,6 +474,138 @@ namespace OSBLE.Controllers
             {
                 return new FileStreamResult(FileSystem.GetDefaultProfilePicture(), "image/jpeg");
             }
+        }
+
+        public ActionResult CreateReplyAll()
+        {
+            int replyto;
+            Mail mail = new Mail();
+            List<UserProfile> recipientList = new List<UserProfile>();
+            if (Int32.TryParse(Request.Params["replyAll"], out replyto) == true)
+            {
+                if ((mail = db.Mails.Find(replyto)) != null)
+                {
+                    recipientList = (from m in db.Mails
+                                     where m.ThreadID == replyto &&
+                                     m.ToUserProfileID != currentUser.ID
+                                     select m.ToUserProfile).ToList<UserProfile>();
+                    if (!recipientList.Contains(mail.FromUserProfile))
+                    {
+                        recipientList.Add(mail.FromUserProfile); //Adds the sender to the reply list
+                    }
+                    ViewBag.MailHeader = mail.Subject = "RE: " + mail.Subject;
+                    // Prefix each line with a '> '
+                    mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
+                                    mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
+                                    Regex.Replace(mail.Message, "^.*$", "> $&",
+                                    RegexOptions.Multiline);
+                }
+            }
+
+            Session["mail_recipients"] = recipientList;
+            return View("Create", mail);
+        }
+
+
+        public ActionResult CreateReply()
+        {
+            int replyto;
+            List<UserProfile> recipientList = new List<UserProfile>();
+            Mail mail = new Mail();
+
+            if (Int32.TryParse(Request.Params["replyTo"], out replyto) == true)
+            {
+                if ((mail = db.Mails.Find(replyto)) != null)
+                {
+                    recipientList.Add(mail.FromUserProfile); //Adds the sender to the reply list
+                    ViewBag.MailHeader = mail.Subject = "RE: " + mail.Subject;
+                    // Prefix each line with a '> '
+                    mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
+                                    mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
+                                    Regex.Replace(mail.Message, "^.*$", "> $&",
+                                    RegexOptions.Multiline);
+                }
+            }
+
+            Session["mail_recipients"] = recipientList;
+            return View("Create", mail);
+        }
+
+        public ActionResult CreateForward()
+        {
+            int forwardto;
+            Mail mail = new Mail();
+            List<UserProfile> recipientList = new List<UserProfile>();
+            if (Int32.TryParse(Request.Params["forwardTo"], out forwardto) == true)
+            {
+                if ((mail = db.Mails.Find(forwardto)) != null)
+                {
+                    ViewBag.MailHeader = mail.Subject = "FW: " + mail.Subject;
+                    // Prefix each line with a '> '
+                    mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
+                                    mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
+                                    Regex.Replace(mail.Message, "^.*$", "> $&",
+                                    RegexOptions.Multiline);
+                }
+            }
+
+            Session["mail_recipients"] = recipientList;
+            return View("Create", mail);
+        }
+
+
+        [HttpPost]
+        public ActionResult DeleteFromInbox(int id)
+        {
+            Mail mail = db.Mails.Find(id);
+
+            if (mail.ToUserProfile == currentUser)
+            {
+                if (mail.DeleteFromOutbox == true)
+                {
+                    db.Mails.Remove(mail);
+                    db.SaveChanges();
+                }
+                else
+                {
+                    mail.DeleteFromInbox = true;
+                    db.SaveChanges();
+                }
+            }
+            else
+            {
+                Response.StatusCode = 403;
+                return View("_AjaxEmpty");
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public ActionResult DeleteFromOutbox(int id)
+        {
+            Mail mail = db.Mails.Find(id);
+
+            if (mail.FromUserProfile == currentUser)
+            {
+                if (mail.DeleteFromInbox == true)
+                {
+                    db.Mails.Remove(mail);
+                    db.SaveChanges();
+                }
+                else
+                {
+                    mail.DeleteFromOutbox = true;
+                    db.SaveChanges();
+                }
+            }
+            else
+            {
+                Response.StatusCode = 403;
+                return View("_AjaxEmpty");
+            }
+
+            return RedirectToAction("Index");
         }
     }
 }
