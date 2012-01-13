@@ -218,9 +218,6 @@ namespace OSBLE.Controllers
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            // gets the current courseid
-            mail.ContextID = (int)context.Session["ActiveCourse"];
-
             Session["mail_recipients"] = recipientList;
             return View("Create", mail);
         }
@@ -345,6 +342,9 @@ namespace OSBLE.Controllers
             {
                 string recipient_string = Request.Params["recipientlist"];
                 string[] recipients;
+
+                // gets the current courseid
+                mail.ContextID = (int)context.Session["ActiveCourse"];
 
                 // gets the current course
                 mail.Context = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
