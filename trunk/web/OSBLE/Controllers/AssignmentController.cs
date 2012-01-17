@@ -404,6 +404,7 @@ namespace OSBLE.Controllers
         {
             Assignment assignment = db.Assignments.Find(id);
             List<Score> scores = assignment.Scores.ToList();
+            List<CourseUser> cuList = null;
 
             if (activeCourse.AbstractRole.CanModify) //Instructor setup
             {
@@ -464,12 +465,31 @@ namespace OSBLE.Controllers
                     ViewBag.TeamID = assignment.AssignmentTeams.FirstOrDefault().TeamID;
                 }
             }
-            if (activeCourse.AbstractRole.CanSubmit)//STudent setup
+
+            else if (activeCourse.AbstractRole.CanSubmit)//STudent setup
             {
-                ViewBag.TeamID = GetAssignmentTeam(assignment, currentUser).TeamID;
+                AssignmentTeam at = GetAssignmentTeam(assignment, currentUser);
+                ViewBag.TeamID = at.TeamID;
+                ViewBag.TeamName = at.Team.Name;
 
+                if (assignment.HasTeams)
+                {
+                    
+                    foreach(TeamMember tm in at.Team.TeamMembers)
+                    {
+                        if (tm.CourseUser.ID != activeCourse.ID)
+                        {
+                            if (cuList == null) //init only when needed, otherwise leave null for view check.
+                            {
+                                cuList = new List<CourseUser>();
+                            }
+                            cuList.Add(tm.CourseUser);
+                        }
+                    }
+                    
+                }
             }
-
+            ViewBag.TeamMembers = cuList; //null if no team members
             
 
             //MG: getting a list of the deliverables to list for assignment details. 
@@ -480,6 +500,7 @@ namespace OSBLE.Controllers
             }
 
             ViewBag.filetypeList = fileTypes;
+
             return View(assignment);
         }
 

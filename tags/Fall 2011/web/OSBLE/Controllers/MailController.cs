@@ -19,7 +19,7 @@ namespace OSBLE.Controllers
         public ViewResult Index()
         {
             ViewBag.BoxHeader = "Inbox";
-            var mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID).OrderByDescending(m => m.Posted);
+            var mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && !m.DeleteFromInbox).OrderByDescending(m => m.Posted);
             return View(mails.ToList());
         }
 
