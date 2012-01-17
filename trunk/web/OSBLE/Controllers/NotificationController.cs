@@ -90,6 +90,7 @@ namespace OSBLE.Controllers
             n.ItemID = mail.ID;
             n.RecipientID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.ToUserProfileID).FirstOrDefault().ID;
             n.SenderID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.FromUserProfileID).FirstOrDefault().ID;
+            n.CourseID = mail.ContextID;
 
             addNotification(n);
         }
@@ -171,6 +172,7 @@ namespace OSBLE.Controllers
                 n.CourseID = e.Poster.AbstractCourseID;
                 n.RecipientID = instructor.ID;
                 n.SenderID = e.Poster.ID;
+                n.CourseID = activeCourse.AbstractCourseID; 
 
                 addNotification(n);
             }
@@ -188,6 +190,7 @@ namespace OSBLE.Controllers
                 n.Data = assignment.ID.ToString() + ";" + team.TeamID.ToString() + ";" + assignment.AssignmentName;
                 n.RecipientID = user.ID;
                 n.SenderID = activeCourse.ID;
+                n.CourseID = activeCourse.AbstractCourseID;
 
                 addNotification(n);
             }
@@ -206,6 +209,7 @@ namespace OSBLE.Controllers
                 
                 n.RecipientID = user.ID;
                 n.SenderID = activeCourse.ID;
+                n.CourseID = activeCourse.AbstractCourseID;
 
                 addNotification(n);
             }
@@ -228,6 +232,7 @@ namespace OSBLE.Controllers
                     n.Data = assignment.ID.ToString() + ";" + team.TeamID.ToString() + ";" + assignment.AssignmentName + ";" + team.Team.Name + ";" + fileName + ";" + DateTime.Now;
                     n.RecipientID = user.ID;
                     n.SenderID = activeCourse.ID;
+                    n.CourseID = activeCourse.AbstractCourseID;
 
                     addNotification(n);
                 }
@@ -270,6 +275,7 @@ namespace OSBLE.Controllers
             UserProfile sender = db.UserProfiles.Find(n.Sender.UserProfileID);
             UserProfile recipient = db.UserProfiles.Find(n.Recipient.UserProfileID);
 
+            // this comes back as null, for some reason.
             AbstractCourse course = db.AbstractCourses.Where(b => b.ID == n.CourseID).FirstOrDefault();
 
             string subject = "";

@@ -518,7 +518,6 @@ namespace OSBLE.Controllers
                     }
                     if ((cu != null) && (cu.AbstractRole.CanGrade || ((ac != null) && (ac.AllowDashboardPosts))))
                     {
-
                         replyToPost.Replies.Add(dr);
                         db.SaveChanges();
 
