@@ -273,7 +273,7 @@ namespace OSBLE.Controllers
             AbstractCourse course = db.AbstractCourses.Where(b => b.ID == n.CourseID).FirstOrDefault();
 
             string subject = "";
-            if(getCourseTag(course) != null)
+            if(getCourseTag(course) != "")
             {
                 subject = "[" + getCourseTag(course) + "] "; // Email subject prefix
             }
