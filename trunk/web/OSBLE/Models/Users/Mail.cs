@@ -42,7 +42,6 @@ namespace OSBLE.Models.Users
 
         [Required]
         [AllowHtml]
-        [StringLength(4000)]
         public string Message { get; set; }
 
         public Mail()
