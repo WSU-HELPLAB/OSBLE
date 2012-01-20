@@ -57,12 +57,19 @@ var teamCounter = 1;
 function createTeam(evt, teamName) {
     var divId = "teamDiv_" + teamCounter + "_0";
     var listId = 'team_' + teamCounter + "_0";
-    var InputContent = "Team " + teamCounter;
-    if (teamName != undefined) {
-        InputContent = teamName;
+    if (teamName == undefined) {
+        teamName = "Team ";
+
+        //Add leading zero as requested in CodePlex ticket #695
+        if (teamCounter < 10) {
+            teamName += "0" + teamCounter;
+        }
+        else {
+            teamName += teamCounter;
+        }
     }
     var newContent = '<div style="display:none;" id="' + divId + '" class="TeamDiv">' +
-                            '<input type="text" class="TeamNameTextBox" value="' + InputContent + '" />' +
+                            '<input type="text" class="TeamNameTextBox" value="' + teamName + '" />' +
                             '<img class="RemoveTeamIcon" src="/Content/images/delete_up.png" alt="remove team" title="remove team" onclick="removeTeam(\'' + divId + '\')" />' +
                             '<ul id="' + listId + '" class="TeamSortable"></ul>' +
                          '</div>';
