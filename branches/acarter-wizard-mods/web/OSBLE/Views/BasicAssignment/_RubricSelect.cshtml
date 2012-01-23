@@ -1,0 +1,17 @@
+﻿@using OSBLE.Models.Courses.Rubrics;
+@{
+    Layout = null;
+    var index = 0;
+}
+<select name="RubricToUse">
+    @foreach (Rubric rubric in ViewBag.Rubrics)
+    { 
+        <option value="@rubric.ID"
+        @{if(ViewBag.SelectedRubric == rubric.ID)
+          {
+              <text>selected="selected"</text>
+          }
+          }
+        >@rubric.Description</option>
+    }
+</select>

@@ -1,0 +1,281 @@
+﻿@using OSBLE.Models.Assignments
+@using OSBLE.Models.Assignments.Activities
+@using OSBLE.Models.Users;
+@using System.Linq;
+@using OSBLE.Models.Assignments.Activities.Scores
+@using OSBLE.Controllers;
+@model StudioAssignment
+
+@{
+    StudioAssignment sa = Model;
+    int StudioAssignmentCounter = (int)ViewBag.StudioAssignmentCounter;
+}
+
+<div class="assignment_header">
+            <a id="@StudioAssignmentCounter" href="#">@sa.Name</a>
+        </div>
+        @{
+            //The magic number of "2" means that we're looking at a future assignment.  In this case, don't show any details.
+            //This functionality was requested in work item #412
+            if (ViewBag.AssignmentList == 2)
+            {
+                <text><div>Information on this assignment is not yet available.</div></text>
+                return;
+            }
+            }
+        <div>
+            <div class="assignment_title">
+                Description</div>
+            @* Add links to assignment description *@
+            <div class="assignment_description">@Helpers.Linkify(sa.Description)</div>
+            @if (sa.IsTeamAssignment)
+            {
+                TeamMember team = sa.GetUsersTeam(ViewBag.CurrentUser);
+                <div class="assignment_title">
+                Team Assignment
+                </div>
+                <div>
+                    You are a member of &quot;@team.Name&quot;.  The team members are:
+                    <br />
+                    <ul class="user_list">
+                    @foreach (TeamUserMember genericMember in team.Team.Members)
+                    {
+                        UserMember member = genericMember as UserMember;
+                        <li>
+                            <div class="user_controls">
+                            @if (member.UserProfile.UserName != null)
+                            {
+                            <a title="Mail This User" href="@Url.Action("CreateTeamMember", "Mail", new { id = member.UserProfile.ID })">@Helpers.MailButton()</a>
+                            }
+                            
+                            </div>
+                        
+                        @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", "Roster", new { userProfile = member.UserProfile.ID }))
+                        <span class="roster_name">@Helpers.DisplayFullNameOrPending(member.UserProfile)</span>
+                        
+                        </li>
+                    }
+                    </ul>
+                </div>
+                <div>
+                    <a title="Email whole team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = team.Team.ID })">Email the whole team</a>
+                </div>
+                <br />
+                
+            }
+            @if (sa.Deliverables.Count > 0)
+            {
+
+                if (sa.AssignmentActivities.Where(aa => aa is SubmissionActivity).Count() > 0)
+                {
+                <div class="assignment_title">
+                    Submissions
+                </div>
+
+                <ul class="assignment_deliverables">
+                    @{
+@* First get full list of assignment activities. This is to later get the assignment activity
+                                Immediately following each submission activity. The controller's responsibility is to send
+                                this view only lists of assignment activities where there are at least 2 activities and the last
+                                is a stop, which guarantees that if there are submission activities, there will be an activity
+                                after it to define an end date. *@
+                    List<AbstractAssignmentActivity> assignmentActivities = sa.AssignmentActivities.OrderBy(aa => aa.ReleaseDate).ToList();
+@* Now get each submission activity. *@
+                    List<AbstractAssignmentActivity> submissionActivities = assignmentActivities.Where(aa => aa is SubmissionActivity).OrderBy(aa => aa.ReleaseDate).ToList();
+
+                    int submissionCounter = 0;
+
+                    foreach (SubmissionActivity submission in submissionActivities)
+                    {
+@* Get submission's release date as start date *@
+                        DateTime startDate = submission.ReleaseDate;
+@* Get the activity following the submission's release date as end date *@
+                        DateTime endDate = assignmentActivities[assignmentActivities.IndexOf(submission) + 1].ReleaseDate;    
+                                        
+                        <li>
+                            <input id="@(StudioAssignmentCounter.ToString() + "_" + submissionCounter.ToString())" type="hidden" value="@submission.ID" />
+                            <table>
+                                <tr>
+                                    <th>
+                                        <span>Start Date</span>
+                                    </th>
+                                    <td>
+                                        <span>@startDate.ToString()</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <span>End Date</span>
+                                    </th>
+                                    <td>
+                                        <!--Make the due date red if less than 3 days away from being due-->
+                                        @if (endDate > DateTime.Now && endDate < DateTime.Now.AddDays(3))
+                                        { 
+                                            <span style="color: Red">@endDate.ToString()</span>
+                                        
+                                        }
+                                        else
+                                        {
+                                            <span>@endDate.ToString()</span>
+                                        }
+                                    </td>
+                                </tr>
+                            </table>
+                            <h4>
+                                Deliverables</h4>
+                            <div>
+                                @{
+                                        int deliverablesCounter = 0;
+                                }
+                                @foreach (Deliverable d in sa.Deliverables)
+                                {
+                                    SelectListItem sli = ViewBag.DeliverableTypes[d.Type];
+                                    <div class="submission_deliverable">
+                                        @* Get deliverable type string *@
+                                        <table>
+                                            <tr>
+                                                <th>
+                                                    <span>Name</span>
+                                                </th>
+                                                <td >
+                                                    <span>@d.Name</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>
+                                                    <span>Type</span>
+                                                </th>
+                                                <td>
+                                                    <span>@sli.Text</span>
+                                                </td>
+                                            </tr>
+                                            <!--Only have submitted if it is someone who can submit and past the time
+                                            that they could have submitted something-->
+                                            @if (ViewBag.CanSubmit && submission.ReleaseDate < DateTime.Now)
+                                            {
+                                                <tr>
+                                                    <th>
+                                                        <span>Submitted:</span>
+                                                    </th>
+                                                    <td>
+                                                        <!--If submitted put the time it was submitted in green or say Not Submitted in red-->
+                                                        @{
+                                                Tuple<bool, DateTime> submittedTime = ViewBag.SubmissionDictionary[submission.ID][deliverablesCounter] as Tuple<bool, DateTime>;
+                                                if (submittedTime.Item1)
+                                                {
+                                                            <span style="color: Green">@(submittedTime.Item2)</span>
+                                                }
+                                                else
+                                                {
+                                                            <span style="color: Red">Not Submitted</span>
+                                                }
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                
+                                            }
+                                        </table>
+                                        <div>
+                                        @if ((ViewBag.SubmissionDictionary[submission.ID][deliverablesCounter] as Tuple<bool, DateTime>).Item1)
+                                        {
+                                            @Html.ActionLink("View Submission", "GetSubmissionDeliverableByType", "FileHandler", new { assignmentActivityID = submission.ID, userProfileID = (ViewBag.CurrentUser as UserProfile).ID, fileName = d.Name, type = d.Type }, new { });
+                                        }
+                                        </div>
+                                    </div>
+                                        deliverablesCounter++;
+                                }
+                            </div>
+                            <div class="submission_deliverables_end">
+                            @{
+                                TeamUserMember teamUser = (OSBLEController.GetTeamUser(submission, ViewBag.CurrentUser as UserProfile));
+                                Score score = (from c in submission.Scores where c.TeamUserMemberID == teamUser.ID select c).FirstOrDefault();
+                                if ((score == null) || (score.Points < 0))
+                                {
+                                    AjaxOptions options = new AjaxOptions()
+                                    {
+                                        InsertionMode = InsertionMode.Replace,
+                                        LoadingElementId = "Loading",
+                                        HttpMethod = "Get",
+                                        UpdateTargetId = "submitFiles",
+                                        OnComplete = "SubmissionLoaded"
+                                    };
+                            @Ajax.ActionLink("Submit...", "Create", "Submission", new { id = submission.ID.ToString() }, options, new object())
+                                }
+                                else
+                                {
+                                @Html.ActionLink("View Grade", "View", "Rubric", new { abstractAssignmentActivityId = submission.ID, teamUserId = teamUser.ID }, new { })
+                                }
+
+                                FileInfo info = new FileInfo(OSBLE.FileSystem.GetTeamUserPeerReview(false, ViewBag.ActiveCourse.AbstractCourse, submission.ID, teamUser.ID));
+                                if (info.Exists)
+                                {
+                                    <br />@Html.ActionLink("View Inline Comments", "ViewInlineReview", new { abstractAssignmentActivityId = submission.ID, teamUserId = teamUser.ID });
+                                }
+                            }
+                            
+                            <script type="text/javascript">
+
+                                function SubmissionLoaded() {
+                                    $('#submit_files_dialog').dialog('open');
+
+                                }
+                            </script>
+
+                            <text id="Loading" style="display:none"> <br />Please Wait...</text>
+                            <div id="submit_files_dialog" style="display:none">
+                                    <div id= "submitFiles"></div>
+                                    <script type="text/javascript">
+                                        $(function () {
+                                            $('#submit_files_dialog').dialog(
+                                            {
+                                                modal:true,
+                                                autoOpen: false,
+                                                height: 600,
+                                                width: 500
+                                            });
+                                        });
+                                    </script>
+                            </div>
+                            </div>
+                        </li>   
+                                if (ViewBag.CanSubmit && submission.ReleaseDate < DateTime.Now)
+                                {
+                                    
+                        
+                                    
+                                    <!--<button onclick="location.href='@Url.Action("Create", "Submission", new { id = submission.ID.ToString() })'">
+                            Submit Files For This Submission</button>   -->
+                                }
+
+                                submissionCounter++;
+                    }
+                                
+                    }
+                </ul>
+                }
+
+
+            }
+        
+@* Only show grading if points possible are greater than 0 *@
+            @if (sa.PointsPossible > 0)
+            {
+
+                <div class="assignment_title">
+                    Grading</div>
+
+                <div class="assignment_grading">
+                    Worth @sa.PointsPossible points in <em>@sa.Category.Name</em> category
+                </div>
+            
+            }
+            
+            @{AbstractAssignmentActivity saa = sa.AssignmentActivities.Where(aa => aa is SubmissionActivity).FirstOrDefault();} 
+            <div class="assignment_title">
+                    Late Penalty</div>
+                
+            <div class="assignment_grading">
+                Students may submit assignments up to <b>@saa.MinutesLateWithNoPenalty</b> minutes late at no penalty, after which a penalty of <b>@saa.PercentPenalty</b> percent per <b>@saa.HoursLatePerPercentPenalty</b> hours late will be applied.
+                Assignments that are submitted more than <b>@saa.HoursLateUntilZero</b> hours after the due date and time will receive an automatic <b>0</b>.
+            </div>
+        </div>
