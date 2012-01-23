@@ -1344,12 +1344,9 @@ namespace OsbleRubric
 
                 if (selectedRubric.ID > 0 && (currentCourseHasEvaluations == false))
                 {
-                    rubric = selectedRubric;
+                    rubric.ID = selectedRubric.ID;
                 }
-                else
-                {
-                    selectedRubric = rubric;
-                }
+                selectedRubric = rubric;
                 rubric.HasCriteriaComments = false;
                 rubric.HasGlobalComments = false;
                 rubric.Description = thisView.RubricDescriptionTextBox.Text;

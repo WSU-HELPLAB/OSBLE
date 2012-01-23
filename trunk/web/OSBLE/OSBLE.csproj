@@ -305,6 +305,8 @@
     <Content Include="App_Data\FirstNames.txt" />
     <Content Include="App_Data\LastNames.txt" />
     <Content Include="Areas\AssignmentWizard\Content\css\team.css" />
+    <Content Include="Areas\AssignmentWizard\Content\icons\rubric_add.png" />
+    <Content Include="Areas\AssignmentWizard\Content\icons\rubric_delete.png" />
     <Content Include="Areas\AssignmentWizard\Content\js\commentCategories.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\deliverables.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\team.js" />
@@ -313,12 +315,9 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="ClientBin\EditPeerReview.xap" />
-    <Content Include="ClientBin\FileUploader.xap" />
     <Content Include="ClientBin\OsbleRubric.xap" />
     <Content Include="ClientBin\PeerReview.xap" />
     <Content Include="ClientBin\SilverlightSandbox.xap" />
-    <Content Include="ClientBin\StudioTimelineCreation.xap" />
-    <Content Include="ClientBin\TeamCreation.xap" />
     <Content Include="ClientBin\ViewPeerReview.xap" />
     <Content Include="Content\favicon.ico" />
     <Content Include="Content\images\arrow_left.png" />
