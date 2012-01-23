@@ -11,6 +11,8 @@ namespace OSBLE.Models.Assignments
         [Key]
         public string Type { get; set; }
 
+        public string Description { get; set; }
+
         public override string ToString()
         {
             return Type;

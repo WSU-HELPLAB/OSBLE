@@ -529,7 +529,8 @@ namespace OSBLE.Models
             #endregion add course users
 
             //Assignment Types
-            this.AssignmentTypes.Add(new AssignmentType() { Type="Basic Assignment" });
+            this.AssignmentTypes.Add(new AssignmentType() { Type="Basic Assignment", Description="A basic, non-studio assignment." });
+            this.AssignmentTypes.Add(new AssignmentType() { Type = "Peer Review", Description = "Peer review assignments have students review the work of others on a previous assignment." });
             this.SaveChanges();
         }
 
