@@ -376,11 +376,11 @@ namespace OSBLE.Controllers
             {
                 if (c is Course)
                 {
-                    tag = " " + (c as Course).Prefix + " " + (c as Course).Number;
+                    tag = (c as Course).Prefix + " " + (c as Course).Number;
                 }
                 else if (c is Community)
                 {
-                    tag = " " + (c as Community).Nickname;
+                    tag = (c as Community).Nickname;
                 }
             }
 
