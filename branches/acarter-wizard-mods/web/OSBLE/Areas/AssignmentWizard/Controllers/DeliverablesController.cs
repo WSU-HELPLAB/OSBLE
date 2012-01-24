@@ -33,6 +33,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
+        public override ICollection<Models.AssignmentTypes> ValidAssignmentTypes
+        {
+            get
+            {
+                return base.AllAssignmentTypes;
+            }
+        }
+
         private new void SetUpViewBag()
         {
             ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");

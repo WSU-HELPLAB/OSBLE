@@ -35,6 +35,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
+        public override ICollection<Models.AssignmentTypes> ValidAssignmentTypes
+        {
+            get 
+            {
+                return base.AllAssignmentTypes;
+            }
+        }
+
         private void BuildViewBag()
         {
             IEnumerable<Category> categories = new List<Category>();

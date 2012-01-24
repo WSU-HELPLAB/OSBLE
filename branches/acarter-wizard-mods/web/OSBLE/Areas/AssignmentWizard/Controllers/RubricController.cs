@@ -31,6 +31,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
+        public override ICollection<Models.AssignmentTypes> ValidAssignmentTypes
+        {
+            get
+            {
+                return base.AllAssignmentTypes;
+            }
+        }
+
         public override ActionResult Index()
         {
             base.Index();

@@ -38,6 +38,23 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         /// </summary>
         public abstract ICollection<WizardBaseController> Prerequisites { get; }
 
+        /// <summary>
+        /// Provides a list of assignment types in which the current component is relevant.  Several
+        /// components are relevant in all assignment types, but others only make sense in a small subset
+        /// </summary>
+        public abstract ICollection<AssignmentTypes> ValidAssignmentTypes { get; }
+
+        /// <summary>
+        /// Shorthand for returning all AssignmentTypes in the system.
+        /// </summary>
+        protected ICollection<AssignmentTypes> AllAssignmentTypes
+        {
+            get
+            {
+                return Enum.GetValues(typeof(AssignmentTypes)).Cast<AssignmentTypes>().ToList();
+            }
+        }
+
         public Assignment Assignment { get; set; }
 
         public bool WasUpdateSuccessful { get; set; }

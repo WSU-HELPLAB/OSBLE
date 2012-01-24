@@ -31,6 +31,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
+        public override ICollection<Models.AssignmentTypes> ValidAssignmentTypes
+        {
+            get
+            {
+                return base.AllAssignmentTypes;
+            }
+        }
+
         /// <summary>
         /// Sets up the viewbag for various controller actions.
         /// </summary>
