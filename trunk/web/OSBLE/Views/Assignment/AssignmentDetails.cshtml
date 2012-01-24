@@ -25,80 +25,141 @@
 @assignment.AssignmentName
 </h2>    
 
-<text class="osbleColorBold">Released:</text> @assignment.ReleaseDate<br />
-<text class="osbleColorBold">Due:</text> @assignment.DueDate<br />
-<text class="osbleColorBold">Grading:</text> Worth @assignment.PointsPossible in @assignment.Category.Name category.<br />
-<text class="osbleColorBold">Late Policy:</text> 
-@if (assignment.HoursLateWindow == 0)
-{
-    @:No late assignments accepted.<br />
-}
-else
-{
-    @:Assignments accepted up to  @assignment.HoursLateWindow hours late, docking @assignment.DeductionPerHourLate% per hour.<br />
-}
-
-<text class="osbleColorBold">Description:</text> @assignment.AssignmentDescription<br />
-@if (assignment.HasDeliverables)
-{
-    int i = 0;
-    @:<text class="osbleColorBold">Deliverables:</text><br />
-    foreach (Deliverable d in assignment.Deliverables)
+<table>
+    <tr><!--Released row-->
+        <td>
+            <text class="osbleColorBold">Released:</text>
+        </td>
+        <td>
+             @assignment.ReleaseDate
+        </td>
+    </tr>
+    <tr><!--Due row-->
+        <td>
+            <text class="osbleColorBold">Due:</text>
+        </td>
+        <td>
+            @assignment.DueDate
+        </td>
+    </tr>
+    <tr><!--Grading row-->
+        <td>
+            <text class="osbleColorBold">Grading:</text>
+        </td>
+        <td>
+            Worth @assignment.PointsPossible in @assignment.Category.Name category.
+        </td>
+    </tr>
+    <tr><!--Late Policy row-->
+        <td>
+            <text class="osbleColorBold">Late Policy:</text> 
+        </td>
+        <td>
+            @if (assignment.HoursLateWindow == 0)
+            {
+                @:No late assignments accepted.
+            }
+            else
+            {
+                @:Assignments accepted up to  @assignment.HoursLateWindow hours late, docking @assignment.DeductionPerHourLate% per hour.
+            }
+        </td>
+    </tr>
+    <tr><!--Description row-->
+        <td>
+            <text class="osbleColorBold">Description:</text> 
+        </td>
+        <td>
+            @assignment.AssignmentDescription
+        </td>
+    </tr>
+    @if (assignment.HasDeliverables)
     {
-        @: &nbsp &nbsp &nbsp &nbsp &nbsp-@d.Name (
-        foreach (string str in @ViewBag.filetypeList[i])
-         {
-             @:@str
-         }
-        //(@ViewBag.filetypeList[i])<br />
-        i++;
-        @: )<br />
-    }
-}
-@if (assignment.HasRubric)
-{
-    @:<text class="osbleColorBold">Rubric:</text>
-    if (ViewBag.ActiveCourse.AbstractRole.CanModify)
-    {
-        @Html.ActionLink("View Rubric", "Index", "Rubric", new { assignmentId = assignment.ID, teamId = ViewBag.TeamID }, new { });
-    }
-    else
-    {
-        @Html.ActionLink("View Rubric", "View", "Rubric", new { assignmentId = assignment.ID, teamId = ViewBag.TeamID }, new { });
-    }
-}
-@if (ViewBag.TeamMembers != null)
-{
-    <div>
-        <text class="osbleColorBold">Team: @ViewBag.TeamName</text><br />
-        <text class="osbleColorBold">Team Members:</text>
-        <br />
-        <ul class="user_list">
-        @foreach (CourseUser cu in ViewBag.TeamMembers)
+        int i = 0;
+        int j = 1;
+        
+        <tr><!--Deliverables row-->
+            <td>
+                <text class="osbleColorBold">Deliverables:</text><br />
+            </td>
+        </tr>
+        foreach (Deliverable d in assignment.Deliverables)
         {
-            <li>
-                <div class="user_controls">
-                @if (cu.UserProfile.UserName != null)
-                {
-                <a title="Mail This User" href="@Url.Action("CreateTeamMember", "Mail", new { id = cu.UserProfile.ID })">@Helpers.MailButton()</a>
-                }
-                            
-                </div>
-                        
-            @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", "Roster", new { userProfile = cu.UserProfile.ID }))
-            <span class="roster_name">@Helpers.DisplayFullNameOrPending(cu.UserProfile)</span>
-                        
-            </li>
+            <tr>
+                <td></td>
+                <td>
+                    @(i+1).
+                    @d.Name (
+                    @foreach (string str in @ViewBag.filetypeList[i])
+                    {
+                        if (j == @ViewBag.filetypeList[i].Length)
+                        {
+                            @(str)
+                        }
+                        else
+                        {
+                            @(str + ", ")
+                        }
+                        j++;
+                    }
+                    )
+                </td>
+            </tr>
+                    i++;
+                    j = 1;
         }
-        </ul>
-    </div>
-    <div>
-        <a title="Email whole team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = ViewBag.TeamID })">Email the whole team</a>
-    </div>
-    <br />
-}
-
-<br />
+    }
+    @if (assignment.HasRubric)
+    {
+        <tr><!--Rubric row-->
+            <td><text class="osbleColorBold">Rubric:</text></td>
+            <td>
+                @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                {
+                    @Html.ActionLink("View Rubric", "Index", "Rubric", new { assignmentId = assignment.ID, teamId = ViewBag.TeamID }, new { });
+                }
+                else
+                {
+                    @Html.ActionLink("View Rubric", "View", "Rubric", new { assignmentId = assignment.ID, teamId = ViewBag.TeamID }, new { });
+                }
+            </td>
+        </tr>
+    }
+    @if (ViewBag.TeamMembers != null)
+    {
+        <tr><!--Team name row-->
+            <td>
+                <text class="osbleColorBold">Team:</text>
+            </td>
+            <td>
+                @ViewBag.TeamName
+            </td>
+        </tr>
+        <tr><!--Team members row-->
+            <td style="vertical-align:text-top">
+                <text class="osbleColorBold">Members:</text>
+            </td>
+            <td>
+                <ul class="user_list">
+                    @foreach (CourseUser cu in ViewBag.TeamMembers)
+                    {
+                        <li>
+                            <div class="user_controls">
+                                @if (cu.UserProfile.UserName != null)
+                                {
+                                    <a title="Mail This User" href="@Url.Action("CreateTeamMember", "Mail", new { id = cu.UserProfile.ID })">@Helpers.MailButton()</a>
+                                }
+                            </div>
+                            @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", "Roster", new { userProfile = cu.UserProfile.ID }))
+                            <span class="roster_name">@Helpers.DisplayFullNameOrPending(cu.UserProfile)</span>
+                        </li>
+                    }
+                </ul>
+                <a title="Email whole team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = ViewBag.TeamID })">Email the whole team</a>
+            </td>
+        </tr>
+    }
+ </table>
 
 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
 {
