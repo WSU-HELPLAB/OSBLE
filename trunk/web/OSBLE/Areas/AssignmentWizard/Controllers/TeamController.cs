@@ -150,6 +150,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
                 //update the team name
                 Team team = teams.Find(t => t.ID == teamId);
+
+                //null team means that it exists in a different context (assignment) than the current one
+                if (team == null)
+                {
+                    continue;
+                }
                 team.Name = teamName;
 
                 //clear any existing team members
