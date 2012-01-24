@@ -1,0 +1,20 @@
+﻿#TypeSelectTable
+{
+    border-collapse: collapse;
+}
+
+#TypeSelectTable td, #TypeSelectTable th
+{
+    padding:4px;
+}
+
+#TypeSelectTable th
+{
+    background: #BFBFBF;
+    text-align:left;
+}
+
+.AltRow
+{
+    background-color: #EFEFEF;
+}

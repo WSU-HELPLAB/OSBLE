@@ -18,5 +18,13 @@ namespace OSBLE.Models.Assignments
             return Type;
         }
 
+        public string TypeWithoutSpaces
+        {
+            get
+            {
+                return Type.Replace(" ", string.Empty);
+            }
+        }
+
     }
 }

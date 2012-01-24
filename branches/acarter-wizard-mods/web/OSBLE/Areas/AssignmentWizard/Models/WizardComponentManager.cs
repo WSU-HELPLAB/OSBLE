@@ -14,6 +14,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         private const string assignmentKey = "ComponentManagerStudioAssignmentKey";
         private const string activeComponentIndexKey = "ComponentManagerActiveComponentIndex";
         private const string instance = "_wcm_instance";
+        private const string activeAssignmentTypeKey = "_wcm_activeAssignmentType";
 
         public ICollection<WizardComponent> AllComponents
         {
@@ -50,6 +51,29 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                 if (HttpContext.Current != null)
                 {
                     HttpContext.Current.Session[assignmentKey] = value;
+                }
+            }
+        }
+
+        public AssignmentTypes ActiveAssignmentType
+        {
+            get
+            {
+                if (HttpContext.Current.Session[activeAssignmentTypeKey] != null)
+                {
+                    return (AssignmentTypes)HttpContext.Current.Session[activeAssignmentTypeKey];
+                }
+                else
+                {
+                    HttpContext.Current.Session[activeAssignmentTypeKey] = AssignmentTypes.Basic;
+                    return AssignmentTypes.Basic;
+                }
+            }
+            private set
+            {
+                if (HttpContext.Current != null)
+                {
+                    HttpContext.Current.Session[activeAssignmentTypeKey] = value;
                 }
             }
         }
@@ -204,6 +228,50 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Sets the active assignment type by trying to match the supplied parameter with possible assignment types
+        /// listed in the AssignmentTypes enumeration.  Will default to AssignmentTypes.Basic if no match was found.
+        /// </summary>
+        /// <param name="modelType"></param>
+        /// <returns>True if a good match was found, false otherwise.</returns>
+        public bool SetActiveAssignmentType(AssignmentType modelType)
+        {
+            return SetActiveAssignmentType(modelType.TypeWithoutSpaces);
+        }
+
+        /// <summary>
+        /// Sets the active assignment type by trying to match the supplied parameter with possible assignment types
+        /// listed in the AssignmentTypes enumeration.  Will default to AssignmentTypes.Basic if no match was found.
+        /// </summary>
+        /// <param name="assignmentType"></param>
+        /// <returns>True if a good match was found, false otherwise.</returns>
+        public bool SetActiveAssignmentType(string assignmentType)
+        {
+            List<AssignmentTypes> possibleTypes = Enum.GetValues(typeof(AssignmentTypes)).Cast<AssignmentTypes>().ToList();
+            foreach (AssignmentTypes type in possibleTypes)
+            {
+                if (assignmentType.Contains(type.ToString()))
+                {
+                    return SetActiveAssignmentType(type);
+                }
+            }
+
+            //default to basic
+            SetActiveAssignmentType(AssignmentTypes.Basic);
+            return false;
+        }
+
+        /// <summary>
+        /// Sets the active assignment type based on the supplied parameter.
+        /// </summary>
+        /// <param name="assignmentType"></param>
+        /// <returns>Always true</returns>
+        public bool SetActiveAssignmentType(AssignmentTypes assignmentType)
+        {
+            ActiveAssignmentType = assignmentType;
+            return true;
         }
 
         /// <summary>

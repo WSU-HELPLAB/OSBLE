@@ -1,0 +1,44 @@
+﻿@using OSBLE.Areas.AssignmentWizard.Controllers;
+@using OSBLE.Areas.AssignmentWizard.Models;
+@using System.Collections;
+@model ICollection<WizardComponent>
+@{
+    ViewBag.Title = "Assignment Creation Wizard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h1>Component Selection</h1>
+<p>
+Please select the components that you would like to use for this assignment. 
+</p>
+@using (Html.BeginForm())
+{
+<fieldset>
+<legend>Components</legend>
+<table>
+@{
+    foreach(WizardComponent component in Model)
+    {
+        
+        string checkedText = "";
+        if(component.IsSelected)
+        {
+            checkedText = "checked=\"checked\" ";
+        }
+        if (component.IsRequired)
+        {
+            //disabled form elements won't get submitted by a POST.  We display the item anyway for
+            //UI consistency but create a hidden element that will actually be responsible for sending
+            //the data to the server.
+            checkedText = "checked=\"checked\" disabled=\"disabled\"";
+            <input type="hidden" name="component_@(component.Name)" value="@(component.Name)" />
+        }
+        <tr>
+            <td><input type="checkbox" id="component_@(component.Name)" name="component_@(component.Name)" value="@(component.Name)" @Html.Raw(checkedText) /></td>
+            <td><label for="component_@(component.Name)">@component.Controller.ControllerDescription</label></td>
+        </tr>
+    }
+}
+</table>
+</fieldset>
+<input type="submit" value="Continue" name="@ViewBag.BeginWizardButton" id="@ViewBag.BeginWizardButton" />
+}

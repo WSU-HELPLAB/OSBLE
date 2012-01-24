@@ -306,6 +306,7 @@
     <Content Include="App_Code\Libraries\LumenWorks.Framework.IO.dll" />
     <Content Include="App_Data\FirstNames.txt" />
     <Content Include="App_Data\LastNames.txt" />
+    <Content Include="Areas\AssignmentWizard\Content\css\home.css" />
     <Content Include="Areas\AssignmentWizard\Content\css\team.css" />
     <Content Include="Areas\AssignmentWizard\Content\icons\rubric_add.png" />
     <Content Include="Areas\AssignmentWizard\Content\icons\rubric_delete.png" />
@@ -654,6 +655,7 @@
     <Content Include="Areas\AssignmentWizard\Views\Home\Summary.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\CommentCategory\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Home\ContextLost.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Home\Index.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />
@@ -732,7 +734,7 @@
     <Content Include="Views\Account\AccountCreated.cshtml" />
     <Content Include="Views\Account\ActivateAccount.cshtml" />
     <Content Include="Views\School\Delete.cshtml" />
-    <Content Include="Areas\AssignmentWizard\Views\Home\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Home\SelectComponent.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Basics\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Wizard.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Rubric\Index.cshtml" />

@@ -16,12 +16,40 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
         public HomeController()
         {
+            ViewBag.AssignmentTypeRadioName = "AssignmentType";
             manager = WizardComponentManager.GetInstance();
         }
 
         #region action results
 
         public ActionResult Index(int? assignmentId)
+        {
+            //existing assignments skip this step
+            if (assignmentId != null)
+            {
+                return RedirectToRoute(new { controller = "Home", action = "SelectComponent", assignmentId = assignmentId });
+            }
+            return View(db.AssignmentTypes.ToList());
+        }
+
+        [HttpPost]
+        public ActionResult Index(ICollection<AssignmentType> assignments)
+        {
+            string keyName = ViewBag.AssignmentTypeRadioName;
+            if (Request.Form.AllKeys.Contains(keyName))
+            {
+                //set the assignment type and carry on to the next screen.
+                manager.SetActiveAssignmentType(Request.Form[keyName]);
+                return RedirectToRoute(new { controller = "Home", action = "SelectComponent" });
+            }
+            else
+            {
+                //send back to the old page if we didn't get anything.
+                return View(db.AssignmentTypes.ToList());
+            }
+        }
+
+        public ActionResult SelectComponent(int? assignmentId)
         {
             //if our assignmentId isn't null, then we need to pull that assignment
             //from the DB
@@ -41,7 +69,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         }
 
         [HttpPost]
-        public ActionResult Index(ICollection<WizardComponent> components)
+        public ActionResult SelectComponent(ICollection<WizardComponent> components)
         {
             ActivateSelectedComponents();
             return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute, new { controller = manager.ActiveComponent.Name });
