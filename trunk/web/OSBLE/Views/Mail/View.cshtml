@@ -82,48 +82,71 @@
                 //@Helpers.CreateToolTip(ToolTips.MailDelete)
             }
         }
+        else
+        {   //outbox
+             //Delete
+            using (Html.BeginForm("DeleteFromOutbox", "Mail", FormMethod.Post))
+            {
+                <input type="hidden" name="ID" value="@Model.ID" />
+                <input type="submit" value="Delete" onclick="return confirm('Are you sure you want to delete this message?')" /> 
+                //@Helpers.CreateToolTip(ToolTips.MailDelete)
+            }
+        }
     </p>
     </div>
 
     <div id="mail_message">
         @Helpers.Linkify(Model.Message)
     </div>
-<p>
-@if (ViewBag.CurrentUser == Model.ToUserProfile)
-{
-    //Replying
-    using (Html.BeginForm("CreateReply", "Mail", FormMethod.Get))
-    {
-        <input type="hidden" name="replyTo" value="@Model.ID" />
-        <input type="submit" value="Reply" />  
-        //@Helpers.CreateToolTip(ToolTips.MailReply)  
-    }
 
-    //Reply all
-    using (Html.BeginForm("CreateReplyAll", "Mail", FormMethod.Get))
+    <p>
+    @if (ViewBag.CurrentUser == Model.ToUserProfile)
     {
-        <input type="hidden" name="replyAll" value="@Model.ThreadID" />
-        <input type="submit" value="Reply All" />  
-        //@Helpers.CreateToolTip(ToolTips.MailReply)  
-    }
+        //Replying
+        using (Html.BeginForm("CreateReply", "Mail", FormMethod.Get))
+        {
+            <input type="hidden" name="replyTo" value="@Model.ID" />
+            <input type="submit" value="Reply" />  
+            //@Helpers.CreateToolTip(ToolTips.MailReply)  
+        }
 
-    //Forwarding
-    using (Html.BeginForm("CreateForward", "Mail", FormMethod.Get))
-    {
-        <input type="hidden" name="forwardTo" value="@Model.ID" />
-        <input type="submit" value="Forward" />  
-        //@Helpers.CreateToolTip(ToolTips.MailReply)  
-    }
+        //Reply all
+        using (Html.BeginForm("CreateReplyAll", "Mail", FormMethod.Get))
+        {
+            <input type="hidden" name="replyAll" value="@Model.ThreadID" />
+            <input type="submit" value="Reply All" />  
+            //@Helpers.CreateToolTip(ToolTips.MailReply)  
+        }
 
-    //Delete
-    using (Html.BeginForm("DeleteFromInbox", "Mail", FormMethod.Post))
-    {
-        <input type="hidden" name="ID" value="@Model.ID" />
-        <input type="submit" value="Delete" onclick="return confirm('Are you sure you want to delete this message?')" /> 
-                //@Helpers.CreateToolTip(ToolTips.MailDelete)
+        //Forwarding
+        using (Html.BeginForm("CreateForward", "Mail", FormMethod.Get))
+        {
+            <input type="hidden" name="forwardTo" value="@Model.ID" />
+            <input type="submit" value="Forward" />  
+            //@Helpers.CreateToolTip(ToolTips.MailReply)  
+        }
+
+        //Delete
+        using (Html.BeginForm("DeleteFromInbox", "Mail", FormMethod.Post))
+        {
+            <input type="hidden" name="ID" value="@Model.ID" />
+            <input type="submit" value="Delete" onclick="return confirm('Are you sure you want to delete this message?')" /> 
+            //@Helpers.CreateToolTip(ToolTips.MailDelete)
+        }
+        <br /><br />
     }
-    <br /><br />
-    
+    else
+    {   //outbox
+            //Delete
+        using (Html.BeginForm("DeleteFromOutbox", "Mail", FormMethod.Post))
+        {
+            <input type="hidden" name="ID" value="@Model.ID" />
+            <input type="submit" value="Delete" onclick="return confirm('Are you sure you want to delete this message?')" /> 
+            //@Helpers.CreateToolTip(ToolTips.MailDelete)
+        }
+        <br /><br />
+    }
+        
     <table>
         <tr>
             <td class="email_view_links">
@@ -136,7 +159,14 @@
             }
             </td>
             <td class="email_view_links">
-            @Html.ActionLink("Back to Inbox\t", "Index") <a>&nbsp;</a>
+                @if (ViewBag.CurrentUser == Model.ToUserProfile)
+                { // inbox
+                    @Html.ActionLink("Back to Inbox\t", "Index") <a>&nbsp;</a>
+                }
+                else
+                { // outbox
+                    @Html.ActionLink("Back to Outbox", "Outbox")
+                }
             </td>
             <td class="email_view_links">
             @if (ViewBag.Next > Model.ID)
@@ -149,9 +179,4 @@
             </td>
         </tr>
     </table>
-}
-else
-{
-    @Html.ActionLink("Back to Outbox", "Outbox")
-}
 </p>

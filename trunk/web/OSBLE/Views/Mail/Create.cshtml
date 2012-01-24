@@ -92,6 +92,8 @@
             $('#recipients_data').append('<div id="NoRecipient" class="recipient" />');
             var NoRecipient = $('#NoRecipient');
             NoRecipient.append('<div class="recipient_tools"/><a><< No Recipients >></a>');
+            // if no recipients then set focus to the To field.
+            document.getElementById("people_finder").focus();
         }
 
         var selection_state = false;

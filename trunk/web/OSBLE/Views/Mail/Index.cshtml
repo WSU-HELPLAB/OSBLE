@@ -92,7 +92,10 @@
                         @Helpers.DeleteSubmit("Delete This Mail Message")
                         </form>
                     }
-                    else if (ViewBag.BoxHeader == "Outbox")
+                }
+                else if(item.FromUserProfile == ViewBag.CurrentUser)
+                {
+                    if (ViewBag.BoxHeader == "Outbox")
                     {
                         <form action="@Url.Action("DeleteFromOutbox")"
                         style="display: inline;"
@@ -104,7 +107,6 @@
                         @Helpers.DeleteSubmit("Delete This Mail Message")
                         </form>
                     }
-
                 }
             </td>
         </tr>
