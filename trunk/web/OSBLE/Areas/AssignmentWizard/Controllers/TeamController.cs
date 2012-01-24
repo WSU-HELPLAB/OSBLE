@@ -133,7 +133,13 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             List<Team> teams = Assignment.AssignmentTeams.Select(at => at.Team).ToList();
 
             //Now that we've captured any existing teams, wipe out the old association
+            //as well as the old team members
             Assignment.AssignmentTeams.Clear();
+            foreach (Team team in teams)
+            {
+                team.TeamMembers.Clear();
+            }
+            db.SaveChanges();
 
             //update all prior teams (those already stored in the DB)
             string[] teamKeys = Request.Form.AllKeys.Where(k => k.Contains("team_")).ToArray();
@@ -150,8 +156,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
                 //update the team name
                 Team team = teams.Find(t => t.ID == teamId);
-
-                //null team means that it exists in a different context (assignment) than the current one
                 if (team == null)
                 {
                     continue;
@@ -212,7 +216,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             //attach the new teams to the assignment
             foreach (Team team in teams)
             {
-                Assignment.AssignmentTeams.Add(new AssignmentTeam() { Assignment = Assignment, Team = team });
+                Assignment.AssignmentTeams.Add(new AssignmentTeam() { 
+                        Assignment = Assignment, 
+                        AssignmentID = Assignment.ID, 
+                        Team = team,
+                        TeamID = team.ID
+                });
             }
         }
     }

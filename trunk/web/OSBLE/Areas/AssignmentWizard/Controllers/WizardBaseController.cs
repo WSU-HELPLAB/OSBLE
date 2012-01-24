@@ -128,7 +128,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                                           );
                 }
             }
-            SetUpViewBag();
+            try
+            {
+                SetUpViewBag();
+            }
+            catch (Exception ex)
+            {
+                return RedirectToRoute(new { controller = "Home", action = "ContextLost", assignmentId = Assignment.ID });
+            }
             return View(model);
         }
 
