@@ -181,7 +181,7 @@
     @if (assignment.HasDeliverables)
     {
         <th>Submission</th>
-        <th>Submit for Student</th>
+        @*<th>Submit for Student</th>*@
     }
     
 
@@ -269,7 +269,7 @@
                         @:Nothing Received
                     }
                 </td>
-                <td><!--Cell for submitting on behalf of students -->
+                @*<td><!--Cell for submitting on behalf of students -->
                     @{
                     //Student with deliverables. Can submit
                     AjaxOptions options = new AjaxOptions()
@@ -282,6 +282,7 @@
                     @Ajax.ActionLink("Submit", "Create", "Submission", new { id = assignment.ID, up = da.Item2.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile }, options, new object());
                     }
                 </td>
+                *@
             }
         </tr>
     }
