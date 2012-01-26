@@ -465,7 +465,7 @@ namespace OSBLE.Controllers
                     ViewBag.TeamID = assignment.AssignmentTeams.FirstOrDefault().TeamID;
 
                     //MG: Due to rubric tronller change 
-                    ViewBag.CurrentUser = assignment.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUser;
+                    ViewBag.CurrentUserID = assignment.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUser.ID;
                 }
             }
 
@@ -473,7 +473,7 @@ namespace OSBLE.Controllers
             {
                 AssignmentTeam at = GetAssignmentTeam(assignment, currentUser);
                 ViewBag.TeamID = at.TeamID;
-                ViewBag.CurrentUser = activeCourse;
+                ViewBag.CurrentUserID = activeCourse.ID;
                 ViewBag.TeamName = at.Team.Name;
 
                 if (assignment.HasTeams)
