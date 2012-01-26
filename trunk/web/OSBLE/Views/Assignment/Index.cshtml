@@ -169,7 +169,7 @@
                         @if (a.HasRubric)
                         {
                             string gradeToDisplay = ViewBag.SubmissionInfoDictionary[a.ID].Item2;
-                            @Html.ActionLink(gradeToDisplay, "View", "Rubric", new { assignmentId = a.ID, teamId = ViewBag.SubmissionInfoDictionary[a.ID].Item3 }, new { });
+                            @Html.ActionLink(gradeToDisplay, "View", "Rubric", new { assignmentId = a.ID, cuId = ViewBag.SubmissionInfoDictionary[a.ID].Item3 }, new { });
                         }
                         else
                         {

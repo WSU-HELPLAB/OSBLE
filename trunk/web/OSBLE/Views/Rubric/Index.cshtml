@@ -69,7 +69,7 @@ function create_and_open_downloading_submission_dialog() {
     {
         var assignmentID = $('#@selectedAssignment').val();
         var teamID = $('#@selectedTeam').val();
-        window.location.replace("/Rubric?assignmentId=" + assignmentID + "&teamId=" + teamID);
+        window.location.replace("/Rubric?assignmentId=" + assignmentID + "&cuId=" + teamID);
     }
 
     function updateGrade()
@@ -151,7 +151,7 @@ function create_and_open_downloading_submission_dialog() {
                               {
                                   selectedValue = "selected=\"selected\"";
                               }
-                            @Html.Raw(String.Format(optionText, team.TeamID, selectedValue, team.Team.Name));
+                            @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
                           }
                         }
                     </select>
@@ -225,6 +225,7 @@ function create_and_open_downloading_submission_dialog() {
         <br />
         <br />
         <input type="hidden" name="@ViewBag.AssignmentId" value="@Model.SelectedAssignment.ID" />
+        <input type="hidden" name="@ViewBag.CourseUserId" value="@Model.SelectedTeam.Team.TeamMembers.FirstOrDefault().CourseUserID" />
         <input type="hidden" name="@ViewBag.TeamId" value="@Model.SelectedTeam.TeamID" />
     }
 </div>

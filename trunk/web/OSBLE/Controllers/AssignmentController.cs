@@ -136,11 +136,10 @@ namespace OSBLE.Controllers
                     {
                         scoreString = (score as Score).getGradeAsPercent(a.PointsPossible);
                     }
-                    submissionInfo.Add(a.ID, new Tuple<string, string, int>(submissionTime, scoreString, at.TeamID));
+                    submissionInfo.Add(a.ID, new Tuple<string, string, int>(submissionTime, scoreString, at.Team.TeamMembers.FirstOrDefault().CourseUserID));
                 }
                 ViewBag.SubmissionInfoDictionary = submissionInfo; 
             }
-
             
             ViewBag.PastAssignments = pastAssignments;
             ViewBag.PresentAssignments = presentAssignments;

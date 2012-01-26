@@ -2314,11 +2314,10 @@ namespace OSBLE.Controllers
                                select scores;
 
             //pull the students in the course.  Each student is a row.
-            List<UserProfile> students = (from up in db.UserProfiles
-                                          join cu in db.CourseUsers on up.ID equals cu.UserProfileID
-                                          where cu.AbstractCourseID == currentCourseId && cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student
-                                          orderby up.LastName, up.FirstName
-                                          select up).ToList();
+            List<CourseUser> students = (from user in db.CourseUsers
+                                         where user.AbstractCourseID == currentCourseId && user.AbstractRole.CanSubmit
+                                         select user).ToList();
+                                         
 
 
             //Finally the scores for each student.
@@ -2327,6 +2326,7 @@ namespace OSBLE.Controllers
                                 score.Points >= 0 /*&&
                                score.isDropped == false*/
                                 select score).ToList();
+            
 
             var userScore = from scores in scor
                             where scores.isDropped == false

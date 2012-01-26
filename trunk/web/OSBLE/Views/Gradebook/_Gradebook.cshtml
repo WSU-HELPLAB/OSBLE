@@ -170,16 +170,16 @@
         }
     </tr>
     <!--loop through all users -->
-    @foreach (OSBLE.Models.Users.UserProfile user in ViewBag.Users)
+    @foreach (CourseUser user in ViewBag.Users)
     {        
         <tr id="studentGrades">
             <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; width:25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
             @{index++;}
-            <td id="@user.Identification" >@user.LastName, @user.FirstName</td>
+            <td id="@user.UserProfile.Identification" >@user.UserProfile.LastName, @user.UserProfile.FirstName</td>
                     
             @{
               var percent = from p in ViewBag.Percents as IEnumerable<Score>
-                            where p.TeamMember.CourseUser.UserProfileID == user.ID
+                            where p.TeamMember.CourseUserID == user.ID
                             select p;
               if (percent.Count() > 0)
               {
@@ -198,53 +198,48 @@
               }
             }
                 
-            @foreach (Assignment gradeAssignmentActivity in ViewBag.Assignments)
+            @foreach (Assignment gradeAssignment in ViewBag.Assignments)
             {
                 var gradableQuery = from g in ViewBag.Grades as IEnumerable<Score>
-                                    where g.AsssignmentID == gradeAssignmentActivity.ID
-                                    && g.TeamMember.CourseUser.UserProfileID == user.ID
+                                    where g.AsssignmentID == gradeAssignment.ID
+                                    && g.TeamMember.CourseUser.UserProfileID == user.UserProfile.ID
                                     //&& g.Points >= 0
                                     select g;
                 //use the stored score if possible.  Otherwise, just use a "0"
                 if (gradableQuery.Count() > 0)
                 {
-                    if (gradeAssignmentActivity.Rubric != null)
+                    if (gradeAssignment.Rubric != null)
                     {
                         if (gradableQuery.First().LatePenaltyPercent > 0)
                         {
-                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { abstractAssignmentActivityId = gradableQuery.First().AsssignmentID, teamUserID = gradableQuery.First().TeamMemberID }, new { @class = "rubric", @style = "color:Red;" })</td>
+                            <td id="@String.Format("{0}-{1}", user.UserProfile.Identification, gradeAssignment.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { assignmentId = gradableQuery.First().AsssignmentID, cuId = user.ID}, new { @class = "rubric", @style = "color:Red;" })</td>
                         }
                         else
                         {                            
-                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { abstractAssignmentActivityId = gradableQuery.First().AsssignmentID, teamUserID = gradableQuery.First().TeamMemberID }, new { @class = "rubric" })</td>
+                            <td id="@String.Format("{0}-{1}", user.UserProfile.Identification, gradeAssignment.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { assignmentId = gradableQuery.First().AsssignmentID, cuId = user.ID }, new { @class = "rubric" })</td>
                         }
                     }
                     else
                     {
                         if (gradableQuery.First().LatePenaltyPercent > 0)
                         { 
-                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic; color:Red;"  onclick="cellGainsFocus(event, this)">@gradableQuery.First().Points.ToString(".#")</td>
+                            <td id="@String.Format("{0}-{1}", user.UserProfile.Identification, gradeAssignment.ID)" style="font-style:italic; color:Red;"  onclick="cellGainsFocus(event, this)">@gradableQuery.First().Points.ToString(".#")</td>
                         }
                         else
                         {
-                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" onclick="cellGainsFocus(event, this)">@gradableQuery.First().Points.ToString(".#")</td>
+                            <td id="@String.Format("{0}-{1}", user.UserProfile.Identification, gradeAssignment.ID)" onclick="cellGainsFocus(event, this)">@gradableQuery.First().Points.ToString(".#")</td>
                         }
                     }
                 }
                 else
                 {
-                    if (gradeAssignmentActivity.Rubric != null)
+                    if (gradeAssignment.Rubric != null)
                     {
-                        //COMMENTED OUT FOR TESTING PURPOSES
-                        @*var teamUser = from tu in gradeAssignmentActivity.AssignmentTeams where tu.Team.TeamMembers.Contains(user) select tu;
-                        if (teamUser.Count() > 0)
-                        {
-                            <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" style="font-style:italic;">@Html.ActionLink("NG", "Index", "Rubric", new { abstractAssignmentActivityId = gradeAssignmentActivity.ID, teamUserID = teamUser.First().ID }, new { @class = "rubric" })</td>
-                        }*@
+                        <td id="@String.Format("{0}-{1}", user.UserProfile.Identification, gradeAssignment.ID)" style="font-style:italic;">@Html.ActionLink("NG", "Index", "Rubric", new { assignmentId = gradeAssignment.ID, cuId = user.ID }, new { @class = "rubric" })</td>
                     }
                     else
                     {
-                        <td id="@String.Format("{0}-{1}", user.Identification, gradeAssignmentActivity.ID)" onclick="cellGainsFocus(event, this)">NG</td>
+                        <td id="@String.Format("{0}-{1}", user.UserProfile.Identification, gradeAssignment.ID)" onclick="cellGainsFocus(event, this)">NG</td>
                     }
                 }
             }

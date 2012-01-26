@@ -215,7 +215,7 @@
                     if (da.Item1 == null)
                     {
                         //Could do a check to see if it is a draft, if it is could say "Draft"
-                        @Html.ActionLink("Not Graded", "Index", "Rubric", new { assignmentId = da.Item2.AssignmentID, cuId = ViewBagCurrentUser.ID }, new { })
+                        @Html.ActionLink("Not Graded", "Index", "Rubric", new { assignmentId = da.Item2.AssignmentID, cuId = ViewBag.CurrentUserID }, new { })
                     }
                     else
                     {
@@ -350,6 +350,14 @@
     }
 
     function deleteAssignment() {
+        $.ajax({
+           async: false,
+           url: "/Assignment/Delete",
+           data: { id: assignmentToDeleteID },
+        });       
+
+        var replaceString = "http://" + window.location.host + "/Assignment";
+        window.location.assign(replaceString);
         hideConfirmDeleteWindow();
     }
 
@@ -363,7 +371,7 @@
     <form id="confirmForm" onsubmit="deleteAssignment();">
         <text>Are you sure you want to delete that assignment?</text>
         <div class="yesAndNoDiv">
-            <input value="Delete" type="button"  onclick="deleteAssignment()"/>
+            <input value="Delete" type="submit"/>
             <input value="Cancel" type="button" onclick="hideConfirmDeleteWindow()" />
         </div>
     </form>

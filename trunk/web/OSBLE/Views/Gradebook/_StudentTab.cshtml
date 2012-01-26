@@ -297,11 +297,11 @@
                     {
                         if (score.First().LatePenaltyPercent > 0)
                         {
-                            <td id="rubric-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AsssignmentID, teamID = score.First().AssignmentTeamID}, new { @style = "color:Red" }) @Helpers.CreateToolTip("This assignment was late")</td>                            
+                            <td id="rubric-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AsssignmentID, cuId = cu.ID}, new { @style = "color:Red" }) @Helpers.CreateToolTip("This assignment was late")</td>                            
                         }
                         else
                         {
-                            <td id="rubric-@assignment.ID" onmouseover="showRubricToolTip();" onmouseout="hideRubricToolTip();">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AsssignmentID, teamID = score.First().AsssignmentID }, new { })</td>
+                            <td id="rubric-@assignment.ID" onmouseover="showRubricToolTip();" onmouseout="hideRubricToolTip();">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AsssignmentID, cuId = cu.ID }, new { })</td>
                         }
                     }
                     else
