@@ -116,11 +116,11 @@
             <td>
                 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
-                    @Html.ActionLink("View Rubric", "Index", "Rubric", new { assignmentId = assignment.ID, teamId = ViewBag.TeamID }, new { });
+                    @Html.ActionLink("View Rubric", "Index", "Rubric", new { assignmentId = assignment.ID, cu = ViewBag.CurrentUser }, new { });
                 }
                 else
                 {
-                    @Html.ActionLink("View Rubric", "View", "Rubric", new { assignmentId = assignment.ID, teamId = ViewBag.TeamID }, new { });
+                    @Html.ActionLink("View Rubric", "View", "Rubric", new { assignmentId = assignment.ID, cy = ViewBag.CurrentUser }, new { });
                 }
             </td>
         </tr>
@@ -215,7 +215,7 @@
                     if (da.Item1 == null)
                     {
                         //Could do a check to see if it is a draft, if it is could say "Draft"
-                        @Html.ActionLink("Not Graded", "Index", "Rubric", new { assignmentId = da.Item2.AssignmentID, teamId = da.Item2.TeamID }, new { })
+                        @Html.ActionLink("Not Graded", "Index", "Rubric", new { assignmentId = da.Item2.AssignmentID, cu = ViewBag.CurrentUser }, new { })
                     }
                     else
                     {

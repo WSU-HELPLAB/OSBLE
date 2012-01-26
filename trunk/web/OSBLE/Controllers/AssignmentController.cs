@@ -463,6 +463,9 @@ namespace OSBLE.Controllers
                 if(assignment.AssignmentTeams.Count > 0)
                 {
                     ViewBag.TeamID = assignment.AssignmentTeams.FirstOrDefault().TeamID;
+
+                    //MG: Due to rubric tronller change 
+                    ViewBag.CurrentUser = assignment.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUser;
                 }
             }
 
@@ -470,6 +473,7 @@ namespace OSBLE.Controllers
             {
                 AssignmentTeam at = GetAssignmentTeam(assignment, currentUser);
                 ViewBag.TeamID = at.TeamID;
+                ViewBag.CurrentUser = activeCourse;
                 ViewBag.TeamName = at.Team.Name;
 
                 if (assignment.HasTeams)
