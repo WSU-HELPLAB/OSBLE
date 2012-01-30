@@ -71,8 +71,13 @@
     {<img src="/Content/images/arrow_left.png" alt="Edit Button" />}
 @helper DeleteButton()
     {<img src="/Content/images/delete_up.png" alt="Delete Button" />}
+@helper PublishButton()
+    {<img src="/Content/images/publish.png" alt="Publish Button" />}
+@helper UnPublishButton()
+    {<img src="/Content/images/unpublish.png" alt="Unpublish Button" />}
 @helper DeleteSubmit(string title)
     {<input type="image" title="@title" src="../../Content/images/delete_up.png" alt="Delete Button" />}
+
 @* Returns last 4 digits of student ID for pending students *@
 @helper DisplayLastFourID(string Identification)
     { <text>(@Identification.Substring(Math.Max(Identification.Length - 4, 0), Math.Min(Identification.Length, 4)))</text>}

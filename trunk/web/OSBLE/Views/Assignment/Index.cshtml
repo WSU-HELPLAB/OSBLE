@@ -74,7 +74,7 @@
                 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
                     <td style="padding-right:0"><!--Cell for icons-->
-                    <a title="Click to unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.PublishedIcon()</a>
+                    <a title="Click to unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.UnPublishButton()</a>
                     <a title="Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">@Helpers.EditButton()</a>
                     <a title="Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@a.ID)">@Helpers.DeleteButton()</a>
                     </td>
@@ -153,7 +153,7 @@
                 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
                     <td style="padding-right:0"><!--Cell for icons-->
-                    <a title="Click to unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.PublishedIcon()</a>
+                    <a title="Click to unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.UnPublishButton()</a>
                     <a title="Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">@Helpers.EditButton()</a>
                     <a title="Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@a.ID)">@Helpers.DeleteButton()</a>
                     </td>
@@ -244,7 +244,7 @@
                 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
                     <td style="padding-right:0"><!--Cell for icons-->
-                    <a title="Click to unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.PublishedIcon()</a>
+                    <a title="Click to unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.UnPublishButton()</a>
                     <a title="Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">@Helpers.EditButton()</a>
                     <a title="Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@a.ID)">@Helpers.DeleteButton()</a>
                     </td>
@@ -297,7 +297,7 @@
                 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
                     <td style="padding-right:0"><!--Cell for icons-->
-                    <a title="Click to Publish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.PublishedIcon()</a>
+                    <a title="Click to Publish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.PublishButton()</a>
                     <a title="Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">@Helpers.EditButton()</a>
                     <a title="Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@a.ID)">@Helpers.DeleteButton()</a>
                     </td>
