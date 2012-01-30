@@ -41,6 +41,19 @@ namespace OSBLE.Models.HomePage
             Read = false;
         }
 
+        [Obsolete("For legacy compatibility.  You should be using either the Recipient or Sender property instead.")]
+        public int CourseID
+        {
+            get
+            {
+                if (this.Recipient != null)
+                {
+                    return this.Recipient.AbstractCourseID;
+                }
+                return 0;
+            }
+        }
+
         public static class Types
         {
             public const string Mail = "Mail";
