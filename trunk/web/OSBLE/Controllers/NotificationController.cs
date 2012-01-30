@@ -101,14 +101,14 @@ namespace OSBLE.Controllers
         [NonAction]
         public void SendDashboardNotification(DashboardPost dp, CourseUser poster)
         {
-            List<int> sendToUsers = new List<int>();
+            List<CourseUser> sendToUsers = new List<CourseUser>();
 
             // Send notification to original thread poster if poster is not anonymized,
             // are still in the course,
             // and are not the poster of the new reply.
             if (poster != null && !poster.AbstractRole.Anonymized && dp.CourseUser.UserProfileID != poster.ID)
             {
-                sendToUsers.Add(dp.ID);
+                sendToUsers.Add(dp.CourseUser);
             }
 
             foreach (DashboardReply reply in dp.Replies)
@@ -119,17 +119,22 @@ namespace OSBLE.Controllers
                 // Also checks to make sure a duplicate notification is not sent.
                 if (reply.CourseUser != null && !reply.CourseUser.AbstractRole.Anonymized && reply.CourseUserID != poster.ID && !sendToUsers.Contains(reply.ID))
                 {
-                    sendToUsers.Add(reply.ID);
+                    sendToUsers.Add(reply.CourseUser);
                 }
             }
 
             // Send notification to each valid user.
-            foreach (int CourseUserProfileID in sendToUsers)
+            foreach (CourseUser courseUser in sendToUsers)
             {
+                //ignore null course users
+                if (courseUser == null)
+                {
+                    continue;
+                }
                 Notification n = new Notification();
                 n.ItemType = Notification.Types.Dashboard;
                 n.ItemID = dp.ID;
-                n.RecipientID = CourseUserProfileID;
+                n.RecipientID = courseUser.ID;
                 n.SenderID = poster.ID;
                 addNotification(n);
             }
