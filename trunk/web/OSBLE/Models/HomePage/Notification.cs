@@ -20,10 +20,6 @@ namespace OSBLE.Models.HomePage
 
         public virtual CourseUser Sender { get; set; }
 
-        public int? CourseID { get; set; }
-
-        public virtual AbstractCourse Course { get; set; }
-
         public bool Read { get; set; }
 
         [Required]

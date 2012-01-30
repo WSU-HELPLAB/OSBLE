@@ -90,8 +90,6 @@ namespace OSBLE.Controllers
             n.ItemID = mail.ID;
             n.RecipientID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.ToUserProfileID).FirstOrDefault().ID;
             n.SenderID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.FromUserProfileID).FirstOrDefault().ID;
-            n.CourseID = mail.ContextID;
-
             addNotification(n);
         }
 
@@ -101,39 +99,33 @@ namespace OSBLE.Controllers
         /// <param name="dp">The parent dashboard post</param>
         /// <param name="poster">The user profile of the user who posted the reply</param>
         [NonAction]
-        public void SendDashboardNotification(DashboardPost dp, UserProfile poster)
+        public void SendDashboardNotification(DashboardPost dp, CourseUser poster)
         {
             List<int> sendToUsers = new List<int>();
 
-            CourseUser dpPosterCu = db.CourseUsers.Where(cu => cu.AbstractCourseID == dp.CourseID && cu.UserProfileID == dp.UserProfileID).FirstOrDefault();
+            CourseUser dpPosterCu = db.CourseUsers.Where(cu => cu.AbstractCourseID == dp.CourseUser.AbstractCourseID && cu.ID == dp.CourseUserID).FirstOrDefault();
 
             // Send notification to original thread poster if poster is not anonymized,
             // are still in the course,
             // and are not the poster of the new reply.
-            if (dpPosterCu != null && !dpPosterCu.AbstractRole.Anonymized && dp.UserProfileID != poster.ID)
+            if (dpPosterCu != null && !dpPosterCu.AbstractRole.Anonymized && dp.CourseUser.UserProfileID != poster.ID)
             {
                 sendToUsers.Add(dp.ID);
             }
 
             foreach (DashboardReply dr in dp.Replies)
             {
-                CourseUser drPosterCu = db.CourseUsers.Where(cu => cu.AbstractCourseID == dp.CourseID && cu.UserProfileID == dr.UserProfileID).FirstOrDefault();
+                CourseUser drPosterCu = db.CourseUsers.Where(cu => cu.AbstractCourseID == dp.CourseUser.AbstractCourseID && cu.ID == dr.ID).FirstOrDefault();
 
                 // Send notifications to each participant as long as they are not anonymized,
                 // are still in the course,
                 // and are not the poster of the new reply.
                 // Also checks to make sure a duplicate notification is not sent.
-                if (drPosterCu != null && !drPosterCu.AbstractRole.Anonymized && dr.UserProfileID != poster.ID && !sendToUsers.Contains(dr.ID))
+                if (drPosterCu != null && !drPosterCu.AbstractRole.Anonymized && dr.CourseUserID != poster.ID && !sendToUsers.Contains(dr.ID))
                 {
                     sendToUsers.Add(dr.ID);
                 }
             }
-
-            //Pulling the posters course user ID
-            int posterID = (from a in db.CourseUsers
-                            where a.UserProfileID == poster.ID &&
-                            a.AbstractCourseID == dp.CourseID
-                            select a.ID).FirstOrDefault();
 
             // Send notification to each valid user.
             foreach (int CourseUserProfileID in sendToUsers)
@@ -142,9 +134,7 @@ namespace OSBLE.Controllers
                 n.ItemType = Notification.Types.Dashboard;
                 n.ItemID = dp.ID;
                 n.RecipientID = CourseUserProfileID;
-                n.SenderID = posterID;
-                n.CourseID = dp.CourseID;
-
+                n.SenderID = poster.ID;
                 addNotification(n);
             }
         }
@@ -169,10 +159,8 @@ namespace OSBLE.Controllers
                 Notification n = new Notification();
                 n.ItemType = Notification.Types.EventApproval;
                 n.ItemID = e.ID;
-                n.CourseID = e.Poster.AbstractCourseID;
                 n.RecipientID = instructor.ID;
                 n.SenderID = e.Poster.ID;
-                n.CourseID = activeCourse.AbstractCourseID; 
 
                 addNotification(n);
             }
@@ -190,8 +178,6 @@ namespace OSBLE.Controllers
                 n.Data = assignment.ID.ToString() + ";" + team.TeamID.ToString() + ";" + assignment.AssignmentName;
                 n.RecipientID = user.ID;
                 n.SenderID = activeCourse.ID;
-                n.CourseID = activeCourse.AbstractCourseID;
-
                 addNotification(n);
             }
         }
@@ -209,8 +195,6 @@ namespace OSBLE.Controllers
                 
                 n.RecipientID = user.ID;
                 n.SenderID = activeCourse.ID;
-                n.CourseID = activeCourse.AbstractCourseID;
-
                 addNotification(n);
             }
         }
@@ -232,8 +216,6 @@ namespace OSBLE.Controllers
                     n.Data = assignment.ID.ToString() + ";" + team.TeamID.ToString() + ";" + assignment.AssignmentName + ";" + team.Team.Name + ";" + fileName + ";" + DateTime.Now;
                     n.RecipientID = user.ID;
                     n.SenderID = activeCourse.ID;
-                    n.CourseID = activeCourse.AbstractCourseID;
-
                     addNotification(n);
                 }
             }

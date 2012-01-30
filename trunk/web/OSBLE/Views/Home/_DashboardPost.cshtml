@@ -6,11 +6,11 @@
     AbstractCourse course = new Course();
     
     if (Model is DashboardPost) {
-        course = (Model as DashboardPost).Course;
+        course = (Model as DashboardPost).CourseUser.AbstractCourse;
     }
     else if (Model is DashboardReply)
     {
-        course = (Model as DashboardReply).Parent.Course;
+        course = (Model as DashboardReply).Parent.CourseUser.AbstractCourse;
     }
     
 }
@@ -46,7 +46,7 @@
 
                 @if (Model.ShowProfilePicture)
                 {
-                    @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = course.ID, userprofile = Model.UserProfileID }));
+                    @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = course.ID, userprofile = Model.CourseUser.UserProfileID }));
                 }
                 else
                 {
@@ -68,7 +68,7 @@
                 <span class="dp_tools">
                 @if (Model.CanMail)
                 {
-                    <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = Model.UserProfileID })">@Helpers.MailButton()</a>
+                    <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = Model.CourseUser.UserProfileID })">@Helpers.MailButton()</a>
                 }
                 @if (Model.CanDelete)
                 {

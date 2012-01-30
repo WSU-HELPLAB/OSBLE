@@ -46,9 +46,9 @@
     if (dash is DashboardPost)
     {
         DashboardPost dp = dash as DashboardPost;
-        if (dp.Course is Community)
+        if (dp.CourseUser.AbstractCourse is Community)
         {
-            text += ", " + d.UserProfile.School.Name;
+            text += ", " + d.CourseUser.UserProfile.School.Name;
         }
     }
     <text><small><em>@(text)</em></small></text>
