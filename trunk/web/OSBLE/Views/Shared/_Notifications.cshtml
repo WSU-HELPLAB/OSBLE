@@ -2,6 +2,10 @@
 <ul id="notifications_list">
     @foreach (Notification n in ViewBag.Notifications)
     {
+        if (n == null || n.Sender == null)
+        {
+            continue;
+        }
         <li id="notification_@(n.ID)" @if (n.Read)
                                       {<text>class="read"</text>}><small>@n.Posted.ToShortDateString() @n.Posted.ToShortTimeString()</small>&nbsp;
             @if (ViewBag.ShowNotificationDelete == true)
