@@ -103,27 +103,23 @@ namespace OSBLE.Controllers
         {
             List<int> sendToUsers = new List<int>();
 
-            CourseUser dpPosterCu = db.CourseUsers.Where(cu => cu.AbstractCourseID == dp.CourseUser.AbstractCourseID && cu.ID == dp.CourseUserID).FirstOrDefault();
-
             // Send notification to original thread poster if poster is not anonymized,
             // are still in the course,
             // and are not the poster of the new reply.
-            if (dpPosterCu != null && !dpPosterCu.AbstractRole.Anonymized && dp.CourseUser.UserProfileID != poster.ID)
+            if (poster != null && !poster.AbstractRole.Anonymized && dp.CourseUser.UserProfileID != poster.ID)
             {
                 sendToUsers.Add(dp.ID);
             }
 
-            foreach (DashboardReply dr in dp.Replies)
+            foreach (DashboardReply reply in dp.Replies)
             {
-                CourseUser drPosterCu = db.CourseUsers.Where(cu => cu.AbstractCourseID == dp.CourseUser.AbstractCourseID && cu.ID == dr.ID).FirstOrDefault();
-
                 // Send notifications to each participant as long as they are not anonymized,
                 // are still in the course,
                 // and are not the poster of the new reply.
                 // Also checks to make sure a duplicate notification is not sent.
-                if (drPosterCu != null && !drPosterCu.AbstractRole.Anonymized && dr.CourseUserID != poster.ID && !sendToUsers.Contains(dr.ID))
+                if (reply.CourseUser != null && !reply.CourseUser.AbstractRole.Anonymized && reply.CourseUserID != poster.ID && !sendToUsers.Contains(reply.ID))
                 {
-                    sendToUsers.Add(dr.ID);
+                    sendToUsers.Add(reply.ID);
                 }
             }
 
