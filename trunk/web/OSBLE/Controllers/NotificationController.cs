@@ -117,7 +117,7 @@ namespace OSBLE.Controllers
                 // are still in the course,
                 // and are not the poster of the new reply.
                 // Also checks to make sure a duplicate notification is not sent.
-                if (reply.CourseUser != null && !reply.CourseUser.AbstractRole.Anonymized && reply.CourseUserID != poster.ID && !sendToUsers.Contains(reply.ID))
+                if (reply.CourseUser != null && !reply.CourseUser.AbstractRole.Anonymized && reply.CourseUserID != poster.ID && !sendToUsers.Contains(reply.CourseUser))
                 {
                     sendToUsers.Add(reply.CourseUser);
                 }
