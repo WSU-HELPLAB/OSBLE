@@ -322,6 +322,7 @@
     <Content Include="Content\favicon.ico" />
     <Content Include="Content\images\arrow_left.png" />
     <Content Include="Content\images\helplab_logo.png" />
+    <Content Include="Content\images\publish.png" />
     <Content Include="Content\images\tooltip\109_AllAnnotations_Help_16x16_72.png" />
     <Content Include="Content\images\account.png" />
     <Content Include="Content\images\add_up.png" />
@@ -426,6 +427,7 @@
     <Content Include="Content\images\ui-icons_eeeeee_256x240.png" />
     <Content Include="Content\images\ui-icons_eee_256x240.png" />
     <Content Include="Content\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="Content\images\unpublish.png" />
     <Content Include="Content\jquery-ui-1.8.13.custom.css" />
     <Content Include="Content\jquery-ui-timepicker.css" />
     <Content Include="Content\jquery-tooltip.css" />
