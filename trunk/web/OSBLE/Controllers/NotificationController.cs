@@ -193,9 +193,9 @@ namespace OSBLE.Controllers
                 Notification n = new Notification();
                 n.ItemType = Notification.Types.RubricEvaluationCompleted;
                 n.Data = assignment.ID.ToString() + ";" + team.TeamID.ToString() + ";" + assignment.AssignmentName;
-
-                n.Recipient = user;
-                n.Sender = activeCourse;
+                
+                n.RecipientID = user.ID;
+                n.SenderID = activeCourse.ID;
                 addNotification(n);
             }
         }
@@ -250,7 +250,7 @@ namespace OSBLE.Controllers
         /// <param name="n">Notification to be emailed</param>
         private void emailNotification(Notification n)
         {
-#if !DEBUG
+#if FALSE
 
             SmtpClient mailClient = new SmtpClient();
             mailClient.UseDefaultCredentials = true;
