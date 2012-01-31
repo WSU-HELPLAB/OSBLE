@@ -127,17 +127,17 @@ namespace OSBLE.Controllers
                                 }
                                 else
                                 {
-                                    AbstractAssignmentActivity assign = (from g in db.AbstractAssignmentActivities where g.ID == currentAssignmentID select g).FirstOrDefault();
+                                    Assignment assign = (from g in db.Assignments where g.ID == currentAssignmentID select g).FirstOrDefault();
                                     if (Session["radio"].ToString() == "r")
                                     {
 
-                                        var position = (from pos in db.Assignments
-                                                        where pos.CategoryID == categoryId &&
-                                                        pos.ColumnOrder > assign.ColumnOrder
-                                                        orderby pos.ColumnOrder
-                                                        select pos);
+                                        List<Assignment> position = (from pos in db.Assignments
+                                                                     where pos.CategoryID == categoryId &&
+                                                                     pos.ColumnOrder > assign.ColumnOrder
+                                                                     orderby pos.ColumnOrder
+                                                                     select pos).ToList();
 
-                                        if (position.FirstOrDefault() != null)
+                                        if (position.Count() > 0)
                                         {
                                             AddColumn(assignment.ToString(), 10, assign.ColumnOrder + assignmentNumber);
                                             positionList.Add(assign.ColumnOrder + assignmentNumber);
@@ -198,7 +198,8 @@ namespace OSBLE.Controllers
                                     int classId = ActiveCourse.AbstractCourseID;
                                     CourseUser user = (from u in db.CourseUsers
                                                        where u.UserProfile.Identification == studentId &&
-                                                       u.AbstractCourseID == classId
+                                                       u.AbstractCourseID == classId &&
+                                                       u.AbstractRole.CanSubmit
                                                        select u).FirstOrDefault();
 
                                     if (assignmentQuery.Count() > 0)
@@ -232,19 +233,20 @@ namespace OSBLE.Controllers
                                             
                                             Score newScore = new Score()
                                             {
-                                                TeamMember = currentUser,
-                                                CustomLatePenaltyPercent = -1,
                                                 AssignmentTeam = currentTeam,
+                                                CustomLatePenaltyPercent = -1,
+                                                TeamMember = currentUser,
                                                 Points = points,
                                                 AsssignmentID = currentAssignment.ID,
+                                                Assignment = currentAssignment,
                                                 PublishedDate = DateTime.Now,
                                                 isDropped = false,
+                                                LatePenaltyPercent = 0,
                                                 StudentPoints = -1,
-                                                RawPoints = rawPoints
+                                                RawPoints = points,
                                             };
                                             db.Scores.Add(newScore);
                                             db.SaveChanges();
-                                            //}
                                         }
                                     }
                                 }
@@ -642,7 +644,8 @@ namespace OSBLE.Controllers
 
             int currentCourseId = ActiveCourse.AbstractCourseID;
             List<CourseUser> Users = (from user in db.CourseUsers
-                                      where user.AbstractCourseID == currentCourseId
+                                      where user.AbstractCourseID == currentCourseId &&
+                                      user.AbstractRole.CanSubmit
                                       select user).ToList();
 
             var allAssignments = from assign in db.Assignments
@@ -660,7 +663,7 @@ namespace OSBLE.Controllers
 
             Assignment newAssignment = new Assignment()
             {
-                AssignmentName = "Untitled",
+                AssignmentName = columnName,
                 IsWizardAssignment = false,
                 CategoryID = categoryId,
                 ColumnOrder = position,
