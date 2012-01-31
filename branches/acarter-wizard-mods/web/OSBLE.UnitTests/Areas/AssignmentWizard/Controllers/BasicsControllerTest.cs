@@ -84,7 +84,7 @@ namespace OSBLE.UnitTests.Areas.AssignmentWizard.Controllers
             Assignment someAssignment = new Assignment()
             {
                 AssignmentDescription = "asdf",
-                AssignmentType = "Basic Assignment",
+                Type = AssignmentTypes.Basic,
                 AssignmentName = "foo",
                 CategoryID = 8
             };

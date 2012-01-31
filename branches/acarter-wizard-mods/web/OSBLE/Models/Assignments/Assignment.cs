@@ -21,14 +21,28 @@ namespace OSBLE.Models.Assignments
             IsDraft = true;
             addedPoints = 0;
             IsWizardAssignment = true;
+            AssignmentTypeID = 1;
         }
 
         [Key]
         public int ID { get; set; }
 
         [Required(ErrorMessage = "Please specify this assignment's type")]
-        [Display(Name="AssignmentType")]
-        public AssignmentTypes Type { get; set; }
+        public int AssignmentTypeID { get; set; }
+
+        [Display(Name="Assignment Type")]
+        [NotMapped]
+        public AssignmentTypes Type 
+        {
+            get
+            {
+                return (AssignmentTypes)AssignmentTypeID;
+            }
+            set
+            {
+                AssignmentTypeID = (int)value;
+            }
+        }
 
         [Required(ErrorMessage = "Please specify an assignment name")]
         [Display(Name = "Assignment Name")]

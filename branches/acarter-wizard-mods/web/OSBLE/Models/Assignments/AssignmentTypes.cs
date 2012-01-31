@@ -5,7 +5,12 @@ using System.Web;
 
 namespace OSBLE.Models.Assignments
 {
-    public enum AssignmentTypes { Basic, CriticalReview, DiscussionAssignment };
+    public enum AssignmentTypes : byte 
+    { 
+        Basic = 1, 
+        CriticalReview = 2, 
+        DiscussionAssignment = 3 
+    };
 
 	public static class AssignmentTypeExtensions
 	{
