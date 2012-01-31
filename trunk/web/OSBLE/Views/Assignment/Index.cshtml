@@ -74,9 +74,9 @@
                 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
                     <td style="padding-right:0"><!--Cell for icons-->
-                    <a title="Click to unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.UnPublishButton()</a>
-                    <a title="Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">@Helpers.EditButton()</a>
-                    <a title="Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@a.ID)">@Helpers.DeleteButton()</a>
+                    <a title="Click to Unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.UnPublishButton()</a>
+                    <a title="Click to Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">@Helpers.EditButton()</a>
+                    <a title="Click to Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@a.ID)">@Helpers.DeleteButton()</a>
                     </td>
                 }
                 <td> <!--Cell for name-->
@@ -153,9 +153,9 @@
                 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
                     <td style="padding-right:0"><!--Cell for icons-->
-                    <a title="Click to unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.UnPublishButton()</a>
-                    <a title="Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">@Helpers.EditButton()</a>
-                    <a title="Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@a.ID)">@Helpers.DeleteButton()</a>
+                    <a title="Click to Unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.UnPublishButton()</a>
+                    <a title="Click to Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">@Helpers.EditButton()</a>
+                    <a title="Click to Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@a.ID)">@Helpers.DeleteButton()</a>
                     </td>
                 }
                 <td> <!--Cell for name-->
@@ -244,9 +244,9 @@
                 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
                     <td style="padding-right:0"><!--Cell for icons-->
-                    <a title="Click to unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.UnPublishButton()</a>
-                    <a title="Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">@Helpers.EditButton()</a>
-                    <a title="Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@a.ID)">@Helpers.DeleteButton()</a>
+                    <a title="Click to Unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.UnPublishButton()</a>
+                    <a title="Click to Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">@Helpers.EditButton()</a>
+                    <a title="Click to Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@a.ID)">@Helpers.DeleteButton()</a>
                     </td>
                 }
                 <td> <!--Cell for name-->
@@ -298,8 +298,8 @@
                 {
                     <td style="padding-right:0"><!--Cell for icons-->
                     <a title="Click to Publish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.PublishButton()</a>
-                    <a title="Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">@Helpers.EditButton()</a>
-                    <a title="Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@a.ID)">@Helpers.DeleteButton()</a>
+                    <a title="Click to Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = a.ID })">@Helpers.EditButton()</a>
+                    <a title="Click to Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@a.ID)">@Helpers.DeleteButton()</a>
                     </td>
                 }
                 <td> <!--Cell for name-->
@@ -393,7 +393,7 @@
             url: "/Assignment/Delete",
             data: { id: assignmentToDeleteID },
         });
-        window.location.reload(true);
+        //window.location.reload(true);
     }
 
    function hideConfirmDeleteWindow() {
@@ -402,7 +402,7 @@
 </script>
 
 <!--Element for modal confirmation box-->
-<div id="confirmDeleteWindow" style="display:none;" title="Change Category Weight">
+<div id="confirmDeleteWindow" style="display:none;" title="Delete Assignment">
     <form id="confirmForm" onsubmit="deleteAssignment();">
         <text>Are you sure you want to delete that assignment?</text>
         <div class="yesAndNoDiv">

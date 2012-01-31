@@ -15,6 +15,7 @@ using OSBLE.Models.HomePage;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
 using OSBLE.Models.Assignments.Activities.Scores;
+using OSBLE.Models.Courses.Rubrics;
 
 namespace OSBLE.Controllers
 {
@@ -466,6 +467,13 @@ namespace OSBLE.Controllers
                     //MG: Due to rubric tronller change 
                     ViewBag.CurrentUserID = assignment.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUser.ID;
                 }
+                //Setting up a list of evaluations
+                List<RubricEvaluation> evaluations = (from e in db.RubricEvaluations
+                                                      where e.AssignmentID == assignment.ID &&
+                                                      e.IsPublished == false
+                                                      select e).ToList();
+
+                ViewBag.RubricEvals = evaluations;
             }
 
             else if (activeCourse.AbstractRole.CanSubmit)//STudent setup

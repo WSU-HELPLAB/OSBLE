@@ -5,7 +5,7 @@
 @model Assignment
 
 @{
-    Assignment assignment = Model;   
+    Assignment assignment = Model;
 }
 
 <h2>
@@ -13,14 +13,14 @@
 {
     if (assignment.IsDraft)
     {
-        <a title="Click to Publish"  class="pointerOnMouseOver" onclick="toggleDraft(@assignment.ID)">@Helpers.PublishedIcon()</a>
+        <a title="Click to Publish"  class="pointerOnMouseOver" onclick="toggleDraft(@assignment.ID)">@Helpers.PublishButton()</a>
     }
     else
     {
-        <a title="Click to Unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@assignment.ID)">@Helpers.PublishedIcon()</a>
+        <a title="Click to Unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@assignment.ID)">@Helpers.UnPublishButton()</a>
     }
-    <a title="Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = assignment.ID })">@Helpers.EditButton()</a>
-    <a title="Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@assignment.ID)">@Helpers.DeleteButton()</a>
+    <a title="Click to Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = assignment.ID })">@Helpers.EditButton()</a>
+    <a title="Click to Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@assignment.ID)">@Helpers.DeleteButton()</a>
 }
 @assignment.AssignmentName
 </h2>    
@@ -79,35 +79,35 @@
         int j = 1;
         
         <tr><!--Deliverables row-->
-            <td>
-                <text class="osbleColorBold">Deliverables:</text><br />
+            <td style="vertical-align:top;">
+                <text class="osbleColorBold">Deliverables: </text>
             </td>
-        </tr>
-        foreach (Deliverable d in assignment.Deliverables)
+            <td>
+        @foreach (Deliverable d in assignment.Deliverables)
         {
-            <tr>
-                <td></td>
-                <td>
-                    @(i+1).
-                    @d.Name (
-                    @foreach (string str in @ViewBag.filetypeList[i])
-                    {
-                        if (j == @ViewBag.filetypeList[i].Length)
-                        {
-                            @(str)
-                        }
-                        else
-                        {
-                            @(str + ", ")
-                        }
-                        j++;
-                    }
-                    )
-                </td>
-            </tr>
-                    i++;
-                    j = 1;
+                
+            @:@(i + 1).
+            @:@d.Name (
+            foreach (string str in @ViewBag.filetypeList[i])
+            {
+                if (j == @ViewBag.filetypeList[i].Length)
+                {
+                    @:@str
+                }
+                else
+                {
+                    @:@(str + ", ")
+                }
+                j++;
+            }
+            @:)
+            <br /> 
+            
+            i++;
+            j = 1;
         }
+        </td>
+        </tr>
     }
     @if (assignment.HasRubric)
     {
@@ -159,6 +159,60 @@
             </td>
         </tr>
     }
+    
+        @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+        {
+            int submittedCount = 0;
+            int totalStudentCount = 0;
+            int totalScores = 0;
+            foreach (Tuple<Score, AssignmentTeam, string> da in ViewBag.ScoresAndTeams)
+            {
+                if (da.Item3 != "No Submission")
+                {
+                    submittedCount++;
+                }
+                if (da.Item1 != null)
+                {
+                    totalScores++;
+                }
+                totalStudentCount++;
+            }
+            List<OSBLE.Models.Courses.Rubrics.RubricEvaluation> r = ViewBag.RubricEvals;
+            if (assignment.HasDeliverables)
+            {
+                <tr>
+                    <td><text class="osbleColorBold">Assignment Info:</text></td>
+                    <td>@submittedCount of @totalStudentCount have been submitted</td>
+                </tr>
+                
+                <tr>
+                    <td></td>
+                    <td>@r.Count() of @assignment.AssignmentTeams.Count() have been saved as draft</td>
+                    <td><button onclick="publishAllGrades();">Publish All</button></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>@totalScores of @assignment.AssignmentTeams.Count() have been graded</td>
+                </tr>
+            }
+            else
+            {
+                <tr>
+                    <td><text class="osbleColorBold">Assignment Info:</text></td>
+                    <td>@r.Count() of @assignment.AssignmentTeams.Count() have been saved as draft</td>
+                    <td><button onclick="publishAllGrades();">Publish All</button></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>@totalScores of @assignment.AssignmentTeams.Count() have been graded</td>
+                </tr>
+            }
+
+        }   
+   
+    
+        
+       
  </table>
 
 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
@@ -183,7 +237,7 @@
         <th>Submission</th>
         @*<th>Submit for Student</th>*@
     }
-    
+    <br />
 
     @foreach (Tuple<Score, AssignmentTeam, string> da in ViewBag.ScoresAndTeams)
     {
@@ -215,22 +269,22 @@
                     if (da.Item1 == null)
                     {
                         //Could do a check to see if it is a draft, if it is could say "Draft"
-                        @Html.ActionLink("Not Graded", "Index", "Rubric", new { assignmentId = da.Item2.AssignmentID, cuId = ViewBag.CurrentUserID }, new { })
+                        @Html.ActionLink("Not Graded", "Index", "Rubric", new { assignmentId = da.Item2.AssignmentID, cuId = da.Item2.Team.TeamMembers.FirstOrDefault().CourseUserID}, new { })
                     }
                     else
                     {
-                        @Html.ActionLink(da.Item1.getGradeAsPercent(da.Item2.Assignment.PointsPossible), "Index", "Rubric", new { assignmentId = da.Item2.AssignmentID,cuId = ViewBag.CurrentUserID  }, new { });
+                        @Html.ActionLink(da.Item1.getGradeAsPercent(da.Item2.Assignment.PointsPossible), "Index", "Rubric", new { assignmentId = da.Item2.AssignmentID, cuId = da.Item2.Team.TeamMembers.FirstOrDefault().CourseUserID }, new { });
                     }
                 }
                 else
                 {
                     if (da.Item1 == null)
                     {
-                        <span>Not Graded</span>
+                        <a href="#" onclick="goToCategoryTab(@assignment.CategoryID, @da.Item2.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.Identification);" style="cursor:pointer;">Not Graded</a>
                     }
                     else
                     {
-                        <span>@da.Item1.getGradeAsPercent(da.Item2.Assignment.PointsPossible)</span>
+                        <a href="#" onclick="goToCategoryTab(@da.Item1.Assignment.CategoryID, @da.Item2.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.Identification);" style="cursor:pointer;">@da.Item1.getGradeAsPercent(da.Item2.Assignment.PointsPossible)></a>
                     }
                 }    
             </td>
@@ -271,7 +325,6 @@
                 </td>
                 @*<td><!--Cell for submitting on behalf of students -->
                     @{
-                    //Student with deliverables. Can submit
                     AjaxOptions options = new AjaxOptions()
                     {
                         LoadingElementId = "Loading",
@@ -336,6 +389,18 @@
 
     }
 
+    function goToCategoryTab(catID, stuID) {
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/SetTabStudent",
+            data: { studentId: stuID.toString() },
+            success: function () {
+                location.href = "/Gradebook/Tab/?categoryId=" + catID;
+            }
+        });
+        hideTabColors();
+    }
+
     /*Functions and variables for deleteAssignment modal box*/
     var assignmentToDeleteID = -1;
     function openConfirmDeleteWindow(assignmentID) {
@@ -353,7 +418,7 @@
         $.ajax({
            async: false,
            url: "/Assignment/Delete",
-           data: { id: assignmentToDeleteID },
+           data: { id: assignmentToDeleteID }           
         });       
 
         var replaceString = "http://" + window.location.host + "/Assignment";
@@ -367,14 +432,14 @@
 </script>
 
 <!--Element for modal confirmation box-->
-<div id="confirmDeleteWindow" style="display:none;" title="Change Category Weight">
-    <form id="confirmForm" onsubmit="deleteAssignment();">
+<div id="confirmDeleteWindow" style="display:none;" title="Delete Assignment">
+    <div id="confirmForm">
         <text>Are you sure you want to delete that assignment?</text>
         <div class="yesAndNoDiv">
-            <input value="Delete" type="submit"/>
+            <input value="Delete" type="submit" onclick="deleteAssignment();"/>
             <input value="Cancel" type="button" onclick="hideConfirmDeleteWindow()" />
         </div>
-    </form>
+    </div>
 </div>
 
 
