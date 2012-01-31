@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using OSBLE.Areas.AssignmentWizard.Models;
+using OSBLE.Models.Assignments;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -34,7 +35,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get 
             {
-                return (new AssignmentTypes[] { AssignmentTypes.PeerReview }).ToList();
+                return (new AssignmentTypes[] { AssignmentTypes.CriticalReview }).ToList();
             }
         }
 

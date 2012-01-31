@@ -56,8 +56,6 @@ namespace OSBLE.Models
 
         public DbSet<Assignment> Assignments { get; set; }
 
-        public DbSet<AssignmentType> AssignmentTypes { get; set; }
-
         public DbSet<AssignmentTeam> AssignmentTeams { get; set; }
 
         public DbSet<Team> Teams { get; set; }
@@ -528,10 +526,6 @@ namespace OSBLE.Models
 
             #endregion add course users
 
-            //Assignment Types
-            this.AssignmentTypes.Add(new AssignmentType() { Type="Basic Assignment", Description="A basic, non-studio assignment." });
-            this.AssignmentTypes.Add(new AssignmentType() { Type = "Peer Review", Description = "Peer review assignments have students review the work of others on a previous assignment." });
-            this.SaveChanges();
         }
 
         public DbSet<PeerReviewActivity> PeerReviewActivities { get; set; }

@@ -27,11 +27,8 @@ namespace OSBLE.Models.Assignments
         public int ID { get; set; }
 
         [Required(ErrorMessage = "Please specify this assignment's type")]
-        [Display(Name = "Assignment Type")]
-        public string AssignmentType { get; set; }
-
-        [ForeignKey("AssignmentType")]
-        public AssignmentType Type { get; set; }
+        [Display(Name="AssignmentType")]
+        public AssignmentTypes Type { get; set; }
 
         [Required(ErrorMessage = "Please specify an assignment name")]
         [Display(Name = "Assignment Name")]
@@ -185,6 +182,35 @@ namespace OSBLE.Models.Assignments
         public virtual ICollection<Score> Scores { get; set; }
 
         public double addedPoints { get; set; }
+
+        public static IList<AssignmentTypes> AllAssignmentTypes
+        {
+            get
+            {
+                return Enum.GetValues(typeof(AssignmentTypes)).Cast<AssignmentTypes>().ToList();
+            }
+        }
+
+        public static string GetAssignmentTypeDescription(AssignmentTypes type)
+        {
+            string description = "";
+            switch (type)
+            {
+                case AssignmentTypes.Basic:
+                    description = "A basic, non-studio assignment.";
+                    break;
+                case AssignmentTypes.CriticalReview:
+                    description = "Peer review assignments have students review the work of others on a previous assignment.";
+                    break;
+                case AssignmentTypes.DiscussionAssignment:
+                    description = "Discussion assignments require students to comment on a particular discussion.";
+                    break;
+                default:
+                    description = "Your run of the mill assignment";
+                    break;
+            }
+            return description;
+        }
 
         
         /// <summary>

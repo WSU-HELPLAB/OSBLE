@@ -31,7 +31,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
-        public override ICollection<Models.AssignmentTypes> ValidAssignmentTypes
+        public override ICollection<AssignmentTypes> ValidAssignmentTypes
         {
             get
             {

@@ -16,7 +16,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
     {
         public static string previousWizardButton = "PreviousWizardButton";
         public static string nextWizardButton = "NextWizardButton";
-        private WizardComponentManager manager;
+        protected WizardComponentManager manager;
 
         /// <summary>
         /// Returns the controller's name.  Must be unique.  The GET method should

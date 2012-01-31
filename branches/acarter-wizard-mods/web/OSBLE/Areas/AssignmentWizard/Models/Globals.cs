@@ -5,5 +5,5 @@ using System.Web;
 
 namespace OSBLE.Areas.AssignmentWizard.Models
 {
-    public enum AssignmentTypes { Basic, PeerReview };
+    
 }

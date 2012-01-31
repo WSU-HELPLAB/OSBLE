@@ -666,7 +666,7 @@ namespace OSBLE.Controllers
                 ColumnOrder = position,
                 AssignmentDescription = "No description",
                 IsDraft = false,
-                AssignmentType = "Basic Assignment",
+                Type = AssignmentTypes.Basic
             };
             db.Assignments.Add(newAssignment);
             db.SaveChanges();
@@ -2263,7 +2263,7 @@ namespace OSBLE.Controllers
                     ColumnOrder = 1,
                     AssignmentDescription = "No description",
                     IsDraft = false,
-                    AssignmentType = "Basic Assignment",
+                    Type = AssignmentTypes.Basic
                 };
                 db.Assignments.Add(newAssignment);
                 db.SaveChanges();

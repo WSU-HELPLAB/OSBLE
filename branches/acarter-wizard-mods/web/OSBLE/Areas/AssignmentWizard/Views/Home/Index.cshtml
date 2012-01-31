@@ -1,6 +1,6 @@
 ﻿@using OSBLE.Models.Assignments;
 @using System.Collections;
-@model ICollection<AssignmentType>
+@model ICollection<AssignmentTypes>
 @{
     ViewBag.Title = "Assignment Creation Wizard";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -26,7 +26,7 @@
             int counter = 0;
             string altText = "";
           }
-        @foreach (AssignmentType type in Model)
+        @foreach (AssignmentTypes type in Model)
         {
             if (counter % 2 == 0)
             {
@@ -37,9 +37,9 @@
                 altText = "";
             }
             <tr class="@altText">
-                <td><input id="type@(counter)" type="radio" value="@type.TypeWithoutSpaces" name="@ViewBag.AssignmentTypeRadioName" /></td>
-                <td><label for="type@(counter)">@type.Type</label></td>
-                <td>@type.Description</td>
+                <td><input id="type@(counter)" type="radio" value="@type" name="@ViewBag.AssignmentTypeRadioName" /></td>
+                <td><label for="type@(counter)">@type.Explode()</label></td>
+                <td>@Assignment.GetAssignmentTypeDescription(type)</td>
             </tr>    
             counter++;
         }   

@@ -29,11 +29,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 return RedirectToRoute(new { controller = "Home", action = "SelectComponent", assignmentId = assignmentId });
             }
-            return View(db.AssignmentTypes.ToList());
+            return View(Assignment.AllAssignmentTypes);
         }
 
         [HttpPost]
-        public ActionResult Index(ICollection<AssignmentType> assignments)
+        public ActionResult Index(ICollection<AssignmentTypes> assignments)
         {
             string keyName = ViewBag.AssignmentTypeRadioName;
             if (Request.Form.AllKeys.Contains(keyName))
@@ -45,7 +45,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             else
             {
                 //send back to the old page if we didn't get anything.
-                return View(db.AssignmentTypes.ToList());
+                return View(Assignment.AllAssignmentTypes);
             }
         }
 

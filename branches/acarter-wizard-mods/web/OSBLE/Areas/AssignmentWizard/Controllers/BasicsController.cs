@@ -35,7 +35,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
-        public override ICollection<Models.AssignmentTypes> ValidAssignmentTypes
+        public override ICollection<AssignmentTypes> ValidAssignmentTypes
         {
             get 
             {
@@ -55,10 +55,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                               select c;
             }
             ViewBag.Categories = new SelectList(categories, "ID", "Name");
-
-            //ASSIGNMENT TYPES
-            var types = db.AssignmentTypes.ToList();
-            ViewBag.AssignmentTypes = new SelectList(types, "Type", "Type");
         }
 
         public override ActionResult Index()
@@ -66,6 +62,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             base.Index();
             ModelState.Clear();
             BuildViewBag();
+            Assignment.Type = manager.ActiveAssignmentType;
             return View(Assignment);
         }
 

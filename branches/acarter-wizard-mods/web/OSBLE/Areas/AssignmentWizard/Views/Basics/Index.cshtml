@@ -10,6 +10,7 @@
 @Html.HiddenFor(m => m.PrecededingAssignmentID)
 @Html.HiddenFor(m => m.CommentCategoryID)
 @Html.HiddenFor(m => m.IsDraft)
+@Html.HiddenFor(m => m.Type)
 <table class="wizard_entry_table">
 <tr>
     <th>@Html.LabelFor(m => m.AssignmentName):</th>
@@ -22,9 +23,9 @@
     <td>@Html.ValidationMessageFor(m => m.AssignmentDescription)</td>
 </tr>
 <tr>
-    <th>@Html.LabelFor(m => m.AssignmentType):</th>
-    <td>@Html.DropDownListFor(m => m.AssignmentType, ViewBag.AssignmentTypes as SelectList)</td>
-    <td>@Html.ValidationMessageFor(m => m.AssignmentType)</td>
+    <th>@Html.LabelFor(m => m.Type):</th>
+    <td>@Model.Type.Explode()</td>
+    <td>&nbsp;</td>
 </tr>
 <tr>
     <th>@Html.LabelFor(m => m.CategoryID):</th>

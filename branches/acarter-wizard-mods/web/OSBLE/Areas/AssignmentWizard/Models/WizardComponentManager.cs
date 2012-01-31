@@ -234,22 +234,11 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         /// Sets the active assignment type by trying to match the supplied parameter with possible assignment types
         /// listed in the AssignmentTypes enumeration.  Will default to AssignmentTypes.Basic if no match was found.
         /// </summary>
-        /// <param name="modelType"></param>
-        /// <returns>True if a good match was found, false otherwise.</returns>
-        public bool SetActiveAssignmentType(AssignmentType modelType)
-        {
-            return SetActiveAssignmentType(modelType.TypeWithoutSpaces);
-        }
-
-        /// <summary>
-        /// Sets the active assignment type by trying to match the supplied parameter with possible assignment types
-        /// listed in the AssignmentTypes enumeration.  Will default to AssignmentTypes.Basic if no match was found.
-        /// </summary>
         /// <param name="assignmentType"></param>
         /// <returns>True if a good match was found, false otherwise.</returns>
         public bool SetActiveAssignmentType(string assignmentType)
         {
-            List<AssignmentTypes> possibleTypes = Enum.GetValues(typeof(AssignmentTypes)).Cast<AssignmentTypes>().ToList();
+            IList<AssignmentTypes> possibleTypes = Assignment.AllAssignmentTypes;
             foreach (AssignmentTypes type in possibleTypes)
             {
                 if (assignmentType.Contains(type.ToString()))
