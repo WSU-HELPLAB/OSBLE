@@ -330,17 +330,18 @@ namespace OSBLE.Controllers
                 catch (System.FormatException)
                 {
                     // Non-integer entered. Ignore and redirect to root.
-                    return Redirect("/");
+                    return RedirectToAction("Index"); ;
                 }
             }
 
             if (Request.Form["redirect"] != null)
             {
-                return Redirect(Request.Form["redirect"]);
+                //return Redirect(Request.Form["redirect"]);
+                return RedirectToAction("Index");
             }
             else
             {
-                return Redirect("/");
+                return RedirectToAction("Index");
             }
         }
 

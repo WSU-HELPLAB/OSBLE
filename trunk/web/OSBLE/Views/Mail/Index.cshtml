@@ -15,7 +15,7 @@
     @if (ViewBag.BoxHeader == "Inbox")
     {
         <h2>Inbox</h2>
-        <p>@Html.ActionLink("Go to Outbox","Outbox")</p>
+        <p>@Html.ActionLink("Go to Outbox", "Outbox")</p>
     }
     else
     {
@@ -26,20 +26,29 @@
 
 <table class="inbox_table">
     <thead>
+    @{
+        if (ViewBag.BoxHeader == "Inbox")
+        {
+    
         <tr>
-            <th id="0" class="inbox_time_header">@Html.ActionLink( "Date:", "Index", new { sortBy = 0 })</th>
+            <th id="0" class="inbox_time_header">@Html.ActionLink("Date:", "Index", new { sortBy = 0 })</th>
             <th id="1" class="inbox_context_header">@Html.ActionLink("Context:", "Index", new { sortBy = 1 })</th>
-            @if (ViewBag.BoxHeader == "Inbox")
-            {
-                <th id="2" class="inbox_from_header">@Html.ActionLink("From:", "Index", new { sortBy = 2 })</th>
-            }
-            else
-            {
-                <th id="2" class="inbox_from_header">@Html.ActionLink("To:", "Index", new { sortBy = 2 })</th>
-            }
+            <th id="2" class="inbox_from_header">@Html.ActionLink("From:", "Index", new { sortBy = 2 })</th>
             <th id="3" class="inbox_subject_header">@Html.ActionLink("Subject:", "Index", new { sortBy = 3 })</th>
             <th id="4" class="inbox_tools_header"></th>
         </tr>
+        }
+        else
+        {
+            <tr>
+            <th id="0" class="inbox_time_header">@Html.ActionLink("Date:", "Outbox", new { sortBy = 0 })</th>
+            <th id="1" class="inbox_context_header">@Html.ActionLink("Context:", "Outbox", new { sortBy = 1 })</th>
+            <th id="2" class="inbox_from_header">@Html.ActionLink("To:", "Outbox", new { sortBy = 2 })</th>
+            <th id="3" class="inbox_subject_header">@Html.ActionLink("Subject:", "Outbox", new { sortBy = 3 })</th>
+            <th id="4" class="inbox_tools_header"></th>
+        </tr>
+        }
+    }
     </thead>
     @foreach (var item in Model)
     {
@@ -93,7 +102,7 @@
                         </form>
                     }
                 }
-                else if(item.FromUserProfile == ViewBag.CurrentUser)
+                else if (item.FromUserProfile == ViewBag.CurrentUser)
                 {
                     if (ViewBag.BoxHeader == "Outbox")
                     {

@@ -22,6 +22,7 @@
     <a title="Click to Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = assignment.ID })">@Helpers.EditButton()</a>
     <a title="Click to Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@assignment.ID)">@Helpers.DeleteButton()</a>
 }
+
 @assignment.AssignmentName
 </h2>    
 
@@ -184,11 +185,10 @@
                     <td><text class="osbleColorBold">Assignment Info:</text></td>
                     <td>@submittedCount of @totalStudentCount have been submitted</td>
                 </tr>
-                
                 <tr>
                     <td></td>
                     <td>@r.Count() of @assignment.AssignmentTeams.Count() have been saved as draft</td>
-                    <td><button onclick="publishAllGrades();">Publish All</button></td>
+                    <td><button onclick="publishAllGrades(@assignment.ID);">Publish All</button></td>
                 </tr>
                 <tr>
                     <td></td>
@@ -200,7 +200,7 @@
                 <tr>
                     <td><text class="osbleColorBold">Assignment Info:</text></td>
                     <td>@r.Count() of @assignment.AssignmentTeams.Count() have been saved as draft</td>
-                    <td><button onclick="publishAllGrades();">Publish All</button></td>
+                    <td><button onclick="publishAllGrades(@assignment.ID);">Publish All</button></td>
                 </tr>
                 <tr>
                     <td></td>
@@ -263,13 +263,35 @@
                 }
             
             </td>
-            <td> <!--Cell for grade-->
+            <td> <!--Cell for grade-->                
                 @if (assignment.HasRubric)
                 {
                     if (da.Item1 == null)
                     {
-                        //Could do a check to see if it is a draft, if it is could say "Draft"
-                        @Html.ActionLink("Not Graded", "Index", "Rubric", new { assignmentId = da.Item2.AssignmentID, cuId = da.Item2.Team.TeamMembers.FirstOrDefault().CourseUserID}, new { })
+                        List<OSBLE.Models.Courses.Rubrics.RubricEvaluation> r = ViewBag.RubricEvals;
+                        r.OrderBy(o => o.Recipient.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName);
+                        bool found = false;
+                        foreach (OSBLE.Models.Courses.Rubrics.RubricEvaluation eval in r)
+                        {
+                            if (eval.Recipient.TeamID == da.Item2.TeamID)
+                            {
+                                if (!eval.IsPublished)
+                                {
+                                    found = true;
+                                }
+                            }
+                        }
+                        if (found) 
+                        {
+                            //Could do a check to see if it is a draft, if it is could say "Draft"
+                            @Html.ActionLink("Saved as Draft", "Index", "Rubric", new { assignmentId = da.Item2.AssignmentID, cuId = da.Item2.Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })
+                        }
+                        else
+                        {
+                            //Could do a check to see if it is a draft, if it is could say "Draft"
+                            @Html.ActionLink("Not Graded", "Index", "Rubric", new { assignmentId = da.Item2.AssignmentID, cuId = da.Item2.Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })
+                        }
+
                     }
                     else
                     {
@@ -301,16 +323,7 @@
                     }
                 </td>
             }
-            <td> <!--Cell for late penalty-->
-                @if (da.Item1 == null)
-                {
-                    @:0.00%
-                }
-                else
-                {
-                    @da.Item1.getAppliedLatePenaltyAsDecimal().ToString("P");
-                }
-            </td>
+            
             @if (assignment.HasDeliverables)
             {
                 <td><!--Cell for submission download - only allow if there is a time submitted-->
@@ -337,6 +350,16 @@
                 </td>
                 *@
             }
+            <td style="vertical-align:bottom;" class="latePenaltyTd"> <!--Cell for late penalty-->
+                @if (da.Item1 == null)
+                {
+                    @:0.00 % <a class="latePenaltyA" style="display:none;" onclick="openManualLatePenWindow(0, @da.Item2.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.Identification, @assignment.ID);">@Helpers.EditButton()</a>
+                }
+                else
+                {
+                    @da.Item1.getAppliedLatePenaltyAsDecimal().ToString("P") <a class="latePenaltyA" style="display:none;" onclick="openManualLatePenWindow(@da.Item1.ID, @da.Item2.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.Identification, @assignment.ID);">@Helpers.EditButton()</a>
+                }
+            </td>
         </tr>
     }
 </table>
@@ -429,6 +452,58 @@
    function hideConfirmDeleteWindow() {
         $("#confirmDeleteWindow").dialog('close');
     }
+
+    function publishAllGrades(aId) {
+        $.ajax({
+            async: false,
+            url: "/Assignment/PublishAllGrades",
+            data: { assignmentId: aId }
+        });
+        window.location.reload(true);
+    }
+
+    var scoreId;
+    var userId;
+    var assId;    
+
+    $(".latePenaltyTd").mouseenter(function () {
+        $(this).find("a").show();
+    });
+
+    $(".latePenaltyTd").mouseleave(function () {
+        $(this).find("a").hide();
+    });
+
+    function openManualLatePenWindow(sId, uId, aId) {
+        scoreId = sId;
+        userId = uId;
+        assId = aId;
+
+        //$("#EditLatePercentWindowID").dialog("open");
+
+        $("#EditLatePercentWindowID").dialog({
+            autoOpen: true,
+            modal: true,
+            resizable: false,
+            width: 350,
+            height: 130,
+            closeOnEscape: false
+        });
+    }
+
+    function closeManualLatePenWindow() {
+        $("#EditLatePercentWindowID").dialog("open");
+    }
+
+    function setManualLatePen() {
+        var lp = $("#manualLatePen").val();
+        $.ajax({
+            async: false,
+            url: "/Assignment/ModifyLatePenalty",
+            data: { scoreId: scoreId, userIdentification: userId, latePenalty: lp, assignmentId: assId }
+        });
+        window.location.reload(true);
+    }
 </script>
 
 <!--Element for modal confirmation box-->
@@ -459,4 +534,17 @@
         });
     </script>
     </div>
+</div>
+
+<!-- Pop-up window for editing late percentage -->
+<div id="EditLatePercentWindowID" style="display: none;" title="Edit Score">
+   <input type="radio" id="radioBtn1" name="group1"/> Use default late penalty<br />
+   <input type="radio" id="radioBtn2" name="group1"/> Use a custom late penalty of <input size="5" id="manualLatePen"/>%<br />
+   <td>
+       <text id="latePenErrorText" style="color:Red; float:left; font-size:smaller"></text>
+       <div style="float:right">
+           <input type="button" onclick="setManualLatePen();" value="Apply Changes" />
+           <input type="button" onclick="closeManualLatePenWindow();" value="Cancel" />
+       </div>
+   </td>
 </div>
