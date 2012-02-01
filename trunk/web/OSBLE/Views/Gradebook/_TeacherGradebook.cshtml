@@ -194,7 +194,6 @@
 
                 foreach (UserProfile user in ViewBag.Students)
                 {
-                    studentCount++;
                     categoryTotalWeight = ViewBag.TotalCategoryWeights;
                     foreach (Category category in ViewBag.CatsWithWeightsAndScores)
                     {
@@ -225,12 +224,20 @@
                                                        select score).ToList();
                             if (totalScores.Count() > 0)
                             {
-                                
+                                int studentAssignmentCount = 0;
                                 foreach (Score score in totalScores)
                                 {
-                                    
                                     if (score.Assignment.CategoryID == category.ID)
                                     {
+                                        //We only want to count the student if they have assignments. They should only get counted
+                                        //for one assignment in there category so we have this check to stop incrementing
+                                        //student count after the first assignment
+                                        studentAssignmentCount++;
+                                        if (studentAssignmentCount < 2)
+                                        {
+                                            studentCount++;
+                                        }
+                                        
                                         categoryPoints += score.Points;
                                         categoryPossible += score.Assignment.PointsPossible;
                                     }
@@ -366,6 +373,7 @@
                   totalCategoryPoints = 0;
                   totalCategoryPossible = 0;
                   double totalCategoryWeight = ViewBag.TotalCategoryWeights;
+                  int studentGradeCount = 0;
                   foreach (Category c in ViewBag.CatsWithWeightsAndScores)
                   {
                       if (c.Name != Constants.UnGradableCatagory)
@@ -397,6 +405,8 @@
                           {
                               foreach (Score score in userScores)
                               {
+                                  //Used to make sure students have grades.
+                                  studentGradeCount++;
                                   points += score.Points;
                                   possible += score.Assignment.PointsPossible;
                               }
@@ -425,7 +435,7 @@
                   letter = "";
                   foreach (LetterGrade item in ViewBag.LetterGrades)
                   {
-                      if (totalGrade >= item.MinimumRequired)
+                      if (totalGrade >= item.MinimumRequired && studentGradeCount > 0)
                       {
                           letter = item.Grade;
                           break;
@@ -433,11 +443,11 @@
                   }
                   <td>@letter</td>
                 
-                  if (totalGrade > 0)
+                  if (totalGrade > 0 && studentGradeCount > 0)
                   {
                     <td>@totalGrade.ToString(".#")%</td>
                   }
-                  else if (totalGrade == 0)
+                  else if (totalGrade == 0 && studentGradeCount > 0)
                   {
                     <td>@String.Format("{0}", 0)%</td>
                   }
