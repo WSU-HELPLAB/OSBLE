@@ -190,7 +190,6 @@
 
                 foreach (CourseUser user in ViewBag.Students)
                 {
-                    studentCount++;
                     categoryTotalWeight = ViewBag.TotalCategoryWeights;
                     foreach (Category category in ViewBag.CatsWithWeightsAndScores)
                     {
@@ -231,8 +230,17 @@
 
                                 foreach (Score userScore in totalScores)
                                 {
+                                    int studentAssignmentCount = 0;
                                     if (userScore.Assignment.CategoryID == category.ID)
                                     {
+                                        //We only want to count the student if they have assignments. They should only get counted
+                                        //for one assignment in there category so we have this check to stop incrementing
+                                        //student count after the first assignment
+                                        studentAssignmentCount++;
+                                        if (studentAssignmentCount < 2)
+                                        {
+                                            studentCount++;
+                                        }
                                         categoryPoints += userScore.Points;
                                         categoryPossible += userScore.Assignment.PointsPossible;
                                     }
