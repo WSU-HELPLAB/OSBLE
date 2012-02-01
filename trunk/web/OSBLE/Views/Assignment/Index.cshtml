@@ -39,7 +39,7 @@
      ViewBag.FutureAssignments.Count > 0) || ViewBag.ActiveCourse.AbstractRole.CanModify && ViewBag.DraftAssignments.Count > 0) 
 {
     ViewBag.AssignmentList = 1;
-    <table class="assignTable">
+    <table class="assignTable" cellspacing="0">
 
         @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
         {
@@ -70,7 +70,7 @@
         @foreach (Assignment a in ViewBag.PastAssignments)
         {
             
-            <tr>
+            <tr class="checkeredRow">
                 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
                     <td style="padding-right:0"><!--Cell for icons-->
@@ -149,7 +149,7 @@
         @foreach (Assignment a in ViewBag.PresentAssignments)
         {
             
-            <tr>
+            <tr class="checkeredRow">
                 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
                     <td style="padding-right:0"><!--Cell for icons-->
@@ -323,6 +323,7 @@
 
 
 <script type="text/javascript">
+
 
     function toggleDraft(id){
         $.ajax({

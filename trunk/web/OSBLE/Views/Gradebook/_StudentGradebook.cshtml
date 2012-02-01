@@ -227,10 +227,9 @@
 
                             if (totalScores.Count() > 0)
                             {
-
+                                int studentAssignmentCount = 0;
                                 foreach (Score userScore in totalScores)
                                 {
-                                    int studentAssignmentCount = 0;
                                     if (userScore.Assignment.CategoryID == category.ID)
                                     {
                                         //We only want to count the student if they have assignments. They should only get counted
