@@ -217,7 +217,7 @@
 
 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
 {
-    <table class="assignTable">
+    <table class="assignDetailsTable" cellspacing="0">
     <!-- Look up activityTeachertable for similar set up
     For name: If a team, display team name and on next line display team members. Have option to email whole team or individual
     for grade: if a rubric assignment, link to rubric tool. Else just show the grade. Display No Grade for NGs and underline them with link if there is a rubric
@@ -231,12 +231,13 @@
     {
         <th>Inline Comments</th>    
     }
-    <th>Late Penalty</th>
+    
     @if (assignment.HasDeliverables)
     {
         <th>Submission</th>
         @*<th>Submit for Student</th>*@
     }
+    <th>Late Penalty</th>
     <br />
 
     @foreach (Tuple<Score, AssignmentTeam, string> da in ViewBag.ScoresAndTeams)
@@ -373,6 +374,8 @@
 
 
 <script type="text/javascript">
+    
+
     function create_and_open_downloading_submission_dialog() {
 
         //create the div that we will then make into a dialog
@@ -485,25 +488,45 @@
             autoOpen: true,
             modal: true,
             resizable: false,
-            width: 350,
-            height: 130,
+            width: 370,
+            height: 150,
             closeOnEscape: false
         });
     }
 
     function closeManualLatePenWindow() {
-        $("#EditLatePercentWindowID").dialog("open");
+        $("#EditLatePercentWindowID").dialog("close");
     }
 
     function setManualLatePen() {
-        var lp = $("#manualLatePen").val();
+        if ($("#radioBtn1").attr('checked') == "checked") {
+            $.ajax({
+                async: false,
+                url: "/Assignment/ModifyLatePenalty",
+                data: { scoreId: scoreId, userIdentification: userId, latePenalty: -1, assignmentId: assId }
+            });
+        }
+        else {
+            var lp = $("#manualLatePen").val();
+            $.ajax({
+                async: false,
+                url: "/Assignment/ModifyLatePenalty",
+                data: { scoreId: scoreId, userIdentification: userId, latePenalty: lp, assignmentId: assId }
+            });
+        }
+        window.location.reload(true);
+    }
+
+    
+    function toggleDraft(id){
         $.ajax({
             async: false,
-            url: "/Assignment/ModifyLatePenalty",
-            data: { scoreId: scoreId, userIdentification: userId, latePenalty: lp, assignmentId: assId }
+            url: "/Assignment/ToggleDraft",
+            data: { assignmentID: id },
         });
         window.location.reload(true);
     }
+
 </script>
 
 <!--Element for modal confirmation box-->
@@ -541,7 +564,7 @@
    <input type="radio" id="radioBtn1" name="group1"/> Use default late penalty<br />
    <input type="radio" id="radioBtn2" name="group1"/> Use a custom late penalty of <input size="5" id="manualLatePen"/>%<br />
    <td>
-       <text id="latePenErrorText" style="color:Red; float:left; font-size:smaller"></text>
+       <text id="latePenErrorText" style="color:Red; float:left; font-size:smaller"></text><br />
        <div style="float:right">
            <input type="button" onclick="setManualLatePen();" value="Apply Changes" />
            <input type="button" onclick="closeManualLatePenWindow();" value="Cancel" />

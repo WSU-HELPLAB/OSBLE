@@ -87,36 +87,31 @@
                 @Html.ActionLink(item.Subject, "View", new { id = item.ID })
             </td>
             <td class="inbox_tools">
-                @if (item.ToUserProfile == ViewBag.CurrentUser)
-                {
-                    if (ViewBag.BoxHeader == "Inbox")
-                    {
-                        <form action="@Url.Action("DeleteFromInbox")"
-                        style="display: inline;"
-                        data-ajax="true"
-                        data-ajax-success="$('#mail_item_@(item.ID)').hide('blind',{},'slow',function(){$(this).remove();})"
-                        data-ajax-confirm="Are you sure you want to delete this message?"
-                        method="post">
-                        <input type="hidden" name="ID" value="@item.ID" />
-                        @Helpers.DeleteSubmit("Delete This Mail Message")
-                        </form>
-                    }
-                }
-                else if (item.FromUserProfile == ViewBag.CurrentUser)
-                {
-                    if (ViewBag.BoxHeader == "Outbox")
-                    {
-                        <form action="@Url.Action("DeleteFromOutbox")"
-                        style="display: inline;"
-                        data-ajax="true"
-                        data-ajax-success="$('#mail_item_@(item.ID)').hide('blind',{},'slow',function(){$(this).remove();})"
-                        data-ajax-confirm="Are you sure you want to delete this message?"
-                        method="post">
-                        <input type="hidden" name="ID" value="@item.ID" />
-                        @Helpers.DeleteSubmit("Delete This Mail Message")
-                        </form>
-                    }
-                }
+            @if (ViewBag.BoxHeader == "Inbox")
+            {
+                <form action="@Url.Action("DeleteFromInbox")"
+                style="display: inline;"
+                data-ajax="true"
+                data-ajax-success="$('#mail_item_@(item.ID)').hide('blind',{},'slow',function(){$(this).remove();})"
+                data-ajax-confirm="Are you sure you want to delete this message?"
+                method="post">
+                <input type="hidden" name="ID" value="@item.ID" />
+                @Helpers.DeleteSubmit("Delete This Mail Message")
+                </form>
+            }
+                
+            @if (ViewBag.BoxHeader == "Outbox")
+            {
+                <form action="@Url.Action("DeleteFromOutbox")"
+                style="display: inline;"
+                data-ajax="true"
+                data-ajax-success="$('#mail_item_@(item.ID)').hide('blind',{},'slow',function(){$(this).remove();})"
+                data-ajax-confirm="Are you sure you want to delete this message?"
+                method="post">
+                <input type="hidden" name="ID" value="@item.ID" />
+                @Helpers.DeleteSubmit("Delete This Mail Message")
+                </form>
+            }
             </td>
         </tr>
     }

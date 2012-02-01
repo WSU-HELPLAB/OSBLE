@@ -1655,7 +1655,10 @@ namespace OSBLE.Controllers
                         }
                         else //Using default late penalty
                         {
-                            value = value * latePenalty;
+                            if (latePenalty != 0)
+                            {
+                                value = value * latePenalty;
+                            }
                         }
 
                         if (currentCategory.MaxAssignmentScore >= 0)
@@ -1717,7 +1720,6 @@ namespace OSBLE.Controllers
                                 LatePenaltyPercent = latePenalty,
                                 StudentPoints = -1,
                                 RawPoints = rawValue,
-
                             };
 
                             db.Scores.Add(newScore);

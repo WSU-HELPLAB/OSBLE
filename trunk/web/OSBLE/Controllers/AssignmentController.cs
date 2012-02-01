@@ -418,7 +418,7 @@ namespace OSBLE.Controllers
                 }
                 else
                 {
-                    teams.Sort((x, y) => string.Compare(x.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName, y.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName));
+                    teams.Sort((x, y) => string.Compare(x.Team.Name, y.Team.Name));
                 }
 
                 string submissionTime;
@@ -527,6 +527,89 @@ namespace OSBLE.Controllers
             Assignment assignment = db.Assignments.Find(assignmentID);
             assignment.IsDraft = !assignment.IsDraft;
             db.SaveChanges();
+        }
+
+        /// <summary>
+        /// Takes any grade that is currently saved as a draft for the specified assignment and 
+        /// publishes the grade to the students.
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        [CanModifyCourse]
+        public void PublishAllGrades(int assignmentId)
+        {
+            if (assignmentId > 0)
+            {
+                Assignment assignment = db.Assignments.Find(assignmentId);
+
+                //Getting the list of evaluations that have been saved as draft
+                List<RubricEvaluation> evaluations = (from e in db.RubricEvaluations
+                                                      where e.AssignmentID == assignment.ID &&
+                                                      e.IsPublished == false
+                                                      select e).ToList();
+
+
+                foreach (RubricEvaluation re in evaluations)
+                {
+                    re.IsPublished = true;
+
+                    (new NotificationController()).SendRubricEvaluationCompletedNotification(assignment, re.Recipient);
+                    GradebookController gradebook = new GradebookController();
+
+                    //figure out the normalized final score.
+                    double maxLevelScore = (from c in assignment.Rubric.Levels
+                                            select c.RangeEnd).Sum();
+                    double totalRubricPoints = (from c in assignment.Rubric.Criteria
+                                                select c.Weight).Sum();
+                    double studentScore = 0.0;
+
+                    foreach (CriterionEvaluation critEval in re.CriterionEvaluations)
+                    {
+                        studentScore += (double)critEval.Score / maxLevelScore * (critEval.Criterion.Weight / totalRubricPoints);
+                    }
+                    
+                    //normalize the score with the abstract assignment score
+                    studentScore *= re.Assignment.PointsPossible;
+
+                    gradebook.ModifyTeamGrade(studentScore, assignment.ID, re.Recipient.TeamID);
+                }
+                db.SaveChanges();
+            }
+        }
+
+
+        /// <summary>
+        /// Modifies a students custom late penalty. If scoreId == 0, we are assuming there is no score
+        /// for the student.
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        [CanModifyCourse]
+        public void ModifyLatePenalty(int scoreId, string userIdentification, double latePenalty, int assignmentId)
+        {
+            if (scoreId > 0)
+            {
+                Score score = db.Scores.Find(scoreId);
+                score.CustomLatePenaltyPercent = latePenalty;
+                db.SaveChanges();
+                new GradebookController().ModifyGrade(score.RawPoints, userIdentification, score.AsssignmentID);
+            }
+            else if (scoreId == 0)
+            {
+                new GradebookController().ModifyGrade(-1, userIdentification, assignmentId);
+                Score score = (from s in db.Scores
+                               where s.TeamMember.CourseUser.UserProfile.Identification == userIdentification &&
+                               s.AsssignmentID == assignmentId
+                               select s).FirstOrDefault();
+
+                if (score != null)
+                {
+                    score.CustomLatePenaltyPercent = latePenalty;
+                    db.SaveChanges();
+                }
+            }
+            else
+            {
+                //If we got here there was a mistake, don't do anything
+            }
         }
     }
 }

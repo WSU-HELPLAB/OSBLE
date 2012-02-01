@@ -883,6 +883,11 @@ body#layoutLogOn
 	border-bottom: 2px solid #cacaca;
 }
 
+.inbox_table tr:nth-child(even)
+{
+    background: #f2f2f2;
+}
+
 .inbox_table tr.inbox_alternate
 {
 	background-color: #eaeaff;
@@ -1654,9 +1659,36 @@ ul.assignment_deliverables, .assignment_deliverables ul
     text-align:left;
     color: #074974;
 }
+
 .assignTable td
 {
     padding-right:50px;
+}
+
+.assignDetailsTable th
+{
+    text-align:left;
+    color: #074974;
+}
+
+.assignTable tr.checkeredRow:nth-child(odd)
+{
+    background: #f2f2f2;
+}
+
+.assignDetailsTable tr:nth-child(even)
+{
+    background: #f2f2f2;
+}
+
+.assignDetailsTable tr
+{
+    vertical-align: bottom;
+}
+
+.assignDetailsTable td
+{
+    padding-right:25px;
 }
 
 .osbleColorBold
