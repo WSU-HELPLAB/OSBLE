@@ -1647,6 +1647,14 @@ namespace OSBLE.Controllers
                         {
                             latePenalty = CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
                             latePenalty = (100 - latePenalty) / 100;
+                        }
+
+                        if (grades.CustomLatePenaltyPercent >= 0) //Using CustomLatePenalty
+                        {
+                            value = value * ((100.0 - grades.CustomLatePenaltyPercent)/100.0);
+                        }
+                        else //Using default late penalty
+                        {
                             value = value * latePenalty;
                         }
 
