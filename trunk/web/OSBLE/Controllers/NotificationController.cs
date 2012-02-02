@@ -106,7 +106,7 @@ namespace OSBLE.Controllers
             // Send notification to original thread poster if poster is not anonymized,
             // are still in the course,
             // and are not the poster of the new reply.
-            if (poster != null && !poster.AbstractRole.Anonymized && dp.CourseUser.UserProfileID != poster.ID)
+            if (poster != null && !poster.AbstractRole.Anonymized && dp.CourseUserID != poster.ID)
             {
                 sendToUsers.Add(dp.CourseUser);
             }
@@ -234,10 +234,10 @@ namespace OSBLE.Controllers
             db.SaveChanges();
 
             // Find recipient profile and check notification settings
-            UserProfile recipient = (from a in db.CourseUsers
-                                where a.ID == n.RecipientID
-                                select a.UserProfile).FirstOrDefault();
-            if (recipient.EmailAllNotifications && !(recipient.EmailAllActivityPosts && n.ItemType == Notification.Types.Dashboard))
+            CourseUser recipient = (from a in db.CourseUsers
+                                    where a.ID == n.RecipientID
+                                    select a).FirstOrDefault();
+            if (recipient.UserProfile.EmailAllNotifications && !(recipient.UserProfile.EmailAllActivityPosts && n.ItemType == Notification.Types.Dashboard))
             {
                 emailNotification(n);
             }
@@ -250,8 +250,8 @@ namespace OSBLE.Controllers
         /// <param name="n">Notification to be emailed</param>
         private void emailNotification(Notification n)
         {
-#if FALSE
 
+#if FALSE
             SmtpClient mailClient = new SmtpClient();
             mailClient.UseDefaultCredentials = true;
             
@@ -259,7 +259,7 @@ namespace OSBLE.Controllers
             UserProfile recipient = db.UserProfiles.Find(n.Recipient.UserProfileID);
 
             // this comes back as null, for some reason.
-            AbstractCourse course = db.AbstractCourses.Where(b => b.ID == n.CourseID).FirstOrDefault();
+            AbstractCourse course = db.AbstractCourses.Where(b => b.ID == n.Sender.AbstractCourseID).FirstOrDefault();
 
             string subject = "";
             if(getCourseTag(course) != "")
