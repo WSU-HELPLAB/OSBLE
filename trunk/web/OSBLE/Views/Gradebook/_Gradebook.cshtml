@@ -98,7 +98,7 @@
             @foreach (Assignment item in ViewBag.Assignments)
             {
                 var score = (from scores in ViewBag.Grades as IEnumerable<Score>
-                             where scores.AsssignmentID == item.ID
+                             where scores.AssignmentID == item.ID
                              select scores);
 
                 double totalAverage = 0;
@@ -200,23 +200,24 @@
                 
             @foreach (Assignment gradeAssignment in ViewBag.Assignments)
             {
-                var gradableQuery = from g in ViewBag.Grades as IEnumerable<Score>
-                                    where g.AsssignmentID == gradeAssignment.ID
+                var gradableQuery = from g in gradeAssignment.Scores
+                                    where g.AssignmentID == gradeAssignment.ID
                                     && g.TeamMember.CourseUser.UserProfileID == user.UserProfile.ID
                                     //&& g.Points >= 0
                                     select g;
                 //use the stored score if possible.  Otherwise, just use a "0"
                 if (gradableQuery.Count() > 0)
                 {
+                    
                     if (gradeAssignment.Rubric != null)
                     {
                         if (gradableQuery.First().LatePenaltyPercent > 0)
                         {
-                            <td id="@String.Format("{0}-{1}", user.UserProfile.Identification, gradeAssignment.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { assignmentId = gradableQuery.First().AsssignmentID, cuId = user.ID}, new { @class = "rubric", @style = "color:Red;" })</td>
+                            <td id="@String.Format("{0}-{1}", user.UserProfile.Identification, gradeAssignment.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { assignmentId = gradableQuery.First().AssignmentID, cuId = user.ID}, new { @class = "rubric", @style = "color:Red;" })</td>
                         }
                         else
                         {                            
-                            <td id="@String.Format("{0}-{1}", user.UserProfile.Identification, gradeAssignment.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { assignmentId = gradableQuery.First().AsssignmentID, cuId = user.ID }, new { @class = "rubric" })</td>
+                            <td id="@String.Format("{0}-{1}", user.UserProfile.Identification, gradeAssignment.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { assignmentId = gradableQuery.First().AssignmentID, cuId = user.ID }, new { @class = "rubric" })</td>
                         }
                     }
                     else

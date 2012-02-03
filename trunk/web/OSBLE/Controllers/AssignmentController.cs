@@ -590,14 +590,14 @@ namespace OSBLE.Controllers
                 Score score = db.Scores.Find(scoreId);
                 score.CustomLatePenaltyPercent = latePenalty;
                 db.SaveChanges();
-                new GradebookController().ModifyGrade(score.RawPoints, userIdentification, score.AsssignmentID);
+                new GradebookController().ModifyGrade(score.RawPoints, userIdentification, score.AssignmentID);
             }
             else if (scoreId == 0)
             {
                 new GradebookController().ModifyGrade(-1, userIdentification, assignmentId);
                 Score score = (from s in db.Scores
                                where s.TeamMember.CourseUser.UserProfile.Identification == userIdentification &&
-                               s.AsssignmentID == assignmentId
+                               s.AssignmentID == assignmentId
                                select s).FirstOrDefault();
 
                 if (score != null)

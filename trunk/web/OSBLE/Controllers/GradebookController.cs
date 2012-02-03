@@ -237,8 +237,7 @@ namespace OSBLE.Controllers
                                                 CustomLatePenaltyPercent = -1,
                                                 TeamMember = currentUser,
                                                 Points = points,
-                                                AsssignmentID = currentAssignment.ID,
-                                                Assignment = currentAssignment,
+                                                AssignmentID = currentAssignment.ID,                                                
                                                 PublishedDate = DateTime.Now,
                                                 isDropped = false,
                                                 LatePenaltyPercent = 0,
@@ -507,7 +506,7 @@ namespace OSBLE.Controllers
                     foreach (Assignment assignment in Assignments)
                     {
                         Score userScore = (from score in userScores
-                                           where score.AsssignmentID == assignment.ID
+                                           where score.AssignmentID == assignment.ID
                                            select score).FirstOrDefault();
 
                         if (userScore != null)
@@ -592,7 +591,7 @@ namespace OSBLE.Controllers
                 foreach (Assignment assignment in Assignments)
                 {
                     var score = (from scores in allScores
-                                 where scores.AsssignmentID == assignment.ID
+                                 where scores.AssignmentID == assignment.ID
                                  select scores);
 
                     totalAverage = 0;
@@ -965,7 +964,7 @@ namespace OSBLE.Controllers
         public void ClearColumn(int assignmentId)
         {
             var assignmentQuery = from s in db.Scores
-                                  where s.AsssignmentID == assignmentId
+                                  where s.AssignmentID == assignmentId
                                   select s;
 
             if (assignmentQuery.Count() > 0)
@@ -1263,7 +1262,7 @@ namespace OSBLE.Controllers
                 if (assignmentId > 0)
                 {
                     List<Score> grades = (from grade in db.Scores
-                                          where grade.AsssignmentID == assignmentId &&
+                                          where grade.AssignmentID == assignmentId &&
                                           grade.Points >= 0
                                           select grade).ToList();
 
@@ -1627,7 +1626,7 @@ namespace OSBLE.Controllers
                     }
 
                     List<Score> gradableQuery = (from g in db.Scores
-                                                 where g.AsssignmentID == assignmentId
+                                                 where g.AssignmentID == assignmentId
                                                  select g).ToList();
 
                     Score grades = (from grade in gradableQuery
@@ -1713,8 +1712,7 @@ namespace OSBLE.Controllers
                                 CustomLatePenaltyPercent = -1,
                                 TeamMember = userTeamMember,
                                 Points = value,
-                                AsssignmentID = currentAssignment.ID,
-                                Assignment = currentAssignment,
+                                AssignmentID = currentAssignment.ID,
                                 PublishedDate = DateTime.Now,
                                 isDropped = false,
                                 LatePenaltyPercent = latePenalty,
@@ -1799,6 +1797,7 @@ namespace OSBLE.Controllers
                         {
                             var TeamMembers = (from c in currentAssignment.AssignmentTeams
                                                select c.Team.TeamMembers);
+
                             if (currentCategory.MaxAssignmentScore > 0)
                             {
                                 if (((value / currentAssignment.PointsPossible) * 100) > currentCategory.MaxAssignmentScore)
@@ -1813,8 +1812,7 @@ namespace OSBLE.Controllers
                                 CustomLatePenaltyPercent = -1,
                                 TeamMember = currentTeamMember,
                                 Points = -1,
-                                AsssignmentID = currentAssignment.ID,
-                                Assignment = currentAssignment,
+                                AssignmentID = currentAssignment.ID,
                                 PublishedDate = DateTime.Now,
                                 isDropped = false,
                                 StudentPoints = value,
@@ -1965,7 +1963,7 @@ namespace OSBLE.Controllers
                                      select grades).ToList();
 
             List<Score> allGradedAssignments = (from grades in allGrades
-                                                join assignment in db.Assignments on grades.AsssignmentID equals assignment.ID
+                                                join assignment in db.Assignments on grades.AssignmentID equals assignment.ID
                                                 where assignment.Scores.Count() > 0
                                                 select grades).ToList();
 
@@ -1984,7 +1982,7 @@ namespace OSBLE.Controllers
                                            select cat.Points).Sum();
 
             List<Assignment> assignmentList = (from assignment in db.Assignments
-                                               join scores in db.Scores on assignment.ID equals scores.AsssignmentID
+                                               join scores in db.Scores on assignment.ID equals scores.AssignmentID
                                                where assignment.Scores.Count() > 0 &&
                                                scores.Points >= 0
                                                select assignment).Distinct().ToList();
@@ -2337,7 +2335,7 @@ namespace OSBLE.Controllers
             List<Score> scor = (from score in db.Scores
                                 where score.Assignment.CategoryID == currentTab.ID &&
                                 score.Points >= 0 /*&&
-                               score.isDropped == false*/
+                               //score.isDropped == false*/
                                 select score).ToList();
             
 

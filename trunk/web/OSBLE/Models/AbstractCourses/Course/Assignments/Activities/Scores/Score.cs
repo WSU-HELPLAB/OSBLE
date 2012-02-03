@@ -69,7 +69,7 @@ namespace OSBLE.Models.Assignments.Activities.Scores
         public bool isDropped { get; set; }
 
         [Required]
-        public int AsssignmentID { get; set; }
+        public int AssignmentID { get; set; }
 
         public virtual Assignment Assignment { get; set; }
 
