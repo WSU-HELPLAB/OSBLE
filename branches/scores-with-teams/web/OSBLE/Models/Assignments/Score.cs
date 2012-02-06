@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Users;
 
-namespace OSBLE.Models.Assignments.Activities.Scores
+namespace OSBLE.Models.Assignments
 {
     public class Score
     {

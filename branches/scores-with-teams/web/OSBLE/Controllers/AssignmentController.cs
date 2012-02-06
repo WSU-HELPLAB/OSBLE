@@ -14,7 +14,7 @@ using OSBLE.Models.ViewModels;
 using OSBLE.Models.HomePage;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
-using OSBLE.Models.Assignments.Activities.Scores;
+using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses.Rubrics;
 
 namespace OSBLE.Controllers

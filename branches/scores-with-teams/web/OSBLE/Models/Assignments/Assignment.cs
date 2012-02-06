@@ -5,7 +5,7 @@ using System.Web;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
 using System.ComponentModel.DataAnnotations;
-using OSBLE.Models.Assignments.Activities.Scores;
+using OSBLE.Models.Assignments;
 
 namespace OSBLE.Models.Assignments
 {

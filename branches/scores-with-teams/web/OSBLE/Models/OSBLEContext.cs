@@ -4,7 +4,7 @@ using System.Web.Security;
 using OSBLE.Models.AbstractCourses;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
-using OSBLE.Models.Assignments.Activities.Scores;
+using OSBLE.Models.Assignments;
 
 //using OSBLE.Models.Assignments.Activities.CommentCategories;
 using OSBLE.Models.Courses;
@@ -80,8 +80,6 @@ namespace OSBLE.Models
         // Assignments.Activities.Scores
 
         public DbSet<Score> Scores { get; set; }
-
-        public DbSet<RubricScore> RubricScores { get; set; }
 
         // Courses
 

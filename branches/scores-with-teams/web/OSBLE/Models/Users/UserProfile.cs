@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Assignments.Activities;
-using OSBLE.Models.Assignments.Activities.Scores;
+using OSBLE.Models.Assignments;
 
 namespace OSBLE.Models.Users
 {

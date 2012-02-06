@@ -7,7 +7,7 @@ using System.Web.Routing;
 using OSBLE.Attributes;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Assignments.Activities;
-using OSBLE.Models.Assignments.Activities.Scores;
+using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.Users;
