@@ -115,7 +115,18 @@
                     }
                     else if (a.HasDeliverables)
                     {
-                        <td>No Submission Received</td>
+                        AjaxOptions options = new AjaxOptions()
+                            {
+                                LoadingElementId = "Loading",
+                                HttpMethod = "Get",
+                                UpdateTargetId = "submitFiles",
+                                OnComplete = "SubmissionLoaded"
+                            }; 
+                         <!--TD for first submission-->
+                        <td>
+                        None.
+                        @Ajax.ActionLink("Submit Here", "Create", "Submission", new { id = a.ID }, options, new object())
+                        </td>
                     }
                     else
                     {
