@@ -240,7 +240,7 @@
     <th>Late Penalty</th>
     <br />
 
-    @foreach (Tuple<Score, AssignmentTeam, string> da in ViewBag.ScoresAndTeams)
+    @foreach (Tuple<Score, Team, string> da in ViewBag.ScoresAndTeams)
     {
         <tr>    
             <td> <!--Cell for name-->
@@ -270,11 +270,11 @@
                     if (da.Item1 == null)
                     {
                         List<OSBLE.Models.Courses.Rubrics.RubricEvaluation> r = ViewBag.RubricEvals;
-                        r.OrderBy(o => o.Recipient.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName);
+                        r.OrderBy(o => o.Recipient.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName);
                         bool found = false;
                         foreach (OSBLE.Models.Courses.Rubrics.RubricEvaluation eval in r)
                         {
-                            if (eval.Recipient.TeamID == da.Item2.TeamID)
+                            if (eval.Recipient.ID == da.Item2.TeamID)
                             {
                                 if (!eval.IsPublished)
                                 {

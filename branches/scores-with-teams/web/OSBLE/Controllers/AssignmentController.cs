@@ -408,7 +408,7 @@ namespace OSBLE.Controllers
 
             if (activeCourse.AbstractRole.CanModify) //Instructor setup
             {
-                List<Tuple<Score, AssignmentTeam, string>> scoreAndTeam = new List<Tuple<Score, AssignmentTeam, string>>();
+                List<Tuple<Score, Team, string>> scoreAndTeam = new List<Tuple<Score, Team, string>>();
                 List<AssignmentTeam> teams = assignment.AssignmentTeams.ToList();
 
                 //Sorting teams by team name or by last name if non-team assignment
@@ -445,7 +445,7 @@ namespace OSBLE.Controllers
                     {
                         if (score.AssignmentTeam.TeamID == team.TeamID)
                         {
-                            scoreAndTeam.Add(new Tuple<Score, AssignmentTeam, string>(score, team, submissionTime));
+                            scoreAndTeam.Add(new Tuple<Score, Team, string>(score, team.Team, submissionTime));
                             foundMatch = true;
                             break;
                         }
@@ -453,7 +453,7 @@ namespace OSBLE.Controllers
                     if (!foundMatch)
                     {
 
-                        scoreAndTeam.Add(new Tuple<Score, AssignmentTeam, string>(null, team, submissionTime));
+                        scoreAndTeam.Add(new Tuple<Score, Team, string>(null, team.Team, submissionTime));
                     }
                 }
                 ViewBag.ScoresAndTeams = scoreAndTeam;
@@ -464,7 +464,7 @@ namespace OSBLE.Controllers
                 {
                     ViewBag.TeamID = assignment.AssignmentTeams.FirstOrDefault().TeamID;
 
-                    //MG: Due to rubric tronller change 
+                    //MG: Due to rubric controller change 
                     ViewBag.CurrentUserID = assignment.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUser.ID;
                 }
                 //Setting up a list of evaluations
@@ -570,7 +570,7 @@ namespace OSBLE.Controllers
                     //normalize the score with the abstract assignment score
                     studentScore *= re.Assignment.PointsPossible;
 
-                    gradebook.ModifyTeamGrade(studentScore, assignment.ID, re.Recipient.TeamID);
+                    gradebook.ModifyTeamGrade(studentScore, assignment.ID, re.Recipient.ID);
                 }
                 db.SaveChanges();
             }

@@ -154,7 +154,7 @@ namespace OSBLE.Controllers
             else
             {
                 //if nothing exists, we need to build a dummy eval for the view to process
-                viewModel.Evaluation.Recipient = assignmentTeam;
+                viewModel.Evaluation.Recipient = assignmentTeam.Team;
                 viewModel.Evaluation.AssignmentID = assignment.ID;
                 viewModel.Evaluation.EvaluatorID = CurrentUser.ID;
                 foreach (Criterion crit in rubric.Criteria)
@@ -236,7 +236,7 @@ namespace OSBLE.Controllers
                     //normalize the score with the abstract assignment score
                     studentScore *= vm.Evaluation.Assignment.PointsPossible;
 
-                    gradebook.ModifyTeamGrade(studentScore, vm.SelectedAssignment.ID, vm.Evaluation.Recipient.TeamID);
+                    gradebook.ModifyTeamGrade(studentScore, vm.SelectedAssignment.ID, vm.Evaluation.Recipient.ID);
 
 
                 }

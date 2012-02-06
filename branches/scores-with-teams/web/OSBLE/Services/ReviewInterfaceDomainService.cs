@@ -131,7 +131,7 @@
                 {
                     sw.Write(str);
                 }
-                new NotificationController().SendInlineReviewCompletedNotification(assignment, team);
+                new NotificationController().SendInlineReviewCompletedNotification(assignment, team.Team);
             }
         }
 
