@@ -251,7 +251,7 @@
         @foreach (Assignment a in ViewBag.FutureAssignments)
         {
             
-            <tr>
+            <tr class="checkeredRow">
                 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
                     <td style="padding-right:0"><!--Cell for icons-->
@@ -304,7 +304,7 @@
         @foreach (Assignment a in ViewBag.DraftAssignments)
         {
             
-            <tr>
+            <tr class="checkeredRow">
                 @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
                     <td style="padding-right:0"><!--Cell for icons-->
