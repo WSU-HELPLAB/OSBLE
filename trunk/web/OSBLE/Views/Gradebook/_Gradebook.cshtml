@@ -203,7 +203,7 @@
                 var gradableQuery = from g in gradeAssignment.Scores
                                     where g.AssignmentID == gradeAssignment.ID
                                     && g.TeamMember.CourseUser.UserProfileID == user.UserProfile.ID
-                                    //&& g.Points >= 0
+                                    && g.Points >= 0
                                     select g;
                 //use the stored score if possible.  Otherwise, just use a "0"
                 if (gradableQuery.Count() > 0)
