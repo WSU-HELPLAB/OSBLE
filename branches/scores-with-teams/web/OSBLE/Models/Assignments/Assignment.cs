@@ -182,7 +182,8 @@ namespace OSBLE.Models.Assignments
         [Association("AssignmentTeams_Assignments", "ID", "AssignmentID")]
         public virtual IList<AssignmentTeam> AssignmentTeams { get; set; }
 
-        public virtual ICollection<Score> Scores { get; set; }
+        [Association("Score_Assignment", "ID", "AssignmentID")]
+        public virtual IList<Score> Scores { get; set; }
 
         public double addedPoints { get; set; }
 

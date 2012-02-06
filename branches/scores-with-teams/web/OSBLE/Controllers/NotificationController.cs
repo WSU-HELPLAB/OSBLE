@@ -4,7 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Net.Mail;
 using System.Web.Mvc;
-using OSBLE.Models.Assignments.Activities;
+
 using OSBLE.Models.Courses;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;

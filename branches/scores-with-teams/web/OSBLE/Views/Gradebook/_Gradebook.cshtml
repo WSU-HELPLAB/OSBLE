@@ -1,6 +1,5 @@
 ﻿@using OSBLE.Controllers;
 @using OSBLE.Models.Assignments;
-@using OSBLE.Models.Assignments.Activities;
 @using OSBLE.Models.Assignments;
 @using OSBLE.Models.Courses;
 @{
@@ -179,7 +178,7 @@
                     
             @{
               var percent = from p in ViewBag.Percents as IEnumerable<Score>
-                            where p.TeamMember.CourseUserID == user.ID
+                            where p.CourseUserID == user.ID
                             select p;
               if (percent.Count() > 0)
               {
@@ -202,7 +201,7 @@
             {
                 var gradableQuery = from g in gradeAssignment.Scores
                                     where g.AssignmentID == gradeAssignment.ID
-                                    && g.TeamMember.CourseUser.UserProfileID == user.UserProfile.ID
+                                    && g.CourseUser.UserProfileID == user.UserProfile.ID
                                     //&& g.Points >= 0
                                     select g;
                 //use the stored score if possible.  Otherwise, just use a "0"

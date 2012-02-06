@@ -6,7 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using OSBLE.Attributes;
 using OSBLE.Models.Assignments;
-using OSBLE.Models.Assignments.Activities;
+
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using Ionic.Zip;
@@ -81,7 +81,7 @@ namespace OSBLE.Controllers
                     teamMember = GetTeamUser(assignment, userprofile);
                 }
 
-                var score = (from c in assignment.Scores where c.TeamMember.CourseUserID == teamMember.CourseUserID select c).FirstOrDefault();
+                var score = (from c in assignment.Scores where c.CourseUserID == teamMember.CourseUserID select c).FirstOrDefault();
 
                 if (score != null)
                 {

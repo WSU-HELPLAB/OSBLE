@@ -7,7 +7,7 @@ using System.Web.Configuration;
 using OSBLE.Attributes;
 using OSBLE.Models;
 using OSBLE.Models.Assignments;
-using OSBLE.Models.Assignments.Activities;
+
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
@@ -131,7 +131,7 @@ namespace OSBLE.Controllers
 
                     //Finding score match based of UserPrfileID to avoid grabbing another team members grade (as they are potentially different)
                     var score = (from assScore in a.Scores
-                                 where assScore.TeamMember.CourseUser.UserProfileID == CurrentUser.ID
+                                 where assScore.CourseUser.UserProfileID == CurrentUser.ID
                                  select assScore).FirstOrDefault();
                     if (score != null) //found matching score. Reassign scoreString
                     {
@@ -149,157 +149,6 @@ namespace OSBLE.Controllers
             ViewBag.DeliverableTypes = GetListOfDeliverableTypes();
             ViewBag.Submitted = false;
             return View();
-        }
-
-        //This is to be used with Ajax
-        [CanModifyCourse]
-        public ActionResult ActivityTeacherTable(int id)
-        {
-            try
-            {
-                Assignment assignment = db.Assignments.Find(id);
-
-
-
-                if (assignment.Category.Course == activeCourse.AbstractCourse)
-                {
-                    ActivityTeacherTableViewModel viewModel = new ActivityTeacherTableViewModel(assignment);
-
-                    int numberOfSubmissions = 0;
-                    int numberGraded = 0;
-
-                    foreach (AssignmentTeam team in assignment.AssignmentTeams)
-                    {
-                        ActivityTeacherTableViewModel.SubmissionInfo submissionInfo = new ActivityTeacherTableViewModel.SubmissionInfo();
-
-                        //This checks when something was submitted by the folder modify time it is imperative that they don't get modified except when a student submits something to that folder.
-                        submissionInfo.Time = GetSubmissionTime(activeCourse.AbstractCourse as Course, assignment, team);
-
-                        if (submissionInfo.Time != null)
-                        {
-                            numberOfSubmissions++;
-                            //submissionInfo.LatePenaltyPercent = CalcualateLatePenaltyPercent(studioActivity, (TimeSpan)calculateLateness(studioActivity.AbstractAssignment.Category.Course, studioActivity, teamUser));
-                        }
-
-                        //Getting the student: only valid for non-team.
-                        TeamMember student = (from a in team.Team.TeamMembers
-                                              select a).FirstOrDefault();
-
-                        //if team
-                        if (assignment.HasTeams == true)
-                        {
-                            submissionInfo.isTeam = true;
-                            submissionInfo.SubmitterID = team.TeamID;
-                            submissionInfo.Name = team.Team.Name;
-                        }
-                        
-                        //else student
-                        else
-                        {
-                            submissionInfo.isTeam = false;
-                            submissionInfo.SubmitterID = team.TeamID;
-                            submissionInfo.Name = student.CourseUser.UserProfile.LastName + ", " + student.CourseUser.UserProfile.FirstName;
-                        }
-
-                        if ((from c in assignment.Scores where c.AssignmentTeamID == team.TeamID && c.Points >= 0 select c).FirstOrDefault() != null)
-                        {
-                            submissionInfo.Graded = true;
-                            numberGraded++;
-                        }
-                        else
-                        {
-                            submissionInfo.Graded = false;
-                        }
-                        viewModel.SubmissionsInfo.Add(submissionInfo);
-                    }
-
-                    //This orders the list into alphabetical order
-                    viewModel.SubmissionsInfo = (from c in viewModel.SubmissionsInfo orderby c.Name select c).ToList();
-                    ViewBag.NumberOfSubmissions = numberOfSubmissions;
-                    ViewBag.NumberGraded = numberGraded;
-
-                    ViewBag.ExpectedSubmissionsAndGrades = assignment.AssignmentTeams.Count;
-
-                    ViewBag.assignmentID = assignment.ID;
-                    ViewBag.CategoryID = assignment.CategoryID;
-
-                    List<Score> studentScores = assignment.Scores.ToList();
-
-                    ViewBag.StudentScores = studentScores;
-
-                    ViewBag.DueDate = assignment.DueDate;
-
-                    return View(viewModel);
-                }
-                else
-                {
-                    throw new Exception("Tried to access AssignmentActivity of a different course than the active one");
-                }
-            }
-
-            catch (Exception e)
-            {
-                throw new Exception("Failed ActivityTeacherTable", e);
-            }
-        }
-
-        /// <summary>
-        /// Takes the Icollectionof TeamUserMembers and returns a string with those members, sorted alphabetically in the format:
-        /// "firstName1 lastName1, firstName2 lastName2 & firstName3 lastName3"
-        /// </summary>
-        private string createStringOfTeamMemebers(ICollection<TeamUserMember> members)
-        {
-            string returnVal = "";
-
-            //Putting names in a list
-            List<string> nameList = new List<string>();
-            foreach (TeamUserMember tm in members)
-            {
-                nameList.Add(tm.Name);
-            }
-            //Sorting the list of names alphabetically
-            nameList.Sort();
-
-            //putting the names in "FirstName LastName" order
-            for (int i = 0; i < nameList.Count; i++)
-            {
-                string[] name = nameList[i].Split(',');
-                if (name.Count() == 2) //Only going to rearrange name if there was only 1 ','; otherwise i dont know how to handle them
-                {
-                    nameList[i] = name[1] + " " + name[0];
-                }
-            }
-
-            //Compiling all the names into one string
-            foreach (string s in nameList)
-            {
-                if (nameList.IndexOf(s) == nameList.Count() - 1) //Last name
-                {
-                    returnVal += s;
-                }
-                else if (nameList.IndexOf(s) == nameList.Count() - 2) //Second to last name
-                {
-                    returnVal += s + " & ";
-                }
-                else //Other names
-                {
-                    returnVal += s + ", ";
-                }
-            }
-            return returnVal;
-        }
-
-        public ActionResult GetTeamMembers(int teamID)
-        {
-            try
-            {
-                //This is a nice way to just return a text as the view
-                return this.Content(String.Join("; ", (
-                    (from c in (db.TeamUsers.Find(teamID) as OldTeamMember).Team.Members select c.Name).ToArray())));
-            }
-            catch { }
-
-            return this.Content("");
         }
 
         [CanGradeCourse]
@@ -443,7 +292,7 @@ namespace OSBLE.Controllers
                     bool foundMatch = false;
                     foreach (Score score in scores)
                     {
-                        if (score.AssignmentTeam.TeamID == team.TeamID)
+                        if (score.TeamID == team.TeamID)
                         {
                             scoreAndTeam.Add(new Tuple<Score, Team, string>(score, team.Team, submissionTime));
                             foundMatch = true;
@@ -452,8 +301,8 @@ namespace OSBLE.Controllers
                     }
                     if (!foundMatch)
                     {
-
-                        scoreAndTeam.Add(new Tuple<Score, Team, string>(null, team.Team, submissionTime));
+                        Score junkScore = new Score() { Assignment = team.Assignment, AssignmentID = team.AssignmentID };
+                        scoreAndTeam.Add(new Tuple<Score, Team, string>(junkScore, team.Team, submissionTime));
                     }
                 }
                 ViewBag.ScoresAndTeams = scoreAndTeam;
@@ -596,7 +445,7 @@ namespace OSBLE.Controllers
             {
                 new GradebookController().ModifyGrade(-1, userIdentification, assignmentId);
                 Score score = (from s in db.Scores
-                               where s.TeamMember.CourseUser.UserProfile.Identification == userIdentification &&
+                               where s.CourseUser.UserProfile.Identification == userIdentification &&
                                s.AssignmentID == assignmentId
                                select s).FirstOrDefault();
 

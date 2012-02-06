@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Users;
-using OSBLE.Models.Assignments.Activities;
 
 namespace OSBLE.Models.Courses.Rubrics
 {

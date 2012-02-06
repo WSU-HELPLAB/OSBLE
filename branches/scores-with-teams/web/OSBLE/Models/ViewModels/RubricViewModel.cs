@@ -6,7 +6,7 @@ using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Users;
 using System.Web.Mvc;
-using OSBLE.Models.Assignments.Activities;
+
 
 namespace OSBLE.Models.ViewModels
 {
