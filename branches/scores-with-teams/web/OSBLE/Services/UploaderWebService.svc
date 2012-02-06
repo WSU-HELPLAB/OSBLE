@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="OSBLE.Services.UploaderWebService" CodeBehind="UploaderWebService.svc.cs" %>

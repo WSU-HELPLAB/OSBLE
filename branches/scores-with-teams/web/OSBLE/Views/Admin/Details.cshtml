@@ -1,0 +1,52 @@
+﻿@model OSBLE.Models.Users.UserProfile
+
+@using OSBLE.Models
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>UserProfile</legend>
+
+    <div class="display-label">UserName @Helpers.CreateToolTip(ToolTips.AdminUserName) </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.UserName)
+    </div>
+
+    <div class="display-label">School @Helpers.CreateToolTip(ToolTips.AdminUserSchool) </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.School.Name)
+    </div>
+
+    <div class="display-label">FirstName @Helpers.CreateToolTip(ToolTips.AdminUserFirstName) </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.FirstName)
+    </div>
+
+    <div class="display-label">LastName @Helpers.CreateToolTip(ToolTips.AdminUserLastName) </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.LastName)
+    </div>
+
+    <div class="display-label">Identification @Helpers.CreateToolTip(ToolTips.AdminUserID) </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Identification)
+    </div>
+
+    <div class="display-label">IsAdmin @Helpers.CreateToolTip(ToolTips.AdminUserIsAdmin) </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.IsAdmin)
+    </div>
+
+    <div class="display-label">CanCreateCourses @Helpers.CreateToolTip(ToolTips.AdminUserIsCourseCreator) </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.CanCreateCourses)
+    </div>
+</fieldset>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index") 
+</div>
