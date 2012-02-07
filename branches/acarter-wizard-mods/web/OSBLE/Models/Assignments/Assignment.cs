@@ -204,28 +204,6 @@ namespace OSBLE.Models.Assignments
                 return Enum.GetValues(typeof(AssignmentTypes)).Cast<AssignmentTypes>().ToList();
             }
         }
-
-        public static string GetAssignmentTypeDescription(AssignmentTypes type)
-        {
-            string description = "";
-            switch (type)
-            {
-                case AssignmentTypes.Basic:
-                    description = "A basic, non-studio assignment.";
-                    break;
-                case AssignmentTypes.CriticalReview:
-                    description = "Peer review assignments have students review the work of others on a previous assignment.";
-                    break;
-                case AssignmentTypes.DiscussionAssignment:
-                    description = "Discussion assignments require students to comment on a particular discussion.";
-                    break;
-                default:
-                    description = "Your run of the mill assignment";
-                    break;
-            }
-            return description;
-        }
-
         
         /// <summary>
         /// used to distinguish wizard created assignments versus gradebook created assignments

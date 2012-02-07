@@ -9,14 +9,16 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.Remoting;
 using OSBLE.Controllers;
 using OSBLE.Areas.AssignmentWizard.Models;
+using System.ComponentModel;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
-    public abstract class WizardBaseController : OSBLEController, IComparable
+    public abstract class WizardBaseController : OSBLEController, IComparable, INotifyPropertyChanged, IEquatable<WizardBaseController>
     {
         public static string previousWizardButton = "PreviousWizardButton";
         public static string nextWizardButton = "NextWizardButton";
         protected WizardComponentManager manager;
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         /// <summary>
         /// Returns the controller's name.  Must be unique.  The GET method should
@@ -55,9 +57,47 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
+        /// <summary>
+        /// Used to hold an instance of the current assignment to be used by the component
+        /// </summary>
         public Assignment Assignment { get; set; }
 
+        /// <summary>
+        /// Whether or not the component successfully updated the Assignment in the database
+        /// </summary>
         public bool WasUpdateSuccessful { get; set; }
+
+
+        private bool _isSelected = false;
+
+        /// <summary>
+        /// UI.  Whether or not the current component is selected by the user in the Assignment Wizard
+        /// </summary>
+        public bool IsSelected
+        {
+            get
+            {
+                return _isSelected;
+            }
+            set
+            {
+                _isSelected = value;
+                NotifyPropertyChanged("IsSelected");
+            }
+        }
+
+        /// <summary>
+        /// UI Whether or not the current component is required during assignment creation.  
+        /// By default, no component is required.  To make component required, override this 
+        /// property in your subclass.
+        /// </summary>
+        public virtual bool IsRequired
+        {
+            get
+            {
+                return false;
+            }
+        }
 
         public WizardBaseController()
         {
@@ -112,7 +152,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 string errorPath = "";
                 string action = "";
                 int id = Assignment.ID;
-                WizardComponent comp = null;
+                WizardBaseController comp = null;
                 if (Request.Form.AllKeys.Contains(previousWizardButton))
                 {
                     comp = manager.GetPreviousComponent();
@@ -130,7 +170,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 {
                     return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute, 
                                           new { 
-                                              controller = manager.ActiveComponent.Name 
+                                              controller = manager.ActiveComponent.ControllerName 
                                               }
                                           );
                 }
@@ -154,7 +194,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             string componentName = Request.Form["ComponentName"];
             manager = WizardComponentManager.GetInstance();
-            WizardComponent componentToFind = manager.GetComponentByName(componentName);
+            WizardBaseController componentToFind = manager.GetComponentByName(componentName);
 
             //start at the beginning
             while (manager.GetPreviousComponent() != null) ;
@@ -167,7 +207,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 {
                     found = true;
                 }
-                else if (manager.ActiveComponent.Name.CompareTo(componentToFind.Name) == 0)
+                else if (manager.ActiveComponent.ControllerName.CompareTo(componentToFind.ControllerName) == 0)
                 {
                     found = true;
                 }
@@ -181,7 +221,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute,
                                     new
                                     {
-                                        controller = componentToFind.Name,
+                                        controller = componentToFind.ControllerName,
                                         action = "Index"
                                     }
                                   );
@@ -195,6 +235,23 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public override string ToString()
         {
             return string.Format("{0}: {1}", this.ControllerName, this.ControllerDescription);
+        }
+
+        private void NotifyPropertyChanged(String info)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(info));
+            }
+        }
+
+        public bool Equals(WizardBaseController other)
+        {
+            if (this.ControllerName.CompareTo(other.ControllerName) == 0)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

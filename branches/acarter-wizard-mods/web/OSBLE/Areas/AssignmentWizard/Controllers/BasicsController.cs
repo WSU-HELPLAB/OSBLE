@@ -43,6 +43,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
+        public override bool IsRequired
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         private void BuildViewBag()
         {
             IEnumerable<Category> categories = new List<Category>();

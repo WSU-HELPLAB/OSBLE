@@ -37,5 +37,31 @@ namespace OSBLE.Models.Assignments
             }
             return formattedValue;
         }
+
+        /// <summary>
+        /// Returns a long-form description of the enumeration.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public static string Description(this AssignmentTypes item)
+        {
+            string description = "";
+            switch (item)
+            {
+                case AssignmentTypes.Basic:
+                    description = "A basic, non-studio assignment.";
+                    break;
+                case AssignmentTypes.CriticalReview:
+                    description = "Peer review assignments have students review the work of others on a previous assignment.";
+                    break;
+                case AssignmentTypes.DiscussionAssignment:
+                    description = "Discussion assignments require students to comment on a particular discussion.";
+                    break;
+                default:
+                    description = "Your run of the mill assignment";
+                    break;
+            }
+            return description;
+        }
 	}
 }

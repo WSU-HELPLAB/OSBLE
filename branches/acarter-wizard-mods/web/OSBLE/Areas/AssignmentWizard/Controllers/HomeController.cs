@@ -65,14 +65,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 manager.DeactivateAllComponents();
             }
             ViewBag.BeginWizardButton = beginWizardButton;
-            return View(manager.AllComponents);
+            return View(manager.GetComponentsForAssignmentType(manager.ActiveAssignmentType));
         }
 
         [HttpPost]
-        public ActionResult SelectComponent(ICollection<WizardComponent> components)
+        public ActionResult SelectComponent(ICollection<WizardBaseController> components)
         {
             ActivateSelectedComponents();
-            return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute, new { controller = manager.ActiveComponent.Name });
+            return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute, new { controller = manager.ActiveComponent.ControllerName });
         }
 
         public ActionResult Summary(int? assignmentId)
@@ -139,7 +139,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 if (key.Substring(0, componentPrefix.Length) == componentPrefix)
                 {
-                    WizardComponent comp = manager.GetComponentByName(Request.Form[key]);
+                    WizardBaseController comp = manager.GetComponentByName(Request.Form[key]);
                     comp.IsSelected = true;
                 }
             }

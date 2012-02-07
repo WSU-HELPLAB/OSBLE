@@ -1,7 +1,7 @@
 ﻿@using OSBLE.Areas.AssignmentWizard.Controllers;
 @using OSBLE.Areas.AssignmentWizard.Models;
 @using System.Collections;
-@model ICollection<WizardComponent>
+@model ICollection<WizardBaseController>
 @{
     ViewBag.Title = "Assignment Creation Wizard";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -16,7 +16,7 @@ Please select the optional components that you would like to use for this assign
 <legend>Components</legend>
 <table>
 @{
-    foreach(WizardComponent component in Model)
+    foreach(WizardBaseController component in Model)
     {
         
         string checkedText = "";
@@ -27,13 +27,15 @@ Please select the optional components that you would like to use for this assign
         if (component.IsRequired)
         {
             //required elements are hidden and automatically selected by the wizard
-            <input type="hidden" name="component_@(component.Name)" value="@(component.Name)" />
+            <tr style="display:none;">
+                <td colspan="2"><input type="hidden" name="component_@(component.ControllerName)" value="@(component.ControllerName)" /></td>
+            </tr>
         }
         else
         {
         <tr>
-            <td><input type="checkbox" id="component_@(component.Name)" name="component_@(component.Name)" value="@(component.Name)" /></td>
-            <td><label for="component_@(component.Name)">@component.Controller.ControllerDescription</label></td>
+            <td><input type="checkbox" id="component_@(component.ControllerName)" name="component_@(component.ControllerName)" value="@(component.ControllerName)" /></td>
+            <td><label for="component_@(component.ControllerName)">@component.ControllerDescription</label></td>
         </tr>
         }
     }

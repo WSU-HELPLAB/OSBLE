@@ -39,6 +39,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
+        public override bool IsRequired
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         /// <summary>
         /// Sets up the viewbag for various controller actions.
         /// </summary>

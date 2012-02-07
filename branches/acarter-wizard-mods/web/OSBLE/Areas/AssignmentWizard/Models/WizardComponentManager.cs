@@ -5,6 +5,7 @@ using System.Web;
 using OSBLE.Models.Assignments;
 using OSBLE.Areas.AssignmentWizard.Controllers;
 using System.ComponentModel;
+using System.Reflection;
 
 namespace OSBLE.Areas.AssignmentWizard.Models
 {
@@ -16,7 +17,42 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         private const string instance = "_wcm_instance";
         private const string activeAssignmentTypeKey = "_wcm_activeAssignmentType";
 
-        public ICollection<WizardComponent> AllComponents
+        private WizardComponentManager()
+        {
+            AllComponents = new List<WizardBaseController>();
+            SelectedComponents = new List<WizardBaseController>();
+            UnselectedComponents = new List<WizardBaseController>();
+            RegisterComponents();
+        }
+
+        /// <summary>
+        /// Singleton pattern implementation.
+        /// </summary>
+        /// <returns></returns>
+        public static WizardComponentManager GetInstance()
+        {
+            //HttpContext will be null when we're not running this code in a web context,
+            //I.E. testing
+            if (HttpContext.Current == null)
+            {
+                return new WizardComponentManager();
+            }
+            else
+            {
+                if (HttpContext.Current.Session[instance] == null)
+                {
+                    WizardComponentManager mgr = new WizardComponentManager();
+                    HttpContext.Current.Session[instance] = mgr;
+                    return mgr;
+                }
+                else
+                {
+                    return HttpContext.Current.Session[instance] as WizardComponentManager;
+                }
+            }
+        }
+
+        public List<WizardBaseController> AllComponents
         {
             get;
             protected set;
@@ -25,12 +61,12 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         /// <summary>
         /// A list of the currently selected wizard components.  DO NOT directly modify this list.
         /// </summary>
-        public ICollection<WizardComponent> SelectedComponents { get; protected set; }
+        public ICollection<WizardBaseController> SelectedComponents { get; protected set; }
 
         /// <summary>
         /// A list of unselected wizard components.  DO NOT directly modify this list.
         /// </summary>
-        public ICollection<WizardComponent> UnselectedComponents { get; protected set; }
+        public ICollection<WizardBaseController> UnselectedComponents { get; protected set; }
 
         public int ActiveAssignmentId
         {
@@ -101,7 +137,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             }
         }
 
-        public WizardComponent ActiveComponent
+        public WizardBaseController ActiveComponent
         {
             get
             {
@@ -109,7 +145,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             }
         }
 
-        public WizardComponent GetNextComponent()
+        public WizardBaseController GetNextComponent()
         {
             if (ActiveComponentIndex < SelectedComponents.Count - 1)
             {
@@ -119,7 +155,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             return null;
         }
 
-        public WizardComponent GetPreviousComponent()
+        public WizardBaseController GetPreviousComponent()
         {
             if (ActiveComponentIndex > 0)
             {
@@ -129,55 +165,27 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             return null;
         }
 
-        public WizardComponent GetComponentByName(string name)
+        public ICollection<WizardBaseController> GetComponentsForAssignmentType(AssignmentTypes type)
         {
-            WizardComponent component = (from c in AllComponents
-                                         where c.Name.CompareTo(name) == 0
+            return AllComponents
+                .Where(a => a.ValidAssignmentTypes.Contains(type))
+                .ToList();
+        }
+
+        public WizardBaseController GetComponentByName(string name)
+        {
+            WizardBaseController component = (from c in AllComponents
+                                         where c.ControllerName.CompareTo(name) == 0
                                          select c).FirstOrDefault();
             return component;
         }
 
-        public WizardComponent GetComponentByType(Type type)
+        public WizardBaseController GetComponentByType(Type type)
         {
-            WizardComponent component = (from c in AllComponents
-                                         where c.Controller.GetType() == type
+            WizardBaseController component = (from c in AllComponents
+                                         where c.GetType() == type
                                          select c).FirstOrDefault();
             return component;
-        }
-
-        private WizardComponentManager()
-        {
-            AllComponents = new List<WizardComponent>();
-            SelectedComponents = new List<WizardComponent>();
-            UnselectedComponents = new List<WizardComponent>();
-            RegisterComponents();
-        }
-
-        /// <summary>
-        /// Singleton pattern implementation.
-        /// </summary>
-        /// <returns></returns>
-        public static WizardComponentManager GetInstance()
-        {
-            //HttpContext will be null when we're not running this code in a web context,
-            //I.E. testing
-            if (HttpContext.Current == null)
-            {
-                return new WizardComponentManager();
-            }
-            else
-            {
-                if (HttpContext.Current.Session[instance] == null)
-                {
-                    WizardComponentManager mgr = new WizardComponentManager();
-                    HttpContext.Current.Session[instance] = mgr;
-                    return mgr;
-                }
-                else
-                {
-                    return HttpContext.Current.Session[instance] as WizardComponentManager;
-                }
-            }
         }
 
         /// <summary>
@@ -186,7 +194,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         /// </summary>
         public void DeactivateAllComponents()
         {
-            foreach (WizardComponent component in AllComponents)
+            foreach (WizardBaseController component in AllComponents)
             {
                 component.IsSelected = false;
             }
@@ -204,7 +212,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             //presently, we only care about selection change
             if (e.PropertyName.CompareTo("IsSelected") == 0)
             {
-                WizardComponent component = sender as WizardComponent;
+                WizardBaseController component = sender as WizardBaseController;
                 if (component.IsSelected)
                 {
                     if (UnselectedComponents.Contains(component))
@@ -268,56 +276,24 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         /// </summary>
         private void RegisterComponents()
         {
-            //AC: Seems like there should be a better (more generic) way to handle this
-            WizardComponent comp;
+            //use reflection to find all available components
+            string componentNamespace = "OSBLE.Areas.AssignmentWizard.Controllers";
+            List<Type> componentObjects = (from type in Assembly.GetExecutingAssembly().GetTypes()
+                           where 
+                           type.IsSubclassOf(typeof(WizardBaseController))
+                           && 
+                           type.Namespace.CompareTo(componentNamespace) == 0
+                           select type).ToList();
 
-            //BASICS COMPONENT
-            comp = new WizardComponent()
+            foreach (Type component in componentObjects)
             {
-                Controller = new BasicsController(),
-                IsSelected = true,
-                IsRequired = true
-            };
-            AllComponents.Add(comp);
-
-            //TEAM ASSIGNMENTS
-            comp = new WizardComponent()
-            {
-                Controller = new TeamController(),
-                IsSelected = true,
-                IsRequired = true
-            };
-            AllComponents.Add(comp);
-
-            //SUBMISSIONS
-            comp = new WizardComponent()
-            {
-                Controller = new DeliverablesController(),
-                IsSelected = false,
-                IsRequired = false
-            };
-            AllComponents.Add(comp);
-
-            //RUBRICS
-            comp = new WizardComponent()
-            {
-                Controller = new RubricController(),
-                IsSelected = false,
-                IsRequired = false
-            };
-            AllComponents.Add(comp);
-
-            //LINE BY LINE REVIEWS (COMMENT CATEGOIRES)
-            comp = new WizardComponent()
-            {
-                Controller = new CommentCategoryController(),
-                IsSelected = false,
-                IsRequired = false
-            };
-            AllComponents.Add(comp); 
+                WizardBaseController controller = Activator.CreateInstance(component) as WizardBaseController;
+                AllComponents.Add(controller);
+            }
+            AllComponents.Sort(new WizardPrerequisiteComparer());            
 
             //attach event listeners to selection change
-            foreach (WizardComponent component in AllComponents)
+            foreach (WizardBaseController component in AllComponents)
             {
                 UnselectedComponents.Add(component);
                 component.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(ComponentPropertyChanged);

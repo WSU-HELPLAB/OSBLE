@@ -39,7 +39,7 @@
             <tr class="@altText">
                 <td><input id="type@(counter)" type="radio" value="@type" name="@ViewBag.AssignmentTypeRadioName" /></td>
                 <td><label for="type@(counter)">@type.Explode()</label></td>
-                <td>@Assignment.GetAssignmentTypeDescription(type)</td>
+                <td>@type.Description()</td>
             </tr>    
             counter++;
         }   

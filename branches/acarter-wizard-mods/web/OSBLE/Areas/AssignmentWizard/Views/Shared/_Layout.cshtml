@@ -18,14 +18,14 @@
     {
         <text>Navigate to section:</text>
         <select id="ComponentNameNavSelect" name="ComponentName">
-        @foreach (WizardComponent component in ViewBag.Components)
+        @foreach (WizardBaseController component in ViewBag.Components)
         {
             string selectedText = "";
-            if (component.Name.CompareTo(ViewBag.ActiveComponent.Name) == 0)
+            if (component.ControllerName.CompareTo(ViewBag.ActiveComponent.Name) == 0)
             {
                 selectedText = "selected=\"selected\"";
             }
-            <option value="@component.Name" @Html.Raw(selectedText)>@component.Name</option>    
+            <option value="@component.ControllerName" @Html.Raw(selectedText)>@component.ControllerName</option>    
         }
         </select>
         <script type="text/javascript">
