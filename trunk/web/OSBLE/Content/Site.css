@@ -879,13 +879,8 @@ body#layoutLogOn
 
 .inbox_table tr
 {
-	background-color: #fafafa;
+	background-color: #e8e8e8;
 	border-bottom: 2px solid #cacaca;
-}
-
-.inbox_table tr:nth-child(even)
-{
-    background: #f2f2f2;
 }
 
 .inbox_table tr.inbox_alternate
@@ -904,9 +899,14 @@ body#layoutLogOn
 	background-color: #f0f0ff;
 }
 
-.inbox_table tr.inbox_unread .inbox_subject
+.inbox_table tr.inbox_unread td
 {
 	font-weight: bold;
+}
+
+.inbox_table tr.inbox_unread
+{
+    background: #fafafa;
 }
 
 .inbox_time, .inbox_time_header
