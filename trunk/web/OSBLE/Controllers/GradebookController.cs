@@ -2262,6 +2262,7 @@ namespace OSBLE.Controllers
             {
                 List<CourseUser> Users = (from user in db.CourseUsers
                                             where user.AbstractCourseID == currentCourseId
+
                                             select user).ToList();
 
                 
@@ -2327,6 +2328,7 @@ namespace OSBLE.Controllers
             //pull the students in the course.  Each student is a row.
             List<CourseUser> students = (from user in db.CourseUsers
                                          where user.AbstractCourseID == currentCourseId && user.AbstractRole.CanSubmit
+                                         orderby user.UserProfile.LastName, user.UserProfile.FirstName
                                          select user).ToList();
                                          
 
