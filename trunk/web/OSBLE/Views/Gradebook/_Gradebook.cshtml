@@ -213,22 +213,22 @@
                     {
                         if (gradableQuery.First().LatePenaltyPercent > 0)
                         {
-                            <td id="@String.Format("{0}-{1}", user.UserProfile.Identification, gradeAssignment.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { assignmentId = gradableQuery.First().AssignmentID, cuId = user.ID}, new { @class = "rubric", @style = "color:Red;" })</td>
+                            <td id="@String.Format("{0}-{1}", user.UserProfile.Identification, gradeAssignment.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.#}", gradableQuery.First().Points), "Index", "Rubric", new { assignmentId = gradableQuery.First().AssignmentID, cuId = user.ID}, new { @class = "rubric", @style = "color:Red;" })</td>
                         }
                         else
                         {                            
-                            <td id="@String.Format("{0}-{1}", user.UserProfile.Identification, gradeAssignment.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", gradableQuery.First().Points), "Index", "Rubric", new { assignmentId = gradableQuery.First().AssignmentID, cuId = user.ID }, new { @class = "rubric" })</td>
+                            <td id="@String.Format("{0}-{1}", user.UserProfile.Identification, gradeAssignment.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.#}", gradableQuery.First().Points), "Index", "Rubric", new { assignmentId = gradableQuery.First().AssignmentID, cuId = user.ID }, new { @class = "rubric" })</td>
                         }
                     }
                     else
                     {
                         if (gradableQuery.First().LatePenaltyPercent > 0)
                         { 
-                            <td id="@String.Format("{0}-{1}", user.UserProfile.Identification, gradeAssignment.ID)" style="font-style:italic; color:Red;"  onclick="cellGainsFocus(event, this)">@gradableQuery.First().Points.ToString(".#")</td>
+                            <td id="@String.Format("{0}-{1}", user.UserProfile.Identification, gradeAssignment.ID)" style="font-style:italic; color:Red;"  onclick="cellGainsFocus(event, this)">@string.Format("{0:0.#}", @gradableQuery.First().Points)</td>
                         }
                         else
                         {
-                            <td id="@String.Format("{0}-{1}", user.UserProfile.Identification, gradeAssignment.ID)" onclick="cellGainsFocus(event, this)">@gradableQuery.First().Points.ToString(".#")</td>
+                            <td id="@String.Format("{0}-{1}", user.UserProfile.Identification, gradeAssignment.ID)" onclick="cellGainsFocus(event, this)">@string.Format("{0:0.#}", @gradableQuery.First().Points)</td>
                         }
                     }
                 }
