@@ -177,9 +177,9 @@
             <td id="@user.UserProfile.Identification" >@user.UserProfile.LastName, @user.UserProfile.FirstName</td>
                     
             @{
-              var percent = from p in ViewBag.Percents as IEnumerable<Score>
-                            where p.CourseUserID == user.ID
-                            select p;
+              List<Score> percent = (from p in ViewBag.Percents as IEnumerable<Score>
+                                     where p.CourseUserID == user.ID
+                                     select p).ToList();
               if (percent.Count() > 0)
               {
                   if (percent.First().Points > 0)
@@ -199,10 +199,11 @@
                 
             @foreach (Assignment gradeAssignment in ViewBag.Assignments)
             {
-                var gradableQuery = from g in gradeAssignment.Scores
+                
+                var gradableQuery = from g in gradeAssignment.Scores as IEnumerable<Score>
                                     where g.AssignmentID == gradeAssignment.ID
                                     && g.CourseUser.UserProfileID == user.UserProfile.ID
-                                    //&& g.Points >= 0
+                                    && g.Points >= 0
                                     select g;
                 //use the stored score if possible.  Otherwise, just use a "0"
                 if (gradableQuery.Count() > 0)
