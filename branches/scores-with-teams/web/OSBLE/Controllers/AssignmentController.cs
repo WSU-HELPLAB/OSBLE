@@ -301,8 +301,7 @@ namespace OSBLE.Controllers
                     }
                     if (!foundMatch)
                     {
-                        Score junkScore = new Score() { Assignment = team.Assignment, AssignmentID = team.AssignmentID };
-                        scoreAndTeam.Add(new Tuple<Score, Team, string>(junkScore, team.Team, submissionTime));
+                        scoreAndTeam.Add(new Tuple<Score, Team, string>(null, team.Team, submissionTime));
                     }
                 }
                 ViewBag.ScoresAndTeams = scoreAndTeam;
