@@ -174,7 +174,10 @@
                 }
                 if (da.Item1 != null)
                 {
+                    if (da.Item1.Points >= 0)
+                    {
                     totalScores++;
+                        }
                 }
                 totalStudentCount++;
             }
@@ -284,13 +287,11 @@
                         }
                         if (found) 
                         {
-                            //Could do a check to see if it is a draft, if it is could say "Draft"
-                            @Html.ActionLink("Saved as Draft", "Index", "Rubric", new { assignmentId = da.Item1.AssignmentID, cuId = da.Item2.TeamMembers.FirstOrDefault().CourseUserID }, new { })
+                            @Html.ActionLink("Saved as Draft", "Index", "Rubric", new { assignmentId = assignment.ID, cuId = da.Item2.TeamMembers.FirstOrDefault().CourseUserID }, new { })
                         }
                         else
                         {
-                            //Could do a check to see if it is a draft, if it is could say "Draft"
-                            @Html.ActionLink("Not Graded", "Index", "Rubric", new { assignmentId = da.Item1.AssignmentID, cuId = da.Item2.TeamMembers.FirstOrDefault().CourseUserID }, new { })
+                            @Html.ActionLink("Not Graded", "Index", "Rubric", new { assignmentId = assignment.ID, cuId = da.Item2.TeamMembers.FirstOrDefault().CourseUserID }, new { })
                         }
 
                     }
