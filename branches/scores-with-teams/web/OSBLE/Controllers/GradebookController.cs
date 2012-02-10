@@ -2369,8 +2369,8 @@ namespace OSBLE.Controllers
                         Score newscore = new Score()
                         {
                             CustomLatePenaltyPercent = -1,
-                            Team = currentTeam,
-                            CourseUser = currentMember,
+                            TeamID = currentTeam.ID,
+                            CourseUserID = currentMember.ID,
                             Points = ((currentPoints / currentTotal) * 100),
                             isDropped = false
                         };
@@ -2380,9 +2380,9 @@ namespace OSBLE.Controllers
                     {
                         Score newscore = new Score()
                         {
-                            Team = currentTeam,
+                            TeamID = currentTeam.ID,
                             CustomLatePenaltyPercent = -1,
-                            CourseUser = currentMember,
+                            CourseUserID = currentMember.ID,
                             Points = ((currentPoints / currentTotal) * 100),
                             isDropped = false
                         };
