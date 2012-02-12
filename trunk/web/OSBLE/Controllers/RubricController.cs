@@ -6,8 +6,8 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using OSBLE.Attributes;
 using OSBLE.Models.Assignments;
-using OSBLE.Models.Assignments.Activities;
-using OSBLE.Models.Assignments.Activities.Scores;
+
+using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.Users;
@@ -154,7 +154,7 @@ namespace OSBLE.Controllers
             else
             {
                 //if nothing exists, we need to build a dummy eval for the view to process
-                viewModel.Evaluation.Recipient = assignmentTeam;
+                viewModel.Evaluation.Recipient = assignmentTeam.Team;
                 viewModel.Evaluation.AssignmentID = assignment.ID;
                 viewModel.Evaluation.EvaluatorID = CurrentUser.ID;
                 foreach (Criterion crit in rubric.Criteria)
@@ -236,7 +236,7 @@ namespace OSBLE.Controllers
                     //normalize the score with the abstract assignment score
                     studentScore *= vm.Evaluation.Assignment.PointsPossible;
 
-                    gradebook.ModifyTeamGrade(studentScore, vm.SelectedAssignment.ID, vm.Evaluation.Recipient.TeamID);
+                    gradebook.ModifyTeamGrade(studentScore, vm.SelectedAssignment.ID, vm.Evaluation.Recipient.ID);
 
 
                 }
@@ -285,7 +285,7 @@ namespace OSBLE.Controllers
                     AssignmentTeam at = GetAssignmentTeam(assignment, cu.UserProfile);
                     ViewBag.AssignmentName = assignment.AssignmentName;
                     ViewBag.PossiblePoints = assignment.PointsPossible;
-                    ViewBag.Score = (from c in assignment.Scores where c.AssignmentTeam.TeamID == at.TeamID select c).FirstOrDefault();
+                    ViewBag.Score = (from c in assignment.Scores where c.TeamID == at.TeamID select c).FirstOrDefault();
                     if (ViewBag.Score != null && ViewBag.Score.Points == -1) //If the score is currently a NG, dont display score (doing this by giving score a null value, handled by view)
                         ViewBag.Score = null;
                     ViewBag.isEditable = false;

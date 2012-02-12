@@ -6,8 +6,8 @@ using OSBLE.Attributes;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
-using OSBLE.Models.Assignments.Activities.Scores;
-using OSBLE.Models.Assignments.Activities;
+using OSBLE.Models.Assignments;
+
 using OSBLE.Models.Assignments;
 using System.IO;
 using System.Web;
@@ -233,9 +233,9 @@ namespace OSBLE.Controllers
                                             
                                             Score newScore = new Score()
                                             {
-                                                AssignmentTeam = currentTeam,
+                                                Team = currentTeam.Team,
                                                 CustomLatePenaltyPercent = -1,
-                                                TeamMember = currentUser,
+                                                CourseUser = currentUser.CourseUser,
                                                 Points = points,
                                                 AssignmentID = currentAssignment.ID,                                                
                                                 PublishedDate = DateTime.Now,
@@ -399,7 +399,7 @@ namespace OSBLE.Controllers
                 {
 
                     List<Score> userScore = (from score in allScores
-                                             where score.TeamMember.CourseUser.UserProfileID == up.ID &&
+                                             where score.CourseUser.UserProfileID == up.ID &&
                                              score.Assignment.CategoryID == category.ID
                                              select score).ToList();
 
@@ -419,7 +419,7 @@ namespace OSBLE.Controllers
                     //studentCategoryPossible = 0;                   
 
                     List<Score> totalScores = (from score in allScores
-                                               where score.TeamMember.CourseUser.UserProfileID == up.ID &&
+                                               where score.CourseUser.UserProfileID == up.ID &&
                                                score.Assignment.CategoryID == category.ID
                                                select score).ToList();
                     if (totalScores.Count() > 0)
@@ -480,7 +480,7 @@ namespace OSBLE.Controllers
                     double categoryPossible = 0;
                     double categoryPercent = 0;
                     List<Score> userScores = (from score in allScores
-                                              where score.TeamMember.CourseUser.UserProfileID == up.ID &&
+                                              where score.CourseUser.UserProfileID == up.ID &&
                                               score.Assignment.CategoryID == category.ID
                                               select score).ToList();
 
@@ -784,7 +784,7 @@ namespace OSBLE.Controllers
                                              select scores).ToList();
 
                     var studentScores = (from scores in scoreList
-                                         where scores.TeamMember.CourseUserID == user.ID &&
+                                         where scores.CourseUserID == user.ID &&
                                          scores.isDropped == true
                                          select scores);
 
@@ -846,7 +846,7 @@ namespace OSBLE.Controllers
                                              select scores).ToList();
 
                     var studentScores = (from scores in scoreList
-                                         where scores.TeamMember.CourseUserID == user.ID
+                                         where scores.CourseUserID == user.ID
                                          select scores);
 
                     Category currentCategory = (from cat in db.Categories where cat.ID == categoryId select cat).FirstOrDefault();
@@ -924,7 +924,7 @@ namespace OSBLE.Controllers
 
                         var studentScores = (from scores in scoreList
                                              orderby scores.Points / scores.Assignment.PointsPossible
-                                             select scores).GroupBy(s => s.TeamMember.CourseUserID);
+                                             select scores).GroupBy(s => s.CourseUserID);
 
                         if (studentScores.Count() > 0)
                         {
@@ -1630,7 +1630,7 @@ namespace OSBLE.Controllers
                                                  select g).ToList();
 
                     Score grades = (from grade in gradableQuery
-                                    where grade.TeamMember.CourseUserID == userTeamMember.CourseUserID
+                                    where grade.CourseUserID == userTeamMember.CourseUserID
                                     select grade).FirstOrDefault();
 
 
@@ -1708,9 +1708,9 @@ namespace OSBLE.Controllers
 
                             Score newScore = new Score()
                             {
-                                AssignmentTeam = userAssignmentTeam,
+                                Team = userAssignmentTeam.Team,
                                 CustomLatePenaltyPercent = -1,
-                                TeamMember = userTeamMember,
+                                CourseUser = userTeamMember.CourseUser,
                                 Points = value,
                                 AssignmentID = currentAssignment.ID,
                                 PublishedDate = DateTime.Now,
@@ -1756,7 +1756,7 @@ namespace OSBLE.Controllers
                         List<Score> assignmentScores = currentAssignment.Scores.ToList();
 
                         Score studentScore = (from score in assignmentScores
-                                              where score.TeamMember.CourseUserID == student.ID
+                                              where score.CourseUserID == student.ID
                                               select score).FirstOrDefault();
 
                         Category currentCategory = currentAssignment.Category;
@@ -1808,9 +1808,9 @@ namespace OSBLE.Controllers
 
                             Score newScore = new Score()
                             {
-                                AssignmentTeam = currentAssignmentTeam,
+                                Team = currentAssignmentTeam.Team,
                                 CustomLatePenaltyPercent = -1,
-                                TeamMember = currentTeamMember,
+                                CourseUser = currentTeamMember.CourseUser,
                                 Points = -1,
                                 AssignmentID = currentAssignment.ID,
                                 PublishedDate = DateTime.Now,
@@ -2000,7 +2000,7 @@ namespace OSBLE.Controllers
                                                  select points).ToList();
 
                         List<Score> userScores = (from points in allScores
-                                                  where points.TeamMember.CourseUser.UserProfileID == up.ID
+                                                  where points.CourseUser.UserProfileID == up.ID
                                                   select points).ToList();
 
                         if (userScores.Count() > 0)
@@ -2064,7 +2064,7 @@ namespace OSBLE.Controllers
                                                 select categoryTotal).ToList();
 
             List<Score> userCategoryTotalPercent = (from userCategoryTotal in categoryTotalPercent
-                                                    where userCategoryTotal.TeamMember.CourseUserID == currentUser.ID
+                                                    where userCategoryTotal.CourseUserID == currentUser.ID
                                                     select userCategoryTotal).ToList();
 
             List<Category> categoriesWithWeightsAndScores = (from cats in categoryTotalPercent
@@ -2159,7 +2159,7 @@ namespace OSBLE.Controllers
                                        select scores).ToList();
 
             List<Score> userScores = (from score in totalScores
-                                      where score.TeamMember.CourseUserID == currentUser.ID
+                                      where score.CourseUserID == currentUser.ID
                                       select score).ToList();
 
 
@@ -2344,7 +2344,7 @@ namespace OSBLE.Controllers
             var userScore = from scores in scor
                             where scores.isDropped == false
                             && scores.Points >= 0
-                            group scores by scores.AssignmentTeam.Team.Name into userScores
+                            group scores by scores.Team.Name into userScores
                             select userScores;
 
             if (userScore.Count() > 0)
@@ -2353,15 +2353,15 @@ namespace OSBLE.Controllers
                 {
                     double currentPoints = 0;
                     double currentTotal = 0;
-                    AssignmentTeam currentTeam = new AssignmentTeam();
-                    TeamMember currentMember = new TeamMember();
+                    Team currentTeam = new Team();
+                    CourseUser currentMember = new CourseUser();
                     var item = userScore.AsEnumerable().ElementAt(i);
                     var currentAssignment = item.First().Assignment;
 
                     foreach (Score a in item)
                     {
-                        currentTeam = a.AssignmentTeam;
-                        currentMember = a.TeamMember;
+                        currentTeam = a.Team;
+                        currentMember = a.CourseUser;
                         currentPoints += a.Points;
                         currentTotal += a.Assignment.PointsPossible;
                     }
@@ -2371,8 +2371,8 @@ namespace OSBLE.Controllers
                         Score newscore = new Score()
                         {
                             CustomLatePenaltyPercent = -1,
-                            AssignmentTeam = currentTeam,
-                            TeamMember = currentMember,
+                            TeamID = currentTeam.ID,
+                            CourseUserID = currentMember.ID,
                             Points = ((currentPoints / currentTotal) * 100),
                             isDropped = false
                         };
@@ -2382,9 +2382,9 @@ namespace OSBLE.Controllers
                     {
                         Score newscore = new Score()
                         {
-                            AssignmentTeam = currentTeam,
+                            TeamID = currentTeam.ID,
                             CustomLatePenaltyPercent = -1,
-                            TeamMember = currentMember,
+                            CourseUserID = currentMember.ID,
                             Points = ((currentPoints / currentTotal) * 100),
                             isDropped = false
                         };
@@ -2417,7 +2417,7 @@ namespace OSBLE.Controllers
             int currentCourseId = ActiveCourse.AbstractCourseID;
 
             //List to store teamUserMembers
-            List<TeamUserMember> userMembers = new List<TeamUserMember>();
+            List<TeamMember> userMembers = new List<TeamMember>();
 
             //By default, select the first tab
             var categoryQuery = from category in db.Categories
@@ -2431,7 +2431,7 @@ namespace OSBLE.Controllers
                 Category category = categoryQuery.First();
                 return category.ID;
             }
-            //ELSE: create a new tab and an anitial gradable
+            //ELSE: create a new tab and an initial gradable
             else
             {
                 Category newCategory = new Category()
@@ -2450,44 +2450,7 @@ namespace OSBLE.Controllers
                                             where user.AbstractCourseID == currentCourseId
                                             select user).ToList();
 
-                foreach (CourseUser u in Users)
-                {
-                    UserMember userMember = new UserMember()
-                    {
-                        UserProfile = u.UserProfile,
-                        UserProfileID = u.UserProfileID
-                    };
-                    userMembers.Add(userMember);
-                    db.TeamUsers.Add(userMember);
-                }
-                db.SaveChanges();
-
-                StudioAssignment newAssignment = new StudioAssignment()
-                {
-                    Name = "Untitled",
-                    //PointsPossible = 100,
-                    AssignmentActivities = new List<AbstractAssignmentActivity>(),
-                    CategoryID = newCategory.ID,
-                    ColumnOrder = 1,
-                    Description = "No description",
-                    IsDraft = false
-                };
-                db.StudioAssignments.Add(newAssignment);
-                db.SaveChanges();
-
-                AbstractAssignmentActivity newActivity = new GradeActivity()
-                {
-                    AbstractAssignmentID = newAssignment.ID,
-                    Name = "Untitled",
-                    PointsPossible = newAssignment.PointsPossible,
-                    AbstractAssignment = newAssignment,
-                    TeamUsers = userMembers
-                    /*ColumnOrder = 0,
-                    Scores = new List<Score>()*/
-                };
-                db.AbstractAssignmentActivities.Add(newActivity);
-                db.SaveChanges();
-
+                
                 //with a new weight / gradable combo created, we can
                 //call Index() to finish
                 //off the rendering

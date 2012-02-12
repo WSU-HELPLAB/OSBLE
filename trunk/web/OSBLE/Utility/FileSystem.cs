@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using Ionic.Zip;
-using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Services.Uploader;
 using OSBLE.Models.Users;

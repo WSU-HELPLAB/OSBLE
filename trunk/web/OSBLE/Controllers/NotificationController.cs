@@ -4,7 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Net.Mail;
 using System.Web.Mvc;
-using OSBLE.Models.Assignments.Activities;
+
 using OSBLE.Models.Courses;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
@@ -168,33 +168,31 @@ namespace OSBLE.Controllers
         }
 
         [NonAction]
-        public void SendInlineReviewCompletedNotification(Assignment assignment, AssignmentTeam team)
+        public void SendInlineReviewCompletedNotification(Assignment assignment, Team team)
         {
-            List<CourseUser> users = GetAllCourseUsers(team);
 
-            foreach (CourseUser user in users)
+            foreach (TeamMember member in team.TeamMembers)
             {
                 Notification n = new Notification();
                 n.ItemType = Notification.Types.InlineReviewCompleted;
-                n.Data = assignment.ID.ToString() + ";" + team.TeamID.ToString() + ";" + assignment.AssignmentName;
-                n.RecipientID = user.ID;
+                n.Data = assignment.ID.ToString() + ";" + team.ID.ToString() + ";" + assignment.AssignmentName;
+                n.RecipientID = member.CourseUserID;
                 n.SenderID = activeCourse.ID;
                 addNotification(n);
             }
         }
 
         [NonAction]
-        public void SendRubricEvaluationCompletedNotification(Assignment assignment, AssignmentTeam team)
+        public void SendRubricEvaluationCompletedNotification(Assignment assignment, Team team)
         {
-            List<CourseUser> users = GetAllCourseUsers(team);
 
-            foreach (CourseUser user in users)
+            foreach (TeamMember member in team.TeamMembers)
             {
                 Notification n = new Notification();
                 n.ItemType = Notification.Types.RubricEvaluationCompleted;
-                n.Data = assignment.ID.ToString() + ";" + team.TeamID.ToString() + ";" + assignment.AssignmentName;
-                
-                n.RecipientID = user.ID;
+                n.Data = assignment.ID.ToString() + ";" + team.ID.ToString() + ";" + assignment.AssignmentName;
+
+                n.RecipientID = member.CourseUser.ID;
                 n.SenderID = activeCourse.ID;
                 addNotification(n);
             }

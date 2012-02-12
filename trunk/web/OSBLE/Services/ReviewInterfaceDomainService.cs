@@ -8,7 +8,7 @@
     using System.Web;
     using OSBLE.Controllers;
     using OSBLE.Models.AbstractCourses;
-    using OSBLE.Models.Assignments.Activities;
+    
     using OSBLE.Models.Courses;
     using OSBLE.Models.Users;
     using OSBLE.Models.ViewModels.ReviewInterface;
@@ -131,7 +131,7 @@
                 {
                     sw.Write(str);
                 }
-                new NotificationController().SendInlineReviewCompletedNotification(assignment, team);
+                new NotificationController().SendInlineReviewCompletedNotification(assignment, team.Team);
             }
         }
 

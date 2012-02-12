@@ -1,9 +1,8 @@
 ﻿@using OSBLE.Controllers;
 @using OSBLE.Models.Courses;
 @using OSBLE.Models.Assignments;
-@using OSBLE.Models.Assignments.Activities.Scores;
-@using OSBLE.Models.Users
-@using OSBLE.Models.Assignments.Activities
+@using OSBLE.Models.Assignments;
+@using OSBLE.Models.Users;
 @using OSBLE.Utility;
 @{
     Layout = null;
@@ -201,7 +200,7 @@
                         {
                             List<Score> userScore = (from score in ViewBag.AllGrades as IEnumerable<Score>
                                                      where score.Assignment.CategoryID == category.ID &&
-                                                     score.TeamMember.CourseUser.UserProfileID == user.ID
+                                                     score.CourseUser.UserProfileID == user.ID
                                                      select score).ToList();
 
                             if (userScore.Count() == 0)
@@ -219,7 +218,7 @@
                             double categoryTotal = 0;
 
                             List<Score> totalScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
-                                                       where score.TeamMember.CourseUser.UserProfileID == user.ID &&
+                                                       where score.CourseUser.UserProfileID == user.ID &&
                                                        score.Assignment.CategoryID == category.ID
                                                        select score).ToList();
                             if (totalScores.Count() > 0)
@@ -379,7 +378,7 @@
                       if (c.Name != Constants.UnGradableCatagory)
                       {
                           List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
-                                                    where score.TeamMember.CourseUser.UserProfileID == student.ID &&
+                                                    where score.CourseUser.UserProfileID == student.ID &&
                                                     score.Assignment.CategoryID == c.ID
                                                     select score).ToList();
                           if (userScores.Count() == 0)
@@ -394,7 +393,7 @@
                       if (c.Name != Constants.UnGradableCatagory)
                       {
                           List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
-                                                    where score.TeamMember.CourseUser.UserProfileID == student.ID &&
+                                                    where score.CourseUser.UserProfileID == student.ID &&
                                                     score.Assignment.CategoryID == c.ID
                                                     select score).ToList();
 
@@ -462,7 +461,7 @@
                       if (c.Name != Constants.UnGradableCatagory)
                       {
                           List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
-                                                    where score.TeamMember.CourseUser.UserProfileID == student.ID &&
+                                                    where score.CourseUser.UserProfileID == student.ID &&
                                                     score.Assignment.CategoryID == c.ID
                                                     select score).ToList();
 

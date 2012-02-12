@@ -1,7 +1,7 @@
 ﻿@using OSBLE.Controllers;
 @using OSBLE.Models.Courses;
 @using OSBLE.Models.Assignments;
-@using OSBLE.Models.Assignments.Activities.Scores;
+@using OSBLE.Models.Assignments;
 @using OSBLE.Models.Users
 @using OSBLE.Utility;
 @{
@@ -198,7 +198,7 @@
                             List<Score> userScore = (from score in ViewBag.CategoryTotalPercent as IEnumerable<Score>
                                                      where score.Assignment.CategoryID == category.ID &&
                                                      score.Points >= 0 &&
-                                                     score.TeamMember.CourseUserID == user.ID &&
+                                                     score.CourseUserID == user.ID &&
                                                      score.isDropped == false
                                                      select score).ToList();
 
@@ -219,7 +219,7 @@
                             double categoryTotal = 0;
 
                             List<Score> totalScores = (from score in ViewBag.CategoryTotalPercent as IEnumerable<Score>
-                                                       where score.TeamMember.CourseUserID == user.ID &&
+                                                       where score.CourseUserID == user.ID &&
                                                        score.Assignment.CategoryID == category.ID &&
                                                        score.Points >= 0 &&
                                                        score.isDropped == false
