@@ -162,62 +162,55 @@
         </tr>
     }
     
-        @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+    @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+    {
+        int submittedCount = 0;
+        int totalStudentCount = 0;
+        int totalScores = 0;
+        foreach (Tuple<Score, Team, string> da in ViewBag.ScoresAndTeams)
         {
-            int submittedCount = 0;
-            int totalStudentCount = 0;
-            int totalScores = 0;
-            foreach (Tuple<Score, Team, string> da in ViewBag.ScoresAndTeams)
+            if (da.Item3 != "No Submission")
             {
-                if (da.Item3 != "No Submission")
+                submittedCount++;
+            }
+            if (da.Item1 != null)
+            {
+                if (da.Item1.Points >= 0)
                 {
-                    submittedCount++;
-                }
-                if (da.Item1 != null)
-                {
-                    if (da.Item1.Points >= 0)
-                    {
                     totalScores++;
-                        }
                 }
-                totalStudentCount++;
             }
-            List<OSBLE.Models.Courses.Rubrics.RubricEvaluation> r = ViewBag.RubricEvals;
-            if (assignment.HasDeliverables)
-            {
-                <tr>
-                    <td><text class="osbleColorBold">Submissions:</text></td>
-                    @if (submittedCount > 0)
-                    {
-                        <td>@submittedCount of @totalStudentCount have been submitted <button style="float:right">Download All</button></td>    
-                    }
-                    else
-                    {
-                        <td>@submittedCount of @totalStudentCount have been submitted</td>
-                    }
-                </tr>
-                <tr>
-                    <td><text class="osbleColorBold">Grading progress:</text></td>
-                    <td>@r.Count() of @assignment.AssignmentTeams.Count() have been saved as draft <button style="float:right;" onclick="publishAllGrades(@assignment.ID);">Publish All</button></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>@totalScores of @assignment.AssignmentTeams.Count() have been graded</td>
-                </tr>
-            }
-            else
-            {
-                <tr>
-                    <td><text class="osbleColorBold">Grading Progress:</text></td>
-                    <td>@r.Count() of @assignment.AssignmentTeams.Count() have been saved as draft<button onclick="publishAllGrades(@assignment.ID);">Publish All</button></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>@totalScores of @assignment.AssignmentTeams.Count() have been graded</td>
-                </tr>
-            }
-
-        }   
+            totalStudentCount++;
+        }
+        List<OSBLE.Models.Courses.Rubrics.RubricEvaluation> r = ViewBag.RubricEvals;
+        if (assignment.HasDeliverables)
+        {
+            @:<tr>
+                <td><text class="osbleColorBold">Submissions:</text></td>
+                if (submittedCount > 0)
+                {
+                    <td>@submittedCount of @totalStudentCount have been submitted&nbsp @Html.ActionLink("[Download All]", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()", style="text-decoration:none"})</td>    
+                }
+                else
+                {
+                    <td>@submittedCount of @totalStudentCount have been submitted</td>
+                }
+        }
+        <tr>
+            <td style="vertical-align:top"><text class="osbleColorBold" >Grading progress:</text></td>
+            <td>
+                @totalScores of @assignment.AssignmentTeams.Count() have been published<br />
+                @if(r.Count() > 0)
+                {
+                    @:@r.Count() have been saved as draft&nbsp<a style="cursor:pointer" onclick="publishAllGrades(@assignment.ID);">[Publish All]</a>
+                }
+                else
+                {
+                    @:@r.Count() have been saved as draft
+                }
+            </td>
+        </tr>
+    }   
    
     
         
@@ -373,7 +366,7 @@
 </table>
     if (assignment.HasDeliverables)
     {
-        <br />@Html.ActionLink("Download all submissions for this activity", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+        <br />
     }
 }
 
