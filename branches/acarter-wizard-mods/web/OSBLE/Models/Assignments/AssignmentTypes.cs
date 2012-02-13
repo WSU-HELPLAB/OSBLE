@@ -9,7 +9,8 @@ namespace OSBLE.Models.Assignments
     { 
         Basic = 1, 
         CriticalReview = 2, 
-        DiscussionAssignment = 3 
+        DiscussionAssignment = 3,
+        TeamEvaluation = 4
     };
 
 	public static class AssignmentTypeExtensions

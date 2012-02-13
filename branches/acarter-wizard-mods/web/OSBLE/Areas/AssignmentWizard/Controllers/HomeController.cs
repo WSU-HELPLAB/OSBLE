@@ -58,6 +58,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 int aid = (int)assignmentId;
                 manager.ActiveAssignmentId = aid;
                 ActivateAssignmentComponents(db.Assignments.Find(aid));
+                Assignment assignment = db.Assignments.Find(aid);
+                manager.SetActiveAssignmentType((AssignmentTypes)assignment.AssignmentTypeID);
             }
             else
             {

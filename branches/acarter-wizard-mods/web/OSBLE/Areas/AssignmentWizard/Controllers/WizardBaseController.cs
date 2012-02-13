@@ -10,6 +10,7 @@ using System.Runtime.Remoting;
 using OSBLE.Controllers;
 using OSBLE.Areas.AssignmentWizard.Models;
 using System.ComponentModel;
+using OSBLE.Attributes;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -114,6 +115,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             ViewBag.Title = "Assignment Creation Wizard";
         }
 
+        [CanModifyCourse]
         public virtual ActionResult Index()
         {
             Assignment = new Assignment();

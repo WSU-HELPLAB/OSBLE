@@ -165,6 +165,7 @@
     <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\ContentController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\PreviousAssignmentController.cs" />
     <Compile Include="Areas\AssignmentWizard\Models\WizardPrerequisiteComparer.cs" />
     <Compile Include="Attributes\CanPostEvent.cs" />
