@@ -431,20 +431,20 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="assignmentId"></param>
         [CanModifyCourse]
-        public void ModifyLatePenalty(int scoreId, string userIdentification, double latePenalty, int assignmentId)
+        public void ModifyLatePenalty(int scoreId, int courseUserId, double latePenalty, int assignmentId)
         {
             if (scoreId > 0)
             {
                 Score score = db.Scores.Find(scoreId);
                 score.CustomLatePenaltyPercent = latePenalty;
                 db.SaveChanges();
-                new GradebookController().ModifyGrade(score.RawPoints, userIdentification, score.AssignmentID);
+                new GradebookController().ModifyGrade(score.RawPoints, courseUserId, score.AssignmentID);
             }
             else if (scoreId == 0)
             {
-                new GradebookController().ModifyGrade(-1, userIdentification, assignmentId);
+                new GradebookController().ModifyGrade(-1, courseUserId, assignmentId);
                 Score score = (from s in db.Scores
-                               where s.CourseUser.UserProfile.Identification == userIdentification &&
+                               where s.CourseUser.ID == courseUserId &&
                                s.AssignmentID == assignmentId
                                select s).FirstOrDefault();
 

@@ -443,7 +443,7 @@ namespace OSBLE.Controllers
             double returnVal;
             if (lateness.TotalHours < assignment.HoursLateWindow)
             {
-                returnVal = lateness.TotalHours * assignment.DeductionPerHourLate;
+                returnVal = lateness.TotalHours * assignment.DeductionPerUnit;
 
                 if (returnVal > 100)
                 {

@@ -347,26 +347,16 @@
             }
         }
         <!--loop through all users -->
-        @foreach (UserProfile student in ViewBag.Students)
+        @foreach (CourseUser student in ViewBag.CoursesUser)
         {        
             <tr id="studentGrades">
                 <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
                 @{r++;}
 
             @{
+                 <td>@student.Section</td>                                               
                 
-                  List<CourseUser> courseUser = (from course in ViewBag.CoursesUser as IEnumerable<CourseUser>
-                                                   where course.UserProfileID == student.ID
-                                                   select course).ToList();
-                  if (courseUser.Count() > 0)
-                  {
-                      foreach (CourseUser item in courseUser)
-                      {
-                           <td>@item.Section</td>
-                      }
-                  }                                                   
-                
-                <td id="@student.ID" >@student.LastName, @student.FirstName</td>   
+                <td id="@student.ID" >@student.UserProfile.LastName, @student.UserProfile.FirstName</td>   
                 
                   totalGrade = 0;
                   totalCategoryPoints = 0;
@@ -481,16 +471,16 @@
                               //It didn't like to put a 0, so I had to use string format to make it display
                               if (totalCategoryGrade == 0)
                               {
-                                  <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.Identification)" style="cursor:pointer;">@String.Format("{0}", 0)%</td>
+                                  <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.ID)" style="cursor:pointer;">@String.Format("{0}", 0)%</td>
                               }
                               else
                               {
-                                  <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.Identification)" style="cursor:pointer;">@totalCategoryGrade.ToString(".#")%</td>
+                                  <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.ID)" style="cursor:pointer;">@totalCategoryGrade.ToString(".#")%</td>
                               }
                           }
                           else
                           {
-                              <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.Identification)" style="cursor:pointer;">NG</td>
+                              <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.ID)" style="cursor:pointer;">NG</td>
                           }
                       }
                   }

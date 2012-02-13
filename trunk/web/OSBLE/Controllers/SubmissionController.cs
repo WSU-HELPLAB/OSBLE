@@ -31,6 +31,10 @@ namespace OSBLE.Controllers
                     if (assignment.Category.CourseID == activeCourse.AbstractCourseID && activeCourse.AbstractRole.CanSubmit == true)
                     {
                         setViewBagDeliverables((assignment).Deliverables);
+
+                        //ViewBag.PrecAssignment = (from a in db.Assignments where a.HasTeams select a).FirstOrDefault();
+                        ViewBag.AssignmentTeam = GetAssignmentTeam(assignment, currentUser);
+                        
                         return View();
                     }
                     else if(activeCourse.AbstractRole.CanGrade == true) 
@@ -89,7 +93,6 @@ namespace OSBLE.Controllers
                         throw new Exception("Cannot submit to an assignmentActivity that already has a score");
                 }
 
-                //purposefully not using the is statement as we also want to make sure it is not a null SubmissionActivity
                 if (assignment != null && assignment.HasDeliverables == true)
                 {
                     List<dynamic> deliverables = new List<dynamic>((assignment).Deliverables);
@@ -182,7 +185,7 @@ namespace OSBLE.Controllers
                                 string inbrowser = Request.Params["inBrowserText[" + j + "]"];
                                 if (inbrowser.Length > 0)
                                 {
-                                    var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, assignmentTeam), delName + ".txt");
+                                    var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, assignmentTeam), currentUser.LastName + "_" + currentUser.FirstName + "_" + delName + ".txt");
                                     System.IO.File.WriteAllText(path, inbrowser);
                                 }
                             }

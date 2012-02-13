@@ -21,6 +21,7 @@ namespace OSBLE.Models.Assignments
             IsDraft = true;
             addedPoints = 0;
             IsWizardAssignment = true;
+            Scores = new List<Score>();
         }
 
         [Key]
@@ -151,12 +152,16 @@ namespace OSBLE.Models.Assignments
         }
 
         [Required(ErrorMessage = "Please specify for how long OSBLE should accept late submissions")]
-        [Display(Name = "Late Assignment Window (Hours)")]
+        [Display(Name = "Assignments Accepted Late For")]
         public int HoursLateWindow { get; set; }
 
         [Required(ErrorMessage = "Please specify the percent that should be deducted per hour late")]
-        [Display(Name = "Percent Deduction Per Late Hour")]
-        public double DeductionPerHourLate { get; set; }
+        [Display(Name = "Penalty of")]
+        public double DeductionPerUnit { get; set; }
+
+        [Required(ErrorMessage = "Please specify the hours per percent deduction.")]
+        [Display(Name = "hour(s) late")]
+        public double HoursPerDeduction { get; set; }
 
         [Required]
         public int ColumnOrder { get; set; }

@@ -127,10 +127,10 @@ namespace OSBLE.Models
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
+           
 #if !DEBUG
             modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
-#endif   
+#endif
             modelBuilder.Entity<Notification>()
                 .HasRequired(n => n.Sender)
                 .WithMany()

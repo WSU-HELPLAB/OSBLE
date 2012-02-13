@@ -337,11 +337,11 @@
 
                     if (studentScore.Count() > 0)
                     {
-                        <td id="@String.Format("{0}-{1}", cu.UserProfile.Identification, assignment.ID)" onclick="cellGainsFocus(event, this);" style="color:Gray; font-style:italic;">@studentScore.First().StudentPoints</td>
+                        <td id="@String.Format("{0}-{1}", cu.ID, assignment.ID)" onclick="cellGainsFocus(event, this);" style="color:Gray; font-style:italic;">@studentScore.First().StudentPoints</td>
                     }
                     else
                     {
-                        <td id="@String.Format("{0}-{1}", cu.UserProfile.Identification, assignment.ID)" onclick="cellGainsFocus(event, this);" style="color:Gray; font-style:italic;">NG</td>
+                        <td id="@String.Format("{0}-{1}", cu.ID, assignment.ID)" onclick="cellGainsFocus(event, this);" style="color:Gray; font-style:italic;">NG</td>
                     }
                 }
             }

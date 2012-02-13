@@ -45,7 +45,7 @@
                         {
                             string[] args = n.Data.Split(new char[] { ';' });
                             <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> has published an
-                            @Html.ActionLink("inline review", "ViewInlineReview", "Assignment", new { abstractAssignmentActivityId = args[0], teamUserID = args[1] }, new { }) of your @args[2]</text>
+                            @Html.ActionLink("inline review", "ViewInlineReview", "Assignment", new { assignmentID = args[0], teamID = args[1] }, new { }) of your @args[2]</text>
                             break;
                         }
                     case Notification.Types.RubricEvaluationCompleted:

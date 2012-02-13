@@ -1701,3 +1701,24 @@ ul.assignment_deliverables, .assignment_deliverables ul
 {
     cursor:pointer;
 }
+
+#DeductionPerUnit
+{
+    width: 175px;
+}
+
+#HoursPerDeduction
+{
+    width: 176px;
+}
+
+#assignmentDetailsHeader
+{
+    border: 1px solid #074974;
+    border-collapse: collapse;
+}
+
+#assignmentDetailsHeader th, #assignmentDetailsHeader tr, #assignmentDetailsHeader td
+{
+    border: 1px solid #074974;
+}

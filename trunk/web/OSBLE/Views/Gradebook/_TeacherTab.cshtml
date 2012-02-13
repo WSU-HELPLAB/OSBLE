@@ -175,17 +175,17 @@
     <input id="studentId" type="hidden" value="@studentId" />
 
     
-    <div id='import_grades_from_csv'  title="Import file">Upload a comma-separated (CSV) file of student grades:<br /><br />
+    <div id='import_grades_from_csv'  title="Import file">Upload a comma-separated (CSV) file containing student scores:<br /><br />
         
 
         @using (Html.BeginForm("ImportColumnsFromCSV", "Gradebook", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             <span><input type="radio" name="rdio" value="r" checked="checked" />Import to the right of this column</span><br />
             <span><input type="radio" name="rdio" value="l"/>Import to the left of this column</span><br /><br />
-            <span><input type="checkbox"/>Overwrite values in this column</span><br /><br />
+            @*<span><input type="checkbox"/>Overwrite values in this column</span><br /><br />*@
             <input type="hidden" name="assignmentColumnId" id="column_assignment_id" />
-            <input type="file" id="file" name="file" />
-            <input type="submit" value="Upload File" />
+            <input type="file" id="file" name="file" size="2" />
+            <input type="submit" value="Begin Import Process..." />
         }
     </div>
     <br />
@@ -792,7 +792,7 @@
                     $.ajax({
                         type: "POST",
                         url: "/Gradebook/ModifyCell",
-                        data: { value: cellValue, userIdentification: ajaxIDs[0], assignmentId: ajaxIDs[1] },
+                        data: { value: cellValue, courseUserId: ajaxIDs[0], assignmentId: ajaxIDs[1] },
                         success: function (response) {
                             if ($("#numDropped").val() >= 1) {
                                 DropLowest(ajaxIDs[0]);

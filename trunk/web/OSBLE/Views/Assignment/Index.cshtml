@@ -64,7 +64,7 @@
         @if (ViewBag.PastAssignments.Count > 0)
         {
             //Needed a way to put blank space in a table, only when the previous assignment category had
-            <tr><td style="padding-bottom:10px"></td></tr>
+            //<tr><td style="padding-bottom:10px"></td></tr>
             <tr><td colspan="100%" style="padding-right:0" class="osbleColorBold">Past (@ViewBag.PastAssignments.Count)</td></tr>
         }
         @foreach (Assignment a in ViewBag.PastAssignments)

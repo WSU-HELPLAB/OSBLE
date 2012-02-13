@@ -52,12 +52,13 @@
 </tr>
 <tr>
     <th>@Html.LabelFor(m => m.HoursLateWindow):</th>
-    <td>@Html.EditorFor(m => m.HoursLateWindow)</td>
+    <td>@Html.EditorFor(m => m.HoursLateWindow) hour(s)</td>
     <td>@Html.ValidationMessageFor(m => m.HoursLateWindow)</td>
 </tr>
 <tr>
-    <th>@Html.LabelFor(m => m.DeductionPerHourLate):</th>
-    <td>@Html.EditorFor(m => m.DeductionPerHourLate)</td>
-    <td>@Html.ValidationMessageFor(m => m.DeductionPerHourLate)</td>
+    <th>@Html.LabelFor(m => m.DeductionPerUnit):</th>
+    <td>@Html.EditorFor(m => m.DeductionPerUnit)% per @Html.EditorFor(m => m.HoursPerDeduction) @Html.LabelFor(m => m.HoursPerDeduction)</td>
+    <td>@Html.ValidationMessageFor(m => m.DeductionPerUnit)</td>
+    <td>@Html.ValidationMessageFor(m => m.HoursPerDeduction)</td>
 </tr>
 </table>
