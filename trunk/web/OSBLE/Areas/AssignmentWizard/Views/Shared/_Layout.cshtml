@@ -12,29 +12,36 @@
 }
 <div id="WizardContent">
 <h1>@ViewBag.ComponentName</h1>
-@using (Html.BeginForm("QuickNav", null, FormMethod.Post, new {id = "QuickNavForm" }))
+
+@using (Html.BeginForm("QuickNav", null, FormMethod.Post, new { id = "QuickNavForm" }))
 {
-    if (ViewBag.Assignment.ID != 0)
-    {
-        <text>Navigate to section:</text>
-        <select id="ComponentNameNavSelect" name="ComponentName">
-        @foreach (WizardComponent component in ViewBag.Components)
+<input type="hidden" id="ComponentNameNavSelect" name="ComponentName" />
+<table>
+    <tr>
+        @foreach (WizardComponent comp in ViewBag.Components)
         {
-            string selectedText = "";
-            if (component.Name.CompareTo(ViewBag.ActiveComponent.Name) == 0)
+            if (comp.Name == ViewBag.ActiveComponent.Name)
             {
-                selectedText = "selected=\"selected\"";
+                <td><a style="padding: 2px; cursor:pointer;" onclick="changePage(@comp.Name.ToString());"><b>@comp.Name</b></a></td>    
             }
-            <option value="@component.Name" @Html.Raw(selectedText)>@component.Name</option>    
+            else
+            {
+                <td><a style="padding: 2px; cursor:pointer; color:#888888;" onclick="changePage('@comp.Name.ToString()');"><small>@comp.Name</small></a></td>
+            }
         }
-        </select>
-        <script type="text/javascript">
-            $('#ComponentNameNavSelect').change(function () { $('#QuickNavForm').submit(); });
-        </script>
-        <br />
-        <br />
-    }
+    </tr>
+</table>
 }
+
+<script type="text/javascript">
+    function changePage(n) {
+        $("#ComponentNameNavSelect").val(n.toString());
+        $("#QuickNavForm").submit();
+    }
+</script>
+
+<br />
+
 @using (Html.BeginForm("Index", null, FormMethod.Post, new { id = "WizardForm" }))
 {
 @RenderBody()
