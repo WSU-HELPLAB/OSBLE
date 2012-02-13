@@ -192,7 +192,7 @@
     <Compile Include="Models\AbstractCourses\CourseUsers.cs" />
     <Compile Include="Models\Assignments\CommentCategory.cs" />
     <Compile Include="Models\Assignments\CommentCategoryConfiguration.cs" />
-    <Compile Include="Models\Services\Score.cs" />
+    <Compile Include="Models\Assignments\Score.cs" />
     <Compile Include="Models\Assignments\CommentCategoryOption.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseUser.cs" />
     <Compile Include="Models\AbstractCourses\Course\GradebookOptions\LetterGrade.cs" />
