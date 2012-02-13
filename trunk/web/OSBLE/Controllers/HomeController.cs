@@ -374,13 +374,7 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public void getMaxCommentLength()
         {
-            var attribute = typeof(AbstractDashboard).GetProperties()
-                                  .Where(p => p.Name == "Content")
-                                  .Single()
-                                  .GetCustomAttributes(typeof(StringLengthAttribute), true)
-                                  .Single() as StringLengthAttribute;
-
-            ViewBag.MaxActivityFeedLength = attribute.MaximumLength;
+            ViewBag.MaxActivityFeedLength = 4000;
         }
 
         [HttpPost]
