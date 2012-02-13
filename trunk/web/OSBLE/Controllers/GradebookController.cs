@@ -1950,7 +1950,9 @@ namespace OSBLE.Controllers
 
 
             List<CourseUser> CourseUser = (from users in db.CourseUsers
-                                           where users.AbstractCourseID == currentCourseId
+                                           where users.AbstractCourseID == currentCourseId &&
+                                           users.AbstractRole.CanSubmit
+                                           orderby users.UserProfile.LastName, users.UserProfile.FirstName
                                            select users).ToList();
 
             List<Category> categories = (from category in db.Categories
@@ -1995,7 +1997,7 @@ namespace OSBLE.Controllers
 
             List<Score> studentScores = new List<Score>();
 
-            foreach (UserProfile up in studentList)
+            foreach (CourseUser cu in CourseUser)
             {
                 foreach (Category cat in categories)
                 {
@@ -2006,7 +2008,7 @@ namespace OSBLE.Controllers
                                                  select points).ToList();
 
                         List<Score> userScores = (from points in allScores
-                                                  where points.CourseUser.UserProfileID == up.ID
+                                                  where points.CourseUserID == cu.ID
                                                   select points).ToList();
 
                         if (userScores.Count() > 0)
