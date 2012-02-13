@@ -44,7 +44,6 @@ namespace OSBLE.Models.HomePage
 
         [AllowHtml]
         [Required]
-        [StringLengthAttribute(4000)]
         public string Content { get; set; }
 
         // User's name to show (anonymized on the controller)
