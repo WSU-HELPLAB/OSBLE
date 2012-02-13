@@ -536,7 +536,7 @@ namespace OSBLE.Controllers
             {
                 db.CourseUsers.Remove(cu);
             }
-            
+            db.SaveChanges();
         }
 
     }
