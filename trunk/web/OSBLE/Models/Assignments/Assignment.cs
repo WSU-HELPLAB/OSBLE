@@ -152,7 +152,7 @@ namespace OSBLE.Models.Assignments
         }
 
         [Required(ErrorMessage = "Please specify for how long OSBLE should accept late submissions")]
-        [Display(Name = "Assignments Accepted Late For")]
+        [Display(Name = "Late Submission Window")]
         public int HoursLateWindow { get; set; }
 
         [Required(ErrorMessage = "Please specify the percent that should be deducted per hour late")]

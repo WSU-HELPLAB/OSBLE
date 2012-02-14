@@ -24,13 +24,29 @@
             Will students complete this assignment in teams? 
         </td>
         <td style="padding-left:15px;">
-            Yes<input id="radioYes" name="teamRadio" type="radio" />
-            No <input id="radioNo"  name="teamRadio" type="radio" checked="checked" />
+            @if (Model.HasTeams)
+            {
+                @:Yes<input id="radioYes" name="teamRadio" type="radio" checked="checked"/>
+                @:No <input id="radioNo"  name="teamRadio" type="radio" />
+            }
+            else
+            {
+                @:Yes<input id="radioYes" name="teamRadio" type="radio" />
+                @:No <input id="radioNo"  name="teamRadio" type="radio" checked="checked" />
+            }
+                
         </td>
     </tr>
 </table>
 
-<div id="teamDiv" style="display:none;">
+@if(Model.HasTeams)
+{
+    @:<div id="teamDiv" >
+}
+else
+{
+    @:<div id="teamDiv" style="display:none;">
+}
 <p>
     @Html.Raw(ToolTips.BasicAssignmentIsTeam)
 </p> 
@@ -92,10 +108,10 @@
                 }
             </ul>
         </div>
-        if (counter % 3 == 0)
-        {
+                if (counter % 3 == 0)
+                {
             <div style="clear:both;"></div>
-        }
+                }
     }
 </div>
 
