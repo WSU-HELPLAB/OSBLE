@@ -375,6 +375,34 @@ namespace OSBLE.Controllers
             Assignment assignment = db.Assignments.Find(assignmentID);
             assignment.IsDraft = !assignment.IsDraft;
             db.SaveChanges();
+
+            if (assignment.IsDraft)
+            {
+                if (assignment.AssociatedEvent != null)
+                {
+                    Event e = db.Events.Find(assignment.AssociatedEventID);
+                    db.Events.Remove(e);
+                    db.SaveChanges();
+                }
+            }
+            else
+            {
+                Event e = new Event()
+                {
+                    Description = assignment.AssignmentDescription,
+                    EndDate = assignment.DueDate,
+                    EndTime = assignment.DueTime,
+                    Approved = true,
+                    PosterID = activeCourse.ID,
+                    StartDate = assignment.ReleaseDate,
+                    StartTime = assignment.ReleaseTime,
+                    Title = assignment.AssignmentName
+                };
+                db.Events.Add(e);
+                db.SaveChanges();
+                assignment.AssociatedEventID = e.ID;
+                db.SaveChanges();
+            }
         }
 
         /// <summary>

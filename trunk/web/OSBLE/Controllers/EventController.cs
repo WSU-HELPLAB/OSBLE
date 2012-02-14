@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using OSBLE.Attributes;
 using OSBLE.Models.Courses;
 using OSBLE.Models.HomePage;
+using OSBLE.Models.Assignments;
 
 namespace OSBLE.Controllers
 {
@@ -297,8 +298,11 @@ namespace OSBLE.Controllers
             if (e != null)
             {
                 CourseUser cu = currentCourses.Where(c => c.AbstractCourse.ID == e.Poster.AbstractCourseID).FirstOrDefault();
+                Assignment assignment = (from a in db.Assignments where a.AssociatedEventID == e.ID select a).FirstOrDefault();
                 if (((cu != null) && (cu.AbstractRole.CanModify)))
                 {
+                    assignment.AssociatedEvent = null;
+                    assignment.AssociatedEventID = null;
                     db.Events.Remove(e);
                     db.SaveChanges();
                 }

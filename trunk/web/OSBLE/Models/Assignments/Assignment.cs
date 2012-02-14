@@ -6,6 +6,7 @@ using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
 using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Assignments;
+using OSBLE.Models.HomePage;
 
 namespace OSBLE.Models.Assignments
 {
@@ -192,6 +193,10 @@ namespace OSBLE.Models.Assignments
 
         public double addedPoints { get; set; }
 
+        public int? AssociatedEventID { get; set; }
+
+        [ForeignKey("AssociatedEventID")]
+        public virtual Event AssociatedEvent { get; set; }
         
         /// <summary>
         /// used to distinguish wizard created assignments versus gradebook created assignments
