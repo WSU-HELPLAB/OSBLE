@@ -223,6 +223,7 @@
     <Compile Include="Models\AbstractCourses\Course\Rubrics\RubricEvaluation.cs" />
     <Compile Include="Models\Assignments\Assignment.cs" />
     <Compile Include="Models\Assignments\AssignmentTeam.cs" />
+    <Compile Include="Models\Assignments\DiscussionSettings.cs" />
     <Compile Include="Models\Assignments\Team.cs" />
     <Compile Include="Models\Assignments\TeamMember.cs" />
     <Compile Include="Models\HomePage\AbstractDashboard.cs" />
@@ -656,6 +657,7 @@
     <Content Include="Areas\AssignmentWizard\Views\Home\ContextLost.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Home\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\PreviousAssignment\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Discussion\Index.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />

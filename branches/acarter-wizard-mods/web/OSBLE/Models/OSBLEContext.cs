@@ -62,6 +62,8 @@ namespace OSBLE.Models
 
         public DbSet<TeamMember> TeamMembers { get; set; }
 
+        public DbSet<DiscussionSetting> DiscussionSettings { get; set; }
+
 
         // Assignments.Activities
 
@@ -170,7 +172,10 @@ namespace OSBLE.Models
                 .WithMany()
                 .WillCascadeOnDelete(false);
 
-            
+            modelBuilder.Entity<DiscussionSetting>()
+                .HasRequired(ds => ds.Assignment)
+                .WithOptional(a => a.DiscussionSettings)
+                .WillCascadeOnDelete(true);
         }
 
         private void createSampleUser(string username, string password, string firstname, string lastname, string ident, int school, bool isAdmin, bool canCreateCourses)

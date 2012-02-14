@@ -35,7 +35,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get
             {
-                return base.AllAssignmentTypes;
+                List<AssignmentTypes> types = base.AllAssignmentTypes.ToList();
+                types.Remove(AssignmentTypes.DiscussionAssignment);
+                return types;
             }
         }
 
