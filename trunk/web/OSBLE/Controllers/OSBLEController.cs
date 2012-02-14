@@ -537,6 +537,15 @@ namespace OSBLE.Controllers
                 db.CourseUsers.Remove(cu);
             }
             db.SaveChanges();
+
+            List<AssignmentTeam> teamsWithNoMembers = (from at in db.AssignmentTeams
+                                                       where at.Team.TeamMembers.Count == 0
+                                                       select at).ToList();
+            foreach (AssignmentTeam team in teamsWithNoMembers)
+            {
+                db.AssignmentTeams.Remove(team);
+            }
+            db.SaveChanges();
         }
 
     }

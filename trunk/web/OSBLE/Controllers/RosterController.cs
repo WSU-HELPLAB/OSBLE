@@ -437,26 +437,6 @@ namespace OSBLE.Controllers
             if ((CourseUser != null) && CanModifyOwnLink(CourseUser))
             {
                 RemoveUserFromCourse(CourseUser.UserProfile);
-                List<Assignment> assignmentList = (from a in db.Assignments
-                                                   where a.Category.CourseID == activeCourse.AbstractCourseID
-                                                   select a).ToList();
-                List<AssignmentTeam> removeList = new List<AssignmentTeam>();
-                foreach (Assignment assignment in assignmentList)
-                {
-                    foreach (AssignmentTeam at in assignment.AssignmentTeams)
-                    {
-                        if (at.Team.TeamMembers.Count() == 0)
-                        {
-                            removeList.Add(at);
-                            
-                        }
-                    }
-                }
-                foreach (AssignmentTeam at in removeList)
-                {
-                    db.AssignmentTeams.Remove(at);
-                }
-                db.SaveChanges();
             }
             else
             {
