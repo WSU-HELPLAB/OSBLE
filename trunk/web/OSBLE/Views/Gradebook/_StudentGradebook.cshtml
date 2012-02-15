@@ -191,6 +191,7 @@
                 foreach (CourseUser user in ViewBag.Students)
                 {
                     categoryTotalWeight = ViewBag.TotalCategoryWeights;
+                    int studentAssignmentCount = 0;
                     foreach (Category category in ViewBag.CatsWithWeightsAndScores)
                     {
                         if (category.Name != Constants.UnGradableCatagory)
@@ -227,7 +228,7 @@
 
                             if (totalScores.Count() > 0)
                             {
-                                int studentAssignmentCount = 0;
+                                
                                 foreach (Score userScore in totalScores)
                                 {
                                     if (userScore.Assignment.CategoryID == category.ID)
@@ -280,7 +281,7 @@
                 }
                 
                 <td>@letter</td>
-                <td>@totalGrade.ToString(".#")%</td>
+                <td>@totalGrade.ToString(".##")%</td>
                 
                 
                 int totalStudents = 0;
@@ -311,7 +312,7 @@
                         totalAverage += categoryScore * 100;
                         if (oneScore == true)
                         {
-                            <td id="averageScore">@totalAverage.ToString(".#")%</td>  
+                            <td id="averageScore">@totalAverage.ToString(".##")%</td>  
                         }
                         else
                         {
@@ -483,12 +484,12 @@
                 if (studentWhatIf == true)
                 {
                     <td style="color:Gray; font-style:italic;">@letter</td>
-                    <td style="color:Gray; font-style:italic;">@totalGrade.ToString(".#")%</td>
+                    <td style="color:Gray; font-style:italic;">@totalGrade.ToString(".##")%</td>
                 }
                 else
                 {
                     <td>@letter</td>
-                    <td>@totalGrade.ToString(".#")%</td>
+                    <td>@totalGrade.ToString(".##")%</td>
                 }
 
                 foreach (Category category in ViewBag.Categories)
@@ -568,12 +569,12 @@
                             {
                                 if (usingWhatIf == true)
                                 {
-                                    <td style="color:Gray; font-style:italic;">@total.ToString(".#")%</td>
+                                    <td style="color:Gray; font-style:italic;">@total.ToString(".##")%</td>
                                     usingWhatIf = false;
                                 }
                                 else
                                 {
-                                    <td>@total.ToString(".#")%</td>
+                                    <td>@total.ToString(".##")%</td>
                                 }
                             }
                             else

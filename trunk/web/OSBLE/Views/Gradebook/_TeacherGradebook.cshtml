@@ -190,9 +190,11 @@
                 //Get the total score for the class
 
                 int studentCount = 0;
+                
 
                 foreach (CourseUser user in ViewBag.CoursesUser)
                 {
+                    int studentAssignmentCount = 0;
                     categoryTotalWeight = ViewBag.TotalCategoryWeights;
                     foreach (Category category in ViewBag.CatsWithWeightsAndScores)
                     {
@@ -223,7 +225,7 @@
                                                        select score).ToList();
                             if (totalScores.Count() > 0)
                             {
-                                int studentAssignmentCount = 0;
+                                
                                 foreach (Score score in totalScores)
                                 {
                                     if (score.Assignment.CategoryID == category.ID)
@@ -276,7 +278,7 @@
                 }
                 
                 <td>@letter</td>
-                <td>@totalGrade.ToString(".#")%</td>
+                <td>@totalGrade.ToString(".##")%</td>
                 
                 int totalStudents = 0;
 
@@ -303,7 +305,7 @@
                         totalAverage += categoryScore * 100;
                         if (oneScore == true)
                         {
-                            <td id="averageScore">@totalAverage.ToString(".#")%</td>  
+                            <td id="averageScore">@totalAverage.ToString(".##")%</td>  
                         }
                         else
                         {
@@ -434,7 +436,7 @@
                 
                   if (totalGrade > 0 && studentGradeCount > 0)
                   {
-                    <td>@totalGrade.ToString(".#")%</td>
+                    <td>@totalGrade.ToString(".##")%</td>
                   }
                   else if (totalGrade == 0 && studentGradeCount > 0)
                   {
@@ -475,7 +477,7 @@
                               }
                               else
                               {
-                                  <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.ID)" style="cursor:pointer;">@totalCategoryGrade.ToString(".#")%</td>
+                                  <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.ID)" style="cursor:pointer;">@totalCategoryGrade.ToString(".##")%</td>
                               }
                           }
                           else

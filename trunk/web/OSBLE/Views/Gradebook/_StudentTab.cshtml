@@ -161,7 +161,7 @@
                 if (totalGrade > 0)
                 {
                 <td id="averageTotal">
-                    @totalGrade.ToString(".#")%
+                    @totalGrade.ToString(".##")%
                 </td>
                 }
                 else
@@ -193,7 +193,7 @@
                 totalAverage += categoryScore;
                 if (oneScore == true)
                 {
-                    <td id="averageScore">@totalAverage.ToString(".#")</td>  
+                    <td id="averageScore">@totalAverage.ToString(".##")</td>  
                 }
                 else
                 {
@@ -267,7 +267,7 @@
                 totalPoints = (totalPoints / totalPossible) * 100;
                 if (totalPoints > 0)
                 {
-                    <td id="totalAverage">@totalPoints.ToString(".#")%</td>
+                    <td id="totalAverage">@totalPoints.ToString(".##")%</td>
                 }
                 else
                 {
@@ -308,11 +308,11 @@
                         {
                             if (score.First().LatePenaltyPercent > 0)
                             {   
-                                <td id="teacher-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" style="font-style:italic; color:Red;">@score.First().Points.ToString(".#")</td>
+                                <td id="teacher-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" style="font-style:italic; color:Red;">@score.First().Points.ToString(".##")</td>
                             }
                             else
                             {
-                                <td id="teacher-@assignment.ID">@score.First().Points.ToString(".#")</td>
+                                <td id="teacher-@assignment.ID">@score.First().Points.ToString(".##")</td>
                             }
                         }
                         else
