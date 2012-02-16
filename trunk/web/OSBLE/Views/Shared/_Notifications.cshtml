@@ -51,7 +51,7 @@
                     case Notification.Types.RubricEvaluationCompleted:
                         {
                             string[] args1 = n.Data.Split(new char[] { ';' });
-                            <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> completed an @Html.ActionLink("evaluation rubric", "View", "Rubric", new { assignmentId = args1[0], teamId = args1[1] }, new { }) of your @args1[2]
+                            <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> completed an @Html.ActionLink("evaluation rubric", "View", "Rubric", new { assignmentId = args1[0], cuId = args1[1] }, new { }) of your @args1[2]
                             </text>
                             break;
                         }
