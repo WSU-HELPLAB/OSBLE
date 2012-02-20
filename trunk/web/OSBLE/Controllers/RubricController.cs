@@ -285,7 +285,7 @@ namespace OSBLE.Controllers
                     AssignmentTeam at = GetAssignmentTeam(assignment, cu.UserProfile);
                     ViewBag.AssignmentName = assignment.AssignmentName;
                     ViewBag.PossiblePoints = assignment.PointsPossible;
-                    ViewBag.Score = (from c in assignment.Scores where c.TeamID == at.TeamID select c).FirstOrDefault();
+                    ViewBag.Score = (from c in assignment.Scores where c.CourseUserID == cuId select c).FirstOrDefault();
                     if (ViewBag.Score != null && ViewBag.Score.Points == -1) //If the score is currently a NG, dont display score (doing this by giving score a null value, handled by view)
                         ViewBag.Score = null;
                     ViewBag.isEditable = false;
