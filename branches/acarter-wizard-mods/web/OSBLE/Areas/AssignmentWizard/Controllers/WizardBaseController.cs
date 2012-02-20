@@ -159,7 +159,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 {
                     comp = manager.GetPreviousComponent();
                     errorPath = "Home";
-                    action = "Index";
+                    action = "SelectComponent";
                 }
                 else
                 {

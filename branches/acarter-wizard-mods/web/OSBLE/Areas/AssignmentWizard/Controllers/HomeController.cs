@@ -27,7 +27,26 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             //existing assignments skip this step
             if (assignmentId != null)
             {
-                return RedirectToRoute(new { controller = "Home", action = "SelectComponent", assignmentId = assignmentId });
+                Assignment assignment = db.Assignments.Find(assignmentId);
+                
+                //prime the manager for the new assignment
+                manager.ActiveAssignmentId = assignment.ID;
+                manager.SetActiveAssignmentType((AssignmentTypes)assignment.AssignmentTypeID);
+
+                //load in any secondary (non-required) components
+                ActivateAssignmentComponents(assignment);
+
+                //now, load in essential components
+                List<WizardBaseController> components = (from comp in manager.GetComponentsForAssignmentType(assignment.Type)
+                                                        where comp.IsRequired == true
+                                                        select comp).ToList();
+                foreach (WizardBaseController component in components)
+                {
+                    component.IsSelected = true;
+                }
+
+                //begin wizard
+                return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute, new { controller = manager.ActiveComponent.ControllerName });
             }
             return View(Assignment.AllAssignmentTypes);
         }
@@ -164,12 +183,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 {
                     assignment.CommentCategory = null;
                     assignment.CommentCategoryID = null;
-                }
-
-                //TEAM ASSIGNMENTS
-                if (manager.UnselectedComponents.Contains(manager.GetComponentByType(typeof(TeamController))))
-                {
-                    assignment.AssignmentTeams = null;
                 }
 
                 //DELIVERABLES
