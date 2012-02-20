@@ -233,7 +233,7 @@ namespace OSBLE.Controllers
                         studentScore += (double)critEval.Score / maxLevelScore * (critEval.Criterion.Weight / totalRubricPoints);
                     }
 
-                    //normalize the score with the abstract assignment score
+                    //normalize the score with the assignment score
                     studentScore *= vm.Evaluation.Assignment.PointsPossible;
 
                     gradebook.ModifyTeamGrade(studentScore, vm.SelectedAssignment.ID, vm.Evaluation.Recipient.ID);
