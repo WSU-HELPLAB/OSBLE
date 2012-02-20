@@ -32,31 +32,42 @@ namespace OSBLE.Models.Assignments
         [Required]
         public byte AnonymitySettings { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Please specify when the first post should be due")]
+        [Display(Name = "Due date for initial post")]
+        [DataType(DataType.Date)]
         public DateTime InitialPostDueDate { get; set; }
 
+        [NotMapped]
+        [DataType(DataType.Time)]
+        public DateTime InitialPostDueDueTime
+        {
+            get
+            {
+                return InitialPostDueDate;
+            }
+            set
+            {
+                //first, zero out the date's time component
+                InitialPostDueDate = DateTime.Parse(InitialPostDueDate.ToShortDateString());
+
+                InitialPostDueDate = InitialPostDueDate.AddHours(value.Hour);
+                InitialPostDueDate = InitialPostDueDate.AddMinutes(value.Minute);
+            }
+        }
+
         [Required]
+        [Display(Name = "Minimum length for first post")]
         public int MinimumFirstPostLength { get; set; }
 
         public DiscussionSetting()
         {
             AnonymitySettings = 0;
-            InitialPostDueDate = DateTime.MaxValue;
+            InitialPostDueDate = DateTime.Now;
             MinimumFirstPostLength = 0;
         }
 
-        public void AddAnonymityLevel(AnonymityLevels level)
-        {
-            AnonymitySettings = (byte)(AnonymitySettings | (byte)level);
-        }
-
-        public void RemoveAnonymityLevel(AnonymityLevels level)
-        {
-            //~ is a bitwise not in c#
-            //Doing a bitwise AND on a NOTed level should result in the level being removed
-            AnonymitySettings = (byte)(AnonymitySettings & (~(byte)level) );
-        }
-
+        #region anonymity settings
+        
         /// <summary>
         /// Returns true if the discussion is anonymous.
         /// </summary>
@@ -71,33 +82,72 @@ namespace OSBLE.Models.Assignments
         /// <summary>
         /// Returns true if posts in the discussion are anonymous
         /// </summary>
+        [NotMapped]
+        [Display(Name = "Allow anonymous posting")]
         public bool HasAnonymousPosts
         {
             get
             {
                 return HasAnonymityLevel(AnonymityLevels.AnonymousPosts);
             }
+            set
+            {
+                if (value == true)
+                {
+                    AddAnonymityLevel(AnonymityLevels.AnonymousPosts);
+                }
+                else
+                {
+                    RemoveAnonymityLevel(AnonymityLevels.AnonymousPosts);
+                }
+            }
         }
 
         /// <summary>
         /// Returns true if replies in the discussion are marked anonymous
         /// </summary>
+        [NotMapped]
+        [Display(Name="Allow anonymous replies to posts")]
         public bool HasAnonymousReplies
         {
             get
             {
                 return HasAnonymityLevel(AnonymityLevels.AnonymousReplies);
             }
+            set
+            {
+                if (value == true)
+                {
+                    AddAnonymityLevel(AnonymityLevels.AnonymousReplies);
+                }
+                else
+                {
+                    RemoveAnonymityLevel(AnonymityLevels.AnonymousReplies);
+                }
+            }
         }
 
         /// <summary>
         /// Returns true if user roles are hidden in discussions
         /// </summary>
+        [NotMapped]
+        [Display(Name = "Anonymize Roles")]
         public bool HasAnonymousRoles
         {
             get
             {
                 return HasAnonymityLevel(AnonymityLevels.AnonymousRoles);
+            }
+            set
+            {
+                if (value == true)
+                {
+                    AddAnonymityLevel(AnonymityLevels.AnonymousRoles);
+                }
+                else
+                {
+                    RemoveAnonymityLevel(AnonymityLevels.AnonymousRoles);
+                }
             }
         }
 
@@ -106,10 +156,24 @@ namespace OSBLE.Models.Assignments
         /// </summary>
         /// <param name="level"></param>
         /// <returns></returns>
-        public bool HasAnonymityLevel(AnonymityLevels level)
+        protected bool HasAnonymityLevel(AnonymityLevels level)
         {
             int result = AnonymitySettings & (byte)level;
             return result == (int)level;
         }
+
+        protected void AddAnonymityLevel(AnonymityLevels level)
+        {
+            AnonymitySettings = (byte)(AnonymitySettings | (byte)level);
+        }
+
+        protected void RemoveAnonymityLevel(AnonymityLevels level)
+        {
+            //~ is a bitwise not in c#
+            //Doing a bitwise AND on a NOTed level should result in the level being removed
+            AnonymitySettings = (byte)(AnonymitySettings & (~(byte)level));
+        }
+
+        #endregion
     }
 }

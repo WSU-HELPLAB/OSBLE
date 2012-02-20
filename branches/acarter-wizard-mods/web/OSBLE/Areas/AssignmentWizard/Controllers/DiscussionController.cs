@@ -52,13 +52,26 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public override ActionResult Index()
         {
             base.Index();
-            return View(Assignment);
+            if (Assignment.DiscussionSettings == null)
+            {
+                Assignment.DiscussionSettings = new DiscussionSetting();
+                Assignment.DiscussionSettings.InitialPostDueDate = Assignment.ReleaseDate.Add(new TimeSpan(7, 0, 0, 0, 0));
+                Assignment.DiscussionSettings.AssignmentID = Assignment.ID;
+            }
+            return View(Assignment.DiscussionSettings);
         }
 
         [HttpPost]
-        public ActionResult Index(Assignment model)
+        public ActionResult Index(DiscussionSetting model)
         {
-            return base.Index(model);
+            Assignment = db.Assignments.Find(model.AssignmentID);
+            Assignment.DiscussionSettings = model;
+            if (ModelState.IsValid)
+            {
+                WasUpdateSuccessful = true;
+                db.SaveChanges();
+            }
+            return base.Index(Assignment);
         }
     }
 }

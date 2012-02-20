@@ -58,8 +58,11 @@ namespace OSBLE.Models.Assignments
                 case AssignmentTypes.DiscussionAssignment:
                     description = "Discussion assignments require students to comment on a particular discussion.";
                     break;
+                case AssignmentTypes.TeamEvaluation:
+                    description = "Students will evaluate their team members on a previous assignment.";
+                    break;
                 default:
-                    description = "Your run of the mill assignment";
+                    description = "Your run of the mill assignment.";
                     break;
             }
             return description;
