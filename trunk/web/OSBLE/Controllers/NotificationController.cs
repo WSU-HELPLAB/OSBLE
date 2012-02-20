@@ -190,7 +190,7 @@ namespace OSBLE.Controllers
             {
                 Notification n = new Notification();
                 n.ItemType = Notification.Types.RubricEvaluationCompleted;
-                n.Data = assignment.ID.ToString() + ";" + team.ID.ToString() + ";" + assignment.AssignmentName;
+                n.Data = assignment.ID.ToString() + ";" + member.CourseUserID + ";" + assignment.AssignmentName;
 
                 n.RecipientID = member.CourseUser.ID;
                 n.SenderID = activeCourse.ID;
