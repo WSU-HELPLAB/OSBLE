@@ -95,7 +95,7 @@ namespace OSBLE.Controllers
                                                   select assignment).ToList();
 
             List<Assignment> draftAssignments = new List<Assignment>();
-            if (ActiveCourse.AbstractRole.CanModify)
+            if (ActiveCourse.AbstractRole.CanModify || ActiveCourse.AbstractRole.Anonymized)
             {
                 // Draft assignments (viewable by instructor only) are assignments that have not yet been published to students
                 draftAssignments = (from assignment in db.Assignments
@@ -255,7 +255,7 @@ namespace OSBLE.Controllers
             List<Score> scores = assignment.Scores.ToList();
             List<CourseUser> cuList = null;
 
-            if (activeCourse.AbstractRole.CanModify) //Instructor setup
+            if (activeCourse.AbstractRole.CanModify || activeCourse.AbstractRole.Anonymized) //Instructor setup
             {
                 List<Tuple<Score, Team, string>> scoreAndTeam = new List<Tuple<Score, Team, string>>();
                 List<AssignmentTeam> teams = assignment.AssignmentTeams.ToList();

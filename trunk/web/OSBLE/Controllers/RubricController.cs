@@ -273,12 +273,12 @@ namespace OSBLE.Controllers
                     Assignment assignment = db.Assignments.Find(assignmentId);
                     AssignmentTeam team = GetAssignmentTeam(assignment, currentUser);
                     if (team != null)
-                    {
+                    { 
                         isOwnAssignment = true;
                     }
                 }
 
-                if (activeCourse.AbstractRole.CanGrade || isOwnAssignment)
+                if (activeCourse.AbstractRole.CanGrade || isOwnAssignment || activeCourse.AbstractRole.Anonymized)
                 {
                     Assignment assignment = db.Assignments.Find(assignmentId);
                     CourseUser cu = db.CourseUsers.Find(cuId);
