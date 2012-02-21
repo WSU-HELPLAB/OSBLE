@@ -12,6 +12,8 @@ namespace OSBLE.Models.Users
 
         public string UserName { get; set; }
 
+        public string AspNetUserName { get; set; }
+
         public int SchoolID { get; set; }
 
         public virtual School School { get; set; }
