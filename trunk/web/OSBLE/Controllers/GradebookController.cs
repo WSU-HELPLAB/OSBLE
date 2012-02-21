@@ -1676,6 +1676,11 @@ namespace OSBLE.Controllers
 
                         if (grades.Points == value)
                         {
+                            //If the user has a grade but is in a new team we need to change the team
+                            if (grades.TeamID != userAssignmentTeam.TeamID)
+                            {
+                                grades.TeamID = userAssignmentTeam.TeamID;
+                            }
                             //Don't do anything to the points because our value coming in equals the points in the db.
                             //However, we do need to set the raw value in case that changed.
                             grades.RawPoints = rawValue;
@@ -1683,6 +1688,11 @@ namespace OSBLE.Controllers
                         }
                         else
                         {
+                            //If the user has a grade but is in a new team we need to change the team
+                            if (grades.TeamID != userAssignmentTeam.TeamID)
+                            {
+                                grades.TeamID = userAssignmentTeam.TeamID;
+                            }
                             grades.Points = value;
                             grades.AddedPoints = 0;
                             grades.LatePenaltyPercent = latePenalty;
