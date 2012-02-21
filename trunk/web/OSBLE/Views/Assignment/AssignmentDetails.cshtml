@@ -252,9 +252,22 @@
                     <a title="Email this team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = da.Item2.ID })">@Helpers.MailButton()</a>
                     <br/>
                     var teamList = "";
+                    int i = 1;
                     foreach (TeamMember tm in da.Item2.TeamMembers)
                     {
-                        teamList += tm.CourseUser.UserProfile.FirstName + " " + tm.CourseUser.UserProfile.LastName + ", ";
+                        if(i == da.Item2.TeamMembers.Count) 
+                        {
+                            teamList += " & " + tm.CourseUser.UserProfile.FirstName + " " + tm.CourseUser.UserProfile.LastName;
+                        }
+                        else if(i == 1)
+                        {
+                            teamList += tm.CourseUser.UserProfile.FirstName + " " + tm.CourseUser.UserProfile.LastName;
+                        }
+                        else 
+                        {
+                            teamList += ", " + tm.CourseUser.UserProfile.FirstName + " " + tm.CourseUser.UserProfile.LastName;
+                        }
+                        i++;
                     }
                     <span>@teamList</span>
                 }
