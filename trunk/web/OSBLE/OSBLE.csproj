@@ -436,6 +436,7 @@
     <Content Include="Content\themes\base\jquery.ui.tabs.css" />
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
     <Content Include="Areas\AssignmentWizard\Controllers\README.txt" />
+    <Content Include="Scripts\time.js" />
     <Content Include="crossdomain.xml" />
     <Content Include="EditPeerReviewTestPage.aspx" />
     <Content Include="EditPeerReviewTestPage.html" />
@@ -708,6 +709,7 @@
     <Content Include="Areas\AssignmentWizard\Views\Deliverables\Index.cshtml" />
     <Content Include="Views\Assignment\AssignmentDetails.cshtml" />
     <Content Include="Views\Gradebook\ExportToCSV.cshtml" />
+    <Content Include="Views\Home\Time.cshtml" />
     <Content Include="Views\Assignment\_ObserverAssignmentDetails.cshtml" />
     <Content Include="Views\Assignment\_ObserverIndex.cshtml" />
     <Content Include="Views\Assignment\_StudentIndex.cshtml" />

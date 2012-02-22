@@ -688,5 +688,18 @@ namespace OSBLE.Controllers
 
             return new FileStreamResult(pictureStream, "image/jpeg");
         }
+
+        [Authorize]
+        public ActionResult Time()
+        {
+            if (currentUser != null)
+            {
+                return View();
+            }
+            else
+            {
+                return View();
+            }
+        }
     }
 }
