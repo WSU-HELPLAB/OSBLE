@@ -1631,6 +1631,38 @@ namespace OSBLE.Controllers
                         }
                     }
 
+                    //If we don't find an assignment team for the user we need to create them one
+                    //for the current assignment we have a grade for
+                    if (userAssignmentTeam.Team == null)
+                    {
+
+                        TeamMember userMember = new TeamMember()
+                        {
+                            CourseUserID = user.ID
+                        };
+
+                        Team team = new Team();
+                        team.Name = user.UserProfile.LastName + "," + user.UserProfile.FirstName;
+                        team.TeamMembers.Add(userMember);
+
+                        db.Teams.Add(team);
+                        db.SaveChanges();
+                        userTeamMember = userMember;
+
+
+                        AssignmentTeam assignmentTeam = new AssignmentTeam()
+                        {
+                            AssignmentID = assignmentId,
+                            Team = team,
+                            TeamID = team.ID
+                        };
+
+                        db.AssignmentTeams.Add(assignmentTeam);
+                        db.SaveChanges();
+                        userAssignmentTeam = assignmentTeam;
+                    }
+                    
+
                     List<Score> gradableQuery = (from g in db.Scores
                                                  where g.AssignmentID == assignmentId
                                                  select g).ToList();
