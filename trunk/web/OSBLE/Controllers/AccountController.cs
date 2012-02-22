@@ -76,7 +76,7 @@ namespace OSBLE.Controllers
                     if (Membership.ValidateUser(localUser.AspNetUserName, model.Password))
                     {
                         context.Session.Clear(); // Clear session variables.
-                        FormsAuthentication.SetAuthCookie(model.UserName, model.RememberMe);
+                        FormsAuthentication.SetAuthCookie(model.UserName, true);
                         if (Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
                             && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
                         {
@@ -201,8 +201,15 @@ namespace OSBLE.Controllers
                         user.Comment = null;
                         user.IsApproved = true;
                         Membership.UpdateUser(user);
-                        FormsAuthentication.SetAuthCookie(model.UserName, false);
-
+                        FormsAuthentication.SetAuthCookie(model.UserName, true);
+                        
+                        //make sure that the asp.net user name is saved to the user profile
+                        UserProfile osbleProfile = db.UserProfiles.Where(u => u.UserName.CompareTo(model.UserName) == 0).FirstOrDefault();
+                        if (osbleProfile != null)
+                        {
+                            osbleProfile.AspNetUserName = model.UserName;
+                            db.SaveChanges();
+                        }
                         return RedirectToAction("Index", "Home");
                     }
                     else
