@@ -24,6 +24,7 @@
 
     //refreshes the count of how many charecters you can input
     function refreshCount() {
+        $('body').css('cursor', 'wait');
         $('#remCharsReply').val("(" + $('#MaxContentChars').val() + ") Characters left");
     }
 
@@ -135,7 +136,7 @@
                         data-ajax-update="#dp_replies_for_@(Model.ID)"
                         data-ajax-begin="$('#reply_@(Model.ID)_button').attr('disabled', 'disabled')"
                         data-ajax-failure="alert('There was an error sending your reply.')"
-                        data-ajax-complete="$('#reply_@(Model.ID)_button').removeAttr('disabled')"
+                        data-ajax-complete="$('#reply_@(Model.ID)_button').removeAttr('disabled'); $('body').css('cursor', 'default');"
                         data-ajax-success="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');}); $('#dp_replybox_content_@(Model.ID)').val('')"
                         data-ajax-mode="after"
                         method="post">

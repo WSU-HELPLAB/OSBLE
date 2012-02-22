@@ -2,12 +2,12 @@
     ViewBag.Title = "Import CSV";
 }
 
-<h2>Import Columns From CSV</h2>
+<h2>Import Columns From CSV file</h2>
 
 <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
 
-<p>To complete roster import, first select the header of the column containing Student ID numbers:</p>
+<p>To complete roster import, please select the header of the column containing Student ID numbers, and the headers of the columns to import:</p>
 
 <div class="selector">
 <h3>Student Identification Header:</h3>
@@ -23,7 +23,7 @@
 
 <div class="selector">
 <br />
-<p>And then select the headers of the columns to import:</p>
+<p></p>
 <h3>Headers of Columns to Import:</h3>
 
 <ul id="assignment_selector" class="selector">
@@ -78,9 +78,8 @@
     
     <input type="hidden" id="id_column" name="idColumn" value="" />
     <input type="hidden" id="assignment_column" name="assignmentColumn" value="" />
-    <input type="submit" value="Import Assignment(s)" />
+    <input type="submit" value="Import Column(s)" />
+    <input type="button" value="Cancel"/>
 }
-    <br />
-    @Html.ActionLink("Back to Gradebook", "Index");
 </div>
 </div>
