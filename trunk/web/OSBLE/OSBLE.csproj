@@ -708,6 +708,11 @@
     <Content Include="Areas\AssignmentWizard\Views\Deliverables\Index.cshtml" />
     <Content Include="Views\Assignment\AssignmentDetails.cshtml" />
     <Content Include="Views\Gradebook\ExportToCSV.cshtml" />
+    <Content Include="Views\Assignment\_ObserverAssignmentDetails.cshtml" />
+    <Content Include="Views\Assignment\_ObserverIndex.cshtml" />
+    <Content Include="Views\Assignment\_StudentIndex.cshtml" />
+    <Content Include="Views\Assignment\_TeacherAssignmentDetails.cshtml" />
+    <Content Include="Views\Assignment\_TeacherIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />
