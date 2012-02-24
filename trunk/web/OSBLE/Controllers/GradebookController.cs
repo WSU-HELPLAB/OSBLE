@@ -97,6 +97,8 @@ namespace OSBLE.Controllers
 
             StreamReader sr = new StreamReader(file.InputStream);
 
+            Category currentCategory = new Category();
+
             string line;
             string[] row;
 
@@ -128,6 +130,8 @@ namespace OSBLE.Controllers
                                 else
                                 {
                                     Assignment assign = (from g in db.Assignments where g.ID == currentAssignmentID select g).FirstOrDefault();
+
+                                    currentCategory = assign.Category;
                                     if (Session["radio"].ToString() == "r")
                                     {
 
@@ -254,8 +258,9 @@ namespace OSBLE.Controllers
                         count++;
                     }
                 }
-
             }
+            ClearAllDropLowest(categoryId);
+            AllDropLowest(categoryId, currentCategory.dropX, currentCategory.Customize.ToString());
             return RedirectToAction("Tab", "Gradebook", new { categoryId = (int)Session["categoryId"] });
         }
 
@@ -767,7 +772,7 @@ namespace OSBLE.Controllers
 
         [HttpPost]
         [CanGradeCourse]
-        public void ClearDropLowest(int categoryId, string userId)
+        public void ClearDropLowest(int categoryId, int courseUserId)
         {
             if (ModelState.IsValid)
             {
@@ -775,7 +780,7 @@ namespace OSBLE.Controllers
                 if (categoryId > 0)
                 {
                     CourseUser user = (from u in db.CourseUsers
-                                       where u.UserProfile.Identification == userId
+                                       where u.ID == courseUserId
                                        select u).FirstOrDefault();
 
                     List<Score> scoreList = (from scores in db.Scores
@@ -828,16 +833,16 @@ namespace OSBLE.Controllers
 
         [HttpPost]
         [CanGradeCourse]
-        public ActionResult DropLowest(int categoryId, string userId)
+        public ActionResult DropLowest(int categoryId, int courseUserId)
         {
             if (ModelState.IsValid)
             {
-                ClearDropLowest(categoryId, userId);
+                ClearDropLowest(categoryId, courseUserId);
 
                 if (categoryId > 0)
                 {
                     CourseUser user = (from u in db.CourseUsers
-                                        where u.UserProfile.Identification == userId
+                                        where u.ID == courseUserId
                                         select u).FirstOrDefault();
 
                     List<Score> scoreList = (from scores in db.Scores
@@ -1087,17 +1092,17 @@ namespace OSBLE.Controllers
             {
                 if (assignmentId != 0)
                 {
-                    var activityQuery = from a in db.Assignments
-                                        where a.ID == assignmentId
-                                        select a;
-
-                    if (activityQuery.Count() > 0)
+                    Assignment assignment = db.Assignments.Find(assignmentId);
+                    if (assignmentId != null)
                     {
-                        foreach (Assignment item in activityQuery)
-                        {
-                            item.PointsPossible = value;
-                        }
+                        assignment.PointsPossible = value;
                         db.SaveChanges();
+
+                        if (assignment.Category.dropX > 0)
+                        {
+                            ClearAllDropLowest(assignment.CategoryID);
+                            AllDropLowest(assignment.CategoryID, assignment.Category.dropX, assignment.Category.Customize.ToString());
+                        }
                     }
                 }
                 else
@@ -1776,20 +1781,25 @@ namespace OSBLE.Controllers
                     {
                         DoAddPoints(assignmentId, currentAssignment.addedPoints);
                     }
+
+                    if (currentAssignment.Category.dropX > 0)
+                    {
+                        DropLowest(currentAssignment.CategoryID, courseUserId);
+                    }
                 }
             }
             return value;
         }
 
         [HttpPost]
-        public ActionResult ModifyStudentScore(string userId, int assignmentId, double value)
+        public ActionResult ModifyStudentScore(int courseUserId, int assignmentId, double value)
         {
             if (ModelState.IsValid)
             {
                 if (assignmentId > 0)
                 {
                     CourseUser student = (from user in db.CourseUsers
-                                           where user.UserProfile.Identification == userId
+                                           where user.ID == courseUserId
                                            select user).FirstOrDefault();
                     if (student != null)
                     {
@@ -1873,8 +1883,8 @@ namespace OSBLE.Controllers
 
                         if (currentAssignment.Category.dropX > 0)
                         {
-                            ClearDropLowest(currentAssignment.CategoryID, userId);
-                            DropLowest(currentAssignment.CategoryID, userId);
+                            ClearDropLowest(currentAssignment.CategoryID, courseUserId);
+                            DropLowest(currentAssignment.CategoryID, courseUserId);
                         }
                     }
                 }

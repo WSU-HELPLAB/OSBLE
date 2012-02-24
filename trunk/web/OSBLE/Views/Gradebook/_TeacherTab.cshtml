@@ -582,7 +582,7 @@
                     if (grade.toString() == "NaN") {
                         $(this).text("NG");
                     } else {
-                        $(this).text(grade.toFixed(1) + "%");
+                        $(this).text(grade.toFixed(2) + "%");
                     }
                 }
             });
@@ -794,9 +794,9 @@
                         url: "/Gradebook/ModifyCell",
                         data: { value: cellValue, courseUserId: ajaxIDs[0], assignmentId: ajaxIDs[1] },
                         success: function (response) {
-                            if ($("#numDropped").val() >= 1) {
-                                DropLowest(ajaxIDs[0]);
-                            }
+//                            if ($("#numDropped").val() >= 1) {
+//                                DropLowest(ajaxIDs[0]);
+//                            }
                         }
                     });
                 }
@@ -1004,7 +1004,7 @@
 
         $("#grades tr").children("td:nth-child(" + Index + ")").each(function () {
             if ($(this).attr("id") == "averageTotal") {
-                colTotal = parseFloat(colTotal / count).toFixed(1);
+                colTotal = parseFloat(colTotal / count).toFixed(2);
                 if (colTotal == "NaN") {
                     $(this).html("NG");
                 }
@@ -1013,7 +1013,7 @@
                 }
             }
             if ($(this).attr("id") == "averageScore") {
-                colTotal = parseFloat(colTotal / count).toFixed(1);
+                colTotal = parseFloat(colTotal / count).toFixed(2);
                 if ((colTotal * 10) % (parseInt(colTotal) * 10) == 0) {
                     colTotal = parseInt(colTotal);
                 }
