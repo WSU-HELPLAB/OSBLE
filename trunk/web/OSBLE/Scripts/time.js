@@ -11,9 +11,14 @@ function time() {
     $.ajax({
         url: "/Home/Time",
         success: function (data) {
+            if (data == "true") {
+            }
+            else {
+                alert("The session has timed out.");
+            }
         },
         failure: function (result) {
-            alert("The session timed out");
+            alert("The session has timed out.");
         }
     });
 }

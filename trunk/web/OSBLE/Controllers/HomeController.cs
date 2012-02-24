@@ -493,7 +493,7 @@ namespace OSBLE.Controllers
 
                 int latestReply = 0;
                 if (Request.Form["latest_reply"] != null)
-                {
+                { 
                     latestReply = Convert.ToInt32(Request.Form["latest_reply"]);
                 }
 
@@ -694,11 +694,19 @@ namespace OSBLE.Controllers
         {
             if (currentUser != null)
             {
-                return View();
+                UserProfile user = db.UserProfiles.Find(currentUser.ID);
+                if (user != null)
+                {
+                    return View();
+                }
+                else
+                {
+                    return RedirectToAction("Index");
+                }
             }
             else
             {
-                return View();
+                return RedirectToAction("Index");
             }
         }
     }
