@@ -181,8 +181,9 @@ namespace OSBLE.Controllers
                 throw new Exception("Hash cannot be null");
             }
             ViewBag.Hash = hash;
-
-            return View();
+            LogOnModel model = new LogOnModel();
+            model.Password = "foo";
+            return View(model);
         }
 
         [HttpPost]
@@ -214,12 +215,12 @@ namespace OSBLE.Controllers
                     }
                     else
                     {
-                        ModelState.AddModelError("hashIsWrong", "Either the e-mail address or the the hash is no long valid");
+                        ModelState.AddModelError("", "Either the e-mail address or the link used to access this page is no longer valid");
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError("userDoesNotExist", new Exception("The email address provided does not exist"));
+                    ModelState.AddModelError("", "Either the e-mail address or the link used to access this page is no longer valid");
                 }
             }
             return View();
