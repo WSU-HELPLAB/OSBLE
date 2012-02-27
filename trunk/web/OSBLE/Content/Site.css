@@ -914,6 +914,11 @@ body#layoutLogOn
 	width: 140px;
 }
 
+.inbox_checkbox_header
+{
+    background: Silver;   
+}
+
 .inbox_context, .inbox_context_header
 {
     width: 85px;
@@ -1714,11 +1719,11 @@ ul.assignment_deliverables, .assignment_deliverables ul
 
 #assignmentDetailsHeader
 {
-    border: 1px solid #074974;
+    border: 1px solid #B0B0B0;
     border-collapse: collapse;
 }
 
 #assignmentDetailsHeader th, #assignmentDetailsHeader tr, #assignmentDetailsHeader td
 {
-    border: 1px solid #074974;
+    border: 1px solid #B0B0B0;
 }

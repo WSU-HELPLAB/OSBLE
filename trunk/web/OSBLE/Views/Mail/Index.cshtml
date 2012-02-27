@@ -15,14 +15,26 @@
     @if (ViewBag.BoxHeader == "Inbox")
     {
         <h2>Inbox</h2>
-        <p>@Html.ActionLink("Go to Outbox", "Outbox")</p>
+        <table>
+            <tr>
+                <td>@Html.ActionLink("Go to Outbox", "Outbox")</td>
+                <td><a href="#" onclick="deleteSelectedInbox();">Delete Selected</a></td>
+            </tr>
+        </table>
     }
     else
     {
         <h2>Outbox</h2>
-        <p>@Html.ActionLink("Go to Inbox", "Index")</p>
+        <table>
+            <tr>
+                <td>@Html.ActionLink("Go to Inbox", "Index")</td>
+                <td><a href="#" onclick="deleteSelectedOutbox();">Delete Selected</a></td>
+            </tr>
+        </table>
+        
     }
-
+    <br />
+    <br />
 
 <table class="inbox_table">
     <thead>
@@ -31,6 +43,7 @@
         {
     
         <tr>
+            <th id="checkAll" class="inbox_checkbox_header"><input id="checkAllBox" name="foo" type="checkbox" /></th>
             <th id="0" class="inbox_time_header">@Html.ActionLink("Date:", "Index", new { sortBy = 0 })</th>
             <th id="1" class="inbox_context_header">@Html.ActionLink("Context:", "Index", new { sortBy = 1 })</th>
             <th id="2" class="inbox_from_header">@Html.ActionLink("From:", "Index", new { sortBy = 2 })</th>
@@ -40,7 +53,8 @@
         }
         else
         {
-            <tr>
+        <tr>
+            <th id="checkAll" class="inbox_checkbox_header"><input id="checkAllBox" type="checkbox" /></th>
             <th id="0" class="inbox_time_header">@Html.ActionLink("Date:", "Outbox", new { sortBy = 0 })</th>
             <th id="1" class="inbox_context_header">@Html.ActionLink("Context:", "Outbox", new { sortBy = 1 })</th>
             <th id="2" class="inbox_from_header">@Html.ActionLink("To:", "Outbox", new { sortBy = 2 })</th>
@@ -55,6 +69,7 @@
       
         <tr id="mail_item_@(item.ID)" class="@if (!item.Read)
                                              {<text>inbox_unread</text>}">
+            <td><input id="@item.ID" class="mailCheckBoxClass" name="deleteInputs" type="checkbox" /></td>
             <td class="inbox_time">
                 <small>@item.Posted.ToShortDateString() @item.Posted.ToShortTimeString()</small>
             </td>
@@ -116,3 +131,57 @@
         </tr>
     }
 </table>
+
+<script type="text/javascript">
+    var checkBool = true;
+    $("#checkAll").change(function () {
+        if (checkBool == true) {            
+            checkBool = false;
+            $('input[class=mailCheckBoxClass]').each(function () {
+                $(this).attr('checked', true);
+            });
+        }
+        else {
+            checkBool = true;
+            $('input[class=mailCheckBoxClass]').each(function () {
+                $(this).attr('checked', false);
+            });
+        }
+    });
+
+    function deleteSelectedInbox() {
+
+        var mailIds = new Array();
+        var i = 0;
+        $('input[class=mailCheckBoxClass]').each(function () {
+            if ($(this).attr("checked") == "checked") {
+                mailIds[i] = $(this).attr("id");
+                i += 1;
+            }
+        });
+        $.ajax({
+            type: "POST",
+            url: "/Mail/DeleteSelectedInbox",
+            data: { deleteIds: mailIds.toString() }
+        });
+        window.location.reload(true);
+    };
+
+    function deleteSelectedOutbox() {
+
+        var mailIds = new Array();
+        var i = 0;
+        $('input[class=mailCheckBoxClass]').each(function () {
+            if ($(this).attr("checked") == "checked") {
+                mailIds[i] = $(this).attr("id");
+                i += 1;
+            }
+        });
+        $.ajax({
+            type: "POST",
+            url: "/Mail/DeleteSelectedOutbox",
+            data: { deleteIds: mailIds.toString() }
+        });
+        window.location.reload(true);
+    };
+</script>

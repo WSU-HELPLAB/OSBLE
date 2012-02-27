@@ -706,5 +706,57 @@ namespace OSBLE.Controllers
 
             return RedirectToAction("Index");
         }
+
+        [HttpPost]
+        public ActionResult DeleteSelectedInbox(string deleteIds)
+        {
+            string[] idsToDelete = deleteIds.Split(',');
+            foreach (string s in idsToDelete)
+            {
+                Mail m = db.Mails.Find(Convert.ToInt32(s));
+                if (m != null)
+                {
+                    if (m.ToUserProfileID == currentUser.ID)
+                    {
+                        if (m.DeleteFromOutbox == true)
+                        {
+                            db.Mails.Remove(m);
+                        }
+                        else
+                        {
+                            m.DeleteFromInbox = true;
+                        }
+                        db.SaveChanges();
+                    }
+                }
+            }
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public ActionResult DeleteSelectedOutbox(string deleteIds)
+        {
+            string[] idsToDelete = deleteIds.Split(',');
+            foreach (string s in idsToDelete)
+            {
+                Mail m = db.Mails.Find(Convert.ToInt32(s));
+                if (m != null)
+                {
+                    if (m.FromUserProfileID == currentUser.ID)
+                    {
+                        if (m.DeleteFromInbox == true)
+                        {
+                            db.Mails.Remove(m);
+                        }
+                        else
+                        {
+                            m.DeleteFromOutbox = true;
+                        }
+                        db.SaveChanges();
+                    }
+                }
+            }
+            return RedirectToAction("Outbox");
+        }
     }
 }
