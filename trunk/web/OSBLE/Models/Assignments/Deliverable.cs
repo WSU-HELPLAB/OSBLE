@@ -32,6 +32,8 @@ namespace OSBLE.Models.Assignments
         [FileExtensions(new string[] { ".doc", ".docx" })]
         WordDocument,
 
+        [FileExtensions(new string[] { ".pdf" })]
+        PDF,
     }
 
     /// <summary>
