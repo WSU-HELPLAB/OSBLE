@@ -92,8 +92,8 @@ namespace OSBLE.Controllers
                         setLogOnCaptcha();
                         ModelState.AddModelError("", "This account has not been activated.  An additional verification letter has been sent to your email address.");
                         string randomHash = GenerateRandomString(40);
-                        UserProfile up = db.UserProfiles.Where(m => m.UserName == user.UserName).FirstOrDefault();
-                        MembershipUser mu = Membership.GetUser(up.UserName);
+                        UserProfile up = db.UserProfiles.Where(m => m.AspNetUserName == user.UserName).FirstOrDefault();
+                        MembershipUser mu = Membership.GetUser(up.AspNetUserName);
                         mu.Comment = randomHash;
                         Membership.UpdateUser(mu);
                         sendVerificationEmail(true, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), up.FirstName, up.UserName);
