@@ -2,6 +2,10 @@
 <ul id="notifications_list">
     @foreach (Notification n in ViewBag.Notifications)
     {
+        if (n == null || n.Sender == null)
+        {
+            continue;
+        }
         <li id="notification_@(n.ID)" @if (n.Read)
                                       {<text>class="read"</text>}><small>@n.Posted.ToShortDateString() @n.Posted.ToShortTimeString()</small>&nbsp;
             @if (ViewBag.ShowNotificationDelete == true)
@@ -41,13 +45,13 @@
                         {
                             string[] args = n.Data.Split(new char[] { ';' });
                             <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> has published an
-                            @Html.ActionLink("inline review", "ViewInlineReview", "Assignment", new { abstractAssignmentActivityId = args[0], teamUserID = args[1] }, new { }) of your @args[2]</text>
+                            @Html.ActionLink("inline review", "ViewInlineReview", "Assignment", new { assignmentID = args[0], teamID = args[1] }, new { }) of your @args[2]</text>
                             break;
                         }
                     case Notification.Types.RubricEvaluationCompleted:
                         {
                             string[] args1 = n.Data.Split(new char[] { ';' });
-                            <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> completed an @Html.ActionLink("evaluation rubric", "View", "Rubric", new { assignmentId = args1[0], teamId = args1[1] }, new { }) of your @args1[2]
+                            <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> completed an @Html.ActionLink("evaluation rubric", "View", "Rubric", new { assignmentId = args1[0], cuId = args1[1] }, new { }) of your @args1[2]
                             </text>
                             break;
                         }

@@ -189,7 +189,6 @@
     <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="EntityFramework\DbContextExtensions.cs" />
     <Compile Include="Models\AbstractCourses\CourseRubric.cs" />
-    <Compile Include="Models\AbstractCourses\CourseUsers.cs" />
     <Compile Include="Models\Assignments\CommentCategory.cs" />
     <Compile Include="Models\Assignments\CommentCategoryConfiguration.cs" />
     <Compile Include="Models\Assignments\Score.cs" />

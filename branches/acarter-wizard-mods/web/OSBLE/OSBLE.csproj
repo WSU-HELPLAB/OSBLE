@@ -166,8 +166,10 @@
     <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\ContentController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionTeamsController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\PreviousAssignmentController.cs" />
     <Compile Include="Areas\AssignmentWizard\Models\WizardPrerequisiteComparer.cs" />
+    <Compile Include="Areas\AssignmentWizard\Models\WizardSortOrderComparer.cs" />
     <Compile Include="Attributes\CanPostEvent.cs" />
     <Compile Include="Attributes\FileCacheAttribute.cs" />
     <Compile Include="Attributes\IsCommunity.cs" />
@@ -179,36 +181,24 @@
     <Compile Include="Areas\AssignmentWizard\Controllers\HomeController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\TeamController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\WizardBaseController.cs" />
-    <Compile Include="Controllers\AsyncIssueVotingController.cs" />
-    <Compile Include="Controllers\AuthorRebuttalController.cs" />
-    <Compile Include="Controllers\BasicAssignmentController.cs" />
     <Compile Include="Controllers\CommunityController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
     <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\FileHandlerController.cs" />
     <Compile Include="Controllers\GradebookController.cs" />
     <Compile Include="Controllers\SubmissionController.cs" />
-    <Compile Include="Controllers\SyncIssueVotingController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
-    <Compile Include="Controllers\PeerReviewController.cs" />
     <Compile Include="Controllers\RubricController.cs" />
     <Compile Include="Controllers\StudioAssignmentController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="EntityFramework\DbContextExtensions.cs" />
     <Compile Include="Models\Assignments\AssignmentTypes.cs" />
+    <Compile Include="Models\AbstractCourses\CourseRubric.cs" />
     <Compile Include="Models\Assignments\CommentCategory.cs" />
     <Compile Include="Models\Assignments\CommentCategoryConfiguration.cs" />
-    <Compile Include="Models\AbstractCourses\CourseRubric.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\AbstractAssignment.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\AsyncIssueVotingActivity.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\AuthorRebuttalActivity.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\GradeActivity.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\IssueVotingActivity.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\PeerReviewActivity.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\Scores\RubricScore.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\Scores\Score.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\StudioActivity.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\SyncIssueVotingActivity.cs" />
+    <Compile Include="Models\Assignments\DiscussionTeam.cs" />
+    <Compile Include="Models\Assignments\IAssignmentTeam.cs" />
+    <Compile Include="Models\Assignments\Score.cs" />
     <Compile Include="Models\Assignments\CommentCategoryOption.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseUser.cs" />
     <Compile Include="Models\AbstractCourses\Course\GradebookOptions\LetterGrade.cs" />
@@ -218,8 +208,6 @@
     <Compile Include="Models\AbstractCourses\Course\Rubrics\CellDescription.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Rubric.cs" />
     <Compile Include="Models\AbstractCourses\AbstractCourse.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\StopActivity.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\StudioAssignment.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\RubricEvaluation.cs" />
     <Compile Include="Models\Assignments\Assignment.cs" />
     <Compile Include="Models\Assignments\AssignmentTeam.cs" />
@@ -228,8 +216,6 @@
     <Compile Include="Models\Assignments\TeamMember.cs" />
     <Compile Include="Models\HomePage\AbstractDashboard.cs" />
     <Compile Include="Models\AbstractCourses\AbstractRole.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\AbstractAssignmentActivity.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Assignments\Activities\SubmissionActivity.cs" />
     <Compile Include="Models\AbstractCourses\Community\Community.cs" />
     <Compile Include="Models\AbstractCourses\Community\CommunityRole.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseBreak.cs" />
@@ -241,13 +227,7 @@
     <Compile Include="Models\Services\Uploader\ParentDirectoryListing.cs" />
     <Compile Include="Models\Services\Uploader\UserSession.cs" />
     <Compile Include="Models\ToolTips.cs" />
-    <Compile Include="Models\Users\Team.cs" />
-    <Compile Include="Models\Users\TeamMember.cs" />
-    <Compile Include="Models\Users\TeamUserMember.cs" />
-    <Compile Include="Models\Users\UserMember.cs" />
-    <Compile Include="Models\ViewModels\ActivityTeacherTableViewModel.cs" />
     <Compile Include="Models\ViewModels\AssignmentListViewModel.cs" />
-    <Compile Include="Models\ViewModels\BasicAssignmentViewModel.cs" />
     <Compile Include="Models\Services\Uploader\AbstractListing.cs" />
     <Compile Include="Models\Services\Uploader\DirectoryListing.cs" />
     <Compile Include="Models\Services\Uploader\FileListing.cs" />
@@ -325,6 +305,7 @@
     <Content Include="Content\favicon.ico" />
     <Content Include="Content\images\arrow_left.png" />
     <Content Include="Content\images\helplab_logo.png" />
+    <Content Include="Content\images\publish.png" />
     <Content Include="Content\images\tooltip\109_AllAnnotations_Help_16x16_72.png" />
     <Content Include="Content\images\account.png" />
     <Content Include="Content\images\add_up.png" />
@@ -429,6 +410,7 @@
     <Content Include="Content\images\ui-icons_eeeeee_256x240.png" />
     <Content Include="Content\images\ui-icons_eee_256x240.png" />
     <Content Include="Content\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="Content\images\unpublish.png" />
     <Content Include="Content\jquery-ui-1.8.13.custom.css" />
     <Content Include="Content\jquery-ui-timepicker.css" />
     <Content Include="Content\jquery-tooltip.css" />
@@ -460,6 +442,7 @@
     <Content Include="Content\themes\base\jquery.ui.tabs.css" />
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
     <Content Include="Areas\AssignmentWizard\Controllers\README.txt" />
+    <Content Include="Scripts\time.js" />
     <Content Include="crossdomain.xml" />
     <Content Include="EditPeerReviewTestPage.aspx" />
     <Content Include="EditPeerReviewTestPage.html" />
@@ -509,6 +492,7 @@
     <Content Include="Silverlight.js" />
     <Content Include="SilverlightSandboxTestPage.aspx" />
     <Content Include="SilverlightSandboxTestPage.html" />
+    <Content Include="SiteDown.html" />
     <Content Include="ViewPeerReviewTestPage.aspx" />
     <Content Include="ViewPeerReviewTestPage.html" />
     <Content Include="Web.config">
@@ -535,10 +519,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\Wizard\" />
     <Folder Include="Validations\" />
-    <Folder Include="Views\SubbmissionAssignmentActivity\" />
-    <Folder Include="Views\SubmissionAssignmentActivity\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
@@ -658,6 +639,7 @@
     <Content Include="Areas\AssignmentWizard\Views\Home\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\PreviousAssignment\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Discussion\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\DiscussionTeams\Index.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />
@@ -665,10 +647,6 @@
     <Content Include="Views\Roster\CreateByEmail.cshtml" />
     <Content Include="Views\Roster\RosterError.cshtml" />
     <Content Include="Utility\Notification\Index.cshtml" />
-    <Content Include="Views\BasicAssignment\Index.cshtml" />
-    <Content Include="Views\BasicAssignment\Details.cshtml" />
-    <Content Include="Views\BasicAssignment\Create.cshtml" />
-    <Content Include="Views\BasicAssignment\Delete.cshtml" />
     <Content Include="Views\Course\Create.cshtml" />
     <Content Include="Views\Course\Edit.cshtml" />
     <Content Include="Views\Course\Delete.cshtml" />
@@ -694,7 +672,6 @@
     <Content Include="Views\Event\Approval.cshtml" />
     <Content Include="Views\Mail\NotFound.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\SilverlightObject.cshtml" />
-    <Content Include="Views\StudioAssignment\SilverlightTest.cshtml" />
     <Content Include="Views\Shared\_ReCaptcha.cshtml" />
     <Content Include="Views\Gradebook\_Tabs.cshtml" />
     <Content Include="Views\Gradebook\Tab.cshtml" />
@@ -705,7 +682,6 @@
     <Content Include="Views\Assignment\Index.cshtml" />
     <Content Include="Views\Account\Privacy.cshtml" />
     <Content Include="Views\PeerReview\Create.cshtml" />
-    <Content Include="Views\SyncIssueVoting\Create.cshtml" />
     <Content Include="Views\AuthorRebuttal\Create.cshtml" />
     <Content Include="Views\Assignment\_AssignmentList.cshtml" />
     <Content Include="Views\AsyncIssueVoting\Create.cshtml" />
@@ -713,7 +689,6 @@
     <Content Include="Views\AuthorRebuttal\Index.cshtml" />
     <Content Include="Views\AsyncIssueVoting\Index.cshtml" />
     <Content Include="Views\PeerReview\Index.cshtml" />
-    <Content Include="Views\SyncIssueVoting\Index.cshtml" />
     <Content Include="Views\Account\ErrorPage.cshtml" />
     <Content Include="Views\Account\ProfessionalRegister.cshtml" />
     <Content Include="Views\Submission\Create.cshtml" />
@@ -723,7 +698,6 @@
     <Content Include="Views\Assignment\_AssignmentContentTeacher.cshtml" />
     <Content Include="Views\Assignment\_ActivityTeacherView.cshtml" />
     <Content Include="Views\Assignment\ActivityTeacherTable.cshtml" />
-    <Content Include="Views\BasicAssignment\_RubricSelect.cshtml" />
     <Content Include="Views\Rubric\Index.cshtml" />
     <Content Include="Views\Submission\_Submit.cshtml" />
     <Content Include="Views\Rubric\_Display.cshtml" />
@@ -744,6 +718,13 @@
     <Content Include="Areas\AssignmentWizard\Views\WizardSummary.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Deliverables\Index.cshtml" />
     <Content Include="Views\Assignment\AssignmentDetails.cshtml" />
+    <Content Include="Views\Gradebook\ExportToCSV.cshtml" />
+    <Content Include="Views\Home\Time.cshtml" />
+    <Content Include="Views\Assignment\_ObserverAssignmentDetails.cshtml" />
+    <Content Include="Views\Assignment\_ObserverIndex.cshtml" />
+    <Content Include="Views\Assignment\_StudentIndex.cshtml" />
+    <Content Include="Views\Assignment\_TeacherAssignmentDetails.cshtml" />
+    <Content Include="Views\Assignment\_TeacherIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

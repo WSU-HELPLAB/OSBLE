@@ -4,7 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Net.Mail;
 using System.Web.Mvc;
-using OSBLE.Models.Assignments.Activities;
+
 using OSBLE.Models.Courses;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
@@ -90,8 +90,6 @@ namespace OSBLE.Controllers
             n.ItemID = mail.ID;
             n.RecipientID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.ToUserProfileID).FirstOrDefault().ID;
             n.SenderID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.FromUserProfileID).FirstOrDefault().ID;
-            n.CourseID = mail.ContextID;
-
             addNotification(n);
         }
 
@@ -101,50 +99,43 @@ namespace OSBLE.Controllers
         /// <param name="dp">The parent dashboard post</param>
         /// <param name="poster">The user profile of the user who posted the reply</param>
         [NonAction]
-        public void SendDashboardNotification(DashboardPost dp, UserProfile poster)
+        public void SendDashboardNotification(DashboardPost dp, CourseUser poster)
         {
-            List<int> sendToUsers = new List<int>();
-
-            CourseUser dpPosterCu = db.CourseUsers.Where(cu => cu.AbstractCourseID == dp.CourseID && cu.UserProfileID == dp.UserProfileID).FirstOrDefault();
+            List<CourseUser> sendToUsers = new List<CourseUser>();
 
             // Send notification to original thread poster if poster is not anonymized,
             // are still in the course,
             // and are not the poster of the new reply.
-            if (dpPosterCu != null && !dpPosterCu.AbstractRole.Anonymized && dp.UserProfileID != poster.ID)
+            if (poster != null && !poster.AbstractRole.Anonymized && dp.CourseUserID != poster.ID)
             {
-                sendToUsers.Add(dp.ID);
+                sendToUsers.Add(dp.CourseUser);
             }
 
-            foreach (DashboardReply dr in dp.Replies)
+            foreach (DashboardReply reply in dp.Replies)
             {
-                CourseUser drPosterCu = db.CourseUsers.Where(cu => cu.AbstractCourseID == dp.CourseID && cu.UserProfileID == dr.UserProfileID).FirstOrDefault();
-
                 // Send notifications to each participant as long as they are not anonymized,
                 // are still in the course,
                 // and are not the poster of the new reply.
                 // Also checks to make sure a duplicate notification is not sent.
-                if (drPosterCu != null && !drPosterCu.AbstractRole.Anonymized && dr.UserProfileID != poster.ID && !sendToUsers.Contains(dr.ID))
+                if (reply.CourseUser != null && !reply.CourseUser.AbstractRole.Anonymized && reply.CourseUserID != poster.ID && !sendToUsers.Contains(reply.CourseUser))
                 {
-                    sendToUsers.Add(dr.ID);
+                    sendToUsers.Add(reply.CourseUser);
                 }
             }
 
-            //Pulling the posters course user ID
-            int posterID = (from a in db.CourseUsers
-                            where a.UserProfileID == poster.ID &&
-                            a.AbstractCourseID == dp.CourseID
-                            select a.ID).FirstOrDefault();
-
             // Send notification to each valid user.
-            foreach (int CourseUserProfileID in sendToUsers)
+            foreach (CourseUser courseUser in sendToUsers)
             {
+                //ignore null course users
+                if (courseUser == null)
+                {
+                    continue;
+                }
                 Notification n = new Notification();
                 n.ItemType = Notification.Types.Dashboard;
                 n.ItemID = dp.ID;
-                n.RecipientID = CourseUserProfileID;
-                n.SenderID = posterID;
-                n.CourseID = dp.CourseID;
-
+                n.RecipientID = courseUser.ID;
+                n.SenderID = poster.ID;
                 addNotification(n);
             }
         }
@@ -169,48 +160,40 @@ namespace OSBLE.Controllers
                 Notification n = new Notification();
                 n.ItemType = Notification.Types.EventApproval;
                 n.ItemID = e.ID;
-                n.CourseID = e.Poster.AbstractCourseID;
                 n.RecipientID = instructor.ID;
                 n.SenderID = e.Poster.ID;
-                n.CourseID = activeCourse.AbstractCourseID; 
 
                 addNotification(n);
             }
         }
 
         [NonAction]
-        public void SendInlineReviewCompletedNotification(Assignment assignment, AssignmentTeam team)
+        public void SendInlineReviewCompletedNotification(Assignment assignment, Team team)
         {
-            List<CourseUser> users = GetAllCourseUsers(team);
 
-            foreach (CourseUser user in users)
+            foreach (TeamMember member in team.TeamMembers)
             {
                 Notification n = new Notification();
                 n.ItemType = Notification.Types.InlineReviewCompleted;
-                n.Data = assignment.ID.ToString() + ";" + team.TeamID.ToString() + ";" + assignment.AssignmentName;
-                n.RecipientID = user.ID;
+                n.Data = assignment.ID.ToString() + ";" + team.ID.ToString() + ";" + assignment.AssignmentName;
+                n.RecipientID = member.CourseUserID;
                 n.SenderID = activeCourse.ID;
-                n.CourseID = activeCourse.AbstractCourseID;
-
                 addNotification(n);
             }
         }
 
         [NonAction]
-        public void SendRubricEvaluationCompletedNotification(Assignment assignment, AssignmentTeam team)
+        public void SendRubricEvaluationCompletedNotification(Assignment assignment, Team team)
         {
-            List<CourseUser> users = GetAllCourseUsers(team);
 
-            foreach (CourseUser user in users)
+            foreach (TeamMember member in team.TeamMembers)
             {
                 Notification n = new Notification();
                 n.ItemType = Notification.Types.RubricEvaluationCompleted;
-                n.Data = assignment.ID.ToString() + ";" + team.TeamID.ToString() + ";" + assignment.AssignmentName;
-                
-                n.RecipientID = user.ID;
-                n.SenderID = activeCourse.ID;
-                n.CourseID = activeCourse.AbstractCourseID;
+                n.Data = assignment.ID.ToString() + ";" + member.CourseUserID + ";" + assignment.AssignmentName;
 
+                n.RecipientID = member.CourseUser.ID;
+                n.SenderID = activeCourse.ID;
                 addNotification(n);
             }
         }
@@ -232,8 +215,6 @@ namespace OSBLE.Controllers
                     n.Data = assignment.ID.ToString() + ";" + team.TeamID.ToString() + ";" + assignment.AssignmentName + ";" + team.Team.Name + ";" + fileName + ";" + DateTime.Now;
                     n.RecipientID = user.ID;
                     n.SenderID = activeCourse.ID;
-                    n.CourseID = activeCourse.AbstractCourseID;
-
                     addNotification(n);
                 }
             }
@@ -251,10 +232,10 @@ namespace OSBLE.Controllers
             db.SaveChanges();
 
             // Find recipient profile and check notification settings
-            UserProfile recipient = (from a in db.CourseUsers
-                                where a.ID == n.RecipientID
-                                select a.UserProfile).FirstOrDefault();
-            if (recipient.EmailAllNotifications && !(recipient.EmailAllActivityPosts && n.ItemType == Notification.Types.Dashboard))
+            CourseUser recipient = (from a in db.CourseUsers
+                                    where a.ID == n.RecipientID
+                                    select a).FirstOrDefault();
+            if (recipient.UserProfile.EmailAllNotifications && !(recipient.UserProfile.EmailAllActivityPosts && n.ItemType == Notification.Types.Dashboard))
             {
                 emailNotification(n);
             }
@@ -267,8 +248,8 @@ namespace OSBLE.Controllers
         /// <param name="n">Notification to be emailed</param>
         private void emailNotification(Notification n)
         {
-#if !DEBUG
 
+#if FALSE
             SmtpClient mailClient = new SmtpClient();
             mailClient.UseDefaultCredentials = true;
             
@@ -276,7 +257,7 @@ namespace OSBLE.Controllers
             UserProfile recipient = db.UserProfiles.Find(n.Recipient.UserProfileID);
 
             // this comes back as null, for some reason.
-            AbstractCourse course = db.AbstractCourses.Where(b => b.ID == n.CourseID).FirstOrDefault();
+            AbstractCourse course = db.AbstractCourses.Where(b => b.ID == n.Sender.AbstractCourseID).FirstOrDefault();
 
             string subject = "";
             if(getCourseTag(course) != "")
@@ -376,11 +357,11 @@ namespace OSBLE.Controllers
             {
                 if (c is Course)
                 {
-                    tag = " " + (c as Course).Prefix + " " + (c as Course).Number;
+                    tag = (c as Course).Prefix + " " + (c as Course).Number;
                 }
                 else if (c is Community)
                 {
-                    tag = " " + (c as Community).Nickname;
+                    tag = (c as Community).Nickname;
                 }
             }
 

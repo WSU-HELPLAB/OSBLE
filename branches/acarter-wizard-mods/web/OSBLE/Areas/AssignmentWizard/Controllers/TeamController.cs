@@ -53,7 +53,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         /// <param name="assignmentWithTeams">Supply the assignment that you want pull the teams from.
         /// This is used for pulling team configurations from other assignments
         /// </param>
-        private void SetUpViewBag(Assignment assignmentWithTeams)
+        protected void SetUpViewBag(List<IAssignmentTeam> teams)
         {
             //Guaranteed to pull all people enrolled in the course that can submit files
             //(probably students).
@@ -63,11 +63,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                                        select cu).ToList();
             List<CourseUser> allUsers = users.ToList();
 
-            //We'll need to cross the current teams with the list of course users
-            List<AssignmentTeam> teams = assignmentWithTeams.AssignmentTeams.ToList();
-
             //remove students currently on the team list from our complete user list
-            foreach (AssignmentTeam team in teams)
+            foreach (IAssignmentTeam team in teams)
             {
                 foreach (TeamMember member in team.Team.TeamMembers)
                 {
@@ -98,9 +95,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         /// Sets up the viewbag for various controller actions.  Will pull team information from
         /// the assignment currently being edited.
         /// </summary>
-        private void SetUpViewBag()
+        protected new void SetUpViewBag()
         {
-            SetUpViewBag(Assignment);
+            SetUpViewBag(Assignment.AssignmentTeams.Cast<IAssignmentTeam>().ToList());
         }
 
         public override ActionResult Index() 
@@ -111,7 +108,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         }
 
         [HttpPost]
-        public ActionResult Index(Assignment model)
+        public virtual ActionResult Index(Assignment model)
         {
             //reset our assignment
             Assignment = db.Assignments.Find(model.ID);
@@ -128,11 +125,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 int assignmentId = Assignment.ID;
                 Int32.TryParse(Request.Form["AutoGenFromPastSelect"].ToString(), out assignmentId);
                 Assignment otherAssignment = db.Assignments.Find(assignmentId);
-                SetUpViewBag(otherAssignment);
+                SetUpViewBag(otherAssignment.AssignmentTeams.Cast<IAssignmentTeam>().ToList());
             }
             else
             {
-                ParseFormValues();
+                List<IAssignmentTeam> teams = Assignment.AssignmentTeams.Cast<IAssignmentTeam>().ToList();
+                ParseFormValues(teams);
+                IList<IAssignmentTeam> castedTeams = CastTeamAsConcreteType(teams, typeof(AssignmentTeam));
+                Assignment.AssignmentTeams = castedTeams.Cast<AssignmentTeam>().ToList();
                 db.SaveChanges();
 
                 //We need to force the update as our model validation fails by default because
@@ -140,16 +140,45 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 WasUpdateSuccessful = true;
                 SetUpViewBag();
             }
-            return base.Index(Assignment);
+            return base.PostBack(Assignment);
         }
 
-        private void ParseFormValues()
+        /// <summary>
+        /// AC: As of 2012-02-27, we have two different team uses (AssignmentTeam, DiscussionTeam).  Both inherit from
+        /// IAssignmentTeam, but when creating new objects, I need to instantiate a concrete class.  This method
+        /// allows the programmer to convert between concrete implementations of IAssignmentTeam.
+        /// </summary>
+        /// <param name="genericTeam"></param>
+        /// <param name="teamType"></param>
+        /// <returns></returns>
+        protected IList<IAssignmentTeam> CastTeamAsConcreteType(IList<IAssignmentTeam> genericTeam, Type teamType)
+        {
+            List<IAssignmentTeam> castedTeams = new List<IAssignmentTeam>();
+            foreach (IAssignmentTeam team in genericTeam)
+            {
+                IAssignmentTeam t = Activator.CreateInstance(teamType) as IAssignmentTeam;
+                t.AssignmentID = team.AssignmentID;
+                t.Assignment = team.Assignment;
+                t.TeamID = team.TeamID;
+                t.Team = team.Team;
+                castedTeams.Add(t);
+            }
+            return castedTeams;
+        }
+
+        protected void ParseFormValues(IList<IAssignmentTeam> previousTeams)
         {
             //our new list of teams
-            List<Team> teams = Assignment.AssignmentTeams.Select(at => at.Team).ToList();
+            List<Team> teams = previousTeams.Select(at => at.Team).ToList();
 
             //Now that we've captured any existing teams, wipe out the old association
-            Assignment.AssignmentTeams.Clear();
+            //as well as the old team members
+            previousTeams.Clear();
+            foreach (Team team in teams)
+            {
+                team.TeamMembers.Clear();
+            }
+            db.SaveChanges();
 
             //update all prior teams (those already stored in the DB)
             string[] teamKeys = Request.Form.AllKeys.Where(k => k.Contains("team_")).ToArray();
@@ -166,6 +195,10 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
                 //update the team name
                 Team team = teams.Find(t => t.ID == teamId);
+                if (team == null)
+                {
+                    continue;
+                }
                 team.Name = teamName;
 
                 //clear any existing team members
@@ -222,7 +255,13 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             //attach the new teams to the assignment
             foreach (Team team in teams)
             {
-                Assignment.AssignmentTeams.Add(new AssignmentTeam() { Assignment = Assignment, Team = team });
+                previousTeams.Add(new AssignmentTeam()
+                { 
+                        Assignment = Assignment, 
+                        AssignmentID = Assignment.ID, 
+                        Team = team,
+                        TeamID = team.ID
+                });
             }
         }
     }

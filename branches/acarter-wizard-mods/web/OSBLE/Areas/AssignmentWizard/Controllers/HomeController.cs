@@ -45,6 +45,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     component.IsSelected = true;
                 }
 
+                //finally, request that the list be sorted
+                manager.SortComponents();
+
                 //begin wizard
                 return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute, new { controller = manager.ActiveComponent.ControllerName });
             }

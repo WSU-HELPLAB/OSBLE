@@ -77,6 +77,16 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult Edit(UserProfile userprofile)
         {
+            //make sure that the user name isn't already taken
+            int count = (from user in db.UserProfiles
+                         where user.UserName.ToLower().CompareTo(userprofile.UserName.ToLower()) == 0
+                         && user.ID != userprofile.ID
+                         select user).Count();
+            if (count != 0)
+            {
+                ModelState.AddModelError("UserName", "User name already taken.");
+            }
+            
             if (ModelState.IsValid)
             {
                 db.Entry(userprofile).State = EntityState.Modified;

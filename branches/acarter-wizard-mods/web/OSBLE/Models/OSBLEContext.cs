@@ -3,8 +3,8 @@ using System.Web;
 using System.Web.Security;
 using OSBLE.Models.AbstractCourses;
 using OSBLE.Models.Assignments;
-using OSBLE.Models.Assignments.Activities;
-using OSBLE.Models.Assignments.Activities.Scores;
+
+using OSBLE.Models.Assignments;
 
 //using OSBLE.Models.Assignments.Activities.CommentCategories;
 using OSBLE.Models.Courses;
@@ -18,6 +18,7 @@ namespace OSBLE.Models
 {
     public class OSBLEContext : DbContext
     {
+
         // You can add custom code to this file. Changes will not be overwritten.
         //
         // If you want Entity Framework to drop and regenerate your database
@@ -42,10 +43,6 @@ namespace OSBLE.Models
 
         // Assignments
 
-        public DbSet<AbstractAssignment> AbstractAssignments { get; set; }
-
-        public DbSet<StudioAssignment> StudioAssignments { get; set; }
-
         public DbSet<CommentCategory> CommentCategories { get; set; }
 
         public DbSet<CommentCategoryConfiguration> CommentCategoryConfigurations { get; set; }
@@ -58,30 +55,17 @@ namespace OSBLE.Models
 
         public DbSet<AssignmentTeam> AssignmentTeams { get; set; }
 
+        public DbSet<DiscussionTeam> DiscussionTeams { get; set; }
+
         public DbSet<Team> Teams { get; set; }
 
         public DbSet<TeamMember> TeamMembers { get; set; }
 
         public DbSet<DiscussionSetting> DiscussionSettings { get; set; }
 
-
-        // Assignments.Activities
-
-        public DbSet<AbstractAssignmentActivity> AbstractAssignmentActivities { get; set; }
-
-        public DbSet<Deliverable> Deliverables { get; set; }
-
-        public DbSet<GradeActivity> GradeActivities { get; set; }
-
-        public DbSet<StopActivity> StopActivities { get; set; }
-
-        public DbSet<SubmissionActivity> SubmissionActivities { get; set; }
-
-        // Assignments.Activities.Scores
+        // Assignments
 
         public DbSet<Score> Scores { get; set; }
-
-        public DbSet<RubricScore> RubricScores { get; set; }
 
         // Courses
 
@@ -137,21 +121,17 @@ namespace OSBLE.Models
 
         // Users
 
-        public DbSet<OldTeam> OldTeams { get; set; }
-
         public DbSet<Mail> Mails { get; set; }
 
         public DbSet<UserProfile> UserProfiles { get; set; }
 
-        public DbSet<TeamUserMember> TeamUsers { get; set; }
-
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
+           
 #if !DEBUG
             modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
-#endif   
+#endif
             modelBuilder.Entity<Notification>()
                 .HasRequired(n => n.Sender)
                 .WithMany()
@@ -172,6 +152,11 @@ namespace OSBLE.Models
                 .WithMany()
                 .WillCascadeOnDelete(false);
 
+            modelBuilder.Entity<Score>()
+                .HasRequired(s => s.Assignment)
+                .WithMany(a => a.Scores)
+                .WillCascadeOnDelete(false);
+
             modelBuilder.Entity<DiscussionSetting>()
                 .HasRequired(ds => ds.Assignment)
                 .WithOptional(a => a.DiscussionSettings)
@@ -189,6 +174,7 @@ namespace OSBLE.Models
             up.Identification = ident;
             up.SchoolID = school;
             up.UserName = username;
+            up.AspNetUserName = username;
             up.CanCreateCourses = canCreateCourses;
 
             this.UserProfiles.Add(up);
@@ -344,7 +330,7 @@ namespace OSBLE.Models
 
             this.SaveChanges();
 
-            createSampleUser("bob@smith.com", "123123", "Bob", "Smith", "1", 1, false, true);
+            createSampleUser("bob@smith.com", "123123", "Bob", "Smith", "1", 1, true, true);
             createSampleUser("stu@dent.com", "123123", "Stu", "Dent", "2", 1, false, false);
             createSampleUser("me@me.com", "123123", "Ad", "Min", "3", 1, true, true);
             createSampleUser("John@Morgan.com", "123123", "John", "Morgan", "4", 1, false, false);
@@ -531,15 +517,8 @@ namespace OSBLE.Models
 
             #endregion add course users
 
+            this.SaveChanges();
         }
-
-        public DbSet<PeerReviewActivity> PeerReviewActivities { get; set; }
-
-        public DbSet<IssueVotingActivity> IssueVotingActivities { get; set; }
-
-        public DbSet<AuthorRebuttalActivity> AuthorRebuttalActivities { get; set; }
-
-        public DbSet<AsyncIssueVotingActivity> AsyncIssueVotingActivities { get; set; }
     }
 
     /// <summary>

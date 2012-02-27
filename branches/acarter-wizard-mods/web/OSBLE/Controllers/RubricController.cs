@@ -6,8 +6,8 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using OSBLE.Attributes;
 using OSBLE.Models.Assignments;
-using OSBLE.Models.Assignments.Activities;
-using OSBLE.Models.Assignments.Activities.Scores;
+
+using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.Users;
@@ -25,7 +25,8 @@ namespace OSBLE.Controllers
             ViewBag.CritSliderPrefix = "crit_slider";
             ViewBag.CritCommentPrefix = "crit_comment";
             ViewBag.AssignmentId = "AssignmentId";
-            ViewBag.TeamId = "teamId";
+            ViewBag.CourseUserId = "CourseUserId";
+            ViewBag.TeamId = "TeamId";
             ViewBag.AssignmentSelectId = "selected_assignment";
             ViewBag.TeamSelectId = "selected_team";
             ViewBag.GlobalCommentId = ViewBag.CritCommentPrefix + "_global";
@@ -41,14 +42,16 @@ namespace OSBLE.Controllers
         {
             RubricViewModel viewModel = new RubricViewModel();
             int assignmentId = 0;
+            int courseUserId = 0;
             int teamId = 0;
             Int32.TryParse(Request.Form[ViewBag.AssignmentId].ToString(), out assignmentId);
+            Int32.TryParse(Request.Form[ViewBag.CourseUserId].ToString(), out courseUserId);
             Int32.TryParse(Request.Form[ViewBag.TeamId].ToString(), out teamId);
 
             //before we populate with FORM values, fill in the basic stuff
-            if (assignmentId > 0 && teamId > 0)
+            if (assignmentId > 0 && courseUserId > 0 && teamId > 0)
             {
-                viewModel = GetRubricViewModel(assignmentId, teamId);
+                viewModel = GetRubricViewModel(assignmentId, courseUserId);
             }
 
             //now, change the view model based on what we were passed through the form
@@ -115,21 +118,19 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// Populates a generic RubricViewModel based on the supplied parameters
-        /// </summary>
-        /// <param name="abstractAssignmentActivityId"></param>
-        /// <param name="teamUserId"></param>
-        /// <returns></returns>
-        private RubricViewModel GetRubricViewModel(int assignmentId, int teamId)
+       /// Populates a generic RubricViewModel based on the supplied parameters
+       /// </summary>
+       /// <param name="abstractAssignmentActivityId"></param>
+       /// <param name="teamUserId"></param>
+       /// <returns></returns>
+        private RubricViewModel GetRubricViewModel(int assignmentId, int cuId)
         {
+            CourseUser cu = db.CourseUsers.Find(cuId);
             RubricViewModel viewModel = new RubricViewModel();
 
             Assignment assignment = db.Assignments.Find(assignmentId);
 
-            AssignmentTeam assignmentTeam = (from at in db.AssignmentTeams
-                                             where at.TeamID == teamId &&
-                                             at.AssignmentID == assignment.ID
-                                             select at).FirstOrDefault();
+            AssignmentTeam assignmentTeam = GetAssignmentTeam(assignment, cu.UserProfile);
 
             if (assignment == null || assignmentTeam == null)
             {
@@ -153,7 +154,7 @@ namespace OSBLE.Controllers
             else
             {
                 //if nothing exists, we need to build a dummy eval for the view to process
-                viewModel.Evaluation.Recipient = assignmentTeam;
+                viewModel.Evaluation.Recipient = assignmentTeam.Team;
                 viewModel.Evaluation.AssignmentID = assignment.ID;
                 viewModel.Evaluation.EvaluatorID = CurrentUser.ID;
                 foreach (Criterion crit in rubric.Criteria)
@@ -232,10 +233,10 @@ namespace OSBLE.Controllers
                         studentScore += (double)critEval.Score / maxLevelScore * (critEval.Criterion.Weight / totalRubricPoints);
                     }
 
-                    //normalize the score with the abstract assignment score
+                    //normalize the score with the assignment score
                     studentScore *= vm.Evaluation.Assignment.PointsPossible;
 
-                    gradebook.ModifyTeamGrade(studentScore, vm.SelectedAssignment.ID, vm.Evaluation.Recipient.TeamID);
+                    gradebook.ModifyTeamGrade(studentScore, vm.SelectedAssignment.ID, vm.Evaluation.Recipient.ID);
 
 
                 }
@@ -244,9 +245,9 @@ namespace OSBLE.Controllers
         }
 
         [CanGradeCourse]
-        public ActionResult Index(int assignmentId, int teamId)
+        public ActionResult Index(int assignmentId, int cuId)
         {
-            RubricViewModel viewModel = GetRubricViewModel(assignmentId, teamId);
+            RubricViewModel viewModel = GetRubricViewModel(assignmentId, cuId);
 
             if (!HasValidViewModel(viewModel))
             {
@@ -257,9 +258,10 @@ namespace OSBLE.Controllers
             return View(viewModel);
         }
 
-        public ActionResult View(int assignmentId, int teamId)
+
+        public ActionResult View(int assignmentId, int cuId)
         {
-            RubricViewModel viewModel = GetRubricViewModel(assignmentId, teamId);
+            RubricViewModel viewModel = GetRubricViewModel(assignmentId, cuId);
 
             if (HasValidViewModel(viewModel))
             {
@@ -271,18 +273,19 @@ namespace OSBLE.Controllers
                     Assignment assignment = db.Assignments.Find(assignmentId);
                     AssignmentTeam team = GetAssignmentTeam(assignment, currentUser);
                     if (team != null)
-                    {
+                    { 
                         isOwnAssignment = true;
                     }
                 }
 
-                if (activeCourse.AbstractRole.CanGrade || isOwnAssignment)
+                if (activeCourse.AbstractRole.CanGrade || isOwnAssignment || activeCourse.AbstractRole.Anonymized)
                 {
                     Assignment assignment = db.Assignments.Find(assignmentId);
-
+                    CourseUser cu = db.CourseUsers.Find(cuId);
+                    AssignmentTeam at = GetAssignmentTeam(assignment, cu.UserProfile);
                     ViewBag.AssignmentName = assignment.AssignmentName;
                     ViewBag.PossiblePoints = assignment.PointsPossible;
-                    ViewBag.Score = (from c in assignment.Scores where c.AssignmentTeam.TeamID == teamId select c).FirstOrDefault();
+                    ViewBag.Score = (from c in assignment.Scores where c.CourseUserID == cuId select c).FirstOrDefault();
                     if (ViewBag.Score != null && ViewBag.Score.Points == -1) //If the score is currently a NG, dont display score (doing this by giving score a null value, handled by view)
                         ViewBag.Score = null;
                     ViewBag.isEditable = false;

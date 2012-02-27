@@ -10,13 +10,13 @@ namespace OSBLE.Areas.AssignmentWizard.Models
     {
         public int Compare(WizardBaseController x, WizardBaseController y)
         {
-            //if the other controller thinks we are a prereq, then we must go first
+            //if x thinks y is a prereq, then y must go first
             if (x.Prerequisites.Contains(y))
             {
                 return 1;
             }
 
-            //if we think that the other is a prereq, then they go first
+            //if y thinks x is a prereq, then x most go first
             if (y.Prerequisites.Contains(x))
             {
                 return -1;

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using OSBLE.Models.Assignments.Activities;
-using OSBLE.Models.Assignments.Activities.Scores;
+using OSBLE.Models.Assignments;
 
 namespace OSBLE.Models.Users
 {
@@ -12,6 +11,8 @@ namespace OSBLE.Models.Users
         public int ID { get; set; }
 
         public string UserName { get; set; }
+
+        public string AspNetUserName { get; set; }
 
         public int SchoolID { get; set; }
 
@@ -28,8 +29,6 @@ namespace OSBLE.Models.Users
         public bool CanCreateCourses { get; set; }
 
         public int DefaultCourse { get; set; }
-
-        public ICollection<Score> Scores { get; set; }
 
         // User E-mail Notification Settings
 
@@ -75,7 +74,6 @@ namespace OSBLE.Models.Users
             this.LastName = up.LastName;
             this.School = up.School;
             this.SchoolID = up.SchoolID;
-            this.Scores = up.Scores;
             this.UserName = up.UserName;
             this.SortBy = up.SortBy;
         }

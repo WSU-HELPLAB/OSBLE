@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using OSBLE.Models.Assignments.Activities;
 using OSBLE.Models.Assignments;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
@@ -69,7 +68,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             //assignment creation.
             db.Entry(Assignment).State = System.Data.EntityState.Modified;
             db.SaveChanges();
-            return base.Index(model);
+            return base.PostBack(model);
         }
 
         private void ParseFormValues()

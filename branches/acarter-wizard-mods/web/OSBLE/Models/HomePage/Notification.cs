@@ -20,10 +20,6 @@ namespace OSBLE.Models.HomePage
 
         public virtual CourseUser Sender { get; set; }
 
-        public int? CourseID { get; set; }
-
-        public virtual AbstractCourse Course { get; set; }
-
         public bool Read { get; set; }
 
         [Required]
@@ -43,6 +39,19 @@ namespace OSBLE.Models.HomePage
         {
             Posted = DateTime.Now;
             Read = false;
+        }
+
+        [Obsolete("For legacy compatibility.  You should be using either the Recipient or Sender property instead.")]
+        public int CourseID
+        {
+            get
+            {
+                if (this.Recipient != null)
+                {
+                    return this.Recipient.AbstractCourseID;
+                }
+                return 0;
+            }
         }
 
         public static class Types

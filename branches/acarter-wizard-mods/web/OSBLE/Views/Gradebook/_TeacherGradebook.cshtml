@@ -1,9 +1,8 @@
 ﻿@using OSBLE.Controllers;
 @using OSBLE.Models.Courses;
 @using OSBLE.Models.Assignments;
-@using OSBLE.Models.Assignments.Activities.Scores;
-@using OSBLE.Models.Users
-@using OSBLE.Models.Assignments.Activities
+@using OSBLE.Models.Assignments;
+@using OSBLE.Models.Users;
 @using OSBLE.Utility;
 @{
     Layout = null;
@@ -191,10 +190,11 @@
                 //Get the total score for the class
 
                 int studentCount = 0;
+                
 
-                foreach (UserProfile user in ViewBag.Students)
+                foreach (CourseUser user in ViewBag.CoursesUser)
                 {
-                    studentCount++;
+                    int studentAssignmentCount = 0;
                     categoryTotalWeight = ViewBag.TotalCategoryWeights;
                     foreach (Category category in ViewBag.CatsWithWeightsAndScores)
                     {
@@ -202,7 +202,7 @@
                         {
                             List<Score> userScore = (from score in ViewBag.AllGrades as IEnumerable<Score>
                                                      where score.Assignment.CategoryID == category.ID &&
-                                                     score.TeamMember.CourseUser.UserProfileID == user.ID
+                                                     score.CourseUserID == user.ID
                                                      select score).ToList();
 
                             if (userScore.Count() == 0)
@@ -220,7 +220,7 @@
                             double categoryTotal = 0;
 
                             List<Score> totalScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
-                                                       where score.TeamMember.CourseUser.UserProfileID == user.ID &&
+                                                       where score.CourseUserID == user.ID &&
                                                        score.Assignment.CategoryID == category.ID
                                                        select score).ToList();
                             if (totalScores.Count() > 0)
@@ -228,9 +228,17 @@
                                 
                                 foreach (Score score in totalScores)
                                 {
-                                    
                                     if (score.Assignment.CategoryID == category.ID)
                                     {
+                                        //We only want to count the student if they have assignments. They should only get counted
+                                        //for one assignment in there category so we have this check to stop incrementing
+                                        //student count after the first assignment
+                                        studentAssignmentCount++;
+                                        if (studentAssignmentCount < 2)
+                                        {
+                                            studentCount++;
+                                        }
+                                        
                                         categoryPoints += score.Points;
                                         categoryPossible += score.Assignment.PointsPossible;
                                     }
@@ -270,7 +278,7 @@
                 }
                 
                 <td>@letter</td>
-                <td>@totalGrade.ToString(".#")%</td>
+                <td>@totalGrade.ToString(".##")%</td>
                 
                 int totalStudents = 0;
 
@@ -297,7 +305,7 @@
                         totalAverage += categoryScore * 100;
                         if (oneScore == true)
                         {
-                            <td id="averageScore">@totalAverage.ToString(".#")%</td>  
+                            <td id="averageScore">@totalAverage.ToString(".##")%</td>  
                         }
                         else
                         {
@@ -341,37 +349,28 @@
             }
         }
         <!--loop through all users -->
-        @foreach (UserProfile student in ViewBag.Students)
+        @foreach (CourseUser student in ViewBag.CoursesUser)
         {        
             <tr id="studentGrades">
                 <td id="row-@r" class="rowHeader" style="background:#DCDCDC; border:outset 2.5px; border-color: #E8E8E8;" onclick="selectRow(this, event);" onmouseover="showButton(this);" onmouseout="hideButton(this);"></td>
                 @{r++;}
 
             @{
+                 <td>@student.Section</td>                                               
                 
-                  List<CourseUser> courseUser = (from course in ViewBag.CoursesUser as IEnumerable<CourseUser>
-                                                   where course.UserProfileID == student.ID
-                                                   select course).ToList();
-                  if (courseUser.Count() > 0)
-                  {
-                      foreach (CourseUser item in courseUser)
-                      {
-                           <td>@item.Section</td>
-                      }
-                  }                                                   
-                
-                <td id="@student.ID" >@student.LastName, @student.FirstName</td>   
+                <td id="@student.ID" >@student.UserProfile.LastName, @student.UserProfile.FirstName</td>   
                 
                   totalGrade = 0;
                   totalCategoryPoints = 0;
                   totalCategoryPossible = 0;
                   double totalCategoryWeight = ViewBag.TotalCategoryWeights;
+                  int studentGradeCount = 0;
                   foreach (Category c in ViewBag.CatsWithWeightsAndScores)
                   {
                       if (c.Name != Constants.UnGradableCatagory)
                       {
                           List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
-                                                    where score.TeamMember.CourseUser.UserProfileID == student.ID &&
+                                                    where score.CourseUserID == student.ID &&
                                                     score.Assignment.CategoryID == c.ID
                                                     select score).ToList();
                           if (userScores.Count() == 0)
@@ -386,7 +385,7 @@
                       if (c.Name != Constants.UnGradableCatagory)
                       {
                           List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
-                                                    where score.TeamMember.CourseUser.UserProfileID == student.ID &&
+                                                    where score.CourseUserID == student.ID &&
                                                     score.Assignment.CategoryID == c.ID
                                                     select score).ToList();
 
@@ -397,6 +396,8 @@
                           {
                               foreach (Score score in userScores)
                               {
+                                  //Used to make sure students have grades.
+                                  studentGradeCount++;
                                   points += score.Points;
                                   possible += score.Assignment.PointsPossible;
                               }
@@ -425,7 +426,7 @@
                   letter = "";
                   foreach (LetterGrade item in ViewBag.LetterGrades)
                   {
-                      if (totalGrade >= item.MinimumRequired)
+                      if (totalGrade >= item.MinimumRequired && studentGradeCount > 0)
                       {
                           letter = item.Grade;
                           break;
@@ -433,11 +434,11 @@
                   }
                   <td>@letter</td>
                 
-                  if (totalGrade > 0)
+                  if (totalGrade > 0 && studentGradeCount > 0)
                   {
-                    <td>@totalGrade.ToString(".#")%</td>
+                    <td>@totalGrade.ToString(".##")%</td>
                   }
-                  else if (totalGrade == 0)
+                  else if (totalGrade == 0 && studentGradeCount > 0)
                   {
                     <td>@String.Format("{0}", 0)%</td>
                   }
@@ -452,7 +453,7 @@
                       if (c.Name != Constants.UnGradableCatagory)
                       {
                           List<Score> userScores = (from score in ViewBag.AllGrades as IEnumerable<Score>
-                                                    where score.TeamMember.CourseUser.UserProfileID == student.ID &&
+                                                    where score.CourseUserID == student.ID &&
                                                     score.Assignment.CategoryID == c.ID
                                                     select score).ToList();
 
@@ -472,16 +473,16 @@
                               //It didn't like to put a 0, so I had to use string format to make it display
                               if (totalCategoryGrade == 0)
                               {
-                                  <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.Identification)" style="cursor:pointer;">@String.Format("{0}", 0)%</td>
+                                  <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.ID)" style="cursor:pointer;">@String.Format("{0}", 0)%</td>
                               }
                               else
                               {
-                                  <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.Identification)" style="cursor:pointer;">@totalCategoryGrade.ToString(".#")%</td>
+                                  <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.ID)" style="cursor:pointer;">@totalCategoryGrade.ToString(".##")%</td>
                               }
                           }
                           else
                           {
-                              <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.Identification)" style="cursor:pointer;">NG</td>
+                              <td id="categoryGrade" onclick="goToCategoryTab(@c.ID, @student.ID)" style="cursor:pointer;">NG</td>
                           }
                       }
                   }

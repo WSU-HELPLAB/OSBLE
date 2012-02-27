@@ -61,12 +61,26 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         /// <summary>
         /// A list of the currently selected wizard components.  DO NOT directly modify this list.
         /// </summary>
-        public ICollection<WizardBaseController> SelectedComponents { get; protected set; }
+        public List<WizardBaseController> SelectedComponents { get; protected set; }
 
         /// <summary>
         /// A list of unselected wizard components.  DO NOT directly modify this list.
         /// </summary>
-        public ICollection<WizardBaseController> UnselectedComponents { get; protected set; }
+        public List<WizardBaseController> UnselectedComponents { get; protected set; }
+
+        public void SortComponents()
+        {
+            if (AllComponents[0].SortOrder != 0)
+            {
+                SelectedComponents.Sort(new WizardSortOrderComparer());
+                UnselectedComponents.Sort(new WizardSortOrderComparer());
+            }
+            else
+            {
+                SelectedComponents.Sort(new WizardPrerequisiteComparer());
+                UnselectedComponents.Sort(new WizardPrerequisiteComparer());
+            }
+        }
 
         public int ActiveAssignmentId
         {
@@ -235,6 +249,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                         UnselectedComponents.Add(component);
                     }
                 }
+
             }
         }
 
@@ -290,13 +305,27 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                 WizardBaseController controller = Activator.CreateInstance(component) as WizardBaseController;
                 AllComponents.Add(controller);
             }
-            AllComponents.Sort(new WizardPrerequisiteComparer());            
 
+            //If we have already sorted in the past, use the component's sort order to make things go faster.
+            //Otherwise, do it the long way
+            if (AllComponents[0].SortOrder != 0)
+            {
+                AllComponents.Sort(new WizardSortOrderComparer());            
+            }
+            else
+            {
+                AllComponents.Sort(new WizardPrerequisiteComparer());            
+            }
+            
             //attach event listeners to selection change
+            //and apply a sort order for faster sorting in the future
+            int counter = 1;
             foreach (WizardBaseController component in AllComponents)
             {
+                component.SortOrder = counter;
                 UnselectedComponents.Add(component);
                 component.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(ComponentPropertyChanged);
+                counter++;
             }
         }
     }

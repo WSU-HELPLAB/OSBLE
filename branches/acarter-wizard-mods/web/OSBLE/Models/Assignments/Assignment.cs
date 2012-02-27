@@ -5,7 +5,8 @@ using System.Web;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
 using System.ComponentModel.DataAnnotations;
-using OSBLE.Models.Assignments.Activities.Scores;
+using OSBLE.Models.Assignments;
+using OSBLE.Models.HomePage;
 
 namespace OSBLE.Models.Assignments
 {
@@ -18,10 +19,12 @@ namespace OSBLE.Models.Assignments
             ColumnOrder = 0;
             Deliverables = new List<Deliverable>();
             AssignmentTeams = new List<AssignmentTeam>();
+            DiscussionTeams = new List<DiscussionTeam>();
             IsDraft = true;
             addedPoints = 0;
             IsWizardAssignment = true;
-            AssignmentTypeID = 1;
+            Scores = new List<Score>();
+            Type = AssignmentTypes.Basic;
         }
 
         [Key]
@@ -30,9 +33,10 @@ namespace OSBLE.Models.Assignments
         [Required(ErrorMessage = "Please specify this assignment's type")]
         public int AssignmentTypeID { get; set; }
 
-        [Display(Name="Assignment Type")]
+
+        [Display(Name = "Assignment Type")]
         [NotMapped]
-        public AssignmentTypes Type 
+        public AssignmentTypes Type
         {
             get
             {
@@ -138,6 +142,29 @@ namespace OSBLE.Models.Assignments
         }
 
         /// <summary>
+        /// Returns true if the assignment has discussion teams
+        /// </summary>
+        [NotMapped]
+        public bool HasDiscussionTeams
+        {
+            get
+            {
+                if (Type != AssignmentTypes.DiscussionAssignment)
+                {
+                    return false;
+                }
+                int count = (from team in DiscussionTeams
+                             where team.Team.TeamMembers.Count > 1
+                             select team).Count();
+                if (count > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Returns true if the assignment has comment categories
         /// </summary>
         [NotMapped]
@@ -162,12 +189,16 @@ namespace OSBLE.Models.Assignments
         }
 
         [Required(ErrorMessage = "Please specify for how long OSBLE should accept late submissions")]
-        [Display(Name = "Late Assignment Window (Hours)")]
+        [Display(Name = "Late Submission Window")]
         public int HoursLateWindow { get; set; }
 
         [Required(ErrorMessage = "Please specify the percent that should be deducted per hour late")]
-        [Display(Name = "Percent Deduction Per Late Hour")]
-        public double DeductionPerHourLate { get; set; }
+        [Display(Name = "Penalty of")]
+        public double DeductionPerUnit { get; set; }
+
+        [Required(ErrorMessage = "Please specify the hours per percent deduction.")]
+        [Display(Name = "hour(s) late")]
+        public double HoursPerDeduction { get; set; }
 
         [Required]
         public int ColumnOrder { get; set; }
@@ -190,13 +221,17 @@ namespace OSBLE.Models.Assignments
         [Association("Assignment_Deliverables", "ID", "AssignmentID")]
         public virtual IList<Deliverable> Deliverables { get; set; }
 
-        [Association("AssignmentTeams_Assignments", "ID", "AssignmentID")]
+        [Association("AssignmentTeam_Assignments", "ID", "AssignmentID")]
         public virtual IList<AssignmentTeam> AssignmentTeams { get; set; }
+
+        [Association("DiscussionTeam_Assignments", "ID", "AssignmentID")]
+        public virtual IList<DiscussionTeam> DiscussionTeams { get; set; }
+
+        [Association("Score_Assignment", "ID", "AssignmentID")]
+        public virtual IList<Score> Scores { get; set; }
 
         [Association("DiscussionSetting_Assignment", "ID", "AssignmentID")]
         public virtual DiscussionSetting DiscussionSettings { get; set; }
-
-        public virtual ICollection<Score> Scores { get; set; }
 
         public double addedPoints { get; set; }
 
@@ -207,6 +242,11 @@ namespace OSBLE.Models.Assignments
                 return Enum.GetValues(typeof(AssignmentTypes)).Cast<AssignmentTypes>().ToList();
             }
         }
+
+        public int? AssociatedEventID { get; set; }
+
+        [ForeignKey("AssociatedEventID")]
+        public virtual Event AssociatedEvent { get; set; }
         
         /// <summary>
         /// used to distinguish wizard created assignments versus gradebook created assignments

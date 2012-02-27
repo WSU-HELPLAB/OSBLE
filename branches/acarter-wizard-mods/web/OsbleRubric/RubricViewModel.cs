@@ -1530,6 +1530,8 @@ namespace OsbleRubric
 
         private void FinalizeSaving(object sender, EventArgs e)
         {
+            MessageBox.Show("Rubric updated.");
+
             //Saving and exiting
             HtmlPage.Window.Invoke("rubricSaveComplete", selectedRubric.ID.ToString());
         }

@@ -65,13 +65,22 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public ActionResult Index(DiscussionSetting model)
         {
             Assignment = db.Assignments.Find(model.AssignmentID);
-            Assignment.DiscussionSettings = model;
             if (ModelState.IsValid)
             {
-                WasUpdateSuccessful = true;
+                //delete preexisting settings to prevent an FK relation issue
+                DiscussionSetting setting = db.DiscussionSettings.Find(model.AssignmentID);
+                if (setting != null)
+                {
+                    db.DiscussionSettings.Remove(setting);
+                }
                 db.SaveChanges();
+
+                //...and then re-add it.
+                Assignment.DiscussionSettings = model;
+                db.SaveChanges();
+                WasUpdateSuccessful = true;
             }
-            return base.Index(Assignment);
+            return base.PostBack(Assignment);
         }
     }
 }

@@ -8,6 +8,7 @@
 
 
 @using (Html.BeginForm()) {
+    @Html.HiddenFor(m => m.Password)
     @Html.ValidationSummary() 
     <div>
             <div class="editor-label">
@@ -18,7 +19,7 @@
                 @Html.ValidationMessageFor(m => m.UserName)
             </div>
 
-            <input id="hash" type="hidden" value=@ViewBag.Hash />
+            <input id="hash" type="hidden" value="@ViewBag.Hash" />
 
             <p>
                 <input type="submit" value="Activate Account" />

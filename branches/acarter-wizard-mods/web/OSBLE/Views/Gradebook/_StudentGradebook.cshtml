@@ -1,7 +1,7 @@
 ﻿@using OSBLE.Controllers;
 @using OSBLE.Models.Courses;
 @using OSBLE.Models.Assignments;
-@using OSBLE.Models.Assignments.Activities.Scores;
+@using OSBLE.Models.Assignments;
 @using OSBLE.Models.Users
 @using OSBLE.Utility;
 @{
@@ -190,8 +190,8 @@
 
                 foreach (CourseUser user in ViewBag.Students)
                 {
-                    studentCount++;
                     categoryTotalWeight = ViewBag.TotalCategoryWeights;
+                    int studentAssignmentCount = 0;
                     foreach (Category category in ViewBag.CatsWithWeightsAndScores)
                     {
                         if (category.Name != Constants.UnGradableCatagory)
@@ -199,7 +199,7 @@
                             List<Score> userScore = (from score in ViewBag.CategoryTotalPercent as IEnumerable<Score>
                                                      where score.Assignment.CategoryID == category.ID &&
                                                      score.Points >= 0 &&
-                                                     score.TeamMember.CourseUserID == user.ID &&
+                                                     score.CourseUserID == user.ID &&
                                                      score.isDropped == false
                                                      select score).ToList();
 
@@ -220,7 +220,7 @@
                             double categoryTotal = 0;
 
                             List<Score> totalScores = (from score in ViewBag.CategoryTotalPercent as IEnumerable<Score>
-                                                       where score.TeamMember.CourseUserID == user.ID &&
+                                                       where score.CourseUserID == user.ID &&
                                                        score.Assignment.CategoryID == category.ID &&
                                                        score.Points >= 0 &&
                                                        score.isDropped == false
@@ -228,11 +228,19 @@
 
                             if (totalScores.Count() > 0)
                             {
-
+                                
                                 foreach (Score userScore in totalScores)
                                 {
                                     if (userScore.Assignment.CategoryID == category.ID)
                                     {
+                                        //We only want to count the student if they have assignments. They should only get counted
+                                        //for one assignment in there category so we have this check to stop incrementing
+                                        //student count after the first assignment
+                                        studentAssignmentCount++;
+                                        if (studentAssignmentCount < 2)
+                                        {
+                                            studentCount++;
+                                        }
                                         categoryPoints += userScore.Points;
                                         categoryPossible += userScore.Assignment.PointsPossible;
                                     }
@@ -273,7 +281,7 @@
                 }
                 
                 <td>@letter</td>
-                <td>@totalGrade.ToString(".#")%</td>
+                <td>@totalGrade.ToString(".##")%</td>
                 
                 
                 int totalStudents = 0;
@@ -304,7 +312,7 @@
                         totalAverage += categoryScore * 100;
                         if (oneScore == true)
                         {
-                            <td id="averageScore">@totalAverage.ToString(".#")%</td>  
+                            <td id="averageScore">@totalAverage.ToString(".##")%</td>  
                         }
                         else
                         {
@@ -476,12 +484,12 @@
                 if (studentWhatIf == true)
                 {
                     <td style="color:Gray; font-style:italic;">@letter</td>
-                    <td style="color:Gray; font-style:italic;">@totalGrade.ToString(".#")%</td>
+                    <td style="color:Gray; font-style:italic;">@totalGrade.ToString(".##")%</td>
                 }
                 else
                 {
                     <td>@letter</td>
-                    <td>@totalGrade.ToString(".#")%</td>
+                    <td>@totalGrade.ToString(".##")%</td>
                 }
 
                 foreach (Category category in ViewBag.Categories)
@@ -561,12 +569,12 @@
                             {
                                 if (usingWhatIf == true)
                                 {
-                                    <td style="color:Gray; font-style:italic;">@total.ToString(".#")%</td>
+                                    <td style="color:Gray; font-style:italic;">@total.ToString(".##")%</td>
                                     usingWhatIf = false;
                                 }
                                 else
                                 {
-                                    <td>@total.ToString(".#")%</td>
+                                    <td>@total.ToString(".##")%</td>
                                 }
                             }
                             else

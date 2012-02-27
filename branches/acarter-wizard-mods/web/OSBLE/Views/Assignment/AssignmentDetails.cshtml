@@ -1,11 +1,12 @@
 ﻿@using OSBLE.Models
 @using OSBLE.Models.Assignments
 @using OSBLE.Models.Courses
-@using OSBLE.Models.Assignments.Activities.Scores
+@using OSBLE.Models.Assignments
 @model Assignment
 
 @{
-    Assignment assignment = Model;   
+    Assignment assignment = Model;
+    ViewBag.Title = "Assignment Details";
 }
 
 <h2>
@@ -13,228 +14,169 @@
 {
     if (assignment.IsDraft)
     {
-        <a title="Click to Publish"  class="pointerOnMouseOver" onclick="toggleDraft(@assignment.ID)">@Helpers.PublishedIcon()</a>
+        <a title="Click to Publish"  class="pointerOnMouseOver" onclick="toggleDraft(@assignment.ID)">@Helpers.PublishButton()</a>
     }
     else
     {
-        <a title="Click to Unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@assignment.ID)">@Helpers.PublishedIcon()</a>
+        <a title="Click to Unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@assignment.ID)">@Helpers.UnPublishButton()</a>
     }
-    <a title="Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = assignment.ID })">@Helpers.EditButton()</a>
-    <a title="Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@assignment.ID)">@Helpers.DeleteButton()</a>
+    <a title="Click to Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = assignment.ID })">@Helpers.EditButton()</a>
+    <a title="Click to Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@assignment.ID)">@Helpers.DeleteButton()</a>
 }
+
 @assignment.AssignmentName
 </h2>    
 
-<text class="osbleColorBold">Released:</text> @assignment.ReleaseDate<br />
-<text class="osbleColorBold">Due:</text> @assignment.DueDate<br />
-<text class="osbleColorBold">Grading:</text> Worth @assignment.PointsPossible in @assignment.Category.Name category.<br />
-<text class="osbleColorBold">Late Policy:</text> 
-@if (assignment.HoursLateWindow == 0)
-{
-    @:No late assignments accepted.<br />
-}
-else
-{
-    @:Assignments accepted up to  @assignment.HoursLateWindow hours late, docking @assignment.DeductionPerHourLate% per hour.<br />
-}
-
-<text class="osbleColorBold">Description:</text> @assignment.AssignmentDescription<br />
-@if (assignment.HasDeliverables)
-{
-    int i = 0;
-    @:<text class="osbleColorBold">Deliverables:</text><br />
-    foreach (Deliverable d in assignment.Deliverables)
-    {
-        @: &nbsp &nbsp &nbsp &nbsp &nbsp-@d.Name (
-        foreach (string str in @ViewBag.filetypeList[i])
-         {
-             @:@str
-         }
-        //(@ViewBag.filetypeList[i])<br />
-        i++;
-        @: )<br />
-    }
-}
-@if (assignment.HasRubric)
-{
-    @:<text class="osbleColorBold">Rubric:</text>
-    if (ViewBag.ActiveCourse.AbstractRole.CanModify)
-    {
-        @Html.ActionLink("View Rubric", "Index", "Rubric", new { assignmentId = assignment.ID, teamId = ViewBag.TeamID }, new { });
-    }
-    else
-    {
-        @Html.ActionLink("View Rubric", "View", "Rubric", new { assignmentId = assignment.ID, teamId = ViewBag.TeamID }, new { });
-    }
-}
-@if (ViewBag.TeamMembers != null)
-{
-    <div>
-        <text class="osbleColorBold">Team: @ViewBag.TeamName</text><br />
-        <text class="osbleColorBold">Team Members:</text>
-        <br />
-        <ul class="user_list">
-        @foreach (CourseUser cu in ViewBag.TeamMembers)
-        {
-            <li>
-                <div class="user_controls">
-                @if (cu.UserProfile.UserName != null)
-                {
-                <a title="Mail This User" href="@Url.Action("CreateTeamMember", "Mail", new { id = cu.UserProfile.ID })">@Helpers.MailButton()</a>
-                }
-                            
-                </div>
-                        
-            @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", "Roster", new { userProfile = cu.UserProfile.ID }))
-            <span class="roster_name">@Helpers.DisplayFullNameOrPending(cu.UserProfile)</span>
-                        
-            </li>
-        }
-        </ul>
-    </div>
-    <div>
-        <a title="Email whole team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = ViewBag.TeamID })">Email the whole team</a>
-    </div>
-    <br />
-}
-
-<br />
-
-@if (ViewBag.ActiveCourse.AbstractRole.CanModify)
-{
-    <table class="assignTable">
-    <!-- Look up activityTeachertable for similar set up
-    For name: If a team, display team name and on next line display team members. Have option to email whole team or individual
-    for grade: if a rubric assignment, link to rubric tool. Else just show the grade. Display No Grade for NGs and underline them with link if there is a rubric
-    For inline comments: Only show if assignment has comment categories. Then allow user to go each students
-    For late penalty: display the currently used late penalty. Have edit option there
-    For Submission: have a download option with the time submitted or say "Nothing Submitted"
-    -->
-    <th>Name</th>
-    <th>Grade</th>
-    @if (assignment.HasCommentCategories)
-    {
-        <th>Inline Comments</th>    
-    }
-    <th>Late Penalty</th>
+<table id="assignmentDetailsHeader">
+    <tr><!--Released row-->
+        <td>
+            <text class="osbleColorBold">Released:</text>
+        </td>
+        <td>
+             @assignment.ReleaseDate
+        </td>
+    </tr>
+    <tr><!--Due row-->
+        <td>
+            <text class="osbleColorBold">Due:</text>
+        </td>
+        <td>
+            @assignment.DueDate
+        </td>
+    </tr>
+    <tr><!--Grading row-->
+        <td>
+            <text class="osbleColorBold">Grading:</text>
+        </td>
+        <td>
+            Worth @assignment.PointsPossible points in "@assignment.Category.Name" category.
+        </td>
+    </tr>
+    <tr><!--Late Policy row-->
+        <td>
+            <text class="osbleColorBold">Late Policy:</text> 
+        </td>
+        <td>
+            @if (assignment.HoursLateWindow == 0)
+            {
+                @:No late assignments accepted.
+            }
+            else
+            {
+                @:Assignments accepted up to  @assignment.HoursLateWindow hours late, docking @assignment.DeductionPerUnit% per hour.
+            }
+        </td>
+    </tr>
+    <tr><!--Description row-->
+        <td>
+            <text class="osbleColorBold">Description:</text> 
+        </td>
+        <td>
+            @assignment.AssignmentDescription
+        </td>
+    </tr>
     @if (assignment.HasDeliverables)
     {
-        <th>Submission</th>
-        <th>Submit for Student</th>
-    }
-    
-
-    @foreach (Tuple<Score, AssignmentTeam, string> da in ViewBag.ScoresAndTeams)
-    {
-        <tr>    
-            <td> <!--Cell for name-->
-                @if (assignment.HasTeams)
+        int i = 0;
+        int j = 1;
+        
+        <tr><!--Deliverables row-->
+            <td style="vertical-align:top;">
+                <text class="osbleColorBold">Deliverables: </text>
+            </td>
+            <td>
+        @foreach (Deliverable d in assignment.Deliverables)
+        {
+                
+            @:@(i + 1).
+            @:@d.Name (
+            foreach (string str in @ViewBag.filetypeList[i])
+            {
+                if (j == @ViewBag.filetypeList[i].Length)
                 {
-                    <span style="text-decoration: underline">@da.Item2.Team.Name</span>
-                    <a title="Email this team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = da.Item2.TeamID })">@Helpers.MailButton()</a>
-                    <br/>
-                    var teamList = "";
-                    foreach (TeamMember tm in da.Item2.Team.TeamMembers)
-                    {
-                        teamList += tm.CourseUser.UserProfile.FirstName + " " + tm.CourseUser.UserProfile.LastName + ", ";
-                    }
-                    <span>@teamList</span>
+                    @:@str
                 }
                 else
                 {
-                    <a title="Email this User" href="@Url.Action("CreateUser", "Mail", new { id = da.Item2.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfileID })">@Helpers.MailButton()</a>
-                    @(da.Item2.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName + ", " + da.Item2.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName)
-                    
+                    @:@(str + ", ")
                 }
+                j++;
+            }
+            @:)
+            <br /> 
             
-            </td>
-            <td> <!--Cell for grade-->
-                @if (assignment.HasRubric)
-                {
-                    if (da.Item1 == null)
-                    {
-                        //Could do a check to see if it is a draft, if it is could say "Draft"
-                        @Html.ActionLink("Not Graded", "Index", "Rubric", new { assignmentId = da.Item2.AssignmentID, teamId = da.Item2.TeamID }, new { })
-                    }
-                    else
-                    {
-                        @Html.ActionLink(da.Item1.getGradeAsPercent(da.Item2.Assignment.PointsPossible), "Index", "Rubric", new { assignmentId = da.Item2.AssignmentID, teamId = da.Item2.TeamID }, new { });
-                    }
-                }
-                else
-                {
-                    if (da.Item1 == null)
-                    {
-                        <span>Not Graded</span>
-                    }
-                    else
-                    {
-                        <span>@da.Item1.getGradeAsPercent(da.Item2.Assignment.PointsPossible)</span>
-                    }
-                }    
-            </td>
-            @if (assignment.HasCommentCategories)
-            {
-                <td> <!--Cell for inline comments - only allow them to edit if there has been something submitted-->
-                    @if (da.Item3 != "No Submission")
-                    {
-                        @Html.ActionLink("View/Edit...", "InlineReview", "Assignment", new { assignmentID = assignment.ID, teamID = da.Item2.TeamID }, new { })
-                    }
-                    else
-                    {
-                        @:Nothing to Review
-                    }
-                </td>
-            }
-            <td> <!--Cell for late penalty-->
-                @if (da.Item1 == null)
-                {
-                    @:0.00%
-                }
-                else
-                {
-                    @da.Item1.getAppliedLatePenaltyAsDecimal().ToString("P");
-                }
-            </td>
-            @if (assignment.HasDeliverables)
-            {
-                <td><!--Cell for submission download - only allow if there is a time submitted-->
-                    @if (da.Item3 != "No Submission")
-                    {
-                        @(Html.ActionLink(da.Item3, "GetSubmissionZip", "FileHandler", new { assignmentID = assignment.ID, teamID = da.Item2.TeamID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
-                    }
-                    else
-                    {
-                        @:Nothing Received
-                    }
-                </td>
-                <td><!--Cell for submitting on behalf of students -->
-                    @{
-                    //Student with deliverables. Can submit
-                    AjaxOptions options = new AjaxOptions()
-                    {
-                        LoadingElementId = "Loading",
-                        HttpMethod = "Get",
-                        UpdateTargetId = "submitFiles",
-                        OnComplete = "SubmissionLoaded"
-                    };
-                    @Ajax.ActionLink("Submit", "Create", "Submission", new { id = assignment.ID, up = da.Item2.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile }, options, new object());
-                    }
-                </td>
-            }
+            i++;
+            j = 1;
+        }
+        </td>
         </tr>
     }
-</table>
-    if (assignment.HasDeliverables)
+    @if (assignment.HasRubric)
     {
-        <br />@Html.ActionLink("Download all submissions for this activity", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+        <tr><!--Rubric row-->
+            <td><text class="osbleColorBold">Rubric:</text></td>
+            <td>
+                @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                {
+                    @Html.ActionLink("View Rubric", "Index", "Rubric", new { assignmentId = assignment.ID, cuId = ViewBag.CurrentUserID }, new { });
+                }
+                else
+                {
+                    @Html.ActionLink("View Rubric", "View", "Rubric", new { assignmentId = assignment.ID, cuId = ViewBag.CurrentUserID }, new { });
+                }
+            </td>
+        </tr>
     }
-}
+    @if (ViewBag.TeamMembers != null)
+    {
+        <tr><!--Team name row-->
+            <td>
+                <text class="osbleColorBold">Team:</text>
+            </td>
+            <td>
+                @ViewBag.TeamName
+            </td>
+        </tr>
+        <tr><!--Team members row-->
+            <td style="vertical-align:text-top">
+                <text class="osbleColorBold">Members:</text>
+            </td>
+            <td>
+                <ul class="user_list">
+                    @foreach (CourseUser cu in ViewBag.TeamMembers)
+                    {
+                        <li>
+                            <div class="user_controls">
+                                @if (cu.UserProfile.UserName != null)
+                                {
+                                    <a title="Mail This User" href="@Url.Action("CreateTeamMember", "Mail", new { id = cu.UserProfile.ID })">@Helpers.MailButton()</a>
+                                }
+                            </div>
+                            @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", "Roster", new { userProfile = cu.UserProfile.ID }))
+                            <span class="roster_name">@Helpers.DisplayFullNameOrPending(cu.UserProfile)</span>
+                        </li>
+                    }
+                </ul>
+                <a title="Email whole team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = ViewBag.TeamID })">Email the whole team</a>
+            </td>
+        </tr>
+    }
+    
+    @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+    {
+        @Html.Partial("_TeacherAssignmentDetails");
+    }
+    else if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
+    {
+        @Html.Partial("_ObserverAssignmentDetails");
+    }
 
 
 
 
 <script type="text/javascript">
+    
+
     function create_and_open_downloading_submission_dialog() {
 
         //create the div that we will then make into a dialog
@@ -274,6 +216,18 @@ else
 
     }
 
+    function goToCategoryTab(catID, stuID) {
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/SetTabStudent",
+            data: { studentId: stuID.toString() },
+            success: function () {
+                location.href = "/Gradebook/Tab/?categoryId=" + catID;
+            }
+        });
+        hideTabColors();
+    }
+
     /*Functions and variables for deleteAssignment modal box*/
     var assignmentToDeleteID = -1;
     function openConfirmDeleteWindow(assignmentID) {
@@ -288,24 +242,103 @@ else
     }
 
     function deleteAssignment() {
-        window.location.assign("http://www.google.com");
+        $.ajax({
+           async: false,
+           url: "/Assignment/Delete",
+           data: { id: assignmentToDeleteID }           
+        });       
+
+        var replaceString = "http://" + window.location.host + "/Assignment";
+        window.location.assign(replaceString);
         hideConfirmDeleteWindow();
     }
 
    function hideConfirmDeleteWindow() {
         $("#confirmDeleteWindow").dialog('close');
     }
+
+    function publishAllGrades(aId) {
+        $.ajax({
+            async: false,
+            url: "/Assignment/PublishAllGrades",
+            data: { assignmentId: aId }
+        });
+        window.location.reload(true);
+    }
+
+    var scoreId;
+    var userId;
+    var assId;    
+
+    $(".latePenaltyTd").mouseenter(function () {
+        $(this).find("a").show();
+    });
+
+    $(".latePenaltyTd").mouseleave(function () {
+        $(this).find("a").hide();
+    });
+
+    function openManualLatePenWindow(sId, uId, aId) {
+        scoreId = sId;
+        userId = uId;
+        assId = aId;
+
+        //$("#EditLatePercentWindowID").dialog("open");
+
+        $("#EditLatePercentWindowID").dialog({
+            autoOpen: true,
+            modal: true,
+            resizable: false,
+            width: 370,
+            height: 150,
+            closeOnEscape: false
+        });
+    }
+
+    function closeManualLatePenWindow() {
+        $("#EditLatePercentWindowID").dialog("close");
+    }
+
+    function setManualLatePen() {
+        if ($("#radioBtn1").attr('checked') == "checked") {
+            $.ajax({
+                async: false,
+                url: "/Assignment/ModifyLatePenalty",
+                data: { scoreId: scoreId, courseUserId: userId, latePenalty: -1, assignmentId: assId }
+            });
+        }
+        else {
+            var lp = $("#manualLatePen").val();
+            $.ajax({
+                async: false,
+                url: "/Assignment/ModifyLatePenalty",
+                data: { scoreId: scoreId, courseUserId: userId, latePenalty: lp, assignmentId: assId }
+            });
+        }
+        window.location.reload(true);
+    }
+
+    
+    function toggleDraft(id){
+        $.ajax({
+            async: false,
+            url: "/Assignment/ToggleDraft",
+            data: { assignmentID: id },
+        });
+        window.location.reload(true);
+    }
+
 </script>
 
 <!--Element for modal confirmation box-->
-<div id="confirmDeleteWindow" style="display:none;" title="Change Category Weight">
-    <form id="confirmForm" onsubmit="deleteAssignment();">
+<div id="confirmDeleteWindow" style="display:none;" title="Delete Assignment">
+    <div id="confirmForm">
         <text>Are you sure you want to delete that assignment?</text>
         <div class="yesAndNoDiv">
-            <input value="Delete" type="button"  onclick="deleteAssignment()"/>
+            <input value="Delete" type="submit" onclick="deleteAssignment();"/>
             <input value="Cancel" type="button" onclick="hideConfirmDeleteWindow()" />
         </div>
-    </form>
+    </div>
 </div>
 
 
@@ -326,3 +359,4 @@ else
     </script>
     </div>
 </div>
+

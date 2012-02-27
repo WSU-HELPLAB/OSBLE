@@ -77,7 +77,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 Assignment.PrecededingAssignmentID = previousAssignmentId;
                 db.SaveChanges();
             }
-            return base.Index(model);
+            return base.PostBack(model);
         }
     }
 }

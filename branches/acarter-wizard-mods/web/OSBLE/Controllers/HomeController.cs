@@ -48,7 +48,7 @@ namespace OSBLE.Controllers
         {
             DashboardPost dp = db.DashboardPosts.Find(id);
             // Ensure post exists and that user is in the course.
-            if (dp == null || (currentCourses.Where(cc => cc.AbstractCourseID == dp.CourseID).Count() < 1))
+            if (dp == null || (currentCourses.Where(cc => cc.AbstractCourseID == dp.CourseUser.AbstractCourseID).Count() < 1))
             {
                 return RedirectToAction("Index");
             }
@@ -108,7 +108,7 @@ namespace OSBLE.Controllers
             }
 
             // First get all posts to do a count and then do proper paging
-            dashboardPosts = db.DashboardPosts.Where(d => viewedCourses.Contains(d.CourseID))
+            dashboardPosts = db.DashboardPosts.Where(d => viewedCourses.Contains(d.CourseUser.AbstractCourseID))
                                                                         .OrderByDescending(d => d.Posted).ToList();
 
             pagedDashboardPosts = dashboardPosts.Skip(startPost)
@@ -190,19 +190,19 @@ namespace OSBLE.Controllers
             if (post is DashboardPost)
             {
                 DashboardPost dp = post as DashboardPost;
-                courseList = db.CourseUsers.Where(c => c.AbstractCourseID == dp.CourseID).ToList();
+                courseList = db.CourseUsers.Where(c => c.AbstractCourseID == dp.CourseUser.AbstractCourseID).ToList();
             }
             else if (post is DashboardReply)
             {
                 DashboardReply dr = post as DashboardReply;
-                courseList = db.CourseUsers.Where(c => c.AbstractCourseID == dr.Parent.CourseID).ToList();
+                courseList = db.CourseUsers.Where(c => c.AbstractCourseID == dr.Parent.CourseUser.AbstractCourseID).ToList();
             }
 
             // Get Course/User link for current user.
             CourseUser currentCu = courseList.Where(c => c.UserProfileID == currentUser.ID).FirstOrDefault();
 
             // " " for poster of post/reply.
-            CourseUser posterCu = courseList.Where(c => c.UserProfileID == post.UserProfileID).FirstOrDefault();
+            CourseUser posterCu = courseList.Where(c => c.UserProfileID == post.CourseUser.UserProfileID).FirstOrDefault();
 
             // Setup Display Name/Display Title/Profile Picture/Mail Button/Delete Button
 
@@ -330,17 +330,18 @@ namespace OSBLE.Controllers
                 catch (System.FormatException)
                 {
                     // Non-integer entered. Ignore and redirect to root.
-                    return Redirect("/");
+                    return RedirectToAction("Index"); ;
                 }
             }
 
             if (Request.Form["redirect"] != null)
             {
-                return Redirect(Request.Form["redirect"]);
+                //return Redirect(Request.Form["redirect"]);
+                return RedirectToAction("Index");
             }
             else
             {
-                return Redirect("/");
+                return RedirectToAction("Index");
             }
         }
 
@@ -373,19 +374,13 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public void getMaxCommentLength()
         {
-            var attribute = typeof(AbstractDashboard).GetProperties()
-                                  .Where(p => p.Name == "Content")
-                                  .Single()
-                                  .GetCustomAttributes(typeof(StringLengthAttribute), true)
-                                  .Single() as StringLengthAttribute;
-
-            ViewBag.MaxActivityFeedLength = attribute.MaximumLength;
+            ViewBag.MaxActivityFeedLength = 4000;
         }
 
         [HttpPost]
         public ActionResult NewPost(DashboardPost dp)
         {
-            dp.UserProfile = currentUser;
+            dp.CourseUser = activeCourse;
             dp.Posted = DateTime.Now;
 
             List<CourseUser> CoursesToPost = new List<CourseUser>();
@@ -413,8 +408,7 @@ namespace OSBLE.Controllers
                     DashboardPost newDp = new DashboardPost();
                     newDp.Content = dp.Content;
                     newDp.Posted = dp.Posted;
-                    newDp.UserProfile = dp.UserProfile;
-                    newDp.Course = cu.AbstractCourse;
+                    newDp.CourseUser = dp.CourseUser;
 
                     if (ModelState.IsValid)
                     {
@@ -488,7 +482,7 @@ namespace OSBLE.Controllers
         {
             if (ModelState.IsValid)
             {
-                dr.UserProfile = currentUser;
+                dr.CourseUser = activeCourse;
                 dr.Posted = DateTime.Now;
 
                 int replyTo = 0;
@@ -499,7 +493,7 @@ namespace OSBLE.Controllers
 
                 int latestReply = 0;
                 if (Request.Form["latest_reply"] != null)
-                {
+                { 
                     latestReply = Convert.ToInt32(Request.Form["latest_reply"]);
                 }
 
@@ -508,7 +502,7 @@ namespace OSBLE.Controllers
                 { // Does the post we're replying to exist?
                     // Are we a member of the course we're replying to?
                     CourseUser cu = (from c in currentCourses
-                                       where c.AbstractCourseID == replyToPost.CourseID
+                                       where c.AbstractCourseID == replyToPost.CourseUser.AbstractCourseID
                                        select c).FirstOrDefault();
 
                     AbstractCourse ac = null;
@@ -579,7 +573,7 @@ namespace OSBLE.Controllers
                         // Post notification to other thread participants
                         using (NotificationController nc = new NotificationController())
                         {
-                            nc.SendDashboardNotification(dr.Parent, dr.UserProfile);
+                            nc.SendDashboardNotification(dr.Parent, dr.CourseUser);
                         }
                     }
                     else
@@ -609,8 +603,8 @@ namespace OSBLE.Controllers
 
             if (dp != null)
             {
-                CourseUser cu = currentCourses.Where(c => c.AbstractCourse == dp.Course).FirstOrDefault();
-                if ((dp.UserProfileID == currentUser.ID) || ((cu != null) && (cu.AbstractRole.CanGrade)))
+                CourseUser cu = currentCourses.Where(c => c.AbstractCourseID == dp.CourseUser.AbstractCourseID).FirstOrDefault();
+                if ((dp.CourseUserID == activeCourse.ID) || ((cu != null) && (cu.AbstractRole.CanGrade)))
                 {
                     dp.Replies.Clear();
                     db.SaveChanges();
@@ -642,8 +636,8 @@ namespace OSBLE.Controllers
 
             if (dr != null)
             {
-                CourseUser cu = currentCourses.Where(c => c.AbstractCourse == dr.Parent.Course).FirstOrDefault();
-                if ((dr.UserProfileID == currentUser.ID) || ((cu != null) && (cu.AbstractRole.CanGrade)))
+                CourseUser cu = currentCourses.Where(c => c.AbstractCourse == dr.Parent.CourseUser.AbstractCourse).FirstOrDefault();
+                if ((dr.CourseUserID == activeCourse.ID) || ((cu != null) && (cu.AbstractRole.CanGrade)))
                 {
                     db.DashboardReplies.Remove(dr);
                     db.SaveChanges();
@@ -693,6 +687,27 @@ namespace OSBLE.Controllers
             }
 
             return new FileStreamResult(pictureStream, "image/jpeg");
+        }
+
+        [Authorize]
+        public ActionResult Time()
+        {
+            if (currentUser != null)
+            {
+                UserProfile user = db.UserProfiles.Find(currentUser.ID);
+                if (user != null)
+                {
+                    return View();
+                }
+                else
+                {
+                    return RedirectToAction("Index");
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index");
+            }
         }
     }
 }

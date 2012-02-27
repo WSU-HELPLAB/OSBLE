@@ -92,10 +92,83 @@ namespace OSBLE.Controllers
             return View(mails.ToList());
         }
 
-        public ViewResult Outbox()
+        public ViewResult Outbox(int? sortBy)
         {
+            //ViewBag.BoxHeader = "Outbox";
+            //var mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderByDescending(m => m.Posted);
+            //return View("Index", mails.ToList());
+
             ViewBag.BoxHeader = "Outbox";
-            var mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderByDescending(m => m.Posted);
+            List<Mail> mails = new List<Mail>();
+            bool reverse = false;
+            //setting up the sort order for email default is by posted date
+            UserProfile cu = db.UserProfiles.Where(u => u.ID == CurrentUser.ID).FirstOrDefault();
+            if (sortBy != null)
+            {
+                if (cu.SortBy == sortBy)
+                {
+                    reverse = true;
+                }
+                cu.SortBy = (int)sortBy;
+                db.SaveChanges();
+            }
+            else
+            {
+                cu.SortBy = (int)UserProfile.sortEmailBy.POSTED;
+                db.SaveChanges();
+            }
+
+            switch ((UserProfile.sortEmailBy)CurrentUser.SortBy)
+            {
+                case UserProfile.sortEmailBy.POSTED:
+                    if (!reverse)
+                    {
+                        mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderByDescending(m => m.Posted).ToList();
+                    }
+                    else // reverse
+                    {
+                        mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderBy(m => m.Posted).ToList();
+                    }
+                    break;
+                case UserProfile.sortEmailBy.CONTEXT:
+                    if (!reverse)
+                    {
+                        mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderBy(m => m.Context.Name).ToList();
+                    }
+                    else // reverse
+                    {
+                        mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderByDescending(m => m.Context.Name).ToList();
+                    }
+                    break;
+                case UserProfile.sortEmailBy.FROM:
+                    if (!reverse)
+                    {
+                        mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderBy(m => m.FromUserProfile.FirstName).ToList();
+                    }
+                    else // reverse
+                    {
+                        mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderByDescending(m => m.FromUserProfile.FirstName).ToList();
+                    }
+                    break;
+                case UserProfile.sortEmailBy.SUBJECT:
+                    if (!reverse)
+                    {
+                        mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderBy(m => m.Subject).ToList();
+                    }
+                    else // reverse
+                    {
+                        mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderByDescending(m => m.Subject).ToList();
+                    }
+                    break;
+                default:
+                    break;
+            }
+            // hackish way to handle the second reverse  couldn't think of a better way to do it. (KD) might look into it later.
+            if (reverse)
+            {
+                cu.SortBy = -1;
+                db.SaveChanges();
+            }
             return View("Index", mails.ToList());
         }
 
@@ -119,7 +192,7 @@ namespace OSBLE.Controllers
             else if ((mail.ToUserProfile == currentUser) && (mail.Read == false))
             {
                 mail.Read = true;
-                
+
                 // Removes the notification once the email is read.
                 Notification n = (from notification in db.Notifications
                                   where notification.ItemID == id
@@ -139,40 +212,66 @@ namespace OSBLE.Controllers
 
             // getting all recipients of the mail
             List<UserProfile> recipients = (from m in db.Mails
-                                            where m.ThreadID == mail.ThreadID 
+                                            where m.ThreadID == mail.ThreadID
                                             select m.ToUserProfile).ToList();
 
-            // for the older message and newer message links
-            int i = 1, j = 1;
-            var lastMail = (from m in db.Mails
-                            where m.ToUserProfileID == currentUser.ID
-                            orderby m.ID descending
-                            select m).FirstOrDefault();
-
             var next = id;
-            // == null handles deleted emails
-            // toUserProfile handes the issue of switching to the outbox
-            while ((db.Mails.Find(id + i) == null || db.Mails.Find(id + i).ToUserProfileID != currentUser.ID) && ((id + i) <= lastMail.ID))
-            {
-                i++;
-            }
-            if (id + i <= lastMail.ID)
-            {
-                next = id + i;
-            }
-            ViewBag.Next = next;
-
             var prev = id;
-            // == null handles deleted emails
-            // toUserProfile handes the issue of switching to the outbox
-            while ((db.Mails.Find(id - j) == null || db.Mails.Find(id - j).ToUserProfileID != currentUser.ID) && j < id)
+
+            if (mail.ToUserProfileID == currentUser.ID)
             {
-                j++;
+                var inboxMail = (from m in db.Mails
+                                 where m.ToUserProfileID == currentUser.ID &&
+                                 !m.DeleteFromInbox 
+                                 orderby m.ID ascending
+                                 select m).ToList();
+
+
+                //MG&KD:Loops through the mail (that is sorted ascending). Continues to set and replace "prev" while the ID is lower than the current mails ID
+                //Eventually if there is an ID that is higher than the current, it will be the set to "next" and break. Setting both prev and next if there are valid values.
+                foreach (Mail m in inboxMail)
+                {
+                    if (m.ID < id)
+                    {
+                        prev = m.ID;
+                    }
+                    if (m.ID > id)
+                    {
+                        next = m.ID;
+                        break;
+                    }
+                }
             }
-            if (j < id)
+            else if (mail.FromUserProfileID == currentUser.ID)
             {
-                prev = id - j;
+                var outboxMail = (from m in db.Mails
+                                 where m.FromUserProfileID == currentUser.ID &&
+                                 !m.DeleteFromOutbox
+                                 orderby m.ID ascending
+                                 select m).ToList();
+
+
+                //MG&KD:Loops through the mail (that is sorted ascending). Continues to set and replace "prev" while the ID is lower than the current mails ID
+                //Eventually if there is an ID that is higher than the current, it will be the set to "next" and break. Setting both prev and next if there are valid values.
+                foreach (Mail m in outboxMail)
+                {
+                    if (m.ID < id)
+                    {
+                        prev = m.ID;
+                    }
+                    if (m.ID > id)
+                    {
+                        next = m.ID;
+                        break;
+                    }
+                }
             }
+            else //Mail is not to or from them, should not be viewing it!
+            {
+                return RedirectToAction("Index");
+            }
+
+            ViewBag.Next = next;
             ViewBag.Prev = prev;
 
             ViewBag.AllRecipients = recipients;

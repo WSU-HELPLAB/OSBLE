@@ -71,6 +71,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             ModelState.Clear();
             BuildViewBag();
             Assignment.Type = manager.ActiveAssignmentType;
+
+            Assignment.HoursPerDeduction = (ActiveCourse.AbstractCourse as Course).HoursLatePerPercentPenalty;
+            Assignment.DeductionPerUnit = (ActiveCourse.AbstractCourse as Course).PercentPenalty;
+            Assignment.HoursLateWindow = (ActiveCourse.AbstractCourse as Course).HoursLateUntilZero;
+
             return View(Assignment);
         }
 
@@ -117,7 +122,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 WasUpdateSuccessful = false;
             }
             BuildViewBag();
-            return base.Index(Assignment);
+            return base.PostBack(Assignment);
         }
     }
 }

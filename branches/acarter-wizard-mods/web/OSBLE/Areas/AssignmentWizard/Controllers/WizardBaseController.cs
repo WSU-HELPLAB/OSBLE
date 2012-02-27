@@ -28,6 +28,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public abstract string ControllerName { get; }
 
         /// <summary>
+        /// To be used by the WizardComponentManager to aid in component sorting.  It's okay to access
+        /// the number if need be, but try not to set the value unless you know what you're doing.
+        /// </summary>
+        public int SortOrder { get; set; }
+
+        /// <summary>
         /// Returns a brief description of the controller's purpose.  Used mainly on the "Start"
         /// page
         /// </summary>
@@ -103,6 +109,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public WizardBaseController()
         {
             WasUpdateSuccessful = true;
+            SortOrder = 0;
         }
 
         public void SetUpViewBag()
@@ -133,7 +140,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         }
 
         [HttpPost]
-        protected ActionResult Index(dynamic model)
+        protected ActionResult PostBack(dynamic model)
         {
             manager = WizardComponentManager.GetInstance();
             if (WasUpdateSuccessful)
@@ -187,7 +194,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                                           );
                 }
             }
-            SetUpViewBag();
+            try
+            {
+                SetUpViewBag();
+            }
+            catch (Exception ex)
+            {
+                return RedirectToRoute(new { controller = "Home", action = "ContextLost", assignmentId = Assignment.ID });
+            }
             return View(model);
         }
 

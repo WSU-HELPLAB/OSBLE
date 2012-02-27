@@ -71,7 +71,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 WasUpdateSuccessful = false;
             }
             ViewBag.ActiveCourse = activeCourse;
-            return base.Index(Assignment);
+            return base.PostBack(Assignment);
         }
     }
 }

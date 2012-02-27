@@ -32,6 +32,11 @@ a img
 	border: none;
 }
 
+input
+{
+    z-index:2000;
+}
+
 /* Common layout elements */
 #header
 {
@@ -879,7 +884,7 @@ body#layoutLogOn
 
 .inbox_table tr
 {
-	background-color: #fafafa;
+	background-color: #e8e8e8;
 	border-bottom: 2px solid #cacaca;
 }
 
@@ -899,9 +904,14 @@ body#layoutLogOn
 	background-color: #f0f0ff;
 }
 
-.inbox_table tr.inbox_unread .inbox_subject
+.inbox_table tr.inbox_unread td
 {
 	font-weight: bold;
+}
+
+.inbox_table tr.inbox_unread
+{
+    background: #fafafa;
 }
 
 .inbox_time, .inbox_time_header
@@ -1654,9 +1664,36 @@ ul.assignment_deliverables, .assignment_deliverables ul
     text-align:left;
     color: #074974;
 }
+
 .assignTable td
 {
     padding-right:50px;
+}
+
+.assignDetailsTable th
+{
+    text-align:left;
+    color: #074974;
+}
+
+.assignTable tr.checkeredRow:nth-child(odd)
+{
+    background: #f2f2f2;
+}
+
+.assignDetailsTable tr:nth-child(even)
+{
+    background: #f2f2f2;
+}
+
+.assignDetailsTable tr
+{
+    vertical-align: bottom;
+}
+
+.assignDetailsTable td
+{
+    padding-right:25px;
 }
 
 .osbleColorBold
@@ -1668,4 +1705,25 @@ ul.assignment_deliverables, .assignment_deliverables ul
 .pointerOnMouseOver
 {
     cursor:pointer;
+}
+
+#DeductionPerUnit
+{
+    width: 175px;
+}
+
+#HoursPerDeduction
+{
+    width: 176px;
+}
+
+#assignmentDetailsHeader
+{
+    border: 1px solid #074974;
+    border-collapse: collapse;
+}
+
+#assignmentDetailsHeader th, #assignmentDetailsHeader tr, #assignmentDetailsHeader td
+{
+    border: 1px solid #074974;
 }

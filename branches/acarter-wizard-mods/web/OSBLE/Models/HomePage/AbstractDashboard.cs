@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 using OSBLE.Models.Users;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Models.HomePage
 {
@@ -15,13 +16,34 @@ namespace OSBLE.Models.HomePage
         [Required]
         public DateTime Posted { get; set; }
 
-        public int UserProfileID { get; set; }
+        public int CourseUserID { get; set; }
 
-        public virtual UserProfile UserProfile { get; set; }
+        public virtual CourseUser CourseUser { get; set; }
+
+        [Obsolete("For legacy compatibility.  You should be using the CourseUser property instead.")]
+        public int UserProfileID
+        {
+            get
+            {
+                if (CourseUser != null)
+                {
+                    return CourseUser.UserProfileID;
+                }
+                return 0;
+            }
+        }
+
+        [Obsolete("For legacy compatibility.  You should be using the CourseUser property instead.")]
+        public UserProfile UserProfile
+        {
+            get
+            {
+                return CourseUser.UserProfile;
+            }
+        }
 
         [AllowHtml]
         [Required]
-        [StringLengthAttribute(4000)]
         public string Content { get; set; }
 
         // User's name to show (anonymized on the controller)

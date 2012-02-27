@@ -354,12 +354,22 @@ namespace OSBLE.Services
                 return false;
             }
 
+            CourseUser courseUser = (from cu in db.CourseUsers 
+                             where cu.UserProfileID == currentUser.ID
+                             &&
+                             cu.AbstractCourseID == course.ID
+                             select cu
+                             ).FirstOrDefault();
+            if (courseUser == null)
+            {
+                return false;
+            }
+
             //use the data provided to create a new dashboard post
             DashboardPost newDp = new DashboardPost();
             newDp.Content = message;
             newDp.Posted = DateTime.Now;
-            newDp.UserProfile = currentUser;
-            newDp.Course = course;
+            newDp.CourseUser = courseUser;
 
             //add & save
             db.DashboardPosts.Add(newDp);

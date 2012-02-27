@@ -60,7 +60,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             Assignment.CommentCategoryID = 0;
             db.SaveChanges();
             WasUpdateSuccessful = true;
-            return base.Index(Assignment);
+            return base.PostBack(Assignment);
         }
 
         private CommentCategoryConfiguration BuildCommentCategories()

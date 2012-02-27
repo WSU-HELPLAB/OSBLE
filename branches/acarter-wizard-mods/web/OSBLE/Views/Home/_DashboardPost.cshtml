@@ -6,11 +6,11 @@
     AbstractCourse course = new Course();
     
     if (Model is DashboardPost) {
-        course = (Model as DashboardPost).Course;
+        course = (Model as DashboardPost).CourseUser.AbstractCourse;
     }
     else if (Model is DashboardReply)
     {
-        course = (Model as DashboardReply).Parent.Course;
+        course = (Model as DashboardReply).Parent.CourseUser.AbstractCourse;
     }
     
 }
@@ -24,6 +24,7 @@
 
     //refreshes the count of how many charecters you can input
     function refreshCount() {
+        $('body').css('cursor', 'wait');
         $('#remCharsReply').val("(" + $('#MaxContentChars').val() + ") Characters left");
     }
 
@@ -46,7 +47,7 @@
 
                 @if (Model.ShowProfilePicture)
                 {
-                    @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = course.ID, userprofile = Model.UserProfileID }));
+                    @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = course.ID, userprofile = Model.CourseUser.UserProfileID }));
                 }
                 else
                 {
@@ -68,7 +69,7 @@
                 <span class="dp_tools">
                 @if (Model.CanMail)
                 {
-                    <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = Model.UserProfileID })">@Helpers.MailButton()</a>
+                    <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = Model.CourseUser.UserProfileID })">@Helpers.MailButton()</a>
                 }
                 @if (Model.CanDelete)
                 {
@@ -135,7 +136,7 @@
                         data-ajax-update="#dp_replies_for_@(Model.ID)"
                         data-ajax-begin="$('#reply_@(Model.ID)_button').attr('disabled', 'disabled')"
                         data-ajax-failure="alert('There was an error sending your reply.')"
-                        data-ajax-complete="$('#reply_@(Model.ID)_button').removeAttr('disabled')"
+                        data-ajax-complete="$('#reply_@(Model.ID)_button').removeAttr('disabled'); $('body').css('cursor', 'default');"
                         data-ajax-success="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');}); $('#dp_replybox_content_@(Model.ID)').val('')"
                         data-ajax-mode="after"
                         method="post">

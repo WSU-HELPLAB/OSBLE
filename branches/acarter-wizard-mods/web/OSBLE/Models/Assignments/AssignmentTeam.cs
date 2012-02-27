@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models.Assignments
 {
-    public class AssignmentTeam
+    public class AssignmentTeam : IAssignmentTeam
     {
         [Key]
         [Column(Order=0)]

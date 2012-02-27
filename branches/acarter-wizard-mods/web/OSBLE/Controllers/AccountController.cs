@@ -58,40 +58,51 @@ namespace OSBLE.Controllers
             {
                 model.UserName = model.UserName.Trim();
                 model.Password = model.Password.Trim();
-                MembershipUser user = Membership.GetUser(model.UserName);
+                UserProfile localUser = db.UserProfiles.Where(m => m.UserName.CompareTo(model.UserName) == 0).FirstOrDefault();
 
-                //remove any locks.  A little unsecure as it allows a constant brute-force 
-                //attack, but it seems to annoy users much more regularly.  Consider
-                //removing is OSBLE ever gets to the point that user accounts start getting
-                //hacked.
-                if(user != null)
+                if (localUser != null)
                 {
-                    user.UnlockUser();
-                }
-                if (Membership.ValidateUser(model.UserName, model.Password))
-                {
-                    context.Session.Clear(); // Clear session variables.
-                    FormsAuthentication.SetAuthCookie(model.UserName, model.RememberMe);
-                    if (Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
-                        && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
+                    MembershipUser user = Membership.GetUser(localUser.AspNetUserName);
+
+
+                    //remove any locks.  A little unsecure as it allows a constant brute-force 
+                    //attack, but it seems to annoy users much more regularly.  Consider
+                    //removing if OSBLE ever gets to the point that user accounts start getting
+                    //hacked.
+                    if (user != null)
                     {
-                        return Redirect(returnUrl);
+                        user.UnlockUser();
+                    }
+                    if (Membership.ValidateUser(localUser.AspNetUserName, model.Password))
+                    {
+                        context.Session.Clear(); // Clear session variables.
+                        FormsAuthentication.SetAuthCookie(model.UserName, true);
+                        if (Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
+                            && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
+                        {
+                            return Redirect(returnUrl);
+                        }
+                        else
+                        {
+                            return RedirectToAction("Index", "Home");
+                        }
+                    }
+                    else if (user != null && !user.IsApproved)
+                    {
+                        setLogOnCaptcha();
+                        ModelState.AddModelError("", "This account has not been activated.  An additional verification letter has been sent to your email address.");
+                        string randomHash = GenerateRandomString(40);
+                        UserProfile up = db.UserProfiles.Where(m => m.UserName == user.UserName).FirstOrDefault();
+                        MembershipUser mu = Membership.GetUser(up.UserName);
+                        mu.Comment = randomHash;
+                        Membership.UpdateUser(mu);
+                        sendVerificationEmail(true, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), up.FirstName, up.UserName);
                     }
                     else
                     {
-                        return RedirectToAction("Index", "Home");
+                        setLogOnCaptcha();
+                        ModelState.AddModelError("", "The user name or password provided is incorrect.");
                     }
-                }
-                else if(user != null && !user.IsApproved)
-                {
-                    setLogOnCaptcha();
-                    ModelState.AddModelError("", "This account has not been activated.  An additional verification letter has been sent to your email address.");
-                    string randomHash = GenerateRandomString(40);
-                    UserProfile up = db.UserProfiles.Where(m => m.UserName == user.UserName).FirstOrDefault();
-                    MembershipUser mu = Membership.GetUser(up.UserName);
-                    mu.Comment = randomHash;
-                    Membership.UpdateUser(mu);
-                    sendVerificationEmail(true, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), up.FirstName, up.UserName);
                 }
                 else
                 {
@@ -190,8 +201,15 @@ namespace OSBLE.Controllers
                         user.Comment = null;
                         user.IsApproved = true;
                         Membership.UpdateUser(user);
-                        FormsAuthentication.SetAuthCookie(model.UserName, false);
-
+                        FormsAuthentication.SetAuthCookie(model.UserName, true);
+                        
+                        //make sure that the asp.net user name is saved to the user profile
+                        UserProfile osbleProfile = db.UserProfiles.Where(u => u.UserName.CompareTo(model.UserName) == 0).FirstOrDefault();
+                        if (osbleProfile != null)
+                        {
+                            osbleProfile.AspNetUserName = model.UserName;
+                            db.SaveChanges();
+                        }
                         return RedirectToAction("Index", "Home");
                     }
                     else
@@ -243,6 +261,7 @@ namespace OSBLE.Controllers
                             UserProfile profile = new UserProfile();
 
                             profile.UserName = model.Email;
+                            profile.AspNetUserName = model.Email;
                             profile.FirstName = model.FirstName;
                             profile.LastName = model.LastName;
                             profile.Identification = model.Identification;
@@ -324,6 +343,7 @@ namespace OSBLE.Controllers
                             UserProfile profile = new UserProfile();
 
                             profile.UserName = model.Email;
+                            profile.AspNetUserName = model.Email;
                             profile.FirstName = model.FirstName;
                             profile.LastName = model.LastName;
                             profile.Identification = model.Identification;
@@ -454,9 +474,12 @@ namespace OSBLE.Controllers
             //Fall through if ReCaptcha is not set up correctly
             if (privatekey == null || ReCaptcha.Validate(privateKey: privatekey))
             {
-                var user = Membership.GetUser(model.EmailAddress);
-                if (user != null)
+                UserProfile osbleProfile = db.UserProfiles.Where(m => m.UserName.CompareTo(model.EmailAddress) == 0).FirstOrDefault();
+                if (osbleProfile != null)
                 {
+                    var user = Membership.GetUser(osbleProfile.AspNetUserName);
+                    if (user != null)
+                    {
 #if !DEBUG
 
                     string newPass = user.ResetPassword();
@@ -476,7 +499,8 @@ namespace OSBLE.Controllers
                     sc.Send(mm);
 #endif
 
-                    return View("ResetPasswordSuccess");
+                        return View("ResetPasswordSuccess");
+                    }
                 }
             }
             return View("ResetPasswordFailure");
