@@ -9,7 +9,7 @@
     List<CourseUser> allUsers = ViewBag.AllUsers;
     List<Assignment> previousTeamAssignments = ViewBag.PreviousTeamAssignments;
     ViewBag.Title = "Assignment Creation Wizard";
-    ViewBag.ComponentName = "Team Settings";
+    ViewBag.ComponentName = "Discussion Team Settings";
 }
 
 @section Header
@@ -24,7 +24,7 @@
             Is this a class-wide discussion assignment?
         </td>
         <td style="padding-left:15px;">
-            @if (Model.HasTeams)
+            @if (Model.HasDiscussionTeams)
             {
                 @:Yes<input id="radioYes" name="teamRadio" type="radio" checked="checked"/>
                 @:No <input id="radioNo"  name="teamRadio" type="radio" />
@@ -48,7 +48,6 @@ else
     @:<div id="teamDiv" style="display:none;">
 }
 <p>
-    @Html.Raw(ToolTips.BasicAssignmentIsTeam)
 </p> 
 @Html.HiddenFor(m => m.ID)
 <div>

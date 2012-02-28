@@ -306,15 +306,36 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                 AllComponents.Add(controller);
             }
 
-            //If we have already sorted in the past, use the component's sort order to make things go faster.
-            //Otherwise, do it the long way
-            if (AllComponents[0].SortOrder != 0)
+            //AC: The List data type's Sort() method uses quicksort, which uses a partitioning scheme.  
+            //Because wizard component sorting is a little goofy, this won't work for us.  Therefore, we must
+            //use something more simplistic (Insertion Sort used)
+
+            //AC TODO: Cache this, it takes WAY TOO LONG!
+            AllComponents.Sort(new WizardPrerequisiteCountComparer());
+            WizardPrerequisiteComparer comparer = new WizardPrerequisiteComparer();
+            for (int i = 1; i < AllComponents.Count; i++)
             {
-                AllComponents.Sort(new WizardSortOrderComparer());            
-            }
-            else
-            {
-                AllComponents.Sort(new WizardPrerequisiteComparer());            
+                WizardBaseController current = AllComponents[i];
+                int j = i - 1;
+                bool done = false;
+                while (!done)
+                {
+                    //if the previous component is greater than (comes before the current component)
+                    if (comparer.Compare(AllComponents[j], current) == 1)
+                    {
+                        AllComponents[j + 1] = AllComponents[j];
+                        j--;
+                        if (j < 0)
+                        {
+                            done = true;
+                        }
+                    }
+                    else
+                    {
+                        done = true;
+                    }
+                    AllComponents[j + 1] = current;
+                }
             }
             
             //attach event listeners to selection change

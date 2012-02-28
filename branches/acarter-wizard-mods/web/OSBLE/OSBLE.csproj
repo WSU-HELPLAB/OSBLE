@@ -165,10 +165,12 @@
     <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\ContentController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\CriticalReviewController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionTeamsController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\PreviousAssignmentController.cs" />
     <Compile Include="Areas\AssignmentWizard\Models\WizardPrerequisiteComparer.cs" />
+    <Compile Include="Areas\AssignmentWizard\Models\WizardPrerequisiteCountComparer.cs" />
     <Compile Include="Areas\AssignmentWizard\Models\WizardSortOrderComparer.cs" />
     <Compile Include="Attributes\CanPostEvent.cs" />
     <Compile Include="Attributes\FileCacheAttribute.cs" />
@@ -286,11 +288,13 @@
     <Content Include="App_Code\Libraries\LumenWorks.Framework.IO.dll" />
     <Content Include="App_Data\FirstNames.txt" />
     <Content Include="App_Data\LastNames.txt" />
+    <Content Include="Areas\AssignmentWizard\Content\css\criticalReview.css" />
     <Content Include="Areas\AssignmentWizard\Content\css\home.css" />
     <Content Include="Areas\AssignmentWizard\Content\css\team.css" />
     <Content Include="Areas\AssignmentWizard\Content\icons\rubric_add.png" />
     <Content Include="Areas\AssignmentWizard\Content\icons\rubric_delete.png" />
     <Content Include="Areas\AssignmentWizard\Content\js\commentCategories.js" />
+    <Content Include="Areas\AssignmentWizard\Content\js\criticalReview.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\deliverables.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\team.js" />
     <Content Include="Areas\AssignmentWizard\Modifications.txt" />
@@ -640,6 +644,7 @@
     <Content Include="Areas\AssignmentWizard\Views\PreviousAssignment\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Discussion\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\DiscussionTeams\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\CriticalReview\Index.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />
