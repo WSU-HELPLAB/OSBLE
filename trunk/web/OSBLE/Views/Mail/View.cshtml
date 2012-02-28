@@ -47,6 +47,40 @@
     <br />
 
     <div style="margin-top: 115px">
+
+    <table>
+        <tr>
+            <td class="email_view_links">
+            @if (ViewBag.Prev < Model.ID)
+            {
+                @Html.ActionLink("Older", "View", new { id = ViewBag.Prev }) <a>&nbsp;</a>
+            }
+            else
+            {
+            }
+            </td>
+            <td class="email_view_links">
+                @if (ViewBag.CurrentUser == Model.ToUserProfile)
+                { // inbox
+                    @Html.ActionLink("Back to Inbox\t", "Index") <a>&nbsp;</a>
+                }
+                else
+                { // outbox
+                    @Html.ActionLink("Back to Outbox", "Outbox")
+                }
+            </td>
+            <td class="email_view_links">
+            @if (ViewBag.Next > Model.ID)
+            {
+                @Html.ActionLink("Newer", "View", new { id = ViewBag.Next })
+            }
+            else
+            {
+            }
+            </td>
+        </tr>
+    </table>
+
     <p>
         @if (ViewBag.CurrentUser == Model.ToUserProfile)
         {
