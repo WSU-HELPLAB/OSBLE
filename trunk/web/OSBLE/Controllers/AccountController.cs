@@ -205,7 +205,7 @@ namespace OSBLE.Controllers
                         FormsAuthentication.SetAuthCookie(model.UserName, true);
                         
                         //make sure that the asp.net user name is saved to the user profile
-                        UserProfile osbleProfile = db.UserProfiles.Where(u => u.UserName.CompareTo(model.UserName) == 0).FirstOrDefault();
+                        UserProfile osbleProfile = db.UserProfiles.Where(u => u.AspNetUserName.CompareTo(model.UserName) == 0).FirstOrDefault();
                         if (osbleProfile != null)
                         {
                             osbleProfile.AspNetUserName = model.UserName;
