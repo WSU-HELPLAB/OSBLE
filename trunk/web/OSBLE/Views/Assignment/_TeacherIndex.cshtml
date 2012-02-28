@@ -2,10 +2,10 @@
 @using OSBLE.Models.Assignments
 @model OSBLE.Models.ViewModels.AssignmentListViewModel
 
-@if((ViewBag.PastAssignments.Count > 0 ||
+@if ((ViewBag.PastAssignments.Count > 0 ||
      ViewBag.PresentAssignments.Count > 0 ||
-     ViewBag.FutureAssignments.Count > 0) || 
-     ViewBag.DraftAssignments.Count > 0) 
+     ViewBag.FutureAssignments.Count > 0) ||
+     ViewBag.DraftAssignments.Count > 0)
 {
     ViewBag.AssignmentList = 1;
     <table class="assignTable" cellspacing="0">
@@ -13,6 +13,7 @@
         <th>Release Date</th>
         <th>Due Date</th>
         <th>Submissions</th>
+        <th>Grading</th>
         @if (ViewBag.PastAssignments.Count > 0)
         {
             //Needed a way to put blank space in a table, only when the previous assignment category had
@@ -21,7 +22,6 @@
         }
         @foreach (Assignment a in ViewBag.PastAssignments)
         {
-            
             <tr class="checkeredRow">
                 <td style="padding-right:0"><!--Cell for icons-->
                     <a title="Click to Unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.UnPublishButton()</a>
@@ -31,16 +31,27 @@
                 <td> <!--Cell for name-->
                     @Html.ActionLink(a.AssignmentName, "AssignmentDetails", "Assignment", new { a.ID }, null)
                 </td>
-                <td>@a.ReleaseDate.ToShortDateString()</td>
-                <td>@a.DueDate.ToShortDateString()</td>
+                <td>@a.ReleaseDate.ToShortDateString() @a.ReleaseTime.ToShortTimeString()</td>
+                <td>@a.DueDate.ToShortDateString() @a.DueDate.ToShortTimeString()</td>
                 @if (a.HasDeliverables)
                 {
                     //Teacher with deliverables, download all option should be here
-                    <td>@Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })</td>
+                    <td>@a.GetSubmissionCount() of @a.AssignmentTeams.Count received. @Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })</td>
                 }
                 else
                 {
                     <td>No Deliverables</td>
+                }
+                @if (a.HasRubric)
+                {
+                     <td>@a.GetPublishedCount() of @a.AssignmentTeams.Count published, with @a.GetSavedAsDraftCount() saved as draft.
+                     @Html.ActionLink("Grade Now", "Index", "Rubric", new { assignmentId = a.ID, cuId = a.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })
+                     &nbsp<a href="#" style="cursor:pointer" onclick="publishAllGrades(@a.ID);">Publish All</a>
+                     </td>
+                }
+                else
+                {
+                    <td><a href="#" onclick="goToCategoryTab(@a.CategoryID, @a.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID);" style="cursor:pointer;">Grade Now</a></td>
                 }
             </tr>
         }
@@ -56,6 +67,7 @@
         }
         @foreach (Assignment a in ViewBag.PresentAssignments)
         {
+            
             <tr class="checkeredRow">
                 <td style="padding-right:0"><!--Cell for icons-->
                     <a title="Click to Unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@a.ID)">@Helpers.UnPublishButton()</a>
@@ -65,16 +77,27 @@
                 <td> <!--Cell for name-->
                     @Html.ActionLink(a.AssignmentName, "AssignmentDetails", "Assignment", new { a.ID }, null)
                 </td>
-                <td>@a.ReleaseDate.ToShortDateString()</td>
-                <td>@a.DueDate.ToShortDateString()</td>
+                <td>@a.ReleaseDate.ToShortDateString() @a.ReleaseTime.ToShortTimeString() </td>
+                <td>@a.DueDate.ToShortDateString() @a.DueDate.ToShortTimeString() </td>
                 @if (a.HasDeliverables)
                 {
                     //Teacher with deliverables, download all option should be here
-                    <td>@Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })</td>
+                    <td>@a.GetSubmissionCount() of @a.AssignmentTeams.Count received. @Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })</td>
                 }
                 else
                 {
                     <td>No Deliverables</td>
+                }
+                @if (a.HasRubric)
+                {
+                     <td>@a.GetPublishedCount() of @a.AssignmentTeams.Count published, with @a.GetSavedAsDraftCount() saved as draft.
+                     @Html.ActionLink("Grade Now", "Index", "Rubric", new { assignmentId = a.ID, cuId = a.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })
+                     &nbsp<a href="#" style="cursor:pointer" onclick="publishAllGrades(@a.ID);">Publish All</a>
+                     </td>
+                }
+                else
+                {
+                    <td><a href="#" onclick="goToCategoryTab(@a.CategoryID, @a.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID);" style="cursor:pointer;">Grade Now</a></td>
                 }
             </tr>
         }
@@ -98,8 +121,8 @@
                 <td> <!--Cell for name-->
                     @Html.ActionLink(a.AssignmentName, "AssignmentDetails", "Assignment", new { a.ID }, null)
                 </td>
-                <td>@a.ReleaseDate.ToShortDateString()</td>
-                <td>@a.DueDate.ToShortDateString()</td>
+                <td>@a.ReleaseDate.ToShortDateString() @a.ReleaseTime.ToShortTimeString() </td>
+                <td>@a.DueDate.ToShortDateString() @a.DueDate.ToShortTimeString() </td>
                 @if (a.HasDeliverables)
                 {
                     //Teacher with deliverables, download all option should be here
@@ -109,6 +132,7 @@
                 {
                     <td>No Deliverables</td>
                 }
+                <td>Not Available</td>
             </tr>
         }
         @if (ViewBag.DraftAssignments.Count > 0)
@@ -132,8 +156,8 @@
                 <td> <!--Cell for name-->
                     @Html.ActionLink(a.AssignmentName, "AssignmentDetails", "Assignment", new { a.ID }, null)
                 </td>
-                <td>@a.ReleaseDate.ToShortDateString()</td>
-                <td>@a.DueDate.ToShortDateString()</td>
+                <td>@a.ReleaseDate.ToShortDateString() @a.ReleaseTime.ToShortTimeString() </td>
+                <td>@a.DueDate.ToShortDateString() @a.DueDate.ToShortTimeString() </td>
                 @if (a.HasDeliverables)
                 {
                     //Teacher with deliverables, download all option should be here
@@ -143,7 +167,31 @@
                 {
                     <td>No Deliverables</td>
                 }
+                <td>Not Available</td>
             </tr>
         }
     </table>
 }
+
+<script type="text/javascript">
+function publishAllGrades(aId) {
+        $.ajax({
+            async: false,
+            url: "/Assignment/PublishAllGrades",
+            data: { assignmentId: aId }
+        });
+        window.location.reload(true);
+    }
+
+    function goToCategoryTab(catID, stuID) {
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/SetTabStudent",
+            data: { studentId: stuID.toString() },
+            success: function () {
+                location.href = "/Gradebook/Tab/?categoryId=" + catID;
+            }
+        });
+        hideTabColors();
+    }
+</script>

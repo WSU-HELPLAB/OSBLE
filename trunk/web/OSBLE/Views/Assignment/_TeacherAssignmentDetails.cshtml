@@ -29,9 +29,9 @@
     List<OSBLE.Models.Courses.Rubrics.RubricEvaluation> r = ViewBag.RubricEvals;
     if (assignment.HasDeliverables)
     {
-        @:<tr>
+        <tr>
             <td><text class="osbleColorBold">Submissions:</text></td>
-            if (submittedCount > 0)
+            @if (submittedCount > 0)
             {
                 <td>@submittedCount of @totalStudentCount have been submitted&nbsp @Html.ActionLink("[Download All]", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()", style="text-decoration:none"})</td>    
             }
@@ -39,6 +39,8 @@
             {
                 <td>@submittedCount of @totalStudentCount have been submitted</td>
             }
+        </tr>
+           
     }
     <tr>
         <td style="vertical-align:top"><text class="osbleColorBold" >Grading progress:</text></td>
@@ -157,7 +159,7 @@
                     }
                     else
                     {
-                        <a href="#" onclick="goToCategoryTab(@da.Item1.Assignment.CategoryID, @da.Item2.TeamMembers.FirstOrDefault().CourseUser.ID);" style="cursor:pointer;">@da.Item1.getGradeAsPercent(da.Item1.Assignment.PointsPossible)></a>
+                        <a href="#" onclick="goToCategoryTab(@da.Item1.Assignment.CategoryID, @da.Item2.TeamMembers.FirstOrDefault().CourseUser.ID);" style="cursor:pointer;">@da.Item1.getGradeAsPercent(da.Item1.Assignment.PointsPossible)</a>
                     }
                 }    
             </td>

@@ -466,7 +466,7 @@ namespace OSBLE
 
         public static string GetAssignmentsFolder(Course course)
         {
-            return string.Format("{0}\\Assignments", getCoursePath(course));
+            return string.Format("{0}Assignments\\", getCoursePath(course));
         }
 
         //AH: Will probably no longer need, commenting out until we find out for sure.
@@ -630,6 +630,17 @@ namespace OSBLE
             }
         }
 
+        public static int GetFolderDocumentCount(AbstractCourse course, int assignmentId)
+        {
+            int returnVal = 0;
+            string path = GetAssignmentIDFolder(course as Course, assignmentId) + "\\Submissions";
+            if (Directory.Exists(path))
+            {
+                string[] dirs = Directory.GetDirectories(path);
+                returnVal = dirs.Count();
+            }
+            return returnVal;
+        }
         public static void PrepCourseDocuments(DirectoryListing listing, int courseId, string previousPath = "")
         {
             string coursePath = GetCourseDocumentsPath(courseId);

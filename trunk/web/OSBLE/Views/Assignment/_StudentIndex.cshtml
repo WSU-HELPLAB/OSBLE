@@ -26,8 +26,8 @@
                 <td> <!--Cell for name-->
                     @Html.ActionLink(a.AssignmentName, "AssignmentDetails", "Assignment", new { a.ID }, null)
                 </td>
-                <td>@a.ReleaseDate.ToShortDateString()</td>
-                <td>@a.DueDate.ToShortDateString()</td>
+                <td>@a.ReleaseDate.ToShortDateString() @a.ReleaseTime.ToShortTimeString()</td>
+                <td>@a.DueDate.ToShortDateString() @a.DueDate.ToShortTimeString()</td>
                 <td><!--Td for grade-->
                     @if (a.HasRubric)
                     {
@@ -93,8 +93,8 @@
                 <td> <!--Cell for name-->
                     @Html.ActionLink(a.AssignmentName, "AssignmentDetails", "Assignment", new { a.ID }, null)
                 </td>
-                <td>@a.ReleaseDate.ToShortDateString()</td>
-                <td>@a.DueDate.ToShortDateString()</td>
+                <td>@a.ReleaseDate.ToShortDateString() @a.ReleaseTime.ToShortTimeString()</td>
+                <td>@a.DueDate.ToShortDateString() @a.DueDate.ToShortTimeString()</td>
                 <td><!--Td for grade-->
                     @if (a.HasRubric)
                     {

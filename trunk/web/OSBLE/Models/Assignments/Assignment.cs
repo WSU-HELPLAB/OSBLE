@@ -152,6 +152,41 @@ namespace OSBLE.Models.Assignments
             }
         }
 
+        /// <summary>
+        /// Returns an int with the amount of submissions received for the assignment
+        /// </summary>
+        public int GetSubmissionCount()
+        {
+            return FileSystem.GetFolderDocumentCount(this.Category.Course, this.ID);
+        }
+
+        /// <summary>
+        /// Returns an int with the amount of scores that are currently saved as draft
+        /// </summary>
+        public int GetSavedAsDraftCount()
+        {
+            OSBLEContext db = new OSBLEContext();
+            int draftRubricEvals = (from a in db.RubricEvaluations
+                                    where a.AssignmentID == this.ID &&
+                                    !a.IsPublished
+                                    select a).Count();
+            return draftRubricEvals;
+        }
+
+        /// <summary>
+        /// Returns an int with the amount of scores that are currently Published
+        /// </summary>
+        /// <returns></returns>
+        public int GetPublishedCount()
+        {
+            OSBLEContext db = new OSBLEContext();
+            int draftRubricEvals = (from a in db.RubricEvaluations
+                                    where a.AssignmentID == this.ID &&
+                                    a.IsPublished
+                                    select a).Count();
+            return draftRubricEvals;
+        }
+
         [Required(ErrorMessage = "Please specify for how long OSBLE should accept late submissions")]
         [Display(Name = "Late Submission Window")]
         public int HoursLateWindow { get; set; }
