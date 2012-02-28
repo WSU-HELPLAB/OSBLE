@@ -600,6 +600,37 @@ namespace OSBLE.Controllers
             {
                 db.CourseUsers.Add(courseuser);
                 db.SaveChanges();
+
+                //If we already have assignments in the course, we need to add the new student into the class
+                int currentCourseId = activeCourse.AbstractCourseID;
+                List<Assignment> assignments = (from a in db.Assignments
+                                                where a.Category.CourseID == currentCourseId
+                                                select a).ToList();
+
+                foreach (Assignment a in assignments)
+                {
+                    TeamMember userMember = new TeamMember()
+                    {
+                        CourseUserID = user.ID
+                    };
+
+                    Team team = new Team();
+                    team.Name = courseuser.UserProfile.LastName + "," + courseuser.UserProfile.FirstName;
+                    team.TeamMembers.Add(userMember);
+
+                    db.Teams.Add(team);
+                    db.SaveChanges();
+
+                    AssignmentTeam assignmentTeam = new AssignmentTeam()
+                    {
+                        AssignmentID = a.ID,
+                        Team = team,
+                        TeamID = team.ID
+                    };
+
+                    db.AssignmentTeams.Add(assignmentTeam);
+                    db.SaveChanges();
+                }
             }
         }
 
