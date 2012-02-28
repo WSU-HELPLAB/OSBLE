@@ -84,7 +84,7 @@ namespace OSBLE.Models.Assignments
         public string getGradeAsPercent(int assignmentPossiblePoints)
         {
             if (this.Points == -1 || assignmentPossiblePoints == 0)
-                return "NG";
+                return "Not Graded";
             else
                 return ((this.Points / (double)assignmentPossiblePoints)).ToString("P");
         }
