@@ -76,57 +76,6 @@
             return true;
     }
 
-    function changePoints(pp) {
-        var points = 0;
-        var pointsPossible = parseInt(pp);
-        $("#errorText").text("");
-        $("table tr").each(function (i) {
-            //loop tr's in table with class 'adminlist'
-            $(this).find("#points").each(function (j) {
-                var addTo = parseInt($(this).val());
-                if (isNaN($(this).val())) {
-                    $("#errorText").text("Values can only be numbers.");
-                }
-                else if (addTo < 0) {
-                    $("#errorText").text("Values cannot be negative.");
-                }
-                points += parseInt($(this).val());
-            });
-        });
-        pointsPossible = pointsPossible - points;
-        $("#pointsPossibleId").html(pointsPossible);
-
-    }
-
-    $('#file_uploader_form').submit(function (e) {
-
-        $("table tr").each(function (i) {
-            //loop tr's in table with class 'adminlist'
-            $(this).find("#points").each(function (j) {
-                var addTo = parseInt($(this).val());
-
-                if (isNaN($(this).val())) {
-                    $("#errorText").text("Values can only be numbers.");
-                    e.preventDefault();
-                }
-                else if (addTo < 0) {
-                    alert("here");
-                    $("#errorText").text("Values cannot be negative.");
-                    e.preventDefault();
-                }
-            });
-        });
-
-        if (parseInt($("#pointsPossibleId").text()) < 0) {
-            $("#errorText").text("Points Remaining must equal 0.");
-            e.preventDefault();
-        }
-    });
-
-    function checkForErrors() {
-        
-    }
-
 </script>
 @{
     int fileUploadsSoFar = 0;
@@ -193,35 +142,20 @@
                 // InBrowserText field
                 else 
                 {
-                    Assignment a = ViewBag.AssignmentTeam.Assignment;
-                    <tr>
-                        <td><b>Points Remaining:</b></td><td><div id="pointsPossibleId">@a.PointsPossible</div></td>
-                    </tr>
-                    foreach (TeamMember tm in ViewBag.AssignmentTeam.Team.TeamMembers)
-                    {
-                        <tr>
-                            <td>@tm.CourseUser.UserProfile.FirstName @tm.CourseUser.UserProfile.LastName: </td> <td><input id="points" onblur="changePoints(@a.PointsPossible);" size="1" value="0"/></td>
-                        </tr>
-                        
-                    }
-                    
-                    <tr></tr>
-                    <tr>
-                    
-                    <td valign="top"><b>Comments:</b> </td></tr>
                     <tr>
                         <td colspan="2">
                             <input type="hidden" name="desiredName[@inBrowserCount]" readonly="true" value="@deliverable.Name"/>
-                            <textarea class="textAreaClass" name="inBrowserText[@inBrowserCount]" rows="5" cols = "53" ></textarea>
+                            <textarea class="textAreaClass" name="inBrowserText[@inBrowserCount]" rows="10" cols = "53" ></textarea>
                         </td>
                     </tr>
-                        
+                         
                     inBrowserCount++;
                 }
             </table>
+            <br/>
         }
-        <div>
-            <input type="submit" value="Submit" /> <text id="errorText" style="color:Red"></text>
-        </div>
+        <p>
+            <input type="submit" value="Submit"/>
+        </p>
     </fieldset>
 }
