@@ -29,15 +29,15 @@ using OSBLE.Models.Assignments;
  *                     |       Records.txt { %random number%.zip}
  *                     |
  *           [AssignmentActivityId]
- *           /       \          \
- *          /         \          \
- *       AADocs   Submissions    Reviews
- *          |          |             \
- *      {aa docs}      |      [TeamuserMemberId]
- *                     |                 |
- *            [TeamUserMemberId]         |
- *                     |             {reviews}
- *            {team submissions}
+ *           /       \        \    
+ *          /         \        \                        
+ *       AADocs   Submissions   Reviews              
+ *          |          |             \                   
+ *      {aa docs}      |      [TeamuserMemberId]       
+ *                     |                 |              
+ *                 [TeamId]              |                 
+ *                     |             {reviews}           
+ *            {team submissions}                     
  * */
 
 namespace OSBLE
