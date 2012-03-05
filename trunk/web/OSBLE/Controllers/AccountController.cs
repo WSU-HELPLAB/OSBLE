@@ -355,6 +355,8 @@ namespace OSBLE.Controllers
 
                             if (up != null) // User profile exists. Is it a stub?
                             {
+                                MembershipUser msu = Membership.GetUser(up.UserName);
+
                                 if (up.UserName == null) // Stub. Register to the account.
                                 {
                                     up.UserName = model.Email;
@@ -362,7 +364,16 @@ namespace OSBLE.Controllers
                                     up.LastName = model.LastName;
                                     db.Entry(up).State = EntityState.Modified;
                                 }
-                                else // Existing Account. Throw validation error.
+                                else if (!msu.IsApproved) // Already Registered but never acivated their account
+                                {
+                                    Membership.DeleteUser(up.UserName);  // Removes the MemberShipUser that was created on the previous registration.
+
+                                    up.UserName = model.Email;
+                                    up.FirstName = model.FirstName;
+                                    up.LastName = model.LastName;
+                                    db.Entry(up).State = EntityState.Modified;
+                                }
+                                else // Existing Activated Account. Throw validation error.
                                 {
                                     throw new Exception("You have entered an ID number that is already in use for your school.");
                                 }
