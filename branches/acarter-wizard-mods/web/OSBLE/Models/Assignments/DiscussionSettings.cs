@@ -11,11 +11,13 @@ namespace OSBLE.Models.Assignments
     /// Note that I'm using bit masking to store all settings inside one variable.  As such,
     /// be sure to make each setting's integer value a power of 2.
     /// </summary>
-    public enum AnonymityLevels : byte 
+    [Flags]
+    public enum DiscussionSettings : byte
     { 
         AnonymousPosts = 1,
         AnonymousReplies = 2,
-        AnonymousRoles = 4
+        AnonymousRoles = 4,
+        RequiresPostBeforeView = 8,
     };
 
     public class DiscussionSetting
@@ -88,17 +90,17 @@ namespace OSBLE.Models.Assignments
         {
             get
             {
-                return HasAnonymityLevel(AnonymityLevels.AnonymousPosts);
+                return HasAnonymityLevel(DiscussionSettings.AnonymousPosts);
             }
             set
             {
                 if (value == true)
                 {
-                    AddAnonymityLevel(AnonymityLevels.AnonymousPosts);
+                    AddAnonymityLevel(DiscussionSettings.AnonymousPosts);
                 }
                 else
                 {
-                    RemoveAnonymityLevel(AnonymityLevels.AnonymousPosts);
+                    RemoveAnonymityLevel(DiscussionSettings.AnonymousPosts);
                 }
             }
         }
@@ -112,17 +114,17 @@ namespace OSBLE.Models.Assignments
         {
             get
             {
-                return HasAnonymityLevel(AnonymityLevels.AnonymousReplies);
+                return HasAnonymityLevel(DiscussionSettings.AnonymousReplies);
             }
             set
             {
                 if (value == true)
                 {
-                    AddAnonymityLevel(AnonymityLevels.AnonymousReplies);
+                    AddAnonymityLevel(DiscussionSettings.AnonymousReplies);
                 }
                 else
                 {
-                    RemoveAnonymityLevel(AnonymityLevels.AnonymousReplies);
+                    RemoveAnonymityLevel(DiscussionSettings.AnonymousReplies);
                 }
             }
         }
@@ -136,17 +138,42 @@ namespace OSBLE.Models.Assignments
         {
             get
             {
-                return HasAnonymityLevel(AnonymityLevels.AnonymousRoles);
+                return HasAnonymityLevel(DiscussionSettings.AnonymousRoles);
             }
             set
             {
                 if (value == true)
                 {
-                    AddAnonymityLevel(AnonymityLevels.AnonymousRoles);
+                    AddAnonymityLevel(DiscussionSettings.AnonymousRoles);
                 }
                 else
                 {
-                    RemoveAnonymityLevel(AnonymityLevels.AnonymousRoles);
+                    RemoveAnonymityLevel(DiscussionSettings.AnonymousRoles);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the assignment requires that students must first submit a post before
+        /// they can view the posts of others
+        /// </summary>
+        [NotMapped]
+        [Display(Name = "Student must submit a post before they can view the posts of others")]
+        public bool RequiresPostBeforeView
+        {
+            get
+            {
+                return HasAnonymityLevel(DiscussionSettings.RequiresPostBeforeView);
+            }
+            set
+            {
+                if (value == true)
+                {
+                    AddAnonymityLevel(DiscussionSettings.RequiresPostBeforeView);
+                }
+                else
+                {
+                    RemoveAnonymityLevel(DiscussionSettings.RequiresPostBeforeView);
                 }
             }
         }
@@ -156,18 +183,18 @@ namespace OSBLE.Models.Assignments
         /// </summary>
         /// <param name="level"></param>
         /// <returns></returns>
-        protected bool HasAnonymityLevel(AnonymityLevels level)
+        protected bool HasAnonymityLevel(DiscussionSettings level)
         {
             int result = AnonymitySettings & (byte)level;
             return result == (int)level;
         }
 
-        protected void AddAnonymityLevel(AnonymityLevels level)
+        protected void AddAnonymityLevel(DiscussionSettings level)
         {
             AnonymitySettings = (byte)(AnonymitySettings | (byte)level);
         }
 
-        protected void RemoveAnonymityLevel(AnonymityLevels level)
+        protected void RemoveAnonymityLevel(DiscussionSettings level)
         {
             //~ is a bitwise not in c#
             //Doing a bitwise AND on a NOTed level should result in the level being removed

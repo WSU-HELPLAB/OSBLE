@@ -24,7 +24,7 @@
             Is this a class-wide discussion assignment?
         </td>
         <td style="padding-left:15px;">
-            @if (Model.HasDiscussionTeams)
+            @if (!Model.HasDiscussionTeams)
             {
                 @:Yes<input id="radioYes" name="teamRadio" type="radio" checked="checked"/>
                 @:No <input id="radioNo"  name="teamRadio" type="radio" />
@@ -94,7 +94,7 @@ else
     <h3>Teams</h3>
 
     @{int counter = 0;}
-    @foreach (AssignmentTeam aTeam in teams.OrderBy(t => t.Team.Name))
+    @foreach (DiscussionTeam aTeam in teams.OrderBy(t => t.Team.Name))
     {
         counter++;
         <div id="teamDiv_@(counter)_@(aTeam.TeamID)" class="TeamDiv">
@@ -119,7 +119,7 @@ else
 {
     <input type="hidden" id="student_@(cu.ID)" name="student_@(cu.ID)" value="@(cu.UserProfile.FirstName) @(cu.UserProfile.LastName)" />
 }
-@foreach (AssignmentTeam team in teams)
+@foreach (DiscussionTeam team in teams)
 {
     //we only care about teams that already have DB values
     if (team.TeamID == 0)
@@ -136,7 +136,7 @@ else
 <script type="text/javascript">
 
     $('input[name=teamRadio]').change(function () {
-        if ($('#radioYes').attr('checked')) {
+        if ($('#radioNo').attr('checked')) {
             $('#teamDiv').show();
         }
         else {

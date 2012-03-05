@@ -18,6 +18,11 @@
 @Html.HiddenFor(m => m.AssignmentID)
 <table class="wizard_entry_table">
     <tr>
+        <th>@Html.LabelFor(m => m.MinimumFirstPostLength)</th>
+        <td>@Html.EditorFor(m => m.MinimumFirstPostLength)</td>
+        <td>@Html.ValidationMessageFor(m => m.MinimumFirstPostLength)</td>
+    </tr>
+    <tr>
         <th>@Html.LabelFor(m => m.HasAnonymousPosts)</th>
         <td>@Html.CheckBoxFor(m => m.HasAnonymousPosts)</td>
         <td></td>
@@ -30,6 +35,11 @@
     <tr>
         <th>@Html.LabelFor(m => m.HasAnonymousRoles)</th>
         <td>@Html.CheckBoxFor(m => m.HasAnonymousRoles)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.RequiresPostBeforeView)</th>
+        <td>@Html.CheckBoxFor(m => m.RequiresPostBeforeView)</td>
         <td></td>
     </tr>
     <tr>
