@@ -14,11 +14,11 @@ using OSBLE.Models.Assignments;
 //the intended use of the folder
 /*
  *
- *                          FileSystem
- *                         /          \
- *                        /            \
- *                    Courses          Users
- *                     /                  \
+ *                          FileSystem  
+ *                         /          \  
+ *                        /            \  
+ *                    Courses          Users                                 
+ *                     /                  \                                 
  *                [courseID]            [userId]
  *               /     |    \                \
  *              /      |     \         {global user content}
@@ -28,14 +28,14 @@ using OSBLE.Models.Assignments;
  *  {course docs}      |              \
  *                     |       Records.txt { %random number%.zip}
  *                     |
- *           [AssignmentActivityId]
+ *               [AssignmentId]
  *           /       \          \
  *          /         \          \
  *       AADocs   Submissions    Reviews
  *          |          |             \
- *      {aa docs}      |      [TeamuserMemberId]
+ *      {aa docs}      |          [CourseUserId]
  *                     |                 |
- *            [TeamUserMemberId]         |
+ *                  [TeamID]             |
  *                     |             {reviews}
  *            {team submissions}
  * */
