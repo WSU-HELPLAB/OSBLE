@@ -6,6 +6,8 @@ using OSBLE.Models.Assignments;
 using OSBLE.Areas.AssignmentWizard.Controllers;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.Caching;
+using OSBLE.Utility;
 
 namespace OSBLE.Areas.AssignmentWizard.Models
 {
@@ -16,6 +18,8 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         private const string activeComponentIndexKey = "ComponentManagerActiveComponentIndex";
         private const string instance = "_wcm_instance";
         private const string activeAssignmentTypeKey = "_wcm_activeAssignmentType";
+        private const string componentsCacheString = "sortedComponents";
+        private const string cacheRegion = "OSBLE.Areas.AssignmentWizard.Models.WizardComponentManager";
 
         private WizardComponentManager()
         {
@@ -305,37 +309,79 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                 WizardBaseController controller = Activator.CreateInstance(component) as WizardBaseController;
                 AllComponents.Add(controller);
             }
-
-            //AC: The List data type's Sort() method uses quicksort, which uses a partitioning scheme.  
-            //Because wizard component sorting is a little goofy, this won't work for us.  Therefore, we must
-            //use something more simplistic (Insertion Sort used)
-
-            //AC TODO: Cache this, it takes WAY TOO LONG!
-            AllComponents.Sort(new WizardPrerequisiteCountComparer());
-            WizardPrerequisiteComparer comparer = new WizardPrerequisiteComparer();
-            for (int i = 1; i < AllComponents.Count; i++)
+            
+            //pull from the cache if possible
+            ObjectCache cache = new FileCache();
+            bool loadedFromCache = false;
+            string[] sorted = (string[])cache.Get(componentsCacheString, cacheRegion);
+            if (sorted != null)
             {
-                WizardBaseController current = AllComponents[i];
-                int j = i - 1;
-                bool done = false;
-                while (!done)
+                //set loaded to true for now
+                loadedFromCache = true;
+
+                //make sure all components are represented in the cache
+                foreach (WizardBaseController component in AllComponents)
                 {
-                    //if the previous component is greater than (comes before the current component)
-                    if (comparer.Compare(AllComponents[j], current) == 1)
+                    if (!sorted.Contains(component.ControllerName))
                     {
-                        AllComponents[j + 1] = AllComponents[j];
-                        j--;
-                        if (j < 0)
+                        loadedFromCache = false;
+                        break;
+                    }
+                }
+
+                //if we're still clear to load from the cache, then do so
+                if (loadedFromCache)
+                {
+                    WizardBaseController[] tempComponentList = new WizardBaseController[sorted.Length];
+                    for (int i = 0; i < sorted.Length; i++)
+                    {
+                        tempComponentList[i] = AllComponents.Find(c => c.ControllerName == sorted[i]);
+                    }
+
+                    //reassign the sorted list
+                    AllComponents = tempComponentList.ToList();
+                }
+            }
+            //if caching failed, do it the long way
+            if (!loadedFromCache)
+            {
+                //AC: The List data type's Sort() method uses quicksort, which uses a partitioning scheme.  
+                //Because wizard component sorting is a little goofy, this won't work for us.  Therefore, we must
+                //use something more simplistic (Insertion Sort used)
+                AllComponents.Sort(new WizardPrerequisiteCountComparer());
+                WizardPrerequisiteComparer comparer = new WizardPrerequisiteComparer();
+                for (int i = 1; i < AllComponents.Count; i++)
+                {
+                    WizardBaseController current = AllComponents[i];
+                    int j = i - 1;
+                    bool done = false;
+                    while (!done)
+                    {
+                        //if the previous component is greater than (comes before the current component)
+                        if (comparer.Compare(AllComponents[j], current) == 1)
+                        {
+                            AllComponents[j + 1] = AllComponents[j];
+                            j--;
+                            if (j < 0)
+                            {
+                                done = true;
+                            }
+                        }
+                        else
                         {
                             done = true;
                         }
+                        AllComponents[j + 1] = current;
                     }
-                    else
-                    {
-                        done = true;
-                    }
-                    AllComponents[j + 1] = current;
                 }
+
+                //save sorted component information to cache
+                string[] sortedComponents = new string[AllComponents.Count];
+                for (int i = 0; i < sortedComponents.Length; i++)
+                {
+                    sortedComponents[i] = AllComponents[i].ControllerName;
+                }
+                cache.Add(componentsCacheString, sortedComponents, DateTime.Now, cacheRegion);
             }
             
             //attach event listeners to selection change
