@@ -85,7 +85,7 @@ namespace OSBLE.Models.Assignments
         /// Returns true if posts in the discussion are anonymous
         /// </summary>
         [NotMapped]
-        [Display(Name = "Allow anonymous posting")]
+        [Display(Name = "Anonymous posts")]
         public bool HasAnonymousPosts
         {
             get
@@ -109,7 +109,7 @@ namespace OSBLE.Models.Assignments
         /// Returns true if replies in the discussion are marked anonymous
         /// </summary>
         [NotMapped]
-        [Display(Name="Allow anonymous replies to posts")]
+        [Display(Name="Anonymous replies")]
         public bool HasAnonymousReplies
         {
             get
@@ -133,7 +133,7 @@ namespace OSBLE.Models.Assignments
         /// Returns true if user roles are hidden in discussions
         /// </summary>
         [NotMapped]
-        [Display(Name = "Anonymize Roles")]
+        [Display(Name = "Anonymize roles")]
         public bool HasAnonymousRoles
         {
             get
