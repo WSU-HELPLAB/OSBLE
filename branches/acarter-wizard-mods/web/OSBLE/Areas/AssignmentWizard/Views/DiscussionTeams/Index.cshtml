@@ -94,7 +94,7 @@ else
     <h3>Teams</h3>
 
     @{int counter = 0;}
-    @foreach (DiscussionTeam aTeam in teams.OrderBy(t => t.Team.Name))
+    @foreach (IAssignmentTeam aTeam in teams.OrderBy(t => t.Team.Name))
     {
         counter++;
         <div id="teamDiv_@(counter)_@(aTeam.TeamID)" class="TeamDiv">
@@ -119,7 +119,7 @@ else
 {
     <input type="hidden" id="student_@(cu.ID)" name="student_@(cu.ID)" value="@(cu.UserProfile.FirstName) @(cu.UserProfile.LastName)" />
 }
-@foreach (DiscussionTeam team in teams)
+@foreach (IAssignmentTeam team in teams)
 {
     //we only care about teams that already have DB values
     if (team.TeamID == 0)
