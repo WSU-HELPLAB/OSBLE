@@ -28,6 +28,13 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public abstract string ControllerName { get; }
 
         /// <summary>
+        /// Returns the controller's pretty name.  By default, it's just the same as ControllerName.
+        /// However, if you wanted to do something more fancy (ex: display 'foobar' as 'foo bar') you could 
+        /// do that here.
+        /// </summary>
+        public virtual string PrettyName { get { return ControllerName; } }
+
+        /// <summary>
         /// To be used by the WizardComponentManager to aid in component sorting.  It's okay to access
         /// the number if need be, but try not to set the value unless you know what you're doing.
         /// </summary>
@@ -214,6 +221,19 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
             //start at the beginning
             while (manager.GetPreviousComponent() != null) ;
+
+            //empty component name = start at the beginning (component selection)
+            if (componentName.Length == 0)
+            {
+                return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute,
+                                    new
+                                    {
+                                        controller = "Home",
+                                        action = "SelectComponent",
+                                        assignmentId = manager.ActiveAssignmentId
+                                    }
+                                  );
+            }
 
             //from the beginning, find the component that we want to jump to
             bool found = false;

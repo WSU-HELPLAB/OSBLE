@@ -16,6 +16,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get { return "Team"; }
         }
 
+        public override string PrettyName
+        {
+            get
+            {
+                return "Team Settings";
+            }
+        }
+
         public override string ControllerDescription
         {
             get { return "The assignment is team-based"; }

@@ -20,6 +20,7 @@ namespace OSBLE.Models.Assignments
             Deliverables = new List<Deliverable>();
             AssignmentTeams = new List<AssignmentTeam>();
             DiscussionTeams = new List<DiscussionTeam>();
+            ReviewTeams = new List<AssignmentReviewTeam>();
             IsDraft = true;
             addedPoints = 0;
             IsWizardAssignment = true;
@@ -226,6 +227,9 @@ namespace OSBLE.Models.Assignments
 
         [Association("DiscussionTeam_Assignments", "ID", "AssignmentID")]
         public virtual IList<DiscussionTeam> DiscussionTeams { get; set; }
+
+        [Association("AssignmentReviewTeam_Assignment", "ID", "AssignmentID")]
+        public virtual IList<AssignmentReviewTeam> ReviewTeams { get; set; }
 
         [Association("Score_Assignment", "ID", "AssignmentID")]
         public virtual IList<Score> Scores { get; set; }

@@ -75,7 +75,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             //if our assignmentId isn't null, then we need to pull that assignment
             //from the DB
-            if (assignmentId != null)
+            if (assignmentId != null && assignmentId != 0)
             {
                 int aid = (int)assignmentId;
                 manager.ActiveAssignmentId = aid;

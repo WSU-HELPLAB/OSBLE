@@ -1,0 +1,42 @@
+﻿#QuickNav
+{
+    list-style:none;
+    margin:0;
+    padding:3px 10px 3px 10px;
+    border-bottom:2px solid #074974;
+}
+
+.quickNavItem
+{
+    margin:0;
+    padding:0;
+    display:inline;
+    padding: 3px 15px 3px 15px;
+    border:2px solid #074974;
+    position:relative;
+    top:1px;
+    background:#DFDFDF;
+}
+
+.quickNavItem a
+{
+    text-decoration:none;
+}
+
+.quickNavNotActive a
+{
+    font-size:80%;
+    color:#2D2D2D;
+}
+
+.quickNavActive
+{
+    border-bottom: 2px solid white;
+    background: white;
+
+}
+
+.quickNavActive a
+{
+    font-weight:bold;
+}

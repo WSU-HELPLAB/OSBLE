@@ -319,6 +319,12 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                 //set loaded to true for now
                 loadedFromCache = true;
 
+                //make sure that the sizes match up
+                if (sorted.Length != AllComponents.Count)
+                {
+                    loadedFromCache = false;
+                }
+
                 //make sure all components are represented in the cache
                 foreach (WizardBaseController component in AllComponents)
                 {

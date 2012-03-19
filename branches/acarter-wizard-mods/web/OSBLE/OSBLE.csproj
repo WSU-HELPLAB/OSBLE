@@ -201,6 +201,7 @@
     <Compile Include="Models\Assignments\CommentCategoryConfiguration.cs" />
     <Compile Include="Models\Assignments\DiscussionTeam.cs" />
     <Compile Include="Models\Assignments\IAssignmentTeam.cs" />
+    <Compile Include="Models\Assignments\ReviewTeam.cs" />
     <Compile Include="Models\Assignments\Score.cs" />
     <Compile Include="Models\Assignments\CommentCategoryOption.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseUser.cs" />
@@ -292,6 +293,7 @@
     <Content Include="App_Data\LastNames.txt" />
     <Content Include="Areas\AssignmentWizard\Content\css\criticalReview.css" />
     <Content Include="Areas\AssignmentWizard\Content\css\home.css" />
+    <Content Include="Areas\AssignmentWizard\Content\css\layout.css" />
     <Content Include="Areas\AssignmentWizard\Content\css\team.css" />
     <Content Include="Areas\AssignmentWizard\Content\icons\rubric_add.png" />
     <Content Include="Areas\AssignmentWizard\Content\icons\rubric_delete.png" />

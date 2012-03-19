@@ -6,7 +6,12 @@
     padding-right:15px;
     border-right:1px solid #CFCFCF;
 }
-    
+
+#AvailableStudentList .RemoveTeamIcon
+{
+    display:none;
+}
+
 .NoDecoration
 {
     text-decoration: none;

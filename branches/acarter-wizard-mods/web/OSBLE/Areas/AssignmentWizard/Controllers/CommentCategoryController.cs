@@ -15,6 +15,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get { return "CommentCategory"; }
         }
 
+        public override string PrettyName
+        {
+            get
+            {
+                return "Comment Categories";
+            }
+        }
+
         public override string ControllerDescription
         {
             get { return "The instructor can mark-up student submissions with annotations"; }

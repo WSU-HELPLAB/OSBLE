@@ -30,8 +30,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get
             {
-                //the basics page has no prereqs
-                return new List<WizardBaseController>();
+                List<WizardBaseController> prereqs = new List<WizardBaseController>();
+                return prereqs;
             }
         }
 

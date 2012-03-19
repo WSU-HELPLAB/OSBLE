@@ -16,6 +16,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get { return "PreviousAssignment"; }
         }
 
+        public override string PrettyName
+        {
+            get
+            {
+                return "Link Previous Assignment";
+            }
+        }
+
         public override string ControllerDescription
         {
             get { return "This assignment depends on a previous assignment."; }

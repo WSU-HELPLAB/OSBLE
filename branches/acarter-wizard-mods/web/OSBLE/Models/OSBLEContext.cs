@@ -57,6 +57,8 @@ namespace OSBLE.Models
 
         public DbSet<DiscussionTeam> DiscussionTeams { get; set; }
 
+        public DbSet<AssignmentReviewTeam> ReviewTeams { get; set; }
+
         public DbSet<Team> Teams { get; set; }
 
         public DbSet<TeamMember> TeamMembers { get; set; }
@@ -161,6 +163,16 @@ namespace OSBLE.Models
                 .HasRequired(ds => ds.Assignment)
                 .WithOptional(a => a.DiscussionSettings)
                 .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<AssignmentReviewTeam>()
+                .HasRequired(rt => rt.AuthorTeam)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<AssignmentReviewTeam>()
+                .HasRequired(rt => rt.ReviewTeam)
+                .WithMany()
+                .WillCascadeOnDelete(false);
         }
 
         private void createSampleUser(string username, string password, string firstname, string lastname, string ident, int school, bool isAdmin, bool canCreateCourses)

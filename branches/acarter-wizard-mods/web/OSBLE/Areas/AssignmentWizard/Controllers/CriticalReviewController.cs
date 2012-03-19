@@ -14,6 +14,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get { return "CriticalReview"; }
         }
 
+        public override string PrettyName
+        {
+            get
+            {
+                return "Critical Review Settings";
+            }
+        }
+
         public override string ControllerDescription
         {
             get { return "Assign students or teams to review documents"; }

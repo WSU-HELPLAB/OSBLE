@@ -14,6 +14,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get { return "Discussion"; }
         }
 
+        public override string PrettyName
+        {
+            get
+            {
+                return "Discussion Settings";
+            }
+        }
+
         public override string ControllerDescription
         {
             get { return "This assignment has students discuss one or more topics."; }
