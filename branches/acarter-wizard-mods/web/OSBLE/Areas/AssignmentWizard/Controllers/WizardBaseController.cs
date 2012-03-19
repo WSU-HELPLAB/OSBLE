@@ -14,13 +14,17 @@ using OSBLE.Attributes;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
+    public enum WizardNavButtons
+    {
+        PreviousButton,
+        NextButton,
+        SaveAndExitButton,
+        ResetFormButton,
+        QuickNavButton
+    }
+
     public abstract class WizardBaseController : OSBLEController, IComparable, INotifyPropertyChanged, IEquatable<WizardBaseController>
     {
-        public static string previousWizardButton = "PreviousWizardButton";
-        public static string nextWizardButton = "NextWizardButton";
-        public static string saveAndExitWizardButton = "SaveAndExitButton";
-        public static string resetFormWizardButton = "ResetFormButton";
-
         protected WizardComponentManager manager;
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
@@ -127,10 +131,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             ViewBag.Components = manager.SelectedComponents;
             ViewBag.ActiveComponent = manager.ActiveComponent;
             ViewBag.Assignment = Assignment;
-            ViewBag.PreviousWizardButton = WizardBaseController.previousWizardButton;
-            ViewBag.NextWizardButton = WizardBaseController.nextWizardButton;
-            ViewBag.SaveAndExitWizardButton = WizardBaseController.saveAndExitWizardButton;
-            ViewBag.ResetFormWizardButton = WizardBaseController.resetFormWizardButton;
             ViewBag.Title = "Assignment Creation Wizard";
         }
 
@@ -181,19 +181,19 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 string action = "ContextLost";
                 int id = Assignment.ID;
                 WizardBaseController comp = null;
-                if (Request.Form.AllKeys.Contains(previousWizardButton))
+                if (Request.Form.AllKeys.Contains(WizardNavButtons.PreviousButton.ToString()))
                 {
                     comp = manager.GetPreviousComponent();
                     errorPath = "Home";
                     action = "SelectComponent";
                 }
-                else if (Request.Form.AllKeys.Contains(nextWizardButton))
+                else if (Request.Form.AllKeys.Contains(WizardNavButtons.NextButton.ToString()))
                 {
                     comp = manager.GetNextComponent();
                     errorPath = "Home";
                     action = "Summary";
                 }
-                else if (Request.Form.AllKeys.Contains(saveAndExitWizardButton))
+                else if (Request.Form.AllKeys.Contains(WizardNavButtons.SaveAndExitButton.ToString()))
                 {
                     return RedirectToRoute("Default",
                                           new
@@ -202,6 +202,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                                               action = "index"
                                           }
                                           );
+                }
+                else
+                {
+                    //not having any form keys means that we're using the QuickNav as it won't send back
+                    //any submit button data
+                    return QuickNav();
                 }
 
                 if (comp != null)
