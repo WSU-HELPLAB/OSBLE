@@ -40,3 +40,11 @@
 {
     font-weight:bold;
 }
+
+#WizardFormBody
+{
+    padding:15px 4px 15px 4px;
+    margin-bottom:7px;
+    border:2px solid #074974;
+    border-top:none;
+}

@@ -18,7 +18,7 @@
 {
 <input type="hidden" id="ComponentNameNavSelect" name="ComponentName" />
     <ul id="QuickNav">
-        @if (ViewBag.Assignment.ID != 0)
+        @if (ViewBag.Assignment != null && ViewBag.Assignment.ID != 0)
         {
             <li class="quickNavItem quickNavNotActive"><a href="#" onclick="changePage('');">Component Selection</a></li>
         }
@@ -43,13 +43,18 @@
     }
 </script>
 
-<br />
-
 @using (Html.BeginForm("Index", null, FormMethod.Post, new { id = "WizardForm" }))
 {
+<div id="WizardFormBody">
 @RenderBody()
+</div>
 <div id="WizardBottomNav" style="clear:both;">
         <input type="submit" value="Previous" name="@ViewBag.PreviousWizardButton" />
+        @if (ViewBag.Assignment != null && ViewBag.Assignment.ID != 0)
+        {
+            <input type="submit" value="Save & Exit" name="@ViewBag.SaveAndExitWizardButton" />
+            <input type="button" value="Reset Values" name="@ViewBag.ResetFormWizardButton" onclick="changePage('@ViewBag.ActiveComponent.ControllerName');" />
+        }
         <input type="submit" value="Next" name="@ViewBag.NextWizardButton" />
 </div>
 }

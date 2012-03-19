@@ -18,6 +18,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
     {
         public static string previousWizardButton = "PreviousWizardButton";
         public static string nextWizardButton = "NextWizardButton";
+        public static string saveAndExitWizardButton = "SaveAndExitButton";
+        public static string resetFormWizardButton = "ResetFormButton";
+
         protected WizardComponentManager manager;
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
@@ -126,6 +129,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             ViewBag.Assignment = Assignment;
             ViewBag.PreviousWizardButton = WizardBaseController.previousWizardButton;
             ViewBag.NextWizardButton = WizardBaseController.nextWizardButton;
+            ViewBag.SaveAndExitWizardButton = WizardBaseController.saveAndExitWizardButton;
+            ViewBag.ResetFormWizardButton = WizardBaseController.resetFormWizardButton;
             ViewBag.Title = "Assignment Creation Wizard";
         }
 
@@ -142,7 +147,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 Assignment = new Assignment();
             }
-            SetUpViewBag();
+            try
+            {
+                SetUpViewBag();
+            }
+            catch (Exception ex)
+            {
+                return RedirectToRoute(new { controller = "Home", action = "ContextLost", assignmentId = Assignment.ID });
+            }
             return View();
         }
 
@@ -165,8 +177,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     return RedirectToRoute(new { controller = "Home", action = "ContextLost", assignmentId = Assignment.ID });
                 }
 
-                string errorPath = "";
-                string action = "";
+                string errorPath = "Home";
+                string action = "ContextLost";
                 int id = Assignment.ID;
                 WizardBaseController comp = null;
                 if (Request.Form.AllKeys.Contains(previousWizardButton))
@@ -175,29 +187,41 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     errorPath = "Home";
                     action = "SelectComponent";
                 }
-                else
+                else if (Request.Form.AllKeys.Contains(nextWizardButton))
                 {
                     comp = manager.GetNextComponent();
                     errorPath = "Home";
                     action = "Summary";
                 }
+                else if (Request.Form.AllKeys.Contains(saveAndExitWizardButton))
+                {
+                    return RedirectToRoute("Default",
+                                          new
+                                          {
+                                              controller = "Assignment",
+                                              action = "index"
+                                          }
+                                          );
+                }
 
                 if (comp != null)
                 {
-                    return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute, 
-                                          new { 
-                                              controller = manager.ActiveComponent.ControllerName 
-                                              }
+                    return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute,
+                                          new
+                                          {
+                                              controller = manager.ActiveComponent.ControllerName
+                                          }
                                           );
                 }
                 else
                 {
-                    return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute, 
-                                          new { 
+                    return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute,
+                                          new
+                                          {
                                               controller = errorPath,
                                               action = action,
                                               assignmentId = id
-                                              }
+                                          }
                                           );
                 }
             }
@@ -265,7 +289,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
         public int CompareTo(object obj)
         {
-            return this.ToString().CompareTo(obj.ToString());   
+            return this.ToString().CompareTo(obj.ToString());
         }
 
         public override string ToString()
