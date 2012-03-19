@@ -34,6 +34,9 @@ namespace OSBLE.Models.Assignments
 
         [FileExtensions(new string[] { ".pdf" })]
         PDF,
+
+        [FileExtensions(new string[] { ".xls", ".xlsx"})]
+        ExcelSpreadSheet,
     }
 
     /// <summary>
