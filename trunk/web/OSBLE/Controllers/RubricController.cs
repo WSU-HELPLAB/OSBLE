@@ -290,7 +290,16 @@ namespace OSBLE.Controllers
                 return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
             }
 
-            ViewBag.isEditable = true;
+            CourseUser cu = db.CourseUsers.Find(cuId);
+            if (cu.AbstractRole.Anonymized)
+            {
+                ViewBag.ObserverCU = db.CourseUsers.Where(c => c.AbstractCourseID == cu.AbstractCourseID).ToList();
+                ViewBag.isEditable = false;
+            }
+            else
+            {
+                ViewBag.isEditable = true;
+            }
             return View(viewModel);
         }
 

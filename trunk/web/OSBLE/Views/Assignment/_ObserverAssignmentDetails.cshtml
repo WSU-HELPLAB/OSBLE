@@ -122,15 +122,12 @@ For Submission: have a download option with the time submitted or say "Nothing S
                     {
                         if (eval.Recipient.ID == da.Item2.ID)
                         {
-                            if (!eval.IsPublished)
-                            {
-                                found = true;
-                            }
+                               found = true;
                         }
                     }
                     if (found)
                     {
-                            @Html.ActionLink("View", "Rubric", new { assignmentId = assignment.ID, cuId = ViewBag.CurrentUserID }, new { })
+                            @Html.ActionLink("View", "Rubric", new { assignmentId = assignment.ID, cuId = da.Item2.TeamMembers.FirstOrDefault().CourseUserID }, new { })
                     }
                     else
                     {
@@ -140,7 +137,7 @@ For Submission: have a download option with the time submitted or say "Nothing S
                 }
                 else
                 {
-                        @Html.ActionLink(da.Item1.getGradeAsPercent(da.Item1.Assignment.PointsPossible), "Index", "Rubric", new { assignmentId = da.Item1.AssignmentID, cuId = da.Item2.TeamMembers.FirstOrDefault().CourseUserID }, new { });
+                        @Html.ActionLink(da.Item1.getGradeAsPercent(da.Item1.Assignment.PointsPossible), "View", "Rubric", new { assignmentId = da.Item1.AssignmentID, cuId = da.Item2.TeamMembers.FirstOrDefault().CourseUserID }, new { });
                 }
             }
             else
