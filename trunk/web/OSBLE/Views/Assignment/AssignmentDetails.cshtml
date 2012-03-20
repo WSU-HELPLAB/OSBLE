@@ -161,6 +161,60 @@
             </td>
         </tr>
     }
+    @if (assignment.HasDeliverables && ViewBag.ActiveCourse.AbstractRole.CanSubmit)
+    {
+        <tr>
+            <td style="vertical-align:text-top">
+                <text class="osbleColorBold">Submission:</text>
+            </td>
+            @{
+                String display = ViewBag.SubmissionTime;
+                AjaxOptions options = new AjaxOptions()
+                {
+                    LoadingElementId = "Loading",
+                    HttpMethod = "Get",
+                    UpdateTargetId = "submitFiles",
+                    OnComplete = "SubmissionLoaded"
+                };
+                if (ViewBag.SubmissionTime == "No Submission")
+                {
+                    //If there is no sumission, submission time will be labeled "No Submission" rather than a datetime.
+                    <td>
+                        @Ajax.ActionLink("Submit", "Create", "Submission", new { id = assignment.ID }, options, new object())
+                    </td>
+                }
+                else
+                {
+                    <td> <!--TD for displaying latest submission and resubmit-->
+                        @(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))  
+                        @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = assignment.ID }, options, new object())
+                    </td>
+                }
+            }
+        </tr>
+    }
+    @if (ViewBag.ActiveCourse.AbstractRole.CanSubmit)
+    {
+        <tr>
+            <td style="vertical-align:text-top">
+                <text class="osbleColorBold">Grade:</text>
+            </td>
+            @if (assignment.HasRubric)
+            {
+                string temp = ViewBag.Grade;
+                <td>
+                    @Html.ActionLink(temp, "View", "Rubric", new { assignmentId = assignment.ID, cuId = ViewBag.CurrentUserID }, new { })
+                </td>
+            }
+            else
+            {
+                <td>
+                    @ViewBag.Grade
+                </td>
+            }
+            
+        </tr>
+    }
     
     @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
     {
@@ -170,7 +224,7 @@
     {
         @Html.Partial("_ObserverAssignmentDetails");
     }
-
+</table>
 
 
 

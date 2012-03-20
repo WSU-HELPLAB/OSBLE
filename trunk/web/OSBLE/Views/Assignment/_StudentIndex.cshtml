@@ -2,146 +2,117 @@
 @using OSBLE.Models.Assignments
 @model OSBLE.Models.ViewModels.AssignmentListViewModel
 
-@if ((ViewBag.PastAssignments.Count > 0 ||
-         ViewBag.PresentAssignments.Count > 0 ||
-         ViewBag.FutureAssignments.Count > 0) )
-{
-    ViewBag.AssignmentList = 1;
-    <table class="assignTable" cellspacing="0">
-        <th>Assignment</th>
-        <th>Release Date</th>
-        <th>Due Date</th>
-        <th>Grade</th>
-        <th>Latest Submission</th>
 
-        @if (ViewBag.PastAssignments.Count > 0)
+<table class="assignTable" cellspacing="0">
+    <th style="font-size:larger">Assignment</th>
+    <th style="font-size:larger">Release Date</th>
+    <th style="font-size:larger">Due Date</th>
+    <th style="font-size:larger">Grade</th>
+    <th style="font-size:larger">Latest Submission</th>
+    @{
+    //MG & KD: Assignments are in order based on:: past & present -> future -> draft. The flags below are used to avoid duplicate headers for each category
+    bool  futureFlag = false, presentFlag = false, pastFlag = false;
+    foreach (Assignment assignment in ViewBag.Assignments)
+    {
+        if (assignment.DueDate < ViewBag.CurrentDate && !pastFlag)
         {
-            //Needed a way to put blank space in a table, only when the previous assignment category had
-            //<tr><td style="padding-bottom:10px"></td></tr>
-            <tr><td colspan="100%" style="padding-right:0" class="osbleColorBold">Past (@ViewBag.PastAssignments.Count)</td></tr>
+            //PAST
+            pastFlag = true;
+            <tr><td colspan="100%" style="padding-right:0;font-size:large" class="osbleColorBold">Past (@ViewBag.PastCount)</td></tr>
         }
-        @foreach (Assignment a in ViewBag.PastAssignments)
+        else if (assignment.ReleaseDate > ViewBag.CurrentDate && !futureFlag)
         {
-            <tr class="checkeredRow">
-                <td> <!--Cell for name-->
-                    @Html.ActionLink(a.AssignmentName, "AssignmentDetails", "Assignment", new { a.ID }, null)
-                </td>
-                <td>@a.ReleaseDate.ToShortDateString() @a.ReleaseTime.ToShortTimeString()</td>
-                <td>@a.DueDate.ToShortDateString() @a.DueDate.ToShortTimeString()</td>
-                <td><!--Td for grade-->
-                    @if (a.HasRubric)
-                    {
-                        string gradeToDisplay = ViewBag.SubmissionInfoDictionary[a.ID].Item2;
-                        @Html.ActionLink(gradeToDisplay, "View", "Rubric", new { assignmentId = a.ID, cuId = ViewBag.SubmissionInfoDictionary[a.ID].Item3 }, new { });
-
-                    }
-                    else
-                    {
-                        @ViewBag.SubmissionInfoDictionary[a.ID].Item2
-                    }
-                </td>
-                @*if a student, allow to view last submission*@
-                @if (ViewBag.SubmissionInfoDictionary[a.ID].Item1 != "No Submission" && a.HasDeliverables)
+            //FUTURE
+            futureFlag = true;
+            if (pastFlag || presentFlag)
+            {
+                <tr><td style="padding-bottom:10px"></td></tr>
+            }
+            <tr><td colspan="100%" style="padding-right:0;font-size:large" class="osbleColorBold">Future (@ViewBag.FutureCount)</td></tr>
+                
+        }
+        else if (assignment.DueDate >= ViewBag.CurrentDate && !presentFlag)
+        {
+            //PRESENT
+            presentFlag = true;
+            if (pastFlag)
+            {
+                <tr><td style="padding-bottom:10px"></td></tr>
+            }
+            <tr><td colspan="100%" style="padding-right:0;font-size:large" class="osbleColorBold">Present (@ViewBag.PresentCount)</td></tr>
+        }
+            
+        <tr class="checkeredRow">
+            <td> <!--Cell for name-->
+                @if (futureFlag)
                 {
-                    String display = ViewBag.SubmissionInfoDictionary[a.ID].Item1;
-                    AjaxOptions options = new AjaxOptions()
-                    {
-                        LoadingElementId = "Loading",
-                        HttpMethod = "Get",
-                        UpdateTargetId = "submitFiles",
-                        OnComplete = "SubmissionLoaded"
-                    };    
-                    <td> <!--TD for displaying latest submission and resubmit-->
-                        @(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))  
-                        @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = a.ID }, options, new object())
-                    </td>
-                }
-                else if (a.HasDeliverables)
-                {
-                    AjaxOptions options = new AjaxOptions()
-                        {
-                            LoadingElementId = "Loading",
-                            HttpMethod = "Get",
-                            UpdateTargetId = "submitFiles",
-                            OnComplete = "SubmissionLoaded"
-                        }; 
-                    <!--TD for first submission-->
-                    <td>
-                    None.
-                    @Ajax.ActionLink("Submit Here", "Create", "Submission", new { id = a.ID }, options, new object())
-                    </td>
+                    @assignment.AssignmentName
                 }
                 else
                 {
-                <td>No Deliverables</td>
+                    @Html.ActionLink(assignment.AssignmentName, "AssignmentDetails", "Assignment", new { assignment.ID }, null)
                 }
-            </tr>
-        }
-        
-        @if (ViewBag.PresentAssignments.Count > 0)
-        {
-            if (ViewBag.PastAssignments.Count > 0)
+                
+            </td>
+            <td>@assignment.ReleaseDate.ToShortDateString() @assignment.ReleaseTime.ToShortTimeString()</td>
+            <td>@assignment.DueDate.ToShortDateString() @assignment.DueDate.ToShortTimeString()</td>
+            <td><!--Td for grade-->
+                @if(futureFlag)
+                {
+                }
+                else if (assignment.HasRubric)
+                {
+                    string gradeToDisplay = ViewBag.SubmissionInfoDictionary[assignment.ID].Item2;
+                    @Html.ActionLink(gradeToDisplay, "View", "Rubric", new { assignmentId = assignment.ID, cuId = ViewBag.SubmissionInfoDictionary[assignment.ID].Item3 }, new { });
+                }
+                else
+                {
+                    @ViewBag.SubmissionInfoDictionary[assignment.ID].Item2
+                }
+            </td>
+            @*if a student, allow to view last submission*@
+            @if (futureFlag)
             {
-                //Needed a way to put blank space in a table, only when the previous assignment category had
-                <tr><td style="padding-bottom:10px"></td></tr>
+                <td></td>
             }
-            <tr><td colspan="100%" class="osbleColorBold">Present (@ViewBag.PresentAssignments.Count)</td></tr>
-        }
-        @foreach (Assignment a in ViewBag.PresentAssignments)
-        {
-            <tr class="checkeredRow">
-                <td> <!--Cell for name-->
-                    @Html.ActionLink(a.AssignmentName, "AssignmentDetails", "Assignment", new { a.ID }, null)
+            else if (ViewBag.SubmissionInfoDictionary[assignment.ID].Item1 != "No Submission" && assignment.HasDeliverables)
+            {
+                String display = ViewBag.SubmissionInfoDictionary[assignment.ID].Item1;
+                AjaxOptions options = new AjaxOptions()
+                {
+                    LoadingElementId = "Loading",
+                    HttpMethod = "Get",
+                    UpdateTargetId = "submitFiles",
+                    OnComplete = "SubmissionLoaded"
+                };    
+                <td> <!--TD for displaying latest submission and resubmit-->
+                    @(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))  
+                    @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = assignment.ID }, options, new object())
                 </td>
-                <td>@a.ReleaseDate.ToShortDateString() @a.ReleaseTime.ToShortTimeString()</td>
-                <td>@a.DueDate.ToShortDateString() @a.DueDate.ToShortTimeString()</td>
-                <td><!--Td for grade-->
-                    @if (a.HasRubric)
-                    {
-                        string gradeToDisplay = ViewBag.SubmissionInfoDictionary[a.ID].Item2;
-                        @Html.ActionLink(gradeToDisplay, "View", "Rubric", new { assignmentId = a.ID, cuId = ViewBag.SubmissionInfoDictionary[a.ID].Item3 }, new { });
-                    }
-                    else
-                    {
-                        @ViewBag.SubmissionInfoDictionary[a.ID].Item2
-                    }
+            }
+            else if (assignment.HasDeliverables)
+            {
+                
+                AjaxOptions options = new AjaxOptions()
+                {
+                    LoadingElementId = "Loading",
+                    HttpMethod = "Get",
+                    UpdateTargetId = "submitFiles",
+                    OnComplete = "SubmissionLoaded"
+                }; 
+                <!--TD for first submission-->
+                <td>
+                    @Ajax.ActionLink("Submit", "Create", "Submission", new { id = assignment.ID }, options, new object())
                 </td>
-                    @*//if a student, allow to view last submission*@
-                    @if (ViewBag.SubmissionInfoDictionary[a.ID].Item1 != "No Submission" && a.HasDeliverables)
-                    {
-                        String display = ViewBag.SubmissionInfoDictionary[a.ID].Item1;
-                        AjaxOptions options = new AjaxOptions()
-                        {
-                            LoadingElementId = "Loading",
-                            HttpMethod = "Get",
-                            UpdateTargetId = "submitFiles",
-                            OnComplete = "SubmissionLoaded"
-                        };    
-                        <td> <!--TD for displaying latest submission and resubmit-->
-                            @(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = a.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))  
-                            @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = a.ID }, options, new object())
-                        </td>
-                    }
-                    else if (a.HasDeliverables)
-                    {
-                        AjaxOptions options = new AjaxOptions()
-                        {
-                            LoadingElementId = "Loading",
-                            HttpMethod = "Get",
-                            UpdateTargetId = "submitFiles",
-                            OnComplete = "SubmissionLoaded"
-                        }; 
-                        <!--TD for first submission-->
-                        <td>
-                            None.
-                            @Ajax.ActionLink("Submit Here", "Create", "Submission", new { id = a.ID }, options, new object())
-                        </td>
-                    }
-                    else
-                    {
-                        <td>No Deliverables</td>
-                    }
-            </tr>
-        }
-    </table>
+            }
+            else
+            {
+                <td>No Deliverables</td>
+            }
+        </tr>
+    }
 }
+        
+</table>
+
+

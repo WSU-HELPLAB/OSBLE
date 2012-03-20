@@ -23,30 +23,29 @@
     <a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard"})" class="add_link" id="assignment_create_button">@Helpers.AddButton() Create New Assignment</a><br /><br />
 }
 
-@if (ViewBag.PastAssignments.Count == 0 &&
-        ViewBag.PresentAssignments.Count == 0 &&
-        ViewBag.FutureAssignments.Count == 0)
+@if (ViewBag.Assignments.Count == 0)
 { 
     <h4>No Active Assignments</h4>
 }
-
-@if (ViewBag.ActiveCourse.AbstractRole.CanModify)
-{
-   @Html.Partial("_TeacherIndex");
-}
-else if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
-{
-    @Html.Partial("_ObserverIndex");
-}
-else if (ViewBag.ActiveCourse.AbstractRole.CanSubmit)
-{
-    @Html.Partial("_StudentIndex");
-}
 else
 {
-    // should never happen but should prob handle some exception
+    if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+    {
+       @Html.Partial("_TeacherIndex");
+    }
+    else if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
+    {
+        @Html.Partial("_ObserverIndex");
+    }
+    else if (ViewBag.ActiveCourse.AbstractRole.CanSubmit)
+    {
+        @Html.Partial("_StudentIndex");
+    }
+    else
+    {
+        // should never happen but should prob handle some exception
+    }
 }
-
 <script type="text/javascript">
 
 

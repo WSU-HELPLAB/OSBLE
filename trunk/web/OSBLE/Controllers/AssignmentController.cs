@@ -65,60 +65,47 @@ namespace OSBLE.Controllers
                 ViewBag.SubmissionReceived = false;
                 Session["SubmissionReceived"] = null;
             }
-            
-            // Past assignments are non-draft assignments whose final stop date has already passed.
-            List<Assignment> pastAssignments = (from assignment in db.Assignments
+
+            List<Assignment> Assignments = new List<Assignment>();
+            //Getting the assginment list, initially without future or draft assignments.
+            Assignments = (from assignment in db.Assignments
                                                 where !assignment.IsDraft &&
                                                 assignment.Category.CourseID == activeCourse.AbstractCourseID &&
                                                 assignment.IsWizardAssignment &&
-                                                assignment.DueDate <= DateTime.Now
+                                                assignment.ReleaseDate <= DateTime.Now
                                                 orderby assignment.DueDate
                                                 select assignment).ToList();
 
-            // Present assignments are any (non-draft) for which we are between the first start date and last end date.
-            List<Assignment> presentAssignments = (from assignment in db.Assignments
-                                                   where !assignment.IsDraft &&
-                                                   assignment.Category.CourseID == activeCourse.AbstractCourseID &&
-                                                   assignment.IsWizardAssignment &&
-                                                   assignment.DueDate > DateTime.Now &&
-                                                   assignment.ReleaseDate <= DateTime.Now
-                                                   orderby assignment.DueDate
-                                                   select assignment).ToList();
-
-            // Future assignments are non-draft assignments whose start date has not yet happened.
-            List<Assignment> futureAssignments = (from assignment in db.Assignments
+            // Future assignments are non-draft assignments whose start date has not yet happened. Appending to list now.
+            Assignments.AddRange((from assignment in db.Assignments
                                                   where !assignment.IsDraft &&
                                                   assignment.Category.CourseID == activeCourse.AbstractCourseID &&
                                                   assignment.IsWizardAssignment == true &&
                                                   assignment.ReleaseDate > DateTime.Now
                                                   orderby assignment.ReleaseDate
-                                                  select assignment).ToList();
+                                                  select assignment).ToList());
 
-            List<Assignment> draftAssignments = new List<Assignment>();
             if (ActiveCourse.AbstractRole.CanModify || ActiveCourse.AbstractRole.Anonymized)
             {
-                // Draft assignments (viewable by instructor only) are assignments that have not yet been published to students
-                draftAssignments = (from assignment in db.Assignments
+                // Draft assignments (viewable by instructor only) are assignments that have not yet been published to students. Appending to list now.
+                Assignments.AddRange( (from assignment in db.Assignments
                                     where assignment.IsDraft &&
                                     assignment.IsWizardAssignment &&
                                     assignment.Category.CourseID == activeCourse.AbstractCourseID
                                     orderby assignment.ReleaseDate
-                                    select assignment).ToList();
+                                    select assignment).ToList());
             }
             else if(ActiveCourse.AbstractRole.CanSubmit)
             {
-                /*MG: gathering a list of assignments for that course that are non-draft. Then creating a dictionary<assignmentID, submissionTime> 
-                 * to be used in the view. This is only done for the students view. 
-                 */
-                List<Assignment> assignmentList = (from assignment in db.Assignments
-                                                      where !assignment.IsDraft &&
-                                                      assignment.IsWizardAssignment &&
-                                                      assignment.Category.CourseID == activeCourse.AbstractCourseID
-                                                      select assignment).ToList();
-                //This will hold the assignment ID, the date submitted in string format, the grade in string format, and the team ID
+
+                /*Dictionary is in <AssignmentID, Tuple> format. Where the tuple contains:
+                Item 1: Submission time as a stirng, or "No Submission" if there is not a submission
+                Item 2: Grade of the assignment in string format
+                Item 3: Course user ID of a team member, used for action calls in view. */
                 Dictionary<int, Tuple<string, string, int>> submissionInfo = new Dictionary<int, Tuple<string, string, int>>();
-                foreach (Assignment a in assignmentList)
+                foreach (Assignment a in Assignments)
                 {
+                    //populating tuple to add to dictionary by collecting the information described in the above commentblock.
                     AssignmentTeam at = OSBLEController.GetAssignmentTeam(a, currentUser);
                     DateTime? subTime = GetSubmissionTime(a.Category.Course, a, at);
                     string submissionTime = "No Submission";
@@ -128,8 +115,7 @@ namespace OSBLE.Controllers
                         submissionTime = subTime.Value.ToString();
                     }
 
-
-                    //Finding score match based of UserPrfileID to avoid grabbing another team members grade (as they are potentially different)
+                    //Finding score match based off UserPrfileID rather than courseUserID to avoid grabbing another team members grade (as they are potentially different)
                     var score = (from assScore in a.Scores
                                  where assScore.CourseUser.UserProfileID == CurrentUser.ID
                                  select assScore).FirstOrDefault();
@@ -141,12 +127,30 @@ namespace OSBLE.Controllers
                 }
                 ViewBag.SubmissionInfoDictionary = submissionInfo; 
             }
-            
-            ViewBag.PastAssignments = pastAssignments;
-            ViewBag.PresentAssignments = presentAssignments;
-            ViewBag.FutureAssignments = futureAssignments;
-            ViewBag.DraftAssignments = draftAssignments;
-            ViewBag.DeliverableTypes = GetListOfDeliverableTypes();
+
+            ViewBag.PastCount = (from a in Assignments
+                                    where a.DueDate < DateTime.Now &&
+                                    !a.IsDraft &&
+                                    a.IsWizardAssignment
+                                    select a).Count();
+            ViewBag.PresentCount = (from a in Assignments
+                                    where a.ReleaseDate < DateTime.Now &&
+                                    a.DueDate > DateTime.Now &&
+                                    !a.IsDraft &&
+                                    a.IsWizardAssignment
+                                    select a).Count();
+            ViewBag.FutureCount = (from a in Assignments
+                                    where a.DueDate >= DateTime.Now &&
+                                    a.ReleaseDate >= DateTime.Now &&
+                                    !a.IsDraft &&
+                                    a.IsWizardAssignment
+                                    select a).Count();
+            ViewBag.DraftCount = (from a in Assignments
+                                  where a.IsDraft &&
+                                  a.IsWizardAssignment
+                                    select a).Count();
+            ViewBag.Assignments = Assignments;
+            ViewBag.CurrentDate = DateTime.Now;
             ViewBag.Submitted = false;
             return View();
         }
@@ -330,7 +334,24 @@ namespace OSBLE.Controllers
                 ViewBag.TeamID = at.TeamID;
                 ViewBag.CurrentUserID = activeCourse.ID;
                 ViewBag.TeamName = at.Team.Name;
-
+                DateTime? subTime = GetSubmissionTime(assignment.Category.Course, assignment, at);
+                var score = (from assScore in assignment.Scores
+                             where assScore.CourseUser.UserProfileID == CurrentUser.ID
+                             select assScore).FirstOrDefault();
+                ViewBag.Grade = "No Grade";
+                if (score != null) //found matching score. Reassign scoreString
+                {
+                    ViewBag.Grade = (score as Score).getGradeAsPercent(assignment.PointsPossible);
+                }
+                if (subTime.HasValue)
+                {
+                    ViewBag.SubmissionTime = subTime.Value.ToString();
+                }
+                else
+                {
+                    ViewBag.SubmissionTime = "No Submission";
+                }
+                
                 if (assignment.HasTeams)
                 {
                     
