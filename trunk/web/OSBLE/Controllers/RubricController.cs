@@ -117,6 +117,42 @@ namespace OSBLE.Controllers
             return true;
         }
 
+
+        /// <summary>
+        /// Populates a RubricViewModel that is for an uneditable Rubric
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        /// <returns></returns>
+        private RubricViewModel GetUneditableRubricViewModel(int assignmentId)
+        {
+            RubricViewModel viewModel = new RubricViewModel();
+            Assignment assignment = db.Assignments.Find(assignmentId);
+
+            if (assignment == null)
+            {
+                return viewModel;
+            }
+
+            //assigns the rubric to our view model
+            Rubric rubric = assignment.Rubric;
+            viewModel.Rubric = rubric;
+            viewModel.SelectedAssignment = assignment;
+
+            //if nothing exists, we need to build a dummy eval for the view to process
+            viewModel.Evaluation.AssignmentID = assignment.ID;
+            viewModel.Evaluation.EvaluatorID = CurrentUser.ID;
+            foreach (Criterion crit in rubric.Criteria)
+            {
+                CriterionEvaluation critEval = new CriterionEvaluation();
+                critEval.Criterion = crit;
+                critEval.CriterionID = crit.ID;
+                critEval.Score = 0;
+                critEval.Comment = "";
+                viewModel.Evaluation.CriterionEvaluations.Add(critEval);
+            }
+            return viewModel;
+        }
+
         /// <summary>
        /// Populates a generic RubricViewModel based on the supplied parameters
        /// </summary>
@@ -292,6 +328,18 @@ namespace OSBLE.Controllers
 
                     return View(viewModel);
                 }
+            }
+            return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
+        }
+
+        public ActionResult ViewAsUneditable(int assignmentId)
+        {
+            RubricViewModel viewModel = GetUneditableRubricViewModel(assignmentId);
+            if (!(viewModel.Rubric == null || viewModel.SelectedAssignment.Category.CourseID != activeCourse.AbstractCourseID))
+            {
+                ViewBag.Score = null;
+                ViewBag.isEditable = false;
+                return View("View", viewModel);
             }
             return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
         }

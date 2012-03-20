@@ -116,14 +116,7 @@
         <tr><!--Rubric row-->
             <td><text class="osbleColorBold">Rubric:</text></td>
             <td>
-                @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
-                {
-                    @Html.ActionLink("View Rubric", "Index", "Rubric", new { assignmentId = assignment.ID, cuId = ViewBag.CurrentUserID }, new { });
-                }
-                else
-                {
-                    @Html.ActionLink("View Rubric", "View", "Rubric", new { assignmentId = assignment.ID, cuId = ViewBag.CurrentUserID }, new { });
-                }
+                @Html.ActionLink("View Rubric", "ViewAsUneditable", "Rubric", new { assignmentId = assignment.ID }, new { })
             </td>
         </tr>
     }
