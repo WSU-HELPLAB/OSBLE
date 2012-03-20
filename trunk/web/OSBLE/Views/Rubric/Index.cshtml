@@ -2,6 +2,7 @@
 @using OSBLE.Models.Courses.Rubrics;
 @using OSBLE.Models.Assignments;
 @using OSBLE.Models.Users;
+@using OSBLE.Models.Courses;
 @{ViewBag.Title = "Rubric Evaluation";
   int maxLevelScore = (from c in Model.Rubric.Levels
                        select c.RangeEnd).Sum();
@@ -19,6 +20,10 @@
   int textInputLenght = 25;
   int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;
   DateTime? publishTime = Model.Evaluation.DatePublished;
+
+  Boolean editable = ViewBag.isEditable;
+  List<CourseUser> cuList = ViewBag.ObserverCU;
+  
   }
 <script type="text/javascript">
 function create_and_open_downloading_submission_dialog() {
@@ -110,8 +115,15 @@ function create_and_open_downloading_submission_dialog() {
     }
 </style>
 <div id="rubric_evaluator">
-    <h1>
-        Rubric Evaluation of @Model.SelectedAssignment.AssignmentName for @Model.Evaluation.Recipient.Name</h1>
+    
+    @if (editable == true) 
+    {
+        <h1>Rubric Evaluation of @Model.SelectedAssignment.AssignmentName for @Model.Evaluation.Recipient.Name</h1>
+    }
+    else
+    {
+        <h1>Rubric Evaluation of @Model.SelectedAssignment.AssignmentName for Anonymous @cuList.IndexOf(@Model.Evaluation.Recipient.TeamMembers.FirstOrDefault().CourseUser)</h1>
+    }
     <div class="dashboard">
         <table>
             <tr>
@@ -146,7 +158,15 @@ function create_and_open_downloading_submission_dialog() {
                               {
                                   selectedValue = "selected=\"selected\"";
                               }
-                            @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
+                              if (editable == true) 
+                              {
+                                    @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
+                              }
+                              else
+                              {
+                                  string name = "Anonymous " + @cuList.IndexOf(team.Team.TeamMembers.FirstOrDefault().CourseUser);
+                                  @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, name);
+                              }
                           }
                         }
                     </select>
@@ -180,7 +200,7 @@ function create_and_open_downloading_submission_dialog() {
     {
         <table style="float:right">
             <tr>
-                @if(Model.Evaluation.IsPublished == true)
+                @if (Model.Evaluation.IsPublished == true || editable == false)
                 {
                     <td><input disabled="disabled" type="submit" name="@draftButton" value="Save as Draft" /></td>
                 }
@@ -189,7 +209,10 @@ function create_and_open_downloading_submission_dialog() {
                     <td><input type="submit" name="@draftButton" value="Save as Draft" /></td>
                 }
                 
-                <td><input type="submit" name="@publishButton" value="Publish to Student" /></td>
+                @if(editable == true)
+                {
+                    <td><input type="submit" name="@publishButton" value="Publish to Student" /></td>
+                }
             </tr>
                 @if (publishTime.HasValue)
                 {
@@ -207,16 +230,19 @@ function create_and_open_downloading_submission_dialog() {
         
         @Html.Partial("_Display", Model)
         
-        //Disable the save as draft button if its already published
-        if (Model.Evaluation.IsPublished == true) 
-        {
-            <input disabled="disabled" type="submit" name="@draftButton" value="Save as Draft" />
-        }
-        else
-        {
-            <input type="submit" name="@draftButton" value="Save as Draft" />
-        }
-        <input type="submit" name="@publishButton" value="Publish to Student" />
+                //Disable the save as draft button if its already published
+                if (Model.Evaluation.IsPublished == true || editable == false)
+                {
+                    <input disabled="disabled" type="submit" name="@draftButton" value="Save as Draft" />
+                }
+                else
+                {
+                    <input type="submit" name="@draftButton" value="Save as Draft" />
+                }
+                if(editable == true)
+                {
+                    <input type="submit" name="@publishButton" value="Publish to Student" />
+                }
         <br />
         <br />
         <input type="hidden" name="@ViewBag.AssignmentId" value="@Model.SelectedAssignment.ID" />

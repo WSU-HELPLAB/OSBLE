@@ -251,18 +251,22 @@ namespace OSBLE.Controllers
             };
         }
         
-
-
         public ActionResult AssignmentDetails (int id)
         {
             Assignment assignment = db.Assignments.Find(id);
             List<Score> scores = assignment.Scores.ToList();
             List<CourseUser> cuList = null;
 
-            if (activeCourse.AbstractRole.CanModify || activeCourse.AbstractRole.Anonymized) //Instructor setup
+            if (activeCourse.AbstractRole.CanModify || activeCourse.AbstractRole.Anonymized) //Instructor setup || Observer
             {
                 List<Tuple<Score, Team, string>> scoreAndTeam = new List<Tuple<Score, Team, string>>();
                 List<AssignmentTeam> teams = assignment.AssignmentTeams.ToList();
+
+                if (activeCourse.AbstractRole.Anonymized)
+                {
+                    List<CourseUser> cus = db.CourseUsers.Where(c => c.AbstractCourseID == assignment.Category.Course.ID).ToList();
+                    ViewBag.ObserverCU = cus;
+                }
 
                 //Sorting teams by team name or by last name if non-team assignment
                 if (assignment.HasTeams)
@@ -328,7 +332,7 @@ namespace OSBLE.Controllers
                 ViewBag.RubricEvals = evaluations;
             }
 
-            else if (activeCourse.AbstractRole.CanSubmit)//STudent setup
+            else if (activeCourse.AbstractRole.CanSubmit)//Student setup
             {
                 AssignmentTeam at = GetAssignmentTeam(assignment, currentUser);
                 ViewBag.TeamID = at.TeamID;
