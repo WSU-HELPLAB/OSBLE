@@ -332,6 +332,7 @@ namespace OSBLE.Controllers
             return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
         }
 
+
         public ActionResult ViewAsUneditable(int assignmentId)
         {
             RubricViewModel viewModel = GetUneditableRubricViewModel(assignmentId);
