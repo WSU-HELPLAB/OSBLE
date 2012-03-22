@@ -192,7 +192,7 @@
             <td style="vertical-align:text-top">
                 <text class="osbleColorBold">Grade:</text>
             </td>
-            @if (assignment.HasRubric)
+            @if (assignment.HasRubric && ViewBag.Grade != "No Grade")
             {
                 string temp = ViewBag.Grade;
                 <td>

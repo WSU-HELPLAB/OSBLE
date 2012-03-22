@@ -59,11 +59,12 @@
             <td><!--Td for grade-->
                 @if(futureFlag)
                 {
+                    /*show nothing if future assignment*/
                 }
-                else if (assignment.HasRubric)
-                {
+                else if (assignment.HasRubric && ViewBag.SubmissionInfoDictionary[assignment.ID].Item2 != "No Grade")
+                { 
                     string gradeToDisplay = ViewBag.SubmissionInfoDictionary[assignment.ID].Item2;
-                    @Html.ActionLink(gradeToDisplay, "View", "Rubric", new { assignmentId = assignment.ID, cuId = ViewBag.SubmissionInfoDictionary[assignment.ID].Item3 }, new { });
+                    @Html.ActionLink(gradeToDisplay, "View", "Rubric", new { assignmentId = assignment.ID, cuId = ViewBag.SubmissionInfoDictionary[assignment.ID].Item3 }, new { });   
                 }
                 else
                 {
