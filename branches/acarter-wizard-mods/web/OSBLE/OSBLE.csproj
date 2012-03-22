@@ -186,6 +186,7 @@
     <Compile Include="Areas\AssignmentWizard\Controllers\WizardBaseController.cs" />
     <Compile Include="Controllers\CommunityController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
+    <Compile Include="Controllers\DiscussionAssignmentController.cs" />
     <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\FileHandlerController.cs" />
     <Compile Include="Controllers\GradebookController.cs" />
@@ -217,7 +218,11 @@
     <Compile Include="Models\Assignments\AssignmentTeam.cs" />
     <Compile Include="Models\Assignments\DiscussionSettings.cs" />
     <Compile Include="Models\Assignments\Team.cs" />
+    <Compile Include="Models\Assignments\TeamEvaluation.cs" />
     <Compile Include="Models\Assignments\TeamMember.cs" />
+    <Compile Include="Models\Assignments\TeamMemberEvaluation.cs" />
+    <Compile Include="Models\DiscussionAssignment\DiscussionPost.cs" />
+    <Compile Include="Models\DiscussionAssignment\DiscussionReply.cs" />
     <Compile Include="Models\HomePage\AbstractDashboard.cs" />
     <Compile Include="Models\AbstractCourses\AbstractRole.cs" />
     <Compile Include="Models\AbstractCourses\Community\Community.cs" />
@@ -693,10 +698,7 @@
     <Content Include="Views\PeerReview\Create.cshtml" />
     <Content Include="Views\AuthorRebuttal\Create.cshtml" />
     <Content Include="Views\Assignment\_AssignmentList.cshtml" />
-    <Content Include="Views\AsyncIssueVoting\Create.cshtml" />
     <Content Include="Views\Shared\_AddToGradebook.cshtml" />
-    <Content Include="Views\AuthorRebuttal\Index.cshtml" />
-    <Content Include="Views\AsyncIssueVoting\Index.cshtml" />
     <Content Include="Views\PeerReview\Index.cshtml" />
     <Content Include="Views\Account\ErrorPage.cshtml" />
     <Content Include="Views\Account\ProfessionalRegister.cshtml" />
@@ -734,6 +736,17 @@
     <Content Include="Views\Assignment\_StudentIndex.cshtml" />
     <Content Include="Views\Assignment\_TeacherAssignmentDetails.cshtml" />
     <Content Include="Views\Assignment\_TeacherIndex.cshtml" />
+    <Content Include="Views\Assignment\_TeacherTeamEvaluationView.cshtml" />
+    <Content Include="Views\Assignment\_StudentTeamEvaluationView.cshtml" />
+    <Content Include="Views\DiscussionAssignment\Index.cshtml" />
+    <Content Include="Views\DiscussionAssignment\_DiscussionFeed.cshtml" />
+    <Content Include="Views\StudioAssignment\SilverlightTest.cshtml" />
+    <Content Include="Views\BasicAssignment\Create.cshtml" />
+    <Content Include="Views\BasicAssignment\Delete.cshtml" />
+    <Content Include="Views\BasicAssignment\Details.cshtml" />
+    <Content Include="Views\BasicAssignment\Index.cshtml" />
+    <Content Include="Views\BasicAssignment\_RubricSelect.cshtml" />
+    <Content Include="Views\DiscussionAssignment\_SubDiscussionReply.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

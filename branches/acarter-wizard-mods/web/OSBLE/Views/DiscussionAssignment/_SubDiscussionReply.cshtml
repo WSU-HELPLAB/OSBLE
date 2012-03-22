@@ -1,0 +1,10 @@
+﻿@using OSBLE.Models.DiscussionAssignment
+
+@{
+    Layout = null;
+}
+
+@foreach (DiscussionReply dr in ViewBag.DiscussionReplies)
+{
+    @Html.Partial("_DashboardPost",dr);                                    
+}

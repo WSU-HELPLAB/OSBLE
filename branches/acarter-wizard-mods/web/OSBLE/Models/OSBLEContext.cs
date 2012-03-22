@@ -13,6 +13,7 @@ using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
 using OSBLE.Utility;
 using System.Data.Entity.Infrastructure;
+using OSBLE.Models.DiscussionAssignment;
 
 namespace OSBLE.Models
 {
@@ -64,6 +65,14 @@ namespace OSBLE.Models
         public DbSet<TeamMember> TeamMembers { get; set; }
 
         public DbSet<DiscussionSetting> DiscussionSettings { get; set; }
+
+        public DbSet<TeamEvaluation> TeamEvaluations { get; set; }
+
+        public DbSet<TeamMemberEvaluation> TeamMemberEvaluations { get; set; }
+
+        public DbSet<DiscussionPost> DiscussionPosts { get; set; }
+
+        public DbSet<DiscussionReply> DiscussionReplies { get; set; }
 
         // Assignments
 
@@ -164,6 +173,21 @@ namespace OSBLE.Models
                 .WithOptional(a => a.DiscussionSettings)
                 .WillCascadeOnDelete(true);
 
+            modelBuilder.Entity<TeamMemberEvaluation>()
+                .HasRequired(tm => tm.Evaluator)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<TeamMemberEvaluation>()
+                .HasRequired(tm => tm.Recipient)
+                .WithMany()
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<TeamMemberEvaluation>()
+                .HasRequired(tm => tm.TeamEvaluation)
+                .WithMany(e => e.TeamMemberEvaluations)
+                .WillCascadeOnDelete(false);
+
             modelBuilder.Entity<AssignmentReviewTeam>()
                 .HasRequired(rt => rt.AuthorTeam)
                 .WithMany()
@@ -173,7 +197,18 @@ namespace OSBLE.Models
                 .HasRequired(rt => rt.ReviewTeam)
                 .WithMany()
                 .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<DiscussionPost>()
+                .HasRequired(cu => cu.CourseUser)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<DiscussionReply>()
+                .HasRequired(cu => cu.CourseUser)
+                .WithMany()
+                .WillCascadeOnDelete(false);
         }
+
 
         private void createSampleUser(string username, string password, string firstname, string lastname, string ident, int school, bool isAdmin, bool canCreateCourses)
         {
