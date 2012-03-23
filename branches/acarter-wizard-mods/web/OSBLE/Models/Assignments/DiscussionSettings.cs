@@ -58,7 +58,7 @@ namespace OSBLE.Models.Assignments
         }
 
         [Required]
-        [Display(Name = "Minimum length for first post")]
+        [Display(Name = "Minimum length for first post (in characters)")]
         public int MinimumFirstPostLength { get; set; }
 
         public DiscussionSetting()
@@ -85,7 +85,7 @@ namespace OSBLE.Models.Assignments
         /// Returns true if posts in the discussion are anonymous
         /// </summary>
         [NotMapped]
-        [Display(Name = "Anonymous posts")]
+        [Display(Name = "Anonymize names of participants in the discussion")]
         public bool HasAnonymousPosts
         {
             get
@@ -105,11 +105,12 @@ namespace OSBLE.Models.Assignments
             }
         }
 
+        //TODO- This is not longer needed. We need to remove it.
         /// <summary>
         /// Returns true if replies in the discussion are marked anonymous
         /// </summary>
         [NotMapped]
-        [Display(Name="Anonymous replies")]
+        [Display(Name = "Anonymize authors of replies to discussion posts")]
         public bool HasAnonymousReplies
         {
             get
@@ -133,7 +134,7 @@ namespace OSBLE.Models.Assignments
         /// Returns true if user roles are hidden in discussions
         /// </summary>
         [NotMapped]
-        [Display(Name = "Anonymize roles")]
+        [Display(Name = "Hide roles of discussion participants")]
         public bool HasAnonymousRoles
         {
             get
@@ -158,7 +159,7 @@ namespace OSBLE.Models.Assignments
         /// they can view the posts of others
         /// </summary>
         [NotMapped]
-        [Display(Name = "Student must submit a post before they can view the posts of others")]
+        [Display(Name = "Students must make initial post before they can view the posts of others")]
         public bool RequiresPostBeforeView
         {
             get

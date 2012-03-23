@@ -526,6 +526,18 @@ body#layoutLogOn
 	height: 50px;
 }
 
+.discussion_replybox
+{
+    display: none;
+}
+
+.discussion_replybox textarea
+{
+    width: 90%;
+    width: 50px;
+    padding-left: 10px;
+}
+
 .dp_post_header:hover .dp_tools
 {
 	display: inline;
@@ -1726,4 +1738,16 @@ ul.assignment_deliverables, .assignment_deliverables ul
 #assignmentDetailsHeader th, #assignmentDetailsHeader tr, #assignmentDetailsHeader td
 {
     border: 1px solid #074974;
+}
+
+#TeamMemberEvaluationTable
+{
+    border: 1px solid #B0B0B0;
+    border-collapse: collapse;
+}
+
+#TeamMemberEvaluationTable th, #TeamMemberEvaluationTable tr, #TeamMemberEvaluationTable td
+{
+    border: 1px solid #B0B0B0;
+    padding: 4px;
 }

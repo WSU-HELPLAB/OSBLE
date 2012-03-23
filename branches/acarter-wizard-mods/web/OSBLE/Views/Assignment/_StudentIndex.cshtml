@@ -4,7 +4,7 @@
 
 @if ((ViewBag.PastAssignments.Count > 0 ||
          ViewBag.PresentAssignments.Count > 0 ||
-         ViewBag.FutureAssignments.Count > 0) )
+         ViewBag.FutureAssignments.Count > 0))
 {
     ViewBag.AssignmentList = 1;
     <table class="assignTable" cellspacing="0">
@@ -13,7 +13,10 @@
         <th>Due Date</th>
         <th>Grade</th>
         <th>Latest Submission</th>
-
+        @{
+            List<TeamEvaluation> teamEvals = (from te in ViewBag.TeamEvaluations as IEnumerable<TeamEvaluation>
+                                            select te).ToList();
+        }
         @if (ViewBag.PastAssignments.Count > 0)
         {
             //Needed a way to put blank space in a table, only when the previous assignment category had
@@ -32,7 +35,7 @@
                     @if (a.HasRubric)
                     {
                         string gradeToDisplay = ViewBag.SubmissionInfoDictionary[a.ID].Item2;
-                        @Html.ActionLink(gradeToDisplay, "View", "Rubric", new { assignmentId = a.ID, cuId = ViewBag.SubmissionInfoDictionary[a.ID].Item3 }, new { });
+                        @Html.ActionLink(gradeToDisplay, "View", "Rubric", new { assignmentId = a.ID, cuId = ViewBag.SubmissionInfoDictionary[a.ID].Item3.Team.TeamMembers.FirstOrDefault().CourseUserID }, new { });
 
                     }
                     else
@@ -56,21 +59,46 @@
                         @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = a.ID }, options, new object())
                     </td>
                 }
-                else if (a.HasDeliverables)
-                {
-                    AjaxOptions options = new AjaxOptions()
+                else if (a.HasDeliverables || a.AssignmentTypeID == 4)
+                    {
+                        if (a.AssignmentTypeID == 4)
                         {
-                            LoadingElementId = "Loading",
-                            HttpMethod = "Get",
-                            UpdateTargetId = "submitFiles",
-                            OnComplete = "SubmissionLoaded"
-                        }; 
-                    <!--TD for first submission-->
-                    <td>
-                    None.
-                    @Ajax.ActionLink("Submit Here", "Create", "Submission", new { id = a.ID }, options, new object())
-                    </td>
-                }
+                            bool found = false;
+                            foreach (TeamEvaluation te in teamEvals)
+                            {
+                                if (te.AssignmentID == a.ID)
+                                {
+                                    found = true;
+                                    <td>
+                                        @Html.ActionLink("View/Edit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = a.ID }, new { })
+                                    </td>
+                                    break;
+                                }
+
+                            }
+                            if (found == false)
+                            {
+                                <td>
+                                    @Html.ActionLink("Submit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = a.ID }, new { })
+                                </td>
+                            }
+                        }
+                        else
+                        {
+                            AjaxOptions options = new AjaxOptions()
+                            {
+                                LoadingElementId = "Loading",
+                                HttpMethod = "Get",
+                                UpdateTargetId = "submitFiles",
+                                OnComplete = "SubmissionLoaded"
+                            }; 
+                        <!--TD for first submission-->
+                        <td>
+                            None.
+                            @Ajax.ActionLink("Submit Here", "Create", "Submission", new { id = a.ID }, options, new object())
+                        </td>
+                        }
+                    }
                 else
                 {
                 <td>No Deliverables</td>
@@ -99,7 +127,7 @@
                     @if (a.HasRubric)
                     {
                         string gradeToDisplay = ViewBag.SubmissionInfoDictionary[a.ID].Item2;
-                        @Html.ActionLink(gradeToDisplay, "View", "Rubric", new { assignmentId = a.ID, cuId = ViewBag.SubmissionInfoDictionary[a.ID].Item3 }, new { });
+                        @Html.ActionLink(gradeToDisplay, "View", "Rubric", new { assignmentId = a.ID, cuId = ViewBag.SubmissionInfoDictionary[a.ID].Item3.Team.TeamMembers.FirstOrDefault().CourseUserID }, new { });
                     }
                     else
                     {
@@ -122,19 +150,50 @@
                             @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = a.ID }, options, new object())
                         </td>
                     }
-                    else if (a.HasDeliverables)
+                    else if (a.HasDeliverables || a.AssignmentTypeID == 4)
                     {
-                        AjaxOptions options = new AjaxOptions()
+                        if (a.AssignmentTypeID == 4)
                         {
-                            LoadingElementId = "Loading",
-                            HttpMethod = "Get",
-                            UpdateTargetId = "submitFiles",
-                            OnComplete = "SubmissionLoaded"
-                        }; 
+                            bool found = false;
+                            foreach (TeamEvaluation te in teamEvals)
+                            {
+                                if (te.AssignmentID == a.ID)
+                                {
+                                    found = true;
+                                    <td>
+                                        @Html.ActionLink("View/Edit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = a.ID }, new { })
+                                    </td>
+                                    break;
+                                }
+
+                            }
+                            if (found == false)
+                            {
+                                <td>
+                                    @Html.ActionLink("Submit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = a.ID }, new { })
+                                </td>
+                            }
+                        }
+                        else
+                        {
+                            AjaxOptions options = new AjaxOptions()
+                            {
+                                LoadingElementId = "Loading",
+                                HttpMethod = "Get",
+                                UpdateTargetId = "submitFiles",
+                                OnComplete = "SubmissionLoaded"
+                            }; 
                         <!--TD for first submission-->
                         <td>
                             None.
                             @Ajax.ActionLink("Submit Here", "Create", "Submission", new { id = a.ID }, options, new object())
+                        </td>
+                        }
+                    }
+                    else if (a.AssignmentTypeID == 3)
+                    {
+                        <td>
+                            @Html.ActionLink("Participate in Discussion", "Index", "DiscussionAssignment", new { assignmentId = a.ID }, new { })
                         </td>
                     }
                     else
@@ -143,5 +202,5 @@
                     }
             </tr>
         }
-    </table>
+    </table>   
 }

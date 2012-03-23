@@ -80,6 +80,7 @@ namespace OSBLE.Models
 
             public static string AssignmentTitle = "When you click \"Create New Assignment\" below, a dialog box will prompt you for which type of assignment you would like to create, either a Basic Assignment or a Studio Assignment. <br /><br /> Basic Assignments have the final products turned in then graded by an official grader.  <br /><br /> Studio Assignments are typically workshopped by peers prior to final grading.";
             public static string AssignmentLoadingError = "In some cases, this section may fail to load. First try reloading it by opening and closing this section. <br /><br /> It may also fail to load due to a feature of AVG Free 2011, which can be disabled by following instructions at <a href='http://free.avg.com/us-en/faq.num-2964'>AVG's FAQ page</a>.";
+            public static string DiscussionPostRole = "Check this box if you want to hide the role of discussion participants (e.g., student, instructor, moderator, observer).";
 
         #endregion
 

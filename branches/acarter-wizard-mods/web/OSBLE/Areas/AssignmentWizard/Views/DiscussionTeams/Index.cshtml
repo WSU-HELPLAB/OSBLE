@@ -21,7 +21,7 @@
 <table>
     <tr>
         <td>
-            Is this a class-wide discussion assignment?
+            Will the class participate in this discussion as a whole?
         </td>
         <td style="padding-left:15px;">
             @if (!Model.HasDiscussionTeams)
@@ -51,7 +51,7 @@ else
 </p> 
 @Html.HiddenFor(m => m.ID)
 <div>
-<h3>Auto Generation Options</h3>
+<h3>Generate Teams Automatically</h3>
 <ul>
     <li>
         Create a configuration with at least <input type="text" id="AutoGenByStudentTextBox"  /> students per team
@@ -73,6 +73,8 @@ else
     </li>
 </ul>
 </div>
+
+<h3>Create Teams Manually</h3>
 <div id="TeamCreationOptions">
     <a id="CreateTeamLink" class="NoDecoration">
         <img src="@Url.Content("~/Content/images/add_up.png")" alt="Create New Team" title="Create New Team" />
@@ -81,17 +83,17 @@ else
     
 <div id="AvailableStudentList">
     <h3>
-        Unassigned Students</h3>
+        Unassigned Students/Teams</h3>
     <ul id="AvailableStudent" class="TeamSortable">
         @foreach (CourseUser cu in unassignedUsers)
         {
-            <li id="cu_@(cu.ID)" class="ui-state-default Student">@cu.UserProfile.LastName, @cu.UserProfile.FirstName</li>
+            <li id="cu_@(cu.ID)" class="ui-state-default Student" style="list-style-type:none">@cu.UserProfile.LastName, @cu.UserProfile.FirstName</li>
         }
     </ul>
 </div>
     
 <div id="TeamsDiv">
-    <h3>Teams</h3>
+    <h3>Discussion Teams</h3>
 
     @{int counter = 0;}
     @foreach (IAssignmentTeam aTeam in teams.OrderBy(t => t.Team.Name))

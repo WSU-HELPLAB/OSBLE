@@ -4,7 +4,5 @@
     Layout = null;
 }
 
-@foreach (DiscussionReply dr in ViewBag.DiscussionReplies)
-{
-    @Html.Partial("_DashboardPost",dr);                                    
-}
+@Html.Partial("_DashboardPost");                                    
+

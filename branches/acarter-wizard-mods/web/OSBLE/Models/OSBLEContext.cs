@@ -70,13 +70,16 @@ namespace OSBLE.Models
 
         public DbSet<TeamMemberEvaluation> TeamMemberEvaluations { get; set; }
 
-        public DbSet<DiscussionPost> DiscussionPosts { get; set; }
 
         public DbSet<DiscussionReply> DiscussionReplies { get; set; }
 
         // Assignments
 
         public DbSet<Score> Scores { get; set; }
+
+        // DiscussionAssignments
+
+        public DbSet<DiscussionPost> DiscussionPosts { get; set; }
 
         // Courses
 
