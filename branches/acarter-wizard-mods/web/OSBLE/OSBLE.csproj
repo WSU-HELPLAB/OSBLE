@@ -747,6 +747,7 @@
     <Content Include="Views\BasicAssignment\Index.cshtml" />
     <Content Include="Views\BasicAssignment\_RubricSelect.cshtml" />
     <Content Include="Views\DiscussionAssignment\_SubDiscussionReply.cshtml" />
+    <Content Include="Views\DiscussionAssignment\TeacherIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

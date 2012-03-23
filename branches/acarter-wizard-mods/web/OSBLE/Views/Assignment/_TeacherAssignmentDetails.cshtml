@@ -72,7 +72,7 @@
         <th>Inline Comments</th>    
     }
     
-    @if (assignment.HasDeliverables)
+    @if (assignment.HasDeliverables || assignment.AssignmentTypeID == 3)
     {
         <th>Submission</th>
         @*<th>Submit for Student</th>*@
@@ -184,10 +184,17 @@
                 </td>
             }
             
-            @if (assignment.HasDeliverables)
+            @if (assignment.HasDeliverables || assignment.AssignmentTypeID == 3)
             {
                 <td><!--Cell for submission download - only allow if there is a time submitted-->
-                    @if (da.Item3 != "No Submission")
+                @if (assignment.AssignmentTypeID == 3)
+                {
+                    @(Html.ActionLink("View/Participate in Discussion", "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = da.Item2.TeamMembers.FirstOrDefault().CourseUserID }, new { }))
+                }
+                else
+                { 
+                
+                    if (da.Item3 != "No Submission")
                     {
                         @(Html.ActionLink(da.Item3, "GetSubmissionZip", "FileHandler", new { assignmentID = assignment.ID, teamID = da.Item2.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
                     }
@@ -195,6 +202,8 @@
                     {
                         @:Nothing Received
                     }
+                
+                }
                 </td>
                 @*<td><!--Cell for submitting on behalf of students -->
                     @{

@@ -46,15 +46,14 @@ else
     
 </div>
 
-<div id="dp_posts">
+
     @if (ViewBag.Posts != null && ViewBag.FirstPost == true)
     {
         foreach (DiscussionPost dp in ViewBag.Posts)
         {
-
+            @:<div id="dp_posts">
             if (assignment.DiscussionSettings.HasAnonymousPosts)
             {
-            <div class="dp_post" id="dp_post_@(dp.ID)">
                 <div class="dp_post_header">
                     @Helpers.DefaultProfilePicture()
                     Annonymous <br />
@@ -107,13 +106,26 @@ else
                     });
 
                 </script>
-            </div>
             
             }
             else
             {
-                
-            <div class="dp_post" id="dp_post_@(dp.ID)">
+                if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                {
+                    if (ViewBag.Student.ID == dp.CourseUserID)
+                    {
+                        @:<div class="dp_post" id="dp_post_@(dp.ID)" style="background:#FFF8C6;">
+                    }
+                    else
+                    {
+                        @:<div class="dp_post" id="dp_post_@(dp.ID)">
+                    }
+                }
+                else
+                {
+                    @:<div class="dp_post" id="dp_post_@(dp.ID)">
+                }
+            @*<div class="dp_post" id="dp_post_@(dp.ID)">*@
                 <div class="dp_post_header">
                     @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dp.CourseUser.AbstractCourseID, userprofile = dp.CourseUser.UserProfileID }))
                     @dp.DisplayName <br />
@@ -124,14 +136,42 @@ else
                     <div id="dp_replies_for_@(dp.ID)">
                         @foreach (DiscussionReply dr in dp.Replies)
                         {
-                            <div class="dp_post" id="dp_post_@(dr.ID)">
+                            if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                            {
+                                if (ViewBag.Student.ID == dr.CourseUserID)
+                                {
+                                    @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:#FFF8C6;">
+                                    <div class="dp_post_header">
+                                        @Helpers.DefaultProfilePicture()
+                                        @dr.DisplayName <br />
+                                        @dr.Posted <br /> <br />
+                                    </div>
+                                    @dr.Content
+                                    @:</div>
+                                }
+                                else
+                                {
+                                    @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:white;">
+                                    <div class="dp_post_header">
+                                        @Helpers.DefaultProfilePicture()
+                                        @dr.DisplayName <br />
+                                        @dr.Posted <br /> <br />
+                                    </div>
+                                    @dr.Content
+                                @:</div>
+                                }
+                            }
+                            else
+                            {
+                                @:<div class="dp_post" id="dp_post_@(dr.ID)">
                                 <div class="dp_post_header">
                                     @Helpers.DefaultProfilePicture()
                                     @dr.DisplayName <br />
                                     @dr.Posted <br /> <br />
                                 </div>
                                 @dr.Content
-                            </div>
+                                @:</div>
+                            }
                         }
                     </div>
                 </div>
@@ -173,8 +213,8 @@ else
                     });
 
                 </script>
-            </div>
             }
+            @:</div>
         }
     }
 </div>
