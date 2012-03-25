@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models.Assignments
 {
-    public class AssignmentTeam
+    public class AssignmentTeam : IAssignmentTeam
     {
         [Key]
         [Column(Order=0)]
@@ -14,7 +14,7 @@ namespace OSBLE.Models.Assignments
         public virtual Assignment Assignment { get; set; }
 
         [Key]
-        [Column(Order=0)]
+        [Column(Order=1)]
         public int TeamID { get; set; }
 
         [ForeignKey("TeamID")]

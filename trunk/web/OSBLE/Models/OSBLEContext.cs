@@ -13,6 +13,7 @@ using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
 using OSBLE.Utility;
 using System.Data.Entity.Infrastructure;
+using OSBLE.Models.DiscussionAssignment;
 
 namespace OSBLE.Models
 {
@@ -53,18 +54,32 @@ namespace OSBLE.Models
 
         public DbSet<Assignment> Assignments { get; set; }
 
-        public DbSet<AssignmentType> AssignmentTypes { get; set; }
-
         public DbSet<AssignmentTeam> AssignmentTeams { get; set; }
+
+        public DbSet<DiscussionTeam> DiscussionTeams { get; set; }
+
+        public DbSet<AssignmentReviewTeam> ReviewTeams { get; set; }
 
         public DbSet<Team> Teams { get; set; }
 
         public DbSet<TeamMember> TeamMembers { get; set; }
 
+        public DbSet<DiscussionSetting> DiscussionSettings { get; set; }
+
+        public DbSet<TeamEvaluation> TeamEvaluations { get; set; }
+
+        public DbSet<TeamMemberEvaluation> TeamMemberEvaluations { get; set; }
+
+
+        public DbSet<DiscussionReply> DiscussionReplies { get; set; }
 
         // Assignments
 
         public DbSet<Score> Scores { get; set; }
+
+        // DiscussionAssignments
+
+        public DbSet<DiscussionPost> DiscussionPosts { get; set; }
 
         // Courses
 
@@ -156,7 +171,47 @@ namespace OSBLE.Models
                 .WithMany(a => a.Scores)
                 .WillCascadeOnDelete(false);
 
+            modelBuilder.Entity<DiscussionSetting>()
+                .HasRequired(ds => ds.Assignment)
+                .WithOptional(a => a.DiscussionSettings)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<TeamMemberEvaluation>()
+                .HasRequired(tm => tm.Evaluator)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<TeamMemberEvaluation>()
+                .HasRequired(tm => tm.Recipient)
+                .WithMany()
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<TeamMemberEvaluation>()
+                .HasRequired(tm => tm.TeamEvaluation)
+                .WithMany(e => e.TeamMemberEvaluations)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<AssignmentReviewTeam>()
+                .HasRequired(rt => rt.AuthorTeam)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<AssignmentReviewTeam>()
+                .HasRequired(rt => rt.ReviewTeam)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<DiscussionPost>()
+                .HasRequired(cu => cu.CourseUser)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<DiscussionReply>()
+                .HasRequired(cu => cu.CourseUser)
+                .WithMany()
+                .WillCascadeOnDelete(false);
         }
+
 
         private void createSampleUser(string username, string password, string firstname, string lastname, string ident, int school, bool isAdmin, bool canCreateCourses)
         {
@@ -512,8 +567,6 @@ namespace OSBLE.Models
 
             #endregion add course users
 
-            //Assignment Types
-            this.AssignmentTypes.Add(new AssignmentType() { Type="Basic Assignment" });
             this.SaveChanges();
         }
     }

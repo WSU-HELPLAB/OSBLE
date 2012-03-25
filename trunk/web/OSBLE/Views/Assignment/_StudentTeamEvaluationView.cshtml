@@ -1,0 +1,138 @@
+﻿@using OSBLE.Models.Assignments
+@{
+    ViewBag.Title = "_StudentTeamEvaluationView";
+}
+
+<h2>Team Evaluations</h2>
+    @{
+        List<TeamMemberEvaluation> teamMemberEvals = (from tme in ViewBag.TeamMemberEvaluations as IEnumerable<TeamMemberEvaluation>
+                                                      orderby tme.Recipient.UserProfile.LastName
+                                                      select tme).ToList();
+                                                      
+        AssignmentTeam at = ViewBag.AssignmentTeam;
+                                                      
+        if (teamMemberEvals.Count() > 0)
+        {
+            //Assignment assign = ViewBag.AssignmentTeam.Assignment;
+            int pointsRemaining = ViewBag.AssignmentTeam.Team.TeamMembers.Count * 100;
+            int assignId = ViewBag.AssignmentTeam.AssignmentID;
+            using (Html.BeginForm("SubmitTeamEvaluation", "Assignment", new { assignmentId = assignId }, FormMethod.Post))
+            {
+                <fieldset style="width:400px;">
+                <table style="width:400px;">
+                <tr>
+                    <td><b>Points Remaining:</b></td><td><div id="pointsPossibleId">@pointsRemaining</div></td>
+                </tr>
+                @foreach (TeamMemberEvaluation tme in teamMemberEvals)
+                {
+                    <tr>
+                        <td>@tme.Recipient.UserProfile.FirstName @tme.Recipient.UserProfile.LastName: </td> <td><input id="points @tme.RecipientID" name="points-@tme.RecipientID" onblur="changePoints(@pointsRemaining);" size="1" value="@tme.Points"/></td>
+                    </tr>
+                        
+                }
+                    
+                <tr></tr>
+                    
+                <tr>
+                    <td colspan="2">
+                        <textarea class="textAreaClass" name="inBrowserText" rows="10" cols = "53" >@teamMemberEvals.First().TeamEvaluation.Comments</textarea>
+                    </td>
+                </tr>
+                </table> 
+                <p>
+                    <input type="submit" value="Resubmit"/>
+                    <input type="button" value="Cancel"/>
+                </p>    
+                </fieldset>
+            }
+        }
+        else
+        {
+            //Assignment assign = ViewBag.AssignmentTeam.Assignment;
+            int pointsRemaining = ViewBag.AssignmentTeam.Team.TeamMembers.Count * 100;
+            int assignId = ViewBag.AssignmentTeam.AssignmentID;
+            using (Html.BeginForm("SubmitTeamEvaluation", "Assignment", new { assignmentId = assignId }, FormMethod.Post))
+            {
+                <fieldset style="width:400px;">
+                <table style="width:400px;">
+                <tr>
+                    <td><b>Points Remaining:</b></td><td><div id="pointsPossibleId">@pointsRemaining</div></td>
+                </tr>
+                @foreach (TeamMember tm in at.Team.TeamMembers.OrderBy(u => u.CourseUser.UserProfile.LastName))
+                {
+                    <tr>
+                        <td>@tm.CourseUser.UserProfile.FirstName @tm.CourseUser.UserProfile.LastName: </td> <td><input id="points @tm.CourseUserID" name="points-@tm.CourseUserID" onblur="changePoints(@pointsRemaining);" size="1" value="0"/></td>
+                    </tr>
+                        
+                }
+                    
+                <tr></tr>
+                    
+                <tr>
+                    <td colspan="2">
+                        <textarea class="textAreaClass" name="inBrowserText" rows="10" cols = "53" ></textarea>
+                    </td>
+                </tr>
+                </table> 
+                <p>
+                    <input type="submit" value="Submit"/>
+                    <input type="button" value="Cancel"/>
+                </p>    
+                </fieldset>
+            }
+        }  
+    }
+
+    <script type="text/javascript">
+
+        function changePoints(pp) {
+            var points = 0;
+            var pointsPossible = parseInt(pp);
+            $("#errorText").text("");
+            $("table tr").each(function (i) {
+                //loop tr's in table with class 'adminlist'
+                $(this).find("#points").each(function (j) {
+                    var addTo = parseInt($(this).val());
+                    if (isNaN($(this).val())) {
+                        $("#errorText").text("Values can only be numbers.");
+                    }
+                    else if (addTo < 0) {
+                        $("#errorText").text("Values cannot be negative.");
+                    }
+                    points += parseInt($(this).val());
+                });
+            });
+            pointsPossible = pointsPossible - points;
+            $("#pointsPossibleId").html(pointsPossible);
+
+        }
+
+        $('#file_uploader_form').submit(function (e) {
+
+            $("table tr").each(function (i) {
+                //loop tr's in table with class 'adminlist'
+                $(this).find("#points").each(function (j) {
+                    var addTo = parseInt($(this).val());
+
+                    if (isNaN($(this).val())) {
+                        $("#errorText").text("Values can only be numbers.");
+                        e.preventDefault();
+                    }
+                    else if (addTo < 0) {
+                        alert("here");
+                        $("#errorText").text("Values cannot be negative.");
+                        e.preventDefault();
+                    }
+                });
+            });
+
+            if (parseInt($("#pointsPossibleId").text()) < 0) {
+                $("#errorText").text("Points Remaining must equal 0.");
+                e.preventDefault();
+            }
+        });
+
+        function checkForErrors() {
+
+        }
+    </script>

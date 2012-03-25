@@ -33,7 +33,6 @@ namespace OSBLE.Controllers
                         setViewBagDeliverables((assignment).Deliverables);
 
                         //ViewBag.PrecAssignment = (from a in db.Assignments where a.HasTeams select a).FirstOrDefault();
-                        ViewBag.AssignmentTeam = GetAssignmentTeam(assignment, currentUser);
                         
                         return View();
                     }
@@ -185,6 +184,11 @@ namespace OSBLE.Controllers
                                 string inbrowser = Request.Params["inBrowserText[" + j + "]"];
                                 if (inbrowser.Length > 0)
                                 {
+                                    //If the assignment is a team evaluation
+                                    if (assignment.AssignmentTypeID == 4)
+                                    {
+                                        
+                                    }
                                     var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, assignmentTeam), currentUser.LastName + "_" + currentUser.FirstName + "_" + delName + ".txt");
                                     System.IO.File.WriteAllText(path, inbrowser);
                                 }

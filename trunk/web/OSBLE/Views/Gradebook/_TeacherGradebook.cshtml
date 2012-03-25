@@ -901,7 +901,11 @@
         $("#grades tr").children("td:nth-child(" + Index + ")").each(function () {
             if ($(this).attr("id") == "averageTotal") {
                 colTotal = parseFloat(colTotal / count).toFixed(2);
-                $(this).html(colTotal + "%");
+                if (colTotal.toString() == "NaN") {
+                }
+                else {
+                    $(this).html(colTotal + "%");
+                }
             }
             if ($(this).attr("id") == "averageScore") {
                 colTotal = parseFloat(colTotal / count).toFixed(2);

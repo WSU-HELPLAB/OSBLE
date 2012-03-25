@@ -28,13 +28,41 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 List<WizardBaseController> prereqs = new List<WizardBaseController>();
                 prereqs.Add(new BasicsController());
                 prereqs.Add(new TeamController());
+                prereqs.Add(new CommentCategoryController());
                 return prereqs;
+            }
+        }
+
+        public override ICollection<AssignmentTypes> ValidAssignmentTypes
+        {
+            get
+            {
+                List<AssignmentTypes> types = base.AllAssignmentTypes.ToList();
+                types.Remove(AssignmentTypes.DiscussionAssignment);
+                return types;
             }
         }
 
         private new void SetUpViewBag()
         {
-            ViewBag.DeliverableTypes = new SelectList(GetListOfDeliverableTypes(), "Value", "Text");
+            List<SelectListItem> allItems = GetListOfDeliverableTypes();
+            
+            //if we're in an inline review assignment type, then use only the deliverables that work for us
+            if (Assignment.HasCommentCategories)
+            {
+                List<SelectListItem> restrictedItems = new List<SelectListItem>();
+                string[] validTypes = {"xps", "code", "video", "text"};
+                foreach(string type in validTypes)
+                {
+                    SelectListItem item = allItems.Where(sli => sli.Text.ToLower().Contains(type)).FirstOrDefault();
+                    if (item != null)
+                    {
+                        restrictedItems.Add(item);
+                    }
+                }
+                allItems = restrictedItems;
+            }
+            ViewBag.DeliverableTypes = new SelectList(allItems, "Value", "Text");
             ViewBag.AllowedFileNames = from c in FileSystem.GetCourseDocumentsFileList(activeCourse.AbstractCourse, includeParentLink: false).Files select c.Name;
         }
 
@@ -58,7 +86,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             //assignment creation.
             db.Entry(Assignment).State = System.Data.EntityState.Modified;
             db.SaveChanges();
-            return base.Index(model);
+            return base.PostBack(model);
         }
 
         private void ParseFormValues()

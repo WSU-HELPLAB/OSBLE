@@ -16,6 +16,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
         public HomeController()
         {
+            ViewBag.AssignmentTypeRadioName = "AssignmentType";
             manager = WizardComponentManager.GetInstance();
         }
 
@@ -23,13 +24,64 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
         public ActionResult Index(int? assignmentId)
         {
+            //existing assignments skip this step
+            if (assignmentId != null)
+            {
+                Assignment assignment = db.Assignments.Find(assignmentId);
+                
+                //prime the manager for the new assignment
+                manager.ActiveAssignmentId = assignment.ID;
+                manager.SetActiveAssignmentType((AssignmentTypes)assignment.AssignmentTypeID);
+
+                //load in any secondary (non-required) components
+                ActivateAssignmentComponents(assignment);
+
+                //now, load in essential components
+                List<WizardBaseController> components = (from comp in manager.GetComponentsForAssignmentType(assignment.Type)
+                                                        where comp.IsRequired == true
+                                                        select comp).ToList();
+                foreach (WizardBaseController component in components)
+                {
+                    component.IsSelected = true;
+                }
+
+                //finally, request that the list be sorted
+                manager.SortComponents();
+
+                //begin wizard
+                return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute, new { controller = manager.ActiveComponent.ControllerName });
+            }
+            return View(Assignment.AllAssignmentTypes);
+        }
+
+        [HttpPost]
+        public ActionResult Index(ICollection<AssignmentTypes> assignments)
+        {
+            string keyName = ViewBag.AssignmentTypeRadioName;
+            if (Request.Form.AllKeys.Contains(keyName))
+            {
+                //set the assignment type and carry on to the next screen.
+                manager.SetActiveAssignmentType(Request.Form[keyName]);
+                return RedirectToRoute(new { controller = "Home", action = "SelectComponent" });
+            }
+            else
+            {
+                //send back to the old page if we didn't get anything.
+                return View(Assignment.AllAssignmentTypes);
+            }
+        }
+
+        public ActionResult SelectComponent(int? assignmentId)
+        {
             //if our assignmentId isn't null, then we need to pull that assignment
             //from the DB
-            if (assignmentId != null)
+            if (assignmentId != null && assignmentId != 0)
             {
                 int aid = (int)assignmentId;
                 manager.ActiveAssignmentId = aid;
                 ActivateAssignmentComponents(db.Assignments.Find(aid));
+                Assignment assignment = db.Assignments.Find(aid);
+                manager.SetActiveAssignmentType((AssignmentTypes)assignment.AssignmentTypeID);
             }
             else
             {
@@ -37,14 +89,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 manager.DeactivateAllComponents();
             }
             ViewBag.BeginWizardButton = beginWizardButton;
-            return View(manager.AllComponents);
+            return View(manager.GetComponentsForAssignmentType(manager.ActiveAssignmentType));
         }
 
         [HttpPost]
-        public ActionResult Index(ICollection<WizardComponent> components)
+        public ActionResult SelectComponent(ICollection<WizardBaseController> components)
         {
             ActivateSelectedComponents();
-            return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute, new { controller = manager.ActiveComponent.Name });
+            return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute, new { controller = manager.ActiveComponent.ControllerName });
         }
 
         public ActionResult Summary(int? assignmentId)
@@ -111,7 +163,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 if (key.Substring(0, componentPrefix.Length) == componentPrefix)
                 {
-                    WizardComponent comp = manager.GetComponentByName(Request.Form[key]);
+                    WizardBaseController comp = manager.GetComponentByName(Request.Form[key]);
                     comp.IsSelected = true;
                 }
             }
@@ -134,12 +186,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 {
                     assignment.CommentCategory = null;
                     assignment.CommentCategoryID = null;
-                }
-
-                //TEAM ASSIGNMENTS
-                if (manager.UnselectedComponents.Contains(manager.GetComponentByType(typeof(TeamController))))
-                {
-                    assignment.AssignmentTeams = null;
                 }
 
                 //DELIVERABLES

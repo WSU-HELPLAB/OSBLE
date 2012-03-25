@@ -32,6 +32,11 @@ a img
 	border: none;
 }
 
+input
+{
+    z-index:2000;
+}
+
 /* Common layout elements */
 #header
 {
@@ -519,6 +524,18 @@ body#layoutLogOn
 {
 	width: 90%;
 	height: 50px;
+}
+
+.discussion_replybox
+{
+    display: none;
+}
+
+.discussion_replybox textarea
+{
+    width: 90%;
+    width: 50px;
+    padding-left: 10px;
 }
 
 .dp_post_header:hover .dp_tools
@@ -1719,11 +1736,23 @@ ul.assignment_deliverables, .assignment_deliverables ul
 
 #assignmentDetailsHeader
 {
-    border: 1px solid #B0B0B0;
+    border: 1px solid #074974;
     border-collapse: collapse;
 }
 
 #assignmentDetailsHeader th, #assignmentDetailsHeader tr, #assignmentDetailsHeader td
 {
+    border: 1px solid #074974;
+}
+
+#TeamMemberEvaluationTable
+{
     border: 1px solid #B0B0B0;
+    border-collapse: collapse;
+}
+
+#TeamMemberEvaluationTable th, #TeamMemberEvaluationTable tr, #TeamMemberEvaluationTable td
+{
+    border: 1px solid #B0B0B0;
+    padding: 4px;
 }

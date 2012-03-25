@@ -16,7 +16,8 @@ function documentReady() {
     $("#CreateTeamLink").click(createTeam);
 
     //turn off selection as it ruins the UI experience
-    $("#WizardContent").disableSelection();
+    $("#AvailableStudentList").disableSelection();
+    $("#TeamsDiv").disableSelection();
 }
 
 //Before we can postback, we need to inject students into teams for the controller to process

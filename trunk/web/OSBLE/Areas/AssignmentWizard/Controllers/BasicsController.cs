@@ -30,8 +30,24 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get
             {
-                //the basics page has no prereqs
-                return new List<WizardBaseController>();
+                List<WizardBaseController> prereqs = new List<WizardBaseController>();
+                return prereqs;
+            }
+        }
+
+        public override ICollection<AssignmentTypes> ValidAssignmentTypes
+        {
+            get 
+            {
+                return base.AllAssignmentTypes;
+            }
+        }
+
+        public override bool IsRequired
+        {
+            get
+            {
+                return true;
             }
         }
 
@@ -47,10 +63,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                               select c;
             }
             ViewBag.Categories = new SelectList(categories, "ID", "Name");
-
-            //ASSIGNMENT TYPES
-            var types = db.AssignmentTypes.ToList();
-            ViewBag.AssignmentTypes = new SelectList(types, "Type", "Type");
         }
 
         public override ActionResult Index()
@@ -58,6 +70,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             base.Index();
             ModelState.Clear();
             BuildViewBag();
+            Assignment.Type = manager.ActiveAssignmentType;
 
             Assignment.HoursPerDeduction = (ActiveCourse.AbstractCourse as Course).HoursLatePerPercentPenalty;
             Assignment.DeductionPerUnit = (ActiveCourse.AbstractCourse as Course).PercentPenalty;
@@ -109,7 +122,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 WasUpdateSuccessful = false;
             }
             BuildViewBag();
-            return base.Index(Assignment);
+            return base.PostBack(Assignment);
         }
     }
 }

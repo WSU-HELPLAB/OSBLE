@@ -19,21 +19,35 @@ namespace OSBLE.Models.Assignments
             ColumnOrder = 0;
             Deliverables = new List<Deliverable>();
             AssignmentTeams = new List<AssignmentTeam>();
+            DiscussionTeams = new List<DiscussionTeam>();
+            ReviewTeams = new List<AssignmentReviewTeam>();
             IsDraft = true;
             addedPoints = 0;
             IsWizardAssignment = true;
             Scores = new List<Score>();
+            Type = AssignmentTypes.Basic;
         }
 
         [Key]
         public int ID { get; set; }
 
         [Required(ErrorMessage = "Please specify this assignment's type")]
-        [Display(Name = "Assignment Type")]
-        public string AssignmentType { get; set; }
+        public int AssignmentTypeID { get; set; }
 
-        [ForeignKey("AssignmentType")]
-        public AssignmentType Type { get; set; }
+
+        [Display(Name = "Assignment Type")]
+        [NotMapped]
+        public AssignmentTypes Type
+        {
+            get
+            {
+                return (AssignmentTypes)AssignmentTypeID;
+            }
+            set
+            {
+                AssignmentTypeID = (int)value;
+            }
+        }
 
         [Required(ErrorMessage = "Please specify an assignment name")]
         [Display(Name = "Assignment Name")]
@@ -123,6 +137,29 @@ namespace OSBLE.Models.Assignments
                     {
                         return true;
                     }
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the assignment has discussion teams
+        /// </summary>
+        [NotMapped]
+        public bool HasDiscussionTeams
+        {
+            get
+            {
+                if (Type != AssignmentTypes.DiscussionAssignment)
+                {
+                    return false;
+                }
+                int count = (from team in DiscussionTeams
+                             where team.Team.TeamMembers.Count > 1
+                             select team).Count();
+                if (count > 0)
+                {
+                    return true;
                 }
                 return false;
             }
@@ -220,13 +257,30 @@ namespace OSBLE.Models.Assignments
         [Association("Assignment_Deliverables", "ID", "AssignmentID")]
         public virtual IList<Deliverable> Deliverables { get; set; }
 
-        [Association("AssignmentTeams_Assignments", "ID", "AssignmentID")]
+        [Association("AssignmentTeam_Assignments", "ID", "AssignmentID")]
         public virtual IList<AssignmentTeam> AssignmentTeams { get; set; }
+
+        [Association("DiscussionTeam_Assignments", "ID", "AssignmentID")]
+        public virtual IList<DiscussionTeam> DiscussionTeams { get; set; }
+
+        [Association("AssignmentReviewTeam_Assignment", "ID", "AssignmentID")]
+        public virtual IList<AssignmentReviewTeam> ReviewTeams { get; set; }
 
         [Association("Score_Assignment", "ID", "AssignmentID")]
         public virtual IList<Score> Scores { get; set; }
 
+        [Association("DiscussionSetting_Assignment", "ID", "AssignmentID")]
+        public virtual DiscussionSetting DiscussionSettings { get; set; }
+
         public double addedPoints { get; set; }
+
+        public static IList<AssignmentTypes> AllAssignmentTypes
+        {
+            get
+            {
+                return Enum.GetValues(typeof(AssignmentTypes)).Cast<AssignmentTypes>().ToList();
+            }
+        }
 
         public int? AssociatedEventID { get; set; }
 

@@ -15,6 +15,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get { return "CommentCategory"; }
         }
 
+        public override string PrettyName
+        {
+            get
+            {
+                return "Comment Categories";
+            }
+        }
+
         public override string ControllerDescription
         {
             get { return "The instructor can mark-up student submissions with annotations"; }
@@ -28,6 +36,16 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 prereqs.Add(new BasicsController());
                 prereqs.Add(new TeamController());
                 return prereqs;
+            }
+        }
+
+        public override ICollection<AssignmentTypes> ValidAssignmentTypes
+        {
+            get
+            {
+                List<AssignmentTypes> types = base.AllAssignmentTypes.ToList();
+                types.Remove(AssignmentTypes.DiscussionAssignment);
+                return types;
             }
         }
 
@@ -50,7 +68,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             Assignment.CommentCategoryID = 0;
             db.SaveChanges();
             WasUpdateSuccessful = true;
-            return base.Index(Assignment);
+            return base.PostBack(Assignment);
         }
 
         private CommentCategoryConfiguration BuildCommentCategories()

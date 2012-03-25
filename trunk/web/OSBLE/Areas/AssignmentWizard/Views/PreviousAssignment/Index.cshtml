@@ -1,0 +1,18 @@
+﻿@using OSBLE.Models.Assignments;
+@using OSBLE.Models;
+@{
+    ViewBag.Title = "Assignment Creation Wizard";
+    ViewBag.ComponentName = "Previous Assignment Selector";
+    List<Assignment> previousAssignments = ViewBag.PreviousAssignments as List<Assignment>;
+}
+@model Assignment
+@Html.HiddenFor(m => m.ID)
+<p>
+This assignment type depends on a previously created assignment.  Please select that assignment from the dropdown list.  
+</p>
+<select name="PreviousAssignmentSelect">
+    @foreach (Assignment previousAssignment in previousAssignments)
+    {
+        <option value="@previousAssignment.ID">@previousAssignment.AssignmentName</option>
+    }
+</select>

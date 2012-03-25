@@ -31,6 +31,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
+        public override ICollection<AssignmentTypes> ValidAssignmentTypes
+        {
+            get
+            {
+                return base.AllAssignmentTypes;
+            }
+        }
+
         public override ActionResult Index()
         {
             base.Index();
@@ -63,7 +71,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 WasUpdateSuccessful = false;
             }
             ViewBag.ActiveCourse = activeCourse;
-            return base.Index(Assignment);
+            return base.PostBack(Assignment);
         }
     }
 }

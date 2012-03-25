@@ -49,7 +49,7 @@
         var indexOfDot = filePath.indexOf('.');
         if (indexOfDot == -1) {
 
-        //this does not work for IE
+            //this does not work for IE
             elem.value = "";
             return false;
         }
@@ -68,12 +68,11 @@
         return false;
     }
 
-    function isValid(elem)
-    {
+    function isValid(elem) {
         if (elem.value == null || elem.value.length == 0) {
-                return false;
-            }
-            return true;
+            return false;
+        }
+        return true;
     }
 
 </script>
@@ -140,7 +139,7 @@
                     </tr>
                 }
                 // InBrowserText field
-                else 
+                else
                 {
                     <tr>
                         <td colspan="2">
@@ -148,7 +147,7 @@
                             <textarea class="textAreaClass" name="inBrowserText[@inBrowserCount]" rows="10" cols = "53" ></textarea>
                         </td>
                     </tr>
-                         
+                        
                     inBrowserCount++;
                 }
             </table>

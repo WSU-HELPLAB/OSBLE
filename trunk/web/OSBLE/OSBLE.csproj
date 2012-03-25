@@ -93,9 +93,8 @@
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework">
-      <HintPath>..\packages\EntityFramework.4.1.10331.0\lib\EntityFramework.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="EntityFramework, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.4.1.10715.0\lib\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="Ionic.Zip.Reduced">
       <HintPath>..\packages\DotNetZip-v1.9-Reduced\Ionic.Zip.Reduced.dll</HintPath>
@@ -105,8 +104,8 @@
       <HintPath>App_Code\Libraries\LumenWorks.Framework.IO.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.ServiceModel.DomainServices.EntityFramework">
-      <HintPath>..\packages\RIAServices.EntityFramework.4.1.60629.0\lib\Net40\Microsoft.ServiceModel.DomainServices.EntityFramework.dll</HintPath>
+    <Reference Include="Microsoft.ServiceModel.DomainServices.EntityFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\RIAServices.EntityFramework.4.1.60730.0\lib\Net40\Microsoft.ServiceModel.DomainServices.EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.Helpers">
       <HintPath>..\packages\microsoft-web-helpers.1.15\lib\Microsoft.Web.Helpers.dll</HintPath>
@@ -118,6 +117,7 @@
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Data.Services" />
     <Reference Include="System.Data.Services.Client" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.ServiceModel">
@@ -166,6 +166,13 @@
     <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\ContentController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\CriticalReviewController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionTeamsController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\PreviousAssignmentController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Models\WizardPrerequisiteComparer.cs" />
+    <Compile Include="Areas\AssignmentWizard\Models\WizardPrerequisiteCountComparer.cs" />
+    <Compile Include="Areas\AssignmentWizard\Models\WizardSortOrderComparer.cs" />
     <Compile Include="Attributes\CanPostEvent.cs" />
     <Compile Include="Attributes\FileCacheAttribute.cs" />
     <Compile Include="Attributes\IsCommunity.cs" />
@@ -179,6 +186,7 @@
     <Compile Include="Areas\AssignmentWizard\Controllers\WizardBaseController.cs" />
     <Compile Include="Controllers\CommunityController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
+    <Compile Include="Controllers\DiscussionAssignmentController.cs" />
     <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\FileHandlerController.cs" />
     <Compile Include="Controllers\GradebookController.cs" />
@@ -188,9 +196,13 @@
     <Compile Include="Controllers\StudioAssignmentController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="EntityFramework\DbContextExtensions.cs" />
+    <Compile Include="Models\Assignments\AssignmentTypes.cs" />
     <Compile Include="Models\AbstractCourses\CourseRubric.cs" />
     <Compile Include="Models\Assignments\CommentCategory.cs" />
     <Compile Include="Models\Assignments\CommentCategoryConfiguration.cs" />
+    <Compile Include="Models\Assignments\DiscussionTeam.cs" />
+    <Compile Include="Models\Assignments\IAssignmentTeam.cs" />
+    <Compile Include="Models\Assignments\ReviewTeam.cs" />
     <Compile Include="Models\Assignments\Score.cs" />
     <Compile Include="Models\Assignments\CommentCategoryOption.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseUser.cs" />
@@ -204,9 +216,13 @@
     <Compile Include="Models\AbstractCourses\Course\Rubrics\RubricEvaluation.cs" />
     <Compile Include="Models\Assignments\Assignment.cs" />
     <Compile Include="Models\Assignments\AssignmentTeam.cs" />
-    <Compile Include="Models\Assignments\AssignmentType.cs" />
+    <Compile Include="Models\Assignments\DiscussionSettings.cs" />
     <Compile Include="Models\Assignments\Team.cs" />
+    <Compile Include="Models\Assignments\TeamEvaluation.cs" />
     <Compile Include="Models\Assignments\TeamMember.cs" />
+    <Compile Include="Models\Assignments\TeamMemberEvaluation.cs" />
+    <Compile Include="Models\DiscussionAssignment\DiscussionPost.cs" />
+    <Compile Include="Models\DiscussionAssignment\DiscussionReply.cs" />
     <Compile Include="Models\HomePage\AbstractDashboard.cs" />
     <Compile Include="Models\AbstractCourses\AbstractRole.cs" />
     <Compile Include="Models\AbstractCourses\Community\Community.cs" />
@@ -231,7 +247,6 @@
     <Compile Include="Models\ViewModels\SerializableTeamMembers.cs" />
     <Compile Include="Models\ViewModels\StudioAssignmentViewModel.cs" />
     <Compile Include="Models\ViewModels\TeamCreationViewModel.cs" />
-    <Compile Include="Areas\AssignmentWizard\Models\WizardComponent.cs" />
     <Compile Include="Areas\AssignmentWizard\Models\WizardComponentManager.cs" />
     <Compile Include="Services\AuthenticationDomainService1.cs" />
     <Compile Include="Services\OSBLEService.cs" />
@@ -242,6 +257,7 @@
       <DependentUpon>UploaderWebService.svc</DependentUpon>
     </Compile>
     <Compile Include="Utility\ActionResultExtensions.cs" />
+    <Compile Include="Utility\FileCache.cs" />
     <Compile Include="Utility\Constants.cs" />
     <Compile Include="Utility\Email.cs" />
     <Compile Include="Utility\FileSystem.cs" />
@@ -280,10 +296,14 @@
     <Content Include="App_Code\Libraries\LumenWorks.Framework.IO.dll" />
     <Content Include="App_Data\FirstNames.txt" />
     <Content Include="App_Data\LastNames.txt" />
+    <Content Include="Areas\AssignmentWizard\Content\css\criticalReview.css" />
+    <Content Include="Areas\AssignmentWizard\Content\css\home.css" />
+    <Content Include="Areas\AssignmentWizard\Content\css\layout.css" />
     <Content Include="Areas\AssignmentWizard\Content\css\team.css" />
     <Content Include="Areas\AssignmentWizard\Content\icons\rubric_add.png" />
     <Content Include="Areas\AssignmentWizard\Content\icons\rubric_delete.png" />
     <Content Include="Areas\AssignmentWizard\Content\js\commentCategories.js" />
+    <Content Include="Areas\AssignmentWizard\Content\js\criticalReview.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\deliverables.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\team.js" />
     <Content Include="Areas\AssignmentWizard\Modifications.txt" />
@@ -629,6 +649,11 @@
     <Content Include="Areas\AssignmentWizard\Views\Home\Summary.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\CommentCategory\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Home\ContextLost.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Home\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\PreviousAssignment\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Discussion\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\DiscussionTeams\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\CriticalReview\Index.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />
@@ -673,10 +698,7 @@
     <Content Include="Views\PeerReview\Create.cshtml" />
     <Content Include="Views\AuthorRebuttal\Create.cshtml" />
     <Content Include="Views\Assignment\_AssignmentList.cshtml" />
-    <Content Include="Views\AsyncIssueVoting\Create.cshtml" />
     <Content Include="Views\Shared\_AddToGradebook.cshtml" />
-    <Content Include="Views\AuthorRebuttal\Index.cshtml" />
-    <Content Include="Views\AsyncIssueVoting\Index.cshtml" />
     <Content Include="Views\PeerReview\Index.cshtml" />
     <Content Include="Views\Account\ErrorPage.cshtml" />
     <Content Include="Views\Account\ProfessionalRegister.cshtml" />
@@ -699,7 +721,7 @@
     <Content Include="Views\Account\AccountCreated.cshtml" />
     <Content Include="Views\Account\ActivateAccount.cshtml" />
     <Content Include="Views\School\Delete.cshtml" />
-    <Content Include="Areas\AssignmentWizard\Views\Home\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Home\SelectComponent.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Basics\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Wizard.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Rubric\Index.cshtml" />
@@ -714,6 +736,18 @@
     <Content Include="Views\Assignment\_StudentIndex.cshtml" />
     <Content Include="Views\Assignment\_TeacherAssignmentDetails.cshtml" />
     <Content Include="Views\Assignment\_TeacherIndex.cshtml" />
+    <Content Include="Views\Assignment\_TeacherTeamEvaluationView.cshtml" />
+    <Content Include="Views\Assignment\_StudentTeamEvaluationView.cshtml" />
+    <Content Include="Views\DiscussionAssignment\Index.cshtml" />
+    <Content Include="Views\DiscussionAssignment\_DiscussionFeed.cshtml" />
+    <Content Include="Views\StudioAssignment\SilverlightTest.cshtml" />
+    <Content Include="Views\BasicAssignment\Create.cshtml" />
+    <Content Include="Views\BasicAssignment\Delete.cshtml" />
+    <Content Include="Views\BasicAssignment\Details.cshtml" />
+    <Content Include="Views\BasicAssignment\Index.cshtml" />
+    <Content Include="Views\BasicAssignment\_RubricSelect.cshtml" />
+    <Content Include="Views\DiscussionAssignment\_SubDiscussionReply.cshtml" />
+    <Content Include="Views\DiscussionAssignment\TeacherIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

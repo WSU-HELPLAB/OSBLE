@@ -97,13 +97,18 @@ namespace OSBLE.Controllers
             }
             else if(ActiveCourse.AbstractRole.CanSubmit)
             {
+                /*MG: gathering a list of assignments for that course that are non-draft. Then creating a dictionary<assignmentID, submissionTime> 
+                 * to be used in the view. This is only done for the students view. 
+                 */
+                List<Assignment> assignmentList = (from assignment in db.Assignments
+                                                   where !assignment.IsDraft &&
+                                                   assignment.IsWizardAssignment &&
+                                                   assignment.Category.CourseID == activeCourse.AbstractCourseID
+                                                   select assignment).ToList();
 
-                /*Dictionary is in <AssignmentID, Tuple> format. Where the tuple contains:
-                Item 1: Submission time as a stirng, or "No Submission" if there is not a submission
-                Item 2: Grade of the assignment in string format
-                Item 3: Course user ID of a team member, used for action calls in view. */
-                Dictionary<int, Tuple<string, string, int>> submissionInfo = new Dictionary<int, Tuple<string, string, int>>();
-                foreach (Assignment a in Assignments)
+                //This will hold the assignment ID, the date submitted in string format, the grade in string format, and the team ID
+                Dictionary<int, Tuple<string, string, AssignmentTeam>> submissionInfo = new Dictionary<int, Tuple<string, string, AssignmentTeam>>();
+                foreach (Assignment a in assignmentList)
                 {
                     //populating tuple to add to dictionary by collecting the information described in the above commentblock.
                     AssignmentTeam at = OSBLEController.GetAssignmentTeam(a, currentUser);
@@ -123,9 +128,18 @@ namespace OSBLE.Controllers
                     {
                         scoreString = (score as Score).getGradeAsPercent(a.PointsPossible);
                     }
-                    submissionInfo.Add(a.ID, new Tuple<string, string, int>(submissionTime, scoreString, at.Team.TeamMembers.FirstOrDefault().CourseUserID));
+                    submissionInfo.Add(a.ID, new Tuple<string, string, AssignmentTeam>(submissionTime, scoreString, at));
+
                 }
-                ViewBag.SubmissionInfoDictionary = submissionInfo; 
+
+                //Gathering the Team Evaluations for the current users teams.
+                List<TeamEvaluation> teamEvaluations = (from t in db.TeamMemberEvaluations
+                                                        where t.EvaluatorID == activeCourse.ID
+                                                        select t.TeamEvaluation).ToList();
+
+                ViewBag.TeamEvaluations = teamEvaluations;
+
+                ViewBag.SubmissionInfoDictionary = submissionInfo;
             }
 
             ViewBag.PastCount = (from a in Assignments
@@ -511,6 +525,160 @@ namespace OSBLE.Controllers
             {
                 //If we got here there was a mistake, don't do anything
             }
+        }
+
+        /// <summary>
+        /// This will take a Team and display the team evaluations to the teacher.
+        /// </summary>
+        /// <param name="teamId"></param>
+        [CanModifyCourse]
+        public ActionResult TeacherTeamEvaluation(int teamId, int assignmentId)
+        {
+            ViewBag.Team = db.Teams.Find(teamId);
+            ViewBag.Time = DateTime.Now;
+            List<TeamEvaluation> teamEvaluations = (from t in db.TeamEvaluations
+                                                    where t.TeamID == teamId &&
+                                                    t.AssignmentID == assignmentId
+                                                    select t).ToList();
+            List<TeamMemberEvaluation> teamMemberEvaluations = (from t in db.TeamMemberEvaluations
+                                                                where t.TeamEvaluation.TeamID == teamId &&
+                                                                t.TeamEvaluation.AssignmentID == assignmentId
+                                                                select t).ToList();
+            if (teamEvaluations.Count > 0)
+            {
+                ViewBag.TeamEvaluations = teamEvaluations;
+                ViewBag.TeamMemberEvaluations = teamMemberEvaluations;
+                return View("_TeacherTeamEvaluationView");
+            }
+            else
+            {
+                return View("_TeacherAssignmentDetails");
+            }            
+        }
+
+        /// <summary>
+        /// This will take a Team and display the team evaluations to the teacher.
+        /// </summary>
+        /// <param name="teamId"></param
+        [CanSubmitAssignments]
+        public ActionResult StudentTeamEvaluation(int assignmentId)
+        {
+            Assignment a = db.Assignments.Find(assignmentId);
+            AssignmentTeam at = GetAssignmentTeam(a, currentUser);
+            if (at != null)
+            {
+                ViewBag.AssignmentTeam = at;
+                ViewBag.TeamMemberEvaluations = (from tme in db.TeamMemberEvaluations
+                                                 where tme.EvaluatorID == activeCourse.ID &&
+                                                 tme.TeamEvaluation.AssignmentID == a.ID
+                                                 select tme).ToList();
+
+                return View("_StudentTeamEvaluationView");
+            }
+            else
+            {
+                return View("Index");
+            }
+        }
+
+        
+        [HttpPost]
+        public ActionResult SubmitTeamEvaluation(int assignmentId)
+        {
+            Assignment assignment = db.Assignments.Find(assignmentId);
+
+            //Get the assignment team for the current user
+            AssignmentTeam at = GetAssignmentTeam(assignment, currentUser);
+            int tmPoints;
+
+            List<TeamMemberEvaluation> teamMemberEvaluation = (from t in db.TeamMemberEvaluations
+                                                               where t.Evaluator.UserProfileID == currentUser.ID &&
+                                                               t.TeamEvaluation.AssignmentID == assignment.ID
+                                                               select t).ToList();
+
+            string comments = Request.Params["inBrowserText"];
+            if (teamMemberEvaluation.Count() > 0)
+            {
+                teamMemberEvaluation.FirstOrDefault().TeamEvaluation.Comments = comments;
+                foreach (TeamMember tm in at.Team.TeamMembers)
+                {
+                    foreach (TeamMemberEvaluation tme in teamMemberEvaluation)
+                    {
+                        if (tme.RecipientID == tm.CourseUserID)
+                        {
+                            string param = "points-" + tm.CourseUserID;
+                            tmPoints = Convert.ToInt32(Request.Params[param]);
+
+                            tme.Points = tmPoints;
+
+                        }
+                    }
+                }
+                db.SaveChanges();
+            }
+            else
+            {
+                //Create a new team evaluation
+                TeamEvaluation te = new TeamEvaluation()
+                {
+                    AssignmentID = assignment.ID,
+                    TeamID = at.TeamID,
+                    Comments = comments
+                };
+                db.TeamEvaluations.Add(te);
+                db.SaveChanges();
+
+                //Loop through the different team members on the team
+                foreach (TeamMember tm in at.Team.TeamMembers)
+                {
+                    //Get the points from the view assigned to the specific recipient
+                    string param = "points-" + tm.CourseUserID;
+                    tmPoints = Convert.ToInt32(Request.Params[param]);
+
+                    //Get the Team Member of the current user
+                    TeamMember currentTm = GetTeamUser(assignment, currentUser);
+
+                    //Create a team member evaluation
+                    TeamMemberEvaluation tme = new TeamMemberEvaluation()
+                    {
+                        Points = tmPoints,
+                        RecipientID = tm.CourseUserID,
+                        EvaluatorID = currentTm.CourseUserID,
+                        TeamEvaluationID = te.ID
+                    };
+                    db.TeamMemberEvaluations.Add(tme);
+                }
+                db.SaveChanges();
+            }
+            return RedirectToAction("Index");
+        }
+
+        [CanModifyCourse]
+        public void SubmitMultiplier(int assignmentId)
+        {
+            int currentCourseId = ActiveCourse.AbstractCourseID;
+            Assignment assignment = db.Assignments.Find(assignmentId);
+
+            List<CourseUser> studentList = (from cu in db.CourseUsers
+                                            where cu.AbstractCourseID == currentCourseId && 
+                                            cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student
+                                            orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
+                                            select cu).ToList();
+                                            
+            List<TeamMemberEvaluation> teamEvaluations = (from te in db.TeamMemberEvaluations
+                                                          where te.TeamEvaluation.AssignmentID == assignmentId
+                                                          select te).ToList();
+
+            foreach (CourseUser user in studentList)
+            {
+                double multiplier = (from m in teamEvaluations
+                                     where m.RecipientID == user.ID
+                                     select m.Points).Sum();
+
+                assignment.PreceedingAssignment.Scores.Where(s => s.CourseUserID == user.ID).FirstOrDefault().Multiplier = multiplier;
+                db.SaveChanges();
+            }
+
         }
     }
 }
