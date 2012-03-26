@@ -146,14 +146,51 @@ namespace OSBLE.Models
 #if !DEBUG
             modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
 #endif
-            modelBuilder.Entity<Notification>()
-                .HasRequired(n => n.Sender)
+            //try to keep modelbuilder stuff in alphabetical order
+
+            modelBuilder.Entity<AssignmentReviewTeam>()
+                .HasRequired(rt => rt.AuthorTeam)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<AssignmentReviewTeam>()
+                .HasRequired(rt => rt.ReviewTeam)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Deliverable>()
+                .HasRequired(d => d.Assignment)
+                .WithMany(a => a.Deliverables)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<DiscussionPost>()
+                .HasRequired(cu => cu.CourseUser)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<DiscussionSetting>()
+                .HasRequired(ds => ds.Assignment)
+                .WithOptional(a => a.DiscussionSettings)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<DiscussionReply>()
+                .HasRequired(cu => cu.CourseUser)
                 .WithMany()
                 .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Mail>()
                 .HasRequired(n => n.ToUserProfile)
                 .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Notification>()
+                .HasRequired(n => n.Sender)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Score>()
+                .HasRequired(s => s.Assignment)
+                .WithMany(a => a.Scores)
                 .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Rubric>()
@@ -165,16 +202,6 @@ namespace OSBLE.Models
                 .HasRequired(re => re.Recipient)
                 .WithMany()
                 .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<Score>()
-                .HasRequired(s => s.Assignment)
-                .WithMany(a => a.Scores)
-                .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<DiscussionSetting>()
-                .HasRequired(ds => ds.Assignment)
-                .WithOptional(a => a.DiscussionSettings)
-                .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<TeamMemberEvaluation>()
                 .HasRequired(tm => tm.Evaluator)
@@ -189,26 +216,6 @@ namespace OSBLE.Models
             modelBuilder.Entity<TeamMemberEvaluation>()
                 .HasRequired(tm => tm.TeamEvaluation)
                 .WithMany(e => e.TeamMemberEvaluations)
-                .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<AssignmentReviewTeam>()
-                .HasRequired(rt => rt.AuthorTeam)
-                .WithMany()
-                .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<AssignmentReviewTeam>()
-                .HasRequired(rt => rt.ReviewTeam)
-                .WithMany()
-                .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<DiscussionPost>()
-                .HasRequired(cu => cu.CourseUser)
-                .WithMany()
-                .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<DiscussionReply>()
-                .HasRequired(cu => cu.CourseUser)
-                .WithMany()
                 .WillCascadeOnDelete(false);
         }
 

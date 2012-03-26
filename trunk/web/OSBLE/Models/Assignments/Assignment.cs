@@ -254,7 +254,7 @@ namespace OSBLE.Models.Assignments
         [ForeignKey("PrecededingAssignmentID")]
         public virtual Assignment PreceedingAssignment { get; set; }
 
-        [Association("Assignment_Deliverables", "ID", "AssignmentID")]
+        [Association("Deliverable_Assignment", "ID", "AssignmentID")]
         public virtual IList<Deliverable> Deliverables { get; set; }
 
         [Association("AssignmentTeam_Assignments", "ID", "AssignmentID")]

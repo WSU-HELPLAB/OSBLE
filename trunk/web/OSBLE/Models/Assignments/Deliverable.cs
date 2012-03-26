@@ -68,6 +68,7 @@ namespace OSBLE.Models.Assignments
         public int AssignmentID { get; set; }
         public Assignment Assignment { get; set; }
 
+        [Key]
         [Required(ErrorMessage = "The deliverable must have a name")]
         [Column(Order = 1)]
         [Display(Name = "File Name")]
