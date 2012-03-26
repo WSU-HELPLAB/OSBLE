@@ -196,6 +196,9 @@
     <Compile Include="Controllers\StudioAssignmentController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="EntityFramework\DbContextExtensions.cs" />
+    <Compile Include="Models\Assignments\Assignment.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Models\Assignments\AssignmentTypes.cs" />
     <Compile Include="Models\AbstractCourses\CourseRubric.cs" />
     <Compile Include="Models\Assignments\CommentCategory.cs" />
@@ -214,7 +217,6 @@
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Rubric.cs" />
     <Compile Include="Models\AbstractCourses\AbstractCourse.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\RubricEvaluation.cs" />
-    <Compile Include="Models\Assignments\Assignment.cs" />
     <Compile Include="Models\Assignments\AssignmentTeam.cs" />
     <Compile Include="Models\Assignments\DiscussionSettings.cs" />
     <Compile Include="Models\Assignments\Team.cs" />
@@ -508,6 +510,7 @@
     <Content Include="SiteDown.html" />
     <Content Include="ViewPeerReviewTestPage.aspx" />
     <Content Include="ViewPeerReviewTestPage.html" />
+    <Content Include="Views\Assignment\_StudentIndex.cshtml" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -730,7 +733,6 @@
     <Content Include="Views\Home\Time.cshtml" />
     <Content Include="Views\Assignment\_ObserverAssignmentDetails.cshtml" />
     <Content Include="Views\Assignment\_ObserverIndex.cshtml" />
-    <Content Include="Views\Assignment\_StudentIndex.cshtml" />
     <Content Include="Views\Assignment\_TeacherAssignmentDetails.cshtml" />
     <Content Include="Views\Assignment\_TeacherIndex.cshtml" />
     <Content Include="Views\Assignment\_TeacherTeamEvaluationView.cshtml" />
