@@ -697,6 +697,7 @@
     <Content Include="Views\Account\Privacy.cshtml" />
     <Content Include="Views\PeerReview\Create.cshtml" />
     <Content Include="Views\AuthorRebuttal\Create.cshtml" />
+    <Content Include="Views\AsyncIssueVoting\Create.cshtml" />
     <Content Include="Views\Assignment\_AssignmentList.cshtml" />
     <Content Include="Views\Shared\_AddToGradebook.cshtml" />
     <Content Include="Views\PeerReview\Index.cshtml" />
@@ -705,10 +706,6 @@
     <Content Include="Views\Submission\Create.cshtml" />
     <Content Include="Views\Submission\SubmittedSuccessfully.cshtml" />
     <Content Include="Views\Gradebook\ImportColumnsFromCSV.cshtml" />
-    <Content Include="Views\Assignment\_AssignmentContentStudent.cshtml" />
-    <Content Include="Views\Assignment\_AssignmentContentTeacher.cshtml" />
-    <Content Include="Views\Assignment\_ActivityTeacherView.cshtml" />
-    <Content Include="Views\Assignment\ActivityTeacherTable.cshtml" />
     <Content Include="Views\Rubric\Index.cshtml" />
     <Content Include="Views\Submission\_Submit.cshtml" />
     <Content Include="Views\Rubric\_Display.cshtml" />
