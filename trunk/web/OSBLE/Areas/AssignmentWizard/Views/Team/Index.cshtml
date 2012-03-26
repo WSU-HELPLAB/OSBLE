@@ -103,7 +103,7 @@ else
         <div id="teamDiv_@(counter)_@(aTeam.TeamID)" class="TeamDiv">
             <input type="text" class="TeamNameTextBox" value="@aTeam.Team.Name" />
             <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" alt="remove team" title="remove team" onclick="removeTeam('teamDiv_@(counter)_@(aTeam.TeamID)')" />
-            <ul id="team_(@counter)_@(@aTeam.TeamID)" class="TeamSortable">
+            <ul id="team_@(counter)_@(@aTeam.TeamID)" class="TeamSortable">
                 @foreach (TeamMember member in aTeam.Team.TeamMembers)
                 {
                     <li id="cu_@(member.CourseUserID)" class="ui-state-default Student">@member.CourseUser.UserProfile.LastName, @member.CourseUser.UserProfile.FirstName</li>

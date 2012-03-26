@@ -19,7 +19,7 @@
 </tr>
 <tr>
     <th>@Html.LabelFor(m => m.AssignmentDescription):</th>
-    <td>@Html.EditorFor(m => m.AssignmentDescription)</td>
+    <td>@Html.TextAreaFor(m => m.AssignmentDescription, new {cols = 50, rows =  4})</td>
     <td>@Html.ValidationMessageFor(m => m.AssignmentDescription)</td>
 </tr>
 <tr>

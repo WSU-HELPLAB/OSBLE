@@ -25,18 +25,18 @@
 <h3>Auto Generation Options</h3>
 <ul>
     <li>
-    Each review team must review <input type="text" /> items <button type="button" id="AutoAssignReviewTeamsButton" onclick="">Go</button>
+    Each review team must review <input id="ReviewItemsText" type="text" /> items <button type="button" id="AutoAssignReviewTeamsButton" onclick="buildTeams();">Go</button>
     </li>
 </ul>
 </div>
-    
+<div id="ErrorBox">This is the error box</div>
 <div id="AvailableStudentList">
     <h3>
         Students / Teams</h3>
     <ul id="AvailableStudent">
         @foreach (Team team in teams)
         {
-            <li id="reviewTeam_@(team.ID)" class="ui-state-default StudentListItem">
+            <li data-id="reviewTeam_@(team.ID)" class="ui-state-default StudentListItem">
             @team.Name
             <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @team.Name" title="remove @team.Name" onclick="removeFromTeam(this)" />
             </li>
@@ -53,7 +53,7 @@
         counter++;
         <div id="teamDiv_@(counter)_@(aTeam.TeamID)" class="TeamDiv">
             @aTeam.Team.Name
-            <ul id="team_(@counter)_@(@aTeam.TeamID)" class="TeamSortable">
+            <ul id="team_@(counter)_@(@aTeam.TeamID)" class="TeamSortable">
                 @foreach (AssignmentReviewTeam reviewTeam in Model.ReviewTeams.Where(rt => rt.AuthorTeamID == aTeam.TeamID))
                 {
                     <li>@reviewTeam.ReviewTeam.Name</li>
