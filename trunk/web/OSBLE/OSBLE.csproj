@@ -698,12 +698,7 @@
     <Content Include="Views\Home\ViewThread.cshtml" />
     <Content Include="Views\Assignment\Index.cshtml" />
     <Content Include="Views\Account\Privacy.cshtml" />
-    <Content Include="Views\PeerReview\Create.cshtml" />
-    <Content Include="Views\AuthorRebuttal\Create.cshtml" />
-    <Content Include="Views\AsyncIssueVoting\Create.cshtml" />
-    <Content Include="Views\Assignment\_AssignmentList.cshtml" />
     <Content Include="Views\Shared\_AddToGradebook.cshtml" />
-    <Content Include="Views\PeerReview\Index.cshtml" />
     <Content Include="Views\Account\ErrorPage.cshtml" />
     <Content Include="Views\Account\ProfessionalRegister.cshtml" />
     <Content Include="Views\Submission\Create.cshtml" />
@@ -739,12 +734,6 @@
     <Content Include="Views\Assignment\_StudentTeamEvaluationView.cshtml" />
     <Content Include="Views\DiscussionAssignment\Index.cshtml" />
     <Content Include="Views\DiscussionAssignment\_DiscussionFeed.cshtml" />
-    <Content Include="Views\StudioAssignment\SilverlightTest.cshtml" />
-    <Content Include="Views\BasicAssignment\Create.cshtml" />
-    <Content Include="Views\BasicAssignment\Delete.cshtml" />
-    <Content Include="Views\BasicAssignment\Details.cshtml" />
-    <Content Include="Views\BasicAssignment\Index.cshtml" />
-    <Content Include="Views\BasicAssignment\_RubricSelect.cshtml" />
     <Content Include="Views\DiscussionAssignment\_SubDiscussionReply.cshtml" />
     <Content Include="Views\DiscussionAssignment\TeacherIndex.cshtml" />
   </ItemGroup>
