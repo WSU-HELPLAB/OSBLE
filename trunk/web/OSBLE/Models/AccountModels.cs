@@ -77,7 +77,7 @@ namespace OSBLE.Models
 
         [Required]
         [StringLength(50)]
-        [Display(Name = "School ID number")]
+        [Display(Name = "Student, Faculty, or Staff ID Number")]
         public string Identification { get; set; }
 
         [Required]
