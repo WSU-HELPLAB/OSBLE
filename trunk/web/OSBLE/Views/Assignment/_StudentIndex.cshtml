@@ -10,37 +10,40 @@
     <th style="font-size:larger">Grade</th>
     <th style="font-size:larger">Latest Submission</th>
     @{
-    //MG & KD: Assignments are in order based on:: past & present -> future -> draft. The flags below are used to avoid duplicate headers for each category
-    bool  futureFlag = false, presentFlag = false, pastFlag = false;
-    foreach (Assignment assignment in ViewBag.Assignments)
-    {
-        if (assignment.DueDate < ViewBag.CurrentDate && !pastFlag)
+        List<TeamEvaluation> teamEvals = (from te in ViewBag.TeamEvaluations as IEnumerable<TeamEvaluation>
+                                          select te).ToList();
+        
+        //MG & KD: Assignments are in order based on:: past & present -> future -> draft. The flags below are used to avoid duplicate headers for each category
+        bool futureFlag = false, presentFlag = false, pastFlag = false;
+        foreach (Assignment assignment in ViewBag.Assignments)
         {
-            //PAST
-            pastFlag = true;
-            <tr><td colspan="100%" style="padding-right:0;font-size:large" class="osbleColorBold">Past (@ViewBag.PastCount)</td></tr>
-        }
-        else if (assignment.ReleaseDate > ViewBag.CurrentDate && !futureFlag)
-        {
-            //FUTURE
-            futureFlag = true;
-            if (pastFlag || presentFlag)
+            if (assignment.DueDate < ViewBag.CurrentDate && !pastFlag)
             {
-                <tr><td style="padding-bottom:10px"></td></tr>
+                //PAST
+                pastFlag = true;
+            <tr><td colspan="100%" style="padding-right:0;font-size:large" class="osbleColorBold">Past (@ViewBag.PastCount)</td></tr>
             }
+            else if (assignment.ReleaseDate > ViewBag.CurrentDate && !futureFlag)
+            {
+                //FUTURE
+                futureFlag = true;
+                if (pastFlag || presentFlag)
+                {
+                <tr><td style="padding-bottom:10px"></td></tr>
+                }
             <tr><td colspan="100%" style="padding-right:0;font-size:large" class="osbleColorBold">Future (@ViewBag.FutureCount)</td></tr>
                 
-        }
-        else if (assignment.DueDate >= ViewBag.CurrentDate && !presentFlag)
-        {
-            //PRESENT
-            presentFlag = true;
-            if (pastFlag)
-            {
-                <tr><td style="padding-bottom:10px"></td></tr>
             }
+            else if (assignment.DueDate >= ViewBag.CurrentDate && !presentFlag)
+            {
+                //PRESENT
+                presentFlag = true;
+                if (pastFlag)
+                {
+                <tr><td style="padding-bottom:10px"></td></tr>
+                }
             <tr><td colspan="100%" style="padding-right:0;font-size:large" class="osbleColorBold">Present (@ViewBag.PresentCount)</td></tr>
-        }
+            }
             
         <tr class="checkeredRow">
             <td> <!--Cell for name-->
@@ -57,14 +60,14 @@
             <td>@assignment.ReleaseDate.ToShortDateString() @assignment.ReleaseTime.ToShortTimeString()</td>
             <td>@assignment.DueDate.ToShortDateString() @assignment.DueDate.ToShortTimeString()</td>
             <td><!--Td for grade-->
-                @if(futureFlag)
+                @if (futureFlag)
                 {
                     /*show nothing if future assignment*/
                 }
                 else if (assignment.HasRubric && ViewBag.SubmissionInfoDictionary[assignment.ID].Item2 != "No Grade")
-                { 
+                {
                     string gradeToDisplay = ViewBag.SubmissionInfoDictionary[assignment.ID].Item2;
-                    @Html.ActionLink(gradeToDisplay, "View", "Rubric", new { assignmentId = assignment.ID, cuId = ViewBag.SubmissionInfoDictionary[assignment.ID].Item3 }, new { });   
+                    @Html.ActionLink(gradeToDisplay, "View", "Rubric", new { assignmentId = assignment.ID, cuId = ViewBag.SubmissionInfoDictionary[assignment.ID].Item3 }, new { });
                 }
                 else
                 {
@@ -91,27 +94,58 @@
                     @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = assignment.ID }, options, new object())
                 </td>
             }
-            else if (assignment.HasDeliverables)
+            else if (assignment.HasDeliverables || assignment.AssignmentTypeID == 4)
             {
-                
-                AjaxOptions options = new AjaxOptions()
+                if (assignment.AssignmentTypeID == 4)
                 {
-                    LoadingElementId = "Loading",
-                    HttpMethod = "Get",
-                    UpdateTargetId = "submitFiles",
-                    OnComplete = "SubmissionLoaded"
-                }; 
-                <!--TD for first submission-->
-                <td>
-                    @Ajax.ActionLink("Submit", "Create", "Submission", new { id = assignment.ID }, options, new object())
-                </td>
+                    bool found = false;
+                    foreach (TeamEvaluation te in teamEvals)
+                    {
+                        if (te.AssignmentID == assignment.ID)
+                        {
+                            found = true;
+                                    <td>
+                                        @Html.ActionLink("View/Edit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignment.ID }, new { })
+                                    </td>
+                            break;
+                        }
+
+                    }
+                    if (found == false)
+                    {
+                                <td>
+                                    @Html.ActionLink("Submit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignment.ID }, new { })
+                                </td>
+                    }
+                }
+                else
+                {
+                    AjaxOptions options = new AjaxOptions()
+                    {
+                        LoadingElementId = "Loading",
+                        HttpMethod = "Get",
+                        UpdateTargetId = "submitFiles",
+                        OnComplete = "SubmissionLoaded"
+                    }; 
+                        <!--TD for first submission-->
+                        <td>
+                            None.
+                            @Ajax.ActionLink("Submit Here", "Create", "Submission", new { id = assignment.ID }, options, new object())
+                        </td>
+                }
+            }
+            else if (assignment.AssignmentTypeID == 3)
+            {
+                        <td>
+                            @Html.ActionLink("Participate in Discussion", "Index", "DiscussionAssignment", new { assignmentId = assignment.ID }, new { })
+                        </td>
             }
             else
             {
                 <td>No Deliverables</td>
             }
         </tr>
-    }
+        }
 }
         
 </table>

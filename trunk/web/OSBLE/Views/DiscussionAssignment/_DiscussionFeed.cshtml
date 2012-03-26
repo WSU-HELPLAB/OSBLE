@@ -62,7 +62,7 @@ else
                 @dp.Content
                 <div class="dp_replies">
                     <div id="dp_replies_for_@(dp.ID)">
-                        @foreach (DiscussionReply dr in dp.Replies)
+                        @foreach (DiscussionPost dr in dp.Replies)
                         {
                             @Html.Partial("_DiscussionFeed", dr);
                         }
@@ -134,7 +134,7 @@ else
                 @dp.Content
                 <div class="dp_replies">
                     <div id="dp_replies_for_@(dp.ID)">
-                        @foreach (DiscussionReply dr in dp.Replies)
+                        @foreach (DiscussionPost dr in dp.Replies)
                         {
                             if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                             {

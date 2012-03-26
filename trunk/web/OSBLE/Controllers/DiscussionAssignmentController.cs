@@ -21,14 +21,31 @@ namespace OSBLE.Controllers
         {
             List<DiscussionPost> teamPosts = new List<DiscussionPost>();
             DiscussionTeam discussionTeam = new DiscussionTeam();
+            List<DiscussionPost> posts = new List<DiscussionPost>();
             Assignment assignment = db.Assignments.Find(assignmentId);
             ViewBag.Assignment = assignment;
             ViewBag.Posts = null;
             ViewBag.FirstPost = false;
-            List<DiscussionPost> posts = (from post in db.DiscussionPosts
-                                          where post.AssignmentID == assignment.ID
-                                          orderby post.Posted
-                                          select post).ToList();
+            AssignmentTeam at = GetAssignmentTeam(assignment, activeCourse.UserProfile);
+
+            if (assignment.HasTeams)
+            {
+                posts = (from post in db.DiscussionPosts
+                         where post.AssignmentID == assignment.ID &&
+                         post.TeamID == at.TeamID &&
+                         post.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor &&
+                         post.IsReply == false
+                         orderby post.Posted
+                         select post).ToList();
+            }
+            else
+            {
+                posts = (from post in db.DiscussionPosts
+                         where post.AssignmentID == assignment.ID &&
+                         post.IsReply == false
+                         orderby post.Posted
+                         select post).ToList();
+            }
 
             foreach (DiscussionPost post in posts)
             {
@@ -37,7 +54,7 @@ namespace OSBLE.Controllers
                     ViewBag.FirstPost = true;
                 }
             }
-                
+
             if (assignment.HasDiscussionTeams)
             {
                 foreach (DiscussionTeam dt in assignment.DiscussionTeams)
@@ -54,9 +71,9 @@ namespace OSBLE.Controllers
                 foreach (TeamMember tm in discussionTeam.Team.TeamMembers)
                 {
                     posts = (from post in db.DiscussionPosts
-                                where post.AssignmentID == assignment.ID &&
-                                post.CourseUserID == tm.CourseUserID
-                                select post).ToList();
+                             where post.AssignmentID == assignment.ID &&
+                             post.TeamID == tm.TeamID
+                             select post).ToList();
                     foreach (DiscussionPost post in posts)
                     {
                         teamPosts.Add(post);
@@ -83,7 +100,7 @@ namespace OSBLE.Controllers
             DiscussionTeam discussionTeam = new DiscussionTeam();
 
             Session["StudentID"] = student.ID;
-            
+
             if (assignment != null && student != null)
             {
                 if (assignment.HasDiscussionTeams)
@@ -103,7 +120,8 @@ namespace OSBLE.Controllers
                     {
                         posts = (from post in db.DiscussionPosts
                                  where post.AssignmentID == assignment.ID &&
-                                 post.CourseUserID == tm.CourseUserID
+                                 post.CourseUserID == tm.CourseUserID &&
+                                 post.IsReply == false
                                  select post).ToList();
                         foreach (DiscussionPost post in posts)
                         {
@@ -116,7 +134,8 @@ namespace OSBLE.Controllers
                 else
                 {
                     posts = (from post in db.DiscussionPosts
-                             where post.AssignmentID == assignment.ID
+                             where post.AssignmentID == assignment.ID &&
+                             post.IsReply == false
                              orderby post.Posted
                              select post).ToList();
                     ViewBag.Posts = posts;
@@ -137,6 +156,7 @@ namespace OSBLE.Controllers
             {
                 if (assignment != null)
                 {
+                    AssignmentTeam at = GetAssignmentTeam(assignment, activeCourse.UserProfile);
                     if (assignment.DiscussionSettings.HasAnonymousPosts)
                     {
                         DiscussionPost post = new DiscussionPost()
@@ -144,9 +164,12 @@ namespace OSBLE.Controllers
                             Content = dp.Content,
                             CourseUser = activeCourse,
                             CourseUserID = activeCourse.ID,
+                            Team = at.Team,
+                            TeamID = at.TeamID,
                             Posted = DateTime.Now,
                             AssignmentID = assignment.ID,
-                            DisplayName = "Anonymous"
+                            DisplayName = "Anonymous",
+                            IsReply = false
                         };
                         db.DiscussionPosts.Add(post);
                         db.SaveChanges();
@@ -158,9 +181,12 @@ namespace OSBLE.Controllers
                             Content = dp.Content,
                             CourseUser = activeCourse,
                             CourseUserID = activeCourse.ID,
+                            Team = at.Team,
+                            TeamID = at.TeamID,
                             Posted = DateTime.Now,
                             AssignmentID = assignment.ID,
-                            DisplayName = activeCourse.UserProfile.FirstName + " " + activeCourse.UserProfile.LastName
+                            DisplayName = activeCourse.UserProfile.FirstName + " " + activeCourse.UserProfile.LastName,
+                            IsReply = false
                         };
                         db.DiscussionPosts.Add(post);
                         db.SaveChanges();
@@ -206,11 +232,13 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
-        public ActionResult NewReply(DiscussionReply dr)
+        public ActionResult NewReply(DiscussionPost dr)
         {
             dr.CourseUserID = activeCourse.ID;
             dr.CourseUser = activeCourse;
             dr.Posted = DateTime.Now;
+
+
 
             int replyTo = 0;
             if (Request.Form["reply_to"] != null)
@@ -229,15 +257,23 @@ namespace OSBLE.Controllers
             {
                 dr.AssignmentID = replyToPost.AssignmentID;
                 dr.DisplayName = activeCourse.UserProfile.FirstName + " " + activeCourse.UserProfile.LastName;
+                dr.IsReply = true;
                 replyToPost.Replies.Add(dr);
+
+                AssignmentTeam at = GetAssignmentTeam(replyToPost.Assignment, activeCourse.UserProfile);
+
+                dr.TeamID = at.TeamID;
+                dr.Team = at.Team;
+
                 db.SaveChanges();
 
                 ViewBag.dp = replyToPost;
-                List<DiscussionReply> replys = replyToPost.Replies.Where(r => r.ID > latestReply).ToList();
+                List<DiscussionPost> replys = replyToPost.Replies.Where(r => r.ID > latestReply).ToList();
 
                 ViewBag.DiscussionReplies = replys;
             }
             ViewBag.Assignment = dr.Assignment;
+            ;
             if (activeCourse.AbstractRole.CanSubmit)
             {
                 return RedirectToAction("Index", new { assignmentId = dr.AssignmentID });

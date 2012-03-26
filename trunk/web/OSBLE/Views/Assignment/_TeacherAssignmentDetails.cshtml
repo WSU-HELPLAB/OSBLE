@@ -7,7 +7,7 @@
 @{
     Assignment assignment = Model;
     ViewBag.Title = "Assignment Details";
-    
+
     int submittedCount = 0;
     int totalStudentCount = 0;
     int totalScores = 0;
@@ -33,7 +33,7 @@
             <td><text class="osbleColorBold">Submissions:</text></td>
             @if (submittedCount > 0)
             {
-                <td>@submittedCount of @totalStudentCount have been submitted&nbsp @Html.ActionLink("[Download All]", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()", style="text-decoration:none"})</td>    
+                <td>@submittedCount of @totalStudentCount have been submitted&nbsp @Html.ActionLink("[Download All]", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()", style = "text-decoration:none" })</td>    
             }
             else
             {
@@ -45,7 +45,7 @@
         <td style="vertical-align:top"><text class="osbleColorBold" >Grading progress:</text></td>
         <td>
             @totalScores of @assignment.AssignmentTeams.Count() have been published<br />
-            @if(r.Count() > 0)
+            @if (r.Count() > 0)
             {
                 @:@r.Count() have been saved as draft&nbsp<a style="cursor:pointer" onclick="publishAllGrades(@assignment.ID);">[Publish All]</a>
             }
@@ -73,7 +73,7 @@
         <th>Inline Comments</th>    
     }
     
-    @if (assignment.HasDeliverables)
+    @if (assignment.HasDeliverables || assignment.AssignmentTypeID == 3)
     {
         <th>Submission</th>
         @*<th>Submit for Student</th>*@
@@ -176,10 +176,17 @@
                 </td>
             }
             
-            @if (assignment.HasDeliverables)
+            @if (assignment.HasDeliverables || assignment.AssignmentTypeID == 3)
             {
                 <td><!--Cell for submission download - only allow if there is a time submitted-->
-                    @if (da.Item3 != "No Submission")
+                @if (assignment.AssignmentTypeID == 3)
+                {
+                    @(Html.ActionLink("View/Participate in Discussion", "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = da.Item2.TeamMembers.FirstOrDefault().CourseUserID }, new { }))
+                }
+                else
+                {
+
+                    if (da.Item3 != "No Submission")
                     {
                         @(Html.ActionLink(da.Item3, "GetSubmissionZip", "FileHandler", new { assignmentID = assignment.ID, teamID = da.Item2.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
                     }
@@ -187,6 +194,8 @@
                     {
                         @:Nothing Received
                     }
+
+                }
                 </td>
                 @*<td><!--Cell for submitting on behalf of students -->
                     @{

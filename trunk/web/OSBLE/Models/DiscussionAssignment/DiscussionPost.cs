@@ -12,7 +12,7 @@ namespace OSBLE.Models.DiscussionAssignment
     {
         [Key]
         public int ID { get; set; }
-         
+
         [Required]
         public DateTime Posted { get; set; }
 
@@ -21,23 +21,30 @@ namespace OSBLE.Models.DiscussionAssignment
         public virtual CourseUser CourseUser { get; set; }
 
         [Required]
+        public int TeamID { get; set; }
+        public virtual Team Team { get; set; }
+
+        [Required]
         public string Content { get; set; }
 
         [Required]
         public int AssignmentID { get; set; }
         public virtual Assignment Assignment { get; set; }
 
-        public virtual ICollection<DiscussionReply> Replies { get; set; }
+        public virtual ICollection<DiscussionPost> Replies { get; set; }
 
         public string DisplayName { get; set; }
 
         public bool ShowProfilePicture { get; set; }
+
+        public bool IsReply { get; set; }
 
         public DiscussionPost()
             : base()
         {
             Posted = DateTime.Now;
             ShowProfilePicture = false;
+            IsReply = false;
         }
     }
 }
