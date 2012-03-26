@@ -312,7 +312,7 @@ namespace OSBLE.Controllers
             {
                 bool isOwnAssignment = false;
 
-                if (activeCourse.AbstractRole.CanSubmit)
+                if (activeCourse.AbstractRole.CanSubmit && activeCourse.ID == cuId )
                 {
                     
                     Assignment assignment = db.Assignments.Find(assignmentId);

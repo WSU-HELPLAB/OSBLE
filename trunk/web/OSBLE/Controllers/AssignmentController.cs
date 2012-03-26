@@ -16,6 +16,7 @@ using System.Data.Entity.Validation;
 using System.Diagnostics;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses.Rubrics;
+using OSBLE.Models.DiscussionAssignment;
 
 namespace OSBLE.Controllers
 {
@@ -270,10 +271,12 @@ namespace OSBLE.Controllers
             Assignment assignment = db.Assignments.Find(id);
             List<Score> scores = assignment.Scores.ToList();
             List<CourseUser> cuList = null;
+            List<AssignmentDetailsViewModel> AssignmentDetailsList = new List<AssignmentDetailsViewModel>();
+
+
 
             if (activeCourse.AbstractRole.CanModify || activeCourse.AbstractRole.Anonymized) //Instructor setup || Observer
             {
-                List<Tuple<Score, Team, string>> scoreAndTeam = new List<Tuple<Score, Team, string>>();
                 List<AssignmentTeam> teams = assignment.AssignmentTeams.ToList();
 
                 if (activeCourse.AbstractRole.Anonymized)
@@ -292,23 +295,46 @@ namespace OSBLE.Controllers
                     teams.Sort((x, y) => string.Compare(x.Team.Name, y.Team.Name));
                 }
 
-                string submissionTime;
+                List<DiscussionPost> allUserPosts = (from a in db.DiscussionPosts
+                                                     where a.AssignmentID == assignment.ID
+                                                     select a).ToList();
+
+                List<DiscussionTeam> discussionTeamList = assignment.DiscussionTeams.ToList();
+                ViewBag.DiscussionTeamList = discussionTeamList;
+
+                var discussionTeamAndAssignmentTeamJoin = (from a in db.AssignmentTeams
+                                                           join b in db.DiscussionTeams
+                                                           on a.AssignmentID equals b.AssignmentID
+                                                           select new { a, b });
+
                 /*MG Going through each team in the assignment and for each team going through the scores until a match is found
                  * the match will then be used for display information. 
                  *Conflict: There can multiple scores with the same team ID as each individual gets a Score in the DB. So this will only pick up first score found
                  */
                 foreach (AssignmentTeam team in teams)
                 {
+                    int postCount = 0;
+                    int replyCount = 0;
+                    if (assignment.AssignmentTypeID == 3)
+                    {
+                        postCount = (from a in allUserPosts
+                                     where a.TeamID == team.TeamID &&
+                                     !a.IsReply
+                                     select a).Count();
+                        replyCount = (from a in allUserPosts
+                                      where a.TeamID == team.TeamID &&
+                                      a.IsReply
+                                     select a).Count();
+                    }
+
                     //Grabbing the submission time for the assignment
-                    DateTime? subTime = GetSubmissionTime(team.Assignment.Category.Course, team.Assignment, team);
-                    if (subTime != null)
+                    DateTime? subTime = new DateTime?();
+                    if (assignment.HasDeliverables)
                     {
-                        submissionTime = subTime.Value.ToString();
+                        subTime = GetSubmissionTime(team.Assignment.Category.Course, team.Assignment, team);
                     }
-                    else
-                    {
-                        submissionTime = "No Submission";
-                    }
+
+
 
                     //Checking for matched score, if there is none - add a null entry
                     bool foundMatch = false;
@@ -316,17 +342,18 @@ namespace OSBLE.Controllers
                     {
                         if (score.TeamID == team.TeamID)
                         {
-                            scoreAndTeam.Add(new Tuple<Score, Team, string>(score, team.Team, submissionTime));
+                            AssignmentDetailsList.Add(new AssignmentDetailsViewModel(score, subTime, team.Team, postCount, replyCount));
                             foundMatch = true;
                             break;
                         }
                     }
                     if (!foundMatch)
                     {
-                        scoreAndTeam.Add(new Tuple<Score, Team, string>(null, team.Team, submissionTime));
+                        AssignmentDetailsList.Add(new AssignmentDetailsViewModel(null, subTime, team.Team, postCount, replyCount));
                     }
+
                 }
-                ViewBag.ScoresAndTeams = scoreAndTeam;
+                ViewBag.AssignmentDetailsVMList = AssignmentDetailsList;
 
                 //Just giving the first or defaults teams ID, the instructor link to the rubric won't be specific.
                 ViewBag.TeamID = 0;
