@@ -281,7 +281,7 @@ namespace OSBLE.Controllers
 
                 if (activeCourse.AbstractRole.Anonymized)
                 {
-                    List<CourseUser> cus = db.CourseUsers.Where(c => c.AbstractCourseID == assignment.Category.Course.ID).ToList();
+                    List<CourseUser> cus = GetAnonymizedCourseUserList(activeCourse.AbstractCourseID);
                     ViewBag.ObserverCU = cus;
                 }
 

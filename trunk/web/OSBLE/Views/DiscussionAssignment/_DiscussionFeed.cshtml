@@ -52,11 +52,11 @@ else
         foreach (DiscussionPost dp in ViewBag.Posts)
         {
             @:<div id="dp_posts">
-            if (assignment.DiscussionSettings.HasAnonymousPosts)
+            if (assignment.DiscussionSettings.HasAnonymousPosts && !ViewBag.ActiveCourse.AbstractRole.CanModify)
             {
                 <div class="dp_post_header">
                     @Helpers.DefaultProfilePicture()
-                    Annonymous <br />
+                    @dp.DisplayName <br />
                     @dp.Posted <br /> <br />
                 </div>
                 @dp.Content
@@ -112,7 +112,7 @@ else
             {
                 if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
-                    if (ViewBag.Student.ID == dp.CourseUserID)
+                    if (ViewBag.Student.ID == dp.CourseUserID && ViewBag.PostOrReply != 1)
                     {
                         @:<div class="dp_post" id="dp_post_@(dp.ID)" style="background:#FFF8C6;">
                     }
@@ -128,7 +128,7 @@ else
             @*<div class="dp_post" id="dp_post_@(dp.ID)">*@
                 <div class="dp_post_header">
                     @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dp.CourseUser.AbstractCourseID, userprofile = dp.CourseUser.UserProfileID }))
-                    @dp.DisplayName <br />
+                    @dp.CourseUser.UserProfile.FirstName @dp.CourseUser.UserProfile.LastName <br />
                     @dp.Posted <br /> <br />
                 </div>
                 @dp.Content
@@ -138,7 +138,7 @@ else
                         {
                             if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                             {
-                                if (ViewBag.Student.ID == dr.CourseUserID)
+                                if (ViewBag.Student.ID == dr.CourseUserID && ViewBag.PostOrReply != 0)
                                 {
                                     @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:#FFF8C6;">
                                     <div class="dp_post_header">

@@ -548,5 +548,41 @@ namespace OSBLE.Controllers
             db.SaveChanges();
         }
 
+        /// <summary>
+        /// Given a courseId, returns a list of random ordered courseusers.
+        /// </summary>
+        /// <param name="courseId"></param>
+        /// <returns></returns>
+        public List<CourseUser> GetAnonymizedCourseUserList(int courseId)
+        {
+            List<Tuple<CourseUser, string>> Users = new List<Tuple<CourseUser, string>>();
+            List<Tuple<CourseUser, string>> Anonymized = new List<Tuple<CourseUser, string>>();
+            List<CourseUser> UserList = new List<CourseUser>();
+            List<CourseUser> returnList = new List<CourseUser>();
+
+            if (courseId > 0)
+            {
+                UserList = (from user in db.CourseUsers
+                         where user.AbstractCourseID == courseId &&
+                         user.AbstractRole.CanSubmit
+                         orderby user.ID
+                         select user).ToList();
+
+                foreach (CourseUser u in UserList)
+                {
+                    char[] rev = u.ID.ToString().ToCharArray();
+                    Array.Reverse(rev);
+                    Tuple<CourseUser, string> user = new Tuple<CourseUser, string>(u, new string(rev));
+                    Users.Add(user);
+                }
+
+                Anonymized = Users.OrderBy(u => u.Item2.ToString()).ToList();
+                foreach (Tuple<CourseUser, string> x in Anonymized)
+                {
+                    returnList.Add(x.Item1);
+                }
+            }
+            return returnList;
+        }
     }
 }

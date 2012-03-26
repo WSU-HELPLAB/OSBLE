@@ -82,13 +82,21 @@
     {
         foreach(DiscussionTeam dt in ViewBag.DiscussionTeamList)
         {
-            <tr colspan="6"><td>@dt.Team.Name</td></tr>//put team name row here
-            foreach(TeamMember tm in dt.Team.TeamMembers)
+        <tbody id="awesome">
+            <tr>
+                <td colspan="2">@dt.Team.Name</td>
+                <td id="posts-@dt.TeamID"></td>
+                <td id="replies-@dt.TeamID"></td>
+                <td id="all-@dt.TeamID" colspan="2"></td>
+            </tr>
+            
+            @foreach(TeamMember tm in dt.Team.TeamMembers)
             {
                 foreach(AssignmentDetailsViewModel advm in ViewBag.AssignmentDetailsVMList)
                 {
                     if(tm.CourseUserID ==  advm.team.TeamMembers.FirstOrDefault().CourseUserID)
                     {
+                        
                         <tr>
                         <td>&nbsp&nbsp&nbsp @tm.CourseUser.UserProfile.LastAndFirst()</td>
                         <td> <!--td for grade-->
@@ -136,13 +144,13 @@
                             }
                         </td>
                         <td><!--postcount-->
-                            @advm.postCount
+                            @(Html.ActionLink((advm.postCount.ToString()), "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 0 }, new { }))
                         </td>  
                         <td><!--replycount-->
-                            @advm.replyCount
+                            @(Html.ActionLink((advm.replyCount.ToString()), "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 1 }, new { }))
                         </td> 
                         <td><!--post&reply count-->
-                            @(Html.ActionLink((advm.replyCount + advm.postCount).ToString(), "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID }, new { }))
+                            @(Html.ActionLink((advm.replyCount + advm.postCount).ToString(), "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 2 }, new { }))
                         </td>   
                         <td style="vertical-align:bottom;" class="latePenaltyTd"> <!--Cell for late penalty-->
                             @if (advm.score == null)
@@ -158,6 +166,7 @@
                     } 
                 }
             }
+        </tbody>
         }
     }
     else
