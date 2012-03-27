@@ -562,14 +562,16 @@ namespace OSBLE.Controllers
         public ActionResult TeacherTeamEvaluation(int teamId, int assignmentId)
         {
             ViewBag.Team = db.Teams.Find(teamId);
+            Team team = db.Teams.Find(teamId);
             ViewBag.Time = DateTime.Now;
+            Assignment a = db.Assignments.Find(assignmentId);
             List<TeamEvaluation> teamEvaluations = (from t in db.TeamEvaluations
                                                     where t.TeamID == teamId &&
-                                                    t.AssignmentID == assignmentId
+                                                    t.AssignmentID == a.ID
                                                     select t).ToList();
             List<TeamMemberEvaluation> teamMemberEvaluations = (from t in db.TeamMemberEvaluations
                                                                 where t.TeamEvaluation.TeamID == teamId &&
-                                                                t.TeamEvaluation.AssignmentID == assignmentId
+                                                                t.TeamEvaluation.AssignmentID == a.ID
                                                                 select t).ToList();
             if (teamEvaluations.Count > 0)
             {
@@ -591,10 +593,12 @@ namespace OSBLE.Controllers
         public ActionResult StudentTeamEvaluation(int assignmentId)
         {
             Assignment a = db.Assignments.Find(assignmentId);
+            AssignmentTeam pAt = GetAssignmentTeam(a.PreceedingAssignment, currentUser);
             AssignmentTeam at = GetAssignmentTeam(a, currentUser);
             if (at != null)
             {
                 ViewBag.AssignmentTeam = at;
+                ViewBag.PreviousAssignmentTeam = pAt;
                 ViewBag.TeamMemberEvaluations = (from tme in db.TeamMemberEvaluations
                                                  where tme.EvaluatorID == activeCourse.ID &&
                                                  tme.TeamEvaluation.AssignmentID == a.ID
@@ -616,6 +620,7 @@ namespace OSBLE.Controllers
 
             //Get the assignment team for the current user
             AssignmentTeam at = GetAssignmentTeam(assignment, currentUser);
+            AssignmentTeam pAt = GetAssignmentTeam(assignment.PreceedingAssignment, currentUser);
             int tmPoints;
 
             List<TeamMemberEvaluation> teamMemberEvaluation = (from t in db.TeamMemberEvaluations
@@ -627,7 +632,7 @@ namespace OSBLE.Controllers
             if (teamMemberEvaluation.Count() > 0)
             {
                 teamMemberEvaluation.FirstOrDefault().TeamEvaluation.Comments = comments;
-                foreach (TeamMember tm in at.Team.TeamMembers)
+                foreach (TeamMember tm in pAt.Team.TeamMembers)
                 {
                     foreach (TeamMemberEvaluation tme in teamMemberEvaluation)
                     {
@@ -656,7 +661,7 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
 
                 //Loop through the different team members on the team
-                foreach (TeamMember tm in at.Team.TeamMembers)
+                foreach (TeamMember tm in pAt.Team.TeamMembers)
                 {
                     //Get the points from the view assigned to the specific recipient
                     string param = "points-" + tm.CourseUserID;
