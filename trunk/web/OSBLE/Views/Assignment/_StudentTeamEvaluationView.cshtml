@@ -10,6 +10,7 @@
                                                       select tme).ToList();
                                                       
         AssignmentTeam at = ViewBag.AssignmentTeam;
+        AssignmentTeam pAt = ViewBag.PreviousAssignmentTeam;
                                                       
         if (teamMemberEvals.Count() > 0)
         {
@@ -49,7 +50,7 @@
         else
         {
             //Assignment assign = ViewBag.AssignmentTeam.Assignment;
-            int pointsRemaining = ViewBag.AssignmentTeam.Team.TeamMembers.Count * 100;
+            int pointsRemaining = ViewBag.PreviousAssignmentTeam.Team.TeamMembers.Count * 100;
             int assignId = ViewBag.AssignmentTeam.AssignmentID;
             using (Html.BeginForm("SubmitTeamEvaluation", "Assignment", new { assignmentId = assignId }, FormMethod.Post))
             {
@@ -58,7 +59,7 @@
                 <tr>
                     <td><b>Points Remaining:</b></td><td><div id="pointsPossibleId">@pointsRemaining</div></td>
                 </tr>
-                @foreach (TeamMember tm in at.Team.TeamMembers.OrderBy(u => u.CourseUser.UserProfile.LastName))
+                @foreach (TeamMember tm in pAt.Team.TeamMembers.OrderBy(u => u.CourseUser.UserProfile.LastName))
                 {
                     <tr>
                         <td>@tm.CourseUser.UserProfile.FirstName @tm.CourseUser.UserProfile.LastName: </td> <td><input id="points @tm.CourseUserID" name="points-@tm.CourseUserID" onblur="changePoints(@pointsRemaining);" size="1" value="0"/></td>

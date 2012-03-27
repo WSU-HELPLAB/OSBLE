@@ -103,11 +103,12 @@ namespace OSBLE.Controllers
             CourseUser student = db.CourseUsers.Find(courseUserId);
             DiscussionTeam discussionTeam = new DiscussionTeam();
 
-            Session["StudentID"] = student.ID;
-            Session["PostOrReply"] = postOrReply;
 
+            Session["PostOrReply"] = postOrReply;
             if (assignment != null && student != null && (postOrReply >= 0 && postOrReply <= 2))
             {
+                Session["StudentID"] = student.ID;
+                
                 if (assignment.HasDiscussionTeams)
                 {
                     foreach (DiscussionTeam dt in assignment.DiscussionTeams)
@@ -157,6 +158,17 @@ namespace OSBLE.Controllers
                     ViewBag.Posts = posts;
                 }
             }
+
+            if (postOrReply == -1)
+            {
+                posts = (from post in db.DiscussionPosts
+                         where post.AssignmentID == assignment.ID &&
+                         !post.IsReply
+                         orderby post.Posted
+                         select post).ToList();
+                ViewBag.Posts = posts;
+            }
+
             ViewBag.Student = student;
             ViewBag.Assignment = assignment;
             ViewBag.FirstPost = true;

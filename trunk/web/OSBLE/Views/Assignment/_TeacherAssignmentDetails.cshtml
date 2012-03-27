@@ -53,6 +53,15 @@
             }
         </td>
     </tr> 
+    if (assignment.AssignmentTypeID == 3 && !assignment.HasDiscussionTeams)
+    {
+        <tr>
+            <td><text class="osbleColorBold" >Discussion:</text></td>
+            <td>@Html.ActionLink("View Discussion", "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = -1, postOrReply = -1 }, new { })</td>
+
+
+        </tr>   
+    }
     }
  </table>
 @{    

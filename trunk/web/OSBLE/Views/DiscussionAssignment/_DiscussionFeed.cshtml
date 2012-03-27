@@ -112,9 +112,16 @@ else
             {
                 if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
-                    if (ViewBag.Student.ID == dp.CourseUserID && ViewBag.PostOrReply != 1)
+                    if (ViewBag.Student != null)
                     {
-                        @:<div class="dp_post" id="dp_post_@(dp.ID)" style="background:#FFF8C6;">
+                        if (ViewBag.Student.ID == dp.CourseUserID && ViewBag.PostOrReply != 1)
+                        {
+                            @:<div class="dp_post" id="dp_post_@(dp.ID)" style="background:#FFF8C6;">
+                        }
+                        else
+                        {
+                            @:<div class="dp_post" id="dp_post_@(dp.ID)">
+                        }
                     }
                     else
                     {
@@ -138,16 +145,30 @@ else
                         {
                             if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                             {
-                                if (ViewBag.Student.ID == dr.CourseUserID && ViewBag.PostOrReply != 0)
+                                if (ViewBag.Student != null)
                                 {
-                                    @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:#FFF8C6;">
-                                    <div class="dp_post_header">
-                                        @Helpers.DefaultProfilePicture()
-                                        @dr.DisplayName <br />
-                                        @dr.Posted <br /> <br />
-                                    </div>
-                                    @dr.Content
+                                    if (ViewBag.Student.ID == dr.CourseUserID && ViewBag.PostOrReply != 0)
+                                    {
+                                        @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:#FFF8C6;">
+                                        <div class="dp_post_header">
+                                            @Helpers.DefaultProfilePicture()
+                                            @dr.DisplayName <br />
+                                            @dr.Posted <br /> <br />
+                                        </div>
+                                        @dr.Content
+                                        @:</div>
+                                    }
+                                    else
+                                    {
+                                        @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:white;">
+                                        <div class="dp_post_header">
+                                            @Helpers.DefaultProfilePicture()
+                                            @dr.DisplayName <br />
+                                            @dr.Posted <br /> <br />
+                                        </div>
+                                        @dr.Content
                                     @:</div>
+                                    }
                                 }
                                 else
                                 {
@@ -158,7 +179,7 @@ else
                                         @dr.Posted <br /> <br />
                                     </div>
                                     @dr.Content
-                                @:</div>
+                                    @:</div>
                                 }
                             }
                             else
