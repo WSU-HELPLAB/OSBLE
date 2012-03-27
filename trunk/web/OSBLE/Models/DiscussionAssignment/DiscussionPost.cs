@@ -21,10 +21,6 @@ namespace OSBLE.Models.DiscussionAssignment
         public virtual CourseUser CourseUser { get; set; }
 
         [Required]
-        public int TeamID { get; set; }
-        public virtual Team Team { get; set; }
-
-        [Required]
         public string Content { get; set; }
 
         [Required]

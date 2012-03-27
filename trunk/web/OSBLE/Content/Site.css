@@ -1687,6 +1687,13 @@ ul.assignment_deliverables, .assignment_deliverables ul
     padding-right:50px;
 }
 
+tbody #awesome
+{
+    border-width: 2px;
+	border-style: solid;
+    border-collapse: collapse;
+}
+
 .assignDetailsTable th
 {
     text-align:left;
