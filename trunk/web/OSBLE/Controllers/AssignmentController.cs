@@ -276,34 +276,29 @@ namespace OSBLE.Controllers
             if (activeCourse.AbstractRole.CanModify || activeCourse.AbstractRole.Anonymized) //Instructor setup || Observer
             {
                 List<AssignmentTeam> teams = assignment.AssignmentTeams.ToList();
+                List<DiscussionPost> allUserPosts = (from a in db.DiscussionPosts
+                                                     where a.AssignmentID == assignment.ID
+                                                     select a).ToList();
 
                 if (activeCourse.AbstractRole.Anonymized)
                 {
                     List<CourseUser> cus = GetAnonymizedCourseUserList(activeCourse.AbstractCourseID);
                     ViewBag.ObserverCU = cus;
                 }
+                
+                //Setting up Viewbag for Discussion team assignments
+                if (assignment.AssignmentTypeID == 3)
+                {
+                    List<DiscussionTeam> discussionTeamList = assignment.DiscussionTeams.ToList();
+                    discussionTeamList.Sort((x, y) => string.Compare(x.Team.Name, y.Team.Name));                 
+                    ViewBag.DiscussionTeamList = discussionTeamList;
+                }
 
-                //Sorting teams by team name or by last name if non-team assignment
+                //Sorting teams by team name (also last name if teams are of 1 because team name is the users name
                 if (assignment.HasTeams)
                 {
                     teams.Sort((x, y) => string.Compare(x.Team.Name, y.Team.Name));
                 }
-                else
-                {
-                    teams.Sort((x, y) => string.Compare(x.Team.Name, y.Team.Name));
-                }
-
-                List<DiscussionPost> allUserPosts = (from a in db.DiscussionPosts
-                                                     where a.AssignmentID == assignment.ID
-                                                     select a).ToList();
-
-                List<DiscussionTeam> discussionTeamList = assignment.DiscussionTeams.ToList();
-                ViewBag.DiscussionTeamList = discussionTeamList;
-
-                var discussionTeamAndAssignmentTeamJoin = (from a in db.AssignmentTeams
-                                                           join b in db.DiscussionTeams
-                                                           on a.AssignmentID equals b.AssignmentID
-                                                           select new { a, b });
 
                 /*MG Going through each team in the assignment and for each team going through the scores until a match is found
                  * the match will then be used for display information. 
@@ -328,14 +323,12 @@ namespace OSBLE.Controllers
                         }
                     }
 
-                    //Grabbing the submission time for the assignment
+                    //Grabbing the submission time for the assignment team
                     DateTime? subTime = new DateTime?();
                     if (assignment.HasDeliverables)
                     {
                         subTime = GetSubmissionTime(team.Assignment.Category.Course, team.Assignment, team);
                     }
-
-
 
                     //Checking for matched score, if there is none - add a null entry
                     bool foundMatch = false;
@@ -354,7 +347,7 @@ namespace OSBLE.Controllers
                     }
 
                 }
-                ViewBag.AssignmentDetailsVMList = AssignmentDetailsList;
+               
 
                 //Just giving the first or defaults teams ID, the instructor link to the rubric won't be specific.
                 ViewBag.TeamID = 0;
@@ -365,12 +358,13 @@ namespace OSBLE.Controllers
                     //MG: Due to rubric controller change 
                     ViewBag.CurrentUserID = assignment.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUser.ID;
                 }
+
                 //Setting up a list of evaluations
                 List<RubricEvaluation> evaluations = (from e in db.RubricEvaluations
                                                       where e.AssignmentID == assignment.ID &&
                                                       e.IsPublished == false
                                                       select e).ToList();
-
+                ViewBag.AssignmentDetailsVMList = AssignmentDetailsList;
                 ViewBag.RubricEvals = evaluations;
             }
 
