@@ -287,7 +287,7 @@ namespace OSBLE.Controllers
                 }
                 
                 //Setting up Viewbag for Discussion team assignments
-                if (assignment.AssignmentTypeID == 3)
+                if (assignment.AssignmentTypeID == 3 && assignment.HasDiscussionTeams)
                 {
                     List<DiscussionTeam> discussionTeamList = assignment.DiscussionTeams.ToList();
                     discussionTeamList.Sort((x, y) => string.Compare(x.Team.Name, y.Team.Name));                 
