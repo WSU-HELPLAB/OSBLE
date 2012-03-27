@@ -103,9 +103,14 @@ namespace OSBLE.Controllers
             CourseUser student = db.CourseUsers.Find(courseUserId);
             DiscussionTeam discussionTeam = new DiscussionTeam();
 
+            posts = (from post in db.DiscussionPosts
+                     where post.AssignmentID == assignment.ID &&
+                     !post.IsReply
+                     orderby post.Posted
+                     select post).ToList();
 
             Session["PostOrReply"] = postOrReply;
-            if (assignment != null && student != null && (postOrReply >= 0 && postOrReply <= 2))
+            if (assignment != null && student != null && (postOrReply >= 0 && postOrReply <= 3))
             {
                 Session["StudentID"] = student.ID;
                 
@@ -133,7 +138,6 @@ namespace OSBLE.Controllers
                         {
                             teamPosts.Add(post);
                         }
-                        //db.SaveChanges();
                     }
                     posts = (from post in db.DiscussionPosts
                              where post.AssignmentID == assignment.ID &&
@@ -144,7 +148,6 @@ namespace OSBLE.Controllers
                     {
                         teamPosts.Add(post);
                     }
-                   // db.SaveChanges();
                     ViewBag.Posts = teamPosts.OrderBy(t => t.Posted);
                     
                 }
@@ -159,14 +162,13 @@ namespace OSBLE.Controllers
                 }
             }
 
-            if (postOrReply == -1)
+            if (postOrReply == 3)
             {
-                posts = (from post in db.DiscussionPosts
-                         where post.AssignmentID == assignment.ID &&
-                         !post.IsReply
-                         orderby post.Posted
-                         select post).ToList();
-                ViewBag.Posts = posts;
+                if (!assignment.HasDiscussionTeams)
+                {
+                    ViewBag.Posts = posts;
+                }
+                student = null;
             }
 
             ViewBag.Student = student;

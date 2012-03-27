@@ -57,7 +57,7 @@
     {
         <tr>
             <td><text class="osbleColorBold" >Discussion:</text></td>
-            <td>@Html.ActionLink("View Discussion", "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = -1, postOrReply = -1 }, new { })</td>
+            <td>@Html.ActionLink("View Discussion", "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = -1, postOrReply = 3 }, new { })</td>
 
 
         </tr>   
@@ -93,7 +93,7 @@
         {
         <tbody id="awesome">
             <tr>
-                <td colspan="2">@dt.Team.Name</td>
+                <td colspan="2">@Html.ActionLink(dt.Team.Name, "TeacherIndex", "DiscussionAssignment", new {assignmentId = assignment.ID, courseUserId = dt.Team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 3}, new {})</td>
                 <td id="posts-@dt.TeamID"></td>
                 <td id="replies-@dt.TeamID"></td>
                 <td id="all-@dt.TeamID" colspan="2"></td>
@@ -288,17 +288,11 @@
                     </td>
                 }
             
-                @if (assignment.HasDeliverables || assignment.AssignmentTypeID == 3)
+                @if (assignment.HasDeliverables )
                 {
-                    <td><!--Cell for submission download - only allow if there is a time submitted-->
-                    @if (assignment.AssignmentTypeID == 3)
-                    {
-                        @(Html.ActionLink("View/Participate in Discussion", "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID }, new { }))
-                    }
-                    else
-                    {
+                    <td>
 
-                        if (advm.submissionTime != null)
+                        @if (advm.submissionTime != null)
                         {
                             @(Html.ActionLink(advm.submissionTime.ToString(), "GetSubmissionZip", "FileHandler", new { assignmentID = assignment.ID, teamID = advm.team.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
                         }
@@ -307,7 +301,6 @@
                             @:Nothing Received
                         }
 
-                    }
                     </td>
                     @*<td><!--Cell for submitting on behalf of students -->
                         @{

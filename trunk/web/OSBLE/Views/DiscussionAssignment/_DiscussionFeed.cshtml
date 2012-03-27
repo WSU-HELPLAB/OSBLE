@@ -145,7 +145,7 @@ else
                         {
                             if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                             {
-                                if (ViewBag.Student != null)
+                                if (ViewBag.Student != null && ViewBag.PostOrReply != 3)
                                 {
                                     if (ViewBag.Student.ID == dr.CourseUserID && ViewBag.PostOrReply != 0)
                                     {
