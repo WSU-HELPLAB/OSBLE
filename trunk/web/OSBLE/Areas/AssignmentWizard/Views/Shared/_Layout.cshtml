@@ -36,13 +36,13 @@
 @RenderBody()
 </div>
 <div id="WizardBottomNav" style="clear:both;">
-        <input type="submit" value="<<Previous" name="@WizardNavButtons.PreviousButton" />
+        <input type="submit" value="Previous" name="@WizardNavButtons.PreviousButton" />
         @if (ViewBag.Assignment != null && ViewBag.Assignment.ID != 0)
         {
             <input type="submit" value="Save & Exit" name="@WizardNavButtons.SaveAndExitButton" />
             <input type="button" value="Reset Values" name="@WizardNavButtons.ResetFormButton" onclick="resetPage();" />
         }
-        <input type="submit" value="Next>>" name="@WizardNavButtons.NextButton" />
+        <input type="submit" value="Next" name="@WizardNavButtons.NextButton" />
         <input type="hidden" id="ComponentNameNavSelect" name="ComponentName" />
 </div>
 }
