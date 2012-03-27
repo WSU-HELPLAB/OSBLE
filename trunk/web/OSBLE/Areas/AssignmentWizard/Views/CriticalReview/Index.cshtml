@@ -32,7 +32,7 @@
 <div id="ErrorBox">This is the error box</div>
 <div id="AvailableStudentList">
     <h3>
-        Students / Teams</h3>
+        Reviewers</h3>
     <ul id="AvailableStudent">
         @foreach (Team team in teams)
         {
@@ -45,7 +45,7 @@
 </div>
     
 <div id="TeamsDiv">
-    <h3>Review Items</h3>
+    <h3>Items to be Reviewed from &quot;@Model.PreceedingAssignment.AssignmentName&quot;</h3>
 
     @{int counter = 0;}
     @foreach (AssignmentTeam aTeam in Model.PreceedingAssignment.AssignmentTeams.OrderBy(t => t.Team.Name))
