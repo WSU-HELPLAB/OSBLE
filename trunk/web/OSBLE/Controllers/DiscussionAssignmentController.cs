@@ -118,6 +118,7 @@ namespace OSBLE.Controllers
                 {
                     foreach (DiscussionTeam dt in assignment.DiscussionTeams)
                     {
+                        List<TeamMember> tmList = dt.Team.TeamMembers.OrderBy(s => s.CourseUser.UserProfile.LastName).ThenBy(r => r.CourseUser.UserProfile.FirstName).ToList();
                         foreach (TeamMember tm in dt.Team.TeamMembers)
                         {
                             if (tm.CourseUser.ID == student.ID)

@@ -345,9 +345,9 @@ namespace OSBLE.Controllers
                     {
                         AssignmentDetailsList.Add(new AssignmentDetailsViewModel(null, subTime, team.Team, postCount, replyCount));
                     }
-
                 }
-               
+
+                ViewBag.AssignmentDetailsVMList = AssignmentDetailsList;
 
                 //Just giving the first or defaults teams ID, the instructor link to the rubric won't be specific.
                 ViewBag.TeamID = 0;

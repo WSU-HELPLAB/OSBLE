@@ -89,7 +89,7 @@
 
     @if(assignment.AssignmentTypeID == 3 && assignment.HasDiscussionTeams)
     {
-        foreach(DiscussionTeam dt in ViewBag.DiscussionTeamList)
+        foreach(DiscussionTeam dt in (ViewBag.DiscussionTeamList))
         {
         <tbody id="awesome">
             <tr>
@@ -99,7 +99,7 @@
                 <td id="all-@dt.TeamID" colspan="2"></td>
             </tr>
             
-            @foreach(TeamMember tm in dt.Team.TeamMembers)
+            @foreach(TeamMember tm in (dt.Team.TeamMembers).OrderBy(s => s.CourseUser.UserProfile.LastName).ThenBy(c => c.CourseUser.UserProfile.FirstName))
             {
                 foreach(AssignmentDetailsViewModel advm in ViewBag.AssignmentDetailsVMList)
                 {
@@ -191,7 +191,7 @@
                         <br/>
                         var teamList = "";
                         int i = 1;
-                        foreach (TeamMember tm in advm.team.TeamMembers)
+                        foreach (TeamMember tm in (advm.team.TeamMembers).OrderBy(s => s.CourseUser.UserProfile.LastName).ThenBy(d => d.CourseUser.UserProfile.FirstName))
                         {
                             if (i == advm.team.TeamMembers.Count)
                             {
