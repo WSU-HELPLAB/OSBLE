@@ -7,14 +7,12 @@ using System.Web.Configuration;
 using OSBLE.Attributes;
 using OSBLE.Models;
 using OSBLE.Models.Assignments;
-
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
 using OSBLE.Models.HomePage;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
-using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.DiscussionAssignment;
 
@@ -317,14 +315,17 @@ namespace OSBLE.Controllers
                     int replyCount = 0;
                     if (assignment.AssignmentTypeID == 3)
                     {
-                        postCount = (from a in allUserPosts
-                                     where a.TeamID == team.TeamID &&
-                                     !a.IsReply
-                                     select a).Count();
-                        replyCount = (from a in allUserPosts
-                                      where a.TeamID == team.TeamID &&
-                                      a.IsReply
-                                     select a).Count();
+                        foreach (TeamMember tm in team.Team.TeamMembers)
+                        {
+                            postCount = (from a in allUserPosts
+                                         where a.CourseUserID == tm.CourseUserID &&
+                                         !a.IsReply
+                                         select a).Count();
+                            replyCount = (from a in allUserPosts
+                                          where a.CourseUserID == tm.CourseUserID && 
+                                          a.IsReply
+                                          select a).Count();
+                        }
                     }
 
                     //Grabbing the submission time for the assignment
