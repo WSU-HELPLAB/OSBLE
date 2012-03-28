@@ -93,7 +93,7 @@
         {
         <tbody id="awesome">
             <tr>
-                <td colspan="2" title="Clicking this link will show @dt.Team.Name's discussion.">@Html.ActionLink(dt.Team.Name, "TeacherIndex", "DiscussionAssignment", new {assignmentId = assignment.ID, courseUserId = dt.Team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 3}, new {})</td>
+                <td colspan="2" title="View @dt.Team.Name's discussion.">@Html.ActionLink(dt.Team.Name, "TeacherIndex", "DiscussionAssignment", new {assignmentId = assignment.ID, courseUserId = dt.Team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 3}, new {})</td>
                 <td id="posts-@dt.TeamID"></td>
                 <td id="replies-@dt.TeamID"></td>
                 <td id="all-@dt.TeamID" colspan="2"></td>

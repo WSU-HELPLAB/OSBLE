@@ -2441,7 +2441,6 @@ namespace OSBLE.Controllers
             {
                 List<CourseUser> Users = (from user in db.CourseUsers
                                             where user.AbstractCourseID == currentCourseId
-
                                             select user).ToList();
 
                 
@@ -2580,6 +2579,7 @@ namespace OSBLE.Controllers
             ViewBag.Dropped = numDropped;
             ViewBag.Customize = customizeOption;
             ViewBag.MaxPoints = currentTab.MaxAssignmentScore;
+            ViewBag.ActiveCourse = activeCourse;
 
             Session["isTab"] = 1;
         }

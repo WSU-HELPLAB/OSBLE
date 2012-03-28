@@ -174,32 +174,40 @@
         <tr id="studentGrades">
             <td id="_row-@index" class="rowHeader" style="background:#DCDCDC; border:outset 2px; border-color:#E8E8E8; width:25px;" onmouseover="showButton(this);" onmouseout="hideButton(this);" onclick="selectRow(event, this);"></td>
             @{index++;}
-            <td id="@user.ID" >@user.UserProfile.LastName, @user.UserProfile.FirstName</td>
+            @if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
+            {
+                <td id="@user.ID" >Anonymous @user.ID</td>
+            }
+            else
+            {
+                <td id="@user.ID" >@user.UserProfile.LastName, @user.UserProfile.FirstName</td>
+            }
+            
                     
             @{
-              List<Score> percent = (from p in ViewBag.Percents as IEnumerable<Score>
-                                     where p.CourseUserID == user.ID
-                                     select p).ToList();
-              if (percent.Count() > 0)
-              {
-                  if (percent.First().Points > 0)
-                  {
+            List<Score> percent = (from p in ViewBag.Percents as IEnumerable<Score>
+                                   where p.CourseUserID == user.ID
+                                   select p).ToList();
+            if (percent.Count() > 0)
+            {
+                if (percent.First().Points > 0)
+                {
                       <td id="total">@percent.First().Points.ToString(".##")%</td>
-                  }
-                  else
-                  {
+                }
+                else
+                {
                       <td id="total">@String.Format("{0}", 0)%</td>
-                  }
-              }
-              else
-              {
+                }
+            }
+            else
+            {
                     <td id="total">NG</td>
-              }
+            }
             }
                 
             @foreach (Assignment gradeAssignment in ViewBag.Assignments)
             {
-                
+
                 var gradableQuery = from g in gradeAssignment.Scores as IEnumerable<Score>
                                     where g.AssignmentID == gradeAssignment.ID
                                     && g.CourseUser.UserProfileID == user.UserProfile.ID
@@ -208,12 +216,12 @@
                 //use the stored score if possible.  Otherwise, just use a "0"
                 if (gradableQuery.Count() > 0)
                 {
-                    
+
                     if (gradeAssignment.Rubric != null)
                     {
                         if (gradableQuery.First().LatePenaltyPercent > 0)
                         {
-                            <td id="@String.Format("{0}-{1}", user.ID, gradeAssignment.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.##}", gradableQuery.First().Points), "Index", "Rubric", new { assignmentId = gradableQuery.First().AssignmentID, cuId = user.ID}, new { @class = "rubric", @style = "color:Red;" })</td>
+                            <td id="@String.Format("{0}-{1}", user.ID, gradeAssignment.ID)" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.##}", gradableQuery.First().Points), "Index", "Rubric", new { assignmentId = gradableQuery.First().AssignmentID, cuId = user.ID }, new { @class = "rubric", @style = "color:Red;" })</td>
                         }
                         else
                         {                            
