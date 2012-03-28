@@ -68,7 +68,7 @@
     </div>
 
     <p>
-        <input id="send_btn" type="submit" value="Send Message" disabled="disabled" onclick="test()"/>
+        <input id="send_btn" type="submit" value="Send Message" disabled="disabled"/>
     </p>
     
     
@@ -146,11 +146,6 @@
             .append( "<a>" + '<img src="@Url.Action("ProfilePicture")/' + item.value + '" class="small_profile_picture" alt="Profile Picture" /> ' + item.label + '</a>')
             .appendTo( ul );
         }
-
-
-        function test(){
-            alert($('#recipient_list').val());
-            }
 
         function removeRecipient(div) {
             var id = $(div).parent().parent().attr("id");
