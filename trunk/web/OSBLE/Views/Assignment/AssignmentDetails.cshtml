@@ -161,28 +161,28 @@
                 <text class="osbleColorBold">Submission:</text>
             </td>
             @{
-                String display = ViewBag.SubmissionTime;
-                AjaxOptions options = new AjaxOptions()
-                {
-                    LoadingElementId = "Loading",
-                    HttpMethod = "Get",
-                    UpdateTargetId = "submitFiles",
-                    OnComplete = "SubmissionLoaded"
-                };
-                if (ViewBag.SubmissionTime == "No Submission")
-                {
-                    //If there is no sumission, submission time will be labeled "No Submission" rather than a datetime.
+        String display = ViewBag.SubmissionTime;
+        AjaxOptions options = new AjaxOptions()
+        {
+            LoadingElementId = "Loading",
+            HttpMethod = "Get",
+            UpdateTargetId = "submitFiles",
+            OnComplete = "SubmissionLoaded"
+        };
+        if (ViewBag.SubmissionTime == "No Submission")
+        {
+            //If there is no sumission, submission time will be labeled "No Submission" rather than a datetime.
                     <td>
                         @Ajax.ActionLink("Submit", "Create", "Submission", new { id = assignment.ID }, options, new object())
                     </td>
-                }
-                else
-                {
+        }
+        else
+        {
                     <td> <!--TD for displaying latest submission and resubmit-->
                         @(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))  
                         @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = assignment.ID }, options, new object())
                     </td>
-                }
+        }
             }
         </tr>
     }

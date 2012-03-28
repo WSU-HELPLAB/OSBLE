@@ -144,7 +144,7 @@
                     else
                     {
                         Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dp.CourseUser.AbstractCourseID, userprofile = dp.CourseUser.UserProfileID }));
-                        @:@dp.CourseUser.UserProfile.FirstName dp.CourseUser.UserProfile.LastName <br />
+                        @:@dp.CourseUser.UserProfile.FirstName @dp.CourseUser.UserProfile.LastName <br />
                     }
                     
                     @dp.Posted <br /> <br />
