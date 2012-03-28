@@ -138,15 +138,14 @@
                 <div class="dp_post_header">
                     @if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
                     {
-                        Helpers.DefaultProfilePicture();
+                        @:Helpers.DefaultProfilePicture();
                         @:@dp.DisplayName <br />
                     }
                     else
                     {
-                        Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dp.CourseUser.AbstractCourseID, userprofile = dp.CourseUser.UserProfileID }));
+                        @:Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dp.CourseUser.AbstractCourseID, userprofile = dp.CourseUser.UserProfileID }));
                         @:@dp.CourseUser.UserProfile.FirstName @dp.CourseUser.UserProfile.LastName <br />
                     }
-                    
                     @dp.Posted <br /> <br />
                 </div>
                 @dp.Content
@@ -164,12 +163,12 @@
                                         <div class="dp_post_header">
                                             @if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
                                             {
-                                                Helpers.DefaultProfilePicture();
+                                                @:Helpers.DefaultProfilePicture();
                                                 @:Anonymous @dr.CourseUserID <br />
                                             }
                                             else
                                             {
-                                                Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }));
+                                                @:Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }));
                                                 @:@dr.CourseUser.UserProfile.FirstName @dr.CourseUser.UserProfile.LastName <br />
                                             }
                                             @dr.Posted <br /> <br />
@@ -183,12 +182,12 @@
                                         <div class="dp_post_header">
                                             @if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
                                             {
-                                                Helpers.DefaultProfilePicture();
+                                                @:Helpers.DefaultProfilePicture();
                                                 @:Anonymous @dr.CourseUserID <br />
                                             }
                                             else
                                             {
-                                                Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }));
+                                                @:Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }));
                                                 @:@dr.CourseUser.UserProfile.FirstName @dr.CourseUser.UserProfile.LastName <br />
                                             }
                                             @dr.Posted <br /> <br />
@@ -203,12 +202,12 @@
                                     <div class="dp_post_header">
                                         @if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
                                         {
-                                            Helpers.DefaultProfilePicture();
+                                            @:Helpers.DefaultProfilePicture();
                                             @:Anonymous @dr.CourseUserID <br />
                                         }
                                         else
                                         {
-                                            Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }));
+                                            @:Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }));
                                             @:@dr.CourseUser.UserProfile.FirstName @dr.CourseUser.UserProfile.LastName <br />
                                         }
                                         @dr.Posted <br /> <br />
