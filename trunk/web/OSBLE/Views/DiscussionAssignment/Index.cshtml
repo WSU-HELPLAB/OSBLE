@@ -6,7 +6,7 @@
 
 <h2>Discussion Assignment</h2>
 
-<fieldset style="border-color:White;">@Html.Raw(ViewBag.RawHtmlDescription)</fieldset>
+<fieldset style="border-color:White;">@Html.Raw(HttpUtility.HtmlDecode(assignment.AssignmentDescription.ToString()))</fieldset>
 <br />
 
 <div id="activity_feed">

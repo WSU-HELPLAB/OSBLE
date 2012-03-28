@@ -18,7 +18,7 @@
     <ul id="QuickNav">
         @if (ViewBag.Assignment != null && ViewBag.Assignment.ID != 0)
         {
-            <li class="quickNavItem quickNavNotActive"><a href="#" onclick="changePage('');">Component Selection</a></li>
+            <li class="quickNavItem quickNavNotActive"><a href="#" onclick="changePage('');">Assignment Components</a></li>
             foreach (WizardBaseController comp in ViewBag.Components)
             {
                 if (comp.ControllerName == ViewBag.ActiveComponent.ControllerName)

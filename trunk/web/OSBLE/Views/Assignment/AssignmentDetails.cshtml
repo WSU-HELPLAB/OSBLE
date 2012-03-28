@@ -72,7 +72,8 @@
             <text class="osbleColorBold">Description:</text> 
         </td>
         <td>
-            @Html.Raw(ViewBag.RawHtmlDescription)
+        @Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(assignment.AssignmentDescription).ToString()))
+            
         </td>
     </tr>
     @if (assignment.HasDeliverables)

@@ -365,6 +365,7 @@ namespace OSBLE.Controllers
                                                       where e.AssignmentID == assignment.ID &&
                                                       e.IsPublished == false
                                                       select e).ToList();
+
                 ViewBag.AssignmentDetailsVMList = AssignmentDetailsList;
                 if (activeCourse.AbstractRole.Anonymized) 
                 {
@@ -415,37 +416,13 @@ namespace OSBLE.Controllers
             }
             ViewBag.TeamMembers = cuList; //null if no team members
 
-
-            //Parsing description looking for a link in thr format [url:WordToLink|http://www.placetolink.com]
-            //Then replacing it with html to make it a link.
-            Match match = Regex.Match(assignment.AssignmentDescription, @"\[url:[\w\W]*\|[\w\W]*]");
-            if (match.Length > 0)
-            {
-                string parsedDescription = assignment.AssignmentDescription.Remove(match.Index, match.Length);
-                Match match2 = Regex.Match(match.Value, @"\|[\W\w]*]");
-                string url = match2.Value;
-                url = url.Substring(1, match2.Length - 2);
-                match2 = Regex.Match(match.Value, @"\:[\W\w]*\|");
-                string label = match2.Value;
-                label = label.Substring(1, match2.Length - 2);
-                string rawHtml = "<a href=\"" + url + "\">" + label + "</a>";
-                parsedDescription = parsedDescription.Insert(match.Index, rawHtml);
-                ViewBag.RawHtmlDescription = parsedDescription;
-            }
-            else
-            {
-                ViewBag.RawHtmlDescription = assignment.AssignmentDescription;
-            }
-
             //MG: getting a list of the deliverables to list for assignment details. 
             List<string[]> fileTypes = new List<string[]>();
             foreach(Deliverable d in assignment.Deliverables)
             {
                 fileTypes.Add(GetFileExtensions((DeliverableType)d.Type));
             }
-
             ViewBag.filetypeList = fileTypes;
-
             return View(assignment);
         }
 

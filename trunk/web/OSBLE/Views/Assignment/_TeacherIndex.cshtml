@@ -62,7 +62,7 @@
                 <td style="padding-right:0"><!--Cell for icons-->
                     @if (assignment.IsDraft)
                     {
-                        <a title="Click to Unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@assignment.ID)">@Helpers.PublishButton()</a>
+                        <a title="Click to Publish"  class="pointerOnMouseOver" onclick="toggleDraft(@assignment.ID)">@Helpers.PublishButton()</a>
                     }
                     else
                     {
@@ -96,8 +96,7 @@
                 {
                     if (futureFlag || draftFlag)
                     {
-                        //MG&KD: If the assignment is future or draft, then only showing rubric as showing grading status is not logical
-                        //MG: Might uncomment later<td>@Html.ActionLink("View Rubric", "Index", "Rubric", new { assignmentId = assignment.ID, cuId = assignment.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })</td>
+                        //MG&KD: If the assignment is future or draft, then show nothing
                     }
                     else
                     {

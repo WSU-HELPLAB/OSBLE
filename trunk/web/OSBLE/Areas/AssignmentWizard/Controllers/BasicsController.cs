@@ -13,6 +13,10 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
     public class BasicsController : WizardBaseController
     {
+        public override string PrettyName
+        {
+            get { return "Basic Settings"; }
+        }
         public override string ControllerName
         {
             get { return "Basics"; }

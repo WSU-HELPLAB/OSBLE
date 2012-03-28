@@ -20,7 +20,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get
             {
-                return "Team Settings";
+                return "Assignment Teams";
             }
         }
 
