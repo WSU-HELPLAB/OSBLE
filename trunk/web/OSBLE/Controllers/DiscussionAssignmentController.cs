@@ -137,6 +137,7 @@ namespace OSBLE.Controllers
                                  select post).ToList();
                         foreach (DiscussionPost post in posts)
                         {
+                            post.DisplayName = "Anonymous " + post.CourseUserID;
                             teamPosts.Add(post);
                         }
                     }
@@ -159,6 +160,10 @@ namespace OSBLE.Controllers
                              !post.IsReply
                              orderby post.Posted
                              select post).ToList();
+                    foreach (DiscussionPost post in posts)
+                    {
+                        post.DisplayName = "Anonymous " + post.CourseUserID;
+                    }
                     ViewBag.Posts = posts;
                 }
             }
@@ -180,6 +185,70 @@ namespace OSBLE.Controllers
             return View();
         }
 
+        public ActionResult ObserverIndex(int assignmentId, int courseUserId, int postOrReply)
+        {
+            List<DiscussionPost> teamPosts = new List<DiscussionPost>();
+            List<DiscussionPost> posts = new List<DiscussionPost>();
+            Assignment assignment = db.Assignments.Find(assignmentId); 
+            CourseUser student = db.CourseUsers.Find(courseUserId);
+            DiscussionTeam discussionTeam = new DiscussionTeam();
+
+            Session["StudentID"] = student.ID;
+
+            if (assignment != null && student != null && (postOrReply >= 0 && postOrReply <= 2))
+            {
+                if (assignment.HasDiscussionTeams)
+                {
+                    foreach (DiscussionTeam dt in assignment.DiscussionTeams)
+                    {
+                        foreach (TeamMember tm in dt.Team.TeamMembers)
+                        {
+                            if (tm.CourseUser.ID == student.ID)
+                            {
+                                discussionTeam = dt;
+                                break;
+                            }
+                        }
+                    }
+                    foreach (TeamMember tm in discussionTeam.Team.TeamMembers)
+                    {
+                        posts = (from post in db.DiscussionPosts
+                                 where post.AssignmentID == assignment.ID &&
+                                 post.CourseUserID == tm.CourseUserID &&
+                                 post.IsReply == false
+                                 select post).ToList();
+                        foreach (DiscussionPost post in posts)
+                        {
+                            post.DisplayName = "Anonymous " + tm.CourseUserID;
+                            post.ShowProfilePicture = false;
+                            teamPosts.Add(post);
+                        }
+                    }
+                    ViewBag.Posts = teamPosts.OrderBy(t => t.Posted);
+                }
+                else
+                {
+                    posts = (from post in db.DiscussionPosts
+                             where post.AssignmentID == assignment.ID &&
+                             post.IsReply == false
+                             orderby post.Posted
+                             select post).ToList();
+                    foreach (DiscussionPost post in posts)
+                    {
+                        post.DisplayName = "Anonymous " + post.CourseUserID;
+                        post.ShowProfilePicture = false;
+                    }
+                    ViewBag.Posts = posts;
+                }
+            }
+            ViewBag.Student = student;
+            ViewBag.Assignment = assignment;
+            ViewBag.FirstPost = true;
+            ViewBag.ActiveCourse = activeCourse;
+            ViewBag.PostOrReply = postOrReply;
+            return View();
+        }
+
         [HttpPost]
         public ActionResult NewPost(DiscussionPost dp)
         {
@@ -191,16 +260,6 @@ namespace OSBLE.Controllers
                     AssignmentTeam at = GetAssignmentTeam(assignment, activeCourse.UserProfile);
                     if (assignment.DiscussionSettings.HasAnonymousPosts)
                     {
-                        List<CourseUser> users = GetAnonymizedCourseUserList(activeCourse.AbstractCourseID);
-                        int i = -1;
-                        foreach (CourseUser u in users)
-                        {
-                            i++;
-                            if (u.ID == activeCourse.ID)
-                            {
-                                break;
-                            }
-                        }
                         DiscussionPost post = new DiscussionPost()
                         {
                             Content = dp.Content,
@@ -208,7 +267,7 @@ namespace OSBLE.Controllers
                             CourseUserID = activeCourse.ID,
                             Posted = DateTime.Now,
                             AssignmentID = assignment.ID,
-                            DisplayName = "Anonymous " + i.ToString(),
+                            DisplayName = "Anonymous " + activeCourse.ID,
                             IsReply = false
                         };
                         db.DiscussionPosts.Add(post);
@@ -236,6 +295,10 @@ namespace OSBLE.Controllers
             {
                 return RedirectToAction("TeacherIndex", new { assignmentId = assignment.ID, courseUserId = (int)Session["StudentId"], postOrReply = (int)Session["PostOrReply"]});
             }
+            //else if (activeCourse.AbstractRole.Anonymized)
+            //{
+            //    return RedirectToAction("ObserverIndex", new { assignmentId = assignment.ID, courseUserId = (int)Session["StudentId"], postOrReply = (int)Session["PostOrReply"] });
+            //}
             else
             {
                 return RedirectToAction("Index", new { assignmentId = assignment.ID });
@@ -326,6 +389,11 @@ namespace OSBLE.Controllers
                 int cuId = (int)Session["StudentID"];
                 int postOrReply = (int)Session["PostOrReply"];
                 return RedirectToAction("TeacherIndex", new { assignmentId = dr.AssignmentID, courseUserId = cuId, postOrReply = postOrReply });
+            }
+            else if (activeCourse.AbstractRole.Anonymized)
+            {
+                int cuId = (int)Session["StudentID"];
+                return RedirectToAction("ObserverIndex", new { assignmentId = dr.AssignmentID, courseUserId = cuId });
             }
             else
             {

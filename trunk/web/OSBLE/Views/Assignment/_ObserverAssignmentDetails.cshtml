@@ -10,7 +10,7 @@
     ViewBag.Title = "Assignment Details";
 
     List<CourseUser> cuList = ViewBag.ObserverCU;
-    
+
     int submittedCount = 0;
     int totalStudentCount = 0;
     int totalScores = 0;
@@ -31,14 +31,14 @@
     {
         @:<tr>
             <td><text class="osbleColorBold">Submissions:</text></td>
-            if (submittedCount > 0)
-            {
-                <td>@submittedCount of @totalStudentCount have been submitted&nbsp @Html.ActionLink("[Download All]", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()", style="text-decoration:none"})</td>    
-            }
-            else
-            {
+        if (submittedCount > 0)
+        {
+                <td>@submittedCount of @totalStudentCount have been submitted&nbsp @Html.ActionLink("[Download All]", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()", style = "text-decoration:none" })</td>    
+        }
+        else
+        {
                 <td>@submittedCount of @totalStudentCount have been submitted</td>
-            }
+        }
     }
     <tr>
         <td style="vertical-align:top"><text class="osbleColorBold" >Grading progress:</text></td>
@@ -70,7 +70,7 @@ For Submission: have a download option with the time submitted or say "Nothing S
 {
     <th>Submission</th>
 }
-@if(assignment.AssignmentTypeID == 3)
+@if (assignment.AssignmentTypeID == 3)
 {
     <th>Posts</th> 
     <th>Replies</th> 
@@ -79,19 +79,24 @@ For Submission: have a download option with the time submitted or say "Nothing S
 <th>Late Penalty</th>
 <br />
 
-@if(assignment.AssignmentTypeID == 3 && assignment.HasDiscussionTeams)
+@if (assignment.AssignmentTypeID == 3 && assignment.HasDiscussionTeams)
+{
+    foreach (DiscussionTeam dt in ViewBag.DiscussionTeamList)
     {
-        foreach(DiscussionTeam dt in ViewBag.DiscussionTeamList)
+            <tr>
+                <td colspan="2">@Html.ActionLink("Anonymous Team" +  dt.TeamID, "ObserverIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = dt.Team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 3 }, new { })</td>
+                <td id="posts-@dt.TeamID"></td>
+                <td id="replies-@dt.TeamID"></td>
+                <td id="all-@dt.TeamID" colspan="2"></td>
+            </tr>
+        foreach (TeamMember tm in dt.Team.TeamMembers)
         {
-            <tr colspan="6"><td>@dt.Team.Name</td></tr>//put team name row here
-            foreach(TeamMember tm in dt.Team.TeamMembers)
+            foreach (AssignmentDetailsViewModel advm in ViewBag.AssignmentDetailsVMList)
             {
-                foreach(AssignmentDetailsViewModel advm in ViewBag.AssignmentDetailsVMList)
+                if (tm.CourseUserID == advm.team.TeamMembers.FirstOrDefault().CourseUserID)
                 {
-                    if(tm.CourseUserID ==  advm.team.TeamMembers.FirstOrDefault().CourseUserID)
-                    {
                         <tr>
-                        <td>&nbsp&nbsp&nbsp Anonymous @cuList.IndexOf(tm.CourseUser)</td>
+                        <td>&nbsp&nbsp&nbsp Anonymous @tm.CourseUserID</td>
                         <td> <!--td for grade-->
                             @if (assignment.HasRubric)
                             {
@@ -126,7 +131,7 @@ For Submission: have a download option with the time submitted or say "Nothing S
                             }
                             else
                             {
-                                if (advm.score== null)
+                                if (advm.score == null)
                                 {
                                     <a href="#" onclick="goToCategoryTab(@assignment.CategoryID, @advm.team.TeamMembers.FirstOrDefault().CourseUser.ID);" style="cursor:pointer;">Not Graded</a>
                                 }
@@ -135,15 +140,15 @@ For Submission: have a download option with the time submitted or say "Nothing S
                                     <a href="#" onclick="goToCategoryTab(@advm.score.Assignment.CategoryID, @advm.team.TeamMembers.FirstOrDefault().CourseUser.ID);" style="cursor:pointer;">@advm.score.getGradeAsPercent(advm.score.Assignment.PointsPossible)</a>
                                 }
                             }
-                        </td>
+                        </td> 
                         <td><!--postcount-->
-                            @advm.postCount
+                            @(Html.ActionLink((advm.postCount.ToString()), "ObserverIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 0 }, new { }))
                         </td>  
                         <td><!--replycount-->
-                            @advm.replyCount
+                            @(Html.ActionLink((advm.replyCount.ToString()), "ObserverIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 1 }, new { }))
                         </td> 
                         <td><!--post&reply count-->
-                            @(Html.ActionLink((advm.replyCount + advm.postCount).ToString(), "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID }, new { }))
+                            @(Html.ActionLink((advm.replyCount + advm.postCount).ToString(), "ObserverIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 2 }, new { }))
                         </td>   
                         <td style="vertical-align:bottom;" class="latePenaltyTd"> <!--Cell for late penalty-->
                             @if (advm.score == null)
@@ -156,38 +161,38 @@ For Submission: have a download option with the time submitted or say "Nothing S
                             }
                         </td>
                         </tr>
-                    } 
                 }
             }
         }
     }
-    else
+}
+else
+{
+    foreach (AssignmentDetailsViewModel advm in ViewBag.AssignmentDetailsVMList)
     {
-        foreach (AssignmentDetailsViewModel advm in ViewBag.AssignmentDetailsVMList)
-        {
             <tr>    
                 <td> <!--Cell for name-->
                     @if (assignment.HasTeams)
                     {
-                        <span style="text-decoration: underline">@cuList.IndexOf(advm.team.TeamMembers.FirstOrDefault().CourseUser)</span>
+                        <span style="text-decoration: underline">Anonymous Team @advm.team.ID</span>
                         <a title="Email this team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = advm.team.ID })">@Helpers.MailButton()</a>
                         <br/>
                         var teamList = "";
                         int i = 1;
                         foreach (TeamMember tm in advm.team.TeamMembers)
                         {
-                        
+
                             if (i == advm.team.TeamMembers.Count)
                             {
-                                teamList += " & Anonymous " + cuList.IndexOf(tm.CourseUser);
+                                teamList += " & Anonymous " + tm.CourseUserID;
                             }
                             else if (i == 1)
                             {
-                                teamList += " Anonymous " + cuList.IndexOf(tm.CourseUser);
+                                teamList += " Anonymous " + tm.CourseUserID;
                             }
                             else
                             {
-                                teamList += ", Anonymous " + cuList.IndexOf(tm.CourseUser);
+                                teamList += ", Anonymous " + tm.CourseUserID;
                             }
                             i++;
                         }
@@ -196,8 +201,7 @@ For Submission: have a download option with the time submitted or say "Nothing S
                     else
                     {
                         <a title="Email this User" href="@Url.Action("CreateUser", "Mail", new { id = advm.team.TeamMembers.FirstOrDefault().CourseUser.UserProfileID })">@Helpers.MailButton()</a>
-                        @(" Anonymous " + cuList.IndexOf(advm.team.TeamMembers.FirstOrDefault().CourseUser))
-                    
+                        @(" Anonymous " + advm.team.TeamMembers.FirstOrDefault().CourseUserID)
                     }
             
                 </td>
@@ -212,7 +216,7 @@ For Submission: have a download option with the time submitted or say "Nothing S
                             {
                                 if (eval.Recipient.ID == advm.team.ID)
                                 {
-                                       found = true;
+                                    found = true;
                                 }
                             }
                             if (found)
@@ -234,7 +238,16 @@ For Submission: have a download option with the time submitted or say "Nothing S
                     {
                         if (advm.score == null)
                         {
-                            <a href="#" onclick="goToCategoryTab(@assignment.CategoryID, @advm.team.TeamMembers.FirstOrDefault().CourseUser.ID);" style="cursor:pointer;">Not Graded</a>
+                            //If the assignment is a team evaluation
+                            if (assignment.AssignmentTypeID == 4)
+                            {
+                                //@Html.ActionLink("Team Evaluation", "TeacherTeamEvaluation", "Assignment", new { teamId = advm.team.ID, assignmentId = assignment.ID }, new { })
+                                //<a href="#" onclick="goToCategoryTab(@da.Item1.Assignment.CategoryID, @da.Item2.TeamMembers.FirstOrDefault().CourseUser.ID);" style="cursor:pointer;">@da.Item1.getGradeAsPercent(da.Item1.Assignment.PointsPossible)></a>
+                            }
+                            else
+                            {
+                                <a href="#" onclick="goToCategoryTab(@assignment.CategoryID, @advm.team.TeamMembers.FirstOrDefault().CourseUser.ID);" style="cursor:pointer;">Not Graded</a>
+                            }
                         }
                         else
                         {
@@ -276,11 +289,17 @@ For Submission: have a download option with the time submitted or say "Nothing S
                         }
                     </td>
                 }
-                @if(assignment.AssignmentTypeID == 3)
+                @if (assignment.AssignmentTypeID == 3)
                 {
-                    <td>@advm.postCount</td>
-                    <td>@advm.replyCount</td>
-                    <td>@(Html.ActionLink((advm.postCount+advm.replyCount).ToString(), "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID }, new { }))</td>
+                    <td><!--postcount-->
+                        @(Html.ActionLink((advm.postCount.ToString()), "ObserverIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 0 }, new { }))
+                    </td>  
+                    <td><!--replycount-->
+                        @(Html.ActionLink((advm.replyCount.ToString()), "ObserverIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 1 }, new { }))
+                    </td> 
+                    <td><!--post&reply count-->
+                        @(Html.ActionLink((advm.replyCount + advm.postCount).ToString(), "ObserverIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 2 }, new { }))
+                    </td>  
                 }
                 <td style="vertical-align:bottom;" class="latePenaltyTd"> <!--Cell for late penalty-->
                         @if (advm.score == null)
@@ -293,6 +312,6 @@ For Submission: have a download option with the time submitted or say "Nothing S
                         }
                 </td>
             </tr>
-        }
     }
+}
 </table>

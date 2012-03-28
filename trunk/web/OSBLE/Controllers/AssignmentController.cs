@@ -271,8 +271,6 @@ namespace OSBLE.Controllers
             List<CourseUser> cuList = null;
             List<AssignmentDetailsViewModel> AssignmentDetailsList = new List<AssignmentDetailsViewModel>();
 
-
-
             if (activeCourse.AbstractRole.CanModify || activeCourse.AbstractRole.Anonymized) //Instructor setup || Observer
             {
                 List<AssignmentTeam> teams = assignment.AssignmentTeams.ToList();
@@ -282,16 +280,20 @@ namespace OSBLE.Controllers
 
                 if (activeCourse.AbstractRole.Anonymized)
                 {
-                    List<CourseUser> cus = GetAnonymizedCourseUserList(activeCourse.AbstractCourseID);
-                    ViewBag.ObserverCU = cus;
+                    List<CourseUser> cus = db.CourseUsers.Where(c => c.AbstractCourseID == assignment.Category.Course.ID).ToList();
+                    ViewBag.ObserverCU = cus.OrderBy(o => o.ID).ToList();
                 }
                 
                 //Setting up Viewbag for Discussion team assignments
                 if (assignment.AssignmentTypeID == 3 && assignment.HasDiscussionTeams)
                 {
                     List<DiscussionTeam> discussionTeamList = assignment.DiscussionTeams.ToList();
-                    discussionTeamList.Sort((x, y) => string.Compare(x.Team.Name, y.Team.Name));                 
+                    discussionTeamList.Sort((x, y) => string.Compare(x.Team.Name, y.Team.Name));
                     ViewBag.DiscussionTeamList = discussionTeamList;
+                    if (activeCourse.AbstractRole.Anonymized)
+                    {
+                        ViewBag.DiscussionTeamList = discussionTeamList.OrderBy(o => o.TeamID).ToList();
+                    }     
                 }
 
                 //Sorting teams by team name (also last name if teams are of 1 because team name is the users name
@@ -346,9 +348,7 @@ namespace OSBLE.Controllers
                         AssignmentDetailsList.Add(new AssignmentDetailsViewModel(null, subTime, team.Team, postCount, replyCount));
                     }
                 }
-
-                ViewBag.AssignmentDetailsVMList = AssignmentDetailsList;
-
+                
                 //Just giving the first or defaults teams ID, the instructor link to the rubric won't be specific.
                 ViewBag.TeamID = 0;
                 if(assignment.AssignmentTeams.Count > 0)
@@ -365,9 +365,12 @@ namespace OSBLE.Controllers
                                                       e.IsPublished == false
                                                       select e).ToList();
                 ViewBag.AssignmentDetailsVMList = AssignmentDetailsList;
+                if (activeCourse.AbstractRole.Anonymized) 
+                {
+                    ViewBag.AssignmentDetailsVMList = AssignmentDetailsList.OrderBy(o => o.team.ID).ThenBy(c => c.team.TeamMembers.OrderBy(d => d.CourseUserID)).ToList();
+                }
                 ViewBag.RubricEvals = evaluations;
             }
-
             else if (activeCourse.AbstractRole.CanSubmit)//Student setup
             {
                 AssignmentTeam at = GetAssignmentTeam(assignment, currentUser);

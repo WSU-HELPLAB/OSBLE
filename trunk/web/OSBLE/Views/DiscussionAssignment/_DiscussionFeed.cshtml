@@ -14,37 +14,39 @@
     //    }
 
 </script>
-
-@if (assignment.DiscussionSettings.MinimumFirstPostLength > 0 && !ViewBag.FirstPost)
-{
-    <div>A minimum of @assignment.DiscussionSettings.MinimumFirstPostLength characters required for first post. You may not see the discussion until you make your first post.</div>
-    <div id="firstPostLengthDiv" >(@assignment.DiscussionSettings.MinimumFirstPostLength) additional characters needed.</div>
-    <input id="firstPostLength" type="hidden" value="@assignment.DiscussionSettings.MinimumFirstPostLength" />
-}
-else
-{
-    <input id="firstPostLength" type="hidden" value="0" />
-}
-
-<div>
-    
-    <input type="hidden" id="MaxContentChars" value="@ViewBag.MaxActivityFeedLength"/>
-    
-    @using (Html.BeginForm("NewPost", "DiscussionAssignment", FormMethod.Post))
+    @if (!ViewBag.ActiveCourse.AbstractRole.Anonymized)
     {
-    <textarea id="ActivityFeed" name="Content" rows="10" style="width:100%" placeholder="Enter new discussion post here..." onkeydown="RemainingCharsReply()" onkeyup="RemainingCharsReply()"></textarea><br />
-    <input type="hidden" name="AssignmentID" value="@ViewBag.Assignment.ID" />
         if (assignment.DiscussionSettings.MinimumFirstPostLength > 0 && !ViewBag.FirstPost)
         {
-            <input id="postNewDiscussion" type="submit" name="post_active" value="Post" disabled="disabled"/>             
+            <div>A minimum of @assignment.DiscussionSettings.MinimumFirstPostLength characters required for first post. You may not see the discussion until you make your first post.</div>
+            <div id="firstPostLengthDiv" >(@assignment.DiscussionSettings.MinimumFirstPostLength) additional characters needed.</div>
+            <input id="firstPostLength" type="hidden" value="@assignment.DiscussionSettings.MinimumFirstPostLength" />
         }
         else
         {
-            <input id="postNewDiscussion" type="submit" name="post_active" value="Post"/>             
+            <input id="firstPostLength" type="hidden" value="0" />
         }
-    }
+
+        <div>
     
-</div>
+            <input type="hidden" id="MaxContentChars" value="@ViewBag.MaxActivityFeedLength"/>
+    
+            @using (Html.BeginForm("NewPost", "DiscussionAssignment", FormMethod.Post))
+            {
+            <textarea id="ActivityFeed" name="Content" rows="10" style="width:100%" placeholder="Enter new discussion post here..." onkeydown="RemainingCharsReply()" onkeyup="RemainingCharsReply()"></textarea><br />
+            <input type="hidden" name="AssignmentID" value="@ViewBag.Assignment.ID" />
+                if (assignment.DiscussionSettings.MinimumFirstPostLength > 0 && !ViewBag.FirstPost)
+                {
+                    <input id="postNewDiscussion" type="submit" name="post_active" value="Post" disabled="disabled"/>             
+                }
+                else
+                {
+                    <input id="postNewDiscussion" type="submit" name="post_active" value="Post"/>             
+                }
+            }
+    
+        </div>
+    }
 
 
     @if (ViewBag.Posts != null && ViewBag.FirstPost == true)
@@ -110,7 +112,7 @@ else
             }
             else
             {
-                if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                if (ViewBag.ActiveCourse.AbstractRole.CanModify || ViewBag.ActiveCourse.AbstractRole.Anonymized)
                 {
                     if (ViewBag.Student != null)
                     {
@@ -134,8 +136,17 @@ else
                 }
             @*<div class="dp_post" id="dp_post_@(dp.ID)">*@
                 <div class="dp_post_header">
-                    @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dp.CourseUser.AbstractCourseID, userprofile = dp.CourseUser.UserProfileID }))
-                    @dp.CourseUser.UserProfile.FirstName @dp.CourseUser.UserProfile.LastName <br />
+                    @if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
+                    {
+                        Helpers.DefaultProfilePicture();
+                        @:@dp.DisplayName <br />
+                    }
+                    else
+                    {
+                        Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dp.CourseUser.AbstractCourseID, userprofile = dp.CourseUser.UserProfileID }));
+                        @:@dp.CourseUser.UserProfile.FirstName dp.CourseUser.UserProfile.LastName <br />
+                    }
+                    
                     @dp.Posted <br /> <br />
                 </div>
                 @dp.Content
@@ -143,7 +154,7 @@ else
                     <div id="dp_replies_for_@(dp.ID)">
                         @foreach (DiscussionPost dr in dp.Replies)
                         {
-                            if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                            if (ViewBag.ActiveCourse.AbstractRole.CanModify || ViewBag.ActiveCourse.AbstractRole.Anonymized)
                             {
                                 if (ViewBag.Student != null && ViewBag.PostOrReply != 3)
                                 {
@@ -220,6 +231,7 @@ else
                         <a href="#" id="replycancel_@(dp.ID)">Cancel</a>
                     </div>
                 </div>
+        
                 <script type="text/javascript">
                     $("#reply_@(dp.ID)").click(function () {
                         $("#reply_@(dp.ID)").hide();

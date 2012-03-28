@@ -243,8 +243,7 @@ namespace OSBLE.Controllers
             else // Display anonymous name.
             {
                 // Anonymous number is currently the number of the student in the course list.
-                // TODO: Investigate better anonymous numbering?
-                post.DisplayName = "Anonymous " + courseList.IndexOf(posterCu);
+                post.DisplayName = "Anonymous " + posterCu.ID;
 
                 // Profile picture will display default picture.
                 post.ShowProfilePicture = false;
