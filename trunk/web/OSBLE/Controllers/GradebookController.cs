@@ -1969,7 +1969,12 @@ namespace OSBLE.Controllers
             {
                 return TeacherIndex();
             }
-            
+
+            else if (activeCourse.AbstractRole.Anonymized == true)
+            {
+                return ObserverIndex();
+            }
+
             else if (activeCourse.AbstractRole.CanSubmit == true)
             {
                 return StudentIndex();
@@ -2091,6 +2096,117 @@ namespace OSBLE.Controllers
             return View("Index");
         }
 
+        public ActionResult ObserverIndex()
+        {
+            //LINQ complains when we use this directly in our queries,so pull it beforehand
+            int currentCourseId = ActiveCourse.AbstractCourseID;
+            List<Score> percentList = new List<Score>();
+
+            var letterGrades = from letters in db.Courses
+                               where letters.ID == currentCourseId
+                               select letters.LetterGrades;
+
+            //pull the students in the course.  Each student is a row.
+            List<UserProfile> studentList = (from up in db.UserProfiles
+                                             join cu in db.CourseUsers on up.ID equals cu.UserProfileID
+                                             where cu.AbstractCourseID == currentCourseId && cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student
+                                             orderby up.LastName, up.FirstName
+                                             select up).ToList();
+
+            List<Score> scor = (from s in db.Scores
+                                where s.Assignment.Category.CourseID == currentCourseId
+                                select s).ToList();
+
+
+            List<CourseUser> CourseUser = (from users in db.CourseUsers
+                                           where users.AbstractCourseID == currentCourseId &&
+                                           users.AbstractRole.CanSubmit
+                                           orderby users.ID
+                                           select users).ToList();
+
+            List<Category> categories = (from category in db.Categories
+                                         where category.CourseID == currentCourseId
+                                         orderby category.ColumnOrder
+                                         select category).ToList();
+
+            List<Assignment> assignments = (from assignment in db.Assignments
+                                            where assignment.Category.CourseID == currentCourseId
+                                            select assignment).ToList();
+
+            List<Score> allGrades = (from grades in db.Scores
+                                     where grades.Assignment.Category.CourseID == currentCourseId &&
+                                     grades.Points >= 0 &&
+                                     grades.isDropped == false
+                                     select grades).ToList();
+
+            List<Score> allGradedAssignments = (from grades in allGrades
+                                                join assignment in db.Assignments on grades.AssignmentID equals assignment.ID
+                                                where assignment.Scores.Count() > 0
+                                                select grades).ToList();
+
+            List<LetterGrade> letterGradeList = ((activeCourse.AbstractCourse as Course).LetterGrades).ToList();
+
+            List<Score> categoryTotalPercent = (from categoryTotal in db.Scores
+                                                where categoryTotal.Assignment.Category.CourseID == currentCourseId &&
+                                                categoryTotal.Points >= 0 &&
+                                                categoryTotal.isDropped == false
+                                                select categoryTotal).ToList();
+
+            List<Category> categoriesWithWeightsAndScores = (from cats in categoryTotalPercent
+                                                             select cats.Assignment.Category).Distinct().ToList();
+
+            double totalCategoryWeights = (from cat in categoriesWithWeightsAndScores
+                                           select cat.Points).Sum();
+
+            List<Assignment> assignmentList = (from assignment in db.Assignments
+                                               join scores in db.Scores on assignment.ID equals scores.AssignmentID
+                                               where assignment.Scores.Count() > 0 &&
+                                               scores.Points >= 0
+                                               select assignment).Distinct().ToList();
+
+            List<Score> studentScores = new List<Score>();
+
+            foreach (CourseUser cu in CourseUser)
+            {
+                foreach (Category cat in categories)
+                {
+                    if (cat.Name != Constants.UnGradableCatagory)
+                    {
+                        List<Score> allScores = (from points in db.Scores
+                                                 where points.Assignment.CategoryID == cat.ID
+                                                 select points).ToList();
+
+                        List<Score> userScores = (from points in allScores
+                                                  where points.CourseUserID == cu.ID
+                                                  select points).ToList();
+
+                        if (userScores.Count() > 0)
+                        {
+                            foreach (Score score in userScores)
+                            {
+                                studentScores.Add(score);
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            ViewBag.Students = studentList;
+            ViewBag.Scores = studentScores;
+            ViewBag.Categories = categories;
+            ViewBag.CoursesUser = CourseUser;
+            ViewBag.GradeAssignments = assignments;
+            ViewBag.LetterGrades = letterGradeList;
+            ViewBag.AllGrades = allGrades;
+            ViewBag.CategoryTotalPercent = categoryTotalPercent;
+            ViewBag.CatsWithWeightsAndScores = categoriesWithWeightsAndScores;
+            ViewBag.TotalCategoryWeights = totalCategoryWeights;
+            ViewBag.AllGradedAssignments = allGradedAssignments;
+            ViewBag.Assignments = assignmentList;
+            return View("Index");
+        }
+
         public ActionResult StudentIndex()
         {
             bool usesWeights = false;
@@ -2181,6 +2297,11 @@ namespace OSBLE.Controllers
                 BuildGradebook((int)categoryId);
                 return View();
             }
+            else if (activeCourse.AbstractRole.Anonymized == true)
+            {
+                BuildGradebook((int)categoryId);
+                return View();
+            }
             else if (activeCourse.AbstractRole.CanSubmit == true)
             {
                 BuildStudentGradebook((int)categoryId);
@@ -2256,8 +2377,6 @@ namespace OSBLE.Controllers
             ViewBag.UserScores = userScores;
             ViewBag.TotalScores = totalScores;
         }
-
-
 
 
         /// <summary>

@@ -211,11 +211,11 @@
     
     @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
     {
-        @Html.Partial("_TeacherAssignmentDetails");
+        @Html.Partial("_TeacherAssignmentDetails")
     }
     else if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
     {
-        @Html.Partial("_ObserverAssignmentDetails");
+        @Html.Partial("_ObserverAssignmentDetails")
     }
 </table>
 
