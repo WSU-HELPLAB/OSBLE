@@ -5,7 +5,6 @@
 
 <table class="assignTable" cellspacing="0">
     <th style="font-size:larger">Assignment</th>
-    <th style="font-size:larger">Release Date</th>
     <th style="font-size:larger">Due Date</th>
     <th style="font-size:larger">Grade</th>
     <th style="font-size:larger">Latest Submission</th>
@@ -57,7 +56,6 @@
                 }
                 
             </td>
-            <td>@assignment.ReleaseDate.ToShortDateString() @assignment.ReleaseTime.ToShortTimeString()</td>
             <td>@assignment.DueDate.ToShortDateString() @assignment.DueDate.ToShortTimeString()</td>
             <td><!--Td for grade-->
                 @if (futureFlag)

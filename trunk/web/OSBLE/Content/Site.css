@@ -1684,6 +1684,7 @@ ul.assignment_deliverables, .assignment_deliverables ul
 
 .assignTable td
 {
+    vertical-align:text-top;
     padding-right:50px;
 }
 

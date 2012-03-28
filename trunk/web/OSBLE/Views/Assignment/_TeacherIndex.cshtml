@@ -5,7 +5,7 @@
 
 <table class="assignTable" cellspacing="0">
     <th colspan="2" style="font-size:larger">Assignment</th>
-    <th  style="font-size:larger">Release Date</th>
+    <!--<th  style="font-size:larger">Release Date</th>-->
     <th  style="font-size:larger">Due Date</th>
     <th  style="font-size:larger">Submissions</th>
     <th  style="font-size:larger">Grading</th>
@@ -58,8 +58,8 @@
             }
 
             //Now that headers are in place, inserting a assignment
-            <tr class="checkeredRow" >
-                <td style="padding-right:0"><!--Cell for icons-->
+            <tr class="checkeredRow"  >
+                <td style="padding-right:0; white-space:nowrap"><!--Cell for icons-->
                     @if (assignment.IsDraft)
                     {
                         <a title="Click to Publish"  class="pointerOnMouseOver" onclick="toggleDraft(@assignment.ID)">@Helpers.PublishButton()</a>
@@ -71,11 +71,11 @@
                     <a title="Click to Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = assignment.ID })">@Helpers.EditButton()</a>
                     <a title="Click to Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@assignment.ID)">@Helpers.DeleteButton()</a>
                 </td>
-                <td> <!--Cell for name-->
+                <td > <!--Cell for name-->
                     @Html.ActionLink(assignment.AssignmentName, "AssignmentDetails", "Assignment", new { assignment.ID }, null)
                 </td>
-                <td>@assignment.ReleaseDate.ToShortDateString() @assignment.ReleaseTime.ToShortTimeString()</td>
-                <td>@assignment.DueDate.ToShortDateString() @assignment.DueDate.ToShortTimeString()</td>
+                <!--<td>@assignment.ReleaseDate.ToShortDateString()</td>-->
+                <td>@assignment.DueDate.ToShortDateString() @assignment.DueTime.ToShortTimeString()</td>
                 @if (assignment.HasDeliverables)
                 {
                     if (draftFlag || pastFlag)
@@ -84,7 +84,7 @@
                     }
                     else
                     {
-                        <td>@assignment.GetSubmissionCount() of @assignment.AssignmentTeams.Count received. @Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })</td>
+                        <td>@assignment.GetSubmissionCount() of @assignment.AssignmentTeams.Count received. <br /> @Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })</td>
                     }
                 }
                 else
@@ -101,9 +101,13 @@
                     else
                     {
                         <td>
+                            @*
                             @assignment.GetPublishedCount() of @assignment.AssignmentTeams.Count published, with @assignment.GetSavedAsDraftCount() saved as draft.
                             @Html.ActionLink("Grade Now", "Index", "Rubric", new { assignmentId = assignment.ID, cuId = assignment.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })
                             &nbsp<a href="#" style="cursor:pointer" onclick="publishAllGrades(@assignment.ID);">Publish All</a>
+                            *@
+                            @assignment.GetPublishedCount() of @assignment.AssignmentTeams.Count published.&nbsp @Html.ActionLink("Grade Now", "Index", "Rubric", new { assignmentId = assignment.ID, cuId = assignment.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })<br />
+                            @assignment.GetSavedAsDraftCount() of @assignment.AssignmentTeams.Count saved as draft.&nbsp<a href="#" style="cursor:pointer" onclick="publishAllGrades(@assignment.ID);">Publish All</a>
                         </td>
                     }
                 }

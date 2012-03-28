@@ -25,5 +25,28 @@ namespace OSBLE.Models.ViewModels
             this.replyCount = replyCount;
             this.team = team;
         }
+
+        public string PrintTeam()
+        {
+            int i = 1;
+            string teamList = "";
+            foreach (TeamMember tm in (team.TeamMembers).OrderBy(s => s.CourseUser.UserProfile.LastName).ThenBy(d => d.CourseUser.UserProfile.FirstName))
+            {
+                if (i == team.TeamMembers.Count && team.TeamMembers.Count != 1)
+                {
+                    teamList += " & " + tm.CourseUser.UserProfile.FirstName + " " + tm.CourseUser.UserProfile.LastName;
+                }
+                else if (i == 1)
+                {
+                    teamList += tm.CourseUser.UserProfile.FirstName + " " + tm.CourseUser.UserProfile.LastName;
+                }
+                else
+                {
+                    teamList += ", " + tm.CourseUser.UserProfile.FirstName + " " + tm.CourseUser.UserProfile.LastName;
+                }
+                i++;
+            }
+            return teamList;
+        }
     }
 }

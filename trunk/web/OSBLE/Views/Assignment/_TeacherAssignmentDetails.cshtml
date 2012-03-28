@@ -189,25 +189,7 @@
                         <span style="text-decoration: underline">@advm.team.Name</span>
                         <a title="Email this team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = advm.team.ID })">@Helpers.MailButton()</a>
                         <br/>
-                        var teamList = "";
-                        int i = 1;
-                        foreach (TeamMember tm in (advm.team.TeamMembers).OrderBy(s => s.CourseUser.UserProfile.LastName).ThenBy(d => d.CourseUser.UserProfile.FirstName))
-                        {
-                            if (i == advm.team.TeamMembers.Count && advm.team.TeamMembers.Count != 1)
-                            {
-                                teamList += " & " + tm.CourseUser.UserProfile.FirstName + " " + tm.CourseUser.UserProfile.LastName;
-                            }
-                            else if (i == 1)
-                            {
-                                teamList += tm.CourseUser.UserProfile.FirstName + " " + tm.CourseUser.UserProfile.LastName;
-                            }
-                            else
-                            {
-                                teamList += ", " + tm.CourseUser.UserProfile.FirstName + " " + tm.CourseUser.UserProfile.LastName;
-                            }
-                            i++;
-                        }
-                        <span>@teamList</span>
+                        <span>@advm.PrintTeam()</span>
                     }
                     else
                     {
