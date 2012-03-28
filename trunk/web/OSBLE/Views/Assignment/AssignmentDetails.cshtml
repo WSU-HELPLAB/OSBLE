@@ -72,7 +72,7 @@
             <text class="osbleColorBold">Description:</text> 
         </td>
         <td>
-            @assignment.AssignmentDescription
+            @Html.Raw(ViewBag.RawHtmlDescription)
         </td>
     </tr>
     @if (assignment.HasDeliverables)
