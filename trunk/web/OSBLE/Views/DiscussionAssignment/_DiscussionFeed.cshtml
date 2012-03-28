@@ -162,8 +162,16 @@
                                     {
                                         @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:#FFF8C6;">
                                         <div class="dp_post_header">
-                                            @Helpers.DefaultProfilePicture()
-                                            @dr.DisplayName <br />
+                                            @if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
+                                            {
+                                                Helpers.DefaultProfilePicture();
+                                                @:Anonymous @dr.CourseUserID <br />
+                                            }
+                                            else
+                                            {
+                                                Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }));
+                                                @:@dr.CourseUser.UserProfile.FirstName @dr.CourseUser.UserProfile.LastName <br />
+                                            }
                                             @dr.Posted <br /> <br />
                                         </div>
                                         @dr.Content
@@ -173,8 +181,16 @@
                                     {
                                         @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:white;">
                                         <div class="dp_post_header">
-                                            @Helpers.DefaultProfilePicture()
-                                            @dr.DisplayName <br />
+                                            @if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
+                                            {
+                                                Helpers.DefaultProfilePicture();
+                                                @:Anonymous @dr.CourseUserID <br />
+                                            }
+                                            else
+                                            {
+                                                Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }));
+                                                @:@dr.CourseUser.UserProfile.FirstName @dr.CourseUser.UserProfile.LastName <br />
+                                            }
                                             @dr.Posted <br /> <br />
                                         </div>
                                         @dr.Content
@@ -185,8 +201,16 @@
                                 {
                                     @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:white;">
                                     <div class="dp_post_header">
-                                        @Helpers.DefaultProfilePicture()
-                                        @dr.DisplayName <br />
+                                        @if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
+                                        {
+                                            Helpers.DefaultProfilePicture();
+                                            @:Anonymous @dr.CourseUserID <br />
+                                        }
+                                        else
+                                        {
+                                            Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }));
+                                            @:@dr.CourseUser.UserProfile.FirstName @dr.CourseUser.UserProfile.LastName <br />
+                                        }
                                         @dr.Posted <br /> <br />
                                     </div>
                                     @dr.Content
