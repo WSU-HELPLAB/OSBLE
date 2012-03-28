@@ -47,6 +47,16 @@
             @r.Count() have been saved as draft
         </td>
     </tr>
+    
+    if (assignment.AssignmentTypeID == 3 && !assignment.HasDiscussionTeams)
+    {
+        <tr>
+            <td><text class="osbleColorBold" >Discussion:</text></td>
+            <td>@Html.ActionLink("View Discussion", "ObserverIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = -1, postOrReply = 3 }, new { })</td>
+
+
+        </tr>   
+    }
 }  
 
  </table>
@@ -84,7 +94,7 @@ For Submission: have a download option with the time submitted or say "Nothing S
     foreach (DiscussionTeam dt in ViewBag.DiscussionTeamList)
     {
             <tr>
-                <td colspan="2">@Html.ActionLink("Anonymous Team" +  dt.TeamID, "ObserverIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = dt.Team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 3 }, new { })</td>
+                <td colspan="2">@Html.ActionLink("Anonymous Team" + dt.TeamID, "ObserverIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = dt.Team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 3 }, new { })</td>
                 <td id="posts-@dt.TeamID"></td>
                 <td id="replies-@dt.TeamID"></td>
                 <td id="all-@dt.TeamID" colspan="2"></td>
@@ -182,7 +192,7 @@ else
                         foreach (TeamMember tm in advm.team.TeamMembers)
                         {
 
-                            if (i == advm.team.TeamMembers.Count)
+                            if (i == advm.team.TeamMembers.Count && advm.team.TeamMembers.Count != 1)
                             {
                                 teamList += " & Anonymous " + tm.CourseUserID;
                             }

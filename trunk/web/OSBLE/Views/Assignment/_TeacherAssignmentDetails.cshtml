@@ -93,7 +93,7 @@
         {
         <tbody id="awesome">
             <tr>
-                <td colspan="2">@Html.ActionLink(dt.Team.Name, "TeacherIndex", "DiscussionAssignment", new {assignmentId = assignment.ID, courseUserId = dt.Team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 3}, new {})</td>
+                <td colspan="2" title="Clicking this link will show @dt.Team.Name's discussion.">@Html.ActionLink(dt.Team.Name, "TeacherIndex", "DiscussionAssignment", new {assignmentId = assignment.ID, courseUserId = dt.Team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 3}, new {})</td>
                 <td id="posts-@dt.TeamID"></td>
                 <td id="replies-@dt.TeamID"></td>
                 <td id="all-@dt.TeamID" colspan="2"></td>
@@ -193,7 +193,7 @@
                         int i = 1;
                         foreach (TeamMember tm in (advm.team.TeamMembers).OrderBy(s => s.CourseUser.UserProfile.LastName).ThenBy(d => d.CourseUser.UserProfile.FirstName))
                         {
-                            if (i == advm.team.TeamMembers.Count)
+                            if (i == advm.team.TeamMembers.Count && advm.team.TeamMembers.Count != 1)
                             {
                                 teamList += " & " + tm.CourseUser.UserProfile.FirstName + " " + tm.CourseUser.UserProfile.LastName;
                             }

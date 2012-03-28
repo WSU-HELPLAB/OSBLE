@@ -137,7 +137,7 @@ namespace OSBLE.Controllers
                                  select post).ToList();
                         foreach (DiscussionPost post in posts)
                         {
-                            post.DisplayName = "Anonymous " + post.CourseUserID;
+                            post.DisplayName = tm.CourseUser.UserProfile.FirstName + " " + tm.CourseUser.UserProfile.LastName;
                             teamPosts.Add(post);
                         }
                     }
@@ -162,7 +162,7 @@ namespace OSBLE.Controllers
                              select post).ToList();
                     foreach (DiscussionPost post in posts)
                     {
-                        post.DisplayName = "Anonymous " + post.CourseUserID;
+                        post.DisplayName = post.CourseUser.UserProfile.FirstName + " " + post.CourseUser.UserProfile.LastName;
                     }
                     ViewBag.Posts = posts;
                 }
@@ -193,10 +193,21 @@ namespace OSBLE.Controllers
             CourseUser student = db.CourseUsers.Find(courseUserId);
             DiscussionTeam discussionTeam = new DiscussionTeam();
 
-            Session["StudentID"] = student.ID;
+            posts = (from post in db.DiscussionPosts
+                     where post.AssignmentID == assignment.ID &&
+                     !post.IsReply
+                     orderby post.Posted
+                     select post).ToList();
 
+            foreach (DiscussionPost post in posts)
+            {
+                post.DisplayName = "Anonymous " + post.CourseUserID;
+            }            
+
+            Session["PostOrReply"] = postOrReply;
             if (assignment != null && student != null && (postOrReply >= 0 && postOrReply <= 3))
             {
+                Session["StudentID"] = student.ID;
                 if (assignment.HasDiscussionTeams)
                 {
                     foreach (DiscussionTeam dt in assignment.DiscussionTeams)
@@ -250,6 +261,17 @@ namespace OSBLE.Controllers
                     ViewBag.Posts = posts;
                 }
             }
+
+            if (postOrReply == 3)
+            {
+                if (!assignment.HasDiscussionTeams)
+                {
+                    ViewBag.Posts = posts;
+                }
+                student = null;
+            }
+
+
             ViewBag.Student = student;
             ViewBag.Assignment = assignment;
             ViewBag.FirstPost = true;
@@ -356,8 +378,6 @@ namespace OSBLE.Controllers
             dr.CourseUser = activeCourse;
             dr.Posted = DateTime.Now;
 
-
-
             int replyTo = 0;
             if (Request.Form["reply_to"] != null)
             {
@@ -402,7 +422,8 @@ namespace OSBLE.Controllers
             else if (activeCourse.AbstractRole.Anonymized)
             {
                 int cuId = (int)Session["StudentID"];
-                return RedirectToAction("ObserverIndex", new { assignmentId = dr.AssignmentID, courseUserId = cuId });
+                int postOrReply = (int)Session["PostOrReply"];
+                return RedirectToAction("ObserverIndex", new { assignmentId = dr.AssignmentID, courseUserId = cuId, postOrReply = postOrReply });
             }
             else
             {

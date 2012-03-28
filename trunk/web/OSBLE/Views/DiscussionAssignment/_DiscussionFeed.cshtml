@@ -35,13 +35,20 @@
             {
             <textarea id="ActivityFeed" name="Content" rows="10" style="width:100%" placeholder="Enter new discussion post here..." onkeydown="RemainingCharsReply()" onkeyup="RemainingCharsReply()"></textarea><br />
             <input type="hidden" name="AssignmentID" value="@ViewBag.Assignment.ID" />
-                if (assignment.DiscussionSettings.MinimumFirstPostLength > 0 && !ViewBag.FirstPost)
+                if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
-                    <input id="postNewDiscussion" type="submit" name="post_active" value="Post" disabled="disabled"/>             
+                    <input id="postNewDiscussion" type="submit" name="post_active" value="Post to Entire Class"/> @Helpers.CreateToolTip(ToolTips.TeacherPostButton)          
                 }
                 else
                 {
-                    <input id="postNewDiscussion" type="submit" name="post_active" value="Post"/>             
+                    if (assignment.DiscussionSettings.MinimumFirstPostLength > 0 && !ViewBag.FirstPost)
+                    {
+                        <input id="postNewDiscussion" type="submit" name="post_active" value="Post" disabled="disabled"/>             
+                    }
+                    else
+                    {
+                        <input id="postNewDiscussion" type="submit" name="post_active" value="Post"/>             
+                    }
                 }
             }
     
@@ -138,12 +145,12 @@
                 <div class="dp_post_header">
                     @if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
                     {
-                        @:Helpers.DefaultProfilePicture();
+                        @:@Helpers.DefaultProfilePicture();
                         @:@dp.DisplayName <br />
                     }
                     else
                     {
-                        @:Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dp.CourseUser.AbstractCourseID, userprofile = dp.CourseUser.UserProfileID }));
+                        @:@Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dp.CourseUser.AbstractCourseID, userprofile = dp.CourseUser.UserProfileID }))
                         @:@dp.CourseUser.UserProfile.FirstName @dp.CourseUser.UserProfile.LastName <br />
                     }
                     @dp.Posted <br /> <br />
