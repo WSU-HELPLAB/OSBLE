@@ -195,7 +195,7 @@ namespace OSBLE.Controllers
 
             Session["StudentID"] = student.ID;
 
-            if (assignment != null && student != null && (postOrReply >= 0 && postOrReply <= 2))
+            if (assignment != null && student != null && (postOrReply >= 0 && postOrReply <= 3))
             {
                 if (assignment.HasDiscussionTeams)
                 {
@@ -215,17 +215,26 @@ namespace OSBLE.Controllers
                         posts = (from post in db.DiscussionPosts
                                  where post.AssignmentID == assignment.ID &&
                                  post.CourseUserID == tm.CourseUserID &&
-                                 post.IsReply == false
+                                 !post.IsReply 
                                  select post).ToList();
                         foreach (DiscussionPost post in posts)
                         {
-                            post.DisplayName = "Anonymous " + tm.CourseUserID;
-                            post.ShowProfilePicture = false;
+                            post.DisplayName = "Anonymous " + post.CourseUserID;
                             teamPosts.Add(post);
                         }
                     }
+                    posts = (from post in db.DiscussionPosts
+                             where post.AssignmentID == assignment.ID &&
+                             post.CourseUser.AbstractRole.CanModify &&
+                             !post.IsReply
+                             select post).ToList();
+                    foreach (DiscussionPost post in posts)
+                    {
+                        teamPosts.Add(post);
+                    }
                     ViewBag.Posts = teamPosts.OrderBy(t => t.Posted);
-                }
+                    }
+               
                 else
                 {
                     posts = (from post in db.DiscussionPosts
