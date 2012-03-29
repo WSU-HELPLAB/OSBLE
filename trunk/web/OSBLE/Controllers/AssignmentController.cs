@@ -271,10 +271,19 @@ namespace OSBLE.Controllers
             List<Score> scores = assignment.Scores.ToList();
             List<CourseUser> cuList = null;
             List<AssignmentDetailsViewModel> AssignmentDetailsList = new List<AssignmentDetailsViewModel>();
+            List<AssignmentTeam> teams = new List<AssignmentTeam>();
 
             if (activeCourse.AbstractRole.CanModify || activeCourse.AbstractRole.Anonymized) //Instructor setup || Observer
             {
-                List<AssignmentTeam> teams = assignment.AssignmentTeams.ToList();
+
+                if (assignment.AssignmentTypeID == 4)
+                {
+                    teams = assignment.PreceedingAssignment.AssignmentTeams.ToList();
+                }
+                else
+                {
+                    teams = assignment.AssignmentTeams.ToList();
+                }
                 List<DiscussionPost> allUserPosts = (from a in db.DiscussionPosts
                                                      where a.AssignmentID == assignment.ID
                                                      select a).ToList();
@@ -298,9 +307,12 @@ namespace OSBLE.Controllers
                 }
 
                 //Sorting teams by team name (also last name if teams are of 1 because team name is the users name
-                if (assignment.HasTeams)
+                if (assignment.PreceedingAssignment != null)
                 {
-                    teams.Sort((x, y) => string.Compare(x.Team.Name, y.Team.Name));
+                    if (assignment.PreceedingAssignment.HasTeams)
+                    {
+                        teams.Sort((x, y) => string.Compare(x.Team.Name, y.Team.Name));
+                    }                    
                 }
 
                 /*MG Going through each team in the assignment and for each team going through the scores until a match is found
@@ -559,9 +571,11 @@ namespace OSBLE.Controllers
         public ActionResult TeacherTeamEvaluation(int teamId, int assignmentId)
         {
             ViewBag.Team = db.Teams.Find(teamId);
-            Team team = db.Teams.Find(teamId);
             ViewBag.Time = DateTime.Now;
             Assignment a = db.Assignments.Find(assignmentId);
+
+            Team team = db.Teams.Find(teamId);
+
             List<TeamEvaluation> teamEvaluations = (from t in db.TeamEvaluations
                                                     where t.TeamID == teamId &&
                                                     t.AssignmentID == a.ID
@@ -570,10 +584,15 @@ namespace OSBLE.Controllers
                                                                 where t.TeamEvaluation.TeamID == teamId &&
                                                                 t.TeamEvaluation.AssignmentID == a.ID
                                                                 select t).ToList();
+
+            
             if (teamEvaluations.Count > 0)
             {
+                AssignmentTeam at = GetAssignmentTeam(a.PreceedingAssignment, teamMemberEvaluations.FirstOrDefault().Evaluator.UserProfile);
+                ViewBag.Team = at;
                 ViewBag.TeamEvaluations = teamEvaluations;
                 ViewBag.TeamMemberEvaluations = teamMemberEvaluations;
+                ViewBag.Assignment = a;
                 return View("_TeacherTeamEvaluationView");
             }
             else
@@ -651,7 +670,7 @@ namespace OSBLE.Controllers
                 TeamEvaluation te = new TeamEvaluation()
                 {
                     AssignmentID = assignment.ID,
-                    TeamID = at.TeamID,
+                    TeamID = pAt.TeamID,
                     Comments = comments
                 };
                 db.TeamEvaluations.Add(te);
@@ -683,6 +702,40 @@ namespace OSBLE.Controllers
         }
 
         [CanModifyCourse]
+        public ActionResult PublishTeamMultiplier(int teamId, int assignmentId)
+        {
+            Team team = db.Teams.Find(teamId);
+            Assignment assignment = db.Assignments.Find(assignmentId);
+            double multiplier = 0;
+            foreach (TeamMember tm in team.TeamMembers)
+            {
+                double evalPoints = (from t in db.TeamMemberEvaluations
+                                     where t.RecipientID == tm.CourseUserID &&
+                                     t.TeamEvaluation.AssignmentID == assignment.ID
+                                     select t.Points).Sum();
+
+                int count = (from te in db.TeamEvaluations
+                             where te.TeamID == team.ID &&
+                             te.AssignmentID == assignment.ID
+                             select te).Count();
+
+                multiplier = (evalPoints / (count * 100));
+                Score userPreviousAssignmentScore = (from s in db.Scores
+                                                     where s.CourseUserID == tm.CourseUserID &&
+                                                     s.AssignmentID == assignment.PrecededingAssignmentID
+                                                     select s).FirstOrDefault();
+
+                if (userPreviousAssignmentScore != null)
+                {
+                    userPreviousAssignmentScore.Points *= multiplier;
+                    db.SaveChanges();
+                }
+            }
+
+            return RedirectToAction("AssignmentDetails", new { id = assignment.ID });
+        }
+
+        [CanModifyCourse]
         public void SubmitMultiplier(int assignmentId)
         {
             int currentCourseId = ActiveCourse.AbstractCourseID;
@@ -707,7 +760,6 @@ namespace OSBLE.Controllers
                 assignment.PreceedingAssignment.Scores.Where(s => s.CourseUserID == user.ID).FirstOrDefault().Multiplier = multiplier;
                 db.SaveChanges();
             }
-
         }
     }
 }

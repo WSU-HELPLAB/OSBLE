@@ -184,7 +184,7 @@
         {
             <tr>    
                 <td> <!--Cell for name-->
-                    @if (assignment.HasTeams)
+                    @if (assignment.HasTeams || (assignment.PreceedingAssignment.HasTeams && assignment.AssignmentTypeID == 4))
                     {
                         <span style="text-decoration: underline">@advm.team.Name</span>
                         <a title="Email this team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = advm.team.ID })">@Helpers.MailButton()</a>
@@ -233,9 +233,9 @@
                     }
                     else
                     {
-                        if (advm.score== null)
+                        if (advm.score == null)
                         {
-                            
+
                             //If the assignment is a team evaluation
                             if (assignment.AssignmentTypeID == 4)
                             {
@@ -246,9 +246,6 @@
                             {
                                 <a href="#" onclick="goToCategoryTab(@assignment.CategoryID, @advm.team.TeamMembers.FirstOrDefault().CourseUser.ID);" style="cursor:pointer;">Not Graded</a>
                             }
-                            
-                            
-                            
                         }
                         else
                         {
@@ -270,7 +267,7 @@
                     </td>
                 }
             
-                @if (assignment.HasDeliverables )
+                @if (assignment.HasDeliverables)
                 {
                     <td>
 

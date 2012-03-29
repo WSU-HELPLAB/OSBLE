@@ -5,22 +5,25 @@
 @model Assignment
 
 @{
-    Assignment assignment = Model;
+    Assignment assignment = ViewBag.Assignment;
     ViewBag.Title = "Team Evaluation";
-    Team team = ViewBag.Team;
+    AssignmentTeam team = ViewBag.Team;
 }
 
-<h2>@team.Name Team Member Evaluations</h2>
+<h2>@team.Team.Name Team Member Evaluations</h2>
 
 
 @{
     List<TeamEvaluation> teamEvaluations = (from t in ViewBag.TeamEvaluations as IEnumerable<TeamEvaluation>
                                             select t).ToList();
 
+    List<TeamMemberEvaluation> teamMemberEvals = (from t in ViewBag.TeamMemberEvaluations as IEnumerable<TeamMemberEvaluation>
+                                                  select t).ToList();
+
     <table id="TeamMemberEvaluationTable">
         <tr>
             <th>Evaluators</th>
-            @foreach (TeamMember member in teamEvaluations.FirstOrDefault().Team.TeamMembers.OrderBy(u => u.CourseUser.UserProfile.LastName))
+            @foreach (TeamMember member in team.Team.TeamMembers.OrderBy(u => u.CourseUser.UserProfile.LastName).ThenBy(f => f.CourseUser.UserProfile.FirstName))
             {
                 <th>@member.CourseUser.UserProfile.FirstName @member.CourseUser.UserProfile.LastName</th>
             }
@@ -32,7 +35,7 @@
             <tr>
                 @{
             int count = 0;
-            foreach (TeamMemberEvaluation tme in te.TeamMemberEvaluations.OrderBy(u => u.Recipient.UserProfile.LastName))
+            foreach (TeamMemberEvaluation tme in te.TeamMemberEvaluations.OrderBy(u => u.Recipient.UserProfile.LastName).ThenBy(f => f.Recipient.UserProfile.FirstName))
             {
                 if (count < 1)
                 {
@@ -54,7 +57,7 @@
                 <b>Multiplier</b>
             </td>
             
-            @foreach (TeamMember member in teamEvaluations.FirstOrDefault().Team.TeamMembers.OrderBy(u => u.CourseUser.UserProfile.LastName))
+            @foreach (TeamMember member in team.Team.TeamMembers.OrderBy(u => u.CourseUser.UserProfile.LastName).ThenBy(f => f.CourseUser.UserProfile.FirstName))
             {
                 double multiplier = (from tm in ViewBag.TeamMemberEvaluations as IEnumerable<TeamMemberEvaluation>
                                      where tm.RecipientID == member.CourseUserID
@@ -66,7 +69,9 @@
             }
             <td></td>
         </tr> 
-    </table>                                                                                                   
+    </table>    
+    <br />
+    @Html.ActionLink("Publish " + team.Team.Name + "'s  Multiplier", "PublishTeamMultiplier", new { teamId = team.TeamID, assignmentId = assignment.ID })                                                                                               
 }
 
 
