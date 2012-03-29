@@ -198,10 +198,12 @@ namespace OSBLE.Controllers
                      !post.IsReply
                      orderby post.Posted
                      select post).ToList();
-
             foreach (DiscussionPost post in posts)
             {
-                post.DisplayName = "Anonymous " + post.CourseUserID;
+                if (!post.CourseUser.AbstractRole.CanModify)
+                {
+                    post.DisplayName = "Anonymous " + post.CourseUserID;
+                }
             }            
 
             Session["PostOrReply"] = postOrReply;
