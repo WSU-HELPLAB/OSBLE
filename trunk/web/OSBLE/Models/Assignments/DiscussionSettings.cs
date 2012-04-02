@@ -15,9 +15,8 @@ namespace OSBLE.Models.Assignments
     public enum DiscussionSettings : byte
     { 
         AnonymousPosts = 1,
-        AnonymousReplies = 2,
-        AnonymousRoles = 4,
-        RequiresPostBeforeView = 8,
+        AnonymousRoles = 2,
+        RequiresPostBeforeView = 4,
     };
 
     public class DiscussionSetting
@@ -101,31 +100,6 @@ namespace OSBLE.Models.Assignments
                 else
                 {
                     RemoveAnonymityLevel(DiscussionSettings.AnonymousPosts);
-                }
-            }
-        }
-
-        //TODO- This is not longer needed. We need to remove it.
-        /// <summary>
-        /// Returns true if replies in the discussion are marked anonymous
-        /// </summary>
-        [NotMapped]
-        [Display(Name = "Anonymize authors of replies to discussion posts")]
-        public bool HasAnonymousReplies
-        {
-            get
-            {
-                return HasAnonymityLevel(DiscussionSettings.AnonymousReplies);
-            }
-            set
-            {
-                if (value == true)
-                {
-                    AddAnonymityLevel(DiscussionSettings.AnonymousReplies);
-                }
-                else
-                {
-                    RemoveAnonymityLevel(DiscussionSettings.AnonymousReplies);
                 }
             }
         }

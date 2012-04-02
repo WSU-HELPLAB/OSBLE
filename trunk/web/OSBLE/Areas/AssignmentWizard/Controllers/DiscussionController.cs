@@ -20,7 +20,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 return "Discussion Settings";
             }
-        }
+        }
+
 
         public override string ControllerDescription
         {

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.Assignments;
 
 namespace OSBLE.Models.Courses
 {
@@ -108,5 +110,6 @@ namespace OSBLE.Models.Courses
             EndDate = DateTime.Now.Date.AddDays(112); // Add 16 weeks.
             Categories = new List<Category>();
         }
+
     }
 }

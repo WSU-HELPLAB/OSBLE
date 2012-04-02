@@ -5,11 +5,15 @@ using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.AbstractCourses;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
     public class CommentCategoryController : WizardBaseController
     {
+        private string previousButtonText = "LoadPreviousConfiguration";
+        private string previousSelect = "PreviousSelect";
+
         public override string ControllerName
         {
             get { return "CommentCategory"; }
@@ -49,9 +53,19 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
+        private void BuildViewBag()
+        {
+            ViewBag.PreviousAssignments = (from assignment in db.Assignments
+                                          where assignment.Category.CourseID == activeCourse.AbstractCourseID
+                                          select assignment).ToList();
+            ViewBag.PreviousAssignmentButton = previousButtonText;
+            ViewBag.PreviousSelectName = previousSelect;
+        }
+
         public override ActionResult Index()
         {
             base.Index();
+            BuildViewBag();
             if (Assignment.CommentCategory == null)
             {
                 Assignment.CommentCategory = new CommentCategoryConfiguration();
@@ -63,12 +77,38 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public ActionResult Index(Assignment model)
         {
             Assignment = db.Assignments.Find(model.ID);
-            CommentCategoryConfiguration config = BuildCommentCategories();
-            Assignment.CommentCategory = config;
-            Assignment.CommentCategoryID = 0;
-            db.SaveChanges();
-            WasUpdateSuccessful = true;
-            return base.PostBack(Assignment);
+
+            //are we loading a previous config?
+            if (Request.Form.AllKeys.Contains(previousButtonText))
+            {
+                //prevent wizard advancement
+                WasUpdateSuccessful = false;
+
+                //load previous comment categories
+                int assignmentId = 0;
+                Int32.TryParse(Request.Form[previousSelect], out assignmentId);
+                if (assignmentId != 0)
+                {
+                    Assignment oldAssignment = db.Assignments.Find(assignmentId);
+                    Index();
+                    Assignment.CommentCategory = oldAssignment.CommentCategory;
+                    return View(Assignment);
+                }
+                else
+                {
+                    return Index();
+                }
+            }
+            else
+            {
+                //normal postback
+                CommentCategoryConfiguration config = BuildCommentCategories();
+                Assignment.CommentCategory = config;
+                Assignment.CommentCategoryID = 0;
+                db.SaveChanges();
+                WasUpdateSuccessful = true;
+                return base.PostBack(Assignment);
+            }
         }
 
         private CommentCategoryConfiguration BuildCommentCategories()

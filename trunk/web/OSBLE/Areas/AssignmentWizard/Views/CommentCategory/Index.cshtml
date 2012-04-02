@@ -4,6 +4,9 @@
 @{
     ViewBag.Title = "Assignment Creation Wizard";
     ViewBag.ComponentName = "Comment Categories";
+    List<Assignment> previousAssignments = ViewBag.PreviousAssignments;
+    string previousButtonText = ViewBag.PreviousAssignmentButton;
+    string previousSelectName = ViewBag.PreviousSelectName;
 }
 @section Header
 {
@@ -11,9 +14,22 @@
 }
 @Html.HiddenFor(m => m.ID)
 <div id="manual_config_options" class="indented_options">
+<ul style="list-style:none;">
+    <li style="margin-bottom:8px;">Load an existing configuration from: 
+        <select name="@previousSelectName">
+        @foreach (Assignment pastAssignment in previousAssignments)
+        {
+            <option value="@pastAssignment.ID">@pastAssignment.AssignmentName</option>
+        }
+        </select>
+        <input type="submit" value="Load" name="@previousButtonText" />
+    </li>
+    <li>
     Create a new set of comment categories called
         <input type="text" id="category_config_name" name="category_config_name" value="@Model.CommentCategory.Name" />
         <br />
+    </li>
+</ul>
         <br style="clear: both;" />
     <div id="category_data">
     </div>
