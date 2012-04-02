@@ -58,7 +58,7 @@ namespace OSBLE.Models
 
         public DbSet<DiscussionTeam> DiscussionTeams { get; set; }
 
-        public DbSet<AssignmentReviewTeam> ReviewTeams { get; set; }
+        public DbSet<ReviewTeam> ReviewTeams { get; set; }
 
         public DbSet<Team> Teams { get; set; }
 
@@ -148,16 +148,6 @@ namespace OSBLE.Models
 #endif
             //try to keep modelbuilder stuff in alphabetical order
 
-            modelBuilder.Entity<AssignmentReviewTeam>()
-                .HasRequired(rt => rt.AuthorTeam)
-                .WithMany()
-                .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<AssignmentReviewTeam>()
-                .HasRequired(rt => rt.ReviewTeam)
-                .WithMany()
-                .WillCascadeOnDelete(false);
-
             modelBuilder.Entity<Deliverable>()
                 .HasRequired(d => d.Assignment)
                 .WithMany(a => a.Deliverables)
@@ -191,6 +181,16 @@ namespace OSBLE.Models
             modelBuilder.Entity<Score>()
                 .HasRequired(s => s.Assignment)
                 .WithMany(a => a.Scores)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<ReviewTeam>()
+                .HasRequired(rt => rt.AuthorTeam)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<ReviewTeam>()
+                .HasRequired(rt => rt.Team)
+                .WithMany()
                 .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Rubric>()

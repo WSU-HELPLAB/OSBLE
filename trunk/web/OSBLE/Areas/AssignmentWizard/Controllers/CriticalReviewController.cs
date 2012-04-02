@@ -74,5 +74,64 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             SetUpViewBag();
             return View(Assignment);
         }
+
+        [HttpPost]
+        public virtual ActionResult Index(Assignment model)
+        {
+            Assignment = db.Assignments.Find(model.ID);
+
+            //Blow out all previous review teams and readd the ones we get from the view.
+            //AC Note: This may have to be changed depending on how we implement the new 
+            //HTML-based review interface.
+            List<ReviewTeam> oldTeams = db.ReviewTeams.Where(rt => rt.AssignmentID == Assignment.ID).ToList();
+            foreach(ReviewTeam oldTeam in oldTeams)
+            {
+                db.ReviewTeams.Remove(oldTeam);
+            }
+            db.SaveChanges();
+
+            //add new values back in, save again.
+            Assignment.ReviewTeams = ParseReviewTeams();
+            db.SaveChanges();
+            WasUpdateSuccessful = true;
+            SetUpViewBag();
+            return base.PostBack(Assignment);
+        }
+
+        private List<ReviewTeam> ParseReviewTeams()
+        {
+            List<ReviewTeam> reviewTeams = new List<ReviewTeam>();
+            string[] reviewTeamKeys = Request.Form.AllKeys.Where(k => k.Contains("reviewTeam_")).ToArray();
+            foreach (string reviewTeamKey in reviewTeamKeys)
+            {
+
+                int reviewerId = 0;
+                Int32.TryParse(reviewTeamKey.Split('_')[1], out reviewerId);
+
+                //skip bad apples
+                if (reviewerId == 0)
+                {
+                    continue;
+                }
+
+                //Loop through each review item.  Review items are contained within the form value separated
+                //by underscores (_)
+                string reviewItems = Request.Form[reviewTeamKey];
+                string[] itemPieces = reviewItems.Split('_');
+                foreach (string item in itemPieces)
+                {
+                    int authorId = 0;
+                    Int32.TryParse(item, out authorId);
+                    if (authorId > 0)
+                    {
+                        ReviewTeam activeTeam = new ReviewTeam();
+                        activeTeam.ReviewTeamID = reviewerId;
+                        activeTeam.AuthorTeamID = authorId;
+                        reviewTeams.Add(activeTeam);
+                    }
+                }
+            }
+            return reviewTeams;
+        }
     }
 }

@@ -72,7 +72,8 @@ function buildTeams() {
     hideErrors();
 
     //don't continue if we didn't get a valid number
-    if (itemsToReview == undefined || itemsToReview == 0) {
+    itemsToReview = parseInt(itemsToReview);
+    if (itemsToReview == undefined || itemsToReview == 0 || isNaN(itemsToReview)) {
         displayError("The number of review items must be greater than zero.");
         return;
     }
@@ -80,6 +81,11 @@ function buildTeams() {
     //don't allow more review instances than reviewers (will cause an infinte loop)
     if (itemsToReview > numReviewers) {
         displayError("The number of review items cannot exceed the number of reviewers.");
+        return;
+    }
+
+    if (itemsToReview > numReviewTeams) {
+        displayError("The number of reviewers cannot exceed the number of review items.");
         return;
     }
 
@@ -207,30 +213,24 @@ function hideErrors() {
 //Before we can postback, we need to inject students into teams for the controller to process
 function processForm(evt) {
 
-    //get all teams
-    var teams = $.find('.TeamDiv');
-    for (var i = 0; i < teams.length; i++) {
-
-        //find the team's name
-        var teamName = $(teams[i]).find('.TeamNameTextBox').val();
+    //get all review items
+    var reviewItems = $.find('.TeamDiv');
+    for (var i = 0; i < reviewItems.length; i++) {
 
         //find the team's DB ID
-        var teamId = parseInt($(teams[i]).context.id.split('_')[2]);
+        var itemId = parseInt($(reviewItems[i]).context.id.split('_')[1]);
 
-        //set the team name if the DB ID isn't 0
-        if (teamId > 0) {
-            $('#team_' + teamId).val(teamName);
-        }
+        //find all reviewers for this item
+        $(reviewItems[i]).find(".StudentListItem").each(function (index) {
 
-        //find all students on this team
-        $(teams[i]).find(".Student").each(function (index) {
-
-            //find the student's id
-            var rawId = $(this).context.id;
-            var studentId = rawId.split("_")[1];
+            //find the reviewer's id
+            var rawId = $(this).attr("data-id");
+            var reviewerId = rawId.split("_")[1];
 
             //set the form value
-            $("#student_" + studentId).val(teamName);
+            var oldVal = $("#reviewTeam_" + reviewerId).val();
+            var newVal = "" + oldVal + "_" + itemId;
+            $("#reviewTeam_" + reviewerId).val(newVal);
         });
     }
 }
