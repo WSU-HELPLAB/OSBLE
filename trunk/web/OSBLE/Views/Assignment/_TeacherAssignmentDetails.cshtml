@@ -14,11 +14,11 @@
     int totalScores = 0;
     foreach (AssignmentDetailsViewModel advm in ViewBag.AssignmentDetailsVMList)
     {
-        if(advm.submissionTime != null)
+        if (advm.submissionTime != null)
         {
             submittedCount++;
         }
-        if(advm.score != null && advm.score.Points >= 0)
+        if (advm.score != null && advm.score.Points >= 0)
         {
             totalScores++;
         }
@@ -78,7 +78,7 @@
         <th>Submission</th>
         @*<th>Submit for Student</th>*@
     }
-    @if(assignment.AssignmentTypeID == 3)
+    @if (assignment.AssignmentTypeID == 3)
     {
         <th style="padding-right:10px">Posts</th> 
         <th style="padding-right:10px">Replies</th> 
@@ -87,23 +87,23 @@
     <th>Late Penalty</th>
     <br />
 
-    @if(assignment.AssignmentTypeID == 3 && assignment.HasDiscussionTeams)
+    @if (assignment.AssignmentTypeID == 3 && assignment.HasDiscussionTeams)
     {
-        foreach(DiscussionTeam dt in (ViewBag.DiscussionTeamList))
+        foreach (DiscussionTeam dt in (ViewBag.DiscussionTeamList))
         {
         <tbody id="awesome">
             <tr>
-                <td colspan="2" title="View @dt.Team.Name's discussion.">@Html.ActionLink(dt.Team.Name, "TeacherIndex", "DiscussionAssignment", new {assignmentId = assignment.ID, courseUserId = dt.Team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 3}, new {})</td>
+                <td colspan="2" title="View @dt.Team.Name's discussion.">@Html.ActionLink(dt.Team.Name, "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = dt.Team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 3 }, new { })</td>
                 <td id="posts-@dt.TeamID"></td>
                 <td id="replies-@dt.TeamID"></td>
                 <td id="all-@dt.TeamID" colspan="2"></td>
             </tr>
             
-            @foreach(TeamMember tm in (dt.Team.TeamMembers).OrderBy(s => s.CourseUser.UserProfile.LastName).ThenBy(c => c.CourseUser.UserProfile.FirstName))
+            @foreach (TeamMember tm in (dt.Team.TeamMembers).OrderBy(s => s.CourseUser.UserProfile.LastName).ThenBy(c => c.CourseUser.UserProfile.FirstName))
             {
-                foreach(AssignmentDetailsViewModel advm in ViewBag.AssignmentDetailsVMList)
+                foreach (AssignmentDetailsViewModel advm in ViewBag.AssignmentDetailsVMList)
                 {
-                    if(tm.CourseUserID ==  advm.team.TeamMembers.FirstOrDefault().CourseUserID)
+                    if (tm.CourseUserID == advm.team.TeamMembers.FirstOrDefault().CourseUserID)
                     {
                         
                         <tr>
@@ -142,7 +142,7 @@
                             }
                             else
                             {
-                                if (advm.score== null)
+                                if (advm.score == null)
                                 {
                                     <a href="#" onclick="goToCategoryTab(@assignment.CategoryID, @advm.team.TeamMembers.FirstOrDefault().CourseUser.ID);" style="cursor:pointer;">Not Graded</a>
                                 }
@@ -172,7 +172,7 @@
                             }
                         </td>
                         </tr>
-                    } 
+                    }
                 }
             }
         </tbody>
@@ -184,12 +184,22 @@
         {
             <tr>    
                 <td> <!--Cell for name-->
-                    @if (assignment.HasTeams || (assignment.PreceedingAssignment.HasTeams && assignment.AssignmentTypeID == 4))
+                    @if (assignment.HasTeams)
                     {
                         <span style="text-decoration: underline">@advm.team.Name</span>
                         <a title="Email this team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = advm.team.ID })">@Helpers.MailButton()</a>
                         <br/>
                         <span>@advm.PrintTeam()</span>
+                    }
+                    else if (assignment.PreceedingAssignment != null)
+                    {
+                        if (assignment.PreceedingAssignment.HasTeams && assignment.AssignmentTypeID == 4)
+                        {
+                            <span style="text-decoration: underline">@advm.team.Name</span>
+                            <a title="Email this team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = advm.team.ID })">@Helpers.MailButton()</a>
+                            <br/>
+                            <span>@advm.PrintTeam()</span>
+                        }
                     }
                     else
                     {
