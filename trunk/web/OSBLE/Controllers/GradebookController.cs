@@ -1093,10 +1093,25 @@ namespace OSBLE.Controllers
                 if (assignmentId != 0)
                 {
                     Assignment assignment = db.Assignments.Find(assignmentId);
-                    if (assignmentId != null)
+                    if (assignment != null)
                     {
+                        int pointsPossibleTemp = assignment.PointsPossible;
                         assignment.PointsPossible = value;
+                        assignment.addedPoints = assignment.addedPoints * ((double)value / pointsPossibleTemp);
                         db.SaveChanges();
+                        
+                        foreach (Score s in assignment.Scores)
+                        {
+                            if (assignment.PointsPossible <= 0)
+                            {
+                                ModifyGrade(-1.0, s.CourseUserID, s.AssignmentID);
+                            }
+                            else
+                            {
+                                s.RawPoints = s.RawPoints * ((double)value / pointsPossibleTemp);
+                                ModifyGrade(s.RawPoints, s.CourseUserID, s.AssignmentID);
+                            }
+                        }                        
 
                         if (assignment.Category.dropX > 0)
                         {
@@ -1688,7 +1703,6 @@ namespace OSBLE.Controllers
                         if (lateness != null)
                         {
                             latePenalty = CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
-                            latePenalty = (100 - latePenalty) / 100;
                         }
 
                         if (grades.CustomLatePenaltyPercent >= 0) //Using CustomLatePenalty
@@ -1697,10 +1711,7 @@ namespace OSBLE.Controllers
                         }
                         else //Using default late penalty
                         {
-                            if (latePenalty != 0)
-                            {
-                                value = value * latePenalty;
-                            }
+                            value = value * ((100.0 - latePenalty) / 100.0);
                         }
 
                         if (currentCategory.MaxAssignmentScore >= 0)
@@ -1746,8 +1757,7 @@ namespace OSBLE.Controllers
                             if (lateness != null)
                             {
                                 latePenalty = CalcualateLatePenaltyPercent(currentAssignment, (TimeSpan)lateness);
-                                latePenalty = (100 - latePenalty) / 100;
-                                value = value * latePenalty;
+                                value = value * ((100 - latePenalty) / 100);
                             }
 
                             if (currentCategory.MaxAssignmentScore > 0)
@@ -2433,7 +2443,8 @@ namespace OSBLE.Controllers
             //Pull the gradeAssignments
             List<Assignment> assignments = (from assignment in db.Assignments
                                             where assignment.CategoryID == currentTab.ID &&
-                                            !(assignment.IsDraft)
+                                            !(assignment.IsDraft) &&
+                                            assignment.PointsPossible > 0
                                             orderby assignment.ColumnOrder
                                             select assignment).ToList();
 
@@ -2490,7 +2501,8 @@ namespace OSBLE.Controllers
                 //Pull the gradeAssignments
                 assignments = (from assignment in db.Assignments
                                where assignment.CategoryID == currentTab.ID &&
-                               !(assignment.IsDraft)
+                               !(assignment.IsDraft) &&
+                               assignment.PointsPossible > 0
                                orderby assignment.ColumnOrder
                                select assignment).ToList();
 

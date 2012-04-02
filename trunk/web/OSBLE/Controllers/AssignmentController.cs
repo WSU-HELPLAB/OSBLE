@@ -728,6 +728,7 @@ namespace OSBLE.Controllers
                 if (userPreviousAssignmentScore != null)
                 {
                     userPreviousAssignmentScore.Points *= multiplier;
+                    userPreviousAssignmentScore.Multiplier = multiplier;
                     db.SaveChanges();
                 }
             }

@@ -429,8 +429,8 @@ namespace OSBLE.Controllers
                 return null;
             }
 
-            TimeSpan? lateness = dueDate - submissionTime;
-            if (lateness.Value.TotalMinutes >= 0)
+            TimeSpan? lateness = submissionTime - dueDate;
+            if (lateness.Value.TotalMinutes <= 0)
             {
                 return null;
             }
@@ -443,13 +443,13 @@ namespace OSBLE.Controllers
             double returnVal;
             if (lateness.TotalHours < assignment.HoursLateWindow)
             {
-                returnVal = lateness.TotalHours * assignment.DeductionPerUnit;
+                returnVal = ((int)(lateness.TotalHours / assignment.HoursPerDeduction) + 1) * assignment.DeductionPerUnit;
 
                 if (returnVal > 100)
                 {
                     returnVal = 100;
                 }
-                return Math.Abs(returnVal);
+                return returnVal;
             }
             //The assignment is automatic 0.
             else

@@ -103,6 +103,20 @@
         background: White;
     }
     
+    #multiplier
+    {
+        border: 1px solid black;
+        width: 300px;
+        background: White;
+    }
+    
+    #subjectToMultiplier
+    {
+        border: 1px solid black;
+        width: 300px;
+        background: White;
+    }
+    
     #rubricToolTip
     {
         border: 1px solid black;
@@ -206,7 +220,7 @@
                 Name
             </th>
             @{
-                if(ViewBag.Customize == Category.GradeOptions.XtoDrop && ViewBag.NumDropped != 0)
+                if (ViewBag.Customize == Category.GradeOptions.XtoDrop && ViewBag.NumDropped != 0)
                 {
                     <th id="totalCustomize">Total [Drop @ViewBag.NumDropped lowest]</th>
                 }
@@ -282,44 +296,88 @@
             int cols = 2;
             foreach (Assignment assignment in ViewBag.Assignments)
             {
+                bool hasEval = false;
                 cols++;
                 var score = (from scores in ViewBag.UserScores as IEnumerable<Score>
                              where scores.AssignmentID == assignment.ID &&
                              scores.Points >= 0
                              select scores);
 
+                foreach (Assignment a in ViewBag.Assignments)
+                {
+                    if (a.PrecededingAssignmentID == assignment.ID)
+                    {
+                        hasEval = true;
+                    }
+                }
+
                 if (score.Count() > 0)
                 {
-                    latePercentPenalty = (1 - score.First().LatePenaltyPercent) * 100;
+                    latePercentPenalty = score.First().LatePenaltyPercent;
                     if (score.First().Assignment.Rubric != null)
                     {
-                        if (score.First().LatePenaltyPercent > 0)
+                        if (hasEval == true)
                         {
-                            <td id="rubric-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AssignmentID, cuId = cu.ID}, new { @style = "color:Red" }) @Helpers.CreateToolTip("This assignment was late")</td>                            
+
+                            if (score.First().LatePenaltyPercent > 0)
+                            {
+                                if (score.First().Multiplier > 0)
+                                {
+                                    <td id="rubric-@assignment.ID" onmouseover="showLatePenaltyAndMultiplier();" onmouseout="hideLatePenaltyAndMultiplier();" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AssignmentID, cuId = cu.ID }, new { @style = "color:Red" }) @Helpers.CreateToolTip("This assignment was late")</td>                            
+                                }
+                            }
+                            else
+                            {
+                                if (score.First().Multiplier > 0)
+                                {
+                                    <td id="rubric-@assignment.ID" onmouseover="showMultiplier(@score.First().Multiplier);" onmouseout="hideMultiplier()">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AssignmentID, cuId = cu.ID }, new { })</td>
+                                }
+                                else
+                                {
+                                    <td id="rubric-@assignment.ID" onmouseover="showSubjectMultiplier();" onmouseout="hideSubjectMultiplier();">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AssignmentID, cuId = cu.ID }, new { })</td>
+                                }
+                            }
                         }
                         else
                         {
-                            <td id="rubric-@assignment.ID" onmouseover="showRubricToolTip();" onmouseout="hideRubricToolTip();">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AssignmentID, cuId = cu.ID }, new { })</td>
+                            if (score.First().LatePenaltyPercent > 0)
+                            {
+                                <td id="rubric-@assignment.ID" onmouseover="showLatePenalty(@score.First().LatePenaltyPercent);" onmouseout="hideLatePenalty();" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AssignmentID, cuId = cu.ID }, new { @style = "color:Red" }) @Helpers.CreateToolTip("This assignment was late")</td>                            
+                            }
+                            else
+                            {
+                                <td id="rubric-@assignment.ID" onmouseover="showRubricToolTip();" onmouseout="hideRubricToolTip();">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AssignmentID, cuId = cu.ID }, new { })</td>
+                            }
                         }
                     }
                     else
                     {
                         if (score.First().Points > 0)
                         {
-                            if (score.First().LatePenaltyPercent > 0)
-                            {   
-                                <td id="teacher-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" style="font-style:italic; color:Red;">@score.First().Points.ToString(".##")</td>
-                            }
-                            else
+                            if (hasEval == true)
                             {
-                                <td id="teacher-@assignment.ID">@score.First().Points.ToString(".##")</td>
+                                if (score.First().LatePenaltyPercent > 0)
+                                {   
+                                    <td id="teacher-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" style="font-style:italic; color:Red;">@score.First().Points.ToString(".##")</td>
+                                }
+                                else
+                                {
+                                    if (score.First().Multiplier > 0)
+                                    {
+                                        <td id="teacher-@assignment.ID" onmouseover="showMultiplier(@score.First().Multiplier);" onmouseout="hideMultiplier();" style="color:Green">@score.First().Points.ToString(".##")</td>
+                                    }
+                                    else
+                                    {
+                                        <td id="teacher-@assignment.ID" onmouseover="showSubjectMultiplier();" onmouseout="hideSubjectMultiplier();">@score.First().Points.ToString(".##")</td>
+                                    }
+                                }
                             }
                         }
                         else
                         {
                             if (score.First().LatePenaltyPercent > 0)
                             {
-                                <td id="teacher-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" style="font-style:italic; color:Red">@String.Format("{0}", 0)</td>
+                                <td id="teacher-@assignment.ID" onmouseover="showLatePenalty(@score.First().LatePenaltyPercent);" onmouseout="hideLatePenalty();" style="font-style:italic; color:Red">@String.Format("{0}", 0)</td>
                             }
                             else
                             {
@@ -360,8 +418,35 @@
 <div id="latePenalty" style="display:none; position:absolute;">
     <table>
         <tr>
+            <td id="latePenBox">
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="latePenaltyAndMultiplier" style="display:none; position:absolute;">
+    <table>
+        <tr>
+            <td id="latePenAndMultBox">
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="subjectToMultiplier" style="display:none; position:absolute;">
+    <table>
+        <tr>
             <td>
-                This assignment was graded <b>@latePercentPenalty%</b> off because it was submitted late.
+                This grade is subject to change with team evaluation multiplier.
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="multiplier" style="display:none; position:absolute;">
+    <table>
+        <tr>
+            <td id="multiplierText" style="color:Green;">
             </td>
         </tr>
     </table>
@@ -398,13 +483,16 @@
         x = parseFloat(x);
         y = parseFloat(y);
 
-        y -= 100;
+        //y -= 100;
 
         $("#latePenalty").css("left", x + "px");
         $("#latePenalty").css("top", y + "px");
 
         $("#rubricToolTip").css("left", x + "px");
         $("#rubricToolTip").css("top", y + "px");
+
+        $("#multiplier").css("left", x + "px");
+        $("#multiplier").css("left", x + "px");
     });
 
     $("#grades td").keydown(function (e) {
@@ -439,12 +527,32 @@
         }
     });
 
-    function showLatePenalty() {
+    function showLatePenalty(latePen) {
         $("#latePenalty").animate({ "height": "show" }, { duration: 0 });
+        $("#latePenBox").html("This assignment was graded <b>" + latePen.toString() + "%</b> off because it was submitted late.");
+    }
+
+    function showLatePenaltyAndMultiplier(latePen, mult) {
+        $("#latePenaltyAndMultiplier").animate({ "height": "show" }, { duration: 0 });
+
+        $("#latePenAndMultBox").html("This assignment was graded <b>" + latePen.toString() +"%</b> off because it was submitted late. <br />This assignment's multiplier is " + mult.toString());
+    }
+
+    function hideLatePenaltyAndMultiplier() {
+        $("#latePenalty").animate({ "height": "show" }, { duration: 0 });
+    }
+
+    function showMultiplier(mult) {
+        $("#multiplier").animate({ "height": "show" }, { duration: 0 });
+        $("#multiplierText").html("The multiplier is " + mult.toString());
     }
 
     function hideLatePenalty() {
         $("#latePenalty").animate({ "height": "hide" }, { duration: 0 });
+    }
+
+    function showSubjectMultiplier() {
+        $("#subjectToMultiplier").animate({ "height": "show" }, { duration: 0 });
     }
 
     function showRubricToolTip() {
@@ -453,6 +561,14 @@
 
     function hideRubricToolTip() {
         $("#rubricToolTip").animate({ "height": "hide" }, { duration: 0 });
+    }
+
+    function hideMultiplier() {
+        $("#multiplier").animate({ "height": "hide" }, { duration: 0 });
+    }
+
+    function hideSubjectMultiplier() {
+        $("#subjectToMultiplier").animate({ "height": "hide" }, { duration: 0 });
     }
 
 
