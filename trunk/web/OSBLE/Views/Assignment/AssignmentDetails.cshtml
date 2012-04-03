@@ -314,6 +314,15 @@
         window.location.reload(true);
     }
 
+    function publishAllMultipliers(aId) {
+        $.ajax({
+            async: false,
+            url: "/Assignment/PublishAllMultipliers",
+            data: { assignmentId: aId }
+        });
+        window.location.reload(true);
+    }
+
     var scoreId;
     var userId;
     var assId;    

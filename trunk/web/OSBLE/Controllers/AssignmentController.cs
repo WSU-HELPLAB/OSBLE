@@ -737,29 +737,51 @@ namespace OSBLE.Controllers
         }
 
         [CanModifyCourse]
-        public void SubmitMultiplier(int assignmentId)
+        public void PublishAllMultipliers(int assignmentId)
         {
             int currentCourseId = ActiveCourse.AbstractCourseID;
             Assignment assignment = db.Assignments.Find(assignmentId);
+            List<TeamEvaluation> specificTeamEval = new List<TeamEvaluation>();
+            double multiplier = 0.0;
 
-            List<CourseUser> studentList = (from cu in db.CourseUsers
-                                            where cu.AbstractCourseID == currentCourseId && 
-                                            cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student
-                                            orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
-                                            select cu).ToList();
-                                            
-            List<TeamMemberEvaluation> teamEvaluations = (from te in db.TeamMemberEvaluations
-                                                          where te.TeamEvaluation.AssignmentID == assignmentId
-                                                          select te).ToList();
+            List<AssignmentTeam> teams = (from team in db.AssignmentTeams
+                                          where team.AssignmentID == assignment.PrecededingAssignmentID
+                                          select team).ToList();
 
-            foreach (CourseUser user in studentList)
+            List<TeamMemberEvaluation> teamMemberEvaluations = (from tme in db.TeamMemberEvaluations
+                                                                where tme.TeamEvaluation.AssignmentID == assignmentId
+                                                                select tme).ToList();
+            List<TeamEvaluation> teamEvaluations = (from te in db.TeamEvaluations
+                                                    where te.AssignmentID == assignment.ID
+                                                    select te).ToList();
+
+            foreach (AssignmentTeam team in teams)
             {
-                double multiplier = (from m in teamEvaluations
-                                     where m.RecipientID == user.ID
-                                     select m.Points).Sum();
+                foreach (TeamMember tm in team.Team.TeamMembers)
+                {
+                    specificTeamEval = (from te in teamEvaluations
+                                        where te.TeamID == team.TeamID
+                                        select te).ToList();
 
-                assignment.PreceedingAssignment.Scores.Where(s => s.CourseUserID == user.ID).FirstOrDefault().Multiplier = multiplier;
-                db.SaveChanges();
+                    if (specificTeamEval.Count() > 0)
+                    {
+                        double evalPoints = (from m in teamMemberEvaluations
+                                             where m.RecipientID == tm.CourseUserID
+                                             select m.Points).Sum();
+
+                        int count = (from te in db.TeamEvaluations
+                                     where te.TeamID == team.TeamID
+                                     select te).Count();
+
+                        multiplier = (evalPoints / (count * 100));
+
+                        double userAssignPoints = assignment.PreceedingAssignment.Scores.Where(s => s.CourseUserID == tm.CourseUserID).FirstOrDefault().Points;
+
+                        assignment.PreceedingAssignment.Scores.Where(s => s.CourseUserID == tm.CourseUserID).FirstOrDefault().Points = userAssignPoints * multiplier;
+                        assignment.PreceedingAssignment.Scores.Where(s => s.CourseUserID == tm.CourseUserID).FirstOrDefault().Multiplier = multiplier;
+                        db.SaveChanges();
+                    }
+                }
             }
         }
     }

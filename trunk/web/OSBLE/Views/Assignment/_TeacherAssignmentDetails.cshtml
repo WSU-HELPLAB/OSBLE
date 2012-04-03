@@ -43,11 +43,16 @@
         <td style="vertical-align:top"><text class="osbleColorBold" >Grading progress:</text></td>
         <td>
             @totalScores of @assignment.AssignmentTeams.Count() have been published<br />
-            @if (r.Count() > 0)
+            @if (assignment.AssignmentTypeID == 4)
+            {
+                <a style="cursor:pointer" onclick="publishAllMultipliers(@assignment.ID);">[Publish All Multipliers]</a>
+            }
+            else if (r.Count() > 0)
             {
                 @:@r.Count() have been saved as draft&nbsp<a style="cursor:pointer" onclick="publishAllGrades(@assignment.ID);">[Publish All]</a>
             }
-            else
+            
+            else 
             {
                 @:@r.Count() have been saved as draft
             }

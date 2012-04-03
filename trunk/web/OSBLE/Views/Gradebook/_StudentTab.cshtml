@@ -323,7 +323,7 @@
                             {
                                 if (score.First().Multiplier > 0)
                                 {
-                                    <td id="rubric-@assignment.ID" onmouseover="showLatePenaltyAndMultiplier();" onmouseout="hideLatePenaltyAndMultiplier();" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AssignmentID, cuId = cu.ID }, new { @style = "color:Red" }) @Helpers.CreateToolTip("This assignment was late")</td>                            
+                                    <td id="rubric-@assignment.ID" onmouseover="showLatePenaltyAndMultiplier(@score.First().LatePenaltyPercent, @score.First().Multiplier);" onmouseout="hideLatePenaltyAndMultiplier();" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AssignmentID, cuId = cu.ID }, new { @style = "color:Red" }) @Helpers.CreateToolTip("This assignment was late")</td>                            
                                 }
                             }
                             else
@@ -358,7 +358,7 @@
                             {
                                 if (score.First().LatePenaltyPercent > 0)
                                 {   
-                                    <td id="teacher-@assignment.ID" onmouseover="showLatePenalty();" onmouseout="hideLatePenalty();" style="font-style:italic; color:Red;">@score.First().Points.ToString(".##")</td>
+                                    <td id="teacher-@assignment.ID" onmouseover="showLatePenalty(@score.First().LatePenaltyPercent);" onmouseout="hideLatePenalty();" style="font-style:italic; color:Red;">@score.First().Points.ToString(".##")</td>
                                 }
                                 else
                                 {
@@ -371,6 +371,18 @@
                                         <td id="teacher-@assignment.ID" onmouseover="showSubjectMultiplier();" onmouseout="hideSubjectMultiplier();">@score.First().Points.ToString(".##")</td>
                                     }
                                 }
+                            }
+                            else
+                            {
+                                if (score.First().LatePenaltyPercent > 0)
+                                {   
+                                    <td id="teacher-@assignment.ID" onmouseover="showLatePenalty(@score.First().LatePenaltyPercent);" onmouseout="hideLatePenalty();" style="font-style:italic; color:Red;">@score.First().Points.ToString(".##")</td>
+                                }
+                                else
+                                {
+                                    <td id="teacher-@assignment.ID">@score.First().Points</td>
+                                }
+
                             }
                         }
                         else
@@ -437,7 +449,7 @@
     <table>
         <tr>
             <td>
-                This grade is subject to change with team evaluation multiplier.
+                This grade is subject to change after team evaluation multiplier is applied.
             </td>
         </tr>
     </table>

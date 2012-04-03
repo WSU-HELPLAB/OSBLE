@@ -2334,7 +2334,8 @@ namespace OSBLE.Controllers
 
             List<Assignment> assignments = (from assignment in db.Assignments
                                             where assignment.CategoryID == categoryId &&
-                                            !assignment.IsDraft
+                                            !assignment.IsDraft &&
+                                            assignment.PointsPossible > 0
                                             orderby assignment.ColumnOrder
                                             select assignment).ToList();
 
