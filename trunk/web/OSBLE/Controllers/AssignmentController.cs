@@ -377,8 +377,16 @@ namespace OSBLE.Controllers
                                                       where e.AssignmentID == assignment.ID &&
                                                       e.IsPublished == false
                                                       select e).ToList();
+                if (assignment.HasTeams)
+                {
+                    ViewBag.AssignmentDetailsVMList = AssignmentDetailsList.OrderBy(tn => tn.team.Name);
+                }
+                else
+                {
+                    ViewBag.AssignmentDetailsVMList = AssignmentDetailsList.OrderBy(l => l.team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName).ThenBy(f => f.team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName);
+                }
 
-                ViewBag.AssignmentDetailsVMList = AssignmentDetailsList;
+
                 if (activeCourse.AbstractRole.Anonymized) 
                 {
                     ViewBag.AssignmentDetailsVMList = AssignmentDetailsList.OrderBy(o => o.team.ID).ThenBy(c => c.team.TeamMembers.OrderBy(d => d.CourseUserID)).ToList();
