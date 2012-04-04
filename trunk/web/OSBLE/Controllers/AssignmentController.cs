@@ -594,19 +594,15 @@ namespace OSBLE.Controllers
                                                                 select t).ToList();
 
             
-            if (teamEvaluations.Count > 0)
-            {
-                AssignmentTeam at = GetAssignmentTeam(a.PreceedingAssignment, teamMemberEvaluations.FirstOrDefault().Evaluator.UserProfile);
-                ViewBag.Team = at;
-                ViewBag.TeamEvaluations = teamEvaluations;
-                ViewBag.TeamMemberEvaluations = teamMemberEvaluations;
-                ViewBag.Assignment = a;
-                return View("_TeacherTeamEvaluationView");
-            }
-            else
-            {
-                return View("_TeacherAssignmentDetails");
-            }            
+            AssignmentTeam at = GetAssignmentTeam(a.PreceedingAssignment, team.TeamMembers.FirstOrDefault().CourseUser.UserProfile);
+            ViewBag.Team = at;
+
+
+            ViewBag.TeamEvaluations = teamEvaluations;
+            ViewBag.TeamMemberEvaluations = teamMemberEvaluations;
+            ViewBag.Assignment = a;
+            
+            return View("_TeacherTeamEvaluationView");           
         }
 
         /// <summary>
