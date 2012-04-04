@@ -252,6 +252,9 @@
     <Compile Include="Models\ViewModels\TeamCreationViewModel.cs" />
     <Compile Include="Areas\AssignmentWizard\Models\WizardComponentManager.cs" />
     <Compile Include="Services\AuthenticationDomainService1.cs" />
+    <Compile Include="Services\AuthenticationService.svc.cs">
+      <DependentUpon>AuthenticationService.svc</DependentUpon>
+    </Compile>
     <Compile Include="Services\OSBLEService.cs" />
     <Compile Include="Services\ReviewInterfaceDomainService.cs" />
     <Compile Include="Services\RubricRiaService.cs" />
@@ -504,6 +507,7 @@
     <Content Include="Scripts\osble.js" />
     <Content Include="Scripts\osble.teacher_activity.js" />
     <Content Include="Scripts\Silverlight.js" />
+    <Content Include="Services\AuthenticationService.svc" />
     <Content Include="Services\UploaderWebService.svc" />
     <Content Include="Silverlight.js" />
     <Content Include="SilverlightSandboxTestPage.aspx" />
