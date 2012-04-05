@@ -35,10 +35,12 @@ namespace OSBLE.Services
                 List<HttpPostedFileBase> files = new List<HttpPostedFileBase>();
                 foreach (byte[] file in data)
                 {
+                    /*
                     HttpPostedFile assignmentFile = new HttpPostedFile();
                     StreamWriter writer = new StreamWriter(assignmentFile.InputStream);
                     writer.Write(file);
                     assignmentFile.InputStream.Position = 0;
+                     * */
                 }
 
                 SubmissionController submission = new SubmissionController();
