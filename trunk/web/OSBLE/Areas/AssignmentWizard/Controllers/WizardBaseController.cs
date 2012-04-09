@@ -126,12 +126,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             SortOrder = 0;
         }
 
-        public void SetUpViewBag()
+        private void SetUpViewBag()
         {
             ViewBag.Components = manager.SelectedComponents;
             ViewBag.ActiveComponent = manager.ActiveComponent;
             ViewBag.Assignment = Assignment;
-            ViewBag.Title = "Assignment Creation Wizard";
+            ViewBag.Title = "Assignment Wizard";
         }
 
         [CanModifyCourse]

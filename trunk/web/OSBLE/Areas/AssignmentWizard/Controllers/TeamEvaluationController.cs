@@ -2,30 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Web.Mvc;
 using OSBLE.Models.Assignments;
+using System.Web.Mvc;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
-    public class DiscussionController : WizardBaseController
+    public class TeamEvaluationController : WizardBaseController
     {
+#region WizardBaseController Overrides
         public override string ControllerName
         {
-            get { return "Discussion"; }
+            get { return "TeamEvaluation"; }
         }
-
-        public override string PrettyName
-        {
-            get
-            {
-                return "Discussion Settings";
-            }
-        }
-
 
         public override string ControllerDescription
         {
-            get { return "This assignment has students discuss one or more topics."; }
+            get { return "This assignment contains a team evaluation."; }
         }
 
         public override ICollection<WizardBaseController> Prerequisites
@@ -35,6 +27,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 List<WizardBaseController> prereqs = new List<WizardBaseController>();
                 prereqs.Add(new BasicsController());
                 prereqs.Add(new TeamController());
+                prereqs.Add(new PreviousAssignmentController());
                 return prereqs;
             }
         }
@@ -43,13 +36,10 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get
             {
-                return (new AssignmentTypes[] { AssignmentTypes.DiscussionAssignment }).ToList();
+                return (new AssignmentTypes[] { AssignmentTypes.TeamEvaluation }).ToList();
             }
         }
 
-        /// <summary>
-        /// The discussion component is required for discussion assignments
-        /// </summary>
         public override bool IsRequired
         {
             get
@@ -58,34 +48,45 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
+        public override string PrettyName
+        {
+            get
+            {
+                return "Evaluation Settings";
+            }
+        }
+#endregion
+
         public override ActionResult Index()
         {
             base.Index();
-            if (Assignment.DiscussionSettings == null)
+            if (Assignment.TeamEvaluationSettings == null)
             {
-                Assignment.DiscussionSettings = new DiscussionSetting();
-                Assignment.DiscussionSettings.InitialPostDueDate = Assignment.ReleaseDate.Add(new TimeSpan(7, 0, 0, 0, 0));
-                Assignment.DiscussionSettings.AssignmentID = Assignment.ID;
+                Assignment.TeamEvaluationSettings = new TeamEvaluationSettings();
+                Assignment.TeamEvaluationSettings.DiscrepancyCheckSize = 0;
+                Assignment.TeamEvaluationSettings.RequiredCommentLength = 0;
+                Assignment.TeamEvaluationSettings.MaximumMultiplier = 1.35;
+                Assignment.TeamEvaluationSettings.AssignmentID = Assignment.ID;
             }
-            return View(Assignment.DiscussionSettings);
+            return View(Assignment.TeamEvaluationSettings);
         }
 
         [HttpPost]
-        public ActionResult Index(DiscussionSetting model)
+        public ActionResult Index(TeamEvaluationSettings model)
         {
             Assignment = db.Assignments.Find(model.AssignmentID);
             if (ModelState.IsValid)
             {
                 //delete preexisting settings to prevent an FK relation issue
-                DiscussionSetting setting = db.DiscussionSettings.Find(model.AssignmentID);
+                TeamEvaluationSettings setting = db.TeamEvaluationSettings.Find(model.AssignmentID);
                 if (setting != null)
                 {
-                    db.DiscussionSettings.Remove(setting);
+                    db.TeamEvaluationSettings.Remove(setting);
                 }
                 db.SaveChanges();
 
                 //...and then re-add it.
-                Assignment.DiscussionSettings = model;
+                Assignment.TeamEvaluationSettings = model;
                 db.SaveChanges();
                 WasUpdateSuccessful = true;
             }
@@ -93,7 +94,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 WasUpdateSuccessful = false;
             }
-            return base.PostBack(Assignment.DiscussionSettings);
+            return base.PostBack(Assignment.TeamEvaluationSettings);
         }
     }
 }

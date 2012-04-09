@@ -272,6 +272,9 @@ namespace OSBLE.Models.Assignments
         [Association("DiscussionSetting_Assignment", "ID", "AssignmentID")]
         public virtual DiscussionSetting DiscussionSettings { get; set; }
 
+        [Association("TeamEvaluationSettings_Assignment", "ID", "AssignmentID")]
+        public virtual TeamEvaluationSettings TeamEvaluationSettings { get; set; }
+
         public double addedPoints { get; set; }
 
         public static IList<AssignmentTypes> AllAssignmentTypes

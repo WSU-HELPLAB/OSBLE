@@ -70,8 +70,9 @@ namespace OSBLE.Models
 
         public DbSet<TeamMemberEvaluation> TeamMemberEvaluations { get; set; }
 
-
         public DbSet<DiscussionReply> DiscussionReplies { get; set; }
+
+        public DbSet<TeamEvaluationSettings> TeamEvaluationSettings { get; set; }
 
         // Assignments
 
@@ -203,6 +204,11 @@ namespace OSBLE.Models
                 .HasRequired(re => re.Recipient)
                 .WithMany()
                 .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<TeamEvaluationSettings>()
+                .HasRequired(tes => tes.Assignment)
+                .WithOptional(a => a.TeamEvaluationSettings)
+                .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<TeamMemberEvaluation>()
                 .HasRequired(tm => tm.Evaluator)

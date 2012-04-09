@@ -170,6 +170,7 @@
     <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionTeamsController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\PreviousAssignmentController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\TeamEvaluationController.cs" />
     <Compile Include="Areas\AssignmentWizard\Models\WizardPrerequisiteComparer.cs" />
     <Compile Include="Areas\AssignmentWizard\Models\WizardPrerequisiteCountComparer.cs" />
     <Compile Include="Areas\AssignmentWizard\Models\WizardSortOrderComparer.cs" />
@@ -204,6 +205,7 @@
     <Compile Include="Models\Assignments\CommentCategory.cs" />
     <Compile Include="Models\Assignments\CommentCategoryConfiguration.cs" />
     <Compile Include="Models\Assignments\DiscussionTeam.cs" />
+    <Compile Include="Models\Assignments\TeamEvaluationSettings.cs" />
     <Compile Include="Models\Assignments\IAssignmentTeam.cs" />
     <Compile Include="Models\Assignments\ReviewTeam.cs" />
     <Compile Include="Models\Assignments\Score.cs" />
@@ -666,6 +668,7 @@
     <Content Include="Areas\AssignmentWizard\Views\Discussion\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\DiscussionTeams\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\CriticalReview\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\TeamEvaluation\Index.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />
