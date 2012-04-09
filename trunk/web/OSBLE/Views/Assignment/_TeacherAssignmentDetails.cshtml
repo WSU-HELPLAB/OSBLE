@@ -72,7 +72,14 @@
 @{    
     <table class="assignDetailsTable" cellspacing="0">
     <th>Name</th>
-    <th>Grade</th>
+    @if (assignment.AssignmentTypeID != 4)
+    {
+        <th>Grade</th>
+    }
+    else
+    {
+        <th style="padding-right:10px">Team Evaluations</th>
+    }
     @if (assignment.HasCommentCategories)
     {
         <th>Inline Comments</th>    
@@ -89,7 +96,14 @@
         <th style="padding-right:10px">Replies</th> 
         <th>All</th> 
     }
-    <th>Late Penalty</th>
+    @if(assignment.AssignmentTypeID == 4)
+    {
+        <th>Largest Discrepancy</th>
+    }
+    @if (assignment.AssignmentTypeID != 4)
+    {
+        <th>Late Penalty</th>
+    }
     <br />
 
     @if (assignment.AssignmentTypeID == 3 && assignment.HasDiscussionTeams)
@@ -254,7 +268,8 @@
                             //If the assignment is a team evaluation
                             if (assignment.AssignmentTypeID == 4)
                             {
-                                @Html.ActionLink("Team Evaluation", "TeacherTeamEvaluation", "Assignment", new { teamId = advm.team.ID, assignmentId = assignment.ID }, new { })
+                                
+                                @Html.ActionLink(advm.teamEvalsCompleted.ToString() + " of " + advm.teamEvalsTotal.ToString() + " submitted", "TeacherTeamEvaluation", "Assignment", new { teamId = advm.team.ID, assignmentId = assignment.ID }, new { })
                                 //<a href="#" onclick="goToCategoryTab(@da.Item1.Assignment.CategoryID, @da.Item2.TeamMembers.FirstOrDefault().CourseUser.ID);" style="cursor:pointer;">@da.Item1.getGradeAsPercent(da.Item1.Assignment.PointsPossible)></a>
                             }
                             else
@@ -322,16 +337,25 @@
                             @(Html.ActionLink((advm.replyCount + advm.postCount).ToString(), "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 2 }, new { }))
                         </td>   
                 }
-                <td style="vertical-align:bottom;" class="latePenaltyTd"> <!--Cell for late penalty-->
-                    @if (advm.score == null)
-                    {
-                        @:0.00 % <a class="latePenaltyA" style="display:none;" onclick="openManualLatePenWindow(0, @advm.team.TeamMembers.FirstOrDefault().CourseUser.ID, @assignment.ID);">@Helpers.EditButton()</a>
-                    }
-                    else
-                    {
-                        @advm.score.getAppliedLatePenaltyAsDecimal().ToString("P") <a class="latePenaltyA" style="display:none;" onclick="openManualLatePenWindow(@advm.score.ID, @advm.team.TeamMembers.FirstOrDefault().CourseUser.ID, @assignment.ID);">@Helpers.EditButton()</a>
-                    }
-                </td>
+                @if (assignment.AssignmentTypeID != 4)
+                {
+                    <td style="vertical-align:bottom;" class="latePenaltyTd"> <!--Cell for late penalty-->
+                        @if (advm.score == null)
+                        {
+                            @:0.00 % <a class="latePenaltyA" style="display:none;" onclick="openManualLatePenWindow(0, @advm.team.TeamMembers.FirstOrDefault().CourseUser.ID, @assignment.ID);">@Helpers.EditButton()</a>
+                        }
+                        else
+                        {
+                            @advm.score.getAppliedLatePenaltyAsDecimal().ToString("P") <a class="latePenaltyA" style="display:none;" onclick="openManualLatePenWindow(@advm.score.ID, @advm.team.TeamMembers.FirstOrDefault().CourseUser.ID, @assignment.ID);">@Helpers.EditButton()</a>
+                        }
+                    </td>
+                }
+                @if (assignment.AssignmentTypeID == 4)
+                {
+                    <td style="text-align:center">
+                        @advm.largestDifferenceInEvaluation().ToString()
+                    </td>
+                }
             </tr>
         }
     }

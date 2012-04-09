@@ -33,17 +33,39 @@
             <text class="osbleColorBold">Released:</text>
         </td>
         <td>
-             @assignment.ReleaseDate
+                @assignment.ReleaseDate
         </td>
     </tr>
-    <tr><!--Due row-->
-        <td>
-            <text class="osbleColorBold">Due:</text>
-        </td>
-        <td>
-            @assignment.DueDate
-        </td>
-    </tr>
+    @if (assignment.AssignmentTypeID == 3)
+    {
+        <tr><!--Due row-->
+            <td>
+                <text class="osbleColorBold">Initial Post Due:</text>
+            </td>
+            <td>
+                @assignment.DiscussionSettings.InitialPostDueDate
+            </td>
+        </tr>
+        <tr><!--Due row-->
+            <td>
+                <text class="osbleColorBold">Final Post(s) Due:</text>
+            </td>
+            <td>
+                @assignment.DueDate
+            </td>
+        </tr>
+    }
+    else
+    {        
+        <tr><!--Due row-->
+            <td>
+                <text class="osbleColorBold">Due:</text>
+            </td>
+            <td>
+                @assignment.DueDate
+            </td>
+        </tr>
+    }
     <tr><!--Grading row-->
         <td>
             <text class="osbleColorBold">Grading:</text>
@@ -52,29 +74,40 @@
             Worth @assignment.PointsPossible points in "@assignment.Category.Name" category.
         </td>
     </tr>
-    <tr><!--Late Policy row-->
-        <td>
-            <text class="osbleColorBold">Late Policy:</text> 
-        </td>
-        <td>
-            @if (assignment.HoursLateWindow == 0)
-            {
-                @:No late assignments accepted.
-            }
-            else
-            {
-                @:Assignments accepted up to  @assignment.HoursLateWindow hours late, docking @assignment.DeductionPerUnit% per @assignment.HoursPerDeduction hours.
-            }
-        </td>
-    </tr>
+    @if (assignment.AssignmentTypeID != 4)
+    {
+        <tr><!--Late Policy row-->
+            <td>
+                <text class="osbleColorBold">Late Policy:</text> 
+            </td>
+            <td>
+                @if (assignment.HoursLateWindow == 0)
+                {
+                    @:No late assignments accepted.
+                }
+                else
+                {
+                    @:Assignments accepted up to  @assignment.HoursLateWindow hours late, docking @assignment.DeductionPerUnit% per @assignment.HoursPerDeduction hours.
+                }
+            </td>
+        </tr>
+    }
     <tr><!--Description row-->
         <td>
             <text class="osbleColorBold">Description:</text> 
         </td>
         <td>
         @Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(assignment.AssignmentDescription).ToString()))
-            
         </td>
+        <tr><!--Assignment Type row-->
+            <td>
+            <text class="osbleColorBold">Type:</text>
+            </td>
+            <td>
+                 @ViewBag.AssignmentType
+            </td>
+        </tr>
+        
     </tr>
     @if (assignment.HasDeliverables)
     {

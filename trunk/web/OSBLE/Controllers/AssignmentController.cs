@@ -278,7 +278,14 @@ namespace OSBLE.Controllers
 
                 if (assignment.AssignmentTypeID == 4)
                 {
-                    teams = assignment.PreceedingAssignment.AssignmentTeams.ToList();
+                    if (assignment.PreceedingAssignment.AssignmentTypeID == 3) //preceding assignment is discussion, use discussion teams
+                    {
+                        //teams = assignment.PreceedingAssignment.DiscussionTeams.ToList();
+                    }
+                    else
+                    {
+                        teams = assignment.PreceedingAssignment.AssignmentTeams.ToList();
+                    }
                 }
                 else
                 {
@@ -306,15 +313,6 @@ namespace OSBLE.Controllers
                     }     
                 }
 
-                //Sorting teams by team name (also last name if teams are of 1 because team name is the users name
-                if (assignment.PreceedingAssignment != null)
-                {
-                    if (assignment.PreceedingAssignment.HasTeams)
-                    {
-                        teams.Sort((x, y) => string.Compare(x.Team.Name, y.Team.Name));
-                    }                    
-                }
-
                 /*MG Going through each team in the assignment and for each team going through the scores until a match is found
                  * the match will then be used for display information. 
                  *Conflict: There can multiple scores with the same team ID as each individual gets a Score in the DB. So this will only pick up first score found
@@ -338,6 +336,18 @@ namespace OSBLE.Controllers
                         }
                     }
 
+                    int l_teamEvalsCompleted = 0;
+                    int l_teamEvalsTotal = 0;
+                    if(assignment.AssignmentTypeID == 4)
+                    {
+                        l_teamEvalsCompleted = (from d in db.TeamMemberEvaluations
+                                              where d.TeamEvaluation.Assignment.ID == assignment.ID &&
+                                              d.TeamEvaluation.Team.ID == team.TeamID
+                                              select d).GroupBy(a => a.EvaluatorID).Count();
+                        l_teamEvalsTotal = team.Team.TeamMembers.Count;
+                    }
+
+
                     //Grabbing the submission time for the assignment team
                     DateTime? subTime = new DateTime?();
                     if (assignment.HasDeliverables)
@@ -351,14 +361,14 @@ namespace OSBLE.Controllers
                     {
                         if (score.TeamID == team.TeamID)
                         {
-                            AssignmentDetailsList.Add(new AssignmentDetailsViewModel(score, subTime, team.Team, postCount, replyCount));
+                            AssignmentDetailsList.Add(new AssignmentDetailsViewModel(assignment.ID, score, subTime, team.Team, postCount, replyCount) { teamEvalsCompleted = l_teamEvalsCompleted, teamEvalsTotal = l_teamEvalsTotal });
                             foundMatch = true;
                             break;
                         }
                     }
                     if (!foundMatch)
                     {
-                        AssignmentDetailsList.Add(new AssignmentDetailsViewModel(null, subTime, team.Team, postCount, replyCount));
+                        AssignmentDetailsList.Add(new AssignmentDetailsViewModel(assignment.ID, null, subTime, team.Team, postCount, replyCount) { teamEvalsCompleted = l_teamEvalsCompleted, teamEvalsTotal = l_teamEvalsTotal });
                     }
                 }
 
@@ -377,7 +387,7 @@ namespace OSBLE.Controllers
                                                       where e.AssignmentID == assignment.ID &&
                                                       e.IsPublished == false
                                                       select e).ToList();
-                if (assignment.HasTeams)
+                if (assignment.HasTeams || (assignment.AssignmentTypeID == 4 && assignment.PreceedingAssignment.HasTeams))
                 {
                     ViewBag.AssignmentDetailsVMList = AssignmentDetailsList.OrderBy(tn => tn.team.Name);
                 }
@@ -434,6 +444,7 @@ namespace OSBLE.Controllers
                     
                 }
             }
+            ViewBag.AssignmentType = AssignmentTypeExtensions.Explode((AssignmentTypes)assignment.AssignmentTypeID);
             ViewBag.TeamMembers = cuList; //null if no team members
 
             //MG: getting a list of the deliverables to list for assignment details. 
