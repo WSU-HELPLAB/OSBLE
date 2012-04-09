@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models.Assignments
 {
-    public class ReviewTeam : IAssignmentTeam
+    public class ReviewTeam
     {
         [Key]
         [Column(Order = 0)]
@@ -15,48 +15,14 @@ namespace OSBLE.Models.Assignments
 
         [Key]
         [Column(Order = 1)]
-        public int TeamID { get; set; }
-
-        /// <summary>
-        /// The team that will be reviewing the author's work
-        /// </summary>
-        [ForeignKey("TeamID")]
-        public virtual Team Team { get; set; }
-
-        [NotMapped]
-        public Team ReviewingTeam
-        {
-            get
-            {
-                return Team;
-            }
-            set
-            {
-                Team = value;
-            }
-        }
-
-        [NotMapped]
-        public int ReviewTeamID
-        {
-            get
-            {
-                return TeamID;
-            }
-            set
-            {
-                TeamID = value;
-            }
-        }
+        public int AuthorTeamID { get; set; }
+        public virtual Team AuthorTeam { get; set; }
 
         [Key]
         [Column(Order = 2)]
-        public int AuthorTeamID { get; set; }
+        public int ReviewTeamID { get; set; }
 
-        /// <summary>
-        /// The original author of the document to be reviewed
-        /// </summary>
-        [ForeignKey("AuthorTeamID")]
-        public virtual Team AuthorTeam { get; set; }
+        [ForeignKey("ReviewTeamID")]
+        public virtual Team ReviewingTeam { get; set; }        
     }
 }

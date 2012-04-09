@@ -18,7 +18,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get
             {
-                return "Critical Review Settings";
+                return "Critical Review Teams";
             }
         }
 
@@ -55,7 +55,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
-        private void SetUpViewBag()
+        private new void SetUpViewBag()
         {
             //pull previous team configurations
             List<Assignment> previousTeamAssignments = (from assignment in db.Assignments

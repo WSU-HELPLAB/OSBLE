@@ -147,7 +147,6 @@ namespace OSBLE.Models
             modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
 #endif
             //try to keep modelbuilder stuff in alphabetical order
-
             modelBuilder.Entity<Deliverable>()
                 .HasRequired(d => d.Assignment)
                 .WithMany(a => a.Deliverables)
@@ -183,13 +182,15 @@ namespace OSBLE.Models
                 .WithMany(a => a.Scores)
                 .WillCascadeOnDelete(false);
 
+            //In a critical review, students will be reviewing an existing assignment.
+            //Therefore, AuthorTeams are fixed while the reviewing team might still change.
             modelBuilder.Entity<ReviewTeam>()
-                .HasRequired(rt => rt.AuthorTeam)
+                .HasRequired(rt => rt.ReviewingTeam)
                 .WithMany()
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<ReviewTeam>()
-                .HasRequired(rt => rt.Team)
+                .HasRequired(rt => rt.AuthorTeam)
                 .WithMany()
                 .WillCascadeOnDelete(false);
 
