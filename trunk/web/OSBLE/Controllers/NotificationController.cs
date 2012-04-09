@@ -249,7 +249,7 @@ namespace OSBLE.Controllers
         private void emailNotification(Notification n)
         {
 
-#if FALSE
+#if !DEBUG
             SmtpClient mailClient = new SmtpClient();
             mailClient.UseDefaultCredentials = true;
             
