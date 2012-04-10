@@ -39,6 +39,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 List<AssignmentTypes> types = base.AllAssignmentTypes.ToList();
                 types.Remove(AssignmentTypes.DiscussionAssignment);
+                types.Remove(AssignmentTypes.TeamEvaluation);
                 return types;
             }
         }
