@@ -2291,7 +2291,13 @@ namespace OSBLE.Controllers
                                          orderby category.ColumnOrder
                                          select category).ToList();
 
-            List<Assignment> assignments = (from assignment in db.Assignments
+            List<Assignment> assignmentsWithEvals = (from assignment in db.Assignments
+                                                     where assignment.CategoryID == categoryId &&
+                                                     !assignment.IsDraft
+                                                     orderby assignment.ColumnOrder
+                                                     select assignment).ToList();
+
+            List<Assignment> assignments = (from assignment in assignmentsWithEvals
                                             where assignment.CategoryID == categoryId &&
                                             !assignment.IsDraft &&
                                             assignment.PointsPossible > 0
@@ -2337,6 +2343,7 @@ namespace OSBLE.Controllers
 
             ViewBag.Categories = categories;
             ViewBag.Assignments = assignments;
+            ViewBag.AssignmentsWithEvals = assignmentsWithEvals;
             ViewBag.CurrentStudent = currentUser;
             ViewBag.NumDropped = numDropped;
             ViewBag.Customize = customize_options;
