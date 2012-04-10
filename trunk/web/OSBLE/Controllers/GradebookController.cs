@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 using OSBLE.Attributes;
-using OSBLE.Models.HomePage;
+using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
-using OSBLE.Models.Assignments;
-
-using OSBLE.Models.Assignments;
-using System.IO;
-using System.Web;
 using OSBLE.Utility;
-using OSBLE.Models.Courses.Rubrics;
-using OSBLE.Models.ViewModels;
 
 namespace OSBLE.Controllers
 {
@@ -23,6 +18,7 @@ namespace OSBLE.Controllers
     public class GradebookController : OSBLEController
     {
         public enum ColumnAction { InsertLeft, InsertRight, Delete, Clear, ImportCSV, NoAction };
+
         public int colorCount { get; set; }
 
         //
@@ -40,8 +36,7 @@ namespace OSBLE.Controllers
         /// <param name="pointsPossible">The number of points that this column is worth</param>
         /// <param name="position">The order in which this column should appear</param>
         /// <returns></returns>
-        /// 
-
+        ///
 
         [HttpPost]
         [CanModifyCourse]
@@ -134,7 +129,6 @@ namespace OSBLE.Controllers
                                     currentCategory = assign.Category;
                                     if (Session["radio"].ToString() == "r")
                                     {
-
                                         List<Assignment> position = (from pos in db.Assignments
                                                                      where pos.CategoryID == categoryId &&
                                                                      pos.ColumnOrder > assign.ColumnOrder
@@ -154,11 +148,9 @@ namespace OSBLE.Controllers
                                             index.Add(count);
                                         }
                                         assignmentNumber++;
-
                                     }
                                     else if (Session["radio"].ToString() == "l")
                                     {
-
                                         var position = from pos in db.Assignments
                                                        where pos.CategoryID == categoryId &&
                                                        pos.ColumnOrder >= assign.ColumnOrder
@@ -222,7 +214,7 @@ namespace OSBLE.Controllers
                                             }
                                             AssignmentTeam currentTeam = new AssignmentTeam();
                                             TeamMember currentUser = new TeamMember();
-                                            
+
                                             foreach (AssignmentTeam at in currentAssignment.AssignmentTeams)
                                             {
                                                 foreach (TeamMember tm in at.Team.TeamMembers)
@@ -234,14 +226,14 @@ namespace OSBLE.Controllers
                                                     }
                                                 }
                                             }
-                                            
+
                                             Score newScore = new Score()
                                             {
                                                 TeamID = currentTeam.TeamID,
                                                 CustomLatePenaltyPercent = -1,
                                                 CourseUserID = currentUser.CourseUser.ID,
                                                 Points = points,
-                                                AssignmentID = currentAssignment.ID,                                            
+                                                AssignmentID = currentAssignment.ID,
                                                 PublishedDate = DateTime.Now,
                                                 isDropped = false,
                                                 LatePenaltyPercent = 0,
@@ -402,7 +394,6 @@ namespace OSBLE.Controllers
                 categoryTotalWeight = TotalCategoryWeights;
                 foreach (Category category in Category)
                 {
-
                     List<Score> userScore = (from score in allScores
                                              where score.CourseUser.UserProfileID == up.ID &&
                                              score.Assignment.CategoryID == category.ID
@@ -421,7 +412,7 @@ namespace OSBLE.Controllers
                     double categoryPossible = 0;
                     double categoryTotal = 0;
                     //studentCategoryPoints = 0;
-                    //studentCategoryPossible = 0;                   
+                    //studentCategoryPossible = 0;
 
                     List<Score> totalScores = (from score in allScores
                                                where score.CourseUser.UserProfileID == up.ID &&
@@ -525,7 +516,6 @@ namespace OSBLE.Controllers
                     }
                 }
                 table.Add(tableLine);
-
             }
             if (TotalCategoryWeights == 0)
             {
@@ -590,7 +580,7 @@ namespace OSBLE.Controllers
                 }
 
                 List<Assignment> Assignments = (from assignment in db.Assignments
-                                                where assignment.CategoryID == category.ID 
+                                                where assignment.CategoryID == category.ID
                                                 select assignment).ToList();
 
                 foreach (Assignment assignment in Assignments)
@@ -636,7 +626,6 @@ namespace OSBLE.Controllers
 
             Response.ContentType = "application/octet-stream";
 
-
             return View();
         }
 
@@ -673,7 +662,8 @@ namespace OSBLE.Controllers
                 ColumnOrder = position,
                 AssignmentDescription = "No description",
                 IsDraft = false,
-                Type = AssignmentTypes.Basic
+                Type = AssignmentTypes.Basic,
+                PointsPossible = pointsPossible
             };
             db.Assignments.Add(newAssignment);
             db.SaveChanges();
@@ -697,7 +687,7 @@ namespace OSBLE.Controllers
                 {
                     AssignmentID = newAssignment.ID,
                     Team = team,
-                    TeamID = team.ID, 
+                    TeamID = team.ID,
                 };
 
                 db.AssignmentTeams.Add(assignmentTeam);
@@ -720,7 +710,7 @@ namespace OSBLE.Controllers
             /************* AH: DO ONCE RUBRICS ARE RE-DONE TO NEW ASSIGNMENT WIZARD *****************/
             //var rubricEvals = (from a in db.RubricEvaluations where a.AbstractAssignmentActivityID == assignmentActivity.ID select a);
 
-            //Linq won't let me delete from the iCollection so I made a List<Deliverable> to 
+            //Linq won't let me delete from the iCollection so I made a List<Deliverable> to
             //store the deliverables and then looping through the list to delete them.
             List<Deliverable> deliverables = new List<Deliverable>();
 
@@ -776,7 +766,6 @@ namespace OSBLE.Controllers
         {
             if (ModelState.IsValid)
             {
-
                 if (categoryId > 0)
                 {
                     CourseUser user = (from u in db.CourseUsers
@@ -842,8 +831,8 @@ namespace OSBLE.Controllers
                 if (categoryId > 0)
                 {
                     CourseUser user = (from u in db.CourseUsers
-                                        where u.ID == courseUserId
-                                        select u).FirstOrDefault();
+                                       where u.ID == courseUserId
+                                       select u).FirstOrDefault();
 
                     List<Score> scoreList = (from scores in db.Scores
                                              where scores.Assignment.CategoryID == categoryId
@@ -887,7 +876,6 @@ namespace OSBLE.Controllers
             BuildGradebook(categoryId);
             return View("_Gradebook");
         }
-
 
         [HttpPost]
         [CanGradeCourse]
@@ -1083,7 +1071,6 @@ namespace OSBLE.Controllers
             return View("_Gradebook");
         }
 
-
         [HttpPost]
         [CanGradeCourse]
         public ActionResult ModifyPossiblePoints(int value, int assignmentId)
@@ -1099,7 +1086,7 @@ namespace OSBLE.Controllers
                         assignment.PointsPossible = value;
                         assignment.addedPoints = assignment.addedPoints * ((double)value / pointsPossibleTemp);
                         db.SaveChanges();
-                        
+
                         foreach (Score s in assignment.Scores)
                         {
                             if (assignment.PointsPossible <= 0)
@@ -1111,7 +1098,7 @@ namespace OSBLE.Controllers
                                 s.RawPoints = s.RawPoints * ((double)value / pointsPossibleTemp);
                                 ModifyGrade(s.RawPoints, s.CourseUserID, s.AssignmentID);
                             }
-                        }                        
+                        }
 
                         if (assignment.Category.dropX > 0)
                         {
@@ -1128,7 +1115,6 @@ namespace OSBLE.Controllers
             BuildGradebook((int)Session["categoryId"]);
             return View("_Gradebook");
         }
-
 
         [HttpPost]
         [CanGradeCourse]
@@ -1262,7 +1248,6 @@ namespace OSBLE.Controllers
             return View("Index");
         }
 
-
         [HttpPost]
         [CanGradeCourse]
         public ActionResult AddPoints(int assignmentId, double number)
@@ -1318,7 +1303,7 @@ namespace OSBLE.Controllers
                 if (assignmentId != 0)
                 {
                     int currentCourseId = ActiveCourse.AbstractCourseID;
-                    
+
                     Assignment assignment = (from assign in db.Assignments
                                              where assign.ID == assignmentId
                                              select assign).FirstOrDefault();
@@ -1423,7 +1408,6 @@ namespace OSBLE.Controllers
                             db.SaveChanges();
                         }
                     }
-
                 }
             }
 
@@ -1531,8 +1515,8 @@ namespace OSBLE.Controllers
                     }
                     db.SaveChanges();
 
-                    //If the values percent is greater than the maximum percent, we need to set the value to the 
-                    //maximum percent. We give the score the total points possible for the assignment 
+                    //If the values percent is greater than the maximum percent, we need to set the value to the
+                    //maximum percent. We give the score the total points possible for the assignment
                     //multiplied by the (max value / 100). This will give us the total percent for the assignment
                     //the student can receive. We need to check both points and student points.
                     foreach (Score score in scores)
@@ -1572,7 +1556,7 @@ namespace OSBLE.Controllers
                                           where score.Assignment.CategoryID == currentCategoryId
                                           select score).ToList();
 
-                    //If there are scores, set the student scores to their raw scores and 
+                    //If there are scores, set the student scores to their raw scores and
                     //save the database.
                     if (scores.Count() > 0)
                     {
@@ -1599,19 +1583,16 @@ namespace OSBLE.Controllers
                 ModifyGrade(value, tm.CourseUserID, assignmentId);
             }
         }
-        
 
         [HttpPost]
         [CanGradeCourse]
         public ActionResult ModifyCell(double value, int courseUserId, int assignmentId)
         {
-
             ModifyGrade(value, courseUserId, assignmentId);
 
             BuildGradebook((int)Session["categoryId"]);
             return View("_Gradebook");
         }
-
 
         [CanGradeCourse]
         public double ModifyGrade(double value, int courseUserId, int assignmentId)
@@ -1655,7 +1636,6 @@ namespace OSBLE.Controllers
                     //for the current assignment we have a grade for
                     if (userAssignmentTeam.Team == null)
                     {
-
                         TeamMember userMember = new TeamMember()
                         {
                             CourseUserID = user.ID
@@ -1669,7 +1649,6 @@ namespace OSBLE.Controllers
                         db.SaveChanges();
                         userTeamMember = userMember;
 
-
                         AssignmentTeam assignmentTeam = new AssignmentTeam()
                         {
                             AssignmentID = assignmentId,
@@ -1681,7 +1660,6 @@ namespace OSBLE.Controllers
                         db.SaveChanges();
                         userAssignmentTeam = assignmentTeam;
                     }
-                    
 
                     List<Score> gradableQuery = (from g in db.Scores
                                                  where g.AssignmentID == assignmentId
@@ -1690,7 +1668,6 @@ namespace OSBLE.Controllers
                     Score grades = (from grade in gradableQuery
                                     where grade.CourseUserID == userTeamMember.CourseUserID
                                     select grade).FirstOrDefault();
-
 
                     var TeamMembers = (from c in currentAssignment.AssignmentTeams
                                        select c.Team.TeamMembers);
@@ -1707,7 +1684,7 @@ namespace OSBLE.Controllers
 
                         if (grades.CustomLatePenaltyPercent >= 0) //Using CustomLatePenalty
                         {
-                            value = value * ((100.0 - grades.CustomLatePenaltyPercent)/100.0);
+                            value = value * ((100.0 - grades.CustomLatePenaltyPercent) / 100.0);
                         }
                         else //Using default late penalty
                         {
@@ -1768,7 +1745,6 @@ namespace OSBLE.Controllers
                                 }
                             }
 
-
                             Score newScore = new Score()
                             {
                                 TeamID = userAssignmentTeam.TeamID,
@@ -1809,8 +1785,8 @@ namespace OSBLE.Controllers
                 if (assignmentId > 0)
                 {
                     CourseUser student = (from user in db.CourseUsers
-                                           where user.ID == courseUserId
-                                           select user).FirstOrDefault();
+                                          where user.ID == courseUserId
+                                          select user).FirstOrDefault();
                     if (student != null)
                     {
                         double rawValue = value;
@@ -1904,7 +1880,6 @@ namespace OSBLE.Controllers
             return View();
         }
 
-
         [HttpPost]
         [CanGradeCourse]
         public ActionResult ModifyColumn()
@@ -1937,13 +1912,11 @@ namespace OSBLE.Controllers
                         break;
                     default:
                         break;
-
                 }
             }
             BuildGradebook((int)Session["categoryId"]);
             return View("_Gradebook");
         }
-
 
         [HttpPost]
         public void SetTabStudent(string studentId)
@@ -1964,9 +1937,6 @@ namespace OSBLE.Controllers
             return View("_Gradebook");
         }
 
-
-       
-
         /// <summary>
         /// This will initialize the page using the supplied weightId (tab).
         /// </summary>
@@ -1974,7 +1944,6 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public ActionResult Index()
         {
-
             if (activeCourse.AbstractRole.CanGrade == true)
             {
                 return TeacherIndex();
@@ -1990,10 +1959,9 @@ namespace OSBLE.Controllers
                 return StudentIndex();
             }
             return RedirectToAction("Index", "Home");
-
         }
 
-        [OutputCache(Duration=3600)]
+        [OutputCache(Duration = 3600)]
         public ActionResult TeacherIndex()
         {
             //LINQ complains when we use this directly in our queries,so pull it beforehand
@@ -2014,7 +1982,6 @@ namespace OSBLE.Controllers
             List<Score> scor = (from s in db.Scores
                                 where s.Assignment.Category.CourseID == currentCourseId
                                 select s).ToList();
-
 
             List<CourseUser> CourseUser = (from users in db.CourseUsers
                                            where users.AbstractCourseID == currentCourseId &&
@@ -2089,7 +2056,6 @@ namespace OSBLE.Controllers
                 }
             }
 
-
             ViewBag.Students = studentList;
             ViewBag.Scores = studentScores;
             ViewBag.Categories = categories;
@@ -2126,7 +2092,6 @@ namespace OSBLE.Controllers
             List<Score> scor = (from s in db.Scores
                                 where s.Assignment.Category.CourseID == currentCourseId
                                 select s).ToList();
-
 
             List<CourseUser> CourseUser = (from users in db.CourseUsers
                                            where users.AbstractCourseID == currentCourseId &&
@@ -2201,7 +2166,6 @@ namespace OSBLE.Controllers
                 }
             }
 
-
             ViewBag.Students = studentList;
             ViewBag.Scores = studentScores;
             ViewBag.Categories = categories;
@@ -2232,7 +2196,6 @@ namespace OSBLE.Controllers
                                             where cu.AbstractCourseID == currentCourseId && cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student
                                             orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
                                             select cu).ToList();
-
 
             List<LetterGrade> letterGrades = ((activeCourse.AbstractCourse as Course).LetterGrades).OrderByDescending(l => l.MinimumRequired).ToList();
 
@@ -2269,7 +2232,6 @@ namespace OSBLE.Controllers
             double userTotalCategoryWeights = (from cat in userCatsWithWeightsAndScores
                                                select cat.Points).Sum();
 
-
             ViewBag.Categories = categories;
             ViewBag.LetterGrades = letterGrades;
             ViewBag.CurrentStudent = currentUser;
@@ -2282,7 +2244,6 @@ namespace OSBLE.Controllers
             ViewBag.Students = studentList;
             return View("Index");
         }
-
 
         /// <summary>
         /// Switches to one of the tabs (Categories) to display the assignments
@@ -2319,9 +2280,7 @@ namespace OSBLE.Controllers
             }
 
             return RedirectToAction("Index", "Home");
-
         }
-
 
         private void BuildStudentGradebook(int categoryId)
         {
@@ -2339,12 +2298,10 @@ namespace OSBLE.Controllers
                                             orderby assignment.ColumnOrder
                                             select assignment).ToList();
 
-            
             CourseUser currentUser = (from users in db.CourseUsers
                                       where users.AbstractCourseID == currentCourseId &&
                                       users.UserProfileID == CurrentUser.ID
                                       select users).FirstOrDefault();
-            
 
             List<Score> totalScores = (from scores in db.Scores
                                        where scores.Assignment.CategoryID == categoryId
@@ -2353,7 +2310,6 @@ namespace OSBLE.Controllers
             List<Score> userScores = (from score in totalScores
                                       where score.CourseUserID == currentUser.ID
                                       select score).ToList();
-
 
             int numDropped = (from cats in categories
                               where cats.ID == categoryId
@@ -2379,7 +2335,6 @@ namespace OSBLE.Controllers
                     break;
             };
 
-
             ViewBag.Categories = categories;
             ViewBag.Assignments = assignments;
             ViewBag.CurrentStudent = currentUser;
@@ -2388,7 +2343,6 @@ namespace OSBLE.Controllers
             ViewBag.UserScores = userScores;
             ViewBag.TotalScores = totalScores;
         }
-
 
         /// <summary>
         /// This function is responsible for making the various calls needed to build the gradebook.
@@ -2452,10 +2406,8 @@ namespace OSBLE.Controllers
             if (assignments.Count() == 0)
             {
                 List<CourseUser> Users = (from user in db.CourseUsers
-                                            where user.AbstractCourseID == currentCourseId
-                                            select user).ToList();
-
-                
+                                          where user.AbstractCourseID == currentCourseId
+                                          select user).ToList();
 
                 Assignment newAssignment = new Assignment()
                 {
@@ -2469,7 +2421,6 @@ namespace OSBLE.Controllers
                 };
                 db.Assignments.Add(newAssignment);
                 db.SaveChanges();
-
 
                 foreach (CourseUser u in Users)
                 {
@@ -2491,7 +2442,6 @@ namespace OSBLE.Controllers
                         AssignmentID = newAssignment.ID,
                         Team = team,
                         TeamID = team.ID,
-                        
                     };
 
                     db.AssignmentTeams.Add(assignmentTeam);
@@ -2506,9 +2456,7 @@ namespace OSBLE.Controllers
                                assignment.PointsPossible > 0
                                orderby assignment.ColumnOrder
                                select assignment).ToList();
-
             }
-
 
             //Pull the dropped lowest
             var droppedCount = from scores in db.Scores
@@ -2521,15 +2469,12 @@ namespace OSBLE.Controllers
                                          where user.AbstractCourseID == currentCourseId && user.AbstractRole.CanSubmit
                                          orderby user.UserProfile.LastName, user.UserProfile.FirstName
                                          select user).ToList();
-                                         
-
 
             //Finally the scores for each student.
             List<Score> scor = (from score in db.Scores
                                 where score.Assignment.CategoryID == currentTab.ID &&
                                 score.Points >= 0
                                 select score).ToList();
-            
 
             var userScore = from scores in scor
                             where scores.isDropped == false
@@ -2560,12 +2505,12 @@ namespace OSBLE.Controllers
                     {
                         Score newscore = new Score()
                        {
-                            CustomLatePenaltyPercent = -1,
-                            TeamID = currentTeam.ID,
-                            CourseUserID = currentMember.ID,
-                            Points = ((currentPoints / currentTotal) * 100),
-                            isDropped = false
-                        };
+                           CustomLatePenaltyPercent = -1,
+                           TeamID = currentTeam.ID,
+                           CourseUserID = currentMember.ID,
+                           Points = ((currentPoints / currentTotal) * 100),
+                           isDropped = false
+                       };
                         studentScores.Add(newscore);
                     }
                     else
@@ -2582,7 +2527,7 @@ namespace OSBLE.Controllers
                     }
                 }
             }
-            
+
             //save everything that we need to the viewebag
             ViewBag.Categories = allCategories;
             ViewBag.Grades = scor;
@@ -2638,10 +2583,9 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
 
                 List<CourseUser> Users = (from user in db.CourseUsers
-                                            where user.AbstractCourseID == currentCourseId
-                                            select user).ToList();
+                                          where user.AbstractCourseID == currentCourseId
+                                          select user).ToList();
 
-                
                 //with a new weight / gradable combo created, we can
                 //call Index() to finish
                 //off the rendering
