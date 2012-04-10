@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
-using System.Net.Mail;
 using System.Web.Mvc;
-
+using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
-using OSBLE.Models.Assignments;
 
 namespace OSBLE.Controllers
 {
@@ -88,8 +85,8 @@ namespace OSBLE.Controllers
             Notification n = new Notification();
             n.ItemType = Notification.Types.Mail;
             n.ItemID = mail.ID;
-            n.RecipientID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.ToUserProfileID).FirstOrDefault().ID;
-            n.SenderID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.FromUserProfileID).FirstOrDefault().ID;
+            n.RecipientID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.ToUserProfileID && cu.AbstractCourseID == activeCourse.AbstractCourseID).FirstOrDefault().ID;
+            n.SenderID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.FromUserProfileID && cu.AbstractCourseID == activeCourse.AbstractCourseID).FirstOrDefault().ID;
             addNotification(n);
         }
 
@@ -150,11 +147,11 @@ namespace OSBLE.Controllers
         {
             // Get all instructors in the course.
             List<CourseUser> instructors = (from i in db.CourseUsers
-                                             where
-                                                 i.AbstractCourseID == e.Poster.AbstractCourseID &&
-                                                 i.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor
-                                             select i).ToList();
-                
+                                            where
+                                                i.AbstractCourseID == e.Poster.AbstractCourseID &&
+                                                i.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor
+                                            select i).ToList();
+
             foreach (CourseUser instructor in instructors)
             {
                 Notification n = new Notification();
@@ -170,7 +167,6 @@ namespace OSBLE.Controllers
         [NonAction]
         public void SendInlineReviewCompletedNotification(Assignment assignment, Team team)
         {
-
             foreach (TeamMember member in team.TeamMembers)
             {
                 Notification n = new Notification();
@@ -185,7 +181,6 @@ namespace OSBLE.Controllers
         [NonAction]
         public void SendRubricEvaluationCompletedNotification(Assignment assignment, Team team)
         {
-
             foreach (TeamMember member in team.TeamMembers)
             {
                 Notification n = new Notification();
@@ -248,11 +243,10 @@ namespace OSBLE.Controllers
         /// <param name="n">Notification to be emailed</param>
         private void emailNotification(Notification n)
         {
-
 #if !DEBUG
             SmtpClient mailClient = new SmtpClient();
             mailClient.UseDefaultCredentials = true;
-            
+
             UserProfile sender = db.UserProfiles.Find(n.Sender.UserProfileID);
             UserProfile recipient = db.UserProfiles.Find(n.Recipient.UserProfileID);
 
