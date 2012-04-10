@@ -6,7 +6,7 @@
 $(document).ready(function () {
     window.setInterval("time()", 60000);
 });
-
+var isTimedOut = false;
 function time() {
     $.ajax({
         url: "/Home/Time",
@@ -14,11 +14,17 @@ function time() {
             if (data == "true") {
             }
             else {
-                alert("The session has timed out.");
+                if (!isTimedOut) {
+                    alert("The session has timed out.  To avoid losing work on this page, please open a new browser window and re-log into OSBLE.");
+                    isTimedOut = true;
+                }
             }
         },
         failure: function (result) {
-            alert("The session has timed out.");
+            if (!isTimedOut) {
+                alert("The session has timed out.  To avoid losing work on this page, please open a new browser window and re-log into OSBLE.");
+                isTimedOut = true;
+            }
         }
     });
 }
