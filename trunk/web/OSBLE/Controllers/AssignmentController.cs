@@ -3,19 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
-using System.Web.Configuration;
 using OSBLE.Attributes;
 using OSBLE.Models;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
-using OSBLE.Models.Users;
-using OSBLE.Models.ViewModels;
-using OSBLE.Models.HomePage;
-using System.Data.Entity.Validation;
-using System.Diagnostics;
 using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.DiscussionAssignment;
-using System.Text.RegularExpressions;
+using OSBLE.Models.HomePage;
+using OSBLE.Models.ViewModels;
 
 namespace OSBLE.Controllers
 {
@@ -69,36 +64,36 @@ namespace OSBLE.Controllers
             List<Assignment> Assignments = new List<Assignment>();
             //Getting the assginment list, initially without future or draft assignments.
             Assignments = (from assignment in db.Assignments
-                                                where !assignment.IsDraft &&
-                                                assignment.Category.CourseID == activeCourse.AbstractCourseID &&
-                                                assignment.IsWizardAssignment &&
-                                                assignment.ReleaseDate <= DateTime.Now
-                                                orderby assignment.DueDate
-                                                select assignment).ToList();
+                           where !assignment.IsDraft &&
+                           assignment.Category.CourseID == activeCourse.AbstractCourseID &&
+                           assignment.IsWizardAssignment &&
+                           assignment.ReleaseDate <= DateTime.Now
+                           orderby assignment.DueDate
+                           select assignment).ToList();
 
             // Future assignments are non-draft assignments whose start date has not yet happened. Appending to list now.
             Assignments.AddRange((from assignment in db.Assignments
-                                                  where !assignment.IsDraft &&
-                                                  assignment.Category.CourseID == activeCourse.AbstractCourseID &&
-                                                  assignment.IsWizardAssignment == true &&
-                                                  assignment.ReleaseDate > DateTime.Now
-                                                  orderby assignment.ReleaseDate
-                                                  select assignment).ToList());
+                                  where !assignment.IsDraft &&
+                                  assignment.Category.CourseID == activeCourse.AbstractCourseID &&
+                                  assignment.IsWizardAssignment == true &&
+                                  assignment.ReleaseDate > DateTime.Now
+                                  orderby assignment.ReleaseDate
+                                  select assignment).ToList());
 
             if (ActiveCourse.AbstractRole.CanModify || ActiveCourse.AbstractRole.Anonymized)
             {
                 // Draft assignments (viewable by instructor only) are assignments that have not yet been published to students. Appending to list now.
-                Assignments.AddRange( (from assignment in db.Assignments
-                                    where assignment.IsDraft &&
-                                    assignment.IsWizardAssignment &&
-                                    assignment.Category.CourseID == activeCourse.AbstractCourseID
-                                    orderby assignment.ReleaseDate
-                                    select assignment).ToList());
+                Assignments.AddRange((from assignment in db.Assignments
+                                      where assignment.IsDraft &&
+                                      assignment.IsWizardAssignment &&
+                                      assignment.Category.CourseID == activeCourse.AbstractCourseID
+                                      orderby assignment.ReleaseDate
+                                      select assignment).ToList());
             }
-            else if(ActiveCourse.AbstractRole.CanSubmit)
+            else if (ActiveCourse.AbstractRole.CanSubmit)
             {
-                /*MG: gathering a list of assignments for that course that are non-draft. Then creating a dictionary<assignmentID, submissionTime> 
-                 * to be used in the view. This is only done for the students view. 
+                /*MG: gathering a list of assignments for that course that are non-draft. Then creating a dictionary<assignmentID, submissionTime>
+                 * to be used in the view. This is only done for the students view.
                  */
                 List<Assignment> assignmentList = (from assignment in db.Assignments
                                                    where !assignment.IsDraft &&
@@ -129,7 +124,6 @@ namespace OSBLE.Controllers
                         scoreString = (score as Score).getGradeAsPercent(a.PointsPossible);
                     }
                     submissionInfo.Add(a.ID, new Tuple<string, string, AssignmentTeam>(submissionTime, scoreString, at));
-
                 }
 
                 //Gathering the Team Evaluations for the current users teams.
@@ -143,10 +137,10 @@ namespace OSBLE.Controllers
             }
 
             ViewBag.PastCount = (from a in Assignments
-                                    where a.DueDate < DateTime.Now &&
-                                    !a.IsDraft &&
-                                    a.IsWizardAssignment
-                                    select a).Count();
+                                 where a.DueDate < DateTime.Now &&
+                                 !a.IsDraft &&
+                                 a.IsWizardAssignment
+                                 select a).Count();
             ViewBag.PresentCount = (from a in Assignments
                                     where a.ReleaseDate < DateTime.Now &&
                                     a.DueDate > DateTime.Now &&
@@ -154,15 +148,15 @@ namespace OSBLE.Controllers
                                     a.IsWizardAssignment
                                     select a).Count();
             ViewBag.FutureCount = (from a in Assignments
-                                    where a.DueDate >= DateTime.Now &&
-                                    a.ReleaseDate >= DateTime.Now &&
-                                    !a.IsDraft &&
-                                    a.IsWizardAssignment
-                                    select a).Count();
+                                   where a.DueDate >= DateTime.Now &&
+                                   a.ReleaseDate >= DateTime.Now &&
+                                   !a.IsDraft &&
+                                   a.IsWizardAssignment
+                                   select a).Count();
             ViewBag.DraftCount = (from a in Assignments
                                   where a.IsDraft &&
                                   a.IsWizardAssignment
-                                    select a).Count();
+                                  select a).Count();
             ViewBag.Assignments = Assignments;
             ViewBag.CurrentDate = DateTime.Now;
             ViewBag.Submitted = false;
@@ -218,7 +212,7 @@ namespace OSBLE.Controllers
                     {
                         if (tm.CourseUser.UserProfileID == currentUser.ID)
                         {
-                           // Session.Add("CurrentActivityID", activity.ID);
+                            // Session.Add("CurrentActivityID", activity.ID);
                             Session.Add("CurrentAssignmentID", assignment.ID);
                             //Session.Add("TeamUserID", teamUser.ID);
                             Session.Add("TeamID", at.TeamID);
@@ -264,8 +258,8 @@ namespace OSBLE.Controllers
                 Parameters = parameters
             };
         }
-        
-        public ActionResult AssignmentDetails (int id)
+
+        public ActionResult AssignmentDetails(int id)
         {
             Assignment assignment = db.Assignments.Find(id);
             List<Score> scores = assignment.Scores.ToList();
@@ -275,7 +269,6 @@ namespace OSBLE.Controllers
 
             if (activeCourse.AbstractRole.CanModify || activeCourse.AbstractRole.Anonymized) //Instructor setup || Observer
             {
-
                 if (assignment.AssignmentTypeID == 4)
                 {
                     if (assignment.PreceedingAssignment.AssignmentTypeID == 3) //preceding assignment is discussion, use discussion teams
@@ -300,7 +293,7 @@ namespace OSBLE.Controllers
                     List<CourseUser> cus = db.CourseUsers.Where(c => c.AbstractCourseID == assignment.Category.Course.ID).ToList();
                     ViewBag.ObserverCU = cus.OrderBy(o => o.ID).ToList();
                 }
-                
+
                 //Setting up Viewbag for Discussion team assignments
                 if (assignment.AssignmentTypeID == 3 && assignment.HasDiscussionTeams)
                 {
@@ -310,11 +303,11 @@ namespace OSBLE.Controllers
                     if (activeCourse.AbstractRole.Anonymized)
                     {
                         ViewBag.DiscussionTeamList = discussionTeamList.OrderBy(o => o.TeamID).ToList();
-                    }     
+                    }
                 }
 
                 /*MG Going through each team in the assignment and for each team going through the scores until a match is found
-                 * the match will then be used for display information. 
+                 * the match will then be used for display information.
                  *Conflict: There can multiple scores with the same team ID as each individual gets a Score in the DB. So this will only pick up first score found
                  */
                 foreach (AssignmentTeam team in teams)
@@ -330,7 +323,7 @@ namespace OSBLE.Controllers
                                          !a.IsReply
                                          select a).Count();
                             replyCount = (from a in allUserPosts
-                                          where a.CourseUserID == tm.CourseUserID && 
+                                          where a.CourseUserID == tm.CourseUserID &&
                                           a.IsReply
                                           select a).Count();
                         }
@@ -338,15 +331,14 @@ namespace OSBLE.Controllers
 
                     int l_teamEvalsCompleted = 0;
                     int l_teamEvalsTotal = 0;
-                    if(assignment.AssignmentTypeID == 4)
+                    if (assignment.AssignmentTypeID == 4)
                     {
                         l_teamEvalsCompleted = (from d in db.TeamMemberEvaluations
-                                              where d.TeamEvaluation.Assignment.ID == assignment.ID &&
-                                              d.TeamEvaluation.Team.ID == team.TeamID
-                                              select d).GroupBy(a => a.EvaluatorID).Count();
+                                                where d.TeamEvaluation.Assignment.ID == assignment.ID &&
+                                                d.TeamEvaluation.Team.ID == team.TeamID
+                                                select d).GroupBy(a => a.EvaluatorID).Count();
                         l_teamEvalsTotal = team.Team.TeamMembers.Count;
                     }
-
 
                     //Grabbing the submission time for the assignment team
                     DateTime? subTime = new DateTime?();
@@ -374,11 +366,11 @@ namespace OSBLE.Controllers
 
                 //Just giving the first or defaults teams ID, the instructor link to the rubric won't be specific.
                 ViewBag.TeamID = 0;
-                if(assignment.AssignmentTeams.Count > 0)
+                if (assignment.AssignmentTeams.Count > 0)
                 {
                     ViewBag.TeamID = assignment.AssignmentTeams.FirstOrDefault().TeamID;
 
-                    //MG: Due to rubric controller change 
+                    //MG: Due to rubric controller change
                     ViewBag.CurrentUserID = assignment.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUser.ID;
                 }
 
@@ -396,8 +388,7 @@ namespace OSBLE.Controllers
                     ViewBag.AssignmentDetailsVMList = AssignmentDetailsList.OrderBy(l => l.team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName).ThenBy(f => f.team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName);
                 }
 
-
-                if (activeCourse.AbstractRole.Anonymized) 
+                if (activeCourse.AbstractRole.Anonymized)
                 {
                     ViewBag.AssignmentDetailsVMList = AssignmentDetailsList.OrderBy(o => o.team.ID).ThenBy(c => c.team.TeamMembers.OrderBy(d => d.CourseUserID)).ToList();
                 }
@@ -426,11 +417,10 @@ namespace OSBLE.Controllers
                 {
                     ViewBag.SubmissionTime = "No Submission";
                 }
-                
+
                 if (assignment.HasTeams)
                 {
-                    
-                    foreach(TeamMember tm in at.Team.TeamMembers)
+                    foreach (TeamMember tm in at.Team.TeamMembers)
                     {
                         if (tm.CourseUser.ID != activeCourse.ID)
                         {
@@ -441,15 +431,14 @@ namespace OSBLE.Controllers
                             cuList.Add(tm.CourseUser);
                         }
                     }
-                    
                 }
             }
             ViewBag.AssignmentType = AssignmentTypeExtensions.Explode((AssignmentTypes)assignment.AssignmentTypeID);
             ViewBag.TeamMembers = cuList; //null if no team members
 
-            //MG: getting a list of the deliverables to list for assignment details. 
+            //MG: getting a list of the deliverables to list for assignment details.
             List<string[]> fileTypes = new List<string[]>();
-            foreach(Deliverable d in assignment.Deliverables)
+            foreach (Deliverable d in assignment.Deliverables)
             {
                 fileTypes.Add(GetFileExtensions((DeliverableType)d.Type));
             }
@@ -459,13 +448,13 @@ namespace OSBLE.Controllers
 
         /// <summary>
         /// Toggles an assignment between draft and regular assignment. Draft assignments are not shown to students, and not
-        /// used to calculate grades. 
+        /// used to calculate grades.
         /// </summary>
         /// <param name="assignmentID"></param>
         [CanModifyCourse]
         public void ToggleDraft(int assignmentID)
         {
-            //MG: Pulling the assignment from the DB, toggling its IsDraft parameter. and saving it back to the DB. 
+            //MG: Pulling the assignment from the DB, toggling its IsDraft parameter. and saving it back to the DB.
             Assignment assignment = db.Assignments.Find(assignmentID);
             assignment.IsDraft = !assignment.IsDraft;
             db.SaveChanges();
@@ -500,7 +489,7 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// Takes any grade that is currently saved as a draft for the specified assignment and 
+        /// Takes any grade that is currently saved as a draft for the specified assignment and
         /// publishes the grade to the students.
         /// </summary>
         /// <param name="assignmentId"></param>
@@ -516,7 +505,6 @@ namespace OSBLE.Controllers
                                                       where e.AssignmentID == assignment.ID &&
                                                       e.IsPublished == false
                                                       select e).ToList();
-
 
                 foreach (RubricEvaluation re in evaluations)
                 {
@@ -536,7 +524,7 @@ namespace OSBLE.Controllers
                     {
                         studentScore += (double)critEval.Score / maxLevelScore * (critEval.Criterion.Weight / totalRubricPoints);
                     }
-                    
+
                     //normalize the score with the abstract assignment score
                     studentScore *= re.Assignment.PointsPossible;
 
@@ -545,7 +533,6 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
             }
         }
-
 
         /// <summary>
         /// Modifies a students custom late penalty. If scoreId == 0, we are assuming there is no score
@@ -604,16 +591,14 @@ namespace OSBLE.Controllers
                                                                 t.TeamEvaluation.AssignmentID == a.ID
                                                                 select t).ToList();
 
-            
             AssignmentTeam at = GetAssignmentTeam(a.PreceedingAssignment, team.TeamMembers.FirstOrDefault().CourseUser.UserProfile);
             ViewBag.Team = at;
-
 
             ViewBag.TeamEvaluations = teamEvaluations;
             ViewBag.TeamMemberEvaluations = teamMemberEvaluations;
             ViewBag.Assignment = a;
-            
-            return View("_TeacherTeamEvaluationView");           
+
+            return View("_TeacherTeamEvaluationView");
         }
 
         /// <summary>
@@ -643,7 +628,6 @@ namespace OSBLE.Controllers
             }
         }
 
-        
         [HttpPost]
         public ActionResult SubmitTeamEvaluation(int assignmentId)
         {
@@ -673,7 +657,6 @@ namespace OSBLE.Controllers
                             tmPoints = Convert.ToInt32(Request.Params[param]);
 
                             tme.Points = tmPoints;
-
                         }
                     }
                 }
@@ -742,9 +725,31 @@ namespace OSBLE.Controllers
 
                 if (userPreviousAssignmentScore != null)
                 {
-                    userPreviousAssignmentScore.Points *= multiplier;
-                    userPreviousAssignmentScore.Multiplier = multiplier;
-                    db.SaveChanges();
+                    bool alreadyPublishedMultiplier = (from score in db.Scores where score.AssignmentID == assignment.ID && score.CourseUserID == tm.CourseUserID select score.Published).FirstOrDefault();
+
+                    //Check to see if the user already has a published multiplier
+                    if (!alreadyPublishedMultiplier)
+                    {
+                        userPreviousAssignmentScore.Points *= multiplier;
+                        userPreviousAssignmentScore.Multiplier = multiplier;
+                        Score newScore = new Score()
+                        {
+                            AssignmentID = assignment.ID,
+                            Points = assignment.PointsPossible,
+                            Published = true,
+                            RawPoints = assignment.PointsPossible,
+                            CourseUserID = userPreviousAssignmentScore.CourseUserID,
+                            TeamID = userPreviousAssignmentScore.TeamID,
+                            CustomLatePenaltyPercent = -1,
+                            PublishedDate = DateTime.Now,
+                            isDropped = false,
+                            LatePenaltyPercent = 0,
+                            StudentPoints = -1
+                        };
+
+                        db.Scores.Add(newScore);
+                        db.SaveChanges();
+                    }
                 }
             }
 
@@ -790,15 +795,41 @@ namespace OSBLE.Controllers
 
                         multiplier = (evalPoints / (count * 100));
 
-                        double userAssignPoints = assignment.PreceedingAssignment.Scores.Where(s => s.CourseUserID == tm.CourseUserID).FirstOrDefault().Points;
+                        double userAssignPoints = (from point in db.Scores
+                                                   where point.AssignmentID == assignment.PrecededingAssignmentID &&
+                                                   point.CourseUserID == tm.CourseUserID
+                                                   select point.Points).FirstOrDefault();
 
-                        assignment.PreceedingAssignment.Scores.Where(s => s.CourseUserID == tm.CourseUserID).FirstOrDefault().Points = userAssignPoints * multiplier;
-                        assignment.PreceedingAssignment.Scores.Where(s => s.CourseUserID == tm.CourseUserID).FirstOrDefault().Multiplier = multiplier;
-                        db.SaveChanges();
+                        bool alreadyPublishedMultiplier = (from score in db.Scores where score.AssignmentID == assignment.ID && score.CourseUserID == tm.CourseUserID select score.Published).FirstOrDefault();
+
+                        if (!alreadyPublishedMultiplier)
+                        {
+                            assignment.PreceedingAssignment.Scores.Where(s => s.CourseUserID == tm.CourseUserID).FirstOrDefault().Points = userAssignPoints * multiplier;
+                            assignment.PreceedingAssignment.Scores.Where(s => s.CourseUserID == tm.CourseUserID).FirstOrDefault().Multiplier = multiplier;
+
+                            Score newScore = new Score()
+                            {
+                                AssignmentID = assignment.ID,
+                                Points = assignment.PointsPossible,
+                                Published = true,
+                                RawPoints = assignment.PointsPossible,
+                                CourseUserID = tm.CourseUserID,
+                                TeamID = tm.TeamID,
+                                CustomLatePenaltyPercent = -1,
+                                PublishedDate = DateTime.Now,
+                                isDropped = false,
+                                LatePenaltyPercent = 0,
+                                StudentPoints = -1
+                            };
+
+                            db.Scores.Add(newScore);
+                            db.SaveChanges();
+
+                            db.SaveChanges();
+                        }
                     }
                 }
             }
         }
     }
 }
-
