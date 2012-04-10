@@ -313,6 +313,7 @@
                 int cols = 2;
                 foreach (Assignment assignment in ViewBag.Assignments)
                 {
+                    bool published = false;
                     bool hasEval = false;
                     cols++;
                     var score = (from scores in ViewBag.UserScores as IEnumerable<Score>
@@ -325,6 +326,9 @@
                         if (a.PrecededingAssignmentID == assignment.ID)
                         {
                             hasEval = true;
+                            published = (from scores in ViewBag.UserScores as IEnumerable<Score>
+                                         where scores.AssignmentID == a.ID
+                                         select scores.Published).FirstOrDefault();
                         }
                     }
 
@@ -338,7 +342,7 @@
 
                                 if (score.First().LatePenaltyPercent > 0)
                                 {
-                                    if (score.First().Multiplier > 0)
+                                    if (published)
                                     {
                 <td id="rubric-@assignment.ID" onmouseover="showLatePenaltyAndMultiplier(@score.First().LatePenaltyPercent, @score.First().Multiplier);" onmouseout="hideLatePenaltyAndMultiplier();" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AssignmentID, cuId = cu.ID }, new { @style = "color:Red" })
                     @Helpers.CreateToolTip("This assignment was late")
@@ -347,14 +351,14 @@
                                 }
                                 else
                                 {
-                                    if (score.First().Multiplier > 0)
+                                    if (published)
                                     {
-                <td id="rubric-@assignment.ID" onmouseover="showMultiplier(@score.First().Multiplier);" onmouseout="hideMultiplier()">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AssignmentID, cuId = cu.ID }, new { })
+                <td id="rubric-@assignment.ID" onmouseover="showMultiplier(@score.First().Multiplier);" onmouseout="hideMultiplier()" style="color:#009900">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AssignmentID, cuId = cu.ID }, new { })
                 </td>
                                     }
                                     else
                                     {
-                <td id="rubric-@assignment.ID" onmouseover="showSubjectMultiplier();" onmouseout="hideSubjectMultiplier();">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AssignmentID, cuId = cu.ID }, new { })
+                <td id="rubric-@assignment.ID" onmouseover="showSubjectMultiplier();" onmouseout="hideSubjectMultiplier();" style="color: #A6D785;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AssignmentID, cuId = cu.ID }, new { })
                 </td>
                                     }
                                 }
@@ -387,14 +391,14 @@
                                     }
                                     else
                                     {
-                                        if (score.First().Multiplier > 0)
+                                        if (published)
                                         {
-                <td id="teacher-@assignment.ID" onmouseover="showMultiplier(@score.First().Multiplier);" onmouseout="hideMultiplier();" style="color:Green">@score.First().Points.ToString(".##")
+                <td id="teacher-@assignment.ID" onmouseover="showMultiplier(@score.First().Multiplier);" onmouseout="hideMultiplier();" style="color:#009900">@score.First().Points.ToString(".##")
                 </td>
                                         }
                                         else
                                         {
-                <td id="teacher-@assignment.ID" onmouseover="showSubjectMultiplier();" onmouseout="hideSubjectMultiplier();">@score.First().Points.ToString(".##")
+                <td id="teacher-@assignment.ID" onmouseover="showSubjectMultiplier();" onmouseout="hideSubjectMultiplier();" style="color: #A6D785">@score.First().Points.ToString(".##")
                 </td>
                                         }
                                     }
@@ -500,7 +504,7 @@
 <div id="multiplier" style="display: none; position: absolute;">
     <table>
         <tr>
-            <td id="multiplierText" style="color: Green;">
+            <td id="multiplierText" style="color: #4AA02C;">
             </td>
         </tr>
     </table>
@@ -543,6 +547,9 @@
 
         $("#multiplier").css("left", x + "px");
         $("#multiplier").css("top", y + "px");
+
+        $("#subjectToMultiplier").css("left", x + "px");
+        $("#subjectToMultiplier").css("top", y + "px");
     });
 
     $("#grades td").keydown(function (e) {
@@ -594,7 +601,7 @@
 
     function showMultiplier(mult) {
         $("#multiplier").animate({ "height": "show" }, { duration: 0 });
-        $("#multiplierText").html("The multiplier is " + mult.toString());
+        $("#multiplierText").html("A multiplier of " + mult.toString() + " has been applied to this score.");
     }
 
     function hideLatePenalty() {

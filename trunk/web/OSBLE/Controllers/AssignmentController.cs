@@ -793,6 +793,10 @@ namespace OSBLE.Controllers
                                      where te.TeamID == team.TeamID
                                      select te).Count();
 
+                        int evalSubmitPoints = (from member in teamMemberEvaluations
+                                                where member.EvaluatorID == tm.CourseUserID
+                                                select member.Points).FirstOrDefault();
+
                         multiplier = (evalPoints / (count * 100));
 
                         double userAssignPoints = (from point in db.Scores
@@ -810,9 +814,7 @@ namespace OSBLE.Controllers
                             Score newScore = new Score()
                             {
                                 AssignmentID = assignment.ID,
-                                Points = assignment.PointsPossible,
                                 Published = true,
-                                RawPoints = assignment.PointsPossible,
                                 CourseUserID = tm.CourseUserID,
                                 TeamID = tm.TeamID,
                                 CustomLatePenaltyPercent = -1,
@@ -822,9 +824,18 @@ namespace OSBLE.Controllers
                                 StudentPoints = -1
                             };
 
-                            db.Scores.Add(newScore);
-                            db.SaveChanges();
+                            if (evalSubmitPoints > 0)
+                            {
+                                newScore.Points = assignment.PointsPossible;
+                                newScore.RawPoints = assignment.PointsPossible;
+                            }
+                            else
+                            {
+                                newScore.Points = 0;
+                                newScore.RawPoints = 0;
+                            }
 
+                            db.Scores.Add(newScore);
                             db.SaveChanges();
                         }
                     }
