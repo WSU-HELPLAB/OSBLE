@@ -161,7 +161,7 @@ namespace OSBLE.Models
             modelBuilder.Entity<DiscussionSetting>()
                 .HasRequired(ds => ds.Assignment)
                 .WithOptional(a => a.DiscussionSettings)
-                .WillCascadeOnDelete(true);
+                .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<DiscussionReply>()
                 .HasRequired(cu => cu.CourseUser)

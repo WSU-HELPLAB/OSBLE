@@ -10,9 +10,13 @@
 <div id="tabHeader">
 <h3>Gradebook</h3>
 
-    @if (ViewBag.ActiveCourse.AbstractRole.CanModify || ViewBag.ActiveCourse.AbstractRole.Anonymized)
+    @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
     {
         @Html.Partial("_TeacherTab");
+    }
+    else if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
+    {
+        @Html.Partial("_ObserverTab");
     }
     else
     {

@@ -358,7 +358,7 @@
             @{
                  <td>@student.Section</td>                                               
                 
-                <td id="@student.ID" >@student.UserProfile.LastName, @student.UserProfile.FirstName</td>   
+                <td id="@student.ID" >@student.DisplayName(ViewBag.ActiveCourse.AbstractRole)</td> 
                 
                   totalGrade = 0;
                   totalCategoryPoints = 0;

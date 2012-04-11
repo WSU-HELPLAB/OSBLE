@@ -137,7 +137,7 @@ namespace OSBLE.Controllers
                                  select post).ToList();
                         foreach (DiscussionPost post in posts)
                         {
-                            post.DisplayName = tm.CourseUser.UserProfile.FirstName + " " + tm.CourseUser.UserProfile.LastName;
+                            post.DisplayName = post.CourseUser.DisplayName(activeCourse.AbstractRole);
                             teamPosts.Add(post);
                         }
                     }
@@ -162,7 +162,7 @@ namespace OSBLE.Controllers
                              select post).ToList();
                     foreach (DiscussionPost post in posts)
                     {
-                        post.DisplayName = post.CourseUser.UserProfile.FirstName + " " + post.CourseUser.UserProfile.LastName;
+                        post.DisplayName = post.CourseUser.DisplayName(activeCourse.AbstractRole);
                     }
                     ViewBag.Posts = posts;
                 }
@@ -202,7 +202,7 @@ namespace OSBLE.Controllers
             {
                 if (!post.CourseUser.AbstractRole.CanModify)
                 {
-                    post.DisplayName = "Anonymous " + post.CourseUserID;
+                    post.DisplayName = post.CourseUser.DisplayName(activeCourse.AbstractRole);
                 }
             }            
 
@@ -232,7 +232,7 @@ namespace OSBLE.Controllers
                                  select post).ToList();
                         foreach (DiscussionPost post in posts)
                         {
-                            post.DisplayName = "Anonymous " + post.CourseUserID;
+                            post.DisplayName = post.CourseUser.DisplayName(activeCourse.AbstractRole);
                             teamPosts.Add(post);
                         }
                     }
@@ -257,7 +257,7 @@ namespace OSBLE.Controllers
                              select post).ToList();
                     foreach (DiscussionPost post in posts)
                     {
-                        post.DisplayName = "Anonymous " + post.CourseUserID;
+                        post.DisplayName = post.CourseUser.DisplayName(activeCourse.AbstractRole);
                         post.ShowProfilePicture = false;
                     }
                     ViewBag.Posts = posts;
@@ -279,7 +279,7 @@ namespace OSBLE.Controllers
             ViewBag.FirstPost = true;
             ViewBag.ActiveCourse = activeCourse;
             ViewBag.PostOrReply = postOrReply;
-            return View();
+            return View("TeacherIndex");
         }
 
         [HttpPost]
@@ -315,7 +315,7 @@ namespace OSBLE.Controllers
                             CourseUserID = activeCourse.ID,
                             Posted = DateTime.Now,
                             AssignmentID = assignment.ID,
-                            DisplayName = activeCourse.UserProfile.FirstName + " " + activeCourse.UserProfile.LastName,
+                            DisplayName = activeCourse.DisplayName(activeCourse.AbstractRole),
                             IsReply = false
                         };
                         db.DiscussionPosts.Add(post);
@@ -339,7 +339,7 @@ namespace OSBLE.Controllers
 
         }
         [HttpGet, FileCache(Duration = 3600)]
-        public FileStreamResult ProfilePictureForDashboard(int course, int userProfile)
+        public FileStreamResult ProfilePictureForDiscussion(int course, int userProfile)
         {
             // File Stream that will ultimately contain profile picture.
             FileStream pictureStream;
@@ -396,7 +396,7 @@ namespace OSBLE.Controllers
             if (replyToPost != null)
             {
                 dr.AssignmentID = replyToPost.AssignmentID;
-                dr.DisplayName = activeCourse.UserProfile.FirstName + " " + activeCourse.UserProfile.LastName;
+                dr.DisplayName = dr.CourseUser.DisplayName(activeCourse.AbstractRole);
                 dr.IsReply = true;
                 replyToPost.Replies.Add(dr);
 

@@ -267,7 +267,7 @@ namespace OSBLE.Controllers
             List<AssignmentDetailsViewModel> AssignmentDetailsList = new List<AssignmentDetailsViewModel>();
             List<AssignmentTeam> teams = new List<AssignmentTeam>();
 
-            if (activeCourse.AbstractRole.CanModify || activeCourse.AbstractRole.Anonymized) //Instructor setup || Observer
+            if (activeCourse.AbstractRole.CanModify || activeCourse.AbstractRole.Anonymized) //Instructor || Observer setup 
             {
                 if (assignment.AssignmentTypeID == 4)
                 {

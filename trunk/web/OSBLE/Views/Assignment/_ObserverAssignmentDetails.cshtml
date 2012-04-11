@@ -104,7 +104,8 @@ For Submission: have a download option with the time submitted or say "Nothing S
                 if (tm.CourseUserID == advm.team.TeamMembers.FirstOrDefault().CourseUserID)
                 {
                         <tr>
-                        <td>&nbsp&nbsp&nbsp Anonymous @tm.CourseUserID</td>
+                        @*<td>&nbsp&nbsp&nbsp Anonymous @tm.CourseUserID</td>*@
+                        <td>&nbsp&nbsp&nbsp  @tm.CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)</td>
                         <td> <!--td for grade-->
                             @if (assignment.HasRubric)
                             {
@@ -124,7 +125,7 @@ For Submission: have a download option with the time submitted or say "Nothing S
                                     }
                                     if (found)
                                     {
-                                        @Html.ActionLink("View", "Rubric", new { assignmentId = assignment.ID, cuId = advm.team.TeamMembers.FirstOrDefault().CourseUserID }, new { })
+                                        @Html.ActionLink("View", "View", "Rubric", new { assignmentId = assignment.ID, cuId = advm.team.TeamMembers.FirstOrDefault().CourseUserID }, new { })
                                     }
                                     else
                                     {
@@ -192,15 +193,15 @@ else
 
                             if (i == advm.team.TeamMembers.Count && advm.team.TeamMembers.Count != 1)
                             {
-                                teamList += " & Anonymous " + tm.CourseUserID;
+                                teamList += " & " + tm.CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole);
                             }
                             else if (i == 1)
                             {
-                                teamList += " Anonymous " + tm.CourseUserID;
+                                teamList += tm.CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole);
                             }
                             else
                             {
-                                teamList += ", Anonymous " + tm.CourseUserID;
+                                teamList += ", " + tm.CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole);
                             }
                             i++;
                         }
@@ -229,7 +230,7 @@ else
                             }
                             if (found)
                             {
-                                    @Html.ActionLink("View", "Rubric", new { assignmentId = assignment.ID, cuId = advm.team.TeamMembers.FirstOrDefault().CourseUserID }, new { })
+                                    @Html.ActionLink("View", "ViewAsUneditable", "Rubric", new { assignmentId = assignment.ID, cuId = advm.team.TeamMembers.FirstOrDefault().CourseUserID }, new { })
                             }
                             else
                             {

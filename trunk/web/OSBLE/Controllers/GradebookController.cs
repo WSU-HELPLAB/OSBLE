@@ -2472,10 +2472,23 @@ namespace OSBLE.Controllers
                                select scores;
 
             //pull the students in the course.  Each student is a row.
-            List<CourseUser> students = (from user in db.CourseUsers
-                                         where user.AbstractCourseID == currentCourseId && user.AbstractRole.CanSubmit
-                                         orderby user.UserProfile.LastName, user.UserProfile.FirstName
-                                         select user).ToList();
+            List<CourseUser> students = new List<CourseUser>();
+            if (activeCourse.AbstractRole.Anonymized) // observer
+            {
+                students = (from user in db.CourseUsers
+                            where user.AbstractCourseID == currentCourseId && user.AbstractRole.CanSubmit
+                            orderby user.ID
+                            select user).ToList();
+            }
+            else
+            {
+                students = (from user in db.CourseUsers
+                            where user.AbstractCourseID == currentCourseId && user.AbstractRole.CanSubmit
+                            orderby user.UserProfile.LastName, user.UserProfile.FirstName
+                            select user).ToList();
+            }
+                                         
+
 
             //Finally the scores for each student.
             List<Score> scor = (from score in db.Scores

@@ -748,7 +748,8 @@
     <Content Include="Views\DiscussionAssignment\_DiscussionFeed.cshtml" />
     <Content Include="Views\DiscussionAssignment\_SubDiscussionReply.cshtml" />
     <Content Include="Views\DiscussionAssignment\TeacherIndex.cshtml" />
-    <Content Include="Views\DiscussionAssignment\ObserverIndex.cshtml" />
+    <Content Include="Views\Gradebook\_ObserverGradebook.cshtml" />
+    <Content Include="Views\Gradebook\_ObserverTab.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

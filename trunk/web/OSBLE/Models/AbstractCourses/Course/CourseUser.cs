@@ -37,5 +37,18 @@ namespace OSBLE.Models.Courses
         {
             Hidden = false;
         }
+
+        public string DisplayName(AbstractRole viewerRole)
+        {
+            if (viewerRole.Anonymized) // observer
+            {
+                // will want to change this.ID to this.ID % with course size
+                return "Anonymous " + this.ID;
+            }
+            else
+            {
+                return this.UserProfile.LastName + ", " + this.UserProfile.FirstName;
+            }
+        }
     }
 }
