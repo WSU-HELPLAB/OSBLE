@@ -1753,6 +1753,7 @@ namespace OSBLE.Controllers
                                 Points = value,
                                 AssignmentID = currentAssignment.ID,
                                 PublishedDate = DateTime.Now,
+                                Published = true,
                                 isDropped = false,
                                 LatePenaltyPercent = latePenalty,
                                 StudentPoints = -1,
@@ -2487,8 +2488,6 @@ namespace OSBLE.Controllers
                             orderby user.UserProfile.LastName, user.UserProfile.FirstName
                             select user).ToList();
             }
-                                         
-
 
             //Finally the scores for each student.
             List<Score> scor = (from score in db.Scores
