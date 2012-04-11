@@ -239,8 +239,19 @@
                     @ViewBag.Grade
                 </td>
             }
-            
         </tr>
+        if (assignment.HasCommentCategories)
+        {
+            <tr>
+                 <td style="vertical-align:text-top">
+                    <text class="osbleColorBold">Inline Review:</text>
+                </td>
+                <td>
+                    @Html.ActionLink("Inline Review", "ViewInlineReview", "Assignment", new { assignmentID = assignment.ID, teamID = ViewBag.TeamID }, new { })
+                </td>
+            </tr>
+            
+        }
     }
     
     @if (ViewBag.ActiveCourse.AbstractRole.CanModify)

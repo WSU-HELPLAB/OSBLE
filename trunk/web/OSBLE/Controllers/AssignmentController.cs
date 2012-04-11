@@ -101,7 +101,10 @@ namespace OSBLE.Controllers
                                                    assignment.Category.CourseID == activeCourse.AbstractCourseID
                                                    select assignment).ToList();
 
-                //This will hold the assignment ID, the date submitted in string format, the grade in string format, and the team ID
+                //This will hold the assignment ID, the date submitted in string format:, the grade in string format, and the team ID
+                //submission time
+                //score as string (or "No Grade" if there is not one)
+                //assignmentTeam for that submission
                 Dictionary<int, Tuple<string, string, AssignmentTeam>> submissionInfo = new Dictionary<int, Tuple<string, string, AssignmentTeam>>();
                 foreach (Assignment a in assignmentList)
                 {
@@ -132,7 +135,7 @@ namespace OSBLE.Controllers
                                                         select t.TeamEvaluation).ToList();
 
                 ViewBag.TeamEvaluations = teamEvaluations;
-
+                ViewBag.CourseUser = activeCourse;
                 ViewBag.SubmissionInfoDictionary = submissionInfo;
             }
 
