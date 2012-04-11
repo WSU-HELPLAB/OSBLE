@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.Users;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Models.Assignments
 {
@@ -34,6 +36,19 @@ namespace OSBLE.Models.Assignments
             else
             {
                 return this.ID.CompareTo(other.ID);
+            }
+        }
+
+        public string DisplayName(AbstractRole viewerRole)
+        {
+            if (viewerRole.Anonymized) // observer
+            {
+                // will want to change this.ID to this.ID % with # teams Mabye
+                return "Team " + this.ID;
+            }
+            else
+            {
+                return this.Name;
             }
         }
     }
