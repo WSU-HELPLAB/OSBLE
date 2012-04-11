@@ -4,10 +4,8 @@ using System.Linq;
 using System.Web.Mvc;
 using Ionic.Zip;
 using OSBLE.Attributes;
-
-using OSBLE.Models.Courses;
-using OSBLE.Models.Users;
 using OSBLE.Models.Assignments;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Controllers
 {
@@ -153,7 +151,7 @@ namespace OSBLE.Controllers
                         {
                             foreach (DirectoryInfo submissionDirectory in acitvityDirectory.GetDirectories())
                             {
-                                zipfile.AddDirectory(submissionDirectory.FullName, (from c in assignment.AssignmentTeams where c.TeamID.ToString() == submissionDirectory.Name select c.Team).FirstOrDefault().Name);
+                                zipfile.AddDirectory(submissionDirectory.FullName, (from c in assignment.AssignmentTeams where c.TeamID.ToString() == submissionDirectory.Name select c.Team).FirstOrDefault().TeamMembers.FirstOrDefault().CourseUser.DisplayName(ActiveCourse.AbstractRole));
                             }
 
                             FileSystem.CreateZipFolder(activeCourse.AbstractCourse as Course, zipfile, assignment);
@@ -205,7 +203,7 @@ namespace OSBLE.Controllers
                     }
                     else if (activeCourse.AbstractRole.CanSubmit)
                     {
-                        foreach(TeamMember tm in at.Team.TeamMembers)
+                        foreach (TeamMember tm in at.Team.TeamMembers)
                         {
                             if (tm.CourseUser.UserProfileID == currentUser.ID)
                             {
@@ -214,7 +212,6 @@ namespace OSBLE.Controllers
                                 return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
                             }
                         }
-                        
                     }
                 }
             }
@@ -247,7 +244,6 @@ namespace OSBLE.Controllers
                         return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
                     }
 
-
                     string submissionfolder = FileSystem.GetTeamUserSubmissionFolder(false, (activeCourse.AbstractCourse as Course), assignmentID, assignmentTeam);
 
                     using (ZipFile zipfile = new ZipFile())
@@ -271,7 +267,6 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        
         [NotForCommunity]
         public ActionResult getCurrentUsersZip(int assignmentID)
         {
