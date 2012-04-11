@@ -4,6 +4,7 @@ using System.ServiceModel.DomainServices.Client;
 using OSBLE.Models.AbstractCourses;
 using OSBLE.Services;
 using ReviewInterfaceBase.ViewModel.Category;
+using OSBLE.Models.Assignments;
 
 namespace ReviewInterfaceBase.Model.CatergoryHolder
 {

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ServiceModel.DomainServices.Client;
-using OSBLE.Models.AbstractCourses.Course;
+using OSBLE.Models.AbstractCourses;
 using OSBLE.Services;
 using ReviewInterfaceBase.ViewModel.Tag;
+using OSBLE.Models.Assignments;
 
 namespace ReviewInterfaceBase.Model.Category
 {
