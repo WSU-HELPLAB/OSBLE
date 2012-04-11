@@ -53,7 +53,7 @@ namespace IssueVoting.HelperClasses
             }
             else
             {
-                MessageBox.Show("There was an error reading one of the files, please reformat your hard drive and try again");
+                MessageBox.Show("There was an error.");
             }
 
             documentEnumerator.MoveNext();
