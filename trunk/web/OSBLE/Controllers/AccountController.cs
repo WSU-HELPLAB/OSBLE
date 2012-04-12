@@ -8,16 +8,17 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
+using System.Reflection;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using Microsoft.Web.Helpers;
 using OSBLE.Models;
+using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Utility;
-using System.Reflection;
 
 namespace OSBLE.Controllers
 {
@@ -64,8 +65,7 @@ namespace OSBLE.Controllers
                 {
                     MembershipUser user = Membership.GetUser(localUser.AspNetUserName);
 
-
-                    //remove any locks.  A little unsecure as it allows a constant brute-force 
+                    //remove any locks.  A little unsecure as it allows a constant brute-force
                     //attack, but it seems to annoy users much more regularly.  Consider
                     //removing if OSBLE ever gets to the point that user accounts start getting
                     //hacked.
@@ -201,9 +201,10 @@ namespace OSBLE.Controllers
                     {
                         user.Comment = null;
                         user.IsApproved = true;
+
                         Membership.UpdateUser(user);
                         FormsAuthentication.SetAuthCookie(model.UserName, true);
-                        
+
                         //make sure that the asp.net user name is saved to the user profile
                         UserProfile osbleProfile = db.UserProfiles.Where(u => u.AspNetUserName.CompareTo(model.UserName) == 0).FirstOrDefault();
                         if (osbleProfile != null)
@@ -211,6 +212,25 @@ namespace OSBLE.Controllers
                             osbleProfile.AspNetUserName = model.UserName;
                             db.SaveChanges();
                         }
+
+                        List<AssignmentTeam> atList = (from at in db.AssignmentTeams
+                                                       select at).ToList();
+                        UserProfile up = (from users in db.UserProfiles
+                                          where users.UserName == user.UserName
+                                          select users).FirstOrDefault();
+
+                        foreach (AssignmentTeam at in atList)
+                        {
+                            if (!at.Assignment.HasTeams)
+                            {
+                                if (at.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.UserName == user.UserName)
+                                {
+                                    at.Team.Name = up.LastAndFirst();
+                                }
+                            }
+                        }
+                        db.SaveChanges();
+
                         return RedirectToAction("Index", "Home");
                     }
                     else
@@ -364,7 +384,7 @@ namespace OSBLE.Controllers
                                 }
                                 else
                                 {
-                                    MembershipUser msu = Membership.GetUser(up.UserName); 
+                                    MembershipUser msu = Membership.GetUser(up.UserName);
 
                                     if (msu != null && !msu.IsApproved) // Already Registered but never acivated their account
                                     {
@@ -443,7 +463,7 @@ namespace OSBLE.Controllers
                 try
                 {
                     MembershipUser currentUser = Membership.GetUser(User.Identity.Name, true /* userIsOnline */);
-                    
+
                     //never lock out users
                     currentUser.UnlockUser();
                     changePasswordSucceeded = currentUser.ChangePassword(model.OldPassword, model.NewPassword);
