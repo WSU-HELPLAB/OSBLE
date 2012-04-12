@@ -219,7 +219,17 @@ namespace OSBLE.Controllers
             }
 
             viewModel.AssignmentList = rubricAssignmentList;
-            viewModel.TeamList = assignment.AssignmentTeams.OrderBy(t => t.Team.Name).ToList();
+            if (assignment.HasTeams)
+            {
+                viewModel.TeamList = assignment.AssignmentTeams.OrderBy(t => t.Team.Name).ToList();
+            }
+            else
+            {
+                viewModel.TeamList = assignment.AssignmentTeams.OrderBy(t => t.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(activeCourse.AbstractRole)).ToList();
+            }
+            viewModel.RubricEvaluationList = (from r in db.RubricEvaluations
+                                              where r.AssignmentID == assignment.ID
+                                              select r).ToList();
             return viewModel;
         }
 

@@ -27,7 +27,6 @@ namespace OSBLE.Models.DiscussionAssignment
         public int AssignmentID { get; set; }
         public virtual Assignment Assignment { get; set; }
 
-        public int RepliesID { get; set; }
         public virtual ICollection<DiscussionPost> Replies { get; set; }
 
         public string DisplayName { get; set; }
