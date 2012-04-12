@@ -259,11 +259,17 @@
     @:</div>
         }
 }
-</div> <script type="text/javascript"> function RemainingCharsReply() { var remainingReply
-= $('#firstPostLength').val() - $('#ActivityFeed').val().length; if (parseInt(remainingReply)
-<= 0) { $("#postNewDiscussion").removeAttr("disabled"); $('#firstPostLengthDiv').html("(0)
-characters remaining for the first post."); } else { $("#postNewDiscussion").attr("disabled",
-"disabled"); $('#firstPostLengthDiv').html("(" + remainingReply + ") additional
-characters needed."); } } //refreshes the count of how many charecters you can input
-function refreshCount() { $('body').css('cursor', 'wait'); $('#remCharsReply').val("("
-+ $('#MaxContentChars').val() + ") Characters left"); } </script> 
+</div> <script type="text/javascript">
+function RemainingCharsReply() 
+{ 
+var remainingReply = $('#firstPostLength').val() - $('#ActivityFeed').val().length; 
+    if (parseInt(remainingReply)<= 0) 
+    { 
+        $("#postNewDiscussion").removeAttr("disabled"); $('#firstPostLengthDiv').html("(0) characters remaining for the first post."); } else { $("#postNewDiscussion").attr("disabled","disabled");
+        $('#firstPostLengthDiv').html("(" + remainingReply + ") additional characters needed.");
+    } 
+} //refreshes the count of how many charecters you can input
+function refreshCount() {
+        $('body').css('cursor', 'wait'); $('#remCharsReply').val("(" + $('#MaxContentChars').val() + ") Characters left"); 
+    } 
+</script> 
