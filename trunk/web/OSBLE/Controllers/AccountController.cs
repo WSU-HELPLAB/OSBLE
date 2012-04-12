@@ -63,6 +63,12 @@ namespace OSBLE.Controllers
 
                 if (localUser != null)
                 {
+                    //they have a user name, but not a .net user name.  This is an oddity.  Correct and continue.
+                    if (localUser.AspNetUserName == null)
+                    {
+                        localUser.AspNetUserName = localUser.UserName;
+                        db.SaveChanges();
+                    }
                     MembershipUser user = Membership.GetUser(localUser.AspNetUserName);
 
                     //remove any locks.  A little unsecure as it allows a constant brute-force
