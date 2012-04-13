@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
-using System.Net.Mail;
-using System.Configuration;
 
 namespace OSBLE.Controllers
 {
@@ -198,23 +195,23 @@ namespace OSBLE.Controllers
         [NonAction]
         public void SendFilesSubmittedNotification(Assignment assignment, AssignmentTeam team, string fileName)
         {
-            if (assignment.Category.CourseID == activeCourse.AbstractCourseID)
-            {
-                var canGrade = (from c in db.CourseUsers
-                                where c.AbstractCourseID == activeCourse.AbstractCourseID
-                                && c.AbstractRole.CanGrade
-                                select c).ToList();
+            //if (assignment.Category.CourseID == activeCourse.AbstractCourseID)
+            //{
+            //    var canGrade = (from c in db.CourseUsers
+            //                    where c.AbstractCourseID == activeCourse.AbstractCourseID
+            //                    && c.AbstractRole.CanGrade
+            //                    select c).ToList();
 
-                foreach (CourseUser user in canGrade)
-                {
-                    Notification n = new Notification();
-                    n.ItemType = Notification.Types.FileSubmitted;
-                    n.Data = assignment.ID.ToString() + ";" + team.TeamID.ToString() + ";" + assignment.AssignmentName + ";" + team.Team.Name + ";" + fileName + ";" + DateTime.Now;
-                    n.RecipientID = user.ID;
-                    n.SenderID = activeCourse.ID;
-                    addNotification(n);
-                }
-            }
+            //    foreach (CourseUser user in canGrade)
+            //    {
+            //        Notification n = new Notification();
+            //        n.ItemType = Notification.Types.FileSubmitted;
+            //        n.Data = assignment.ID.ToString() + ";" + team.TeamID.ToString() + ";" + assignment.AssignmentName + ";" + team.Team.Name + ";" + fileName + ";" + DateTime.Now;
+            //        n.RecipientID = user.ID;
+            //        n.SenderID = activeCourse.ID;
+            //        addNotification(n);
+            //    }
+            //}
         }
 
         /// <summary>
