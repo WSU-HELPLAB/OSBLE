@@ -137,13 +137,13 @@ namespace OSBLE.Controllers
 
                                         if (position.Count() > 0)
                                         {
-                                            AddColumn(assignment.ToString(), 10, assign.ColumnOrder + assignmentNumber);
+                                            AddColumn(assignment.ToString(), 1, assign.ColumnOrder + assignmentNumber);
                                             positionList.Add(assign.ColumnOrder + assignmentNumber);
                                             index.Add(count);
                                         }
                                         else
                                         {
-                                            AddColumn(assignment.ToString(), 10, assign.ColumnOrder + assignmentNumber);
+                                            AddColumn(assignment.ToString(), 1, assign.ColumnOrder + assignmentNumber);
                                             positionList.Add(assign.ColumnOrder + assignmentNumber);
                                             index.Add(count);
                                         }
@@ -2002,6 +2002,7 @@ namespace OSBLE.Controllers
             List<Score> allGrades = (from grades in db.Scores
                                      where grades.Assignment.Category.CourseID == currentCourseId &&
                                      grades.Points >= 0 &&
+                                     grades.Assignment.PointsPossible > 0 &&
                                      grades.isDropped == false
                                      select grades).ToList();
 
@@ -2015,6 +2016,7 @@ namespace OSBLE.Controllers
             List<Score> categoryTotalPercent = (from categoryTotal in db.Scores
                                                 where categoryTotal.Assignment.Category.CourseID == currentCourseId &&
                                                 categoryTotal.Points >= 0 &&
+                                                categoryTotal.Assignment.PointsPossible > 0 &&
                                                 categoryTotal.isDropped == false
                                                 select categoryTotal).ToList();
 
@@ -2039,7 +2041,8 @@ namespace OSBLE.Controllers
                     if (cat.Name != Constants.UnGradableCatagory)
                     {
                         List<Score> allScores = (from points in db.Scores
-                                                 where points.Assignment.CategoryID == cat.ID
+                                                 where points.Assignment.CategoryID == cat.ID &&
+                                                 points.Assignment.PointsPossible > 0
                                                  select points).ToList();
 
                         List<Score> userScores = (from points in allScores
@@ -2112,6 +2115,7 @@ namespace OSBLE.Controllers
             List<Score> allGrades = (from grades in db.Scores
                                      where grades.Assignment.Category.CourseID == currentCourseId &&
                                      grades.Points >= 0 &&
+                                     grades.Assignment.PointsPossible > 0 &&
                                      grades.isDropped == false
                                      select grades).ToList();
 
@@ -2125,6 +2129,7 @@ namespace OSBLE.Controllers
             List<Score> categoryTotalPercent = (from categoryTotal in db.Scores
                                                 where categoryTotal.Assignment.Category.CourseID == currentCourseId &&
                                                 categoryTotal.Points >= 0 &&
+                                                categoryTotal.Assignment.PointsPossible > 0 &&
                                                 categoryTotal.isDropped == false
                                                 select categoryTotal).ToList();
 
@@ -2149,7 +2154,8 @@ namespace OSBLE.Controllers
                     if (cat.Name != Constants.UnGradableCatagory)
                     {
                         List<Score> allScores = (from points in db.Scores
-                                                 where points.Assignment.CategoryID == cat.ID
+                                                 where points.Assignment.CategoryID == cat.ID &&
+                                                 points.Assignment.PointsPossible > 0
                                                  select points).ToList();
 
                         List<Score> userScores = (from points in allScores
@@ -2210,7 +2216,8 @@ namespace OSBLE.Controllers
                                  select section.Section).FirstOrDefault();
 
             List<Score> categoryTotalPercent = (from categoryTotal in db.Scores
-                                                where categoryTotal.Assignment.Category.CourseID == currentCourseId
+                                                where categoryTotal.Assignment.Category.CourseID == currentCourseId &&
+                                                categoryTotal.Assignment.PointsPossible > 0
                                                 select categoryTotal).ToList();
 
             List<Score> userCategoryTotalPercent = (from userCategoryTotal in categoryTotalPercent
@@ -2311,7 +2318,8 @@ namespace OSBLE.Controllers
                                       select users).FirstOrDefault();
 
             List<Score> totalScores = (from scores in db.Scores
-                                       where scores.Assignment.CategoryID == categoryId
+                                       where scores.Assignment.CategoryID == categoryId &&
+                                       scores.Assignment.PointsPossible > 0
                                        select scores).ToList();
 
             List<Score> userScores = (from score in totalScores
@@ -2492,12 +2500,12 @@ namespace OSBLE.Controllers
             //Finally the scores for each student.
             List<Score> scor = (from score in db.Scores
                                 where score.Assignment.CategoryID == currentTab.ID &&
-                                score.Points >= 0
+                                score.Points >= 0 &&
+                                score.Assignment.PointsPossible > 0
                                 select score).ToList();
 
             var userScore = from scores in scor
                             where scores.isDropped == false
-                            && scores.Points >= 0
                             group scores by scores.CourseUserID into userScores
                             select userScores;
 
