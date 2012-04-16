@@ -328,10 +328,10 @@ namespace OSBLE.Controllers
             {
                 return RedirectToAction("TeacherIndex", new { assignmentId = assignment.ID, courseUserId = (int)Session["StudentId"], postOrReply = (int)Session["PostOrReply"]});
             }
-            //else if (activeCourse.AbstractRole.Anonymized)
-            //{
-            //    return RedirectToAction("ObserverIndex", new { assignmentId = assignment.ID, courseUserId = (int)Session["StudentId"], postOrReply = (int)Session["PostOrReply"] });
-            //}
+            else if (activeCourse.AbstractRole.Anonymized)
+            {
+                return RedirectToAction("ObserverIndex", new { assignmentId = assignment.ID, courseUserId = (int)Session["StudentId"], postOrReply = (int)Session["PostOrReply"] });
+            }
             else
             {
                 return RedirectToAction("Index", new { assignmentId = assignment.ID });
