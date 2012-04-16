@@ -69,43 +69,44 @@
     @:<div id="dp_posts">
             if (assignment.DiscussionSettings.HasAnonymousPosts && !ViewBag.ActiveCourse.AbstractRole.CanModify)
             {
-    <div class="dp_post_header">
-    @Helpers.DefaultProfilePicture()
-    @dp.DisplayName <br />
-    @dp.Posted <br /> <br /> </div>
-    @dp.Content
-    <div class="dp_replies"> <div id="dp_replies_for_@(dp.ID)">
-    @foreach (DiscussionPost dr in dp.Replies)
-    {
-        @Html.Partial("_DiscussionFeed", dr);
-    }
-    </div> </div>
-    if (assignment.DueDate > DateTime.Now)
-    {
-    <div class="dp_replylink"> <a href="#" id="reply_@(dp.ID)">Reply</a> </div>
-    }
-    <div class="dp_replybox" id="replybox_@(dp.ID)" > <form action="@Url.Action("NewReply")"
-    data-ajax="true" data-ajax-update="#dp_replies_for_@(dp.ID)" data-ajax-begin="$('#reply_@(dp.ID)_button').attr('disabled',
-    'disabled')" data-ajax-failure="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');});
-    $('#dp_replybox_content_@(dp.ID)').val('')" data-ajax-complete="$('#reply_@(dp.ID)_button').removeAttr('disabled');
-    $('body').css('cursor', 'default');" data-ajax-success="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');});
-    $('#dp_replybox_content_@(dp.ID)').val('')" data-ajax-mode="after" method="post">
-    <input type="hidden" name="reply_to" value="@dp.ID" /> <input type="hidden" name="latest_reply"
-    value="0" id="latest_reply_@(dp.ID)" /> <textarea name="Content" rows="5" cols="40"
-    id="dp_replybox_content_@(dp.ID)" placeholder="Enter reply here..."></textarea><br
-    /> <input id="reply @(dp.ID)
-    button" type="submit" name="post_reply" value="Post Reply" onclick="refreshCount()"
-    /> </form> <br /> <div class="dp_replylink"> <a href="#" id="replycancel_@(dp.ID)">Cancel</a>
-    </div> </div>
-    <script type="text/javascript">        $("#reply_@(dp.ID)").click(function () {
-            $("#reply_@(dp.ID)").hide();
-            $("#replybox_@(dp.ID)").show('blind'); return false;
-        }); $("#replycancel_@(dp.ID)").click(function
-    () {
-            $("#reply_@(dp.ID)").show('highlight'); $("#replybox_@(dp.ID)").hide('blind');
-            return false;
-        }); </script>
-
+                <div class="dp_post_header">
+                    @Helpers.DefaultProfilePicture()
+                    @dp.DisplayName <br />
+                    @dp.Posted <br /> <br /> </div>
+                    @dp.Content
+                    <div class="dp_replies"> <div id="dp_replies_for_@(dp.ID)">
+                    @foreach (DiscussionPost dr in dp.Replies)
+                    {
+                        @Html.Partial("_DiscussionFeed", dr);
+                    }
+                </div> </div>
+                if (assignment.DueDate > DateTime.Now)
+                {
+                    <div class="dp_replylink"> <a href="#" id="reply_@(dp.ID)">Reply</a> </div>
+                }
+                <div class="dp_replybox" id="replybox_@(dp.ID)" > <form action="@Url.Action("NewReply")"
+                    data-ajax="true" data-ajax-update="#dp_replies_for_@(dp.ID)" data-ajax-begin="$('#reply_@(dp.ID)_button').attr('disabled',
+                    'disabled')" data-ajax-failure="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');});
+                    $('#dp_replybox_content_@(dp.ID)').val('')" data-ajax-complete="$('#reply_@(dp.ID)_button').removeAttr('disabled');
+                    $('body').css('cursor', 'default');" data-ajax-success="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');});
+                    $('#dp_replybox_content_@(dp.ID)').val('')" data-ajax-mode="after" method="post">
+                    <input type="hidden" name="reply_to" value="@dp.ID" /> <input type="hidden" name="latest_reply"
+                    value="0" id="latest_reply_@(dp.ID)" /> <textarea name="Content" rows="5" cols="40"
+                    id="dp_replybox_content_@(dp.ID)" placeholder="Enter reply here..."></textarea><br
+                    /> <input id="reply @(dp.ID)
+                    button" type="submit" name="post_reply" value="Post Reply" onclick="refreshCount()"
+                    /> </form> <br /> <div class="dp_replylink"> <a href="#" id="replycancel_@(dp.ID)">Cancel</a>
+                </div> </div>
+                <script type="text/javascript">        
+                    $("#reply_@(dp.ID)").click(function () {
+                        $("#reply_@(dp.ID)").hide();
+                        $("#replybox_@(dp.ID)").show('blind'); return false;
+                    }); 
+                    $("#replycancel_@(dp.ID)").click(function() {
+                        $("#reply_@(dp.ID)").show('highlight'); $("#replybox_@(dp.ID)").hide('blind');
+                        return false;
+                    }); 
+                </script>
             }
             else
             {
@@ -115,125 +116,93 @@
                     {
                         if (ViewBag.Student.ID == dp.CourseUserID && ViewBag.PostOrReply != 1)
                         {
-    @:<div class="dp_post" id="dp_post_@(dp.ID)" style="background:#FFF8C6;">
+                            @:<div class="dp_post" id="dp_post_@(dp.ID)" style="background:#FFF8C6;">
                         }
                         else
                         {
-    @:<div class="dp_post" id="dp_post_@(dp.ID)">
+                            @:<div class="dp_post" id="dp_post_@(dp.ID)">
                         }
                     }
                     else
                     {
-    @:<div class="dp_post" id="dp_post_@(dp.ID)">
+                        @:<div class="dp_post" id="dp_post_@(dp.ID)">
                     }
                 }
                 else
                 {
-    @:<div class="dp_post" id="dp_post_@(dp.ID)">
+                    @:<div class="dp_post" id="dp_post_@(dp.ID)">
                 }
 @*<div class="dp_post" id="dp_post_@(dp.ID)">*@
     <div class="dp_post_header">
-    @if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
-    {
-        @:@Helpers.DefaultProfilePicture()
-                        @:@dp.DisplayName <br />
-                    }
-    else
-    {
-        @:@Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dp.CourseUser.AbstractCourseID, userprofile = dp.CourseUser.UserProfileID }))
-                        @:@dp.CourseUser.UserProfile.FirstName @dp.CourseUser.UserProfile.LastName <br />
-                                                                                                                                                                    }
+    @Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = dp.CourseUser.AbstractCourseID, userprofile = dp.CourseUser.UserProfileID }))
+    @dp.DisplayName <br />
     @dp.Posted <br /> <br /> </div>
     @dp.Content
     <div class="dp_replies"> <div id="dp_replies_for_@(dp.ID)">
-    @foreach (DiscussionPost dr in dp.Replies)
-    {
-        if (ViewBag.ActiveCourse.AbstractRole.CanModify || ViewBag.ActiveCourse.AbstractRole.Anonymized)
+        @foreach (DiscussionPost dr in dp.Replies)
         {
-            if (ViewBag.Student != null && ViewBag.PostOrReply != 3)
+            if (ViewBag.ActiveCourse.AbstractRole.CanModify || ViewBag.ActiveCourse.AbstractRole.Anonymized)
             {
-                if (ViewBag.Student.ID == dr.CourseUserID && ViewBag.PostOrReply != 0)
+                if (ViewBag.Student != null && ViewBag.PostOrReply != 3)
                 {
-        @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:#FFF8C6;">
-                                        <div class="dp_post_header">
-        @if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
-        {
-            @:@Helpers.DefaultProfilePicture()
-                                                @:Anonymous @dr.CourseUserID <br />
-                                            }
-        else
-        {
-            @:@Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }))
-                                                @:@dr.CourseUser.UserProfile.FirstName @dr.CourseUser.UserProfile.LastName <br />
-                                                                                                                                                                                                                                                                                                                                            }
-        @dr.Posted <br /> <br /> </div>
-        @dr.Content
-        @:</div>
-                                    }
+                    if (ViewBag.Student.ID == dr.CourseUserID && ViewBag.PostOrReply != 0)
+                    {
+                        @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:#FFF8C6;">
+                            <div class="dp_post_header">
+                                @Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }))
+                                @dr.DisplayName <br />
+                                @dr.Posted <br /> <br /> </div>
+                                @dr.Content
+                        @:</div>
+                    }
+                    else
+                    {
+                        @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:white;">
+                            <div class="dp_post_header">
+                            @Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }))
+                            @dr.DisplayName <br />
+                            @dr.Posted <br /> <br /> </div>
+                            @dr.Content
+                        @:</div>
+                    }
+                }
                 else
                 {
-        @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:white;">
-                                        <div class="dp_post_header">
-        @if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
-        {
-            @:@Helpers.DefaultProfilePicture()
-                                                @:Anonymous @dr.CourseUserID <br />
-                                            }
-        else
-        {
-            @:@Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }))
-                                                @:@dr.CourseUser.UserProfile.FirstName @dr.CourseUser.UserProfile.LastName <br />
-                                                                                                                                                                                                                                                                                                                                            }
-        @dr.Posted <br /> <br /> </div>
-        @dr.Content
-        @:</div>
-                                    }
+                    @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:white;">
+                        <div class="dp_post_header">
+                        @Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }))
+                        @dr.DisplayName <br />
+                        @dr.Posted <br /> <br /> </div>
+                        @dr.Content
+                    @:</div>
+                }
             }
             else
             {
-        @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:white;">
-                                    <div class="dp_post_header">
-        @if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
-        {
-            @:@Helpers.DefaultProfilePicture()
-                                            @:Anonymous @dr.CourseUserID <br />
-                                        }
-        else
-        {
-            @:@Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }))
-                                            @:@dr.CourseUser.UserProfile.FirstName @dr.CourseUser.UserProfile.LastName <br />
-                                                                                                                                                                                                                                                                                                                                        }
-        @dr.Posted <br /> <br /> </div>
-        @dr.Content
-        @:</div>
-                                }
+                @:<div class="dp_post" id="dp_post_@(dr.ID)">
+                    <div class="dp_post_header">
+                @Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }))
+                @dr.DisplayName <br />
+                @dr.Posted <br /> <br /> </div>
+                @dr.Content
+                @:</div>
+            }
         }
-        else
-        {
-        @:<div class="dp_post" id="dp_post_@(dr.ID)">
-                                <div class="dp_post_header">
-        @Helpers.ProfilePicture(Url.Action("ProfilePictureForDashboard", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }))
-        @dr.DisplayName <br />
-        @dr.Posted <br /> <br /> </div>
-        @dr.Content
-        @:</div>
-                                                                                                                                                                            }
-    }
     </div> </div>
     if (assignment.DueDate > DateTime.Now)
     {
-    <div class="dp_replylink"> <a href="#" id="reply_@(dp.ID)">Reply</a> </div>
+        <div class="dp_replylink"> <a href="#" id="reply_@(dp.ID)">Reply</a> </div>
     }
     <div class="dp_replybox" id="replybox_@(dp.ID)" style="padding-left:23px;" >
     @using (Html.BeginForm("NewReply", "DiscussionAssignment", FormMethod.Post))
     {
-@*data-ajax="true"*@
-@*data-ajax-update="#dp_replies_for_@(dp.ID)"
-                        data-ajax-begin="$('#reply_@(dp.ID)_button').attr('disabled', 'disabled')"
-                        data-ajax-complete="$('#reply_@(dp.ID)_button').removeAttr('disabled'); $('body').css('cursor', 'default');"
-                        data-ajax-success="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');}); $('#dp_replybox_content_@(dp.ID)').val('')"
-                        data-ajax-mode="after"*@
-@*method="post"*@
+        @*data-ajax="true"*@
+        @*data-ajax-update="#dp_replies_for_@(dp.ID)"
+        data-ajax-begin="$('#reply_@(dp.ID)_button').attr('disabled', 'disabled')"
+        data-ajax-complete="$('#reply_@(dp.ID)_button').removeAttr('disabled'); $('body').css('cursor', 'default');"
+        data-ajax-success="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');}); $('#dp_replybox_content_@(dp.ID)').val('')"
+        data-ajax-mode="after"*@
+        @*method="post"*@
         <input type="hidden" name="reply_to" value="@dp.ID" />
         <input type="hidden" name="latest_reply" value="0" id="latest_reply_@(dp.ID)" />
         <span id="remCharsReply" name="remainingCharsReply" readonly="true" value="(@ViewBag.MaxActivityFeedLength)
