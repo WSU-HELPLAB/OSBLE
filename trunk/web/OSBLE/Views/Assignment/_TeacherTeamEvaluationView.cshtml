@@ -10,7 +10,7 @@
     AssignmentTeam team = ViewBag.Team;
 }
 
-<h2>@team.Team.Name Team Member Evaluations</h2>
+<h2>@team.Team.DisplayName(ViewBag.ActiveCourse.AbstractRole) Team Member Evaluations</h2>
 
 
 @{
@@ -23,9 +23,9 @@
     <table id="TeamMemberEvaluationTable">
         <tr>
             <th>Evaluators</th>
-            @foreach (TeamMember member in team.Team.TeamMembers.OrderBy(u => u.CourseUser.UserProfile.LastName).ThenBy(f => f.CourseUser.UserProfile.FirstName))
+            @foreach (TeamMember member in team.Team.TeamMembers)
             {
-                <th>@member.CourseUser.UserProfile.FirstName @member.CourseUser.UserProfile.LastName</th>
+                <th>@member.CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)</th>
             }
             <th>Comments</th>
         </tr>
@@ -34,21 +34,22 @@
         {
             <tr>
                 @{
-            int count = 0;
-            foreach (TeamMemberEvaluation tme in te.TeamMemberEvaluations.OrderBy(u => u.Recipient.UserProfile.LastName).ThenBy(f => f.Recipient.UserProfile.FirstName))
-            {
-                if (count < 1)
+                int count = 0;
+                foreach (TeamMemberEvaluation tme in te.TeamMemberEvaluations)
                 {
-                    count++;
-                            <td>@tme.Evaluator.UserProfile.FirstName @tme.Evaluator.UserProfile.LastName</td>
-                            <td>@tme.Points</td>
+                    if (count < 1)
+                    {
+                        count++;
+                        <td>@tme.Evaluator.DisplayName(ViewBag.ActiveCourse.AbstractRole)</td>
+                        <td>@tme.Points</td>
+                    }
+                    else
+                    {
+                        <td>@tme.Points</td>
+                    }
                 }
-                else
-                {
-                            <td>@tme.Points</td>
-                }
-            }
-                    <td>@te.Comments</td>
+                
+                <td>@te.Comments</td>
                 }
             </tr>
         }     
@@ -57,7 +58,7 @@
                 <b>Multiplier</b>
             </td>
             
-            @foreach (TeamMember member in team.Team.TeamMembers.OrderBy(u => u.CourseUser.UserProfile.LastName).ThenBy(f => f.CourseUser.UserProfile.FirstName))
+            @foreach (TeamMember member in team.Team.TeamMembers)
             {
                 double multiplier = (from tm in ViewBag.TeamMemberEvaluations as IEnumerable<TeamMemberEvaluation>
                                      where tm.RecipientID == member.CourseUserID
@@ -71,7 +72,8 @@
         </tr> 
     </table>    
     <br />
-    @Html.ActionLink("Publish " + team.Team.Name + "'s  Multiplier", "PublishTeamMultiplier", new { teamId = team.TeamID, assignmentId = assignment.ID })                                                                                               
+    string teamName = team.Team.DisplayName(ViewBag.ActiveCourse.AbstractRole);
+    @Html.ActionLink("Publish " + teamName + "'s  Multiplier", "PublishTeamMultiplier", new { teamId = team.TeamID, assignmentId = assignment.ID })                                                                                               
 }
 
 

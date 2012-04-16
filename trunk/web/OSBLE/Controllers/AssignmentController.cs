@@ -588,11 +588,42 @@ namespace OSBLE.Controllers
             List<TeamEvaluation> teamEvaluations = (from t in db.TeamEvaluations
                                                     where t.TeamID == teamId &&
                                                     t.AssignmentID == a.ID
-                                                    select t).ToList();
+                                                    select t).OrderBy(u => u.Team.Name).ToList();
             List<TeamMemberEvaluation> teamMemberEvaluations = (from t in db.TeamMemberEvaluations
                                                                 where t.TeamEvaluation.TeamID == teamId &&
                                                                 t.TeamEvaluation.AssignmentID == a.ID
-                                                                select t).ToList();
+                                                                select t).OrderBy(u => u.Recipient.UserProfile.LastName).ThenBy(f => f.Recipient.UserProfile.FirstName).ToList();
+
+            AssignmentTeam at = GetAssignmentTeam(a.PreceedingAssignment, team.TeamMembers.FirstOrDefault().CourseUser.UserProfile);
+            ViewBag.Team = at;
+
+            ViewBag.TeamEvaluations = teamEvaluations;
+            ViewBag.TeamMemberEvaluations = teamMemberEvaluations;
+            ViewBag.Assignment = a;
+
+            return View("_TeacherTeamEvaluationView");
+        }
+
+        /// <summary>
+        /// This will take a Team and display the team evaluations to the Observer.
+        /// </summary>
+        /// <param name="teamId"></param>
+        public ActionResult ObserverTeamEvaluation(int teamId, int assignmentId)
+        {
+            ViewBag.Team = db.Teams.Find(teamId);
+            ViewBag.Time = DateTime.Now;
+            Assignment a = db.Assignments.Find(assignmentId);
+
+            Team team = db.Teams.Find(teamId);
+
+            List<TeamEvaluation> teamEvaluations = (from t in db.TeamEvaluations
+                                                    where t.TeamID == teamId &&
+                                                    t.AssignmentID == a.ID
+                                                    select t).OrderBy(u => u.TeamID).ToList();
+            List<TeamMemberEvaluation> teamMemberEvaluations = (from t in db.TeamMemberEvaluations
+                                                                where t.TeamEvaluation.TeamID == teamId &&
+                                                                t.TeamEvaluation.AssignmentID == a.ID
+                                                                select t).OrderBy(u => u.RecipientID).ToList();
 
             AssignmentTeam at = GetAssignmentTeam(a.PreceedingAssignment, team.TeamMembers.FirstOrDefault().CourseUser.UserProfile);
             ViewBag.Team = at;

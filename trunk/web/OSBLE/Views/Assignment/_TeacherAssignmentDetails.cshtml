@@ -110,9 +110,10 @@
     {
         foreach (DiscussionTeam dt in (ViewBag.DiscussionTeamList))
         {
+            string teamName = dt.Team.DisplayName(ViewBag.ActiveCourse.AbstractRole);
         <tbody id="awesome">
             <tr>
-                <td colspan="2" title="View @dt.Team.Name's discussion.">@Html.ActionLink(dt.Team.Name, "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = dt.Team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 3 }, new { })</td>
+                <td colspan="2" title="View @dt.Team.Name's discussion.">@Html.ActionLink(teamName, "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = dt.Team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 3 }, new { })</td>
                 <td id="posts-@dt.TeamID"></td>
                 <td id="replies-@dt.TeamID"></td>
                 <td id="all-@dt.TeamID" colspan="2"></td>
@@ -126,7 +127,7 @@
                     {
                         
                         <tr>
-                        <td>&nbsp&nbsp&nbsp @tm.CourseUser.UserProfile.LastAndFirst()</td>
+                        <td>&nbsp&nbsp&nbsp @tm.CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)</td>
                         <td> <!--td for grade-->
                             @if (assignment.HasRubric)
                             {
@@ -205,25 +206,25 @@
                 <td> <!--Cell for name-->
                     @if (assignment.HasTeams)
                     {
-                        <span style="text-decoration: underline">@advm.team.Name</span>
+                        <span style="text-decoration: underline">@advm.team.DisplayName(ViewBag.ActiveCourse.AbstractRole)</span>
                         <a title="Email this team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = advm.team.ID })">@Helpers.MailButton()</a>
                         <br/>
-                        <span>@advm.PrintTeam()</span>
+                        <span>@advm.PrintTeam(ViewBag.ActiveCourse.AbstractRole)</span>
                     }
                     else if (assignment.PreceedingAssignment != null)
                     {
                         if (assignment.PreceedingAssignment.HasTeams && assignment.AssignmentTypeID == 4)
                         {
-                            <span style="text-decoration: underline">@advm.team.Name</span>
+                            <span style="text-decoration: underline">@advm.team.DisplayName(ViewBag.ActiveCourse.AbstractRole)</span>
                             <a title="Email this team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = advm.team.ID })">@Helpers.MailButton()</a>
                             <br/>
-                            <span>@advm.PrintTeam()</span>
+                            <span>@advm.PrintTeam(ViewBag.ActiveCourse.AbstractRole)</span>
                         }
                     }
                     else
                     {
                         <a title="Email this User" href="@Url.Action("CreateUser", "Mail", new { id = advm.team.TeamMembers.FirstOrDefault().CourseUser.UserProfileID })">@Helpers.MailButton()</a>
-                        @(advm.team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName + ", " + advm.team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName)
+                        @advm.team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)
                     
                     }
             
