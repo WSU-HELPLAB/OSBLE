@@ -18,6 +18,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         private const string activeComponentIndexKey = "ComponentManagerActiveComponentIndex";
         private const string instance = "_wcm_instance";
         private const string activeAssignmentTypeKey = "_wcm_activeAssignmentType";
+        private const string isNewAssignmentKey = "_wcm_isNewAssignment";
         private const string componentsCacheString = "sortedComponents";
         private const string cacheRegion = "OSBLE.Areas.AssignmentWizard.Models.WizardComponentManager";
 
@@ -83,6 +84,29 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             {
                 SelectedComponents.Sort(new WizardPrerequisiteComparer());
                 UnselectedComponents.Sort(new WizardPrerequisiteComparer());
+            }
+        }
+
+        public bool IsNewAssignment
+        {
+            get
+            {
+                if (HttpContext.Current.Session[isNewAssignmentKey] != null)
+                {
+                    return (bool)HttpContext.Current.Session[isNewAssignmentKey];
+                }
+                else
+                {
+                    HttpContext.Current.Session[isNewAssignmentKey] = true;
+                    return true;
+                }
+            }
+            set
+            {
+                if (HttpContext.Current != null)
+                {
+                    HttpContext.Current.Session[isNewAssignmentKey] = value;
+                }
             }
         }
 

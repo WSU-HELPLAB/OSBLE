@@ -32,6 +32,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 //prime the manager for the new assignment
                 manager.ActiveAssignmentId = assignment.ID;
                 manager.SetActiveAssignmentType((AssignmentTypes)assignment.AssignmentTypeID);
+                manager.IsNewAssignment = false;
 
                 //load in any secondary (non-required) components
                 ActivateAssignmentComponents(assignment);

@@ -1,11 +1,11 @@
 ﻿@model OSBLE.Models.Assignments.Assignment
 
 @{
-    ViewBag.Title = "Assignment Wizard";
+    ViewBag.Title = "Wizard Complete";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>Wizard Complete!</h2>
 <p>
-You have finished creating your assignment.  At any time, you may go back and edit the assignment's details.
+You have finished creating your assignment.  At any time, you may <a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = @Model.ID})" class="add_link" id="assignment_create_button">go back</a> and edit the assignment's details.
 </p>

@@ -131,7 +131,16 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             ViewBag.Components = manager.SelectedComponents;
             ViewBag.ActiveComponent = manager.ActiveComponent;
             ViewBag.Assignment = Assignment;
-            ViewBag.Title = "Assignment Wizard";
+            if (manager.IsNewAssignment)
+            {
+                ViewBag.IsNewAssignment = true;
+                ViewBag.Title = "Create New Assignment";
+            }
+            else
+            {
+                ViewBag.IsNewAssignment = false;
+                ViewBag.Title = "Edit Assignment";
+            }
         }
 
         [CanModifyCourse]

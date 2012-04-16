@@ -12,11 +12,11 @@
     @RenderSection("Header", false)
 }
 <div id="WizardContent">
-<h1>Assignment Wizard</h1>
+<h1>@ViewBag.Title</h1>
 @using (Html.BeginForm("Index", null, FormMethod.Post, new { id = "WizardForm" }))
 {
     <ul id="QuickNav">
-        @if (ViewBag.Assignment != null && ViewBag.Assignment.ID != 0)
+        @if (ViewBag.Assignment != null && ViewBag.Assignment.ID != 0 && ViewBag.IsNewAssignment == false)
         {
             <li class="quickNavItem quickNavNotActive"><a href="#" onclick="changePage('');">Assignment Components</a></li>
             foreach (WizardBaseController comp in ViewBag.Components)
