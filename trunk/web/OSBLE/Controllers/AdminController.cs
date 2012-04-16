@@ -9,7 +9,7 @@ using OSBLE.Models.Users;
 
 namespace OSBLE.Controllers
 {
-    [Authorize]
+    [OsbleAuthorize]
     [IsAdmin]
     public class AdminController : OSBLEController
     {

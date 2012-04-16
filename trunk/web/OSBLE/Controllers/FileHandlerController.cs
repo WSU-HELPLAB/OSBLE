@@ -9,7 +9,7 @@ using OSBLE.Models.Courses;
 
 namespace OSBLE.Controllers
 {
-    [Authorize]
+    [OsbleAuthorize]
     [RequireActiveCourse]
     public class FileHandlerController : OSBLEController
     {

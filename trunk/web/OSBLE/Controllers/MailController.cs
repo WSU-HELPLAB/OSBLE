@@ -11,7 +11,7 @@ using OSBLE.Models.Assignments;
 
 namespace OSBLE.Controllers
 {
-    [Authorize]
+    [OsbleAuthorize]
     public class MailController : OSBLEController
     {
         //

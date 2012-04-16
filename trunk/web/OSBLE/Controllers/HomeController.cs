@@ -15,7 +15,7 @@ using OSBLE.Utility;
 
 namespace OSBLE.Controllers
 {
-    [Authorize]
+    [OsbleAuthorize]
     public class HomeController : OSBLEController
     {
         /// <summary>
@@ -689,7 +689,7 @@ namespace OSBLE.Controllers
             return new FileStreamResult(pictureStream, "image/jpeg");
         }
 
-        [Authorize]
+        [OsbleAuthorize]
         public ActionResult Time()
         {
             if (currentUser != null)

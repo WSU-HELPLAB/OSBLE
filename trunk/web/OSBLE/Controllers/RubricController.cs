@@ -15,7 +15,7 @@ using OSBLE.Models.ViewModels;
 
 namespace OSBLE.Controllers
 {
-    [Authorize]
+    [OsbleAuthorize]
     [RequireActiveCourse]
     public class RubricController : OSBLEController
     {

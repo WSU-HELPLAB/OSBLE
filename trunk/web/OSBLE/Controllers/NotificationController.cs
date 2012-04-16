@@ -7,10 +7,11 @@ using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
 using System.Net.Mail;
 using System.Configuration;
+using OSBLE.Attributes;
 
 namespace OSBLE.Controllers
 {
-    [Authorize]
+    [OsbleAuthorize]
     public class NotificationController : OSBLEController
     {
         //

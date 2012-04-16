@@ -19,6 +19,7 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Utility;
+using OSBLE.Attributes;
 
 namespace OSBLE.Controllers
 {
@@ -83,6 +84,9 @@ namespace OSBLE.Controllers
                     {
                         context.Session.Clear(); // Clear session variables.
                         FormsAuthentication.SetAuthCookie(model.UserName, true);
+                        OsbleAuthentication auth = new OsbleAuthentication();
+                        HttpCookie userCookie = auth.UserAsCookie(localUser);
+                        Response.Cookies.Add(userCookie);
                         if (Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
                             && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
                         {
@@ -126,13 +130,16 @@ namespace OSBLE.Controllers
 
         public ActionResult LogOff()
         {
+            OsbleAuthentication auth = new OsbleAuthentication();
+            HttpCookie cookie = auth.InvalidateUserCookie(CurrentUser);
+            Response.Cookies.Add(cookie);
             FormsAuthentication.SignOut();
             context.Session.Clear(); // Clear session on signout.
 
             return RedirectToAction("Index", "Home");
         }
 
-        [Authorize]
+        [OsbleAuthorize]
         [HttpPost]
         public ActionResult UpdateEmailSettings()
         {
@@ -145,7 +152,7 @@ namespace OSBLE.Controllers
             return RedirectToAction("Profile");
         }
 
-        [Authorize]
+        [OsbleAuthorize]
         [HttpPost]
         public ActionResult UpdateMenu()
         {
@@ -450,7 +457,7 @@ namespace OSBLE.Controllers
         //
         // GET: /Account/ChangePassword
 
-        [Authorize]
+        [OsbleAuthorize]
         public ActionResult Profile()
         {
             return View();
@@ -459,7 +466,7 @@ namespace OSBLE.Controllers
         //
         // POST: /Account/ChangePassword
 
-        [Authorize]
+        [OsbleAuthorize]
         [HttpPost]
         public ActionResult Profile(ChangePasswordModel model)
         {
@@ -549,13 +556,13 @@ namespace OSBLE.Controllers
             return View("ResetPasswordFailure");
         }
 
-        [Authorize]
+        [OsbleAuthorize]
         public ActionResult ProfilePicture()
         {
             return new FileStreamResult(FileSystem.GetProfilePictureOrDefault(currentUser), "image/jpeg");
         }
 
-        [Authorize]
+        [OsbleAuthorize]
         [HttpPost]
         public ActionResult UploadPicture(HttpPostedFileBase file)
         {

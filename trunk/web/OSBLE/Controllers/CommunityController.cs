@@ -5,7 +5,7 @@ using OSBLE.Models.Courses;
 
 namespace OSBLE.Controllers
 {
-    [Authorize]
+    [OsbleAuthorize]
     public class CommunityController : OSBLEController
     {
         //

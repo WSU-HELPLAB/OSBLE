@@ -12,7 +12,7 @@ using OSBLE.Utility;
 
 namespace OSBLE.Controllers
 {
-    [Authorize]
+    [OsbleAuthorize]
     [RequireActiveCourse]
     [NotForCommunity]
     public class GradebookController : OSBLEController

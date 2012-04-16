@@ -7,7 +7,7 @@ using OSBLE.Models;
 
 namespace OSBLE.Controllers
 {
-    [Authorize]
+    [OsbleAuthorize]
     [IsAdmin]
     public class SchoolController : OSBLEController
     {

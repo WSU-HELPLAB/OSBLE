@@ -10,7 +10,7 @@ using OSBLE.Models.Assignments;
 
 namespace OSBLE.Controllers
 {
-    [Authorize]
+    [OsbleAuthorize]
     [RequireActiveCourse]
     public class EventController : OSBLEController
     {

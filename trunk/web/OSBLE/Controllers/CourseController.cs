@@ -20,7 +20,7 @@ using OSBLE.Utility;
 
 namespace OSBLE.Controllers
 {
-    [Authorize]
+    [OsbleAuthorize]
     public class CourseController : OSBLEController
     {
         //

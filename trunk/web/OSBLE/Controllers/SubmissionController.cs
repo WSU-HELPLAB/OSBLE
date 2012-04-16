@@ -13,7 +13,7 @@ using Ionic.Zip;
 
 namespace OSBLE.Controllers
 {
-    [Authorize]
+    [OsbleAuthorize]
     //[CanSubmitAssignments]
     public class SubmissionController : OSBLEController
     {

@@ -7,7 +7,7 @@ using OSBLE.Models.ViewModels;
 
 namespace OSBLE.Controllers
 {
-    [Authorize]
+    [OsbleAuthorize]
     [RequireActiveCourse]
     [NotForCommunity]
     public class StudioAssignmentController : OSBLEController

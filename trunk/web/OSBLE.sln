@@ -16,9 +16,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLE.UnitTests", "OSBLE.UnitTests\OSBLE.UnitTests.csproj", "{5AA0B7E4-E77B-4B92-9658-682AD71F3163}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5F5F62F4-7B96-4A21-B6AB-9EC48CDB768C}"
-	ProjectSection(SolutionItems) = preProject
-		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
