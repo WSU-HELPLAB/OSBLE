@@ -14,7 +14,9 @@
 </script>
 
 <div id="activity_new_post">
-    @if ((ViewBag.ActiveCourse.AbstractRole.CanGrade == true) || (ViewBag.ActiveCourse.AbstractRole.Anonymized) || ((ViewBag.ActiveCourse.AbstractCourse is Course)&&(ViewBag.ActiveCourse.AbstractCourse.AllowDashboardPosts) == true))
+    @if (ViewBag.ActiveCourse.AbstractRole != null)
+    {
+    if ((ViewBag.ActiveCourse.AbstractRole.CanGrade == true) || (ViewBag.ActiveCourse.AbstractRole.Anonymized) || ((ViewBag.ActiveCourse.AbstractCourse is Course) && (ViewBag.ActiveCourse.AbstractCourse.AllowDashboardPosts) == true))
     {
         <input type="hidden" id="MaxContentChars" value="@ViewBag.MaxActivityFeedLength"/>
         
@@ -42,6 +44,7 @@
             }
 
         }
+    }
     }
 </div>
 <div class="dashboard_mode">
