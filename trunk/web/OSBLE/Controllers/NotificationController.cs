@@ -5,6 +5,8 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Users;
+using System.Net.Mail;
+using System.Configuration;
 
 namespace OSBLE.Controllers
 {
