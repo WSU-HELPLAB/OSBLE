@@ -384,6 +384,7 @@ namespace OSBLE.Controllers
                                 if (up.UserName == null) // Stub. Register to the account.
                                 {
                                     up.UserName = model.Email;
+                                    up.AspNetUserName = model.Email;
                                     up.FirstName = model.FirstName;
                                     up.LastName = model.LastName;
                                     db.Entry(up).State = EntityState.Modified;
@@ -397,6 +398,7 @@ namespace OSBLE.Controllers
                                         Membership.DeleteUser(up.UserName);  // Removes the MemberShipUser that was created on the previous registration.
 
                                         up.UserName = model.Email;
+                                        up.AspNetUserName = model.Email;
                                         up.FirstName = model.FirstName;
                                         up.LastName = model.LastName;
                                         db.Entry(up).State = EntityState.Modified;
