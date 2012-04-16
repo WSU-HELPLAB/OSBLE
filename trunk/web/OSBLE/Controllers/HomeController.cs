@@ -243,7 +243,7 @@ namespace OSBLE.Controllers
             else // Display anonymous name.
             {
                 // Anonymous number is currently the number of the student in the course list.
-                post.DisplayName = "Anonymous " + posterCu.ID;
+                post.DisplayName = posterCu.DisplayName(activeCourse.AbstractRole);
 
                 // Profile picture will display default picture.
                 post.ShowProfilePicture = false;
@@ -256,10 +256,11 @@ namespace OSBLE.Controllers
             {
                 DashboardPost thisDp = post as DashboardPost;
 
-                // For posts, set reply box display if the course allows replies or if Instructor/TA.
+                // For posts, set reply box display if the course allows replies or if Instructor/TA/Observer.
                 if ((currentCu.AbstractCourse is Course &&
                         ((currentCu.AbstractCourse as Course).AllowDashboardReplies)
-                         || (currentCu.AbstractRole.CanGrade))
+                         || (currentCu.AbstractRole.CanGrade)
+                         || (currentCu.AbstractRole.Anonymized))
                     // For communities, always allow replies
                     || (currentCu.AbstractCourse is Community)
                     )

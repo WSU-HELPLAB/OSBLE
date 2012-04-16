@@ -27,38 +27,38 @@
                 {
                     case Notification.Types.Mail:
                         {
-                            <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> sent you a @NotificationLink(n.ID, "message")</text>
+                            <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> sent you a @NotificationLink(n.ID, "message")</text>
                             break;
                         }
                     case Notification.Types.EventApproval:
                         {                                     
-                            <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> submitted an @NotificationLink(n.ID, "event for approval")</text>
+                            <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> submitted an @NotificationLink(n.ID, "event for approval")</text>
                             break;
                         }
                     case Notification.Types.Dashboard:
                         {
-                            <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> posted in a @NotificationLink(n.ID, "dashboard thread")
+                            <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> posted in a @NotificationLink(n.ID, "dashboard thread")
                             that you participated in</text>
                             break;
                         }
                     case Notification.Types.InlineReviewCompleted:
                         {
                             string[] args = n.Data.Split(new char[] { ';' });
-                            <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> has published an
+                            <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> has published an
                             @Html.ActionLink("inline review", "ViewInlineReview", "Assignment", new { assignmentID = args[0], teamID = args[1] }, new { }) of your @args[2]</text>
                             break;
                         }
                     case Notification.Types.RubricEvaluationCompleted:
                         {
                             string[] args1 = n.Data.Split(new char[] { ';' });
-                            <text><em>@n.Sender.UserProfile.FirstName @n.Sender.UserProfile.LastName</em> completed an @Html.ActionLink("evaluation rubric", "View", "Rubric", new { assignmentId = args1[0], cuId = args1[1] }, new { }) of your @args1[2]
+                            <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> completed an @Html.ActionLink("evaluation rubric", "View", "Rubric", new { assignmentId = args1[0], cuId = args1[1] }, new { }) of your @args1[2]
                             </text>
                             break;
                         }
                     case Notification.Types.FileSubmitted:
                         {
                             string[] args2 = n.Data.Split(new char[] { ';' });
-                            <text><em>@args2[3]</em> submitted the file @args2[4] for the assignment '@args2[2]' at @args2[5] download it
+                            <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> submitted the file @args2[4] for the assignment '@args2[2]' at @args2[5] download it
                             @Html.ActionLink("here", "GetSubmissionZip", "FileHandler", new { assignmentID = args2[0], teamID = args2[1] }, new { })</text>
                             break;
                         }

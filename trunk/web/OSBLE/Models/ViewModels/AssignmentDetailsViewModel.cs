@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using OSBLE.Models.Assignments;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Models.ViewModels
 {
@@ -30,25 +31,47 @@ namespace OSBLE.Models.ViewModels
             this.team = team;
         }
 
-        public string PrintTeam()
+        public string PrintTeam(AbstractRole role)
         {
             int i = 1;
             string teamList = "";
-            foreach (TeamMember tm in (team.TeamMembers).OrderBy(s => s.CourseUser.UserProfile.LastName).ThenBy(d => d.CourseUser.UserProfile.FirstName))
+            if (role.Anonymized) // observer
             {
-                if (i == team.TeamMembers.Count && team.TeamMembers.Count != 1)
+                foreach (TeamMember tm in (team.TeamMembers).OrderBy(s => s.CourseUserID))
                 {
-                    teamList += " & " + tm.CourseUser.UserProfile.FirstName + " " + tm.CourseUser.UserProfile.LastName;
+                    if (i == team.TeamMembers.Count && team.TeamMembers.Count != 1)
+                    {
+                        teamList += " & " + tm.CourseUser.DisplayName(role);
+                    }
+                    else if (i == 1)
+                    {
+                        teamList += tm.CourseUser.DisplayName(role);
+                    }
+                    else
+                    {
+                        teamList += ", " + tm.CourseUser.DisplayName(role);
+                    }
+                    i++;
                 }
-                else if (i == 1)
+            }
+            else
+            {
+                foreach (TeamMember tm in (team.TeamMembers).OrderBy(s => s.CourseUser.UserProfile.LastName).ThenBy(d => d.CourseUser.UserProfile.FirstName))
                 {
-                    teamList += tm.CourseUser.UserProfile.FirstName + " " + tm.CourseUser.UserProfile.LastName;
+                    if (i == team.TeamMembers.Count && team.TeamMembers.Count != 1)
+                    {
+                        teamList += " & " + tm.CourseUser.DisplayName(role);
+                    }
+                    else if (i == 1)
+                    {
+                        teamList += tm.CourseUser.DisplayName(role);
+                    }
+                    else
+                    {
+                        teamList += ", " + tm.CourseUser.DisplayName(role);
+                    }
+                    i++;
                 }
-                else
-                {
-                    teamList += ", " + tm.CourseUser.UserProfile.FirstName + " " + tm.CourseUser.UserProfile.LastName;
-                }
-                i++;
             }
             return teamList;
         }
