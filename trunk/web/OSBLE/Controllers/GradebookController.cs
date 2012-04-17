@@ -1082,23 +1082,25 @@ namespace OSBLE.Controllers
                     Assignment assignment = db.Assignments.Find(assignmentId);
                     if (assignment != null)
                     {
+                        if (value == 0)
+                        {
+                            List<Score> scores = assignment.Scores.ToList();
+                            foreach (Score s in scores)
+                            {
+                                db.Scores.Remove(s);
+                            }
+                            db.SaveChanges();
+
+                            db.Assignments.Remove(assignment);
+                            db.SaveChanges();
+
+                            BuildGradebook((int)Session["categoryId"]);
+                            return View("_Gradebook");
+                        }
                         int pointsPossibleTemp = assignment.PointsPossible;
                         assignment.PointsPossible = value;
                         assignment.addedPoints = assignment.addedPoints * ((double)value / pointsPossibleTemp);
                         db.SaveChanges();
-
-                        foreach (Score s in assignment.Scores)
-                        {
-                            if (assignment.PointsPossible <= 0)
-                            {
-                                ModifyGrade(-1.0, s.CourseUserID, s.AssignmentID);
-                            }
-                            else
-                            {
-                                s.RawPoints = s.RawPoints * ((double)value / pointsPossibleTemp);
-                                ModifyGrade(s.RawPoints, s.CourseUserID, s.AssignmentID);
-                            }
-                        }
 
                         if (assignment.Category.dropX > 0)
                         {

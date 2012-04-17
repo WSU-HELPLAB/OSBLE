@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
+using OSBLE.Controllers;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Utility;
-using System.Data.Entity.Validation;
-using System.Diagnostics;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -17,12 +16,13 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get { return "Basic Settings"; }
         }
+
         public override string ControllerName
         {
             get { return "Basics"; }
         }
 
-        public override string ControllerDescription 
+        public override string ControllerDescription
         {
             get
             {
@@ -41,7 +41,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
         public override ICollection<AssignmentTypes> ValidAssignmentTypes
         {
-            get 
+            get
             {
                 return base.AllAssignmentTypes;
             }
@@ -63,8 +63,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 //SUBMISSION CATEGORIES
                 categories = from c in (activeCourse.AbstractCourse as Course).Categories
-                              where c.Name != Constants.UnGradableCatagory
-                              select c;
+                             where c.Name != Constants.UnGradableCatagory
+                             select c;
             }
             ViewBag.Categories = new SelectList(categories, "ID", "Name");
         }
@@ -91,6 +91,24 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 WasUpdateSuccessful = true;
 
+                double oldPointsPossible = (from a in db.Assignments
+                                            where a.ID == Assignment.ID
+                                            select a.PointsPossible).FirstOrDefault();
+
+                List<Score> assignmentScores = (from a in db.Scores
+                                                where a.AssignmentID == Assignment.ID
+                                                select a).ToList();
+
+                if (Assignment.PointsPossible != oldPointsPossible)
+                {
+                    foreach (Score s in assignmentScores)
+                    {
+                        s.RawPoints = s.RawPoints * ((double)Assignment.PointsPossible / oldPointsPossible);
+                        GradebookController gbc = new GradebookController();
+                        gbc.ModifyGrade(s.RawPoints, s.CourseUserID, s.AssignmentID);
+                    }
+                }
+
                 //update our DB
                 if (Assignment.ID == 0)
                 {
@@ -103,7 +121,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 }
                 else
                 {
-
                     db.Entry(Assignment).State = System.Data.EntityState.Modified;
                 }
                 try
