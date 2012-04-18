@@ -47,9 +47,18 @@ namespace OSBLE.Attributes
             {
                 //get the user and then update the underlying asp.net authentication cookie
                 UserProfile profile = auth.GetUserFromCookie(profileCookie);
-                HttpCookie updatedCookie = auth.UserAsCookie(profile);
-                filterContext.HttpContext.Response.Cookies.Add(profileCookie);
-                FormsAuthentication.SetAuthCookie(profile.AspNetUserName, true);
+
+                //method returns null when something wrong happened
+                if (profile == null)
+                {
+                    filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Account", action = "LogOn" }));
+                }
+                else
+                {
+                    HttpCookie updatedCookie = auth.UserAsCookie(profile);
+                    filterContext.HttpContext.Response.Cookies.Add(profileCookie);
+                    FormsAuthentication.SetAuthCookie(profile.AspNetUserName, true);
+                }
             }
         }
     }
