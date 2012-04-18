@@ -751,6 +751,7 @@
     <Content Include="Views\DiscussionAssignment\TeacherIndex.cshtml" />
     <Content Include="Views\Gradebook\_ObserverGradebook.cshtml" />
     <Content Include="Views\Gradebook\_ObserverTab.cshtml" />
+    <Content Include="Views\DiscussionAssignment\ObserverIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

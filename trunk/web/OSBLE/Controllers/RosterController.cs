@@ -8,9 +8,9 @@ using System.Web;
 using System.Web.Mvc;
 using LumenWorks.Framework.IO.Csv;
 using OSBLE.Attributes;
+using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
-using OSBLE.Models.Assignments;
 
 namespace OSBLE.Controllers
 {
@@ -32,6 +32,12 @@ namespace OSBLE.Controllers
             }
 
             public int Section
+            {
+                get;
+                set;
+            }
+
+            public string Name
             {
                 get;
                 set;
@@ -181,6 +187,8 @@ namespace OSBLE.Controllers
 
                 string guessedSection = null;
                 string guessedIdentification = null;
+                string guessedName = null;
+                string guessedName2 = null;
 
                 // Guess headers for section and identification
                 foreach (string header in headers)
@@ -203,11 +211,28 @@ namespace OSBLE.Controllers
                             guessedIdentification = header;
                         }
                     }
+
+                    if (guessedName == null)
+                    {
+                        if (Regex.IsMatch(header, "name", RegexOptions.IgnoreCase))
+                        {
+                            guessedName = header;
+                        }
+                    }
+                    else if (guessedName2 == null)
+                    {
+                        if (Regex.IsMatch(header, "name", RegexOptions.IgnoreCase))
+                        {
+                            guessedName2 = header;
+                        }
+                    }
                 }
 
                 ViewBag.Headers = headers;
                 ViewBag.GuessedSection = guessedSection;
                 ViewBag.GuessedIdentification = guessedIdentification;
+                ViewBag.GuessedName = guessedName;
+                ViewBag.GuessedName2 = guessedName2;
 
                 return View();
             }
@@ -218,16 +243,17 @@ namespace OSBLE.Controllers
         [HttpPost]
         [CanModifyCourse]
         [NotForCommunity]
-        public ActionResult ApplyRoster(string idColumn, string sectionColumn)
+        public ActionResult ApplyRoster(string idColumn, string sectionColumn, string nameColumn, string name2Column)
         {
             HttpPostedFileBase file = Session["RosterFile"] as HttpPostedFileBase;
 
             int rosterCount = 0;
 
-            if ((file != null) && (idColumn != null))
+            if ((file != null) && (idColumn != null) && (nameColumn != null))
             {
                 Stream s = file.InputStream;
-                List<RosterEntry> rosterEntries = parseRoster(s, idColumn, sectionColumn);
+
+                List<RosterEntry> rosterEntries = parseRoster(s, idColumn, sectionColumn, nameColumn, name2Column);
 
                 if (rosterEntries.Count > 0)
                 {
@@ -262,14 +288,15 @@ namespace OSBLE.Controllers
                     //Use the list of our old students to track changes between the current and new class roster.
                     //Students that exist on the old roster but do not appear on the new roster will
                     //be removed from the course
-                    var oldRoster = from c in db.CourseUsers 
-                                    where c.AbstractCourseID == activeCourse.AbstractCourseID 
-                                    && 
-                                    c.AbstractRoleID == (int)CourseRole.CourseRoles.Student 
+                    var oldRoster = from c in db.CourseUsers
+                                    where c.AbstractCourseID == activeCourse.AbstractCourseID
+                                    &&
+                                    c.AbstractRoleID == (int)CourseRole.CourseRoles.Student
                                     select c;
                     List<UserProfile> orphans = oldRoster.Select(cu => cu.UserProfile).ToList();
                     List<CourseUser> newRoster = new List<CourseUser>();
 
+                    string[] names = new string[2];
                     // Attach to users or add new user profile stubs.
                     foreach (RosterEntry entry in rosterEntries)
                     {
@@ -278,10 +305,23 @@ namespace OSBLE.Controllers
                         courseUser.Section = entry.Section;
                         courseUser.UserProfile = new UserProfile();
                         courseUser.UserProfile.Identification = entry.Identification;
+                        if (entry.Name != null)
+                        {
+                            names = entry.Name.Split(',');
+                            string[] parseFirstName = names[1].Trim().Split(' ');
+                            courseUser.UserProfile.FirstName = parseFirstName[0];
+                            courseUser.UserProfile.LastName = names[0].Trim();
+                        }
+                        else
+                        {
+                            courseUser.UserProfile.FirstName = "Pending";
+                            courseUser.UserProfile.LastName = string.Format("({0})", entry.Identification);
+                        }
                         newRoster.Add(courseUser);
                         createCourseUser(courseUser);
                         orphans.Remove(courseUser.UserProfile);
                     }
+                    db.SaveChanges();
 
                     //remove all orphans
                     foreach (UserProfile orphan in orphans)
@@ -491,7 +531,7 @@ namespace OSBLE.Controllers
             return csvReader.GetFieldHeaders().ToList();
         }
 
-        private List<RosterEntry> parseRoster(Stream roster, string idNumberColumnName, string sectionColumnName)
+        private List<RosterEntry> parseRoster(Stream roster, string idNumberColumnName, string sectionColumnName, string nameColumnName, string name2ColumnName)
         {
             StreamReader sr = new StreamReader(roster);
             CachedCsvReader csvReader = new CachedCsvReader(sr, true);
@@ -511,6 +551,22 @@ namespace OSBLE.Controllers
                 int sectionNum;
                 RosterEntry entry = new RosterEntry();
                 entry.Identification = csvReader[csvReader.GetFieldIndex(idNumberColumnName)];
+
+                if (nameColumnName != "")
+                {
+                    if (name2ColumnName != "")
+                    {
+                        entry.Name = csvReader[csvReader.GetFieldIndex(name2ColumnName)] + ", " + csvReader[csvReader.GetFieldIndex(nameColumnName)];
+                    }
+                    else
+                    {
+                        entry.Name = csvReader[csvReader.GetFieldIndex(nameColumnName)];
+                    }
+                }
+                else
+                {
+                    entry.Name = null;
+                }
                 if (hasSectionInfo)
                 {
                     int.TryParse(csvReader[csvReader.GetFieldIndex(sectionColumnName)], out sectionNum);
@@ -577,18 +633,30 @@ namespace OSBLE.Controllers
                 up.IsAdmin = false;
                 up.SchoolID = currentUser.SchoolID;
                 up.Identification = courseuser.UserProfile.Identification;
-                up.FirstName = "Pending User";
-                up.LastName = string.Format("({0})", up.Identification);
+
+                if (courseuser.UserProfile.FirstName != null)
+                {
+                    up.FirstName = courseuser.UserProfile.FirstName;
+                    up.LastName = courseuser.UserProfile.LastName;
+                }
+                else
+                {
+                    up.FirstName = "Pending";
+                    up.LastName = string.Format("({0})", up.Identification);
+                }
                 db.UserProfiles.Add(up);
                 db.SaveChanges();
 
                 //Set the UserProfileID to point to our new student
-                courseuser.UserProfile = null;
+                courseuser.UserProfile = up;
                 courseuser.UserProfileID = up.ID;
                 courseuser.AbstractCourseID = activeCourse.AbstractCourseID;
             }
             else
             {
+                user.FirstName = courseuser.UserProfile.FirstName;
+                user.LastName = courseuser.UserProfile.LastName;
+                db.SaveChanges();
                 courseuser.UserProfile = user;
                 courseuser.UserProfileID = user.ID;
             }
