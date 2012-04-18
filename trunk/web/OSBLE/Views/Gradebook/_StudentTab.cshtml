@@ -340,12 +340,11 @@
                             if (hasEval == true)
                             {
 
-                                if (score.First().LatePenaltyPercent > 0)
+                                if (score.First().LatePenaltyPercent > 0 && score.First().CustomLatePenaltyPercent != 0)
                                 {
                                     if (published)
                                     {
                 <td id="rubric-@assignment.ID" onmouseover="showLatePenaltyAndMultiplier(@score.First().LatePenaltyPercent, @score.First().Multiplier);" onmouseout="hideLatePenaltyAndMultiplier();" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AssignmentID, cuId = cu.ID }, new { @style = "color:Red" })
-                    @Helpers.CreateToolTip("This assignment was late")
                 </td>
                                     }
                                 }
@@ -365,10 +364,9 @@
                             }
                             else
                             {
-                                if (score.First().LatePenaltyPercent > 0)
+                                if (score.First().LatePenaltyPercent > 0 && score.First().CustomLatePenaltyPercent != 0)
                                 {
                 <td id="rubric-@assignment.ID" onmouseover="showLatePenalty(@score.First().LatePenaltyPercent);" onmouseout="hideLatePenalty();" style="font-style:italic;">@Html.ActionLink(String.Format("{0:0.0}", score.First().Points), "View", "Rubric", new { assignmentID = score.First().AssignmentID, cuId = cu.ID }, new { @style = "color:Red" })
-                    @Helpers.CreateToolTip("This assignment was late")
                 </td>
                                 }
                                 else
@@ -384,7 +382,7 @@
                             {
                                 if (hasEval == true)
                                 {
-                                    if (score.First().LatePenaltyPercent > 0)
+                                    if (score.First().LatePenaltyPercent > 0 && score.First().CustomLatePenaltyPercent != 0)
                                     {
                 <td id="teacher-@assignment.ID" onmouseover="showLatePenalty(@score.First().LatePenaltyPercent);" onmouseout="hideLatePenalty();" style="font-style:italic; color:Red;">@score.First().Points.ToString(".##")
                 </td>
@@ -405,7 +403,7 @@
                                 }
                                 else
                                 {
-                                    if (score.First().LatePenaltyPercent > 0)
+                                    if (score.First().LatePenaltyPercent > 0 && score.First().CustomLatePenaltyPercent != 0)
                                     {
                 <td id="teacher-@assignment.ID" onmouseover="showLatePenalty(@score.First().LatePenaltyPercent);" onmouseout="hideLatePenalty();" style="font-style:italic; color:Red;">@score.First().Points.ToString(".##")
                 </td>
@@ -420,7 +418,7 @@
                             }
                             else
                             {
-                                if (score.First().LatePenaltyPercent > 0)
+                                if (score.First().LatePenaltyPercent > 0 && score.First().CustomLatePenaltyPercent != 0)
                                 {
                 <td id="teacher-@assignment.ID" onmouseover="showLatePenalty(@score.First().LatePenaltyPercent);" onmouseout="hideLatePenalty();" style="font-style:italic; color:Red">@String.Format("{0}", 0)
                 </td>
@@ -757,7 +755,7 @@
             $.ajax({
                 type: "POST",
                 url: "/Gradebook/ModifyStudentScore",
-                data: { userId: IDs[0].toString(), assignmentId: IDs[1], value: parseFloat(cellValue) }
+                data: { courseUserId: IDs[0].toString(), assignmentId: IDs[1], value: parseFloat(cellValue) }
             });
 
             if (cellValue == -1) {
