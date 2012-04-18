@@ -32,9 +32,16 @@ namespace OSBLE.Utility
             string userName = System.Text.Encoding.UTF8.GetString(bytes);
 
             //auth key
-            string authToken = System.Text.Encoding.UTF8.GetString(MachineKey.Decode(cookie.Values[authKey].ToString(), MachineKeyProtection.All));
+            try
+            {
+                string authToken = System.Text.Encoding.UTF8.GetString(MachineKey.Decode(cookie.Values[authKey].ToString(), MachineKeyProtection.All));
 
-            if (authToken.CompareTo(HttpContext.Current.Request.UserAgent) != 0)
+                if (authToken.CompareTo(HttpContext.Current.Request.UserAgent) != 0)
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
             {
                 return null;
             }
