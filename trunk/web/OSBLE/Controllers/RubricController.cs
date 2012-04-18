@@ -7,10 +7,8 @@ using System.Web.Routing;
 using OSBLE.Attributes;
 using OSBLE.Models.Assignments;
 
-using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
-using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
 
 namespace OSBLE.Controllers
@@ -76,21 +74,20 @@ namespace OSBLE.Controllers
             //that once published, a review cannot be unpublished.  In this case,
             //the "save as draft" and "publish to student" buttons do the same thing.
             //In the future, it might be cool to have the "draft" button grayed out or
-            //something - DONE. 
+            //something - DONE.
             string publishKey = ViewBag.PublishButtonId;
             if (Request.Form.AllKeys.Contains(publishKey))
             {
                 viewModel.Evaluation.IsPublished = true;
                 viewModel.Evaluation.DatePublished = DateTime.Now;
             }
-            else 
+            else
             {
-                //Even if the user has selected to save as draft, 
-                //it should store the DatePublished to be displayed when the draft was last saved. 
+                //Even if the user has selected to save as draft,
+                //it should store the DatePublished to be displayed when the draft was last saved.
                 viewModel.Evaluation.IsPublished = false;
                 viewModel.Evaluation.DatePublished = DateTime.Now;
             }
-
 
             string globalCommentKey = ViewBag.GlobalCommentId;
             if (Request.Form.AllKeys.Contains(globalCommentKey))
@@ -116,7 +113,6 @@ namespace OSBLE.Controllers
             }
             return true;
         }
-
 
         /// <summary>
         /// Populates a RubricViewModel that is for an uneditable Rubric
@@ -154,11 +150,11 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-       /// Populates a generic RubricViewModel based on the supplied parameters
-       /// </summary>
-       /// <param name="abstractAssignmentActivityId"></param>
-       /// <param name="teamUserId"></param>
-       /// <returns></returns>
+        /// Populates a generic RubricViewModel based on the supplied parameters
+        /// </summary>
+        /// <param name="abstractAssignmentActivityId"></param>
+        /// <param name="teamUserId"></param>
+        /// <returns></returns>
         private RubricViewModel GetRubricViewModel(int assignmentId, int cuId)
         {
             CourseUser cu = db.CourseUsers.Find(cuId);
@@ -206,16 +202,20 @@ namespace OSBLE.Controllers
 
             //assignments are storied within categories, which are found within
             //the active course.
-            List<Assignment> rubricAssignmentList = new List<Assignment>();
-            foreach (Category cat in (activeCourse.AbstractCourse as Course).Categories)
+            List<Assignment> rubricAssignmentList = (from a in db.Assignments
+                                                     where a.Category.CourseID == assignment.Category.CourseID &&
+                                                     a.Rubric != null
+                                                     select a).ToList();
+
+            viewModel.AssignmentList = rubricAssignmentList;
+            viewModel.RubricEvaluationList = (from re in db.RubricEvaluations where re.AssignmentID == assignment.ID select re).ToList();
+            if (assignment.HasTeams)
             {
-                foreach (Assignment a in cat.Assignments)
-                {
-                    if (a.HasRubric)
-                    {
-                        rubricAssignmentList.Add(a);
-                    }
-                }
+                viewModel.TeamList = assignment.AssignmentTeams.OrderBy(t => t.Team.Name).ToList();
+            }
+            else
+            {
+                viewModel.TeamList = assignment.AssignmentTeams.OrderBy(l => l.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName).ThenBy(f => f.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName).ToList();
             }
 
             viewModel.AssignmentList = rubricAssignmentList;
@@ -283,8 +283,6 @@ namespace OSBLE.Controllers
                     studentScore *= vm.Evaluation.Assignment.PointsPossible;
 
                     gradebook.ModifyTeamGrade(studentScore, vm.SelectedAssignment.ID, vm.Evaluation.Recipient.ID);
-
-
                 }
             }
             return View(vm);
@@ -313,7 +311,6 @@ namespace OSBLE.Controllers
             return View(viewModel);
         }
 
-
         public ActionResult View(int assignmentId, int cuId)
         {
             RubricViewModel viewModel = GetRubricViewModel(assignmentId, cuId);
@@ -322,13 +319,12 @@ namespace OSBLE.Controllers
             {
                 bool isOwnAssignment = false;
 
-                if (activeCourse.AbstractRole.CanSubmit && activeCourse.ID == cuId )
+                if (activeCourse.AbstractRole.CanSubmit && activeCourse.ID == cuId)
                 {
-                    
                     Assignment assignment = db.Assignments.Find(assignmentId);
                     AssignmentTeam team = GetAssignmentTeam(assignment, currentUser);
                     if (team != null)
-                    { 
+                    {
                         isOwnAssignment = true;
                     }
                 }
@@ -350,7 +346,6 @@ namespace OSBLE.Controllers
             }
             return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
         }
-
 
         public ActionResult ViewAsUneditable(int assignmentId)
         {
