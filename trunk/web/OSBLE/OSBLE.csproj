@@ -257,7 +257,6 @@
     <Compile Include="Services\AssignmentSubmissionService.svc.cs">
       <DependentUpon>AssignmentSubmissionService.svc</DependentUpon>
     </Compile>
-    <Compile Include="Services\AuthenticationDomainService1.cs" />
     <Compile Include="Services\AuthenticationService.svc.cs">
       <DependentUpon>AuthenticationService.svc</DependentUpon>
     </Compile>
