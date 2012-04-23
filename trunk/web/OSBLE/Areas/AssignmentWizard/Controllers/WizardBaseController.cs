@@ -302,7 +302,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
         public override string ToString()
         {
-            return string.Format("{0}: {1}", this.ControllerName, this.ControllerDescription);
+            return string.Format("{0}", this.ControllerName);
         }
 
         private void NotifyPropertyChanged(String info)

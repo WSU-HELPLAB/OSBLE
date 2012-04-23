@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Caching;
 using OSBLE.Utility;
+using System.Collections.ObjectModel;
 
 namespace OSBLE.Areas.AssignmentWizard.Models
 {
@@ -20,13 +21,35 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         private const string activeAssignmentTypeKey = "_wcm_activeAssignmentType";
         private const string isNewAssignmentKey = "_wcm_isNewAssignment";
         private const string componentsCacheString = "sortedComponents";
+        private const string managerCookieString = "_wcm_managerCookie";
         private const string cacheRegion = "OSBLE.Areas.AssignmentWizard.Models.WizardComponentManager";
+        private const string allComponentsKey = "_wcm_allComponents";
+        private const string selectedComponentsKey = "_wcm_selectedComponents";
+        private const string unselectedComponentsKey = "_wcm_unselectedComponents";
+
+        private HttpCookie managerCookie;
+        private ObservableCollection<WizardBaseController> _selectedComponents = new ObservableCollection<WizardBaseController>();
+        private ObservableCollection<WizardBaseController> _unselectedComponents = new ObservableCollection<WizardBaseController>();
+
+        #region constructor
 
         private WizardComponentManager()
         {
             AllComponents = new List<WizardBaseController>();
-            SelectedComponents = new List<WizardBaseController>();
-            UnselectedComponents = new List<WizardBaseController>();
+            SelectedComponents = new ObservableCollection<WizardBaseController>();
+            UnselectedComponents = new ObservableCollection<WizardBaseController>();
+
+            if (HttpContext.Current != null)
+            {
+                managerCookie = HttpContext.Current.Request.Cookies.Get(managerCookieString);
+                if (managerCookie == null)
+                {
+                    managerCookie = new HttpCookie(managerCookieString);
+                    managerCookie.Expires = DateTime.Now.AddHours(24.0);
+                }
+                HttpContext.Current.Response.SetCookie(managerCookie);
+            }
+
             RegisterComponents();
         }
 
@@ -57,33 +80,64 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             }
         }
 
-        public List<WizardBaseController> AllComponents
-        {
-            get;
-            protected set;
-        }
+        #endregion
+
+        #region properties
+
+        public List<WizardBaseController> AllComponents { get; private set; }
 
         /// <summary>
         /// A list of the currently selected wizard components.  DO NOT directly modify this list.
         /// </summary>
-        public List<WizardBaseController> SelectedComponents { get; protected set; }
+        public ObservableCollection<WizardBaseController> SelectedComponents
+        {
+            get
+            {
+                return _selectedComponents;
+            }
+            protected set
+            {
+                if (_selectedComponents != null)
+                {
+                    _selectedComponents.CollectionChanged -= new System.Collections.Specialized.NotifyCollectionChangedEventHandler(ComponentsCollectionChanged);
+                }
+                _selectedComponents = value;
+                _selectedComponents.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(ComponentsCollectionChanged);
+            }
+        }
 
         /// <summary>
         /// A list of unselected wizard components.  DO NOT directly modify this list.
         /// </summary>
-        public List<WizardBaseController> UnselectedComponents { get; protected set; }
-
-        public void SortComponents()
+        public ObservableCollection<WizardBaseController> UnselectedComponents
         {
-            if (AllComponents[0].SortOrder != 0)
+            get
             {
-                SelectedComponents.Sort(new WizardSortOrderComparer());
-                UnselectedComponents.Sort(new WizardSortOrderComparer());
+                return _unselectedComponents;
             }
-            else
+            protected set
             {
-                SelectedComponents.Sort(new WizardPrerequisiteComparer());
-                UnselectedComponents.Sort(new WizardPrerequisiteComparer());
+                if (_unselectedComponents != null)
+                {
+                    _unselectedComponents.CollectionChanged -= new System.Collections.Specialized.NotifyCollectionChangedEventHandler(ComponentsCollectionChanged);
+                }
+                _unselectedComponents = value;
+                _unselectedComponents.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(ComponentsCollectionChanged);
+            }
+        }
+
+        void ComponentsCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (HttpContext.Current != null)
+            {
+                //update all collections
+                string selectedComponentPieces = string.Join("|", _selectedComponents);
+                string unselectedComponentsPieces = string.Join("|", _unselectedComponents);
+
+                managerCookie.Values[selectedComponentsKey] = selectedComponentPieces;
+                managerCookie.Values[unselectedComponentsKey] = unselectedComponentsPieces;
+
+                HttpContext.Current.Response.SetCookie(managerCookie);
             }
         }
 
@@ -91,13 +145,13 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         {
             get
             {
-                if (HttpContext.Current.Session[isNewAssignmentKey] != null)
+                if (managerCookie.Values[isNewAssignmentKey] != null)
                 {
-                    return (bool)HttpContext.Current.Session[isNewAssignmentKey];
+                    return Convert.ToBoolean(managerCookie.Values[isNewAssignmentKey]);
                 }
                 else
                 {
-                    HttpContext.Current.Session[isNewAssignmentKey] = true;
+                    managerCookie.Values[isNewAssignmentKey] = true.ToString();
                     return true;
                 }
             }
@@ -105,7 +159,8 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             {
                 if (HttpContext.Current != null)
                 {
-                    HttpContext.Current.Session[isNewAssignmentKey] = value;
+                    managerCookie.Values[isNewAssignmentKey] = value.ToString();
+                    HttpContext.Current.Response.SetCookie(managerCookie);
                 }
             }
         }
@@ -114,13 +169,13 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         {
             get
             {
-                if (HttpContext.Current.Session[assignmentKey] != null)
+                if (managerCookie.Values[assignmentKey] != null)
                 {
-                    return (int)HttpContext.Current.Session[assignmentKey];
+                    return Convert.ToInt32(managerCookie.Values[assignmentKey]);
                 }
                 else
                 {
-                    HttpContext.Current.Session[assignmentKey] = 0;
+                    managerCookie.Values[assignmentKey] = "0";
                     return 0;
                 }
             }
@@ -128,7 +183,8 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             {
                 if (HttpContext.Current != null)
                 {
-                    HttpContext.Current.Session[assignmentKey] = value;
+                    managerCookie.Values[assignmentKey] = value.ToString();
+                    HttpContext.Current.Response.SetCookie(managerCookie);
                 }
             }
         }
@@ -137,13 +193,13 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         {
             get
             {
-                if (HttpContext.Current.Session[activeAssignmentTypeKey] != null)
+                if (managerCookie.Values[activeAssignmentTypeKey] != null)
                 {
-                    return (AssignmentTypes)HttpContext.Current.Session[activeAssignmentTypeKey];
+                    return (AssignmentTypes)Convert.ToInt32(managerCookie.Values[activeAssignmentTypeKey]);
                 }
                 else
                 {
-                    HttpContext.Current.Session[activeAssignmentTypeKey] = AssignmentTypes.Basic;
+                    managerCookie.Values[activeAssignmentTypeKey] = ((int)AssignmentTypes.Basic).ToString();
                     return AssignmentTypes.Basic;
                 }
             }
@@ -151,7 +207,8 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             {
                 if (HttpContext.Current != null)
                 {
-                    HttpContext.Current.Session[activeAssignmentTypeKey] = value;
+                    managerCookie.Values[activeAssignmentTypeKey] = ((int)value).ToString();
+                    HttpContext.Current.Response.SetCookie(managerCookie);
                 }
             }
         }
@@ -160,13 +217,13 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         {
             get
             {
-                if (HttpContext.Current.Session[activeComponentIndexKey] != null)
+                if (managerCookie.Values[activeComponentIndexKey] != null)
                 {
-                    return (int)HttpContext.Current.Session[activeComponentIndexKey];
+                    return Convert.ToInt32(managerCookie.Values[activeComponentIndexKey]);
                 }
                 else
                 {
-                    HttpContext.Current.Session[activeComponentIndexKey] = 0;
+                    managerCookie.Values[activeComponentIndexKey] = "0";
                     return 0;
                 }
             }
@@ -174,7 +231,8 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             {
                 if (HttpContext.Current != null)
                 {
-                    HttpContext.Current.Session[activeComponentIndexKey] = value;
+                    managerCookie.Values[activeComponentIndexKey] = value.ToString();
+                    HttpContext.Current.Response.SetCookie(managerCookie);
                 }
             }
         }
@@ -183,7 +241,46 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         {
             get
             {
+                WizardBaseController component = SelectedComponents.ElementAtOrDefault(ActiveComponentIndex);
+                
+                //null component probably means that we lost our context
+                if (component == null)
+                {
+                    //load in selected / unselected components
+                    SelectedComponents = new ObservableCollection<WizardBaseController>(ComponentsFromString(managerCookie[selectedComponentsKey], "|"));
+                    UnselectedComponents = new ObservableCollection<WizardBaseController>(ComponentsFromString(managerCookie[unselectedComponentsKey], "|"));
+                }
+
+                //retry
                 return SelectedComponents.ElementAt(ActiveComponentIndex);
+            }
+        }
+
+        #endregion
+
+        #region public methods
+
+        public void SortComponents()
+        {
+            if (AllComponents[0].SortOrder != 0)
+            {
+                List<WizardBaseController> selectedAsList = SelectedComponents.ToList();
+                selectedAsList.Sort(new WizardSortOrderComparer());
+                SelectedComponents = new ObservableCollection<WizardBaseController>(selectedAsList);
+
+                List<WizardBaseController> unselectedAsList = UnselectedComponents.ToList();
+                unselectedAsList.Sort(new WizardSortOrderComparer());
+                UnselectedComponents = new ObservableCollection<WizardBaseController>(unselectedAsList);
+            }
+            else
+            {
+                List<WizardBaseController> selectedAsList = SelectedComponents.ToList();
+                selectedAsList.Sort(new WizardPrerequisiteComparer());
+                SelectedComponents = new ObservableCollection<WizardBaseController>(selectedAsList);
+
+                List<WizardBaseController> unselectedAsList = UnselectedComponents.ToList();
+                unselectedAsList.Sort(new WizardPrerequisiteComparer());
+                UnselectedComponents = new ObservableCollection<WizardBaseController>(unselectedAsList);
             }
         }
 
@@ -217,16 +314,16 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         public WizardBaseController GetComponentByName(string name)
         {
             WizardBaseController component = (from c in AllComponents
-                                         where c.ControllerName.CompareTo(name) == 0
-                                         select c).FirstOrDefault();
+                                              where c.ControllerName.CompareTo(name) == 0
+                                              select c).FirstOrDefault();
             return component;
         }
 
         public WizardBaseController GetComponentByType(Type type)
         {
             WizardBaseController component = (from c in AllComponents
-                                         where c.GetType() == type
-                                         select c).FirstOrDefault();
+                                              where c.GetType() == type
+                                              select c).FirstOrDefault();
             return component;
         }
 
@@ -242,6 +339,62 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             }
             ActiveComponentIndex = 0;
             SelectedComponents.Clear();
+        }
+
+
+        /// <summary>
+        /// Sets the active assignment type by trying to match the supplied parameter with possible assignment types
+        /// listed in the AssignmentTypes enumeration.  Will default to AssignmentTypes.Basic if no match was found.
+        /// </summary>
+        /// <param name="assignmentType"></param>
+        /// <returns>True if a good match was found, false otherwise.</returns>
+        public bool SetActiveAssignmentType(string assignmentType)
+        {
+            IList<AssignmentTypes> possibleTypes = Assignment.AllAssignmentTypes;
+            foreach (AssignmentTypes type in possibleTypes)
+            {
+                if (assignmentType.Contains(type.ToString()))
+                {
+                    return SetActiveAssignmentType(type);
+                }
+            }
+
+            //default to basic
+            SetActiveAssignmentType(AssignmentTypes.Basic);
+            return false;
+        }
+
+        /// <summary>
+        /// Sets the active assignment type based on the supplied parameter.
+        /// </summary>
+        /// <param name="assignmentType"></param>
+        /// <returns>Always true</returns>
+        public bool SetActiveAssignmentType(AssignmentTypes assignmentType)
+        {
+            ActiveAssignmentType = assignmentType;
+            return true;
+        }
+
+#endregion
+
+        #region private helpers
+
+        /// <summary>
+        /// Converts a delimited string into a list of <see cref="WizardBaseController "/> objects.
+        /// </summary>
+        /// <param name="itemString"></param>
+        /// <param name="delimiter">The token used to delimit each entry</param>
+        /// <returns></returns>
+        private List<WizardBaseController> ComponentsFromString(string itemString, string delimiter)
+        {
+            List<WizardBaseController> components = new List<WizardBaseController>();
+            string[] items = itemString.Split(delimiter.ToCharArray());
+            foreach (string item in items)
+            {
+                WizardBaseController component = AllComponents.Find(c => c.ControllerName == item);
+                components.Add(component);
+            }
+            return components;
         }
 
         /// <summary>
@@ -282,39 +435,6 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         }
 
         /// <summary>
-        /// Sets the active assignment type by trying to match the supplied parameter with possible assignment types
-        /// listed in the AssignmentTypes enumeration.  Will default to AssignmentTypes.Basic if no match was found.
-        /// </summary>
-        /// <param name="assignmentType"></param>
-        /// <returns>True if a good match was found, false otherwise.</returns>
-        public bool SetActiveAssignmentType(string assignmentType)
-        {
-            IList<AssignmentTypes> possibleTypes = Assignment.AllAssignmentTypes;
-            foreach (AssignmentTypes type in possibleTypes)
-            {
-                if (assignmentType.Contains(type.ToString()))
-                {
-                    return SetActiveAssignmentType(type);
-                }
-            }
-
-            //default to basic
-            SetActiveAssignmentType(AssignmentTypes.Basic);
-            return false;
-        }
-
-        /// <summary>
-        /// Sets the active assignment type based on the supplied parameter.
-        /// </summary>
-        /// <param name="assignmentType"></param>
-        /// <returns>Always true</returns>
-        public bool SetActiveAssignmentType(AssignmentTypes assignmentType)
-        {
-            ActiveAssignmentType = assignmentType;
-            return true;
-        }
-
-        /// <summary>
         /// Registers all components with the component manager
         /// </summary>
         private void RegisterComponents()
@@ -322,18 +442,18 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             //use reflection to find all available components
             string componentNamespace = "OSBLE.Areas.AssignmentWizard.Controllers";
             List<Type> componentObjects = (from type in Assembly.GetExecutingAssembly().GetTypes()
-                           where 
-                           type.IsSubclassOf(typeof(WizardBaseController))
-                           && 
-                           type.Namespace.CompareTo(componentNamespace) == 0
-                           select type).ToList();
+                                           where
+                                           type.IsSubclassOf(typeof(WizardBaseController))
+                                           &&
+                                           type.Namespace.CompareTo(componentNamespace) == 0
+                                           select type).ToList();
 
             foreach (Type component in componentObjects)
             {
                 WizardBaseController controller = Activator.CreateInstance(component) as WizardBaseController;
                 AllComponents.Add(controller);
             }
-            
+
             //pull from the cache if possible
             ObjectCache cache = new FileCache();
             bool loadedFromCache = false;
@@ -378,7 +498,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                 //AC: The List data type's Sort() method uses quicksort, which uses a partitioning scheme.  
                 //Because wizard component sorting is a little goofy, this won't work for us.  Therefore, we must
                 //use something more simplistic (Insertion Sort used)
-                AllComponents.Sort(new WizardPrerequisiteCountComparer());
+                AllComponents.Sort(new WizardPrerequisiteComparer());
                 WizardPrerequisiteComparer comparer = new WizardPrerequisiteComparer();
                 for (int i = 1; i < AllComponents.Count; i++)
                 {
@@ -413,7 +533,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                 }
                 cache.Add(componentsCacheString, sortedComponents, DateTime.Now, cacheRegion);
             }
-            
+
             //attach event listeners to selection change
             //and apply a sort order for faster sorting in the future
             int counter = 1;
@@ -425,5 +545,6 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                 counter++;
             }
         }
+        #endregion
     }
 }

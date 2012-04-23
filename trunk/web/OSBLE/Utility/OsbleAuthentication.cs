@@ -27,27 +27,26 @@ namespace OSBLE.Utility
         {
             UserProfile profile = new UserProfile();
             
-            //user name
-            byte[] bytes = MachineKey.Decode(cookie.Values[userNameKey].ToString(), MachineKeyProtection.All);
-            string userName = System.Text.Encoding.UTF8.GetString(bytes);
-
-            //auth key
+            //do everything in a try/catch to account for potential null fields
             try
             {
+                //user name
+                byte[] bytes = MachineKey.Decode(cookie.Values[userNameKey].ToString(), MachineKeyProtection.All);
+                string userName = System.Text.Encoding.UTF8.GetString(bytes);
                 string authToken = System.Text.Encoding.UTF8.GetString(MachineKey.Decode(cookie.Values[authKey].ToString(), MachineKeyProtection.All));
 
                 if (authToken.CompareTo(HttpContext.Current.Request.UserAgent) != 0)
                 {
                     return null;
                 }
+
+                profile = db.UserProfiles.Where(u => u.AspNetUserName == userName).FirstOrDefault();
+                return profile;
             }
             catch (Exception ex)
             {
                 return null;
             }
-
-            profile = db.UserProfiles.Where(u => u.AspNetUserName == userName).FirstOrDefault();
-            return profile;
         }
 
         public HttpCookie InvalidateUserCookie(UserProfile profile)
