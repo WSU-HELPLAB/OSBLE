@@ -20,6 +20,8 @@ namespace OSBLE.Models
 
         public int? UserID { get; set; }
 
+        public DateTime Timestamp { get; set; }
+
         /// <summary>
         /// The user that is making the request (usually the person logged in)
         /// </summary>
@@ -30,5 +32,10 @@ namespace OSBLE.Models
         /// Log-specific message information
         /// </summary>
         public string Message { get; set; }
+
+        public ActivityLog()
+        {
+            Timestamp = DateTime.Now;
+        }
     }
 }

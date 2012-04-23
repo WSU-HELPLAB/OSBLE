@@ -60,7 +60,7 @@ namespace OSBLE.Utility
                 ActivityLog log = new ActivityLog()
                 {
                     Sender = typeof(OsbleAuthentication).ToString(),
-                    Message = "Authentiation exception encoutered: " + ex.Message
+                    Message = "Authentiation exception encoutered for IP " + HttpContext.Current.Request.UserHostAddress + ": " + ex.Message
                 };
                 db.ActivityLogs.Add(log);
                 db.SaveChanges();
