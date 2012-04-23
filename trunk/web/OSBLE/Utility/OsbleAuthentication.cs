@@ -30,23 +30,51 @@ namespace OSBLE.Utility
             //do everything in a try/catch to account for potential null fields
             try
             {
+                ActivityLog log = new ActivityLog()
+                {
+                    Sender = typeof(OsbleAuthentication).ToString(),
+                    Message = "Attempting to retrieve cookie from IP " + HttpContext.Current.Request.UserHostAddress
+                };
+                db.ActivityLogs.Add(log);
+
                 //user name
                 byte[] bytes = MachineKey.Decode(cookie.Values[userNameKey].ToString(), MachineKeyProtection.All);
                 string userName = System.Text.Encoding.UTF8.GetString(bytes);
                 string authToken = System.Text.Encoding.UTF8.GetString(MachineKey.Decode(cookie.Values[authKey].ToString(), MachineKeyProtection.All));
 
-                if (authToken.CompareTo(HttpContext.Current.Request.UserAgent) != 0)
+                if (authToken.CompareTo(HttpContext.Current.Request.UserHostAddress) != 0)
                 {
+                    log = new ActivityLog()
+                    {
+                        Sender = typeof(OsbleAuthentication).ToString(),
+                        Message = "Bad auth token detected.  Expected: " + HttpContext.Current.Request.UserHostAddress + ", Received: " + authToken
+                    };
+                    db.ActivityLogs.Add(log);
                     return null;
                 }
-
                 profile = db.UserProfiles.Where(u => u.AspNetUserName == userName).FirstOrDefault();
-                return profile;
+                
             }
             catch (Exception ex)
             {
+                ActivityLog log = new ActivityLog()
+                {
+                    Sender = typeof(OsbleAuthentication).ToString(),
+                    Message = "Authentiation exception encoutered: " + ex.Message
+                };
+                db.ActivityLogs.Add(log);
+                db.SaveChanges();
                 return null;
             }
+            ActivityLog successLog = new ActivityLog()
+            {
+                Sender = typeof(OsbleAuthentication).ToString(),
+                Message = "Authentication successful.",
+                UserID = profile.ID
+            };
+            db.ActivityLogs.Add(successLog);
+            db.SaveChanges();
+            return profile;
         }
 
         public HttpCookie InvalidateUserCookie(UserProfile profile)
@@ -64,7 +92,7 @@ namespace OSBLE.Utility
             cookie.Values[userNameKey] = MachineKey.Encode(System.Text.Encoding.UTF8.GetBytes(profile.AspNetUserName), MachineKeyProtection.All);
 
             //AC: need a better way to tie the cookie to the current machine
-            cookie.Values[authKey] = MachineKey.Encode(System.Text.Encoding.UTF8.GetBytes(HttpContext.Current.Request.UserAgent), MachineKeyProtection.All);
+            cookie.Values[authKey] = MachineKey.Encode(System.Text.Encoding.UTF8.GetBytes(HttpContext.Current.Request.UserHostAddress), MachineKeyProtection.All);
 
             //set a really long expiration date
             cookie.Expires = DateTime.Now.AddDays(30);

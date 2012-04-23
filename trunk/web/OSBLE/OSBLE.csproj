@@ -198,6 +198,7 @@
     <Compile Include="Controllers\StudioAssignmentController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="EntityFramework\DbContextExtensions.cs" />
+    <Compile Include="Models\ActivityLog.cs" />
     <Compile Include="Models\Assignments\Assignment.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -751,7 +752,6 @@
     <Content Include="Views\DiscussionAssignment\TeacherIndex.cshtml" />
     <Content Include="Views\Gradebook\_ObserverGradebook.cshtml" />
     <Content Include="Views\Gradebook\_ObserverTab.cshtml" />
-    <Content Include="Views\DiscussionAssignment\ObserverIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

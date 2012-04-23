@@ -140,6 +140,9 @@ namespace OSBLE.Models
 
         public DbSet<UserProfile> UserProfiles { get; set; }
 
+        //misc
+        public DbSet<ActivityLog> ActivityLogs { get; set; }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -4,7 +4,8 @@
 
 
 $(document).ready(function () {
-    window.setInterval("time()", 60000);
+    //check in every 5 minutes
+    window.setInterval("time()", 5 * 60000);
 });
 var isTimedOut = false;
 function time() {
