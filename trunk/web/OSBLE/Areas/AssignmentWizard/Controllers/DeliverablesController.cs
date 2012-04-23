@@ -47,8 +47,10 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         private new void SetUpViewBag()
         {
             List<SelectListItem> allItems = GetListOfDeliverableTypes();
-            
+
+            //AC: This borks code.  Not sure why.
             //if we're in an inline review assignment type, then use only the deliverables that work for us
+            /*
             if (Assignment.HasCommentCategories)
             {
                 List<SelectListItem> restrictedItems = new List<SelectListItem>();
@@ -63,6 +65,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 }
                 allItems = restrictedItems;
             }
+             * */
+
             ViewBag.DeliverableTypes = new SelectList(allItems, "Value", "Text");
             ViewBag.AllowedFileNames = from c in FileSystem.GetCourseDocumentsFileList(activeCourse.AbstractCourse, includeParentLink: false).Files select c.Name;
         }
