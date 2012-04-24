@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using System.Web.Security;
 using OSBLE.Attributes;
 using OSBLE.Models.Users;
+using OSBLE.Utility;
 
 namespace OSBLE.Controllers
 {
@@ -49,8 +50,12 @@ namespace OSBLE.Controllers
         {
             UserProfile u = db.UserProfiles.Find(id);
 
+            OsbleAuthentication auth = new OsbleAuthentication();
+            Response.SetCookie(auth.InvalidateUserCookie(CurrentUser));
+
             FormsAuthentication.SignOut();
             context.Session.Clear();
+
             FormsAuthentication.SetAuthCookie(u.UserName, false);
 
             return RedirectToAction("Index", "Home");
