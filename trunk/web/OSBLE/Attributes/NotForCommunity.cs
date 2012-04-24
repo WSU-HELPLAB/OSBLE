@@ -2,6 +2,8 @@
 using System.Web.Routing;
 using OSBLE.Controllers;
 using OSBLE.Models.Courses;
+using System;
+using OSBLE.Models;
 
 namespace OSBLE.Attributes
 {
@@ -17,9 +19,24 @@ namespace OSBLE.Attributes
             {
                 OSBLEController controller = filterContext.Controller as OSBLEController;
 
-                if (controller.ActiveCourse.AbstractCourse is Community)
+                //AC: Will fail when session clears
+                try
                 {
-                    filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
+                    if (controller.ActiveCourse.AbstractCourse is Community)
+                    {
+                        filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    OSBLEContext db = new OSBLEContext();
+                    ActivityLog log = new ActivityLog()
+                    {
+                        Sender = typeof(NotForCommunity).ToString(),
+                        Message = "IP " + filterContext.HttpContext.Request.UserHostAddress + " encountered exception: " + ex.ToString()
+                    };
+                    db.ActivityLogs.Add(log);
+                    db.SaveChanges();
                 }
             }
         }
