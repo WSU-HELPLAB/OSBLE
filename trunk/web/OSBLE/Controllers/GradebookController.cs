@@ -2435,7 +2435,8 @@ namespace OSBLE.Controllers
                     ColumnOrder = 1,
                     AssignmentDescription = "No description",
                     IsDraft = false,
-                    Type = AssignmentTypes.Basic
+                    Type = AssignmentTypes.Basic,
+                    PointsPossible = 1
                 };
                 db.Assignments.Add(newAssignment);
                 db.SaveChanges();

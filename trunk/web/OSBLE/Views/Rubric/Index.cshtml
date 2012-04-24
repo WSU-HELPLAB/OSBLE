@@ -356,9 +356,9 @@ function create_and_open_downloading_submission_dialog() {
                 }
             }
         </table>
-
-        @Html.Partial("_Display", Model)
-
+        <div style="width: 1200px; height: 600px; overflow: auto">
+            @Html.Partial("_Display", Model)
+        </div>
             //Disable the save as draft button if its already published
             if (Model.Evaluation.IsPublished == true || editable == false)
             {
