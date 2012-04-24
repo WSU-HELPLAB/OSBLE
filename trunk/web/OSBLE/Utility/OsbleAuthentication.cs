@@ -95,7 +95,7 @@ namespace OSBLE.Utility
             cookie.Values[authKey] = MachineKey.Encode(System.Text.Encoding.UTF8.GetBytes(HttpContext.Current.Request.UserHostAddress), MachineKeyProtection.All);
 
             //set a really long expiration date
-            cookie.Expires = DateTime.Now.AddDays(30);
+            cookie.Expires = DateTime.Now.AddDays(300);
             return cookie;
         }
     }

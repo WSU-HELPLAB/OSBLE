@@ -56,8 +56,8 @@ namespace OSBLE.Attributes
                 else
                 {
                     HttpCookie updatedCookie = auth.UserAsCookie(profile);
-                    filterContext.HttpContext.Response.Cookies.Add(profileCookie);
                     FormsAuthentication.SetAuthCookie(profile.AspNetUserName, true);
+                    //filterContext.HttpContext.Response.Cookies.Add(profileCookie);
                 }
             }
         }
