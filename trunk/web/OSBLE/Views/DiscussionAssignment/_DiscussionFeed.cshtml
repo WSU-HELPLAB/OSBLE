@@ -162,7 +162,7 @@
                                             @dr.Posted <br /> <br /> </div>
                                             <div class="dp_content">
                                              @{
-                                                    content = Helpers.Linkify(dp.Content).ToHtmlString();
+                                                    content = Helpers.Linkify(dr.Content).ToHtmlString();
                                                     content = content.Replace("\n", "<br />");
                                             }
                                             @Html.Raw(content)
@@ -178,7 +178,7 @@
                                         @dr.Posted <br /> <br /> </div>
                                         <div class="dp_content">
                                         @{
-                                                content = Helpers.Linkify(dp.Content).ToHtmlString();
+                                                content = Helpers.Linkify(dr.Content).ToHtmlString();
                                                 content = content.Replace("\n", "<br />");
                                         }
                                         @Html.Raw(content)
@@ -195,7 +195,7 @@
                                     @dr.Posted <br /> <br /> </div>
                                     <div class="dp_content">
                                     @{
-                                        content = Helpers.Linkify(dp.Content).ToHtmlString();
+                                        content = Helpers.Linkify(dr.Content).ToHtmlString();
                                         content = content.Replace("\n", "<br />");
                                     }
                                     @Html.Raw(content)
@@ -212,7 +212,7 @@
                             @dr.Posted <br /> <br /> </div>
                             <div class="dp_content">
                              @{
-                                content = Helpers.Linkify(dp.Content).ToHtmlString();
+                                content = Helpers.Linkify(dr.Content).ToHtmlString();
                                 content = content.Replace("\n", "<br />");
                             }
                             @Html.Raw(content)
