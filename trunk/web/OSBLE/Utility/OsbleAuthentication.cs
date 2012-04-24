@@ -35,7 +35,7 @@ namespace OSBLE.Utility
                     Sender = typeof(OsbleAuthentication).ToString(),
                     Message = "Attempting to retrieve cookie from IP " + HttpContext.Current.Request.UserHostAddress
                 };
-                db.ActivityLogs.Add(log);
+                //db.ActivityLogs.Add(log);
 
                 //user name
                 byte[] bytes = MachineKey.Decode(cookie.Values[userNameKey].ToString(), MachineKeyProtection.All);
@@ -72,7 +72,7 @@ namespace OSBLE.Utility
                 Message = "Authentication successful.",
                 UserID = profile.ID
             };
-            db.ActivityLogs.Add(successLog);
+            //db.ActivityLogs.Add(successLog);
             db.SaveChanges();
             return profile;
         }
