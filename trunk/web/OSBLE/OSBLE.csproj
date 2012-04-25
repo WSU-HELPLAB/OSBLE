@@ -187,6 +187,7 @@
     <Compile Include="Areas\AssignmentWizard\Controllers\TeamController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\WizardBaseController.cs" />
     <Compile Include="Controllers\CommunityController.cs" />
+    <Compile Include="Controllers\CookieTestController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
     <Compile Include="Controllers\DiscussionAssignmentController.cs" />
     <Compile Include="Controllers\EventController.cs" />
@@ -750,6 +751,7 @@
     <Content Include="Views\DiscussionAssignment\TeacherIndex.cshtml" />
     <Content Include="Views\Gradebook\_ObserverGradebook.cshtml" />
     <Content Include="Views\Gradebook\_ObserverTab.cshtml" />
+    <Content Include="Views\CookieTest\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />
