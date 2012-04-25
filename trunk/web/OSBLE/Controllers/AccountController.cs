@@ -82,10 +82,11 @@ namespace OSBLE.Controllers
                     }
                     if (Membership.ValidateUser(localUser.AspNetUserName, model.Password))
                     {
-                        //AC: commented out to see what will happen.  If bad stuff starts to happen, uncomment.  Otherwise
-                        //consider removing.
-                        //context.Session.Clear(); // Clear session variables.
+                        context.Session.Clear(); // Clear session variables.
                         FormsAuthentication.SetAuthCookie(model.UserName, true);
+                        OsbleAuthentication auth = new OsbleAuthentication();
+                        HttpCookie userCookie = auth.UserAsCookie(localUser);
+                        Response.Cookies.Add(userCookie);
                         if (Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
                             && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
                         {

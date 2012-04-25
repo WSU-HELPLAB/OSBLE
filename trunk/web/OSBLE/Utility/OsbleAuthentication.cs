@@ -26,7 +26,9 @@ namespace OSBLE.Utility
         public UserProfile GetUserFromCookie(HttpCookie cookie)
         {
             UserProfile profile = new UserProfile();
-            
+            string userName = "";
+            string authToken = "";
+
             //do everything in a try/catch to account for potential null fields
             try
             {
@@ -39,15 +41,19 @@ namespace OSBLE.Utility
 
                 //user name
                 byte[] bytes = MachineKey.Decode(cookie.Values[userNameKey].ToString(), MachineKeyProtection.All);
-                string userName = System.Text.Encoding.UTF8.GetString(bytes);
-                string authToken = System.Text.Encoding.UTF8.GetString(MachineKey.Decode(cookie.Values[authKey].ToString(), MachineKeyProtection.All));
+                userName = System.Text.Encoding.UTF8.GetString(bytes);
+                authToken = System.Text.Encoding.UTF8.GetString(MachineKey.Decode(cookie.Values[authKey].ToString(), MachineKeyProtection.All));
 
                 if (authToken.CompareTo(HttpContext.Current.Request.UserHostAddress) != 0)
                 {
                     log = new ActivityLog()
                     {
                         Sender = typeof(OsbleAuthentication).ToString(),
-                        Message = "Bad auth token detected.  Expected: " + HttpContext.Current.Request.UserHostAddress + ", Received: " + authToken
+                        Message = "Bad auth token detected.  Expected: " + 
+                                    HttpContext.Current.Request.UserHostAddress + 
+                                    ", Received: " + authToken + 
+                                    " User Name: " + userName + 
+                                    " authToken: " + authToken 
                     };
                     db.ActivityLogs.Add(log);
                     return null;
@@ -60,7 +66,10 @@ namespace OSBLE.Utility
                 ActivityLog log = new ActivityLog()
                 {
                     Sender = typeof(OsbleAuthentication).ToString(),
-                    Message = "Authentiation exception encoutered for IP " + HttpContext.Current.Request.UserHostAddress + ": " + ex.Message
+                    Message = "Authentiation exception encoutered for IP " + HttpContext.Current.Request.UserHostAddress + ": " + ex.Message +
+                                " User Name: " + userName +
+                                " authToken: " + authToken 
+
                 };
                 db.ActivityLogs.Add(log);
                 db.SaveChanges();
