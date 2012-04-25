@@ -26,6 +26,39 @@
 
 }
 <script type="text/javascript">
+
+$(document).ready(function () {
+    var height = parseFloat($(window).height());
+    height = height - 300;
+    $("#internalScrollID").height(height + "px");
+
+    var width = parseFloat($(window).width());
+    width = width - 20;
+    $("#rubric_evaluator").width(width + "px");
+    $("#internalScrollID").width(width + "px");
+    width = width - 70;
+    $(".criterion_div").width(width + "px");
+    
+
+    $(window).bind('resize', resizeWindow);
+
+    function resizeWindow(e) {
+        var height = parseFloat($(window).height());
+        height = height - 300;
+        $("#internalScrollID").height(height + "px");
+
+        var width = parseFloat($(window).width());
+        if (width > 1000) {
+            width = width - 20;
+            $("#rubric_evaluator").width(width + "px");
+            $("#internalScrollID").width(width + "px");
+            width = width - 70;
+            $(".criterion_div").width(width + "px");
+        }
+
+    }
+});
+
 function create_and_open_downloading_submission_dialog() {
 
         //create the div that we will then make into a dialog
@@ -114,7 +147,7 @@ function create_and_open_downloading_submission_dialog() {
 
     #rubric_evaluator
     {
-        width: 1050px;
+        width: 1200px;
     }
 </style>
 <div id="rubric_evaluator">
@@ -129,7 +162,7 @@ function create_and_open_downloading_submission_dialog() {
             Rubric Evaluation of @Model.SelectedAssignment.AssignmentName for Anonymous @cuList.IndexOf(@Model.Evaluation.Recipient.TeamMembers.FirstOrDefault().CourseUser)</h1>
     }
     <div class="dashboard">
-        <table>
+        <table style="border-collapse: collapse; border-spacing: 0;">
             <tr>
                 <th>
                     Assignments:
@@ -149,10 +182,14 @@ function create_and_open_downloading_submission_dialog() {
                         }
                     </select>
                 </td>
+            </tr>
+            </table>
+            <table>
+            <tr>
                 <th>
                     Student/Team:
                 </th>
-                <td>
+                
                     @{
                         int prevUserId;
                         int userCount;
@@ -174,10 +211,10 @@ function create_and_open_downloading_submission_dialog() {
                             userCount = atList.Count() - (atList.IndexOf(at) - 1);
                         }
                     }
-                    <input type="button" value="<" onclick="switchEvalButton(@Model.SelectedAssignment.ID, @prevUserId);"/>
-                </td>
-                <td>
-                    <select id="@selectedTeam" name="@selectedTeam">
+                
+                <td style="padding:0;margin:0;border:0">
+                    <input type="button" value="<" onclick="switchEvalButton(@Model.SelectedAssignment.ID, @prevUserId);" style="margin:0" />
+                    <select id="@selectedTeam" name="@selectedTeam" style="margin:0">
                         @{foreach (AssignmentTeam team in Model.TeamList)
                           {
                               string optionTextPublished = "<option style=\"background:#43D58C;\" value=\"{0}\" {1}>{2}</option>";
@@ -242,12 +279,7 @@ function create_and_open_downloading_submission_dialog() {
                             @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, name));
                               }
                           }
-                        }
-                    </select>
-                </td>
-                <td>
-                    @{
-                        int userId;
+                          int userId;
 
                         atList = (from t in @Model.TeamList as IEnumerable<AssignmentTeam>
                                   select t).ToList();
@@ -260,30 +292,27 @@ function create_and_open_downloading_submission_dialog() {
                         {
                             userId = atList.SkipWhile(item => item.TeamID != @Model.SelectedTeam.TeamID).Skip(1).FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
                         }
+                    
+                        <input type="button" value=">" onclick="switchEvalButton(@Model.SelectedAssignment.ID, @userId);"/>
                     }
-                    <input type="button" value=">" onclick="switchEvalButton(@Model.SelectedAssignment.ID, @userId);"/>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                </td>
-                <td>
-                </td>
-                <td>
-                </td>
-                <td>
+                    </select>
                 </td>
                 <td style="text-align: center">
-                    @userCount of @atList.Count()
+                    @userCount/@atList.Count()
                 </td>
             </tr>
+            
+                
         </table>
-        <table>
+    </div>
+    @using (Html.BeginForm("Index", "Rubric", FormMethod.Post, new { id = "rubric_form" }))
+    {
+        <table style="float: right">
             <tr>
-                <th>
+                <th style="text-align:right">
                     Grade:
                 </th>
-                <td id="@gradeId" style="padding-right:25px">
+                <td id="@gradeId" style="text-align:right;" >
                     0%
                 </td>
                 @if (Model.SelectedAssignment.HasDeliverables)
@@ -311,11 +340,36 @@ function create_and_open_downloading_submission_dialog() {
                     </td>
                 }
             </tr>
-        </table>
-    </div>
-    @using (Html.BeginForm("Index", "Rubric", FormMethod.Post, new { id = "rubric_form" }))
-    {
-        <table style="float: right">
+            @if (publishTime.HasValue)
+            {
+                if (Model.Evaluation.IsPublished == true)
+                {
+                <tr>
+                    <th style="text-align:right">Published:</th>
+                    <td style="text-align:right">
+                        @publishTime.Value.ToString("g")
+                    </td>
+                </tr>
+                }
+                else
+                {
+                <tr>
+                    <th style="text-align:right">Draft:</th>
+                    <td style="text-align:right">
+                        @publishTime.Value.ToString("g")
+                    </td>
+                </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <th style="text-align:right">Published:</th>
+                    <td style="text-align:right">
+                         Not Published
+                    </td>
+                </tr>
+            }
             <tr>
                 @if (Model.Evaluation.IsPublished == true || editable == false)
                 {
@@ -336,43 +390,27 @@ function create_and_open_downloading_submission_dialog() {
                     </td>
                 }
             </tr>
-            @if (publishTime.HasValue)
-            {
-                if (Model.Evaluation.IsPublished == true)
+        </table>
+        <br />
+        <br />
+        <br />
+        <br />
+        <div id="internalScrollID" style="width: 1200px; overflow: auto;">
+            @Html.Partial("_Display", Model)
+        </div>
+                //Disable the save as draft button if its already published
+                if (Model.Evaluation.IsPublished == true || editable == false)
                 {
-                <tr>
-                    <td colspan="2">
-                        Published at: @publishTime.Value.ToString("g")
-                    </td>
-                </tr>
+        <input disabled="disabled" type="submit" name="@draftButton" value="Save as Draft" />
                 }
                 else
                 {
-                <tr>
-                    <td colspan="2">
-                        Draft saved at: @publishTime.Value.ToString("g")
-                    </td>
-                </tr>
-                }
-            }
-        </table>
-        <br />
-        <div style="width: 1200px; height: 600px; overflow: auto">
-            @Html.Partial("_Display", Model)
-        </div>
-            //Disable the save as draft button if its already published
-            if (Model.Evaluation.IsPublished == true || editable == false)
-            {
-        <input disabled="disabled" type="submit" name="@draftButton" value="Save as Draft" />
-            }
-            else
-            {
         <input type="submit" name="@draftButton" value="Save as Draft" />
-            }
-            if (editable == true)
-            {
+                }
+                if (editable == true)
+                {
         <input type="submit" name="@publishButton" value="Publish to Student" />
-            }
+                }
         <br />
         <br />
         <input type="hidden" name="@ViewBag.AssignmentId" value="@Model.SelectedAssignment.ID" />
