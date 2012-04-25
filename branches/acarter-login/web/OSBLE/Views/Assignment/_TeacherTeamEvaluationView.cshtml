@@ -1,0 +1,79 @@
+﻿@using OSBLE.Models
+@using OSBLE.Models.Assignments
+@using OSBLE.Models.Courses
+@using OSBLE.Models.Assignments
+@model Assignment
+
+@{
+    Assignment assignment = ViewBag.Assignment;
+    ViewBag.Title = "Team Evaluation";
+    AssignmentTeam team = ViewBag.Team;
+}
+
+<h2>@team.Team.DisplayName(ViewBag.ActiveCourse.AbstractRole) Team Member Evaluations</h2>
+
+
+@{
+    List<TeamEvaluation> teamEvaluations = (from t in ViewBag.TeamEvaluations as IEnumerable<TeamEvaluation>
+                                            select t).ToList();
+
+    List<TeamMemberEvaluation> teamMemberEvals = (from t in ViewBag.TeamMemberEvaluations as IEnumerable<TeamMemberEvaluation>
+                                                  select t).ToList();
+
+    <table id="TeamMemberEvaluationTable">
+        <tr>
+            <th>Evaluators</th>
+            @foreach (TeamMember member in team.Team.TeamMembers)
+            {
+                <th>@member.CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)</th>
+            }
+            <th>Comments</th>
+        </tr>
+        
+        @foreach (TeamEvaluation te in teamEvaluations)
+        {
+            <tr>
+                @{
+                int count = 0;
+                foreach (TeamMemberEvaluation tme in te.TeamMemberEvaluations)
+                {
+                    if (count < 1)
+                    {
+                        count++;
+                        <td>@tme.Evaluator.DisplayName(ViewBag.ActiveCourse.AbstractRole)</td>
+                        <td>@tme.Points</td>
+                    }
+                    else
+                    {
+                        <td>@tme.Points</td>
+                    }
+                }
+                
+                <td>@te.Comments</td>
+                }
+            </tr>
+        }     
+        <tr>
+            <td>
+                <b>Multiplier</b>
+            </td>
+            
+            @foreach (TeamMember member in team.Team.TeamMembers)
+            {
+                double multiplier = (from tm in ViewBag.TeamMemberEvaluations as IEnumerable<TeamMemberEvaluation>
+                                     where tm.RecipientID == member.CourseUserID
+                                     select tm.Points).Sum();
+
+                multiplier = multiplier / (100 * teamEvaluations.Count());
+                
+                <td>@multiplier</td>
+            }
+            <td></td>
+        </tr> 
+    </table>    
+    <br />
+    string teamName = team.Team.DisplayName(ViewBag.ActiveCourse.AbstractRole);
+    @Html.ActionLink("Publish " + teamName + "'s  Multiplier", "PublishTeamMultiplier", new { teamId = team.TeamID, assignmentId = assignment.ID })                                                                                               
+}
+
+

@@ -1,0 +1,276 @@
+﻿@using OSBLE.Models
+@using OSBLE.Models.Courses
+@using OSBLE.Models.HomePage
+@using OSBLE.Models.DiscussionAssignment
+@using OSBLE.Models.Assignments
+@{
+    Assignment assignment = ViewBag.Assignment;
+}
+<script type="text/javascript">
+
+    //    function RemainingChars() {
+    //        var remaining = $('#MaxContentChars').val() - $('#ActivityFeed').val().length;
+    //        $('#remChars').val("(" + remaining + ") Characters left");
+    //    }
+
+</script>
+@if (!ViewBag.ActiveCourse.AbstractRole.Anonymized)
+{
+    if (assignment.DiscussionSettings.MinimumFirstPostLength > 0 && !ViewBag.FirstPost && assignment.DueDate > DateTime.Now)
+    {
+        <div>
+            A minimum of @assignment.DiscussionSettings.MinimumFirstPostLength characters required
+            for first post. You may not see the discussion until you make your first post.</div>
+        <div id="firstPostLengthDiv">
+            (@assignment.DiscussionSettings.MinimumFirstPostLength) additional characters needed.</div>
+        <input id="firstPostLength" type="hidden" value="@assignment.DiscussionSettings.MinimumFirstPostLength" />
+    }
+    else
+    {
+        <input id="firstPostLength" type="hidden" value="0" />
+    }
+    if (assignment.DueDate > DateTime.Now)
+    {
+
+        <div>
+            <input type="hidden" id="MaxContentChars" value="@ViewBag.MaxActivityFeedLength"/>
+            @using (Html.BeginForm("NewPost", "DiscussionAssignment", FormMethod.Post))
+            {
+                <textarea id="ActivityFeed" name="Content" rows="10" style="width: 100%" placeholder="Enter new discussion post here..."
+                    onkeydown="RemainingCharsReply()" onkeyup="RemainingCharsReply()"></textarea><br />
+                <input type="hidden" name="AssignmentID" value="@ViewBag.Assignment.ID" />
+                if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+                {
+                <input id="postNewDiscussion" type="submit" name="post_active" value="Post to Entire Class" /> @Helpers.CreateToolTip(ToolTips.TeacherPostButton)
+                }
+                else
+                {
+                    if (assignment.DiscussionSettings.MinimumFirstPostLength > 0 && !ViewBag.FirstPost)
+                    {
+                <input id="postNewDiscussion" type="submit" name="post_active" value="Post" disabled="disabled" />
+                    }
+                    else
+                    {
+                <input id="postNewDiscussion" type="submit" name="post_active" value="Post" />
+                    }
+                }
+            }
+        </div>
+    }
+    else
+    {
+        @:This assignment is closed.<br /><br />
+    }
+}
+@if (ViewBag.Posts != null && ViewBag.FirstPost == true)
+{
+    foreach (DiscussionPost dp in ViewBag.Posts)
+    {
+        @:<div id="dp_posts">
+            if (assignment.DiscussionSettings.HasAnonymousPosts && !ViewBag.ActiveCourse.AbstractRole.CanModify)
+            {
+                <div class="dp_post_header">
+                    @Helpers.DefaultProfilePicture()
+                    @dp.DisplayName <br />
+                    @dp.Posted <br /> <br /> </div>
+                    <div class="dp_content">
+                     @{
+                        string content = Helpers.Linkify(dp.Content).ToHtmlString();
+                        content = content.Replace("\n", "<br />");
+                            }
+                            @Html.Raw(content)
+                    </div>
+                    <div class="dp_replies"> <div id="dp_replies_for_@(dp.ID)">
+                    @foreach (DiscussionPost dr in dp.Replies)
+                    {
+                        @Html.Partial("_DiscussionFeed", dr);
+                    }
+                </div> </div>
+                    if (assignment.DueDate > DateTime.Now)
+                    {
+                    <div class="dp_replylink"> <a href="#" id="reply_@(dp.ID)">Reply</a> </div>
+                    }
+                <div class="dp_replybox" id="replybox_@(dp.ID)" > <form action="@Url.Action("NewReply")" data-ajax="true" data-ajax-update="#dp_replies_for_@(dp.ID)" data-ajax-begin="$('#reply_@(dp.ID)_button').attr('disabled','disabled')" 
+                data-ajax-failure="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');});$('#dp_replybox_content_@(dp.ID)').val('')" 
+                data-ajax-complete="$('#reply_@(dp.ID)_button').removeAttr('disabled');$('body').css('cursor', 'default');" data-ajax-success="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');});$('#dp_replybox_content_@(dp.ID)').val('')" 
+                data-ajax-mode="after" method="post">
+                    <input type="hidden" name="reply_to" value="@dp.ID" /> <input type="hidden" name="latest_reply"
+                    value="0" id="latest_reply_@(dp.ID)" /> <textarea name="Content" rows="5" cols="40" id="dp_replybox_content_@(dp.ID)" placeholder="Enter reply here..."></textarea><br/> 
+                    <input id="reply @(dp.ID)button" type="submit" name="post_reply" value="Post Reply" onclick="refreshCount()"/> 
+                    </form> <br /> <div class="dp_replylink"> <a href="#" id="replycancel_@(dp.ID)">Cancel</a>
+                </div> </div>
+                <script type="text/javascript">        
+                    $("#reply_@(dp.ID)").click(function () {
+                        $("#reply_@(dp.ID)").hide();
+                        $("#replybox_@(dp.ID)").show('blind'); return false;
+                    }); 
+                    $("#replycancel_@(dp.ID)").click(function() {
+                        $("#reply_@(dp.ID)").show('highlight'); $("#replybox_@(dp.ID)").hide('blind');
+                        return false;
+                    }); 
+                </script>
+            }
+            else
+            {
+                if (ViewBag.ActiveCourse.AbstractRole.CanModify || ViewBag.ActiveCourse.AbstractRole.Anonymized)
+                {
+                    if (ViewBag.Student != null)
+                    {
+                        if (ViewBag.Student.ID == dp.CourseUserID && ViewBag.PostOrReply != 1)
+                        {
+                            @:<div class="dp_post" id="dp_post_@(dp.ID)" style="background:#FFF8C6;">
+                        }
+                        else
+                        {
+                            @:<div class="dp_post" id="dp_post_@(dp.ID)">
+                        }
+                    }
+                    else
+                    {
+                        @:<div class="dp_post" id="dp_post_@(dp.ID)">
+                    }
+                }
+                else
+                {
+                    @:<div class="dp_post" id="dp_post_@(dp.ID)">
+                }
+                @*<div class="dp_post" id="dp_post_@(dp.ID)">*@
+                <div class="dp_post_header">
+                @Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = dp.CourseUser.AbstractCourseID, userprofile = dp.CourseUser.UserProfileID }))
+                @dp.DisplayName <br />
+                @dp.Posted <br /> <br /> </div>
+                <div class="dp_content">
+                     @{
+                string content = Helpers.Linkify(dp.Content).ToHtmlString();
+                content = content.Replace("\n", "<br />");
+                            }
+                            @Html.Raw(content)
+                    </div>
+                <div class="dp_replies"> <div id="dp_replies_for_@(dp.ID)">
+                    @foreach (DiscussionPost dr in dp.Replies)
+                    {
+                        if (ViewBag.ActiveCourse.AbstractRole.CanModify || ViewBag.ActiveCourse.AbstractRole.Anonymized)
+                        {
+                            if (ViewBag.Student != null && ViewBag.PostOrReply != 3)
+                            {
+                                if (ViewBag.Student.ID == dr.CourseUserID && ViewBag.PostOrReply != 0)
+                                {
+                                    @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:#FFF8C6;">
+                                        <div class="dp_post_header">
+                                            @Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }))
+                                            @dr.DisplayName <br />
+                                            @dr.Posted <br /> <br /> </div>
+                                            <div class="dp_content">
+                                             @{
+                                                    content = Helpers.Linkify(dr.Content).ToHtmlString();
+                                                    content = content.Replace("\n", "<br />");
+                                            }
+                                            @Html.Raw(content)
+                                            </div>
+                                    @:</div>
+                                }
+                                else
+                                {
+                                    @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:white;">
+                                        <div class="dp_post_header">
+                                        @Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }))
+                                        @dr.DisplayName <br />
+                                        @dr.Posted <br /> <br /> </div>
+                                        <div class="dp_content">
+                                        @{
+                                                content = Helpers.Linkify(dr.Content).ToHtmlString();
+                                                content = content.Replace("\n", "<br />");
+                                        }
+                                        @Html.Raw(content)
+                                        </div>
+                                    @:</div>
+                                }
+                            }
+                            else
+                            {
+                                @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:white;">
+                                    <div class="dp_post_header">
+                                    @Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }))
+                                    @dr.DisplayName <br />
+                                    @dr.Posted <br /> <br /> </div>
+                                    <div class="dp_content">
+                                    @{
+                                        content = Helpers.Linkify(dr.Content).ToHtmlString();
+                                        content = content.Replace("\n", "<br />");
+                                    }
+                                    @Html.Raw(content)
+                                 </div>
+                                @:</div>
+                            }
+                        }
+                        else
+                        {
+                            @:<div class="dp_post" id="dp_post_@(dr.ID)">
+                                <div class="dp_post_header">
+                            @Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }))
+                            @dr.DisplayName <br />
+                            @dr.Posted <br /> <br /> </div>
+                            <div class="dp_content">
+                             @{
+                                content = Helpers.Linkify(dr.Content).ToHtmlString();
+                                content = content.Replace("\n", "<br />");
+                            }
+                            @Html.Raw(content)
+                            </div>
+                            @:</div>
+                        }
+                    }
+                </div> </div>
+                    if (assignment.DueDate > DateTime.Now)
+                    {
+                    <div class="dp_replylink"> <a href="#" id="reply_@(dp.ID)">Reply</a> </div>
+                    }
+                <div class="dp_replybox" id="replybox_@(dp.ID)" style="padding-left:23px;" >
+                @using (Html.BeginForm("NewReply", "DiscussionAssignment", FormMethod.Post))
+                {
+                    @*data-ajax="true"*@
+                    @*data-ajax-update="#dp_replies_for_@(dp.ID)"
+                    data-ajax-begin="$('#reply_@(dp.ID)_button').attr('disabled', 'disabled')"
+                    data-ajax-complete="$('#reply_@(dp.ID)_button').removeAttr('disabled'); $('body').css('cursor', 'default');"
+                    data-ajax-success="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');}); $('#dp_replybox_content_@(dp.ID)').val('')"
+                    data-ajax-mode="after"*@
+                    @*method="post"*@
+                    <input type="hidden" name="reply_to" value="@dp.ID" />
+                    <input type="hidden" name="latest_reply" value="0" id="latest_reply_@(dp.ID)" />
+                    <span id="remCharsReply" name="remainingCharsReply" readonly="true" value="(@ViewBag.MaxActivityFeedLength)
+                    Characters left"></span><br />
+                    <textarea name="Content" rows="5" cols="40" id="dp_replybox_content_@(dp.ID)" placeholder="Enter
+                    reply here..."></textarea><br />
+                    <input id="reply @(dp.ID) button" type="submit" name="post_reply" value="Post Reply" onclick="refreshCount()" />
+                }
+                <br /> <div class="dp_replylink"> <a href="#" id="replycancel_@(dp.ID)">Cancel</a>
+                </div> </div>
+
+                <script type="text/javascript">        
+                    $("#reply_@(dp.ID)").click(function () {
+                        $("#reply_@(dp.ID)").hide();
+                        $("#replybox_@(dp.ID)").show('blind'); return false;
+                    }); 
+                    $("#replycancel_@(dp.ID)").click(function() {
+                        $("#reply_@(dp.ID)").show('highlight'); $("#replybox_@(dp.ID)").hide('blind');
+                        return false;
+                    }); 
+                </script>
+            }
+        @:</div>
+    }
+}
+</div> <script type="text/javascript">
+function RemainingCharsReply() 
+{ 
+    var remainingReply = $('#firstPostLength').val() - $('#ActivityFeed').val().length; 
+    if (parseInt(remainingReply)<= 0) 
+    { 
+        $("#postNewDiscussion").removeAttr("disabled"); $('#firstPostLengthDiv').html("(0) characters remaining for the first post."); } else { $("#postNewDiscussion").attr("disabled","disabled");
+        $('#firstPostLengthDiv').html("(" + remainingReply + ") additional characters needed.");
+    } 
+} //refreshes the count of how many charecters you can input
+function refreshCount() {
+        $('body').css('cursor', 'wait'); $('#remCharsReply').val("(" + $('#MaxContentChars').val() + ") Characters left"); 
+    } 
+</script> 

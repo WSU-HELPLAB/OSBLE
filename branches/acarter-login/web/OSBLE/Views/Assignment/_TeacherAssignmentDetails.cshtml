@@ -1,0 +1,382 @@
+﻿@using OSBLE.Models
+@using OSBLE.Models.Assignments
+@using OSBLE.Models.Courses
+@using OSBLE.Models.Assignments
+@using OSBLE.Models.ViewModels
+@model Assignment
+
+@{
+    Assignment assignment = Model;
+    ViewBag.Title = "Assignment Details";
+
+    int submittedCount = 0;
+    int totalStudentCount = 0;
+    int totalScores = 0;
+    foreach (AssignmentDetailsViewModel advm in ViewBag.AssignmentDetailsVMList)
+    {
+        if (advm.submissionTime != null)
+        {
+            submittedCount++;
+        }
+        if (advm.score != null && advm.score.Points >= 0)
+        {
+            totalScores++;
+        }
+        totalStudentCount++;
+    }
+    List<OSBLE.Models.Courses.Rubrics.RubricEvaluation> r = ViewBag.RubricEvals;
+    if (assignment.HasDeliverables)
+    {
+        <tr>
+            <td><text class="osbleColorBold">Submissions:</text></td>
+            @if (submittedCount > 0)
+            {
+                <td>@submittedCount of @totalStudentCount have been submitted&nbsp @Html.ActionLink("[Download All]", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()", style = "text-decoration:none" })</td>    
+            }
+            else
+            {
+                <td>@submittedCount of @totalStudentCount have been submitted</td>
+            }
+        </tr>  
+    }
+    <tr>
+        <td style="vertical-align:top"><text class="osbleColorBold" >Grading progress:</text></td>
+        <td>
+            @totalScores of @assignment.AssignmentTeams.Count() have been published<br />
+            @if (assignment.AssignmentTypeID == 4)
+            {
+                <a style="cursor:pointer" onclick="publishAllMultipliers(@assignment.ID);">[Publish All Multipliers]</a>
+            }
+            else if (r.Count() > 0)
+            {
+                @:@r.Count() have been saved as draft&nbsp<a style="cursor:pointer" onclick="publishAllGrades(@assignment.ID);">[Publish All]</a>
+            }
+            
+            else 
+            {
+                @:@r.Count() have been saved as draft
+            }
+        </td>
+    </tr> 
+    if (assignment.AssignmentTypeID == 3 && !assignment.HasDiscussionTeams)
+    {
+        <tr>
+            <td><text class="osbleColorBold" >Discussion:</text></td>
+            <td>@Html.ActionLink("View Discussion", "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = -1, postOrReply = 3 }, new { })</td>
+
+
+        </tr>   
+    }
+    }
+ </table>
+@{    
+    <table class="assignDetailsTable" cellspacing="0">
+    <th>Name</th>
+    @if (assignment.AssignmentTypeID != 4)
+    {
+        <th>Grade</th>
+    }
+    else
+    {
+        <th style="padding-right:10px">Team Evaluations</th>
+    }
+    @if (assignment.HasCommentCategories)
+    {
+        <th>Inline Comments</th>    
+    }
+    
+    @if (assignment.HasDeliverables)
+    {
+        <th>Submission</th>
+        @*<th>Submit for Student</th>*@
+    }
+    @if (assignment.AssignmentTypeID == 3)
+    {
+        <th style="padding-right:10px">Posts</th> 
+        <th style="padding-right:10px">Replies</th> 
+        <th>All</th> 
+    }
+    @if(assignment.AssignmentTypeID == 4)
+    {
+        <th>Largest Discrepancy</th>
+    }
+    @if (assignment.AssignmentTypeID != 4)
+    {
+        <th>Late Penalty</th>
+    }
+    <br />
+
+    @if (assignment.AssignmentTypeID == 3 && assignment.HasDiscussionTeams)
+    {
+        foreach (DiscussionTeam dt in (ViewBag.DiscussionTeamList))
+        {
+            string teamName = dt.Team.DisplayName(ViewBag.ActiveCourse.AbstractRole);
+        <tbody id="awesome">
+            <tr>
+                <td colspan="2" title="View @dt.Team.Name's discussion.">@Html.ActionLink(teamName, "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = dt.Team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 3 }, new { })</td>
+                <td id="posts-@dt.TeamID"></td>
+                <td id="replies-@dt.TeamID"></td>
+                <td id="all-@dt.TeamID" colspan="2"></td>
+            </tr>
+            
+            @foreach (TeamMember tm in (dt.Team.TeamMembers).OrderBy(s => s.CourseUser.UserProfile.LastName).ThenBy(c => c.CourseUser.UserProfile.FirstName))
+            {
+                foreach (AssignmentDetailsViewModel advm in ViewBag.AssignmentDetailsVMList)
+                {
+                    if (tm.CourseUserID == advm.team.TeamMembers.FirstOrDefault().CourseUserID)
+                    {
+                        
+                        <tr>
+                        <td>&nbsp&nbsp&nbsp @tm.CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)</td>
+                        <td> <!--td for grade-->
+                            @if (assignment.HasRubric)
+                            {
+                                if (advm.score == null)
+                                {
+                                    r.OrderBy(o => o.Recipient.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName);
+                                    bool found = false;
+                                    foreach (OSBLE.Models.Courses.Rubrics.RubricEvaluation eval in r)
+                                    {
+                                        if (eval.Recipient.ID == advm.team.ID)
+                                        {
+                                            if (!eval.IsPublished)
+                                            {
+                                                found = true;
+                                            }
+                                        }
+                                    }
+                                    if (found)
+                                    {
+                                        @Html.ActionLink("Saved as Draft", "Index", "Rubric", new { assignmentId = assignment.ID, cuId = advm.team.TeamMembers.FirstOrDefault().CourseUserID }, new { })
+                                    }
+                                    else
+                                    {
+                                        @Html.ActionLink("Not Graded", "Index", "Rubric", new { assignmentId = assignment.ID, cuId = advm.team.TeamMembers.FirstOrDefault().CourseUserID }, new { })
+                                    }
+
+                                }
+                                else
+                                {
+                                    @Html.ActionLink(advm.score.getGradeAsPercent(advm.score.Assignment.PointsPossible), "Index", "Rubric", new { assignmentId = advm.score.AssignmentID, cuId = advm.team.TeamMembers.FirstOrDefault().CourseUserID }, new { });
+                                }
+                            }
+                            else
+                            {
+                                if (advm.score == null)
+                                {
+                                    <a href="#" onclick="goToCategoryTab(@assignment.CategoryID, @advm.team.TeamMembers.FirstOrDefault().CourseUser.ID);" style="cursor:pointer;">Not Graded</a>
+                                }
+                                else
+                                {
+                                    <a href="#" onclick="goToCategoryTab(@advm.score.Assignment.CategoryID, @advm.team.TeamMembers.FirstOrDefault().CourseUser.ID);" style="cursor:pointer;">@advm.score.getGradeAsPercent(advm.score.Assignment.PointsPossible)</a>
+                                }
+                            }
+                        </td>
+                        <td><!--postcount-->
+                            @(Html.ActionLink((advm.postCount.ToString()), "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 0 }, new { }))
+                        </td>  
+                        <td><!--replycount-->
+                            @(Html.ActionLink((advm.replyCount.ToString()), "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 1 }, new { }))
+                        </td> 
+                        <td><!--post&reply count-->
+                            @(Html.ActionLink((advm.replyCount + advm.postCount).ToString(), "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 2 }, new { }))
+                        </td>   
+                        <td style="vertical-align:bottom;" class="latePenaltyTd"> <!--Cell for late penalty-->
+                            @if (advm.score == null)
+                            {
+                                @:0.00 % <a class="latePenaltyA" style="display:none;" onclick="openManualLatePenWindow(0, @advm.team.TeamMembers.FirstOrDefault().CourseUser.ID, @assignment.ID);">@Helpers.EditButton()</a>
+                            }
+                            else
+                            {
+                                @advm.score.getAppliedLatePenaltyAsDecimal().ToString("P") <a class="latePenaltyA" style="display:none;" onclick="openManualLatePenWindow(@advm.score.ID, @advm.team.TeamMembers.FirstOrDefault().CourseUser.ID, @assignment.ID);">@Helpers.EditButton()</a>
+                            }
+                        </td>
+                        </tr>
+                    }
+                }
+            }
+        </tbody>
+        }
+    }
+    else
+    {
+        foreach (AssignmentDetailsViewModel advm in ViewBag.AssignmentDetailsVMList)
+        {
+            <tr>    
+                <td> <!--Cell for name-->
+                    @if (assignment.HasTeams)
+                    {
+                        <span style="text-decoration: underline">@advm.team.DisplayName(ViewBag.ActiveCourse.AbstractRole)</span>
+                        <a title="Email this team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = advm.team.ID })">@Helpers.MailButton()</a>
+                        <br/>
+                        <span>@advm.PrintTeam(ViewBag.ActiveCourse.AbstractRole)</span>
+                    }
+                    else if (assignment.PreceedingAssignment != null)
+                    {
+                        if (assignment.PreceedingAssignment.HasTeams && assignment.AssignmentTypeID == 4)
+                        {
+                            <span style="text-decoration: underline">@advm.team.DisplayName(ViewBag.ActiveCourse.AbstractRole)</span>
+                            <a title="Email this team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = advm.team.ID })">@Helpers.MailButton()</a>
+                            <br/>
+                            <span>@advm.PrintTeam(ViewBag.ActiveCourse.AbstractRole)</span>
+                        }
+                    }
+                    else
+                    {
+                        <a title="Email this User" href="@Url.Action("CreateUser", "Mail", new { id = advm.team.TeamMembers.FirstOrDefault().CourseUser.UserProfileID })">@Helpers.MailButton()</a>
+                        @advm.team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)
+                    
+                    }
+            
+                </td>
+                <td> <!--Cell for grade-->                
+                    @if (assignment.HasRubric)
+                    {
+                        if (advm.score == null)
+                        {
+                            r.OrderBy(o => o.Recipient.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName);
+                            bool found = false;
+                            foreach (OSBLE.Models.Courses.Rubrics.RubricEvaluation eval in r)
+                            {
+                                if (eval.Recipient.ID == advm.team.ID)
+                                {
+                                    if (!eval.IsPublished)
+                                    {
+                                        found = true;
+                                    }
+                                }
+                            }
+                            if (found)
+                            {
+                                @Html.ActionLink("Saved as Draft", "Index", "Rubric", new { assignmentId = assignment.ID, cuId = advm.team.TeamMembers.FirstOrDefault().CourseUserID }, new { })
+                            }
+                            else
+                            {
+                                @Html.ActionLink("Not Graded", "Index", "Rubric", new { assignmentId = assignment.ID, cuId = advm.team.TeamMembers.FirstOrDefault().CourseUserID }, new { })
+                            }
+
+                        }
+                        else
+                        {
+                            @Html.ActionLink(advm.score.getGradeAsPercent(advm.score.Assignment.PointsPossible), "Index", "Rubric", new { assignmentId = advm.score.AssignmentID, cuId = advm.team.TeamMembers.FirstOrDefault().CourseUserID }, new { });
+                        }
+                    }
+                    else
+                    {
+                        if (advm.score == null)
+                        {
+
+                            //If the assignment is a team evaluation
+                            if (assignment.AssignmentTypeID == 4)
+                            {
+                                
+                                @Html.ActionLink(advm.teamEvalsCompleted.ToString() + " of " + advm.teamEvalsTotal.ToString() + " submitted", "TeacherTeamEvaluation", "Assignment", new { teamId = advm.team.ID, assignmentId = assignment.ID }, new { })
+                                //<a href="#" onclick="goToCategoryTab(@da.Item1.Assignment.CategoryID, @da.Item2.TeamMembers.FirstOrDefault().CourseUser.ID);" style="cursor:pointer;">@da.Item1.getGradeAsPercent(da.Item1.Assignment.PointsPossible)></a>
+                            }
+                            else
+                            {
+                                <a href="#" onclick="goToCategoryTab(@assignment.CategoryID, @advm.team.TeamMembers.FirstOrDefault().CourseUser.ID);" style="cursor:pointer;">Not Graded</a>
+                            }
+                        }
+                        else
+                        {
+                            <a href="#" onclick="goToCategoryTab(@advm.score.Assignment.CategoryID, @advm.team.TeamMembers.FirstOrDefault().CourseUser.ID);" style="cursor:pointer;">@advm.score.getGradeAsPercent(advm.score.Assignment.PointsPossible)</a>
+                        }
+                    }    
+                </td>
+                @if (assignment.HasCommentCategories)
+                {
+                    <td> <!--Cell for inline comments - only allow them to edit if there has been something submitted-->
+                        @if (advm.submissionTime != null)
+                        {
+                            @Html.ActionLink("View/Edit...", "InlineReview", "Assignment", new { assignmentID = assignment.ID, teamID = advm.team.ID }, new { })
+                        }
+                        else
+                        {
+                            @:Nothing to Review
+                        }
+                    </td>
+                }
+            
+                @if (assignment.HasDeliverables)
+                {
+                    <td>
+
+                        @if (advm.submissionTime != null)
+                        {
+                            @(Html.ActionLink(advm.submissionTime.ToString(), "GetSubmissionZip", "FileHandler", new { assignmentID = assignment.ID, teamID = advm.team.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
+                        }
+                        else
+                        {
+                            @:Nothing Received
+                        }
+
+                    </td>
+                    @*<td><!--Cell for submitting on behalf of students -->
+                        @{
+                        AjaxOptions options = new AjaxOptions()
+                        {
+                            LoadingElementId = "Loading",
+                            HttpMethod = "Get",
+                            UpdateTargetId = "submitFiles",
+                            OnComplete = "SubmissionLoaded"
+                        };
+                        @Ajax.ActionLink("Submit", "Create", "Submission", new { id = assignment.ID, up = da.Item2.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile }, options, new object());
+                        }
+                    </td>
+                    *@
+                }
+                @if (assignment.AssignmentTypeID == 3)
+                {
+                    <td><!--postcount-->
+                            @(Html.ActionLink((advm.postCount.ToString()), "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 0 }, new { }))
+                        </td>  
+                        <td><!--replycount-->
+                            @(Html.ActionLink((advm.replyCount.ToString()), "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 1 }, new { }))
+                        </td> 
+                        <td><!--post&reply count-->
+                            @(Html.ActionLink((advm.replyCount + advm.postCount).ToString(), "TeacherIndex", "DiscussionAssignment", new { assignmentId = assignment.ID, courseUserId = advm.team.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 2 }, new { }))
+                        </td>   
+                }
+                @if (assignment.AssignmentTypeID != 4)
+                {
+                    <td style="vertical-align:bottom;" class="latePenaltyTd"> <!--Cell for late penalty-->
+                        @if (advm.score == null)
+                        {
+                            @:0.00 % <a class="latePenaltyA" style="display:none;" onclick="openManualLatePenWindow(0, @advm.team.TeamMembers.FirstOrDefault().CourseUser.ID, @assignment.ID);">@Helpers.EditButton()</a>
+                        }
+                        else
+                        {
+                            @advm.score.getAppliedLatePenaltyAsDecimal().ToString("P") <a class="latePenaltyA" style="display:none;" onclick="openManualLatePenWindow(@advm.score.ID, @advm.team.TeamMembers.FirstOrDefault().CourseUser.ID, @assignment.ID);">@Helpers.EditButton()</a>
+                        }
+                    </td>
+                }
+                @if (assignment.AssignmentTypeID == 4)
+                {
+                    <td style="text-align:center">
+                        @advm.largestDifferenceInEvaluation().ToString()
+                    </td>
+                }
+            </tr>
+        }
+    }
+</table>
+    if (assignment.HasDeliverables)
+    {
+        <br />
+    }
+}
+
+
+<!-- Pop-up window for editing late percentage -->
+<div id="EditLatePercentWindowID" style="display: none;" title="Edit Score">
+   <input type="radio" id="radioBtn1" name="group1"/> Use default late penalty<br />
+   <input type="radio" id="radioBtn2" name="group1"/> Use a custom late penalty of <input size="5" id="manualLatePen"/>%<br />
+   <td>
+       <text id="latePenErrorText" style="color:Red; float:left; font-size:smaller"></text><br />
+       <div style="float:right">
+           <input type="button" onclick="setManualLatePen();" value="Apply Changes" />
+           <input type="button" onclick="closeManualLatePenWindow();" value="Cancel" />
+       </div>
+   </td>
+</div>

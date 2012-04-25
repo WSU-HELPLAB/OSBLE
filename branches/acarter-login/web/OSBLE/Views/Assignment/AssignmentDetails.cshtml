@@ -1,0 +1,463 @@
+﻿@using OSBLE.Models
+@using OSBLE.Models.Assignments
+@using OSBLE.Models.Courses
+@using OSBLE.Models.Assignments
+@model Assignment
+
+@{
+    Assignment assignment = Model;
+    ViewBag.Title = "Assignment Details";
+}
+
+<h2>
+@if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+{
+    if (assignment.IsDraft)
+    {
+        <a title="Click to Publish"  class="pointerOnMouseOver" onclick="toggleDraft(@assignment.ID)">@Helpers.PublishButton()</a>
+    }
+    else
+    {
+        <a title="Click to Unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@assignment.ID)">@Helpers.UnPublishButton()</a>
+    }
+    <a title="Click to Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = assignment.ID })">@Helpers.EditButton()</a>
+    <a title="Click to Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@assignment.ID)">@Helpers.DeleteButton()</a>
+}
+
+@assignment.AssignmentName
+</h2>    
+
+<table id="assignmentDetailsHeader">
+    <tr><!--Released row-->
+        <td>
+            <text class="osbleColorBold">Released:</text>
+        </td>
+        <td>
+                @assignment.ReleaseDate
+        </td>
+    </tr>
+    @if (assignment.AssignmentTypeID == 3)
+    {
+        <tr><!--Due row-->
+            <td>
+                <text class="osbleColorBold">Initial Post Due:</text>
+            </td>
+            <td>
+                @assignment.DiscussionSettings.InitialPostDueDate
+            </td>
+        </tr>
+        <tr><!--Due row-->
+            <td>
+                <text class="osbleColorBold">Final Post(s) Due:</text>
+            </td>
+            <td>
+                @assignment.DueDate
+            </td>
+        </tr>
+    }
+    else
+    {        
+        <tr><!--Due row-->
+            <td>
+                <text class="osbleColorBold">Due:</text>
+            </td>
+            <td>
+                @assignment.DueDate
+            </td>
+        </tr>
+    }
+    <tr><!--Grading row-->
+        <td>
+            <text class="osbleColorBold">Grading:</text>
+        </td>
+        <td>
+            Worth @assignment.PointsPossible points in "@assignment.Category.Name" category.
+        </td>
+    </tr>
+    @if (assignment.AssignmentTypeID != 4)
+    {
+        <tr><!--Late Policy row-->
+            <td>
+                <text class="osbleColorBold">Late Policy:</text> 
+            </td>
+            <td>
+                @if (assignment.HoursLateWindow == 0)
+                {
+                    @:No late assignments accepted.
+                }
+                else
+                {
+                    @:Assignments accepted up to  @assignment.HoursLateWindow hours late, docking @assignment.DeductionPerUnit% per @assignment.HoursPerDeduction hours.
+                }
+            </td>
+        </tr>
+    }
+    <tr><!--Description row-->
+        <td>
+            <text class="osbleColorBold">Description:</text> 
+        </td>
+        <td>
+        @Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(assignment.AssignmentDescription).ToString()))
+        </td>
+        <tr><!--Assignment Type row-->
+            <td>
+            <text class="osbleColorBold">Type:</text>
+            </td>
+            <td>
+                 @ViewBag.AssignmentType
+            </td>
+        </tr>
+        
+    </tr>
+    @if (assignment.HasDeliverables)
+    {
+        int i = 0;
+        int j = 1;
+        
+        <tr><!--Deliverables row-->
+            <td style="vertical-align:top;">
+                <text class="osbleColorBold">Deliverables: </text>
+            </td>
+            <td>
+        @foreach (Deliverable d in assignment.Deliverables)
+        {
+                
+            @:@(i + 1).
+            @:@d.Name (
+            foreach (string str in @ViewBag.filetypeList[i])
+            {
+                if (j == @ViewBag.filetypeList[i].Length)
+                {
+                    @:@str
+                }
+                else
+                {
+                    @:@(str + ", ")
+                }
+                j++;
+            }
+            @:)
+            <br /> 
+            
+            i++;
+            j = 1;
+        }
+        </td>
+        </tr>
+    }
+    @if (assignment.HasRubric)
+    {
+        <tr><!--Rubric row-->
+            <td><text class="osbleColorBold">Rubric:</text></td>
+            <td>
+                @Html.ActionLink("View Rubric", "ViewAsUneditable", "Rubric", new { assignmentId = assignment.ID }, new { })
+            </td>
+        </tr>
+    }
+    @if (ViewBag.TeamMembers != null)
+    {
+        <tr><!--Team name row-->
+            <td>
+                <text class="osbleColorBold">Team:</text>
+            </td>
+            <td>
+                @ViewBag.TeamName
+            </td>
+        </tr>
+        <tr><!--Team members row-->
+            <td style="vertical-align:text-top">
+                <text class="osbleColorBold">Members:</text>
+            </td>
+            <td>
+                <ul class="user_list">
+                    @foreach (CourseUser cu in ViewBag.TeamMembers)
+                    {
+                        <li>
+                            <div class="user_controls">
+                                @if (cu.UserProfile.UserName != null)
+                                {
+                                    <a title="Mail This User" href="@Url.Action("CreateTeamMember", "Mail", new { id = cu.UserProfile.ID })">@Helpers.MailButton()</a>
+                                }
+                            </div>
+                            @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", "Roster", new { userProfile = cu.UserProfile.ID }))
+                            <span class="roster_name">@Helpers.DisplayFullNameOrPending(cu.UserProfile)</span>
+                        </li>
+                    }
+                </ul>
+                <a title="Email whole team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = ViewBag.TeamID })">Email the whole team</a>
+            </td>
+        </tr>
+    }
+    @if (assignment.HasDeliverables && ViewBag.ActiveCourse.AbstractRole.CanSubmit)
+    {
+        <tr>
+            <td style="vertical-align:text-top">
+                <text class="osbleColorBold">Submission:</text>
+            </td>
+            @{
+        String display = ViewBag.SubmissionTime;
+        AjaxOptions options = new AjaxOptions()
+        {
+            LoadingElementId = "Loading",
+            HttpMethod = "Get",
+            UpdateTargetId = "submitFiles",
+            OnComplete = "SubmissionLoaded"
+        };
+        if (ViewBag.SubmissionTime == "No Submission")
+        {
+            //If there is no sumission, submission time will be labeled "No Submission" rather than a datetime.
+                    <td>
+                        @Ajax.ActionLink("Submit", "Create", "Submission", new { id = assignment.ID }, options, new object())
+                    </td>
+        }
+        else
+        {
+                    <td> <!--TD for displaying latest submission and resubmit-->
+                        @(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))  
+                        @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = assignment.ID }, options, new object())
+                    </td>
+        }
+            }
+        </tr>
+    }
+    @if (ViewBag.ActiveCourse.AbstractRole.CanSubmit)
+    {
+        <tr>
+            <td style="vertical-align:text-top">
+                <text class="osbleColorBold">Grade:</text>
+            </td>
+            @if (assignment.HasRubric && ViewBag.Grade != "No Grade")
+            {
+                string temp = ViewBag.Grade;
+                <td>
+                    @Html.ActionLink(temp, "View", "Rubric", new { assignmentId = assignment.ID, cuId = ViewBag.CurrentUserID }, new { })
+                </td>
+            }
+            else
+            {
+                <td>
+                    @ViewBag.Grade
+                </td>
+            }
+        </tr>
+        if (assignment.HasCommentCategories)
+        {
+            <tr>
+                 <td style="vertical-align:text-top">
+                    <text class="osbleColorBold">Inline Review:</text>
+                </td>
+                <td>
+                    @Html.ActionLink("Inline Review", "ViewInlineReview", "Assignment", new { assignmentID = assignment.ID, teamID = ViewBag.TeamID }, new { })
+                </td>
+            </tr>
+            
+        }
+    }
+    
+    @if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+    {
+        @Html.Partial("_TeacherAssignmentDetails")
+    }
+    else if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
+    {
+        @Html.Partial("_ObserverAssignmentDetails")
+    }
+</table>
+
+
+
+<script type="text/javascript">
+    
+
+    function create_and_open_downloading_submission_dialog() {
+
+        //create the div that we will then make into a dialog
+        $('body').append(
+      '<div id="downloading_submission_dialog" title="Download Submission"> \
+       <p>The zip is being generated and will automatically start downloading when it is ready, please do not leave the page or click the link again</p> \
+   </div>');
+
+        //make the div we just created into a dialog box
+        $('#downloading_submission_dialog').dialog({
+            modal: false,
+            autoOpen: true,
+            resizable: true,
+            width: 350,
+            height: 300,
+            closeOnEscape: true,
+            close: remove_downloading_submission_dialog,
+            buttons: { "OK": remove_downloading_submission_dialog }
+        });
+
+        $('#downloading_submission_dialog').dialog('open');
+        return false;
+    }
+
+    function remove_downloading_submission_dialog() {
+
+        //change the dialog back into a normal div (that is what destroy does although it does not destroy the div)
+        $('#downloading_submission_dialog').dialog("destroy");
+
+        //then remove the div
+        $('#downloading_submission_dialog').remove();
+    }
+
+
+    function SubmissionLoaded() {
+        $('#submit_files_dialog').dialog('open');
+
+    }
+
+    function goToCategoryTab(catID, stuID) {
+        $.ajax({
+            type: "POST",
+            url: "/Gradebook/SetTabStudent",
+            data: { studentId: stuID.toString() },
+            success: function () {
+                location.href = "/Gradebook/Tab/?categoryId=" + catID;
+            }
+        });
+        hideTabColors();
+    }
+
+    /*Functions and variables for deleteAssignment modal box*/
+    var assignmentToDeleteID = -1;
+    function openConfirmDeleteWindow(assignmentID) {
+        assignmentToDeleteID = assignmentID;
+        $("#confirmDeleteWindow").dialog({
+            modal: true,
+            resizable: false,
+            width: 310,
+            height: 135,
+            closeOnEscape: false
+        });
+    }
+
+    function deleteAssignment() {
+        $.ajax({
+           async: false,
+           url: "/Assignment/Delete",
+           data: { id: assignmentToDeleteID }           
+        });       
+
+        var replaceString = "http://" + window.location.host + "/Assignment";
+        window.location.assign(replaceString);
+        hideConfirmDeleteWindow();
+    }
+
+   function hideConfirmDeleteWindow() {
+        $("#confirmDeleteWindow").dialog('close');
+    }
+
+    function publishAllGrades(aId) {
+        $.ajax({
+            async: false,
+            url: "/Assignment/PublishAllGrades",
+            data: { assignmentId: aId }
+        });
+        window.location.reload(true);
+    }
+
+    function publishAllMultipliers(aId) {
+        $.ajax({
+            async: false,
+            url: "/Assignment/PublishAllMultipliers",
+            data: { assignmentId: aId }
+        });
+        window.location.reload(true);
+    }
+
+    var scoreId;
+    var userId;
+    var assId;    
+
+    $(".latePenaltyTd").mouseenter(function () {
+        $(this).find("a").show();
+    });
+
+    $(".latePenaltyTd").mouseleave(function () {
+        $(this).find("a").hide();
+    });
+
+    function openManualLatePenWindow(sId, uId, aId) {
+        scoreId = sId;
+        userId = uId;
+        assId = aId;
+
+        //$("#EditLatePercentWindowID").dialog("open");
+
+        $("#EditLatePercentWindowID").dialog({
+            autoOpen: true,
+            modal: true,
+            resizable: false,
+            width: 370,
+            height: 150,
+            closeOnEscape: false
+        });
+    }
+
+    function closeManualLatePenWindow() {
+        $("#EditLatePercentWindowID").dialog("close");
+    }
+
+    function setManualLatePen() {
+        if ($("#radioBtn1").attr('checked') == "checked") {
+            $.ajax({
+                async: false,
+                url: "/Assignment/ModifyLatePenalty",
+                data: { scoreId: scoreId, courseUserId: userId, latePenalty: -1, assignmentId: assId }
+            });
+        }
+        else {
+            var lp = $("#manualLatePen").val();
+            $.ajax({
+                async: false,
+                url: "/Assignment/ModifyLatePenalty",
+                data: { scoreId: scoreId, courseUserId: userId, latePenalty: lp, assignmentId: assId }
+            });
+        }
+        window.location.reload(true);
+    }
+
+    
+    function toggleDraft(id){
+        $.ajax({
+            async: false,
+            url: "/Assignment/ToggleDraft",
+            data: { assignmentID: id },
+        });
+        window.location.reload(true);
+    }
+
+</script>
+
+<!--Element for modal confirmation box-->
+<div id="confirmDeleteWindow" style="display:none;" title="Delete Assignment">
+    <div id="confirmForm">
+        <text>Are you sure you want to delete that assignment?</text>
+        <div class="yesAndNoDiv">
+            <input value="Delete" type="submit" onclick="deleteAssignment();"/>
+            <input value="Cancel" type="button" onclick="hideConfirmDeleteWindow()" />
+        </div>
+    </div>
+</div>
+
+
+<!--Elements for loading message and submit box-->
+<br /><text id="Loading" style="display:none"> <br />Please Wait...</text>
+<div id="submit_files_dialog" style="display:none">
+    <div id= "submitFiles"></div>
+    <script type="text/javascript">
+        $(function () {
+            $('#submit_files_dialog').dialog(
+            {
+                modal: true,
+                autoOpen: false,
+                height: 600,
+                width: 500
+            });
+        });
+    </script>
+    </div>
+</div>
+

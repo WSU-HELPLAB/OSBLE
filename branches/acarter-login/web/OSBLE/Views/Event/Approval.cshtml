@@ -1,0 +1,33 @@
+﻿@using OSBLE.Models.HomePage
+
+@model Event
+           
+<h2>Event Approval</h2>
+
+<table class="event_approval">
+<tr>
+<th>Submitter</th>
+<td>@Helpers.DisplayFullNameOrPending(Model.Poster)</td>
+</tr>
+<tr>
+<th>Event Title</th>
+<td>@Model.Title</td>
+</tr>
+<tr>
+<th>Event Time</th>
+<td>@Model.StartDate</td>
+</tr>
+<tr>
+<th>Description</th>
+<td>@Model.Description</td>
+</tr>
+
+</table>
+<br />
+<form action="@Url.Action("Approve",new { ID=Model.ID })" method=post>
+    <input type="submit" value="Approve This Event" />
+</form>
+<br />
+<form action="@Url.Action("Reject",new { ID=Model.ID })" method=post>
+    <input type="submit" value="Delete This Event" onclick="return confirm('Are you sure you want to delete this event?')" />
+</form>

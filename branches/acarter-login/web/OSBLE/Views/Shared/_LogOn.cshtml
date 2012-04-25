@@ -1,0 +1,30 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>OSBLE - @ViewBag.Title</title>
+    
+    <link href="../../Content/Site.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../Content/jquery-ui-1.8.13.custom.css" />
+    <link rel="shortcut icon" type="text/css" href="../../Content/favicon.ico" />
+    <link href="@Url.Content("~/Content/jquery-tooltip.css")" rel="stylesheet" type="text/css" />
+
+    <script src="../../Scripts/jquery-1.6.1.min.js" type="text/javascript"></script>
+    <script src="../../Scripts/jquery-ui-1.8.11.min.js")" type="text/javascript"></script>
+    <script src="../../Scripts/MicrosoftAjax.debug.js" type="text/javascript"></script>
+    <script src="../../Scripts/MicrosoftMvcAjax.debug.js" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery-tooltip.js")" type="text/javascript"></script>
+    
+</head>
+<body id="layoutLogOn">
+    <div id="contentLogOn">
+        <span><a href="/"><img src="../../Content/images/logon_logo.png" /></a></span>
+        @RenderBody()
+    </div>
+
+</body>
+</html>

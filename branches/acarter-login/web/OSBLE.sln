@@ -1,0 +1,85 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLE", "OSBLE\OSBLE.csproj", "{7297687F-BF8A-4195-8EA3-A05DA302B24E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsbleRubric", "OsbleRubric\OsbleRubric.csproj", "{4196777B-69DF-4B8C-95CF-D4487C34F03F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7297687F-BF8A-4195-8EA3-A05DA302B24E} = {7297687F-BF8A-4195-8EA3-A05DA302B24E}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SilverlightSandbox", "SilverlightSandbox\SilverlightSandbox.csproj", "{D7C51CF9-3BB2-44CF-9880-E35EF83A1F85}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7297687F-BF8A-4195-8EA3-A05DA302B24E} = {7297687F-BF8A-4195-8EA3-A05DA302B24E}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLE.UnitTests", "OSBLE.UnitTests\OSBLE.UnitTests.csproj", "{5AA0B7E4-E77B-4B92-9658-682AD71F3163}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5F5F62F4-7B96-4A21-B6AB-9EC48CDB768C}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 5
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = OSBLE\\OSBLE.csproj
+		SccProjectName1 = OSBLE
+		SccLocalPath1 = OSBLE
+		SccProjectUniqueName2 = OsbleRubric\\OsbleRubric.csproj
+		SccProjectName2 = OsbleRubric
+		SccLocalPath2 = OsbleRubric
+		SccProjectUniqueName3 = SilverlightSandbox\\SilverlightSandbox.csproj
+		SccProjectName3 = SilverlightSandbox
+		SccLocalPath3 = SilverlightSandbox
+		SccProjectUniqueName4 = OSBLE.UnitTests\\OSBLE.UnitTests.csproj
+		SccProjectName4 = OSBLE.UnitTests
+		SccLocalPath4 = OSBLE.UnitTests
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = OSBLE.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		OSBLE Deployment|Any CPU = OSBLE Deployment|Any CPU
+		OSBLE Dev Server|Any CPU = OSBLE Dev Server|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.OSBLE Deployment|Any CPU.ActiveCfg = OSBLE Deployment|Any CPU
+		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.OSBLE Deployment|Any CPU.Build.0 = OSBLE Deployment|Any CPU
+		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.OSBLE Dev Server|Any CPU.ActiveCfg = Osble Dev Server|Any CPU
+		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.OSBLE Dev Server|Any CPU.Build.0 = Osble Dev Server|Any CPU
+		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7297687F-BF8A-4195-8EA3-A05DA302B24E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4196777B-69DF-4B8C-95CF-D4487C34F03F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4196777B-69DF-4B8C-95CF-D4487C34F03F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4196777B-69DF-4B8C-95CF-D4487C34F03F}.OSBLE Deployment|Any CPU.ActiveCfg = Release|Any CPU
+		{4196777B-69DF-4B8C-95CF-D4487C34F03F}.OSBLE Deployment|Any CPU.Build.0 = Release|Any CPU
+		{4196777B-69DF-4B8C-95CF-D4487C34F03F}.OSBLE Dev Server|Any CPU.ActiveCfg = Osble Dev Server|Any CPU
+		{4196777B-69DF-4B8C-95CF-D4487C34F03F}.OSBLE Dev Server|Any CPU.Build.0 = Osble Dev Server|Any CPU
+		{4196777B-69DF-4B8C-95CF-D4487C34F03F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4196777B-69DF-4B8C-95CF-D4487C34F03F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7C51CF9-3BB2-44CF-9880-E35EF83A1F85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7C51CF9-3BB2-44CF-9880-E35EF83A1F85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7C51CF9-3BB2-44CF-9880-E35EF83A1F85}.OSBLE Deployment|Any CPU.ActiveCfg = Release|Any CPU
+		{D7C51CF9-3BB2-44CF-9880-E35EF83A1F85}.OSBLE Deployment|Any CPU.Build.0 = Release|Any CPU
+		{D7C51CF9-3BB2-44CF-9880-E35EF83A1F85}.OSBLE Dev Server|Any CPU.ActiveCfg = Osble Dev Server|Any CPU
+		{D7C51CF9-3BB2-44CF-9880-E35EF83A1F85}.OSBLE Dev Server|Any CPU.Build.0 = Osble Dev Server|Any CPU
+		{D7C51CF9-3BB2-44CF-9880-E35EF83A1F85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7C51CF9-3BB2-44CF-9880-E35EF83A1F85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AA0B7E4-E77B-4B92-9658-682AD71F3163}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AA0B7E4-E77B-4B92-9658-682AD71F3163}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AA0B7E4-E77B-4B92-9658-682AD71F3163}.OSBLE Deployment|Any CPU.ActiveCfg = Release|Any CPU
+		{5AA0B7E4-E77B-4B92-9658-682AD71F3163}.OSBLE Deployment|Any CPU.Build.0 = Release|Any CPU
+		{5AA0B7E4-E77B-4B92-9658-682AD71F3163}.OSBLE Dev Server|Any CPU.ActiveCfg = Release|Any CPU
+		{5AA0B7E4-E77B-4B92-9658-682AD71F3163}.OSBLE Dev Server|Any CPU.Build.0 = Release|Any CPU
+		{5AA0B7E4-E77B-4B92-9658-682AD71F3163}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AA0B7E4-E77B-4B92-9658-682AD71F3163}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
