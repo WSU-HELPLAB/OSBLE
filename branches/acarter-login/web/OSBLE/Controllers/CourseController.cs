@@ -151,7 +151,7 @@ namespace OSBLE.Controllers
                 // Make current user an instructor on new course.
                 CourseUser cu = new CourseUser();
                 cu.AbstractCourseID = course.ID;
-                cu.UserProfileID = currentUser.ID;
+                cu.UserProfileID = CurrentUser.ID;
                 cu.AbstractRoleID = (int)CourseRole.CourseRoles.Instructor;
 
                 //Add new Categories to the course

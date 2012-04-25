@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Assignments;
+using System.Linq;
+using System.Security.Cryptography;
 
 namespace OSBLE.Models.Users
 {
@@ -13,6 +15,12 @@ namespace OSBLE.Models.Users
         public string UserName { get; set; }
 
         public string AspNetUserName { get; set; }
+
+        public string Password { get; set; }
+
+        public string AuthenticationHash { get; set; }
+
+        public bool IsApproved { get; set; }
 
         public int SchoolID { get; set; }
 
@@ -55,6 +63,9 @@ namespace OSBLE.Models.Users
             IsAdmin = false;
             CanCreateCourses = false;
             DefaultCourse = 0;
+            Password = "";
+            AuthenticationHash = "";
+            IsApproved = false;
         }
 
         /// <summary>
@@ -64,6 +75,7 @@ namespace OSBLE.Models.Users
         public UserProfile(UserProfile up)
             : base()
         {
+            this.AspNetUserName = up.AspNetUserName;
             this.CanCreateCourses = up.CanCreateCourses;
             this.DefaultCourse = up.DefaultCourse;
             this.EmailAllNotifications = up.EmailAllNotifications;
@@ -71,7 +83,9 @@ namespace OSBLE.Models.Users
             this.ID = up.ID;
             this.Identification = up.Identification;
             this.IsAdmin = up.IsAdmin;
+            this.IsApproved = up.IsApproved;
             this.LastName = up.LastName;
+            this.Password = up.Password;
             this.School = up.School;
             this.SchoolID = up.SchoolID;
             this.UserName = up.UserName;
@@ -86,6 +100,70 @@ namespace OSBLE.Models.Users
         public string LastAndFirst()
         {
             return string.Format("{0}, {1}", LastName, FirstName);
+        }
+
+        /// <summary>
+        /// Converts a clear-text password into its encrypted form
+        /// </summary>
+        /// <param name="rawPassword"></param>
+        /// <returns></returns>
+        public static string GetPasswordHash(string rawPassword)
+        {
+            SHA1 sha = new SHA1CryptoServiceProvider();
+            byte[] unhashedPassword = System.Text.Encoding.UTF8.GetBytes(rawPassword);
+            byte[] hashedBytes = sha.ComputeHash(unhashedPassword);
+            string hashedPassword = System.Text.Encoding.UTF8.GetString(hashedBytes);
+            return hashedPassword;
+        }
+
+        /// <summary>
+        /// Validates the supplied user/pass combo.
+        /// </summary>
+        /// <param name="profile"></param>
+        /// <returns>True if the combo is valid, false otherwise</returns>
+        public static bool ValidateUser(UserProfile profile)
+        {
+            return ValidateUser(profile.UserName, profile.Password);
+        }
+
+        /// <summary>
+        /// Validates the supplied user/pass combo.
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="password"></param>
+        /// <returns>True if the combo is valid, false otherwise</returns>
+        public static bool ValidateUser(string userName, string password)
+        {
+            OSBLEContext db = new OSBLEContext();
+            string hashedPassword = UserProfile.GetPasswordHash(password);
+            int count = (from user in db.UserProfiles
+                         where
+                         user.UserName.CompareTo(userName) == 0
+                         &&
+                         user.Password.CompareTo(hashedPassword) == 0
+                         select user
+                             ).Count();
+            if(count == 1)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns the user profile attached to the specified user name
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <returns>A <see cref="UserProfile"/> object or NULL</returns>
+        public static UserProfile GetUser(string userName)
+        {
+            OSBLEContext db = new OSBLEContext();
+            UserProfile profile = (from user in db.UserProfiles
+                                   where
+                                   user.UserName.CompareTo(userName) == 0
+                                   select user
+                             ).FirstOrDefault();
+            return profile;
         }
     }
 }

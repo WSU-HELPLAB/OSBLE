@@ -16,7 +16,7 @@ namespace OSBLE.Controllers
         public ActionResult CourseDocument(int courseId, string filePath)
         {
             var course = (from c in db.CourseUsers
-                          where c.UserProfileID == currentUser.ID && c.AbstractCourseID == courseId
+                          where c.UserProfileID == CurrentUser.ID && c.AbstractCourseID == courseId
                           select c).FirstOrDefault();
 
             if (course != null)
@@ -57,11 +57,11 @@ namespace OSBLE.Controllers
         {
             try
             {
-                int currentUserID = currentUser.ID;
+                int currentUserID = CurrentUser.ID;
                 Assignment assignment = db.Assignments.Find(assignmentID);
                 AssignmentTeam team = db.AssignmentTeams.Find(assignmentID, teamID);
                 TeamMember teamMember = (from teamMembers in team.Team.TeamMembers
-                                         where teamMembers.CourseUser.UserProfileID == currentUser.ID
+                                         where teamMembers.CourseUser.UserProfileID == CurrentUser.ID
                                          select teamMembers).FirstOrDefault();
                 //make sure assignmentActivity is part of the activeCourse and (the person can grade  or is allowed access to it)
                 if (assignment.Category.CourseID == activeCourse.AbstractCourseID && (activeCourse.AbstractRole.CanGrade || team.Team.TeamMembers.Contains(teamMember)))
@@ -98,7 +98,7 @@ namespace OSBLE.Controllers
             try
             {
                 //If u are looking at the activeCourse and you can either see all or looking at your own let it pass
-                if (activeCourse.AbstractCourseID == assignment.Category.CourseID && (activeCourse.AbstractRole.CanSeeAll || currentUser.ID == userProfileID))
+                if (activeCourse.AbstractCourseID == assignment.Category.CourseID && (activeCourse.AbstractRole.CanSeeAll || CurrentUser.ID == userProfileID))
                 {
                     //var teamUser = (from c in activity.TeamUsers where c.Contains(db.UserProfiles.Find(userProfileID)) select c).FirstOrDefault();
 
@@ -205,7 +205,7 @@ namespace OSBLE.Controllers
                     {
                         foreach (TeamMember tm in at.Team.TeamMembers)
                         {
-                            if (tm.CourseUser.UserProfileID == currentUser.ID)
+                            if (tm.CourseUser.UserProfileID == CurrentUser.ID)
                             {
                                 //if we are dealing with student try to give them the published one but if that doesn't exist give them nothing
                                 string path = FileSystem.GetTeamUserPeerReview(false, activeCourse.AbstractCourse as Course, assignment.ID, at.TeamID);
@@ -272,7 +272,7 @@ namespace OSBLE.Controllers
         {
             Assignment assignment = db.Assignments.Find(assignmentID);
 
-            AssignmentTeam at = OSBLEController.GetAssignmentTeam(assignment, currentUser);
+            AssignmentTeam at = OSBLEController.GetAssignmentTeam(assignment, CurrentUser);
 
             try
             {

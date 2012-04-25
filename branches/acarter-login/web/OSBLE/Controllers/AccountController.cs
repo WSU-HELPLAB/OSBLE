@@ -70,43 +70,49 @@ namespace OSBLE.Controllers
                         localUser.AspNetUserName = localUser.UserName;
                         db.SaveChanges();
                     }
-                    MembershipUser user = Membership.GetUser(localUser.AspNetUserName);
 
-                    //remove any locks.  A little unsecure as it allows a constant brute-force
-                    //attack, but it seems to annoy users much more regularly.  Consider
-                    //removing if OSBLE ever gets to the point that user accounts start getting
-                    //hacked.
-                    if (user != null)
+                    //AC: if the user doesn't have a password, it's probably because they have an old .NET account.  
+                    //find this information and then update their profile with their password
+                    if (localUser.Password.Length == 0)
                     {
-                        user.UnlockUser();
-                    }
-                    if (Membership.ValidateUser(localUser.AspNetUserName, model.Password))
-                    {
-                        context.Session.Clear(); // Clear session variables.
-                        FormsAuthentication.SetAuthCookie(model.UserName, true);
-                        OsbleAuthentication auth = new OsbleAuthentication();
-                        HttpCookie userCookie = auth.UserAsCookie(localUser);
-                        Response.Cookies.Add(userCookie);
-                        if (Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
-                            && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
+                        if (Membership.ValidateUser(localUser.AspNetUserName, model.Password))
                         {
-                            return Redirect(returnUrl);
+                            localUser.Password = UserProfile.GetPasswordHash(model.Password);
+                            db.SaveChanges();
+                        }
+                    }
+
+                    //do we have a valid password
+                    if (UserProfile.ValidateUser(model.UserName, model.Password))
+                    {
+                        //is the user approved
+                        if (localUser.IsApproved)
+                        {
+                            //log them in
+                            OsbleAuthentication.LogIn(localUser);
+
+                            //..then send them on their way
+                            if (Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
+                            && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
+                            {
+                                return Redirect(returnUrl);
+                            }
+                            else
+                            {
+                                return RedirectToAction("Index", "Home");
+                            }
                         }
                         else
                         {
-                            return RedirectToAction("Index", "Home");
+                            //...send an additional email verification
+                            setLogOnCaptcha();
+                            ModelState.AddModelError("", "This account has not been activated.  An additional verification letter has been sent to your email address.");
+                            string randomHash = GenerateRandomString(40);
+                            localUser.AuthenticationHash = randomHash;
+                            db.SaveChanges();
+                            sendVerificationEmail(true, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), localUser.FirstName, localUser.UserName);
                         }
-                    }
-                    else if (user != null && !user.IsApproved)
-                    {
-                        setLogOnCaptcha();
-                        ModelState.AddModelError("", "This account has not been activated.  An additional verification letter has been sent to your email address.");
-                        string randomHash = GenerateRandomString(40);
-                        UserProfile up = db.UserProfiles.Where(m => m.AspNetUserName == user.UserName).FirstOrDefault();
-                        MembershipUser mu = Membership.GetUser(up.AspNetUserName);
-                        mu.Comment = randomHash;
-                        Membership.UpdateUser(mu);
-                        sendVerificationEmail(true, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), up.FirstName, up.UserName);
+
                     }
                     else
                     {
@@ -130,10 +136,7 @@ namespace OSBLE.Controllers
 
         public ActionResult LogOff()
         {
-            OsbleAuthentication auth = new OsbleAuthentication();
-            HttpCookie cookie = auth.InvalidateUserCookie(CurrentUser);
-            Response.Cookies.Add(cookie);
-            FormsAuthentication.SignOut();
+            OsbleAuthentication.LogOut();
             context.Session.Clear(); // Clear session on signout.
 
             return RedirectToAction("Index", "Home");
@@ -143,10 +146,10 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult UpdateEmailSettings()
         {
-            currentUser.EmailAllNotifications = Convert.ToBoolean(Request.Params["EmailallNotifications"]);
-            currentUser.EmailAllActivityPosts = Convert.ToBoolean(Request.Params["EmailAllActivityPosts"]);
+            CurrentUser.EmailAllNotifications = Convert.ToBoolean(Request.Params["EmailallNotifications"]);
+            CurrentUser.EmailAllActivityPosts = Convert.ToBoolean(Request.Params["EmailAllActivityPosts"]);
 
-            db.Entry(currentUser).State = EntityState.Modified;
+            db.Entry(CurrentUser).State = EntityState.Modified;
             db.SaveChanges();
 
             return RedirectToAction("Profile");
@@ -167,8 +170,8 @@ namespace OSBLE.Controllers
             }
 
             // Update the default course ID for log in.
-            currentUser.DefaultCourse = Convert.ToInt32(Request.Params["defaultCourse"]);
-            db.Entry(currentUser).State = EntityState.Modified;
+            CurrentUser.DefaultCourse = Convert.ToInt32(Request.Params["defaultCourse"]);
+            db.Entry(CurrentUser).State = EntityState.Modified;
             db.SaveChanges();
 
             return RedirectToAction("Profile");
@@ -206,26 +209,17 @@ namespace OSBLE.Controllers
 
             if (hash != null && hash != "")
             {
-                MembershipUser user = Membership.GetUser(model.UserName);
-
+                UserProfile user = UserProfile.GetUser(model.UserName);
                 if (user != null)
                 {
-                    if ((user.Comment as string) == hash)
+                    if ((user.AuthenticationHash as string) == hash)
                     {
-                        user.Comment = null;
+                        user.AuthenticationHash = null;
                         user.IsApproved = true;
+                        db.SaveChanges();
+                        OsbleAuthentication.LogIn(user);
 
-                        Membership.UpdateUser(user);
-                        FormsAuthentication.SetAuthCookie(model.UserName, true);
-
-                        //make sure that the asp.net user name is saved to the user profile
-                        UserProfile osbleProfile = db.UserProfiles.Where(u => u.AspNetUserName.CompareTo(model.UserName) == 0).FirstOrDefault();
-                        if (osbleProfile != null)
-                        {
-                            osbleProfile.AspNetUserName = model.UserName;
-                            db.SaveChanges();
-                        }
-
+                        //AC: Who wrote this?  I think that it updates pending assignment teams.
                         List<AssignmentTeam> atList = (from at in db.AssignmentTeams
                                                        select at).ToList();
                         UserProfile up = (from users in db.UserProfiles
@@ -275,55 +269,35 @@ namespace OSBLE.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    // Attempt to register the user
-                    MembershipCreateStatus createStatus;
-
                     string randomHash = GenerateRandomString(40);
-
-                    Membership.CreateUser(model.Email, model.Password, model.Email, null, null, isActivited(), out createStatus);
-
-                    if (createStatus == MembershipCreateStatus.Success)
+                    try
                     {
-                        MembershipUser user = Membership.GetUser(model.Email);
+                        UserProfile profile = new UserProfile();
+                        profile.Password = UserProfile.GetPasswordHash(model.Password);
+                        profile.AuthenticationHash = randomHash;
+                        profile.UserName = model.Email;
+                        profile.FirstName = model.FirstName;
+                        profile.LastName = model.LastName;
+                        profile.Identification = model.Identification;
+                        profile.SchoolID = model.SchoolID;
+                        profile.School = db.Schools.Find(model.SchoolID);
 
-                        user.Comment = randomHash;
-
-                        Membership.UpdateUser(user);
-
-                        try
-                        {
-                            UserProfile profile = new UserProfile();
-
-                            profile.UserName = model.Email;
-                            profile.AspNetUserName = model.Email;
-                            profile.FirstName = model.FirstName;
-                            profile.LastName = model.LastName;
-                            profile.Identification = model.Identification;
-                            profile.SchoolID = model.SchoolID;
-                            profile.School = db.Schools.Find(model.SchoolID);
-
-                            db.UserProfiles.Add(profile);
-                            db.SaveChanges();
-                        }
-                        catch (Exception e)
-                        {
-                            FormsAuthentication.SignOut();
-                            Membership.DeleteUser(model.Email);
-
-                            ModelState.AddModelError("", e.Message);
-
-                            return ProfessionalRegister();
-                        }
-
-                        sendVerificationEmail(false, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), model.FirstName, model.Email);
-
-                        return RedirectToAction("AccountCreated");
+                        db.UserProfiles.Add(profile);
+                        db.SaveChanges();
                     }
-                    else
+                    catch (Exception e)
                     {
-                        ModelState.AddModelError("", ErrorCodeToString(createStatus));
+                        return ProfessionalRegister();
                     }
+
+                    sendVerificationEmail(false, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), model.FirstName, model.Email);
+                    return RedirectToAction("AccountCreated");
                 }
+                else
+                {
+                    ModelState.AddModelError("", "There was an error creating your account.  Please contact OSBLE support at support@osble.org");
+                }
+
             }
             else
             {
@@ -359,88 +333,63 @@ namespace OSBLE.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    // Attempt to register the user
-                    MembershipCreateStatus createStatus;
-
+                    //used for email verification
                     string randomHash = GenerateRandomString(40);
 
-                    Membership.CreateUser(model.Email, model.Password, model.Email, null, null, isActivited(), out createStatus);
-
-                    if (createStatus == MembershipCreateStatus.Success)
+                    //make sure that the user name isn't already taken
+                    UserProfile takenName = db.UserProfiles.Where(u => u.UserName == model.Email).FirstOrDefault();
+                    if (takenName != null)
                     {
-                        MembershipUser user = Membership.GetUser(model.Email);
-                        user.Comment = randomHash;
-                        Membership.UpdateUser(user);
+                        //add an error message then get us out of here
+                        ModelState.AddModelError("", "The email address provided is already associated with an OSBLE account.");
+                        return AcademiaRegister();
+                    }
 
-                        try
+                    //try creating the account
+                    try
+                    {
+                        UserProfile profile = new UserProfile();
+
+                        profile.UserName = model.Email;
+                        profile.Password = UserProfile.GetPasswordHash(model.Password);
+                        profile.AuthenticationHash = randomHash;
+                        profile.FirstName = model.FirstName;
+                        profile.LastName = model.LastName;
+                        profile.Identification = model.Identification;
+                        profile.SchoolID = model.SchoolID;
+                        profile.School = db.Schools.Find(model.SchoolID);
+
+                        //check for stubs (accounts created through roster import function)
+                        UserProfile up = db.UserProfiles.Where(c => c.SchoolID == profile.SchoolID && c.Identification == profile.Identification).FirstOrDefault();
+                        if (up != null)
                         {
-                            UserProfile profile = new UserProfile();
-
-                            profile.UserName = model.Email;
-                            profile.AspNetUserName = model.Email;
-                            profile.FirstName = model.FirstName;
-                            profile.LastName = model.LastName;
-                            profile.Identification = model.Identification;
-                            profile.SchoolID = model.SchoolID;
-                            profile.School = db.Schools.Find(model.SchoolID);
-
-                            UserProfile up = db.UserProfiles.Where(c => c.SchoolID == profile.SchoolID && c.Identification == profile.Identification).FirstOrDefault();
-
-                            if (up != null) // User profile exists. Is it a stub?
+                            if (up.UserName == null) // Stub. Register to the account.
                             {
-                                if (up.UserName == null) // Stub. Register to the account.
-                                {
-                                    up.UserName = model.Email;
-                                    up.AspNetUserName = model.Email;
-                                    up.FirstName = model.FirstName;
-                                    up.LastName = model.LastName;
-                                    db.Entry(up).State = EntityState.Modified;
-                                }
-                                else
-                                {
-                                    MembershipUser msu = Membership.GetUser(up.UserName);
-
-                                    if (msu != null && !msu.IsApproved) // Already Registered but never acivated their account
-                                    {
-                                        Membership.DeleteUser(up.UserName);  // Removes the MemberShipUser that was created on the previous registration.
-
-                                        up.UserName = model.Email;
-                                        up.AspNetUserName = model.Email;
-                                        up.FirstName = model.FirstName;
-                                        up.LastName = model.LastName;
-                                        db.Entry(up).State = EntityState.Modified;
-                                    }
-                                    else // Existing Activated Account. Throw validation error.
-                                    {
-                                        throw new Exception("You have entered an ID number that is already in use for your school.");
-                                    }
-                                }
+                                up.UserName = model.Email;
+                                up.Password = UserProfile.GetPasswordHash(model.Password);
+                                up.FirstName = model.FirstName;
+                                up.LastName = model.LastName;
+                                db.Entry(up).State = EntityState.Modified;
                             }
-                            else // Profile does not exist.
-                            {
-                                db.UserProfiles.Add(profile);
-                            }
-
-                            db.SaveChanges();
                         }
-                        catch (Exception e)
+                        else // Profile does not exist.
                         {
-                            FormsAuthentication.SignOut();
-                            Membership.DeleteUser(model.Email);
-
-                            ModelState.AddModelError("", e.Message);
-
-                            return AcademiaRegister();
+                            db.UserProfiles.Add(profile);
                         }
 
-                        sendVerificationEmail(true, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), model.FirstName, model.Email);
-
-                        return RedirectToAction("AccountCreated");
+                        db.SaveChanges();
                     }
-                    else
+                    catch (Exception e)
                     {
-                        ModelState.AddModelError("", ErrorCodeToString(createStatus));
+                        FormsAuthentication.SignOut();
+                        ModelState.AddModelError("", e.Message);
+
+                        return AcademiaRegister();
                     }
+
+                    sendVerificationEmail(true, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), model.FirstName, model.Email);
+
+                    return RedirectToAction("AccountCreated");
                 }
             }
             else
@@ -466,6 +415,7 @@ namespace OSBLE.Controllers
         //
         // POST: /Account/ChangePassword
 
+
         [OsbleAuthorize]
         [HttpPost]
         public ActionResult Profile(ChangePasswordModel model)
@@ -477,11 +427,17 @@ namespace OSBLE.Controllers
                 bool changePasswordSucceeded;
                 try
                 {
-                    MembershipUser currentUser = Membership.GetUser(User.Identity.Name, true /* userIsOnline */);
-
-                    //never lock out users
-                    currentUser.UnlockUser();
-                    changePasswordSucceeded = currentUser.ChangePassword(model.OldPassword, model.NewPassword);
+                    UserProfile currentUser = OsbleAuthentication.CurrentUser;
+                    if (currentUser != null)
+                    {
+                        currentUser.Password = UserProfile.GetPasswordHash(model.NewPassword);
+                        db.SaveChanges();
+                        changePasswordSucceeded = true;
+                    }
+                    else
+                    {
+                        changePasswordSucceeded = false;
+                    }
                 }
                 catch (Exception)
                 {
@@ -527,13 +483,10 @@ namespace OSBLE.Controllers
                 UserProfile osbleProfile = db.UserProfiles.Where(m => m.UserName.CompareTo(model.EmailAddress) == 0).FirstOrDefault();
                 if (osbleProfile != null)
                 {
-                    var user = Membership.GetUser(osbleProfile.AspNetUserName);
-                    if (user != null)
-                    {
+                    string newPass = GenerateRandomString(10);
+                    osbleProfile.Password = UserProfile.GetPasswordHash(newPass);
+                    db.SaveChanges();
 #if !DEBUG
-
-                    string newPass = user.ResetPassword();
-
                     string body = "Your OSBLE password has been reset.\n Your new password is: " + newPass + "\n\nPlease change this password as soon as possible.";
 
                     MailMessage mm = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE"),
@@ -549,8 +502,9 @@ namespace OSBLE.Controllers
                     sc.Send(mm);
 #endif
 
-                        return View("ResetPasswordSuccess");
-                    }
+                    
+                    return View("ResetPasswordSuccess");
+
                 }
             }
             return View("ResetPasswordFailure");
@@ -559,7 +513,7 @@ namespace OSBLE.Controllers
         [OsbleAuthorize]
         public ActionResult ProfilePicture()
         {
-            return new FileStreamResult(FileSystem.GetProfilePictureOrDefault(currentUser), "image/jpeg");
+            return new FileStreamResult(FileSystem.GetProfilePictureOrDefault(CurrentUser), "image/jpeg");
         }
 
         [OsbleAuthorize]
@@ -568,7 +522,7 @@ namespace OSBLE.Controllers
         {
             if (Request.Params["remove"] != null) // Delete Picture
             {
-                FileSystem.DeleteProfilePicture(currentUser);
+                FileSystem.DeleteProfilePicture(CurrentUser);
                 return RedirectToAction("Profile");
             }
 
@@ -609,7 +563,7 @@ namespace OSBLE.Controllers
                                                 GraphicsUnit.Pixel);
 
                             // Write image to memory stream.
-                            FileStream fs = FileSystem.GetProfilePictureForWrite(currentUser);
+                            FileStream fs = FileSystem.GetProfilePictureForWrite(CurrentUser);
                             finalImage.Save(fs, ImageFormat.Jpeg);
                             fs.Close();
                         }

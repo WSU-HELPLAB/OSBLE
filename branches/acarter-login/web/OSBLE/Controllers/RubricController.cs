@@ -322,7 +322,7 @@ namespace OSBLE.Controllers
                 if (activeCourse.AbstractRole.CanSubmit && activeCourse.ID == cuId)
                 {
                     Assignment assignment = db.Assignments.Find(assignmentId);
-                    AssignmentTeam team = GetAssignmentTeam(assignment, currentUser);
+                    AssignmentTeam team = GetAssignmentTeam(assignment, CurrentUser);
                     if (team != null)
                     {
                         isOwnAssignment = true;

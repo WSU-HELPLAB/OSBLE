@@ -232,7 +232,6 @@ namespace OSBLE.Models
 
         private void createSampleUser(string username, string password, string firstname, string lastname, string ident, int school, bool isAdmin, bool canCreateCourses)
         {
-            Membership.CreateUser(username, password, username);
 
             UserProfile up = new UserProfile();
             up.FirstName = firstname;
@@ -242,6 +241,8 @@ namespace OSBLE.Models
             up.SchoolID = school;
             up.UserName = username;
             up.AspNetUserName = username;
+            up.Password = UserProfile.GetPasswordHash(password);
+            up.IsApproved = true;
             up.CanCreateCourses = canCreateCourses;
 
             this.UserProfiles.Add(up);
@@ -388,12 +389,6 @@ namespace OSBLE.Models
             c4.Categories.Add(w3);
             c4.Categories.Add(w1);
             c4.Categories.Add(w2);
-
-            MembershipUserCollection muc = Membership.GetAllUsers();
-            foreach (MembershipUser mu in muc)
-            {
-                Membership.DeleteUser(mu.UserName);
-            }
 
             this.SaveChanges();
 

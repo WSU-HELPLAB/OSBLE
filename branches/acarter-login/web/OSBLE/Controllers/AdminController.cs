@@ -26,9 +26,9 @@ namespace OSBLE.Controllers
         public ViewResult Index()
         {
             // Get list of users (other than current user) ordered by last name, who are not pending
-            List<UserProfile> userprofiles = db.UserProfiles.Where(u => u.ID != currentUser.ID && u.UserName != null).OrderBy(u => u.LastName).Include(u => u.School).ToList();
+            List<UserProfile> userprofiles = db.UserProfiles.Where(u => u.ID != CurrentUser.ID && u.UserName != null).OrderBy(u => u.LastName).Include(u => u.School).ToList();
             // Add pending users to bottom of list.
-            userprofiles = userprofiles.Concat(db.UserProfiles.Where(u => u.ID != currentUser.ID && u.UserName == null).ToList()).ToList();
+            userprofiles = userprofiles.Concat(db.UserProfiles.Where(u => u.ID != CurrentUser.ID && u.UserName == null).ToList()).ToList();
             return View(userprofiles);
         }
 
@@ -50,13 +50,8 @@ namespace OSBLE.Controllers
         {
             UserProfile u = db.UserProfiles.Find(id);
 
-            OsbleAuthentication auth = new OsbleAuthentication();
-            Response.SetCookie(auth.InvalidateUserCookie(CurrentUser));
-
-            FormsAuthentication.SignOut();
+            OsbleAuthentication.LogIn(u);
             context.Session.Clear();
-
-            FormsAuthentication.SetAuthCookie(u.UserName, false);
 
             return RedirectToAction("Index", "Home");
         }
@@ -131,7 +126,6 @@ namespace OSBLE.Controllers
             userprofile.LastName = "User";
             userprofile.SchoolID = 1;
             userprofile.EmailAllNotifications = false;
-            Membership.DeleteUser(userprofile.UserName);
             userprofile.UserName = "DeleteUser";
 
             db.SaveChanges();

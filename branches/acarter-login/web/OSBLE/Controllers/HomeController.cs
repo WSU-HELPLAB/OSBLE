@@ -199,7 +199,7 @@ namespace OSBLE.Controllers
             }
 
             // Get Course/User link for current user.
-            CourseUser currentCu = courseList.Where(c => c.UserProfileID == currentUser.ID).FirstOrDefault();
+            CourseUser currentCu = courseList.Where(c => c.UserProfileID == CurrentUser.ID).FirstOrDefault();
 
             // " " for poster of post/reply.
             CourseUser posterCu = courseList.Where(c => c.UserProfileID == post.CourseUser.UserProfileID).FirstOrDefault();
@@ -423,20 +423,20 @@ namespace OSBLE.Controllers
                         if (c is Course)
                         {
                             Course course = c as Course;
-                            subject = "[" + course.Prefix + " " + course.Number + "] Notice from " + currentUser.FirstName + " " + currentUser.LastName;
-                            body = currentUser.FirstName + " " + currentUser.LastName + " sent the following message to the class at " + dp.Posted.ToString() + ":";
+                            subject = "[" + course.Prefix + " " + course.Number + "] Notice from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message to the class at " + dp.Posted.ToString() + ":";
                         }
                         else if (c is Community)
                         {
                             Community community = c as Community;
-                            subject = "[" + community.Nickname + "] Notice from " + currentUser.FirstName + " " + currentUser.LastName;
-                            body = currentUser.FirstName + " " + currentUser.LastName + " sent the following message to the community at " + dp.Posted.ToString() + ":";
+                            subject = "[" + community.Nickname + "] Notice from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message to the community at " + dp.Posted.ToString() + ":";
                         }
                         else
                         {
                             //this should never execute, but just in case...
                             subject = "OSBLE Activity Post";
-                            body = currentUser.FirstName + " " + currentUser.LastName + " sent the following message at " + dp.Posted.ToString() + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message at " + dp.Posted.ToString() + ":";
                         }
                         body += "<br /><br />";
                         body += dp.Content.Replace("\n", "<br />");
@@ -527,20 +527,20 @@ namespace OSBLE.Controllers
                         if (ac is Course && (ac as Course).AllowDashboardReplies)
                         {
                             Course course = (Course)ac;
-                            subject = "[" + course.Prefix + " " + course.Number + "] Reply from " + currentUser.FirstName + " " + currentUser.LastName;
-                            body = currentUser.FirstName + " " + currentUser.LastName + " sent the following reply to the Dashboard post " + replyToPost.DisplayTitle + " at " + dr.Posted.ToString() + ":";
+                            subject = "[" + course.Prefix + " " + course.Number + "] Reply from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following reply to the Dashboard post " + replyToPost.DisplayTitle + " at " + dr.Posted.ToString() + ":";
                         }
                         else if (ac is Community)
                         {
                             Community community = ac as Community;
-                            subject = "[" + community.Nickname + "] Reply from " + currentUser.FirstName + " " + currentUser.LastName;
-                            body = currentUser.FirstName + " " + currentUser.LastName + " sent the following reply to the Dashboard post " + replyToPost.DisplayTitle + " at " + dr.Posted.ToString() + ":";
+                            subject = "[" + community.Nickname + "] Reply from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following reply to the Dashboard post " + replyToPost.DisplayTitle + " at " + dr.Posted.ToString() + ":";
                         }
                         else
                         {
                             //this should never execute, but just in case...
                             subject = "OSBLE Activity Post";
-                            body = currentUser.FirstName + " " + currentUser.LastName + " sent the following message at " + dr.Posted.ToString() + ":";
+                            body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message at " + dr.Posted.ToString() + ":";
                         }
                         body += "<br /><br />";
                         body += dr.Content.Replace("\n", "<br />");
@@ -549,7 +549,7 @@ namespace OSBLE.Controllers
                         List<CourseUser> courseUsers = (from c in db.CourseUsers
                                                           where c.AbstractCourseID == ac.ID &&
                                                           c.UserProfile.EmailAllActivityPosts &&
-                                                          c.UserProfileID != currentUser.ID
+                                                          c.UserProfileID != CurrentUser.ID
                                                           select c).ToList();
 
                         foreach (CourseUser member in courseUsers)
@@ -669,7 +669,7 @@ namespace OSBLE.Controllers
             AbstractRole theirRole = db.CourseUsers.Where(c => (c.AbstractCourseID == course) && (c.UserProfileID == userProfile)).Select(c => c.AbstractRole).FirstOrDefault();
 
             // Show picture if user is requesting their own profile picture or they have the right to view the profile picture
-            if (userProfile == currentUser.ID ||
+            if (userProfile == CurrentUser.ID ||
                 // Current user's CourseRole
                 ourRole != null &&
                 // Target user's CourseRole
@@ -692,9 +692,9 @@ namespace OSBLE.Controllers
         [OsbleAuthorize]
         public ActionResult Time()
         {
-            if (currentUser != null)
+            if (CurrentUser != null)
             {
-                UserProfile user = db.UserProfiles.Find(currentUser.ID);
+                UserProfile user = db.UserProfiles.Find(CurrentUser.ID);
                 if (user != null)
                 {
                     return View();

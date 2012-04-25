@@ -185,11 +185,11 @@ namespace OSBLE.Controllers
                 return View("NotFound");
             }
             // Unauthorized mail to view.
-            if ((mail.ToUserProfile != currentUser) && (mail.FromUserProfile != currentUser))
+            if ((mail.ToUserProfile != CurrentUser) && (mail.FromUserProfile != CurrentUser))
             {
                 return RedirectToAction("Index");
             }
-            else if ((mail.ToUserProfile == currentUser) && (mail.Read == false))
+            else if ((mail.ToUserProfile == CurrentUser) && (mail.Read == false))
             {
                 mail.Read = true;
 
@@ -199,7 +199,7 @@ namespace OSBLE.Controllers
                                   select notification).FirstOrDefault();
 
                 // Notification exists and belongs to current user.
-                if ((n != null) && (n.RecipientID == currentUser.ID))
+                if ((n != null) && (n.RecipientID == CurrentUser.ID))
                 {
                     // Mark notification as read.
                     n.Read = true;
@@ -218,10 +218,10 @@ namespace OSBLE.Controllers
             var next = id;
             var prev = id;
 
-            if (mail.ToUserProfileID == currentUser.ID)
+            if (mail.ToUserProfileID == CurrentUser.ID)
             {
                 var inboxMail = (from m in db.Mails
-                                 where m.ToUserProfileID == currentUser.ID &&
+                                 where m.ToUserProfileID == CurrentUser.ID &&
                                  !m.DeleteFromInbox 
                                  orderby m.ID ascending
                                  select m).ToList();
@@ -242,10 +242,10 @@ namespace OSBLE.Controllers
                     }
                 }
             }
-            else if (mail.FromUserProfileID == currentUser.ID)
+            else if (mail.FromUserProfileID == CurrentUser.ID)
             {
                 var outboxMail = (from m in db.Mails
-                                 where m.FromUserProfileID == currentUser.ID &&
+                                 where m.FromUserProfileID == CurrentUser.ID &&
                                  !m.DeleteFromOutbox
                                  orderby m.ID ascending
                                  select m).ToList();
@@ -290,7 +290,7 @@ namespace OSBLE.Controllers
         {
             UserProfile u = db.UserProfiles.Find(id);
 
-            if (id == currentUser.ID)
+            if (id == CurrentUser.ID)
             {
                 return true;
             }
@@ -530,7 +530,7 @@ namespace OSBLE.Controllers
                 .Select(c => c.UserProfile)
                 .ToList();
 
-            authorizedUsers.Add(currentUser); // Add ourselves just in case we're not in a course.
+            authorizedUsers.Add(CurrentUser); // Add ourselves just in case we're not in a course.
 
             // If we are anonymous, limit search to ourselves plus instructors/TAs
             List<int> addedCourses = currentCourses
@@ -539,7 +539,7 @@ namespace OSBLE.Controllers
                 .ToList();
 
             List<UserProfile> addedUsers = db.CourseUsers
-                .Where(c => addedCourses.Contains(c.AbstractCourseID) && ((c.UserProfileID == currentUser.ID) || (c.AbstractRole.CanGrade == true)))
+                .Where(c => addedCourses.Contains(c.AbstractCourseID) && ((c.UserProfileID == CurrentUser.ID) || (c.AbstractRole.CanGrade == true)))
                 .Select(c => c.UserProfile)
                 .ToList();
 
@@ -586,7 +586,7 @@ namespace OSBLE.Controllers
                 {
                     recipientList = (from m in db.Mails
                                      where m.ThreadID == replyto &&
-                                     m.ToUserProfileID != currentUser.ID
+                                     m.ToUserProfileID != CurrentUser.ID
                                      select m.ToUserProfile).ToList<UserProfile>();
                     if (!recipientList.Contains(mail.FromUserProfile))
                     {
@@ -658,7 +658,7 @@ namespace OSBLE.Controllers
         {
             Mail mail = db.Mails.Find(id);
 
-            if (mail.ToUserProfile == currentUser)
+            if (mail.ToUserProfile == CurrentUser)
             {
                 if (mail.DeleteFromOutbox == true)
                 {
@@ -685,7 +685,7 @@ namespace OSBLE.Controllers
         {
             Mail mail = db.Mails.Find(id);
 
-            if (mail.FromUserProfile == currentUser)
+            if (mail.FromUserProfile == CurrentUser)
             {
                 if (mail.DeleteFromInbox == true)
                 {
@@ -716,7 +716,7 @@ namespace OSBLE.Controllers
                 Mail m = db.Mails.Find(Convert.ToInt32(s));
                 if (m != null)
                 {
-                    if (m.ToUserProfileID == currentUser.ID)
+                    if (m.ToUserProfileID == CurrentUser.ID)
                     {
                         if (m.DeleteFromOutbox == true)
                         {
@@ -742,7 +742,7 @@ namespace OSBLE.Controllers
                 Mail m = db.Mails.Find(Convert.ToInt32(s));
                 if (m != null)
                 {
-                    if (m.FromUserProfileID == currentUser.ID)
+                    if (m.FromUserProfileID == CurrentUser.ID)
                     {
                         if (m.DeleteFromInbox == true)
                         {
