@@ -5,22 +5,22 @@
 
 @{
     string critInputPrefix = ViewBag.CritInputPrefix;
-string critSliderPrefix = ViewBag.CritSliderPrefix;
-string critCommentPrefix = ViewBag.CritCommentPrefix;
-int sliderTableLength = 880;
-int maxLevelScore = (from c in Model.Rubric.Levels
-                     select c.RangeEnd).Sum();
-int textInputLenght = 25;
-int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;
-string selectedAssignment = ViewBag.AssignmentSelectId;
-string selectedTeam = ViewBag.TeamSelectId;
-bool isEditable = ViewBag.isEditable;
-string textBoxDisabled = "";
+    string critSliderPrefix = ViewBag.CritSliderPrefix;
+    string critCommentPrefix = ViewBag.CritCommentPrefix;
+    int sliderTableLength = 880;
+    int maxLevelScore = (from c in Model.Rubric.Levels
+                         select c.RangeEnd).Sum();
+    int textInputLenght = 25;
+    int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;
+    string selectedAssignment = ViewBag.AssignmentSelectId;
+    string selectedTeam = ViewBag.TeamSelectId;
+    bool isEditable = ViewBag.isEditable;
+    string textBoxDisabled = "";
 
-if (!isEditable)
-{
-    textBoxDisabled = "disabled=disabled";
-}
+    if (!isEditable)
+    {
+        textBoxDisabled = "disabled=disabled";
+    }
 
 }
 
@@ -37,7 +37,7 @@ if (!isEditable)
           }
           else
           { 
-          disabledOption = "disabled: true";
+            disabledOption = "disabled: true";
           }
 
           string sliderId = String.Format("\"#{0}_{1}\"", critSliderPrefix, critEval.Criterion.ID);

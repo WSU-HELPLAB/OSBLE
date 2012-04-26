@@ -10,6 +10,8 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.ViewModels;
+using System.Web;
+using System.IO;
 
 namespace OSBLE.Controllers
 {
@@ -352,11 +354,191 @@ namespace OSBLE.Controllers
             RubricViewModel viewModel = GetUneditableRubricViewModel(assignmentId);
             if (!(viewModel.Rubric == null || viewModel.SelectedAssignment.Category.CourseID != activeCourse.AbstractCourseID))
             {
+                Assignment assignment = db.Assignments.Find(assignmentId);
                 ViewBag.Score = null;
+                ViewBag.AssignmentName = assignment.AssignmentName;
                 ViewBag.isEditable = false;
                 return View("View", viewModel);
             }
             return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
+        }
+
+        //[HttpPost]
+        //[CanModifyCourse]
+        //public ActionResult ImportRubricFromCSV(HttpPostedFileBase file)
+        //{
+        //    Session["RubricFile"] = file;
+        //    Session["radio"] = Request.Params["radioBtn"];
+        //    Session["RubricId"] = Request.Params["RubricId"];
+
+        //    List<string[]> parsedData = new List<string[]>();
+        //    List<int> positionList = new List<int>();
+        //    List<int> doNotAdd = new List<int>();
+        //    int currentCourseId = ActiveCourse.AbstractCourseID;
+
+        //    var students = from student in db.CourseUsers
+        //                   where student.AbstractCourseID == currentCourseId
+        //                   group student by student.UserProfile.ID into studentList
+        //                   select studentList;
+
+        //    StreamReader readFile = new StreamReader(file.InputStream);
+
+        //    string line;
+        //    string[] row;
+
+        //    while ((line = readFile.ReadLine()) != null)
+        //    {
+        //        row = line.Split(',');
+        //        parsedData.Add(row);
+        //    }
+            
+        //    file.InputStream.Seek(0, SeekOrigin.Begin);
+        //    file.InputStream.Position = 0;
+
+        //    ViewBag.Headers = parsedData.ElementAt(0);
+        //    ViewBag.File = file.FileName;
+
+        //    return View();
+        //}
+
+        [CanModifyCourse]
+        public ActionResult ExportIndividualToCSV(int teamID, int assignID)
+        {
+            string completeRubricString = "";
+            AbstractCourse currentCourse = activeCourse.AbstractCourse;
+            Team team = db.Teams.Find(teamID);
+            Assignment curAssignment = (from a in db.Assignments
+                                        where a.ID == assignID
+                                        select a).FirstOrDefault();
+            
+            completeRubricString = "*** ASSIGNMENT: " + curAssignment.AssignmentName + "\n";
+            completeRubricString += "*** COURSE: " + currentCourse.Name + "(" + (currentCourse as Course).Semester + ", " + (currentCourse as Course).Year + ")\n";
+            completeRubricString += "\n---Please use this file to complete rubric evaluations for this\n";
+            completeRubricString += "---assignment\n";
+            completeRubricString += "*** are uneditable lines / --- are comment lines\n\n";
+            completeRubricString += "--------------------------------------------------------\n";
+
+            completeRubricString += parseRubricToString(team, curAssignment);
+
+            ViewBag.CompleteRubricString = completeRubricString;
+
+
+            context.Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + currentCourse.Name + "_" + curAssignment.AssignmentName + "_" + team.DisplayName(activeCourse.AbstractRole) + " rubric.txt\"");
+            Response.ContentType = "application/octet-stream";
+
+            return View();
+        }
+
+        [CanModifyCourse]
+        public ActionResult ImportIndividualToCSV()
+        {
+            return View();
+        }
+
+        [CanModifyCourse]
+        public ActionResult ExportAllToCSV(int assignID)
+        {
+            string completeRubricString = "";
+            AbstractCourse currentCourse = activeCourse.AbstractCourse;
+            Assignment curAssignment = (from a in db.Assignments
+                                        where a.ID == assignID
+                                        select a).FirstOrDefault();
+
+            List<AssignmentTeam> assignTeamsList = (from at in db.AssignmentTeams
+                                                    where at.AssignmentID == assignID
+                                                    select at).ToList();
+            
+            completeRubricString =  "*** ASSIGNMENT: " + curAssignment.AssignmentName + "\n";
+            completeRubricString += "*** COURSE:     " + currentCourse.Name + "(" + (currentCourse as Course).Semester +", " + (currentCourse as Course).Year + ")\n";
+            completeRubricString += "\n---Please use this file to complete rubric evaluations for this\n";
+            completeRubricString += "---assignment\n";
+            completeRubricString += "*** are uneditable lines / --- are comment lines\n\n";
+            completeRubricString += "--------------------------------------------------------\n";
+
+
+            foreach (AssignmentTeam a in assignTeamsList)
+            {
+                completeRubricString += parseRubricToString(a.Team, curAssignment);
+                completeRubricString += "--------------------------------------------------------\n";
+            }
+
+            ViewBag.CompleteRubricString = completeRubricString;
+
+            context.Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + currentCourse.Name  + "_" + curAssignment.AssignmentName + "_rubric.txt\"");
+            Response.ContentType = "application/octet-stream";
+
+            return View();
+        }
+
+        [CanModifyCourse]
+        public ActionResult ImportAllToCSV()
+        {
+            return View("View");
+        }
+
+        public string parseRubricToString(Team team, Assignment curAssignment)
+        {
+            int i = 0;
+            string header = "";
+            string finalString = "";
+            string criterions = "";
+            string points = "";
+            string comment = "";
+            string gComment = "";
+            string globalComments = "";
+
+            header = "------------------------------------------------\n";
+            header += "*** STUDENT/TEAM: " + team.DisplayName(activeCourse.AbstractRole) + "\n";
+
+            // Criterion rows set up
+            RubricEvaluation rubricEvaluation = new RubricEvaluation();
+            rubricEvaluation = (from re in db.RubricEvaluations
+                                where re.AssignmentID == curAssignment.ID
+                                && re.RecipientID == team.ID
+                                select re).FirstOrDefault();
+
+
+
+            List<Criterion> criterionList = (from c in db.Criteria
+                                             where c.RubricID == curAssignment.RubricID
+                                             select c).ToList();
+            foreach (Criterion criterion in criterionList)
+            {
+                i++;
+
+                // existing graded rubric
+                if (rubricEvaluation != null)
+                {
+                    points = (from g in rubricEvaluation.CriterionEvaluations
+                             where g.CriterionID == criterion.ID
+                             select g.Score).FirstOrDefault().ToString();
+                    comment = (from c in rubricEvaluation.CriterionEvaluations
+                               where c.CriterionID == criterion.ID
+                               select c.Comment).FirstOrDefault().ToString();
+                }
+                criterions += "*** " + criterion.CriterionTitle + " (Weight: " + criterion.Weight + ")\n";
+                criterions += "*** Points (0 - " + curAssignment.PointsPossible + "):\n";
+                criterions += points + "\n";
+                criterions += "*** Comments: \n";
+                criterions += comment + "\n\n";
+                criterions += "------------------------------------------------\n";
+            }
+
+            // Global comments string set up
+            if (curAssignment.Rubric.HasGlobalComments)
+            {
+                if (rubricEvaluation != null)
+                {
+                    gComment = rubricEvaluation.GlobalComment;
+                }
+                gComment += "\n";
+
+                globalComments = "*** General Comments:\n" + gComment + "\n";
+                globalComments += "------------------------------------------------\n";
+            }
+            finalString = header + criterions + globalComments;
+
+            return (finalString);
         }
     }
 }

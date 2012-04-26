@@ -151,16 +151,7 @@ function create_and_open_downloading_submission_dialog() {
     }
 </style>
 <div id="rubric_evaluator">
-    @if (editable == true)
-    {
-        <h1>
-            Rubric Evaluation of @Model.SelectedAssignment.AssignmentName for @Model.Evaluation.Recipient.Name</h1>
-    }
-    else
-    {
-        <h1>
-            Rubric Evaluation of @Model.SelectedAssignment.AssignmentName for Anonymous @cuList.IndexOf(@Model.Evaluation.Recipient.TeamMembers.FirstOrDefault().CourseUser)</h1>
-    }
+    <h1>Rubric Evaluation of @Model.SelectedAssignment.AssignmentName for @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole)</h1>
     <div class="dashboard">
         <table style="border-collapse: collapse; border-spacing: 0;">
             <tr>
@@ -309,6 +300,8 @@ function create_and_open_downloading_submission_dialog() {
     {
         <table style="float: right">
             <tr>
+                <td></td>
+                <td></td>
                 <th style="text-align:right">
                     Grade:
                 </th>
@@ -345,6 +338,8 @@ function create_and_open_downloading_submission_dialog() {
                 if (Model.Evaluation.IsPublished == true)
                 {
                 <tr>
+                    <td></td>
+                    <td></td>
                     <th style="text-align:right">Published:</th>
                     <td style="text-align:right">
                         @publishTime.Value.ToString("g")
@@ -354,6 +349,8 @@ function create_and_open_downloading_submission_dialog() {
                 else
                 {
                 <tr>
+                    <td></td>
+                    <td></td>
                     <th style="text-align:right">Draft:</th>
                     <td style="text-align:right">
                         @publishTime.Value.ToString("g")
@@ -364,6 +361,8 @@ function create_and_open_downloading_submission_dialog() {
             else
             {
                 <tr>
+                    <td></td>
+                    <td></td>
                     <th style="text-align:right">Published:</th>
                     <td style="text-align:right">
                          Not Published
@@ -371,6 +370,17 @@ function create_and_open_downloading_submission_dialog() {
                 </tr>
             }
             <tr>
+
+                @*<a href="/Rubric/ExportIndividualToCSV"> Export @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole)'s Rubric</a>*@
+                @{string rubricUserName = "Export " + @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole) + "'s Rubric";}
+                <td style="padding-right:10px;">
+                    @Html.ActionLink(rubricUserName, "ExportIndividualToCSV", new { teamID = Model.Evaluation.Recipient.ID, assignID = Model.SelectedAssignment.ID }, new { })
+                </td>
+                <td style="padding-right:10px; padding-left:10px;">
+                    <a href="/Rubric/ImportIndividualToCSV"> Import @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole)'s Rubric</a>
+                </td>
+
+
                 @if (Model.Evaluation.IsPublished == true || editable == false)
                 {
                     <td>
