@@ -23,6 +23,20 @@ namespace OSBLE.Utility
 
         private OSBLEContext db = new OSBLEContext();
 
+        public static string Encrypt(string content)
+        {
+            byte[] rawBytes = System.Text.Encoding.UTF8.GetBytes(content);
+            string enctryptedString = MachineKey.Encode(rawBytes, MachineKeyProtection.All); 
+            return enctryptedString;
+        }
+
+        public static string Decrypt(string content)
+        {
+            byte[] encryptedBytes = MachineKey.Decode(content, MachineKeyProtection.All);
+            string decryptedContent = System.Text.Encoding.UTF8.GetString(encryptedBytes);
+            return decryptedContent;
+        }
+
         /// <summary>
         /// Logs the supplied user into OSBLE
         /// </summary>
@@ -32,7 +46,7 @@ namespace OSBLE.Utility
             HttpCookie cookie = new HttpCookie(ProfileCookieKey);
 
             //save the profile's user name
-            cookie.Values[userNameKey] = profile.UserName;
+            cookie.Values[userNameKey] = Encrypt(profile.UserName);
 
             //set a really long expiration date
             cookie.Expires = DateTime.Now.AddDays(300);
@@ -58,7 +72,7 @@ namespace OSBLE.Utility
                     try
                     {
                         HttpCookie cookie = HttpContext.Current.Request.Cookies.Get(ProfileCookieKey);
-                        string userName = cookie.Values[userNameKey];
+                        string userName = Decrypt(cookie.Values[userNameKey]);
                         return db.UserProfiles.Where(u => u.UserName == userName).FirstOrDefault();
                     }
                     catch (Exception ex)
