@@ -73,7 +73,7 @@ namespace OSBLE.Controllers
 
                     //AC: if the user doesn't have a password, it's probably because they have an old .NET account.  
                     //find this information and then update their profile with their password
-                    if (localUser.Password.Length == 0)
+                    if (localUser.Password == null || localUser.Password.Length == 0)
                     {
                         if (Membership.ValidateUser(localUser.AspNetUserName, model.Password))
                         {
