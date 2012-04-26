@@ -29,7 +29,7 @@
 
 $(document).ready(function () {
     var height = parseFloat($(window).height());
-    height = height - 300;
+    height = height - 275;
     $("#internalScrollID").height(height + "px");
 
     var width = parseFloat($(window).width());
@@ -44,7 +44,7 @@ $(document).ready(function () {
 
     function resizeWindow(e) {
         var height = parseFloat($(window).height());
-        height = height - 300;
+        height = height - 275;
         $("#internalScrollID").height(height + "px");
 
         var width = parseFloat($(window).width());
@@ -398,23 +398,5 @@ function create_and_open_downloading_submission_dialog() {
         <div id="internalScrollID" style="width: 1200px; overflow: auto;">
             @Html.Partial("_Display", Model)
         </div>
-                //Disable the save as draft button if its already published
-                if (Model.Evaluation.IsPublished == true || editable == false)
-                {
-        <input disabled="disabled" type="submit" name="@draftButton" value="Save as Draft" />
-                }
-                else
-                {
-        <input type="submit" name="@draftButton" value="Save as Draft" />
-                }
-                if (editable == true)
-                {
-        <input type="submit" name="@publishButton" value="Publish to Student" />
-                }
-        <br />
-        <br />
-        <input type="hidden" name="@ViewBag.AssignmentId" value="@Model.SelectedAssignment.ID" />
-        <input type="hidden" name="@ViewBag.CourseUserId" value="@Model.SelectedTeam.Team.TeamMembers.FirstOrDefault().CourseUserID" />
-        <input type="hidden" name="@ViewBag.TeamId" value="@Model.SelectedTeam.TeamID" />
     }
 </div>
