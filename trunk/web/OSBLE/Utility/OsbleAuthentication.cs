@@ -46,7 +46,7 @@ namespace OSBLE.Utility
             HttpCookie cookie = new HttpCookie(ProfileCookieKey);
 
             //save the profile's user name
-            cookie.Values[userNameKey] = Encrypt(profile.UserName);
+            cookie.Values[userNameKey] = profile.UserName;// Encrypt(profile.UserName);
 
             //set a really long expiration date
             cookie.Expires = DateTime.Now.AddDays(300);
@@ -72,7 +72,7 @@ namespace OSBLE.Utility
                     try
                     {
                         HttpCookie cookie = HttpContext.Current.Request.Cookies.Get(ProfileCookieKey);
-                        string userName = Decrypt(cookie.Values[userNameKey]);
+                        string userName = cookie.Values[userNameKey]; //Decrypt(cookie.Values[userNameKey]);
                         return db.UserProfiles.Where(u => u.UserName == userName).FirstOrDefault();
                     }
                     catch (Exception ex)
