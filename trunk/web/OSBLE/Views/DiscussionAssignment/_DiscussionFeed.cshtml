@@ -36,8 +36,7 @@
             <input type="hidden" id="MaxContentChars" value="@ViewBag.MaxActivityFeedLength"/>
             @using (Html.BeginForm("NewPost", "DiscussionAssignment", FormMethod.Post))
             {
-                <textarea id="ActivityFeed" name="Content" rows="10" style="width: 100%" placeholder="Enter new discussion post here..."
-                    onkeydown="RemainingCharsReply()" onkeyup="RemainingCharsReply()"></textarea><br />
+                <textarea id="ActivityFeed" name="Content" rows="10" style="width: 100%" placeholder="Enter new discussion post here..." onkeydown="RemainingCharsReply()" onkeyup="RemainingCharsReply()"></textarea><br />
                 <input type="hidden" name="AssignmentID" value="@ViewBag.Assignment.ID" />
                 if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
@@ -237,10 +236,8 @@
                     @*method="post"*@
                     <input type="hidden" name="reply_to" value="@dp.ID" />
                     <input type="hidden" name="latest_reply" value="0" id="latest_reply_@(dp.ID)" />
-                    <span id="remCharsReply" name="remainingCharsReply" readonly="true" value="(@ViewBag.MaxActivityFeedLength)
-                    Characters left"></span><br />
-                    <textarea name="Content" rows="5" cols="40" id="dp_replybox_content_@(dp.ID)" placeholder="Enter
-                    reply here..."></textarea><br />
+                    <span id="remCharsReply" name="remainingCharsReply" readonly="true" value="(@ViewBag.MaxActivityFeedLength) Characters left"></span><br />
+                    <textarea name="Content" rows="5" cols="40" id="dp_replybox_content_@(dp.ID)" placeholder="Enter reply here..."></textarea><br />
                     <input id="reply @(dp.ID) button" type="submit" name="post_reply" value="Post Reply" onclick="refreshCount()" />
                 }
                 <br /> <div class="dp_replylink"> <a href="#" id="replycancel_@(dp.ID)">Cancel</a>

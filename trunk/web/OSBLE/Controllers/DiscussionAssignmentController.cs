@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using OSBLE.Models.Assignments;
-using OSBLE.Models.DiscussionAssignment;
-using OSBLE.Attributes;
 using System.IO;
-using OSBLE.Models.Users;
+using System.Linq;
+using System.Web.Mvc;
+using OSBLE.Attributes;
+using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
+using OSBLE.Models.DiscussionAssignment;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Controllers
 {
@@ -22,6 +21,7 @@ namespace OSBLE.Controllers
             List<DiscussionPost> teamPosts = new List<DiscussionPost>();
             DiscussionTeam discussionTeam = new DiscussionTeam();
             List<DiscussionPost> posts = new List<DiscussionPost>();
+            
             Assignment assignment = db.Assignments.Find(assignmentId);
             ViewBag.Assignment = assignment;
             ViewBag.Posts = null;
@@ -29,7 +29,7 @@ namespace OSBLE.Controllers
 
             if (!assignment.DiscussionSettings.RequiresPostBeforeView)
             {
-                ViewBag.FirstPost = true; 
+                ViewBag.FirstPost = true;
             }
 
             posts = (from post in db.DiscussionPosts
@@ -91,6 +91,14 @@ namespace OSBLE.Controllers
             }
 
             ViewBag.ActiveCourse = activeCourse;
+            if (assignment.HasDiscussionTeams)
+            {
+                ViewBag.TeamName = discussionTeam.Team.Name;
+            }
+            else
+            {
+                ViewBag.TeamName = "";
+            }
             return View();
         }
 
@@ -102,6 +110,8 @@ namespace OSBLE.Controllers
             Assignment assignment = db.Assignments.Find(assignmentId);
             CourseUser student = db.CourseUsers.Find(courseUserId);
             DiscussionTeam discussionTeam = new DiscussionTeam();
+            AssignmentTeam at = new AssignmentTeam();
+            List<AssignmentTeam> atList = new List<AssignmentTeam>();
 
             posts = (from post in db.DiscussionPosts
                      where post.AssignmentID == assignment.ID &&
@@ -113,7 +123,7 @@ namespace OSBLE.Controllers
             if (assignment != null && student != null && (postOrReply >= 0 && postOrReply <= 3))
             {
                 Session["StudentID"] = student.ID;
-                
+
                 if (assignment.HasDiscussionTeams)
                 {
                     foreach (DiscussionTeam dt in assignment.DiscussionTeams)
@@ -133,11 +143,11 @@ namespace OSBLE.Controllers
                         posts = (from post in db.DiscussionPosts
                                  where post.AssignmentID == assignment.ID &&
                                  post.CourseUserID == tm.CourseUserID &&
-                                 !post.IsReply 
+                                 !post.IsReply
                                  select post).ToList();
                         foreach (DiscussionPost post in posts)
                         {
-                            post.DisplayName = post.CourseUser.DisplayName(activeCourse.AbstractRole);
+                            post.DisplayName = post.CourseUser.DisplayNameFirstLast(activeCourse.AbstractRole);
                             teamPosts.Add(post);
                         }
                     }
@@ -151,7 +161,6 @@ namespace OSBLE.Controllers
                         teamPosts.Add(post);
                     }
                     ViewBag.Posts = teamPosts.OrderBy(t => t.Posted);
-                    
                 }
                 else
                 {
@@ -162,7 +171,19 @@ namespace OSBLE.Controllers
                              select post).ToList();
                     foreach (DiscussionPost post in posts)
                     {
-                        post.DisplayName = post.CourseUser.DisplayName(activeCourse.AbstractRole);
+                        post.DisplayName = post.CourseUser.DisplayNameFirstLast(activeCourse.AbstractRole);
+                    }
+
+                    foreach (AssignmentTeam a in assignment.AssignmentTeams)
+                    {
+                        if (a.Team.TeamMembers.FirstOrDefault().CourseUser.ID == student.ID)
+                        {
+                            discussionTeam.Assignment = a.Assignment;
+                            discussionTeam.AssignmentID = a.AssignmentID;
+                            discussionTeam.Team = a.Team;
+                            discussionTeam.TeamID = a.TeamID;
+                            break;
+                        }
                     }
                     ViewBag.Posts = posts;
                 }
@@ -177,10 +198,41 @@ namespace OSBLE.Controllers
                 student = null;
             }
 
+            
+
             ViewBag.Student = student;
             ViewBag.Assignment = assignment;
             ViewBag.FirstPost = true;
             ViewBag.ActiveCourse = activeCourse;
+            ViewBag.PostOrReply = postOrReply;
+            if (assignment.HasDiscussionTeams)
+            {
+                ViewBag.TeamName = "- " + discussionTeam.Team.Name;
+                ViewBag.TeamList = assignment.DiscussionTeams.OrderBy(s => s.Team.Name).ToList();
+            }
+            else
+            {
+                ViewBag.TeamName = "- " + student.DisplayNameFirstLast(activeCourse.AbstractRole);
+                
+                List<DiscussionTeam> dtList = new List<DiscussionTeam>();
+                DiscussionTeam dt = new DiscussionTeam();
+                foreach (AssignmentTeam assignTeam in assignment.AssignmentTeams)
+                {
+                    dt.Assignment = assignTeam.Assignment;
+                    dt.AssignmentID = assignTeam.AssignmentID;
+                    dt.Team = assignTeam.Team;
+                    dt.TeamID = assignTeam.TeamID;
+                    dt.Team.Name = assignTeam.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastAndFirst();
+                    dtList.Add(dt);
+
+                    dt = new DiscussionTeam();
+                }
+                ViewBag.TeamList = dtList.OrderBy(l => l.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName).ThenBy(f => f.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName).ToList();
+            }
+            
+            ViewBag.TeamSelectId = "selected_team";
+            ViewBag.AssignmentSelectId = "selected_assignment";
+            ViewBag.SelectedTeam = discussionTeam;
             ViewBag.PostOrReply = postOrReply;
             return View();
         }
@@ -189,9 +241,11 @@ namespace OSBLE.Controllers
         {
             List<DiscussionPost> teamPosts = new List<DiscussionPost>();
             List<DiscussionPost> posts = new List<DiscussionPost>();
-            Assignment assignment = db.Assignments.Find(assignmentId); 
+            Assignment assignment = db.Assignments.Find(assignmentId);
             CourseUser student = db.CourseUsers.Find(courseUserId);
             DiscussionTeam discussionTeam = new DiscussionTeam();
+
+            
 
             posts = (from post in db.DiscussionPosts
                      where post.AssignmentID == assignment.ID &&
@@ -202,9 +256,9 @@ namespace OSBLE.Controllers
             {
                 if (!post.CourseUser.AbstractRole.CanModify)
                 {
-                    post.DisplayName = post.CourseUser.DisplayName(activeCourse.AbstractRole);
+                    post.DisplayName = post.CourseUser.DisplayNameFirstLast(activeCourse.AbstractRole);
                 }
-            }            
+            }
 
             Session["PostOrReply"] = postOrReply;
             if (assignment != null && student != null && (postOrReply >= 0 && postOrReply <= 3))
@@ -228,11 +282,11 @@ namespace OSBLE.Controllers
                         posts = (from post in db.DiscussionPosts
                                  where post.AssignmentID == assignment.ID &&
                                  post.CourseUserID == tm.CourseUserID &&
-                                 !post.IsReply 
+                                 !post.IsReply
                                  select post).ToList();
                         foreach (DiscussionPost post in posts)
                         {
-                            post.DisplayName = post.CourseUser.DisplayName(activeCourse.AbstractRole);
+                            post.DisplayName = post.CourseUser.DisplayNameFirstLast(activeCourse.AbstractRole);
                             teamPosts.Add(post);
                         }
                     }
@@ -246,8 +300,8 @@ namespace OSBLE.Controllers
                         teamPosts.Add(post);
                     }
                     ViewBag.Posts = teamPosts.OrderBy(t => t.Posted);
-                    }
-               
+                }
+
                 else
                 {
                     posts = (from post in db.DiscussionPosts
@@ -257,7 +311,7 @@ namespace OSBLE.Controllers
                              select post).ToList();
                     foreach (DiscussionPost post in posts)
                     {
-                        post.DisplayName = post.CourseUser.DisplayName(activeCourse.AbstractRole);
+                        post.DisplayName = post.CourseUser.DisplayNameFirstLast(activeCourse.AbstractRole);
                         post.ShowProfilePicture = false;
                     }
                     ViewBag.Posts = posts;
@@ -273,12 +327,12 @@ namespace OSBLE.Controllers
                 student = null;
             }
 
-
             ViewBag.Student = student;
             ViewBag.Assignment = assignment;
             ViewBag.FirstPost = true;
             ViewBag.ActiveCourse = activeCourse;
             ViewBag.PostOrReply = postOrReply;
+            ViewBag.TeamName = discussionTeam.Team.Name;
             return View("TeacherIndex");
         }
 
@@ -315,18 +369,17 @@ namespace OSBLE.Controllers
                             CourseUserID = activeCourse.ID,
                             Posted = DateTime.Now,
                             AssignmentID = assignment.ID,
-                            DisplayName = activeCourse.DisplayName(activeCourse.AbstractRole),
+                            DisplayName = activeCourse.DisplayNameFirstLast(activeCourse.AbstractRole),
                             IsReply = false
                         };
                         db.DiscussionPosts.Add(post);
                         db.SaveChanges();
                     }
-                    
                 }
             }
             if (activeCourse.AbstractRole.CanModify)
             {
-                return RedirectToAction("TeacherIndex", new { assignmentId = assignment.ID, courseUserId = (int)Session["StudentId"], postOrReply = (int)Session["PostOrReply"]});
+                return RedirectToAction("TeacherIndex", new { assignmentId = assignment.ID, courseUserId = (int)Session["StudentId"], postOrReply = (int)Session["PostOrReply"] });
             }
             else if (activeCourse.AbstractRole.Anonymized)
             {
@@ -336,8 +389,8 @@ namespace OSBLE.Controllers
             {
                 return RedirectToAction("Index", new { assignmentId = assignment.ID });
             }
-
         }
+
         [HttpGet, FileCache(Duration = 3600)]
         public FileStreamResult ProfilePictureForDiscussion(int course, int userProfile)
         {
@@ -396,7 +449,7 @@ namespace OSBLE.Controllers
             if (replyToPost != null)
             {
                 dr.AssignmentID = replyToPost.AssignmentID;
-                dr.DisplayName = dr.CourseUser.DisplayName(activeCourse.AbstractRole);
+                dr.DisplayName = dr.CourseUser.DisplayNameFirstLast(activeCourse.AbstractRole);
                 dr.IsReply = true;
                 replyToPost.Replies.Add(dr);
 

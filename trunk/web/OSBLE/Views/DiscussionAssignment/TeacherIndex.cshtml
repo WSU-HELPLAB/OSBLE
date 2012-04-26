@@ -2,9 +2,91 @@
 @{
     Assignment assignment = ViewBag.Assignment;
     ViewBag.Title = "Discussion Assignment: " + assignment.AssignmentName;
+    string selectedTeam = ViewBag.TeamSelectId;
+    string selectedAssignment = ViewBag.AssignmentSelectId;
+    int postOrReply = ViewBag.PostOrReply;
 }
 
-<h2>Discussion Assignment</h2>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#@selectedTeam').change(function() { 
+            var assignmentID = $('#@selectedAssignment').val();
+            var teamID = $('#@selectedTeam').val();
+            window.location.replace("/DiscussionAssignment/TeacherIndex?assignmentId=" + @assignment.ID + "&courseUserId=" + teamID + "&postOrReply=" + @postOrReply);
+        });
+    });
+
+    function switchEvalButton(aId, cId) {
+        window.location.replace("/DiscussionAssignment/TeacherIndex?assignmentId=" + aId + "&courseUserId=" + cId + "&postOrReply=" + @postOrReply);
+    }
+</script>
+
+<h2>@assignment.AssignmentName @ViewBag.TeamName</h2>
+<table>
+<tr>
+    <th>
+        Student/Team:
+    </th>
+                
+        @{
+            int prevUserId;
+            int userCount;
+            DiscussionTeam at;
+
+            List<DiscussionTeam> atList = (from t in ViewBag.TeamList as IEnumerable<DiscussionTeam>
+                                           select t).Reverse().ToList();
+
+            //We reversed the list so the last person is our first person
+            if (atList.LastOrDefault().TeamID == ViewBag.SelectedTeam.TeamID)
+            {
+                prevUserId = atList.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
+                userCount = 1;
+            }
+            else
+            {
+                at = atList.SkipWhile(item => item.TeamID != ViewBag.SelectedTeam.TeamID).Skip(1).FirstOrDefault();
+                prevUserId = at.Team.TeamMembers.FirstOrDefault().CourseUserID;
+                userCount = atList.Count() - (atList.IndexOf(at) - 1);
+            }
+        }
+                
+    <td style="padding:0;margin:0;border:0">
+        <input type="button" value="<" onclick="switchEvalButton(@ViewBag.Assignment.ID, @prevUserId);" style="margin:0" />
+        <select id="@selectedTeam" name="@selectedTeam" style="margin:0">
+            @{foreach (DiscussionTeam team in ViewBag.TeamList)
+              {
+                  string optionText = "<option value=\"{0}\" {1}>{2}</option>";
+
+                  string selectedValue = "";
+                  if (team.TeamID == ViewBag.SelectedTeam.TeamID)
+                  {
+                      selectedValue = "selected=\"selected\"";
+                  }
+
+                    
+                @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
+              }
+              int userId;
+              atList = (from t in ViewBag.TeamList as IEnumerable<DiscussionTeam>
+                        select t).ToList();
+
+              if (atList.LastOrDefault().TeamID == ViewBag.SelectedTeam.TeamID)
+              {
+                  userId = atList.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
+              }
+              else
+              {
+                  userId = atList.SkipWhile(item => item.TeamID != ViewBag.SelectedTeam.TeamID).Skip(1).FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
+              }
+                    
+            <input type="button" value=">" onclick="switchEvalButton(@ViewBag.Assignment.ID, @userId);"/>
+        }
+        </select>
+    </td>
+    <td style="text-align: center">
+        @userCount/@atList.Count()
+    </td>
+</table>
 
 <fieldset style="border-color:White;">@Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(assignment.AssignmentDescription).ToString()))</fieldset>
 <br />
@@ -14,3 +96,4 @@
 </div>
 <p>
 </p>
+
