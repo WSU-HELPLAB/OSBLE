@@ -292,7 +292,28 @@ function create_and_open_downloading_submission_dialog() {
                     @userCount/@atList.Count()
                 </td>
             </tr>
-            
+            </table>
+            <table>
+            <tr>
+                @if (Model.SelectedAssignment.HasDeliverables)
+                {
+                    <td>
+                        @Html.ActionLink("Download Submission Files", "GetSubmissionZip", "FileHandler", new { assignmentID = Model.SelectedAssignment.ID, teamID = Model.SelectedTeam.TeamID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+                    </td>
+                }
+                @if (Model.SelectedAssignment.HasCommentCategories)
+                {
+                    <td>
+                        @Html.ActionLink("View/Edit Inline Comments", "InlineReview", "Assignment", new { assignmentID = Model.SelectedAssignment.ID, teamID = Model.SelectedTeam.TeamID }, new { style = "padding-left: 25px;" })
+                    </td>
+                }
+                @if (Model.SelectedAssignment.AssignmentTypeID == 3)
+                {
+                    <td>
+                        @(Html.ActionLink("View " + Model.Evaluation.Recipient.Name + "'s discussion contributions", "TeacherIndex", "DiscussionAssignment", new { assignmentId = Model.SelectedAssignment.ID, courseUserId = Model.Evaluation.Recipient.TeamMembers.FirstOrDefault().CourseUserID, postOrReply = 2 }, new { })) 
+                    </td>
+                }
+            </tr>
                 
         </table>
     </div>
@@ -308,30 +329,6 @@ function create_and_open_downloading_submission_dialog() {
                 <td id="@gradeId" style="text-align:right;" >
                     0%
                 </td>
-                @if (Model.SelectedAssignment.HasDeliverables)
-                {
-                    <td>
-                        @Html.ActionLink("Download Submission Files", "GetSubmissionZip", "FileHandler", new { assignmentID = Model.SelectedAssignment.ID, teamID = Model.SelectedTeam.TeamID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
-                    </td>
-                }
-                else
-                {
-                    <td>
-                        &nbsp
-                    </td>
-                }
-                @if (Model.SelectedAssignment.HasCommentCategories)
-                {
-                    <td>
-                        @Html.ActionLink("View/Edit Inline Comments", "InlineReview", "Assignment", new { assignmentID = Model.SelectedAssignment.ID, teamID = Model.SelectedTeam.TeamID }, new { style = "padding-left: 25px;" })
-                    </td>
-                }
-                else
-                {
-                    <td>
-                        &nbsp
-                    </td>
-                }
             </tr>
             @if (publishTime.HasValue)
             {
