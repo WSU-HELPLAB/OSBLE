@@ -6,6 +6,8 @@ using OSBLE.Models.Users;
 using System.Web.Security;
 using System.IO;
 using OSBLE.Models;
+using System.Security.Cryptography;
+using System.Configuration;
 
 namespace OSBLE.Utility
 {
@@ -25,16 +27,84 @@ namespace OSBLE.Utility
 
         public static string Encrypt(string content)
         {
-            byte[] rawBytes = System.Text.Encoding.UTF8.GetBytes(content);
-            string enctryptedString = MachineKey.Encode(rawBytes, MachineKeyProtection.All); 
-            return enctryptedString;
+            string hash = ConfigurationManager.AppSettings["EncryptionHash"];
+            byte[] Results;
+            System.Text.UTF8Encoding UTF8 = new System.Text.UTF8Encoding();
+
+            // Step 1. We hash the passphrase using MD5
+            // We use the MD5 hash generator as the result is a 128 bit byte array
+            // which is a valid length for the TripleDES encoder we use below
+
+            MD5CryptoServiceProvider HashProvider = new MD5CryptoServiceProvider();
+            byte[] TDESKey = HashProvider.ComputeHash(UTF8.GetBytes(hash));
+
+            // Step 2. Create a new TripleDESCryptoServiceProvider object
+            TripleDESCryptoServiceProvider TDESAlgorithm = new TripleDESCryptoServiceProvider();
+
+            // Step 3. Setup the encoder
+            TDESAlgorithm.Key = TDESKey;
+            TDESAlgorithm.Mode = CipherMode.ECB;
+            TDESAlgorithm.Padding = PaddingMode.PKCS7;
+
+            // Step 4. Convert the input string to a byte[]
+            byte[] DataToEncrypt = UTF8.GetBytes(content);
+
+            // Step 5. Attempt to encrypt the string
+            try
+            {
+                ICryptoTransform Encryptor = TDESAlgorithm.CreateEncryptor();
+                Results = Encryptor.TransformFinalBlock(DataToEncrypt, 0, DataToEncrypt.Length);
+            }
+            finally
+            {
+                // Clear the TripleDes and Hashprovider services of any sensitive information
+                TDESAlgorithm.Clear();
+                HashProvider.Clear();
+            }
+
+            // Step 6. Return the encrypted string as a base64 encoded string
+            return Convert.ToBase64String(Results);
         }
 
         public static string Decrypt(string content)
         {
-            byte[] encryptedBytes = MachineKey.Decode(content, MachineKeyProtection.All);
-            string decryptedContent = System.Text.Encoding.UTF8.GetString(encryptedBytes);
-            return decryptedContent;
+            byte[] Results;
+            string hash = ConfigurationManager.AppSettings["EncryptionHash"];
+            System.Text.UTF8Encoding UTF8 = new System.Text.UTF8Encoding();
+
+            // Step 1. We hash the passphrase using MD5
+            // We use the MD5 hash generator as the result is a 128 bit byte array
+            // which is a valid length for the TripleDES encoder we use below
+
+            MD5CryptoServiceProvider HashProvider = new MD5CryptoServiceProvider();
+            byte[] TDESKey = HashProvider.ComputeHash(UTF8.GetBytes(hash));
+
+            // Step 2. Create a new TripleDESCryptoServiceProvider object
+            TripleDESCryptoServiceProvider TDESAlgorithm = new TripleDESCryptoServiceProvider();
+
+            // Step 3. Setup the decoder
+            TDESAlgorithm.Key = TDESKey;
+            TDESAlgorithm.Mode = CipherMode.ECB;
+            TDESAlgorithm.Padding = PaddingMode.PKCS7;
+
+            // Step 4. Convert the input string to a byte[]
+            byte[] DataToDecrypt = Convert.FromBase64String(content);
+
+            // Step 5. Attempt to decrypt the string
+            try
+            {
+                ICryptoTransform Decryptor = TDESAlgorithm.CreateDecryptor();
+                Results = Decryptor.TransformFinalBlock(DataToDecrypt, 0, DataToDecrypt.Length);
+            }
+            finally
+            {
+                // Clear the TripleDes and Hashprovider services of any sensitive information
+                TDESAlgorithm.Clear();
+                HashProvider.Clear();
+            }
+
+            // Step 6. Return the decrypted string in UTF8 format
+            return UTF8.GetString(Results);
         }
 
         /// <summary>
@@ -46,7 +116,7 @@ namespace OSBLE.Utility
             HttpCookie cookie = new HttpCookie(ProfileCookieKey);
 
             //save the profile's user name
-            cookie.Values[userNameKey] = profile.UserName;// Encrypt(profile.UserName);
+            cookie.Values[userNameKey] = Encrypt(profile.UserName);
 
             //set a really long expiration date
             cookie.Expires = DateTime.Now.AddDays(300);
@@ -72,7 +142,7 @@ namespace OSBLE.Utility
                     try
                     {
                         HttpCookie cookie = HttpContext.Current.Request.Cookies.Get(ProfileCookieKey);
-                        string userName = cookie.Values[userNameKey]; //Decrypt(cookie.Values[userNameKey]);
+                        string userName = Decrypt(cookie.Values[userNameKey]);
                         return db.UserProfiles.Where(u => u.UserName == userName).FirstOrDefault();
                     }
                     catch (Exception ex)
