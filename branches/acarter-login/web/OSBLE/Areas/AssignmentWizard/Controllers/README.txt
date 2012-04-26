@@ -1,1 +1,0 @@
-﻿Place your wizard components into here.  Be sure to inherit from WizardBaseController.
