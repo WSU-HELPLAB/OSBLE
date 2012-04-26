@@ -60,7 +60,7 @@
             }
             </td>
             <td class="email_view_links">
-                @if (ViewBag.CurrentUser == Model.ToUserProfile)
+                @if (ViewBag.CurrentUser.ID == Model.ToUserProfile.ID)
                 { // inbox
                     @Html.ActionLink("Back to Inbox\t", "Index") <a>&nbsp;</a>
                 }
@@ -82,7 +82,7 @@
     </table>
 
     <p>
-        @if (ViewBag.CurrentUser == Model.ToUserProfile)
+        @if (ViewBag.CurrentUser.ID == Model.ToUserProfile.ID)
         {
             //Replying
             using (Html.BeginForm("CreateReply", "Mail", FormMethod.Get))
@@ -134,7 +134,7 @@
     </div>
 
     <p>
-    @if (ViewBag.CurrentUser == Model.ToUserProfile)
+    @if (ViewBag.CurrentUser.ID == Model.ToUserProfile.ID)
     {
         //Replying
         using (Html.BeginForm("CreateReply", "Mail", FormMethod.Get))
@@ -193,7 +193,7 @@
             }
             </td>
             <td class="email_view_links">
-                @if (ViewBag.CurrentUser == Model.ToUserProfile)
+                @if (ViewBag.CurrentUser.ID == Model.ToUserProfile.ID)
                 { // inbox
                     @Html.ActionLink("Back to Inbox\t", "Index") <a>&nbsp;</a>
                 }
