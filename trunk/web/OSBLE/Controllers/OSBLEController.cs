@@ -13,6 +13,7 @@ using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models.Assignments;
 using System.Configuration;
+using OSBLE.Utility;
 
 namespace OSBLE.Controllers
 {
@@ -21,11 +22,18 @@ namespace OSBLE.Controllers
     {
         protected OSBLEContext db = new OSBLEContext();
 
-        protected UserProfile currentUser = null;
-
+        private UserProfile _currentUser = OsbleAuthentication.CurrentUser;
         public UserProfile CurrentUser
         {
-            get { return currentUser; }
+            get 
+            {
+                //reduces db calls
+                if (_currentUser == null)
+                {
+                    _currentUser = OsbleAuthentication.CurrentUser;
+                }
+                return _currentUser;
+            }
         }
 
         protected CourseUser activeCourse = null;
@@ -129,7 +137,7 @@ namespace OSBLE.Controllers
             // If logged in, feed user profile to view.
             if (Convert.ToBoolean(ConfigurationManager.AppSettings["RequireLoginValidation"]) == true)
             {
-                if (context.User.Identity.IsAuthenticated)
+                if (OsbleAuthentication.CurrentUser != null && OsbleAuthentication.CurrentUser.IsApproved)
                 {
                     setupInitialDatabaseData();
 
@@ -188,6 +196,10 @@ namespace OSBLE.Controllers
             {
                 ViewBag.CourseListTitle = "Course";
             }
+            if (currentCourses == null)
+            {
+                currentCourses = new List<CourseUser>();
+            }
             ViewBag.CurrentCourses = currentCourses;
         }
 
@@ -236,11 +248,11 @@ namespace OSBLE.Controllers
         protected void GetEnrolledCourses()
         {
             // If current user is valid, get course list for user.
-            if (currentUser != null)
+            if (CurrentUser != null)
             {
                 // Sends the ViewBag the amount of unread mail messages the user has.
                 SetUnreadMessageCount();
-                List<CourseUser> allUsersCourses = db.CourseUsers.Where(cu => cu.UserProfileID == currentUser.ID).ToList();
+                List<CourseUser> allUsersCourses = db.CourseUsers.Where(cu => cu.UserProfileID == CurrentUser.ID).ToList();
 
                 // Get list of courses this user is connected to. Remove inactive (for anyone other than instructors or observers) or hidden (for all) courses.
                 currentCourses = allUsersCourses.Where(cu => (cu.AbstractCourse is Course) &&
@@ -265,7 +277,7 @@ namespace OSBLE.Controllers
                 if (sessionAc == null || !(sessionAc is int))
                 {
                     // On login or invalid ActiveCourse, set to user's default course.
-                    activeCourseID = currentUser.DefaultCourse;
+                    activeCourseID = CurrentUser.DefaultCourse;
                 }
                 else if (sessionAc is int)
                 {
@@ -299,13 +311,12 @@ namespace OSBLE.Controllers
 
         private void setCurrentUserProfile()
         {
-            string userName = context.User.Identity.Name;
-            ViewBag.CurrentUser = currentUser = db.UserProfiles.Where(u => u.UserName == userName).FirstOrDefault();
+            ViewBag.CurrentUser = OsbleAuthentication.CurrentUser;
         }
 
         public void SetUnreadMessageCount()
         {
-            ViewBag.UnreadMessageCount = (int)db.Mails.Where(m => (m.ToUserProfileID == currentUser.ID) && (m.Read == false)).Count();
+            ViewBag.UnreadMessageCount = (int)db.Mails.Where(m => (m.ToUserProfileID == CurrentUser.ID) && (m.Read == false)).Count();
         }
 
         public static List<UserProfile> GetAllUsers(AssignmentTeam team)

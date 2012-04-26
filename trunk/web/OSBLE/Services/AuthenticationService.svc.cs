@@ -122,7 +122,7 @@ namespace OSBLE.Services
             //clean up the active sessions table
             CleanActiveSessions();
 
-            if (Membership.ValidateUser(userName, password))
+            if (UserProfile.ValidateUser(userName, password))
             {
                 UserProfile profile = (from p in db.UserProfiles
                                        where p.AspNetUserName == userName

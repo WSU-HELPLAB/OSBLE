@@ -7,6 +7,7 @@
     using OSBLE.Models;
     using OSBLE.Models.Courses;
     using OSBLE.Models.Users;
+    using OSBLE.Utility;
 
     /// <summary>
     /// Provides current user and active course context,
@@ -29,7 +30,7 @@
         public OSBLEService()
             : base()
         {
-            string userName = Context.User.Identity.Name;
+            string userName = OsbleAuthentication.CurrentUser.UserName;
 
             currentUserProfile = db.UserProfiles.Where(u => u.UserName == userName).FirstOrDefault();
 

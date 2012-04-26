@@ -353,7 +353,7 @@ namespace OSBLE.Controllers
             AbstractRole theirRole = db.CourseUsers.Where(c => (c.AbstractCourseID == course) && (c.UserProfileID == userProfile)).Select(c => c.AbstractRole).FirstOrDefault();
 
             // Show picture if user is requesting their own profile picture or they have the right to view the profile picture
-            if (userProfile == currentUser.ID ||
+            if (userProfile == CurrentUser.ID ||
                 // Current user's CourseRole
                 ourRole != null &&
                 // Target user's CourseRole

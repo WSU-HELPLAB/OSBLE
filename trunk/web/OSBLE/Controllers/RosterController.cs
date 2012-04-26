@@ -513,7 +513,7 @@ namespace OSBLE.Controllers
                                && c.UserProfileID != courseUser.UserProfileID)
                                select c);
 
-            if (courseUser.UserProfile != currentUser || diffTeacher.Count() > 0)
+            if (courseUser.UserProfile != CurrentUser || diffTeacher.Count() > 0)
             {
                 return true;
             }
@@ -589,7 +589,7 @@ namespace OSBLE.Controllers
             bool show = false;
             UserProfile u = db.UserProfiles.Find(userProfile);
 
-            if (userProfile == currentUser.ID)
+            if (userProfile == CurrentUser.ID)
             {
                 show = true;
             }
@@ -631,7 +631,7 @@ namespace OSBLE.Controllers
                 UserProfile up = new UserProfile();
                 up.CanCreateCourses = false;
                 up.IsAdmin = false;
-                up.SchoolID = currentUser.SchoolID;
+                up.SchoolID = CurrentUser.SchoolID;
                 up.Identification = courseuser.UserProfile.Identification;
 
                 if (courseuser.UserProfile.FirstName != null)

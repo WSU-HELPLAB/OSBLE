@@ -20,45 +20,9 @@ namespace OSBLE.Attributes
     {
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            OsbleAuthentication auth = new OsbleAuthentication();
-            HttpCookie profileCookie = filterContext.HttpContext.Request.Cookies.Get(OsbleAuthentication.ProfileCookieKey);
-            string aspName = filterContext.HttpContext.User.Identity.Name;
-            
-            //no cookie?  
-            if (profileCookie == null)
+            if (OsbleAuthentication.CurrentUser == null)
             {
-                //what about a asp.net auth cookie?
-                if (aspName == null || aspName.Length == 0)
-                {
-                    filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Account", action = "LogOn" }));
-                }
-                else
-                {
-                    //the user is logged in to asp.net, but doesn't have our custom auth cookie.  Create one now.
-                    using(OSBLEContext db = new OSBLEContext())
-                    {
-                        UserProfile profile = db.UserProfiles.Where(u => u.AspNetUserName == aspName).FirstOrDefault();
-                        profileCookie = auth.UserAsCookie(profile);
-                        filterContext.HttpContext.Response.Cookies.Add(profileCookie);
-                    }
-                }
-            }
-            else
-            {
-                //get the user and then update the underlying asp.net authentication cookie
-                UserProfile profile = auth.GetUserFromCookie(profileCookie);
-
-                //method returns null when something wrong happened
-                if (profile == null)
-                {
-                    filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Account", action = "LogOn" }));
-                }
-                else
-                {
-                    HttpCookie updatedCookie = auth.UserAsCookie(profile);
-                    FormsAuthentication.SetAuthCookie(profile.AspNetUserName, true);
-                    //filterContext.HttpContext.Response.Cookies.Add(profileCookie);
-                }
+                filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Account", action = "LogOn" }));
             }
         }
     }

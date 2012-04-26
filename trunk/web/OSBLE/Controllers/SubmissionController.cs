@@ -77,7 +77,7 @@ namespace OSBLE.Controllers
                 TeamMember teamMember;
                 if (userprofile == null)
                 {
-                    teamMember = GetTeamUser(assignment, currentUser);
+                    teamMember = GetTeamUser(assignment, CurrentUser);
                 }
                 else
                 {
@@ -100,7 +100,7 @@ namespace OSBLE.Controllers
                     {
 
 
-                        AssignmentTeam assignmentTeam = GetAssignmentTeam(assignment, currentUser);
+                        AssignmentTeam assignmentTeam = GetAssignmentTeam(assignment, CurrentUser);
                         
                         int i = 0;
 
@@ -189,7 +189,7 @@ namespace OSBLE.Controllers
                                     {
                                         
                                     }
-                                    var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, assignmentTeam), currentUser.LastName + "_" + currentUser.FirstName + "_" + delName + ".txt");
+                                    var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, assignmentTeam), CurrentUser.LastName + "_" + CurrentUser.FirstName + "_" + delName + ".txt");
                                     System.IO.File.WriteAllText(path, inbrowser);
                                 }
                             }

@@ -23,89 +23,80 @@ namespace OSBLE.Utility
 
         private OSBLEContext db = new OSBLEContext();
 
-        public UserProfile GetUserFromCookie(HttpCookie cookie)
-        {
-            UserProfile profile = new UserProfile();
-            string userName = "";
-            string authToken = "";
-
-            //do everything in a try/catch to account for potential null fields
-            try
-            {
-                ActivityLog log = new ActivityLog()
-                {
-                    Sender = typeof(OsbleAuthentication).ToString(),
-                    Message = "Attempting to retrieve cookie from IP " + HttpContext.Current.Request.UserHostAddress
-                };
-                //db.ActivityLogs.Add(log);
-
-                //user name
-                byte[] bytes = MachineKey.Decode(cookie.Values[userNameKey].ToString(), MachineKeyProtection.All);
-                userName = System.Text.Encoding.UTF8.GetString(bytes);
-                authToken = System.Text.Encoding.UTF8.GetString(MachineKey.Decode(cookie.Values[authKey].ToString(), MachineKeyProtection.All));
-
-                if (authToken.CompareTo(HttpContext.Current.Request.UserHostAddress) != 0)
-                {
-                    log = new ActivityLog()
-                    {
-                        Sender = typeof(OsbleAuthentication).ToString(),
-                        Message = "Bad auth token detected.  Expected: " + 
-                                    HttpContext.Current.Request.UserHostAddress + 
-                                    ", Received: " + authToken + 
-                                    " User Name: " + userName + 
-                                    " authToken: " + authToken 
-                    };
-                    db.ActivityLogs.Add(log);
-                    return null;
-                }
-                profile = db.UserProfiles.Where(u => u.AspNetUserName == userName).FirstOrDefault();
-                
-            }
-            catch (Exception ex)
-            {
-                ActivityLog log = new ActivityLog()
-                {
-                    Sender = typeof(OsbleAuthentication).ToString(),
-                    Message = "Authentiation exception encoutered for IP " + HttpContext.Current.Request.UserHostAddress + ": " + ex.Message +
-                                " User Name: " + userName +
-                                " authToken: " + authToken 
-
-                };
-                db.ActivityLogs.Add(log);
-                db.SaveChanges();
-                return null;
-            }
-            ActivityLog successLog = new ActivityLog()
-            {
-                Sender = typeof(OsbleAuthentication).ToString(),
-                Message = "Authentication successful.",
-                UserID = profile.ID
-            };
-            //db.ActivityLogs.Add(successLog);
-            db.SaveChanges();
-            return profile;
-        }
-
-        public HttpCookie InvalidateUserCookie(UserProfile profile)
-        {
-            HttpCookie cookie = UserAsCookie(profile);
-            cookie.Expires = DateTime.Now.AddDays(-1d);
-            return cookie;
-        }
-
-        public HttpCookie UserAsCookie(UserProfile profile)
+        /// <summary>
+        /// Logs the supplied user into OSBLE
+        /// </summary>
+        /// <param name="profile"></param>
+        public static void LogIn(UserProfile profile)
         {
             HttpCookie cookie = new HttpCookie(ProfileCookieKey);
-            
-            //encode and save the profile's user name
-            cookie.Values[userNameKey] = MachineKey.Encode(System.Text.Encoding.UTF8.GetBytes(profile.AspNetUserName), MachineKeyProtection.All);
 
-            //AC: need a better way to tie the cookie to the current machine
-            cookie.Values[authKey] = MachineKey.Encode(System.Text.Encoding.UTF8.GetBytes(HttpContext.Current.Request.UserHostAddress), MachineKeyProtection.All);
+            //save the profile's user name
+            cookie.Values[userNameKey] = profile.UserName;
 
             //set a really long expiration date
             cookie.Expires = DateTime.Now.AddDays(300);
-            return cookie;
+
+            //and then store it in the next response
+            if (HttpContext.Current != null)
+            {
+                HttpContext.Current.Response.Cookies.Set(cookie);
+            }
+        }
+
+        /// <summary>
+        /// Returns the currently logged in user
+        /// </summary>
+        public static UserProfile CurrentUser
+        {
+            get
+            {
+                UserProfile profile = null;
+                if (HttpContext.Current != null)
+                {
+                    OSBLEContext db = new OSBLEContext();
+                    try
+                    {
+                        HttpCookie cookie = HttpContext.Current.Request.Cookies.Get(ProfileCookieKey);
+                        string userName = cookie.Values[userNameKey];
+                        return db.UserProfiles.Where(u => u.UserName == userName).FirstOrDefault();
+                    }
+                    catch (Exception ex)
+                    {
+                        string message = string.Format("Error parsing current user for IP {0}: {1}", HttpContext.Current.Request.UserHostAddress, ex.Message);
+                        ActivityLog log = new ActivityLog()
+                        {
+                            Sender = typeof(OsbleAuthentication).ToString(),
+                            Message = message
+                        };
+                        db.ActivityLogs.Add(log);
+                        db.SaveChanges();
+                    }
+                }
+                return profile;
+            }
+        }
+
+        /// <summary>
+        /// Logs the current user out of the system
+        /// </summary>
+        public static void LogOut()
+        {
+            if (HttpContext.Current != null)
+            {
+                //cookie might not exist
+                try
+                {
+                    HttpCookie cookie = HttpContext.Current.Request.Cookies.Get(ProfileCookieKey);
+                    cookie.Expires = DateTime.Now.AddDays(-1d);
+                    HttpContext.Current.Response.Cookies.Set(cookie);
+                }
+                catch (Exception ex)
+                {
+                    //removes annoying VS warning message
+                    string foo = ex.Message;
+                }
+            }
         }
     }
 }
