@@ -185,7 +185,7 @@ namespace OSBLE.Controllers
                 return View("NotFound");
             }
             // Unauthorized mail to view.
-            if ((mail.ToUserProfile != CurrentUser) && (mail.FromUserProfile != CurrentUser))
+            if ((mail.ToUserProfile.ID != CurrentUser.ID) && (mail.FromUserProfile.ID != CurrentUser.ID))
             {
                 return RedirectToAction("Index");
             }
