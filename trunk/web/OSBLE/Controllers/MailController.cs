@@ -189,7 +189,7 @@ namespace OSBLE.Controllers
             {
                 return RedirectToAction("Index");
             }
-            else if ((mail.ToUserProfile == CurrentUser) && (mail.Read == false))
+            else if ((mail.ToUserProfile.ID == CurrentUser.ID) && (mail.Read == false))
             {
                 mail.Read = true;
 
