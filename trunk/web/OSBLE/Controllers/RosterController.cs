@@ -654,11 +654,15 @@ namespace OSBLE.Controllers
             }
             else
             {
-                user.FirstName = courseuser.UserProfile.FirstName;
-                user.LastName = courseuser.UserProfile.LastName;
-                db.SaveChanges();
+                if (courseuser.UserProfile.FirstName != null)
+                {
+                    user.FirstName = courseuser.UserProfile.FirstName;
+                    user.LastName = courseuser.UserProfile.LastName;
+                    db.SaveChanges();
+                }
                 courseuser.UserProfile = user;
                 courseuser.UserProfileID = user.ID;
+                db.SaveChanges();
             }
             courseuser.AbstractCourseID = activeCourse.AbstractCourseID;
             //Check uniqueness
