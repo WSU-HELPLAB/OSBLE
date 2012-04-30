@@ -658,7 +658,7 @@ namespace OSBLE.Controllers
         {
             Mail mail = db.Mails.Find(id);
 
-            if (mail.ToUserProfile == CurrentUser)
+            if (mail.ToUserProfile.ID == CurrentUser.ID)
             {
                 if (mail.DeleteFromOutbox == true)
                 {
@@ -685,7 +685,7 @@ namespace OSBLE.Controllers
         {
             Mail mail = db.Mails.Find(id);
 
-            if (mail.FromUserProfile == CurrentUser)
+            if (mail.FromUserProfile.ID == CurrentUser.ID)
             {
                 if (mail.DeleteFromInbox == true)
                 {
