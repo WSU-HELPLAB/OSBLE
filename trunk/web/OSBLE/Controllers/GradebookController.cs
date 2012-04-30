@@ -774,17 +774,13 @@ namespace OSBLE.Controllers
 
                     List<Score> scoreList = (from scores in db.Scores
                                              where scores.Assignment.CategoryID == categoryId
-                                             && scores.isDropped == true
+                                             && scores.isDropped == true &&
+                                             scores.CourseUserID == user.ID
                                              select scores).ToList();
 
-                    var studentScores = (from scores in scoreList
-                                         where scores.CourseUserID == user.ID &&
-                                         scores.isDropped == true
-                                         select scores);
-
-                    if (studentScores.Count() > 0)
+                    if (scoreList.Count() > 0)
                     {
-                        foreach (Score score in studentScores)
+                        foreach (Score score in scoreList)
                         {
                             score.isDropped = false;
                         }
@@ -835,19 +831,16 @@ namespace OSBLE.Controllers
                                        select u).FirstOrDefault();
 
                     List<Score> scoreList = (from scores in db.Scores
-                                             where scores.Assignment.CategoryID == categoryId
+                                             where scores.Assignment.CategoryID == categoryId &&
+                                             scores.CourseUserID == user.ID
                                              orderby (scores.Points / scores.Assignment.PointsPossible)
                                              select scores).ToList();
 
-                    var studentScores = (from scores in scoreList
-                                         where scores.CourseUserID == user.ID
-                                         select scores);
-
                     Category currentCategory = (from cat in db.Categories where cat.ID == categoryId select cat).FirstOrDefault();
 
-                    if (studentScores.Count() > 0)
+                    if (scoreList.Count() > 0)
                     {
-                        List<Score> scores = studentScores.ToList();
+                        List<Score> scores = scoreList.ToList();
 
                         var max = 0;
                         int dropX = currentCategory.dropX;
