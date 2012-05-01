@@ -272,17 +272,17 @@ function create_and_open_downloading_submission_dialog() {
                           }
                           int userId;
 
-                        atList = (from t in @Model.TeamList as IEnumerable<AssignmentTeam>
-                                  select t).ToList();
+                          atList = (from t in @Model.TeamList as IEnumerable<AssignmentTeam>
+                                    select t).ToList();
 
-                        if (atList.LastOrDefault().TeamID == @Model.SelectedTeam.TeamID)
-                        {
-                            userId = atList.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
-                        }
-                        else
-                        {
-                            userId = atList.SkipWhile(item => item.TeamID != @Model.SelectedTeam.TeamID).Skip(1).FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
-                        }
+                          if (atList.LastOrDefault().TeamID == @Model.SelectedTeam.TeamID)
+                          {
+                              userId = atList.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
+                          }
+                          else
+                          {
+                              userId = atList.SkipWhile(item => item.TeamID != @Model.SelectedTeam.TeamID).Skip(1).FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
+                          }
                     
                         <input type="button" value=">" onclick="switchEvalButton(@Model.SelectedAssignment.ID, @userId);"/>
                     }
@@ -405,5 +405,8 @@ function create_and_open_downloading_submission_dialog() {
         <div id="internalScrollID" style="width: 1200px; overflow: auto;">
             @Html.Partial("_Display", Model)
         </div>
+        <input type="hidden" name="@ViewBag.AssignmentId" value="@Model.SelectedAssignment.ID" />
+        <input type="hidden" name="@ViewBag.CourseUserId" value="@Model.SelectedTeam.Team.TeamMembers.FirstOrDefault().CourseUserID" />
+        <input type="hidden" name="@ViewBag.TeamId" value="@Model.SelectedTeam.TeamID" />
     }
 </div>
