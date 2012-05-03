@@ -21,33 +21,36 @@
     }
 </script>
 
-<h2>@assignment.AssignmentName @ViewBag.TeamName</h2>
+<h2>@assignment.AssignmentName @if (ViewBag.TeamName != null) { @ViewBag.TeamName }</h2>
+@if (ViewBag.ActiveCourse.AbstractRole.CanModify && ViewBag.SelectedTeam != null)
+{
 <table>
+
 <tr>
     <th>
         Student/Team:
     </th>
                 
         @{
-            int prevUserId;
-            int userCount;
-            DiscussionTeam at;
+    int prevUserId;
+    int userCount;
+    DiscussionTeam at;
 
-            List<DiscussionTeam> atList = (from t in ViewBag.TeamList as IEnumerable<DiscussionTeam>
-                                           select t).Reverse().ToList();
+    List<DiscussionTeam> atList = (from t in ViewBag.TeamList as IEnumerable<DiscussionTeam>
+                                   select t).Reverse().ToList();
 
-            //We reversed the list so the last person is our first person
-            if (atList.LastOrDefault().TeamID == ViewBag.SelectedTeam.TeamID)
-            {
-                prevUserId = atList.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
-                userCount = 1;
-            }
-            else
-            {
-                at = atList.SkipWhile(item => item.TeamID != ViewBag.SelectedTeam.TeamID).Skip(1).FirstOrDefault();
-                prevUserId = at.Team.TeamMembers.FirstOrDefault().CourseUserID;
-                userCount = atList.Count() - (atList.IndexOf(at) - 1);
-            }
+    //We reversed the list so the last person is our first person
+    if (atList.LastOrDefault().TeamID == ViewBag.SelectedTeam.TeamID)
+    {
+        prevUserId = atList.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
+        userCount = 1;
+    }
+    else
+    {
+        at = atList.SkipWhile(item => item.TeamID != ViewBag.SelectedTeam.TeamID).Skip(1).FirstOrDefault();
+        prevUserId = at.Team.TeamMembers.FirstOrDefault().CourseUserID;
+        userCount = atList.Count() - (atList.IndexOf(at) - 1);
+    }
         }
                 
     <td style="padding:0;margin:0;border:0">
@@ -86,8 +89,9 @@
     <td style="text-align: center">
         @userCount/@atList.Count()
     </td>
+</tr>
 </table>
-
+}
 <fieldset style="border-color:White;">@Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(assignment.AssignmentDescription).ToString()))</fieldset>
 <br />
 

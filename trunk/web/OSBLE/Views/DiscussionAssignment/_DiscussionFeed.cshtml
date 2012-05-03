@@ -157,7 +157,7 @@
                                     @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:#FFF8C6;">
                                         <div class="dp_post_header">
                                             @Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }))
-                                            @dr.DisplayName <br />
+                                            @dr.CourseUser.DisplayNameFirstLast(ViewBag.ActiveCourse.AbstractRole)<br />
                                             @dr.Posted <br /> <br /> </div>
                                             <div class="dp_content">
                                              @{
@@ -173,7 +173,7 @@
                                     @:<div class="dp_post" id="dp_post_@(dr.ID)" style="background:white;">
                                         <div class="dp_post_header">
                                         @Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }))
-                                        @dr.DisplayName <br />
+                                        @dr.CourseUser.DisplayNameFirstLast(ViewBag.ActiveCourse.AbstractRole) <br />
                                         @dr.Posted <br /> <br /> </div>
                                         <div class="dp_content">
                                         @{

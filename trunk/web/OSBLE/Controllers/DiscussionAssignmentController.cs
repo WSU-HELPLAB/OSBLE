@@ -197,7 +197,6 @@ namespace OSBLE.Controllers
                 }
                 student = null;
             }
-
             
 
             ViewBag.Student = student;
@@ -207,12 +206,19 @@ namespace OSBLE.Controllers
             ViewBag.PostOrReply = postOrReply;
             if (assignment.HasDiscussionTeams)
             {
-                ViewBag.TeamName = "- " + discussionTeam.Team.Name;
+                ViewBag.TeamName = " - " + discussionTeam.Team.Name;
                 ViewBag.TeamList = assignment.DiscussionTeams.OrderBy(s => s.Team.Name).ToList();
             }
             else
             {
-                ViewBag.TeamName = "- " + student.DisplayNameFirstLast(activeCourse.AbstractRole);
+                if (student == null)
+                {
+                    ViewBag.TeamName = null;
+                }
+                else
+                {
+                    ViewBag.TeamName = " - " + student.DisplayNameFirstLast(activeCourse.AbstractRole);
+                }
                 
                 List<DiscussionTeam> dtList = new List<DiscussionTeam>();
                 DiscussionTeam dt = new DiscussionTeam();
@@ -232,7 +238,14 @@ namespace OSBLE.Controllers
             
             ViewBag.TeamSelectId = "selected_team";
             ViewBag.AssignmentSelectId = "selected_assignment";
-            ViewBag.SelectedTeam = discussionTeam;
+            if (discussionTeam.AssignmentID != 0)
+            {
+                ViewBag.SelectedTeam = discussionTeam;
+            }
+            else
+            {
+                ViewBag.SelectedTeam = null;
+            }
             ViewBag.PostOrReply = postOrReply;
             return View();
         }
@@ -306,13 +319,24 @@ namespace OSBLE.Controllers
                 {
                     posts = (from post in db.DiscussionPosts
                              where post.AssignmentID == assignment.ID &&
-                             post.IsReply == false
+                             !post.IsReply
                              orderby post.Posted
                              select post).ToList();
                     foreach (DiscussionPost post in posts)
                     {
                         post.DisplayName = post.CourseUser.DisplayNameFirstLast(activeCourse.AbstractRole);
-                        post.ShowProfilePicture = false;
+                    }
+
+                    foreach (AssignmentTeam a in assignment.AssignmentTeams)
+                    {
+                        if (a.Team.TeamMembers.FirstOrDefault().CourseUser.ID == student.ID)
+                        {
+                            discussionTeam.Assignment = a.Assignment;
+                            discussionTeam.AssignmentID = a.AssignmentID;
+                            discussionTeam.Team = a.Team;
+                            discussionTeam.TeamID = a.TeamID;
+                            break;
+                        }
                     }
                     ViewBag.Posts = posts;
                 }
@@ -327,12 +351,53 @@ namespace OSBLE.Controllers
                 student = null;
             }
 
+            if (assignment.HasDiscussionTeams)
+            {
+                ViewBag.TeamName = "- " + discussionTeam.Team.Name;
+                ViewBag.TeamList = assignment.DiscussionTeams.OrderBy(s => s.Team.Name).ToList();
+            }
+            else
+            {
+                if (student == null)
+                {
+                    ViewBag.TeamName = null;
+                }
+                else
+                {
+                    ViewBag.TeamName = "- " + student.DisplayNameFirstLast(activeCourse.AbstractRole);
+                }
+
+                List<DiscussionTeam> dtList = new List<DiscussionTeam>();
+                DiscussionTeam dt = new DiscussionTeam();
+                foreach (AssignmentTeam assignTeam in assignment.AssignmentTeams)
+                {
+                    dt.Assignment = assignTeam.Assignment;
+                    dt.AssignmentID = assignTeam.AssignmentID;
+                    dt.Team = assignTeam.Team;
+                    dt.TeamID = assignTeam.TeamID;
+                    dt.Team.Name = assignTeam.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastAndFirst();
+                    dtList.Add(dt);
+
+                    dt = new DiscussionTeam();
+                }
+                ViewBag.TeamList = dtList.OrderBy(l => l.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName).ThenBy(f => f.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName).ToList();
+            }
+
             ViewBag.Student = student;
             ViewBag.Assignment = assignment;
             ViewBag.FirstPost = true;
             ViewBag.ActiveCourse = activeCourse;
             ViewBag.PostOrReply = postOrReply;
-            ViewBag.TeamName = discussionTeam.Team.Name;
+            ViewBag.TeamSelectId = "selected_team";
+            ViewBag.AssignmentSelectId = "selected_assignment";
+            if (discussionTeam != null)
+            {
+                ViewBag.SelectedTeam = discussionTeam;
+            }
+            else
+            {
+                ViewBag.SelectedTeam = null;
+            }
             return View("TeacherIndex");
         }
 
