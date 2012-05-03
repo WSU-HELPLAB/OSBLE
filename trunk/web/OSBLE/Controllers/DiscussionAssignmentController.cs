@@ -93,7 +93,7 @@ namespace OSBLE.Controllers
             ViewBag.ActiveCourse = activeCourse;
             if (assignment.HasDiscussionTeams)
             {
-                ViewBag.TeamName = discussionTeam.Team.Name;
+                ViewBag.TeamName = "- " + discussionTeam.Team.Name;
             }
             else
             {
@@ -353,7 +353,7 @@ namespace OSBLE.Controllers
 
             if (assignment.HasDiscussionTeams)
             {
-                ViewBag.TeamName = "- " + discussionTeam.Team.Name;
+                ViewBag.TeamName = " - " + discussionTeam.Team.Name;
                 ViewBag.TeamList = assignment.DiscussionTeams.OrderBy(s => s.Team.Name).ToList();
             }
             else
@@ -364,7 +364,7 @@ namespace OSBLE.Controllers
                 }
                 else
                 {
-                    ViewBag.TeamName = "- " + student.DisplayNameFirstLast(activeCourse.AbstractRole);
+                    ViewBag.TeamName = " - " + student.DisplayNameFirstLast(activeCourse.AbstractRole);
                 }
 
                 List<DiscussionTeam> dtList = new List<DiscussionTeam>();
