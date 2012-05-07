@@ -242,7 +242,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             get
             {
                 WizardBaseController component = SelectedComponents.ElementAtOrDefault(ActiveComponentIndex);
-                
+
                 //null component probably means that we lost our context
                 if (component == null)
                 {
@@ -275,11 +275,11 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             else
             {
                 List<WizardBaseController> selectedAsList = SelectedComponents.ToList();
-                selectedAsList.Sort(new WizardPrerequisiteComparer());
+                selectedAsList.Sort(new WizardComparer());
                 SelectedComponents = new ObservableCollection<WizardBaseController>(selectedAsList);
 
                 List<WizardBaseController> unselectedAsList = UnselectedComponents.ToList();
-                unselectedAsList.Sort(new WizardPrerequisiteComparer());
+                unselectedAsList.Sort(new WizardComparer());
                 UnselectedComponents = new ObservableCollection<WizardBaseController>(unselectedAsList);
             }
         }
@@ -375,7 +375,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             return true;
         }
 
-#endregion
+        #endregion
 
         #region private helpers
 
@@ -495,35 +495,8 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             //if caching failed, do it the long way
             if (!loadedFromCache)
             {
-                //AC: The List data type's Sort() method uses quicksort, which uses a partitioning scheme.  
-                //Because wizard component sorting is a little goofy, this won't work for us.  Therefore, we must
-                //use something more simplistic (Insertion Sort used)
-                AllComponents.Sort(new WizardPrerequisiteComparer());
-                WizardPrerequisiteComparer comparer = new WizardPrerequisiteComparer();
-                for (int i = 1; i < AllComponents.Count; i++)
-                {
-                    WizardBaseController current = AllComponents[i];
-                    int j = i - 1;
-                    bool done = false;
-                    while (!done)
-                    {
-                        //if the previous component is greater than (comes before the current component)
-                        if (comparer.Compare(AllComponents[j], current) == 1)
-                        {
-                            AllComponents[j + 1] = AllComponents[j];
-                            j--;
-                            if (j < 0)
-                            {
-                                done = true;
-                            }
-                        }
-                        else
-                        {
-                            done = true;
-                        }
-                        AllComponents[j + 1] = current;
-                    }
-                }
+                List<WizardBaseController> components = SortWizardComponents(null);
+                AllComponents = components;
 
                 //save sorted component information to cache
                 string[] sortedComponents = new string[AllComponents.Count];
@@ -545,6 +518,43 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                 counter++;
             }
         }
+
+        private List<WizardBaseController> SortWizardComponents(WizardBaseController parent)
+        {
+            List<WizardBaseController> components;
+
+            //base case
+            if (parent == null)
+            {
+                components = (from c in AllComponents
+                              where c.Prerequisite == null
+                              select c).ToList();
+            }
+            else
+            {
+                //non base case
+                components = (from c in AllComponents
+                              where c.Prerequisite != null && c.Prerequisite.CompareTo(parent) == 0
+                              select c).ToList();
+            }
+            List<WizardBaseController> unionedComponents = new List<WizardBaseController>(components);
+            foreach (WizardBaseController component in components)
+            {
+                List<WizardBaseController> children = SortWizardComponents(component);
+
+                //add in children unaccounted for
+                foreach (WizardBaseController child in children)
+                {
+                    if (unionedComponents.Where(c => c.CompareTo(child) == 0).Count() == 0)
+                    {
+                        unionedComponents.Add(child);
+                    }
+                }
+            }
+
+            return unionedComponents;
+        }
+
         #endregion
     }
 }

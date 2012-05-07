@@ -54,12 +54,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public abstract string ControllerDescription { get; }
 
         /// <summary>
-        /// Returns a list of WizardBaseControllers that must preceed the current controller.  
+        /// Returns a concrete WizardBaseController that must preceed the current controller.  
         /// For example, most controllers will expect an assignment to have at least a name.  The
         /// "Basics" controller handles setting up assignment basics and so other controllers should
         /// list "Basics" as being a prerequisite.
         /// </summary>
-        public abstract ICollection<WizardBaseController> Prerequisites { get; }
+        public abstract WizardBaseController Prerequisite { get; }
 
         /// <summary>
         /// Provides a list of assignment types in which the current component is relevant.  Several

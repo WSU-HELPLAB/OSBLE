@@ -28,14 +28,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get { return "This assignment has students discuss one or more topics."; }
         }
 
-        public override ICollection<WizardBaseController> Prerequisites
+        public override WizardBaseController Prerequisite
         {
             get
             {
-                List<WizardBaseController> prereqs = new List<WizardBaseController>();
-                prereqs.Add(new BasicsController());
-                prereqs.Add(new TeamController());
-                return prereqs;
+                return new TeamController();
             }
         }
 

@@ -21,15 +21,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get { return "This assignment requires that students submit one or more files"; }
         }
 
-        public override ICollection<WizardBaseController> Prerequisites
+        public override WizardBaseController Prerequisite
         {
             get
             {
-                List<WizardBaseController> prereqs = new List<WizardBaseController>();
-                prereqs.Add(new BasicsController());
-                prereqs.Add(new TeamController());
-                prereqs.Add(new CommentCategoryController());
-                return prereqs;
+                return new CommentCategoryController();
             }
         }
 

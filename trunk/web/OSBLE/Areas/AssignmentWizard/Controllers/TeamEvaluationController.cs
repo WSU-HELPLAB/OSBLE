@@ -20,15 +20,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get { return "This assignment contains a team evaluation."; }
         }
 
-        public override ICollection<WizardBaseController> Prerequisites
+        public override WizardBaseController Prerequisite
         {
             get
             {
-                List<WizardBaseController> prereqs = new List<WizardBaseController>();
-                prereqs.Add(new BasicsController());
-                prereqs.Add(new TeamController());
-                prereqs.Add(new PreviousAssignmentController());
-                return prereqs;
+                return new PreviousAssignmentController();
             }
         }
 

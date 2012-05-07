@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HELP Lab @ Washington State University")]
 [assembly: AssemblyProduct("OSBLE")]
-[assembly: AssemblyCopyright("Copyright © HELP Lab 2011")]
+[assembly: AssemblyCopyright("Copyright © HELP Lab 2011, 2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -28,5 +28,5 @@ using System.Runtime.InteropServices;
 //      Minor
 //      Patch
 //      Codeplex Check-in Number
-[assembly: AssemblyVersion("1.0.46.14941")]
-[assembly: AssemblyFileVersion("1.0.46.14941")]
+[assembly: AssemblyVersion("1.0.48.14991")]
+[assembly: AssemblyFileVersion("1.0.48.14991")]

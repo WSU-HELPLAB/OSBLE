@@ -30,12 +30,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
-        public override ICollection<WizardBaseController> Prerequisites
+        public override WizardBaseController Prerequisite
         {
             get
             {
-                List<WizardBaseController> prereqs = new List<WizardBaseController>();
-                return prereqs;
+                //nothing comes before the Basics Controller
+                return null;
             }
         }
 

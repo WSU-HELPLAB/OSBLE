@@ -29,13 +29,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get { return "The assignment is team-based"; }
         }
 
-        public override ICollection<WizardBaseController> Prerequisites
+        public override WizardBaseController Prerequisite
         {
             get 
             {
-                List<WizardBaseController> prereqs = new List<WizardBaseController>();
-                prereqs.Add(new BasicsController());
-                return prereqs;
+                return new BasicsController();
             }
         }
 
