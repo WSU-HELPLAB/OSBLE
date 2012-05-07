@@ -14,11 +14,28 @@
 
     <input id="requiredCommentLength" type="hidden" value="@at.Assignment.TeamEvaluationSettings.RequiredCommentLength" />
 
-    if (teamMemberEvals.Count() > 0)
-    {
         //Assignment assign = ViewBag.AssignmentTeam.Assignment;
         int pointsRemaining = ViewBag.PreviousAssignmentTeam.Team.TeamMembers.Count * 100;
         int assignId = ViewBag.AssignmentTeam.AssignmentID;
+        List<TeamMemberEvaluation> teamEvalList = new List<TeamMemberEvaluation>();
+        if(teamMemberEvals.Count > 0)
+        {
+            teamEvalList = teamMemberEvals;
+            //using team member evals for team members
+        }
+        else
+        {
+            //using team member for assignment
+            foreach(TeamMember tm in at.Team.TeamMembers)
+            {
+                TeamMemberEvaluation tme = new TeamMemberEvaluation();
+                tme.Points = 0;
+                tme.Recipient = tm.CourseUser;
+                tme.TeamEvaluation = new TeamEvaluation();
+                tme.TeamEvaluation.Comments = "";
+                teamEvalList.Add(tme);
+            }
+        }
         using (Html.BeginForm("SubmitTeamEvaluation", "Assignment", new { assignmentId = assignId }, FormMethod.Post))
         {
     <fieldset style="width: 400px;">
@@ -32,22 +49,30 @@
                         0</div>
                 </td>
             </tr>
-            @foreach (TeamMemberEvaluation tme in teamMemberEvals)
+            @foreach (TeamMemberEvaluation tme in teamEvalList)
             {
                 <tr>
                     <td>@tme.Recipient.UserProfile.FirstName @tme.Recipient.UserProfile.LastName:
                     </td>
                     <td style="text-align: right;">
-                        <input id="points" name="points-@tme.RecipientID" onkeyup="changePoints(@pointsRemaining);" size="1" value="@tme.Points"/>
+                        <input class="points" name="points-@tme.Recipient.ID" id="points-@tme.Recipient.ID" onkeyup="changePoints(@pointsRemaining);" size="1" value="@tme.Points"/>
                     </td>
                 </tr>
-
             }
             <tr>
             </tr>
             <tr>
                 <td colspan="2">
-                    <textarea class="textAreaClass" name="inBrowserText" rows="10" cols="53">@teamMemberEvals.First().TeamEvaluation.Comments</textarea>
+                    @{
+            TeamMemberEvaluation currentUserEval = teamEvalList.Where(te => te.Recipient.ID == ViewBag.ActiveCourse.ID).FirstOrDefault();
+            string comment = "";
+            if (currentUserEval != null)
+            {
+                comment = currentUserEval.TeamEvaluation.Comments;
+            }
+                            
+                       }
+                    <textarea class="textAreaClass" name="inBrowserText" rows="10" cols="53">@comment</textarea>
                 </td>
             </tr>
             <tr>
@@ -64,58 +89,7 @@
         </p>
     </fieldset>
         }
-    }
-    else
-    {
-        //Assignment assign = ViewBag.AssignmentTeam.Assignment;
-        int pointsRemaining = ViewBag.PreviousAssignmentTeam.Team.TeamMembers.Count * 100;
-        int assignId = ViewBag.AssignmentTeam.AssignmentID;
-        using (Html.BeginForm("SubmitTeamEvaluation", "Assignment", new { assignmentId = assignId }, FormMethod.Post))
-        {
-    <fieldset style="width: 400px;">
-        <table id="teamEvalTable1" style="width: 400px;">
-            <tr>
-                <td>
-                    <b>Points Remaining:</b>
-                </td>
-                <td style="text-align: right;">
-                    <div id="pointsPossibleId">@pointsRemaining</div>
-                </td>
-            </tr>
-            @foreach (TeamMember tm in pAt.Team.TeamMembers.OrderBy(u => u.CourseUser.UserProfile.LastName))
-            {
-                <tr>
-                    <td>@tm.CourseUser.UserProfile.FirstName @tm.CourseUser.UserProfile.LastName:
-                    </td>
-                    <td style="text-align: right;">
-                        <input id="points" name="points-@tm.CourseUserID"  onkeyup="changePoints(@pointsRemaining);" size="1" value="0"/>
-                    </td>
-                </tr>
-
-            }
-            <tr>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <textarea class="textAreaClass" name="inBrowserText" rows="10" cols="53"></textarea>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <div id="errorText" style="color: Red;">
-                        &nbsp
-                    </div>
-                </td>
-            </tr>
-        </table>
-        <p>
-            <input type="submit" value="Submit" onclick="checkForErrors(event);" />
-            <input type="button" value="Cancel" />
-        </p>
-    </fieldset>
         }
-    }
-}
 <script type="text/javascript">
 
     function changePoints(pp) {
@@ -124,7 +98,7 @@
         $("#errorText").html("&nbsp");
         $("table").find("tr").each(function (i) {
             //loop tr's in table with class 'adminlist'
-            $(this).find("#points").each(function (j) {
+            $(this).find(".points").each(function (j) {
                 var addTo = parseInt($(this).val());
                 if (isNaN($(this).val())) {
                     $("#errorText").html("Values can only be numbers.");
@@ -147,7 +121,7 @@
 
         $("table tr").each(function (i) {
             //loop tr's in table with class 'adminlist'
-            $(this).find("#points").each(function (j) {
+            $(this).find(".points").each(function (j) {
                 var addTo = parseInt($(this).val());
 
                 if (isNaN($(this).val())) {
@@ -171,12 +145,31 @@
     function checkForErrors(e) {
 
         if (parseInt($("#pointsPossibleId").text()) == 0) {
-            if ($(".textAreaClass").val().length >= $("#requiredCommentLength").val()) {
+            /*go through .points-CUid for each member and see if a grade a descrepency*/
 
+            var maxValue =  -1;
+            var minValue = @ViewBag.PreviousAssignmentTeam.Team.TeamMembers.Count * 100 + 1;
+            var currentValue = 0;
+            @foreach (TeamMember tm in pAt.Team.TeamMembers.OrderBy(u => u.CourseUser.UserProfile.LastName))
+            {
+                
+               @:currentValue= parseInt($("#points-@(tm.CourseUserID)").val());
+               @:if(currentValue > maxValue)
+               {
+                    @:maxValue = currentValue;
+               }
+               @:if(currentValue < minValue)
+               {
+                    @:minValue = currentValue;
+               }
             }
-            else {
-                $("#errorText").html("Comment length must be greater than " + $("#requiredCommentLength").val().toString() + ".");
-                e.preventDefault();
+
+            if(maxValue - minValue > @ViewBag.AssignmentTeam.Assignment.TeamEvaluationSettings.DiscrepancyCheckSize)
+            {
+                if ($(".textAreaClass").val().length < $("#requiredCommentLength").val()) {
+                    $("#errorText").html("Comment length must be greater than " + $("#requiredCommentLength").val().toString() + ".");
+                    e.preventDefault();
+                }
             }
         }
         else {
