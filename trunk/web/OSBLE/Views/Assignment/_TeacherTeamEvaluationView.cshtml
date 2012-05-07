@@ -19,11 +19,13 @@
 
     List<TeamMemberEvaluation> teamMemberEvals = (from t in ViewBag.TeamMemberEvaluations as IEnumerable<TeamMemberEvaluation>
                                                   select t).ToList();
+                                                  
+    List<TeamMember> teamMembersInOrder = team.Team.TeamMembers.OrderBy(tm => tm.CourseUser.UserProfile.LastName).ToList();
 
     <table id="TeamMemberEvaluationTable">
         <tr>
             <th>Evaluators</th>
-            @foreach (TeamMember member in team.Team.TeamMembers)
+            @foreach (TeamMember member in teamMembersInOrder)
             {
                 <th>@member.CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)</th>
             }
@@ -58,7 +60,7 @@
                 <b>Multiplier</b>
             </td>
             
-            @foreach (TeamMember member in team.Team.TeamMembers)
+            @foreach (TeamMember member in teamMembersInOrder)
             {
                 double multiplier = (from tm in ViewBag.TeamMemberEvaluations as IEnumerable<TeamMemberEvaluation>
                                      where tm.RecipientID == member.CourseUserID

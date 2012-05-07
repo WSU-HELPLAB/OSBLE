@@ -21,12 +21,14 @@
         if(teamMemberEvals.Count > 0)
         {
             teamEvalList = teamMemberEvals;
+
+            teamEvalList = teamEvalList.OrderBy(te => te.Recipient.UserProfile.LastName).ToList();
             //using team member evals for team members
         }
         else
         {
             //using team member for assignment
-            foreach(TeamMember tm in at.Team.TeamMembers)
+            foreach(TeamMember tm in pAt.Team.TeamMembers.OrderBy(tm => tm.CourseUser.UserProfile.LastName))
             {
                 TeamMemberEvaluation tme = new TeamMemberEvaluation();
                 tme.Points = 0;
@@ -84,7 +86,14 @@
             </tr>
         </table>
         <p>
-            <input type="submit" value="Resubmit" onclick="checkForErrors(event);" />
+        @{
+            var buttonValue = "Submit";
+            if (teamMemberEvals.Count > 0)
+            {
+                buttonValue = "Resubmit";
+            }
+        }
+            <input type="submit" value=@buttonValue onclick="checkForErrors(event);" />
             <input type="button" value="Cancel" />
         </p>
     </fieldset>
