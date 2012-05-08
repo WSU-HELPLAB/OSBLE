@@ -770,72 +770,68 @@ namespace OSBLE.Controllers
                     userPreviousAssignmentScore.Published = true;
                     db.SaveChanges(); /*must save before going into GBC*/
                     GradebookController GBC = new GradebookController();
-                    GBC.ModifyGrade(userPreviousAssignmentScore.RawPoints, tm.CourseUserID, userPreviousAssignmentScore.AssignmentID);
+                    GBC.ModifyGrade(userPreviousAssignmentScore.RawPoints, tm.CourseUserID, userPreviousAssignmentScore.AssignmentID);                        
+                }
 
-                    /*MG: Users should only receive points IF they completed a team evaluation. If they did, apply any late penalties */
-                    Score currentAssignmentScore = (from s in db.Scores
-                                                    where s.AssignmentID == assignment.ID &&
-                                                    s.CourseUserID == userPreviousAssignmentScore.CourseUserID &&
-                                                    s.TeamID == teamId
-                                                    select s).FirstOrDefault();
+                /*MG: Getting the team member, then using that to get any pre-existing score. Then modifying (or creating if one did not exist) the score for 
+                 * the Team Evaluation(TE) assignment*/
+
+                /*MG: getting the team member for the Team Evaluation assignment*/
+                TeamMember TeamEvalTeamMember = (from teamMem in db.TeamMembers
+                                                 join att in db.AssignmentTeams on teamMem.TeamID equals att.TeamID
+                                                 where teamMem.CourseUserID == tm.CourseUserID &&
+                                                 att.AssignmentID == assignment.ID
+                                                 select teamMem).FirstOrDefault();
+
+                /*Grabbing any preexisting grade*/
+                Score currentAssignmentScore = (from s in db.Scores
+                                                where s.AssignmentID == assignment.ID &&
+                                                s.CourseUserID == tm.CourseUserID &&
+                                                s.TeamID == TeamEvalTeamMember.TeamID
+                                                select s).FirstOrDefault();
 
 
-                    /*MG: getting the teamID for the current TMs Team Eval assignment*/
-                    TeamMember TeamEvalTeamMember = (from teamMem in db.TeamMembers
-                                        join att in db.AssignmentTeams on teamMem.TeamID equals att.TeamID
-                                        where teamMem.CourseUserID == userPreviousAssignmentScore.CourseUserID &&
-                                        att.AssignmentID == assignment.ID
-                                        select teamMem).FirstOrDefault();
-                    
 
 
-
-                    if (currentAssignmentScore == null) /*No current grade entered, must enter new grade*/
+                if (currentAssignmentScore == null) /*No current grade entered, must enter new grade for the TE*/
+                {
+                    Score newScore = new Score();
+                    newScore.AssignmentID = assignment.ID;
+                    newScore.Published = false;
+                    newScore.CourseUserID = tm.CourseUserID;
+                    newScore.TeamID = TeamEvalTeamMember.TeamID;
+                    newScore.CustomLatePenaltyPercent = -1;
+                    newScore.isDropped = false;
+                    newScore.LatePenaltyPercent = 0;
+                    newScore.StudentPoints = -1;
+                    newScore.PublishedDate = DateTime.Now;
+                    if (EvaluaterTeamEvalCount > 0) /*user gets a score*/
                     {
-                        Score newScore = new Score();
-                        newScore.AssignmentID = assignment.ID;
-                        newScore.Published = false;
-                        newScore.CourseUserID = userPreviousAssignmentScore.CourseUserID;
-                        //newScore.TeamID = userPreviousAssignmentScore.TeamID;
-                        //newScore.TeamID = teamId;
-                        newScore.TeamID = TeamEvalTeamMember.TeamID;
-                        //Need a teamID for the 
-                        newScore.CustomLatePenaltyPercent = -1;
-                        newScore.isDropped = false;
-                        newScore.LatePenaltyPercent = 0;
-                        newScore.StudentPoints = -1;
-                        newScore.PublishedDate = DateTime.Now;
-                        if (EvaluaterTeamEvalCount > 0) /*user gets a score*/
-                        {
-                            newScore.RawPoints = assignment.PointsPossible;
-                            newScore.Points = assignment.PointsPossible;
-                        }
-                        else /*user gets a 0 IF the assignment had any points possible without any submissions*/
-                        {
-                            newScore.RawPoints = 0;
-                            newScore.Points = 0;
-                        }
-                        db.Scores.Add(newScore);
+                        newScore.RawPoints = assignment.PointsPossible;
+                        newScore.Points = assignment.PointsPossible;
+                    }
+                    else /*user gets a 0 IF the assignment had any points possible without any submissions*/
+                    {
+                        newScore.RawPoints = 0;
+                        newScore.Points = 0;
+                    }
+                    db.Scores.Add(newScore);
+                    db.SaveChanges();
+                }
+                else /*score already exists for the TE, just modify it*/
+                {
+                    if (EvaluaterTeamEvalCount > 0) /*user gets reassigned max points*/
+                    {
+                        currentAssignmentScore.RawPoints = assignment.PointsPossible;
+                        currentAssignmentScore.Points = assignment.PointsPossible;
                         db.SaveChanges();
                     }
-                    else /*score already exists*/
+                    else /*user gets reassigned 0*/
                     {
-                        if (EvaluaterTeamEvalCount > 0) /*user gets reassigned max points*/
-                        {
-                            currentAssignmentScore.RawPoints = assignment.PointsPossible;
-                            currentAssignmentScore.Points = assignment.PointsPossible;
-                            db.SaveChanges();
-                        }
-                        else /*user gets reassigned 0*/
-                        {
-                            currentAssignmentScore.RawPoints = 0;
-                            currentAssignmentScore.Points = 0;
-                            db.SaveChanges();
-                        }
+                        currentAssignmentScore.RawPoints = 0;
+                        currentAssignmentScore.Points = 0;
+                        db.SaveChanges();
                     }
-                        
-
-                        
                 }
             }
 
