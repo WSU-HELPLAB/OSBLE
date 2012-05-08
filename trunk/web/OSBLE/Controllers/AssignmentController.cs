@@ -746,6 +746,12 @@ namespace OSBLE.Controllers
                                      t.TeamEvaluation.AssignmentID == assignment.ID
                                      select t.Points).Sum();
 
+                /*counting all the evaluations this TM completed for this assignment*/
+                int EvaluaterTeamEvalCount = (from te in db.TeamMemberEvaluations
+                                                       where te.EvaluatorID == tm.CourseUserID &&
+                                                       te.TeamEvaluation.AssignmentID == assignment.ID
+                                                       select te).ToList().Count();
+
                 int count = (from te in db.TeamEvaluations
                              where te.TeamID == team.ID &&
                              te.AssignmentID == assignment.ID
@@ -758,32 +764,78 @@ namespace OSBLE.Controllers
                                                      select s).FirstOrDefault();
 
                 if (userPreviousAssignmentScore != null)
-                {
-                    bool alreadyPublishedMultiplier = (from score in db.Scores where score.AssignmentID == assignment.ID && score.CourseUserID == tm.CourseUserID select score.Published).FirstOrDefault();
+                {       
+                    /*Setting a value for the multipier, setting published to true and then running ModifyGrade*/
+                    userPreviousAssignmentScore.Multiplier = multiplier;
+                    userPreviousAssignmentScore.Published = true;
+                    db.SaveChanges(); /*must save before going into GBC*/
+                    GradebookController GBC = new GradebookController();
+                    GBC.ModifyGrade(userPreviousAssignmentScore.RawPoints, tm.CourseUserID, userPreviousAssignmentScore.AssignmentID);
 
-                    //Check to see if the user already has a published multiplier
-                    if (!alreadyPublishedMultiplier)
+                    /*MG: Users should only receive points IF they completed a team evaluation. If they did, apply any late penalties */
+                    Score currentAssignmentScore = (from s in db.Scores
+                                                    where s.AssignmentID == assignment.ID &&
+                                                    s.CourseUserID == userPreviousAssignmentScore.CourseUserID &&
+                                                    s.TeamID == teamId
+                                                    select s).FirstOrDefault();
+
+
+                    /*MG: getting the teamID for the current TMs Team Eval assignment*/
+                    TeamMember TeamEvalTeamMember = (from teamMem in db.TeamMembers
+                                        join att in db.AssignmentTeams on teamMem.TeamID equals att.TeamID
+                                        where teamMem.CourseUserID == userPreviousAssignmentScore.CourseUserID &&
+                                        att.AssignmentID == assignment.ID
+                                        select teamMem).FirstOrDefault();
+                    
+
+
+
+                    if (currentAssignmentScore == null) /*No current grade entered, must enter new grade*/
                     {
-                        userPreviousAssignmentScore.Points *= multiplier;
-                        userPreviousAssignmentScore.Multiplier = multiplier;
-                        Score newScore = new Score()
+                        Score newScore = new Score();
+                        newScore.AssignmentID = assignment.ID;
+                        newScore.Published = false;
+                        newScore.CourseUserID = userPreviousAssignmentScore.CourseUserID;
+                        //newScore.TeamID = userPreviousAssignmentScore.TeamID;
+                        //newScore.TeamID = teamId;
+                        newScore.TeamID = TeamEvalTeamMember.TeamID;
+                        //Need a teamID for the 
+                        newScore.CustomLatePenaltyPercent = -1;
+                        newScore.isDropped = false;
+                        newScore.LatePenaltyPercent = 0;
+                        newScore.StudentPoints = -1;
+                        newScore.PublishedDate = DateTime.Now;
+                        if (EvaluaterTeamEvalCount > 0) /*user gets a score*/
                         {
-                            AssignmentID = assignment.ID,
-                            Points = assignment.PointsPossible,
-                            Published = true,
-                            RawPoints = assignment.PointsPossible,
-                            CourseUserID = userPreviousAssignmentScore.CourseUserID,
-                            TeamID = userPreviousAssignmentScore.TeamID,
-                            CustomLatePenaltyPercent = -1,
-                            PublishedDate = DateTime.Now,
-                            isDropped = false,
-                            LatePenaltyPercent = 0,
-                            StudentPoints = -1
-                        };
-
+                            newScore.RawPoints = assignment.PointsPossible;
+                            newScore.Points = assignment.PointsPossible;
+                        }
+                        else /*user gets a 0 IF the assignment had any points possible without any submissions*/
+                        {
+                            newScore.RawPoints = 0;
+                            newScore.Points = 0;
+                        }
                         db.Scores.Add(newScore);
                         db.SaveChanges();
                     }
+                    else /*score already exists*/
+                    {
+                        if (EvaluaterTeamEvalCount > 0) /*user gets reassigned max points*/
+                        {
+                            currentAssignmentScore.RawPoints = assignment.PointsPossible;
+                            currentAssignmentScore.Points = assignment.PointsPossible;
+                            db.SaveChanges();
+                        }
+                        else /*user gets reassigned 0*/
+                        {
+                            currentAssignmentScore.RawPoints = 0;
+                            currentAssignmentScore.Points = 0;
+                            db.SaveChanges();
+                        }
+                    }
+                        
+
+                        
                 }
             }
 
@@ -848,7 +900,7 @@ namespace OSBLE.Controllers
                             Score newScore = new Score()
                             {
                                 AssignmentID = assignment.ID,
-                                Published = true,
+                                Published = false,
                                 CourseUserID = tm.CourseUserID,
                                 TeamID = tm.TeamID,
                                 CustomLatePenaltyPercent = -1,

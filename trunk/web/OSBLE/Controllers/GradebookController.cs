@@ -236,6 +236,7 @@ namespace OSBLE.Controllers
                                                 AssignmentID = currentAssignment.ID,
                                                 PublishedDate = DateTime.Now,
                                                 isDropped = false,
+                                                Published = false,
                                                 LatePenaltyPercent = 0,
                                                 StudentPoints = -1,
                                                 RawPoints = points,
@@ -1589,6 +1590,14 @@ namespace OSBLE.Controllers
             return View("_Gradebook");
         }
 
+        /// <summary>
+        /// User sents in a base value (becomes Score.RawPoints), and that value is used to calculate Score.Points or create a new score
+        /// Note: For calculating grades, it first applies late penalty, then applies any multipliers, then applies any maximum assignment score, and then finally adds any category points
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="courseUserId"></param>
+        /// <param name="assignmentId"></param>
+        /// <returns></returns>
         [CanGradeCourse]
         public double ModifyGrade(double value, int courseUserId, int assignmentId)
         {
@@ -1686,6 +1695,29 @@ namespace OSBLE.Controllers
                             value = value * ((100.0 - latePenalty) / 100.0);
                         }
 
+                        
+                        if (grades.Published) /*only apply multiplier if published*/
+                        {
+                            /*MG potential bug point: While trying to grab the assignment that is the team evaluation for the current assignment, you cannot be sure the first one is 
+                             * necessarily the correct assignment if there are multiple assignments that use this assignment as its preceding assignment*/
+                            Assignment teamEvaluationAssignments = (from a in db.Assignments
+                                                             where a.PrecededingAssignmentID == currentAssignment.ID &&
+                                                             a.AssignmentTypeID == 4
+                                                             select a).FirstOrDefault();
+
+                            if (teamEvaluationAssignments != null)
+                            {
+                                /*MG: Adjusting multiplier if it is higher than max, then applying multiplier*/
+                                if (grades.Multiplier > teamEvaluationAssignments.TeamEvaluationSettings.MaximumMultiplier)
+                                {
+                                    grades.Multiplier = teamEvaluationAssignments.TeamEvaluationSettings.MaximumMultiplier;
+                                }
+                                value = value * grades.Multiplier;
+                            }
+                        }
+                        
+                        
+                        /*applying maximum assignment score*/
                         if (currentCategory.MaxAssignmentScore >= 0)
                         {
                             if (((value / grades.Assignment.PointsPossible) * 100) > currentCategory.MaxAssignmentScore)
@@ -1694,34 +1726,22 @@ namespace OSBLE.Controllers
                             }
                         }
 
-                        if (grades.Points == value)
+                        //If the user has a grade but is in a new team we need to change the team
+                        if (grades.TeamID != userAssignmentTeam.TeamID)
                         {
-                            //If the user has a grade but is in a new team we need to change the team
-                            if (grades.TeamID != userAssignmentTeam.TeamID)
-                            {
-                                grades.TeamID = userAssignmentTeam.TeamID;
-                            }
-                            //Don't do anything to the points because our value coming in equals the points in the db.
-                            //However, we do need to set the raw value in case that changed.
-                            grades.RawPoints = rawValue;
-                            db.SaveChanges();
+                            grades.TeamID = userAssignmentTeam.TeamID;
                         }
-                        else
-                        {
-                            //If the user has a grade but is in a new team we need to change the team
-                            if (grades.TeamID != userAssignmentTeam.TeamID)
-                            {
-                                grades.TeamID = userAssignmentTeam.TeamID;
-                            }
-                            grades.Points = value;
-                            grades.AddedPoints = 0;
-                            grades.LatePenaltyPercent = latePenalty;
-                            grades.StudentPoints = -1;
-                            grades.RawPoints = rawValue;
-                            db.SaveChanges();
-                        }
+
+                       
+                        grades.Points = value;
+                        grades.AddedPoints = 0;
+                        grades.LatePenaltyPercent = latePenalty;
+                        grades.StudentPoints = -1;
+                        grades.RawPoints = rawValue;
+                        db.SaveChanges();
+                        
                     }
-                    else
+                    else /*No grade found, must create new*/
                     {
                         if (TeamMembers.Count() > 0)
                         {
@@ -1748,8 +1768,9 @@ namespace OSBLE.Controllers
                                 Points = value,
                                 AssignmentID = currentAssignment.ID,
                                 PublishedDate = DateTime.Now,
-                                Published = true,
+                                Published = false,
                                 isDropped = false,
+                                Multiplier = 1,
                                 LatePenaltyPercent = latePenalty,
                                 StudentPoints = -1,
                                 RawPoints = rawValue,
@@ -1855,6 +1876,7 @@ namespace OSBLE.Controllers
                                 AssignmentID = currentAssignment.ID,
                                 PublishedDate = DateTime.Now,
                                 isDropped = false,
+                                Published = false,
                                 StudentPoints = value,
                                 RawPoints = rawValue,
                             };
@@ -2532,7 +2554,8 @@ namespace OSBLE.Controllers
                            TeamID = currentTeam.ID,
                            CourseUserID = currentMember.ID,
                            Points = ((currentPoints / currentTotal) * 100),
-                           isDropped = false
+                           isDropped = false,
+                           Published = false
                        };
                         studentScores.Add(newscore);
                     }
@@ -2544,7 +2567,8 @@ namespace OSBLE.Controllers
                             CustomLatePenaltyPercent = -1,
                             CourseUserID = currentMember.ID,
                             Points = ((currentPoints / currentTotal) * 100),
-                            isDropped = false
+                            isDropped = false,
+                            Published = false
                         };
                         studentScores.Add(newscore);
                     }
