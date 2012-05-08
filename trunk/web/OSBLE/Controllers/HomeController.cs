@@ -76,14 +76,14 @@ namespace OSBLE.Controllers
             if (DashboardSingleCourseMode)
             {
                 viewedCourses = new List<int>();
-                viewedCourses.Add(activeCourse.AbstractCourseID);
+                viewedCourses.Add(ActiveCourse.AbstractCourseID);
             }
             else // All course mode. Display posts for all non-hidden courses the user is attached to.
             {
                 viewedCourses = currentCourses.Where(cu => !cu.Hidden).Select(cu => cu.AbstractCourseID).ToList();
             }
 
-            if (activeCourse.AbstractCourse is Course && activeCourse.AbstractRole.CanModify)
+            if (ActiveCourse.AbstractCourse is Course && ActiveCourse.AbstractRole.CanModify)
             {
                 ViewBag.IsInstructor = true;
             }
@@ -92,7 +92,7 @@ namespace OSBLE.Controllers
                 ViewBag.IsInstructor = false;
             }
 
-            if (activeCourse.AbstractCourse is Community && activeCourse.AbstractRole.CanModify)
+            if (ActiveCourse.AbstractCourse is Community && ActiveCourse.AbstractRole.CanModify)
             {
                 ViewBag.IsLeader = true;
             }
@@ -133,7 +133,7 @@ namespace OSBLE.Controllers
 
         private void setupCourseLinks()
         {
-            DirectoryListing listing = FileSystem.GetCourseDocumentsFileList(activeCourse.AbstractCourse, false);
+            DirectoryListing listing = FileSystem.GetCourseDocumentsFileList(ActiveCourse.AbstractCourse, false);
             SilverlightObject fileUploader = new SilverlightObject
             {
                 CSSId = "file_uploader",
@@ -160,7 +160,7 @@ namespace OSBLE.Controllers
         private void setupNotifications()
         {
             // Load all unread notifications for the current user to display on the dashboard.
-            ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == activeCourse.ID) && (n.Read == false)).OrderByDescending(n => n.Posted).ToList();
+            ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == ActiveCourse.ID) && (n.Read == false)).OrderByDescending(n => n.Posted).ToList();
         }
 
         private void setupEvents()
@@ -243,7 +243,7 @@ namespace OSBLE.Controllers
             else // Display anonymous name.
             {
                 // Anonymous number is currently the number of the student in the course list.
-                post.DisplayName = posterCu.DisplayName(activeCourse.AbstractRole);
+                post.DisplayName = posterCu.DisplayName(ActiveCourse.AbstractRole);
 
                 // Profile picture will display default picture.
                 post.ShowProfilePicture = false;
@@ -380,7 +380,7 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult NewPost(DashboardPost dp)
         {
-            dp.CourseUser = activeCourse;
+            dp.CourseUser = ActiveCourse;
             dp.Posted = DateTime.Now;
 
             List<CourseUser> CoursesToPost = new List<CourseUser>();
@@ -389,7 +389,7 @@ namespace OSBLE.Controllers
 
             if (Request.Form["post_active"] != null)
             { // Post to active course only.
-                CoursesToPost.Add(activeCourse);
+                CoursesToPost.Add(ActiveCourse);
             }
             else if (Request.Form["post_all"] != null)
             { // Post to all courses.
@@ -482,7 +482,7 @@ namespace OSBLE.Controllers
         {
             if (ModelState.IsValid)
             {
-                dr.CourseUser = activeCourse;
+                dr.CourseUser = ActiveCourse;
                 dr.Posted = DateTime.Now;
 
                 int replyTo = 0;
@@ -604,7 +604,7 @@ namespace OSBLE.Controllers
             if (dp != null)
             {
                 CourseUser cu = currentCourses.Where(c => c.AbstractCourseID == dp.CourseUser.AbstractCourseID).FirstOrDefault();
-                if ((dp.CourseUserID == activeCourse.ID) || ((cu != null) && (cu.AbstractRole.CanGrade)))
+                if ((dp.CourseUserID == ActiveCourse.ID) || ((cu != null) && (cu.AbstractRole.CanGrade)))
                 {
                     dp.Replies.Clear();
                     db.SaveChanges();
@@ -637,7 +637,7 @@ namespace OSBLE.Controllers
             if (dr != null)
             {
                 CourseUser cu = currentCourses.Where(c => c.AbstractCourse == dr.Parent.CourseUser.AbstractCourse).FirstOrDefault();
-                if ((dr.CourseUserID == activeCourse.ID) || ((cu != null) && (cu.AbstractRole.CanGrade)))
+                if ((dr.CourseUserID == ActiveCourse.ID) || ((cu != null) && (cu.AbstractRole.CanGrade)))
                 {
                     db.DashboardReplies.Remove(dr);
                     db.SaveChanges();

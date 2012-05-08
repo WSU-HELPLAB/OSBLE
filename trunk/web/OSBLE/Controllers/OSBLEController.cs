@@ -21,11 +21,12 @@ namespace OSBLE.Controllers
     public abstract class OSBLEController : Controller
     {
         protected OSBLEContext db = new OSBLEContext();
+        private static UserProfile _currentUser = OsbleAuthentication.CurrentUser;
+        private FileCache _cache = new FileCache();
 
-        private UserProfile _currentUser = OsbleAuthentication.CurrentUser;
         public UserProfile CurrentUser
         {
-            get 
+            get
             {
                 //reduces db calls
                 if (_currentUser == null)
@@ -36,17 +37,114 @@ namespace OSBLE.Controllers
             }
         }
 
-        protected CourseUser activeCourse = null;
-
         public CourseUser ActiveCourse
         {
-            get { return activeCourse; }
+            get
+            {
+                int activeCourseId = 0;
+                Int32.TryParse(GetFromCache("ActiveCourseUser").ToString(), out activeCourseId);
+                CourseUser activeCourse = null;
+                /* AC: TODO: Session saving isn't working.
+                if (Session != null)
+                {
+                    if (Session["ActiveCourseUser"] == null)
+                    {
+                        if (activeCourseId != 0)
+                        {
+                            Session["ActiveCourseUser"] = db.CourseUsers.Find(activeCourseId);
+                        }
+                        else
+                        {
+                            Session["ActiveCourseUser"] = null;
+                        }
+                    }
+                    try
+                    {
+                        activeCourse = (CourseUser)Session["ActiveCourseUser"];
+                    }
+                    catch (Exception ex)
+                    {
+                        string foo = ex.Message;
+                        Session["ActiveCourseUser"] = null;
+                        activeCourse = null;
+                    }
+                }
+                else
+                {
+                    activeCourse = db.CourseUsers.Find(activeCourseId);
+                }
+                 * */
+                activeCourse = db.CourseUsers.Find(activeCourseId);
+                return activeCourse;
+            }
+            set
+            {
+                if (value != null)
+                {
+                    SaveToCache("ActiveCourseUser", value.ID);
+                    if (Session != null)
+                    {
+                        Session["ActiveCourseUser"] = value;
+                    }
+                }
+            }
         }
 
         protected HttpContext context = System.Web.HttpContext.Current;
         protected List<CourseUser> currentCourses = new List<CourseUser>();
 
         protected bool DashboardSingleCourseMode;
+
+        /// <summary>
+        /// Provides common data for all controllers in the OSBLE app, such as profile and current course information.
+        /// </summary>
+        public OSBLEController()
+        {
+            Initialize();
+        }
+
+        public OSBLEController(OSBLEContext context)
+        {
+            db = context;
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+
+            // If logged in, feed user profile to view.
+            if (Convert.ToBoolean(ConfigurationManager.AppSettings["RequireLoginValidation"]) == true)
+            {
+                if (OsbleAuthentication.CurrentUser != null && OsbleAuthentication.CurrentUser.IsApproved)
+                {
+                    setupInitialDatabaseData();
+
+                    setupMenu();
+
+                    setCurrentUserProfile();
+
+                    GetEnrolledCourses();
+
+                    setCourseListTitle();
+
+                    setDashboardDisplayMode();
+                }
+            }
+        }
+
+        public void SaveToCache(string key, object data)
+        {
+            string region = string.Format("User_{0}", CurrentUser.ID);
+            _cache.Add(key, data, DateTime.Now, region);
+        }
+
+        public object GetFromCache(string key)
+        {
+            string region = string.Format("User_{0}", CurrentUser.ID);
+            object item = _cache.Get(key, region);
+            return item;
+        }
+
 
         /// <summary>
         /// Defines a menu item tab
@@ -115,42 +213,6 @@ namespace OSBLE.Controllers
                 this.AdminOnly = adminOnly;
                 this.NotInCommunityPage = notInCommunityPage;
                 this.CommunityOnlyPage = communityOnlyPage;
-            }
-        }
-
-        /// <summary>
-        /// Provides common data for all controllers in the OSBLE app, such as profile and current course information.
-        /// </summary>
-        public OSBLEController()
-        {
-            Initialize();
-        }
-
-        public OSBLEController(OSBLEContext context)
-        {
-            db = context;
-            Initialize();
-        }
-
-        private void Initialize()
-        {
-            // If logged in, feed user profile to view.
-            if (Convert.ToBoolean(ConfigurationManager.AppSettings["RequireLoginValidation"]) == true)
-            {
-                if (OsbleAuthentication.CurrentUser != null && OsbleAuthentication.CurrentUser.IsApproved)
-                {
-                    setupInitialDatabaseData();
-
-                    setupMenu();
-
-                    setCurrentUserProfile();
-
-                    GetEnrolledCourses();
-
-                    setCourseListTitle();
-
-                    setDashboardDisplayMode();
-                }
             }
         }
 
@@ -291,15 +353,15 @@ namespace OSBLE.Controllers
 
                 // Load currently selected course, as long as user is actually a member of said course.
                 // Otherwise, load first course.
-                if ((activeCourse = activeCoursePool.Where(cu => cu.AbstractCourseID == activeCourseID).FirstOrDefault()) == null)
+                if ((ActiveCourse = activeCoursePool.Where(cu => cu.AbstractCourseID == activeCourseID).FirstOrDefault()) == null)
                 {
-                    activeCourse = activeCoursePool.FirstOrDefault();
+                    ActiveCourse = activeCoursePool.FirstOrDefault();
                 }
 
-                if (activeCourse != null)
+                if (ActiveCourse != null)
                 {
-                    context.Session["ActiveCourse"] = activeCourse.AbstractCourseID;
-                    ViewBag.ActiveCourse = activeCourse;
+                    context.Session["ActiveCourse"] = ActiveCourse.AbstractCourseID;
+                    ViewBag.ActiveCourse = ActiveCourse;
                 }
             }
             else // User invalid. Logout.
@@ -432,7 +494,7 @@ namespace OSBLE.Controllers
         public TimeSpan? calculateLateness(Course course, Assignment assignment, AssignmentTeam team)
         {
             DateTime? dueDate = assignment.DueDate;
-            
+
             DateTime? submissionTime = GetSubmissionTime(course, assignment, team);
 
             if (submissionTime == null)
@@ -466,7 +528,7 @@ namespace OSBLE.Controllers
             else
             {
                 return 100;
-            }            
+            }
         }
 
         protected string[] GetFileExtensions(DeliverableType deliverableType)
@@ -539,10 +601,10 @@ namespace OSBLE.Controllers
         /// <param name="user"></param>
         public void RemoveUserFromCourse(UserProfile user)
         {
-            CourseUser cu =  (from c in db.CourseUsers
-                    where c.AbstractCourseID == activeCourse.AbstractCourseID
-                    && c.UserProfileID == user.ID
-                    select c).FirstOrDefault();
+            CourseUser cu = (from c in db.CourseUsers
+                             where c.AbstractCourseID == ActiveCourse.AbstractCourseID
+                             && c.UserProfileID == user.ID
+                             select c).FirstOrDefault();
             if (cu != null)
             {
                 db.CourseUsers.Remove(cu);

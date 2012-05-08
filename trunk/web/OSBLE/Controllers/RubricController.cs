@@ -109,7 +109,7 @@ namespace OSBLE.Controllers
             }
 
             //Make sure that the current activity is attached to the active course
-            if (viewModel.SelectedAssignment.Category.CourseID != activeCourse.AbstractCourseID)
+            if (viewModel.SelectedAssignment.Category.CourseID != ActiveCourse.AbstractCourseID)
             {
                 return false;
             }
@@ -227,7 +227,7 @@ namespace OSBLE.Controllers
             }
             else
             {
-                viewModel.TeamList = assignment.AssignmentTeams.OrderBy(t => t.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(activeCourse.AbstractRole)).ToList();
+                viewModel.TeamList = assignment.AssignmentTeams.OrderBy(t => t.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ActiveCourse.AbstractRole)).ToList();
             }
             viewModel.RubricEvaluationList = (from r in db.RubricEvaluations
                                               where r.AssignmentID == assignment.ID
@@ -321,7 +321,7 @@ namespace OSBLE.Controllers
             {
                 bool isOwnAssignment = false;
 
-                if (activeCourse.AbstractRole.CanSubmit && activeCourse.ID == cuId)
+                if (ActiveCourse.AbstractRole.CanSubmit && ActiveCourse.ID == cuId)
                 {
                     Assignment assignment = db.Assignments.Find(assignmentId);
                     AssignmentTeam team = GetAssignmentTeam(assignment, CurrentUser);
@@ -331,7 +331,7 @@ namespace OSBLE.Controllers
                     }
                 }
 
-                if (activeCourse.AbstractRole.CanGrade || isOwnAssignment || activeCourse.AbstractRole.Anonymized)
+                if (ActiveCourse.AbstractRole.CanGrade || isOwnAssignment || ActiveCourse.AbstractRole.Anonymized)
                 {
                     Assignment assignment = db.Assignments.Find(assignmentId);
                     CourseUser cu = db.CourseUsers.Find(cuId);
@@ -352,7 +352,7 @@ namespace OSBLE.Controllers
         public ActionResult ViewAsUneditable(int assignmentId)
         {
             RubricViewModel viewModel = GetUneditableRubricViewModel(assignmentId);
-            if (!(viewModel.Rubric == null || viewModel.SelectedAssignment.Category.CourseID != activeCourse.AbstractCourseID))
+            if (!(viewModel.Rubric == null || viewModel.SelectedAssignment.Category.CourseID != ActiveCourse.AbstractCourseID))
             {
                 Assignment assignment = db.Assignments.Find(assignmentId);
                 ViewBag.Score = null;
@@ -405,7 +405,7 @@ namespace OSBLE.Controllers
         public ActionResult ExportIndividualToCSV(int teamID, int assignID)
         {
             string completeRubricString = "";
-            AbstractCourse currentCourse = activeCourse.AbstractCourse;
+            AbstractCourse currentCourse = ActiveCourse.AbstractCourse;
             Team team = db.Teams.Find(teamID);
             Assignment curAssignment = (from a in db.Assignments
                                         where a.ID == assignID
@@ -423,7 +423,7 @@ namespace OSBLE.Controllers
             ViewBag.CompleteRubricString = completeRubricString;
 
 
-            context.Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + currentCourse.Name + "_" + curAssignment.AssignmentName + "_" + team.DisplayName(activeCourse.AbstractRole) + " rubric.txt\"");
+            context.Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + currentCourse.Name + "_" + curAssignment.AssignmentName + "_" + team.DisplayName(ActiveCourse.AbstractRole) + " rubric.txt\"");
             Response.ContentType = "application/octet-stream";
 
             return View();
@@ -439,7 +439,7 @@ namespace OSBLE.Controllers
         public ActionResult ExportAllToCSV(int assignID)
         {
             string completeRubricString = "";
-            AbstractCourse currentCourse = activeCourse.AbstractCourse;
+            AbstractCourse currentCourse = ActiveCourse.AbstractCourse;
             Assignment curAssignment = (from a in db.Assignments
                                         where a.ID == assignID
                                         select a).FirstOrDefault();
@@ -488,7 +488,7 @@ namespace OSBLE.Controllers
             string globalComments = "";
 
             header = "------------------------------------------------\n";
-            header += "*** STUDENT/TEAM: " + team.DisplayName(activeCourse.AbstractRole) + "\n";
+            header += "*** STUDENT/TEAM: " + team.DisplayName(ActiveCourse.AbstractRole) + "\n";
 
             // Criterion rows set up
             RubricEvaluation rubricEvaluation = new RubricEvaluation();
