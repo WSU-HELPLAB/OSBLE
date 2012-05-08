@@ -269,6 +269,7 @@
       <DependentUpon>UploaderWebService.svc</DependentUpon>
     </Compile>
     <Compile Include="Utility\ActionResultExtensions.cs" />
+    <Compile Include="Utility\NTree.cs" />
     <Compile Include="Utility\OsbleAuthentication.cs" />
     <Compile Include="Utility\FileCache.cs" />
     <Compile Include="Utility\Constants.cs" />

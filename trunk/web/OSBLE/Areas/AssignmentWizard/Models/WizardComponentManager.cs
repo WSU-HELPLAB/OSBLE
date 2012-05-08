@@ -274,12 +274,10 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             }
             else
             {
-                List<WizardBaseController> selectedAsList = SelectedComponents.ToList();
-                selectedAsList.Sort(new WizardComparer());
+                List<WizardBaseController> selectedAsList = SortComponents(SelectedComponents.ToList());
                 SelectedComponents = new ObservableCollection<WizardBaseController>(selectedAsList);
 
-                List<WizardBaseController> unselectedAsList = UnselectedComponents.ToList();
-                unselectedAsList.Sort(new WizardComparer());
+                List<WizardBaseController> unselectedAsList = SortComponents(UnselectedComponents.ToList());
                 UnselectedComponents = new ObservableCollection<WizardBaseController>(unselectedAsList);
             }
         }
@@ -492,10 +490,11 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                     AllComponents = tempComponentList.ToList();
                 }
             }
+
             //if caching failed, do it the long way
             if (!loadedFromCache)
             {
-                List<WizardBaseController> components = SortWizardComponents(null);
+                List<WizardBaseController> components = SortComponents(AllComponents);
                 AllComponents = components;
 
                 //save sorted component information to cache
@@ -519,40 +518,52 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             }
         }
 
-        private List<WizardBaseController> SortWizardComponents(WizardBaseController parent)
+        private List<WizardBaseController> SortComponents(List<WizardBaseController> unsorted)
         {
-            List<WizardBaseController> components;
+            List<WizardBaseController> components = new List<WizardBaseController>();
+            Dictionary<string, NTree<WizardBaseController>> nodes = new Dictionary<string, NTree<WizardBaseController>>();
+            NTree<WizardBaseController> rootNode = null;
 
-            //base case
-            if (parent == null)
+            //build the tree
+            foreach (WizardBaseController component in unsorted)
             {
-                components = (from c in AllComponents
-                              where c.Prerequisite == null
-                              select c).ToList();
-            }
-            else
-            {
-                //non base case
-                components = (from c in AllComponents
-                              where c.Prerequisite != null && c.Prerequisite.CompareTo(parent) == 0
-                              select c).ToList();
-            }
-            List<WizardBaseController> unionedComponents = new List<WizardBaseController>(components);
-            foreach (WizardBaseController component in components)
-            {
-                List<WizardBaseController> children = SortWizardComponents(component);
 
-                //add in children unaccounted for
-                foreach (WizardBaseController child in children)
+                NTree<WizardBaseController> node = null;
+                if (!nodes.ContainsKey(component.ControllerName))
                 {
-                    if (unionedComponents.Where(c => c.CompareTo(child) == 0).Count() == 0)
+                    node = new NTree<WizardBaseController>(component);
+                    nodes.Add(component.ControllerName, node);
+                }
+                else
+                {
+                    node = nodes[component.ControllerName];
+                }
+
+                //check for null prereq before we contine.  Null prereq denotes root node
+                if (component.Prerequisite != null)
+                {
+                    NTree<WizardBaseController> parentNode = null;
+                    if (nodes.ContainsKey(component.Prerequisite.ControllerName))
                     {
-                        unionedComponents.Add(child);
+                        parentNode = nodes[component.Prerequisite.ControllerName];
                     }
+                    else
+                    {
+                        parentNode = new NTree<WizardBaseController>(component.Prerequisite);
+                        nodes.Add(component.Prerequisite.ControllerName, parentNode);
+                    }
+                    parentNode.addChild(node);
+                }
+                else
+                {
+                    //set root node for later traversal
+                    rootNode = node;
                 }
             }
 
-            return unionedComponents;
+            //traverse tree, add to the list of components
+            rootNode.traverse(rootNode, (data) => { components.Add(data); });
+            return components;
         }
 
         #endregion
