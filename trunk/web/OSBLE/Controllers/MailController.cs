@@ -328,7 +328,7 @@ namespace OSBLE.Controllers
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            List<CourseUser> instructors = db.CourseUsers.Where(c => (c.AbstractRole.Name == "Instructor" && c.AbstractCourseID == ActiveCourse.AbstractCourseID)).ToList();
+            List<CourseUser> instructors = db.CourseUsers.Where(c => (c.AbstractRole.Name == "Instructor" && c.AbstractCourseID == activeCourse.AbstractCourseID)).ToList();
             if (instructors != null)
             {
                 foreach (CourseUser cu in instructors)
@@ -347,7 +347,7 @@ namespace OSBLE.Controllers
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            List<CourseUser> tas = db.CourseUsers.Where(c => (c.AbstractRole.Name == "TA" && c.AbstractCourseID == ActiveCourse.AbstractCourseID)).ToList();
+            List<CourseUser> tas = db.CourseUsers.Where(c => (c.AbstractRole.Name == "TA" && c.AbstractCourseID == activeCourse.AbstractCourseID)).ToList();
             if (tas != null)
             {
                 foreach (CourseUser cu in tas)
@@ -367,7 +367,7 @@ namespace OSBLE.Controllers
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            List<CourseUser> instructorTA = db.CourseUsers.Where(c => ((c.AbstractRole.Name == "Instructor" || c.AbstractRole.Name == "TA") && c.AbstractCourseID == ActiveCourse.AbstractCourseID)).ToList();
+            List<CourseUser> instructorTA = db.CourseUsers.Where(c => ((c.AbstractRole.Name == "Instructor" || c.AbstractRole.Name == "TA") && c.AbstractCourseID == activeCourse.AbstractCourseID)).ToList();
             if (instructorTA != null)
             {
                 foreach (CourseUser cu in instructorTA)
@@ -387,7 +387,7 @@ namespace OSBLE.Controllers
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            CourseUser studentRec = db.CourseUsers.Where(c => (c.UserProfileID == id && c.AbstractCourseID == ActiveCourse.AbstractCourseID)).FirstOrDefault();
+            CourseUser studentRec = db.CourseUsers.Where(c => (c.UserProfileID == id && c.AbstractCourseID == activeCourse.AbstractCourseID)).FirstOrDefault();
             if (studentRec != null)
             {
                 recipientList.Add(studentRec.UserProfile);
@@ -404,7 +404,7 @@ namespace OSBLE.Controllers
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            CourseUser studentRec = db.CourseUsers.Where(c => (c.UserProfileID == id && c.AbstractCourseID == ActiveCourse.AbstractCourseID)).FirstOrDefault();
+            CourseUser studentRec = db.CourseUsers.Where(c => (c.UserProfileID == id && c.AbstractCourseID == activeCourse.AbstractCourseID)).FirstOrDefault();
             if (studentRec != null)
             {
                 recipientList.Add(studentRec.UserProfile);
@@ -419,7 +419,7 @@ namespace OSBLE.Controllers
             ViewBag.MailHeader = "New Team Message";
 
             Mail mail = new Mail();
-            mail.ContextID = ActiveCourse.ID;
+            mail.ContextID = activeCourse.ID;
             List<UserProfile> recipientList = new List<UserProfile>();
 
             Team team = db.Teams.Find(teamID);

@@ -87,7 +87,7 @@ namespace OSBLE.Controllers
         {
             //Get all users for the current class
             var users = (from c in db.CourseUsers
-                         where c.AbstractCourseID == ActiveCourse.AbstractCourseID
+                         where c.AbstractCourseID == activeCourse.AbstractCourseID
                          select c);
 
             var usersGroupedBySection = users.GroupBy(CourseUser => CourseUser.Section).OrderBy(CourseUser => CourseUser.Key).ToList();
@@ -161,7 +161,7 @@ namespace OSBLE.Controllers
 
             ViewBag.UsersBySections = usersBySections;
 
-            ViewBag.CanEditSelf = CanModifyOwnLink(ActiveCourse);
+            ViewBag.CanEditSelf = CanModifyOwnLink(activeCourse);
 
             if (Request.Params["notice"] != null)
             {
@@ -275,7 +275,7 @@ namespace OSBLE.Controllers
                     }
 
                     // Make sure no student has the same ID as existing non-student members.
-                    List<CourseUser> otherMembers = db.CourseUsers.Where(c => c.AbstractCourseID == ActiveCourse.AbstractCourseID && c.AbstractRoleID != (int)CourseRole.CourseRoles.Student).ToList();
+                    List<CourseUser> otherMembers = db.CourseUsers.Where(c => c.AbstractCourseID == activeCourse.AbstractCourseID && c.AbstractRoleID != (int)CourseRole.CourseRoles.Student).ToList();
                     foreach (CourseUser member in otherMembers)
                     {
                         if (usedIdentifications.Contains(member.UserProfile.Identification))
@@ -289,7 +289,7 @@ namespace OSBLE.Controllers
                     //Students that exist on the old roster but do not appear on the new roster will
                     //be removed from the course
                     var oldRoster = from c in db.CourseUsers
-                                    where c.AbstractCourseID == ActiveCourse.AbstractCourseID
+                                    where c.AbstractCourseID == activeCourse.AbstractCourseID
                                     &&
                                     c.AbstractRoleID == (int)CourseRole.CourseRoles.Student
                                     select c;
@@ -383,7 +383,7 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult CreateByEmail()
         {
-            if (!(ActiveCourse.AbstractCourse is Community))
+            if (!(activeCourse.AbstractCourse is Community))
             {
                 ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name");
             }
@@ -430,7 +430,7 @@ namespace OSBLE.Controllers
             if (CanModifyOwnLink(CourseUser))
             {
                 ViewBag.UserProfileID = new SelectList(db.UserProfiles, "ID", "UserName", CourseUser.UserProfileID);
-                if (ActiveCourse.AbstractCourse is Course)
+                if (activeCourse.AbstractCourse is Course)
                 {
                     ViewBag.AbstractRoleID = new SelectList(db.CourseRoles, "ID", "Name", CourseUser.AbstractRoleID);
                 }
@@ -494,7 +494,7 @@ namespace OSBLE.Controllers
         private CourseUser getCourseUser(int userProfileId)
         {
             return (from c in db.CourseUsers
-                    where c.AbstractCourseID == ActiveCourse.AbstractCourseID
+                    where c.AbstractCourseID == activeCourse.AbstractCourseID
                     && c.UserProfileID == userProfileId
                     select c).FirstOrDefault();
         }
@@ -595,7 +595,7 @@ namespace OSBLE.Controllers
             }
             else
             {
-                CourseUser cu = db.CourseUsers.Where(c => (c.AbstractCourseID == ActiveCourse.AbstractCourseID) && (c.UserProfileID == userProfile)).FirstOrDefault();
+                CourseUser cu = db.CourseUsers.Where(c => (c.AbstractCourseID == activeCourse.AbstractCourseID) && (c.UserProfileID == userProfile)).FirstOrDefault();
 
                 if (cu != null)
                 {
@@ -622,7 +622,7 @@ namespace OSBLE.Controllers
             //This will return one if they exist already or null if they don't
             var user = (from c in db.UserProfiles
                         where c.Identification == courseuser.UserProfile.Identification
-                        && c.SchoolID == ActiveCourse.UserProfile.SchoolID
+                        && c.SchoolID == activeCourse.UserProfile.SchoolID
                         select c).FirstOrDefault();
             if (user == null)
             {
@@ -650,7 +650,7 @@ namespace OSBLE.Controllers
                 //Set the UserProfileID to point to our new student
                 courseuser.UserProfile = up;
                 courseuser.UserProfileID = up.ID;
-                courseuser.AbstractCourseID = ActiveCourse.AbstractCourseID;
+                courseuser.AbstractCourseID = activeCourse.AbstractCourseID;
             }
             else
             {
@@ -664,7 +664,7 @@ namespace OSBLE.Controllers
                 courseuser.UserProfileID = user.ID;
                 db.SaveChanges();
             }
-            courseuser.AbstractCourseID = ActiveCourse.AbstractCourseID;
+            courseuser.AbstractCourseID = activeCourse.AbstractCourseID;
             //Check uniqueness
             if ((from c in db.CourseUsers
                  where c.AbstractCourseID == courseuser.AbstractCourseID && c.UserProfileID == courseuser.UserProfileID
@@ -674,7 +674,7 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
 
                 //If we already have assignments in the course, we need to add the new student into the class
-                int currentCourseId = ActiveCourse.AbstractCourseID;
+                int currentCourseId = activeCourse.AbstractCourseID;
                 List<Assignment> assignments = (from a in db.Assignments
                                                 where a.Category.CourseID == currentCourseId
                                                 select a).ToList();
@@ -724,7 +724,7 @@ namespace OSBLE.Controllers
                 throw new Exception("No user exists with that email address!");
             }
 
-            courseuser.AbstractCourseID = ActiveCourse.AbstractCourseID;
+            courseuser.AbstractCourseID = activeCourse.AbstractCourseID;
 
             if ((from c in db.CourseUsers
                  where c.AbstractCourseID == courseuser.AbstractCourseID && c.UserProfileID == courseuser.UserProfileID

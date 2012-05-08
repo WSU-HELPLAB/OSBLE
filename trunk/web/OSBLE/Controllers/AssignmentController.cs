@@ -28,7 +28,7 @@ namespace OSBLE.Controllers
         public ActionResult Delete(int id)
         {
             //verify that the user attempting a delete owns this course and that the id is valid
-            if (!ActiveCourse.AbstractRole.CanModify)
+            if (!activeCourse.AbstractRole.CanModify)
             {
                 return RedirectToAction("Index");
             }
@@ -65,7 +65,7 @@ namespace OSBLE.Controllers
             //Getting the assginment list, initially without future or draft assignments.
             Assignments = (from assignment in db.Assignments
                            where !assignment.IsDraft &&
-                           assignment.Category.CourseID == ActiveCourse.AbstractCourseID &&
+                           assignment.Category.CourseID == activeCourse.AbstractCourseID &&
                            assignment.IsWizardAssignment &&
                            assignment.ReleaseDate <= DateTime.Now
                            orderby assignment.DueDate
@@ -74,7 +74,7 @@ namespace OSBLE.Controllers
             // Future assignments are non-draft assignments whose start date has not yet happened. Appending to list now.
             Assignments.AddRange((from assignment in db.Assignments
                                   where !assignment.IsDraft &&
-                                  assignment.Category.CourseID == ActiveCourse.AbstractCourseID &&
+                                  assignment.Category.CourseID == activeCourse.AbstractCourseID &&
                                   assignment.IsWizardAssignment == true &&
                                   assignment.ReleaseDate > DateTime.Now
                                   orderby assignment.ReleaseDate
@@ -86,7 +86,7 @@ namespace OSBLE.Controllers
                 Assignments.AddRange((from assignment in db.Assignments
                                       where assignment.IsDraft &&
                                       assignment.IsWizardAssignment &&
-                                      assignment.Category.CourseID == ActiveCourse.AbstractCourseID
+                                      assignment.Category.CourseID == activeCourse.AbstractCourseID
                                       orderby assignment.ReleaseDate
                                       select assignment).ToList());
             }
@@ -98,7 +98,7 @@ namespace OSBLE.Controllers
                 List<Assignment> assignmentList = (from assignment in db.Assignments
                                                    where !assignment.IsDraft &&
                                                    assignment.IsWizardAssignment &&
-                                                   assignment.Category.CourseID == ActiveCourse.AbstractCourseID
+                                                   assignment.Category.CourseID == activeCourse.AbstractCourseID
                                                    select assignment).ToList();
 
                 //This will hold the assignment ID, the date submitted in string format:, the grade in string format, and the team ID
@@ -131,11 +131,11 @@ namespace OSBLE.Controllers
 
                 //Gathering the Team Evaluations for the current users teams.
                 List<TeamEvaluation> teamEvaluations = (from t in db.TeamMemberEvaluations
-                                                        where t.EvaluatorID == ActiveCourse.ID
+                                                        where t.EvaluatorID == activeCourse.ID
                                                         select t.TeamEvaluation).ToList();
 
                 ViewBag.TeamEvaluations = teamEvaluations;
-                ViewBag.CourseUser = ActiveCourse;
+                ViewBag.CourseUser = activeCourse;
                 ViewBag.SubmissionInfoDictionary = submissionInfo;
             }
 
@@ -175,13 +175,13 @@ namespace OSBLE.Controllers
                 AssignmentTeam team = (from a in assignment.AssignmentTeams
                                        where a.TeamID == teamID
                                        select a).FirstOrDefault();
-                if (assignment.Category.CourseID == ActiveCourse.AbstractCourseID && assignment.AssignmentTeams.Contains(team))
+                if (assignment.Category.CourseID == activeCourse.AbstractCourseID && assignment.AssignmentTeams.Contains(team))
                 {
                     Session.Add("CurrentAssignmentID", assignmentID);
                     Session.Add("TeamID", teamID);
 
                     //if publish file exists then teacher can not save as draft
-                    bool canSaveAsDraft = !(new FileInfo(FileSystem.GetTeamUserPeerReview(false, ActiveCourse.AbstractCourse as Course, assignmentID, teamID)).Exists);
+                    bool canSaveAsDraft = !(new FileInfo(FileSystem.GetTeamUserPeerReview(false, activeCourse.AbstractCourse as Course, assignmentID, teamID)).Exists);
 
                     ViewBag.Assignment = assignment;
                     ViewBag.AssignmentTeam = team;
@@ -209,7 +209,7 @@ namespace OSBLE.Controllers
                 //ViewBag.activity = activity;
                 //ViewBag.TeamUser = teamUser;
 
-                if (assignment.Category.CourseID == ActiveCourse.AbstractCourse.ID)
+                if (assignment.Category.CourseID == activeCourse.AbstractCourse.ID)
                 {
                     foreach (TeamMember tm in at.Team.TeamMembers)
                     {
@@ -270,7 +270,7 @@ namespace OSBLE.Controllers
             List<AssignmentDetailsViewModel> AssignmentDetailsList = new List<AssignmentDetailsViewModel>();
             List<AssignmentTeam> teams = new List<AssignmentTeam>();
 
-            if (ActiveCourse.AbstractRole.CanModify || ActiveCourse.AbstractRole.Anonymized) //Instructor || Observer setup 
+            if (activeCourse.AbstractRole.CanModify || activeCourse.AbstractRole.Anonymized) //Instructor || Observer setup 
             {
                 if (assignment.AssignmentTypeID == 4)
                 {
@@ -291,7 +291,7 @@ namespace OSBLE.Controllers
                                                      where a.AssignmentID == assignment.ID
                                                      select a).ToList();
 
-                if (ActiveCourse.AbstractRole.Anonymized)
+                if (activeCourse.AbstractRole.Anonymized)
                 {
                     List<CourseUser> cus = db.CourseUsers.Where(c => c.AbstractCourseID == assignment.Category.Course.ID).ToList();
                     ViewBag.ObserverCU = cus.OrderBy(o => o.ID).ToList();
@@ -303,7 +303,7 @@ namespace OSBLE.Controllers
                     List<DiscussionTeam> discussionTeamList = assignment.DiscussionTeams.ToList();
                     discussionTeamList.Sort((x, y) => string.Compare(x.Team.Name, y.Team.Name));
                     ViewBag.DiscussionTeamList = discussionTeamList;
-                    if (ActiveCourse.AbstractRole.Anonymized)
+                    if (activeCourse.AbstractRole.Anonymized)
                     {
                         ViewBag.DiscussionTeamList = discussionTeamList.OrderBy(o => o.TeamID).ToList();
                     }
@@ -391,17 +391,17 @@ namespace OSBLE.Controllers
                     ViewBag.AssignmentDetailsVMList = AssignmentDetailsList.OrderBy(l => l.team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName).ThenBy(f => f.team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName);
                 }
 
-                if (ActiveCourse.AbstractRole.Anonymized)
+                if (activeCourse.AbstractRole.Anonymized)
                 {
                     ViewBag.AssignmentDetailsVMList = AssignmentDetailsList.OrderBy(o => o.team.ID).ThenBy(c => c.team.TeamMembers.OrderBy(d => d.CourseUserID)).ToList();
                 }
                 ViewBag.RubricEvals = evaluations;
             }
-            else if (ActiveCourse.AbstractRole.CanSubmit)//Student setup
+            else if (activeCourse.AbstractRole.CanSubmit)//Student setup
             {
                 AssignmentTeam at = GetAssignmentTeam(assignment, CurrentUser);
                 ViewBag.TeamID = at.TeamID;
-                ViewBag.CurrentUserID = ActiveCourse.ID;
+                ViewBag.CurrentUserID = activeCourse.ID;
                 ViewBag.TeamName = at.Team.Name;
                 DateTime? subTime = GetSubmissionTime(assignment.Category.Course, assignment, at);
                 var score = (from assScore in assignment.Scores
@@ -425,7 +425,7 @@ namespace OSBLE.Controllers
                 {
                     foreach (TeamMember tm in at.Team.TeamMembers)
                     {
-                        if (tm.CourseUser.ID != ActiveCourse.ID)
+                        if (tm.CourseUser.ID != activeCourse.ID)
                         {
                             if (cuList == null) //init only when needed, otherwise leave null for view check.
                             {
@@ -479,7 +479,7 @@ namespace OSBLE.Controllers
                     EndDate = assignment.DueDate,
                     EndTime = assignment.DueTime,
                     Approved = true,
-                    PosterID = ActiveCourse.ID,
+                    PosterID = activeCourse.ID,
                     StartDate = assignment.ReleaseDate,
                     StartTime = assignment.ReleaseTime,
                     Title = assignment.AssignmentName
@@ -650,7 +650,7 @@ namespace OSBLE.Controllers
                 ViewBag.AssignmentTeam = at;
                 ViewBag.PreviousAssignmentTeam = pAt;
                 ViewBag.TeamMemberEvaluations = (from tme in db.TeamMemberEvaluations
-                                                 where tme.EvaluatorID == ActiveCourse.ID &&
+                                                 where tme.EvaluatorID == activeCourse.ID &&
                                                  tme.TeamEvaluation.AssignmentID == a.ID
                                                  select tme).ToList();
 

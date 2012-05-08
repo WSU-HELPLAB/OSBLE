@@ -18,7 +18,7 @@ namespace OSBLE.Controllers
         // GET: /Notification/
         public ActionResult Index()
         {
-            ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == ActiveCourse.ID)).OrderByDescending(n => n.Posted).ToList();
+            ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == activeCourse.ID)).OrderByDescending(n => n.Posted).ToList();
             return View();
         }
 
@@ -27,7 +27,7 @@ namespace OSBLE.Controllers
             Notification n = db.Notifications.Find(id);
 
             // Notification exists and belongs to current user.
-            if ((n != null) && (n.RecipientID == ActiveCourse.ID))
+            if ((n != null) && (n.RecipientID == activeCourse.ID))
             {
                 // Mark notification as read.
                 n.Read = true;
@@ -60,7 +60,7 @@ namespace OSBLE.Controllers
             Notification n = db.Notifications.Find(id);
 
             // Notification exists and belongs to current user.
-            if ((n != null) && (n.RecipientID == ActiveCourse.ID))
+            if ((n != null) && (n.RecipientID == activeCourse.ID))
             {
                 // Mark notification as read.
                 n.Read = true;
@@ -87,8 +87,8 @@ namespace OSBLE.Controllers
             Notification n = new Notification();
             n.ItemType = Notification.Types.Mail;
             n.ItemID = mail.ID;
-            n.RecipientID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.ToUserProfileID && cu.AbstractCourseID == ActiveCourse.AbstractCourseID).FirstOrDefault().ID;
-            n.SenderID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.FromUserProfileID && cu.AbstractCourseID == ActiveCourse.AbstractCourseID).FirstOrDefault().ID;
+            n.RecipientID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.ToUserProfileID && cu.AbstractCourseID == activeCourse.AbstractCourseID).FirstOrDefault().ID;
+            n.SenderID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.FromUserProfileID && cu.AbstractCourseID == activeCourse.AbstractCourseID).FirstOrDefault().ID;
             addNotification(n);
         }
 
@@ -175,7 +175,7 @@ namespace OSBLE.Controllers
                 n.ItemType = Notification.Types.InlineReviewCompleted;
                 n.Data = assignment.ID.ToString() + ";" + team.ID.ToString() + ";" + assignment.AssignmentName;
                 n.RecipientID = member.CourseUserID;
-                n.SenderID = ActiveCourse.ID;
+                n.SenderID = activeCourse.ID;
                 addNotification(n);
             }
         }
@@ -190,7 +190,7 @@ namespace OSBLE.Controllers
                 n.Data = assignment.ID.ToString() + ";" + member.CourseUserID + ";" + assignment.AssignmentName;
 
                 n.RecipientID = member.CourseUser.ID;
-                n.SenderID = ActiveCourse.ID;
+                n.SenderID = activeCourse.ID;
                 addNotification(n);
             }
         }

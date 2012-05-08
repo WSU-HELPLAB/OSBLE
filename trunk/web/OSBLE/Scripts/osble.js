@@ -53,5 +53,5 @@ function onSilverlightError(sender, args) {
         errMsg += "MethodName: " + args.methodName + "     \n";
     }
 
-    throw new Error(errMsg);
+    omthrow new Error(errMsg);
 }

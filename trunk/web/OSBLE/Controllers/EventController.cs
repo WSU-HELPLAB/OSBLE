@@ -113,10 +113,10 @@ namespace OSBLE.Controllers
             }
 
             // Approve if instructor/leader, course is community, or approval is not required.
-            if (ActiveCourse.AbstractRole.CanModify ||
-                ((ActiveCourse.AbstractCourse is Course) &&
-                !(ActiveCourse.AbstractCourse as Course).RequireInstructorApprovalForEventPosting) ||
-                (ActiveCourse.AbstractCourse is Community)
+            if (activeCourse.AbstractRole.CanModify ||
+                ((activeCourse.AbstractCourse is Course) &&
+                !(activeCourse.AbstractCourse as Course).RequireInstructorApprovalForEventPosting) ||
+                (activeCourse.AbstractCourse is Community)
                 )
             {
                 e.Approved = true;
@@ -324,7 +324,7 @@ namespace OSBLE.Controllers
             //MG:Pulling all events for this course that approved and have a startdate that 
             //lies within the StartDate and EndDate parameters. 
             List<Event> events = (from e in db.Events
-                                   where e.Poster.AbstractCourseID == ActiveCourse.AbstractCourseID
+                                   where e.Poster.AbstractCourseID == activeCourse.AbstractCourseID
                                    && e.StartDate >= StartDate
                                    && e.StartDate <= EndDate
                                    && e.Approved
