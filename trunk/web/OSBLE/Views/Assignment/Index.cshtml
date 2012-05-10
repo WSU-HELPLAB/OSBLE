@@ -11,6 +11,10 @@
     {
         @Html.Raw("alert(\"Your submission was successfully received.\");");
     }
+    if(ViewBag.Error != null)
+    {
+        @Html.Raw("alert(" + ViewBag.Error + ");");
+    }
 
     ViewBag.Title = "Assignments";
 }

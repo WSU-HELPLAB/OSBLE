@@ -363,43 +363,143 @@ namespace OSBLE.Controllers
             return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
         }
 
-        //[HttpPost]
-        //[CanModifyCourse]
-        //public ActionResult ImportRubricFromCSV(HttpPostedFileBase file)
-        //{
-        //    Session["RubricFile"] = file;
-        //    Session["radio"] = Request.Params["radioBtn"];
-        //    Session["RubricId"] = Request.Params["RubricId"];
+        [HttpPost]
+        [CanModifyCourse]
+        public ActionResult ImportIndividualToCSV(HttpPostedFileBase file)
+        {
+            List<string> parsedData = new List<string>();
+            StreamReader readFile = new StreamReader(file.InputStream);
+            string assignmentName = "";
+            string courseName = "";
+            string studentNames = "";
+            string line;
+            RubricViewModel rvm = new RubricViewModel();
 
-        //    List<string[]> parsedData = new List<string[]>();
-        //    List<int> positionList = new List<int>();
-        //    List<int> doNotAdd = new List<int>();
-        //    int currentCourseId = ActiveCourse.AbstractCourseID;
+            while ((line = readFile.ReadLine()) != null)
+            {
+                if (!line.StartsWith("---") && line.Trim() != "")
+                {
+                    parsedData.Add(line);
+                }
+            }
+            while (!parsedData.ElementAt(0).StartsWith("***"))
+            {
+                parsedData.RemoveAt(0);
+            }
+            assignmentName = parsedData.ElementAt(0).Split(':')[1].Trim();
+            parsedData.RemoveAt(0);
 
-        //    var students = from student in db.CourseUsers
-        //                   where student.AbstractCourseID == currentCourseId
-        //                   group student by student.UserProfile.ID into studentList
-        //                   select studentList;
+            Assignment curAssignment = (from a in db.Assignments
+                                         where a.AssignmentName == assignmentName
+                                         select a).FirstOrDefault();
 
-        //    StreamReader readFile = new StreamReader(file.InputStream);
+            if(curAssignment != null)
+            {
+                courseName = parsedData.ElementAt(0).Split(':')[1].Split('(')[0].Trim();
+                parsedData.RemoveAt(0);
 
-        //    string line;
-        //    string[] row;
+                if(activeCourse.AbstractCourse.Name == courseName)
+                {
+                    studentNames = parsedData.ElementAt(0).Split(':')[1].Trim();
+                    parsedData.RemoveAt(0);
+                    Team team = (from t in db.Teams
+                                 where t.Name == studentNames
+                                 select t).FirstOrDefault();
+                    
 
-        //    while ((line = readFile.ReadLine()) != null)
-        //    {
-        //        row = line.Split(',');
-        //        parsedData.Add(row);
-        //    }
+                    if (team != null)
+                    {
+                        int userID = (from u in team.TeamMembers
+                                      where u.Team.Name == studentNames
+                                      select u.CourseUserID).FirstOrDefault();
+
+                        RubricEvaluation rubricEvaluation = (from re in db.RubricEvaluations
+                                                             where re.Assignment.ID == curAssignment.ID
+                                                             && re.RecipientID == team.ID
+                                                             select re).FirstOrDefault();
+
+                        if (rubricEvaluation == null)
+                        {
+                            rubricEvaluation = new RubricEvaluation();
+                            Rubric rubric = db.Rubrics.Find(curAssignment.Rubric.ID);
+
+                            rubricEvaluation.AssignmentID = curAssignment.ID;
+                            rubricEvaluation.EvaluatorID = activeCourse.UserProfileID;
+                            rubricEvaluation.RecipientID = team.ID;
+
+                            foreach(Criterion c in rubric.Criteria)
+                            {
+                                CriterionEvaluation criterionEvaluation = new CriterionEvaluation();
+                                criterionEvaluation.CriterionID = c.ID;
+                                rubricEvaluation.CriterionEvaluations.Add(criterionEvaluation);
+                            }
+                            db.RubricEvaluations.Add(rubricEvaluation);
+                            db.SaveChanges();
+                        }
+
+                        //int i = 0;
+                        foreach (CriterionEvaluation ce in rubricEvaluation.CriterionEvaluations)
+                        {
+                            if (parsedData.FirstOrDefault().Split('(')[0].Substring(4).Trim() == ce.Criterion.CriterionTitle)
+                            {
+                                // removing the criterion title row
+                                parsedData.RemoveAt(0);
+                                // Removing the points title row
+                                parsedData.RemoveAt(0);
+                                // Makeing sure the points field was populated
+                                if(!parsedData.ElementAt(0).StartsWith("***"))
+                                {
+                                    ce.Score = Convert.ToInt32(parsedData.ElementAt(0));
+                                    // removing the points row after getting the value
+                                    parsedData.RemoveAt(0);
+                                }
+
+                                // will need to change this to handle merging
+                                ce.Comment = "";
+                                parsedData.RemoveAt(0);
+
+                                // Makeing sure the user actually entered comments
+                                while(parsedData.Count != 0 && !parsedData.ElementAt(0).StartsWith("***"))
+                                {
+                                    ce.Comment += parsedData.ElementAt(0);
+                                    // removing the comments string from the list
+                                    parsedData.RemoveAt(0);
+                                }
+                            }
+                        }
+
+                        if (curAssignment.Rubric.HasGlobalComments)
+                        {
+                            if (parsedData.FirstOrDefault().StartsWith("*** General Comments:"))
+                            {
+                                // remove the general comments header
+                                parsedData.RemoveAt(0);
+                                if (!parsedData.ElementAt(0).StartsWith("***"))
+                                {
+                                    rubricEvaluation.GlobalComment = parsedData.ElementAt(0);
+                                    // Remove the general comments for the list
+                                    parsedData.RemoveAt(0);
+                                }
+                            }
+                        }
+                        db.SaveChanges();
+
+                        return RedirectToAction("Index", "Rubric", new { assignmentId = curAssignment.ID, cuId = userID });
+                    }
+                }
+            }
             
-        //    file.InputStream.Seek(0, SeekOrigin.Begin);
-        //    file.InputStream.Position = 0;
+            //return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
+            ViewBag.Error = "Could Not import the rubric as the formatting is not correct!\n";
+            return View("Index", "Assignment");
 
-        //    ViewBag.Headers = parsedData.ElementAt(0);
-        //    ViewBag.File = file.FileName;
+        }
 
-        //    return View();
-        //}
+        [CanModifyCourse]
+        public ActionResult ImportAllToCSV(HttpPostedFileBase file)
+        {
+            return View();
+        }
 
         [CanModifyCourse]
         public ActionResult ExportIndividualToCSV(int teamID, int assignID)
@@ -415,7 +515,7 @@ namespace OSBLE.Controllers
             completeRubricString += "*** COURSE: " + currentCourse.Name + "(" + (currentCourse as Course).Semester + ", " + (currentCourse as Course).Year + ")\n";
             completeRubricString += "\n---Please use this file to complete rubric evaluations for this\n";
             completeRubricString += "---assignment\n";
-            completeRubricString += "*** are uneditable lines / --- are comment lines\n\n";
+            completeRubricString += "----   *** are uneditable lines / --- are comment lines\n\n";
             completeRubricString += "--------------------------------------------------------\n";
 
             completeRubricString += parseRubricToString(team, curAssignment);
@@ -426,12 +526,6 @@ namespace OSBLE.Controllers
             context.Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + currentCourse.Name + "_" + curAssignment.AssignmentName + "_" + team.DisplayName(activeCourse.AbstractRole) + " rubric.txt\"");
             Response.ContentType = "application/octet-stream";
 
-            return View();
-        }
-
-        [CanModifyCourse]
-        public ActionResult ImportIndividualToCSV()
-        {
             return View();
         }
 
@@ -470,12 +564,6 @@ namespace OSBLE.Controllers
             return View();
         }
 
-        [CanModifyCourse]
-        public ActionResult ImportAllToCSV()
-        {
-            return View("View");
-        }
-
         public string parseRubricToString(Team team, Assignment curAssignment)
         {
             int i = 0;
@@ -497,15 +585,13 @@ namespace OSBLE.Controllers
                                 && re.RecipientID == team.ID
                                 select re).FirstOrDefault();
 
-
+            Rubric rubric = db.Rubrics.Find(curAssignment.ID);
 
             List<Criterion> criterionList = (from c in db.Criteria
                                              where c.RubricID == curAssignment.RubricID
                                              select c).ToList();
             foreach (Criterion criterion in criterionList)
             {
-                i++;
-
                 // existing graded rubric
                 if (rubricEvaluation != null)
                 {
@@ -517,11 +603,13 @@ namespace OSBLE.Controllers
                                select c.Comment).FirstOrDefault().ToString();
                 }
                 criterions += "*** " + criterion.CriterionTitle + " (Weight: " + criterion.Weight + ")\n";
-                criterions += "*** Points (0 - " + curAssignment.PointsPossible + "):\n";
+                criterions += "*** Points (0 - " + curAssignment.Rubric.Levels.Sum(s => s.RangeEnd) + "):\n";
                 criterions += points + "\n";
                 criterions += "*** Comments: \n";
                 criterions += comment + "\n\n";
                 criterions += "------------------------------------------------\n";
+
+                i++;
             }
 
             // Global comments string set up

@@ -128,6 +128,19 @@ function create_and_open_downloading_submission_dialog() {
         $(targetId).val(ui.value);
         updateGrade();
     }
+
+    function displayImportRubric(e) {
+        e.preventDefault();
+        $("#import_rubric_from_csv").dialog({
+            modal: true,
+            resizable: false,
+            width: 500,
+            height: 225,
+            closeOnEscape: false
+            
+            
+        });
+    }
 </script>
 <style type="text/css">
     .dashboard
@@ -150,6 +163,14 @@ function create_and_open_downloading_submission_dialog() {
         width: 1200px;
     }
 </style>
+<div id='import_rubric_from_csv'  title="Import file" style="display:none;">Upload a text file containing this students rubric:<br /><br />
+    @using (Html.BeginForm("ImportIndividualToCSV", "Rubric",  FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <input type="file" id="file" name="file" size="2" />
+        <input type="submit" value="Begin Import Process..." />
+    }
+</div>
+
 <div id="rubric_evaluator">
     <h1>Rubric Evaluation of @Model.SelectedAssignment.AssignmentName for @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole)</h1>
     <div class="dashboard">
@@ -374,7 +395,8 @@ function create_and_open_downloading_submission_dialog() {
                     @Html.ActionLink(rubricUserName, "ExportIndividualToCSV", new { teamID = Model.Evaluation.Recipient.ID, assignID = Model.SelectedAssignment.ID }, new { })
                 </td>
                 <td style="padding-right:10px; padding-left:10px;">
-                    <a href="/Rubric/ImportIndividualToCSV"> Import @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole)'s Rubric</a>
+                    <a href="" onclick="displayImportRubric(event);">Import @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole)'s Rubric</a>
+                    @*<a href="/Rubric/ImportIndividualToCSV"> Import @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole)'s Rubric</a>*@
                 </td>
 
 

@@ -753,7 +753,6 @@
     <Content Include="Views\Gradebook\_ObserverTab.cshtml" />
     <Content Include="Views\CookieTest\Index.cshtml" />
     <Content Include="Views\Rubric\ExportIndividualToCSV.cshtml" />
-    <Content Include="Views\Rubric\ImportIndividualToCSV.cshtml" />
     <Content Include="Views\Rubric\ExportAllToCSV.cshtml" />
   </ItemGroup>
   <ItemGroup>
