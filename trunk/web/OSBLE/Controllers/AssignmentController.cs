@@ -924,5 +924,36 @@ namespace OSBLE.Controllers
                 }
             }
         }
+
+
+        /// <summary>
+        /// Returns true if it successfully modifies the user's score's value.
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <param name="cuID"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        [CanModifyCourse]
+        public bool ModifyMultiplier(int teamId, int cuID, double value)
+        {
+            bool returnVal = false;
+            if (teamId > 0 && cuID > 0 && value > 0)
+            {
+                Score usersScore = (from s in db.Scores
+                                    where s.TeamID == teamId &&
+                                    s.CourseUserID == cuID
+                                    select s).FirstOrDefault();
+
+                if (usersScore != null)
+                {
+                    usersScore.Multiplier = value;
+                    db.SaveChanges();
+                    GradebookController GBC = new GradebookController();
+                    GBC.ModifyGrade(usersScore.RawPoints, cuID, usersScore.AssignmentID);
+                    returnVal = true;
+                }
+            }
+            return returnVal;
+        }
     }
 }
