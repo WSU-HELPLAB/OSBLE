@@ -65,10 +65,14 @@
                 double multiplier = (from tm in ViewBag.TeamMemberEvaluations as IEnumerable<TeamMemberEvaluation>
                                      where tm.RecipientID == member.CourseUserID
                                      select tm.Points).Sum();
+                
+                
 
                 multiplier = multiplier / (100 * teamEvaluations.Count());
                 
-                <td>@multiplier</td>
+                <td class="multiplierTD">@multiplier
+                    <a style="display:none;" onclick="openMultiplierWindow(@member.TeamID, @member.CourseUserID, @multiplier);">@Helpers.EditButton()</a>
+                </td>
             }
             <td></td>
         </tr> 
@@ -78,4 +82,72 @@
     @Html.ActionLink("Publish " + teamName + "'s  Multiplier", "PublishTeamMultiplier", new { teamId = team.TeamID, assignmentId = assignment.ID })                                                                                               
 }
 
+	 <!-- Pop-up window for editing late percentage -->
+<div id="MultiplierWindow" style="display: none;" title="Edit Multiplier">
+   <input type="radio" id="radioBtn1" name="group1"/> Use default multiplier<br />
+   <input type="radio" id="radioBtn2" name="group1"/> Use a custom multiplier of <input size="5" id="customMulti"/><br />
+   <td>
+       <text id="latePenErrorText" style="color:Red; float:left; font-size:smaller"></text><br />
+       <div style="float:right">
+           <input id="SetMultiplierButton" data-tid="" data-cuid="" type="button" onclick="setMultiplier();" value="Apply Changes" />
+           <input type="button" onclick="closeMultiplierWindow();" value="Cancel" />
+       </div>
+   </td>
+</div>
 
+<script type="text/javascript">
+
+    $(".multiplierTD").mouseenter(function () {
+        $(this).find("a").show();
+    });
+
+    $(".multiplierTD").mouseleave(function () {
+        $(this).find("a").hide();
+    });
+
+    function openMultiplierWindow(tID, cuID, multi) {
+        $("#SetMultiplierButton").attr("data-tid", tID);
+        $("#SetMultiplierButton").attr("data-cuid", cuID);
+        $("#SetMultiplierButton").attr("data-multi", multi);
+        $("#MultiplierWindow").dialog({
+            autoOpen: true,
+            modal: true,
+            resizable: false,
+            width: 370,
+            height: 150,
+            closeOnEscape: false
+        });
+    }
+
+
+    function closeMultiplierWindow() {
+        $("#MultiplierWindow").dialog("close");
+    }
+
+    function setMultiplier() {
+        if ($("#radioBtn1").attr('checked') == "checked") {
+            $.ajax({
+                async: false,
+                url: "/Assignment/ModifyMultiplier",
+                data: {
+                    teamID: $("#SetMultiplierButton").attr("data-tid"),
+                    cuID: $("#SetMultiplierButton").attr("data-cuid"),
+                    value: $("#SetMultiplierButton").attr("data-multi")
+                    }
+            });
+        }
+        else { /*custom*/
+            var customValue = $("#customMulti").val();
+            $.ajax({
+                async: false,
+                url: "/Assignment/ModifyMultiplier",
+                data: {
+                    teamID: $("#SetMultiplierButton").attr("data-tid"),
+                    cuID: $("#SetMultiplierButton").attr("data-cuid"),
+                    value: customValue
+                }
+            });
+        }
+        window.location.reload(true);
+    }
+</script>
