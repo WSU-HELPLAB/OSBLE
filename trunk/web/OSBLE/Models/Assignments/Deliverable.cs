@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
 namespace OSBLE.Models.Assignments
 {
@@ -80,10 +81,47 @@ namespace OSBLE.Models.Assignments
         [Display(Name = "Type")]
         public int Type { get; set; }
 
-        //TODO: Make required later.
-        //[Required]
-        //[Display(Name = "Comment Categories")]
-        //[MaxLength(6)]
-        //public ICollection<CommentCategory> CommentCategories { get; set; }
+        [NotMapped]
+        public DeliverableType DeliverableType
+        {
+            get
+            {
+                return (DeliverableType)this.Type;
+            }
+            set
+            {
+                this.Type = (int)value;
+            }
+        }
+
+        public string[] FileExtensions
+        {
+            get
+            {
+                return Deliverable.GetFileExtensions(this.DeliverableType);
+            }
+        }
+
+        public static string[] GetFileExtensions(DeliverableType deliverableType)
+        {
+            Type type = deliverableType.GetType();
+
+            FieldInfo fi = type.GetField(deliverableType.ToString());
+
+            //we get the attributes of the selected language
+            FileExtensions[] attrs = (fi.GetCustomAttributes(typeof(FileExtensions), false) as FileExtensions[]);
+
+            //make sure we have more than (should be exactly 1)
+            if (attrs.Length > 0 && attrs[0] is FileExtensions)
+            {
+                return attrs[0].Extensions;
+            }
+            else
+            {
+                //throw and exception if not decorated with any attrs because it is a requirement
+                throw new Exception("Languages must have be decorated with a FileExtensionAttribute");
+            }
+        }
+
     }
 }

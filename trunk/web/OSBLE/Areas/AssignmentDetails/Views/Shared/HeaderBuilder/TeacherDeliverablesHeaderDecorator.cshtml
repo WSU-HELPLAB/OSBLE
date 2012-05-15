@@ -1,0 +1,20 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;               
+}
+<tr>
+    <th>Deliverables:</th>
+    <td>
+    <ol style="margin:0;">
+    @foreach (object deliverableObj in dataModel.Deliverables)
+    {
+        Deliverable deliverable = deliverableObj as Deliverable;
+        string[] extensions = deliverable.FileExtensions;
+        string extensionsStr = string.Join(",", extensions);
+        <li>@deliverable.Name (@extensionsStr)</li>
+    }
+    </ol>
+    </td>
+</tr>

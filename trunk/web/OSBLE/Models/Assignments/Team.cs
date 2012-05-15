@@ -8,7 +8,7 @@ using OSBLE.Models.Courses;
 
 namespace OSBLE.Models.Assignments
 {
-    public class Team : IComparable
+    public class Team : IComparable, IEquatable<Team>, IEqualityComparer<Team>
     {
         [Key]
         public int ID { get; set; }
@@ -22,7 +22,7 @@ namespace OSBLE.Models.Assignments
             TeamMembers = new List<TeamMember>();
         }
 
-        int IComparable.CompareTo(object obj)
+        public int CompareTo(object obj)
         {
             Team other = obj as Team;
             if (other == null)
@@ -37,6 +37,62 @@ namespace OSBLE.Models.Assignments
             {
                 return this.ID.CompareTo(other.ID);
             }
+        }
+
+        public bool Equals(Team other)
+        {
+            if (this.CompareTo(other) == 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public bool Equals(Team x, Team y)
+        {
+            if (x.CompareTo(y) == 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public int GetHashCode(Team obj)
+        {
+            if (obj.ID != 0)
+            {
+                return obj.ID.GetHashCode();
+            }
+            else
+            {
+                return obj.Name.GetHashCode();
+            }
+        }
+
+        /// <summary>
+        /// Converts the list of team members into a string for display purposes.
+        /// Will contain the name(s) of each individual on the team.
+        /// </summary>
+        /// <param name="seperator"></param>
+        /// <returns></returns>
+        public string TeamMemberString(string separator = ";")
+        {
+            string[] names = (from member in this.TeamMembers
+                              select member.CourseUser.DisplayName()).ToArray<string>();
+            return string.Join(separator, names);
+        }
+
+        /// <summary>
+        /// Converts the list of team members into a string for display purposes.
+        /// Will contain the name(s) of each individual on the team.
+        /// </summary>
+        /// <param name="seperator"></param>
+        /// <returns></returns>
+        public string TeamMemberString(AbstractRole viewerRole, string separator = ";")
+        {
+            string[] names = (from member in this.TeamMembers
+                              select member.CourseUser.DisplayName(viewerRole)).ToArray<string>();
+            return string.Join(separator, names);
         }
 
         public string DisplayName(AbstractRole viewerRole)

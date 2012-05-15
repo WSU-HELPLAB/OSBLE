@@ -38,16 +38,22 @@ namespace OSBLE.Models.Courses
             Hidden = false;
         }
 
-        public string DisplayName(AbstractRole viewerRole)
+        public string DisplayName(string separator = ",")
         {
-            if (viewerRole.Anonymized) // observer
+            return this.UserProfile.LastName + separator + this.UserProfile.FirstName; 
+        }
+
+        public string DisplayName(AbstractRole viewerRole, string separator = ",")
+        {
+            // not observer
+            if (viewerRole.Anonymized == false) 
             {
-                // will want to change this.ID to this.ID % with course size
-                return "Anonymous " + this.ID;
+                return this.UserProfile.LastName + separator + this.UserProfile.FirstName;
             }
             else
             {
-                return this.UserProfile.LastName + ", " + this.UserProfile.FirstName;
+                // will want to change this.ID to this.ID % with course size
+                return "Anonymous " + this.ID;
             }
         }
 

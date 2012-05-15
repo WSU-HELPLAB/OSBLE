@@ -476,7 +476,7 @@ namespace OSBLE.Controllers
             }            
         }
 
-        protected string[] GetFileExtensions(DeliverableType deliverableType)
+        public static string[] GetFileExtensions(DeliverableType deliverableType)
         {
             Type type = deliverableType.GetType();
 

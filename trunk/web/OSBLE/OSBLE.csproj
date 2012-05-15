@@ -164,7 +164,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Areas\AssignmentDetails\AssignmentDetailsAreaRegistration.cs" />
+    <Compile Include="Areas\AssignmentDetails\Controllers\ContentController.cs" />
     <Compile Include="Areas\AssignmentDetails\Controllers\HomeController.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\DeliverablesTableDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\TableDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\ViewModels\AssignmentDetailsFactory.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\DefaultBuilder.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\TeacherDeliverablesHeaderDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\IHeaderBuilder.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\HeaderDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\ITableBuilder.cs" />
+    <Compile Include="Areas\AssignmentDetails\ViewModels\AssignmentDetailsViewModel.cs" />
     <Compile Include="Resources\DynamicDictionary.cs" />
     <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
@@ -258,6 +268,7 @@
     <Compile Include="Models\ViewModels\TeamCreationViewModel.cs" />
     <Compile Include="Areas\AssignmentWizard\Models\WizardComponentManager.cs" />
     <Compile Include="Models\ViewModels\TeamEvaluationViewModel.cs" />
+    <Compile Include="Resources\StringExtensions.cs" />
     <Compile Include="Services\AssignmentSubmissionService.svc.cs">
       <DependentUpon>AssignmentSubmissionService.svc</DependentUpon>
     </Compile>
@@ -313,6 +324,7 @@
     <Content Include="App_Code\Libraries\LumenWorks.Framework.IO.dll" />
     <Content Include="App_Data\FirstNames.txt" />
     <Content Include="App_Data\LastNames.txt" />
+    <Content Include="Areas\AssignmentDetails\Content\css\Home.css" />
     <Content Include="Areas\AssignmentWizard\Content\css\criticalReview.css" />
     <Content Include="Areas\AssignmentWizard\Content\css\home.css" />
     <Content Include="Areas\AssignmentWizard\Content\css\layout.css" />
@@ -551,10 +563,7 @@
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Areas\AssignmentDetails\Models\" />
-    <Folder Include="Areas\AssignmentDetails\Views\Shared\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="packages.config">
       <SubType>Designer</SubType>
@@ -678,6 +687,9 @@
     <Content Include="Areas\AssignmentWizard\Views\TeamEvaluation\Index.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Web.config" />
     <Content Include="Areas\AssignmentDetails\Views\Home\Index.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\TeacherDeliverablesHeaderDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Content\Index.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\DeliverablesTableDecorator.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />

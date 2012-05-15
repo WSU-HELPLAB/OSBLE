@@ -1,0 +1,10 @@
+﻿#AssignmentDetailsTable th
+{
+    text-align:left;
+}
+
+#AssignmentDetailsTable th, #AssignmentDetailsTable td
+{
+    padding:4px;
+    vertical-align:middle;
+}

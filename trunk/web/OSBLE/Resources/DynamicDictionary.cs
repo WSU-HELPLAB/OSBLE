@@ -35,6 +35,36 @@ namespace OSBLE.Resources
             }
         }
 
+        /// <summary>
+        /// Merges two <see cref="DynamicDictionary"/> objects.  In the case of duplicate keys, the 
+        /// keys existing in other will overwrite the calling object's keys.
+        /// </summary>
+        /// <param name="other">The other dictionary to merge</param>
+        /// <returns></returns>
+        public void Merge(DynamicDictionary other)
+        {
+            foreach (string key in other.Keys)
+            {
+                this[key] = other[key];
+            }
+        }
+
+        /// <summary>
+        /// Merges two <see cref="DynamicDictionary"/> objects.  In the case of duplicate keys, the values in
+        /// <paramref name="second"/> will overwrite those in <paramref name="first"/>;
+        /// </summary>
+        /// <param name="first"></param>
+        /// <param name="second"></param>
+        /// <returns></returns>
+        public static DynamicDictionary Merge(DynamicDictionary first, DynamicDictionary second)
+        {
+            DynamicDictionary merged = new DynamicDictionary();
+            merged.Merge(first);
+            merged.Merge(second);
+            return merged;
+        }
+
+
         public object this[string s]
         {
             get
