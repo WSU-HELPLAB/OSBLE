@@ -3,16 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using OSBLE.Controllers;
 using OSBLE.Models.Assignments;
+using OSBLE.Controllers;
 
 namespace OSBLE.Areas.AssignmentDetails.Controllers
 {
-    public class DetailsController : OSBLEController
+    public class HomeController : OSBLEController
     {
-        //
-        // GET: /AssignmentDetails/Details/
-
         public ActionResult Index(int assignmentId)
         {
             Assignment assignment = db.Assignments.Find(assignmentId);

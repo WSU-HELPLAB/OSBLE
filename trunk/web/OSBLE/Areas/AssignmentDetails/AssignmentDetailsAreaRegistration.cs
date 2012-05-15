@@ -17,7 +17,7 @@ namespace OSBLE.Areas.AssignmentDetails
             context.MapRoute(
                 "AssignmentDetails_default",
                 "AssignmentDetails/{controller}/{action}/{assignmentId}",
-                new { action = "Index", controller = "Details", assignmentId = UrlParameter.Optional }
+                new { action = "Index", controller = "Home", assignmentId = UrlParameter.Optional }
             );
         }
     }

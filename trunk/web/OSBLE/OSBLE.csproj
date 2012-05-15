@@ -164,8 +164,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Areas\AssignmentDetails\AssignmentDetailsAreaRegistration.cs" />
-    <Compile Include="Areas\AssignmentDetails\Controllers\DetailsController.cs" />
-    <Compile Include="Models\DynamicDictionary.cs" />
+    <Compile Include="Areas\AssignmentDetails\Controllers\HomeController.cs" />
+    <Compile Include="Resources\DynamicDictionary.cs" />
     <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\ContentController.cs" />
@@ -677,7 +677,7 @@
     <Content Include="Areas\AssignmentWizard\Views\CriticalReview\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\TeamEvaluation\Index.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Web.config" />
-    <Content Include="Areas\AssignmentDetails\Views\Details\Index.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Home\Index.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />

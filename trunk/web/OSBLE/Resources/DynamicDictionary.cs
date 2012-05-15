@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Dynamic;
 
-namespace OSBLE.Models
+namespace OSBLE.Resources
 {
     public class DynamicDictionary : DynamicObject
     {

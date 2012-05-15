@@ -6,9 +6,11 @@ using System.Web.Mvc;
 using OSBLE.Controllers;
 using OSBLE.Areas.AssignmentWizard.Models;
 using OSBLE.Models.Assignments;
+using OSBLE.Attributes;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
+    [CanCreateCourses]
     public class HomeController : OSBLEController
     {
         private WizardComponentManager manager;
