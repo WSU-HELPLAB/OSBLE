@@ -10,7 +10,8 @@ namespace OSBLE.Models.Assignments
         Basic = 1, 
         CriticalReview = 2, 
         DiscussionAssignment = 3,
-        TeamEvaluation = 4
+        TeamEvaluation = 4,
+        CriticalReviewDiscussion = 5,
     };
 
 	public static class AssignmentTypeExtensions
@@ -60,6 +61,9 @@ namespace OSBLE.Models.Assignments
                     break;
                 case AssignmentTypes.TeamEvaluation:
                     description = "Students will evaluate their team members on a previous assignment.";
+                    break;
+                case AssignmentTypes.CriticalReviewDiscussion:
+                    description = "Students will discuss a previous critical review assignment.";
                     break;
                 default:
                     description = "Your run of the mill assignment.";

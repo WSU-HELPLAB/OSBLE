@@ -28,7 +28,7 @@ namespace OSBLE.Controllers
 
                 if (assignment != null)
                 {
-                    if (assignment.Category.CourseID == activeCourse.AbstractCourseID && activeCourse.AbstractRole.CanSubmit == true)
+                    if (assignment.Category.CourseID == ActiveCourse.AbstractCourseID && ActiveCourse.AbstractRole.CanSubmit == true)
                     {
                         setViewBagDeliverables((assignment).Deliverables);
 
@@ -36,7 +36,7 @@ namespace OSBLE.Controllers
                         
                         return View();
                     }
-                    else if(activeCourse.AbstractRole.CanGrade == true) 
+                    else if(ActiveCourse.AbstractRole.CanGrade == true) 
                     {
                         ViewBag.userToSubmitFor = up;
                         setViewBagDeliverables((assignment).Deliverables);
@@ -96,7 +96,7 @@ namespace OSBLE.Controllers
                 {
                     List<dynamic> deliverables = new List<dynamic>((assignment).Deliverables);
 
-                    if (assignment.Category.CourseID == activeCourse.AbstractCourseID && activeCourse.AbstractRole.CanSubmit == true)
+                    if (assignment.Category.CourseID == ActiveCourse.AbstractCourseID && ActiveCourse.AbstractRole.CanSubmit == true)
                     {
 
 
@@ -127,7 +127,7 @@ namespace OSBLE.Controllers
                                     if (allowFileExtensions.Contains(extension))
                                     {
                                         //If a submission of any extension exists delete it.  This is needed because they could submit a .c file and then a .cs file and the teacher would not know which one is the real one.
-                                        string submission = FileSystem.GetDeliverable(activeCourse.AbstractCourse as Course, assignment.ID, assignmentTeam, deliverables[i].Name, allowFileExtensions);
+                                        string submission = FileSystem.GetDeliverable(ActiveCourse.AbstractCourse as Course, assignment.ID, assignmentTeam, deliverables[i].Name, allowFileExtensions);
                                         if (submission != null)
                                         {
                                             FileInfo oldSubmission = new FileInfo(submission);
@@ -137,14 +137,14 @@ namespace OSBLE.Controllers
                                                 oldSubmission.Delete();
                                             }
                                         }
-                                        FileSystem.RemoveZipFile(activeCourse.AbstractCourse as Course, assignment, assignmentTeam);
-                                        string path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, assignmentTeam), deliverables[i].Name + extension);
+                                        FileSystem.RemoveZipFile(ActiveCourse.AbstractCourse as Course, assignment, assignmentTeam);
+                                        string path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam), deliverables[i].Name + extension);
                                         file.SaveAs(path);
 
                                         //unzip and rezip xps files because some XPS generators don't do it right
                                         if (extension.ToLower().CompareTo(".xps") == 0)
                                         {
-                                            string extractPath = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, assignmentTeam), "extract");
+                                            string extractPath = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam), "extract");
                                             using (ZipFile oldZip = ZipFile.Read(path))
                                             {
                                                 oldZip.ExtractAll(extractPath, ExtractExistingFileAction.OverwriteSilently);
@@ -189,7 +189,7 @@ namespace OSBLE.Controllers
                                     {
                                         
                                     }
-                                    var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, activeCourse.AbstractCourse as Course, (int)id, assignmentTeam), CurrentUser.LastName + "_" + CurrentUser.FirstName + "_" + delName + ".txt");
+                                    var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam), CurrentUser.LastName + "_" + CurrentUser.FirstName + "_" + delName + ".txt");
                                     System.IO.File.WriteAllText(path, inbrowser);
                                 }
                             }

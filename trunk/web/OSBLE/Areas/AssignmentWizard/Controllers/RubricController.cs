@@ -41,7 +41,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public override ActionResult Index()
         {
             base.Index();
-            ViewBag.ActiveCourse = activeCourse;
+            ViewBag.ActiveCourse = ActiveCourse;
             return View(Assignment);
         }
 
@@ -69,7 +69,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 WasUpdateSuccessful = false;
             }
-            ViewBag.ActiveCourse = activeCourse;
+            ViewBag.ActiveCourse = ActiveCourse;
             return base.PostBack(Assignment);
         }
     }

@@ -59,10 +59,10 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             IEnumerable<Category> categories = new List<Category>();
             //activeCourse should only be null when testing
-            if (activeCourse != null)
+            if (ActiveCourse != null)
             {
                 //SUBMISSION CATEGORIES
-                categories = from c in (activeCourse.AbstractCourse as Course).Categories
+                categories = from c in (ActiveCourse.AbstractCourse as Course).Categories
                              where c.Name != Constants.UnGradableCatagory
                              select c;
             }

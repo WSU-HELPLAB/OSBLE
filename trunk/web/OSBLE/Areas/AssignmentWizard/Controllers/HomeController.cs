@@ -52,7 +52,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 //begin wizard
                 return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute, new { controller = manager.ActiveComponent.ControllerName });
             }
-            return View(Assignment.AllAssignmentTypes);
+            return View(Assignment.AllAssignmentTypes.OrderBy(e => e.ToString()).ToList());
         }
 
         [HttpPost]

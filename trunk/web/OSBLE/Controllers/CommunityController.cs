@@ -63,7 +63,7 @@ namespace OSBLE.Controllers
         public ActionResult Edit()
         {
             ViewBag.CurrentTab = "Community Settings";
-            Community community = db.Communities.Find(activeCourse.AbstractCourseID);
+            Community community = db.Communities.Find(ActiveCourse.AbstractCourseID);
             return View(community);
         }
 
@@ -78,12 +78,12 @@ namespace OSBLE.Controllers
         {
             ViewBag.CurrentTab = "Community Settings";
 
-            if (community.ID != activeCourse.AbstractCourseID)
+            if (community.ID != ActiveCourse.AbstractCourseID)
             {
                 return RedirectToAction("Index");
             }
 
-            Community updateCommunity = (Community)activeCourse.AbstractCourse;
+            Community updateCommunity = (Community)ActiveCourse.AbstractCourse;
 
             updateCommunity.AllowEventPosting = community.AllowEventPosting;
             updateCommunity.CalendarWindowOfTime = community.CalendarWindowOfTime;

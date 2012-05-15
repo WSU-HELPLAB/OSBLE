@@ -261,7 +261,7 @@ namespace OSBLE.Controllers
         [CanGradeCourse]
         public ActionResult ExportToCSV()
         {
-            int currentCourseId = activeCourse.AbstractCourseID;
+            int currentCourseId = ActiveCourse.AbstractCourseID;
 
             //overall string
             string finalString = "";
@@ -298,7 +298,7 @@ namespace OSBLE.Controllers
             average += ",,Average Score";
             header += ",Student ID,Name";
 
-            List<LetterGrade> letterGrades = ((activeCourse.AbstractCourse as Course).LetterGrades).OrderByDescending(l => l.MinimumRequired).ToList();
+            List<LetterGrade> letterGrades = ((ActiveCourse.AbstractCourse as Course).LetterGrades).OrderByDescending(l => l.MinimumRequired).ToList();
             //Grade is empty for weight and holds the Best grade for perfect score
             weights += ",";
             if (letterGrades.Count() > 0)
@@ -1962,17 +1962,17 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public ActionResult Index()
         {
-            if (activeCourse.AbstractRole.CanGrade == true)
+            if (ActiveCourse.AbstractRole.CanGrade == true)
             {
                 return TeacherIndex();
             }
 
-            else if (activeCourse.AbstractRole.Anonymized == true)
+            else if (ActiveCourse.AbstractRole.Anonymized == true)
             {
                 return ObserverIndex();
             }
 
-            else if (activeCourse.AbstractRole.CanSubmit == true)
+            else if (ActiveCourse.AbstractRole.CanSubmit == true)
             {
                 return StudentIndex();
             }
@@ -2028,7 +2028,7 @@ namespace OSBLE.Controllers
                                                 where assignment.Scores.Count() > 0
                                                 select grades).ToList();
 
-            List<LetterGrade> letterGradeList = ((activeCourse.AbstractCourse as Course).LetterGrades).ToList();
+            List<LetterGrade> letterGradeList = ((ActiveCourse.AbstractCourse as Course).LetterGrades).ToList();
 
             List<Score> categoryTotalPercent = (from categoryTotal in db.Scores
                                                 where categoryTotal.Assignment.Category.CourseID == currentCourseId &&
@@ -2141,7 +2141,7 @@ namespace OSBLE.Controllers
                                                 where assignment.Scores.Count() > 0
                                                 select grades).ToList();
 
-            List<LetterGrade> letterGradeList = ((activeCourse.AbstractCourse as Course).LetterGrades).ToList();
+            List<LetterGrade> letterGradeList = ((ActiveCourse.AbstractCourse as Course).LetterGrades).ToList();
 
             List<Score> categoryTotalPercent = (from categoryTotal in db.Scores
                                                 where categoryTotal.Assignment.Category.CourseID == currentCourseId &&
@@ -2208,7 +2208,7 @@ namespace OSBLE.Controllers
         public ActionResult StudentIndex()
         {
             bool usesWeights = false;
-            int currentCourseId = activeCourse.AbstractCourseID;
+            int currentCourseId = ActiveCourse.AbstractCourseID;
 
             List<Category> categories = (from category in db.Categories
                                          where category.CourseID == currentCourseId &&
@@ -2221,7 +2221,7 @@ namespace OSBLE.Controllers
                                             orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
                                             select cu).ToList();
 
-            List<LetterGrade> letterGrades = ((activeCourse.AbstractCourse as Course).LetterGrades).OrderByDescending(l => l.MinimumRequired).ToList();
+            List<LetterGrade> letterGrades = ((ActiveCourse.AbstractCourse as Course).LetterGrades).OrderByDescending(l => l.MinimumRequired).ToList();
 
             CourseUser currentUser = (from users in db.CourseUsers
                                       where users.AbstractCourseID == currentCourseId &&
@@ -2288,17 +2288,17 @@ namespace OSBLE.Controllers
             }
             Session["StudentID"] = null;
 
-            if (activeCourse.AbstractRole.CanGrade == true)
+            if (ActiveCourse.AbstractRole.CanGrade == true)
             {
                 BuildGradebook((int)categoryId);
                 return View();
             }
-            else if (activeCourse.AbstractRole.Anonymized == true)
+            else if (ActiveCourse.AbstractRole.Anonymized == true)
             {
                 BuildGradebook((int)categoryId);
                 return View();
             }
-            else if (activeCourse.AbstractRole.CanSubmit == true)
+            else if (ActiveCourse.AbstractRole.CanSubmit == true)
             {
                 BuildStudentGradebook((int)categoryId);
                 return View();
@@ -2500,7 +2500,7 @@ namespace OSBLE.Controllers
 
             //pull the students in the course.  Each student is a row.
             List<CourseUser> students = new List<CourseUser>();
-            if (activeCourse.AbstractRole.Anonymized) // observer
+            if (ActiveCourse.AbstractRole.Anonymized) // observer
             {
                 students = (from user in db.CourseUsers
                             where user.AbstractCourseID == currentCourseId && user.AbstractRole.CanSubmit
@@ -2584,7 +2584,7 @@ namespace OSBLE.Controllers
             ViewBag.Dropped = numDropped;
             ViewBag.Customize = customizeOption;
             ViewBag.MaxPoints = currentTab.MaxAssignmentScore;
-            ViewBag.ActiveCourse = activeCourse;
+            ViewBag.ActiveCourse = ActiveCourse;
 
             Session["isTab"] = 1;
         }

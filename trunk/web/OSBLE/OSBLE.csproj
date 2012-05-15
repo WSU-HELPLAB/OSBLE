@@ -163,6 +163,9 @@
     <Reference Include="WebMatrix.WebData, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Areas\AssignmentDetails\AssignmentDetailsAreaRegistration.cs" />
+    <Compile Include="Areas\AssignmentDetails\Controllers\DetailsController.cs" />
+    <Compile Include="Models\DynamicDictionary.cs" />
     <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\ContentController.cs" />
@@ -548,7 +551,10 @@
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Areas\AssignmentDetails\Models\" />
+    <Folder Include="Areas\AssignmentDetails\Views\Shared\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
       <SubType>Designer</SubType>
@@ -670,6 +676,8 @@
     <Content Include="Areas\AssignmentWizard\Views\DiscussionTeams\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\CriticalReview\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\TeamEvaluation\Index.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Web.config" />
+    <Content Include="Areas\AssignmentDetails\Views\Details\Index.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />

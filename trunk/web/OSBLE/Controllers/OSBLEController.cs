@@ -36,11 +36,18 @@ namespace OSBLE.Controllers
             }
         }
 
-        protected CourseUser activeCourse = null;
+        private CourseUser activeCourse = null;
 
         public CourseUser ActiveCourse
         {
-            get { return activeCourse; }
+            get 
+            { 
+                return activeCourse; 
+            }
+            protected set
+            {
+                activeCourse = value;
+            }
         }
 
         protected HttpContext context = System.Web.HttpContext.Current;
@@ -291,15 +298,15 @@ namespace OSBLE.Controllers
 
                 // Load currently selected course, as long as user is actually a member of said course.
                 // Otherwise, load first course.
-                if ((activeCourse = activeCoursePool.Where(cu => cu.AbstractCourseID == activeCourseID).FirstOrDefault()) == null)
+                if ((ActiveCourse = activeCoursePool.Where(cu => cu.AbstractCourseID == activeCourseID).FirstOrDefault()) == null)
                 {
-                    activeCourse = activeCoursePool.FirstOrDefault();
+                    ActiveCourse = activeCoursePool.FirstOrDefault();
                 }
 
-                if (activeCourse != null)
+                if (ActiveCourse != null)
                 {
-                    context.Session["ActiveCourse"] = activeCourse.AbstractCourseID;
-                    ViewBag.ActiveCourse = activeCourse;
+                    context.Session["ActiveCourse"] = ActiveCourse.AbstractCourseID;
+                    ViewBag.ActiveCourse = ActiveCourse;
                 }
             }
             else // User invalid. Logout.
@@ -540,7 +547,7 @@ namespace OSBLE.Controllers
         public void RemoveUserFromCourse(UserProfile user)
         {
             CourseUser cu =  (from c in db.CourseUsers
-                    where c.AbstractCourseID == activeCourse.AbstractCourseID
+                    where c.AbstractCourseID == ActiveCourse.AbstractCourseID
                     && c.UserProfileID == user.ID
                     select c).FirstOrDefault();
             if (cu != null)

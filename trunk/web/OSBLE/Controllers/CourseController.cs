@@ -189,7 +189,7 @@ namespace OSBLE.Controllers
         public ActionResult Edit()
         {
             ViewBag.CurrentTab = "Course Settings";
-            Course course = (Course)db.Courses.Find(activeCourse.AbstractCourseID);
+            Course course = (Course)db.Courses.Find(ActiveCourse.AbstractCourseID);
             return View(course);
         }
 
@@ -204,14 +204,14 @@ namespace OSBLE.Controllers
         {
             ViewBag.CurrentTab = "Course Settings";
 
-            if (course.ID != activeCourse.AbstractCourseID)
+            if (course.ID != ActiveCourse.AbstractCourseID)
             {
                 return RedirectToAction("Home");
             }
 
             NameValueCollection parameters = Request.Params;
 
-            Course updateCourse = (Course)activeCourse.AbstractCourse;
+            Course updateCourse = (Course)ActiveCourse.AbstractCourse;
 
             updateCourse.Inactive = course.Inactive;
             updateCourse.AllowDashboardPosts = course.AllowDashboardPosts;
@@ -253,7 +253,7 @@ namespace OSBLE.Controllers
         {
             //our parent already supplies the active course information so we don't
             //have much to do here
-            return View(activeCourse);
+            return View(ActiveCourse);
         }
 
         [HttpPost]
@@ -263,7 +263,7 @@ namespace OSBLE.Controllers
             //if the user clicked continue, then we should continue
             if (Request.Form.AllKeys.Contains("continue"))
             {
-                db.AbstractCourses.Remove(activeCourse.AbstractCourse);
+                db.AbstractCourses.Remove(ActiveCourse.AbstractCourse);
                 db.SaveChanges();
             }
 
