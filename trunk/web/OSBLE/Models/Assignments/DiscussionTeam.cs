@@ -19,5 +19,6 @@ namespace OSBLE.Models.Assignments
 
         [ForeignKey("TeamID")]
         public virtual Team Team { get; set; }
+
     }
 }

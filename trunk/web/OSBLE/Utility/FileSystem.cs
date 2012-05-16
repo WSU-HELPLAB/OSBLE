@@ -482,7 +482,7 @@ namespace OSBLE
             return GetAssignmentIDFolder(course, assignmentID) + "\\Submissions";
         }
 
-        public static string GetTeamUserSubmissionFolder(bool createPathIfNotExists, Course course, int assignmentID, AssignmentTeam submitterTeam)
+        public static string GetTeamUserSubmissionFolder(bool createPathIfNotExists, Course course, int assignmentID, IAssignmentTeam submitterTeam)
         {
             string path = GetAssignmentSubmissionFolder(course, assignmentID);
             path += "\\" + submitterTeam.TeamID.ToString();
@@ -653,6 +653,52 @@ namespace OSBLE
                     Directory.CreateDirectory(directoryPath);
                 }
                 PrepCourseDocuments(dl, courseId, previousPath + dl.Name + "\\");
+            }
+        }
+
+        /// <summary>
+        /// Returns the last submit time for a particular submission
+        /// </summary>
+        /// <param name="team"></param>
+        /// <returns></returns>
+        public static DateTime? GetSubmissionTime(IAssignmentTeam team)
+        {
+            DirectoryInfo submissionFolder = new DirectoryInfo
+                                            (FileSystem.GetTeamUserSubmissionFolder
+                                                (
+                                                    false, 
+                                                    team.Assignment.Category.Course,
+                                                    team.Assignment.ID, 
+                                                    team
+                                                )
+                                            );
+
+            DateTime? timeSubmitted;
+
+            if (submissionFolder.Exists)
+            {
+                //unfortunately LastWriteTime for a directory does not take into account it's file or
+                //sub directories and these we need to check to see when the last file was written too.
+                timeSubmitted = submissionFolder.LastWriteTime;
+                foreach (FileInfo file in submissionFolder.GetFiles())
+                {
+                    if (file.LastWriteTime > timeSubmitted)
+                    {
+                        timeSubmitted = file.LastWriteTime;
+                    }
+                }
+
+                //if no files, return null
+                if (submissionFolder.GetFiles().Count() == 0)
+                {
+                    timeSubmitted = null;
+                }
+
+                return timeSubmitted;
+            }
+            else
+            {
+                return null;
             }
         }
 

@@ -403,6 +403,7 @@ namespace OSBLE.Controllers
             return null;
         }
 
+        [Obsolete("Use FileSystem.GetSubmissionTime")]
         protected DateTime? GetSubmissionTime(Course course, Assignment assignment, AssignmentTeam team)
         {
             DirectoryInfo submissionFolder = new DirectoryInfo(FileSystem.GetTeamUserSubmissionFolder(false, course, assignment.ID, team));
