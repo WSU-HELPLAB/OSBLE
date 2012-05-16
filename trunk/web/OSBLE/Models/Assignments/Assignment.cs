@@ -202,11 +202,14 @@ namespace OSBLE.Models.Assignments
         /// </summary>
         public int GetSavedAsDraftCount()
         {
-            OSBLEContext db = new OSBLEContext();
-            int draftRubricEvals = (from a in db.RubricEvaluations
-                                    where a.AssignmentID == this.ID &&
-                                    !a.IsPublished
-                                    select a).Count();
+            int draftRubricEvals = 0;
+            using (OSBLEContext db = new OSBLEContext())
+            {
+                draftRubricEvals = (from a in db.RubricEvaluations
+                                        where a.AssignmentID == this.ID &&
+                                        !a.IsPublished
+                                        select a).Count();
+            }
             return draftRubricEvals;
         }
 
@@ -216,11 +219,14 @@ namespace OSBLE.Models.Assignments
         /// <returns></returns>
         public int GetPublishedCount()
         {
-            OSBLEContext db = new OSBLEContext();
-            int draftRubricEvals = (from a in db.RubricEvaluations
-                                    where a.AssignmentID == this.ID &&
-                                    a.IsPublished
-                                    select a).Count();
+            int draftRubricEvals = 0;
+            using (OSBLEContext db = new OSBLEContext())
+            {
+                draftRubricEvals = (from a in db.RubricEvaluations
+                                        where a.AssignmentID == this.ID &&
+                                        a.IsPublished
+                                        select a).Count();
+            }
             return draftRubricEvals;
         }
 
