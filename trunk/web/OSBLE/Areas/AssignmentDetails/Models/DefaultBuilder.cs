@@ -17,7 +17,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models
             return dict;
         }
 
-        public DynamicDictionary BuildTableForTeam(Team team)
+        public DynamicDictionary BuildTableForTeam(IAssignmentTeam team)
         {
             DynamicDictionary dict = new DynamicDictionary();
             return dict;

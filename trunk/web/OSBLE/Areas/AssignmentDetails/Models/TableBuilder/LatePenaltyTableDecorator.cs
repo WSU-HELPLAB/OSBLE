@@ -4,13 +4,12 @@ using System.Linq;
 using System.Web;
 using OSBLE.Resources;
 using OSBLE.Models.Assignments;
-using OSBLE.Models.Courses;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
 {
-    public class DeliverablesTableDecorator : TableDecorator
+    public class LatePenaltyTableDecorator : TableDecorator
     {
-        public DeliverablesTableDecorator(ITableBuilder builder)
+        public LatePenaltyTableDecorator(ITableBuilder builder)
             : base(builder)
         {
         }
@@ -19,6 +18,14 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
         {
             dynamic data = Builder.BuildTableForTeam(assignmentTeam);
             data.AssignmentTeam = assignmentTeam;
+            Score score = data.Score;
+
+            //don't pull if we already have it from somewhere else
+            if (score == null)
+            {
+                score = assignmentTeam.Assignment.Scores.Where(s => s.TeamID == assignmentTeam.TeamID).FirstOrDefault();
+                data.Score = score;
+            }
             return data;
         }
     }

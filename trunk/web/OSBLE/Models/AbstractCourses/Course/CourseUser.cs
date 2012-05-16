@@ -38,12 +38,12 @@ namespace OSBLE.Models.Courses
             Hidden = false;
         }
 
-        public string DisplayName(string separator = ",")
+        public string DisplayName(string separator = ", ")
         {
             return this.UserProfile.LastName + separator + this.UserProfile.FirstName; 
         }
 
-        public string DisplayName(AbstractRole viewerRole, string separator = ",")
+        public string DisplayName(AbstractRole viewerRole, string separator = ", ")
         {
             // not observer
             if (viewerRole.Anonymized == false) 

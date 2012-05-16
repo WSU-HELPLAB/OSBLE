@@ -1,0 +1,18 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    IAssignmentTeam currentTeam = dataModel.AssignmentTeam as IAssignmentTeam;
+    Score score = dataModel.Score as Score;
+}
+<td>
+@if (score != null)
+{
+    @score.getAppliedLatePenaltyAsDecimal().ToString("P") <a class="latePenaltyA" style="display:none;" onclick="openManualLatePenWindow(@score.ID, @currentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.ID, @currentTeam.Assignment.ID);">@Helpers.EditButton()</a>    
+}
+else
+{
+    <text>0.00%</text>
+}
+</td>

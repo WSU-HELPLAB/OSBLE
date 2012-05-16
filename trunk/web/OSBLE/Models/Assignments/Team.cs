@@ -88,7 +88,7 @@ namespace OSBLE.Models.Assignments
         /// </summary>
         /// <param name="seperator"></param>
         /// <returns></returns>
-        public string TeamMemberString(AbstractRole viewerRole, string separator = ";")
+        public string TeamMemberString(AbstractRole viewerRole, string separator = "; ")
         {
             string[] names = (from member in this.TeamMembers
                               select member.CourseUser.DisplayName(viewerRole)).ToArray<string>();

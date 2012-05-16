@@ -53,13 +53,13 @@
         <th>@Model.TableColumnHeaders[key]</th>
     }
     </tr>
-    @foreach (Team team in Model.TeamTableBuilders.Keys)
+    @foreach (IAssignmentTeam assignmentTeam in Model.TeamTableBuilders.Keys)
     {
         <tr>
-            <th>@team.TeamMemberString(Model.Client.AbstractRole)</th>
+            <th>@assignmentTeam.Team.TeamMemberString(Model.Client.AbstractRole)</th>
             @foreach (string view in Model.TableColumnHeaders.Keys)
             {
-                DynamicDictionary tableData = Model.TeamTableBuilders[team].BuildTableForTeam(team);
+                DynamicDictionary tableData = Model.TeamTableBuilders[assignmentTeam].BuildTableForTeam(assignmentTeam);
                 string viewLocation = string.Format("TableBuilder/{0}", view);
                 @Html.Partial(viewLocation, tableData);
             }

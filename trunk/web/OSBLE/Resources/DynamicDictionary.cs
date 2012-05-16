@@ -100,10 +100,8 @@ namespace OSBLE.Resources
             // so that property names become case-insensitive.
             string name = binder.Name.ToLower();
 
-            // If the property name is found in a dictionary,
-            // set the result parameter to the property value and return true.
-            // Otherwise, return false.
-            return dictionary.TryGetValue(name, out result);
+            dictionary.TryGetValue(name, out result);
+            return true;
         }
 
         // If you try to set a value of a property that is

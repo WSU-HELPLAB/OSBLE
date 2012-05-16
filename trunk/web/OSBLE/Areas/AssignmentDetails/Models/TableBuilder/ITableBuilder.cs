@@ -10,6 +10,6 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
 {
     public interface ITableBuilder
     {
-        DynamicDictionary BuildTableForTeam(Team team);
+        DynamicDictionary BuildTableForTeam(IAssignmentTeam assignmentTeam);
     }
 }

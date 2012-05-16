@@ -8,6 +8,8 @@ using OSBLE.Areas.AssignmentDetails.ViewModels;
 using OSBLE.Areas.AssignmentDetails.Models;
 using OSBLE.Models.Courses;
 using OSBLE.Areas.AssignmentDetails.Models.TableBuilder;
+using OSBLE.Models.Courses.Rubrics;
+using OSBLE.Models;
 
 namespace OSBLE.Areas.AssignmentDetails.ViewModels
 {
@@ -125,18 +127,32 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
 
             Assignment assignment = vm.CurrentAssignment;
             List<IAssignmentTeam> teams = GetTeams(assignment);
+            List<RubricEvaluation> rubricEvaluations = new List<RubricEvaluation>();
+            List<TeamEvaluation> teamEvaluations = new List<TeamEvaluation>();
+            using (OSBLEContext db = new OSBLEContext())
+            {
+                rubricEvaluations = db.RubricEvaluations.Where(re => re.AssignmentID == assignment.ID).ToList();
+                
+                //AC: waiting on Mario's checkin.
+                //teamEvaluations = db.TeamEvaluations.Where(te => te.AssignmentID == assignment.ID).ToList();
+            }
 
             //create a builder for each team
             foreach (IAssignmentTeam assignmentTeam in teams)
             {
                 Team team = assignmentTeam.Team;
-                vm.TeamTableBuilders[team] = new DefaultBuilder();
+                vm.TeamTableBuilders[assignmentTeam] = new DefaultBuilder();
 
                 if (assignment.HasDeliverables)
                 {
                     //display submission information
-                    vm.TeamTableBuilders[team] = new DeliverablesTableDecorator(vm.TeamTableBuilders[team]);
+                    vm.TeamTableBuilders[assignmentTeam] = new DeliverablesTableDecorator(vm.TeamTableBuilders[assignmentTeam]);
                     vm.TableColumnHeaders["DeliverablesTableDecorator"] = "Submission";
+                }
+
+                if (assignment.HasCommentCategories)
+                {
+                    //link to inline review
                 }
 
                 if (assignment.Type == AssignmentTypes.DiscussionAssignment)
@@ -146,15 +162,37 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
 
                 if (assignment.Type == AssignmentTypes.TeamEvaluation)
                 {
-                    //add team evaluation info
+                    //AC TODO: Rewrite after I get new team evaluation model info.
+                    List<TeamEvaluation> evaluations = teamEvaluations.Where(te => te.TeamID == te.TeamID).ToList();
 
+                    //add team evaluation progress
+                    vm.TeamTableBuilders[assignmentTeam] = new TeamEvaluationProgressTableDecorator(
+                                                                vm.TeamTableBuilders[assignmentTeam],
+                                                                evaluations
+                                                                );
+                    vm.TableColumnHeaders["TeamEvaluationProgressTableDecorator"] = "Evaluations Completed";
+                    
                     //add largest discrepency info
+                    vm.TeamTableBuilders[assignmentTeam] = new TeamEvaluationDiscrepancyTableDecorator(
+                                                                vm.TeamTableBuilders[assignmentTeam],
+                                                                new List<TeamMemberEvaluation>()
+                                                                );
+                    vm.TableColumnHeaders["TeamEvaluationDiscrepancyTableDecorator"] = "Largest Discrepancy";
                 }
                 else
                 {
                     //add grade info
+                    vm.TeamTableBuilders[assignmentTeam] = new GradeTableDecorator(
+                                                                vm.TeamTableBuilders[assignmentTeam],
+                                                                rubricEvaluations
+                                                                );
+                    vm.TableColumnHeaders["GradeTableDecorator"] = "Grade";
 
                     //add late penalty info
+                    vm.TeamTableBuilders[assignmentTeam] = new LatePenaltyTableDecorator(
+                                                                vm.TeamTableBuilders[assignmentTeam]
+                                                                );
+                    vm.TableColumnHeaders["LatePenaltyTableDecorator"] = "Late Penalty";
                 }
             }
             

@@ -17,13 +17,13 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
         public List<string> HeaderViews { get; set; }
         public IHeaderBuilder HeaderBuilder { get; set; }
 
-        public Dictionary<Team, ITableBuilder> TeamTableBuilders { get; set; }
+        public Dictionary<IAssignmentTeam, ITableBuilder> TeamTableBuilders { get; set; }
         public Dictionary<string, string> TableColumnHeaders { get; set; }
 
         public AssignmentDetailsViewModel()
         {
             HeaderViews = new List<string>();
-            TeamTableBuilders = new Dictionary<Team, ITableBuilder>();
+            TeamTableBuilders = new Dictionary<IAssignmentTeam, ITableBuilder>();
             TableColumnHeaders = new Dictionary<string, string>();
         }
     }

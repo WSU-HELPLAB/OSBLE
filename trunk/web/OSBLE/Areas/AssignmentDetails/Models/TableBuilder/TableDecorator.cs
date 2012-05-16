@@ -17,6 +17,6 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
             Builder = builder;
         }
 
-        public abstract DynamicDictionary BuildTableForTeam(Team team);
+        public abstract DynamicDictionary BuildTableForTeam(IAssignmentTeam assignmentTeam);
     }
 }
