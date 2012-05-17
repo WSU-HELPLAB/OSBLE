@@ -175,7 +175,9 @@
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\TeamEvalGradingProgressDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\TeamMembersDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\DeliverablesTableDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\DiscussionPostsTableBuilder.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\GradeTableDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\InlineReviewTableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\LatePenaltyTableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\TableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\TeamEvaluationDiscrepancyTableDecorator.cs" />
@@ -712,6 +714,7 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\LatePenaltyTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\TeamEvaluationProgressTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\TeamEvaluationDiscrepancyTableDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\InlineReviewTableDecorator.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />

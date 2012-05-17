@@ -167,6 +167,8 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 if (assignment.HasCommentCategories)
                 {
                     //link to inline review
+                    vm.TeamTableBuilders[assignmentTeam] = new InlineReviewTableDecorator(vm.TeamTableBuilders[assignmentTeam]);
+                    vm.TableColumnHeaders["InlineReviewTableDecorator"] = "Inline Review";
                 }
 
                 if (assignment.Type == AssignmentTypes.DiscussionAssignment)
