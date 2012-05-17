@@ -427,10 +427,11 @@ namespace OSBLE.Controllers
                 bool changePasswordSucceeded;
                 try
                 {
-                    UserProfile currentUser = OsbleAuthentication.CurrentUser;
+                    UserProfile currentUser = db.UserProfiles.Find(OsbleAuthentication.CurrentUser.ID);
                     if (currentUser != null)
                     {
                         currentUser.Password = UserProfile.GetPasswordHash(model.NewPassword);
+                        db.Entry(currentUser).State = EntityState.Modified;
                         db.SaveChanges();
                         changePasswordSucceeded = true;
                     }
@@ -439,7 +440,7 @@ namespace OSBLE.Controllers
                         changePasswordSucceeded = false;
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     changePasswordSucceeded = false;
                 }
