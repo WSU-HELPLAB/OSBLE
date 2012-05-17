@@ -131,7 +131,7 @@ namespace OSBLE.Controllers
 
                 //Gathering the Team Evaluations for the current user's teams.
                 List<TeamEvaluation> teamEvaluations = (from t in db.TeamEvaluations
-                                                        where t.EvaluatorID == activeCourse.ID
+                                                        where t.EvaluatorID == ActiveCourse.ID
                                                         select t).ToList();
 
                 ViewBag.TeamEvaluations = teamEvaluations;
@@ -770,7 +770,7 @@ namespace OSBLE.Controllers
                 List<TeamEvaluation> teamEvals = (from te in db.TeamEvaluations
                                            where
                                                te.TeamEvaluationAssignmentID == assignmentId &&
-                                               te.EvaluatorID == activeCourse.ID
+                                               te.EvaluatorID == ActiveCourse.ID
                                            orderby te.Recipient.UserProfile.LastName
                                            select te).ToList();
                 //MG: evaluator (currentuser) must have completed at as many evaluations as team members from the previous assignment. 
@@ -815,7 +815,7 @@ namespace OSBLE.Controllers
             AssignmentTeam pAt = GetAssignmentTeam(assignment.PreceedingAssignment, CurrentUser);
             List<TeamEvaluation> existingTeamEvaluations = (from te in db.TeamEvaluations
                                                             where te.TeamEvaluationAssignmentID == assignmentId &&
-                                                            te.EvaluatorID == activeCourse.ID
+                                                            te.EvaluatorID == ActiveCourse.ID
                                                             select te).ToList();
 
             int existingCommentID = (from C in existingTeamEvaluations
@@ -856,7 +856,7 @@ namespace OSBLE.Controllers
                     TeamEvaluation newTE = new TeamEvaluation();
                     newTE.TeamEvaluationAssignmentID = assignmentId;
                     newTE.AssignmentUnderReviewID = (int)assignment.PrecededingAssignmentID;
-                    newTE.EvaluatorID = activeCourse.ID;
+                    newTE.EvaluatorID = ActiveCourse.ID;
                     newTE.RecipientID = tm.CourseUserID;
                     newTE.Points = paramPoints;
                     newTE.CommentID = tec.ID;
