@@ -129,10 +129,10 @@ namespace OSBLE.Controllers
                     submissionInfo.Add(a.ID, new Tuple<string, string, AssignmentTeam>(submissionTime, scoreString, at));
                 }
 
-                //Gathering the Team Evaluations for the current users teams.
-                List<TeamEvaluation> teamEvaluations = (from t in db.TeamMemberEvaluations
-                                                        where t.EvaluatorID == ActiveCourse.ID
-                                                        select t.TeamEvaluation).ToList();
+                //Gathering the Team Evaluations for the current user's teams.
+                List<TeamEvaluation> teamEvaluations = (from t in db.TeamEvaluations
+                                                        where t.EvaluatorID == activeCourse.ID
+                                                        select t).ToList();
 
                 ViewBag.TeamEvaluations = teamEvaluations;
                 ViewBag.CourseUser = ActiveCourse;
@@ -272,11 +272,11 @@ namespace OSBLE.Controllers
 
             if (ActiveCourse.AbstractRole.CanModify || ActiveCourse.AbstractRole.Anonymized) //Instructor || Observer setup 
             {
-                if (assignment.AssignmentTypeID == 4)
+                if (assignment.Type == AssignmentTypes.TeamEvaluation)
                 {
-                    if (assignment.PreceedingAssignment.AssignmentTypeID == 3) //preceding assignment is discussion, use discussion teams
+                    if (assignment.PreceedingAssignment.Type == AssignmentTypes.DiscussionAssignment) //preceding assignment is discussion, use discussion teams
                     {
-                        //teams = assignment.PreceedingAssignment.DiscussionTeams.ToList();
+                        //TODO: Handle getting teams for a discussion assignment as the previous assignment type. Note: You will have to get the discussion teams rather than assignment teams.
                     }
                     else
                     {
@@ -334,12 +334,18 @@ namespace OSBLE.Controllers
 
                     int l_teamEvalsCompleted = 0;
                     int l_teamEvalsTotal = 0;
-                    if (assignment.AssignmentTypeID == 4)
+                    if (assignment.Type == AssignmentTypes.TeamEvaluation)
                     {
-                        l_teamEvalsCompleted = (from d in db.TeamMemberEvaluations
-                                                where d.TeamEvaluation.Assignment.ID == assignment.ID &&
-                                                d.TeamEvaluation.Team.ID == team.TeamID
-                                                select d).GroupBy(a => a.EvaluatorID).Count();
+                        l_teamEvalsCompleted = 0;
+                        foreach(TeamMember member in team.Team.TeamMembers)
+                        {
+                            int completedEvals = db.TeamEvaluations.Where(e => e.EvaluatorID == member.CourseUserID && e.TeamEvaluationAssignmentID == id).Count();
+                            
+                            if(completedEvals > 0)
+                            {
+                                l_teamEvalsCompleted++;
+                            }
+                        }
                         l_teamEvalsTotal = team.Team.TeamMembers.Count;
                     }
 
@@ -579,28 +585,139 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult TeacherTeamEvaluation(int teamId, int assignmentId)
         {
+            //Assignment, Previous Assignment, TEs combined with Scores
+
+            Assignment assignment = db.Assignments.Find(assignmentId);
+            
+            Team precTeam = db.Teams.Find(teamId);
+            AssignmentTeam precAT = GetAssignmentTeam(assignment.PreceedingAssignment, precTeam.TeamMembers.FirstOrDefault().CourseUser.UserProfile);
+            List<TeamEvaluationViewModel> tevmList = new List<TeamEvaluationViewModel>();
+
+
+            var cuIDs = (from tm in precTeam.TeamMembers
+                         select tm.CourseUserID).ToList();
+
+            List<TeamEvaluation> OurTeamEvals = db.TeamEvaluations.Where(te => cuIDs.Contains(te.RecipientID) && te.TeamEvaluationAssignmentID == assignment.ID).ToList();
+            double[,] table;
+
+            //MG & MK: This table will be used for the view. Each row is one evaluator, each column is a recipient. 
+
+            table = new double[precTeam.TeamMembers.Count, precTeam.TeamMembers.Count+1];
+            int i = 0;
+            int j = 0;
+
+            foreach (TeamMember tm in precTeam.TeamMembers)
+            {
+                j = 0;
+                List<TeamEvaluation> myEvals= (from te in OurTeamEvals
+                                 where te.EvaluatorID == tm.CourseUserID
+                                 select te).ToList().OrderBy(te => te.Recipient.UserProfile.LastName).ThenBy(te => te.Recipient.UserProfile.FirstName).ToList();
+
+                double myPoints = (from te in OurTeamEvals
+                            where te.RecipientID == tm.CourseUserID
+                            select te.Points).Sum();
+
+                double myMulti = myPoints / (( OurTeamEvals.Count / precTeam.TeamMembers.Count ) * 100 );
+
+                //Gather all evals where I am the recipient, then sum those. Then gather ALL evals for the team, x the count of that with 100, use that as divisor. 
+                //
+
+                if (myEvals != null && myEvals.Count > 0)
+                {
+                    foreach (TeamEvaluation te in myEvals)
+                    {
+                        table[i,j] = te.Points;
+                        j++;
+                    }
+                }
+                else
+                {
+                    foreach (TeamMember tm2 in precTeam.TeamMembers)
+                    {
+                        table[i, j] = 0;
+                        j++;
+                    }
+                }
+                table[i, j] = myMulti;
+                i++;
+            }
+            
+            ViewBag.Table = table;
+            /*
+            if (OurTeamEvals.Count > 0) //Only populate tevmList if there are TeamEvaluations within OurTeamEvals
+            {
+                foreach (TeamMember tm in precAT.Team.TeamMembers)
+                {
+                    TeamEvaluationViewModel tevm = new TeamEvaluationViewModel();
+                    tevm.MyRecievedEvals = (from te in OurTeamEvals
+                                            where te.RecipientID == tm.CourseUserID &&
+                                            te.TeamEvaluationAssignmentID == assignmentId
+                                            select te).OrderBy(t => t.Evaluator.UserProfile.LastName).ThenBy(t => t.Evaluator.UserProfile.FirstName).ToList();
+
+                    if (tevm.MyRecievedEvals.Count > 0) //Only adding to tevmList if there is content
+                    {
+                        tevm.MyScore = (from s in db.Scores
+                                        where s.AssignmentID == assignmentId &&
+                                        s.CourseUserID == tm.CourseUserID
+                                        select s).FirstOrDefault();
+
+                        double sum = (from t in tevm.MyRecievedEvals
+                                      select t.Points).Sum();
+                        tevm.Multiplier = sum / ((OurTeamEvals.Count / precAT.Team.TeamMembers.Count) * 100);
+                        tevm.Recipient = tm.CourseUser;
+                        tevmList.Add(tevm);
+                    }
+                }
+
+                if (tevmList.Count == 0) //No info, make up dummy for display purposes
+                {
+                    TeamEvaluationViewModel tevm = new TeamEvaluationViewModel();
+                    List<TeamEvaluation> fakeEvals = new List<TeamEvaluation>();
+                    foreach (TeamMember tm in precTeam.TeamMembers)
+                    {
+                        TeamEvaluation te = new TeamEvaluation();
+                        te.Points = 0;
+                        te.EvaluatorID = tm.CourseUserID;
+                        fakeEvals.Add(te);
+                    }
+                    tevm.MyRecievedEvals = fakeEvals;
+                    tevm.Multiplier = 0;
+                    tevm.MyScore = null;
+                    tevm.Recipient = precTeam.TeamMembers.OrderBy(tm => tm.CourseUser.UserProfile.LastName).ThenBy(tm => tm.CourseUser.UserProfile.FirstName).FirstOrDefault().CourseUser;
+                }
+
+                tevmList.OrderBy(t => t.Recipient.UserProfile.LastName).ThenBy(t => t.Recipient.UserProfile.FirstName).ToList();
+            }
+             */
+
+            ViewBag.Team = precTeam;
+            ViewBag.tevmList = tevmList;
+            ViewBag.Assignment = assignment;
+            ViewBag.PrecedingAssignment = assignment.PreceedingAssignment;
+            
+            /*
             ViewBag.Team = db.Teams.Find(teamId);
             ViewBag.Time = DateTime.Now;
             Assignment a = db.Assignments.Find(assignmentId);
 
             Team team = db.Teams.Find(teamId);
 
-            List<TeamEvaluation> teamEvaluations = (from t in db.TeamEvaluations
-                                                    where t.TeamID == teamId &&
-                                                    t.AssignmentID == a.ID
-                                                    select t).OrderBy(u => u.Team.Name).ToList();
-            List<TeamMemberEvaluation> teamMemberEvaluations = (from t in db.TeamMemberEvaluations
-                                                                where t.TeamEvaluation.TeamID == teamId &&
-                                                                t.TeamEvaluation.AssignmentID == a.ID
-                                                                select t).OrderBy(u => u.Recipient.UserProfile.LastName).ThenBy(f => f.Recipient.UserProfile.FirstName).ToList();
+            List<TeamEvaluation> teamEvaluations = new List<TeamEvaluation>();
+             //= (from t in db.TeamEvaluations where t.TeamID == teamId && t.AssignmentID == a.ID
+               //                                     select t).OrderBy(u => u.Team.Name).ToList();
+            List<TeamEvaluation> TeamEvaluations = new List<TeamEvaluation>();  //= (from t in db.TeamEvaluations
+                                                                //where t.TeamEvaluation.TeamID == teamId &&
+                                                                //t.TeamEvaluation.AssignmentID == a.ID
+                                                                //select t).OrderBy(u => u.Recipient.UserProfile.LastName).ThenBy(f => f.Recipient.UserProfile.FirstName).ToList()
+            
 
             AssignmentTeam at = GetAssignmentTeam(a.PreceedingAssignment, team.TeamMembers.FirstOrDefault().CourseUser.UserProfile);
             ViewBag.Team = at;
 
             ViewBag.TeamEvaluations = teamEvaluations;
-            ViewBag.TeamMemberEvaluations = teamMemberEvaluations;
+            ViewBag.TeamEvaluations = TeamEvaluations;
             ViewBag.Assignment = a;
-
+            */
             return View("_TeacherTeamEvaluationView");
         }
 
@@ -616,27 +733,27 @@ namespace OSBLE.Controllers
 
             Team team = db.Teams.Find(teamId);
 
-            List<TeamEvaluation> teamEvaluations = (from t in db.TeamEvaluations
+            List<TeamEvaluation> teamEvaluations = new List<TeamEvaluation>();/* (from t in db.TeamEvaluations
                                                     where t.TeamID == teamId &&
                                                     t.AssignmentID == a.ID
-                                                    select t).OrderBy(u => u.TeamID).ToList();
-            List<TeamMemberEvaluation> teamMemberEvaluations = (from t in db.TeamMemberEvaluations
+                                                    select t).OrderBy(u => u.TeamID).ToList();*/
+            List<TeamEvaluation> TeamEvaluations = new List<TeamEvaluation>(); /* (from t in db.TeamEvaluations
                                                                 where t.TeamEvaluation.TeamID == teamId &&
                                                                 t.TeamEvaluation.AssignmentID == a.ID
                                                                 select t).OrderBy(u => u.RecipientID).ToList();
-
+                                                                                * */
             AssignmentTeam at = GetAssignmentTeam(a.PreceedingAssignment, team.TeamMembers.FirstOrDefault().CourseUser.UserProfile);
             ViewBag.Team = at;
 
             ViewBag.TeamEvaluations = teamEvaluations;
-            ViewBag.TeamMemberEvaluations = teamMemberEvaluations;
+            ViewBag.TeamEvaluations = TeamEvaluations;
             ViewBag.Assignment = a;
 
             return View("_TeacherTeamEvaluationView");
         }
 
         /// <summary>
-        /// This will take a Team and display the team evaluations to the teacher.
+        /// Generates a team evaluation view for the currentUser for assignmentId.
         /// </summary>
         /// <param name="teamId"></param
         [CanSubmitAssignments]
@@ -645,14 +762,41 @@ namespace OSBLE.Controllers
             Assignment a = db.Assignments.Find(assignmentId);
             AssignmentTeam pAt = GetAssignmentTeam(a.PreceedingAssignment, CurrentUser);
             AssignmentTeam at = GetAssignmentTeam(a, CurrentUser);
-            if (at != null)
+            if (at != null && a.Type == AssignmentTypes.TeamEvaluation)
             {
                 ViewBag.AssignmentTeam = at;
                 ViewBag.PreviousAssignmentTeam = pAt;
-                ViewBag.TeamMemberEvaluations = (from tme in db.TeamMemberEvaluations
-                                                 where tme.EvaluatorID == ActiveCourse.ID &&
-                                                 tme.TeamEvaluation.AssignmentID == a.ID
-                                                 select tme).ToList();
+                
+                List<TeamEvaluation> teamEvals = (from te in db.TeamEvaluations
+                                           where
+                                               te.TeamEvaluationAssignmentID == assignmentId &&
+                                               te.EvaluatorID == activeCourse.ID
+                                           orderby te.Recipient.UserProfile.LastName
+                                           select te).ToList();
+                //MG: evaluator (currentuser) must have completed at as many evaluations as team members from the previous assignment. 
+                //Otherwise, use artificial team evals for view
+                if (teamEvals.Count < pAt.Team.TeamMembers.Count)
+                {
+                    List<TeamEvaluation> artificialTeamEvals = new List<TeamEvaluation>();
+
+                    foreach (TeamMember tm in pAt.Team.TeamMembers.OrderBy(tm2 => tm2.CourseUser.UserProfile.LastName))
+                    {
+                        TeamEvaluation te = new TeamEvaluation();
+                        te.Points = 0;
+                        te.Recipient = tm.CourseUser;
+                        artificialTeamEvals.Add(te);
+                    }
+                    ViewBag.SubmitButtonValue = "Submit";
+                    ViewBag.TeamEvaluations = artificialTeamEvals;
+                    ViewBag.InitialPointsPossible = pAt.Team.TeamMembers.Count * 100;
+                }
+                else
+                {
+                    ViewBag.InitialPointsPossible = 0; //Must be 0 as we are reloading old TEs, and requirements for submitting initially are that points possible must be 0
+                    ViewBag.Comment = teamEvals.FirstOrDefault().Comment;
+                    ViewBag.SubmitButtonValue = "Resubmit";
+                    ViewBag.TeamEvaluations = teamEvals;
+                }
 
                 return View("_StudentTeamEvaluationView");
             }
@@ -665,89 +809,88 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult SubmitTeamEvaluation(int assignmentId)
         {
-            Assignment assignment = db.Assignments.Find(assignmentId);
 
-            //Get the assignment team for the current user
+             Assignment assignment = db.Assignments.Find(assignmentId);
             AssignmentTeam at = GetAssignmentTeam(assignment, CurrentUser);
             AssignmentTeam pAt = GetAssignmentTeam(assignment.PreceedingAssignment, CurrentUser);
-            int tmPoints;
+            List<TeamEvaluation> existingTeamEvaluations = (from te in db.TeamEvaluations
+                                                            where te.TeamEvaluationAssignmentID == assignmentId &&
+                                                            te.EvaluatorID == activeCourse.ID
+                                                            select te).ToList();
 
-            List<TeamMemberEvaluation> teamMemberEvaluation = (from t in db.TeamMemberEvaluations
-                                                               where t.Evaluator.UserProfileID == CurrentUser.ID &&
-                                                               t.TeamEvaluation.AssignmentID == assignment.ID
-                                                               select t).ToList();
-
-            string comments = Request.Params["inBrowserText"];
-            if (teamMemberEvaluation.Count() > 0)
+            int existingCommentID = (from C in existingTeamEvaluations
+                                     where C.CommentID != 0
+                                     select C.CommentID).FirstOrDefault();
+            TeamEvaluationComment tec;
+            if (existingCommentID != 0) //Comment already existed. Modify that and use that.
             {
-                teamMemberEvaluation.FirstOrDefault().TeamEvaluation.Comments = comments;
-                foreach (TeamMember tm in pAt.Team.TeamMembers)
-                {
-                    foreach (TeamMemberEvaluation tme in teamMemberEvaluation)
-                    {
-                        if (tme.RecipientID == tm.CourseUserID)
-                        {
-                            string param = "points-" + tm.CourseUserID;
-                            tmPoints = Convert.ToInt32(Request.Params[param]);
 
-                            tme.Points = tmPoints;
-                        }
-                    }
-                }
+                tec = (from tc in db.TeamEvaluationComments
+                       where tc.ID == existingCommentID
+                       select tc).FirstOrDefault();
+
+
+                tec.Comment = Convert.ToString(Request.Params["inBrowserText"]);
                 db.SaveChanges();
             }
-            else
+            else //using new comment
             {
-                //Create a new team evaluation
-                TeamEvaluation te = new TeamEvaluation()
-                {
-                    AssignmentID = assignment.ID,
-                    TeamID = pAt.TeamID,
-                    Comments = comments
-                };
-                db.TeamEvaluations.Add(te);
-                db.SaveChanges();
-
-                //Loop through the different team members on the team
-                foreach (TeamMember tm in pAt.Team.TeamMembers)
-                {
-                    //Get the points from the view assigned to the specific recipient
-                    string param = "points-" + tm.CourseUserID;
-                    tmPoints = Convert.ToInt32(Request.Params[param]);
-
-                    //Get the Team Member of the current user
-                    TeamMember currentTm = GetTeamUser(assignment, CurrentUser);
-
-                    //Create a team member evaluation
-                    TeamMemberEvaluation tme = new TeamMemberEvaluation()
-                    {
-                        Points = tmPoints,
-                        RecipientID = tm.CourseUserID,
-                        EvaluatorID = currentTm.CourseUserID,
-                        TeamEvaluationID = te.ID
-                    };
-                    db.TeamMemberEvaluations.Add(tme);
-                }
+                tec = new TeamEvaluationComment();
+                tec.Comment = Convert.ToString(Request.Params["inBrowserText"]);
+                db.TeamEvaluationComments.Add(tec);
                 db.SaveChanges();
             }
+
+            //Creating or editing TeamEvaluations for each team member from the previous assignment assignment team
+            foreach (TeamMember tm in pAt.Team.TeamMembers)
+            {
+                TeamEvaluation te = (from eval in existingTeamEvaluations
+                                     where eval.RecipientID == tm.CourseUserID
+                                     select eval).FirstOrDefault();
+
+                string param = "points-" + tm.CourseUserID;
+                int paramPoints = Convert.ToInt32(Request.Params[param]);
+
+                if (te == null) //No TE exists, create one
+                {
+                    TeamEvaluation newTE = new TeamEvaluation();
+                    newTE.TeamEvaluationAssignmentID = assignmentId;
+                    newTE.AssignmentUnderReviewID = (int)assignment.PrecededingAssignmentID;
+                    newTE.EvaluatorID = activeCourse.ID;
+                    newTE.RecipientID = tm.CourseUserID;
+                    newTE.Points = paramPoints;
+                    newTE.CommentID = tec.ID;
+
+                    db.TeamEvaluations.Add(newTE);
+                }
+                else //TE exists, modify it
+                {
+                    te.CommentID = tec.ID;
+                    te.Points = paramPoints;
+                }
+            }
+            db.SaveChanges();
             return RedirectToAction("Index");
         }
 
         [CanModifyCourse]
         public ActionResult PublishTeamMultiplier(int teamId, int assignmentId)
         {
+
+            //AC TODO: rewrite
+#if FALSE
             Team team = db.Teams.Find(teamId);
             Assignment assignment = db.Assignments.Find(assignmentId);
             double multiplier = 0;
             foreach (TeamMember tm in team.TeamMembers)
             {
-                double evalPoints = (from t in db.TeamMemberEvaluations
+                double evalPoints = (from t in db.TeamEvaluations
                                      where t.RecipientID == tm.CourseUserID &&
                                      t.TeamEvaluation.AssignmentID == assignment.ID
                                      select t.Points).Sum();
 
-                /*counting all the evaluations this TM completed for this assignment*/
-                int EvaluaterTeamEvalCount = (from te in db.TeamMemberEvaluations
+                //counting all the evaluations this TM completed for this assignment
+                int EvaluaterTeamEvalCount = (from te in db.TeamEvaluations
                                                        where te.EvaluatorID == tm.CourseUserID &&
                                                        te.TeamEvaluation.AssignmentID == assignment.ID
                                                        select te).ToList().Count();
@@ -765,7 +908,7 @@ namespace OSBLE.Controllers
 
                 if (userPreviousAssignmentScore != null)
                 {       
-                    /*Setting a value for the multipier, setting published to true and then running ModifyGrade*/
+                    //Setting a value for the multipier, setting published to true and then running ModifyGrade
                     userPreviousAssignmentScore.Multiplier = multiplier;
                     userPreviousAssignmentScore.Published = true;
                     db.SaveChanges(); /*must save before going into GBC*/
@@ -773,17 +916,17 @@ namespace OSBLE.Controllers
                     GBC.ModifyGrade(userPreviousAssignmentScore.RawPoints, tm.CourseUserID, userPreviousAssignmentScore.AssignmentID);                        
                 }
 
-                /*MG: Getting the team member, then using that to get any pre-existing score. Then modifying (or creating if one did not exist) the score for 
-                 * the Team Evaluation(TE) assignment*/
+                //MG: Getting the team member, then using that to get any pre-existing score. Then modifying (or creating if one did not exist) the score for 
+                //the Team Evaluation(TE) assignment
 
-                /*MG: getting the team member for the Team Evaluation assignment*/
+                //MG: getting the team member for the Team Evaluation assignment
                 TeamMember TeamEvalTeamMember = (from teamMem in db.TeamMembers
                                                  join att in db.AssignmentTeams on teamMem.TeamID equals att.TeamID
                                                  where teamMem.CourseUserID == tm.CourseUserID &&
                                                  att.AssignmentID == assignment.ID
                                                  select teamMem).FirstOrDefault();
 
-                /*Grabbing any preexisting grade*/
+                //Grabbing any preexisting grade
                 Score currentAssignmentScore = (from s in db.Scores
                                                 where s.AssignmentID == assignment.ID &&
                                                 s.CourseUserID == tm.CourseUserID &&
@@ -793,7 +936,7 @@ namespace OSBLE.Controllers
 
 
 
-                if (currentAssignmentScore == null) /*No current grade entered, must enter new grade for the TE*/
+                if (currentAssignmentScore == null) //No current grade entered, must enter new grade for the TE
                 {
                     Score newScore = new Score();
                     newScore.AssignmentID = assignment.ID;
@@ -805,12 +948,12 @@ namespace OSBLE.Controllers
                     newScore.LatePenaltyPercent = 0;
                     newScore.StudentPoints = -1;
                     newScore.PublishedDate = DateTime.Now;
-                    if (EvaluaterTeamEvalCount > 0) /*user gets a score*/
+                    if (EvaluaterTeamEvalCount > 0) //user gets a score
                     {
                         newScore.RawPoints = assignment.PointsPossible;
                         newScore.Points = assignment.PointsPossible;
                     }
-                    else /*user gets a 0 IF the assignment had any points possible without any submissions*/
+                    else //user gets a 0 IF the assignment had any points possible without any submissions
                     {
                         newScore.RawPoints = 0;
                         newScore.Points = 0;
@@ -834,95 +977,14 @@ namespace OSBLE.Controllers
                     }
                 }
             }
-
-            return RedirectToAction("AssignmentDetails", new { id = assignment.ID });
+#endif
+            return RedirectToAction("AssignmentDetails", new { id = assignmentId });
         }
 
         [CanModifyCourse]
+        [Obsolete]
         public void PublishAllMultipliers(int assignmentId)
         {
-            int currentCourseId = ActiveCourse.AbstractCourseID;
-            Assignment assignment = db.Assignments.Find(assignmentId);
-            List<TeamEvaluation> specificTeamEval = new List<TeamEvaluation>();
-            double multiplier = 0.0;
-
-            List<AssignmentTeam> teams = (from team in db.AssignmentTeams
-                                          where team.AssignmentID == assignment.PrecededingAssignmentID
-                                          select team).ToList();
-
-            List<TeamMemberEvaluation> teamMemberEvaluations = (from tme in db.TeamMemberEvaluations
-                                                                where tme.TeamEvaluation.AssignmentID == assignmentId
-                                                                select tme).ToList();
-            List<TeamEvaluation> teamEvaluations = (from te in db.TeamEvaluations
-                                                    where te.AssignmentID == assignment.ID
-                                                    select te).ToList();
-
-            foreach (AssignmentTeam team in teams)
-            {
-                foreach (TeamMember tm in team.Team.TeamMembers)
-                {
-                    specificTeamEval = (from te in teamEvaluations
-                                        where te.TeamID == team.TeamID
-                                        select te).ToList();
-
-                    if (specificTeamEval.Count() > 0)
-                    {
-                        double evalPoints = (from m in teamMemberEvaluations
-                                             where m.RecipientID == tm.CourseUserID
-                                             select m.Points).Sum();
-
-                        int count = (from te in db.TeamEvaluations
-                                     where te.TeamID == team.TeamID
-                                     select te).Count();
-
-                        int evalSubmitPoints = (from member in teamMemberEvaluations
-                                                where member.EvaluatorID == tm.CourseUserID
-                                                select member.Points).FirstOrDefault();
-
-                        multiplier = (evalPoints / (count * 100));
-
-                        double userAssignPoints = (from point in db.Scores
-                                                   where point.AssignmentID == assignment.PrecededingAssignmentID &&
-                                                   point.CourseUserID == tm.CourseUserID
-                                                   select point.Points).FirstOrDefault();
-
-                        bool alreadyPublishedMultiplier = (from score in db.Scores where score.AssignmentID == assignment.ID && score.CourseUserID == tm.CourseUserID select score.Published).FirstOrDefault();
-
-                        if (!alreadyPublishedMultiplier)
-                        {
-                            assignment.PreceedingAssignment.Scores.Where(s => s.CourseUserID == tm.CourseUserID).FirstOrDefault().Points = userAssignPoints * multiplier;
-                            assignment.PreceedingAssignment.Scores.Where(s => s.CourseUserID == tm.CourseUserID).FirstOrDefault().Multiplier = multiplier;
-
-                            Score newScore = new Score()
-                            {
-                                AssignmentID = assignment.ID,
-                                Published = false,
-                                CourseUserID = tm.CourseUserID,
-                                TeamID = tm.TeamID,
-                                CustomLatePenaltyPercent = -1,
-                                PublishedDate = DateTime.Now,
-                                isDropped = false,
-                                LatePenaltyPercent = 0,
-                                StudentPoints = -1
-                            };
-
-                            if (evalSubmitPoints > 0)
-                            {
-                                newScore.Points = assignment.PointsPossible;
-                                newScore.RawPoints = assignment.PointsPossible;
-                            }
-                            else
-                            {
-                                newScore.Points = 0;
-                                newScore.RawPoints = 0;
-                            }
-
-                            db.Scores.Add(newScore);
-                            db.SaveChanges();
-                        }
-                    }
-                }
-            }
         }
 
 

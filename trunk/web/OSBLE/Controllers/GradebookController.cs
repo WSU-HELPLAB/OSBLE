@@ -1712,7 +1712,7 @@ namespace OSBLE.Controllers
                                 {
                                     grades.Multiplier = teamEvaluationAssignments.TeamEvaluationSettings.MaximumMultiplier;
                                 }
-                                value = value * grades.Multiplier;
+                                value = value * (double)grades.Multiplier;
                             }
                         }
                         
@@ -1770,7 +1770,6 @@ namespace OSBLE.Controllers
                                 PublishedDate = DateTime.Now,
                                 Published = false,
                                 isDropped = false,
-                                Multiplier = 1,
                                 LatePenaltyPercent = latePenalty,
                                 StudentPoints = -1,
                                 RawPoints = rawValue,

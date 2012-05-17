@@ -2,84 +2,55 @@
 @using OSBLE.Models.Assignments
 @using OSBLE.Models.Courses
 @using OSBLE.Models.Assignments
+@using OSBLE.Models.ViewModels
 @model Assignment
 
 @{
     Assignment assignment = ViewBag.Assignment;
+    Assignment PrecAssign = ViewBag.PrecedingAssignment;
+    Team team = ViewBag.Team;
+    List<TeamEvaluationViewModel> tevmList = ViewBag.tevmList;
     ViewBag.Title = "Team Evaluation";
-    AssignmentTeam team = ViewBag.Team;
+    
 }
 
-<h2>@team.Team.DisplayName(ViewBag.ActiveCourse.AbstractRole) Team Member Evaluations</h2>
+<h2>@assignment.AssignmentName</h2>
+<h3>@team.Name's team evaluations for @PrecAssign.AssignmentName</h3>
 
 
 @{
-    List<TeamEvaluation> teamEvaluations = (from t in ViewBag.TeamEvaluations as IEnumerable<TeamEvaluation>
-                                            select t).ToList();
-
-    List<TeamMemberEvaluation> teamMemberEvals = (from t in ViewBag.TeamMemberEvaluations as IEnumerable<TeamMemberEvaluation>
-                                                  select t).ToList();
-                                                  
-    List<TeamMember> teamMembersInOrder = team.Team.TeamMembers.OrderBy(tm => tm.CourseUser.UserProfile.LastName).ToList();
-
-    <table id="TeamMemberEvaluationTable">
+    <table id="TeamEvaluationTable">
         <tr>
-            <th>Evaluators</th>
-            @foreach (TeamMember member in teamMembersInOrder)
-            {
-                <th>@member.CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)</th>
-            }
-            <th>Comments</th>
+        <td id="topLeftCell">&nbsp;</td>
+        <th colspan="@(team.TeamMembers.Count+2)">Evaluators</th>
         </tr>
-        
-        @foreach (TeamEvaluation te in teamEvaluations)
-        {
-            <tr>
-                @{
-                int count = 0;
-                foreach (TeamMemberEvaluation tme in te.TeamMemberEvaluations)
-                {
-                    if (count < 1)
-                    {
-                        count++;
-                        <td>@tme.Evaluator.DisplayName(ViewBag.ActiveCourse.AbstractRole)</td>
-                        <td>@tme.Points</td>
-                    }
-                    else
-                    {
-                        <td>@tme.Points</td>
-                    }
-                }
-                
-                <td>@te.Comments</td>
-                }
-            </tr>
-        }     
         <tr>
-            <td>
-                <b>Multiplier</b>
-            </td>
-            
-            @foreach (TeamMember member in teamMembersInOrder)
-            {
-                double multiplier = (from tm in ViewBag.TeamMemberEvaluations as IEnumerable<TeamMemberEvaluation>
-                                     where tm.RecipientID == member.CourseUserID
-                                     select tm.Points).Sum();
-                
-                
+        <th>Recipient</th>
+        @foreach(TeamMember tm in team.TeamMembers)
+        {
+            <th class="nonBoldTH">@tm.CourseUser.UserProfile.LastAndFirst()</th>
+        }
+        <th class="nonBoldTH">Multipliers</th>
+        <th class="nonBoldTH">Grade</th>
+        </tr>
 
-                multiplier = multiplier / (100 * teamEvaluations.Count());
-                
-                <td class="multiplierTD">@multiplier
-                    <a style="display:none;" onclick="openMultiplierWindow(@member.TeamID, @member.CourseUserID, @multiplier);">@Helpers.EditButton()</a>
-                </td>
+        @{
+            for(int i = 0; i<team.TeamMembers.Count;i++)
+            {
+                <tr>
+                <td>@team.TeamMembers[i].CourseUser.UserProfile.LastAndFirst()</td>
+                @for (int j = 0; j < team.TeamMembers.Count; j++)
+                {
+                    <td>@ViewBag.table[j,i]</td>
+                }
+                </tr>
             }
-            <td></td>
-        </tr> 
+            
+            }
+        
     </table>    
     <br />
-    string teamName = team.Team.DisplayName(ViewBag.ActiveCourse.AbstractRole);
-    @Html.ActionLink("Publish " + teamName + "'s  Multiplier", "PublishTeamMultiplier", new { teamId = team.TeamID, assignmentId = assignment.ID })                                                                                               
+    @Html.ActionLink("Publish " + team.Name + "'s  Multiplier", "PublishTeamMultiplier", new { teamId = team.ID, assignmentId = assignment.ID })                                                                                               
 }
 
 	 <!-- Pop-up window for editing late percentage -->

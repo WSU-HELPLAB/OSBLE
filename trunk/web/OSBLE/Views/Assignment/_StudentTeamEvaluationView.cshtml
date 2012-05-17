@@ -5,100 +5,60 @@
 <h2>
     Team Evaluations</h2>
 @{
-    List<TeamMemberEvaluation> teamMemberEvals = (from tme in ViewBag.TeamMemberEvaluations as IEnumerable<TeamMemberEvaluation>
-                                                  orderby tme.Recipient.UserProfile.LastName
-                                                  select tme).ToList();
+    List<TeamEvaluation> teamEvalList = ViewBag.TeamEvaluations;
 
     AssignmentTeam at = ViewBag.AssignmentTeam;
     AssignmentTeam pAt = ViewBag.PreviousAssignmentTeam;
 
     <input id="requiredCommentLength" type="hidden" value="@at.Assignment.TeamEvaluationSettings.RequiredCommentLength" />
 
-        //Assignment assign = ViewBag.AssignmentTeam.Assignment;
-        int pointsRemaining = ViewBag.PreviousAssignmentTeam.Team.TeamMembers.Count * 100;
-        int assignId = ViewBag.AssignmentTeam.AssignmentID;
-        List<TeamMemberEvaluation> teamEvalList = new List<TeamMemberEvaluation>();
-        if(teamMemberEvals.Count > 0)
-        {
-            teamEvalList = teamMemberEvals;
-
-            teamEvalList = teamEvalList.OrderBy(te => te.Recipient.UserProfile.LastName).ToList();
-            //using team member evals for team members
-        }
-        else
-        {
-            //using team member for assignment
-            foreach(TeamMember tm in pAt.Team.TeamMembers.OrderBy(tm => tm.CourseUser.UserProfile.LastName))
-            {
-                TeamMemberEvaluation tme = new TeamMemberEvaluation();
-                tme.Points = 0;
-                tme.Recipient = tm.CourseUser;
-                tme.TeamEvaluation = new TeamEvaluation();
-                tme.TeamEvaluation.Comments = "";
-                teamEvalList.Add(tme);
-            }
-        }
-        using (Html.BeginForm("SubmitTeamEvaluation", "Assignment", new { assignmentId = assignId }, FormMethod.Post))
-        {
-    <fieldset style="width: 400px;">
-        <table id="teamEvaltable" style="width: 400px;">
-            <tr>
-                <td>
-                    <b>Points Remaining:</b>
-                </td>
-                <td style="text-align: right;">
-                    <div id="pointsPossibleId">
-                        0</div>
-                </td>
-            </tr>
-            @foreach (TeamMemberEvaluation tme in teamEvalList)
-            {
+    //Assignment assign = ViewBag.AssignmentTeam.Assignment;
+    int pointsRemaining = ViewBag.PreviousAssignmentTeam.Team.TeamMembers.Count * 100;
+    int assignId = ViewBag.AssignmentTeam.AssignmentID;
+    using (Html.BeginForm("SubmitTeamEvaluation", "Assignment", new { assignmentId = assignId }, FormMethod.Post))
+    {
+        <fieldset style="width: 400px;">
+            <table id="teamEvaltable" style="width: 400px;">
                 <tr>
-                    <td>@tme.Recipient.UserProfile.FirstName @tme.Recipient.UserProfile.LastName:
+                    <td>
+                        <b>Points Remaining:</b>
                     </td>
                     <td style="text-align: right;">
-                        <input class="points" name="points-@tme.Recipient.ID" id="points-@tme.Recipient.ID" onkeyup="changePoints(@pointsRemaining);" size="1" value="@tme.Points"/>
+                        <div id="pointsPossibleId">@ViewBag.InitialPointsPossible</div>
                     </td>
                 </tr>
-            }
-            <tr>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    @{
-            TeamMemberEvaluation currentUserEval = teamEvalList.Where(te => te.Recipient.ID == ViewBag.ActiveCourse.ID).FirstOrDefault();
-            string comment = "";
-            if (currentUserEval != null)
-            {
-                comment = currentUserEval.TeamEvaluation.Comments;
-            }
-                            
-                       }
-                    <textarea class="textAreaClass" name="inBrowserText" rows="10" cols="53">@comment</textarea>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <div id="errorText" style="color: Red;">
-                        &nbsp
-                    </div>
-                </td>
-            </tr>
-        </table>
-        <p>
-        @{
-            var buttonValue = "Submit";
-            if (teamMemberEvals.Count > 0)
-            {
-                buttonValue = "Resubmit";
-            }
-        }
-            <input type="submit" value=@buttonValue onclick="checkForErrors(event);" />
-            <input type="button" value="Cancel" />
-        </p>
-    </fieldset>
-        }
-        }
+                @foreach (TeamEvaluation tme in teamEvalList)
+                {
+                    <tr>
+                        <td>@tme.Recipient.UserProfile.FirstName @tme.Recipient.UserProfile.LastName:
+                        </td>
+                        <td style="text-align: right;">
+                            <input class="points" name="points-@tme.Recipient.ID" id="points-@tme.Recipient.ID" onkeyup="changePoints(@pointsRemaining);" size="1" value="@tme.Points"/>
+                        </td>
+                    </tr>
+                }
+                <tr>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <textarea class="textAreaClass" name="inBrowserText" rows="10" cols="53">@ViewBag.Comment</textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div id="errorText" style="color: Red;">
+                            &nbsp
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <p>
+                <input type="submit" value=@ViewBag.SubmitButtonValue onclick="checkForErrors(event);" />
+                <input type="button" value="Cancel" />
+            </p>
+        </fieldset>
+    }
+}
 <script type="text/javascript">
 
     function changePoints(pp) {

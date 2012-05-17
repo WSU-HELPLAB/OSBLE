@@ -232,6 +232,7 @@
     <Compile Include="Models\Assignments\CommentCategory.cs" />
     <Compile Include="Models\Assignments\CommentCategoryConfiguration.cs" />
     <Compile Include="Models\Assignments\DiscussionTeam.cs" />
+    <Compile Include="Models\Assignments\TeamEvaluationComment.cs" />
     <Compile Include="Models\Assignments\TeamEvaluationSettings.cs" />
     <Compile Include="Models\Assignments\IAssignmentTeam.cs" />
     <Compile Include="Models\Assignments\ReviewTeam.cs" />
@@ -251,7 +252,6 @@
     <Compile Include="Models\Assignments\Team.cs" />
     <Compile Include="Models\Assignments\TeamEvaluation.cs" />
     <Compile Include="Models\Assignments\TeamMember.cs" />
-    <Compile Include="Models\Assignments\TeamMemberEvaluation.cs" />
     <Compile Include="Models\DiscussionAssignment\DiscussionPost.cs" />
     <Compile Include="Models\DiscussionAssignment\DiscussionReply.cs" />
     <Compile Include="Models\HomePage\AbstractDashboard.cs" />

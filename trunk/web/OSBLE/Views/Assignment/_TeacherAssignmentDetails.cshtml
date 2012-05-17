@@ -48,7 +48,7 @@
         </td>
         <td>
             @totalScores of @assignment.AssignmentTeams.Count() have been published<br />
-            @if (assignment.AssignmentTypeID == 4)
+            @if (assignment.Type == AssignmentTypes.TeamEvaluation)
             {
                 <a style="cursor:pointer" onclick="publishAllMultipliers(@assignment.ID);">[Publish
                     All Multipliers]</a>

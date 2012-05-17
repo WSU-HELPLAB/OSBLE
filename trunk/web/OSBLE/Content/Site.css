@@ -1753,14 +1753,26 @@ tbody #awesome
     border: 1px solid #074974;
 }
 
-#TeamMemberEvaluationTable
+#TeamEvaluationTable
 {
     border: 1px solid #B0B0B0;
     border-collapse: collapse;
 }
 
-#TeamMemberEvaluationTable th, #TeamMemberEvaluationTable tr, #TeamMemberEvaluationTable td
+#TeamEvaluationTable th, #TeamEvaluationTable tr, #TeamEvaluationTable td
 {
     border: 1px solid #B0B0B0;
     padding: 4px;
+}
+
+#TeamEvaluationTable #topLeftCell
+{
+    border-left-color: transparent;
+    border-top-color: transparent;
+}
+
+#TeamEvaluationTable .nonBoldTH
+{
+    font-weight:normal;
+    text-align:left;
 }

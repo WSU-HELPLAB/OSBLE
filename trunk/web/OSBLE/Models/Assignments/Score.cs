@@ -34,8 +34,7 @@ namespace OSBLE.Models.Assignments
         [Required]
         public double Points { get; set; }
 
-        [Required]
-        public double Multiplier { get; set; }
+        public double? Multiplier { get; set; }
 
         [Required]
         public double LatePenaltyPercent { get; set; }
@@ -56,7 +55,7 @@ namespace OSBLE.Models.Assignments
         {
             Published = false;
             Points = 0;
-            Multiplier = 1.0;
+            Multiplier = null;
             LatePenaltyPercent = 0;
             StudentPoints = -1;
             AddedPoints = 0;
@@ -80,7 +79,7 @@ namespace OSBLE.Models.Assignments
         /// <summary>
         /// Returns the grade percentage as a string, or as "NG" if there is no grade(points == -1) or points possible is 0
         /// </summary>
-        /// <returns></returns>
+        /// <returns>a string as NG or their grade as apercent</returns>
         public string getGradeAsPercent(int assignmentPossiblePoints)
         {
             if (this.Points == -1 || assignmentPossiblePoints == 0)

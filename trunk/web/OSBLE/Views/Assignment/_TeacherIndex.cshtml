@@ -100,11 +100,6 @@
                     else
                     {
                         <td>
-                            @*
-                            @assignment.GetPublishedCount() of @assignment.AssignmentTeams.Count published, with @assignment.GetSavedAsDraftCount() saved as draft.
-                            @Html.ActionLink("Grade Now", "Index", "Rubric", new { assignmentId = assignment.ID, cuId = assignment.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })
-                            &nbsp<a href="#" style="cursor:pointer" onclick="publishAllGrades(@assignment.ID);">Publish All</a>
-                            *@
                             @assignment.GetPublishedCount() of @assignment.AssignmentTeams.Count published.&nbsp @Html.ActionLink("Grade Now", "Index", "Rubric", new { assignmentId = assignment.ID, cuId = assignment.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })<br />
                             @assignment.GetSavedAsDraftCount() of @assignment.AssignmentTeams.Count saved as draft.&nbsp<a href="#" style="cursor:pointer" onclick="publishAllGrades(@assignment.ID);">Publish All</a>
                         </td>

@@ -80,23 +80,24 @@ namespace OSBLE.Models.ViewModels
         public double largestDifferenceInEvaluation()
         {
             double returnVal = 0.0;
+            /*MG: TODO Redo
             Dictionary<int, double> studentDict = new Dictionary<int,double>();
 
             OSBLEContext db = new OSBLEContext();
 
-            List<TeamMemberEvaluation> teamMemberEvaluations = (from t in db.TeamMemberEvaluations
+            List<TeamEvaluation> TeamEvaluations = (from t in db.TeamEvaluations
                                                                 where t.TeamEvaluation.TeamID == this.team.ID &&
                                                                 t.TeamEvaluation.AssignmentID == this.assignmentID
                                                                 select t).ToList();
             //Gathering all evals for all the team members and putting their average into studentDict
             foreach (TeamMember tm in team.TeamMembers)
             {
-                int denom =  (from t in teamMemberEvaluations
+                int denom =  (from t in TeamEvaluations
                                                         where t.RecipientID == tm.CourseUserID
                                                         select t).Count();
                 if(denom > 0)
                 {
-                    double avg = (from t in teamMemberEvaluations
+                    double avg = (from t in TeamEvaluations
                               where t.RecipientID == tm.CourseUserID
                               select t.Points).Sum() / denom;
                     studentDict.Add(tm.CourseUserID, avg); 
@@ -109,6 +110,7 @@ namespace OSBLE.Models.ViewModels
                 if (Math.Abs(pair.Value - 100) > returnVal)
                     returnVal = Math.Abs(pair.Value - 100);
             }
+             * */
             return returnVal;
         }
     }

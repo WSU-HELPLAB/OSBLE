@@ -99,15 +99,14 @@
         <td>
         @Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(assignment.AssignmentDescription).ToString()))
         </td>
-        <tr><!--Assignment Type row-->
-            <td>
-            <text class="osbleColorBold">Type:</text>
-            </td>
-            <td>
-                 @ViewBag.AssignmentType
-            </td>
-        </tr>
-        
+    </tr>
+    <tr><!--Assignment Type row-->
+        <td>
+        <text class="osbleColorBold">Type:</text>
+        </td>
+        <td>
+                @ViewBag.AssignmentType
+        </td>
     </tr>
     @if (assignment.HasDeliverables)
     {

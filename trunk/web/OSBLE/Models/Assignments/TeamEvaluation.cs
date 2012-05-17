@@ -13,15 +13,44 @@ namespace OSBLE.Models.Assignments
         public int ID { get; set; }
 
         [Required]
-        public int AssignmentID { get; set; }
-        public virtual Assignment Assignment { get; set; }
+        public int EvaluatorID { get; set; }
+        public virtual CourseUser Evaluator { get; set; }
 
-        public int TeamID { get; set; }
-        public virtual Team Team { get; set; }
+        [Required]
+        public int RecipientID { get; set; }
+        public virtual CourseUser Recipient { get; set; }
 
-        public string Comments { get; set; }
+        [Required]
+        public int TeamEvaluationAssignmentID { get; set; }
+        public virtual Assignment TeamEvaluationAssignment { get; set; }
 
-        [Association("TeamMemberEvaluation_TeamEvaluation", "ID", "TeamEvaluationID")]
-        public virtual IList<TeamMemberEvaluation> TeamMemberEvaluations { get; set; }
+        [Required]
+        public int AssignmentUnderReviewID { get; set; }
+        public virtual Assignment AssignmentUnderReview { get; set; }
+
+        [Required]
+        public int Points { get; set; }
+
+        public int CommentID { get; set; }
+
+        [ForeignKey("CommentID")]
+        public virtual TeamEvaluationComment CommentObject { get; set; }
+
+        public string Comment
+        {
+            get
+            {
+                string comment = "";
+                if (CommentObject != null)
+                {
+                    comment = CommentObject.ToString();
+                }
+                return comment;
+            }
+            set
+            {
+                
+            }
+        }
     }
 }

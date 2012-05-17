@@ -68,7 +68,7 @@ namespace OSBLE.Models
 
         public DbSet<TeamEvaluation> TeamEvaluations { get; set; }
 
-        public DbSet<TeamMemberEvaluation> TeamMemberEvaluations { get; set; }
+        public DbSet<TeamEvaluationComment> TeamEvaluationComments { get; set; }
 
         public DbSet<DiscussionReply> DiscussionReplies { get; set; }
 
@@ -213,20 +213,30 @@ namespace OSBLE.Models
                 .WithOptional(a => a.TeamEvaluationSettings)
                 .WillCascadeOnDelete(true);
 
-            modelBuilder.Entity<TeamMemberEvaluation>()
+            modelBuilder.Entity<TeamEvaluation>()
                 .HasRequired(tm => tm.Evaluator)
                 .WithMany()
                 .WillCascadeOnDelete(false);
 
-            modelBuilder.Entity<TeamMemberEvaluation>()
+            modelBuilder.Entity<TeamEvaluation>()
                 .HasRequired(tm => tm.Recipient)
                 .WithMany()
-                .WillCascadeOnDelete(true);
-
-            modelBuilder.Entity<TeamMemberEvaluation>()
-                .HasRequired(tm => tm.TeamEvaluation)
-                .WithMany(e => e.TeamMemberEvaluations)
                 .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<TeamEvaluation>()
+                .HasRequired(tm => tm.AssignmentUnderReview)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<TeamEvaluation>()
+                .HasRequired(tm => tm.TeamEvaluationAssignment)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            /*modelBuilder.Entity<TeamEvaluation>()
+                .HasOptional(te => te.Comment)
+                .WithRequired(c => c.TeamEvaluation)
+                .WillCascadeOnDelete(true);*/
         }
 
 
