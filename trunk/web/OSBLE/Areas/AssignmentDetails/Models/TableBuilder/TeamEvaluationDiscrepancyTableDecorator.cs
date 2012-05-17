@@ -9,8 +9,8 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
 {
     public class TeamEvaluationDiscrepancyTableDecorator : TableDecorator
     {
-        public List<TeamMemberEvaluation> TeamEvaluations { get; set; }
-        public TeamEvaluationDiscrepancyTableDecorator(ITableBuilder builder, List<TeamMemberEvaluation> evaluations)
+        public List<TeamEvaluation> TeamEvaluations { get; set; }
+        public TeamEvaluationDiscrepancyTableDecorator(ITableBuilder builder, List<TeamEvaluation> evaluations)
             : base(builder)
         {
             TeamEvaluations = evaluations;
@@ -21,6 +21,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
             //Gathering all evals for all the team members and putting their average into studentDict
             Dictionary<int, double> studentDict = new Dictionary<int, double>();
             double discrepancy = 0.0;
+            /*
             foreach (TeamMember tm in assignmentTeam.Team.TeamMembers)
             {
                 int denom = (from t in TeamEvaluations
@@ -34,6 +35,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
                     studentDict.Add(tm.CourseUserID, avg);
                 }
             }
+             * */
 
             //going through all the averaged values and extracting the one with the largest difference from 100.
             foreach (KeyValuePair<int, double> pair in studentDict)

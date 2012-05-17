@@ -179,6 +179,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 if (assignment.Type == AssignmentTypes.TeamEvaluation)
                 {
                     //AC TODO: Rewrite after I get new team evaluation model info.
+                    /*
                     List<TeamEvaluation> evaluations = teamEvaluations.Where(te => te.TeamID == te.TeamID).ToList();
 
                     //add team evaluation progress
@@ -194,6 +195,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                                                                 new List<TeamMemberEvaluation>()
                                                                 );
                     vm.TableColumnHeaders["TeamEvaluationDiscrepancyTableDecorator"] = "Largest Discrepancy";
+                     * */
                 }
                 else
                 {
