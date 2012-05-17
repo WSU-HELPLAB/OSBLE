@@ -65,29 +65,41 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 if (assignment.Type == AssignmentTypes.DiscussionAssignment)
                 {
                     //add initial / final post due date information
+                    //TODO: this will replace the "posts due" row
+                    vm.HeaderBuilder = new InitialFinalDueDecorator(vm.HeaderBuilder);
+                    vm.HeaderViews.Add("InitialFinalDueDecorator");
 
                     if (!assignment.HasDiscussionTeams)
                     {
                         //link to classwide discussion
+                        vm.HeaderBuilder = new DiscussionLinkDecorator(vm.HeaderBuilder);
+                        vm.HeaderViews.Add("DiscussionLinkDecorator");
                     }
                 }
                 else
                 {
-                    //add normal due date
+                    // add normal due date
+                    // currently in index - always displayed
                 }
 
                 if (assignment.HasRubric)
                 {
                     //add link to rubric ViewAsUneditable mode
-
+                    vm.HeaderBuilder = new RubricDecorator(vm.HeaderBuilder);
+                    vm.HeaderViews.Add("RubricDecorator");
+                    
                     //add "x of y" have been published
+                    //add "z saved as draft (publish all)
+                    vm.HeaderBuilder = new TeacherGradingProgressDecorator(vm.HeaderBuilder);
+                    vm.HeaderViews.Add("TeacherGradingProgressDecorator");
 
-                    //add "z saved as draft (publish all) info
                 }
 
                 if (assignment.Type == AssignmentTypes.TeamEvaluation)
                 {
                     //add publish all multipliers button
+                    vm.HeaderBuilder = new TeamEvalGradingProgressDecorator(vm.HeaderBuilder);
+                    vm.HeaderViews.Add("TeamEvalGradingProgressDecorator");
                 }
             }
             else if (vm.Client.AbstractRole.CanSubmit) //students
@@ -98,7 +110,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     //get the right kind of teams
                     List<IAssignmentTeam> teams = GetTeams(assignment);
 
-                    //display profile picture
+                    //display profile pictures
                 }
 
                 //needs to submit?
@@ -111,6 +123,8 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 if (assignment.HasRubric)
                 {
                     //add rubric link
+                    vm.HeaderBuilder = new RubricDecorator(vm.HeaderBuilder);
+                    vm.HeaderViews.Add("RubricDecorator");
                 }
                 else
                 {

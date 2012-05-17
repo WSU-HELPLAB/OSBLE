@@ -1,0 +1,12 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;               
+}
+<tr>
+    <th>Discussion:</th>
+    <td>
+        @Html.ActionLink("View Discussion", "TeacherIndex", "DiscussionAssignment", new { assignmentId = dataModel.ID, courseUserId = -1, postOrReply = 3, area = "" }, new { })
+    </td>
+</tr>

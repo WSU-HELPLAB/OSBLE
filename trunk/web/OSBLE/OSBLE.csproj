@@ -166,7 +166,14 @@
     <Compile Include="Areas\AssignmentDetails\AssignmentDetailsAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentDetails\Controllers\ContentController.cs" />
     <Compile Include="Areas\AssignmentDetails\Controllers\HomeController.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\DiscussionLinkDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\InitialFinalDueDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\LatePolicyHeaderDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\RubricDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\StudentGradeDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\TeacherGradingProgressDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\TeamEvalGradingProgressDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\TeamMembersDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\DeliverablesTableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\GradeTableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\LatePenaltyTableDecorator.cs" />
@@ -696,6 +703,11 @@
     <Content Include="Areas\AssignmentDetails\Views\Content\Index.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\DeliverablesTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\LatePolicyHeaderDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\InitialFinalDueDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\DiscussionLinkDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\RubricDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\TeacherGradingProgressDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\TeamEvalGradingProgressDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\GradeTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\LatePenaltyTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\TeamEvaluationProgressTableDecorator.cshtml" />
