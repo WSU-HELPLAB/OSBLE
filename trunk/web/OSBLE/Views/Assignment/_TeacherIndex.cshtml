@@ -120,7 +120,15 @@
                     else
                     {
                         <td>
+                        @try
+                        {
+                            //AC Hack: for some reason something can be null.  Quick fix: try/catch block.
                             <a href="#" onclick="goToCategoryTab(@assignment.CategoryID, @assignment.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID);" style="cursor:pointer;">Grade Now</a>
+                        }
+                        catch (Exception ex)
+                        {
+                            <text>&nbsp;</text>
+                        }
                         </td>
                     }
                 }
