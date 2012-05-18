@@ -90,7 +90,12 @@
                 <th>@Model.TableColumnHeaders[key]</th>
             }                
         </tr>
-        @RenderSection("TableData", true)
+        @RenderSection("TableData", false)
     </table>
+}
+else
+{
+    //AC: should never use, but required by MVC3 to render
+    <text>@RenderSection("TableData", false)</text>
 }
 

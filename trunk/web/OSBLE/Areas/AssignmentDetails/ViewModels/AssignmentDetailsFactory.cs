@@ -70,14 +70,11 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 }
 
                 //is a discussion assignment
-                if (assignment.Type == AssignmentTypes.DiscussionAssignment)
+                if (assignment.Type == AssignmentTypes.DiscussionAssignment && !assignment.HasDiscussionTeams)
                 {
-                    if (!assignment.HasDiscussionTeams)
-                    {
-                        //link to classwide discussion
-                        vm.HeaderBuilder = new DiscussionLinkDecorator(vm.HeaderBuilder);
-                        vm.HeaderViews.Add("DiscussionLinkDecorator");
-                    }
+                    //link to classwide discussion
+                    vm.HeaderBuilder = new DiscussionLinkDecorator(vm.HeaderBuilder);
+                    vm.HeaderViews.Add("DiscussionLinkDecorator");
                 }
 
                 if (assignment.HasRubric)
@@ -87,17 +84,19 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderViews.Add("RubricDecorator");
                 }
 
-                //Show grading progress for all teacher views
-                //add "x of y" have been published
-                //if drafts exist: add "z saved as draft (publish all)
-                vm.HeaderBuilder = new TeacherGradingProgressDecorator(vm.HeaderBuilder);
-                vm.HeaderViews.Add("TeacherGradingProgressDecorator");
-
                 if (assignment.Type == AssignmentTypes.TeamEvaluation)
                 {
                     //add publish all multipliers button
                     vm.HeaderBuilder = new TeamEvalGradingProgressDecorator(vm.HeaderBuilder);
                     vm.HeaderViews.Add("TeamEvalGradingProgressDecorator");
+                }
+                else
+                {
+                    //Show grading progress for all teacher views
+                    //add "x of y" have been published
+                    //if drafts exist: add "z saved as draft (publish all)
+                    vm.HeaderBuilder = new TeacherGradingProgressDecorator(vm.HeaderBuilder);
+                    vm.HeaderViews.Add("TeacherGradingProgressDecorator");
                 }
             }
             else if (vm.Client.AbstractRole.CanSubmit) //students

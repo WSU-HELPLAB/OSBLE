@@ -4,7 +4,6 @@
 @using OSBLE.Resources
 @model AssignmentDetailsViewModel
 @{
-    //Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Assignment Details";
     DynamicDictionary headerData = Model.HeaderBuilder.BuildHeader(Model.CurrentAssignment);
     
@@ -17,26 +16,31 @@
         @Html.Partial(viewLocation, headerData);
     }
 }
-
 @section TableData
 {
-        @foreach (IAssignmentTeam assignmentTeam in Model.CurrentAssignment.DiscussionTeams)
+    @if (Model.Client.AbstractRole.CanGrade)
     {
-        <tr>
-            <th>@assignmentTeam.Team.Name</th>
-            <td>&nbsp;</td>
-        </tr>
-        foreach (TeamMember member in assignmentTeam.Team.TeamMembers)
+        foreach (IAssignmentTeam assignmentTeam in Model.CurrentAssignment.DiscussionTeams)
         {
-            IAssignmentTeam singleUserAssignmentTeam = new AssignmentTeam();
-            singleUserAssignmentTeam.Team = new Team();
-            singleUserAssignmentTeam.Team.TeamMembers.Add(member);
-            singleUserAssignmentTeam.Team.Name = member.CourseUser.DisplayName(Model.Client.AbstractRole);
-            singleUserAssignmentTeam.TeamID = member.TeamID;
-            singleUserAssignmentTeam.Assignment = assignmentTeam.Assignment;
-            singleUserAssignmentTeam.AssignmentID = assignmentTeam.AssignmentID;
         <tr>
-            <td>@member.CourseUser.DisplayName(Model.Client.AbstractRole)</td>
+            <th>@assignmentTeam.Team.Name
+            </th>
+            <td>
+                &nbsp;
+            </td>
+        </tr>
+            foreach (TeamMember member in assignmentTeam.Team.TeamMembers)
+            {
+                IAssignmentTeam singleUserAssignmentTeam = new AssignmentTeam();
+                singleUserAssignmentTeam.Team = new Team();
+                singleUserAssignmentTeam.Team.TeamMembers.Add(member);
+                singleUserAssignmentTeam.Team.Name = member.CourseUser.DisplayName(Model.Client.AbstractRole);
+                singleUserAssignmentTeam.TeamID = member.TeamID;
+                singleUserAssignmentTeam.Assignment = assignmentTeam.Assignment;
+                singleUserAssignmentTeam.AssignmentID = assignmentTeam.AssignmentID;
+        <tr>
+            <td>@member.CourseUser.DisplayName(Model.Client.AbstractRole)
+            </td>
             @foreach (string view in Model.TableColumnHeaders.Keys)
             {
                 DynamicDictionary tableData = Model.TeamTableBuilders[assignmentTeam].BuildTableForTeam(singleUserAssignmentTeam);
@@ -44,6 +48,7 @@
                 @Html.Partial(viewLocation, tableData);
             }
         </tr>
+            }
         }
     }
 }

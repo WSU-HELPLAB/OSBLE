@@ -7,7 +7,6 @@
     ViewBag.Title = "Assignment Details";
     DynamicDictionary headerData = Model.HeaderBuilder.BuildHeader(Model.CurrentAssignment);
 }
-
 @section AssignmentDetails
 {
     <tr>
@@ -23,20 +22,22 @@
         @Html.Partial(viewLocation, headerData);
     }
 }
-
 @section TableData
 {
-        @foreach (IAssignmentTeam assignmentTeam in Model.TeamTableBuilders.Keys)
+    @if (Model.Client.AbstractRole.CanGrade)
+    {
+        foreach (IAssignmentTeam assignmentTeam in Model.TeamTableBuilders.Keys)
         {
-            <tr>
-                <th>@assignmentTeam.Team.TeamMemberString(Model.Client.AbstractRole)
-                </th>
-                @foreach (string view in Model.TableColumnHeaders.Keys)
-                {
-                    DynamicDictionary tableData = Model.TeamTableBuilders[assignmentTeam].BuildTableForTeam(assignmentTeam);
-                    string viewLocation = string.Format("TableBuilder/{0}", view);
-                    @Html.Partial(viewLocation, tableData);
-                }
-            </tr>
+        <tr>
+            <th>@assignmentTeam.Team.TeamMemberString(Model.Client.AbstractRole)
+            </th>
+            @foreach (string view in Model.TableColumnHeaders.Keys)
+            {
+                DynamicDictionary tableData = Model.TeamTableBuilders[assignmentTeam].BuildTableForTeam(assignmentTeam);
+                string viewLocation = string.Format("TableBuilder/{0}", view);
+                @Html.Partial(viewLocation, tableData);
+            }
+        </tr>
         }
+    }
 }
