@@ -37,7 +37,7 @@
         @{
             for (int i = 0; i < ViewBag.CourseUsersInOrder.Count; i++)
             {
-                <tr style="height:32px">
+                <tr style="">
                     <td>@ViewBag.CourseUsersInOrder[i].UserProfile.LastAndFirst()</td>
                     @for (int j = 0; j < ViewBag.CourseUsersInOrder.Count; j++)
                     {
@@ -45,7 +45,7 @@
                     }
                     <td class="multiplierTD" style="vertical-align: bottom;">
                         @ViewBag.MultipliersInOrder[i]
-                        <a style="display:none;" onclick="openMultiplierWindow(@team.ID, @ViewBag.CourseUsersInOrder[i].ID, @ViewBag.MultipliersInOrder[i]);">@Helpers.EditButton()</a>
+                        <a style="visibility:hidden;" onclick="openMultiplierWindow(@team.ID, @ViewBag.CourseUsersInOrder[i].ID, @ViewBag.MultipliersInOrder[i]);">@Helpers.EditButton()</a>
                     </td>
                     @if(ViewBag.ScoresInOrder[i] != null && ViewBag.ScoresInOrder[i].Points != -1)
                     {
@@ -80,11 +80,11 @@
 <script type="text/javascript">
 
     $(".multiplierTD").mouseenter(function () {
-        $(this).find("a").show();
+        $(this).find("a").css("visibility", "visible");
     });
 
     $(".multiplierTD").mouseleave(function () {
-        $(this).find("a").hide();
+        $(this).find("a").css("visibility", "hidden");
     });
 
     function openMultiplierWindow(tID, cuID, multi) {
