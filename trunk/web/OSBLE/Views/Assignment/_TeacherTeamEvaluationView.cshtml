@@ -47,7 +47,15 @@
                         @ViewBag.MultipliersInOrder[i]
                         <a style="display:none;" onclick="openMultiplierWindow(@team.ID, @ViewBag.CourseUsersInOrder[i].ID, @ViewBag.MultipliersInOrder[i]);">@Helpers.EditButton()</a>
                     </td>
-                    <td>@ViewBag.ScoresInOrder[i].Points</td>
+                    @if(ViewBag.ScoresInOrder[i] != null && ViewBag.ScoresInOrder[i].Points != -1)
+                    {
+                        <td>@ViewBag.ScoresInOrder[i].Points</td>
+                    }
+                    else
+                    {
+                        <td>0</td>
+                    }
+
                 </tr>
             }
             

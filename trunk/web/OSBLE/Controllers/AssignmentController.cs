@@ -594,6 +594,9 @@ namespace OSBLE.Controllers
             List<TeamEvaluation> OurTeamEvals = db.TeamEvaluations.Where(te => cuIDs.Contains(te.RecipientID) && te.TeamEvaluationAssignmentID == assignment.ID).ToList();
             List<double> MultipliersInOrder = new List<double>();
             List<Score> ScoresInOrder = new List<Score>();
+            List<CourseUser> CourseUsersInOrder = (from tm in precTeam.TeamMembers
+                                                   orderby tm.CourseUser.UserProfile.LastName, tm.CourseUser.UserProfile.FirstName
+                                                   select tm.CourseUser).ToList();
             double[,] table;
 
             //MG & MK: This table will be used for the view. Each row is one evaluator, each column is a recipient. 
@@ -601,15 +604,21 @@ namespace OSBLE.Controllers
             int i = 0;
             int j = 0;
 
-            foreach (TeamMember tm in precTeam.TeamMembers)
+            foreach (CourseUser cu in CourseUsersInOrder)
             {
                 j = 0;
                 List<TeamEvaluation> myEvals= (from te in OurTeamEvals
-                                 where te.EvaluatorID == tm.CourseUserID
+                                 where te.EvaluatorID == cu.ID
                                  select te).ToList().OrderBy(te => te.Recipient.UserProfile.LastName).ThenBy(te => te.Recipient.UserProfile.FirstName).ToList();
 
+                Score myScore = (from s in assignment.PreceedingAssignment.Scores
+                                 where s.CourseUserID == cu.ID
+                                 select s).FirstOrDefault();
+
+                ScoresInOrder.Add(myScore);
+
                 double myPoints = (from te in OurTeamEvals
-                            where te.RecipientID == tm.CourseUserID
+                            where te.RecipientID == cu.ID
                             select te.Points).Sum();
 
                 double myMulti = myPoints / (( OurTeamEvals.Count / precTeam.TeamMembers.Count ) * 100 );
@@ -634,9 +643,9 @@ namespace OSBLE.Controllers
                 table[i, j] = myMulti;
                 i++;
             }
-            ViewBag.CourseUsersInOrder = (from tm in precTeam.TeamMembers
-                                          orderby tm.CourseUser.UserProfile.LastName, tm.CourseUser.UserProfile.FirstName
-                                          select tm.CourseUser).ToList();
+
+            ViewBag.ScoresInOrder = ScoresInOrder;
+            ViewBag.CourseUsersInOrder = CourseUsersInOrder;
             ViewBag.MultipliersInOrder = MultipliersInOrder;
             ViewBag.Table = table;
             ViewBag.Team = precTeam;
