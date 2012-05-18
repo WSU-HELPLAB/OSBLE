@@ -49,13 +49,6 @@
 <table id="AssignmentDetailsTable">
     <tr>
         <th>
-            Released:
-        </th>
-        <td>@Model.CurrentAssignment.ReleaseDate
-        </td>
-    </tr>
-    <tr>
-        <th>
             Grading:
         </th>
         <td>
@@ -75,6 +68,13 @@
             Type:
         </th>
         <td>@Model.CurrentAssignment.Type.Explode()
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Released:
+        </th>
+        <td>@Model.CurrentAssignment.ReleaseDate
         </td>
     </tr>
     @RenderSection("AssignmentDetails", true)
