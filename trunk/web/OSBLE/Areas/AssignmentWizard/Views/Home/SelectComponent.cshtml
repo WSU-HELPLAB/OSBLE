@@ -34,7 +34,7 @@ Please select the optional components that you would like to use for this assign
         else
         {
         <tr>
-            <td><input type="checkbox" id="component_@(component.ControllerName)" name="component_@(component.ControllerName)" value="@(component.ControllerName)" /></td>
+            <td><input @checkedText type="checkbox" id="component_@(component.ControllerName)" name="component_@(component.ControllerName)" value="@(component.ControllerName)" /></td>
             <td><label for="component_@(component.ControllerName)">@component.ControllerDescription</label></td>
         </tr>
         }
