@@ -90,12 +90,11 @@
 {
     <table id="StudentsTable">
         <tr>
-            <th>@assignmentTeam.Team.Name</th>
-            @foreach (string view in Model.TableColumnHeaders.Keys)
+            <th>Name</th>
+            @foreach (string key in Model.TableColumnHeaders.Keys)
             {
-                <th>@Model.TableColumnHeaders[key]
-                </th>
-            }
+                <th>@Model.TableColumnHeaders[key]</th>
+            }                
         </tr>
         @foreach (IAssignmentTeam assignmentTeam in Model.TeamTableBuilders.Keys)
         {

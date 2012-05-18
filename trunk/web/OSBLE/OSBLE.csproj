@@ -726,6 +726,7 @@
     <Content Include="Areas\AssignmentDetails\Views\Home\DiscussionAssignment.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\DiscussionRepliesTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\DiscussionTotalTableDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\_ViewStart.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />
