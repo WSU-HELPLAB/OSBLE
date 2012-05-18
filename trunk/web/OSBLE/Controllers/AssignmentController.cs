@@ -412,7 +412,7 @@ namespace OSBLE.Controllers
                 DateTime? subTime = GetSubmissionTime(assignment.Category.Course, assignment, at);
                 var score = (from assScore in assignment.Scores
                              where assScore.CourseUser.UserProfileID == CurrentUser.ID
-                             select assScore).FirstOrDefault();
+                              select assScore).FirstOrDefault();
                 ViewBag.Grade = "No Grade";
                 if (score != null) //found matching score. Reassign scoreString
                 {

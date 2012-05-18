@@ -1,0 +1,31 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+
+    AjaxOptions options = new AjaxOptions()
+    {
+        LoadingElementId = "Loading",
+        HttpMethod = "Get",
+        UpdateTargetId = "submitFiles",
+        OnComplete = "SubmissionLoaded"
+    };               
+}
+<tr>
+    <th>
+        Submission:
+    </th>
+    <td>
+        @if (dataModel.Submission.hasSubmitted == false)
+        {
+            @Ajax.ActionLink("Submit", "Create", "Submission", new { id = dataModel.Submission.assignmentID }, options, new object())
+        }
+        else
+        {
+            String submissionTime = dataModel.Submission.SubmissionTime;
+            @(Html.ActionLink(submissionTime, "getCurrentUsersZip", "FileHandler", new { assignmentID = dataModel.Submission.assignmentID, area="" }, new { onclick = "create_and_open_downloading_submission_dialog()" }))  
+            @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.Submission.assignmentID , area=""}, options, new object())  
+        }
+    </td>
+</tr>

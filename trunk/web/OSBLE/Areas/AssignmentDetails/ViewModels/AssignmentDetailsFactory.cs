@@ -5,6 +5,7 @@ using System.Web;
 using OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder;
 using OSBLE.Models.Assignments;
 using OSBLE.Areas.AssignmentDetails.ViewModels;
+using OSBLE.Models.DiscussionAssignment;
 using OSBLE.Areas.AssignmentDetails.Models;
 using OSBLE.Models.Courses;
 using OSBLE.Areas.AssignmentDetails.Models.TableBuilder;
@@ -52,7 +53,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
             //AC NOTE: Investigate the differences between CanGrade and CanModify
             if (vm.Client.AbstractRole.CanGrade || vm.Client.AbstractRole.CanModify)
             {
-                
+
                 //add deliverable information if needed
                 if (assignment.HasDeliverables)
                 {
@@ -79,7 +80,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 else
                 {
                     // add normal due date
-                    // currently in index - always displayed
+                    // TODO: move this from the index
                 }
 
                 if (assignment.HasRubric)
@@ -87,13 +88,13 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     //add link to rubric ViewAsUneditable mode
                     vm.HeaderBuilder = new RubricDecorator(vm.HeaderBuilder);
                     vm.HeaderViews.Add("RubricDecorator");
-                    
-                    //add "x of y" have been published
-                    //add "z saved as draft (publish all)
-                    vm.HeaderBuilder = new TeacherGradingProgressDecorator(vm.HeaderBuilder);
-                    vm.HeaderViews.Add("TeacherGradingProgressDecorator");
-
                 }
+
+                //Show grading progress for all teacher views
+                //add "x of y" have been published
+                //if drafts exist: add "z saved as draft (publish all)
+                vm.HeaderBuilder = new TeacherGradingProgressDecorator(vm.HeaderBuilder);
+                vm.HeaderViews.Add("TeacherGradingProgressDecorator");
 
                 if (assignment.Type == AssignmentTypes.TeamEvaluation)
                 {
@@ -107,16 +108,17 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 //has teams?
                 if (assignment.HasTeams)
                 {
-                    //get the right kind of teams
-                    List<IAssignmentTeam> teams = GetTeams(assignment);
-
-                    //display profile pictures
+                    // add team name and list of members
+                    vm.HeaderBuilder = new TeamMembersDecorator(vm.HeaderBuilder, vm.Client);
+                    vm.HeaderViews.Add("TeamMembersDecorator");
                 }
 
                 //needs to submit?
                 if (assignment.HasDeliverables)
                 {
                     //add student submission link
+                    vm.HeaderBuilder = new StudentSubmissionDecorator(vm.HeaderBuilder, vm.Client);
+                    vm.HeaderViews.Add("StudentSubmissionDecorator");
                 }
 
                 //rubric?
@@ -126,9 +128,11 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderBuilder = new RubricDecorator(vm.HeaderBuilder);
                     vm.HeaderViews.Add("RubricDecorator");
                 }
-                else
+                //else
                 {
                     //add grade link
+                    vm.HeaderBuilder = new StudentGradeDecorator(vm.HeaderBuilder, vm.Client);
+                    vm.HeaderViews.Add("StudentGradeDecorator");
                 }
             }
             return vm;
@@ -173,7 +177,26 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
 
                 if (assignment.Type == AssignmentTypes.DiscussionAssignment)
                 {
-                    //add posts / replies / all info
+                    List<DiscussionPost> allUserPosts;
+                    using (OSBLEContext db = new OSBLEContext())
+                    {
+                        allUserPosts = (from a in db.DiscussionPosts
+                                        where a.AssignmentID == assignmentTeam.Assignment.ID
+                                        select a).ToList();
+                    }
+
+                    //add post count
+                    vm.TeamTableBuilders[assignmentTeam] = new DiscussionPostsTableDecorator(vm.TeamTableBuilders[assignmentTeam], allUserPosts);
+                    vm.TableColumnHeaders["DiscussionPostsTableDecorator"] = "Posts";
+
+                    //add reply count
+                    vm.TeamTableBuilders[assignmentTeam] = new DiscussionRepliesTableDecorator(vm.TeamTableBuilders[assignmentTeam], allUserPosts);
+                    vm.TableColumnHeaders["DiscussionRepliesTableDecorator"] = "Replies";
+
+                    //add total count
+                    vm.TeamTableBuilders[assignmentTeam] = new DiscussionTotalTableDecorator(vm.TeamTableBuilders[assignmentTeam], allUserPosts);
+                    vm.TableColumnHeaders["DiscussionTotalTableDecorator"] = "Total";
+                 
                 }
 
                 if (assignment.Type == AssignmentTypes.TeamEvaluation)

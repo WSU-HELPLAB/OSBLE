@@ -1,0 +1,12 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    IAssignmentTeam currentTeam = dataModel.AssignmentTeam as IAssignmentTeam;      
+    String postCount = dataModel.postCount.ToString();
+}
+<td>  
+ 
+     @(Html.ActionLink(postCount, "TeacherIndex", "DiscussionAssignment", new { assignmentId = dataModel.assignmentID, courseUserId = dataModel.CourseUserID, postOrReply = 0, area=""}, new { }))
+</td>

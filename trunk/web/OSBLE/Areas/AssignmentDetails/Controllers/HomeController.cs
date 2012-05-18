@@ -16,8 +16,16 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
             Assignment assignment = db.Assignments.Find(assignmentId);
             AssignmentDetailsFactory factory = new AssignmentDetailsFactory();
             AssignmentDetailsViewModel viewModel = factory.Bake(assignment, ActiveCourse);
-            return View(viewModel);
-        }
 
+            //discussion assignments require their own special view
+            if (assignment.Type != AssignmentTypes.DiscussionAssignment)
+            {
+                return View(viewModel);
+            }
+            else
+            {
+                return View("DiscussionAssignment", viewModel);
+            }
+        }
     }
 }

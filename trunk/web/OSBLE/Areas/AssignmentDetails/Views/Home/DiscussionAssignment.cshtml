@@ -53,17 +53,31 @@
         <th>@Model.TableColumnHeaders[key]</th>
     }
     </tr>
-    @foreach (IAssignmentTeam assignmentTeam in Model.TeamTableBuilders.Keys)
+    @foreach (IAssignmentTeam assignmentTeam in Model.CurrentAssignment.DiscussionTeams)
     {
         <tr>
             <th>@assignmentTeam.Team.Name</th>
+            <td>&nbsp;</td>
+        </tr>
+        foreach (TeamMember member in assignmentTeam.Team.TeamMembers)
+        {
+            IAssignmentTeam singleUserAssignmentTeam = new AssignmentTeam();
+            singleUserAssignmentTeam.Team = new Team();
+            singleUserAssignmentTeam.Team.TeamMembers.Add(member);
+            singleUserAssignmentTeam.Team.Name = member.CourseUser.DisplayName(Model.Client.AbstractRole);
+            singleUserAssignmentTeam.TeamID = member.TeamID;
+            singleUserAssignmentTeam.Assignment = assignmentTeam.Assignment;
+            singleUserAssignmentTeam.AssignmentID = assignmentTeam.AssignmentID;
+        <tr>
+            <td>@member.CourseUser.DisplayName(Model.Client.AbstractRole)</td>
             @foreach (string view in Model.TableColumnHeaders.Keys)
             {
-                DynamicDictionary tableData = Model.TeamTableBuilders[assignmentTeam].BuildTableForTeam(assignmentTeam);
+                DynamicDictionary tableData = Model.TeamTableBuilders[assignmentTeam].BuildTableForTeam(singleUserAssignmentTeam);
                 string viewLocation = string.Format("TableBuilder/{0}", view);
                 @Html.Partial(viewLocation, tableData);
             }
         </tr>
+        }
     }
 </table>
 }
