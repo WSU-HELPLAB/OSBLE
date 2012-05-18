@@ -7,7 +7,7 @@
 
 @{
     Assignment assignment = ViewBag.Assignment;
-    Assignment PrecAssign = ViewBag.PrecedingAssignment;
+    Assignment PrecAssign = assignment.PreceedingAssignment;
     Team team = ViewBag.Team;
     List<TeamEvaluationViewModel> tevmList = ViewBag.tevmList;
     ViewBag.Title = "Team Evaluation";
@@ -35,21 +35,21 @@
         </tr>
 
         @{
-            for(int i = 0; i<team.TeamMembers.Count;i++)
+            for (int i = 0; i < ViewBag.CourseUsersInOrder.Count; i++)
             {
-                <tr>
+                <tr style="height:32px">
                     <td>@ViewBag.CourseUsersInOrder[i].UserProfile.LastAndFirst()</td>
-                    @for (int j = 0; j < team.TeamMembers.Count; j++)
+                    @for (int j = 0; j < ViewBag.CourseUsersInOrder.Count; j++)
                     {
                         <td>@ViewBag.table[j,i]</td>
                     }
-                    <td class="multiplierTD">
+                    <td class="multiplierTD" style="vertical-align: bottom;">
                         @ViewBag.MultipliersInOrder[i]
                         <a style="display:none;" onclick="openMultiplierWindow(@team.ID, @ViewBag.CourseUsersInOrder[i].ID, @ViewBag.MultipliersInOrder[i]);">@Helpers.EditButton()</a>
                     </td>
                     @if(ViewBag.ScoresInOrder[i] != null && ViewBag.ScoresInOrder[i].Points != -1)
                     {
-                        <td>@ViewBag.ScoresInOrder[i].Points</td>
+                        <td>@ViewBag.ScoresInOrder[i].getGradeAsPercent(PrecAssign.PointsPossible)</td>
                     }
                     else
                     {
@@ -58,9 +58,7 @@
 
                 </tr>
             }
-            
-            }
-        
+        }
     </table>    
     <br />
     @Html.ActionLink("Publish " + team.Name + "'s  Multiplier", "PublishTeamMultiplier", new { teamId = team.ID, assignmentId = assignment.ID })                                                                                               
@@ -116,7 +114,7 @@
                 data: {
                     teamID: $("#SetMultiplierButton").attr("data-tid"),
                     cuID: $("#SetMultiplierButton").attr("data-cuid"),
-                    value: $("#SetMultiplierButton").attr("data-multi")
+                    value: null
                     }
             });
         }

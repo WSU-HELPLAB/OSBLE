@@ -602,7 +602,6 @@ namespace OSBLE.Controllers
                                                    select tm.CourseUser).ToList();
             double[,] table;
 
-            //MG & MK: This table will be used for the view. Each row is one evaluator, each column is a recipient. 
             table = new double[precTeam.TeamMembers.Count, precTeam.TeamMembers.Count+1];
             int i = 0;
             int j = 0;
@@ -617,15 +616,28 @@ namespace OSBLE.Controllers
                 Score myScore = (from s in assignment.PreceedingAssignment.Scores
                                  where s.CourseUserID == cu.ID
                                  select s).FirstOrDefault();
-
                 ScoresInOrder.Add(myScore);
 
-                double myPoints = (from te in OurTeamEvals
-                            where te.RecipientID == cu.ID
-                            select te.Points).Sum();
+                //Adding Multiplier. Use Score's multiplier if its value is non-null. Otherwise, calculate the multiplier from the evals. If there are no
+                //evaluations, then their multiplier is 1.
+                if (myScore != null && myScore.Multiplier != null)
+                {
+                    MultipliersInOrder.Add((double)myScore.Multiplier);
+                }
+                else if (OurTeamEvals.Count > 0) //Only calculate multiplier if there are evaluations
+                {
+                    double myPoints = (from te in OurTeamEvals
+                                       where te.RecipientID == cu.ID
+                                       select te.Points).Sum();
 
-                double myMulti = myPoints / (( OurTeamEvals.Count / precTeam.TeamMembers.Count ) * 100 );
-                MultipliersInOrder.Add(myMulti);
+                    double myMulti = myPoints / ((OurTeamEvals.Count / precTeam.TeamMembers.Count) * 100);
+                    MultipliersInOrder.Add(myMulti);
+                }
+                else
+                {
+                    MultipliersInOrder.Add(1.0);
+                }
+                
 
                 if (myEvals != null && myEvals.Count > 0)
                 {
@@ -643,7 +655,6 @@ namespace OSBLE.Controllers
                         j++;
                     }
                 }
-                table[i, j] = myMulti;
                 i++;
             }
 
@@ -651,7 +662,7 @@ namespace OSBLE.Controllers
             ViewBag.CourseUsersInOrder = CourseUsersInOrder;
             ViewBag.MultipliersInOrder = MultipliersInOrder;
             ViewBag.Table = table;
-            ViewBag.Team = precTeam;
+            ViewBag.Team = precTeam; //Note: ViewBag.Team is actually the preceding assignment's team. 
             ViewBag.Assignment = assignment;
             ViewBag.PrecedingAssignment = assignment.PreceedingAssignment;
 
@@ -811,110 +822,128 @@ namespace OSBLE.Controllers
         }
 
         [CanModifyCourse]
-        public ActionResult PublishTeamMultiplier(int teamId, int assignmentId)
+        private void PublishTeamMultiplierHelper(int precedingAssignmentTeamID, int assignmentId)
         {
+            //MG: publishTeamMultipliers - Handles scores for the assignment and the previous assignment.
+            //The following steps need to be run for each user in the team
+            //Step 0: Score for previous assignment. Pull it, if it does not exist, create it with points == -1. 
+            //Step 1: Find multiplier. First try grabbing the scores multiplier, if its non-null use that. If it is null,
+            //calculate the multiplier using team evaluations. If there are NO team evaluations for the whole team - use 1 as the multiplier. Save Multiplier into score and do a DB save
+            //Step 2: Once the multiplier has been applied to the score - recalculate the grade using GBC.ModifyGrade(rawpoints,yada,yada). 
+            //In order for ModifyGrade to use the multiplier, set Published to true for the score. Additionally, set PublishDate at this point.
+            //Step 3: Now that the previous assignment grades are updated, scores must be created/updated for the Team Evaluation assignment
+            //Start by pulling the score for the user. If it does not exist, create it. Users will get 0 points if they did 0 evals. Otherwise, full points.
 
-            //AC TODO: rewrite
-#if FALSE
-            Team team = db.Teams.Find(teamId);
+            Team precTeam = db.Teams.Find(precedingAssignmentTeamID);
             Assignment assignment = db.Assignments.Find(assignmentId);
-            double multiplier = 0;
-            foreach (TeamMember tm in team.TeamMembers)
+
+            //PEER REVIEW: During Peer review ask about better ways to do this. Seems like it would perform poorly as the TE table will be very large (as each user TE translates to TeamMember.Count amount of TEs in db)
+            List<int> cuIDs = (from tm in precTeam.TeamMembers
+                         select tm.CourseUserID).ToList();  
+            List<TeamEvaluation> OurTeamEvals = db.TeamEvaluations.Where(te => cuIDs.Contains(te.RecipientID) && te.TeamEvaluationAssignmentID == assignment.ID).ToList();
+            GradebookController GBC =  new GradebookController();
+
+            foreach (TeamMember tm in precTeam.TeamMembers)
             {
-                double evalPoints = (from t in db.TeamEvaluations
-                                     where t.RecipientID == tm.CourseUserID &&
-                                     t.TeamEvaluation.AssignmentID == assignment.ID
-                                     select t.Points).Sum();
+                //Step 0
+                Score prevAssignScore = (from s in assignment.PreceedingAssignment.Scores
+                                         where s.CourseUserID == tm.CourseUserID
+                                         select s).FirstOrDefault();
 
-                //counting all the evaluations this TM completed for this assignment
-                int EvaluaterTeamEvalCount = (from te in db.TeamEvaluations
-                                                       where te.EvaluatorID == tm.CourseUserID &&
-                                                       te.TeamEvaluation.AssignmentID == assignment.ID
-                                                       select te).ToList().Count();
-
-                int count = (from te in db.TeamEvaluations
-                             where te.TeamID == team.ID &&
-                             te.AssignmentID == assignment.ID
-                             select te).Count();
-
-                multiplier = (evalPoints / (count * 100));
-                Score userPreviousAssignmentScore = (from s in db.Scores
-                                                     where s.CourseUserID == tm.CourseUserID &&
-                                                     s.AssignmentID == assignment.PrecededingAssignmentID
-                                                     select s).FirstOrDefault();
-
-                if (userPreviousAssignmentScore != null)
-                {       
-                    //Setting a value for the multipier, setting published to true and then running ModifyGrade
-                    userPreviousAssignmentScore.Multiplier = multiplier;
-                    userPreviousAssignmentScore.Published = true;
-                    db.SaveChanges(); /*must save before going into GBC*/
-                    GradebookController GBC = new GradebookController();
-                    GBC.ModifyGrade(userPreviousAssignmentScore.RawPoints, tm.CourseUserID, userPreviousAssignmentScore.AssignmentID);                        
+                if (prevAssignScore == null)
+                {
+                    prevAssignScore = new Score()
+                    {
+                        CourseUserID = tm.CourseUserID,
+                        AssignmentID = assignment.PreceedingAssignment.ID,
+                        Published = false,
+                        AddedPoints = assignment.PreceedingAssignment.addedPoints,
+                        Points = -1,
+                        TeamID = precTeam.ID
+                    };
+                    db.Scores.Add(prevAssignScore);
                 }
 
-                //MG: Getting the team member, then using that to get any pre-existing score. Then modifying (or creating if one did not exist) the score for 
-                //the Team Evaluation(TE) assignment
-
-                //MG: getting the team member for the Team Evaluation assignment
-                TeamMember TeamEvalTeamMember = (from teamMem in db.TeamMembers
-                                                 join att in db.AssignmentTeams on teamMem.TeamID equals att.TeamID
-                                                 where teamMem.CourseUserID == tm.CourseUserID &&
-                                                 att.AssignmentID == assignment.ID
-                                                 select teamMem).FirstOrDefault();
-
-                //Grabbing any preexisting grade
-                Score currentAssignmentScore = (from s in db.Scores
-                                                where s.AssignmentID == assignment.ID &&
-                                                s.CourseUserID == tm.CourseUserID &&
-                                                s.TeamID == TeamEvalTeamMember.TeamID
-                                                select s).FirstOrDefault();
-
-
-
-
-                if (currentAssignmentScore == null) //No current grade entered, must enter new grade for the TE
+                //Step 1
+                if (prevAssignScore.Multiplier == null)
                 {
-                    Score newScore = new Score();
-                    newScore.AssignmentID = assignment.ID;
-                    newScore.Published = false;
-                    newScore.CourseUserID = tm.CourseUserID;
-                    newScore.TeamID = TeamEvalTeamMember.TeamID;
-                    newScore.CustomLatePenaltyPercent = -1;
-                    newScore.isDropped = false;
-                    newScore.LatePenaltyPercent = 0;
-                    newScore.StudentPoints = -1;
-                    newScore.PublishedDate = DateTime.Now;
-                    if (EvaluaterTeamEvalCount > 0) //user gets a score
+                    double multiplier = 1.0;
+                    if (OurTeamEvals.Count > 0)
                     {
-                        newScore.RawPoints = assignment.PointsPossible;
-                        newScore.Points = assignment.PointsPossible;
+                        //Score.Multiplier wasn't set up, and there are more than 0 team evals, so calculate multiplier.
+                        double myEvalPoints = (from e in OurTeamEvals
+                                               where e.RecipientID == tm.CourseUserID
+                                               select e.Points).Sum();
+
+                        multiplier = myEvalPoints / ((OurTeamEvals.Count / precTeam.TeamMembers.Count) * 100);
                     }
-                    else //user gets a 0 IF the assignment had any points possible without any submissions
-                    {
-                        newScore.RawPoints = 0;
-                        newScore.Points = 0;
-                    }
-                    db.Scores.Add(newScore);
+                    prevAssignScore.Multiplier = multiplier;
                     db.SaveChanges();
                 }
-                else /*score already exists for the TE, just modify it*/
+
+                //Step 2
+                prevAssignScore.Published = true;
+                prevAssignScore.PublishedDate = DateTime.Now;
+                if(prevAssignScore.RawPoints > 0) //Only recalculating grade if they have raw points.
                 {
-                    if (EvaluaterTeamEvalCount > 0) /*user gets reassigned max points*/
-                    {
-                        currentAssignmentScore.RawPoints = assignment.PointsPossible;
-                        currentAssignmentScore.Points = assignment.PointsPossible;
-                        db.SaveChanges();
-                    }
-                    else /*user gets reassigned 0*/
-                    {
-                        currentAssignmentScore.RawPoints = 0;
-                        currentAssignmentScore.Points = 0;
-                        db.SaveChanges();
-                    }
+                    GBC.ModifyGrade(prevAssignScore.RawPoints, tm.CourseUserID, (int)assignment.PrecededingAssignmentID);
                 }
+                
+                //Step 3
+                Score currentAssignScore = (from s in assignment.Scores
+                                            where s.CourseUserID == tm.CourseUserID
+                                            select s).FirstOrDefault();
+
+                int myCompletedEvalsCount = (from e in OurTeamEvals
+                                             where e.EvaluatorID == tm.CourseUserID
+                                             select e).Count();
+
+                double myPoints = 0.0;
+                if(myCompletedEvalsCount > 0)
+                {
+                    myPoints = assignment.PointsPossible;
+                }
+
+
+                if (currentAssignScore != null)
+                {
+                    currentAssignScore.RawPoints = myPoints;
+                }
+                else
+                {
+                    int teamId = (from at in assignment.AssignmentTeams
+                                  where at.Team.TeamMembers.FirstOrDefault().CourseUserID == tm.CourseUserID
+                                  select at.TeamID).FirstOrDefault();
+
+                    currentAssignScore = new Score()
+                    {
+                        AddedPoints = assignment.addedPoints,
+                        AssignmentID = assignment.ID,
+                        CourseUserID = tm.CourseUserID,
+                        RawPoints = myPoints,
+                        TeamID = teamId
+                    };
+                    db.Scores.Add(currentAssignScore);
+                }
+                db.SaveChanges();
+                GBC.ModifyGrade(currentAssignScore.RawPoints, tm.CourseUserID, assignment.ID);
             }
-#endif
+        }
+
+        /// <summary>
+        /// This function publishes the Team Evaluation multipliers to the preceding assignment, as well as creates grades for the team evaluation assignment
+        /// </summary>
+        /// <param name="precedingAssignmentTeamID"> the teamId for the preceding assignment (NOT the Team Evaluation assignment) </param>
+        /// <param name="assignmentId">the assignment Id for the Team Evaluation assignment. </param>
+        /// <returns></returns>
+        [CanModifyCourse]
+        public ActionResult PublishTeamMultiplier(int precedingAssignmentTeamID, int assignmentId)
+        {
+            //MG: PublishTeamMultiplier
+            //Step 0: publishTeamMultiplier
+            //Step 1: Redirect to original location. 
+            PublishTeamMultiplierHelper(precedingAssignmentTeamID, assignmentId);
+
             return RedirectToAction("AssignmentDetails", new { id = assignmentId });
         }
 
@@ -933,10 +962,10 @@ namespace OSBLE.Controllers
         /// <param name="value"></param>
         /// <returns></returns>
         [CanModifyCourse]
-        public bool ModifyMultiplier(int teamId, int cuID, double value)
+        public bool ModifyMultiplier(int teamId, int cuID, double? value)
         {
             bool returnVal = false;
-            if (teamId > 0 && cuID > 0 && value > 0)
+            if (teamId > 0 && cuID > 0 && (value > 0 || value == null))
             {
                 Score usersScore = (from s in db.Scores
                                     where s.TeamID == teamId &&

@@ -28,7 +28,6 @@ namespace OSBLE.Models.Assignments
         [Display(Name = "Grade Is Published")]
         public bool Published { get; set; }
 
-        [Required]
         public DateTime? PublishedDate { get; set; }
 
         [Required]
@@ -62,6 +61,7 @@ namespace OSBLE.Models.Assignments
             CustomLatePenaltyPercent = -1;
             isDropped = false;
             RawPoints = -1;
+            PublishedDate = null;
         }
 
         /// <summary>
