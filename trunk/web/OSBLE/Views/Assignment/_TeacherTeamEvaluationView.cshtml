@@ -31,18 +31,23 @@
             <th class="nonBoldTH">@tm.CourseUser.UserProfile.LastAndFirst()</th>
         }
         <th class="nonBoldTH">Multipliers</th>
-        <th class="nonBoldTH">Grade</th>
+        <th class="nonBoldTH">Previous Assignment Grade</th>
         </tr>
 
         @{
             for(int i = 0; i<team.TeamMembers.Count;i++)
             {
                 <tr>
-                <td>@team.TeamMembers[i].CourseUser.UserProfile.LastAndFirst()</td>
-                @for (int j = 0; j < team.TeamMembers.Count; j++)
-                {
-                    <td>@ViewBag.table[j,i]</td>
-                }
+                    <td>@team.TeamMembers[i].CourseUser.UserProfile.LastAndFirst()</td>
+                    @for (int j = 0; j < team.TeamMembers.Count; j++)
+                    {
+                        <td>@ViewBag.table[j,i]</td>
+                    }
+                    <td class="multiplierTD">
+                        ViewBag.MultipliersInOrder[i]
+                        <a style="display:none;" onclick="openMultiplierWindow(@team.ID, @ViewBag.CourseUsersInOrder[i].ID, @ViewBag.MultipliersInOrder[i]);">@Helpers.EditButton()</a>
+                    </td>
+                    <td>ViewBag.ScoresInOrder[i].Points</td>
                 </tr>
             }
             
