@@ -495,6 +495,9 @@ namespace OSBLE.Controllers
                 assignment.AssociatedEventID = e.ID;
                 db.SaveChanges();
             }
+            string requestUrl = Request.UrlReferrer.ToString();
+            Response.Redirect(requestUrl);
+
         }
 
         /// <summary>

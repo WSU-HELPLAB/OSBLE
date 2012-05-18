@@ -718,6 +718,7 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\TeamEvaluationProgressTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\TeamEvaluationDiscrepancyTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\InlineReviewTableDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\_Layout.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\TeamMembersDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\StudentGradeDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\StudentSubmissionDecorator.cshtml" />
@@ -786,10 +787,8 @@
     <Content Include="Views\School\Delete.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Home\SelectComponent.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Basics\Index.cshtml" />
-    <Content Include="Areas\AssignmentWizard\Views\Wizard.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Rubric\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Team\Index.cshtml" />
-    <Content Include="Areas\AssignmentWizard\Views\WizardSummary.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Deliverables\Index.cshtml" />
     <Content Include="Views\Assignment\AssignmentDetails.cshtml" />
     <Content Include="Views\Gradebook\ExportToCSV.cshtml" />
