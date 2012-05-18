@@ -1,4 +1,11 @@
-﻿@{
+﻿@using OSBLE.Models.Assignments
+@using OSBLE.Areas.AssignmentDetails.ViewModels
+@using OSBLE.Models.Courses;
+@using OSBLE.Resources
+@model AssignmentDetailsViewModel
+@{
+    ViewBag.Title = "Assignment Details";
+    DynamicDictionary headerData = Model.HeaderBuilder.BuildHeader(Model.CurrentAssignment);
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @section Header
@@ -6,6 +13,84 @@
     <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/json2.min.js")" type="text/javascript"></script>
+    <link href="@Url.Content("~/AssignmentDetails/Content/css/home.css")" type="text/css" rel="Stylesheet" />
     @RenderSection("Header", false)
 }
-@RenderBody()
+<h1>@Model.CurrentAssignment.AssignmentName.ToFirstCharUpper()</h1>
+<ul>
+    <li>
+        @{string actionUrl = Url.Action(
+                                    "ToggleDraft",
+                                    "Assignment",
+                                    new
+                                    {
+                                        area = "",
+                                        assignmentId = Model.CurrentAssignment.ID
+                                    }
+                                   );
+          string linkTitle = "Unpublish Assignment";
+          HelperResult linkImg = Helpers.UnPublishButton();
+        }
+        @if (Model.CurrentAssignment.IsDraft == false)
+        {
+            linkTitle = "Publish Assignment";
+            linkImg = Helpers.PublishButton();
+        }
+        <a href="@actionUrl" title="@linkTitle">@Html.Raw(linkImg.ToHtmlString())</a>
+    </li>
+    <li>
+        <a title="Click to Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = Model.CurrentAssignment.ID })">@Helpers.EditButton()</a>
+    </li>
+    <li>
+        <a title="Click to Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow()">@Helpers.DeleteButton()</a>
+    </li>
+</ul>
+
+<table id="AssignmentDetailsTable">
+    <tr>
+        <th>
+            Released:
+        </th>
+        <td>@Model.CurrentAssignment.ReleaseDate
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Grading:
+        </th>
+        <td>
+            Worth @Model.CurrentAssignment.PointsPossible in &quot;@Model.CurrentAssignment.Category.Name&quot;
+            category
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Description:
+        </th>
+        <td>@Model.CurrentAssignment.AssignmentDescription
+        </td>
+    </tr>
+    <tr>
+        <th>
+            Type:
+        </th>
+        <td>@Model.CurrentAssignment.Type.Explode()
+        </td>
+    </tr>
+    @RenderSection("AssignmentDetails", true)
+</table>
+
+@if (Model.Client.AbstractRole.CanGrade)
+{
+    <table id="StudentsTable">
+        <tr>
+            <th>Name</th>
+            @foreach (string key in Model.TableColumnHeaders.Keys)
+            {
+                <th>@Model.TableColumnHeaders[key]</th>
+            }                
+        </tr>
+        @RenderSection("TableData", true)
+    </table>
+}
+
