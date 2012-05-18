@@ -40,6 +40,13 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
             vm.HeaderBuilder = new DefaultBuilder();
 
             //views common to both students and teachers:
+            if (assignment.Type == AssignmentTypes.DiscussionAssignment)
+            {
+                //add initial / final post due date information
+                //TODO: this will replace the "posts due" row
+                vm.HeaderBuilder = new InitialFinalDueDecorator(vm.HeaderBuilder);
+                vm.HeaderViews.Add("InitialFinalDueDecorator");
+            }
 
             //not a team evaluation assignment
             if (assignment.Type != AssignmentTypes.TeamEvaluation)
@@ -65,22 +72,12 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 //is a discussion assignment
                 if (assignment.Type == AssignmentTypes.DiscussionAssignment)
                 {
-                    //add initial / final post due date information
-                    //TODO: this will replace the "posts due" row
-                    vm.HeaderBuilder = new InitialFinalDueDecorator(vm.HeaderBuilder);
-                    vm.HeaderViews.Add("InitialFinalDueDecorator");
-
                     if (!assignment.HasDiscussionTeams)
                     {
                         //link to classwide discussion
                         vm.HeaderBuilder = new DiscussionLinkDecorator(vm.HeaderBuilder);
                         vm.HeaderViews.Add("DiscussionLinkDecorator");
                     }
-                }
-                else
-                {
-                    // add normal due date
-                    // TODO: move this from the index
                 }
 
                 if (assignment.HasRubric)
