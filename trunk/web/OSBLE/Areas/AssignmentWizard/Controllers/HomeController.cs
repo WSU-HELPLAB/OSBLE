@@ -54,6 +54,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 //begin wizard
                 return RedirectToRoute(AssignmentWizardAreaRegistration.AssignmentWizardRoute, new { controller = manager.ActiveComponent.ControllerName });
             }
+            manager.IsNewAssignment = true;
             return View(Assignment.AllAssignmentTypes.OrderBy(e => e.ToString()).ToList());
         }
 
