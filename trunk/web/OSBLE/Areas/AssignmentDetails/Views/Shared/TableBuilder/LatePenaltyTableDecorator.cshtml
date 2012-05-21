@@ -9,7 +9,12 @@
 <td>
 @if (score != null)
 {
-    @score.getAppliedLatePenaltyAsDecimal().ToString("P") <a class="latePenaltyA" style="display:none;" onclick="openManualLatePenWindow(@score.ID, @currentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.ID, @currentTeam.Assignment.ID);">@Helpers.EditButton()</a>    
+    <div class="LatePenaltyDiv">
+    @score.getAppliedLatePenaltyAsDecimal().ToString("P") 
+    <a 
+        onclick="openManualLatePenWindow(@score.ID, @currentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.ID, @currentTeam.Assignment.ID);"
+        >@Helpers.EditButton()</a>    
+    </div>
 }
 else
 {

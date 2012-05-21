@@ -51,6 +51,11 @@
     background:#F2F2F2;
 }
 
+.LatePenaltyDiv a
+{
+    cursor:pointer;
+}
+
 #StudentsTable
 {
     border-collapse:collapse;

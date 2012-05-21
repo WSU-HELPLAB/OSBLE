@@ -11,7 +11,7 @@
     AssignmentTeam at = currentTeam as AssignmentTeam;
     if (at.GetSubmissionTime() != null)
     {
-        @(Html.ActionLink(at.GetSubmissionTime().ToString(), "GetSubmissionZip", "FileHandler", new { assignmentID = currentTeam.Assignment.ID, teamID = currentTeam.Team.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
+        @(Html.ActionLink(at.GetSubmissionTime().ToString(), "GetSubmissionZip", "FileHandler", new { area = "", assignmentID = currentTeam.Assignment.ID, teamID = currentTeam.Team.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
     }
     else
     {
