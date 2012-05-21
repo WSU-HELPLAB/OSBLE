@@ -36,8 +36,10 @@ using OSBLE.Models.Assignments;
  *      {aa docs}      |          [CourseUserId]
  *                     |                 |
  *                  [TeamID]             |
- *                     |             {reviews}
- *            {team submissions}
+ *               /        \           {reviews}
+ *    {team submissions}  [AuthorTeamID*]                       *This is only for critical review assignments
+ *                          |
+ *                         {team submissions}
  * */
 
 namespace OSBLE
@@ -495,6 +497,19 @@ namespace OSBLE
             return path;
         }
 
+        public static string GetTeamUserSubmissionFolderForAuthorID(bool createPathIfNotExists, Course course, int assignmentID, IAssignmentTeam submitterTeam, IAssignmentTeam authorTeam)
+        {
+            string path = GetTeamUserSubmissionFolder(false, course, assignmentID, submitterTeam);
+            path += "\\" + authorTeam.Team.Name.ToString();
+
+            if (!Directory.Exists(path) && createPathIfNotExists)
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            return path;
+        }
+
         public static string GetDeliverable(Course course, int assignmentID, AssignmentTeam subbmitterTeam, string fileName)
         {
             return GetTeamUserSubmissionFolder(false, course, assignmentID, subbmitterTeam) + "\\" + fileName;
@@ -503,6 +518,25 @@ namespace OSBLE
         public static string GetDeliverable(Course course, int assignmentID, AssignmentTeam subbmitterTeam, string fileName, string[] possibleFileExtensions)
         {
             string path = GetTeamUserSubmissionFolder(false, course, assignmentID, subbmitterTeam) + "\\";
+
+            if (Directory.Exists(path))
+            {
+                string[] files = Directory.GetFiles(path);
+
+                foreach (string extension in possibleFileExtensions)
+                {
+                    if (files.Contains(path + fileName + extension))
+                    {
+                        return (path + fileName + extension);
+                    }
+                }
+            }
+            return null;
+        }
+
+        public static string GetCriticalReviewDeliverable(Course course, int assignmentID, AssignmentTeam subbmitterTeam, string fileName, string[] possibleFileExtensions, AssignmentTeam authorTeam)
+        {
+            string path = GetTeamUserSubmissionFolderForAuthorID(false, course, assignmentID, subbmitterTeam, authorTeam) + "\\";
 
             if (Directory.Exists(path))
             {

@@ -166,6 +166,7 @@
     <Compile Include="Areas\AssignmentDetails\AssignmentDetailsAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentDetails\Controllers\ContentController.cs" />
     <Compile Include="Areas\AssignmentDetails\Controllers\HomeController.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\CriticalReviewSubmissionDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\DiscussionLinkDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\InitialFinalDueDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\LatePolicyHeaderDecorator.cs" />
@@ -728,6 +729,7 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\DiscussionRepliesTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\DiscussionTotalTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\CriticalReviewSubmissionDecorator.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />

@@ -1,0 +1,52 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    List<ReviewTeam> authorTeams = dataModel.CRSubmission.authorTeams;
+}
+
+@{
+    
+    AjaxOptions options = new AjaxOptions()
+    {
+        LoadingElementId = "Loading",
+        HttpMethod = "Get",
+        UpdateTargetId = "submitFiles",
+        OnComplete = "SubmissionLoaded"
+    };
+    <tr>
+        <th>CRSubmission</th>
+        <td>
+            <table>
+                @foreach (ReviewTeam rt in authorTeams)
+                {
+                        <tr>
+                            <td>@rt.AuthorTeam.Name</td>
+                            <td>@Html.ActionLink("Download Submission", "GetCriticalReviewSubmissionZip", "FileHandler", new { assignmentId = dataModel.CRSubmission.assignmentId, authorTeamId = rt.AuthorTeamID, area="" }, new { })</td>
+                            <td>@Ajax.ActionLink("Submit", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area="" }, options, new object())</td>
+                        </tr>
+                }
+            </table>
+        </td>
+    </tr>
+}
+
+<!--Elements for submission modal box and loading message-->
+<text id="Loading" style="display:none"> <br />Please Wait...</text>
+<div id="submit_files_dialog" style="display:none">
+    <div id= "submitFiles"></div>
+    <script type="text/javascript">
+        $(function () {
+            $('#submit_files_dialog').dialog(
+            {
+                modal: true,
+                autoOpen: false,
+                height: 600,
+                width: 500
+            });
+        });
+    </script>
+    </div>
+</div>
+

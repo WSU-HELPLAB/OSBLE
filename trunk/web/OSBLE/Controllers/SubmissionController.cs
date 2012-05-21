@@ -20,7 +20,7 @@ namespace OSBLE.Controllers
         //
         // GET: /Submission/Create
 
-        public ActionResult Create(int? id, UserProfile up)
+        public ActionResult Create(int? id, int? authorTeamID = null)
         {
             if (id != null)
             {
@@ -30,16 +30,16 @@ namespace OSBLE.Controllers
                 {
                     if (assignment.Category.CourseID == ActiveCourse.AbstractCourseID && ActiveCourse.AbstractRole.CanSubmit == true)
                     {
-                        setViewBagDeliverables((assignment).Deliverables);
 
-                        //ViewBag.PrecAssignment = (from a in db.Assignments where a.HasTeams select a).FirstOrDefault();
-                        
-                        return View();
-                    }
-                    else if(ActiveCourse.AbstractRole.CanGrade == true) 
-                    {
-                        ViewBag.userToSubmitFor = up;
-                        setViewBagDeliverables((assignment).Deliverables);
+                        if (assignment.Type == AssignmentTypes.CriticalReview)
+                        {
+                            ViewBag.authorTeamID = authorTeamID;
+                            setViewBagDeliverables((assignment.PreceedingAssignment).Deliverables);
+                        }
+                        else
+                        {
+                            setViewBagDeliverables((assignment).Deliverables);
+                        }
                         return View();
                     }
                 }
@@ -69,20 +69,12 @@ namespace OSBLE.Controllers
         // POST: /Submission/Create
 
         [HttpPost]
-        public ActionResult Create(int? id, IEnumerable<HttpPostedFileBase> files, UserProfile userprofile)
+        public ActionResult Create(int? id, IEnumerable<HttpPostedFileBase> files, int? authorTeamID = null)
         {
             if (id != null)
             {
                 Assignment assignment = db.Assignments.Find(id);
-                TeamMember teamMember;
-                if (userprofile == null)
-                {
-                    teamMember = GetTeamUser(assignment, CurrentUser);
-                }
-                else
-                {
-                    teamMember = GetTeamUser(assignment, userprofile);
-                }
+                TeamMember teamMember = GetTeamUser(assignment, CurrentUser);
 
                 var score = (from c in assignment.Scores where c.CourseUserID == teamMember.CourseUserID select c).FirstOrDefault();
 
@@ -92,9 +84,18 @@ namespace OSBLE.Controllers
                         throw new Exception("Cannot submit to an assignmentActivity that already has a score");
                 }
 
-                if (assignment != null && assignment.HasDeliverables == true)
+                if (assignment != null && (assignment.HasDeliverables == true || assignment.Type == AssignmentTypes.CriticalReview))
                 {
-                    List<dynamic> deliverables = new List<dynamic>((assignment).Deliverables);
+                    List<dynamic> deliverables;
+                    if(assignment.Type == AssignmentTypes.CriticalReview)
+                    {
+                        deliverables = new List<dynamic>((assignment.PreceedingAssignment).Deliverables);
+                    }
+                    else
+                    {
+                        deliverables = new List<dynamic>((assignment).Deliverables);
+                    }
+                    
 
                     if (assignment.Category.CourseID == ActiveCourse.AbstractCourseID && ActiveCourse.AbstractRole.CanSubmit == true)
                     {
@@ -126,36 +127,79 @@ namespace OSBLE.Controllers
 
                                     if (allowFileExtensions.Contains(extension))
                                     {
-                                        //If a submission of any extension exists delete it.  This is needed because they could submit a .c file and then a .cs file and the teacher would not know which one is the real one.
-                                        string submission = FileSystem.GetDeliverable(ActiveCourse.AbstractCourse as Course, assignment.ID, assignmentTeam, deliverables[i].Name, allowFileExtensions);
-                                        if (submission != null)
+                                        if (assignment.Type == AssignmentTypes.CriticalReview)
                                         {
-                                            FileInfo oldSubmission = new FileInfo(submission);
+                                            AssignmentTeam authorTeam = (from at in db.AssignmentTeams
+                                                                         where at.TeamID == authorTeamID &&
+                                                                         at.AssignmentID == assignment.PrecededingAssignmentID
+                                                                             select at).FirstOrDefault();
+                                            //MG&MK: file system for critical review assignments is laid out a bit differently, so 
+                                            //critical review assignments must use different file system functions
 
-                                            if (oldSubmission.Exists)
+                                            //If a submission of any extension exists delete it.  This is needed because they could submit a .c file and then a .cs file and the teacher would not know which one is the real one.
+                                            string submission = FileSystem.GetCriticalReviewDeliverable(ActiveCourse.AbstractCourse as Course, assignment.ID, assignmentTeam, deliverables[i].Name, allowFileExtensions, authorTeam);
+                                            if (submission != null)
                                             {
-                                                oldSubmission.Delete();
+                                                FileInfo oldSubmission = new FileInfo(submission);
+
+                                                if (oldSubmission.Exists)
+                                                {
+                                                    oldSubmission.Delete();
+                                                }
+                                            }
+
+                                            FileSystem.RemoveZipFile(ActiveCourse.AbstractCourse as Course, assignment, assignmentTeam);
+                                            string path = Path.Combine(FileSystem.GetTeamUserSubmissionFolderForAuthorID(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam, authorTeam), deliverables[i].Name + extension);
+                                            file.SaveAs(path);
+
+                                            //unzip and rezip xps files because some XPS generators don't do it right
+                                            if (extension.ToLower().CompareTo(".xps") == 0)
+                                            {
+                                                string extractPath = Path.Combine(FileSystem.GetTeamUserSubmissionFolderForAuthorID(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam, authorTeam), "extract");
+                                                using (ZipFile oldZip = ZipFile.Read(path))
+                                                {
+                                                    oldZip.ExtractAll(extractPath, ExtractExistingFileAction.OverwriteSilently);
+                                                }
+                                                using (ZipFile newZip = new ZipFile())
+                                                {
+                                                    newZip.AddDirectory(extractPath);
+                                                    newZip.Save(path);
+                                                }
                                             }
                                         }
-                                        FileSystem.RemoveZipFile(ActiveCourse.AbstractCourse as Course, assignment, assignmentTeam);
-                                        string path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam), deliverables[i].Name + extension);
-                                        file.SaveAs(path);
-
-                                        //unzip and rezip xps files because some XPS generators don't do it right
-                                        if (extension.ToLower().CompareTo(".xps") == 0)
+                                        else
                                         {
-                                            string extractPath = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam), "extract");
-                                            using (ZipFile oldZip = ZipFile.Read(path))
+                                            //If a submission of any extension exists delete it.  This is needed because they could submit a .c file and then a .cs file and the teacher would not know which one is the real one.
+                                            string submission = FileSystem.GetDeliverable(ActiveCourse.AbstractCourse as Course, assignment.ID, assignmentTeam, deliverables[i].Name, allowFileExtensions);
+                                            if (submission != null)
                                             {
-                                                oldZip.ExtractAll(extractPath, ExtractExistingFileAction.OverwriteSilently);
+                                                FileInfo oldSubmission = new FileInfo(submission);
+
+                                                if (oldSubmission.Exists)
+                                                {
+                                                    oldSubmission.Delete();
+                                                }
                                             }
-                                            using (ZipFile newZip = new ZipFile())
+                                            FileSystem.RemoveZipFile(ActiveCourse.AbstractCourse as Course, assignment, assignmentTeam);
+                                            string path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam), deliverables[i].Name + extension);
+                                            file.SaveAs(path);
+
+                                            //unzip and rezip xps files because some XPS generators don't do it right
+                                            if (extension.ToLower().CompareTo(".xps") == 0)
                                             {
-                                                newZip.AddDirectory(extractPath);
-                                                newZip.Save(path);
+                                                string extractPath = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam), "extract");
+                                                using (ZipFile oldZip = ZipFile.Read(path))
+                                                {
+                                                    oldZip.ExtractAll(extractPath, ExtractExistingFileAction.OverwriteSilently);
+                                                }
+                                                using (ZipFile newZip = new ZipFile())
+                                                {
+                                                    newZip.AddDirectory(extractPath);
+                                                    newZip.Save(path);
+                                                }
                                             }
                                         }
-
+                                        
                                         DateTime? dueDate = assignment.DueDate;
                                         if (dueDate != null)
                                         {
@@ -202,7 +246,7 @@ namespace OSBLE.Controllers
                 }
             }
 
-            return Create(id, userprofile);
+            return Create(id);
         }
 
         protected override void Dispose(bool disposing)

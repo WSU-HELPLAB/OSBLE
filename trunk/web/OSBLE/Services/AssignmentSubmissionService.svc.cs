@@ -44,7 +44,7 @@ namespace OSBLE.Services
                 }
 
                 SubmissionController submission = new SubmissionController();
-                submission.Create(assignmentId, files, currentUser);
+                submission.Create(assignmentId, files);
             }
         }
     }

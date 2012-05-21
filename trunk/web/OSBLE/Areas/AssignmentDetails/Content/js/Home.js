@@ -53,6 +53,11 @@ function remove_downloading_submission_dialog() {
     $('#downloading_submission_dialog').remove();
 }
 
+function SubmissionLoaded() {
+    $('#submit_files_dialog').dialog('open');
+
+}
+
 function openManualLatePenWindow(sId, uId, aId) {
     scoreId = sId;
     userId = uId;

@@ -116,6 +116,12 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderBuilder = new StudentSubmissionDecorator(vm.HeaderBuilder, vm.Client);
                     vm.HeaderViews.Add("StudentSubmissionDecorator");
                 }
+                else if (assignment.Type == AssignmentTypes.CriticalReview)
+                {
+                    //critical review submission link
+                    vm.HeaderBuilder = new CriticalReviewSubmissionDecorator(vm.HeaderBuilder, vm.Client);
+                    vm.HeaderViews.Add("CriticalReviewSubmissionDecorator");
+                }
 
                 //rubric?
                 if (assignment.HasRubric)

@@ -6,6 +6,7 @@ using Ionic.Zip;
 using OSBLE.Attributes;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
+using System.Collections.Generic;
 
 namespace OSBLE.Controllers
 {
@@ -221,9 +222,32 @@ namespace OSBLE.Controllers
             throw new Exception();
         }
 
+
         [CanGradeCourse]
         [NotForCommunity]
-        public ActionResult GetSubmissionZip(int assignmentID, int teamID)
+        public ActionResult GetSubmissionZip(int assignmentId, int teamId)
+        {
+            return GetSubmissionZipHelper(assignmentId, teamId);
+        }
+
+        [CanSubmitAssignments]
+        public ActionResult GetCriticalReviewSubmissionZip(int assignmentId, int authorTeamId)
+        {
+            Assignment CRassignment = db.Assignments.Find(assignmentId);
+            AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourse.UserProfile);
+            List<int> authorTeams = (from rt in CRassignment.ReviewTeams
+                                            where rt.ReviewTeamID == at.TeamID
+                                            select rt.AuthorTeamID).ToList();
+            if (authorTeams.Contains(authorTeamId) && CRassignment.Type == AssignmentTypes.CriticalReview)
+            {
+                return GetSubmissionZipHelper((int)CRassignment.PrecededingAssignmentID, authorTeamId);
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        
+        private ActionResult GetSubmissionZipHelper(int assignmentID, int teamID)
         {
             Assignment assignment = db.Assignments.Find(assignmentID);
 
@@ -233,6 +257,7 @@ namespace OSBLE.Controllers
                                                  where a.TeamID == teamID &&
                                                  a.AssignmentID == assignment.ID
                                                  select a).FirstOrDefault();//db.AssignmentTeams.Find(teamID);
+
                 if (assignment.Category.CourseID == ActiveCourse.AbstractCourseID && assignment.AssignmentTeams.Contains(assignmentTeam))
                 {
                     Stream stream = FileSystem.FindZipFile(ActiveCourse.AbstractCourse as Course, assignment, assignmentTeam);
