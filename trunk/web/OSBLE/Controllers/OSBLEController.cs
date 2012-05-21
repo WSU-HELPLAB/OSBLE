@@ -36,17 +36,30 @@ namespace OSBLE.Controllers
             }
         }
 
-        private CourseUser activeCourse = null;
+        private CourseUser activeCourseUser = null;
 
+        [Obsolete("Use ActiveCourseUser instead")]
         public CourseUser ActiveCourse
         {
             get 
-            { 
-                return activeCourse; 
+            {
+                return ActiveCourseUser; 
             }
             protected set
             {
-                activeCourse = value;
+                ActiveCourseUser = value;
+            }
+        }
+
+        public CourseUser ActiveCourseUser
+        {
+            get
+            {
+                return activeCourseUser;
+            }
+            protected set
+            {
+                activeCourseUser = value;
             }
         }
 

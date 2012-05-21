@@ -71,7 +71,7 @@
                     <a title="Click to Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@assignment.ID)">@Helpers.DeleteButton()</a>
                 </td>
                 <td > <!--Cell for name-->
-                    @Html.ActionLink(assignment.AssignmentName, "AssignmentDetails", "Assignment", new { assignment.ID }, null)
+                    @Html.ActionLink(assignment.AssignmentName, "Index", "Home", new { area = "AssignmentDetails", assignmentId = assignment.ID }, null)
                 </td>
                 <!--<td>@assignment.ReleaseDate.ToShortDateString()</td>-->
                 <td>@assignment.DueDate.ToShortDateString() @assignment.DueTime.ToShortTimeString()</td>

@@ -54,7 +54,7 @@
                 }
                 <tr class="checkeredRow">
                     <td> <!--Cell for name-->
-                        @Html.ActionLink(assignment.AssignmentName, "AssignmentDetails", "Assignment", new { assignment.ID }, null)
+                        @Html.ActionLink(assignment.AssignmentName, "Index", "Home", new { area = "AssignmentDetails", assignmentId = assignment.ID }, null)
                     </td>
                     <td>@assignment.ReleaseDate.ToShortDateString() @assignment.ReleaseTime.ToShortTimeString()</td>
                     <td>@assignment.DueDate.ToShortDateString() @assignment.DueDate.ToShortTimeString()</td>

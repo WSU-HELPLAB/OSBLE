@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using OSBLE.Models.Assignments;
 using OSBLE.Controllers;
 using OSBLE.Areas.AssignmentDetails.ViewModels;
+using OSBLE.Attributes;
 
 namespace OSBLE.Areas.AssignmentDetails.Controllers
 {
@@ -14,18 +15,38 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
         public ActionResult Index(int assignmentId)
         {
             Assignment assignment = db.Assignments.Find(assignmentId);
+            if (assignment == null)
+            {
+                return RedirectToRoute(new { action = "Index", controller = "Assignment", area = "" });
+            }
             AssignmentDetailsFactory factory = new AssignmentDetailsFactory();
-            AssignmentDetailsViewModel viewModel = factory.Bake(assignment, ActiveCourse);
+            AssignmentDetailsViewModel viewModel = factory.Bake(assignment, ActiveCourseUser);
 
             //discussion assignments require their own special view
             if (assignment.Type != AssignmentTypes.DiscussionAssignment)
             {
-                return View(viewModel);
+                return View("Index", viewModel);
             }
             else
             {
                 return View("DiscussionAssignment", viewModel);
             }
+        }
+
+        [CanModifyCourse]
+        public ActionResult ToggleDraft(int assignmentId)
+        {
+            Assignment.ToggleDraft(assignmentId, ActiveCourseUser.ID);
+            return Index(assignmentId);
+        }
+
+        [CanModifyCourse]
+        public ActionResult DeleteAssignment(int assignmentId)
+        {
+            Assignment assignment = db.Assignments.Find(assignmentId);
+            db.Assignments.Remove(assignment);
+            db.SaveChanges();
+            return RedirectToRoute(new { action = "Index", controller = "Assignment", area = "" });
         }
     }
 }

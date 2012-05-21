@@ -342,6 +342,7 @@
     <Content Include="App_Data\FirstNames.txt" />
     <Content Include="App_Data\LastNames.txt" />
     <Content Include="Areas\AssignmentDetails\Content\css\Home.css" />
+    <Content Include="Areas\AssignmentDetails\Content\js\Home.js" />
     <Content Include="Areas\AssignmentWizard\Content\css\criticalReview.css" />
     <Content Include="Areas\AssignmentWizard\Content\css\home.css" />
     <Content Include="Areas\AssignmentWizard\Content\css\layout.css" />

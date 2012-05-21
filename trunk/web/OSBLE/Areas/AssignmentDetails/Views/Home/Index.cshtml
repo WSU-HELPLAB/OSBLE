@@ -26,10 +26,23 @@
 {
     @if (Model.Client.AbstractRole.CanGrade)
     {
+        bool altRow = false;
         foreach (IAssignmentTeam assignmentTeam in Model.TeamTableBuilders.Keys)
         {
-        <tr>
-            <th>@assignmentTeam.Team.TeamMemberString(Model.Client.AbstractRole)
+            string rowText = "class=\"NormalRow\"";
+            if(altRow)
+            {
+                rowText = "class=\"AltRow\"";
+            }
+            altRow = !altRow;
+        <tr @Html.Raw(rowText)>
+            <th class="StudentName">
+            @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", id = Model.Client.ID  });
+              }
+            <a href="@actionLink"
+               title="Email this user"
+            >@Helpers.MailButton()</a>
+            @assignmentTeam.Team.TeamMemberString(Model.Client.AbstractRole)
             </th>
             @foreach (string view in Model.TableColumnHeaders.Keys)
             {

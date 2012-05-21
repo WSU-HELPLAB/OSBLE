@@ -5,6 +5,7 @@ namespace OSBLE.Areas.AssignmentDetails
     public class AssignmentDetailsAreaRegistration : AreaRegistration
     {
         public static string AssignmentDetailsRoute = "AssignmentDetails_default";
+        public static string AssignmentDetailsShortcutRoute = "AssignmentDetails_shortcut";
         public static string AssignmentDetailsContentRoute = "AssignmentDetails_content";
 
         public override string AreaName
@@ -24,8 +25,14 @@ namespace OSBLE.Areas.AssignmentDetails
             );
 
             context.MapRoute(
-                AssignmentDetailsRoute,
+                AssignmentDetailsShortcutRoute,
                 "AssignmentDetails/{assignmentId}",
+                new { action = "Index", controller = "Home", assignmentId = UrlParameter.Optional }
+            );
+
+            context.MapRoute(
+                AssignmentDetailsRoute,
+                "AssignmentDetails/{controller}/{action}/{assignmentId}",
                 new { action = "Index", controller = "Home", assignmentId = UrlParameter.Optional }
             );
         }

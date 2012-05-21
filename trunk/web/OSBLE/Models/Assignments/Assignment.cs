@@ -28,6 +28,8 @@ namespace OSBLE.Models.Assignments
             Type = AssignmentTypes.Basic;
         }
 
+        #region public properties
+
         [Key]
         public int ID { get; set; }
 
@@ -189,6 +191,81 @@ namespace OSBLE.Models.Assignments
             }
         }
 
+        [Required(ErrorMessage = "Please specify for how long OSBLE should accept late submissions")]
+        [Display(Name = "Late Submission Window")]
+        public int HoursLateWindow { get; set; }
+
+        [Required(ErrorMessage = "Please specify the percent that should be deducted per hour late")]
+        [Display(Name = "Penalty of")]
+        public double DeductionPerUnit { get; set; }
+
+        [Required(ErrorMessage = "Please specify the hours per percent deduction.")]
+        [Display(Name = "hour(s) late")]
+        public double HoursPerDeduction { get; set; }
+
+        [Required]
+        public int ColumnOrder { get; set; }
+
+        [Required(ErrorMessage = "Please specify whether or not this assignment is a draft")]
+        [Display(Name = "Safe As Draft")]
+        public bool IsDraft { get; set; }
+
+        public int? RubricID { get; set; }
+        public virtual Rubric Rubric { get; set; }
+
+        public int? CommentCategoryID { get; set; }
+        public virtual CommentCategoryConfiguration CommentCategory { get; set; }
+
+        public int? PrecededingAssignmentID { get; set; }
+
+        [ForeignKey("PrecededingAssignmentID")]
+        public virtual Assignment PreceedingAssignment { get; set; }
+
+        [Association("Deliverable_Assignment", "ID", "AssignmentID")]
+        public virtual IList<Deliverable> Deliverables { get; set; }
+
+        [Association("AssignmentTeam_Assignments", "ID", "AssignmentID")]
+        public virtual IList<AssignmentTeam> AssignmentTeams { get; set; }
+
+        [Association("DiscussionTeam_Assignments", "ID", "AssignmentID")]
+        public virtual IList<DiscussionTeam> DiscussionTeams { get; set; }
+
+        [Association("AssignmentReviewTeam_Assignment", "ID", "AssignmentID")]
+        public virtual IList<ReviewTeam> ReviewTeams { get; set; }
+
+        [Association("Score_Assignment", "ID", "AssignmentID")]
+        public virtual IList<Score> Scores { get; set; }
+
+        [Association("DiscussionSetting_Assignment", "ID", "AssignmentID")]
+        public virtual DiscussionSetting DiscussionSettings { get; set; }
+
+        [Association("TeamEvaluationSettings_Assignment", "ID", "AssignmentID")]
+        public virtual TeamEvaluationSettings TeamEvaluationSettings { get; set; }
+
+        public double addedPoints { get; set; }
+
+        public static IList<AssignmentTypes> AllAssignmentTypes
+        {
+            get
+            {
+                return Enum.GetValues(typeof(AssignmentTypes)).Cast<AssignmentTypes>().ToList();
+            }
+        }
+
+        public int? AssociatedEventID { get; set; }
+
+        [ForeignKey("AssociatedEventID")]
+        public virtual Event AssociatedEvent { get; set; }
+
+        /// <summary>
+        /// used to distinguish wizard created assignments versus gradebook created assignments
+        /// </summary>
+        public bool IsWizardAssignment { get; set; }
+
+        #endregion
+
+        #region public methods
+
         /// <summary>
         /// Returns an int with the amount of submissions received for the assignment
         /// </summary>
@@ -230,75 +307,49 @@ namespace OSBLE.Models.Assignments
             return draftRubricEvals;
         }
 
-        [Required(ErrorMessage = "Please specify for how long OSBLE should accept late submissions")]
-        [Display(Name = "Late Submission Window")]
-        public int HoursLateWindow { get; set; }
+        #endregion
 
-        [Required(ErrorMessage = "Please specify the percent that should be deducted per hour late")]
-        [Display(Name = "Penalty of")]
-        public double DeductionPerUnit { get; set; }
+        #region static methods
 
-        [Required(ErrorMessage = "Please specify the hours per percent deduction.")]
-        [Display(Name = "hour(s) late")]
-        public double HoursPerDeduction { get; set; }
-
-        [Required]
-        public int ColumnOrder { get; set; }
-
-        [Required(ErrorMessage = "Please specify whether or not this assignment is a draft")]
-        [Display(Name = "Safe As Draft")]
-        public bool IsDraft { get; set; }
-
-        public int? RubricID { get; set; }
-        public virtual Rubric Rubric { get; set; }
-        
-        public int? CommentCategoryID { get; set; }
-        public virtual CommentCategoryConfiguration CommentCategory { get; set; }
-
-        public int? PrecededingAssignmentID  { get; set; }
-
-        [ForeignKey("PrecededingAssignmentID")]
-        public virtual Assignment PreceedingAssignment { get; set; }
-
-        [Association("Deliverable_Assignment", "ID", "AssignmentID")]
-        public virtual IList<Deliverable> Deliverables { get; set; }
-
-        [Association("AssignmentTeam_Assignments", "ID", "AssignmentID")]
-        public virtual IList<AssignmentTeam> AssignmentTeams { get; set; }
-
-        [Association("DiscussionTeam_Assignments", "ID", "AssignmentID")]
-        public virtual IList<DiscussionTeam> DiscussionTeams { get; set; }
-
-        [Association("AssignmentReviewTeam_Assignment", "ID", "AssignmentID")]
-        public virtual IList<ReviewTeam> ReviewTeams { get; set; }
-
-        [Association("Score_Assignment", "ID", "AssignmentID")]
-        public virtual IList<Score> Scores { get; set; }
-
-        [Association("DiscussionSetting_Assignment", "ID", "AssignmentID")]
-        public virtual DiscussionSetting DiscussionSettings { get; set; }
-
-        [Association("TeamEvaluationSettings_Assignment", "ID", "AssignmentID")]
-        public virtual TeamEvaluationSettings TeamEvaluationSettings { get; set; }
-
-        public double addedPoints { get; set; }
-
-        public static IList<AssignmentTypes> AllAssignmentTypes
+        public static void ToggleDraft(int assignmentId, int posterId)
         {
-            get
+            using (OSBLEContext db = new OSBLEContext())
             {
-                return Enum.GetValues(typeof(AssignmentTypes)).Cast<AssignmentTypes>().ToList();
+                //MG: Pulling the assignment from the DB, toggling its IsDraft parameter. and saving it back to the DB.
+                Assignment assignment = db.Assignments.Find(assignmentId);
+                assignment.IsDraft = !assignment.IsDraft;
+                db.SaveChanges();
+
+                if (assignment.IsDraft)
+                {
+                    if (assignment.AssociatedEvent != null)
+                    {
+                        Event e = db.Events.Find(assignment.AssociatedEventID);
+                        db.Events.Remove(e);
+                        db.SaveChanges();
+                    }
+                }
+                else
+                {
+                    Event e = new Event()
+                    {
+                        Description = assignment.AssignmentDescription,
+                        EndDate = assignment.DueDate,
+                        EndTime = assignment.DueTime,
+                        Approved = true,
+                        PosterID = posterId,
+                        StartDate = assignment.ReleaseDate,
+                        StartTime = assignment.ReleaseTime,
+                        Title = assignment.AssignmentName
+                    };
+                    db.Events.Add(e);
+                    db.SaveChanges();
+                    assignment.AssociatedEventID = e.ID;
+                    db.SaveChanges();
+                }
             }
         }
 
-        public int? AssociatedEventID { get; set; }
-
-        [ForeignKey("AssociatedEventID")]
-        public virtual Event AssociatedEvent { get; set; }
-        
-        /// <summary>
-        /// used to distinguish wizard created assignments versus gradebook created assignments
-        /// </summary>
-        public bool IsWizardAssignment { get; set; }
+        #endregion 
     }
 }

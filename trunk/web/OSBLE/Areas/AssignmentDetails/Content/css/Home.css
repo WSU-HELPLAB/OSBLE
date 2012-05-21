@@ -1,10 +1,69 @@
-﻿#AssignmentDetailsTable th
+﻿h1
+{
+    margin-bottom:0;
+    padding-bottom:0;
+}
+
+#AssignmentDetailsTable
+{
+    border-collapse:collapse;
+    margin-bottom:15px;
+}
+
+#AssignmentDetailsTable th
 {
     text-align:left;
+}
+
+#AssignmentDetailsTable td
+{
+    border-left:1px solid gray;
 }
 
 #AssignmentDetailsTable th, #AssignmentDetailsTable td
 {
     padding:4px;
     vertical-align:middle;
+    border-top:1px solid gray;
+}
+
+#AssignmentDetailsTableFirstRow th, #AssignmentDetailsTableFirstRow td
+{
+    border-top:none;
+}
+
+#AssignmentLinksList
+{
+    margin:0;
+    padding:0;
+    list-style:none;
+    padding-bottom:10px;
+}
+
+#AssignmentLinksList li
+{
+    display:inline;
+    padding-right:5px;
+}
+
+.AltRow
+{
+    background:#F2F2F2;
+}
+
+#StudentsTable
+{
+    border-collapse:collapse;
+    font-size:.8em;
+}
+
+.StudentName
+{
+    text-align:left;
+}
+
+#StudentsTable th, #StudentsTable td
+{
+    border:1px solid gray;
+    padding:4px;
 }
