@@ -25,10 +25,8 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             header.CRSubmission = new DynamicDictionary();
 
             //Foreach author
-                //get id
-                //allow download of author submission
                 //get last submission time
-                //provide link for submission
+
 
             AssignmentTeam assignmentTeam = null;
             foreach (AssignmentTeam at in assignment.AssignmentTeams)

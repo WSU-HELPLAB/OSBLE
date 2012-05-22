@@ -16,16 +16,15 @@
         OnComplete = "SubmissionLoaded"
     };
     <tr>
-        <th>CRSubmission</th>
+        <th>Review Items</th>
         <td>
             <table>
                 @foreach (ReviewTeam rt in authorTeams)
                 {
-                        <tr>
-                            <td>@rt.AuthorTeam.Name</td>
-                            <td>@Html.ActionLink("Download Submission", "GetCriticalReviewSubmissionZip", "FileHandler", new { assignmentId = dataModel.CRSubmission.assignmentId, authorTeamId = rt.AuthorTeamID, area="" }, new { })</td>
-                            <td>@Ajax.ActionLink("Submit", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area="" }, options, new object())</td>
-                        </tr>
+                    <tr>
+                        <td>@Html.ActionLink("Review " + rt.AuthorTeam.Name.ToString() + "'s Submission", "GetCriticalReviewSubmissionZip", "FileHandler", new { assignmentId = dataModel.CRSubmission.assignmentId, authorTeamId = rt.AuthorTeamID, area = "" }, new { })</td>
+                        <td>@Ajax.ActionLink("Submit", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area="" }, options, new object())</td>
+                    </tr>
                 }
             </table>
         </td>
