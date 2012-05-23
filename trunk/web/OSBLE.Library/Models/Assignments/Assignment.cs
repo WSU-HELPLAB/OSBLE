@@ -297,7 +297,7 @@ namespace OSBLE.Models.Assignments
         public int GetPublishedCount()
         {
             int draftRubricEvals = 0;
-            using (OSBLEContext db = new OSBLEContext())
+            using (ContextBase db = new SimpleContext())
             {
                 draftRubricEvals = (from a in db.RubricEvaluations
                                         where a.AssignmentID == this.ID &&
@@ -313,7 +313,7 @@ namespace OSBLE.Models.Assignments
 
         public static void ToggleDraft(int assignmentId, int posterId)
         {
-            using (OSBLEContext db = new OSBLEContext())
+            using (ContextBase db = new SimpleContext())
             {
                 //MG: Pulling the assignment from the DB, toggling its IsDraft parameter. and saving it back to the DB.
                 Assignment assignment = db.Assignments.Find(assignmentId);
