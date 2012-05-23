@@ -65,7 +65,7 @@ namespace OSBLE.Controllers
             //Getting the assginment list, initially without future or draft assignments.
             Assignments = (from assignment in db.Assignments
                            where !assignment.IsDraft &&
-                           assignment.Category.CourseID == ActiveCourse.AbstractCourseID &&
+                           assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID &&
                            assignment.IsWizardAssignment &&
                            assignment.ReleaseDate <= DateTime.Now
                            orderby assignment.DueDate
@@ -163,7 +163,7 @@ namespace OSBLE.Controllers
             ViewBag.Assignments = Assignments;
             ViewBag.CurrentDate = DateTime.Now;
             ViewBag.Submitted = false;
-            return View();
+            return View("Index");
         }
 
         [CanGradeCourse]
@@ -461,10 +461,16 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="assignmentID"></param>
         [CanModifyCourse]
-        public void ToggleDraft(int assignmentID)
+        public ActionResult ToggleDraft(int assignmentID)
         {
-            
+            Assignment assignment = db.Assignments.Find(assignmentID);
 
+            //Confirm assignment belongs to the current users course before proceeding
+            if (assignment.Category.CourseID == ActiveCourseUser.AbstractCourse.ID) 
+            {
+                Assignment.ToggleDraft(assignmentID, ActiveCourseUser.ID);
+            }
+            return RedirectToRoute(new { action = "Index" });
         }
 
         /// <summary>
@@ -560,7 +566,7 @@ namespace OSBLE.Controllers
 
             var cuIDs = (from tm in precTeam.TeamMembers
                          select tm.CourseUserID).ToList();
-
+            var query = db.TeamEvaluations.Where(te => cuIDs.Contains(te.RecipientID) && te.TeamEvaluationAssignmentID == assignment.ID);
             List<TeamEvaluation> OurTeamEvals = db.TeamEvaluations.Where(te => cuIDs.Contains(te.RecipientID) && te.TeamEvaluationAssignmentID == assignment.ID).ToList();
             List<double> MultipliersInOrder = new List<double>();
             List<Score> ScoresInOrder = new List<Score>();
@@ -804,10 +810,10 @@ namespace OSBLE.Controllers
             Team precTeam = db.Teams.Find(precedingAssignmentTeamID);
             Assignment assignment = db.Assignments.Find(assignmentId);
 
-            //PEER REVIEW: During Peer review ask about better ways to do this. Seems like it would perform poorly as the TE table will be very large (as each user TE translates to TeamMember.Count amount of TEs in db)
             List<int> cuIDs = (from tm in precTeam.TeamMembers
                          select tm.CourseUserID).ToList();  
-            List<TeamEvaluation> OurTeamEvals = db.TeamEvaluations.Where(te => cuIDs.Contains(te.RecipientID) && te.TeamEvaluationAssignmentID == assignment.ID).ToList();
+            List<TeamEvaluation> OurTeamEvals = db.TeamEvaluations.Where(te => cuIDs.Contains(te.RecipientID) 
+                && te.TeamEvaluationAssignmentID == assignment.ID).ToList();
             GradebookController GBC =  new GradebookController();
 
             foreach (TeamMember tm in precTeam.TeamMembers)

@@ -51,16 +51,6 @@ else
 }
 <script type="text/javascript">
 
-
-    function toggleDraft(id){
-        $.ajax({
-            async: false,
-            url: "/Assignment/ToggleDraft",
-            data: { assignmentID: id },
-        });
-        window.location.reload(true);
-    }
-
     function create_and_open_downloading_submission_dialog() {
 
         //create the div that we will then make into a dialog

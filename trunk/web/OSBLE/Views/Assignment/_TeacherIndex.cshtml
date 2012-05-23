@@ -61,11 +61,11 @@
                 <td style="padding-right:0; white-space:nowrap"><!--Cell for icons-->
                     @if (assignment.IsDraft)
                     {
-                        <a title="Click to Publish"  class="pointerOnMouseOver" onclick="toggleDraft(@assignment.ID)">@Helpers.PublishButton()</a>
+                        <a title="Click to Publish"  class="pointerOnMouseOver" href="/Assignment/ToggleDraft?assignmentID=@assignment.ID" >@Helpers.PublishButton()</a>
                     }
                     else
                     {
-                        <a title="Click to Unpublish"  class="pointerOnMouseOver" onclick="toggleDraft(@assignment.ID)">@Helpers.UnPublishButton()</a>
+                        <a title="Click to Unpublish"  class="pointerOnMouseOver" href="/Assignment/ToggleDraft?assignmentID=@assignment.ID">@Helpers.UnPublishButton()</a>
                     }
                     <a title="Click to Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = assignment.ID })">@Helpers.EditButton()</a>
                     <a title="Click to Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@assignment.ID)">@Helpers.DeleteButton()</a>
