@@ -19,7 +19,7 @@
     <td>
         @if (dataModel.Submission.hasSubmitted == false)
         {
-            @Ajax.ActionLink("Submit", "Create", "Submission", new { id = dataModel.Submission.assignmentID }, options, new object())
+            @Ajax.ActionLink("Submit", "Create", "Submission", new { id = dataModel.Submission.assignmentID , area = ""}, options, new object())
         }
         else
         {

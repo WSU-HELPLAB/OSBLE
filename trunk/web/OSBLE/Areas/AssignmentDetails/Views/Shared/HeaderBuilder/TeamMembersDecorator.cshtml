@@ -6,18 +6,13 @@
     dynamic dataModel = Model;               
 }
 <tr>
-    <th>
-        Team:
-    </th>
-    <td>@dataModel.Team.Name
-    </td>
-</tr>
-<tr>
     <!--Team members row-->
     <th>
-        Members:
+        Your Team
     </th>
     <td>
+    <strong>@dataModel.Team.Name</strong>
+    <br />
         @foreach (TeamMember member in dataModel.Team.TeamMembers)
         {
                 

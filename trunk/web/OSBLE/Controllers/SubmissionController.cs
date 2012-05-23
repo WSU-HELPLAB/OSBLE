@@ -148,14 +148,14 @@ namespace OSBLE.Controllers
                                                 }
                                             }
 
-                                            FileSystem.RemoveZipFile(ActiveCourse.AbstractCourse as Course, assignment, assignmentTeam);
-                                            string path = Path.Combine(FileSystem.GetTeamUserSubmissionFolderForAuthorID(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam, authorTeam), deliverables[i].Name + extension);
+                                            FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, assignmentTeam);
+                                            string path = Path.Combine(FileSystem.GetTeamUserSubmissionFolderForAuthorID(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam, authorTeam.Team), deliverables[i].Name + extension);
                                             file.SaveAs(path);
 
                                             //unzip and rezip xps files because some XPS generators don't do it right
                                             if (extension.ToLower().CompareTo(".xps") == 0)
                                             {
-                                                string extractPath = Path.Combine(FileSystem.GetTeamUserSubmissionFolderForAuthorID(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam, authorTeam), "extract");
+                                                string extractPath = Path.Combine(FileSystem.GetTeamUserSubmissionFolderForAuthorID(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam, authorTeam.Team), "extract");
                                                 using (ZipFile oldZip = ZipFile.Read(path))
                                                 {
                                                     oldZip.ExtractAll(extractPath, ExtractExistingFileAction.OverwriteSilently);

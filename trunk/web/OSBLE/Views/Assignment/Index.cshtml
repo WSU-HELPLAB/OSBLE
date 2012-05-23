@@ -9,6 +9,7 @@
     if (ViewBag.SubmissionReceived)
     {
         @Html.Raw("alert(\"Your submission was successfully received.\");");
+        
     }
     if(ViewBag.Error != null)
     {
@@ -132,6 +133,7 @@ else
 
 <!--Elements for submission modal box and loading message-->
 <text id="Loading" style="display:none"> <br />Please Wait...</text>
+
 <div id="submit_files_dialog" style="display:none">
     <div id= "submitFiles"></div>
     <script type="text/javascript">

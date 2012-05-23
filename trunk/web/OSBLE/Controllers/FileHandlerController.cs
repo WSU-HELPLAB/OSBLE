@@ -230,11 +230,18 @@ namespace OSBLE.Controllers
             return GetSubmissionZipHelper(assignmentId, teamId);
         }
 
+        /// <summary>
+        /// Get deliverables from the reviewee's assignment (previous assignment) for the current user, 
+        /// needed for a critical review assignment (current user)
+        /// </summary>
+        /// <param name="assignmentId">critical review assignment ID</param>
+        /// <param name="authorTeamId">reviewee team ID</param>
+        /// <returns></returns>
         [CanSubmitAssignments]
-        public ActionResult GetCriticalReviewSubmissionZip(int assignmentId, int authorTeamId)
+        public ActionResult GetPrecedingSubmissionForCriticalReview(int assignmentId, int authorTeamId)
         {
             Assignment CRassignment = db.Assignments.Find(assignmentId);
-            AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourse.UserProfile);
+            AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourseUser.UserProfile);
             List<int> authorTeams = (from rt in CRassignment.ReviewTeams
                                             where rt.ReviewTeamID == at.TeamID
                                             select rt.AuthorTeamID).ToList();
@@ -246,8 +253,19 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [CanSubmitAssignments]
+        public ActionResult GetCriticalReviewSubmissionZip(int assignmentId, int authorTeamId)
+        {
+            //get authorTeam
+            Team authorTeam = db.Teams.Find(authorTeamId);
+
+            Assignment CRassignment = db.Assignments.Find(assignmentId);
+            AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourseUser.UserProfile);
+
+            return GetSubmissionZipHelper(assignmentId, at.TeamID, authorTeam);
+        }
         
-        private ActionResult GetSubmissionZipHelper(int assignmentID, int teamID)
+        private ActionResult GetSubmissionZipHelper(int assignmentID, int teamID, Team authorTeam = null)
         {
             Assignment assignment = db.Assignments.Find(assignmentID);
 
@@ -258,9 +276,9 @@ namespace OSBLE.Controllers
                                                  a.AssignmentID == assignment.ID
                                                  select a).FirstOrDefault();//db.AssignmentTeams.Find(teamID);
 
-                if (assignment.Category.CourseID == ActiveCourse.AbstractCourseID && assignment.AssignmentTeams.Contains(assignmentTeam))
+                if (assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID && assignment.AssignmentTeams.Contains(assignmentTeam))
                 {
-                    Stream stream = FileSystem.FindZipFile(ActiveCourse.AbstractCourse as Course, assignment, assignmentTeam);
+                    Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, assignmentTeam);
 
                     string zipFileName = assignment.AssignmentName + " by " + assignmentTeam.Team.Name + ".zip";
 
@@ -269,7 +287,15 @@ namespace OSBLE.Controllers
                         return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
                     }
 
-                    string submissionfolder = FileSystem.GetTeamUserSubmissionFolder(false, (ActiveCourse.AbstractCourse as Course), assignmentID, assignmentTeam);
+                    string submissionfolder;
+                    if (assignment.Type == AssignmentTypes.CriticalReview)
+                    {
+                        submissionfolder = FileSystem.GetTeamUserSubmissionFolderForAuthorID(false, (ActiveCourseUser.AbstractCourse as Course), assignmentID, assignmentTeam, authorTeam);
+                    }
+                    else
+                    {
+                        submissionfolder = FileSystem.GetTeamUserSubmissionFolder(false, (ActiveCourseUser.AbstractCourse as Course), assignmentID, assignmentTeam);
+                    }
 
                     using (ZipFile zipfile = new ZipFile())
                     {
@@ -277,7 +303,7 @@ namespace OSBLE.Controllers
                         {
                             zipfile.AddDirectory(submissionfolder);
                         }
-                        FileSystem.CreateZipFolder(ActiveCourse.AbstractCourse as Course, zipfile, assignment, assignmentTeam);
+                        FileSystem.CreateZipFolder(ActiveCourseUser.AbstractCourse as Course, zipfile, assignment, assignmentTeam);
 
                         stream = FileSystem.GetDocumentForRead(zipfile.Name);
 

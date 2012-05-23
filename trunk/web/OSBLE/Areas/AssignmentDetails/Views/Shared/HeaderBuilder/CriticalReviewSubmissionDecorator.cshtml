@@ -5,7 +5,6 @@
     dynamic dataModel = Model;
     List<ReviewTeam> authorTeams = dataModel.CRSubmission.authorTeams;
 }
-
 @{
     
     AjaxOptions options = new AjaxOptions()
@@ -16,25 +15,85 @@
         OnComplete = "SubmissionLoaded"
     };
     <tr>
-        <th>Review Items</th>
+        <th>
+            Critical Review
+        </th>
         <td>
-            <table>
-                @foreach (ReviewTeam rt in authorTeams)
-                {
-                    <tr>
-                        <td>@Html.ActionLink("Review " + rt.AuthorTeam.Name.ToString() + "'s Submission", "GetCriticalReviewSubmissionZip", "FileHandler", new { assignmentId = dataModel.CRSubmission.assignmentId, authorTeamId = rt.AuthorTeamID, area = "" }, new { })</td>
-                        <td>@Ajax.ActionLink("Submit", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area="" }, options, new object())</td>
+            <table id="CriticalReviews">
+                @{
+                    int i = 0;
+                    foreach (ReviewTeam rt in authorTeams)
+                    {
+                    
+                      
+
+                         string trclass = "";
+                         if(i != authorTeams.Count() - 1)
+                         {
+                             trclass = "TableRowCriticalReview";
+                         }
+                         <tr class="@trclass">
+
+                    
+                        <td>
+                            @rt.AuthorTeam.Name
+                        </td>
+                        <td>
+                            <table id="CriticalReviewSubTable">
+                                <tr>
+                                    <td>
+                                        @{
+                                            string name;
+                                        if(!dataModel.CRSubmission.hasTeams)
+                                        {
+                                            name = rt.AuthorTeam.Name;
+                                        }
+                                        else{
+                                            name = rt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName;
+                                        }
+                                        @Html.ActionLink("Download " + name
+                                        + "'s submission to review", 
+                                        "GetPrecedingSubmissionForCriticalReview", "FileHandler", 
+                                        new { assignmentId = dataModel.CRSubmission.assignmentId, authorTeamId = rt.AuthorTeamID, area = "" }, 
+                                        new { onclick = "create_and_open_downloading_submission_dialog()" })
+                                            }
+                                    </td>
+                                </tr>
+                                @if (dataModel.CRSubmission.submissionTimes[i] == null)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Ajax.ActionLink("Upload your review", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area = "" }, options, new object())
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    String submissionTime = dataModel.CRSubmission.submissionTimes[i].ToString();
+                                    <tr>
+                                        <td>
+                                            @Html.ActionLink("Download your review", "GetCriticalReviewSubmissionZip", "FileHandler", new { assignmentId = dataModel.CRSubmission.assignmentId, authorTeamId = rt.AuthorTeamID, area = "" }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+                                            @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area = "" }, options, new object())
+                                        </td>
+                                    </tr>
+                                    
+                                }
+                            </table>
+                        </td>
                     </tr>
+                    
+                                i++;
+                    }
                 }
             </table>
         </td>
     </tr>
 }
-
 <!--Elements for submission modal box and loading message-->
-<text id="Loading" style="display:none"> <br />Please Wait...</text>
-<div id="submit_files_dialog" style="display:none">
-    <div id= "submitFiles"></div>
+<text id="Loading" style="display: none"> <br />Please Wait...</text>
+<div id="submit_files_dialog" style="display: none">
+    <div id="submitFiles">
+    </div>
     <script type="text/javascript">
         $(function () {
             $('#submit_files_dialog').dialog(
@@ -46,6 +105,5 @@
             });
         });
     </script>
-    </div>
 </div>
-
+</div> 

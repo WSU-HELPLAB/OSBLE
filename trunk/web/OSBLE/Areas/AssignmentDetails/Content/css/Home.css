@@ -72,3 +72,18 @@
     border:1px solid gray;
     padding:4px;
 }
+
+#CriticalReviews
+{
+    border-collapse:collapse;
+}
+
+#CriticalReviews td, #CriticalReviews th
+{
+    border:none;
+}
+
+.TableRowCriticalReview
+{
+    border-bottom:1px solid black;
+}

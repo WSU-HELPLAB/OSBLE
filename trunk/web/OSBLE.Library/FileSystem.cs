@@ -497,10 +497,10 @@ namespace OSBLE
             return path;
         }
 
-        public static string GetTeamUserSubmissionFolderForAuthorID(bool createPathIfNotExists, Course course, int assignmentID, IAssignmentTeam submitterTeam, IAssignmentTeam authorTeam)
+        public static string GetTeamUserSubmissionFolderForAuthorID(bool createPathIfNotExists, Course course, int assignmentID, IAssignmentTeam submitterTeam, Team authorTeam)
         {
             string path = GetTeamUserSubmissionFolder(false, course, assignmentID, submitterTeam);
-            path += "\\" + authorTeam.Team.Name.ToString();
+            path += "\\" + authorTeam.Name.ToString();
 
             if (!Directory.Exists(path) && createPathIfNotExists)
             {
@@ -534,9 +534,19 @@ namespace OSBLE
             return null;
         }
 
+        /// <summary>
+        /// Alternative to getDeliverable, used accessing location of critical review assignments
+        /// </summary>
+        /// <param name="course"></param>
+        /// <param name="assignmentID"></param>
+        /// <param name="subbmitterTeam"></param>
+        /// <param name="fileName"></param>
+        /// <param name="possibleFileExtensions"></param>
+        /// <param name="authorTeam"></param>
+        /// <returns></returns>
         public static string GetCriticalReviewDeliverable(Course course, int assignmentID, AssignmentTeam subbmitterTeam, string fileName, string[] possibleFileExtensions, AssignmentTeam authorTeam)
         {
-            string path = GetTeamUserSubmissionFolderForAuthorID(false, course, assignmentID, subbmitterTeam, authorTeam) + "\\";
+            string path = GetTeamUserSubmissionFolderForAuthorID(false, course, assignmentID, subbmitterTeam, authorTeam.Team) + "\\";
 
             if (Directory.Exists(path))
             {
@@ -695,17 +705,28 @@ namespace OSBLE
         /// </summary>
         /// <param name="team"></param>
         /// <returns></returns>
-        public static DateTime? GetSubmissionTime(IAssignmentTeam team)
+        public static DateTime? GetSubmissionTime(IAssignmentTeam team, Team authorTeam = null)
         {
-            DirectoryInfo submissionFolder = new DirectoryInfo
-                                            (FileSystem.GetTeamUserSubmissionFolder
-                                                (
-                                                    false, 
-                                                    team.Assignment.Category.Course,
-                                                    team.Assignment.ID, 
-                                                    team
-                                                )
+            DirectoryInfo submissionFolder;
+            if (team.Assignment.Type == AssignmentTypes.CriticalReview && authorTeam != null)
+            {
+                submissionFolder = new DirectoryInfo
+                                            (FileSystem.GetTeamUserSubmissionFolderForAuthorID
+                                                (false, team.Assignment.Category.Course, team.AssignmentID, team, authorTeam) 
                                             );
+            }
+            else
+            {
+                submissionFolder = new DirectoryInfo
+                                                (FileSystem.GetTeamUserSubmissionFolder
+                                                    (
+                                                        false,
+                                                        team.Assignment.Category.Course,
+                                                        team.Assignment.ID,
+                                                        team
+                                                    )
+                                                );
+            }
 
             DateTime? timeSubmitted;
 

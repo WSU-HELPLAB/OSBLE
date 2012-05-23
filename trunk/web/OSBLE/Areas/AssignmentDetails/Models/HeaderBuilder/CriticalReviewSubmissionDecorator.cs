@@ -28,6 +28,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                 //get last submission time
 
 
+            // get the assignment team ( team doing the review )
             AssignmentTeam assignmentTeam = null;
             foreach (AssignmentTeam at in assignment.AssignmentTeams)
             {
@@ -40,6 +41,9 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                 }
             }
 
+            header.CRSubmission.hasSubmitted = false;
+            
+
             if (assignmentTeam != null)
             {
                 List<ReviewTeam> authorTeams = new List<ReviewTeam>();
@@ -48,6 +52,24 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                                select rt).ToList();
                 header.CRSubmission.authorTeams = authorTeams;
                 header.CRSubmission.assignmentId = assignment.ID;
+
+                List<DateTime?> submissionTimes = new List<DateTime?>();
+               
+                // get submission time
+                foreach(ReviewTeam reviewTeam in authorTeams)
+                {
+                    submissionTimes.Add(FileSystem.GetSubmissionTime(assignmentTeam, reviewTeam.AuthorTeam)); 
+                }
+
+                header.CRSubmission.submissionTimes = submissionTimes;
+                if (assignment.HasTeams)
+                {
+                    header.CRSubmission.hasTeams = true;
+                }
+                else
+                {
+                    header.CRSubmission.hasTeams = false;
+                }
             }
             
             return header;
