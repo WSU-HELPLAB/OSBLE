@@ -444,11 +444,11 @@ namespace OSBLE.Controllers
             }
             if (ActiveCourse.AbstractRole.CanModify)
             {
-                return RedirectToAction("TeacherIndex", new { assignmentId = assignment.ID, courseUserId = (int)Session["StudentId"], postOrReply = (int)Session["PostOrReply"] });
+                return RedirectToAction("TeacherIndex", new { assignmentId = assignment.ID, courseUserId = ActiveCourseUser.ID, postOrReply = (int)Session["PostOrReply"] });
             }
             else if (ActiveCourse.AbstractRole.Anonymized)
             {
-                return RedirectToAction("ObserverIndex", new { assignmentId = assignment.ID, courseUserId = (int)Session["StudentId"], postOrReply = (int)Session["PostOrReply"] });
+                return RedirectToAction("ObserverIndex", new { assignmentId = assignment.ID, courseUserId = ActiveCourseUser.ID, postOrReply = (int)Session["PostOrReply"] });
             }
             else
             {
