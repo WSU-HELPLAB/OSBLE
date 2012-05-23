@@ -116,6 +116,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OSBLE.Library\OSBLE.Library.csproj">
+      <Project>{6873CAF7-4914-4B62-AF7E-BFFFA0A9FFD4}</Project>
+      <Name>OSBLE.Library</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OSBLE\OSBLE.csproj">
       <Project>{7297687F-BF8A-4195-8EA3-A05DA302B24E}</Project>
       <Name>OSBLE</Name>

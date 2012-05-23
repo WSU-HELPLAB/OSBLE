@@ -17,9 +17,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLE.UnitTests", "OSBLE.Un
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5F5F62F4-7B96-4A21-B6AB-9EC48CDB768C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSBLE.Library", "OSBLE.Library\OSBLE.Library.csproj", "{6873CAF7-4914-4B62-AF7E-BFFFA0A9FFD4}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
+		SccNumberOfProjects = 6
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
 		SccLocalPath0 = .
@@ -35,6 +37,9 @@ Global
 		SccProjectUniqueName4 = OSBLE.UnitTests\\OSBLE.UnitTests.csproj
 		SccProjectName4 = OSBLE.UnitTests
 		SccLocalPath4 = OSBLE.UnitTests
+		SccProjectUniqueName5 = OSBLE.Library\\OSBLE.Library.csproj
+		SccProjectName5 = OSBLE.Library
+		SccLocalPath5 = OSBLE.Library
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = OSBLE.vsmdi
@@ -78,6 +83,14 @@ Global
 		{5AA0B7E4-E77B-4B92-9658-682AD71F3163}.OSBLE Dev Server|Any CPU.Build.0 = Release|Any CPU
 		{5AA0B7E4-E77B-4B92-9658-682AD71F3163}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5AA0B7E4-E77B-4B92-9658-682AD71F3163}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6873CAF7-4914-4B62-AF7E-BFFFA0A9FFD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6873CAF7-4914-4B62-AF7E-BFFFA0A9FFD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6873CAF7-4914-4B62-AF7E-BFFFA0A9FFD4}.OSBLE Deployment|Any CPU.ActiveCfg = Release|Any CPU
+		{6873CAF7-4914-4B62-AF7E-BFFFA0A9FFD4}.OSBLE Deployment|Any CPU.Build.0 = Release|Any CPU
+		{6873CAF7-4914-4B62-AF7E-BFFFA0A9FFD4}.OSBLE Dev Server|Any CPU.ActiveCfg = Release|Any CPU
+		{6873CAF7-4914-4B62-AF7E-BFFFA0A9FFD4}.OSBLE Dev Server|Any CPU.Build.0 = Release|Any CPU
+		{6873CAF7-4914-4B62-AF7E-BFFFA0A9FFD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6873CAF7-4914-4B62-AF7E-BFFFA0A9FFD4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -230,63 +230,8 @@
     <Compile Include="Controllers\StudioAssignmentController.cs" />
     <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="EntityFramework\DbContextExtensions.cs" />
-    <Compile Include="Models\ActivityLog.cs" />
-    <Compile Include="Models\Assignments\Assignment.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Models\Assignments\AssignmentTypes.cs" />
-    <Compile Include="Models\AbstractCourses\CourseRubric.cs" />
-    <Compile Include="Models\Assignments\CommentCategory.cs" />
-    <Compile Include="Models\Assignments\CommentCategoryConfiguration.cs" />
-    <Compile Include="Models\Assignments\DiscussionTeam.cs" />
-    <Compile Include="Models\Assignments\TeamEvaluationComment.cs" />
-    <Compile Include="Models\Assignments\TeamEvaluationSettings.cs" />
-    <Compile Include="Models\Assignments\IAssignmentTeam.cs" />
-    <Compile Include="Models\Assignments\ReviewTeam.cs" />
-    <Compile Include="Models\Assignments\Score.cs" />
-    <Compile Include="Models\Assignments\CommentCategoryOption.cs" />
-    <Compile Include="Models\AbstractCourses\Course\CourseUser.cs" />
-    <Compile Include="Models\AbstractCourses\Course\GradebookOptions\LetterGrade.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Rubrics\CriteriaEvaluation.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Rubrics\Criterion.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Rubrics\Level.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Rubrics\CellDescription.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Rubrics\Rubric.cs" />
-    <Compile Include="Models\AbstractCourses\AbstractCourse.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Rubrics\RubricEvaluation.cs" />
-    <Compile Include="Models\Assignments\AssignmentTeam.cs" />
-    <Compile Include="Models\Assignments\DiscussionSettings.cs" />
-    <Compile Include="Models\Assignments\Team.cs" />
-    <Compile Include="Models\Assignments\TeamEvaluation.cs" />
-    <Compile Include="Models\Assignments\TeamMember.cs" />
-    <Compile Include="Models\DiscussionAssignment\DiscussionPost.cs" />
-    <Compile Include="Models\DiscussionAssignment\DiscussionReply.cs" />
-    <Compile Include="Models\HomePage\AbstractDashboard.cs" />
-    <Compile Include="Models\AbstractCourses\AbstractRole.cs" />
-    <Compile Include="Models\AbstractCourses\Community\Community.cs" />
-    <Compile Include="Models\AbstractCourses\Community\CommunityRole.cs" />
-    <Compile Include="Models\AbstractCourses\Course\CourseBreak.cs" />
-    <Compile Include="Models\AbstractCourses\Course\CourseMeeting.cs" />
-    <Compile Include="Models\Assignments\Deliverable.cs" />
-    <Compile Include="Models\HomePage\Event.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Category.cs" />
     <Compile Include="EntityFramework\OsbleViewEngine.cs" />
-    <Compile Include="Models\Services\Uploader\ParentDirectoryListing.cs" />
-    <Compile Include="Models\Services\Uploader\UserSession.cs" />
-    <Compile Include="Models\ToolTips.cs" />
-    <Compile Include="Models\Services\Uploader\AbstractListing.cs" />
-    <Compile Include="Models\Services\Uploader\DirectoryListing.cs" />
-    <Compile Include="Models\Services\Uploader\FileListing.cs" />
-    <Compile Include="Models\SilverlightObject.cs" />
-    <Compile Include="Models\ViewModels\AssignmentDetailsViewModel.cs" />
-    <Compile Include="Models\ViewModels\InlineReviewViewModel.cs" />
-    <Compile Include="Models\ViewModels\ReviewInterfaceModels.cs" />
-    <Compile Include="Models\ViewModels\RubricViewModel.cs" />
-    <Compile Include="Models\ViewModels\SerializableTeamMembers.cs" />
-    <Compile Include="Models\ViewModels\StudioAssignmentViewModel.cs" />
-    <Compile Include="Models\ViewModels\TeamCreationViewModel.cs" />
     <Compile Include="Areas\AssignmentWizard\Models\WizardComponentManager.cs" />
-    <Compile Include="Models\ViewModels\TeamEvaluationViewModel.cs" />
     <Compile Include="Resources\StringExtensions.cs" />
     <Compile Include="Services\AssignmentSubmissionService.svc.cs">
       <DependentUpon>AssignmentSubmissionService.svc</DependentUpon>
@@ -327,16 +272,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\AccountModels.cs" />
-    <Compile Include="Models\Users\Mail.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Course.cs" />
-    <Compile Include="Models\AbstractCourses\Course\CourseRole.cs" />
-    <Compile Include="Models\HomePage\DashboardPost.cs" />
-    <Compile Include="Models\HomePage\DashboardReply.cs" />
-    <Compile Include="Models\HomePage\Notification.cs" />
-    <Compile Include="Models\OSBLEContext.cs" />
-    <Compile Include="Models\Users\UserProfile.cs" />
-    <Compile Include="Models\School.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -612,7 +547,12 @@
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\OSBLE.Library\OSBLE.Library.csproj">
+      <Project>{6873CAF7-4914-4B62-AF7E-BFFFA0A9FFD4}</Project>
+      <Name>OSBLE.Library</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
       <SubType>Designer</SubType>
