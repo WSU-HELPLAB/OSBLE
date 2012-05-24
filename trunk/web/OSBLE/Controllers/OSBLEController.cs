@@ -23,7 +23,7 @@ namespace OSBLE.Controllers
     {
         protected OSBLEContext db = new OSBLEContext();
 
-        public FileCache Cache { protected get; private set; }
+        public FileCache Cache { get; private set; }
         private UserProfile _currentUser = OsbleAuthentication.CurrentUser;
         public UserProfile CurrentUser
         {
