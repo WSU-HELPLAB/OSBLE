@@ -14,6 +14,7 @@ using OSBLE.Models.Users;
 using OSBLE.Models.Assignments;
 using System.Configuration;
 using OSBLE.Utility;
+using System.Runtime.Caching;
 
 namespace OSBLE.Controllers
 {
@@ -22,6 +23,7 @@ namespace OSBLE.Controllers
     {
         protected OSBLEContext db = new OSBLEContext();
 
+        public FileCache Cache { protected get; private set; }
         private UserProfile _currentUser = OsbleAuthentication.CurrentUser;
         public UserProfile CurrentUser
         {
@@ -154,11 +156,15 @@ namespace OSBLE.Controllers
 
         private void Initialize()
         {
+            
             // If logged in, feed user profile to view.
             if (Convert.ToBoolean(ConfigurationManager.AppSettings["RequireLoginValidation"]) == true)
             {
                 if (OsbleAuthentication.CurrentUser != null && OsbleAuthentication.CurrentUser.IsApproved)
                 {
+                    string cachePath = Path.Combine(FileSystem.GetCachePath(), OsbleAuthentication.CurrentUser.ID.ToString());
+                    Cache = new FileCache(cachePath, new ObjectBinder());
+
                     setupInitialDatabaseData();
 
                     setupMenu();

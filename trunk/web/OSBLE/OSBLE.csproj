@@ -251,6 +251,7 @@
     </Compile>
     <Compile Include="Utility\ActionResultExtensions.cs" />
     <Compile Include="Utility\NTree.cs" />
+    <Compile Include="Utility\ObjectBinder.cs" />
     <Compile Include="Utility\OsbleAuthentication.cs" />
     <Compile Include="Utility\Constants.cs" />
     <Compile Include="Utility\Email.cs" />

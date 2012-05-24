@@ -453,7 +453,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             }
 
             //pull from the cache if possible
-            ObjectCache cache = new FileCache();
+            ObjectCache cache = new FileCache(FileSystem.GetCachePath());
             bool loadedFromCache = false;
             string[] sorted = (string[])cache.Get(componentsCacheString, cacheRegion);
             if (sorted != null)
