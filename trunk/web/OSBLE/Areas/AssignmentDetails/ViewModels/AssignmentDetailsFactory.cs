@@ -121,6 +121,10 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     //critical review submission link
                     vm.HeaderBuilder = new CriticalReviewSubmissionDecorator(vm.HeaderBuilder, vm.Client);
                     vm.HeaderViews.Add("CriticalReviewSubmissionDecorator");
+                    
+                    //link for student to download their reviewed assignment
+                    vm.HeaderBuilder = new CriticalReviewStudentDownloadDecorator(vm.HeaderBuilder);
+                    vm.HeaderViews.Add("CriticalReviewStudentDownloadDecorator");
                 }
 
                 //rubric?
@@ -201,6 +205,12 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                  
                 }
 
+                if (assignment.Type == AssignmentTypes.CriticalReview)
+                {
+                    vm.TeamTableBuilders[assignmentTeam] = new TeacherCriticalReviewDecorator(vm.TeamTableBuilders[assignmentTeam]);
+                    vm.TableColumnHeaders["TeacherCriticalReviewDecorator"] = "Download Reviews";
+                }
+
                 if (assignment.Type == AssignmentTypes.TeamEvaluation)
                 {
                     //AC TODO: Rewrite after I get new team evaluation model info.
@@ -238,7 +248,6 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.TableColumnHeaders["LatePenaltyTableDecorator"] = "Late Penalty";
                 }
             }
-            
             return vm;
         }
 

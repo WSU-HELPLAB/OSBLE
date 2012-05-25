@@ -12,11 +12,12 @@
     </th>
     <td>
     <strong>@dataModel.Team.Name</strong>
-    <br />
+    
+    <ul class="UserList">
         @foreach (TeamMember member in dataModel.Team.TeamMembers)
         {
-                
-            <div class="user_controls">
+          <li>    
+            <div class="UserControls">
                 @if (member.CourseUser.UserProfile.UserName != null)
                 {
                     <a title="Mail This User" href="@Url.Action("CreateTeamMember", "Mail", new { id = member.CourseUser.UserProfile.ID, area = "" })">@Helpers.MailButton()</a>
@@ -24,8 +25,9 @@
             </div>
             @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", "Roster", new { userProfile = member.CourseUser.UserProfile.ID, area = "" }))
             <span class="roster_name">@Helpers.DisplayFullNameOrPending(member.CourseUser.UserProfile)</span>
-                
+                </li>  
         }
+
         <br />
         <a title="Email whole team" href="@Url.Action("CreateEntireTeam", "Mail", new { teamID = dataModel.Team.ID, area = "" })">
             Email the whole team</a>

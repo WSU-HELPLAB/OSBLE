@@ -24,10 +24,6 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             dynamic header = Builder.BuildHeader(assignment);
             header.CRSubmission = new DynamicDictionary();
 
-            //Foreach author
-                //get last submission time
-
-
             // get the assignment team ( team doing the review )
             AssignmentTeam assignmentTeam = null;
             foreach (AssignmentTeam at in assignment.AssignmentTeams)
@@ -39,7 +35,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                         assignmentTeam = at;
                     }
                 }
-            }
+            }         
 
             header.CRSubmission.hasSubmitted = false;
             
@@ -55,13 +51,27 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 
                 List<DateTime?> submissionTimes = new List<DateTime?>();
                
-                // get submission time
+                // get submission times for critical review submission
+                List<DateTime?> authorSubmissionTimes = new List<DateTime?>();
                 foreach(ReviewTeam reviewTeam in authorTeams)
                 {
-                    submissionTimes.Add(FileSystem.GetSubmissionTime(assignmentTeam, reviewTeam.AuthorTeam)); 
+                    submissionTimes.Add(FileSystem.GetSubmissionTime(assignmentTeam, reviewTeam.AuthorTeam));
+
+                    AssignmentTeam assignTeam = (from at in assignment.PreceedingAssignment.AssignmentTeams
+                                                 where at.TeamID == reviewTeam.AuthorTeamID
+                                                 select at).FirstOrDefault();
+
+                    authorSubmissionTimes.Add(assignTeam.GetSubmissionTime());
                 }
 
+                // get submission times for original assignment submission (in order to check if they have submitted)
+                // need to loop over each AssignmentTeam from the original assignment to get submission time
+                
+
+                //pass submission times to view
                 header.CRSubmission.submissionTimes = submissionTimes;
+                header.CRSubmission.authorSubmissionTimes = authorSubmissionTimes;
+
                 if (assignment.HasTeams)
                 {
                     header.CRSubmission.hasTeams = true;
@@ -70,6 +80,8 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                 {
                     header.CRSubmission.hasTeams = false;
                 }
+
+                
             }
             
             return header;

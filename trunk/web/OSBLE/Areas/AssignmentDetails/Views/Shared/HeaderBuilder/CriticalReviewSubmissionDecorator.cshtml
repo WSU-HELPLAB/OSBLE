@@ -16,7 +16,7 @@
     };
     <tr>
         <th>
-            Critical Review
+            Assignments to Review
         </th>
         <td>
             <table id="CriticalReviews">
@@ -24,17 +24,13 @@
                     int i = 0;
                     foreach (ReviewTeam rt in authorTeams)
                     {
-                    
-                      
-
-                         string trclass = "";
-                         if(i != authorTeams.Count() - 1)
-                         {
-                             trclass = "TableRowCriticalReview";
-                         }
-                         <tr class="@trclass">
-
-                    
+                    <!-- Add a seperating line (table border bottom) except for the last cell -->
+                        string trclass = "";
+                        if (i != authorTeams.Count() - 1)
+                        {
+                            trclass = "TableRowCriticalReview";
+                        }
+                    <tr class="@trclass">
                         <td>
                             @rt.AuthorTeam.Name
                         </td>
@@ -44,34 +40,49 @@
                                     <td>
                                         @{
                                             string name;
-                                        if(!dataModel.CRSubmission.hasTeams)
-                                        {
-                                            name = rt.AuthorTeam.Name;
-                                        }
-                                        else{
-                                            name = rt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName;
-                                        }
-                                        @Html.ActionLink("Download " + name
-                                        + "'s submission to review", 
-                                        "GetPrecedingSubmissionForCriticalReview", "FileHandler", 
-                                        new { assignmentId = dataModel.CRSubmission.assignmentId, authorTeamId = rt.AuthorTeamID, area = "" }, 
-                                        new { onclick = "create_and_open_downloading_submission_dialog()" })
+                                            
+                                            if (!dataModel.CRSubmission.hasTeams)
+                                            {
+                                                name = rt.AuthorTeam.Name;
                                             }
+                                            else
+                                            {
+                                                name = rt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName;
+                                            }
+
+                                            if (dataModel.CRSubmission.authorSubmissionTimes[i] == null)
+                                            {
+                                                @name@: has not submitted anything to review
+                                            }
+                                            else
+                                            {
+                                                    @Html.ActionLink("Download " + name
+                                                + "'s submission to review",
+                                                "GetPrecedingSubmissionForCriticalReview", "FileHandler",
+                                                new { assignmentId = dataModel.CRSubmission.assignmentId, authorTeamId = rt.AuthorTeamID, area = "" },
+                                                new { onclick = "create_and_open_downloading_submission_dialog()" })
+                                             }
+                                        }
+                                        
                                     </td>
                                 </tr>
                                 @if (dataModel.CRSubmission.submissionTimes[i] == null)
                                 {
                                     <tr>
                                         <td>
+                                        @if(dataModel.CRSubmission.authorSubmissionTimes[i] != null)
+                                        {
                                             @Ajax.ActionLink("Upload your review", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area = "" }, options, new object())
+                                        }
                                         </td>
                                     </tr>
                                 }
+                                
                                 else
                                 {
                                     String submissionTime = dataModel.CRSubmission.submissionTimes[i].ToString();
                                     <tr>
-                                        <td>
+                                        <td title="Last submitted: @submissionTime">
                                             @Html.ActionLink("Download your review", "GetCriticalReviewSubmissionZip", "FileHandler", new { assignmentId = dataModel.CRSubmission.assignmentId, authorTeamId = rt.AuthorTeamID, area = "" }, new { onclick = "create_and_open_downloading_submission_dialog()" })
                                             @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area = "" }, options, new object())
                                         </td>

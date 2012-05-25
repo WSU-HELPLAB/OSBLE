@@ -22,13 +22,15 @@
     {
         foreach (IAssignmentTeam assignmentTeam in Model.CurrentAssignment.DiscussionTeams)
         {
-        <tr>
-            <th>@assignmentTeam.Team.Name
-            </th>
-            <td>
-                &nbsp;
-            </td>
-        </tr>
+            if (assignmentTeam.Team.TeamMembers.Count() > 1)
+            {
+                <tr>
+                    <th class="TeamHeader" colspan="6">
+                        @assignmentTeam.Team.Name
+                    </th>
+                </tr>
+            }
+
             foreach (TeamMember member in assignmentTeam.Team.TeamMembers)
             {
                 IAssignmentTeam singleUserAssignmentTeam = new AssignmentTeam();

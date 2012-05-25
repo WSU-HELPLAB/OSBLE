@@ -1,0 +1,11 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+}
+
+<tr>
+<th>Download Your <br />Reviewed Assignment</th>
+<td>Your reviewed assignment will be available after @dataModel.dueDate</td>
+</tr>

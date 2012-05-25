@@ -16,18 +16,20 @@
     <th>
         Submission:
     </th>
-    <td>
-        @if (dataModel.Submission.hasSubmitted == false)
-        {
-            @Ajax.ActionLink("Submit", "Create", "Submission", new { id = dataModel.Submission.assignmentID , area = ""}, options, new object())
+    @if (dataModel.Submission.hasSubmitted == false)
+    {
+        <td>
+            @Ajax.ActionLink("Submit", "Create", "Submission", new { id = dataModel.Submission.assignmentID, area = "" }, options, new object())
+        </td>
         }
-        else
-        {
-            String submissionTime = dataModel.Submission.SubmissionTime;
-            @(Html.ActionLink(submissionTime, "getCurrentUsersZip", "FileHandler", new { assignmentID = dataModel.Submission.assignmentID, area="" }, new { onclick = "create_and_open_downloading_submission_dialog()" }))  
-            @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.Submission.assignmentID , area=""}, options, new object())  
+    else
+    {
+        String submissionTime = dataModel.Submission.SubmissionTime;
+        <td title = "Last submitted: @submissionTime">
+            @(Html.ActionLink("Download your submission", "getCurrentUsersZip", "FileHandler", new { assignmentID = dataModel.Submission.assignmentID, area = "" }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
+            @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.Submission.assignmentID, area = "" }, options, new object())
+        </td>
         }
-    </td>
 </tr>
 
 <!--Elements for submission modal box and loading message-->

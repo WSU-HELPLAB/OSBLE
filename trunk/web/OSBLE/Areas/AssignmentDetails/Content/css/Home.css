@@ -22,7 +22,7 @@
 
 #AssignmentDetailsTable th, #AssignmentDetailsTable td
 {
-    padding:4px;
+    padding:4px; 
     vertical-align:middle;
     border-top:1px solid gray;
 }
@@ -48,7 +48,7 @@
 
 .AltRow
 {
-    background:#F2F2F2;
+    background:#DFDFDF;
 }
 
 .LatePenaltyDiv a
@@ -60,6 +60,7 @@
 {
     border-collapse:collapse;
     font-size:.8em;
+    border:none;
 }
 
 .StudentName
@@ -86,4 +87,60 @@
 .TableRowCriticalReview
 {
     border-bottom:1px solid black;
+}
+
+.TeamHeader
+{
+    background: #DFDFDF;
+    text-align:left;
+}
+
+/* Users Page */
+.UserList li
+{
+	list-style: none;
+	width: 230px;
+	border-bottom: 1px solid #aaccff;
+	border: 1px solid #eeeeff;
+	border-bottom: 3px solid #eeeeff;
+	min-height: 43px;
+	padding-top: 4px;
+	margin-bottom: 7px;
+	font-size: 10pt;
+}
+
+.UserList li form
+{
+	display: none;
+	margin: 0;
+	padding: 0;
+}
+
+.UserList input
+{
+	position: relative;
+}
+
+.UserList li:hover
+{
+	background-color: #fafaff;
+	border: 1px solid #aaaadd;
+	border-bottom: 3px solid #aaaadd;
+}
+
+.UserList li:hover div.UserControls
+{
+	display: block;
+}
+
+.UserList li div.UserControls
+{
+	display: none;
+	float: right;
+	padding-right: 3px;
+}
+
+.UserControls img:hover
+{
+	cursor: pointer;
 }
