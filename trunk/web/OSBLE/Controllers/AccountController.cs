@@ -388,7 +388,8 @@ namespace OSBLE.Controllers
                         return AcademiaRegister();
                     }
 
-                    sendVerificationEmail(true, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), model.FirstName, model.Email);
+                    string url = string.Format("https://osble.org{0}", Url.Action("ActivateAccount", new { hash = randomHash }));
+                    sendVerificationEmail(true, url, model.FirstName, model.Email);
 
                     return RedirectToAction("AccountCreated");
                 }
