@@ -325,7 +325,7 @@ namespace OSBLE.Controllers
             {
                 try
                 {
-                    context.Session["ActiveCourse"] = Convert.ToInt32(Request.Form["course"]);
+                    context.Cache["ActiveCourse"] = Convert.ToInt32(Request.Form["course"]);
                 }
                 catch (System.FormatException)
                 {
@@ -355,12 +355,12 @@ namespace OSBLE.Controllers
             {
                 try
                 {
-                    context.Session["DashboardSingleCourseMode"] = Convert.ToBoolean(Request.Form["mode"]);
+                    context.Cache["DashboardSingleCourseMode"] = Convert.ToBoolean(Request.Form["mode"]);
                 }
                 catch (System.FormatException)
                 {
                     // Non-integer input. Default to false.
-                    context.Session["DashboardSingleCourseMode"] = true;
+                    context.Cache["DashboardSingleCourseMode"] = true;
                 }
             }
 

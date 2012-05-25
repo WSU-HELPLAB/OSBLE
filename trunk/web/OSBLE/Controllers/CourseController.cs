@@ -172,7 +172,7 @@ namespace OSBLE.Controllers
                 db.CourseUsers.Add(cu);
                 db.SaveChanges();
 
-                Session["ActiveCourse"] = course.ID;
+                Cache["ActiveCourse"] = course.ID;
 
                 return RedirectToAction("Index", "Home");
             }

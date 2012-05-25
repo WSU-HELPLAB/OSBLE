@@ -695,11 +695,11 @@ namespace OSBLE.Controllers
             int attempts = 0;
             try
             {
-                attempts = (int)context.Session["attempts"];
+                attempts = (int)Cache["attempts"];
             }
             catch { }
 
-            context.Session["attempts"] = ++attempts;
+            Cache["attempts"] = ++attempts;
             if (attempts > 3)
             {
                 ViewBag.UseCaptcha = true;

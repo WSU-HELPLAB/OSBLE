@@ -119,10 +119,10 @@ namespace OSBLE.Controllers
                      orderby post.Posted
                      select post).ToList();
 
-            Session["PostOrReply"] = postOrReply;
+            Cache["PostOrReply"] = postOrReply;
             if (assignment != null && student != null && (postOrReply >= 0 && postOrReply <= 3))
             {
-                Session["StudentID"] = student.ID;
+                Cache["StudentID"] = student.ID;
 
                 if (assignment.HasDiscussionTeams)
                 {
@@ -273,10 +273,10 @@ namespace OSBLE.Controllers
                 }
             }
 
-            Session["PostOrReply"] = postOrReply;
+            Cache["PostOrReply"] = postOrReply;
             if (assignment != null && student != null && (postOrReply >= 0 && postOrReply <= 3))
             {
-                Session["StudentID"] = student.ID;
+                Cache["StudentID"] = student.ID;
                 if (assignment.HasDiscussionTeams)
                 {
                     foreach (DiscussionTeam dt in assignment.DiscussionTeams)
@@ -444,11 +444,11 @@ namespace OSBLE.Controllers
             }
             if (ActiveCourse.AbstractRole.CanModify)
             {
-                return RedirectToAction("TeacherIndex", new { assignmentId = assignment.ID, courseUserId = ActiveCourseUser.ID, postOrReply = (int)Session["PostOrReply"] });
+                return RedirectToAction("TeacherIndex", new { assignmentId = assignment.ID, courseUserId = ActiveCourseUser.ID, postOrReply = (int)Cache["PostOrReply"] });
             }
             else if (ActiveCourse.AbstractRole.Anonymized)
             {
-                return RedirectToAction("ObserverIndex", new { assignmentId = assignment.ID, courseUserId = ActiveCourseUser.ID, postOrReply = (int)Session["PostOrReply"] });
+                return RedirectToAction("ObserverIndex", new { assignmentId = assignment.ID, courseUserId = ActiveCourseUser.ID, postOrReply = (int)Cache["PostOrReply"] });
             }
             else
             {
@@ -535,14 +535,14 @@ namespace OSBLE.Controllers
             }
             else if (ActiveCourse.AbstractRole.CanModify)
             {
-                int cuId = (int)Session["StudentID"];
-                int postOrReply = (int)Session["PostOrReply"];
+                int cuId = (int)Cache["StudentID"];
+                int postOrReply = (int)Cache["PostOrReply"];
                 return RedirectToAction("TeacherIndex", new { assignmentId = dr.AssignmentID, courseUserId = cuId, postOrReply = postOrReply });
             }
             else if (ActiveCourse.AbstractRole.Anonymized)
             {
-                int cuId = (int)Session["StudentID"];
-                int postOrReply = (int)Session["PostOrReply"];
+                int cuId = (int)Cache["StudentID"];
+                int postOrReply = (int)Cache["PostOrReply"];
                 return RedirectToAction("ObserverIndex", new { assignmentId = dr.AssignmentID, courseUserId = cuId, postOrReply = postOrReply });
             }
             else

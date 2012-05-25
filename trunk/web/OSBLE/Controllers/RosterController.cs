@@ -179,7 +179,7 @@ namespace OSBLE.Controllers
             if ((file != null) && (file.ContentLength > 0))
             {
                 // Save file into session
-                Session["RosterFile"] = file;
+                Cache["RosterFile"] = file;
 
                 Stream s = file.InputStream;
                 List<string> headers = getRosterHeaders(s);
@@ -245,7 +245,7 @@ namespace OSBLE.Controllers
         [NotForCommunity]
         public ActionResult ApplyRoster(string idColumn, string sectionColumn, string nameColumn, string name2Column)
         {
-            HttpPostedFileBase file = Session["RosterFile"] as HttpPostedFileBase;
+            HttpPostedFileBase file = Cache["RosterFile"] as HttpPostedFileBase;
 
             int rosterCount = 0;
 

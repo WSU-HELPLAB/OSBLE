@@ -50,15 +50,15 @@ namespace OSBLE.Controllers
         public ActionResult Index(int? id)
         {
             //did the user just submit something?  If so, set up view to notify user
-            if (Session["SubmissionReceived"] != null && Convert.ToBoolean(Session["SubmissionReceived"]) == true)
+            if (Cache["SubmissionReceived"] != null && Convert.ToBoolean(Cache["SubmissionReceived"]) == true)
             {
                 ViewBag.SubmissionReceived = true;
-                Session["SubmissionReceived"] = null;
+                Cache["SubmissionReceived"] = false;
             }
             else
             {
                 ViewBag.SubmissionReceived = false;
-                Session["SubmissionReceived"] = null;
+                Cache["SubmissionReceived"] = false;
             }
 
             List<Assignment> Assignments = new List<Assignment>();

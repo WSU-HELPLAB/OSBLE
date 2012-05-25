@@ -317,7 +317,7 @@ namespace OSBLE.Controllers
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            Session["mail_recipients"] = recipientList;
+            Cache["mail_recipients"] = recipientList;
             return View("Create", mail);
         }
 
@@ -336,7 +336,7 @@ namespace OSBLE.Controllers
                     recipientList.Add(cu.UserProfile);
                 }
             }
-            Session["mail_recipients"] = recipientList;
+            Cache["mail_recipients"] = recipientList;
             return View("Create", mail);
         }
 
@@ -356,7 +356,7 @@ namespace OSBLE.Controllers
                 }
             }
 
-            Session["mail_recipients"] = recipientList;
+            Cache["mail_recipients"] = recipientList;
             return View("Create", mail);
         }
 
@@ -376,7 +376,7 @@ namespace OSBLE.Controllers
                 }
             }
 
-            Session["mail_recipients"] = recipientList;
+            Cache["mail_recipients"] = recipientList;
             return View("Create", mail);
         }
 
@@ -393,7 +393,7 @@ namespace OSBLE.Controllers
                 recipientList.Add(studentRec.UserProfile);
             }
 
-            Session["mail_recipients"] = recipientList;
+            Cache["mail_recipients"] = recipientList;
             return View("Create", mail);
         }
 
@@ -410,7 +410,7 @@ namespace OSBLE.Controllers
                 recipientList.Add(studentRec.UserProfile);
             }
 
-            Session["mail_recipients"] = recipientList;
+            Cache["mail_recipients"] = recipientList;
             return View("Create", mail);
         }
 
@@ -428,7 +428,7 @@ namespace OSBLE.Controllers
                 recipientList.Add(tm.CourseUser.UserProfile);
             }
 
-            Session["mail_recipients"] = recipientList;
+            Cache["mail_recipients"] = recipientList;
             return View("Create", mail);
         }
 
@@ -443,7 +443,7 @@ namespace OSBLE.Controllers
                 string[] recipients;
 
                 // gets the current courseid
-                mail.ContextID = (int)context.Session["ActiveCourse"];
+                mail.ContextID = (int)context.Cache["ActiveCourse"];
 
                 // gets the current course
                 mail.Context = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
@@ -601,7 +601,7 @@ namespace OSBLE.Controllers
                 }
             }
 
-            Session["mail_recipients"] = recipientList;
+            Cache["mail_recipients"] = recipientList;
             return View("Create", mail);
         }
 
@@ -626,7 +626,7 @@ namespace OSBLE.Controllers
                 }
             }
 
-            Session["mail_recipients"] = recipientList;
+            Cache["mail_recipients"] = recipientList;
             return View("Create", mail);
         }
 
@@ -648,7 +648,7 @@ namespace OSBLE.Controllers
                 }
             }
 
-            Session["mail_recipients"] = recipientList;
+            Cache["mail_recipients"] = recipientList;
             return View("Create", mail);
         }
 

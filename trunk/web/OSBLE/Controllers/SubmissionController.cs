@@ -240,7 +240,7 @@ namespace OSBLE.Controllers
                             j++;
                         } while (delName != null);
 
-                        Session["SubmissionReceived"] = true;
+                        Cache["SubmissionReceived"] = true;
                         return RedirectToAction("Index", "Assignment");
                     }
                 }

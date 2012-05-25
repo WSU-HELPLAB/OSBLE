@@ -34,9 +34,9 @@
 
             currentUserProfile = db.UserProfiles.Where(u => u.UserName == userName).FirstOrDefault();
 
-            if (Context.Session["ActiveCourse"] != null && (Context.Session["ActiveCourse"] is int))
+            if (Context.Cache["ActiveCourse"] != null && (Context.Cache["ActiveCourse"] is int))
             {
-                int activeCourse = (int)Context.Session["ActiveCourse"];
+                int activeCourse = (int)Context.Cache["ActiveCourse"];
 
                 currentCourse = (from c in db.AbstractCourses
                                  where c.ID == activeCourse

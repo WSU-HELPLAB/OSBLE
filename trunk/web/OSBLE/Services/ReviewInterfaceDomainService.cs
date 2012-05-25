@@ -24,8 +24,8 @@
 
         public ReviewInterfaceDomainService()
         {
-            assignment = db.Assignments.Find((int)context.Session["CurrentAssignmentID"]);
-            team = db.AssignmentTeams.Find(assignment.ID, (int)context.Session["TeamID"]);
+            assignment = db.Assignments.Find((int)context.Cache["CurrentAssignmentID"]);
+            team = db.AssignmentTeams.Find(assignment.ID, (int)context.Cache["TeamID"]);
 
             //Find the team member
             foreach (AssignmentTeam at in assignment.AssignmentTeams)

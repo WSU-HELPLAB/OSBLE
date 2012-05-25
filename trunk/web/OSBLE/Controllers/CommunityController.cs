@@ -46,7 +46,7 @@ namespace OSBLE.Controllers
                 db.CourseUsers.Add(cu);
                 db.SaveChanges();
 
-                Session["ActiveCourse"] = community.ID;
+                Cache["ActiveCourse"] = community.ID;
 
                 return RedirectToAction("Index");
             }

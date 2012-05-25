@@ -240,12 +240,12 @@ namespace OSBLE.Controllers
             //     set the activity feed to display a single course
             // otherwise
             //     do nothing because it has been set by the user (call to HomeController's SetDashboardMode method)
-            if ((context.Session["DashboardSingleCourseMode"] == null) || (context.Session["DashboardSingleCourseMode"].GetType() != typeof(Boolean)))
+            if ((context.Cache["DashboardSingleCourseMode"] == null) || (context.Cache["DashboardSingleCourseMode"].GetType() != typeof(Boolean)))
             {
-                context.Session["DashboardSingleCourseMode"] = true;
+                context.Cache["DashboardSingleCourseMode"] = true;
             }
 
-            DashboardSingleCourseMode = ViewBag.DashboardSingleCourseMode = context.Session["DashboardSingleCourseMode"];
+            DashboardSingleCourseMode = ViewBag.DashboardSingleCourseMode = context.Cache["DashboardSingleCourseMode"];
         }
 
         /// <summary>
@@ -298,7 +298,7 @@ namespace OSBLE.Controllers
 
                 int activeCourseID;
 
-                var sessionAc = context.Session["ActiveCourse"];
+                var sessionAc = context.Cache["ActiveCourse"];
 
                 if (sessionAc == null || !(sessionAc is int))
                 {
@@ -324,7 +324,7 @@ namespace OSBLE.Controllers
 
                 if (ActiveCourse != null)
                 {
-                    context.Session["ActiveCourse"] = ActiveCourse.AbstractCourseID;
+                    context.Cache["ActiveCourse"] = ActiveCourse.AbstractCourseID;
                     ViewBag.ActiveCourse = ActiveCourse;
                 }
             }

@@ -39,6 +39,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             SelectedComponents = new ObservableCollection<WizardBaseController>();
             UnselectedComponents = new ObservableCollection<WizardBaseController>();
 
+
             if (HttpContext.Current != null)
             {
                 managerCookie = HttpContext.Current.Request.Cookies.Get(managerCookieString);
@@ -59,24 +60,16 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         /// <returns></returns>
         public static WizardComponentManager GetInstance()
         {
-            //HttpContext will be null when we're not running this code in a web context,
-            //I.E. testing
-            if (HttpContext.Current == null)
+            FileCache Cache = new FileCache(FileSystem.GetCachePath(), new ObjectBinder());
+            if (Cache[instance] == null)
             {
-                return new WizardComponentManager();
+                WizardComponentManager mgr = new WizardComponentManager();
+                HttpContext.Current.Cache[instance] = mgr;
+                return mgr;
             }
             else
             {
-                if (HttpContext.Current.Session[instance] == null)
-                {
-                    WizardComponentManager mgr = new WizardComponentManager();
-                    HttpContext.Current.Session[instance] = mgr;
-                    return mgr;
-                }
-                else
-                {
-                    return HttpContext.Current.Session[instance] as WizardComponentManager;
-                }
+                return Cache[instance] as WizardComponentManager;
             }
         }
 

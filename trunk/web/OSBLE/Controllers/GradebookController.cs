@@ -42,9 +42,9 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult ImportColumnsFromCSV(HttpPostedFileBase file)
         {
-            Session["GradeFile"] = file;
-            Session["radio"] = Request.Params["rdio"];
-            Session["assignmentId"] = Request.Params["assignmentColumnId"];
+            Cache["GradeFile"] = file;
+            Cache["radio"] = Request.Params["rdio"];
+            Cache["assignmentId"] = Request.Params["assignmentColumnId"];
 
             List<string[]> parsedData = new List<string[]>();
             List<int> positionList = new List<int>();
@@ -86,9 +86,9 @@ namespace OSBLE.Controllers
             List<int> index = new List<int>();
             List<int> positionList = new List<int>();
             string studentId = (0).ToString();
-            int categoryId = Convert.ToInt32(Session["CurrentCategoryID"]);
+            int categoryId = Convert.ToInt32(Cache["CurrentCategoryID"]);
 
-            HttpPostedFileBase file = Session["GradeFile"] as HttpPostedFileBase;
+            HttpPostedFileBase file = Cache["GradeFile"] as HttpPostedFileBase;
 
             StreamReader sr = new StreamReader(file.InputStream);
 
@@ -107,7 +107,7 @@ namespace OSBLE.Controllers
             {
                 for (int i = 0; i < parsedData.Count(); i++)
                 {
-                    int currentAssignmentID = Convert.ToInt32(Session["assignmentId"]); ;
+                    int currentAssignmentID = Convert.ToInt32(Cache["assignmentId"]); ;
                     int assignmentNumber = 1;
                     int count = 0;
                     int currentColOrder = 0;
@@ -127,7 +127,7 @@ namespace OSBLE.Controllers
                                     Assignment assign = (from g in db.Assignments where g.ID == currentAssignmentID select g).FirstOrDefault();
 
                                     currentCategory = assign.Category;
-                                    if (Session["radio"].ToString() == "r")
+                                    if (Cache["radio"].ToString() == "r")
                                     {
                                         List<Assignment> position = (from pos in db.Assignments
                                                                      where pos.CategoryID == categoryId &&
@@ -149,7 +149,7 @@ namespace OSBLE.Controllers
                                         }
                                         assignmentNumber++;
                                     }
-                                    else if (Session["radio"].ToString() == "l")
+                                    else if (Cache["radio"].ToString() == "l")
                                     {
                                         var position = from pos in db.Assignments
                                                        where pos.CategoryID == categoryId &&
@@ -254,7 +254,7 @@ namespace OSBLE.Controllers
             }
             ClearAllDropLowest(categoryId);
             AllDropLowest(categoryId, currentCategory.dropX, currentCategory.Customize.ToString());
-            return RedirectToAction("Tab", "Gradebook", new { categoryId = (int)Session["categoryId"] });
+            return RedirectToAction("Tab", "Gradebook", new { categoryId = (int)Cache["categoryId"] });
         }
 
         //[HttpPost]
@@ -633,7 +633,7 @@ namespace OSBLE.Controllers
         [CanGradeCourse]
         private void AddColumn(string columnName, int pointsPossible, int position)
         {
-            int categoryId = Convert.ToInt32(Session["CurrentCategoryID"]);
+            int categoryId = Convert.ToInt32(Cache["CurrentCategoryID"]);
             List<TeamMember> teamMembers = new List<TeamMember>();
 
             int currentCourseId = ActiveCourse.AbstractCourseID;
@@ -1061,7 +1061,7 @@ namespace OSBLE.Controllers
                     }
                 }
             }
-            BuildGradebook((int)Session["categoryId"]);
+            BuildGradebook((int)Cache["categoryId"]);
             return View("_Gradebook");
         }
 
@@ -1088,7 +1088,7 @@ namespace OSBLE.Controllers
                             db.Assignments.Remove(assignment);
                             db.SaveChanges();
 
-                            BuildGradebook((int)Session["categoryId"]);
+                            BuildGradebook((int)Cache["categoryId"]);
                             return View("_Gradebook");
                         }
                         int pointsPossibleTemp = assignment.PointsPossible;
@@ -1108,7 +1108,7 @@ namespace OSBLE.Controllers
                     Json("failure");
                 }
             }
-            BuildGradebook((int)Session["categoryId"]);
+            BuildGradebook((int)Cache["categoryId"]);
             return View("_Gradebook");
         }
 
@@ -1250,7 +1250,7 @@ namespace OSBLE.Controllers
         {
             DoAddPoints(assignmentId, number);
 
-            BuildGradebook((int)Session["categoryId"]);
+            BuildGradebook((int)Cache["categoryId"]);
             return View("_Gradebook");
         }
 
@@ -1327,7 +1327,7 @@ namespace OSBLE.Controllers
                     AllDropLowest(category.ID, category.dropX, category.Customize.ToString());
                 }
             }
-            BuildGradebook((int)Session["categoryId"]);
+            BuildGradebook((int)Cache["categoryId"]);
             return View("_Gradebook");
         }
 
@@ -1339,7 +1339,7 @@ namespace OSBLE.Controllers
             {
                 if (assignmentId > 0)
                 {
-                    int categoryId = (int)Session["categoryId"];
+                    int categoryId = (int)Cache["categoryId"];
 
                     var assignmentColPosition = from col in db.Assignments
                                                 where col.ID == assignmentId
@@ -1367,7 +1367,7 @@ namespace OSBLE.Controllers
                     }
                 }
             }
-            BuildGradebook((int)Session["categoryId"]);
+            BuildGradebook((int)Cache["categoryId"]);
             return View("_Gradebook");
         }
 
@@ -1379,7 +1379,7 @@ namespace OSBLE.Controllers
             {
                 if (assignmentId > 0)
                 {
-                    int categoryId = (int)Session["categoryId"];
+                    int categoryId = (int)Cache["categoryId"];
 
                     var assignmentColPosition = from col in db.Assignments
                                                 where col.ID == assignmentId &&
@@ -1407,7 +1407,7 @@ namespace OSBLE.Controllers
                 }
             }
 
-            BuildGradebook((int)Session["categoryId"]);
+            BuildGradebook((int)Cache["categoryId"]);
             return View("_Gradebook");
         }
 
@@ -1492,7 +1492,7 @@ namespace OSBLE.Controllers
         {
             if (ModelState.IsValid)
             {
-                int currentCategoryId = (int)Session["categoryId"];
+                int currentCategoryId = (int)Cache["categoryId"];
                 Category currentCategory = db.Categories.Find(currentCategoryId);
 
                 currentCategory.MaxAssignmentScore = value;
@@ -1539,7 +1539,7 @@ namespace OSBLE.Controllers
             if (ModelState.IsValid)
             {
                 //Get the current category
-                int currentCategoryId = (int)Session["categoryId"];
+                int currentCategoryId = (int)Cache["categoryId"];
                 Category currentCategory = db.Categories.Find(currentCategoryId);
 
                 //Set the current categories max assignment score to -1
@@ -1586,7 +1586,7 @@ namespace OSBLE.Controllers
         {
             ModifyGrade(value, courseUserId, assignmentId);
 
-            BuildGradebook((int)Session["categoryId"]);
+            BuildGradebook((int)Cache["categoryId"]);
             return View("_Gradebook");
         }
 
@@ -1893,7 +1893,7 @@ namespace OSBLE.Controllers
                 }
             }
 
-            BuildStudentGradebook((int)Session["categoryId"]);
+            BuildStudentGradebook((int)Cache["categoryId"]);
             return View();
         }
 
@@ -1931,7 +1931,7 @@ namespace OSBLE.Controllers
                         break;
                 }
             }
-            BuildGradebook((int)Session["categoryId"]);
+            BuildGradebook((int)Cache["categoryId"]);
             return View("_Gradebook");
         }
 
@@ -1942,7 +1942,7 @@ namespace OSBLE.Controllers
             {
                 if (studentId != null)
                 {
-                    Session["StudentID"] = studentId;
+                    Cache["StudentID"] = studentId;
                 }
             }
         }
@@ -1950,7 +1950,7 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult UpdateCells()
         {
-            BuildGradebook((int)Session["categoryId"]);
+            BuildGradebook((int)Cache["categoryId"]);
             return View("_Gradebook");
         }
 
@@ -2280,12 +2280,12 @@ namespace OSBLE.Controllers
             {
                 categoryId = GetDefaultWeightId();
             }
-            Session["categoryId"] = categoryId;
-            if (Session["StudentID"] != null)
+            Cache["categoryId"] = categoryId;
+            if (Cache["StudentID"] != null)
             {
-                ViewBag.StudentId = Session["StudentID"];
+                ViewBag.StudentId = Cache["StudentID"];
             }
-            Session["StudentID"] = null;
+            Cache["StudentID"] = "";
 
             if (ActiveCourse.AbstractRole.CanGrade == true)
             {
@@ -2424,7 +2424,7 @@ namespace OSBLE.Controllers
             var customizeOption = (Category.GradeOptions)currentTab.Customize;
 
             //save to the session.  Needed later for AJAX-related updates.
-            Session["CurrentCategoryId"] = currentTab.ID;
+            Cache["CurrentCategoryId"] = currentTab.ID;
 
             //pull the gradables (columns) for the current weight (tab)
             //Pull the gradeAssignments
@@ -2585,7 +2585,7 @@ namespace OSBLE.Controllers
             ViewBag.MaxPoints = currentTab.MaxAssignmentScore;
             ViewBag.ActiveCourse = ActiveCourse;
 
-            Session["isTab"] = 1;
+            Cache["isTab"] = 1;
         }
 
         /// <summary>
