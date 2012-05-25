@@ -64,7 +64,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             if (Cache[instance] == null)
             {
                 WizardComponentManager mgr = new WizardComponentManager();
-                HttpContext.Current.Cache[instance] = mgr;
+                Cache[instance] = mgr;
                 return mgr;
             }
             else

@@ -34,7 +34,7 @@
 
             currentUserProfile = db.UserProfiles.Where(u => u.UserName == userName).FirstOrDefault();
 
-            if (Context.Cache["ActiveCourse"] != null && (Context.Cache["ActiveCourse"] is int))
+            if (Context.Session["ActiveCourse"] != null && (Context.Session["ActiveCourse"] is int))
             {
                 int activeCourse = (int)Context.Cache["ActiveCourse"];
 

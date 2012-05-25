@@ -5,6 +5,10 @@
 @{
     ViewBag.Title = "Create";
     List<UserProfile> recipients = Cache["mail_recipients"] as List<UserProfile>;
+    if(recipients == null)
+    {
+        recipients = new List<UserProfile>();
+    }
     string ids = "";
 }
 

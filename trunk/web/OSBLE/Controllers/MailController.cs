@@ -443,7 +443,7 @@ namespace OSBLE.Controllers
                 string[] recipients;
 
                 // gets the current courseid
-                mail.ContextID = (int)context.Cache["ActiveCourse"];
+                mail.ContextID = (int)Cache["ActiveCourse"];
 
                 // gets the current course
                 mail.Context = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();

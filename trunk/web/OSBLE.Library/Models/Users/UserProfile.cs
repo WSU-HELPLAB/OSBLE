@@ -3,9 +3,11 @@ using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Assignments;
 using System.Linq;
 using System.Security.Cryptography;
+using System;
 
 namespace OSBLE.Models.Users
 {
+    [Serializable]
     public class UserProfile
     {
         [Required]
