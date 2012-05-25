@@ -53,7 +53,7 @@ namespace OSBLE
 
         public static string GetCachePath()
         {
-            return Path.Combine(getRootPath(), "Cache");
+            return Path.Combine(HttpContext.Current.Server.MapPath("~\\App_Data\\"), "Cache");
         }
 
         private static string getCoursePath(AbstractCourse course)

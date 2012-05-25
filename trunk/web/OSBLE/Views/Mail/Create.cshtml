@@ -4,7 +4,7 @@
 
 @{
     ViewBag.Title = "Create";
-    List<UserProfile> recipients = Session["mail_recipients"] as List<UserProfile>;
+    List<UserProfile> recipients = Cache["mail_recipients"] as List<UserProfile>;
     string ids = "";
 }
 
