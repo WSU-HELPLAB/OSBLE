@@ -81,7 +81,12 @@ namespace OSBLE.Controllers
                 if (score != null)
                 {
                     if (score.Points != -1)
-                        throw new Exception("Cannot submit to an assignmentActivity that already has a score");
+                    {
+                        ModelState.AddModelError("CanNoLongerSubmit", "Cannot resubmit for an assignment that has already received a grade.");
+                        setViewBagDeliverables(assignment.Deliverables);
+                        Cache["SubmissionReceived"] = false;
+                        return View();
+                    }
                 }
 
                 if (assignment != null && (assignment.HasDeliverables == true || assignment.Type == AssignmentTypes.CriticalReview))
@@ -95,9 +100,9 @@ namespace OSBLE.Controllers
                     {
                         deliverables = new List<dynamic>((assignment).Deliverables);
                     }
-                    
 
-                    if (assignment.Category.CourseID == ActiveCourse.AbstractCourseID && ActiveCourse.AbstractRole.CanSubmit == true)
+
+                    if (assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID && ActiveCourseUser.AbstractRole.CanSubmit == true)
                     {
 
 
@@ -137,7 +142,7 @@ namespace OSBLE.Controllers
                                             //critical review assignments must use different file system functions
 
                                             //If a submission of any extension exists delete it.  This is needed because they could submit a .c file and then a .cs file and the teacher would not know which one is the real one.
-                                            string submission = FileSystem.GetCriticalReviewDeliverable(ActiveCourse.AbstractCourse as Course, assignment.ID, assignmentTeam, deliverables[i].Name, allowFileExtensions, authorTeam);
+                                            string submission = FileSystem.GetCriticalReviewDeliverable(ActiveCourseUser.AbstractCourse as Course, assignment.ID, assignmentTeam, deliverables[i].Name, allowFileExtensions, authorTeam);
                                             if (submission != null)
                                             {
                                                 FileInfo oldSubmission = new FileInfo(submission);
@@ -149,13 +154,13 @@ namespace OSBLE.Controllers
                                             }
 
                                             FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, assignmentTeam);
-                                            string path = Path.Combine(FileSystem.GetTeamUserSubmissionFolderForAuthorID(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam, authorTeam.Team), deliverables[i].Name + extension);
+                                            string path = Path.Combine(FileSystem.GetTeamUserSubmissionFolderForAuthorID(true, ActiveCourseUser.AbstractCourse as Course, (int)id, assignmentTeam, authorTeam.Team), deliverables[i].Name + extension);
                                             file.SaveAs(path);
 
                                             //unzip and rezip xps files because some XPS generators don't do it right
                                             if (extension.ToLower().CompareTo(".xps") == 0)
                                             {
-                                                string extractPath = Path.Combine(FileSystem.GetTeamUserSubmissionFolderForAuthorID(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam, authorTeam.Team), "extract");
+                                                string extractPath = Path.Combine(FileSystem.GetTeamUserSubmissionFolderForAuthorID(true, ActiveCourseUser.AbstractCourse as Course, (int)id, assignmentTeam, authorTeam.Team), "extract");
                                                 using (ZipFile oldZip = ZipFile.Read(path))
                                                 {
                                                     oldZip.ExtractAll(extractPath, ExtractExistingFileAction.OverwriteSilently);
@@ -170,7 +175,7 @@ namespace OSBLE.Controllers
                                         else
                                         {
                                             //If a submission of any extension exists delete it.  This is needed because they could submit a .c file and then a .cs file and the teacher would not know which one is the real one.
-                                            string submission = FileSystem.GetDeliverable(ActiveCourse.AbstractCourse as Course, assignment.ID, assignmentTeam, deliverables[i].Name, allowFileExtensions);
+                                            string submission = FileSystem.GetDeliverable(ActiveCourseUser.AbstractCourse as Course, assignment.ID, assignmentTeam, deliverables[i].Name, allowFileExtensions);
                                             if (submission != null)
                                             {
                                                 FileInfo oldSubmission = new FileInfo(submission);
@@ -180,7 +185,7 @@ namespace OSBLE.Controllers
                                                     oldSubmission.Delete();
                                                 }
                                             }
-                                            FileSystem.RemoveZipFile(ActiveCourse.AbstractCourse as Course, assignment, assignmentTeam);
+                                            FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, assignmentTeam);
                                             string path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam), deliverables[i].Name + extension);
                                             file.SaveAs(path);
 
@@ -210,6 +215,7 @@ namespace OSBLE.Controllers
                                     {
                                         ModelState.AddModelError("FileExtensionMatch", "The file " + fileName + " does not have an allowed extension please convert the file to the correct type");
                                         setViewBagDeliverables(assignment.Deliverables);
+                                        Cache["SubmissionReceived"] = false;
                                         return View();
                                     }
                                 }
@@ -239,9 +245,9 @@ namespace OSBLE.Controllers
                             }
                             j++;
                         } while (delName != null);
-
                         Cache["SubmissionReceived"] = true;
-                        return RedirectToAction("Index", "Assignment");
+                        Cache["SubmissionReceivedAssignmentID"] = assignment.ID;
+                        return Redirect(Request.UrlReferrer.ToString());
                     }
                 }
             }

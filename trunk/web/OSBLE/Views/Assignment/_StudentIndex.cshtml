@@ -114,9 +114,28 @@
                     OnComplete = "SubmissionLoaded"
                 };
                 <td>
+                    <ul id="SubmissionItems">
+                        <li>
+                            @(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
+                        </li>
+                        <li>
+                            @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = assignment.ID }, options, new object())
+                        </li>
+                        @if (ViewBag.SubmissionReceived && assignment.ID == ViewBag.SubmissionReceivedAssignmentID)
+                        {
+                            <li id="SubmissionReceivedText">Submission received</li>   
+                        }
+                    </ul>
+
+                    @*
                     <!--TD for displaying latest submission and resubmit-->
                     @(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
                     @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = assignment.ID }, options, new object())
+                    @if (assignment.ID == ViewBag.SubmissionReceivedAssignmentID)
+                    {
+                        
+                    }
+                    *@
                 </td>
             }
             else if (assignment.HasDeliverables || assignment.AssignmentTypeID == 4)

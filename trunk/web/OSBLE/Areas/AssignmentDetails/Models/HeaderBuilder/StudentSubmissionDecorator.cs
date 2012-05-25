@@ -5,6 +5,9 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Caching;
+using OSBLE.Utility;
+using System.IO;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 {
@@ -51,6 +54,25 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             }
 
             header.Submission.assignmentID = assignment.ID;
+
+
+            FileCache Cache;
+            string cachePath = Path.Combine(FileSystem.GetCachePath(), OsbleAuthentication.CurrentUser.ID.ToString());
+            Cache = new FileCache(cachePath, new ObjectBinder());
+
+            //Same functionality as in the other controller. 
+            //did the user just submit something?  If so, set up view to notify user
+            if (Cache["SubmissionReceived"] != null && Convert.ToBoolean(Cache["SubmissionReceived"]) == true)
+            {
+                header.Submission.SubmissionReceived = true;
+                Cache["SubmissionReceived"] = false;
+            }
+            else
+            {
+                header.Submission.SubmissionReceived = false;
+                Cache["SubmissionReceived"] = false;
+            }
+
 
             return header;
         }

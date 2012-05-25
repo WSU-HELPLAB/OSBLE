@@ -12,23 +12,32 @@
         OnComplete = "SubmissionLoaded"
     };               
 }
+
+
 <tr>
     <th>
         Submission:
     </th>
-    @if (dataModel.Submission.hasSubmitted == false)
-    {
-        <td>
+    <td>
+        @if (dataModel.Submission.hasSubmitted == false)
+        {
             @Ajax.ActionLink("Submit", "Create", "Submission", new { id = dataModel.Submission.assignmentID, area = "" }, options, new object())
-        </td>
         }
-    else
-    {
-        String submissionTime = dataModel.Submission.SubmissionTime;
-        <td title = "Last submitted: @submissionTime">
-            @(Html.ActionLink("Download your submission", "getCurrentUsersZip", "FileHandler", new { assignmentID = dataModel.Submission.assignmentID, area = "" }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
-            @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.Submission.assignmentID, area = "" }, options, new object())
-        </td>
+        else
+        {
+            String submissionTime = dataModel.Submission.SubmissionTime;
+            <ul id="SubmissionItems">
+            <li>
+                @(Html.ActionLink(submissionTime, "getCurrentUsersZip", "FileHandler", new { assignmentID = dataModel.Submission.assignmentID, area = "" }, new { onclick = "create_and_open_downloading_submission_dialog()" }))  
+            </li>
+            <li>
+                @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.Submission.assignmentID, area = "" }, options, new object())  
+            </li>
+            @if (dataModel.Submission.SubmissionReceived)
+            {
+                <li id="SubmissionReceivedText">Submission received</li>   
+            }
+            </ul>
         }
 </tr>
 

@@ -4,18 +4,6 @@
 <script src="@Url.Content("~/Scripts/osble.assignment_list.js")" type="text/javascript"></script>
 <script type="text/javascript">
 @{
-    //Chris wanted some sort of notification that a student's submission was received (ticket #406).  Pretty ugly at the moment,
-    //but it'll do
-    if (ViewBag.SubmissionReceived)
-    {
-        @Html.Raw("alert(\"Your submission was successfully received.\");");
-        
-    }
-    if(ViewBag.Error != null)
-    {
-        @Html.Raw("alert(" + ViewBag.Error + ");");
-    }
-
     ViewBag.Title = "Assignments";
 }
 </script>

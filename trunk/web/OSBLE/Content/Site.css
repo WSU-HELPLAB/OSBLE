@@ -1777,3 +1777,22 @@ tbody #awesome
     font-weight:normal;
     text-align:left;
 }
+
+#SubmissionItems
+{
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+#SubmissionItems li
+{
+    display:inline;
+    padding-right:7px;
+}
+
+#SubmissionReceivedText
+{
+    font-weight:bold;
+    color:Gray;
+}

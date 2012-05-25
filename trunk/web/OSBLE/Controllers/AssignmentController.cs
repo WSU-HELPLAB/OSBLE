@@ -53,6 +53,7 @@ namespace OSBLE.Controllers
             if (Cache["SubmissionReceived"] != null && Convert.ToBoolean(Cache["SubmissionReceived"]) == true)
             {
                 ViewBag.SubmissionReceived = true;
+                ViewBag.SubmissionReceivedAssignmentID = Cache["SubmissionReceivedAssignmentID"];
                 Cache["SubmissionReceived"] = false;
             }
             else
