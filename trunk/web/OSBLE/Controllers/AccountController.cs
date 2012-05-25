@@ -210,7 +210,7 @@ namespace OSBLE.Controllers
 
             if (hash != null && hash != "")
             {
-                UserProfile user = UserProfile.GetUser(model.UserName);
+                UserProfile user = db.UserProfiles.Where(up => up.UserName == model.UserName).FirstOrDefault();
                 if (user != null)
                 {
                     if ((user.AuthenticationHash as string) == hash)

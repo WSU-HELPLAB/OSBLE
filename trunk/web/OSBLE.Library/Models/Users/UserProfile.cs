@@ -149,21 +149,5 @@ namespace OSBLE.Models.Users
             }
             return false;
         }
-
-        /// <summary>
-        /// Returns the user profile attached to the specified user name
-        /// </summary>
-        /// <param name="userName"></param>
-        /// <returns>A <see cref="UserProfile"/> object or NULL</returns>
-        public static UserProfile GetUser(string userName)
-        {
-            OSBLEContext db = new OSBLEContext();
-            UserProfile profile = (from user in db.UserProfiles
-                                   where
-                                   user.UserName.CompareTo(userName) == 0
-                                   select user
-                             ).FirstOrDefault();
-            return profile;
-        }
     }
 }
