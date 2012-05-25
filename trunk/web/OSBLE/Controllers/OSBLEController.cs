@@ -155,8 +155,7 @@ namespace OSBLE.Controllers
         }
 
         private void Initialize()
-        {
-            
+        {            
             // If logged in, feed user profile to view.
             if (Convert.ToBoolean(ConfigurationManager.AppSettings["RequireLoginValidation"]) == true)
             {
