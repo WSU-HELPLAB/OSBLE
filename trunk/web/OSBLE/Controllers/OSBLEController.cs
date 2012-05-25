@@ -239,16 +239,15 @@ namespace OSBLE.Controllers
             //     set the activity feed to display a single course
             // otherwise
             //     do nothing because it has been set by the user (call to HomeController's SetDashboardMode method)
-            if (Cache["DashboardSingleCourseMode"] == null)
+            bool returnValue = false;
+            object cacheResult = Cache["DashboardSingleCourseMode"];
+            if(cacheResult == null || bool.TryParse(cacheResult.ToString(), out returnValue))
             {
-                Cache["DashboardSingleCourseMode"] = true;
-            }
-            else if (Cache["DashboardSingleCourseMode"].GetType() != typeof(Boolean))
-            {
-                Cache["DashboardSingleCourseMode"] = true;
+                returnValue = true;
+                Cache["DashboardSingleCourseMode"] = returnValue;
             }
 
-            DashboardSingleCourseMode = ViewBag.DashboardSingleCourseMode = Cache["DashboardSingleCourseMode"];
+            DashboardSingleCourseMode = ViewBag.DashboardSingleCourseMode = returnValue;
         }
 
         /// <summary>
