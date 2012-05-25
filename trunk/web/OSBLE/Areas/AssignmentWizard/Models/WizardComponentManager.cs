@@ -9,12 +9,14 @@ using System.Reflection;
 using System.Runtime.Caching;
 using OSBLE.Utility;
 using System.Collections.ObjectModel;
+using System.Runtime.Serialization;
+using System.IO;
 
 namespace OSBLE.Areas.AssignmentWizard.Models
 {
+    [Serializable]
     public class WizardComponentManager
     {
-
         private const string assignmentKey = "ComponentManagerStudioAssignmentKey";
         private const string activeComponentIndexKey = "ComponentManagerActiveComponentIndex";
         private const string instance = "_wcm_instance";
@@ -27,13 +29,18 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         private const string selectedComponentsKey = "_wcm_selectedComponents";
         private const string unselectedComponentsKey = "_wcm_unselectedComponents";
 
+        [NonSerialized]
         private HttpCookie managerCookie;
+
+        [NonSerialized]
         private ObservableCollection<WizardBaseController> _selectedComponents = new ObservableCollection<WizardBaseController>();
+
+        [NonSerialized]
         private ObservableCollection<WizardBaseController> _unselectedComponents = new ObservableCollection<WizardBaseController>();
 
         #region constructor
 
-        private WizardComponentManager()
+        public WizardComponentManager()
         {
             AllComponents = new List<WizardBaseController>();
             SelectedComponents = new ObservableCollection<WizardBaseController>();
@@ -52,25 +59,6 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             }
 
             RegisterComponents();
-        }
-
-        /// <summary>
-        /// Singleton pattern implementation.
-        /// </summary>
-        /// <returns></returns>
-        public static WizardComponentManager GetInstance()
-        {
-            FileCache Cache = new FileCache(FileSystem.GetCachePath(), new ObjectBinder());
-            if (Cache[instance] == null)
-            {
-                WizardComponentManager mgr = new WizardComponentManager();
-                Cache[instance] = mgr;
-                return mgr;
-            }
-            else
-            {
-                return Cache[instance] as WizardComponentManager;
-            }
         }
 
         #endregion
@@ -446,7 +434,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             }
 
             //pull from the cache if possible
-            ObjectCache cache = new FileCache(FileSystem.GetCachePath());
+            FileCache cache = FileCacheHelpler.GetGlobalCacheInstance();
             bool loadedFromCache = false;
             string[] sorted = (string[])cache.Get(componentsCacheString, cacheRegion);
             if (sorted != null)
@@ -496,7 +484,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                 {
                     sortedComponents[i] = AllComponents[i].ControllerName;
                 }
-                cache.Add(componentsCacheString, sortedComponents, DateTime.Now, cacheRegion);
+                cache.Add(componentsCacheString, sortedComponents, cache.DefaultPolicy, cacheRegion);
             }
 
             //attach event listeners to selection change

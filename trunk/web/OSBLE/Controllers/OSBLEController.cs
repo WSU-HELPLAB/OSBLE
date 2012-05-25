@@ -161,8 +161,7 @@ namespace OSBLE.Controllers
             {
                 if (OsbleAuthentication.CurrentUser != null && OsbleAuthentication.CurrentUser.IsApproved)
                 {
-                    string cachePath = Path.Combine(FileSystem.GetCachePath(), OsbleAuthentication.CurrentUser.ID.ToString());
-                    Cache = new FileCache(cachePath, new ObjectBinder());
+                    Cache = FileCacheHelpler.GetCacheInstance(OsbleAuthentication.CurrentUser);
 
                     setupInitialDatabaseData();
 

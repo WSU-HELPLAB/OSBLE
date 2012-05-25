@@ -147,7 +147,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public virtual ActionResult Index()
         {
             Assignment = new Assignment();
-            manager = WizardComponentManager.GetInstance();
+            manager = new WizardComponentManager();
             if (manager.ActiveAssignmentId != 0)
             {
                 Assignment = db.Assignments.Find(manager.ActiveAssignmentId);
@@ -163,7 +163,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         [HttpPost]
         protected ActionResult PostBack(dynamic model)
         {
-            manager = WizardComponentManager.GetInstance();
+            manager = new WizardComponentManager();
             if (WasUpdateSuccessful)
             {
                 //update the assignment ID.  Probably not necessary when working
@@ -248,7 +248,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public ActionResult QuickNav()
         {
             string componentName = Request.Form["ComponentName"];
-            manager = WizardComponentManager.GetInstance();
+            manager = new WizardComponentManager();
             WizardBaseController componentToFind = manager.GetComponentByName(componentName);
 
             //start at the beginning
