@@ -37,10 +37,10 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
                 }
 
             //Get the most recent submission time
-                DateTime lastSubmission = submissionTimes.Max(DateTime => );
+                //DateTime lastSubmission = submissionTimes.Max(DateTime => );
 
             //MK TODO: fix this to only pass in latest submission time
-            //data.TeacherCritical.submissionTimes = submissionTimes;
+            data.TeacherCritical.submissionTimes = submissionTimes;
           
             
             data.TeacherCritical.AssignmentTeam = assignmentTeam;
