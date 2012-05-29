@@ -56,7 +56,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             header.Submission.assignmentID = assignment.ID;
 
 
-            FileCache Cache = FileCacheHelpler.GetCacheInstance(OsbleAuthentication.CurrentUser);
+            FileCache Cache = FileCacheHelper.GetCacheInstance(OsbleAuthentication.CurrentUser);
 
             //Same functionality as in the other controller. 
             //did the user just submit something?  If so, set up view to notify user

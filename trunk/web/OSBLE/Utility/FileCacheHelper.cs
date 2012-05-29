@@ -7,7 +7,7 @@ using OSBLE.Models.Users;
 
 namespace OSBLE.Utility
 {
-    public class FileCacheHelpler
+    public class FileCacheHelper
     {
         /// <summary>
         /// Returns a <see cref="FileCache"/> with the default region tailored to the
