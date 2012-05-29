@@ -184,6 +184,7 @@
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\TeacherGradingProgressDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\TeamEvalGradingProgressDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\TeamMembersDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\CriticalReviewsReceivedDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\DeliverablesTableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\DiscussionPostsTableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\DiscussionRepliesTableDecorator.cs" />
@@ -710,6 +711,7 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\CriticalReviewSubmissionDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\CriticalReviewStudentDownloadDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\CriticalReviewsPerformedDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\CriticalReviewsReceivedDecorator.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />

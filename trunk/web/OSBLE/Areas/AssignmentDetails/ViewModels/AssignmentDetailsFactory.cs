@@ -134,12 +134,9 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderBuilder = new RubricDecorator(vm.HeaderBuilder);
                     vm.HeaderViews.Add("RubricDecorator");
                 }
-                //else
-                {
                     //add grade link
                     vm.HeaderBuilder = new StudentGradeDecorator(vm.HeaderBuilder, vm.Client);
                     vm.HeaderViews.Add("StudentGradeDecorator");
-                }
             }
             return vm;
         }
@@ -207,8 +204,13 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
 
                 if (assignment.Type == AssignmentTypes.CriticalReview)
                 {
+                    vm.TeamTableBuilders[assignmentTeam] = new CriticalReviewsReceivedDecorator(vm.TeamTableBuilders[assignmentTeam]);
+                    vm.TableColumnHeaders["CriticalReviewsReceivedDecorator"] = "Reviews Received";
+
                     vm.TeamTableBuilders[assignmentTeam] = new CriticalReviewsPerformedDecorator(vm.TeamTableBuilders[assignmentTeam]);
                     vm.TableColumnHeaders["CriticalReviewsPerformedDecorator"] = "Reviews Performed";
+
+                    
                 }
 
                 if (assignment.Type == AssignmentTypes.TeamEvaluation)

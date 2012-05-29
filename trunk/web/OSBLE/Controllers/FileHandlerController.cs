@@ -7,6 +7,7 @@ using OSBLE.Attributes;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using System.Collections.Generic;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Controllers
 {
@@ -263,6 +264,56 @@ namespace OSBLE.Controllers
             AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourseUser.UserProfile);
 
             return GetSubmissionZipHelper(assignmentId, at.TeamID, authorTeam);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="assignmentId">assignment ID of the critical review</param>
+        /// <param name="receiver">This is the CourseUser you want to download received reviews for. 
+        /// If it is team based, any course user in the preceding assignment team will yield the same results</param>
+        /// <returns></returns>
+        public ActionResult GetCriticalReviewReceievedZip(int assignmentId, CourseUser receiver)
+        {
+            Assignment assignment = db.Assignments.Find(assignmentId);
+            AssignmentTeam previousAssignmentTeam = GetAssignmentTeam(assignment.PreceedingAssignment, receiver.UserProfile);
+
+            bool isOwnDocument = false;
+            foreach (TeamMember tm in previousAssignmentTeam.Team.TeamMembers)
+            {
+                if (tm.CourseUserID == receiver.ID)
+                {
+                    isOwnDocument = true;
+                }
+            }
+
+            if(ActiveCourseUser.AbstractRole.CanModify || isOwnDocument)
+            {
+                int recieverId = previousAssignmentTeam.TeamID;
+
+                Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, previousAssignmentTeam);
+                string zipFileName ="Critical Review of" + previousAssignmentTeam.Team.Name;
+
+                if (stream != null)
+                {
+                    return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
+                }
+
+                ZipFile zipfile = new ZipFile();
+                string submissionFolder;
+                foreach (AssignmentTeam at in assignment.AssignmentTeams)
+                {
+                    submissionFolder = FileSystem.GetTeamUserSubmissionFolderForAuthorID(false, (ActiveCourseUser.AbstractCourse as Course), assignment.ID, at, previousAssignmentTeam.Team);
+                    if (new DirectoryInfo(submissionFolder).Exists)
+                    {
+                        zipfile.AddDirectory(submissionFolder);
+                    }
+                }
+                FileSystem.CreateZipFolder((ActiveCourseUser.AbstractCourse as Course), zipfile, assignment, previousAssignmentTeam);
+                stream = FileSystem.GetDocumentForRead(zipfile.Name);
+                return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
+            }
+            return RedirectToAction("Index", "Home");
         }
         
         private ActionResult GetSubmissionZipHelper(int assignmentID, int teamID, Team authorTeam = null)

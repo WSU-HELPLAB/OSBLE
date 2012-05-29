@@ -1,0 +1,23 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@using OSBLE.Models.Courses;
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    Assignment assignment = dataModel.TeacherReceivedCritical.Assignment;
+    List<CourseUser> CourseUsers = dataModel.TeacherReceivedCritical.CourseUsers;
+}
+
+
+
+    <td>
+        <ul>
+            @foreach (CourseUser cu in CourseUsers)
+            {
+                <li>
+                    @(Html.ActionLink("Download", "GetCriticalReviewReceievedZip", "FileHandler", new { area = "", assignmentId = assignment.ID, receiver = cu }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
+                </li>
+            }
+        </ul>
+    </td>
+
