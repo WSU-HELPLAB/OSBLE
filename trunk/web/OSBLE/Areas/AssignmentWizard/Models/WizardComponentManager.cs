@@ -45,8 +45,9 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             AllComponents = new List<WizardBaseController>();
             SelectedComponents = new ObservableCollection<WizardBaseController>();
             UnselectedComponents = new ObservableCollection<WizardBaseController>();
+            RegisterComponents();
 
-
+            //Load in cookie values if possible. Create new one if not.
             if (HttpContext.Current != null)
             {
                 managerCookie = HttpContext.Current.Request.Cookies.Get(managerCookieString);
@@ -55,10 +56,14 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                     managerCookie = new HttpCookie(managerCookieString);
                     managerCookie.Expires = DateTime.Now.AddHours(24.0);
                 }
+                else
+                {
+                    //load in selected / unselected components
+                    SelectedComponents = new ObservableCollection<WizardBaseController>(ComponentsFromString(managerCookie[selectedComponentsKey], "|"));
+                    UnselectedComponents = new ObservableCollection<WizardBaseController>(ComponentsFromString(managerCookie[unselectedComponentsKey], "|"));
+                }
                 HttpContext.Current.Response.SetCookie(managerCookie);
             }
-
-            RegisterComponents();
         }
 
         #endregion
@@ -222,17 +227,6 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         {
             get
             {
-                WizardBaseController component = SelectedComponents.ElementAtOrDefault(ActiveComponentIndex);
-
-                //null component probably means that we lost our context
-                if (component == null)
-                {
-                    //load in selected / unselected components
-                    SelectedComponents = new ObservableCollection<WizardBaseController>(ComponentsFromString(managerCookie[selectedComponentsKey], "|"));
-                    UnselectedComponents = new ObservableCollection<WizardBaseController>(ComponentsFromString(managerCookie[unselectedComponentsKey], "|"));
-                }
-
-                //retry
                 return SelectedComponents.ElementAt(ActiveComponentIndex);
             }
         }
@@ -319,7 +313,6 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             ActiveComponentIndex = 0;
             SelectedComponents.Clear();
         }
-
 
         /// <summary>
         /// Sets the active assignment type by trying to match the supplied parameter with possible assignment types
@@ -493,7 +486,6 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             foreach (WizardBaseController component in AllComponents)
             {
                 component.SortOrder = counter;
-                UnselectedComponents.Add(component);
                 component.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(ComponentPropertyChanged);
                 counter++;
             }
