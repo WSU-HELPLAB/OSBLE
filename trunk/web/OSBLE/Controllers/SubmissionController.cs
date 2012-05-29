@@ -69,6 +69,7 @@ namespace OSBLE.Controllers
         // POST: /Submission/Create
 
         [HttpPost]
+        [CanSubmitAssignments]
         public ActionResult Create(int? id, IEnumerable<HttpPostedFileBase> files, int? authorTeamID = null)
         {
             if (id != null)

@@ -179,8 +179,12 @@ namespace OSBLE.Controllers
             if ((file != null) && (file.ContentLength > 0))
             {
                 // Save file into session
-                Cache["RosterFile"] = file;
+                MemoryStream memStream = new MemoryStream();
+                file.InputStream.CopyTo(memStream);
+                Cache["RosterFile"] = memStream.ToArray();
 
+                //reset position after read
+                file.InputStream.Position = 0;
                 Stream s = file.InputStream;
                 List<string> headers = getRosterHeaders(s);
                 file.InputStream.Seek(0, 0);
@@ -245,15 +249,16 @@ namespace OSBLE.Controllers
         [NotForCommunity]
         public ActionResult ApplyRoster(string idColumn, string sectionColumn, string nameColumn, string name2Column)
         {
-            HttpPostedFileBase file = Cache["RosterFile"] as HttpPostedFileBase;
-
+            byte[] rosterContent = (byte[])Cache["RosterFile"];
             int rosterCount = 0;
 
-            if ((file != null) && (idColumn != null) && (nameColumn != null))
+            if ((rosterContent != null) && (idColumn != null) && (nameColumn != null))
             {
-                Stream s = file.InputStream;
+                MemoryStream memStream = new MemoryStream();
+                memStream.Write(rosterContent, 0, rosterContent.Length);
+                memStream.Position = 0;
 
-                List<RosterEntry> rosterEntries = parseRoster(s, idColumn, sectionColumn, nameColumn, name2Column);
+                List<RosterEntry> rosterEntries = parseRoster(memStream, idColumn, sectionColumn, nameColumn, name2Column);
 
                 if (rosterEntries.Count > 0)
                 {
