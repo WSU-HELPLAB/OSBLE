@@ -3,19 +3,23 @@
 @model DynamicDictionary
 @{
     dynamic dataModel = Model;
-    IAssignmentTeam currentTeam = dataModel.AssignmentTeam as IAssignmentTeam;  
+    IAssignmentTeam currentTeam = dataModel.TeacherCritical.AssignmentTeam as IAssignmentTeam;  
+        AssignmentTeam at = currentTeam as AssignmentTeam;
+                    
 }
 
-<td>
-@{
-    AssignmentTeam at = currentTeam as AssignmentTeam;
-    if (at.GetSubmissionTime() != null)
+
+
+    @if (dataModel.TeacherCritical.submissionTimes[0] != null)
     {
-        @(Html.ActionLink(at.GetSubmissionTime().ToString(), "GetSubmissionZip", "FileHandler", new { area = "", assignmentID = currentTeam.Assignment.ID, teamID = currentTeam.Team.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
+        string submission = dataModel.TeacherCritical.submissionTimes[0].ToString();
+        <td title = "Latest Submission: put the date here">
+            @(Html.ActionLink("Download", "GetSubmissionZip", "FileHandler", new { area = "", assignmentID = currentTeam.Assignment.ID, teamId = currentTeam.Team.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
+        </td>
     }
     else
     {
-        @:no submission   
+        <td>
+            No Submission
+        </td>
     }
-}
-</td>

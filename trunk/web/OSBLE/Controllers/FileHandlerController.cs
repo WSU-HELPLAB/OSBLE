@@ -253,7 +253,8 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        [CanSubmitAssignments]
+        //[CanSubmitAssignments]
+        //[CanGradeCourse]
         public ActionResult GetCriticalReviewSubmissionZip(int assignmentId, int authorTeamId)
         {
             //get authorTeam
@@ -288,7 +289,7 @@ namespace OSBLE.Controllers
                     }
 
                     string submissionfolder;
-                    if (assignment.Type == AssignmentTypes.CriticalReview)
+                    if (assignment.Type == AssignmentTypes.CriticalReview && authorTeam != null)
                     {
                         submissionfolder = FileSystem.GetTeamUserSubmissionFolderForAuthorID(false, (ActiveCourseUser.AbstractCourse as Course), assignmentID, assignmentTeam, authorTeam);
                     }

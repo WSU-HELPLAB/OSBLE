@@ -80,10 +80,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                 {
                     header.CRSubmission.hasTeams = false;
                 }
-
-                
             }
-            
             return header;
         }
     }
