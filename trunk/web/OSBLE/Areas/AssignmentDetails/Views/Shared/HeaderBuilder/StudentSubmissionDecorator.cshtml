@@ -30,9 +30,12 @@
             <li>
                 @(Html.ActionLink(submissionTime, "getCurrentUsersZip", "FileHandler", new { assignmentID = dataModel.Submission.assignmentID, area = "" }, new { onclick = "create_and_open_downloading_submission_dialog()" }))  
             </li>
-            <li>
-                @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.Submission.assignmentID, area = "" }, options, new object())  
-            </li>
+            @if (dataModel.Submission.AllowSubmit)
+            {
+                <li>
+                    @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.Submission.assignmentID, area = "" }, options, new object())  
+                </li>
+            }
             @if (dataModel.Submission.SubmissionReceived)
             {
                 <li id="SubmissionReceivedText">Submission received</li>   
