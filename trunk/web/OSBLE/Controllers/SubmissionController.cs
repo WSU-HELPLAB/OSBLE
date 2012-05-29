@@ -28,7 +28,7 @@ namespace OSBLE.Controllers
 
                 if (assignment != null)
                 {
-                    if (assignment.Category.CourseID == ActiveCourse.AbstractCourseID && ActiveCourse.AbstractRole.CanSubmit == true)
+                    if (assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID && ActiveCourseUser.AbstractRole.CanSubmit == true)
                     {
 
                         if (assignment.Type == AssignmentTypes.CriticalReview)
@@ -80,12 +80,12 @@ namespace OSBLE.Controllers
 
                 if (score != null)
                 {
-                    if (score.Points != -1)
+                    if (score.HasGrade())
                     {
-                        ModelState.AddModelError("CanNoLongerSubmit", "Cannot resubmit for an assignment that has already received a grade.");
-                        setViewBagDeliverables(assignment.Deliverables);
+                        //MG: Users will not be able to open the submission window if they already have a grade, but in the rare case that a user gets here and has a grade
+                        //we will ineloquent redirect them to to the index without any feedback. (Chances of this occuring are slim)
                         Cache["SubmissionReceived"] = false;
-                        return View();
+                        return RedirectToAction("Index", "Assignment");
                     }
                 }
 
@@ -104,8 +104,6 @@ namespace OSBLE.Controllers
 
                     if (assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID && ActiveCourseUser.AbstractRole.CanSubmit == true)
                     {
-
-
                         AssignmentTeam assignmentTeam = GetAssignmentTeam(assignment, CurrentUser);
                         
                         int i = 0;
@@ -213,10 +211,10 @@ namespace OSBLE.Controllers
                                     }
                                     else
                                     {
-                                        ModelState.AddModelError("FileExtensionMatch", "The file " + fileName + " does not have an allowed extension please convert the file to the correct type");
-                                        setViewBagDeliverables(assignment.Deliverables);
+                                        //The submission view handles incorrect extension types, so this area of code is unlikely to be reached. In the case that it does a occur, 
+                                        //we will ineloquently redirect them to assignment index without feedback.
                                         Cache["SubmissionReceived"] = false;
-                                        return View();
+                                        return RedirectToAction("Index", "Assignment");
                                     }
                                 }
                                 i++;
@@ -234,12 +232,7 @@ namespace OSBLE.Controllers
                                 string inbrowser = Request.Params["inBrowserText[" + j + "]"];
                                 if (inbrowser.Length > 0)
                                 {
-                                    //If the assignment is a team evaluation
-                                    if (assignment.AssignmentTypeID == 4)
-                                    {
-                                        
-                                    }
-                                    var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam), CurrentUser.LastName + "_" + CurrentUser.FirstName + "_" + delName + ".txt");
+                                    var path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, ActiveCourseUser.AbstractCourse as Course, (int)id, assignmentTeam), CurrentUser.LastName + "_" + CurrentUser.FirstName + "_" + delName + ".txt");
                                     System.IO.File.WriteAllText(path, inbrowser);
                                 }
                             }

@@ -82,10 +82,25 @@ namespace OSBLE.Models.Assignments
         /// <returns>a string as NG or their grade as apercent</returns>
         public string getGradeAsPercent(int assignmentPossiblePoints)
         {
-            if (this.Points == -1 || assignmentPossiblePoints == 0)
+            if (!this.HasGrade() || assignmentPossiblePoints == 0)
                 return "No Grade";
             else
                 return ((this.Points / (double)assignmentPossiblePoints)).ToString("P");
+        }
+
+        /// <summary>
+        /// Returns true if the user has recieved a grade (points > -1)
+        /// </summary>
+        public bool HasGrade()
+        {
+            if (this.Points > -1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

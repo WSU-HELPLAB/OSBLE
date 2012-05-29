@@ -81,13 +81,13 @@ namespace OSBLE.Controllers
                                   orderby assignment.ReleaseDate
                                   select assignment).ToList());
 
-            if (ActiveCourse.AbstractRole.CanModify || ActiveCourse.AbstractRole.Anonymized)
+            if (ActiveCourseUser.AbstractRole.CanModify || ActiveCourseUser.AbstractRole.Anonymized)
             {
                 // Draft assignments (viewable by instructor only) are assignments that have not yet been published to students. Appending to list now.
                 Assignments.AddRange((from assignment in db.Assignments
                                       where assignment.IsDraft &&
                                       assignment.IsWizardAssignment &&
-                                      assignment.Category.CourseID == ActiveCourse.AbstractCourseID
+                                      assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID
                                       orderby assignment.ReleaseDate
                                       select assignment).ToList());
             }
@@ -99,7 +99,7 @@ namespace OSBLE.Controllers
                 List<Assignment> assignmentList = (from assignment in db.Assignments
                                                    where !assignment.IsDraft &&
                                                    assignment.IsWizardAssignment &&
-                                                   assignment.Category.CourseID == ActiveCourse.AbstractCourseID
+                                                   assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID
                                                    select assignment).ToList();
 
                 //This will hold the assignment ID, the date submitted in string format:, the grade in string format, and the team ID
@@ -111,7 +111,7 @@ namespace OSBLE.Controllers
                 {
                     //populating tuple to add to dictionary by collecting the information described in the above commentblock.
                     AssignmentTeam at = OSBLEController.GetAssignmentTeam(a, CurrentUser);
-                    DateTime? subTime = GetSubmissionTime(a.Category.Course, a, at);
+                    DateTime? subTime = FileSystem.GetSubmissionTime(at);
                     string submissionTime = "No Submission";
                     string scoreString = "No Grade";
                     if (subTime != null) //found a submission time, Reassign submissionTime
@@ -132,11 +132,11 @@ namespace OSBLE.Controllers
 
                 //Gathering the Team Evaluations for the current user's teams.
                 List<TeamEvaluation> teamEvaluations = (from t in db.TeamEvaluations
-                                                        where t.EvaluatorID == ActiveCourse.ID
+                                                        where t.EvaluatorID == ActiveCourseUser.ID
                                                         select t).ToList();
 
                 ViewBag.TeamEvaluations = teamEvaluations;
-                ViewBag.CourseUser = ActiveCourse;
+                ViewBag.CourseUser = ActiveCourseUser;
                 ViewBag.SubmissionInfoDictionary = submissionInfo;
             }
 
@@ -176,13 +176,13 @@ namespace OSBLE.Controllers
                 AssignmentTeam team = (from a in assignment.AssignmentTeams
                                        where a.TeamID == teamID
                                        select a).FirstOrDefault();
-                if (assignment.Category.CourseID == ActiveCourse.AbstractCourseID && assignment.AssignmentTeams.Contains(team))
+                if (assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID && assignment.AssignmentTeams.Contains(team))
                 {
                     Session.Add("CurrentAssignmentID", assignmentID);
                     Session.Add("TeamID", teamID);
 
                     //if publish file exists then teacher can not save as draft
-                    bool canSaveAsDraft = !(new FileInfo(FileSystem.GetTeamUserPeerReview(false, ActiveCourse.AbstractCourse as Course, assignmentID, teamID)).Exists);
+                    bool canSaveAsDraft = !(new FileInfo(FileSystem.GetTeamUserPeerReview(false, ActiveCourseUser.AbstractCourse as Course, assignmentID, teamID)).Exists);
 
                     ViewBag.Assignment = assignment;
                     ViewBag.AssignmentTeam = team;
