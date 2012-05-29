@@ -207,8 +207,8 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
 
                 if (assignment.Type == AssignmentTypes.CriticalReview)
                 {
-                    vm.TeamTableBuilders[assignmentTeam] = new TeacherCriticalReviewDecorator(vm.TeamTableBuilders[assignmentTeam]);
-                    vm.TableColumnHeaders["TeacherCriticalReviewDecorator"] = "Download Reviews";
+                    vm.TeamTableBuilders[assignmentTeam] = new CriticalReviewsPerformedDecorator(vm.TeamTableBuilders[assignmentTeam]);
+                    vm.TableColumnHeaders["CriticalReviewsPerformedDecorator"] = "Reviews Performed";
                 }
 
                 if (assignment.Type == AssignmentTypes.TeamEvaluation)

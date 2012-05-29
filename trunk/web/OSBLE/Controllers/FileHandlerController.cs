@@ -253,8 +253,7 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        //[CanSubmitAssignments]
-        //[CanGradeCourse]
+        [CanSubmitAssignments]
         public ActionResult GetCriticalReviewSubmissionZip(int assignmentId, int authorTeamId)
         {
             //get authorTeam

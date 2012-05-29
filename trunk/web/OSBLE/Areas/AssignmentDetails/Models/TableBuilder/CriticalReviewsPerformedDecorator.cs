@@ -8,9 +8,9 @@ using OSBLE.Resources;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
 {
-    public class TeacherCriticalReviewDecorator : TableDecorator
+    public class CriticalReviewsPerformedDecorator : TableDecorator
     {
-        public TeacherCriticalReviewDecorator(ITableBuilder builder)
+        public CriticalReviewsPerformedDecorator(ITableBuilder builder)
             :base(builder)
         {
         }
