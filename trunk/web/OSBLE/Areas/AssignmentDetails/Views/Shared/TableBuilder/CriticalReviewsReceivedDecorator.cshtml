@@ -6,17 +6,31 @@
     dynamic dataModel = Model;
     Assignment assignment = dataModel.TeacherReceivedCritical.Assignment;
     List<CourseUser> CourseUsers = dataModel.TeacherReceivedCritical.CourseUsers;
+    List<DateTime?> TimeStampList = dataModel.TeacherReceivedCritical.TimeStampList;
 }
 
 
 
     <td>
-        <ul>
-            @foreach (CourseUser cu in CourseUsers)
-            {
-                <li>
-                    @(Html.ActionLink("Download", "GetCriticalReviewReceievedZip", "FileHandler", new { area = "", assignmentId = assignment.ID, receiver = cu }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
-                </li>
+        <ul id="SubmissionItems">
+            @{
+                int i = 0;
+                foreach (CourseUser cu in CourseUsers)
+                {
+                    if(TimeStampList[i] == null)
+                    {
+                        <li>
+                            No Reception
+                        </li>    
+                    }
+                    else
+                    {
+                        <li title="@TimeStampList[i].ToString()">
+                            @(Html.ActionLink("Download", "GetCriticalReviewReceievedZip", "FileHandler", new { area = "", assignmentId = assignment.ID, receiverId = cu.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
+                        </li>
+                    }
+                    i++;
+                }
             }
         </ul>
     </td>

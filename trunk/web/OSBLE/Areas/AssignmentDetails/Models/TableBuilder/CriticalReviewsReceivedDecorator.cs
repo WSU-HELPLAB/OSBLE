@@ -6,6 +6,8 @@ using System.Web.Mvc;
 using OSBLE.Resources;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
+using OSBLE.Controllers;
+using System.IO;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
 {
@@ -25,11 +27,37 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
             AssignmentTeam assignTeam = assignmentTeam as AssignmentTeam;
             Assignment assignment = assignTeam.Assignment;
 
-            List<CourseUser> CourseUsers = (from tm in assignTeam.Team.TeamMembers
+            List<CourseUser> CourseUsersInReviewTeam = (from tm in assignTeam.Team.TeamMembers
                                             orderby tm.CourseUser.UserProfile.LastName, tm.CourseUser.UserProfile.FirstName
                                             select tm.CourseUser).ToList();
 
-            data.TeacherReceivedCritical.CourseUsers = CourseUsers;
+            
+            string submissionFolder;
+            List<DateTime?> timeStamp = new List<DateTime?>();
+
+            foreach(CourseUser cu in CourseUsersInReviewTeam)
+            {
+                bool addedTimeStamp = false;
+                AssignmentTeam previousAssignmentTeam = OSBLEController.GetAssignmentTeam(assignment.PreceedingAssignment, cu.UserProfile);
+            
+                foreach (AssignmentTeam at in assignment.AssignmentTeams)
+                {
+                    submissionFolder = FileSystem.GetTeamUserSubmissionFolderForAuthorID(false, assignment.Category.Course, assignment.ID, at, previousAssignmentTeam.Team);
+                    DirectoryInfo DI = new DirectoryInfo(submissionFolder);
+                    if (DI.Exists)
+                    {
+                        timeStamp.Add(DI.LastAccessTime);
+                        addedTimeStamp = true;
+                        break;
+                    }
+                }
+                if (addedTimeStamp == false)
+                {
+                    timeStamp.Add(null);
+                }
+            }
+            data.TeacherReceivedCritical.TimeStampList = timeStamp;
+            data.TeacherReceivedCritical.CourseUsers = CourseUsersInReviewTeam;
             data.TeacherReceivedCritical.Assignment = assignment;
             return data;
         }

@@ -152,6 +152,11 @@ namespace OSBLE.Controllers
                                                 }
                                             }
 
+                                            //We need to remove the zipfile corrisponding to the authorTeamId being sent in as well as the regularly cached zip. 
+                                            AssignmentTeam precedingAuthorAssignmentTeam = (from at in assignment.PreceedingAssignment.AssignmentTeams
+                                                                                            where at.TeamID == authorTeamID
+                                                                                            select at).FirstOrDefault();
+                                            FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, precedingAuthorAssignmentTeam );
                                             FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, assignmentTeam);
                                             string path = Path.Combine(FileSystem.GetTeamUserSubmissionFolderForAuthorID(true, ActiveCourseUser.AbstractCourse as Course, (int)id, assignmentTeam, authorTeam.Team), deliverables[i].Name + extension);
                                             file.SaveAs(path);
