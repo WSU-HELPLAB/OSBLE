@@ -51,7 +51,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             if (HttpContext.Current != null)
             {
                 managerCookie = HttpContext.Current.Request.Cookies.Get(managerCookieString);
-                if (managerCookie == null)
+                if (managerCookie == null || managerCookie[selectedComponentsKey] == null)
                 {
                     managerCookie = new HttpCookie(managerCookieString);
                     managerCookie.Expires = DateTime.Now.AddHours(24.0);
