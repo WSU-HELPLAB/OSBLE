@@ -255,7 +255,7 @@ namespace OSBLE.Controllers
         }
 
         [CanSubmitAssignments]
-        public ActionResult GetCriticalReviewSubmissionZip(int assignmentId, int authorTeamId)
+        public ActionResult GetReviewForAuthor(int assignmentId, int authorTeamId)
         {
             //get authorTeam
             Team authorTeam = db.Teams.Find(authorTeamId);
@@ -273,25 +273,15 @@ namespace OSBLE.Controllers
         /// <param name="receiver">This is the CourseUser you want to download received reviews for. 
         /// If it is team based, any course user in the preceding assignment team will yield the same results</param>
         /// <returns></returns>
-        public ActionResult GetCriticalReviewReceievedZip(int assignmentId, int receiverId)
+        public ActionResult GetReviewsOfAuthor(int assignmentId, int receiverId)
         {
             CourseUser receiver = db.CourseUsers.Find(receiverId);
             Assignment assignment = db.Assignments.Find(assignmentId);
             AssignmentTeam previousAssignmentTeam = GetAssignmentTeam(assignment.PreceedingAssignment, receiver.UserProfile);
 
-            bool isOwnDocument = false;
-            foreach (TeamMember tm in previousAssignmentTeam.Team.TeamMembers)
+            if(ActiveCourseUser.AbstractRole.CanModify || receiverId == ActiveCourseUser.ID)
             {
-                if (tm.CourseUserID == receiver.ID)
-                {
-                    isOwnDocument = true;
-                }
-            }
-
-            if(ActiveCourseUser.AbstractRole.CanModify || isOwnDocument)
-            {
-                int recieverId = previousAssignmentTeam.TeamID;
-
+                //REVIEW TODO: Explain the hack that you're using below.
                 Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, previousAssignmentTeam);
                 string zipFileName = "Critical Review of " + previousAssignmentTeam.Team.Name + ".zip";
 
@@ -317,8 +307,12 @@ namespace OSBLE.Controllers
                     if (new DirectoryInfo(submissionFolder).Exists)
                     {
                         zipfile.AddDirectory(submissionFolder, at.Team.Name );
-                        //zipfile.AddDirectory(submissionFolder);
                     }
+
+                    //REVIEW TODO: Add ChemProV file merging
+                    //Step 1: Get original document as file stream
+                    //Step 2: Merge in all user reviews
+                    // function call: ChemProV.Core.CommentMerger.Merge
                 }
 
                 FileSystem.CreateZipFolder((ActiveCourseUser.AbstractCourse as Course), zipfile, assignment, previousAssignmentTeam);

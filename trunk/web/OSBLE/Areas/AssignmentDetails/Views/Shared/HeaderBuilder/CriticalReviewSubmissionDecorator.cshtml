@@ -83,7 +83,7 @@
                                     String submissionTime = dataModel.CRSubmission.submissionTimes[i].ToString();
                                     <tr>
                                         <td title="Last submitted: @submissionTime">
-                                            @Html.ActionLink("Download your review", "GetCriticalReviewSubmissionZip", "FileHandler", new { assignmentId = dataModel.CRSubmission.assignmentId, authorTeamId = rt.AuthorTeamID, area = "" }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+                                            @Html.ActionLink("Download your review", "GetReviewForAuthor", "FileHandler", new { assignmentId = dataModel.CRSubmission.assignmentId, authorTeamId = rt.AuthorTeamID, area = "" }, new { onclick = "create_and_open_downloading_submission_dialog()" })
                                             @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area = "" }, options, new object())
                                         </td>
                                     </tr>

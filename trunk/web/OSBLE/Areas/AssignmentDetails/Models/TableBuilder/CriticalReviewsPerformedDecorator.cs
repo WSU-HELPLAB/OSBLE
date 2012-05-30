@@ -30,17 +30,24 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
                                where rt.ReviewTeamID == assignTeam.TeamID
                                select rt).ToList();
 
-                List<DateTime?> submissionTimes = new List<DateTime?>();
+                DateTime lastSubmission = DateTime.MinValue;
                 foreach (ReviewTeam reviewTeam in authorTeams)
                 {
-                    submissionTimes.Add(FileSystem.GetSubmissionTime(assignTeam, reviewTeam.AuthorTeam));
+                    DateTime? thisSub = FileSystem.GetSubmissionTime(assignTeam, reviewTeam.AuthorTeam);
+                    if(thisSub != null)
+                    {
+                        if (lastSubmission < thisSub)
+                        {
+                            lastSubmission = (DateTime)thisSub;
+                        }
+                    }                    
                 }
 
             //Get the most recent submission time
                 //DateTime lastSubmission = submissionTimes.Max(DateTime => );
 
             //MK TODO: fix this to only pass in latest submission time
-            data.TeacherCritical.submissionTimes = submissionTimes;
+            data.TeacherCritical.LastSubmissionTime = lastSubmission;
           
             
             data.TeacherCritical.AssignmentTeam = assignmentTeam;

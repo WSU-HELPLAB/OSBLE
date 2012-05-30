@@ -8,13 +8,19 @@
                     
 }
 
-
-
     @if (dataModel.TeacherCritical.submissionTimes[0] != null)
     {
-        string submission = dataModel.TeacherCritical.submissionTimes[0].ToString();
-        <td title = "Latest Submission: put the date here">
-            @(Html.ActionLink("Download", "GetSubmissionZip", "FileHandler", new { area = "", assignmentID = currentTeam.Assignment.ID, teamId = currentTeam.Team.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
+        <td>
+            @(Html.ActionLink(
+                        "Download", 
+                        "GetSubmissionZip", 
+                        "FileHandler", 
+                        new { area = "", assignmentID = currentTeam.Assignment.ID, teamId = currentTeam.Team.ID }, 
+                        new { 
+                            onclick = "create_and_open_downloading_submission_dialog()",
+                            title = string.Format("Latest Submission: {0}", dataModel.TeacherCritical.LastSubmissionTime.ToString())
+                        })
+                        )
         </td>
     }
     else
