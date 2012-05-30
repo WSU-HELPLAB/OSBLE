@@ -255,6 +255,9 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                 List<WizardBaseController> unselectedAsList = SortComponents(UnselectedComponents.ToList());
                 UnselectedComponents = new ObservableCollection<WizardBaseController>(unselectedAsList);
             }
+
+            //The collectionChanged event won't get called to save our sort, so we have to do it manually
+            ComponentsCollectionChanged(this, new System.Collections.Specialized.NotifyCollectionChangedEventArgs(System.Collections.Specialized.NotifyCollectionChangedAction.Reset));
         }
 
         public WizardBaseController GetNextComponent()
