@@ -84,6 +84,18 @@
     border:none;
 }
 
+#ReviewsItems
+{
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+#ReviewsItems li
+{
+    padding-right:7px;
+}
+
 .TableRowCriticalReview
 {
     border-bottom:1px solid black;
@@ -106,7 +118,6 @@
 {
     font-weight:bold;
     color:Gray;
-}
 }
 
 .TeamHeader

@@ -32,16 +32,13 @@
                         }
                     <tr class="@trclass">
                         <td>
-                            @rt.AuthorTeam.Name
-                        </td>
-                        <td>
                             <table id="CriticalReviewSubTable">
                                 <tr>
                                     <td>
                                         @{
                                             string name;
                                             
-                                            if (!dataModel.CRSubmission.hasTeams)
+                                            if (dataModel.CRSubmission.hasTeams)
                                             {
                                                 name = rt.AuthorTeam.Name;
                                             }

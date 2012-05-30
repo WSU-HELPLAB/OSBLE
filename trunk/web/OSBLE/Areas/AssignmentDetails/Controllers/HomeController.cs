@@ -22,11 +22,17 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
             AssignmentDetailsFactory factory = new AssignmentDetailsFactory();
             AssignmentDetailsViewModel viewModel = factory.Bake(assignment, ActiveCourseUser);
 
-            //discussion assignments require their own special view
-            if (assignment.Type != AssignmentTypes.DiscussionAssignment)
+            //discussion assignments and critical reviews require their own special view
+            if (assignment.Type == AssignmentTypes.CriticalReview)
+            {
+                return View("CriticalReviewAssignment", viewModel);
+            }
+
+            else if (assignment.Type != AssignmentTypes.DiscussionAssignment)
             {
                 return View("Index", viewModel);
             }
+
             else
             {
                 return View("DiscussionAssignment", viewModel);

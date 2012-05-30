@@ -12,7 +12,7 @@
 
 
     <td>
-        <ul id="SubmissionItems">
+        <ul id="ReviewsItems">
             @{
                 int i = 0;
                 foreach (CourseUser cu in CourseUsers)
@@ -20,13 +20,16 @@
                     if(TimeStampList[i] == null)
                     {
                         <li>
-                            No Reception
+                            None Received
                         </li>    
                     }
                     else
                     {
-                        <li title="@TimeStampList[i].ToString()">
-                            @(Html.ActionLink("Download", "GetReviewsOfAuthor", "FileHandler", new { area = "", assignmentId = assignment.ID, receiverId = cu.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
+                        <li>
+                            @(Html.ActionLink(cu.DisplayNameFirstLast(cu.AbstractRole).ToString(), "GetReviewsOfAuthor", "FileHandler", 
+                            new { area = "", assignmentId = assignment.ID, receiverId = cu.ID }, 
+                            new { onclick = "create_and_open_downloading_submission_dialog()",
+                                  title = string.Format("Latest Submission: {0}", TimeStampList[i])}))
                         </li>
                     }
                     i++;

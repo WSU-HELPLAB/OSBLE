@@ -1,0 +1,59 @@
+﻿@using OSBLE.Models.Assignments
+@using OSBLE.Areas.AssignmentDetails.ViewModels
+@using OSBLE.Models.Courses;
+@using OSBLE.Resources
+@model AssignmentDetailsViewModel
+@{
+    ViewBag.Title = "Assignment Details";
+    DynamicDictionary headerData = Model.HeaderBuilder.BuildHeader(Model.CurrentAssignment);
+    
+}
+@section AssignmentDetails
+{
+    @foreach (string view in Model.HeaderViews)
+    {
+        string viewLocation = string.Format("HeaderBuilder/{0}", view);
+        @Html.Partial(viewLocation, headerData);
+    }
+}
+@section TableData
+{
+    @if (Model.Client.AbstractRole.CanGrade)
+    {
+        bool altRow = false;
+        foreach (IAssignmentTeam assignmentTeam in Model.TeamTableBuilders.Keys)
+        {
+            if (assignmentTeam.Team.TeamMembers.Count() > 1)
+            {
+                <tr class="TeamHeader">
+                    <th colspan="6">
+                        @assignmentTeam.Team.Name
+                        @{string actionLink = Url.Action("CreateEntireTeam", "Mail", new { area = "", teamID = assignmentTeam.Team.ID });
+                        }
+                        <a title="Email this user" href="@actionLink" > @Helpers.MailButton() </a>
+                    </th>
+                </tr>
+        
+            }
+                <tr>
+                    <th class="StudentName">
+                        <lu>
+                    @foreach (TeamMember tm in assignmentTeam.Team.TeamMembers.OrderBy(t => t.CourseUser.DisplayName()).ToList())
+                    {
+                        <li id="ReviewsItems">
+                        @tm.CourseUser.DisplayName()
+                        </li>
+                    }
+                    </lu>
+                    </th>
+                    @foreach (string view in Model.TableColumnHeaders.Keys)
+                    {
+                        DynamicDictionary tableData = Model.TeamTableBuilders[assignmentTeam].BuildTableForTeam(assignmentTeam);
+                        string viewLocation = string.Format("TableBuilder/{0}", view);
+                        @Html.Partial(viewLocation, tableData);
+                    }
+                </tr>
+        }
+    }
+}
+} 

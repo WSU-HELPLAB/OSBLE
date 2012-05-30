@@ -8,7 +8,7 @@
                     
 }
 
-    @if (dataModel.TeacherCritical.submissionTimes[0] != null)
+    @if (dataModel.TeacherCritical.LastSubmissionTime != DateTime.MinValue)
     {
         <td>
             @(Html.ActionLink(
@@ -26,6 +26,6 @@
     else
     {
         <td>
-            No Submission
+            None Submitted
         </td>
     }
