@@ -18,6 +18,10 @@ namespace OSBLE.Models.Courses
         [Display(Name = "Minimum % Required")]
         public int MinimumRequired { get; set; }
 
+        [Required]
+        public int CourseID { get; set; }
+        public virtual Course Course { get; set; }
+
         public LetterGrade()
         {
         }
