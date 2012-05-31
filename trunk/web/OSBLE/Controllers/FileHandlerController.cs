@@ -253,7 +253,13 @@ namespace OSBLE.Controllers
 
             return RedirectToAction("Index", "Home");
         }
-
+        /// <summary>
+        /// get a zip containing reviews that the author (authorTeamId) has performed
+        /// on any submission of the assignment specified by assignmentId
+        /// </summary>
+        /// <param name="assignmentId">get reviews of submissions of this assignment</param>
+        /// <param name="authorTeamId">get all reviews submitted by specified authorTeam</param>
+        /// <returns></returns>
         [CanSubmitAssignments]
         public ActionResult GetReviewForAuthor(int assignmentId, int authorTeamId)
         {
@@ -267,7 +273,8 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// 
+        /// get a zip containing reviews that have been done 
+        /// to the the author's (receiverId) preceding assignment 
         /// </summary>
         /// <param name="assignmentId">assignment ID of the critical review</param>
         /// <param name="receiver">This is the CourseUser you want to download received reviews for. 
@@ -285,6 +292,7 @@ namespace OSBLE.Controllers
                 Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, previousAssignmentTeam);
                 string zipFileName = "Critical Review of " + previousAssignmentTeam.Team.Name + ".zip";
 
+                //zip file already exists, no need to create a new one
                 if (stream != null)
                 {
                     return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
@@ -300,7 +308,7 @@ namespace OSBLE.Controllers
                 List<AssignmentTeam> ReviewingAssignmentTeams = (from at in assignment.AssignmentTeams
                                                                  where teamsReviewingIds.Contains(at.TeamID)
                                                                  select at).ToList();
-
+                
                 foreach (AssignmentTeam at in ReviewingAssignmentTeams)
                 {
                     submissionFolder = FileSystem.GetTeamUserSubmissionFolderForAuthorID(false, (ActiveCourseUser.AbstractCourse as Course), assignment.ID, at, previousAssignmentTeam.Team);
@@ -314,6 +322,7 @@ namespace OSBLE.Controllers
                     //Step 2: Merge in all user reviews
                     // function call: ChemProV.Core.CommentMerger.Merge
                 }
+                
 
                 FileSystem.CreateZipFolder((ActiveCourseUser.AbstractCourse as Course), zipfile, assignment, previousAssignmentTeam);
                 stream = FileSystem.GetDocumentForRead(zipfile.Name);

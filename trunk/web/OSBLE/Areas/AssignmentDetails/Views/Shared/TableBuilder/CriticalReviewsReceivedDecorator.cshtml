@@ -29,7 +29,8 @@
                             @(Html.ActionLink(cu.DisplayNameFirstLast(cu.AbstractRole).ToString(), "GetReviewsOfAuthor", "FileHandler", 
                             new { area = "", assignmentId = assignment.ID, receiverId = cu.ID }, 
                             new { onclick = "create_and_open_downloading_submission_dialog()",
-                                  title = string.Format("Latest Submission: {0}", TimeStampList[i])}))
+                                  title = string.Format("Download all reviews of {1}'s previous submission\nLatest Review Received: {0}", 
+                                  TimeStampList[i], cu.DisplayNameFirstLast(cu.AbstractRole))}))
                         </li>
                     }
                     i++;

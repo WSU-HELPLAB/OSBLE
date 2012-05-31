@@ -8,6 +8,7 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Controllers;
 using System.IO;
+using System.Text;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
 {
@@ -56,6 +57,8 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
                     timeStamp.Add(null);
                 }
             }
+
+            //build string for mousover event
             data.TeacherReceivedCritical.TimeStampList = timeStamp;
             data.TeacherReceivedCritical.CourseUsers = CourseUsersInReviewTeam;
             data.TeacherReceivedCritical.Assignment = assignment;

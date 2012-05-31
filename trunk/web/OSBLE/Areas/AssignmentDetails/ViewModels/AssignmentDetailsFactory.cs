@@ -98,6 +98,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderBuilder = new TeacherGradingProgressDecorator(vm.HeaderBuilder);
                     vm.HeaderViews.Add("TeacherGradingProgressDecorator");
                 }
+
             }
             else if (vm.Client.AbstractRole.CanSubmit) //students
             {
@@ -138,6 +139,14 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderBuilder = new StudentGradeDecorator(vm.HeaderBuilder, vm.Client);
                     vm.HeaderViews.Add("StudentGradeDecorator");
             }
+
+            if (assignment.Type == AssignmentTypes.CriticalReview)
+            {
+
+                vm.HeaderBuilder = new CriticalReviewPreviousAssignmentDecorator(vm.HeaderBuilder);
+                vm.HeaderViews.Add("CriticalReviewPreviousAssignmentDecorator");
+            }
+
             return vm;
         }
 

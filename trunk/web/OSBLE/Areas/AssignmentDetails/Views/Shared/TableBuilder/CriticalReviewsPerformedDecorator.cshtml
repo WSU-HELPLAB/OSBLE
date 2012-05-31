@@ -5,20 +5,22 @@
     dynamic dataModel = Model;
     IAssignmentTeam currentTeam = dataModel.TeacherCritical.AssignmentTeam as IAssignmentTeam;  
         AssignmentTeam at = currentTeam as AssignmentTeam;
-                    
+    
 }
 
-    @if (dataModel.TeacherCritical.LastSubmissionTime != DateTime.MinValue)
+    @if (dataModel.TeacherCritical.hasSubmission)
     {
+        string download = dataModel.TeacherCritical.fractionReviewed;
         <td>
+            
             @(Html.ActionLink(
-                        "Download", 
+                        download, 
                         "GetSubmissionZip", 
                         "FileHandler", 
                         new { area = "", assignmentID = currentTeam.Assignment.ID, teamId = currentTeam.Team.ID }, 
                         new { 
                             onclick = "create_and_open_downloading_submission_dialog()",
-                            title = string.Format("Latest Submission: {0}", dataModel.TeacherCritical.LastSubmissionTime.ToString())
+                            title = dataModel.TeacherCritical.altText
                         })
                         )
         </td>

@@ -44,7 +44,8 @@
                                             }
                                             else
                                             {
-                                                name = rt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName;
+                                                name = rt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName + " " +
+                                                    rt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName;
                                             }
 
                                             if (dataModel.CRSubmission.authorSubmissionTimes[i] == null)

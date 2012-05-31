@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models.Assignments;
 using OSBLE.Resources;
+using System.Text;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
 {
@@ -30,20 +31,29 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
                                where rt.ReviewTeamID == assignTeam.TeamID
                                select rt).ToList();
 
+                StringBuilder reviewedTeams = new StringBuilder();
                 DateTime lastSubmission = DateTime.MinValue;
+                bool hasSubmission = false;
+                int submittedCount = 0;
                 foreach (ReviewTeam reviewTeam in authorTeams)
                 {
                     DateTime? thisSub = FileSystem.GetSubmissionTime(assignTeam, reviewTeam.AuthorTeam);
-                    if(thisSub != null)
+                    if (thisSub != null)
                     {
-                        if (lastSubmission < thisSub)
-                        {
-                            lastSubmission = (DateTime)thisSub;
-                        }
-                    }                    
+                        reviewedTeams.Append(reviewTeam.AuthorTeam.Name).Append(", submitted on ").Append(thisSub).Append("\n");
+                        hasSubmission = true;
+                        submittedCount++;
+                    }
+                    else
+                    {
+                        reviewedTeams.Append(reviewTeam.AuthorTeam.Name).Append(", no review submitted\n");
+                    }
                 }
-            data.TeacherCritical.LastSubmissionTime = lastSubmission;
+            string altText = string.Format("Download {0}'s reviews of:\n{1}", assignmentTeam.Team.Name, reviewedTeams);
 
+            data.TeacherCritical.fractionReviewed = string.Format("{0}/{1} submitted", submittedCount.ToString(), authorTeams.Count.ToString());
+            data.TeacherCritical.altText = altText;
+            data.TeacherCritical.hasSubmission = hasSubmission;
             data.TeacherCritical.AssignmentTeam = assignmentTeam;
 
             return data;
