@@ -20,7 +20,7 @@ namespace OSBLE.Attributes
             {
                 OSBLEController controller = filterContext.Controller as OSBLEController;
 
-                if (controller.ActiveCourse == null)
+                if (controller.ActiveCourseUser == null)
                 {
                     filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Home", action = "NoCourses" }));
                 }

@@ -75,6 +75,14 @@
         </div>
 
         <div class="editor-label">
+            @Html.LabelFor(model => model.IsApproved)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.IsApproved)
+            @Html.ValidationMessageFor(model => model.IsApproved)
+        </div>
+
+        <div class="editor-label">
             @Html.LabelFor(model => model.CanCreateCourses)
             @Helpers.CreateToolTip(ToolTips.AdminUserIsCourseCreator) 
         </div>

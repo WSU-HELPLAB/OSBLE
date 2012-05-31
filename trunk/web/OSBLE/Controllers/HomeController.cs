@@ -299,7 +299,7 @@ namespace OSBLE.Controllers
 
         public ActionResult NoCourses()
         {
-            if (ActiveCourse != null)
+            if (ActiveCourseUser != null)
             {
                 return RedirectToAction("Index");
             }
