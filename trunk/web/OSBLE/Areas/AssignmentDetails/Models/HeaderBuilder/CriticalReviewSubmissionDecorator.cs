@@ -6,6 +6,8 @@ using System.Web.Mvc;
 using OSBLE.Resources;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
+using System.Runtime.Caching;
+using OSBLE.Utility;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 {
@@ -81,6 +83,22 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                     header.CRSubmission.hasTeams = false;
                 }
             }
+
+            FileCache Cache = FileCacheHelper.GetCacheInstance(OsbleAuthentication.CurrentUser);
+            //Same functionality as in the other controller. Note: These values are set in SubmissionController/Create[POST]
+            //did the user just submit something?  If so, set up view to notify user
+            if (Cache["SubmissionReceived"] != null && Convert.ToBoolean(Cache["SubmissionReceived"]) == true)
+            {
+                header.CRSubmission.SubmissionReceived = true;
+                header.CRSubmission.AuthorTeamId = (int)Cache["SubmissionForAuthorTeamID"];
+                Cache["SubmissionReceived"] = false;
+            }
+            else
+            {
+                header.CRSubmission.SubmissionReceived = false;
+                Cache["SubmissionReceived"] = false;
+            }
+
             return header;
         }
     }

@@ -80,16 +80,33 @@
                                 {
                                     String submissionTime = dataModel.CRSubmission.submissionTimes[i].ToString();
                                     <tr>
-                                        <td title="Last submitted: @submissionTime">
-                                            @Html.ActionLink("Download your review", 
-                                            "GetReviewForAuthor", 
-                                            "FileHandler", 
-                                            new { assignmentId = dataModel.CRSubmission.assignmentId, authorTeamId = rt.AuthorTeamID, area = "" }, 
-                                            new { onclick = "create_and_open_downloading_submission_dialog()" })
 
-                                            @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area = "" }, options, new object())
+                                        <td> 
+                                            <ul id="SubmissionItems">
+                                                <li>
+                                                    @Html.ActionLink("Download your review", 
+                                                    "GetReviewForAuthor", 
+                                                    "FileHandler", 
+                                                    new { assignmentId = dataModel.CRSubmission.assignmentId, authorTeamId = rt.AuthorTeamID, area = "" }, 
+                                                    new { onclick = "create_and_open_downloading_submission_dialog()",
+                                                          title = "Last submitted: @submissionTime"   })
+                                                </li>
+
+                                                <li>
+                                                    @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area = "" }, options, new object())
+                                                </li>
+                                                @if (dataModel.CRSubmission.SubmissionReceived && rt.AuthorTeamID ==dataModel.CRSubmission.AuthorTeamId)
+                                                {
+                                                    <li id="SubmissionReceivedText">Submission received</li>   
+                                                }
+                                            </ul>
                                         </td>
                                     </tr>
+                                    
+                                    @*
+                                        header.CRSubmission.SubmissionReceived = true;
+                                        header.CRSubmission.AuthorTeamId
+                                    *@
                                     
                                 }
                             </table>

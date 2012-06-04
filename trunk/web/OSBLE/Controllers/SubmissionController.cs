@@ -246,6 +246,10 @@ namespace OSBLE.Controllers
                         } while (delName != null);
                         Cache["SubmissionReceived"] = true;
                         Cache["SubmissionReceivedAssignmentID"] = assignment.ID;
+                        if (authorTeamID != null)
+                        {
+                            Cache["SubmissionForAuthorTeamID"] = authorTeamID;
+                        }
                         return Redirect(Request.UrlReferrer.ToString());
                     }
                 }

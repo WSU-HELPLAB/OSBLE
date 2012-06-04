@@ -68,7 +68,8 @@
         <th>
             Description:
         </th>
-        <td>@Model.CurrentAssignment.AssignmentDescription
+        <td>
+            @Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(Model.CurrentAssignment.AssignmentDescription).ToString()))
         </td>
     </tr>
     <tr>
