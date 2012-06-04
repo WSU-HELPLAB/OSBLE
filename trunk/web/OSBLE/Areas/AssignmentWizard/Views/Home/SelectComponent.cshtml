@@ -5,6 +5,7 @@
 @{
     ViewBag.Title = "Assignment Wizard";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    int optionalComponentCount = Model.Where(m => m.IsRequired == false).Count();
 }
 <h1>Component Selection</h1>
 <p>
@@ -14,11 +15,14 @@ Please select the optional components that you would like to use for this assign
 {
 <fieldset>
 <legend>Components</legend>
+@if (optionalComponentCount == 0)
+{
+    <text>This assignment type has no optional components.</text>
+}
 <table>
 @{
     foreach(WizardBaseController component in Model)
     {
-        
         string checkedText = "";
         if(component.IsSelected)
         {

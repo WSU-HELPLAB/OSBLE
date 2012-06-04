@@ -44,10 +44,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get
             {
-                List<AssignmentTypes> types = base.AllAssignmentTypes.ToList();
-                types.Remove(AssignmentTypes.DiscussionAssignment);
-                types.Remove(AssignmentTypes.TeamEvaluation);
-                return types;
+                //this component is deprecated, so remove from the list
+                return new List<AssignmentTypes>();
             }
         }
 
