@@ -205,6 +205,7 @@
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\HeaderDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\ITableBuilder.cs" />
     <Compile Include="Areas\AssignmentDetails\ViewModels\AssignmentDetailsViewModel.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\CriticalReviewDiscussionTeams.cs" />
     <Compile Include="Resources\DynamicDictionary.cs" />
     <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
