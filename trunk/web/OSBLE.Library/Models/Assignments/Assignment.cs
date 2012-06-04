@@ -26,9 +26,7 @@ namespace OSBLE.Models.Assignments
             IsWizardAssignment = true;
             Scores = new List<Score>();
             Type = AssignmentTypes.Basic;
-            IsCriticalReviewPublished = false;
             CriticalReviewPublishDate = null;
-
         }
 
         #region public properties

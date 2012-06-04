@@ -938,7 +938,6 @@ namespace OSBLE.Controllers
         public ActionResult PublishAllCriticalReviews(int assignmentID)
         {
             Assignment assignment = db.Assignments.Find(assignmentID);
-            assignment.IsCriticalReviewPublished = true;
             assignment.CriticalReviewPublishDate = DateTime.Now;
             db.SaveChanges();
             return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentID });
