@@ -10,9 +10,15 @@
 <tr>
 <th>Download Your <br />Reviewed Assignment</th>
 <td>
-Your instructor has not yet published your reviewed deliverable
-    @(Html.ActionLink(cu.DisplayNameFirstLast(cu.AbstractRole).ToString(), "GetReviewsOfAuthor", "FileHandler",
+@if(dataModel.CRdownload.hasPublished)
+{
+    @(Html.ActionLink("Download your reviewed submission", "GetReviewsOfAuthor", "FileHandler",
             new { area = "", assignmentId = dataModel.CRdownload.assignmentID, receiverId = cu.ID }, 
             new { onclick = "create_and_open_downloading_submission_dialog()"}))
+}
+else
+{
+    @:Your instructor has not yet published your reviewed deliverable
+}
 </td>
 </tr>

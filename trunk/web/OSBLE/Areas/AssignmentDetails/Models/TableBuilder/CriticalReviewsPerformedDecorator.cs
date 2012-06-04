@@ -46,7 +46,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
                     }
                     else
                     {
-                        reviewedTeams.Append(reviewTeam.AuthorTeam.Name).Append(", no review submitted\n");
+                        reviewedTeams.Append(reviewTeam.AuthorTeam.Name).Append("; no review submitted\n");
                     }
                 }
             string altText = string.Format("Download {0}'s reviews of:\n{1}", assignmentTeam.Team.Name, reviewedTeams);

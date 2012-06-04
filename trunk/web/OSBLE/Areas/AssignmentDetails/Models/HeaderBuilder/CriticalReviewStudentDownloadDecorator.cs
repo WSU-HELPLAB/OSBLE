@@ -24,6 +24,9 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             dynamic header = Builder.BuildHeader(assignment);
             header.CRdownload = new DynamicDictionary();
 
+            header.CRdownload.hasPublished = assignment.IsCriticalReviewPublished;
+            header.CRdownload.publishedDate = assignment.CriticalReviewPublishDate;
+
             header.CRdownload.student = Student;
             header.CRdownload.assignmentID = assignment.ID;
 
