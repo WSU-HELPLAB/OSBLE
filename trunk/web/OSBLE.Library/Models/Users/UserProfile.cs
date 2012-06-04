@@ -7,13 +7,15 @@ using System;
 
 namespace OSBLE.Models.Users
 {
-    [Serializable]
+    //[Serializable]
+    //[System.Runtime.Serialization.DataContract]
     public class UserProfile
     {
         [Required]
         [Key]
         public int ID { get; set; }
 
+        //[System.Runtime.Serialization.DataMember]
         public string UserName { get; set; }
 
         public string AspNetUserName { get; set; }
