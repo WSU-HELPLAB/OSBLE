@@ -927,6 +927,29 @@ namespace OSBLE.Controllers
         {
         }
 
+        public ActionResult PublishAllCriticalReviews(int assignmentID)
+        {
+            List<ReviewTeam> reviewTeams = db.ReviewTeams.Where(rt => rt.AssignmentID == assignmentID).ToList();
+
+            foreach (ReviewTeam rt in reviewTeams)
+            {
+                PublishSingleCriticalReview(assignmentID, rt.AuthorTeamID, rt.ReviewTeamID);
+            }
+            return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentID });
+        }
+
+        public void PublishSingleCriticalReview(int assignmentId, int authorTeamId, int reviewTeamId)
+        {
+            ReviewTeam rt = db.ReviewTeams.Find(assignmentId, authorTeamId, reviewTeamId);
+
+            if (rt != null)
+            {
+                rt.PublishedDate = DateTime.Now;
+                rt.Published = true;
+                db.SaveChanges();
+            }
+        }
+
 
         /// <summary>
         /// Returns true if it successfully modifies the user's score's value.

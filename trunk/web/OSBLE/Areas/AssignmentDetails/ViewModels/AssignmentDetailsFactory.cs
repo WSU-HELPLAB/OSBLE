@@ -90,6 +90,11 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderBuilder = new TeamEvalGradingProgressDecorator(vm.HeaderBuilder);
                     vm.HeaderViews.Add("TeamEvalGradingProgressDecorator");
                 }
+                else if (assignment.Type == AssignmentTypes.CriticalReview)
+                {
+                    vm.HeaderBuilder = new PublishCriticalReviewDecorator(vm.HeaderBuilder);
+                    vm.HeaderViews.Add("PublishCriticalReviewDecorator");
+                }
                 else
                 {
                     //Show grading progress for all teacher views
@@ -98,6 +103,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderBuilder = new TeacherGradingProgressDecorator(vm.HeaderBuilder);
                     vm.HeaderViews.Add("TeacherGradingProgressDecorator");
                 }
+
 
             }
             else if (vm.Client.AbstractRole.CanSubmit) //students
@@ -124,7 +130,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderViews.Add("CriticalReviewSubmissionDecorator");
                     
                     //link for student to download their reviewed assignment
-                    vm.HeaderBuilder = new CriticalReviewStudentDownloadDecorator(vm.HeaderBuilder);
+                    vm.HeaderBuilder = new CriticalReviewStudentDownloadDecorator(vm.HeaderBuilder, vm.Client);
                     vm.HeaderViews.Add("CriticalReviewStudentDownloadDecorator");
                 }
 

@@ -5,27 +5,22 @@ using System.Web;
 using System.Web.Mvc;
 using OSBLE.Resources;
 using OSBLE.Models.Assignments;
-using OSBLE.Models.Courses;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 {
-    public class CriticalReviewStudentDownloadDecorator : HeaderDecorator
+    public class PublishCriticalReviewDecorator : HeaderDecorator
     {
-        public CourseUser Student { get; set; }
-
-        public CriticalReviewStudentDownloadDecorator(IHeaderBuilder builder, CourseUser student)
+        public PublishCriticalReviewDecorator(IHeaderBuilder builder)
             : base(builder)
         {
-            Student = student;
         }
 
         public override DynamicDictionary BuildHeader(Assignment assignment)
         {
             dynamic header = Builder.BuildHeader(assignment);
-            header.CRdownload = new DynamicDictionary();
+            header.PublishCR = new DynamicDictionary();
 
-            header.CRdownload.student = Student;
-            header.CRdownload.assignmentID = assignment.ID;
+            header.PublishCR.assignmentID = assignment.ID;
 
             return header;
         }

@@ -179,6 +179,7 @@
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\DiscussionLinkDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\InitialFinalDueDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\LatePolicyHeaderDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\PublishCriticalReviewDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\RubricDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\StudentGradeDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\StudentSubmissionDecorator.cs" />
@@ -715,6 +716,7 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\CriticalReviewsReceivedDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Home\CriticalReviewAssignment.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\CriticalReviewPreviousAssignmentDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\PublishCriticalReviewDecorator.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />

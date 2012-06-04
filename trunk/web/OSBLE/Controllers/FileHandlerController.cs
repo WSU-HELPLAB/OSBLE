@@ -244,8 +244,8 @@ namespace OSBLE.Controllers
             Assignment CRassignment = db.Assignments.Find(assignmentId);
             AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourseUser.UserProfile);
             List<int> authorTeams = (from rt in CRassignment.ReviewTeams
-                                            where rt.ReviewTeamID == at.TeamID
-                                            select rt.AuthorTeamID).ToList();
+                                     where rt.ReviewTeamID == at.TeamID
+                                     select rt.AuthorTeamID).ToList();
             if (authorTeams.Contains(authorTeamId) && CRassignment.Type == AssignmentTypes.CriticalReview)
             {
                 return GetSubmissionZipHelper((int)CRassignment.PrecededingAssignmentID, authorTeamId);
@@ -286,7 +286,7 @@ namespace OSBLE.Controllers
             Assignment assignment = db.Assignments.Find(assignmentId);
             AssignmentTeam previousAssignmentTeam = GetAssignmentTeam(assignment.PreceedingAssignment, receiver.UserProfile);
 
-            if(ActiveCourseUser.AbstractRole.CanModify || receiverId == ActiveCourseUser.ID)
+            if (ActiveCourseUser.AbstractRole.CanModify || receiverId == ActiveCourseUser.ID)
             {
                 //REVIEW TODO: Explain the hack that you're using below.
                 Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, previousAssignmentTeam);
@@ -308,29 +308,79 @@ namespace OSBLE.Controllers
                 List<AssignmentTeam> ReviewingAssignmentTeams = (from at in assignment.AssignmentTeams
                                                                  where teamsReviewingIds.Contains(at.TeamID)
                                                                  select at).ToList();
-                
+
+                Dictionary<string, MemoryStream> parentStreams = new Dictionary<string, MemoryStream>();
+                Dictionary<string, MemoryStream> outputStreams = new Dictionary<string, MemoryStream>();
+
                 foreach (AssignmentTeam at in ReviewingAssignmentTeams)
                 {
                     submissionFolder = FileSystem.GetTeamUserSubmissionFolderForAuthorID(false, (ActiveCourseUser.AbstractCourse as Course), assignment.ID, at, previousAssignmentTeam.Team);
                     if (new DirectoryInfo(submissionFolder).Exists)
                     {
-                        zipfile.AddDirectory(submissionFolder, at.Team.Name );
+                        zipfile.AddDirectory(submissionFolder, at.Team.Name);
+
+                        foreach (string filePath in Directory.EnumerateFiles(submissionFolder))
+                        {
+                            if (Path.GetExtension(filePath) == ".cpml")
+                            {
+                                //Step 1: Get original document as file stream
+                                string originalFile = FileSystem.GetDeliverable((ActiveCourseUser.AbstractCourse as Course),
+                                    (int)assignment.PrecededingAssignmentID,
+                                    previousAssignmentTeam,
+                                    Path.GetFileName(filePath));
+
+                                if(!parentStreams.ContainsKey(originalFile))
+                                {
+                                    FileStream fs = System.IO.File.OpenRead(originalFile);
+                                    parentStreams[originalFile] = new MemoryStream();
+                                    fs.CopyTo(parentStreams[originalFile]);
+                                    fs.Close();
+                                }
+
+                                outputStreams[originalFile] = new MemoryStream();
+
+
+                                //open student's review file
+                                FileStream studentReview = System.IO.File.OpenRead(filePath);
+
+                                //merge the file
+                                ChemProV.Core.CommentMerger.Merge(parentStreams[originalFile], previousAssignmentTeam.Team.Name, studentReview, at.Team.Name, outputStreams[originalFile]);
+
+                                //merge output back into the parent
+                                parentStreams[originalFile] = new MemoryStream();
+                                outputStreams[originalFile].Seek(0, SeekOrigin.Begin);
+                                outputStreams[originalFile].CopyTo(parentStreams[originalFile]);
+                                outputStreams[originalFile].Close();
+                                
+
+                            }
+                        }
                     }
+
 
                     //REVIEW TODO: Add ChemProV file merging
                     //Step 1: Get original document as file stream
                     //Step 2: Merge in all user reviews
                     // function call: ChemProV.Core.CommentMerger.Merge
                 }
-                
 
-                FileSystem.CreateZipFolder((ActiveCourseUser.AbstractCourse as Course), zipfile, assignment, previousAssignmentTeam);
+                foreach (string file in parentStreams.Keys.ToList())
+                {
+                    parentStreams[file].Seek(0, SeekOrigin.Begin);
+                    zipfile.AddEntry(Path.GetFileNameWithoutExtension(file) + "_MergedReview.cpml", parentStreams[file]);
+                }
+
+                FileSystem.CreateZipFolder((ActiveCourseUser.AbstractCourse as Course),
+                                    zipfile,
+                                    assignment,
+                                    previousAssignmentTeam);
+
                 stream = FileSystem.GetDocumentForRead(zipfile.Name);
                 return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
             }
             return RedirectToAction("Index", "Home");
         }
-        
+
         private ActionResult GetSubmissionZipHelper(int assignmentID, int teamID, Team authorTeam = null)
         {
             Assignment assignment = db.Assignments.Find(assignmentID);
