@@ -265,7 +265,14 @@ namespace OSBLE.Models.Assignments
         /// </summary>
         public bool IsWizardAssignment { get; set; }
 
-        public bool IsCriticalReviewPublished { get; set; }
+        [NotMapped]
+        public bool IsCriticalReviewPublished
+        {
+            get
+            {
+                return (CriticalReviewPublishDate != null);
+            }
+        }
         public DateTime? CriticalReviewPublishDate { get; set; }
 
         #endregion
