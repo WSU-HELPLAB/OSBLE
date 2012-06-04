@@ -286,7 +286,7 @@ namespace OSBLE.Controllers
             Assignment assignment = db.Assignments.Find(assignmentId);
             AssignmentTeam previousAssignmentTeam = GetAssignmentTeam(assignment.PreceedingAssignment, receiver.UserProfile);
 
-            if (ActiveCourseUser.AbstractRole.CanModify || receiverId == ActiveCourseUser.ID)
+            if (ActiveCourseUser.AbstractRole.CanModify || (receiverId == ActiveCourseUser.ID && assignment.IsCriticalReviewPublished))
             {
                 //REVIEW TODO: Explain the hack that you're using below.
                 Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, previousAssignmentTeam);
