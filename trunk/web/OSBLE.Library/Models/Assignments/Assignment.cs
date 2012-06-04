@@ -26,6 +26,9 @@ namespace OSBLE.Models.Assignments
             IsWizardAssignment = true;
             Scores = new List<Score>();
             Type = AssignmentTypes.Basic;
+            IsCriticalReviewPublished = false;
+            CriticalReviewPublishDate = null;
+
         }
 
         #region public properties
@@ -261,6 +264,9 @@ namespace OSBLE.Models.Assignments
         /// used to distinguish wizard created assignments versus gradebook created assignments
         /// </summary>
         public bool IsWizardAssignment { get; set; }
+
+        public bool IsCriticalReviewPublished { get; set; }
+        public DateTime? CriticalReviewPublishDate { get; set; }
 
         #endregion
 

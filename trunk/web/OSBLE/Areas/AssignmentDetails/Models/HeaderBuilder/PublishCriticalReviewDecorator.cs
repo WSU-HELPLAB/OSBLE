@@ -20,6 +20,16 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             dynamic header = Builder.BuildHeader(assignment);
             header.PublishCR = new DynamicDictionary();
 
+            header.PublishCR.PublishButtonDisplayValue = "Publish All Reviews";
+            header.PublishCR.PublishStatus = "Not Published";
+            if (assignment.IsCriticalReviewPublished)
+            {
+                if (assignment.CriticalReviewPublishDate != null)
+                {
+                    header.PublishCR.PublishStatus = "Published " + assignment.CriticalReviewPublishDate.ToString();
+                    header.PublishCR.PublishButtonDisplayValue = "Republish All Reviews";
+                }
+            }
             header.PublishCR.assignmentID = assignment.ID;
 
             return header;

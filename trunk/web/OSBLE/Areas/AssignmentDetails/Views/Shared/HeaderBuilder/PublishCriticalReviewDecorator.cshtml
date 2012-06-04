@@ -4,16 +4,19 @@
 @{
     dynamic dataModel = Model;
     int assignmentId = dataModel.PublishCR.assignmentID;
+    string linkDisplayValue = dataModel.PublishCR.PublishButtonDisplayValue;
+    
 }
 
 <tr>
-<th>Critical Review <br /> Publish Progress</th>
-<td>
-    @Html.ActionLink("Publish All",
-                "PublishAllCriticalReviews",
-                "Assignment",
-                new { area = "", assignmentID = assignmentId },
-                new { })
-</td>
+    <th>Critical Review Publish</th>
+    <td>
+        <text>dataModel.PublishCR.PublishCR.PublishStatus</text>
+        @Html.ActionLink(linkDisplayValue,
+                    "PublishAllCriticalReviews",
+                    "Assignment",
+                    new { area = "", assignmentID = assignmentId },
+                    new { })
+    </td>
 </tr>
 

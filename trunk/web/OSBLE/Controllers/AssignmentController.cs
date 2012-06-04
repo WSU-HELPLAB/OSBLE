@@ -927,27 +927,21 @@ namespace OSBLE.Controllers
         {
         }
 
+
+        /// <summary>
+        /// This function will publish all the critical reviews for a critical review assignment. Allowing students to download their evaluated 
+        /// documents.
+        /// </summary>
+        /// <param name="assignmentID">critical review assignment ID</param>
+        /// <returns></returns>
+        [CanModifyCourse]
         public ActionResult PublishAllCriticalReviews(int assignmentID)
         {
-            List<ReviewTeam> reviewTeams = db.ReviewTeams.Where(rt => rt.AssignmentID == assignmentID).ToList();
-
-            foreach (ReviewTeam rt in reviewTeams)
-            {
-                PublishSingleCriticalReview(assignmentID, rt.AuthorTeamID, rt.ReviewTeamID);
-            }
+            Assignment assignment = db.Assignments.Find(assignmentID);
+            assignment.IsCriticalReviewPublished = true;
+            assignment.CriticalReviewPublishDate = DateTime.Now;
+            db.SaveChanges();
             return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentID });
-        }
-
-        public void PublishSingleCriticalReview(int assignmentId, int authorTeamId, int reviewTeamId)
-        {
-            ReviewTeam rt = db.ReviewTeams.Find(assignmentId, authorTeamId, reviewTeamId);
-
-            if (rt != null)
-            {
-                rt.PublishedDate = DateTime.Now;
-                rt.Published = true;
-                db.SaveChanges();
-            }
         }
 
 
