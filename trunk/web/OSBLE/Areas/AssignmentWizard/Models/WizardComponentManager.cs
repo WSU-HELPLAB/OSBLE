@@ -328,7 +328,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             IList<AssignmentTypes> possibleTypes = Assignment.AllAssignmentTypes;
             foreach (AssignmentTypes type in possibleTypes)
             {
-                if (assignmentType.Contains(type.ToString()))
+                if (assignmentType == type.ToString())
                 {
                     return SetActiveAssignmentType(type);
                 }

@@ -41,7 +41,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get 
             {
-                return (new AssignmentTypes[] { AssignmentTypes.CriticalReview, AssignmentTypes.TeamEvaluation }).ToList();
+                return (new AssignmentTypes[] { AssignmentTypes.CriticalReview, AssignmentTypes.TeamEvaluation, AssignmentTypes.CriticalReviewDiscussion }).ToList();
             }
         }
 
