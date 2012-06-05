@@ -8,9 +8,9 @@ using OSBLE.Models.Assignments;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 {
-    public class DiscussionLinkDecorator : HeaderDecorator
+    public class TeacherDiscussionLinkDecorator : HeaderDecorator
     {
-        public DiscussionLinkDecorator(IHeaderBuilder builder)
+        public TeacherDiscussionLinkDecorator(IHeaderBuilder builder)
             : base(builder)
         {
         }

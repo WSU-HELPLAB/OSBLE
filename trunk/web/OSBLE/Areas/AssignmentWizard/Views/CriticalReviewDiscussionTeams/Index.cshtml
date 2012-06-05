@@ -1,4 +1,31 @@
 ﻿@using OSBLE.Models.Assignments;
 @model Assignment
 @Html.HiddenFor(m => m.ID)
-<h2>Wooot woot</h2>
+
+@section Header{
+    <link href="@Url.Content("~/AssignmentWizard/Content/css/team.css")" type="text/css" rel="Stylesheet" />
+    
+}
+
+<div id="TeamsDiv">
+    <h3>Teams</h3>
+
+    @{int counter = 0;}
+    @foreach (DiscussionTeam dt in ViewBag.criticalReviewDiscussionTeams)
+    {
+        counter++;
+        <div id="teamDiv_@(counter)_@(dt.TeamID)" class="TeamDiv">
+            <input type="text" class="TeamNameTextBox" value="@dt.Team.Name" />
+            <ul id="team_@(counter)_@(@dt.TeamID)" class="TeamSortable">
+                @foreach (TeamMember member in dt.Team.TeamMembers)
+                {
+                    <li id="cu_@(member.CourseUserID)" class="ui-state-default Student">@member.CourseUser.UserProfile.LastName, @member.CourseUser.UserProfile.FirstName</li>
+                }
+            </ul>
+        </div>
+                if (counter % 3 == 0)
+                {
+            <div style="clear:both;"></div>
+                }
+    }
+</div>

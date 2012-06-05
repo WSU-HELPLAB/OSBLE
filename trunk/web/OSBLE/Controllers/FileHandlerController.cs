@@ -266,10 +266,25 @@ namespace OSBLE.Controllers
             //get authorTeam
             Team authorTeam = db.Teams.Find(authorTeamId);
 
-            Assignment CRassignment = db.Assignments.Find(assignmentId);
-            AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourseUser.UserProfile);
+            bool isOwnDocument = false;
+            foreach (TeamMember tm in authorTeam.TeamMembers)
+            {
+                if (tm.CourseUserID == ActiveCourseUser.ID)
+                {
+                    isOwnDocument = true;
+                    break;
+                }
+            }
 
-            return GetSubmissionZipHelper(assignmentId, at.TeamID, authorTeam);
+            if (isOwnDocument)
+            {
+                Assignment CRassignment = db.Assignments.Find(assignmentId);
+                AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourseUser.UserProfile);
+
+                return GetSubmissionZipHelper(assignmentId, at.TeamID, authorTeam);
+            }
+
+            return RedirectToAction("Index", "Home");
         }
 
         /// <summary>
@@ -356,12 +371,6 @@ namespace OSBLE.Controllers
                             }
                         }
                     }
-
-
-                    //REVIEW TODO: Add ChemProV file merging
-                    //Step 1: Get original document as file stream
-                    //Step 2: Merge in all user reviews
-                    // function call: ChemProV.Core.CommentMerger.Merge
                 }
 
                 foreach (string file in parentStreams.Keys.ToList())

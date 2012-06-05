@@ -57,46 +57,74 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             base.Index();
 
-            List<DiscussionTeam> discussionTeams = new List<DiscussionTeam>();
-            Dictionary<int, Team> TeamDict = new Dictionary<int, Team>();
-
-            List<int> authorTeamIDs = (from rt in Assignment.PreceedingAssignment.ReviewTeams
-                                       select rt.AuthorTeamID).Distinct().ToList();
-
-            int i = 0;
-            //Right now, were not adding the authorteam into the discussion team created. Find them and insert them
-            foreach (int authorTeamID in authorTeamIDs)
+            //Only creating the discussion teams for the assignment if DiscussionTeams does not exist. 
+            if (Assignment.DiscussionTeams == null || Assignment.DiscussionTeams.Count == 0)
             {
-                DiscussionTeam dt = new DiscussionTeam();
-                Team team = new Team();
 
-                List<Team> reviewTeams = (from rt in Assignment.PreceedingAssignment.ReviewTeams
-                                       where rt.AuthorTeamID == authorTeamID
-                                       select rt.ReviewingTeam).ToList();
+                List<DiscussionTeam> discussionTeams = new List<DiscussionTeam>();
+                Dictionary<int, Team> TeamDict = new Dictionary<int, Team>();
 
-                foreach (Team reviewerTeam in reviewTeams)
+                List<Team> authorTeams = (from rt in Assignment.PreceedingAssignment.ReviewTeams
+                                          select rt.AuthorTeam).Distinct().ToList();
+
+                int i = 0;
+                //Foreach author team, creating a new DiscussionTeam who consists of all the people
+                //who reviewed that author team as well as that author team.
+                foreach (Team authorTeam in authorTeams)
                 {
-                    foreach (TeamMember tm in reviewerTeam.TeamMembers)
+                    DiscussionTeam dt = new DiscussionTeam();
+                    Team team = new Team();
+
+                    List<Team> reviewTeams = (from rt in Assignment.PreceedingAssignment.ReviewTeams
+                                              where rt.AuthorTeamID == authorTeam.ID
+                                              select rt.ReviewingTeam).ToList();
+
+                    //Adding all the reviewing team members to the Team
+                    foreach (Team reviewerTeam in reviewTeams)
                     {
-                        TeamMember newTm = new TeamMember();
-                        newTm.CourseUserID = tm.CourseUserID;
-                        newTm.Team = team;
-                        if (!team.TeamMembers.Contains(newTm)) //Only adding team members once
+
+                        //Generating a list of all team members in the review team and the author team
+                        List<TeamMember> newTeamMembers = reviewerTeam.TeamMembers.ToList();
+                        newTeamMembers.AddRange(authorTeam.TeamMembers);
+
+                        //Going through all the team members, creating new team members out of them and associating them with our newly created team.
+                        foreach (TeamMember tm in newTeamMembers)
                         {
-                            team.TeamMembers.Add(newTm);
+                            TeamMember newTm = new TeamMember();
+                            newTm.CourseUserID = tm.CourseUserID;
+                            newTm.Team = team;
+                            newTm.CourseUser = tm.CourseUser;
+
+                            //Checking to see if member already exists in team. Only adding them if they are not on team. 
+                            bool alreadyInTeam = false;
+                            foreach (TeamMember currentMember in team.TeamMembers)
+                            {
+                                if (currentMember.CourseUserID == newTm.CourseUserID)
+                                {
+                                    alreadyInTeam = true;
+                                }
+                            }
+                            if (!alreadyInTeam)
+                            {
+                                team.TeamMembers.Add(newTm);
+                            }
                         }
                     }
+
+                    //Naming the team and associating the team with a discussion team
+                    team.Name = "Discussion Team " + i.ToString();
+                    i++;
+                    dt.Team = team;
+                    dt.AssignmentID = Assignment.ID;
+                    discussionTeams.Add(dt);
                 }
 
-                team.Name = "Team " + i.ToString();
-                i++;
-                dt.Team = team;
-                dt.AssignmentID = Assignment.ID;
-                discussionTeams.Add(dt);
+                //Associating the list of discussion teams with the Critical Review Discussion assignment
+                Assignment.DiscussionTeams = discussionTeams;
+                db.SaveChanges();
             }
 
-            Assignment.DiscussionTeams = discussionTeams;
-            db.SaveChanges();
+            ViewBag.criticalReviewDiscussionTeams = Assignment.DiscussionTeams;
 
             return View(Assignment);
         }

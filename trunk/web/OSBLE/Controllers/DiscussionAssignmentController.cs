@@ -13,15 +13,13 @@ namespace OSBLE.Controllers
 {
     public class DiscussionAssignmentController : OSBLEController
     {
-        //
         // GET: /DiscussionAssignment/
-
-        public ActionResult Index(int assignmentId)
+        public ActionResult Index(int assignmentId, int? discussionTeamId = null)
         {
             List<DiscussionPost> teamPosts = new List<DiscussionPost>();
             DiscussionTeam discussionTeam = new DiscussionTeam();
             List<DiscussionPost> posts = new List<DiscussionPost>();
-            
+
             Assignment assignment = db.Assignments.Find(assignmentId);
             ViewBag.Assignment = assignment;
             ViewBag.Posts = null;
@@ -40,7 +38,7 @@ namespace OSBLE.Controllers
 
             foreach (DiscussionPost post in posts)
             {
-                if (post.CourseUserID == ActiveCourse.ID)
+                if (post.CourseUserID == ActiveCourseUser.ID)
                 {
                     ViewBag.FirstPost = true;
                     break;
@@ -49,17 +47,12 @@ namespace OSBLE.Controllers
 
             if (assignment.HasDiscussionTeams)
             {
-                foreach (DiscussionTeam dt in assignment.DiscussionTeams)
-                {
-                    foreach (TeamMember tm in dt.Team.TeamMembers)
-                    {
-                        if (tm.CourseUser.ID == ActiveCourse.ID)
-                        {
-                            discussionTeam = dt;
-                            break;
-                        }
-                    }
-                }
+                //finding the discussion team that I am in
+                discussionTeam = (from dt in assignment.DiscussionTeams
+                                  where dt.TeamID == discussionTeamId
+                                  select dt).FirstOrDefault();
+
+                //Gathering the posts for each team member, adding them into List:teamPosts
                 foreach (TeamMember tm in discussionTeam.Team.TeamMembers)
                 {
                     posts = (from post in db.DiscussionPosts
@@ -73,6 +66,9 @@ namespace OSBLE.Controllers
                         teamPosts.Add(post);
                     }
                 }
+
+
+                //Gathering posts from the instructor, adding them into teamPosts
                 posts = (from post in db.DiscussionPosts
                          where post.AssignmentID == assignment.ID &&
                          post.CourseUser.AbstractRole.CanModify &&
@@ -83,14 +79,16 @@ namespace OSBLE.Controllers
                 {
                     teamPosts.Add(post);
                 }
+
                 ViewBag.Posts = teamPosts.OrderBy(t => t.Posted);
             }
-            else
+            else //Discussion for entire class
             {
+                //Adding all posts for the assignment
                 ViewBag.Posts = posts;
             }
 
-            ViewBag.ActiveCourse = ActiveCourse;
+            ViewBag.ActiveCourse = ActiveCourseUser;
             if (assignment.HasDiscussionTeams)
             {
                 ViewBag.TeamName = "- " + discussionTeam.Team.Name;
@@ -103,6 +101,8 @@ namespace OSBLE.Controllers
         }
 
         [CanModifyCourse]
+        //need to add additional paramter: discussionTeamId. Then grab DT based off that paramater rather than 
+        //finding it via CourseUserID (As this will result in multiple finds in a CRD assignment type)
         public ActionResult TeacherIndex(int assignmentId, int courseUserId, int postOrReply)
         {
             List<DiscussionPost> teamPosts = new List<DiscussionPost>();
