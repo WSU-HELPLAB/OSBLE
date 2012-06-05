@@ -133,6 +133,12 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderBuilder = new CriticalReviewStudentDownloadDecorator(vm.HeaderBuilder, vm.Client);
                     vm.HeaderViews.Add("CriticalReviewStudentDownloadDecorator");
                 }
+                else if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion || 
+                    assignment.Type == AssignmentTypes.DiscussionAssignment)
+                {
+                    vm.HeaderBuilder = new StudentDiscussionLinkDecorator(vm.HeaderBuilder, vm.Client);
+                    vm.HeaderViews.Add("StudentDiscussionLinkDecorator");
+                }
 
                 //rubric?
                 if (assignment.HasRubric)

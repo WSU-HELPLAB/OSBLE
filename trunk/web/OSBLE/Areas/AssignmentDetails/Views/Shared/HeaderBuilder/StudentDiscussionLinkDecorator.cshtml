@@ -1,0 +1,29 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    List<DiscussionTeam> discussionTeams = dataModel.StudentDiscussion.DiscussionTeams;              
+}
+<tr>
+    <th>
+        Discussion
+    </th>
+    <td>
+
+            <table id="CriticalReviews">
+                @foreach (DiscussionTeam dt in discussionTeams)
+                {
+                    <tr>
+                        <td>
+                         @Html.ActionLink("View Discussion for " + dt.Team.Name, 
+                         "Index", "DiscussionAssignment",
+                         new { assignmentId = dataModel.StudentDiscussion.assignmentID, discussionTeamId = dt.TeamID, area = "" }, 
+                         new { })
+                        </td>
+                    </tr>
+                }
+            </table>
+
+    </td>
+</tr>

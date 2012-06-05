@@ -40,7 +40,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get
             {
-                return (new AssignmentTypes[] { AssignmentTypes.DiscussionAssignment }).ToList();
+                return (new AssignmentTypes[] { AssignmentTypes.DiscussionAssignment, AssignmentTypes.CriticalReviewDiscussion }).ToList();
             }
         }
 
