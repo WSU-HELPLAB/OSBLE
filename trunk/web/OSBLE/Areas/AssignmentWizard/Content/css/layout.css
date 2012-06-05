@@ -6,7 +6,7 @@
     border-bottom:2px solid #074974;
 }
 
-.quickNavItem
+.QuickNavItem
 {
     display:inline;
     padding: 3px 15px 1px 15px;
@@ -16,24 +16,25 @@
     background:#DFDFDF;
 }
 
-.quickNavItem a
+.QuickNavItem a
 {
     text-decoration:none;
+    cursor:pointer;
 }
 
-.quickNavNotActive a
+.QuickNavNotActive a
 {
     font-size:80%;
     color:#2D2D2D;
 }
 
-.quickNavActive
+.QuickNavActive
 {
     border-bottom: 3px solid white;
     background: white;
 }
 
-.quickNavActive a
+.QuickNavActive a
 {
     font-weight:bold;
 }
@@ -42,8 +43,4 @@
 {
     padding:15px 4px 15px 4px;
     margin-bottom:7px;
-    /*
-    border:2px solid #074974;
-    border-top:none;
-*/
 }

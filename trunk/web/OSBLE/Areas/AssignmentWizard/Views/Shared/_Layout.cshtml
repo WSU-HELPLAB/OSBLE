@@ -16,21 +16,32 @@
 @using (Html.BeginForm("Index", null, FormMethod.Post, new { id = "WizardForm" }))
 {
     <ul id="QuickNav">
-        @if (ViewBag.Assignment != null && ViewBag.Assignment.ID != 0 && ViewBag.IsNewAssignment == false)
-        {
-            <li class="quickNavItem quickNavNotActive"><a href="#" onclick="changePage('');">Assignment Components</a></li>
-            foreach (WizardBaseController comp in ViewBag.Components)
+        
+            <li class="QuickNavItem QuickNavNotActive"><a href="#" onclick="changePage('');">Assignment Components</a></li>
+            @foreach (WizardBaseController comp in ViewBag.Components)
             {
+                string liClasses = "QuickNavItem";
                 if (comp.ControllerName == ViewBag.ActiveComponent.ControllerName)
                 {
-                <li class="quickNavItem quickNavActive"><a href="#" onclick="changePage('@comp.ControllerName');">@comp.PrettyName</a></li>
+                    liClasses += " QuickNavActive";
                 }
                 else
                 {
-                <li class="quickNavItem quickNavNotActive"><a href="#" onclick="changePage('@comp.ControllerName');">@comp.PrettyName</a></li>
+                    liClasses += " QuickNavNotActive";
                 }
+                //AC Note: Style breaks if you place the <LI> and <A> on different lines, so I've
+                //just thrown the whole thing into the IF statement.
+                if (ViewBag.Assignment != null && ViewBag.Assignment.ID != 0 && ViewBag.IsNewAssignment == false)
+                {
+                <li class="@liClasses"><a href="#" onclick="changePage('@comp.ControllerName');">@comp.PrettyName</a></li>
+                }
+                else
+                {
+                    <li class="@liClasses">@comp.PrettyName</li>
+                }
+
             }
-        }
+        
     </ul>
 <div id="WizardFormBody">
 @RenderBody()
