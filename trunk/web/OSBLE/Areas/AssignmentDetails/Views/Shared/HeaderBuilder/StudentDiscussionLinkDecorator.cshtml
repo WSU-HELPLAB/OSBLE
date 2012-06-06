@@ -25,8 +25,8 @@
                         @if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
                         {
                             <td>
-                                @(Html.ActionLink("Download prompt", "GetReviewsOfAuthor", "FileHandler",
-                                new { area = "", assignmentId = assignment.ID, receiverId =  3}, 
+                                @(Html.ActionLink("Download prompt", "GetCriticalReviewDiscussionItems", "FileHandler",
+                                new { area = "", discussionTeamID = dt.ID}, 
                                 new { onclick = "create_and_open_downloading_submission_dialog()"}))
                             </td>
                         }

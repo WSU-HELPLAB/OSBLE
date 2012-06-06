@@ -40,7 +40,8 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
             vm.HeaderBuilder = new DefaultBuilder();
 
             //views common to both students and teachers:
-            if (assignment.Type == AssignmentTypes.DiscussionAssignment)
+            if (assignment.Type == AssignmentTypes.DiscussionAssignment ||
+                assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
             {
                 //add initial / final post due date information
                 //TODO: this will replace the "posts due" row
@@ -70,7 +71,9 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 }
 
                 //is a discussion assignment
-                if (assignment.Type == AssignmentTypes.DiscussionAssignment && !assignment.HasDiscussionTeams)
+                if ((assignment.Type == AssignmentTypes.DiscussionAssignment || 
+                    assignment.Type == AssignmentTypes.CriticalReviewDiscussion) && 
+                    !assignment.HasDiscussionTeams)
                 {
                     //link to classwide discussion
                     vm.HeaderBuilder = new TeacherDiscussionLinkDecorator(vm.HeaderBuilder);
@@ -199,7 +202,8 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.TableColumnHeaders["InlineReviewTableDecorator"] = "Inline Review";
                 }
 
-                if (assignment.Type == AssignmentTypes.DiscussionAssignment)
+                if (assignment.Type == AssignmentTypes.DiscussionAssignment ||
+                    assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
                 {
                     List<DiscussionPost> allUserPosts;
                     using (OSBLEContext db = new OSBLEContext())
@@ -293,7 +297,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 case AssignmentTypes.Basic:
                 case AssignmentTypes.CriticalReview:
                 case AssignmentTypes.CriticalReviewDiscussion:
-                    teams = assignment.AssignmentTeams.Cast<IAssignmentTeam>().ToList();
+                    teams = assignment.DiscussionTeams.Cast<IAssignmentTeam>().ToList();
                     break;
             }
             return teams;

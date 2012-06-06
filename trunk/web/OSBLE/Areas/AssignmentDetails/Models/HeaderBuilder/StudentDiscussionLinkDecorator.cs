@@ -29,7 +29,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             //build a list of all discussionTeams that the current student is on
             foreach(DiscussionTeam dt in assignment.DiscussionTeams)
             {
-                foreach (TeamMember tm in dt.Team.TeamMembers)
+                foreach (TeamMember tm in dt.GetAllTeamMembers())
                 {
                     if (tm.CourseUserID == Student.ID)
                     {

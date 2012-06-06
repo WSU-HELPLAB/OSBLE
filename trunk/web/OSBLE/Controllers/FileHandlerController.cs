@@ -297,97 +297,141 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public ActionResult GetReviewsOfAuthor(int assignmentId, int receiverId)
         {
-            DiscussionTeam dt = new DiscussionTeam();
-            CourseUser receiver = db.CourseUsers.Find(receiverId);
             Assignment assignment = db.Assignments.Find(assignmentId);
-            AssignmentTeam previousAssignmentTeam = GetAssignmentTeam(assignment.PreceedingAssignment, receiver.UserProfile);
 
             if (ActiveCourseUser.AbstractRole.CanModify || (receiverId == ActiveCourseUser.ID && assignment.IsCriticalReviewPublished))
             {
-                //REVIEW TODO: Explain the hack that you're using below.
-                Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, previousAssignmentTeam);
-                string zipFileName = "Critical Review of " + previousAssignmentTeam.Team.Name + ".zip";
+                return GetReviewsOfAuthorHelper(assignment, receiverId);
+            }
+            return RedirectToAction("Index", "Home");
+        }
 
-                //zip file already exists, no need to create a new one
-                if (stream != null)
+
+        public ActionResult GetCriticalReviewDiscussionItems(int discussionTeamID)
+        {
+            DiscussionTeam dt = db.DiscussionTeams.Find(discussionTeamID);
+
+            Assignment precedingAssignment = dt.Assignment.PreceedingAssignment;
+
+            //Permission checking:
+            // assert that the activeCourseUser is a member of the discussion team of discussionTeamID
+            // and confirm that the critical review to be downloaded has been published
+            // note: these contraints do not apply to instructors
+            bool belongsToDT = false;
+
+            foreach (TeamMember tm in dt.GetAllTeamMembers())
+            {
+                if (tm.CourseUserID == ActiveCourseUser.ID)
                 {
-                    return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
+                    belongsToDT = true;
+                    break;
                 }
+            }
 
-                ZipFile zipfile = new ZipFile();
-                string submissionFolder;
+            if (ActiveCourseUser.AbstractRole.CanModify || (belongsToDT && precedingAssignment.IsCriticalReviewPublished))
+            {
+                return GetReviewsOfAuthorHelper(precedingAssignment, dt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUserID);
+            }
+            return RedirectToAction("Index", "Home");
+        }
 
-                List<int> teamsReviewingIds = (from rt in assignment.ReviewTeams
-                                               where rt.AuthorTeamID == previousAssignmentTeam.TeamID
-                                               select rt.ReviewTeamID).ToList();
+        /// <summary>
+        /// get a zip containing reviews that have been done 
+        /// to the the author's (receiverId) preceding assignment
+        /// </summary>
+        /// <param name="assignment">assignment of the critical review</param>
+        /// <param name="receiverId">This is the CourseUser you want to download received reviews for. 
+        /// If it is team based, any course user in the preceding assignment team will yield the same results</param>
+        /// <returns></returns>
+        private ActionResult GetReviewsOfAuthorHelper(Assignment assignment, int receiverId)
+        {
+            CourseUser receiver = db.CourseUsers.Find(receiverId);
+            AssignmentTeam previousAssignmentTeam = GetAssignmentTeam(assignment.PreceedingAssignment, receiver.UserProfile);
 
-                List<AssignmentTeam> ReviewingAssignmentTeams = (from at in assignment.AssignmentTeams
-                                                                 where teamsReviewingIds.Contains(at.TeamID)
-                                                                 select at).ToList();
+            //REVIEW TODO: Explain the hack that you're using below.
+            Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, previousAssignmentTeam);
+            string zipFileName = "Critical Review of " + previousAssignmentTeam.Team.Name + ".zip";
 
-                Dictionary<string, MemoryStream> parentStreams = new Dictionary<string, MemoryStream>();
-                Dictionary<string, MemoryStream> outputStreams = new Dictionary<string, MemoryStream>();
+            //zip file already exists, no need to create a new one
+            if (stream != null)
+            {
+                return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
+            }
 
-                foreach (AssignmentTeam at in ReviewingAssignmentTeams)
+            ZipFile zipfile = new ZipFile();
+            string submissionFolder;
+
+            List<int> teamsReviewingIds = (from rt in assignment.ReviewTeams
+                                           where rt.AuthorTeamID == previousAssignmentTeam.TeamID
+                                           select rt.ReviewTeamID).ToList();
+
+            List<AssignmentTeam> ReviewingAssignmentTeams = (from at in assignment.AssignmentTeams
+                                                             where teamsReviewingIds.Contains(at.TeamID)
+                                                             select at).ToList();
+
+            Dictionary<string, MemoryStream> parentStreams = new Dictionary<string, MemoryStream>();
+            Dictionary<string, MemoryStream> outputStreams = new Dictionary<string, MemoryStream>();
+
+            foreach (AssignmentTeam at in ReviewingAssignmentTeams)
+            {
+                submissionFolder = FileSystem.GetTeamUserSubmissionFolderForAuthorID(false, (ActiveCourseUser.AbstractCourse as Course), assignment.ID, at, previousAssignmentTeam.Team);
+                if (new DirectoryInfo(submissionFolder).Exists)
                 {
-                    submissionFolder = FileSystem.GetTeamUserSubmissionFolderForAuthorID(false, (ActiveCourseUser.AbstractCourse as Course), assignment.ID, at, previousAssignmentTeam.Team);
-                    if (new DirectoryInfo(submissionFolder).Exists)
+                    zipfile.AddDirectory(submissionFolder, at.Team.Name);
+
+                    foreach (string filePath in Directory.EnumerateFiles(submissionFolder))
                     {
-                        zipfile.AddDirectory(submissionFolder, at.Team.Name);
-
-                        foreach (string filePath in Directory.EnumerateFiles(submissionFolder))
+                        if (Path.GetExtension(filePath) == ".cpml")
                         {
-                            if (Path.GetExtension(filePath) == ".cpml")
+                            //Step 1: Get original document as file stream
+                            string originalFile = FileSystem.GetDeliverable((ActiveCourseUser.AbstractCourse as Course),
+                                (int)assignment.PrecededingAssignmentID,
+                                previousAssignmentTeam,
+                                Path.GetFileName(filePath));
+
+                            if (!parentStreams.ContainsKey(originalFile))
                             {
-                                //Step 1: Get original document as file stream
-                                string originalFile = FileSystem.GetDeliverable((ActiveCourseUser.AbstractCourse as Course),
-                                    (int)assignment.PrecededingAssignmentID,
-                                    previousAssignmentTeam,
-                                    Path.GetFileName(filePath));
-
-                                if(!parentStreams.ContainsKey(originalFile))
-                                {
-                                    FileStream fs = System.IO.File.OpenRead(originalFile);
-                                    parentStreams[originalFile] = new MemoryStream();
-                                    fs.CopyTo(parentStreams[originalFile]);
-                                    fs.Close();
-                                }
-
-                                outputStreams[originalFile] = new MemoryStream();
-
-
-                                //open student's review file
-                                FileStream studentReview = System.IO.File.OpenRead(filePath);
-
-                                //merge the file
-                                ChemProV.Core.CommentMerger.Merge(parentStreams[originalFile], previousAssignmentTeam.Team.Name, studentReview, at.Team.Name, outputStreams[originalFile]);
-
-                                //merge output back into the parent
+                                FileStream fs = System.IO.File.OpenRead(originalFile);
                                 parentStreams[originalFile] = new MemoryStream();
-                                outputStreams[originalFile].Seek(0, SeekOrigin.Begin);
-                                outputStreams[originalFile].CopyTo(parentStreams[originalFile]);
-                                outputStreams[originalFile].Close();
-                                
-
+                                fs.CopyTo(parentStreams[originalFile]);
+                                fs.Close();
                             }
+
+                            outputStreams[originalFile] = new MemoryStream();
+
+
+                            //open student's review file
+                            FileStream studentReview = System.IO.File.OpenRead(filePath);
+
+                            //merge the file
+                            ChemProV.Core.CommentMerger.Merge(parentStreams[originalFile], previousAssignmentTeam.Team.Name, studentReview, at.Team.Name, outputStreams[originalFile]);
+
+                            //merge output back into the parent
+                            parentStreams[originalFile] = new MemoryStream();
+                            outputStreams[originalFile].Seek(0, SeekOrigin.Begin);
+                            outputStreams[originalFile].CopyTo(parentStreams[originalFile]);
+                            outputStreams[originalFile].Close();
+
+
                         }
                     }
                 }
-
-                foreach (string file in parentStreams.Keys.ToList())
-                {
-                    parentStreams[file].Seek(0, SeekOrigin.Begin);
-                    zipfile.AddEntry(Path.GetFileNameWithoutExtension(file) + "_MergedReview.cpml", parentStreams[file]);
-                }
-
-                FileSystem.CreateZipFolder((ActiveCourseUser.AbstractCourse as Course),
-                                    zipfile,
-                                    assignment,
-                                    previousAssignmentTeam);
-
-                stream = FileSystem.GetDocumentForRead(zipfile.Name);
-                return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
             }
+
+            foreach (string file in parentStreams.Keys.ToList())
+            {
+                parentStreams[file].Seek(0, SeekOrigin.Begin);
+                zipfile.AddEntry(Path.GetFileNameWithoutExtension(file) + "_MergedReview.cpml", parentStreams[file]);
+            }
+
+            FileSystem.CreateZipFolder((ActiveCourseUser.AbstractCourse as Course),
+                                zipfile,
+                                assignment,
+                                previousAssignmentTeam);
+
+            stream = FileSystem.GetDocumentForRead(zipfile.Name);
+            return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
+
             return RedirectToAction("Index", "Home");
         }
 
