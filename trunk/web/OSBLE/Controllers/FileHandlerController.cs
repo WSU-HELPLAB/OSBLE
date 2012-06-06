@@ -292,11 +292,13 @@ namespace OSBLE.Controllers
         /// to the the author's (receiverId) preceding assignment 
         /// </summary>
         /// <param name="assignmentId">assignment ID of the critical review</param>
-        /// <param name="receiver">This is the CourseUser you want to download received reviews for. 
+        /// <param name="receiverId">This is the CourseUser you want to download received reviews for. 
         /// If it is team based, any course user in the preceding assignment team will yield the same results</param>
         /// <returns></returns>
         public ActionResult GetReviewsOfAuthor(int assignmentId, int receiverId)
         {
+            DiscussionTeam dt = new DiscussionTeam();
+            dt.TeamID
             CourseUser receiver = db.CourseUsers.Find(receiverId);
             Assignment assignment = db.Assignments.Find(assignmentId);
             AssignmentTeam previousAssignmentTeam = GetAssignmentTeam(assignment.PreceedingAssignment, receiver.UserProfile);

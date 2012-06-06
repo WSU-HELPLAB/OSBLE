@@ -5,6 +5,7 @@
 @using OSBLE.Models.Assignments
 @{
     Assignment assignment = ViewBag.Assignment;
+    int discussionTeamID = ViewBag.DiscussionTeamID;
 }
 <script type="text/javascript">
 
@@ -34,7 +35,7 @@
 
         <div>
             <input type="hidden" id="MaxContentChars" value="@ViewBag.MaxActivityFeedLength"/>
-            @using (Html.BeginForm("NewPost", "DiscussionAssignment", FormMethod.Post))
+            @using (Html.BeginForm("NewPost", "DiscussionAssignment", new { discussionTeamId = discussionTeamID }, FormMethod.Post))
             {
                 <textarea id="ActivityFeed" name="Content" rows="10" style="width: 100%" placeholder="Enter new discussion post here..." onkeydown="RemainingCharsReply()" onkeyup="RemainingCharsReply()"></textarea><br />
                 <input type="hidden" name="AssignmentID" value="@ViewBag.Assignment.ID" />
@@ -89,15 +90,18 @@
                     {
                     <div class="dp_replylink"> <a href="#" id="reply_@(dp.ID)">Reply</a> </div>
                     }
-                <div class="dp_replybox" id="replybox_@(dp.ID)" > <form action="@Url.Action("NewReply")" data-ajax="true" data-ajax-update="#dp_replies_for_@(dp.ID)" data-ajax-begin="$('#reply_@(dp.ID)_button').attr('disabled','disabled')" 
+                <div class="dp_replybox" id="replybox_@(dp.ID)" > <form action="@Url.Action("NewReply", new { discussionTeamId = discussionTeamID })" data-ajax="true" 
+                data-ajax-update="#dp_replies_for_@(dp.ID)" data-ajax-begin="$('#reply_@(dp.ID)_button').attr('disabled','disabled')" 
                 data-ajax-failure="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');});$('#dp_replybox_content_@(dp.ID)').val('')" 
-                data-ajax-complete="$('#reply_@(dp.ID)_button').removeAttr('disabled');$('body').css('cursor', 'default');" data-ajax-success="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');});$('#dp_replybox_content_@(dp.ID)').val('')" 
+                data-ajax-complete="$('#reply_@(dp.ID)_button').removeAttr('disabled');$('body').css('cursor', 'default');" 
+                data-ajax-success="$('.dp_new_post').show('blind',{},'slow',function(){$(this).removeClass('dp_new_post');});$('#dp_replybox_content_@(dp.ID)').val('')" 
                 data-ajax-mode="after" method="post">
                     <input type="hidden" name="reply_to" value="@dp.ID" /> <input type="hidden" name="latest_reply"
                     value="0" id="latest_reply_@(dp.ID)" /> <textarea name="Content" rows="5" cols="40" id="dp_replybox_content_@(dp.ID)" placeholder="Enter reply here..."></textarea><br/> 
                     <input id="reply @(dp.ID)button" type="submit" name="post_reply" value="Post Reply" onclick="refreshCount()"/> 
                     </form> <br /> <div class="dp_replylink"> <a href="#" id="replycancel_@(dp.ID)">Cancel</a>
                 </div> </div>
+    
                 <script type="text/javascript">        
                     $("#reply_@(dp.ID)").click(function () {
                         $("#reply_@(dp.ID)").hide();
@@ -225,7 +229,7 @@
                     <div class="dp_replylink"> <a href="#" id="reply_@(dp.ID)">Reply</a> </div>
                     }
                 <div class="dp_replybox" id="replybox_@(dp.ID)" style="padding-left:23px;" >
-                @using (Html.BeginForm("NewReply", "DiscussionAssignment", FormMethod.Post))
+                @using (Html.BeginForm("NewReply", "DiscussionAssignment", new {discussionTeamId = discussionTeamID }, FormMethod.Post))
                 {
                     @*data-ajax="true"*@
                     @*data-ajax-update="#dp_replies_for_@(dp.ID)"

@@ -24,7 +24,6 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
         {
             dynamic data = Builder.BuildTableForTeam(assignmentTeam);
            
-            //assignmentTeam.Team.TeamMembers
             TeamMember member = assignmentTeam.Team.TeamMembers.FirstOrDefault();
             if (member != null)
             {

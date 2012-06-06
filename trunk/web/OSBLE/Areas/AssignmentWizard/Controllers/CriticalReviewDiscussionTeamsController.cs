@@ -82,10 +82,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     //Adding all the reviewing team members to the Team
                     foreach (Team reviewerTeam in reviewTeams)
                     {
-
                         //Generating a list of all team members in the review team and the author team
                         List<TeamMember> newTeamMembers = reviewerTeam.TeamMembers.ToList();
-                        newTeamMembers.AddRange(authorTeam.TeamMembers);
 
                         //Going through all the team members, creating new team members out of them and associating them with our newly created team.
                         foreach (TeamMember tm in newTeamMembers)
@@ -110,6 +108,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                             }
                         }
                     }
+
+                    dt.AuthorTeam = authorTeam;
+                    dt.AuthorTeamID = authorTeam.ID;
 
                     //Naming the team and associating the team with a discussion team
                     team.Name = "Discussion Team " + i.ToString();

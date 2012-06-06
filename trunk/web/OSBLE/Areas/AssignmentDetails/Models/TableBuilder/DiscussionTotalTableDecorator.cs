@@ -30,9 +30,9 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
                                   where a.CourseUserID == member.CourseUserID &&
                                   !a.IsReply
                                   select a).Count();
-                postCount = (from a in AllUserPosts
+                replyCount = (from a in AllUserPosts
                                   where a.CourseUserID == member.CourseUserID &&
-                                  !a.IsReply
+                                  a.IsReply
                                   select a).Count();
                 data.TotalCount = postCount + replyCount;
             }

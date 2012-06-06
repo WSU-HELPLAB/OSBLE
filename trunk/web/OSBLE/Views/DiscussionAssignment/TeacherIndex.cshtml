@@ -47,6 +47,7 @@
     }
     else
     {
+        //assinging at to the next item in atList that is after the first item that is the selectedTeam
         at = atList.SkipWhile(item => item.TeamID != ViewBag.SelectedTeam.TeamID).Skip(1).FirstOrDefault();
         prevUserId = at.Team.TeamMembers.FirstOrDefault().CourseUserID;
         userCount = atList.Count() - (atList.IndexOf(at) - 1);

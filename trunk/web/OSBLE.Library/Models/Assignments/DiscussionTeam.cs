@@ -20,5 +20,12 @@ namespace OSBLE.Models.Assignments
         [ForeignKey("TeamID")]
         public virtual Team Team { get; set; }
 
+
+        //This will host the AuthorTeam for Critical Review Discussion Assignments. For regular Discussion Assignments, 
+        //this should be remain null.
+        public int? AuthorTeamID { get; set; }
+        [ForeignKey("AuthorTeamID")]
+        public virtual Team AuthorTeam { get; set; }
+
     }
 }

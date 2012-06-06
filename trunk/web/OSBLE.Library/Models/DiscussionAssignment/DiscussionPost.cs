@@ -35,6 +35,13 @@ namespace OSBLE.Models.DiscussionAssignment
 
         public bool IsReply { get; set; }
 
+
+        //Note: this is note the ID of the "DiscussionTeam" but rather the team that belongs to the "DiscussionTeam"
+        [Required]
+        public int DiscussionTeamID { get; set; }
+        [ForeignKey("DiscussionTeamID")]
+        public virtual Team DiscussionTeam { get; set; }
+
         public DiscussionPost()
             : base()
         {
