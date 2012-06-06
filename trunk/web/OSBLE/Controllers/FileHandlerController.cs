@@ -298,7 +298,6 @@ namespace OSBLE.Controllers
         public ActionResult GetReviewsOfAuthor(int assignmentId, int receiverId)
         {
             DiscussionTeam dt = new DiscussionTeam();
-            dt.TeamID
             CourseUser receiver = db.CourseUsers.Find(receiverId);
             Assignment assignment = db.Assignments.Find(assignmentId);
             AssignmentTeam previousAssignmentTeam = GetAssignmentTeam(assignment.PreceedingAssignment, receiver.UserProfile);

@@ -3,7 +3,8 @@
 @model DynamicDictionary
 @{
     dynamic dataModel = Model;
-    List<DiscussionTeam> discussionTeams = dataModel.StudentDiscussion.DiscussionTeams;              
+    List<DiscussionTeam> discussionTeams = dataModel.StudentDiscussion.DiscussionTeams;   
+    Assignment assignment = dataModel.StudentDiscussion.assignment;         
 }
 <tr>
     <th>
@@ -18,9 +19,17 @@
                         <td>
                          @Html.ActionLink("View Discussion for " + dt.Team.Name, 
                          "Index", "DiscussionAssignment",
-                         new { assignmentId = dataModel.StudentDiscussion.assignmentID, discussionTeamId = dt.TeamID, area = "" }, 
+                         new { assignmentId = assignment.ID, discussionTeamId = dt.TeamID, area = "" }, 
                          new { })
                         </td>
+                        @if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
+                        {
+                            <td>
+                                @(Html.ActionLink("Download prompt", "GetReviewsOfAuthor", "FileHandler",
+                                new { area = "", assignmentId = assignment.ID, receiverId =  3}, 
+                                new { onclick = "create_and_open_downloading_submission_dialog()"}))
+                            </td>
+                        }
                     </tr>
                 }
             </table>

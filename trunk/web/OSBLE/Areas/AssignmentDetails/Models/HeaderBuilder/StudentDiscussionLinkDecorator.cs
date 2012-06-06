@@ -40,7 +40,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             }
 
             header.StudentDiscussion.DiscussionTeams = usersTeams;
-            header.StudentDiscussion.assignmentID = assignment.ID;
+            header.StudentDiscussion.assignment = assignment;
             return header;
         }
     }
