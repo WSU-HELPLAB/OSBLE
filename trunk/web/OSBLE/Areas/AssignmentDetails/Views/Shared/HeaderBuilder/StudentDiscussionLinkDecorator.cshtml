@@ -19,7 +19,7 @@
                         <td>
                          @Html.ActionLink("View Discussion for " + dt.Team.Name, 
                          "Index", "DiscussionAssignment",
-                         new { assignmentId = assignment.ID, discussionTeamId = dt.TeamID, area = "" }, 
+                         new { assignmentId = assignment.ID, discussionTeamId = dt.ID, area = "" }, 
                          new { })
                         </td>
                         @if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion)

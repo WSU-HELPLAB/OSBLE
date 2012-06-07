@@ -59,7 +59,10 @@ namespace OSBLE.Controllers
                     }
                 }
             }
-
+            // normal discussion: hasDiscussionTeams == true
+            // Problem: CR disc: hasDiscussionTeams == false
+            // Should ALWAYS have discussions teams?
+            // Problem: discussionTeam is never initialized here
             ViewBag.Posts = posts.OrderBy(p => p.Posted);
             ViewBag.ActiveCourse = ActiveCourseUser;
             if (assignment.HasDiscussionTeams)

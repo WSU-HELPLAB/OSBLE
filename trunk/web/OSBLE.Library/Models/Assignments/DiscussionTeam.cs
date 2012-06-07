@@ -35,7 +35,11 @@ namespace OSBLE.Models.Assignments
         {
             Dictionary<int, TeamMember> returnValHelper = new Dictionary<int, TeamMember>();
             List<TeamMember> potentialMembers = Team.TeamMembers.ToList();
-            potentialMembers.AddRange(AuthorTeam.TeamMembers.ToList());
+
+            if (AuthorTeamID != null)
+            {
+                potentialMembers.AddRange(AuthorTeam.TeamMembers.ToList());
+            }
 
             foreach (TeamMember tm in potentialMembers)
             {
