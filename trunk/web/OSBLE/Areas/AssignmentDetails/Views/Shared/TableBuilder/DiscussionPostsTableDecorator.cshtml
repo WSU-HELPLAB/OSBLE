@@ -4,9 +4,17 @@
 @{
     dynamic dataModel = Model;
     IAssignmentTeam currentTeam = dataModel.AssignmentTeam as IAssignmentTeam;      
-    String postCount = dataModel.postCount.ToString();
+    String postCount = dataModel.Posts.PostCount.ToString();
 }
 <td>  
- 
-     @(Html.ActionLink(postCount, "TeacherIndex", "DiscussionAssignment", new { assignmentId = dataModel.assignmentID, courseUserId = dataModel.CourseUserID, postOrReply = 0, area=""}, new { }))
+     @(Html.ActionLink(postCount,
+     "TeacherIndex", "DiscussionAssignment",
+     new
+     {
+         assignmentId = dataModel.Posts.AssignmentID,
+         courseUserId = dataModel.Posts.CourseUserID,
+         postOrReply = 0,
+         discussionTeamId = dataModel.Posts.DiscussionTeamID,
+         area = ""
+     }, new { }))
 </td>

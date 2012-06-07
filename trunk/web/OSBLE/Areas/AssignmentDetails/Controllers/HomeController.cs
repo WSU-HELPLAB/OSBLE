@@ -27,14 +27,14 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
             {
                 return View("CriticalReviewAssignment", viewModel);
             }
-            else if (assignment.Type != AssignmentTypes.DiscussionAssignment && 
-                assignment.Type != AssignmentTypes.CriticalReviewDiscussion)
+            else if (assignment.Type == AssignmentTypes.DiscussionAssignment ||
+                    assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
             {
-                return View("Index", viewModel);
+                return View("DiscussionAssignment", viewModel);
             }
             else
             {
-                return View("DiscussionAssignment", viewModel);
+                return View("Index", viewModel);
             }
         }
 

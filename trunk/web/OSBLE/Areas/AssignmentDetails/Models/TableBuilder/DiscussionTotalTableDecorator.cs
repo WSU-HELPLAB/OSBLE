@@ -18,28 +18,31 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
             AllUserPosts = allUserPosts;
         }
 
-        public override DynamicDictionary BuildTableForTeam(IAssignmentTeam assignmentTeam)
+        public override DynamicDictionary BuildTableForTeam(IAssignmentTeam discussionTeam)
         {
-            dynamic data = Builder.BuildTableForTeam(assignmentTeam);
-            TeamMember member = assignmentTeam.Team.TeamMembers.FirstOrDefault();
-            int postCount = 0;
-            int replyCount = 0;
+            dynamic data = Builder.BuildTableForTeam(discussionTeam);
+            data.Total = new DynamicDictionary();
+
+            TeamMember member = discussionTeam.Team.TeamMembers.FirstOrDefault();
+            data.Total.PostCount = 0;
             if (member != null)
             {
-                postCount = (from a in AllUserPosts
+                data.Total.PostCount = (from a in AllUserPosts
                                   where a.CourseUserID == member.CourseUserID &&
+                                  a.DiscussionTeamID == (discussionTeam as DiscussionTeam).ID &&
                                   !a.IsReply
                                   select a).Count();
-                replyCount = (from a in AllUserPosts
+
+                data.Total.PostCount += (from a in AllUserPosts
                                   where a.CourseUserID == member.CourseUserID &&
+                                  a.DiscussionTeamID == (discussionTeam as DiscussionTeam).ID &&
                                   a.IsReply
                                   select a).Count();
-                data.TotalCount = postCount + replyCount;
             }
-            else
-            {
-                data.TotalCount = 0;
-            }
+
+            data.Total.CourseUserID = member.CourseUserID;
+            data.Total.AssignmentID = discussionTeam.AssignmentID;
+            data.Total.DiscussionTeamID = (discussionTeam as DiscussionTeam).ID;
             return data;
         }
     }

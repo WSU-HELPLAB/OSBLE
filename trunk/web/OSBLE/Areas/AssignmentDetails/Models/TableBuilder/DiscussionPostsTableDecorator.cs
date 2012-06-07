@@ -20,25 +20,27 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
             AllUserPosts = allUserPosts;
         }
 
-        public override DynamicDictionary BuildTableForTeam(IAssignmentTeam assignmentTeam)
+
+        public override DynamicDictionary BuildTableForTeam(IAssignmentTeam discussionTeam)
         {
-            dynamic data = Builder.BuildTableForTeam(assignmentTeam);
-           
-            TeamMember member = assignmentTeam.Team.TeamMembers.FirstOrDefault();
+            dynamic data = Builder.BuildTableForTeam(discussionTeam);
+            data.Posts = new DynamicDictionary();
+            
+            TeamMember member = discussionTeam.Team.TeamMembers.FirstOrDefault();
+
+            data.Posts.PostCount = 0;
             if (member != null)
             {
-                data.postCount = (from a in AllUserPosts
+                data.Posts.PostCount = (from a in AllUserPosts
                                   where a.CourseUserID == member.CourseUserID &&
+                                  a.DiscussionTeamID == (discussionTeam as DiscussionTeam).ID &&
                                   !a.IsReply
                                   select a).Count();
             }
-            else
-            {
-                data.postCount = 0;
-            }
-            data.courseUserID = member.CourseUserID;
-            data.assignmentID = assignmentTeam.AssignmentID;
 
+            data.Posts.DiscussionTeamID = (discussionTeam as DiscussionTeam).ID;
+            data.Posts.CourseUserID = member.CourseUserID;
+            data.Posts.AssignmentID = discussionTeam.AssignmentID;
             return data;
         }
     }

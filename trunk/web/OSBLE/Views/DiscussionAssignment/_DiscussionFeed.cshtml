@@ -35,7 +35,7 @@
 
         <div>
             <input type="hidden" id="MaxContentChars" value="@ViewBag.MaxActivityFeedLength"/>
-            @using (Html.BeginForm("NewPost", "DiscussionAssignment", new { discussionTeamId = discussionTeamID }, FormMethod.Post))
+            @using (Html.BeginForm("NewPost", "DiscussionAssignment", new { discussionTeamID = discussionTeamID }, FormMethod.Post))
             {
                 <textarea id="ActivityFeed" name="Content" rows="10" style="width: 100%" placeholder="Enter new discussion post here..." onkeydown="RemainingCharsReply()" onkeyup="RemainingCharsReply()"></textarea><br />
                 <input type="hidden" name="AssignmentID" value="@ViewBag.Assignment.ID" />

@@ -24,7 +24,7 @@ namespace OSBLE.Controllers
             ViewBag.Posts = null;
             ViewBag.FirstPost = false;
 
-            //Only filter by discussionTeamId if the assignment HasDiscussionTeams
+            //Only filter by discussionTeamID if the assignment HasDiscussionTeams
             if (assignment.HasDiscussionTeams)
             {
                 posts = (from post in db.DiscussionPosts
@@ -70,27 +70,35 @@ namespace OSBLE.Controllers
             {
                 ViewBag.TeamName = "";
             }
-            ViewBag.DiscussionTeamID = discussionTeam.TeamID;
+            ViewBag.DiscussionTeamID = discussionTeam.ID;
             return View();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        /// <param name="courseUserId"></param>
+        /// <param name="postOrReply">postOrReply is used as enumerable. 0 = Posts, 1 = Replies, 2 = Both, 3 = No Selector</param>
+        /// <param name="discussionTeamID"></param>
+        /// <returns></returns>
         [CanModifyCourse]
-        public ActionResult TeacherIndex(int assignmentId, int courseUserId, int postOrReply, int discussionTeamId)
+        public ActionResult TeacherIndex(int assignmentId, int courseUserId, int postOrReply, int discussionTeamID)
         {
             List<DiscussionPost> teamPosts = new List<DiscussionPost>();
             List<DiscussionPost> posts = new List<DiscussionPost>();
             Assignment assignment = db.Assignments.Find(assignmentId);
             CourseUser student = db.CourseUsers.Find(courseUserId);
-            DiscussionTeam discussionTeam = new DiscussionTeam();
-            AssignmentTeam at = new AssignmentTeam();
-            List<AssignmentTeam> atList = new List<AssignmentTeam>();
+            DiscussionTeam discussionTeam = (from dt in assignment.DiscussionTeams
+                                                 where dt.ID == discussionTeamID
+                                                 select dt).FirstOrDefault();
 
-            //Only filter by discussionTeamId if the assignment HasDiscussionTeams
+            //Only filter by discussionTeamID if the assignment HasDiscussionTeams
             if (assignment.HasDiscussionTeams)
             {
                 posts = (from post in db.DiscussionPosts
                          where post.AssignmentID == assignment.ID &&
-                         post.DiscussionTeamID == discussionTeamId &&
+                         post.DiscussionTeamID == discussionTeamID &&
                          !post.IsReply
                          orderby post.Posted
                          select post).ToList();
@@ -103,85 +111,26 @@ namespace OSBLE.Controllers
                          orderby post.Posted
                          select post).ToList();
             }
+
             
-            Cache["PostOrReply"] = postOrReply;
-            if (assignment != null && student != null && (postOrReply >= 0 && postOrReply <= 3))
-            {
-                Cache["StudentID"] = student.ID;
-
-                
-                if(!assignment.HasDiscussionTeams) //Setting up a discussion team for student?
-                {
-                    posts = (from post in db.DiscussionPosts
-                             where post.AssignmentID == assignment.ID &&
-                             !post.IsReply
-                             orderby post.Posted
-                             select post).ToList();
-                    foreach (DiscussionPost post in posts)
-                    {
-                        post.DisplayName = post.CourseUser.DisplayNameFirstLast(ActiveCourseUser.AbstractRole);
-                    }
-
-                    foreach (AssignmentTeam a in assignment.AssignmentTeams)
-                    {
-                        if (a.Team.TeamMembers.FirstOrDefault().CourseUser.ID == student.ID)
-                        {
-                            discussionTeam.Assignment = a.Assignment;
-                            discussionTeam.AssignmentID = a.AssignmentID;
-                            discussionTeam.Team = a.Team;
-                            discussionTeam.TeamID = a.TeamID;
-                            break;
-                        }
-                    }
-                    ViewBag.Posts = posts;
-                }
-            }
-
-            if (postOrReply == 3)
-            {
-                if (!assignment.HasDiscussionTeams)
-                {
-                    ViewBag.Posts = posts;
-                }
+            if (postOrReply == 3)  //If postOrReply is 3, we want no selections - so setting student to null.
+           { 
                 student = null;
-            }
-            
+            }    
 
             ViewBag.Student = student;
             ViewBag.Assignment = assignment;
             ViewBag.FirstPost = true;
             ViewBag.ActiveCourse = ActiveCourseUser;
             ViewBag.PostOrReply = postOrReply;
-            if (assignment.HasDiscussionTeams)
+            ViewBag.TeamList = assignment.DiscussionTeams.OrderBy(s => s.Team.Name).ToList();
+            if (assignment.HasDiscussionTeams) //Setting up TeamName and TeamList
             {
                 ViewBag.TeamName = " - " + discussionTeam.Team.Name;
-                ViewBag.TeamList = assignment.DiscussionTeams.OrderBy(s => s.Team.Name).ToList();
             }
             else
             {
-                if (student == null)
-                {
-                    ViewBag.TeamName = null;
-                }
-                else
-                {
-                    ViewBag.TeamName = " - " + student.DisplayNameFirstLast(ActiveCourseUser.AbstractRole);
-                }
-                
-                List<DiscussionTeam> dtList = new List<DiscussionTeam>();
-                DiscussionTeam dt = new DiscussionTeam();
-                foreach (AssignmentTeam assignTeam in assignment.AssignmentTeams)
-                {
-                    dt.Assignment = assignTeam.Assignment;
-                    dt.AssignmentID = assignTeam.AssignmentID;
-                    dt.Team = assignTeam.Team;
-                    dt.TeamID = assignTeam.TeamID;
-                    dt.Team.Name = assignTeam.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastAndFirst();
-                    dtList.Add(dt);
-
-                    dt = new DiscussionTeam();
-                }
-                ViewBag.TeamList = dtList.OrderBy(l => l.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName).ThenBy(f => f.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName).ToList();
+                ViewBag.TeamName = " - " + student.DisplayNameFirstLast(ActiveCourseUser.AbstractRole);
             }
             
             ViewBag.TeamSelectId = "selected_team";
@@ -195,7 +144,7 @@ namespace OSBLE.Controllers
                 ViewBag.SelectedTeam = null;
             }
             ViewBag.PostOrReply = postOrReply;
-            ViewBag.DiscussionTeamID = discussionTeam.TeamID;
+            ViewBag.DiscussionTeamID = discussionTeam.ID;
             return View();
         }
 

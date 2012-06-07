@@ -24,24 +24,28 @@ namespace OSBLE.Models.Assignments
         /// this should be remain null.
         /// </summary>
         public int? AuthorTeamID { get; set; }
+
         [ForeignKey("AuthorTeamID")]
         public virtual Team AuthorTeam { get; set; }
 
         /// <summary>
-        /// Returns all the team members for the DiscussionTeam. 
+        /// Returns all the distinct team members for the DiscussionTeam. 
         /// </summary>
         public List<TeamMember> GetAllTeamMembers()
         {
-            List<TeamMember> returnVal;
+            Dictionary<int, TeamMember> returnValHelper = new Dictionary<int, TeamMember>();
+            List<TeamMember> potentialMembers = Team.TeamMembers.ToList();
+            potentialMembers.AddRange(AuthorTeam.TeamMembers.ToList());
 
-            returnVal = Team.TeamMembers.ToList();
-            if (AuthorTeam != null)
+            foreach (TeamMember tm in potentialMembers)
             {
-                returnVal.AddRange(AuthorTeam.TeamMembers.ToList());
+                if(!returnValHelper.ContainsKey(tm.CourseUserID))
+                {
+                    returnValHelper.Add(tm.CourseUserID, tm);
+                }
             }
 
-            return returnVal;
+            return returnValHelper.Values.ToList();
         }
-
     }
 }

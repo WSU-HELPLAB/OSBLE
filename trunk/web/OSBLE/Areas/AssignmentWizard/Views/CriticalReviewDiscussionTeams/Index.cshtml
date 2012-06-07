@@ -17,7 +17,7 @@
         <div id="teamDiv_@(counter)_@(dt.TeamID)" class="TeamDiv">
             <input type="text" class="TeamNameTextBox" value="@dt.Team.Name" />
             <ul id="team_@(counter)_@(@dt.TeamID)" class="TeamSortable">
-                @foreach (TeamMember member in dt.Team.TeamMembers)
+                @foreach (TeamMember member in dt.GetAllTeamMembers())
                 {
                     <li id="cu_@(member.CourseUserID)" class="ui-state-default Student">@member.CourseUser.UserProfile.LastName, @member.CourseUser.UserProfile.FirstName</li>
                 }

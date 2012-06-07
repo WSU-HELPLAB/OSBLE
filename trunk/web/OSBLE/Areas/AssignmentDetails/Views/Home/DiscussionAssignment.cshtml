@@ -33,13 +33,15 @@
 
             foreach (TeamMember member in assignmentTeam.Team.TeamMembers)
             {
-                IAssignmentTeam singleUserAssignmentTeam = new AssignmentTeam();
+                DiscussionTeam singleUserAssignmentTeam = new DiscussionTeam();
                 singleUserAssignmentTeam.Team = new Team();
                 singleUserAssignmentTeam.Team.TeamMembers.Add(member);
                 singleUserAssignmentTeam.Team.Name = member.CourseUser.DisplayName(Model.Client.AbstractRole);
                 singleUserAssignmentTeam.TeamID = member.TeamID;
                 singleUserAssignmentTeam.Assignment = assignmentTeam.Assignment;
                 singleUserAssignmentTeam.AssignmentID = assignmentTeam.AssignmentID;
+                singleUserAssignmentTeam.ID = (assignmentTeam as DiscussionTeam).ID;
+                
         <tr>
             <td>@member.CourseUser.DisplayName(Model.Client.AbstractRole)
             </td>

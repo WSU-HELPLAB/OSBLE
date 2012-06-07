@@ -288,15 +288,13 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     teams = assignment.PreceedingAssignment.AssignmentTeams.Cast<IAssignmentTeam>().ToList();
                     break;
 
-                case AssignmentTypes.DiscussionAssignment:
-
-                    //AC TODO: this isn't right.  change
-                    teams = assignment.DiscussionTeams.Cast<IAssignmentTeam>().ToList();
-                    break;
-
                 case AssignmentTypes.Basic:
                 case AssignmentTypes.CriticalReview:
+                    teams = assignment.AssignmentTeams.Cast<IAssignmentTeam>().ToList();
+                    break;
+
                 case AssignmentTypes.CriticalReviewDiscussion:
+                case AssignmentTypes.DiscussionAssignment:
                     teams = assignment.DiscussionTeams.Cast<IAssignmentTeam>().ToList();
                     break;
             }
