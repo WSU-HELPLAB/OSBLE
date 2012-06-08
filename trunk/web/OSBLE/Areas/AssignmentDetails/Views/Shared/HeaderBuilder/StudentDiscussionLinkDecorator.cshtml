@@ -15,21 +15,19 @@
             <table id="CriticalReviews">
                 @foreach (DiscussionTeam dt in discussionTeams)
                 {
+                    //Display string should also display who the discussion is for if it is not classwide.
+                    string displayValue = "View Discussion";
+                    if (assignment.HasDiscussionTeams == true) 
+                    {
+                        displayValue += " for " + dt.Team.Name;
+                    }
                     <tr>
                         <td>
-                         @Html.ActionLink("View Discussion for " + dt.Team.Name, 
+                         @Html.ActionLink(displayValue, 
                          "Index", "DiscussionAssignment",
                          new { assignmentId = assignment.ID, discussionTeamId = dt.ID, area = "" }, 
                          new { })
                         </td>
-                        @if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
-                        {
-                            <td>
-                                @(Html.ActionLink("Download prompt", "GetCriticalReviewDiscussionItems", "FileHandler",
-                                new { area = "", discussionTeamID = dt.ID}, 
-                                new { onclick = "create_and_open_downloading_submission_dialog()"}))
-                            </td>
-                        }
                     </tr>
                 }
             </table>
