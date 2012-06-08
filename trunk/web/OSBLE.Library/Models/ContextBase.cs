@@ -177,6 +177,11 @@ namespace OSBLE.Models
                 .WithMany()
                 .WillCascadeOnDelete(false);
 
+            modelBuilder.Entity<DiscussionPost>()
+                .HasRequired(n => n.DiscussionTeam)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
             modelBuilder.Entity<DiscussionSetting>()
                 .HasRequired(ds => ds.Assignment)
                 .WithOptional(a => a.DiscussionSettings)
