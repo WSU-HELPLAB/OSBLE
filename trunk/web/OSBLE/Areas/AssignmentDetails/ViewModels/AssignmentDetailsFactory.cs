@@ -71,9 +71,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 }
 
                 //is a discussion assignment
-                if ((assignment.Type == AssignmentTypes.DiscussionAssignment || 
-                    assignment.Type == AssignmentTypes.CriticalReviewDiscussion) && 
-                    !assignment.HasDiscussionTeams)
+                if (assignment.Type == AssignmentTypes.DiscussionAssignment &&  !assignment.HasDiscussionTeams)
                 {
                     //link to classwide discussion
                     vm.HeaderBuilder = new TeacherDiscussionLinkDecorator(vm.HeaderBuilder);

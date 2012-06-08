@@ -6,15 +6,72 @@
 @{
     Assignment assignment = ViewBag.Assignment;
     int discussionTeamID = ViewBag.DiscussionTeamID;
+    string selectBoxID = "dtStudentSelect";
+    if(ViewBag.ActiveCourse.AbstractRole.CanModify)
+    {
+        selectBoxID = "dtInstructorSelect";
+    }
+    
+    
 }
 <script type="text/javascript">
 
-    //    function RemainingChars() {
-    //        var remaining = $('#MaxContentChars').val() - $('#ActivityFeed').val().length;
-    //        $('#remChars').val("(" + remaining + ") Characters left");
-    //    }
+    $(document).ready(function () {
+        $('#dtInstructorSelect').change(function () {
+            var dtID = $('#dtInstructorSelect').val();
+            window.location.replace("/DiscussionAssignment/TeacherIndex?assignmentId=" + @assignment.ID + "&courseUserId=" + 0 + "&postOrReply=" + 3 + "&discussionTeamID=" + dtID);
 
+        });
+        $('#dtStudentSelect').change(function () {
+            var dtID = $('#dtStudentSelect').val();
+            window.location.replace("DiscussionAssignment?assignmentId=" + @assignment.ID + "&discussionTeamId=" + dtID);
+
+        });
+    });
 </script>
+
+<h2>@assignment.AssignmentName @if (ViewBag.TeamName != null)
+                               { @ViewBag.TeamName }</h2>
+@if (ViewBag.DiscussionTeamList != null && ViewBag.DiscussionTeamList.Count > 1)
+{
+    <table>
+        <tr>
+            <th>Select Discussion:</th>
+            <td>
+            <select id="@selectBoxID">
+                @foreach (DiscussionTeam dt in ViewBag.DiscussionTeamList)
+                {
+                    @*generating select box*@
+                    string optionText = "<option value=\"{0}\"{1}>{2}</option>";
+                    string selectValue = "";
+                    if (dt.ID == ViewBag.DiscussionTeamID)
+                    {
+                        selectValue = "selected=\"selected\"";
+                    }
+                    @Html.Raw(String.Format(optionText, dt.ID, selectValue, dt.TeamName));
+                }
+                </select>
+            </td>
+        </tr>
+    </table>
+}
+<fieldset style="border-color:White;">
+    @Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(assignment.AssignmentDescription).ToString()))
+    <br />
+
+    @if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
+    {
+        @Html.ActionLink("Download Discussion Items",
+            "GetCriticalReviewDiscussionItems",
+            "FileHandler",
+            new { area = "", discussionTeamID = discussionTeamID },
+            new { onclick = "create_and_open_downloading_submission_dialog()" })
+    }
+    
+</fieldset>
+<br />
+
+
 @if (!ViewBag.ActiveCourse.AbstractRole.Anonymized)
 {
     if (assignment.DiscussionSettings.MinimumFirstPostLength > 0 && !ViewBag.FirstPost && assignment.DueDate > DateTime.Now)
@@ -41,7 +98,7 @@
                 <input type="hidden" name="AssignmentID" value="@ViewBag.Assignment.ID" />
                 if (ViewBag.ActiveCourse.AbstractRole.CanModify)
                 {
-                <input id="postNewDiscussion" type="submit" name="post_active" value="Post to Entire Class" /> @Helpers.CreateToolTip(ToolTips.TeacherPostButton)
+                <input id="postNewDiscussion" type="submit" name="post_active" value="Post" />
                 }
                 else
                 {
@@ -75,8 +132,8 @@
                     @dp.Posted <br /> <br /> </div>
                     <div class="dp_content">
                      @{
-                        string content = Helpers.Linkify(dp.Content).ToHtmlString();
-                        content = content.Replace("\n", "<br />");
+                string content = Helpers.Linkify(dp.Content).ToHtmlString();
+                content = content.Replace("\n", "<br />");
                             }
                             @Html.Raw(content)
                     </div>
@@ -165,8 +222,8 @@
                                             @dr.Posted <br /> <br /> </div>
                                             <div class="dp_content">
                                              @{
-                                                    content = Helpers.Linkify(dr.Content).ToHtmlString();
-                                                    content = content.Replace("\n", "<br />");
+                                    content = Helpers.Linkify(dr.Content).ToHtmlString();
+                                    content = content.Replace("\n", "<br />");
                                             }
                                             @Html.Raw(content)
                                             </div>
@@ -181,8 +238,8 @@
                                         @dr.Posted <br /> <br /> </div>
                                         <div class="dp_content">
                                         @{
-                                                content = Helpers.Linkify(dr.Content).ToHtmlString();
-                                                content = content.Replace("\n", "<br />");
+                                    content = Helpers.Linkify(dr.Content).ToHtmlString();
+                                    content = content.Replace("\n", "<br />");
                                         }
                                         @Html.Raw(content)
                                         </div>
@@ -198,8 +255,8 @@
                                     @dr.Posted <br /> <br /> </div>
                                     <div class="dp_content">
                                     @{
-                                        content = Helpers.Linkify(dr.Content).ToHtmlString();
-                                        content = content.Replace("\n", "<br />");
+                                content = Helpers.Linkify(dr.Content).ToHtmlString();
+                                content = content.Replace("\n", "<br />");
                                     }
                                     @Html.Raw(content)
                                  </div>
@@ -215,8 +272,8 @@
                             @dr.Posted <br /> <br /> </div>
                             <div class="dp_content">
                              @{
-                                content = Helpers.Linkify(dr.Content).ToHtmlString();
-                                content = content.Replace("\n", "<br />");
+                            content = Helpers.Linkify(dr.Content).ToHtmlString();
+                            content = content.Replace("\n", "<br />");
                             }
                             @Html.Raw(content)
                             </div>
@@ -229,7 +286,7 @@
                     <div class="dp_replylink"> <a href="#" id="reply_@(dp.ID)">Reply</a> </div>
                     }
                 <div class="dp_replybox" id="replybox_@(dp.ID)" style="padding-left:23px;" >
-                @using (Html.BeginForm("NewReply", "DiscussionAssignment", new {discussionTeamId = discussionTeamID }, FormMethod.Post))
+                @using (Html.BeginForm("NewReply", "DiscussionAssignment", new { discussionTeamId = discussionTeamID }, FormMethod.Post))
                 {
                     @*data-ajax="true"*@
                     @*data-ajax-update="#dp_replies_for_@(dp.ID)"

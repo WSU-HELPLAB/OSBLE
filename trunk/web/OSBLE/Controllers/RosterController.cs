@@ -312,10 +312,33 @@ namespace OSBLE.Controllers
                         courseUser.UserProfile.Identification = entry.Identification;
                         if (entry.Name != null)
                         {
-                            names = entry.Name.Split(',');
-                            string[] parseFirstName = names[1].Trim().Split(' ');
-                            courseUser.UserProfile.FirstName = parseFirstName[0];
-                            courseUser.UserProfile.LastName = names[0].Trim();
+                            if (entry.Name.Contains(',')) //Assume "LastName, FirstName" format.
+                            {
+                                names = entry.Name.Split(',');
+                                string[] parseFirstName = names[1].Trim().Split(' ');
+                                courseUser.UserProfile.FirstName = parseFirstName[0];
+                                courseUser.UserProfile.LastName = names[0].Trim();
+                            }
+                            else //Assume "FirstName LastName" format. and No middle names.
+                            {
+                                
+                                names = entry.Name.Trim().Split(' '); //Trimming trialing and leading spaces to avoid conflicts below
+                                if(names.Count() ==  1) //Assume only last name
+                                {
+                                    courseUser.UserProfile.FirstName = "";
+                                    courseUser.UserProfile.LastName = names[0];
+                                }
+                                else if(names.Count() == 2) //Only first and last name exist
+                                {
+                                    courseUser.UserProfile.FirstName = names[0];
+                                    courseUser.UserProfile.LastName = names[1];
+                                }
+                                else //at least 1 Middle name exists. Use first and last entries in names
+                                {
+                                    courseUser.UserProfile.FirstName = names[0];
+                                    courseUser.UserProfile.LastName = names[names.Count() - 1];
+                                }
+                            }
                         }
                         else
                         {
@@ -627,7 +650,7 @@ namespace OSBLE.Controllers
             //This will return one if they exist already or null if they don't
             var user = (from c in db.UserProfiles
                         where c.Identification == courseuser.UserProfile.Identification
-                        && c.SchoolID == ActiveCourse.UserProfile.SchoolID
+                        && c.SchoolID == ActiveCourseUser.UserProfile.SchoolID
                         select c).FirstOrDefault();
             if (user == null)
             {
@@ -655,7 +678,7 @@ namespace OSBLE.Controllers
                 //Set the UserProfileID to point to our new student
                 courseuser.UserProfile = up;
                 courseuser.UserProfileID = up.ID;
-                courseuser.AbstractCourseID = ActiveCourse.AbstractCourseID;
+                courseuser.AbstractCourseID = ActiveCourseUser.AbstractCourseID;
             }
             else
             {
@@ -669,7 +692,7 @@ namespace OSBLE.Controllers
                 courseuser.UserProfileID = user.ID;
                 db.SaveChanges();
             }
-            courseuser.AbstractCourseID = ActiveCourse.AbstractCourseID;
+            courseuser.AbstractCourseID = ActiveCourseUser.AbstractCourseID;
             //Check uniqueness
             if ((from c in db.CourseUsers
                  where c.AbstractCourseID == courseuser.AbstractCourseID && c.UserProfileID == courseuser.UserProfileID
@@ -679,16 +702,17 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
 
                 //If we already have assignments in the course, we need to add the new student into the class
-                int currentCourseId = ActiveCourse.AbstractCourseID;
+                int currentCourseId = ActiveCourseUser.AbstractCourseID;
                 List<Assignment> assignments = (from a in db.Assignments
                                                 where a.Category.CourseID == currentCourseId
                                                 select a).ToList();
+
 
                 foreach (Assignment a in assignments)
                 {
                     TeamMember userMember = new TeamMember()
                     {
-                        CourseUserID = user.ID
+                        CourseUserID = courseuser.ID
                     };
 
                     Team team = new Team();

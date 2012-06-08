@@ -49,7 +49,17 @@ namespace OSBLE.Models.Assignments
                 }
             }
 
-            return returnValHelper.Values.ToList();
+            return returnValHelper.Values.OrderBy(tm => tm.CourseUser.UserProfile.LastName).ThenBy(tm => tm.CourseUser.UserProfile.FirstName).ToList();
+        }
+
+
+        [NotMapped]
+        public string TeamName
+        {
+            get
+            {
+                return Team.Name;
+            }
         }
     }
 }

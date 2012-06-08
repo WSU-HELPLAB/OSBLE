@@ -67,7 +67,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 List<Team> authorTeams = (from rt in Assignment.PreceedingAssignment.ReviewTeams
                                           select rt.AuthorTeam).Distinct().ToList();
 
-                int i = 0;
+                int i = 1;
                 //Foreach author team, creating a new DiscussionTeam who consists of all the people
                 //who reviewed that author team as well as that author team.
                 foreach (Team authorTeam in authorTeams)
@@ -112,8 +112,16 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     dt.AuthorTeam = authorTeam;
                     dt.AuthorTeamID = authorTeam.ID;
 
-                    //Naming the team and associating the team with a discussion team
-                    team.Name = "Discussion Team " + i.ToString();
+                    //Naming the team and associating the team with a discussion team. Note: Nameing is: Discussion Team 01...02..10..11...
+                    if (i < 10)
+                    {
+                        team.Name = "Discussion Team 0" + i.ToString();
+                    }
+                    else
+                    {
+                        team.Name = "Discussion Team " + i.ToString();
+                    }
+                    
                     i++;
                     dt.Team = team;
                     dt.AssignmentID = Assignment.ID;

@@ -153,7 +153,7 @@ namespace OSBLE.Models.Assignments
         {
             get
             {
-                if (Type != AssignmentTypes.DiscussionAssignment)
+                if (Type != AssignmentTypes.DiscussionAssignment && Type != AssignmentTypes.CriticalReviewDiscussion)
                 {
                     return false;
                 }

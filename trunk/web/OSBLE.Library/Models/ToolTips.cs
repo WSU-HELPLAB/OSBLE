@@ -84,11 +84,6 @@ namespace OSBLE.Models
 
         #endregion
 
-        #region DiscussionAssignmentToolTips
-
-            public static string TeacherPostButton = "As the course instructor your original posts to a discussion will be visiable to all students/discussion teams. In addition, students' replies to your post will also be visable to all students/discussion teams.";
-
-        #endregion
 
         #region BasicAssignmentToolTips
 
