@@ -123,12 +123,12 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Displays the Discussion view for Teachers
         /// </summary>
         /// <param name="assignmentId"></param>
-        /// <param name="courseUserId"></param>
+        /// <param name="courseUserId">the CourseUser.ID of the student you want to "Highlight". 0 may be passed in highlighting is unnecessary</param>
         /// <param name="postOrReply">postOrReply is used as enumerable. 0 = Posts, 1 = Replies, 2 = Both, 3 = No Selector</param>
-        /// <param name="discussionTeamID"></param>
+        /// <param name="discussionTeamID">The discussion team id for discussion to beto viewed. If it is a classwide discussion, then any dt can be sent.</param>
         /// <returns></returns>
         [CanModifyCourse]
         public ActionResult TeacherIndex(int assignmentId, int courseUserId, int postOrReply, int discussionTeamID)
@@ -185,10 +185,6 @@ namespace OSBLE.Controllers
                 ViewBag.TeamName = "";
             }
 
-            if (assignment.HasDiscussionTeams)
-            {
-
-            }
             ViewBag.PostOrReply = postOrReply;
             ViewBag.Posts = posts;
             ViewBag.Student = student;

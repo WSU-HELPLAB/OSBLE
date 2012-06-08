@@ -19,6 +19,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
         {
             dynamic header = Builder.BuildHeader(assignment);
             header.ID = assignment.ID;
+            header.DiscussionTeamID = assignment.DiscussionTeams.FirstOrDefault().ID;
             return header;
         }
     }
