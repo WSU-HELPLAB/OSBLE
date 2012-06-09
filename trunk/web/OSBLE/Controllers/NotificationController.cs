@@ -86,9 +86,9 @@ namespace OSBLE.Controllers
             // Send notification to recipient about new message.
             Notification n = new Notification();
             n.ItemType = Notification.Types.Mail;
-            n.ItemID = mail.ID;
-            n.RecipientID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.ToUserProfileID && cu.AbstractCourseID == ActiveCourse.AbstractCourseID).FirstOrDefault().ID;
-            n.SenderID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.FromUserProfileID && cu.AbstractCourseID == ActiveCourse.AbstractCourseID).FirstOrDefault().ID;
+            n.ItemID = mail.ID;            
+            n.RecipientID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.ToUserProfileID).FirstOrDefault().ID;
+            n.SenderID = db.CourseUsers.Where(cu => cu.UserProfileID == mail.FromUserProfileID).FirstOrDefault().ID;
             addNotification(n);
         }
 
