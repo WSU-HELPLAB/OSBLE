@@ -7,7 +7,7 @@ using System;
 
 namespace OSBLE.Models.Users
 {
-    //[Serializable]
+    [Serializable]
     //[System.Runtime.Serialization.DataContract]
     public class UserProfile
     {

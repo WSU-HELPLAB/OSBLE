@@ -318,7 +318,8 @@ namespace OSBLE.Controllers
             // and confirm that the critical review to be downloaded has been published
             // note: these contraints do not apply to instructors
             bool belongsToDT = false;
-
+            belongsToDT = true;
+            /* AC: This doesn't work as expected (discoverd 6/9/2012 during ChemProV conference)
             foreach (TeamMember tm in dt.GetAllTeamMembers())
             {
                 if (tm.CourseUserID == ActiveCourseUser.ID)
@@ -327,6 +328,7 @@ namespace OSBLE.Controllers
                     break;
                 }
             }
+             * */
 
             if (ActiveCourseUser.AbstractRole.CanModify || (belongsToDT && precedingAssignment.IsCriticalReviewPublished))
             {
