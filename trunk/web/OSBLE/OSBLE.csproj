@@ -118,8 +118,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.4.5.5\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="PortableChemProV">
-      <HintPath>..\packages\ChemProV\PortableChemProV.dll</HintPath>
+    <Reference Include="PortableChemProvNet4">
+      <HintPath>..\packages\ChemProV\PortableChemProvNet4.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Data.Services" />
