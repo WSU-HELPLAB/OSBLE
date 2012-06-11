@@ -21,7 +21,12 @@
     @if (Model.Client.AbstractRole.CanGrade)
     {
         bool altRow = false;
-        foreach (IAssignmentTeam assignmentTeam in Model.TeamTableBuilders.Keys)
+
+        var teams = from pair in Model.TeamTableBuilders
+                    orderby pair.Key.Team.Name ascending
+                    select pair.Key;
+        
+        foreach (IAssignmentTeam assignmentTeam in teams)
         {
             if (assignmentTeam.Team.TeamMembers.Count() > 1)
             {
@@ -38,13 +43,17 @@
                 <tr>
                     <th class="StudentName">
                         <lu>
-                    @foreach (TeamMember tm in assignmentTeam.Team.TeamMembers.OrderBy(t => t.CourseUser.DisplayName()).ToList())
-                    {
-                        <li id="ReviewsItems">
-                        @tm.CourseUser.DisplayName()
-                        </li>
-                    }
-                    </lu>
+                            @foreach (TeamMember tm in assignmentTeam.Team.TeamMembers.OrderBy(t => t.CourseUser.DisplayName()).ToList())
+                            {
+                                <li id="ReviewsItems">
+                                    @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", id = tm.CourseUser.ID });
+                                      }
+                                    <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
+                        
+                                    @tm.CourseUser.DisplayNameFirstLast(tm.CourseUser.AbstractRole)
+                                </li>
+                            }
+                        </lu>
                     </th>
                     @foreach (string view in Model.TableColumnHeaders.Keys)
                     {

@@ -23,19 +23,18 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
             AssignmentDetailsViewModel viewModel = factory.Bake(assignment, ActiveCourseUser);
 
             //discussion assignments and critical reviews require their own special view
-            if (assignment.Type == AssignmentTypes.CriticalReview)
-            {
-                return View("CriticalReviewAssignment", viewModel);
-            }
-            else if (assignment.Type == AssignmentTypes.DiscussionAssignment ||
+            if (assignment.Type == AssignmentTypes.DiscussionAssignment ||
                     assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
             {
                 return View("DiscussionAssignment", viewModel);
             }
+            else if (assignment.HasTeams)  
+            {
+                return View("TeamIndex", viewModel);
+            }
             else
             {
-                return View("CriticalReviewAssignment", viewModel);
-                //return View("Index", viewModel);
+                return View("Index", viewModel);
             }
         }
 

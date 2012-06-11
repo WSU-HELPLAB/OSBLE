@@ -27,27 +27,28 @@
     @if (Model.Client.AbstractRole.CanGrade)
     {
         bool altRow = false;
-        foreach (IAssignmentTeam assignmentTeam in Model.TeamTableBuilders.Keys)
+
+        var teams = from pair in Model.TeamTableBuilders
+                    orderby pair.Key.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName() ascending
+                    select pair.Key;
+        
+        foreach (IAssignmentTeam assignmentTeam in teams)
         {
-            if (assignmentTeam.Team.TeamMembers.Count() > 1)
+            string rowText = "class=\"NormalRow\"";
+            if (altRow)
             {
-                <tr class="TeamHeader">
-                    <th colspan="6">
-                        @assignmentTeam.Team.Name
-                        @{string teamActionLink = Url.Action("CreateEntireTeam", "Mail", new { area = "", teamID = assignmentTeam.Team.ID });
-                        }
-                        <a title="Email this user" href="@teamActionLink" >@Helpers.MailButton() </a>
-                    </th>
-                </tr>   
+                rowText = "class=\"AltRow\"";
             }
-        <tr>
+            altRow = !altRow;
+        <tr @Html.Raw(rowText)>
             <th class="StudentName">
-            @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", id = Model.Client.ID });
-              }
-            <a href="@actionLink"
+                @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", 
+                      id = assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.ID });
+                }
+                <a href="@actionLink"
                title="Email this user"
             >@Helpers.MailButton()</a>
-            @assignmentTeam.Team.TeamMemberString(Model.Client.AbstractRole)
+                @assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayNameFirstLast(assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.AbstractRole)
             </th>
             @foreach (string view in Model.TableColumnHeaders.Keys)
             {

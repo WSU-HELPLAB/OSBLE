@@ -10,11 +10,19 @@
 <tr>
 <th>Download Your <br />Reviewed Assignment</th>
 <td>
-@if(dataModel.CRdownload.hasPublished)
+@if (dataModel.CRdownload.hasPublished)
 {
-    @(Html.ActionLink("Download your reviewed submission", "GetReviewsOfAuthor", "FileHandler",
-            new { area = "", assignmentId = dataModel.CRdownload.assignmentID, receiverId = cu.ID }, 
-            new { onclick = "create_and_open_downloading_submission_dialog()"}))
+    if (dataModel.CRdownload.hasRecievedReview)
+    {
+        @(Html.ActionLink("Download your reviewed submission", "GetReviewsOfAuthor", "FileHandler",
+        new { area = "", assignmentId = dataModel.CRdownload.assignmentID, receiverId = cu.ID },
+        new { onclick = "create_and_open_downloading_submission_dialog()" }))
+        
+    }
+    else
+    {
+        @:You have not received any reviews
+    }
 }
 else
 {

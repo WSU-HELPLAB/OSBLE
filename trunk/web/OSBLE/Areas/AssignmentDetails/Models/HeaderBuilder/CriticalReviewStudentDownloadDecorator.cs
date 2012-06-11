@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using OSBLE.Resources;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
+using OSBLE.Controllers;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 {
@@ -27,6 +28,32 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             header.CRdownload.hasPublished = assignment.IsCriticalReviewPublished;
             header.CRdownload.publishedDate = assignment.CriticalReviewPublishDate;
 
+            //get student's team
+
+                        
+            AssignmentTeam assignmentTeam = null;
+            assignmentTeam = OSBLEController.GetAssignmentTeam(assignment, Student.UserProfile);
+           
+            header.CRdownload.hasRecievedReview = false;
+
+            if(assignmentTeam != null)
+            {
+                //get list of all teams reviewing student
+                List<AssignmentTeam> reviewersOfStudent = (from rt in assignment.ReviewTeams
+                                                       join at in assignment.AssignmentTeams
+                                                       on rt.ReviewTeamID equals at.TeamID
+                                                       where rt.AuthorTeamID == assignmentTeam.TeamID
+                                                       select at).ToList();
+                //check each team for a submission
+                foreach (AssignmentTeam at in reviewersOfStudent)
+                {
+                    if(at.GetSubmissionTime() != null)
+                    {
+                        header.CRdownload.hasRecievedReview = true;
+                        break;
+                    }
+                }
+            }
             header.CRdownload.student = Student;
             header.CRdownload.assignmentID = assignment.ID;
 
