@@ -109,13 +109,19 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
             }
             else if (vm.Client.AbstractRole.CanSubmit) //students
             {
-                //has teams?
-                if (assignment.HasTeams)
+                //has discussion teams?
+                if (assignment.HasDiscussionTeams)
+                {
+                    vm.HeaderBuilder = new DiscussionTeamMemberDecorator(vm.HeaderBuilder, vm.Client);
+                    vm.HeaderViews.Add("DiscussionTeamMemberDecorator");
+                }
+                else if (assignment.HasTeams)//else has teams?
                 {
                     // add team name and list of members
                     vm.HeaderBuilder = new TeamMembersDecorator(vm.HeaderBuilder, vm.Client);
                     vm.HeaderViews.Add("TeamMembersDecorator");
                 }
+                
 
                 //needs to submit?
                 if (assignment.HasDeliverables)

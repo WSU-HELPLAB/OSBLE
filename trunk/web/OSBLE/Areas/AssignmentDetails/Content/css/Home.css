@@ -56,6 +56,21 @@
     cursor:pointer;
 }
 
+
+#MultiTeamList
+{
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+.MultiTeamListItem
+{
+    display:inline-block;
+    padding-right:7px;
+    
+}
+
 #StudentsTable
 {
     border-collapse:collapse;

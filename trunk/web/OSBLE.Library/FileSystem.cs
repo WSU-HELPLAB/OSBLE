@@ -713,7 +713,7 @@ namespace OSBLE
         public static DateTime? GetSubmissionTime(IAssignmentTeam team, Team authorTeam = null)
         {
             DirectoryInfo submissionFolder;
-            if (team.Assignment.Type == AssignmentTypes.CriticalReview && authorTeam != null)
+            if (team != null && (team.Assignment.Type == AssignmentTypes.CriticalReview && authorTeam != null))
             {
                 submissionFolder = new DirectoryInfo
                                             (FileSystem.GetTeamUserSubmissionFolderForAuthorID

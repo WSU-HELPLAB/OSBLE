@@ -22,7 +22,7 @@
     {
         foreach (IAssignmentTeam assignmentTeam in Model.CurrentAssignment.DiscussionTeams)
         {
-            if (assignmentTeam.Team.TeamMembers.Count() > 1)
+            if ((assignmentTeam as DiscussionTeam).GetAllTeamMembers().Count() > 1)
             {
                 <tr>
                     <th class="TeamHeader" colspan="6">
