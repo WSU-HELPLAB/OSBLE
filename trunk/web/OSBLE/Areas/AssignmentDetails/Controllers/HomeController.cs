@@ -34,7 +34,8 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
             }
             else
             {
-                return View("Index", viewModel);
+                return View("CriticalReviewAssignment", viewModel);
+                //return View("Index", viewModel);
             }
         }
 

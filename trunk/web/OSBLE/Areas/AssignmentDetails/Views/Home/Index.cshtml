@@ -29,15 +29,20 @@
         bool altRow = false;
         foreach (IAssignmentTeam assignmentTeam in Model.TeamTableBuilders.Keys)
         {
-            string rowText = "class=\"NormalRow\"";
-            if(altRow)
+            if (assignmentTeam.Team.TeamMembers.Count() > 1)
             {
-                rowText = "class=\"AltRow\"";
+                <tr class="TeamHeader">
+                    <th colspan="6">
+                        @assignmentTeam.Team.Name
+                        @{string teamActionLink = Url.Action("CreateEntireTeam", "Mail", new { area = "", teamID = assignmentTeam.Team.ID });
+                        }
+                        <a title="Email this user" href="@teamActionLink" >@Helpers.MailButton() </a>
+                    </th>
+                </tr>   
             }
-            altRow = !altRow;
-        <tr @Html.Raw(rowText)>
+        <tr>
             <th class="StudentName">
-            @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", id = Model.Client.ID  });
+            @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", id = Model.Client.ID });
               }
             <a href="@actionLink"
                title="Email this user"
