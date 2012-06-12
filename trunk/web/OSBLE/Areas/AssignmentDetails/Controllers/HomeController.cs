@@ -28,7 +28,10 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
             {
                 return View("DiscussionAssignment", viewModel);
             }
-            else if (assignment.HasTeams)  
+            //MG&MK: For teamevaluation assignments, assignment details uses the 
+            //previous assingment teams for displaying. So, we are forcing 
+            //TeamEvaluation assignment to use TeamIndex.
+            else if (assignment.HasTeams || assignment.Type == AssignmentTypes.TeamEvaluation) 
             {
                 return View("TeamIndex", viewModel);
             }

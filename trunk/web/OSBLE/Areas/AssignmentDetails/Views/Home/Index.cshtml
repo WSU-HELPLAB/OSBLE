@@ -40,22 +40,20 @@
                 rowText = "class=\"AltRow\"";
             }
             altRow = !altRow;
-        <tr @Html.Raw(rowText)>
-            <th class="StudentName">
-                @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", 
-                      id = assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.ID });
+            <tr @Html.Raw(rowText)>
+                <th class="StudentName">
+                    @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", 
+                          courseUserId = assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUserID });
+                    }
+                    <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
+                    @assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayNameFirstLast(assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.AbstractRole)
+                </th>
+                @foreach (string view in Model.TableColumnHeaders.Keys)
+                {
+                    DynamicDictionary tableData = Model.TeamTableBuilders[assignmentTeam].BuildTableForTeam(assignmentTeam);
+                    string viewLocation = string.Format("TableBuilder/{0}", view);
+                    @Html.Partial(viewLocation, tableData);
                 }
-                <a href="@actionLink"
-               title="Email this user"
-            >@Helpers.MailButton()</a>
-                @assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayNameFirstLast(assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.AbstractRole)
-            </th>
-            @foreach (string view in Model.TableColumnHeaders.Keys)
-            {
-                DynamicDictionary tableData = Model.TeamTableBuilders[assignmentTeam].BuildTableForTeam(assignmentTeam);
-                string viewLocation = string.Format("TableBuilder/{0}", view);
-                @Html.Partial(viewLocation, tableData);
-            }
         </tr>
         }
     }

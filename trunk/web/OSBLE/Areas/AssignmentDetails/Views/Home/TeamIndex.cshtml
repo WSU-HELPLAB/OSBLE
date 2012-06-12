@@ -33,7 +33,7 @@
                 <tr class="TeamHeader">
                     <th colspan="6">
                         @assignmentTeam.Team.Name
-                        @{string actionLink = Url.Action("CreateEntireTeam", "Mail", new { area = "", teamID = assignmentTeam.Team.ID });
+                        @{string actionLink = Url.Action("CreateTeam", "Mail", new { area = "", teamID = assignmentTeam.Team.ID });
                         }
                         <a title="Email this user" href="@actionLink" > @Helpers.MailButton() </a>
                     </th>
@@ -46,7 +46,7 @@
                             @foreach (TeamMember tm in assignmentTeam.Team.TeamMembers.OrderBy(t => t.CourseUser.DisplayName()).ToList())
                             {
                                 <li id="ReviewsItems">
-                                    @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", id = tm.CourseUser.ID });
+                                    @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", courseUserId = tm.CourseUser.ID });
                                       }
                                     <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
                         

@@ -263,6 +263,7 @@ namespace OSBLE.Controllers
             };
         }
 
+        [Obsolete("Old assignment details")]
         public ActionResult AssignmentDetails(int id)
         {
             Assignment assignment = db.Assignments.Find(id);
@@ -555,15 +556,19 @@ namespace OSBLE.Controllers
             }
         }
 
+
+        
         /// <summary>
-        /// This will take a TeamID (previous assignment teamID) and display the team evaluations to the teacher. 
+        /// This will display the team evaluations to the teacher. 
         /// </summary>
-        /// <param name="teamId"></param>
+        /// <param name="precedingTeamId">The teamId from the TeamEvaluation's preceding assignment.</param>
+        /// <param name="TeamEvaluationAssignmentId">The assignment ID of the TeamEvaluation assignment</param>
+        /// <returns></returns>
         [CanModifyCourse]
-        public ActionResult TeacherTeamEvaluation(int teamId, int assignmentId)
+        public ActionResult TeacherTeamEvaluation(int precedingTeamId, int TeamEvaluationAssignmentId)
         {
-            Assignment assignment = db.Assignments.Find(assignmentId);
-            Team precTeam = db.Teams.Find(teamId);
+            Assignment assignment = db.Assignments.Find(TeamEvaluationAssignmentId);
+            Team precTeam = db.Teams.Find(precedingTeamId);
 
             var cuIDs = (from tm in precTeam.TeamMembers
                          select tm.CourseUserID).ToList();

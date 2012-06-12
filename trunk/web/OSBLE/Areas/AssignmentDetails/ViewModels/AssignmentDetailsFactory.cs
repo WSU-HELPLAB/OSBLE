@@ -33,11 +33,23 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
 
         private AssignmentDetailsViewModel BuildHeader(AssignmentDetailsViewModel vm)
         {
+
             //AC NOTE: Items will be displayed in the order in which they are added
             // to the ViewModel's HeaderViews list.  Organize accordingly.
 
             Assignment assignment = vm.CurrentAssignment;
             vm.HeaderBuilder = new DefaultBuilder();
+
+            List<TeamEvaluation> teamEvaluations = null;
+            using (OSBLEContext db = new OSBLEContext())
+            {
+                //only need get these when they are needed
+                if (assignment.Type == AssignmentTypes.TeamEvaluation)
+                {
+                    teamEvaluations = db.TeamEvaluations.Where(te => te.TeamEvaluationAssignmentID == assignment.ID).ToList();
+                }
+            }
+
 
             //views common to both students and teachers:
             if (assignment.Type == AssignmentTypes.DiscussionAssignment ||
@@ -122,7 +134,6 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderViews.Add("TeamMembersDecorator");
                 }
                 
-
                 //needs to submit?
                 if (assignment.HasDeliverables)
                 {
@@ -146,6 +157,12 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderBuilder = new StudentDiscussionLinkDecorator(vm.HeaderBuilder, vm.Client);
                     vm.HeaderViews.Add("StudentDiscussionLinkDecorator");
                 }
+                else if (assignment.Type == AssignmentTypes.TeamEvaluation)
+                {
+                    vm.HeaderBuilder = new StudentTeamEvalSubmissionDecorator(vm.HeaderBuilder, teamEvaluations, vm.Client);
+                    vm.HeaderViews.Add("StudentTeamEvalSubmissionDecorator");
+
+                }
 
                 //rubric?
                 if (assignment.HasRubric)
@@ -159,11 +176,12 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderViews.Add("StudentGradeDecorator");
             }
 
-            if (assignment.Type == AssignmentTypes.CriticalReview)
+            if (assignment.Type == AssignmentTypes.CriticalReview || 
+                assignment.Type == AssignmentTypes.CriticalReviewDiscussion ||
+                assignment.Type == AssignmentTypes.TeamEvaluation)
             {
-
-                vm.HeaderBuilder = new CriticalReviewPreviousAssignmentDecorator(vm.HeaderBuilder);
-                vm.HeaderViews.Add("CriticalReviewPreviousAssignmentDecorator");
+                vm.HeaderBuilder = new PreviousAssignmentDecorator(vm.HeaderBuilder);
+                vm.HeaderViews.Add("PreviousAssignmentDecorator");
             }
 
             return vm;
@@ -177,13 +195,22 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
             Assignment assignment = vm.CurrentAssignment;
             List<IAssignmentTeam> teams = GetTeams(assignment);
             List<RubricEvaluation> rubricEvaluations = new List<RubricEvaluation>();
-            List<TeamEvaluation> teamEvaluations = new List<TeamEvaluation>();
+            List<TeamEvaluation> teamEvaluations = null;
+            List<DiscussionPost> allUserPosts= null;
             using (OSBLEContext db = new OSBLEContext())
             {
                 rubricEvaluations = db.RubricEvaluations.Where(re => re.AssignmentID == assignment.ID).ToList();
-                
-                //AC: waiting on Mario's checkin.
-                //teamEvaluations = db.TeamEvaluations.Where(te => te.AssignmentID == assignment.ID).ToList();
+                //only need get these when they are needed
+                if (assignment.Type == AssignmentTypes.TeamEvaluation)
+                {
+                    teamEvaluations = db.TeamEvaluations.Where(te => te.TeamEvaluationAssignmentID == assignment.ID).ToList();
+                }
+
+                if(assignment.Type == AssignmentTypes.DiscussionAssignment ||
+                    assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
+                allUserPosts = (from a in db.DiscussionPosts
+                                where a.AssignmentID == assignment.ID
+                                select a).ToList();
             }
 
             //create a builder for each team
@@ -209,14 +236,6 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 if (assignment.Type == AssignmentTypes.DiscussionAssignment ||
                     assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
                 {
-                    List<DiscussionPost> allUserPosts;
-                    using (OSBLEContext db = new OSBLEContext())
-                    {
-                        allUserPosts = (from a in db.DiscussionPosts
-                                        where a.AssignmentID == assignmentTeam.Assignment.ID
-                                        select a).ToList();
-                    }
-
                     //add post count
                     vm.TeamTableBuilders[assignmentTeam] = new DiscussionPostsTableDecorator(vm.TeamTableBuilders[assignmentTeam], allUserPosts);
                     vm.TableColumnHeaders["DiscussionPostsTableDecorator"] = "Posts";
@@ -245,23 +264,25 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 if (assignment.Type == AssignmentTypes.TeamEvaluation)
                 {
                     //AC TODO: Rewrite after I get new team evaluation model info.
-                    /*
-                    List<TeamEvaluation> evaluations = teamEvaluations.Where(te => te.TeamID == te.TeamID).ToList();
+                    
+                    //Grabbing all the evaluations for the TeamEvaluation assignment
+                    List<TeamEvaluation> evaluations = teamEvaluations.Where(te => te.TeamEvaluationAssignmentID == assignment.ID).ToList();
 
                     //add team evaluation progress
                     vm.TeamTableBuilders[assignmentTeam] = new TeamEvaluationProgressTableDecorator(
                                                                 vm.TeamTableBuilders[assignmentTeam],
-                                                                evaluations
+                                                                evaluations, 
+                                                                assignment
                                                                 );
                     vm.TableColumnHeaders["TeamEvaluationProgressTableDecorator"] = "Evaluations Completed";
                     
                     //add largest discrepency info
                     vm.TeamTableBuilders[assignmentTeam] = new TeamEvaluationDiscrepancyTableDecorator(
                                                                 vm.TeamTableBuilders[assignmentTeam],
-                                                                new List<TeamMemberEvaluation>()
+                                                                evaluations
                                                                 );
                     vm.TableColumnHeaders["TeamEvaluationDiscrepancyTableDecorator"] = "Largest Discrepancy";
-                     * */
+                   
                 }
                 else
                 {

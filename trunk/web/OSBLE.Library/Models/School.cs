@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System;
 
 namespace OSBLE.Models
 {
+    [Serializable]
     public class School
     {
         [Required]

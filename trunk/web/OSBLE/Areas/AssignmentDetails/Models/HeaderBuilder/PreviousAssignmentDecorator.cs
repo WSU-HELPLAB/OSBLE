@@ -8,9 +8,9 @@ using OSBLE.Models.Assignments;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 {
-    public class CriticalReviewPreviousAssignmentDecorator : HeaderDecorator
+    public class PreviousAssignmentDecorator : HeaderDecorator
     {
-        public CriticalReviewPreviousAssignmentDecorator(IHeaderBuilder builder)
+        public PreviousAssignmentDecorator(IHeaderBuilder builder)
             : base(builder)
         {
         }

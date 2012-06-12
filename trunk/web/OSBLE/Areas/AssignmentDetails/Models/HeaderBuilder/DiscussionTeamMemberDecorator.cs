@@ -25,7 +25,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             header.DiscussionTeam = new DynamicDictionary();
 
             //create list to store team members
-            List<List<UserProfile>> ListOfListOfMembers = new List<List<UserProfile>>();
+            List<List<CourseUser>> ListOfListOfMembers = new List<List<CourseUser>>();
             List<string> ListOfTeamNames = new List<string>();
             List<int> ListOfTeamIDs = new List<int>();
 
@@ -41,13 +41,10 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                         ListOfListOfMembers.Add(
                             (from tm2 in dt.GetAllTeamMembers()
                              where tm2.CourseUserID != Client.ID
-                             select tm2.CourseUser.UserProfile).ToList()
+                             select tm2.CourseUser).ToList()
                             );
                         ListOfTeamNames.Add(dt.TeamName);
 
-                        //issue: mailing is by team ID...in this case we have two team IDs..the team and author teams....
-                        //perhaps to resolve this, have the CreateTeamMail accept an optional parameter of author team,
-                        //or to make things even easier, simple have CreateDiscussionTeamMail(DiscussionTeam.ID)
                         ListOfTeamIDs.Add(dt.ID);
                         break;
                     }

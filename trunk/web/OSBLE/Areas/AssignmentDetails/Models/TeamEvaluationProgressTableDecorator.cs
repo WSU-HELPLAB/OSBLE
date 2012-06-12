@@ -12,19 +12,25 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
     public class TeamEvaluationProgressTableDecorator : TableDecorator
     {
         public List<TeamEvaluation> Evaluations { get; set; }
-        public TeamEvaluationProgressTableDecorator(ITableBuilder builder, List<TeamEvaluation> evaluations)
+        public Assignment Assignment { get; set; }
+        public TeamEvaluationProgressTableDecorator(ITableBuilder builder, 
+                                                    List<TeamEvaluation> evaluations, 
+                                                    Assignment assignment)
             : base(builder)
         {
             Evaluations = evaluations;
+            Assignment = assignment;
         }
 
         public override DynamicDictionary BuildTableForTeam(IAssignmentTeam assignmentTeam)
         {
             dynamic data = Builder.BuildTableForTeam(assignmentTeam);
-            data.AssignmentTeam = assignmentTeam;
+
             data.TeamEvaluationProgress = new DynamicDictionary();
             data.TeamEvaluationProgress.CompletedEvaluations = Evaluations.Count;
             data.TeamEvaluationProgress.TotalEvaluations = assignmentTeam.Team.TeamMembers.Count;
+            data.TeamEvaluationProgress.AssignmentId = Assignment.ID;
+            data.TeamEvaluationProgress.AssignmentTeam = assignmentTeam;
             return data;
         }
     }

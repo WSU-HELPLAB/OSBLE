@@ -14,6 +14,11 @@ namespace OSBLE.Controllers
     [OsbleAuthorize]
     public class MailController : OSBLEController
     {
+        public MailController()
+        {
+            ViewBag.Cache = Cache;
+        }
+
         //
         // GET: /Mail/
         public ViewResult Index(int? sortBy)
@@ -380,14 +385,15 @@ namespace OSBLE.Controllers
             return View("Create", mail);
         }
 
-        public ActionResult CreateUser(int id)
+        public ActionResult CreateUser(int courseUserId)
         {
             ViewBag.MailHeader = "New Message";
 
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            CourseUser studentRec = db.CourseUsers.Where(c => (c.UserProfileID == id && c.AbstractCourseID == ActiveCourse.AbstractCourseID)).FirstOrDefault();
+            CourseUser studentRec = db.CourseUsers.Find(courseUserId);
+
             if (studentRec != null)
             {
                 recipientList.Add(studentRec.UserProfile);
@@ -397,40 +403,48 @@ namespace OSBLE.Controllers
             return View("Create", mail);
         }
 
-        public ActionResult CreateTeamMember(int id)
-        {
-            ViewBag.MailHeader = "New Team Member Message";
-
-            Mail mail = new Mail();
-            List<UserProfile> recipientList = new List<UserProfile>();
-
-            CourseUser studentRec = db.CourseUsers.Where(c => (c.UserProfileID == id && c.AbstractCourseID == ActiveCourse.AbstractCourseID)).FirstOrDefault();
-            if (studentRec != null)
-            {
-                recipientList.Add(studentRec.UserProfile);
-            }
-
-            Cache["mail_recipients"] = recipientList;
-            return View("Create", mail);
-        }
-
-        public ActionResult CreateEntireTeam(int teamID)
+        public ActionResult CreateTeam(int teamID)
         {
             ViewBag.MailHeader = "New Team Message";
 
             Mail mail = new Mail();
-            mail.ContextID = ActiveCourse.ID;
+            mail.ContextID = ActiveCourseUser.ID;
             List<UserProfile> recipientList = new List<UserProfile>();
 
             Team team = db.Teams.Find(teamID);
             foreach (TeamMember tm in team.TeamMembers)
             {
-                recipientList.Add(tm.CourseUser.UserProfile);
+                if (tm.CourseUserID != ActiveCourseUser.ID)
+                {
+                    recipientList.Add(tm.CourseUser.UserProfile);
+                }
             }
 
             Cache["mail_recipients"] = recipientList;
             return View("Create", mail);
         }
+
+        public ActionResult CreateDiscussionTeam(int discussionTeamId)
+        {
+            ViewBag.MailHeader = "New Message";
+
+            Mail mail = new Mail();
+            mail.ContextID = ActiveCourseUser.ID;
+            List<UserProfile> recipientList = new List<UserProfile>();
+
+            DiscussionTeam discussionTeam = db.DiscussionTeams.Find(discussionTeamId);
+            foreach (TeamMember tm in discussionTeam.GetAllTeamMembers())
+            {
+                if (tm.CourseUserID != ActiveCourseUser.ID)
+                {
+                    recipientList.Add(tm.CourseUser.UserProfile);
+                }
+            }
+
+            Cache["mail_recipients"] = recipientList;
+            return View("Create", mail);
+        }
+        
 
         //
         // POST: /Mail/Create
