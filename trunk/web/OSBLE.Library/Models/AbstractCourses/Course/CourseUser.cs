@@ -1,5 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using OSBLE.Models.Users;
+using System.Collections;
+using System.Collections.Generic;
+using OSBLE.Models.Assignments;
 
 namespace OSBLE.Models.Courses
 {
@@ -32,10 +35,13 @@ namespace OSBLE.Models.Courses
 
         public bool Hidden { get; set; }
 
+        public virtual IList<TeamMember> TeamMemberships { get; set; }
+
         public CourseUser()
             : base()
         {
             Hidden = false;
+            TeamMemberships = new List<TeamMember>();
         }
 
         public string DisplayName(string separator = ", ")

@@ -392,24 +392,23 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// Returns the Assignment team or null if a team does not exist
+        /// Retrieves the team for the provided user profile / assignment combo.
+        /// If the user is not apart of any team, then he will be added to a new 
+        /// team with him as the sole member.
         /// </summary>
         /// <param name="assignment"></param>
         /// <param name="user"></param>
         /// <returns></returns>
-        public static AssignmentTeam GetAssignmentTeam(Assignment assignment, UserProfile user)
+        public static AssignmentTeam GetAssignmentTeam(Assignment assignment, CourseUser user)
         {
-            AssignmentTeam returnValue = new AssignmentTeam();
-            foreach (AssignmentTeam at in assignment.AssignmentTeams)
-            {
-                foreach (TeamMember tm in at.Team.TeamMembers)
-                {
-                    if (tm.CourseUser.UserProfileID == user.ID)
-                    {
-                        returnValue = at;
-                    }
-                }
-            }
+            var basic = user.TeamMemberships
+                                             .SelectMany(t => t.Team.UsedAsAssignmentTeam);
+            var query = basic
+                                             .Where(a => a.AssignmentID == assignment.ID);
+            AssignmentTeam returnValue = user.TeamMemberships
+                                             .SelectMany(t => t.Team.UsedAsAssignmentTeam)
+                                             .Where(a => a.AssignmentID == assignment.ID)
+                                             .FirstOrDefault();
             return returnValue;
         }
 

@@ -110,7 +110,7 @@ namespace OSBLE.Controllers
                 foreach (Assignment a in assignmentList)
                 {
                     //populating tuple to add to dictionary by collecting the information described in the above commentblock.
-                    AssignmentTeam at = OSBLEController.GetAssignmentTeam(a, CurrentUser);
+                    AssignmentTeam at = GetAssignmentTeam(a, ActiveCourseUser);
                     DateTime? subTime = FileSystem.GetSubmissionTime(at);
                     string submissionTime = "No Submission";
                     string scoreString = "No Grade";
@@ -406,7 +406,7 @@ namespace OSBLE.Controllers
             }
             else if (ActiveCourse.AbstractRole.CanSubmit)//Student setup
             {
-                AssignmentTeam at = GetAssignmentTeam(assignment, CurrentUser);
+                AssignmentTeam at = GetAssignmentTeam(assignment, ActiveCourseUser);
                 ViewBag.TeamID = at.TeamID;
                 ViewBag.CurrentUserID = ActiveCourse.ID;
                 ViewBag.TeamName = at.Team.Name;
@@ -664,7 +664,7 @@ namespace OSBLE.Controllers
                                                                 t.TeamEvaluation.AssignmentID == a.ID
                                                                 select t).OrderBy(u => u.RecipientID).ToList();
                                                                                 * */
-            AssignmentTeam at = GetAssignmentTeam(a.PreceedingAssignment, team.TeamMembers.FirstOrDefault().CourseUser.UserProfile);
+            AssignmentTeam at = GetAssignmentTeam(a.PreceedingAssignment, team.TeamMembers.FirstOrDefault().CourseUser);
             ViewBag.Team = at;
 
             ViewBag.TeamEvaluations = teamEvaluations;
@@ -682,8 +682,8 @@ namespace OSBLE.Controllers
         public ActionResult StudentTeamEvaluation(int assignmentId)
         {
             Assignment a = db.Assignments.Find(assignmentId);
-            AssignmentTeam pAt = GetAssignmentTeam(a.PreceedingAssignment, CurrentUser);
-            AssignmentTeam at = GetAssignmentTeam(a, CurrentUser);
+            AssignmentTeam pAt = GetAssignmentTeam(a.PreceedingAssignment, ActiveCourseUser);
+            AssignmentTeam at = GetAssignmentTeam(a, ActiveCourseUser);
             if (at != null && a.Type == AssignmentTypes.TeamEvaluation)
             {
                 ViewBag.AssignmentTeam = at;
@@ -733,11 +733,11 @@ namespace OSBLE.Controllers
         {
 
              Assignment assignment = db.Assignments.Find(assignmentId);
-            AssignmentTeam at = GetAssignmentTeam(assignment, CurrentUser);
-            AssignmentTeam pAt = GetAssignmentTeam(assignment.PreceedingAssignment, CurrentUser);
+             AssignmentTeam at = GetAssignmentTeam(assignment, ActiveCourseUser);
+             AssignmentTeam pAt = GetAssignmentTeam(assignment.PreceedingAssignment, ActiveCourseUser);
             List<TeamEvaluation> existingTeamEvaluations = (from te in db.TeamEvaluations
                                                             where te.TeamEvaluationAssignmentID == assignmentId &&
-                                                            te.EvaluatorID == ActiveCourse.ID
+                                                            te.EvaluatorID == ActiveCourseUser.ID
                                                             select te).ToList();
 
             int existingCommentID = (from C in existingTeamEvaluations

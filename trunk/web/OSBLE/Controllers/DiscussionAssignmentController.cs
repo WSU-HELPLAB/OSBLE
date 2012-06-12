@@ -355,7 +355,7 @@ namespace OSBLE.Controllers
             {
                 if (assignment != null)
                 {
-                    AssignmentTeam at = GetAssignmentTeam(assignment, ActiveCourse.UserProfile);
+                    AssignmentTeam at = GetAssignmentTeam(assignment, ActiveCourseUser);
                     if (assignment.DiscussionSettings.HasAnonymousPosts)
                     {
                         DiscussionPost post = new DiscussionPost()
@@ -455,6 +455,8 @@ namespace OSBLE.Controllers
                 dr.IsReply = true;
                 dr.DiscussionTeamID = discussionTeamId;
                 replyToPost.Replies.Add(dr);
+
+                AssignmentTeam at = GetAssignmentTeam(replyToPost.Assignment, ActiveCourseUser);
 
                 db.SaveChanges();
 

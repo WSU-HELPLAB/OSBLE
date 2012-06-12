@@ -39,7 +39,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
             foreach(CourseUser cu in CourseUsersInReviewTeam)
             {
                 bool addedTimeStamp = false;
-                AssignmentTeam previousAssignmentTeam = OSBLEController.GetAssignmentTeam(assignment.PreceedingAssignment, cu.UserProfile);
+                AssignmentTeam previousAssignmentTeam = OSBLEController.GetAssignmentTeam(assignment.PreceedingAssignment, cu);
             
                 foreach (AssignmentTeam at in assignment.AssignmentTeams)
                 {

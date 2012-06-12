@@ -1,8 +1,11 @@
 ﻿@model OSBLE.Models.Courses.CourseUser
 @using OSBLE.Models
+@using OSBLE.Models.Courses
+@using OSBLE.Models.Assignments
 
 @{
     ViewBag.Title = "Edit";
+    CourseUser client = ViewBag.ActiveCourseUser as CourseUser;
 }
 
 <h2>Edit</h2>
@@ -47,6 +50,17 @@
         </p>
 
 }
+
+<div>
+@Model.DisplayNameFirstLast(client.AbstractRole)  is a member of the following teams:
+<ul>
+    @foreach (TeamMember member in Model.TeamMemberships)
+    {
+        <li>@member.Team.Name</li>
+    }
+</ul>
+
+</div>
 
 <div>
     @Html.ActionLink("Back to Users", "Index")

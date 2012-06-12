@@ -105,7 +105,7 @@ namespace OSBLE.Controllers
 
                     if (assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID && ActiveCourseUser.AbstractRole.CanSubmit == true)
                     {
-                        AssignmentTeam assignmentTeam = GetAssignmentTeam(assignment, CurrentUser);
+                        AssignmentTeam assignmentTeam = GetAssignmentTeam(assignment, ActiveCourseUser);
                         
                         int i = 0;
 

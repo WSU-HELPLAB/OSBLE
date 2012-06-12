@@ -164,7 +164,7 @@ namespace OSBLE.Controllers
 
             Assignment assignment = db.Assignments.Find(assignmentId);
 
-            AssignmentTeam assignmentTeam = GetAssignmentTeam(assignment, cu.UserProfile);
+            AssignmentTeam assignmentTeam = GetAssignmentTeam(assignment, cu);
 
             if (assignment == null || assignmentTeam == null)
             {
@@ -324,7 +324,7 @@ namespace OSBLE.Controllers
                 if (ActiveCourse.AbstractRole.CanSubmit && ActiveCourse.ID == cuId)
                 {
                     Assignment assignment = db.Assignments.Find(assignmentId);
-                    AssignmentTeam team = GetAssignmentTeam(assignment, CurrentUser);
+                    AssignmentTeam team = GetAssignmentTeam(assignment, ActiveCourseUser);
                     if (team != null)
                     {
                         isOwnAssignment = true;
@@ -335,7 +335,7 @@ namespace OSBLE.Controllers
                 {
                     Assignment assignment = db.Assignments.Find(assignmentId);
                     CourseUser cu = db.CourseUsers.Find(cuId);
-                    AssignmentTeam at = GetAssignmentTeam(assignment, cu.UserProfile);
+                    AssignmentTeam at = GetAssignmentTeam(assignment, cu);
                     ViewBag.AssignmentName = assignment.AssignmentName;
                     ViewBag.PossiblePoints = assignment.PointsPossible;
                     ViewBag.Score = (from c in assignment.Scores where c.CourseUserID == cuId select c).FirstOrDefault();

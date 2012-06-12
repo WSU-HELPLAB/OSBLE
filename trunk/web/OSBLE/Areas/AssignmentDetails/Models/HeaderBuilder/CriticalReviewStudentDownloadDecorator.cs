@@ -32,7 +32,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 
                         
             AssignmentTeam assignmentTeam = null;
-            assignmentTeam = OSBLEController.GetAssignmentTeam(assignment, Student.UserProfile);
+            assignmentTeam = OSBLEController.GetAssignmentTeam(assignment, Student);
            
             header.CRdownload.hasRecievedReview = false;
 

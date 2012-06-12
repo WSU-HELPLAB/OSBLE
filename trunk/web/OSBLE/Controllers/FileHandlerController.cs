@@ -242,7 +242,7 @@ namespace OSBLE.Controllers
         public ActionResult GetPrecedingSubmissionForCriticalReview(int assignmentId, int authorTeamId)
         {
             Assignment CRassignment = db.Assignments.Find(assignmentId);
-            AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourseUser.UserProfile);
+            AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourseUser);
             List<int> authorTeams = (from rt in CRassignment.ReviewTeams
                                      where rt.ReviewTeamID == at.TeamID
                                      select rt.AuthorTeamID).ToList();
@@ -279,7 +279,7 @@ namespace OSBLE.Controllers
             if (isOwnDocument)
             {
                 Assignment CRassignment = db.Assignments.Find(assignmentId);
-                AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourseUser.UserProfile);
+                AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourseUser);
 
                 return GetSubmissionZipHelper(assignmentId, at.TeamID, authorTeam);
             }
@@ -298,6 +298,8 @@ namespace OSBLE.Controllers
         public ActionResult GetReviewsOfAuthor(int assignmentId, int receiverId)
         {
             Assignment assignment = db.Assignments.Find(assignmentId);
+            CourseUser receiver = db.CourseUsers.Find(receiverId);
+            AssignmentTeam previousAssignmentTeam = GetAssignmentTeam(assignment.PreceedingAssignment, receiver);
 
             if (ActiveCourseUser.AbstractRole.CanModify || (receiverId == ActiveCourseUser.ID && assignment.IsCriticalReviewPublished))
             {
@@ -347,7 +349,7 @@ namespace OSBLE.Controllers
         private ActionResult GetReviewsOfAuthorHelper(Assignment assignment, int receiverId)
         {
             CourseUser receiver = db.CourseUsers.Find(receiverId);
-            AssignmentTeam previousAssignmentTeam = GetAssignmentTeam(assignment.PreceedingAssignment, receiver.UserProfile);
+            AssignmentTeam previousAssignmentTeam = GetAssignmentTeam(assignment.PreceedingAssignment, receiver);
 
             //REVIEW TODO: Explain the hack that you're using below.
             Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, previousAssignmentTeam);
@@ -495,7 +497,7 @@ namespace OSBLE.Controllers
         {
             Assignment assignment = db.Assignments.Find(assignmentID);
 
-            AssignmentTeam at = OSBLEController.GetAssignmentTeam(assignment, CurrentUser);
+            AssignmentTeam at = GetAssignmentTeam(assignment, ActiveCourseUser);
 
             try
             {

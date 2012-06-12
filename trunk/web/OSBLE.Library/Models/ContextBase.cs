@@ -254,6 +254,11 @@ namespace OSBLE.Models
                 .WithMany()
                 .WillCascadeOnDelete(false);
 
+            modelBuilder.Entity<TeamMember>()
+                .HasRequired(tm => tm.CourseUser)
+                .WithMany(cu => cu.TeamMemberships)
+                .WillCascadeOnDelete(true);
+
         }
     }
 }

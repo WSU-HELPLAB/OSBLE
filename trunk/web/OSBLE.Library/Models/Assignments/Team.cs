@@ -14,12 +14,35 @@ namespace OSBLE.Models.Assignments
         public int ID { get; set; }
         public string Name { get; set; }
 
-        [Association("AssignmentTeam_Team", "ID", "TeamID")]
         public virtual IList<TeamMember> TeamMembers { get; set; }
+        public virtual IList<AssignmentTeam> UsedAsAssignmentTeam { get; set; }
+        public virtual IList<DiscussionTeam> UsedAsDiscussionTeam { get; set; }
+        public virtual IList<ReviewTeam> UsedAsReviewTeam { get; set; }
+
+        [NotMapped]
+        public IList<Assignment> UsedInAssignments
+        {
+            get
+            {
+                List<Assignment> assignments = new List<Assignment>();
+                var assignmentTeams = UsedAsAssignmentTeam.Select(at => at.Assignment);
+                var discussionTeams = UsedAsDiscussionTeam.Select(at => at.Assignment);
+                var reviewTeams = UsedAsReviewTeam.Select(at => at.Assignment);
+                assignments = assignmentTeams
+                              .Union(discussionTeams)
+                              .Union(reviewTeams)
+                              .Distinct()
+                              .ToList();
+                return assignments;
+            }
+        }
 
         public Team()
         {
             TeamMembers = new List<TeamMember>();
+            UsedAsAssignmentTeam = new List<AssignmentTeam>();
+            UsedAsDiscussionTeam = new List<DiscussionTeam>();
+            UsedAsReviewTeam = new List<ReviewTeam>();
         }
 
         public int CompareTo(object obj)

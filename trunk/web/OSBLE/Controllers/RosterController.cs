@@ -21,6 +21,7 @@ namespace OSBLE.Controllers
         public RosterController()
         {
             ViewBag.CurrentTab = "Users";
+            ViewBag.ActiveCourseUser = ActiveCourseUser;
         }
 
         public class RosterEntry
