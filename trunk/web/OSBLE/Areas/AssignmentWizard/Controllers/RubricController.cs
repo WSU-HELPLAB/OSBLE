@@ -32,6 +32,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get
             {
+                //rubric creation is currently broken so disable it for now.
+                return new List<AssignmentTypes>();
                 List<AssignmentTypes> types = base.AllAssignmentTypes.ToList();
                 types.Remove(AssignmentTypes.TeamEvaluation);
                 return types;
@@ -41,7 +43,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public override ActionResult Index()
         {
             base.Index();
-            ViewBag.ActiveCourse = ActiveCourse;
+            ViewBag.ActiveCourse = ActiveCourseUser;
             return View(Assignment);
         }
 

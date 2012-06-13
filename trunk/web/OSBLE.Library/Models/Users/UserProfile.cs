@@ -138,16 +138,19 @@ namespace OSBLE.Models.Users
         /// <returns>True if the combo is valid, false otherwise</returns>
         public static bool ValidateUser(string userName, string password)
         {
-            OSBLEContext db = new OSBLEContext();
-            string hashedPassword = UserProfile.GetPasswordHash(password);
-            int count = (from user in db.UserProfiles
+            int count = 0;
+            using (OSBLEContext db = new OSBLEContext())
+            {
+                string hashedPassword = UserProfile.GetPasswordHash(password);
+                count = (from user in db.UserProfiles
                          where
                          user.UserName.CompareTo(userName) == 0
                          &&
                          user.Password.CompareTo(hashedPassword) == 0
                          select user
-                             ).Count();
-            if(count == 1)
+                                 ).Count();
+            }
+            if (count == 1)
             {
                 return true;
             }

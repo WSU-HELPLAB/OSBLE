@@ -19,7 +19,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <UseIISExpress>false</UseIISExpress>
-    <SilverlightApplicationList>{4196777B-69DF-4B8C-95CF-D4487C34F03F}|..\OsbleRubric\OsbleRubric.csproj|ClientBin|False,{D7C51CF9-3BB2-44CF-9880-E35EF83A1F85}|..\SilverlightSandbox\SilverlightSandbox.csproj|ClientBin|False,{D7E4F1AB-379C-4AD4-BBCF-A0002F44811C}|..\..\silverlight\ReviewInterfaceNew\ViewPeerReview\ViewPeerReview.csproj|ClientBin|False,{172F41E1-B3F6-4519-9DBE-E08B2EE2BC1B}|..\..\silverlight\ReviewInterfaceNew\EditPeerReview\EditPeerReview.csproj|ClientBin|False</SilverlightApplicationList>
+    <SilverlightApplicationList>{D7E4F1AB-379C-4AD4-BBCF-A0002F44811C}|..\..\silverlight\ReviewInterfaceNew\ViewPeerReview\ViewPeerReview.csproj|ClientBin|False,{172F41E1-B3F6-4519-9DBE-E08B2EE2BC1B}|..\..\silverlight\ReviewInterfaceNew\EditPeerReview\EditPeerReview.csproj|ClientBin|False</SilverlightApplicationList>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -254,9 +254,6 @@
     <Compile Include="Services\AuthenticationService.svc.cs">
       <DependentUpon>AuthenticationService.svc</DependentUpon>
     </Compile>
-    <Compile Include="Services\OSBLEService.cs" />
-    <Compile Include="Services\ReviewInterfaceDomainService.cs" />
-    <Compile Include="Services\RubricRiaService.cs" />
     <Compile Include="Services\SilverlightFaultBehavior.cs" />
     <Compile Include="Services\UploaderWebService.svc.cs">
       <DependentUpon>UploaderWebService.svc</DependentUpon>
