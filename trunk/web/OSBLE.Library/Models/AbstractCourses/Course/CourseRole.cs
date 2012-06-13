@@ -19,6 +19,18 @@
             this.Anonymized = Anonymized;
         }
 
+        public CourseRole(AbstractRole copyRole)
+        {
+            this.Anonymized = copyRole.Anonymized;
+            this.CanGrade = copyRole.CanGrade;
+            this.CanModify = copyRole.CanModify;
+            this.CanSeeAll = copyRole.CanSeeAll;
+            this.CanSubmit = copyRole.CanSubmit;
+            this.CanUploadFiles = copyRole.CanUploadFiles;
+            this.ID = copyRole.ID;
+            this.Name = copyRole.Name;
+        }
+
         public enum CourseRoles : int
         {
             //Instructor being the first one is used in RosterController so any new roles add at the end.

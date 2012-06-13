@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/OSBLE.Models.Users" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Users" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:17532/Services/AuthenticationService.svc?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models" />
+  <xs:complexType name="UserProfile">
+    <xs:sequence>
+      <xs:element name="_x003C_AspNetUserName_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_AuthenticationHash_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_CanCreateCourses_x003E_k__BackingField" type="xs:boolean" />
+      <xs:element name="_x003C_DefaultCourse_x003E_k__BackingField" type="xs:int" />
+      <xs:element name="_x003C_EmailAllActivityPosts_x003E_k__BackingField" type="xs:boolean" />
+      <xs:element name="_x003C_EmailAllNotifications_x003E_k__BackingField" type="xs:boolean" />
+      <xs:element name="_x003C_FirstName_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_ID_x003E_k__BackingField" type="xs:int" />
+      <xs:element name="_x003C_Identification_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_IsAdmin_x003E_k__BackingField" type="xs:boolean" />
+      <xs:element name="_x003C_IsApproved_x003E_k__BackingField" type="xs:boolean" />
+      <xs:element name="_x003C_LastName_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_Password_x003E_k__BackingField" nillable="true" type="xs:string" />
+      <xs:element name="_x003C_SchoolID_x003E_k__BackingField" type="xs:int" />
+      <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/OSBLE.Models" name="_x003C_School_x003E_k__BackingField" nillable="true" type="q1:School" />
+      <xs:element name="_x003C_SortBy_x003E_k__BackingField" type="xs:int" />
+      <xs:element name="_x003C_UserName_x003E_k__BackingField" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UserProfile" nillable="true" type="tns:UserProfile" />
+</xs:schema>

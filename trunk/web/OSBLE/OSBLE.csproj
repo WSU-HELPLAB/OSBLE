@@ -254,6 +254,9 @@
     <Compile Include="Services\AuthenticationService.svc.cs">
       <DependentUpon>AuthenticationService.svc</DependentUpon>
     </Compile>
+    <Compile Include="Services\OsbleService.svc.cs">
+      <DependentUpon>OsbleService.svc</DependentUpon>
+    </Compile>
     <Compile Include="Services\SilverlightFaultBehavior.cs" />
     <Compile Include="Services\UploaderWebService.svc.cs">
       <DependentUpon>UploaderWebService.svc</DependentUpon>
@@ -528,6 +531,7 @@
     <Content Include="Scripts\Silverlight.js" />
     <Content Include="Services\AssignmentSubmissionService.svc" />
     <Content Include="Services\AuthenticationService.svc" />
+    <Content Include="Services\OsbleService.svc" />
     <Content Include="Services\UploaderWebService.svc" />
     <Content Include="Silverlight.js" />
     <Content Include="SilverlightSandboxTestPage.aspx" />

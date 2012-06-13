@@ -11,6 +11,7 @@ using OSBLE.Models.Users;
 using System.Security.Cryptography;
 using OSBLE.Utility;
 using System.Runtime.Caching;
+using System.Text;
 
 namespace OSBLE.Services
 {
@@ -63,7 +64,7 @@ namespace OSBLE.Services
             {
                 return new UserProfile();
             }
-            return profile;
+            return new UserProfile(profile);
         }
 
         /// <summary>
@@ -91,14 +92,15 @@ namespace OSBLE.Services
                 //compute the hash
                 using (SHA1Managed sha1 = new SHA1Managed())
                 {
-                    System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
-                    string hash = encoding.GetString(sha1.ComputeHash(encoding.GetBytes(hashString)));
+                    byte[] textBytes = Encoding.ASCII.GetBytes(hashString);
+                    byte[] hashBytes = sha1.ComputeHash(textBytes);
+                    string hashText = BitConverter.ToString(hashBytes);
 
                     //save the hash for validating later calls
-                    _cache[hash] = profile;
+                    _cache[hashText] = profile;
 
                     //return the hash to the caller
-                    return hash;
+                    return hashText;
                 }
             }
             return "";

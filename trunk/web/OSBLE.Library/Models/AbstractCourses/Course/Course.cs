@@ -115,5 +115,33 @@ namespace OSBLE.Models.Courses
             Categories = new List<Category>();
         }
 
+        /// <summary>
+        /// Copy constructor does not handle virtual members.
+        /// </summary>
+        /// <param name="copyCourse"></param>
+        public Course(Course copyCourse)
+            : this()
+        {
+            this.AllowDashboardPosts = copyCourse.AllowDashboardPosts;
+            this.AllowDashboardReplies = copyCourse.AllowDashboardReplies;
+            this.AllowEventPosting = copyCourse.AllowEventPosting;
+            this.CalendarWindowOfTime = copyCourse.CalendarWindowOfTime;
+            this.EndDate = copyCourse.EndDate;
+            this.HoursLatePerPercentPenalty = copyCourse.HoursLatePerPercentPenalty;
+            this.HoursLateUntilZero = copyCourse.HoursLateUntilZero;
+            this.ID = copyCourse.ID;
+            this.Inactive = copyCourse.Inactive;
+            this.MinutesLateWithNoPenalty = copyCourse.MinutesLateWithNoPenalty;
+            this.Name = copyCourse.Name;
+            this.Number = copyCourse.Number;
+            this.PercentPenalty = copyCourse.PercentPenalty;
+            this.Prefix = copyCourse.Prefix;
+            this.RequireInstructorApprovalForEventPosting = copyCourse.RequireInstructorApprovalForEventPosting;
+            this.Semester = copyCourse.Semester;
+            this.ShowMeetings = copyCourse.ShowMeetings;
+            this.StartDate = copyCourse.StartDate;
+            this.Year = copyCourse.Year;
+        }
+
     }
 }

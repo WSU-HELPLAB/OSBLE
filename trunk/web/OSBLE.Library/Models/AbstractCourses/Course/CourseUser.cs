@@ -44,15 +44,30 @@ namespace OSBLE.Models.Courses
             TeamMemberships = new List<TeamMember>();
         }
 
+        /// <summary>
+        /// Note this copy constructor doesn't copy virtual members.
+        /// </summary>
+        /// <param name="copyUser"></param>
+        public CourseUser(CourseUser copyUser)
+            : this()
+        {
+            this.AbstractCourseID = copyUser.AbstractCourseID;
+            this.AbstractRoleID = copyUser.AbstractRoleID;
+            this.Hidden = copyUser.Hidden;
+            this.ID = copyUser.ID;
+            this.Section = copyUser.Section;
+            this.UserProfileID = copyUser.UserProfileID;
+        }
+
         public string DisplayName(string separator = ", ")
         {
-            return this.UserProfile.LastName + separator + this.UserProfile.FirstName; 
+            return this.UserProfile.LastName + separator + this.UserProfile.FirstName;
         }
 
         public string DisplayName(AbstractRole viewerRole, string separator = ", ")
         {
             // not observer
-            if (viewerRole.Anonymized == false) 
+            if (viewerRole.Anonymized == false)
             {
                 return this.UserProfile.LastName + separator + this.UserProfile.FirstName;
             }
