@@ -707,7 +707,7 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\StudentGradeDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\StudentSubmissionDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\DiscussionPostsTableDecorator.cshtml" />
-    <Content Include="Areas\AssignmentDetails\Views\Home\DiscussionAssignment.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Home\DiscussionAssignmentIndex.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\DiscussionRepliesTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\DiscussionTotalTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\_ViewStart.cshtml" />
@@ -722,6 +722,7 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\StudentDiscussionLinkDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\DiscussionTeamMemberDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\StudentTeamEvalSubmissionDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Home\TeamEvaluationIndex.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />
@@ -766,11 +767,11 @@
     <Content Include="Views\Shared\_AddToGradebook.cshtml" />
     <Content Include="Views\Account\ErrorPage.cshtml" />
     <Content Include="Views\Account\ProfessionalRegister.cshtml" />
-    <Content Include="Views\Submission\Create.cshtml" />
-    <Content Include="Views\Submission\SubmittedSuccessfully.cshtml" />
+    <Content Include="Views\Shared\Submission\Create.cshtml" />
+    <Content Include="Views\Shared\Submission\SubmittedSuccessfully.cshtml" />
     <Content Include="Views\Gradebook\ImportColumnsFromCSV.cshtml" />
     <Content Include="Views\Rubric\Index.cshtml" />
-    <Content Include="Views\Submission\_Submit.cshtml" />
+    <Content Include="Views\Shared\Submission\_Submit.cshtml" />
     <Content Include="Views\Rubric\_Display.cshtml" />
     <Content Include="Views\Rubric\View.cshtml" />
     <Content Include="Views\Assignment\InlineReview.cshtml" />

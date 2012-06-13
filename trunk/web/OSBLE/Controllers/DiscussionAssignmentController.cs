@@ -131,7 +131,7 @@ namespace OSBLE.Controllers
         /// <param name="discussionTeamID">The discussion team id for discussion to beto viewed. If it is a classwide discussion, then any dt can be sent.</param>
         /// <returns></returns>
         [CanModifyCourse]
-        public ActionResult TeacherIndex(int assignmentId, int courseUserId, int postOrReply, int discussionTeamID)
+        public ActionResult TeacherIndex(int assignmentId, int discussionTeamID, int courseUserId = 0, int postOrReply = 3)
         {
             List<DiscussionPost> teamPosts = new List<DiscussionPost>();
             List<DiscussionPost> posts = new List<DiscussionPost>();

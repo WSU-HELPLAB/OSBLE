@@ -91,6 +91,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 WasUpdateSuccessful = true;
 
+                Assignment.CourseID = ActiveCourseUser.AbstractCourseID;
+
                 double oldPointsPossible = (from a in db.Assignments
                                             where a.ID == Assignment.ID
                                             select a.PointsPossible).FirstOrDefault();

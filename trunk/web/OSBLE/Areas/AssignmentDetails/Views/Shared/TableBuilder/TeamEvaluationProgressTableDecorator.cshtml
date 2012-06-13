@@ -7,5 +7,12 @@
     string linkText = string.Format("{0} of {1}", dataModel.TeamEvaluationProgress.CompletedEvaluations, dataModel.TeamEvaluationProgress.TotalEvaluations);
 }
 <td>
-@Html.ActionLink(linkText, "TeacherTeamEvaluation", "Assignment", new { precedingTeamId = currentTeam.Team.ID, TeamEvaluationAssignmentId = dataModel.TeamEvaluationProgress.AssignmentId, area = "" }, new { })
+    @if (dataModel.TeamEvaluationProgress.hasSubmitted)
+    {
+       @:Submitted
+    }
+    else
+    {
+        @:<strong>Not Submitted</strong>
+    }
 </td>

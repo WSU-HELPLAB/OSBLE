@@ -20,30 +20,41 @@
 {
     @if (Model.Client.AbstractRole.CanGrade)
     {
-        foreach (IAssignmentTeam assignmentTeam in Model.CurrentAssignment.DiscussionTeams)
+
+        var teams = from t in Model.CurrentAssignment.PreceedingAssignment.AssignmentTeams
+                    orderby t.Team.Name ascending
+                    select t;
+        
+        foreach (IAssignmentTeam assignmentTeam in teams)
         {
-            if ((assignmentTeam as DiscussionTeam).GetAllTeamMembers().Count() > 1)
+            if (assignmentTeam.Team.TeamMembers.Count() > 1)
             {
                 <tr>
                     <th class="TeamHeader" colspan="6">
-                        @assignmentTeam.Team.Name
+                        @{string actionLink = Url.Action("CreateTeam", "Mail", new { area = "", teamID = assignmentTeam.Team.ID });
+                        }
+                        <a href="@actionLink" title="Email this team" >@Helpers.MailButton()</a>
+                        @assignmentTeam.Team.Name - 
+                        @Html.ActionLink("View Evaluations", "TeacherTeamEvaluation", "Assignment", new { precedingTeamId = assignmentTeam.TeamID, TeamEvaluationAssignmentId = Model.CurrentAssignment.ID, area = "" }, new { })
                     </th>
                 </tr>
             }
 
-            foreach (TeamMember member in (assignmentTeam as DiscussionTeam).GetAllTeamMembers())
+            foreach (TeamMember member in assignmentTeam.Team.TeamMembers.OrderBy(t => t.CourseUser.DisplayName()).ToList())
             {
-                DiscussionTeam singleUserAssignmentTeam = new DiscussionTeam();
+                AssignmentTeam singleUserAssignmentTeam = new AssignmentTeam();
                 singleUserAssignmentTeam.Team = new Team();
                 singleUserAssignmentTeam.Team.TeamMembers.Add(member);
                 singleUserAssignmentTeam.Team.Name = member.CourseUser.DisplayName(Model.Client.AbstractRole);
                 singleUserAssignmentTeam.TeamID = member.TeamID;
                 singleUserAssignmentTeam.Assignment = assignmentTeam.Assignment;
-                singleUserAssignmentTeam.AssignmentID = assignmentTeam.AssignmentID;
-                singleUserAssignmentTeam.ID = (assignmentTeam as DiscussionTeam).ID;
-                
+                singleUserAssignmentTeam.AssignmentID = assignmentTeam.AssignmentID;             
         <tr>
-            <td>@member.CourseUser.DisplayName(Model.Client.AbstractRole)
+            <td>
+                @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", courseUserId = member.CourseUser.ID });
+                }
+                <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
+                @member.CourseUser.DisplayNameFirstLast(Model.Client.AbstractRole)
             </td>
             @foreach (string view in Model.TableColumnHeaders.Keys)
             {

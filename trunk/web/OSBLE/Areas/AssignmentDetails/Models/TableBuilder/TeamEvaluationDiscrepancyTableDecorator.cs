@@ -18,36 +18,31 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
 
         public override DynamicDictionary BuildTableForTeam(IAssignmentTeam assignmentTeam)
         {
-            //Gathering all evals for all the team members and putting their average into studentDict
-            Dictionary<int, double> studentDict = new Dictionary<int, double>();
-            double discrepancy = 0.0;
-            /*
-            foreach (TeamMember tm in assignmentTeam.Team.TeamMembers)
-            {
-                int denom = (from t in TeamEvaluations
-                             where t.RecipientID == tm.CourseUserID
-                             select t).Count();
-                if (denom > 0)
-                {
-                    double avg = (from t in TeamEvaluations
-                                  where t.RecipientID == tm.CourseUserID
-                                  select t.Points).Sum() / denom;
-                    studentDict.Add(tm.CourseUserID, avg);
-                }
-            }
-             * */
-
-            //going through all the averaged values and extracting the one with the largest difference from 100.
-            foreach (KeyValuePair<int, double> pair in studentDict)
-            {
-                if (Math.Abs(pair.Value - 100) > discrepancy)
-                {
-                    discrepancy = Math.Abs(pair.Value - 100);
-                }
-            }
-
             dynamic data = Builder.BuildTableForTeam(assignmentTeam);
-            data.TeamEvaluationDiscrepancy = discrepancy;
+            data.Multiplier = new DynamicDictionary();
+            
+            // Note: assume assignment team size == 1 because TeamEvaluationIndex
+            // splits each courseUser into their own seperate team
+            double avg = -1;
+            int denom = (from t in TeamEvaluations
+                            where t.RecipientID == assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUserID
+                            select t).Count();
+            if (denom > 0)
+            {
+                avg = (from t in TeamEvaluations
+                                where t.RecipientID == assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUserID
+                                select t.Points).Sum() / denom;
+            }
+
+            if (avg == -1)
+            {
+                data.Multiplier.MultiplierText = "-";
+            }
+            else
+            {
+                data.Multiplier.MultiplierText = (avg /= 100).ToString();
+            }
+     
             return data;
         }
     }

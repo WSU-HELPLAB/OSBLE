@@ -17,7 +17,22 @@
     <link href="@Url.Content("~/AssignmentDetails/Content/css/Home.css")" type="text/css" rel="Stylesheet" />
     @RenderSection("Header", false)
 }
-<h1>@Model.CurrentAssignment.AssignmentName.ToFirstCharUpper()</h1>
+<h1>@Model.CurrentAssignment.AssignmentName.ToFirstCharUpper()     
+
+</h1>
+<table>
+        <tr>
+            <th>Select Assignment:</th>
+            <td>
+            <select id = "dtInstructorSelect">
+                @foreach(Assignment assignment in (Model.Client.AbstractCourse as Course).Assignments)
+                {
+                    <option>@assignment.AssignmentName</option>
+                }
+                </select>
+            </td>
+        </tr>
+    </table>
 @if (Model.Client.AbstractRole.CanModify)
 {
     <ul id="AssignmentLinksList">

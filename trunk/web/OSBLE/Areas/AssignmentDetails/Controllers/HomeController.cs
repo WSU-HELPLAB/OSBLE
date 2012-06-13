@@ -23,15 +23,19 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
             AssignmentDetailsViewModel viewModel = factory.Bake(assignment, ActiveCourseUser);
 
             //discussion assignments and critical reviews require their own special view
-            if (assignment.Type == AssignmentTypes.DiscussionAssignment ||
+            if (assignment.Type == AssignmentTypes.TeamEvaluation)
+            {
+                return View("TeamEvaluationIndex", viewModel);
+            }
+            else if (assignment.Type == AssignmentTypes.DiscussionAssignment ||
                     assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
             {
-                return View("DiscussionAssignment", viewModel);
+                return View("DiscussionAssignmentIndex", viewModel);
             }
             //MG&MK: For teamevaluation assignments, assignment details uses the 
             //previous assingment teams for displaying. So, we are forcing 
             //TeamEvaluation assignment to use TeamIndex.
-            else if (assignment.HasTeams || assignment.Type == AssignmentTypes.TeamEvaluation) 
+            else if (assignment.HasTeams || assignment.Type == AssignmentTypes.TeamEvaluation)
             {
                 return View("TeamIndex", viewModel);
             }

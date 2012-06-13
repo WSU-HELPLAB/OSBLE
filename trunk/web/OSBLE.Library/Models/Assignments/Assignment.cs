@@ -65,6 +65,9 @@ namespace OSBLE.Models.Assignments
         public int CategoryID { get; set; }
         public virtual Category Category { get; set; }
 
+        public int? CourseID { get; set; }
+        public virtual Course Course {get; set; }
+
         [Required(ErrorMessage = "Please specify the total number of points that this assignment will be worth")]
         [Display(Name = "Total Points Possible")]
         public int PointsPossible { get; set; }

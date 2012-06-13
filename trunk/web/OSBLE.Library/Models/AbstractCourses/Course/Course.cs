@@ -88,10 +88,14 @@ namespace OSBLE.Models.Courses
         [Display(Name = "Include course meetings and breaks in course calendar")]
         public bool ShowMeetings { get; set; }
 
+        public virtual IList<Assignment> Assignments { get; set; }
+
         public Course()
             : base()
         {
             Categories = new List<Category>();
+
+            Assignments = new List<Assignment>();
 
             // Set default values for course settings.
             AllowDashboardPosts = true;

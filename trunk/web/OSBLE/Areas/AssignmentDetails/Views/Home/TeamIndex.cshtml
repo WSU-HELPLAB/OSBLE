@@ -8,6 +8,7 @@
     DynamicDictionary headerData = Model.HeaderBuilder.BuildHeader(Model.CurrentAssignment);
     
 }
+
 @section AssignmentDetails
 {
     @foreach (string view in Model.HeaderViews)
@@ -25,17 +26,17 @@
         var teams = from pair in Model.TeamTableBuilders
                     orderby pair.Key.Team.Name ascending
                     select pair.Key;
-        
+
         foreach (IAssignmentTeam assignmentTeam in teams)
         {
             if (assignmentTeam.Team.TeamMembers.Count() > 1)
             {
                 <tr class="TeamHeader">
                     <th colspan="6">
-                        @assignmentTeam.Team.Name
                         @{string actionLink = Url.Action("CreateTeam", "Mail", new { area = "", teamID = assignmentTeam.Team.ID });
                         }
-                        <a title="Email this user" href="@actionLink" > @Helpers.MailButton() </a>
+                        <a href="@actionLink" title="Email this team" >@Helpers.MailButton()</a>
+                        @assignmentTeam.Team.Name
                     </th>
                 </tr>
         
