@@ -27,7 +27,16 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
             dynamic data = Builder.BuildTableForTeam(assignmentTeam);
 
             data.TeamEvaluationProgress = new DynamicDictionary();
-            data.TeamEvaluationProgress.CompletedEvaluations = Evaluations.Count;
+
+            //Count number of completed evaluations done by the current team
+            int completedEvaluations = (from te in Evaluations
+                                        where assignmentTeam.Team.TeamMembers.Where(tm => tm.CourseUserID == te.RecipientID).Count() > 0
+                                        select te).Count();
+
+
+            completedEvaluations /= assignmentTeam.Team.TeamMembers.Count();
+
+            data.TeamEvaluationProgress.CompletedEvaluations = completedEvaluations;
             data.TeamEvaluationProgress.TotalEvaluations = assignmentTeam.Team.TeamMembers.Count;
             data.TeamEvaluationProgress.AssignmentId = Assignment.ID;
             data.TeamEvaluationProgress.AssignmentTeam = assignmentTeam;

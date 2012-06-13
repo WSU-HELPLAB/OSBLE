@@ -200,7 +200,7 @@
     <Compile Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\TableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\CriticalReviewsPerformedDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\TeamEvaluationDiscrepancyTableDecorator.cs" />
-    <Compile Include="Areas\AssignmentDetails\Models\TeamEvaluationProgressTableDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\TeamEvaluationProgressTableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\ViewModels\AssignmentDetailsFactory.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\DefaultBuilder.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\TeacherDeliverablesHeaderDecorator.cs" />
