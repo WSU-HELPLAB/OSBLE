@@ -7,6 +7,7 @@
     ViewBag.Title = "Assignment Details";
     DynamicDictionary headerData = Model.HeaderBuilder.BuildHeader(Model.CurrentAssignment);
     Layout = "~/Views/Shared/_Layout.cshtml";
+    List<Assignment> assignmentList = (Model.Client.AbstractCourse as Course).Assignments.OrderBy(a => a.AssignmentName).ToList();
 }
 @section Header
 {
@@ -20,19 +21,52 @@
 <h1>@Model.CurrentAssignment.AssignmentName.ToFirstCharUpper()     
 
 </h1>
-<table>
-        <tr>
-            <th>Select Assignment:</th>
-            <td>
-            <select id = "dtInstructorSelect">
-                @foreach(Assignment assignment in (Model.Client.AbstractCourse as Course).Assignments)
-                {
-                    <option>@assignment.AssignmentName</option>
-                }
-                </select>
-            </td>
-        </tr>
-    </table>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#changeAssignment').change(function () {
+            var assignmentNumber = $('#changeAssignment').val();
+            window.location.replace("/AssignmentDetails/" + assignmentNumber);
+
+        });
+    });
+</script>
+
+@*If student, then remove all assignments that have not been published from the assignment list*@
+@if (Model.Client.AbstractRole.CanSubmit)
+{
+    
+    assignmentList = assignmentList.Where(a => a.IsDraft == false).ToList();
+}
+
+@if (assignmentList.Count > 1)
+{
+    <table>
+            <tr>
+                <th>Select Assignment:</th>
+                <td>
+                    <select id="changeAssignment">
+                        @foreach (Assignment assignment in assignmentList)
+                        {
+                            if (!assignment.IsDraft)
+                            {
+                                @*generating select box*@
+                                string optionText = "<option value=\"{0}\"{1}>{2}</option>";
+                                string selectValue = "";
+                                if (Model.CurrentAssignment.ID == assignment.ID)
+                                {
+                                    selectValue = "selected=\"selected\"";
+                                }
+                                @Html.Raw(String.Format(optionText, assignment.ID, selectValue, assignment.AssignmentName));
+                            }
+                        }
+                    </select>
+                </td>
+            </tr>
+        </table>
+}
+
 @if (Model.Client.AbstractRole.CanModify)
 {
     <ul id="AssignmentLinksList">
@@ -55,8 +89,8 @@
             }
             <a href="@actionUrl" title="@linkTitle">@Html.Raw(linkImg.ToHtmlString())</a>
         </li>
-        <li><a title="Click to Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = Model.CurrentAssignment.ID })">@Helpers.EditButton()</a>
-        </li>
+            <li><a title="Click to Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = Model.CurrentAssignment.ID })">@Helpers.EditButton()</a>
+            </li>
         <li>
             @{
             string deleteLink = Url.Action("DeleteAssignment", new { assignmentId = Model.CurrentAssignment.ID });
@@ -98,8 +132,9 @@
         <th>
             Released:
         </th>
-        <td>@Model.CurrentAssignment.ReleaseDate
-        </td>
+            <td>
+                @Model.CurrentAssignment.ReleaseDate
+            </td>
     </tr>
     @RenderSection("AssignmentDetails", true)
 </table>
