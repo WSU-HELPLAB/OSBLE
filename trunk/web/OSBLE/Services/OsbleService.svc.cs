@@ -105,35 +105,8 @@ namespace OSBLE.Services
             {
                 return new CourseRole();
             }
-
+            
             return new CourseRole(courseUser.AbstractRole);
         }
-
-        /// <summary>
-        /// Returns a list of Course-User associations for the provided auth token
-        /// </summary>
-        /// <param name="authToken"></param>
-        /// <returns></returns>
-        [OperationContract]
-        public CourseUser[] GetCouresUsers(string authToken)
-        {
-            if (!_authService.IsValidKey(authToken))
-            {
-                return new CourseUser[0];
-            }
-            UserProfile profile = _authService.GetActiveUser(authToken);
-            CourseUser[] efCourseUsers = _db.CourseUsers.Where(cu => cu.ID == profile.ID).ToArray();
-
-            //convert entity framework-based course users to normal course users for easier wire
-            //transfer
-            List<CourseUser> nonEfCourseUsers = new List<CourseUser>(efCourseUsers.Length);
-            foreach (CourseUser cu in efCourseUsers)
-            {
-                //use copy constructor to remove crud
-                nonEfCourseUsers.Add(new CourseUser(cu));
-            }
-            return nonEfCourseUsers.ToArray();
-        }
-
     }
 }
