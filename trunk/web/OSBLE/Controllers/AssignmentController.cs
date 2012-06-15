@@ -72,7 +72,7 @@ namespace OSBLE.Controllers
                            orderby assignment.DueDate
                            select assignment).ToList();
 
-            // Future assignments are non-draft assignments whose start date has not yet happened. Appending to list now.
+            // Future assignments are non-draft assignments whose start date has not yet happened. Appending to list here.
             Assignments.AddRange((from assignment in db.Assignments
                                   where !assignment.IsDraft &&
                                   assignment.Category.CourseID == ActiveCourse.AbstractCourseID &&
@@ -83,7 +83,7 @@ namespace OSBLE.Controllers
 
             if (ActiveCourseUser.AbstractRole.CanModify || ActiveCourseUser.AbstractRole.Anonymized)
             {
-                // Draft assignments (viewable by instructor only) are assignments that have not yet been published to students. Appending to list now.
+                // Draft assignments (viewable by instructor only) are assignments that have not yet been published to students. Appending to list here.
                 Assignments.AddRange((from assignment in db.Assignments
                                       where assignment.IsDraft &&
                                       assignment.IsWizardAssignment &&
@@ -91,11 +91,11 @@ namespace OSBLE.Controllers
                                       orderby assignment.ReleaseDate
                                       select assignment).ToList());
             }
-            else if (ActiveCourse.AbstractRole.CanSubmit)
+            else if (ActiveCourseUser.AbstractRole.CanSubmit)
             {
-                /*MG: gathering a list of assignments for that course that are non-draft. Then creating a dictionary<assignmentID, submissionTime>
-                 * to be used in the view. This is only done for the students view.
-                 */
+                //MG: gathering non-draft assignments. Then creating a dictionary<assignmentID, submissionTime>
+                // to be used in the view. This is only done for the students view.
+                 
                 List<Assignment> assignmentList = (from assignment in db.Assignments
                                                    where !assignment.IsDraft &&
                                                    assignment.IsWizardAssignment &&

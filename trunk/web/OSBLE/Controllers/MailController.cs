@@ -316,90 +316,42 @@ namespace OSBLE.Controllers
             return false;
         }
 
+        public void setUpMailViewBags()
+        {
+            ViewBag.MailHeader = "New Message";
+            List<UserProfile> TAList = db.CourseUsers
+                    .Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID)
+                    .Select(cu => cu.UserProfile)
+                    .ToList();
+
+            List<UserProfile> InstructorList = db.CourseUsers
+                                .Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID)
+                                .Select(cu => cu.UserProfile)
+                                .ToList();
+
+            ViewBag.InstructorList = InstructorList;
+            ViewBag.TAList = TAList;
+        }
+
         public ActionResult Create()
         {
-            ViewBag.MailHeader = "New Message";
-            Mail mail = new Mail();
-            List<UserProfile> recipientList = new List<UserProfile>();
-
-            Cache["mail_recipients"] = recipientList;
-            return View("Create", mail);
+            setUpMailViewBags();
+            return View("Create");
         }
-
-        public ActionResult CreateInstructor()
-        {
-            ViewBag.MailHeader = "New Instructor Message";
-
-            Mail mail = new Mail();
-            List<UserProfile> recipientList = new List<UserProfile>();
-
-            List<CourseUser> instructors = db.CourseUsers.Where(c => (c.AbstractRole.Name == "Instructor" && c.AbstractCourseID == ActiveCourse.AbstractCourseID)).ToList();
-            if (instructors != null)
-            {
-                foreach (CourseUser cu in instructors)
-                {
-                    recipientList.Add(cu.UserProfile);
-                }
-            }
-            Cache["mail_recipients"] = recipientList;
-            return View("Create", mail);
-        }
-
-        public ActionResult CreateTA()
-        {
-            ViewBag.MailHeader = "New TA(s) Message";
-
-            Mail mail = new Mail();
-            List<UserProfile> recipientList = new List<UserProfile>();
-
-            List<CourseUser> tas = db.CourseUsers.Where(c => (c.AbstractRole.Name == "TA" && c.AbstractCourseID == ActiveCourse.AbstractCourseID)).ToList();
-            if (tas != null)
-            {
-                foreach (CourseUser cu in tas)
-                {
-                    recipientList.Add(cu.UserProfile);
-                }
-            }
-
-            Cache["mail_recipients"] = recipientList;
-            return View("Create", mail);
-        }
-
-        public ActionResult CreateInstructorTA()
-        {
-            ViewBag.MailHeader = "New Instructor and TA(s) Message";
-
-            Mail mail = new Mail();
-            List<UserProfile> recipientList = new List<UserProfile>();
-
-            List<CourseUser> instructorTA = db.CourseUsers.Where(c => ((c.AbstractRole.Name == "Instructor" || c.AbstractRole.Name == "TA") && c.AbstractCourseID == ActiveCourse.AbstractCourseID)).ToList();
-            if (instructorTA != null)
-            {
-                foreach (CourseUser cu in instructorTA)
-                {
-                    recipientList.Add(cu.UserProfile);
-                }
-            }
-
-            Cache["mail_recipients"] = recipientList;
-            return View("Create", mail);
-        }
-
+        
         public ActionResult CreateUser(int courseUserId)
         {
-            ViewBag.MailHeader = "New Message";
-
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
 
             CourseUser studentRec = db.CourseUsers.Find(courseUserId);
-
             if (studentRec != null)
             {
                 recipientList.Add(studentRec.UserProfile);
             }
 
-            Cache["mail_recipients"] = recipientList;
+            setUpMailViewBags();
+            ViewBag.RecipientList = recipientList;
             return View("Create", mail);
         }
 
@@ -408,7 +360,6 @@ namespace OSBLE.Controllers
             ViewBag.MailHeader = "New Team Message";
 
             Mail mail = new Mail();
-            mail.ContextID = ActiveCourseUser.ID;
             List<UserProfile> recipientList = new List<UserProfile>();
 
             Team team = db.Teams.Find(teamID);
@@ -420,7 +371,8 @@ namespace OSBLE.Controllers
                 }
             }
 
-            Cache["mail_recipients"] = recipientList;
+            setUpMailViewBags();
+            ViewBag.RecipientList = recipientList;
             return View("Create", mail);
         }
 
@@ -429,7 +381,6 @@ namespace OSBLE.Controllers
             ViewBag.MailHeader = "New Message";
 
             Mail mail = new Mail();
-            mail.ContextID = ActiveCourseUser.ID;
             List<UserProfile> recipientList = new List<UserProfile>();
 
             DiscussionTeam discussionTeam = db.DiscussionTeams.Find(discussionTeamId);
@@ -441,7 +392,8 @@ namespace OSBLE.Controllers
                 }
             }
 
-            Cache["mail_recipients"] = recipientList;
+            setUpMailViewBags();
+            ViewBag.RecipientList = recipientList;
             return View("Create", mail);
         }
         
@@ -457,7 +409,7 @@ namespace OSBLE.Controllers
                 string[] recipients;
 
                 // gets the current courseid
-                mail.ContextID = (int)Cache["ActiveCourse"];
+                mail.ContextID = ActiveCourseUser.AbstractCourseID;
 
                 // gets the current course
                 mail.Context = db.Courses.Where(b => b.ID == mail.ContextID).FirstOrDefault();
@@ -467,38 +419,42 @@ namespace OSBLE.Controllers
                     recipients = recipient_string.Split(',');
                     int count = 0;
                     int threadID = 0;
+                    int dummyOut = 0;
 
                     foreach (string id in recipients)
                     {
-                        Mail newMail = new Mail();
-                        newMail.FromUserProfileID = CurrentUser.ID;
-                        newMail.Read = false;
-                        newMail.ToUserProfileID = Convert.ToInt32(id);
-                        newMail.Subject = mail.Subject;
-                        newMail.Message = mail.Message;
-                        newMail.ThreadID = threadID;
-                        newMail.ContextID = mail.ContextID;
-                        newMail.DeleteFromInbox = false;
-                        newMail.DeleteFromOutbox = false;
-
-                        //need to create the mail before we can send the notification and set the threadID
-                        db.Mails.Add(newMail);
-                        db.SaveChanges();
-
-                        // need to have an email created to get a valid id to set the thread ids to.
-                        if (count == 0)
+                        if (Int32.TryParse(id, out dummyOut))
                         {
-                            threadID = newMail.ID;
-                            newMail.ThreadID = newMail.ID;
+                            Mail newMail = new Mail();
+                            newMail.FromUserProfileID = CurrentUser.ID;
+                            newMail.Read = false;
+                            newMail.ToUserProfileID = Convert.ToInt32(id);
+                            newMail.Subject = mail.Subject;
+                            newMail.Message = mail.Message;
+                            newMail.ThreadID = threadID;
+                            newMail.ContextID = mail.ContextID;
+                            newMail.DeleteFromInbox = false;
+                            newMail.DeleteFromOutbox = false;
 
+                            //need to create the mail before we can send the notification and set the threadID
+                            db.Mails.Add(newMail);
                             db.SaveChanges();
-                        }
 
-                        using (NotificationController nc = new NotificationController())
-                        {
-                            nc.SendMailNotification(newMail);
+                            // need to have an email created to get a valid id to set the thread ids to.
+                            if (count == 0)
+                            {
+                                threadID = newMail.ID;
+                                newMail.ThreadID = newMail.ID;
+
+                                db.SaveChanges();
+                            }
+
+                            using (NotificationController nc = new NotificationController())
+                            {
+                                nc.SendMailNotification(newMail);
+                            }
+                            ++count;
                         }
-                        ++count;
                     }
                     return RedirectToAction("Index");
                 }
@@ -532,7 +488,6 @@ namespace OSBLE.Controllers
         public ActionResult Search()
         {
             string term = Request.Params["term"].ToString().ToLower();
-            
             // If we are not anonymous in a course, allow search of all users.
             List<int> authorizedCourses = currentCourses
                 .Where(c => c.AbstractRole.Anonymized == false)
@@ -543,8 +498,6 @@ namespace OSBLE.Controllers
                 .Where(c => authorizedCourses.Contains(c.AbstractCourseID))
                 .Select(c => c.UserProfile)
                 .ToList();
-
-            authorizedUsers.Add(CurrentUser); // Add ourselves just in case we're not in a course.
 
             // If we are anonymous, limit search to ourselves plus instructors/TAs
             List<int> addedCourses = currentCourses

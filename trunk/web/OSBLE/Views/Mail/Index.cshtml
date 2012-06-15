@@ -6,10 +6,7 @@
     ViewBag.Title = "Mail";
 }
     <p>
-        @Html.ActionLink("Compose new message", "Create")&nbsp &nbsp
-        @Html.ActionLink("Compose new message to Instructor(s)", "CreateInstructor")&nbsp &nbsp
-        @Html.ActionLink("Compose new message to TA(s)", "CreateTA")&nbsp &nbsp
-        @Html.ActionLink("Compose new message to Instructor(s) and TA(s)", "CreateInstructorTA")
+        @Html.ActionLink("Compose", "Create")&nbsp &nbsp
     </p>
 
     @if (ViewBag.BoxHeader == "Inbox")

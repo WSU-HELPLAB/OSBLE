@@ -18,6 +18,7 @@
 
         @Html.HiddenFor(model => model.UserProfileID)
         @Html.HiddenFor(model => model.AbstractCourseID)
+        @Html.HiddenFor(model => Model.ID);
 
         <div class="editor-label">
             @Html.LabelFor(model => model.UserProfileID, "Name")

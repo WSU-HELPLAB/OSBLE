@@ -4,12 +4,51 @@
 
 @{
     ViewBag.Title = "Create";
-    List<UserProfile> recipients = ViewBag.Cache["mail_recipients"] as List<UserProfile>;
+    List<UserProfile> recipients = ViewBag.RecipientList;//ViewBag.Cache["mail_recipients"] as List<UserProfile>; //
+    List<UserProfile> InstructorList = ViewBag.InstructorList;
+    List<UserProfile> TAList = ViewBag.TAList;
     if(recipients == null)
     {
         recipients = new List<UserProfile>();
     }
     string ids = "";
+    string i_ids = "";
+    string i_names = "";
+    string ta_ids = "";
+    string ta_names = "";
+    
+
+    if (InstructorList != null && InstructorList.Count > 0)
+    {    
+        for(int n = 0; n < InstructorList.Count;n++)
+        {
+            i_ids += InstructorList[n].ID.ToString();
+            i_names += InstructorList[n].FirstName + " " + InstructorList[n].LastName;
+            
+            if(n < InstructorList.Count - 1)
+            {
+                i_ids += ",";
+                i_names += ",";
+            }   
+        }
+    }
+    
+
+    if (TAList != null && TAList.Count > 0)
+    {
+        for (int n = 0; n < TAList.Count; n++)
+        {
+            ta_ids += TAList[n].ID.ToString();
+            ta_names += TAList[n].FirstName + " " + TAList[n].LastName;
+
+            if (n < TAList.Count - 1)
+            {
+                ta_ids += ",";
+                ta_names += ",";
+            }
+        }
+    }
+         
 }
 
 <h2>@ViewBag.MailHeader</h2>
@@ -23,10 +62,24 @@
 
     @Html.HiddenFor(model => model.ContextID)
 
-    <a>To:</a>
-    <input id="people_finder" />
-    @Helpers.CreateToolTip(ToolTips.MailRecipient) 
-   
+    
+    <ul id="MailList">
+        <li><a>To:</a></li>
+        <li>
+            <input id="people_finder" /></li>
+        <li>
+            @Helpers.CreateToolTip(ToolTips.MailRecipient) </li>
+        <li>
+            <div>
+                <input type="checkbox" id="InstructorCB" value="Instructors" />
+                Add Instructors
+                <br />
+                <input type="checkbox" id="TACB" value="TAs" />
+                Add TAs
+            </div>
+        </li>
+    </ul>
+    
     <br />
     <div id="recipients_data">
         @if (recipients.Count > 0)
@@ -35,16 +88,18 @@
             foreach (UserProfile up in recipients)
             {
                 // injecting a comma in between id's
-                if (numRec > 0) 
+                
+                ids += up.ID;
+                ++numRec;
+
+                if (numRec > 0)
                 {
                     ids += ",";
                 }
-                ids += up.ID;
-                ++numRec;
                 
                 <div id="@up.ID" class="recipient" >
                     <div class="recipient_tools">
-                        <a href="#" title="Delete this recipient" onclick="removeRecipient(this)">
+                        <a href="#" title="Delete this recipient" onclick="removeRecipient(this)" class="deleteIconDiv">
                             <img src="/Content/images/delete_up.png" alt="Delete Button" />
                         </a>
                     </div>
@@ -74,7 +129,14 @@
     <p>
         <input id="send_btn" type="submit" value="Send Message" disabled="disabled"/>
     </p>
-    
+
+    //generate a comma delimited string with all instructor or ta ids
+    //that string will be the value of a hidden field
+
+    <input type="hidden" id="TAIdList" value="@ta_ids" />
+    <input type="hidden" id="InstructorIdList"value="@i_ids" />
+    <input type="hidden" id="TANameList"value="@ta_names" />
+    <input type="hidden" id="InstructorNameList"value="@i_names" />
     
     <script type="text/javascript">
         var strids = $('#recipient_list').val();
@@ -100,8 +162,7 @@
             document.getElementById("people_finder").focus();
         }
 
-        var selection_state = false;
-        
+
         $("#people_finder").autocomplete({
             source: "@(Url.Action("Search"))",
             select: function(event, ui) {
@@ -131,8 +192,7 @@
                     newRecipient.append('<div class="recipient_tools"><a href="#" title="Delete this recipient" onclick="removeRecipient(this)"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');                                                                                                                                                                                                  
                     
                     // main layout
-                    newRecipient.append("<a>");
-                    newRecipient.append('<img src="@Url.Action("ProfilePicture")/' + ui.item.value + '" class="small_profile_picture" alt="Profile Picture" />' + ui.item.label + "</a>");
+                    newRecipient.append('<a><img src="@Url.Action("ProfilePicture")/' + ui.item.value + '" class="small_profile_picture" alt="Profile Picture" />' + ui.item.label + "</a>");
 
                     $('#recipient_list').val(list);
                     $('#recipient_list').serializeArray();
@@ -150,6 +210,126 @@
             .append( "<a>" + '<img src="@Url.Action("ProfilePicture")/' + item.value + '" class="small_profile_picture" alt="Profile Picture" /> ' + item.label + '</a>')
             .appendTo( ul );
         }
+
+
+         $('#InstructorCB').click(function(){
+
+            var id_list = $('#InstructorIdList').val();
+            var idArray = id_list.split(',');
+
+            if ($(this).is (':checked')) //add instructors
+            {
+                var name_list = $('#InstructorNameList').val();
+                var nameArray = name_list.split(',');
+
+                if(idArray.length > 0)
+                {
+                    for(j = 0; j<idArray.length;j++)
+                    {
+                        var elementAlreadyInList = false;
+                        for(var k = 0; k < list.length; ++k)
+                        {
+                            if(list[k] == idArray[j])
+                            {
+                                elementAlreadyInList = true;
+                                break;
+                            }
+                        }
+                        if(elementAlreadyInList == false)
+                        {
+                            list.push(idArray[j]);
+
+                            $('#recipients_data').append('<div id="' + idArray[j] + '" class="recipient" />');
+                            var newRecipient = $('#' + idArray[j]);
+
+                            // delete button  
+                            newRecipient.append('<div class="recipient_tools"><a href="#" title="Delete this recipient" onclick="removeRecipient(this)" class="deleteIconDiv"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');                                                                                                                                                                                                  
+                    
+                            // main layout
+                            newRecipient.append('<a><img src="@Url.Action("ProfilePicture")/' + idArray[j] + '" class="small_profile_picture" alt="Profile Picture" />' + nameArray[j]+ "</a>");
+
+                            $('#recipient_list').val(list);
+                            $('#recipient_list').serializeArray();
+                        }
+                        
+                    }
+                    
+                    $('#NoRecipient').remove();
+                    document.getElementById("send_btn").disabled = false;
+                }
+
+            }
+            else //remove instructors
+            {
+                if(idArray.length > 0)
+                {
+                    for(j = 0; j<idArray.length;j++)
+                    {
+                        var myVar = $('#' + idArray[j].toString()).find('.deleteIconDiv');
+                        removeRecipient(myVar);
+                        
+                    }
+                }
+            }
+        });
+
+        $('#TACB').click(function(){
+            var id_list = $('#TAIdList').val();
+            var idArray = id_list.split(',');
+            if ($(this).is (':checked')) //add TAs
+            {
+
+                var name_list = $('#TANameList').val();
+                var nameArray = name_list.split(',');
+                
+                if(idArray.length > 0)
+                {
+                    for(j = 0; j<idArray.length;j++)
+                    {
+                        var elementAlreadyInList = false;
+                        for(var k = 0; k < list.length; ++k)
+                        {
+                            if(list[k] == idArray[j])
+                            {
+                                elementAlreadyInList = true;
+                                break;
+                            }
+                        }
+                        if(elementAlreadyInList == false)
+                        {
+                            list.push(idArray[j]);
+
+                            $('#recipients_data').append('<div id="' + idArray[j] + '" class="recipient" />');
+                            var newRecipient = $('#' + idArray[j]);
+
+                            // delete button  
+                            newRecipient.append('<div class="recipient_tools"><a href="#" title="Delete this recipient" onclick="removeRecipient(this)" class="deleteIconDiv"><img src="/Content/images/delete_up.png" alt="Delete Button" /></a></div>');                                                                                                                                                                                                  
+                    
+                            // main layout
+                            newRecipient.append('<a><img src="@Url.Action("ProfilePicture")/' + idArray[j] + '" class="small_profile_picture" alt="Profile Picture" />' + nameArray[j]+ "</a>");
+
+                            $('#recipient_list').val(list);
+                            $('#recipient_list').serializeArray();
+                        }
+                    }
+                    
+                    $('#NoRecipient').remove();
+                    document.getElementById("send_btn").disabled = false;
+                }
+            }
+            else //remove TAs
+            {
+                if(idArray.length > 0)
+                {
+                    for(j = 0; j<idArray.length;j++)
+                    {
+                        var myVar = $('#' + idArray[j].toString()).find('.deleteIconDiv');
+                        removeRecipient(myVar);
+                        
+                    }
+                }
+            }
+        });
 
         function removeRecipient(div) {
             var id = $(div).parent().parent().attr("id");

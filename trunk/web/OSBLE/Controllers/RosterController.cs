@@ -531,6 +531,8 @@ namespace OSBLE.Controllers
         /// <summary>
         /// This says can the passed courseUser Modify the course and if so is there another teacher
         /// that can also modify this course if so it returns true else returns false
+        /// Reason for check: Do not want instructors to delete themselves out of a course or remove their instructor status if there are no
+        /// other instructors to take their place.
         /// </summary>
         /// <param name="courseUser"></param>
         /// <returns></returns>
@@ -542,7 +544,7 @@ namespace OSBLE.Controllers
                                && c.UserProfileID != courseUser.UserProfileID)
                                select c);
 
-            if (courseUser.UserProfile != CurrentUser || diffTeacher.Count() > 0)
+            if (courseUser.UserProfileID != CurrentUser.ID || diffTeacher.Count() > 0)
             {
                 return true;
             }

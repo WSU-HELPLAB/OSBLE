@@ -722,20 +722,12 @@ namespace OSBLE
             }
             else
             {
-                submissionFolder = new DirectoryInfo
-                                                (FileSystem.GetTeamUserSubmissionFolder
-                                                    (
-                                                        false,
-                                                        team.Assignment.Category.Course,
-                                                        team.Assignment.ID,
-                                                        team
-                                                    )
-                                                );
+                submissionFolder = null;
             }
 
             DateTime? timeSubmitted;
 
-            if (submissionFolder.Exists)
+            if (submissionFolder != null && submissionFolder.Exists)
             {
                 //unfortunately LastWriteTime for a directory does not take into account it's file or
                 //sub directories and these we need to check to see when the last file was written too.

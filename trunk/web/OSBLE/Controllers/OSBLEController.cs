@@ -299,7 +299,9 @@ namespace OSBLE.Controllers
 
                 int activeCourseID;
 
+                //int sessionAc = 0;// = Cache["ActiveCourse"];
                 var sessionAc = Cache["ActiveCourse"];
+
 
                 if (sessionAc == null || !(sessionAc is int))
                 {

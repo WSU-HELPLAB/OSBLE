@@ -17,8 +17,12 @@ namespace OSBLE.Resources
             string[] pieces = item.Split(' ');
             for (int i = 0; i < pieces.Length; i++)
             {
-                char first = char.ToUpper(pieces[i][0]);
-                pieces[i] = string.Format("{0}{1}", first, pieces[i].Substring(1));
+                if (pieces[i].Length > 0)
+                {
+                    char first = char.ToUpper(pieces[i][0]);
+                    pieces[i] = string.Format("{0}{1}", first, pieces[i].Substring(1));
+                }
+
             }
             string final = string.Join(" ", pieces);
             return final;

@@ -1796,3 +1796,16 @@ tbody #awesome
     font-weight:bold;
     color:Gray;
 }
+
+#MailList
+{
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+#MailList li
+{
+    display:inline-block;
+    padding-right:7px;
+}
