@@ -33,7 +33,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             get
             {
                 //rubric creation is currently broken so disable it for now.
-                return new List<AssignmentTypes>();
+                //return new List<AssignmentTypes>();
                 List<AssignmentTypes> types = base.AllAssignmentTypes.ToList();
                 types.Remove(AssignmentTypes.TeamEvaluation);
                 return types;

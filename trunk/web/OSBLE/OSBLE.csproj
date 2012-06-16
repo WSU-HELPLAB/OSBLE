@@ -727,6 +727,7 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\DiscussionTeamMemberDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\StudentTeamEvalSubmissionDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Home\TeamEvaluationIndex.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Rubric\Index.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />
@@ -788,7 +789,7 @@
     <Content Include="Views\School\Delete.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Home\SelectComponent.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Basics\Index.cshtml" />
-    <Content Include="Areas\AssignmentWizard\Views\Rubric\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Rubric\_Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Team\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Deliverables\Index.cshtml" />
     <Content Include="Views\Gradebook\ExportToCSV.cshtml" />

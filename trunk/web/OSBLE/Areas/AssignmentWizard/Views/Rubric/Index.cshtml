@@ -2,95 +2,122 @@
 @model Assignment
 @Html.HiddenFor(m => m.ID)
 @Html.Hidden("RubricID", "0")
-<script type="text/javascript">
-    $(document).ready(documentReady);
 
-    //Called when the document has finished loading and is safe to make DOM calls
-    function documentReady() {
+<style media="screen" type="text/css">
 
-        //AC: Commented out for now, but might reimplement later
-        //$("#silverlightControlHost").height($(window).height() - 230);
+.sample {
+	border-width: 1px;
+	border-spacing: 2px;
+	border-style: outset;
+	border-color: gray;
+	border-collapse: collapse;
+	background-color: white;
+}
+.sample th {
+	border-width: 1px;
+	padding: 10px;
+	border-style: inset;
+	border-color: gray;
+	background-color: white;
+}
+.sample td {
+	border-width: 1px;
+	padding: 1px;
+	border-style: inset;
+	border-color: gray;
+	background-color: white;
+}
+</style>
 
-        //listen to form submit requests
-        $("#WizardForm").submit(processForm);
-    }
+<table>
+    <tr>
+        <td>
+            <table id="dataTable" class="sample">
+            @*Row for titles*@
+                <tr>
+                    <th>Performance Criterion</th>
+                        
+                    <th>Criterion<br />Weight</th>
+                        
+                    <th>
+                        <input type="button" value="-" onclick="deleteColumn('dataTable', this.parentNode.cellIndex)" />
+                        <br />
+                            Level Title<input type="text" />
+                    </th>
+                </tr>
 
-    var lastRubricId = 0;
-    var readyForContinue = false;
-    function processForm(evt) {
+                @*Default first row of rubric*@
+                <tr>
+                    @*Performance Criterion*@
+                    <td>
+                        <input type="button" value="-" onclick="deleteRow('dataTable', this.parentNode.parentNode.rowIndex)" />
+                        <textarea rows="5" cols="20"></textarea>
+                    </td>
 
-        //if lastRubricId is 0, then we need to save the current rubric
-        if (lastRubricId == 0) {
-            readyForContinue = true;
-            document.getElementById("RubricCreationTool").Content.Rubric.PublishChanges_Click(null, null);
-            return false;
+                    @*Criterion Weight*@
+                    <td>
+                        <input type="text" size="1"/>
+                    </td>
+
+                    @*Level Description*@
+                    <td>
+                        <textarea rows="5" cols="35"></textarea>
+                    </td>
+                </tr>
+            </table>
+            <td style="position: relative">
+                <input style="position:absolute; top: 0px; right: 0px" type="button" value="+" onclick="addColumn('dataTable')" />
+            </td>
+    </tr>
+    <tr>
+        <td style="position: relative">
+            <input style="position: absolute; bottom: 0px; left: 0px" type="button" value="+"
+                onclick="addRow('dataTable')" />
+        </td>
+    </tr>
+    <tr>
+        <input type="checkbox" value = "globalComments" />
+        Overall Comments <br />
+        <input type="checkbox" value = "globalComments" />
+        Comments for each category <br />
+    </tr>
+</table>
+
+</html>
+    <script language="javascript">
+        function addRow(tableID) {
+            var table = document.getElementById(tableID);
+
+            var rowCount = table.rows.length;
+            var newRow = table.insertRow(rowCount);
+            newRow.innerHTML = table.rows[rowCount - 1].innerHTML;
         }
-        $("#RubricID").val(lastRubricId);
-    }
 
-    function rubricSaveComplete(rubricId) {
-        lastRubricId = rubricId;
-        if (readyForContinue == true) {
-            processForm();
-            $("form").submit();
-        }
-    }
+        function addColumn(tableID) {
+            var table = document.getElementById(tableID);
 
-    function rubricSelected(rubricId) {
-        lastRubricId = rubricId;
-    }
+            var rowCount = table.rows.length;
+            var columnCount = table.rows[0].cells.length;
 
-</script>
-<script type="text/javascript">
-    function onSilverlightError(sender, args) {
-        var appSource = "";
-        if (sender != null && sender != 0) {
-            appSource = sender.getHost().Source;
-        }
-
-        var errorType = args.ErrorType;
-        var iErrorCode = args.ErrorCode;
-
-        if (errorType == "ImageError" || errorType == "MediaError") {
-            return;
-        }
-
-        var errMsg = "Unhandled Error in Silverlight Application " + appSource + "\n";
-
-        errMsg += "Code: " + iErrorCode + "    \n";
-        errMsg += "Category: " + errorType + "       \n";
-        errMsg += "Message: " + args.ErrorMessage + "     \n";
-
-        if (errorType == "ParserError") {
-            errMsg += "File: " + args.xamlFile + "     \n";
-            errMsg += "Line: " + args.lineNumber + "     \n";
-            errMsg += "Position: " + args.charPosition + "     \n";
-        }
-        else if (errorType == "RuntimeError") {
-            if (args.lineNumber != 0) {
-                errMsg += "Line: " + args.lineNumber + "     \n";
-                errMsg += "Position: " + args.charPosition + "     \n";
+            //loop over each row and append a cell to the end
+            for (var i = 0; i < rowCount; i++) {
+                var element = document.createElement("th");
+                table.rows[i].appendChild(element);
+                element.innerHTML = table.rows[i].cells[columnCount - 1].innerHTML;
             }
-            errMsg += "MethodName: " + args.methodName + "     \n";
         }
 
-        throw new Error(errMsg);
-    }
-</script>
-<div id="silverlightControlHost" style="width:100%; height:600px;">
-        <object 
-        id="RubricCreationTool"
-        data="data:application/x-silverlight-2," 
-        type="application/x-silverlight-2" width="100%" height="100%"
-        >
-		  <param name="source" value="/ClientBin/OsbleRubric.xap"/>
-		  <param name="onError" value="onSilverlightError" />
-		  <param name="background" value="white" />
-		  <param name="minRuntimeVersion" value="4.0.50826.0" />
-		  <param name="autoUpgrade" value="true" />
-          <param name="initParams" value="courseId=@ViewBag.ActiveCourse.AbstractCourseID" />
-		  <a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=4.0.50826.0" style="text-decoration:none">
- 			  <img src="http://go.microsoft.com/fwlink/?LinkId=161376" alt="Get Microsoft Silverlight" style="border-style:none"/>
-		  </a>
-	    </object><iframe id="_sl_historyFrame" style="visibility:hidden;height:0px;width:0px;border:0px"></iframe>
-</div>
+        function deleteColumn(tableID, columnIndex) {
+            var table = document.getElementById(tableID);
+
+            for (var i = 0; i < table.rows.length; i++) {
+                table.rows[i].deleteCell(columnIndex);
+            }
+        }
+
+        function deleteRow(tableID, rowIndex) {
+            document.getElementById(tableID).deleteRow(rowIndex);
+        }
+    </script>
+
+
