@@ -283,24 +283,20 @@ namespace OSBLE.Controllers
             return View(mail);
         }
 
-        //
-        // GET: /Mail/Create
-
         /// <summary>
         /// Checks if the current users course privileges allows them to mail the requested user.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        private bool canMail(int id)
+        private bool canMail(int userProfileId)
         {
-            UserProfile u = db.UserProfiles.Find(id);
-
-            if (id == CurrentUser.ID)
+            if (userProfileId == CurrentUser.ID)
             {
                 return true;
             }
             else
             {
+                UserProfile u = db.UserProfiles.Find(userProfileId);
                 foreach (CourseUser cu in currentCourses)
                 {
                     int courseID = cu.AbstractCourseID;
@@ -316,90 +312,64 @@ namespace OSBLE.Controllers
             return false;
         }
 
-        public void setUpMailViewBags()
+        /// <summary>
+        /// This function sets up the ViewBags for the mail view.
+        /// </summary>
+        /// <param name="InitialRecipients">anyone to be initially added to the mail should be in this list, if there are no initial recipients this parameter is optional</param>
+        public void setUpMailViewBags(List<UserProfile> InitialRecipients = null)
         {
-            ViewBag.MailHeader = "New Message";
-            List<UserProfile> TAList = db.CourseUsers
-                    .Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID)
-                    .Select(cu => cu.UserProfile)
+            List<CourseUser> TaAndInstructorList = db.CourseUsers
+                    .Where(cu => (cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA || cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor) && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID)
                     .ToList();
 
-            List<UserProfile> InstructorList = db.CourseUsers
-                                .Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID)
-                                .Select(cu => cu.UserProfile)
-                                .ToList();
+            string[] TaNameList = TaAndInstructorList
+                    .Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+                    .Select(cu => cu.UserProfile.FirstName + " " + cu.UserProfile.LastName)
+                    .ToArray();
 
-            ViewBag.InstructorList = InstructorList;
-            ViewBag.TAList = TAList;
+            int[] TaIdList = TaAndInstructorList
+                    .Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+                    .Select(cu => cu.UserProfileID)
+                    .ToArray();
+
+            string[] InstructorNameList = TaAndInstructorList
+                    .Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
+                    .Select(cu => cu.UserProfile.FirstName + " " + cu.UserProfile.LastName)
+                    .ToArray();
+
+            int[] InstructorIdList = TaAndInstructorList
+                    .Where(cu => cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
+                    .Select(cu => cu.UserProfileID)
+                    .ToArray();
+
+            if (InitialRecipients != null)
+            {
+                string[] RecipientNameList = InitialRecipients
+                        .Select(up => up.FirstName + " " + up.LastName)
+                        .ToArray();
+
+                int[] RecipientIdList = InitialRecipients
+                        .Select(up => up.ID)
+                        .ToArray();
+
+                ViewBag.RecipientNameList = string.Join(",", RecipientNameList);
+                ViewBag.RecipientIdList = string.Join(",", RecipientIdList);
+            }
+
+            ViewBag.MailHeader = "New Message";
+            ViewBag.TaNameList = string.Join(",", TaNameList);
+            ViewBag.TaIdList = string.Join(",", TaIdList);
+            ViewBag.InstructorNameList = string.Join(",", InstructorNameList);
+            ViewBag.InstructorIdList = string.Join(",", InstructorIdList);
+            
         }
 
         public ActionResult Create()
         {
             setUpMailViewBags();
-            return View("Create");
-        }
-        
-        public ActionResult CreateUser(int courseUserId)
-        {
-            Mail mail = new Mail();
-            List<UserProfile> recipientList = new List<UserProfile>();
-
-            CourseUser studentRec = db.CourseUsers.Find(courseUserId);
-            if (studentRec != null)
-            {
-                recipientList.Add(studentRec.UserProfile);
-            }
-
-            setUpMailViewBags();
-            ViewBag.RecipientList = recipientList;
-            return View("Create", mail);
+            return View("Create", new Mail());
         }
 
-        public ActionResult CreateTeam(int teamID)
-        {
-            ViewBag.MailHeader = "New Team Message";
-
-            Mail mail = new Mail();
-            List<UserProfile> recipientList = new List<UserProfile>();
-
-            Team team = db.Teams.Find(teamID);
-            foreach (TeamMember tm in team.TeamMembers)
-            {
-                if (tm.CourseUserID != ActiveCourseUser.ID)
-                {
-                    recipientList.Add(tm.CourseUser.UserProfile);
-                }
-            }
-
-            setUpMailViewBags();
-            ViewBag.RecipientList = recipientList;
-            return View("Create", mail);
-        }
-
-        public ActionResult CreateDiscussionTeam(int discussionTeamId)
-        {
-            ViewBag.MailHeader = "New Message";
-
-            Mail mail = new Mail();
-            List<UserProfile> recipientList = new List<UserProfile>();
-
-            DiscussionTeam discussionTeam = db.DiscussionTeams.Find(discussionTeamId);
-            foreach (TeamMember tm in discussionTeam.GetAllTeamMembers())
-            {
-                if (tm.CourseUserID != ActiveCourseUser.ID)
-                {
-                    recipientList.Add(tm.CourseUser.UserProfile);
-                }
-            }
-
-            setUpMailViewBags();
-            ViewBag.RecipientList = recipientList;
-            return View("Create", mail);
-        }
-        
-
-        //
-        // POST: /Mail/Create
         [HttpPost]
         public ActionResult Create(Mail mail)
         {
@@ -460,6 +430,139 @@ namespace OSBLE.Controllers
                 }
             }
             return View(mail);
+        }
+        
+        public ActionResult CreateUser(int courseUserId)
+        {
+            List<UserProfile> recipientList = new List<UserProfile>();
+
+            CourseUser studentRec = db.CourseUsers.Find(courseUserId);
+            if (studentRec != null)
+            {
+                recipientList.Add(studentRec.UserProfile);
+            }
+
+            setUpMailViewBags(recipientList);
+            return View("Create", new Mail());
+        }
+
+        public ActionResult CreateTeam(int teamID)
+        {
+            ViewBag.MailHeader = "New Team Message";
+
+            List<UserProfile> recipientList = new List<UserProfile>();
+
+            Team team = db.Teams.Find(teamID);
+            foreach (TeamMember tm in team.TeamMembers)
+            {
+                if (tm.CourseUserID != ActiveCourseUser.ID)
+                {
+                    recipientList.Add(tm.CourseUser.UserProfile);
+                }
+            }
+
+            setUpMailViewBags(recipientList);
+            return View("Create", new Mail());
+        }
+
+        public ActionResult CreateDiscussionTeam(int discussionTeamId)
+        {
+            ViewBag.MailHeader = "New Message";
+            List<UserProfile> recipientList = new List<UserProfile>();
+
+            DiscussionTeam discussionTeam = db.DiscussionTeams.Find(discussionTeamId);
+            foreach (TeamMember tm in discussionTeam.GetAllTeamMembers())
+            {
+                if (tm.CourseUserID != ActiveCourseUser.ID)
+                {
+                    recipientList.Add(tm.CourseUser.UserProfile);
+                }
+            }
+
+            setUpMailViewBags(recipientList);
+            return View("Create", new Mail());
+        }
+
+        public ActionResult CreateReplyAll()
+        {
+            int replyto;
+            Mail mail = new Mail();
+            List<UserProfile> recipientList = new List<UserProfile>();
+            string mailHeader = "";
+            if (Int32.TryParse(Request.Params["replyAll"], out replyto) == true)
+            {
+                if ((mail = db.Mails.Find(replyto)) != null)
+                {
+                    recipientList = (from m in db.Mails
+                                     where m.ThreadID == replyto &&
+                                     m.ToUserProfileID != CurrentUser.ID
+                                     select m.ToUserProfile).ToList<UserProfile>();
+                    if (!recipientList.Contains(mail.FromUserProfile))
+                    {
+                        recipientList.Add(mail.FromUserProfile); //Adds the sender to the reply list
+                    }
+                    mailHeader = mail.Subject = "RE: " + mail.Subject;
+                    // Prefix each line with a '> '
+                    mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
+                                    mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
+                                    Regex.Replace(mail.Message, "^.*$", "> $&",
+                                    RegexOptions.Multiline);
+                }
+            }
+
+            setUpMailViewBags(recipientList);
+            ViewBag.MailHeader = mailHeader;
+            return View("Create", new Mail());
+        }
+
+
+        public ActionResult CreateReply()
+        {
+            int replyto;
+            List<UserProfile> recipientList = new List<UserProfile>();
+            Mail mail = new Mail();
+            string mailHeader = "";
+            if (Int32.TryParse(Request.Params["replyTo"], out replyto) == true)
+            {
+                if ((mail = db.Mails.Find(replyto)) != null)
+                {
+                    recipientList.Add(mail.FromUserProfile); //Adds the sender to the reply list
+                    mailHeader = mail.Subject = "RE: " + mail.Subject;
+                    // Prefix each line with a '> '
+                    mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
+                                    mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
+                                    Regex.Replace(mail.Message, "^.*$", "> $&",
+                                    RegexOptions.Multiline);
+                }
+            }
+
+            setUpMailViewBags(recipientList);
+            ViewBag.MailHeader = mailHeader;
+            return View("Create", new Mail());
+        }
+
+        public ActionResult CreateForward()
+        {
+            int forwardto;
+            Mail mail = new Mail();
+            string maiHeader = ""
+            List<UserProfile> recipientList = new List<UserProfile>();
+            if (Int32.TryParse(Request.Params["forwardTo"], out forwardto) == true)
+            {
+                if ((mail = db.Mails.Find(forwardto)) != null)
+                {
+                    maiHeader = mail.Subject = "FW: " + mail.Subject;
+                    // Prefix each line with a '> '
+                    mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
+                                    mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
+                                    Regex.Replace(mail.Message, "^.*$", "> $&",
+                                    RegexOptions.Multiline);
+                }
+            }
+
+            setUpMailViewBags();
+            ViewBag.MailHeader = maiHeader;
+            return View("Create", new Mail());
         }
 
         protected override void Dispose(bool disposing)
@@ -541,85 +644,6 @@ namespace OSBLE.Controllers
                 return new FileStreamResult(FileSystem.GetDefaultProfilePicture(), "image/jpeg");
             }
         }
-
-        public ActionResult CreateReplyAll()
-        {
-            int replyto;
-            Mail mail = new Mail();
-            List<UserProfile> recipientList = new List<UserProfile>();
-            if (Int32.TryParse(Request.Params["replyAll"], out replyto) == true)
-            {
-                if ((mail = db.Mails.Find(replyto)) != null)
-                {
-                    recipientList = (from m in db.Mails
-                                     where m.ThreadID == replyto &&
-                                     m.ToUserProfileID != CurrentUser.ID
-                                     select m.ToUserProfile).ToList<UserProfile>();
-                    if (!recipientList.Contains(mail.FromUserProfile))
-                    {
-                        recipientList.Add(mail.FromUserProfile); //Adds the sender to the reply list
-                    }
-                    ViewBag.MailHeader = mail.Subject = "RE: " + mail.Subject;
-                    // Prefix each line with a '> '
-                    mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
-                                    mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
-                                    Regex.Replace(mail.Message, "^.*$", "> $&",
-                                    RegexOptions.Multiline);
-                }
-            }
-
-            Cache["mail_recipients"] = recipientList;
-            return View("Create", mail);
-        }
-
-
-        public ActionResult CreateReply()
-        {
-            int replyto;
-            List<UserProfile> recipientList = new List<UserProfile>();
-            Mail mail = new Mail();
-
-            if (Int32.TryParse(Request.Params["replyTo"], out replyto) == true)
-            {
-                if ((mail = db.Mails.Find(replyto)) != null)
-                {
-                    recipientList.Add(mail.FromUserProfile); //Adds the sender to the reply list
-                    ViewBag.MailHeader = mail.Subject = "RE: " + mail.Subject;
-                    // Prefix each line with a '> '
-                    mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
-                                    mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
-                                    Regex.Replace(mail.Message, "^.*$", "> $&",
-                                    RegexOptions.Multiline);
-                }
-            }
-
-            Cache["mail_recipients"] = recipientList;
-            return View("Create", mail);
-        }
-
-        public ActionResult CreateForward()
-        {
-            int forwardto;
-            Mail mail = new Mail();
-            List<UserProfile> recipientList = new List<UserProfile>();
-            if (Int32.TryParse(Request.Params["forwardTo"], out forwardto) == true)
-            {
-                if ((mail = db.Mails.Find(forwardto)) != null)
-                {
-                    ViewBag.MailHeader = mail.Subject = "FW: " + mail.Subject;
-                    // Prefix each line with a '> '
-                    mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
-                                    mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
-                                    Regex.Replace(mail.Message, "^.*$", "> $&",
-                                    RegexOptions.Multiline);
-                }
-            }
-
-            Cache["mail_recipients"] = recipientList;
-            return View("Create", mail);
-        }
-
-
         [HttpPost]
         public ActionResult DeleteFromInbox(int id)
         {
