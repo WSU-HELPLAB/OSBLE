@@ -545,7 +545,7 @@ namespace OSBLE.Controllers
         {
             int forwardto;
             Mail mail = new Mail();
-            string maiHeader = ""
+            string maiHeader = "";
             List<UserProfile> recipientList = new List<UserProfile>();
             if (Int32.TryParse(Request.Params["forwardTo"], out forwardto) == true)
             {
