@@ -1,8 +1,8 @@
 ﻿@using OSBLE.Models.Assignments;
 @model Assignment
-@Html.HiddenFor(m => m.ID)
-@Html.Hidden("RubricID", "0")
-
+@{
+    //Html.HiddenFor(m => m.ID);
+}
 <style media="screen" type="text/css">
 
 .rubric {
@@ -42,6 +42,9 @@ td.top
 </style>
 
 <html> <body>
+
+@Html.HiddenFor(m => m.ID)
+
     <table>
     <tr>
         <td>[Course Dropdown] [Rubric Dropdown] [Rubric Name] </td>
@@ -73,10 +76,23 @@ td.top
                         <th class="level">
                         <ul class="ul" >
                             <li><input type="button" value="-" onclick="deleteColumn('dataTable', this.parentNode.parentNode.parentNode.cellIndex)" /></li>
-
-                            <li>Level</li>
-
-                            <li><input class="Input" name="rubric:0:L" type="text" /></li>
+                            <li>Level Point Spread
+                            <select class="Input" name="rubric:0:S">
+                                    @for(int i = 1; i <= 10; i++)
+                                    {
+                                        if (i == 5)
+                                        {
+                                           <option selected value="@i">@i</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@i">@i</option>
+                                        }
+                                    
+                                    }
+                            </select>
+                            </li>
+                            <li>Level Title<input class="Input" name="rubric:0:L" type="text" /></li>
                             </ul>
                         </th>
                     </tr>

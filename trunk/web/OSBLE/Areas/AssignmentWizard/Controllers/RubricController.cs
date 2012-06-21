@@ -45,7 +45,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             base.Index();
 
             //List of other assignments
-            List<Assignment> assignments = new List<Assignment>();
+            //List<Assignment> assignments = new List<Assignment>();
 
             ViewBag.ActiveCourse = ActiveCourseUser;
             return View(Assignment);
@@ -53,6 +53,36 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
         [HttpPost]
         public ActionResult Index(Assignment model)
+        {
+            string a = Request.Params["rubric:0:S"];
+            
+            //reset our assignment
+            Assignment = db.Assignments.Find(model.ID);
+
+            if (Assignment.HasRubric)
+            {
+                //delete the old rubric (to be replaced with the one in the HTML)
+               db.Rubrics.Remove(Assignment.Rubric);
+               db.SaveChanges();
+            }
+
+            //Load the rubric from the view
+            int rubricID = LoadRubricFromHTML();
+
+            Assignment.RubricID = rubricID;
+            db.Entry(Assignment).State = System.Data.EntityState.Modified;
+            db.SaveChanges();
+
+            return base.PostBack(Assignment);
+        }
+
+        /// <summary>
+        /// Called by the HttpPost. Parses the rubric information from the view
+        /// creates a model.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns>RubricID of newly created rubric</returns>
+        private int LoadRubricFromHTML()
         {
             // Each input element is stored in Request.Params where the key in params is the name of the element.
             // The location of the element can be determined by its name.
@@ -70,8 +100,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             //acquire a list of all relevant keys for the rubric
             foreach (string key in Request.Params.Keys)
             {
-                Match match = Regex.Match(key, "rubric:");
-                if (match.Success)
+
+                if (Regex.Match(key, "rubric:").Success)
                 {
                     Keys.Add(key);
                 }
@@ -79,9 +109,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
             //generate a list of level titles
             levelTitles = (from k in Keys
-                              where Regex.Match(k, @"rubric:\d+:L").Success
-                              orderby k
-                              select Request.Params[k]).ToList();
+                           where Regex.Match(k, @"rubric:\d+:L").Success
+                           orderby k
+                           select Request.Params[k]).ToList();
 
             List<string> RowStrings = (from k in Keys
                                        where Regex.Match(k, @"rubric:0:\d+").Success
@@ -95,43 +125,62 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 Regex r = new Regex(@"rubric:\d+:" + splitKey[2]);
 
                 List<string> rowValues = (from k in Keys
-                                    where r.Match(k).Success
-                                    orderby k
-                                    select Request.Params[k]).ToList();
+                                          where r.Match(k).Success
+                                          orderby k
+                                          select Request.Params[k]).ToList();
 
                 rubricTable.Add(rowValues);
             }
 
-
-            Rubric rubric = new Rubric();
-
+            bool hasGlobalComments = true;
+            bool hasCriteriaComments = true;
             if (Request.Params["globalComments"] == null)
             {
-                rubric.HasGlobalComments = false;
-            }
-            else
-            {
-                rubric.HasGlobalComments = true;
+                hasGlobalComments = false;
             }
 
             if (Request.Params["criterionComments"] == null)
             {
-                rubric.HasCriteriaComments = false;
-            }
-            else
-            {
-                rubric.HasCriteriaComments = true;
+                hasCriteriaComments = false;
             }
 
-            rubric.Description = "gibberish";
+            return CreateRubricModel(rubricTable,
+                levelTitles,
+                hasGlobalComments,
+                hasCriteriaComments);
+        }
 
-            //save rubric here
+        /// <summary>
+        /// Given the paramaters describing a rubric, create a 
+        /// rubric model and store it in the database. Note: the rubric is not yet
+        /// associated with an assignment when this function returns.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="rubricTable">List of List of strings representing the body of a rubric
+        ///         Each List of strings represents a row and contains the following:
+        ///              Index 0: performance criterion title
+        ///              Index 1: criterion weight
+        ///              Index 2-n: level description</param>
+        /// <param name="levelTitles">A list each level title</param>
+        /// <param name="hasGlobalComments"></param>
+        /// <param name="hasCriteriaComments"></param>
+        /// <returns>RubricID of the new rubric</returns>
+        private int CreateRubricModel(List<List<string>> rubricTable, 
+            List<string> levelTitles,
+            bool hasGlobalComments,
+            bool hasCriteriaComments)
+        {
+            Rubric rubric = new Rubric();
+
+            rubric.HasGlobalComments = hasGlobalComments;
+            rubric.HasCriteriaComments = hasCriteriaComments;
+            rubric.Description = "what is the rubric description";
 
             db.Rubrics.Add(rubric);
             db.SaveChanges();
 
-            model.RubricID = rubric.ID;
-            
+            Assignment.RubricID = rubric.ID;
+
             //levels
             int p = 1;
             foreach (string levelTitle in levelTitles)
@@ -139,6 +188,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 Level level = new Level();
                 if (levelTitle == "")
                 {
+                    //WasUpdateSuccessful = false;
                     level.LevelTitle = "Level Title " + p.ToString();
                 }
                 else
@@ -151,13 +201,13 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 db.Levels.Add(level);
                 p++;
             }
-          
+
             //Criteria
             p = 1;
             foreach (List<string> row in rubricTable)
             {
                 Criterion criterion = new Criterion();
-                
+
                 if (row[0] == "")
                 {
                     criterion.CriterionTitle = "Criterion " + p.ToString();
@@ -168,11 +218,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 }
 
                 int weight;
-                if(int.TryParse(row[1], out weight))
+                if (int.TryParse(row[1], out weight))
                 {
                     criterion.Weight = weight;
                 }
-                else{
+                else
+                {
                     criterion.Weight = 0;
                 }
                 criterion.RubricID = rubric.ID;
@@ -183,7 +234,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             db.SaveChanges();
 
             int i = 0;
-            foreach(Criterion criterion in rubric.Criteria) //for each row 
+            foreach (Criterion criterion in rubric.Criteria) //for each row 
             {
                 int n = 2; // the level titles start at index 2 in rubricTable
                 foreach (Level level in rubric.Levels) //
@@ -191,7 +242,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     CellDescription desc = new CellDescription();
                     desc.CriterionID = criterion.ID;
                     desc.LevelID = level.ID;
-                    
+
                     if (rubricTable[i][n] == "")
                     {
                         desc.Description = "Description for " + level.LevelTitle;
@@ -208,12 +259,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 i++;
             }
 
-            Assignment = db.Assignments.Find(model.ID);
-            Assignment.RubricID = rubric.ID;
-            db.Entry(Assignment).State = System.Data.EntityState.Modified;
-            db.SaveChanges();
-
-            return base.PostBack(Assignment);
+            return rubric.ID;
         }
     }
 }
