@@ -161,7 +161,7 @@ namespace OSBLE.Models.Assignments
                     return false;
                 }
                 int count = (from team in DiscussionTeams
-                             where team.Team.TeamMembers.Count > 1
+                             where team.GetAllTeamMembers().Count > 1
                              select team).Count();
                 if (count > 0)
                 {

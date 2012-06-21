@@ -32,10 +32,6 @@ namespace OSBLE.Models.DiscussionAssignment
 
         public virtual ICollection<DiscussionPost> Replies { get; set; }
 
-        public string DisplayName { get; set; }
-
-        public bool ShowProfilePicture { get; set; }
-
         public bool IsReply { get; set; }
 
         [Required]
@@ -46,8 +42,8 @@ namespace OSBLE.Models.DiscussionAssignment
         public DiscussionPost()
             : base()
         {
+            ParentPostID = null;
             Posted = DateTime.Now;
-            ShowProfilePicture = false;
             IsReply = false;
         }
     }

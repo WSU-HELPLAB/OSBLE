@@ -67,32 +67,30 @@ namespace OSBLE.Controllers
                              select post).ToList();
                 }
 
-                //checking if user has made a first post
-                ViewBag.FirstPost = false;
-                if (!assignment.DiscussionSettings.RequiresPostBeforeView)
+                    
+
+                ViewBag.IsFirstPost = true;
+                //Marking IsFirstPost as false if any posts are found that belong to that user.
+                foreach (DiscussionPost post in posts)
                 {
-                    ViewBag.FirstPost = true;
-                }
-                else
-                {
-                    foreach (DiscussionPost post in posts)
+                    if (post.CourseUserID == ActiveCourseUser.ID)
                     {
-                        if (post.CourseUserID == ActiveCourseUser.ID)
-                        {
-                            ViewBag.FirstPost = true;
-                            break;
-                        }
+                        ViewBag.IsFirstPost = false;
+                        break;
                     }
                 }
 
                 //assigning TeamName a value if teams exist.
-                ViewBag.TeamName = "";
                 if (assignment.HasDiscussionTeams)
                 {
-                    ViewBag.TeamName = "- " + discussionTeam.Team.Name;
+                    ViewBag.DiscussionHeader = assignment.AssignmentName + "- " + discussionTeam.TeamName;
+                }
+                else
+                {
+                    ViewBag.DiscussionHeader = assignment.AssignmentName;
                 }
 
-                //for CRD assignment types we need a list of all discussions they can participate in.
+                //for CRD assignment types we need a list of all discussions they can participate in for navigation.
                 if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
                 {
                     List<DiscussionTeam> DiscussionTeamList = new List<DiscussionTeam>();
@@ -110,6 +108,7 @@ namespace OSBLE.Controllers
                     }
                     ViewBag.DiscussionTeamList = DiscussionTeamList.OrderBy(dt => dt.TeamName).ToList();
                 }
+
                 ViewBag.Posts = posts.OrderBy(p => p.Posted);
                 ViewBag.ActiveCourse = ActiveCourseUser;
                 ViewBag.Assignment = assignment;
@@ -133,262 +132,76 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult TeacherIndex(int assignmentId, int discussionTeamID, int courseUserId = 0, int postOrReply = 3)
         {
-            List<DiscussionPost> teamPosts = new List<DiscussionPost>();
-            List<DiscussionPost> posts = new List<DiscussionPost>();
             Assignment assignment = db.Assignments.Find(assignmentId);
-            CourseUser student;
-            DiscussionTeam discussionTeam = (from dt in assignment.DiscussionTeams
+            if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
+            {
+                List<DiscussionPost> posts = null;
+                CourseUser student;
+                DiscussionTeam discussionTeam = (from dt in assignment.DiscussionTeams
                                                  where dt.ID == discussionTeamID
                                                  select dt).FirstOrDefault();
 
-            //Collecting posts and setting up DiscussionTeamList.
-            if (assignment.HasDiscussionTeams)
-            {
-                //Only want posts associated with discussionTeamID
-                ViewBag.DiscussionTeamList = assignment.DiscussionTeams.OrderBy(dt => dt.TeamName).ToList();
-                posts = (from post in db.DiscussionPosts
-                         where post.AssignmentID == assignment.ID &&
-                         post.DiscussionTeamID == discussionTeamID &&
-                         !post.IsReply
-                         orderby post.Posted
-                         select post).ToList();
-            }
-            else
-            {
-                //want all posts associated with assignmentId
-                posts = (from post in db.DiscussionPosts
-                         where post.AssignmentID == assignment.ID &&
-                         !post.IsReply
-                         orderby post.Posted
-                         select post).ToList();
-            }
-
-            if (postOrReply == 3 || courseUserId <= 0)  //If postOrReply is 3, we want no selections - so setting student to null.
-            {
-                student = null;
-            }
-            else
-            {
-                student = db.CourseUsers.Find(courseUserId);
-            }
-            
-            if (assignment.HasDiscussionTeams) //Setting up TeamName
-            {
-                ViewBag.TeamName = " - " + discussionTeam.Team.Name;
-            }
-            else if (student != null)
-            {
-                ViewBag.TeamName = " - " + student.DisplayNameFirstLast(ActiveCourseUser.AbstractRole);
-            }
-            else
-            {
-                ViewBag.TeamName = "";
-            }
-
-            ViewBag.PostOrReply = postOrReply;
-            ViewBag.Posts = posts;
-            ViewBag.Student = student;
-            ViewBag.Assignment = assignment;
-            ViewBag.FirstPost = true;
-            ViewBag.ActiveCourse = ActiveCourseUser;
-            ViewBag.DiscussionTeamID = discussionTeam.ID;
-            return View();
-        }
-
-        [Obsolete("This function has not been kept up to date")]
-        public ActionResult ObserverIndex(int assignmentId, int courseUserId, int postOrReply)
-        {
-            List<DiscussionPost> teamPosts = new List<DiscussionPost>();
-            List<DiscussionPost> posts = new List<DiscussionPost>();
-            Assignment assignment = db.Assignments.Find(assignmentId);
-            CourseUser student = db.CourseUsers.Find(courseUserId);
-            DiscussionTeam discussionTeam = new DiscussionTeam();
-
-            
-
-            posts = (from post in db.DiscussionPosts
-                     where post.AssignmentID == assignment.ID &&
-                     !post.IsReply
-                     orderby post.Posted
-                     select post).ToList();
-            foreach (DiscussionPost post in posts)
-            {
-                if (!post.CourseUser.AbstractRole.CanModify)
-                {
-                    post.DisplayName = post.CourseUser.DisplayNameFirstLast(ActiveCourseUser.AbstractRole);
-                }
-            }
-
-            Cache["PostOrReply"] = postOrReply;
-            if (assignment != null && student != null && (postOrReply >= 0 && postOrReply <= 3))
-            {
-                Cache["StudentID"] = student.ID;
+                //Collecting posts and setting up DiscussionTeamList.
                 if (assignment.HasDiscussionTeams)
                 {
-                    foreach (DiscussionTeam dt in assignment.DiscussionTeams)
-                    {
-                        foreach (TeamMember tm in dt.Team.TeamMembers)
-                        {
-                            if (tm.CourseUser.ID == student.ID)
-                            {
-                                discussionTeam = dt;
-                                break;
-                            }
-                        }
-                    }
-                    foreach (TeamMember tm in discussionTeam.Team.TeamMembers)
-                    {
-                        posts = (from post in db.DiscussionPosts
-                                 where post.AssignmentID == assignment.ID &&
-                                 post.CourseUserID == tm.CourseUserID &&
-                                 !post.IsReply
-                                 select post).ToList();
-                        foreach (DiscussionPost post in posts)
-                        {
-                            post.DisplayName = post.CourseUser.DisplayNameFirstLast(ActiveCourseUser.AbstractRole);
-                            teamPosts.Add(post);
-                        }
-                    }
+                    //Only want posts associated with discussionTeamID
+                    ViewBag.DiscussionTeamList = assignment.DiscussionTeams.OrderBy(dt => dt.TeamName).ToList();
                     posts = (from post in db.DiscussionPosts
                              where post.AssignmentID == assignment.ID &&
-                             post.CourseUser.AbstractRole.CanModify &&
+                             post.DiscussionTeamID == discussionTeamID &&
                              !post.IsReply
+                             orderby post.Posted
                              select post).ToList();
-                    foreach (DiscussionPost post in posts)
-                    {
-                        teamPosts.Add(post);
-                    }
-                    ViewBag.Posts = teamPosts.OrderBy(t => t.Posted);
                 }
-
                 else
                 {
+                    //want all posts associated with assignmentId
                     posts = (from post in db.DiscussionPosts
                              where post.AssignmentID == assignment.ID &&
                              !post.IsReply
                              orderby post.Posted
                              select post).ToList();
-                    foreach (DiscussionPost post in posts)
-                    {
-                        post.DisplayName = post.CourseUser.DisplayNameFirstLast(ActiveCourseUser.AbstractRole);
-                    }
-
-                    foreach (AssignmentTeam a in assignment.AssignmentTeams)
-                    {
-                        if (a.Team.TeamMembers.FirstOrDefault().CourseUser.ID == student.ID)
-                        {
-                            discussionTeam.Assignment = a.Assignment;
-                            discussionTeam.AssignmentID = a.AssignmentID;
-                            discussionTeam.Team = a.Team;
-                            discussionTeam.TeamID = a.TeamID;
-                            break;
-                        }
-                    }
-                    ViewBag.Posts = posts;
                 }
-            }
 
-            if (postOrReply == 3)
-            {
-                if (!assignment.HasDiscussionTeams)
+                if (postOrReply == 3 || courseUserId <= 0)  //If postOrReply is 3, we want no selections - so setting student to null.
                 {
-                    ViewBag.Posts = posts;
-                }
-                student = null;
-            }
-
-            if (assignment.HasDiscussionTeams)
-            {
-                ViewBag.TeamName = " - " + discussionTeam.Team.Name;
-                ViewBag.TeamList = assignment.DiscussionTeams.OrderBy(s => s.Team.Name).ToList();
-            }
-            else
-            {
-                if (student == null)
-                {
-                    ViewBag.TeamName = null;
+                    student = null;
                 }
                 else
                 {
-                    ViewBag.TeamName = " - " + student.DisplayNameFirstLast(ActiveCourse.AbstractRole);
+                    student = db.CourseUsers.Find(courseUserId);
                 }
 
-                List<DiscussionTeam> dtList = new List<DiscussionTeam>();
-                DiscussionTeam dt = new DiscussionTeam();
-                foreach (AssignmentTeam assignTeam in assignment.AssignmentTeams)
+                if (assignment.HasDiscussionTeams)
                 {
-                    dt.Assignment = assignTeam.Assignment;
-                    dt.AssignmentID = assignTeam.AssignmentID;
-                    dt.Team = assignTeam.Team;
-                    dt.TeamID = assignTeam.TeamID;
-                    dt.Team.Name = assignTeam.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastAndFirst();
-                    dtList.Add(dt);
-
-                    dt = new DiscussionTeam();
+                    ViewBag.DiscussionHeader = assignment.AssignmentName + " - " + discussionTeam.TeamName;
                 }
-                ViewBag.TeamList = dtList.OrderBy(l => l.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName).ThenBy(f => f.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName).ToList();
-            }
+                else
+                {
+                    ViewBag.DiscussionHeader = assignment.AssignmentName;
+                }
 
-            ViewBag.Student = student;
-            ViewBag.Assignment = assignment;
-            ViewBag.FirstPost = true;
-            ViewBag.ActiveCourse = ActiveCourseUser;
-            ViewBag.PostOrReply = postOrReply;
-            ViewBag.TeamSelectId = "selected_team";
-            ViewBag.AssignmentSelectId = "selected_assignment";
-            if (discussionTeam != null)
-            {
-                ViewBag.SelectedTeam = discussionTeam;
+                ViewBag.PostOrReply = postOrReply;
+                ViewBag.Posts = posts;
+                ViewBag.Student = student;
+                ViewBag.Assignment = assignment;
+                ViewBag.IsFirstPost = false;
+                ViewBag.ActiveCourse = ActiveCourseUser;
+                ViewBag.DiscussionTeamID = discussionTeam.ID;
+                return View("Index");
             }
-            else
-            {
-                ViewBag.SelectedTeam = null;
-            }
-            return View("TeacherIndex");
+            return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentId });
         }
 
         [HttpPost]
-        public ActionResult NewPost(DiscussionPost dp, int discussionTeamId)
+        public ActionResult NewPost(DiscussionPost newPost)
         {
-            Assignment assignment = db.Assignments.Find(dp.AssignmentID);
-            if (dp.Content != null)
+            if (newPost != null && newPost.Content != null && newPost.AssignmentID > 0 && newPost.DiscussionTeamID > 0)
             {
-                if (assignment != null)
-                {
-                    AssignmentTeam at = GetAssignmentTeam(assignment, ActiveCourseUser);
-                    if (assignment.DiscussionSettings.HasAnonymousPosts)
-                    {
-                        DiscussionPost post = new DiscussionPost()
-                        {
-                            Content = dp.Content,
-                            CourseUser = ActiveCourseUser,
-                            CourseUserID = ActiveCourseUser.ID,
-                            Posted = DateTime.Now,
-                            AssignmentID = assignment.ID,
-                            DisplayName = "Anonymous " + ActiveCourseUser.ID,
-                            DiscussionTeamID = discussionTeamId,
-                            IsReply = false
-                        };
-                        db.DiscussionPosts.Add(post);
-                        db.SaveChanges();
-                    }
-                    else
-                    {
-                        DiscussionPost post = new DiscussionPost()
-                        {
-                            Content = dp.Content,
-                            CourseUser = ActiveCourseUser,
-                            CourseUserID = ActiveCourseUser.ID,
-                            Posted = DateTime.Now,
-                            AssignmentID = assignment.ID,
-                            DisplayName = ActiveCourseUser.DisplayNameFirstLast(ActiveCourseUser.AbstractRole),
-                            DiscussionTeamID = discussionTeamId,
-                            IsReply = false
-                        };
-                        db.DiscussionPosts.Add(post);
-                        db.SaveChanges();
-                    }
-                }
+                Assignment assignment = db.Assignments.Find(newPost.AssignmentID);
+                newPost.CourseUserID = ActiveCourseUser.ID;
+                db.DiscussionPosts.Add(newPost);
+                db.SaveChanges();
             }
             return Redirect(Request.UrlReferrer.ToString());
         }
@@ -429,44 +242,24 @@ namespace OSBLE.Controllers
         }
 
         [HttpPost]
-        public ActionResult NewReply(DiscussionPost dr, int discussionTeamId)
+        public ActionResult NewReply(DiscussionPost reply)
         {
-            dr.CourseUserID = ActiveCourseUser.ID;
-            dr.CourseUser = ActiveCourseUser;
-            dr.Posted = DateTime.Now;
-
-            int replyTo = 0;
-            if (Request.Form["reply_to"] != null)
+            int ParentPostID = 0;
+            if (Request.Form["ParentPostID"] != null)
             {
-                replyTo = Convert.ToInt32(Request.Form["reply_to"]);
+                ParentPostID = Convert.ToInt32(Request.Form["ParentPostID"]);
             }
-
-            int latestReply = 0;
-            if (Request.Form["latest_reply"] != null)
+            
+            DiscussionPost replyToPost = db.DiscussionPosts.Find(ParentPostID);
+            if (replyToPost != null && reply.Content != null && reply.ParentPostID > 0 && reply.DiscussionTeamID > 0 && reply.AssignmentID > 0)
             {
-                latestReply = Convert.ToInt32(Request.Form["latest_reply"]);
-            }
-
-            DiscussionPost replyToPost = db.DiscussionPosts.Find(replyTo);
-            if (replyToPost != null && dr.Content != null)
-            {
-                dr.AssignmentID = replyToPost.AssignmentID;
-                dr.DisplayName = dr.CourseUser.DisplayNameFirstLast(ActiveCourseUser.AbstractRole);
-                dr.IsReply = true;
-                dr.DiscussionTeamID = discussionTeamId;
-                replyToPost.Replies.Add(dr);
-
-                AssignmentTeam at = GetAssignmentTeam(replyToPost.Assignment, ActiveCourseUser);
-
+                Assignment assignment = db.Assignments.Find(reply.AssignmentID);
+                reply.CourseUserID = ActiveCourseUser.ID;
+                reply.IsReply = true;
+                
+                replyToPost.Replies.Add(reply);
                 db.SaveChanges();
-
-                ViewBag.dp = replyToPost;
-                List<DiscussionPost> replys = replyToPost.Replies.Where(r => r.ID > latestReply).ToList();
-
-                ViewBag.DiscussionReplies = replys;
             }
-            ViewBag.Assignment = dr.Assignment;
-
             return Redirect(Request.UrlReferrer.ToString());
         }
     }

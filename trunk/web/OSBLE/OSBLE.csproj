@@ -798,15 +798,12 @@
     <Content Include="Views\Assignment\_TeacherIndex.cshtml" />
     <Content Include="Views\Assignment\_TeacherTeamEvaluationView.cshtml" />
     <Content Include="Views\Assignment\_StudentTeamEvaluationView.cshtml" />
-    <Content Include="Views\DiscussionAssignment\Index.cshtml" />
-    <Content Include="Views\DiscussionAssignment\_DiscussionFeed.cshtml" />
-    <Content Include="Views\DiscussionAssignment\_SubDiscussionReply.cshtml" />
-    <Content Include="Views\DiscussionAssignment\TeacherIndex.cshtml" />
     <Content Include="Views\Gradebook\_ObserverGradebook.cshtml" />
     <Content Include="Views\Gradebook\_ObserverTab.cshtml" />
     <Content Include="Views\CookieTest\Index.cshtml" />
     <Content Include="Views\Rubric\ExportIndividualToCSV.cshtml" />
     <Content Include="Views\Rubric\ExportAllToCSV.cshtml" />
+    <Content Include="Views\DiscussionAssignment\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

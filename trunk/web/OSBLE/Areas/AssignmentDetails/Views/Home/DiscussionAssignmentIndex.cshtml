@@ -26,7 +26,7 @@
 
         foreach (DiscussionTeam assignmentTeam in teams)
         {
-            if ((assignmentTeam as DiscussionTeam).GetAllTeamMembers().Count() > 1)
+            if (Model.CurrentAssignment.HasDiscussionTeams)
             {
                 <tr>
                     <th class="TeamHeader" colspan="6">
