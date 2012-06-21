@@ -23,12 +23,19 @@ namespace OSBLE.Models.Courses.Rubrics
 
         [Association("Levels", "ID", "RubricID")]
         [Include]
-        public virtual ICollection<Level> Levels { get; set; }
+        public virtual IList<Level> Levels { get; set; }
 
         [Association("Criteria", "ID", "RubricID")]
         [Include]
-        public virtual ICollection<Criterion> Criteria { get; set; }
+        public virtual IList<Criterion> Criteria { get; set; }
 
-        public virtual ICollection<CellDescription> CellDescriptions { get; set; }
+        public virtual IList<CellDescription> CellDescriptions { get; set; }
+
+        public Rubric()
+        {
+           Levels = new List<Level>();
+           Criteria = new List<Criterion>();
+           CellDescriptions = new List<CellDescription>();
+        }
     }
 }

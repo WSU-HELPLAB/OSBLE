@@ -5,119 +5,179 @@
 
 <style media="screen" type="text/css">
 
-.sample {
+.rubric {
 	border-width: 1px;
 	border-spacing: 2px;
 	border-style: outset;
-	border-color: gray;
 	border-collapse: collapse;
-	background-color: white;
 }
-.sample th {
+.rubric th {
 	border-width: 1px;
 	padding: 10px;
 	border-style: inset;
-	border-color: gray;
-	background-color: white;
 }
-.sample td {
+.rubric td {
 	border-width: 1px;
-	padding: 1px;
+	padding: 10px;
 	border-style: inset;
-	border-color: gray;
-	background-color: white;
 }
+
+textarea.center
+{
+    vertical-align:middle;
+}
+
+td.top
+{
+    vertical-align:top;
+}
+
+.ul
+{
+    list-style-type: none;
+    padding:0;
+    margin:0;
+}
+
 </style>
 
-<table>
+<html> <body>
+    <table>
     <tr>
-        <td>
-            <table id="dataTable" class="sample">
-            @*Row for titles*@
-                <tr>
-                    <th>Performance Criterion</th>
-                        
-                    <th>Criterion<br />Weight</th>
-                        
-                    <th>
-                        <input type="button" value="-" onclick="deleteColumn('dataTable', this.parentNode.cellIndex)" />
-                        <br />
-                            Level Title<input type="text" />
-                    </th>
-                </tr>
-
-                @*Default first row of rubric*@
-                <tr>
-                    @*Performance Criterion*@
-                    <td>
-                        <input type="button" value="-" onclick="deleteRow('dataTable', this.parentNode.parentNode.rowIndex)" />
-                        <textarea rows="5" cols="20"></textarea>
-                    </td>
-
-                    @*Criterion Weight*@
-                    <td>
-                        <input type="text" size="1"/>
-                    </td>
-
-                    @*Level Description*@
-                    <td>
-                        <textarea rows="5" cols="35"></textarea>
-                    </td>
-                </tr>
-            </table>
-            <td style="position: relative">
-                <input style="position:absolute; top: 0px; right: 0px" type="button" value="+" onclick="addColumn('dataTable')" />
+        <td>[Course Dropdown] [Rubric Dropdown] [Rubric Name] </td>
+    </tr>
+        <tr>
+            <td>
+                <ul class="ul">
+                    <li>
+                        <input type="checkbox" name="globalComments" value="globalComments" />Overall Comments
+                    </li>
+                    <li>
+                        <input type="checkbox" name="criterionComments" value="criterionComments" />Comments for each criterion
+                    </li>
+                </ul>
             </td>
-    </tr>
-    <tr>
-        <td style="position: relative">
-            <input style="position: absolute; bottom: 0px; left: 0px" type="button" value="+"
-                onclick="addRow('dataTable')" />
-        </td>
-    </tr>
-    <tr>
-        <input type="checkbox" value = "globalComments" />
-        Overall Comments <br />
-        <input type="checkbox" value = "globalComments" />
-        Comments for each category <br />
-    </tr>
-</table>
+        </tr>
 
-</html>
-    <script language="javascript">
-        function addRow(tableID) {
-            var table = document.getElementById(tableID);
+        <tr>
+            <td>
+                <table id="dataTable" class="rubric">
+                    @*Row for titles*@
+                    <tr>
+                        <th>
+                            Performance Criterion
+                        </th>
+                        
+                        <th>Criterion<br />Weight</th>
+                        
+                        <th class="level">
+                        <ul class="ul" >
+                            <li><input type="button" value="-" onclick="deleteColumn('dataTable', this.parentNode.parentNode.parentNode.cellIndex)" /></li>
 
-            var rowCount = table.rows.length;
-            var newRow = table.insertRow(rowCount);
-            newRow.innerHTML = table.rows[rowCount - 1].innerHTML;
+                            <li>Level</li>
+
+                            <li><input class="Input" name="rubric:0:L" type="text" /></li>
+                            </ul>
+                        </th>
+                    </tr>
+
+                    @*Default first row of rubric*@
+                    <tr>
+                        @*Performance Criterion*@
+                        <td>
+                            <input type="button" value="-" onclick="deleteRow('dataTable', this.parentNode.parentNode.rowIndex)" />
+                            <textarea class=" Input center" name="rubric:0:0" rows="5" cols="20"></textarea>
+                        </td>
+
+                        @*Criterion Weight*@
+                        <td>
+                            <input class="Input" type="text" name="rubric:1:0"  size="1"/>
+                        </td>
+
+                        @*Level Description*@
+                        <td>
+                            @* Name=X:Y *@
+                            <textarea class="Input" name="rubric:2:0" rows="5" cols="30"></textarea>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td class ="top">
+                <input type="button" value="+" onclick="addColumn('dataTable')" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="button" value="+" onclick="addRow('dataTable')" />
+            </td>
+        </tr>
+    </table>
+</body> </html>
+
+<script type="text/javascript">
+    function addRow(tableID) {
+        var table = document.getElementById(tableID);
+
+        var rowCount = table.rows.length;
+        var columnCount = table.rows[0].cells.length;
+
+        var newRow = table.insertRow(rowCount);
+
+        $(newRow).html(table.rows[rowCount - 1].innerHTML);
+
+        //note: rowCount is now the index of the last row (because a row was added)
+        //Modify the Y value of the name (name="rubric:X:Y") for the new rubric
+        for (var i = 0; i < columnCount; i++) {
+            var name = $(table.rows[rowCount-1].cells[i]).find('.Input').attr("name");
+            var spl = name.split(':');
+            $(newRow.cells[i]).find(".Input").attr("name", spl[0] + ":" + spl[1] + ":" + (parseInt(spl[2]) + 1));
         }
+    }
 
-        function addColumn(tableID) {
-            var table = document.getElementById(tableID);
+    function addColumn(tableID) {
+        var table = document.getElementById(tableID);
 
-            var rowCount = table.rows.length;
-            var columnCount = table.rows[0].cells.length;
+        var rowCount = table.rows.length;
+        var columnCount = table.rows[0].cells.length;
 
-            //loop over each row and append a cell to the end
-            for (var i = 0; i < rowCount; i++) {
-                var element = document.createElement("th");
-                table.rows[i].appendChild(element);
-                element.innerHTML = table.rows[i].cells[columnCount - 1].innerHTML;
-            }
-        }
+        //loop over each row and append a copy of the last cell in that row to the end
+        for (var i = 0; i < rowCount; i++) {
+            var element = document.createElement("th");
 
-        function deleteColumn(tableID, columnIndex) {
-            var table = document.getElementById(tableID);
+            // assign the class from the cells in the previous column to the corresponding
+            // cells in the new column
+            $(element).attr('class', $(table.rows[i].cells[columnCount - 1]).attr('class'));
 
+            table.rows[i].appendChild(element);
+            element.innerHTML = table.rows[i].cells[columnCount - 1].innerHTML;
+
+            //get name of previous element ( in the form X:Y) and increment X to create a unique 
+            //name for the corresponding element in the new column
+            var name = $(table.rows[i].cells[columnCount - 1]).find('.Input').attr("name");
+            var spl = name.split(':');
+            $(element).find('.Input').attr("name",  spl[0] + ":" + (parseInt(spl[1]) + 1) + ":" + spl[2]);
+        }   
+    }
+
+    function deleteColumn(tableID, columnIndex) {
+        var table = document.getElementById(tableID);
+
+        //Delete a column only if there are more than the default amount: 3
+        if (table.rows[0].cells.length > 3) {
             for (var i = 0; i < table.rows.length; i++) {
                 table.rows[i].deleteCell(columnIndex);
             }
         }
+    }
 
-        function deleteRow(tableID, rowIndex) {
+    function deleteRow(tableID, rowIndex) {
+        var table = document.getElementById(tableID);
+        
+        //Delete a row only if there are more than the default amount: 2
+        if (table.rows.length > 2) {
             document.getElementById(tableID).deleteRow(rowIndex);
         }
-    </script>
+    }
+</script>
 
 
