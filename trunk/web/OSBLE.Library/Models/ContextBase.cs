@@ -227,25 +227,21 @@ namespace OSBLE.Models
             modelBuilder.Entity<Level>()
                 .HasRequired(l => l.Rubric)
                 .WithMany(r => r.Levels)
-                .HasForeignKey(l => l.RubricID)
                 .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<Criterion>()
                 .HasRequired(c => c.Rubric)
                 .WithMany(r => r.Criteria)
-                .HasForeignKey(c => c.RubricID)
                 .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<CellDescription>()
                 .HasRequired(cd => cd.Criterion)
                 .WithMany()
-                .HasForeignKey(cd => cd.CriterionID)
                 .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<CellDescription>()
                 .HasRequired(cd => cd.Level)
                 .WithMany()
-                .HasForeignKey(cd => cd.LevelID)
                 .WillCascadeOnDelete(true);
             /////
 

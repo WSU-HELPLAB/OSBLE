@@ -253,7 +253,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     }
 
                     db.CellDescriptions.Add(desc);
-                    rubric.CellDescriptions.Add(desc);
+                    //rubric.CellDescriptions.Add(desc);
                     n++;
                 }
                 i++;

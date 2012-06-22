@@ -29,13 +29,10 @@ namespace OSBLE.Models.Courses.Rubrics
         [Include]
         public virtual IList<Criterion> Criteria { get; set; }
 
-        public virtual IList<CellDescription> CellDescriptions { get; set; }
-
         public Rubric()
         {
            Levels = new List<Level>();
            Criteria = new List<Criterion>();
-           CellDescriptions = new List<CellDescription>();
         }
     }
 }
