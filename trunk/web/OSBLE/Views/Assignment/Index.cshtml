@@ -21,13 +21,9 @@
 }
 else
 {
-    if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+    if (ViewBag.ActiveCourse.AbstractRole.CanGrade)
     {
        @Html.Partial("_TeacherIndex");
-    }
-    else if (ViewBag.ActiveCourse.AbstractRole.Anonymized)
-    {
-        @Html.Partial("_ObserverIndex");
     }
     else if (ViewBag.ActiveCourse.AbstractRole.CanSubmit)
     {

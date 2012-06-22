@@ -56,6 +56,40 @@ namespace OSBLE.Models
         {
         }
 
+        /// <summary>
+        /// Adds course roles to db
+        /// </summary>
+        public void SeedRoles()
+        {
+            // Set up "static" values for Course Roles.
+
+            // Instructor: Can Modify Course, See All, Can Grade
+            this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.Instructor.ToString(), true, true, true, false, true, false));
+
+            // TA: Can See All, Can Grade
+            this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.TA.ToString(), false, true, true, false, true, false));
+
+            // Student: Can Submit Assignments, All Anonymized
+            this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.Student.ToString(), false, false, false, true, false, false));
+
+            // Moderator: No Special Privileges
+            this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.Moderator.ToString(), false, false, false, false, false, false));
+
+            // Observer: Can See All, All Anonymized
+            this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.Observer.ToString(), false, true, false, false, false, true));
+
+            // Community Roles
+
+            // Leader: Can Modify Community
+            this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.Leader.ToString(), true, true, true, true));
+
+            // Participant: Cannot Modify Community
+            this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.Participant.ToString(), false, true, true, false));
+
+            //trusted communityt member: same as participant, but can upload files to the server
+            this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.TrustedCommunityMember.ToString(), false, true, true, true));
+        }
+
         public DbSet<School> Schools { get; set; }
 
         // Assignments
@@ -85,8 +119,6 @@ namespace OSBLE.Models
         public DbSet<TeamEvaluation> TeamEvaluations { get; set; }
 
         public DbSet<TeamEvaluationComment> TeamEvaluationComments { get; set; }
-
-        public DbSet<DiscussionReply> DiscussionReplies { get; set; }
 
         public DbSet<TeamEvaluationSettings> TeamEvaluationSettings { get; set; }
 
@@ -185,11 +217,6 @@ namespace OSBLE.Models
             modelBuilder.Entity<DiscussionSetting>()
                 .HasRequired(ds => ds.Assignment)
                 .WithOptional(a => a.DiscussionSettings)
-                .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<DiscussionReply>()
-                .HasRequired(cu => cu.CourseUser)
-                .WithMany()
                 .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Mail>()

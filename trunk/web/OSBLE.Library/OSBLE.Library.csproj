@@ -99,7 +99,6 @@
     <Compile Include="Models\Assignments\TeamMember.cs" />
     <Compile Include="Models\ContextBase.cs" />
     <Compile Include="Models\DiscussionAssignment\DiscussionPost.cs" />
-    <Compile Include="Models\DiscussionAssignment\DiscussionReply.cs" />
     <Compile Include="Models\HomePage\AbstractDashboard.cs" />
     <Compile Include="Models\HomePage\DashboardPost.cs" />
     <Compile Include="Models\HomePage\DashboardReply.cs" />
@@ -118,7 +117,6 @@
     <Compile Include="Models\Users\Mail.cs" />
     <Compile Include="Models\Users\UserProfile.cs" />
     <Compile Include="Models\ViewModels\AssignmentDetailsViewModel.cs" />
-    <Compile Include="Models\ViewModels\InlineReviewViewModel.cs" />
     <Compile Include="Models\ViewModels\ReviewInterfaceModels.cs" />
     <Compile Include="Models\ViewModels\RubricViewModel.cs" />
     <Compile Include="Models\ViewModels\SerializableTeamMembers.cs" />

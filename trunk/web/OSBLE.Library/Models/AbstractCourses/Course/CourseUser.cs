@@ -3,6 +3,7 @@ using OSBLE.Models.Users;
 using System.Collections;
 using System.Collections.Generic;
 using OSBLE.Models.Assignments;
+using System;
 
 namespace OSBLE.Models.Courses
 {
@@ -59,11 +60,13 @@ namespace OSBLE.Models.Courses
             this.UserProfileID = copyUser.UserProfileID;
         }
 
+        [Obsolete("Use non-obsolete DisplayName() method")]
         public string DisplayName(string separator = ", ")
         {
             return this.UserProfile.LastName + separator + this.UserProfile.FirstName;
         }
 
+        [Obsolete("Use non-obsolete DisplayName() method")]
         public string DisplayName(AbstractRole viewerRole, string separator = ", ")
         {
             // not observer
@@ -78,6 +81,7 @@ namespace OSBLE.Models.Courses
             }
         }
 
+        [Obsolete("Use non-obsolete DisplayName() method")]
         public string DisplayNameFirstLast(AbstractRole viewerRole)
         {
             if (viewerRole.Anonymized) // observer
@@ -89,6 +93,19 @@ namespace OSBLE.Models.Courses
             {
                 return this.UserProfile.FirstName + " " + this.UserProfile.LastName;
             }
+        }
+
+
+        /// <summary>
+        /// This is the only function that should be used to display a courseusers name. By default it displays the name as "FirstName LastName" 
+        /// </summary>
+        /// <param name="AbstractRoleId">The AbstroleRoleId of the current user who will see this name</param>
+        /// <param name="LastThenFirst">This is an optional boolean parameter that should be sent in as true when you want names displayed in "LastName, FirstName" format.</param>
+        /// <param name="AssignmentHasAnonymousPosts">This is an optional boolean parameter that should be sent in when DisplayName is used within a specific assignment scenario (to mask users if anonymous settings turned on) Simply pass in <see cref="Assignment.DiscussionSettings.HasAnonymousPosts"/></param>
+        /// <returns></returns>
+        public string DisplayName(int AbstractRoleId, bool? LastThenFirst = null, bool? AssignmentHasAnonymousPosts = null)
+        {
+            return UserProfile.DisplayName(AbstractRoleId, LastThenFirst, AssignmentHasAnonymousPosts);
         }
     }
 }

@@ -52,17 +52,19 @@ namespace OSBLE.Controllers
                 if (assignment.HasDiscussionTeams)
                 {
                     posts = (from post in db.DiscussionPosts
+                             .Include("Replies")
                              where post.AssignmentID == assignment.ID &&
                              post.DiscussionTeamID == discussionTeamId &&
-                             !post.IsReply
+                             post.ParentPostID == null
                              orderby post.Posted
                              select post).ToList();
                 }
                 else
                 {
                     posts = (from post in db.DiscussionPosts
+                             .Include("Replies")
                              where post.AssignmentID == assignment.ID &&
-                             !post.IsReply
+                             post.ParentPostID == null
                              orderby post.Posted
                              select post).ToList();
                 }
@@ -129,11 +131,11 @@ namespace OSBLE.Controllers
         /// <param name="postOrReply">postOrReply is used as enumerable. 0 = Posts, 1 = Replies, 2 = Both, 3 = No Selector</param>
         /// <param name="discussionTeamID">The discussion team id for discussion to beto viewed. If it is a classwide discussion, then any dt can be sent.</param>
         /// <returns></returns>
-        [CanModifyCourse]
+        [CanGradeCourse]
         public ActionResult TeacherIndex(int assignmentId, int discussionTeamID, int courseUserId = 0, int postOrReply = 3)
         {
             Assignment assignment = db.Assignments.Find(assignmentId);
-            if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
+            if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && ActiveCourseUser.AbstractRole.CanGrade)
             {
                 List<DiscussionPost> posts = null;
                 CourseUser student;
@@ -146,19 +148,22 @@ namespace OSBLE.Controllers
                 {
                     //Only want posts associated with discussionTeamID
                     ViewBag.DiscussionTeamList = assignment.DiscussionTeams.OrderBy(dt => dt.TeamName).ToList();
+
                     posts = (from post in db.DiscussionPosts
-                             where post.AssignmentID == assignment.ID &&
-                             post.DiscussionTeamID == discussionTeamID &&
-                             !post.IsReply
-                             orderby post.Posted
-                             select post).ToList();
+                                 .Include("Replies")
+                                 where post.AssignmentID == assignment.ID &&
+                                 post.DiscussionTeamID == discussionTeamID &&
+                                 post.ParentPostID == null
+                                 orderby post.Posted
+                                 select post).ToList();
                 }
                 else
                 {
                     //want all posts associated with assignmentId
                     posts = (from post in db.DiscussionPosts
+                             .Include("Replies")
                              where post.AssignmentID == assignment.ID &&
-                             !post.IsReply
+                             post.ParentPostID == null
                              orderby post.Posted
                              select post).ToList();
                 }
@@ -206,6 +211,19 @@ namespace OSBLE.Controllers
             return Redirect(Request.UrlReferrer.ToString());
         }
 
+        [HttpPost]
+        public ActionResult NewReply(DiscussionPost reply)
+        {
+            if (reply.Content != null && reply.ParentPostID > 0 && reply.DiscussionTeamID > 0 && reply.AssignmentID > 0)
+            {
+                Assignment assignment = db.Assignments.Find(reply.AssignmentID);
+                reply.CourseUserID = ActiveCourseUser.ID;
+                db.DiscussionPosts.Add(reply);
+                db.SaveChanges();
+            }
+            return Redirect(Request.UrlReferrer.ToString());
+        }
+
         [HttpGet, FileCache(Duration = 3600)]
         public FileStreamResult ProfilePictureForDiscussion(int course, int userProfile)
         {
@@ -239,28 +257,6 @@ namespace OSBLE.Controllers
             }
 
             return new FileStreamResult(pictureStream, "image/jpeg");
-        }
-
-        [HttpPost]
-        public ActionResult NewReply(DiscussionPost reply)
-        {
-            int ParentPostID = 0;
-            if (Request.Form["ParentPostID"] != null)
-            {
-                ParentPostID = Convert.ToInt32(Request.Form["ParentPostID"]);
-            }
-            
-            DiscussionPost replyToPost = db.DiscussionPosts.Find(ParentPostID);
-            if (replyToPost != null && reply.Content != null && reply.ParentPostID > 0 && reply.DiscussionTeamID > 0 && reply.AssignmentID > 0)
-            {
-                Assignment assignment = db.Assignments.Find(reply.AssignmentID);
-                reply.CourseUserID = ActiveCourseUser.ID;
-                reply.IsReply = true;
-                
-                replyToPost.Replies.Add(reply);
-                db.SaveChanges();
-            }
-            return Redirect(Request.UrlReferrer.ToString());
         }
     }
 }

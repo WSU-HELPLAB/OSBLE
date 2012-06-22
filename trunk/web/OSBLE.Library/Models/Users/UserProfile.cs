@@ -4,6 +4,7 @@ using OSBLE.Models.Assignments;
 using System.Linq;
 using System.Security.Cryptography;
 using System;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Models.Users
 {
@@ -104,6 +105,32 @@ namespace OSBLE.Models.Users
         public string LastAndFirst()
         {
             return string.Format("{0}, {1}", LastName, FirstName);
+        }
+
+        /// <summary>
+        /// This is the only function that should be used to display users names. By default it displays the name as "FirstName LastName" 
+        /// </summary>
+        /// <param name="AbstractRoleId">The AbstroleRoleId of the current user who will see this name</param>
+        /// <param name="LastThenFirst">This is an optional boolean parameter that should be sent in as true when you want names displayed in "LastName, FirstName" format.</param>
+        /// <param name="AssignmentHasAnonymousPosts">This is an optional boolean parameter that should be sent in when DisplayName is used within a specific assignment scenario (to mask users if anonymous settings turned on) Simply pass in <see cref="Assignment.DiscussionSettings.HasAnonymousPosts"/></param>
+        /// <returns></returns>
+        public string DisplayName(int AbstractRoleId, bool? LastThenFirst = null, bool? AssignmentHasAnonymousPosts = null)
+        {
+            string returnValue = "";
+            if ((AssignmentHasAnonymousPosts != null && AssignmentHasAnonymousPosts == true)
+                || AbstractRoleId == (int)CourseRole.CourseRoles.Observer)
+            {
+                returnValue = string.Format("Anonymous {0}", this.ID);
+            }
+            else if (LastThenFirst != null && LastThenFirst == true)
+            {
+                returnValue = this.LastAndFirst();
+            }
+            else
+            {
+                returnValue = this.ToString();
+            }
+            return returnValue;
         }
 
         /// <summary>

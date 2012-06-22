@@ -145,6 +145,7 @@
         HelperResult displayPicture;
         string displayName = "";
 
+        <!--Generating posts-->
         foreach (DiscussionPost dp in ViewBag.Posts)
         {
             if (displayAsAnonymous == false || dp.CourseUserID == ViewBag.ActiveCourse.ID)
@@ -182,6 +183,7 @@
                 </div>
                 <div class="dp_replies">
                     <div id="dp_replies_for_@(dp.ID)">
+                        <!--Generating replies under each post-->
                         @foreach (DiscussionPost dr in dp.Replies)
                         {
                             if (displayAsAnonymous == false || dr.CourseUserID == ViewBag.ActiveCourse.ID)

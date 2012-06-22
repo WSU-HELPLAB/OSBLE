@@ -779,7 +779,6 @@
     <Content Include="Views\Shared\Submission\_Submit.cshtml" />
     <Content Include="Views\Rubric\_Display.cshtml" />
     <Content Include="Views\Rubric\View.cshtml" />
-    <Content Include="Views\Assignment\InlineReview.cshtml" />
     <Content Include="Views\Gradebook\_StudentGradebook.cshtml" />
     <Content Include="Views\Gradebook\_StudentTab.cshtml" />
     <Content Include="Views\Gradebook\_TeacherGradebook.cshtml" />
@@ -794,7 +793,6 @@
     <Content Include="Areas\AssignmentWizard\Views\Deliverables\Index.cshtml" />
     <Content Include="Views\Gradebook\ExportToCSV.cshtml" />
     <Content Include="Views\Home\Time.cshtml" />
-    <Content Include="Views\Assignment\_ObserverIndex.cshtml" />
     <Content Include="Views\Assignment\_TeacherIndex.cshtml" />
     <Content Include="Views\Assignment\_TeacherTeamEvaluationView.cshtml" />
     <Content Include="Views\Assignment\_StudentTeamEvaluationView.cshtml" />

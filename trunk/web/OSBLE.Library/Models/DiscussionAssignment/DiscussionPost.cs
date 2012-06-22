@@ -32,7 +32,13 @@ namespace OSBLE.Models.DiscussionAssignment
 
         public virtual ICollection<DiscussionPost> Replies { get; set; }
 
-        public bool IsReply { get; set; }
+        [NotMapped]
+        public bool IsReply { 
+            get 
+            {
+                return (this.ParentPostID != null);
+            } 
+        }
 
         [Required]
         public int DiscussionTeamID { get; set; }
@@ -44,7 +50,6 @@ namespace OSBLE.Models.DiscussionAssignment
         {
             ParentPostID = null;
             Posted = DateTime.Now;
-            IsReply = false;
         }
     }
 }
