@@ -712,58 +712,45 @@ namespace OSBLE
         /// <returns></returns>
         public static DateTime? GetSubmissionTime(IAssignmentTeam team, Team authorTeam = null)
         {
-            DirectoryInfo submissionFolder;
-            if (team != null && (team.Assignment.Type == AssignmentTypes.CriticalReview && authorTeam != null))
+            DateTime? timeSubmitted = null;
+            if (team != null)
             {
-                submissionFolder = new DirectoryInfo
-                                            (FileSystem.GetTeamUserSubmissionFolderForAuthorID
-                                                (false, team.Assignment.Category.Course, team.AssignmentID, team, authorTeam) 
-                                            );
-            }
-            else if (team != null)
-            {
-                submissionFolder = new DirectoryInfo
-                                                (FileSystem.GetTeamUserSubmissionFolder
-                                                    (
-                                                        false,
-                                                        team.Assignment.Category.Course,
-                                                        team.Assignment.ID,
-                                                        team
-                                                    )
-                                                );
-            }
-            else
-            {
-                submissionFolder = null;
-            }
-
-            DateTime? timeSubmitted;
-
-            if (submissionFolder != null && submissionFolder.Exists)
-            {
-                //unfortunately LastWriteTime for a directory does not take into account it's file or
-                //sub directories and these we need to check to see when the last file was written too.
-                timeSubmitted = submissionFolder.LastWriteTime;
-                foreach (FileInfo file in submissionFolder.GetFiles())
+                DirectoryInfo submissionFolder;
+                if (team.Assignment.Type == AssignmentTypes.CriticalReview && authorTeam != null)
                 {
-                    if (file.LastWriteTime > timeSubmitted)
+                    submissionFolder = new DirectoryInfo
+                                                (FileSystem.GetTeamUserSubmissionFolderForAuthorID
+                                                    (false, team.Assignment.Category.Course, team.AssignmentID, team, authorTeam)
+                                                );
+                }
+                else
+                {
+                    submissionFolder = new DirectoryInfo
+                                            (FileSystem.GetTeamUserSubmissionFolder
+                                                (
+                                                    false,
+                                                    team.Assignment.Category.Course,
+                                                    team.Assignment.ID,
+                                                    team
+                                                )
+                                            );
+                }
+
+                if (submissionFolder != null && submissionFolder.Exists && submissionFolder.GetFiles().Count() > 0)
+                {
+                    //unfortunately LastWriteTime for a directory does not take into account it's file or
+                    //sub directories and these we need to check to see when the last file was written too.
+                    timeSubmitted = submissionFolder.LastWriteTime;
+                    foreach (FileInfo file in submissionFolder.GetFiles())
                     {
-                        timeSubmitted = file.LastWriteTime;
+                        if (file.LastWriteTime > timeSubmitted)
+                        {
+                            timeSubmitted = file.LastWriteTime;
+                        }
                     }
                 }
-
-                //if no files, return null
-                if (submissionFolder.GetFiles().Count() == 0)
-                {
-                    timeSubmitted = null;
-                }
-
-                return timeSubmitted;
             }
-            else
-            {
-                return null;
-            }
+            return timeSubmitted;
         }
 
         public static void UpdateFileOrdering(DirectoryListing listing)

@@ -153,10 +153,14 @@ namespace OSBLE.Controllers
                         {
                             foreach (DirectoryInfo submissionDirectory in acitvityDirectory.GetDirectories())
                             {
-                                zipfile.AddDirectory(submissionDirectory.FullName, (from c in assignment.AssignmentTeams where c.TeamID.ToString() == submissionDirectory.Name select c.Team).FirstOrDefault().TeamMembers.FirstOrDefault().CourseUser.DisplayName(ActiveCourse.AbstractRole));
+                                Team currentTeam = (from c in assignment.AssignmentTeams where c.TeamID.ToString() == submissionDirectory.Name select c.Team).FirstOrDefault();
+                                if (currentTeam != null)
+                                {
+                                    zipfile.AddDirectory(submissionDirectory.FullName, currentTeam.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ActiveCourseUser.AbstractRoleID));
+                                }
                             }
 
-                            FileSystem.CreateZipFolder(ActiveCourse.AbstractCourse as Course, zipfile, assignment);
+                            FileSystem.CreateZipFolder(ActiveCourseUser.AbstractCourse as Course, zipfile, assignment);
                         }
                         stream = FileSystem.GetDocumentForRead(zipfile.Name);
 
