@@ -772,11 +772,11 @@
     <Content Include="Views\Shared\_AddToGradebook.cshtml" />
     <Content Include="Views\Account\ErrorPage.cshtml" />
     <Content Include="Views\Account\ProfessionalRegister.cshtml" />
-    <Content Include="Views\Shared\Submission\Create.cshtml" />
-    <Content Include="Views\Shared\Submission\SubmittedSuccessfully.cshtml" />
+    <Content Include="Views\Submission\Create.cshtml" />
+    <Content Include="Views\Submission\SubmittedSuccessfully.cshtml" />
     <Content Include="Views\Gradebook\ImportColumnsFromCSV.cshtml" />
     <Content Include="Views\Rubric\Index.cshtml" />
-    <Content Include="Views\Shared\Submission\_Submit.cshtml" />
+    <Content Include="Views\Submission\_Submit.cshtml" />
     <Content Include="Views\Rubric\_Display.cshtml" />
     <Content Include="Views\Rubric\View.cshtml" />
     <Content Include="Views\Gradebook\_StudentGradebook.cshtml" />

@@ -720,6 +720,18 @@ namespace OSBLE
                                                 (false, team.Assignment.Category.Course, team.AssignmentID, team, authorTeam) 
                                             );
             }
+            else if (team != null)
+            {
+                submissionFolder = new DirectoryInfo
+                                                (FileSystem.GetTeamUserSubmissionFolder
+                                                    (
+                                                        false,
+                                                        team.Assignment.Category.Course,
+                                                        team.Assignment.ID,
+                                                        team
+                                                    )
+                                                );
+            }
             else
             {
                 submissionFolder = null;
