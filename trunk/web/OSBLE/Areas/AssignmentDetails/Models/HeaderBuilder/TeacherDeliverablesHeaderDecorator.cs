@@ -21,19 +21,10 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             header.Deliverables = new DynamicDictionary();
             header.Assignment = assignment;
             header.Deliverables.AllDeliverables = assignment.Deliverables;
-
-            //get submissions for the assignment teams
-            int submissionCount = 0;
-            foreach (AssignmentTeam team in assignment.AssignmentTeams)
-            {
-                if (team.GetSubmissionTime() != null)
-                {
-                    submissionCount++;
-                }
-            }
+            
             
             //set header information
-            header.Deliverables.SubmissionCount = submissionCount;
+            header.Deliverables.SubmissionCount = assignment.GetSubmissionCount();
             header.Deliverables.NumberOfTeams = assignment.AssignmentTeams.Count;
 
             return header;

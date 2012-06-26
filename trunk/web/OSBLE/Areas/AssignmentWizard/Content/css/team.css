@@ -1,4 +1,14 @@
-﻿#AvailableStudentList
+﻿#ErrorBox
+{
+    margin-top:20px;
+    margin-bottom:20px;
+    padding: 10px 4px 10px 4px;
+    background:#FF9B9B;
+    border:2px solid #FF0000;
+    opacity:0.0;
+}
+
+#AvailableStudentList
 {
     float:left;
     width:200px;

@@ -154,9 +154,21 @@ namespace OSBLE.Controllers
                             foreach (DirectoryInfo submissionDirectory in acitvityDirectory.GetDirectories())
                             {
                                 Team currentTeam = (from c in assignment.AssignmentTeams where c.TeamID.ToString() == submissionDirectory.Name select c.Team).FirstOrDefault();
+                                
                                 if (currentTeam != null)
                                 {
-                                    zipfile.AddDirectory(submissionDirectory.FullName, currentTeam.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ActiveCourseUser.AbstractRoleID));
+                                    string folderName = "";
+                                    if (assignment.HasTeams)
+                                    {
+                                        folderName = currentTeam.Name;
+                                    }
+                                    else
+                                    {
+                                        bool HasAnonPosting = (assignment.DiscussionSettings != null && assignment.DiscussionSettings.HasAnonymousPosts);
+                                        folderName = currentTeam.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ActiveCourseUser.AbstractRoleID, true, HasAnonPosting);
+                                    }
+
+                                    zipfile.AddDirectory(submissionDirectory.FullName, folderName);
                                 }
                             }
 

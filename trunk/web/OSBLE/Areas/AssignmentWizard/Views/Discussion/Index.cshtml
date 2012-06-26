@@ -29,6 +29,11 @@
         <td></td>
     </tr>
     <tr>
+        <th>@Html.LabelFor(m => m.TAsCanPostToAll)</th>
+        <td>@Html.CheckBoxFor(m => m.TAsCanPostToAll)</td>
+        <td></td>
+    </tr>
+    <tr>
         <th>@Html.LabelFor(m => m.InitialPostDueDate):</th>
         <td>@Html.EditorFor(m => m.InitialPostDueDate) at @Html.EditorFor(m => m.InitialPostDueDueTime)</td>
         <td>@Html.ValidationMessageFor(m => m.InitialPostDueDate)</td>

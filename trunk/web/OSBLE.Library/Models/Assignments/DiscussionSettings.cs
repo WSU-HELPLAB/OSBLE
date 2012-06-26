@@ -17,6 +17,7 @@ namespace OSBLE.Models.Assignments
         AnonymousPosts = 1,
         AnonymousRoles = 2,
         RequiresPostBeforeView = 4,
+        TAsCanPostToAll = 8
     };
 
     public class DiscussionSetting
@@ -149,6 +150,31 @@ namespace OSBLE.Models.Assignments
                 else
                 {
                     RemoveAnonymityLevel(DiscussionSettings.RequiresPostBeforeView);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the assignment requires that students must first submit a post before
+        /// they can view the posts of others
+        /// </summary>
+        [NotMapped]
+        [Display(Name = "TAs can participate in all discussions")]
+        public bool TAsCanPostToAll
+        {
+            get
+            {
+                return HasAnonymityLevel(DiscussionSettings.TAsCanPostToAll);
+            }
+            set
+            {
+                if (value == true)
+                {
+                    AddAnonymityLevel(DiscussionSettings.TAsCanPostToAll);
+                }
+                else
+                {
+                    RemoveAnonymityLevel(DiscussionSettings.TAsCanPostToAll);
                 }
             }
         }

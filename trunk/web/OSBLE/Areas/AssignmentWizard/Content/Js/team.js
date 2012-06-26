@@ -7,8 +7,18 @@ function documentReady() {
     $(".TeamSortable").sortable(
             {
                 connectWith: ".TeamSortable",
-                forcePlaceholderSize: true
+                forcePlaceholderSize: true,
+                update: dragComplete
             }).disableSelection();
+
+
+    $(".TaListItem").draggable(
+    {
+        connectToSortable: ".TeamSortable",
+        forcePlaceholderSize: true,
+        helper: "clone",
+        start: hideErrors
+    }).disableSelection();
 
 
     //various event listeners
@@ -19,6 +29,69 @@ function documentReady() {
     $("#AvailableStudentList").disableSelection();
     $("#TeamsDiv").disableSelection();
 }
+
+//MG added:
+
+function hideErrors() {
+    $('#ErrorBox').promise().done(function () {
+        $('#ErrorBox').animate({ opacity: 0.0 }, 600, "easeOutExpo");
+    });
+    }
+    
+    
+//Called whenever a draggable (student / team) is dropped onto a review entity
+function dragComplete(event, ui) {
+
+    //the element that just got finished being dragged
+    var dragElement = $(ui.item.context);
+
+    //the data ID of the element (contains key information that we will need to send back to server)
+    var elementDataId = dragElement.attr("data-id");
+
+    //the review list that the element is trying to be added to
+    var list = dragElement.parent().contents();
+
+    //the review entity's name
+    var reviewerName = dragElement.text().trim();
+
+    //the item being reviewed
+    var reviewItem = dragElement
+                        .parent()       //parent should be UL
+                        .parent()       //UL's parent is a DIV
+                        .contents()     //All children (including text) of the DIV
+                        .filter(function () { return this.nodeType == 3; }) //Return only TEXT nodes
+                        .text().trim(); //Get the text and trim whitespace
+
+    if (hasDataId(list, elementDataId)) {
+        alreadyOnTeamError(reviewerName, reviewItem);
+        dragElement.remove();
+    }
+}
+
+//Determines if the provided list already contains the supplied element.
+//Used to help restrict a person from reviewing the same document multiple times.
+function hasDataId(list, dataId) {
+    var count = 0;
+    $(list).each(function () {
+        if ($(this).attr("data-id") == dataId) {
+            count++;
+        }
+    }
+    );
+    if (count > 1) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+//formats a message to be displayed in the error box
+function alreadyOnTeamError(reviewer, reviewItem) {
+    var text = reviewer + " is already reviewing " + reviewItem + ".";
+    displayError(text);
+}
+//end mg added
 
 //Before we can postback, we need to inject students into teams for the controller to process
 function processForm(evt) {

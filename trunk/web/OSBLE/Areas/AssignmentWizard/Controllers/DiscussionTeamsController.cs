@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models.Assignments;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -55,6 +56,24 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             base.Index();
             SetUpViewBag(Assignment.DiscussionTeams.Cast<IAssignmentTeam>().ToList());
+
+            //Grabbing a list of moderators (and potentially TAs) that will be used to
+            //allow instructors to assign to Moderators/TAs to discussion teams
+            if (Assignment.DiscussionSettings != null && Assignment.DiscussionSettings.TAsCanPostToAll)
+            {
+                ViewBag.Moderators = (from cu in db.CourseUsers
+                                      where cu.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator
+                                      && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                                      select cu).ToList();
+            }
+            else
+            {
+                ViewBag.Moderators = (from cu in db.CourseUsers
+                                      where (cu.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator
+                                      || cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+                                      && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                                      select cu).ToList();
+            }
             return View(Assignment);
         }
 

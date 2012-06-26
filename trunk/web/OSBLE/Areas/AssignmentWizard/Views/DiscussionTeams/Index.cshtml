@@ -4,6 +4,7 @@
 @using OSBLE.Models;
 @model Assignment          
 @{
+    List<CourseUser> moderators = ViewBag.Moderators;
     List<CourseUser> unassignedUsers = ViewBag.UnassignedUsers;
     List<IAssignmentTeam> teams = ViewBag.Teams;
     List<CourseUser> allUsers = ViewBag.AllUsers;
@@ -73,6 +74,9 @@ else
 </ul>
 </div>
 
+<div id="ErrorBox">
+        This is the error box</div>
+
 <h3>Create Teams Manually</h3>
 <div id="TeamCreationOptions">
     <a id="CreateTeamLink" class="NoDecoration">
@@ -89,7 +93,19 @@ else
             <li id="cu_@(cu.ID)" class="ui-state-default Student" style="list-style-type:none">@cu.UserProfile.LastName, @cu.UserProfile.FirstName</li>
         }
     </ul>
+    <div id="AvailableStudentList">
+    <h3>
+        Moderators/TAs</h3>
+    <ul id="AvailableModerators" class="TeamSortable">
+        @foreach (CourseUser cu in moderators)
+        {
+            <li id="cu_@(cu.ID)" class="ui-state-default TaListItem" style="list-style-type:none">@cu.UserProfile.LastName, @cu.UserProfile.FirstName (@cu.AbstractRole.Name)</li>
+        }
+    </ul>
 </div>
+</div>
+
+
     
 <div id="TeamsDiv">
     <h3>Discussion Teams</h3>

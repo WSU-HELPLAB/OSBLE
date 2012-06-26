@@ -285,7 +285,15 @@ namespace OSBLE.Models.Assignments
         /// </summary>
         public int GetSubmissionCount()
         {
-            return FileSystem.GetFolderDocumentCount(this.Category.Course, this.ID);
+            int returnVal = 0;
+            foreach (AssignmentTeam team in this.AssignmentTeams)
+            {
+                if (team.GetSubmissionTime() != null)
+                {
+                    returnVal++;
+                }
+            }
+            return returnVal;
         }
 
         /// <summary>
