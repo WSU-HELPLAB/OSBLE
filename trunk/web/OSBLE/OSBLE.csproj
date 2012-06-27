@@ -211,6 +211,7 @@
     <Content Include="Areas\AssignmentWizard\Content\js\discussionTeam.js" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CriticalReviewDiscussionTeamsController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionTeamsController.cs" />
+    <Compile Include="Areas\AssignmentWizard\ViewModels\RubricSelectionViewModel.cs" />
     <Compile Include="Resources\DynamicDictionary.cs" />
     <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
@@ -825,6 +826,7 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

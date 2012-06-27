@@ -6,6 +6,8 @@ using System.Web.Mvc;
 using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.Assignments;
 using System.Text.RegularExpressions;
+using OSBLE.Models.Courses;
+using OSBLE.Areas.AssignmentWizard.ViewModels;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -44,12 +46,36 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             base.Index();
 
-            List<List<string>> rubricTable = new List<List<string>>();
+            //get all courses associated with current user
+            //List<Course> courses = db.Courses.Where(
 
-            if (Assignment.HasRubric)
+            List<CourseUser> myCourseUsers = (from cu in db.CourseUsers
+                                              where cu.UserProfileID == ActiveCourseUser.UserProfileID
+                                              select cu).ToList();
+
+            List<Course> myCourses = (from cu in myCourseUsers
+                                      select cu.AbstractCourse as Course).ToList();
+
+            RubricSelectionViewModel rubricSelectionViewModel = new RubricSelectionViewModel();
+
+            foreach (Course course in myCourses)
             {
-                ViewBag.hasRubric = true;
+                rubricSelectionViewModel.AddCourse(course);
+            }
 
+            ViewBag.rubricSelection = rubricSelectionViewModel;
+
+            return LoadRubric(Assignment);
+        }
+
+
+        private ActionResult LoadRubric(Assignment assignment)
+        {
+            List<List<string>> rubricTable = new List<List<string>>();
+            IList<Level> levels = new List<Level>();
+            if (assignment.HasRubric)
+            {
+                levels = assignment.Rubric.Levels;
                 foreach (Criterion criterion in Assignment.Rubric.Criteria)
                 {
                     List<string> row = new List<string>();
@@ -68,8 +94,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
             else
             {
+                //create empty rubric
                 ViewBag.hasRubric = true;
-
                 List<string> row = new List<string>();
                 row.Add("");
                 row.Add("");
@@ -77,11 +103,13 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 rubricTable.Add(row);
             }
 
+            ViewBag.levels = levels;
             ViewBag.ActiveCourse = ActiveCourseUser;
             ViewBag.rubricTable = rubricTable;
 
             return View(Assignment);
         }
+
 
         [HttpPost]
         public ActionResult Index(Assignment model)

@@ -1,20 +1,12 @@
 ﻿@using OSBLE.Models.Assignments;
 @using OSBLE.Models.Courses.Rubrics;
+@using OSBLE.Areas.AssignmentWizard.ViewModels;
 @model Assignment
 @{
     Html.HiddenFor(m => m.ID);
     bool hasRubric = Model.HasRubric;
-
-    Rubric rubric = new Rubric();
-    
-    if (hasRubric)
-    {
-        rubric = Model.Rubric;  
-    }
-    else
-    {
-        rubric.Levels.Add(new Level());
-    }  
+    string test;
+    OSBLE.Areas.AssignmentWizard.ViewModels.RubricSelectionViewModel rubricSelection = ViewBag.rubricSelection; 
 }
 
 
@@ -62,7 +54,18 @@ td.top
 
     <table>
     <tr>
-        <td>[Course Dropdown] [Rubric Dropdown] [Rubric Name] </td>
+        <td>
+        <select>
+            @foreach(string course in rubricSelection.Courses())
+            {
+                    <option class ="CourseSelector">@course</option>
+            }
+        </select>
+
+        <select id="AssignmentSelector">
+        </select>
+         [Rubric Description]
+          </td>
     </tr>
         <tr>
             <td>
@@ -92,7 +95,7 @@ td.top
                         @* Level Title *@
                         @{
                             int n = 0;
-                            foreach (Level level in rubric.Levels)
+                            foreach (Level level in ViewBag.levels)
                             {
                                 <th class="level">
                                         <ul class="ul" >
@@ -172,6 +175,11 @@ td.top
 </body> </html>
 
 <script type="text/javascript">
+
+    $('.CourseSelector').click(function () {
+        alert("populate selector for assignments");
+
+    });
 
     function addRow(tableID) {
         var table = document.getElementById(tableID);
