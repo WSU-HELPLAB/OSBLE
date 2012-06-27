@@ -208,6 +208,7 @@
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\HeaderDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\ITableBuilder.cs" />
     <Compile Include="Areas\AssignmentDetails\ViewModels\AssignmentDetailsViewModel.cs" />
+    <Content Include="Areas\AssignmentWizard\Content\js\discussionTeam.js" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CriticalReviewDiscussionTeamsController.cs" />
     <Compile Include="Resources\DynamicDictionary.cs" />
     <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
