@@ -26,6 +26,12 @@ namespace OSBLE.Models.Courses.Rubrics
         public virtual Level Level { get; set; }
 
         [Required]
+        public int RubricID { get; set; }
+
+        [Association("Rubric", "RubricID", "ID")]
+        public virtual Rubric Rubric { get; set; }
+
+        [Required]
         public string Description { get; set; }
     }
 }

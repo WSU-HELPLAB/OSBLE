@@ -44,10 +44,42 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             base.Index();
 
-            //List of other assignments
-            //List<Assignment> assignments = new List<Assignment>();
+            List<List<string>> rubricTable = new List<List<string>>();
+
+            if (Assignment.HasRubric)
+            {
+                ViewBag.hasRubric = true;
+
+                foreach (Criterion criterion in Assignment.Rubric.Criteria)
+                {
+                    List<string> row = new List<string>();
+
+                    row.Add(criterion.CriterionTitle);
+                    row.Add(criterion.Weight.ToString());
+
+                    foreach (CellDescription cd in (from cd in Assignment.Rubric.CellDescriptions
+                                                    where cd.CriterionID == criterion.ID
+                                                    select cd).ToList())
+                    {
+                        row.Add(cd.Description);
+                    }
+                    rubricTable.Add(row);
+                }
+            }
+            else
+            {
+                ViewBag.hasRubric = true;
+
+                List<string> row = new List<string>();
+                row.Add("");
+                row.Add("");
+                row.Add("");
+                rubricTable.Add(row);
+            }
 
             ViewBag.ActiveCourse = ActiveCourseUser;
+            ViewBag.rubricTable = rubricTable;
+
             return View(Assignment);
         }
 
@@ -242,6 +274,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     CellDescription desc = new CellDescription();
                     desc.CriterionID = criterion.ID;
                     desc.LevelID = level.ID;
+                    desc.RubricID = rubric.ID;
 
                     if (rubricTable[i][n] == "")
                     {
@@ -253,7 +286,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     }
 
                     db.CellDescriptions.Add(desc);
-                    //rubric.CellDescriptions.Add(desc);
+                    rubric.CellDescriptions.Add(desc);
                     n++;
                 }
                 i++;

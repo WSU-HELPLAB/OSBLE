@@ -1,8 +1,23 @@
 ﻿@using OSBLE.Models.Assignments;
+@using OSBLE.Models.Courses.Rubrics;
 @model Assignment
 @{
-    //Html.HiddenFor(m => m.ID);
+    Html.HiddenFor(m => m.ID);
+    bool hasRubric = Model.HasRubric;
+
+    Rubric rubric = new Rubric();
+    
+    if (hasRubric)
+    {
+        rubric = Model.Rubric;  
+    }
+    else
+    {
+        rubric.Levels.Add(new Level());
+    }  
 }
+
+
 <style media="screen" type="text/css">
 
 .rubric {
@@ -64,8 +79,9 @@ td.top
 
         <tr>
             <td>
+                @* Start Table for Rubric *@
                 <table id="dataTable" class="rubric">
-                    @*Row for titles*@
+                    @*Row for column titles*@
                     <tr>
                         <th>
                             Performance Criterion
@@ -73,49 +89,74 @@ td.top
                         
                         <th>Criterion<br />Weight</th>
                         
-                        <th class="level">
-                        <ul class="ul" >
-                            <li><input type="button" value="-" onclick="deleteColumn('dataTable', this.parentNode.parentNode.parentNode.cellIndex)" /></li>
-                            <li>Level Point Spread
-                            <select class="Input" name="rubric:0:S">
-                                    @for(int i = 1; i <= 10; i++)
+                        @* Level Title *@
+                        @{
+                            int n = 0;
+                            foreach (Level level in rubric.Levels)
+                            {
+                                <th class="level">
+                                        <ul class="ul" >
+                                            <li>
+                                            @*<input type="button" value="<" onclick="moveColumnLeft('dataTable', this.parentNode.parentNode.parentNode.cellIndex)" /> *@
+                                                <input type="button" value="-" onclick="deleteColumn('dataTable', this.parentNode.parentNode.parentNode.cellIndex)" />
+                                                @*<input type="button" value=">" onclick="moveColumnRight('dataTable', this.parentNode.parentNode.parentNode.cellIndex)" /> *@
+                                            </li>
+                                            <li>Level Point Spread
+                                            <select class="SpreadInput" name="rubric:@n:S">
+                                                    @for (int i = 1; i <= 10; i++)
+                                                    {
+                                                        if (i == 5)
+                                                        {
+                                                            <option selected value="@i">@i</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@i">@i</option>
+                                                        }
+                                                    }
+                                            </select>
+                                            </li>
+                                            <li>Level Title<input class="Input" name="rubric:@n:L" type="text" value="@level.LevelTitle"/></li>
+                                        </ul>
+                                </th>
+                                n++;
+                            }
+                        }
+                    </tr>
+                    @{
+                        n = 0;
+                        foreach (List<string> row in ViewBag.rubricTable)
+                        {
+                            @*Default first row of rubric*@
+                            <tr>
+                                @*Performance Criterion*@
+                                <td>
+                                    <ul class="ul" style="float:left;">
+                                    <li><input type="button" value="^" onclick="moveRowUp('dataTable', this.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                                    <li><input type="button" value="-" onclick="deleteRow('dataTable', this.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                                    <li><input type="button" value="v" onclick="moveRowDown('dataTable', this.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                                    </ul>
+                                    <textarea class="Input center" name="rubric:0:@n" rows="5" cols="20">@row[0]</textarea>
+                                </td>
+
+                                @*Criterion Weight*@
+                                <td>
+                                    <input class="Input" type="text" name="rubric:1:@n"  size="1" value="@row[1]"/>
+                                </td>
+
+                                
+                                @*Level Description*@
+                                    @for(int d = 2; d < row.Count; d++)
                                     {
-                                        if (i == 5)
-                                        {
-                                           <option selected value="@i">@i</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@i">@i</option>
-                                        }
-                                    
+                                        <td>
+                                            @* Name=X:Y *@
+                                            <textarea class="Input" name="rubric:@d:@n" rows="5" cols="30">@row[d]</textarea>
+                                        </td>
                                     }
-                            </select>
-                            </li>
-                            <li>Level Title<input class="Input" name="rubric:0:L" type="text" /></li>
-                            </ul>
-                        </th>
-                    </tr>
-
-                    @*Default first row of rubric*@
-                    <tr>
-                        @*Performance Criterion*@
-                        <td>
-                            <input type="button" value="-" onclick="deleteRow('dataTable', this.parentNode.parentNode.rowIndex)" />
-                            <textarea class=" Input center" name="rubric:0:0" rows="5" cols="20"></textarea>
-                        </td>
-
-                        @*Criterion Weight*@
-                        <td>
-                            <input class="Input" type="text" name="rubric:1:0"  size="1"/>
-                        </td>
-
-                        @*Level Description*@
-                        <td>
-                            @* Name=X:Y *@
-                            <textarea class="Input" name="rubric:2:0" rows="5" cols="30"></textarea>
-                        </td>
-                    </tr>
+                            </tr>
+                            n++;
+                        }
+                    }
                 </table>
             </td>
             <td class ="top">
@@ -131,6 +172,7 @@ td.top
 </body> </html>
 
 <script type="text/javascript">
+
     function addRow(tableID) {
         var table = document.getElementById(tableID);
 
@@ -147,6 +189,9 @@ td.top
             var name = $(table.rows[rowCount-1].cells[i]).find('.Input').attr("name");
             var spl = name.split(':');
             $(newRow.cells[i]).find(".Input").attr("name", spl[0] + ":" + spl[1] + ":" + (parseInt(spl[2]) + 1));
+
+            //don't copy the values (inputs) from the old cells
+            $(newRow.cells[i]).find('.Input').attr("value", ""); 
         }
     }
 
@@ -171,7 +216,17 @@ td.top
             //name for the corresponding element in the new column
             var name = $(table.rows[i].cells[columnCount - 1]).find('.Input').attr("name");
             var spl = name.split(':');
-            $(element).find('.Input').attr("name",  spl[0] + ":" + (parseInt(spl[1]) + 1) + ":" + spl[2]);
+            $(element).find('.Input').attr("name", spl[0] + ":" + (parseInt(spl[1]) + 1) + ":" + spl[2]);
+
+            //don't copy the values (inputs) from the old cells
+            $(element).find('.Input').attr("value", ""); 
+
+            //special case to handle level point spread
+            if (i == 0) {
+                name = $(table.rows[i].cells[columnCount - 1]).find('.SpreadInput').attr("name");
+                spl = name.split(':');
+                $(element).find('.SpreadInput').attr("name", spl[0] + ":" + (parseInt(spl[1]) + 1) + ":" + spl[2]);
+            }
         }   
     }
 
@@ -180,20 +235,84 @@ td.top
 
         //Delete a column only if there are more than the default amount: 3
         if (table.rows[0].cells.length > 3) {
-            for (var i = 0; i < table.rows.length; i++) {
-                table.rows[i].deleteCell(columnIndex);
-            }
+            var n = columnIndex + 1;
+            $('td:nth-child(' + n + '), th:nth-child(' + n + ')').remove();
         }
     }
 
     function deleteRow(tableID, rowIndex) {
         var table = document.getElementById(tableID);
-        
+
+        var row = $(table.rows[rowIndex]);
+
         //Delete a row only if there are more than the default amount: 2
         if (table.rows.length > 2) {
             document.getElementById(tableID).deleteRow(rowIndex);
         }
     }
+
+    function moveRowUp(tableID, rowIndex) {
+        var table = document.getElementById(tableID);
+        var row = $(table.rows[rowIndex]);
+
+        //prevent moving the title row
+        if (rowIndex > 1) {
+            row.insertBefore(row.prev())
+        }
+
+        //swap the names back to keep them in order
+        row = table.rows[rowIndex];
+        row2 = table.rows[rowIndex - 1];
+        for (var i = 0; i < table.rows[0].cells.length; i++) {
+            var name = $(row.cells[i]).find('.Input').attr('name');
+            var name2 = $(row2.cells[i]).find('.Input').attr('name');
+
+            $(row2.cells[i]).find('.Input').attr('name', name);
+            $(row.cells[i]).find('.Input').attr('name', name2);
+        }
+   }
+
+    function moveRowDown(tableID, rowIndex) {
+        var table = document.getElementById(tableID);
+
+        var row = $(table.rows[rowIndex]);
+        row.insertAfter(row.next());
+
+        //swap the names to preserve order
+        row = table.rows[rowIndex];
+        row2 = table.rows[rowIndex + 1];
+        for (var i = 0; i < table.rows[0].cells.length; i++) {
+            var name = $(row.cells[i]).find('.Input').attr('name');
+            var name2 = $(row2.cells[i]).find('.Input').attr('name');
+
+            $(row2.cells[i]).find('.Input').attr('name', name);
+            $(row.cells[i]).find('.Input').attr('name', name2);
+        }
+    }
+
+
+    // Not currently used:
+//    function moveColumnLeft(tableID, cellIndex) {
+//        var table = document.getElementById(tableID);
+
+//        if (cellIndex > 2) {
+//            for (var i = 0; i < table.rows.length; i++) {
+//                var temp = table.rows[i].cells[cellIndex].innerHTML;
+//                table.rows[i].cells[cellIndex].innerHTML = table.rows[i].cells[cellIndex - 1].innerHTML;
+//                table.rows[i].cells[cellIndex - 1].innerHTML = temp;
+//            }
+//        }
+//    }
+
+//    function moveColumnRight(tableID, cellIndex) {
+
+//        var n = cellIndex + 1;
+//       $('td:nth-child(' + n + '), th:nth-child(' + n + ')').hide();
+//       // var temp = table.rows[i].cells[cellIndex].innerHTML;
+//       // table.rows[i].cells[cellIndex].innerHTML = table.rows[i].cells[cellIndex + 1].innerHTML;
+//       // table.rows[i].cells[cellIndex + 1].innerHTML = temp;
+//    }
+
 </script>
 
 

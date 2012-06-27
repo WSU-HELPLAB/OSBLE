@@ -246,11 +246,6 @@ namespace OSBLE.Models
                 .WithMany()
                 .WillCascadeOnDelete(false);
 
-            //We want cascade delete on Rubric_Level
-            //                          Rubric_Criterion
-            //                          Criterion_CellDescription
-            //                          Level_CellDescription (FALSE)
-
             modelBuilder.Entity<Level>()
                 .HasRequired(l => l.Rubric)
                 .WithMany(r => r.Levels)
@@ -269,8 +264,12 @@ namespace OSBLE.Models
             modelBuilder.Entity<CellDescription>()
                 .HasRequired(cd => cd.Level)
                 .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<CellDescription>()
+                .HasRequired(cd => cd.Rubric)
+                .WithMany(r => r.CellDescriptions)
                 .WillCascadeOnDelete(true);
-            /////
 
             modelBuilder.Entity<RubricEvaluation>()
                 .HasRequired(re => re.Recipient)

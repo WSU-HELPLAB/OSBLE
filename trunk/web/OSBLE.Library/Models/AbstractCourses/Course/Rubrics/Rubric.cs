@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ServiceModel.DomainServices.Server;
 using System.ComponentModel;
+using System.Linq;
 
 namespace OSBLE.Models.Courses.Rubrics
 {
@@ -22,12 +23,13 @@ namespace OSBLE.Models.Courses.Rubrics
         public bool HasGlobalComments { get; set; }
 
         [Association("Levels", "ID", "RubricID")]
-        [Include]
         public virtual IList<Level> Levels { get; set; }
 
         [Association("Criteria", "ID", "RubricID")]
-        [Include]
         public virtual IList<Criterion> Criteria { get; set; }
+
+        [Association("CellDescription", "ID", "RubricID")]
+        public virtual IList<CellDescription> CellDescriptions { get; set; }
 
         public Rubric()
         {

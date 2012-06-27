@@ -210,13 +210,13 @@
     <Compile Include="Areas\AssignmentDetails\ViewModels\AssignmentDetailsViewModel.cs" />
     <Content Include="Areas\AssignmentWizard\Content\js\discussionTeam.js" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CriticalReviewDiscussionTeamsController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionTeamsController.cs" />
     <Compile Include="Resources\DynamicDictionary.cs" />
     <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\ContentController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CriticalReviewController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionController.cs" />
-    <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionTeamsController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\PreviousAssignmentController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\TeamEvaluationController.cs" />
     <Compile Include="Areas\AssignmentWizard\Models\WizardComparer.cs" />
