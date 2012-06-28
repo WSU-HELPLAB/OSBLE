@@ -5,51 +5,65 @@ using System.Linq;
 using System.Security.Cryptography;
 using System;
 using OSBLE.Models.Courses;
+using System.Runtime.Serialization;
 
 namespace OSBLE.Models.Users
 {
     [Serializable]
-    //[System.Runtime.Serialization.DataContract]
+    [DataContract]
     public class UserProfile
     {
+        [DataMember]
         [Required]
         [Key]
         public int ID { get; set; }
 
-        //[System.Runtime.Serialization.DataMember]
+        [DataMember]
         public string UserName { get; set; }
 
         public string AspNetUserName { get; set; }
 
         public string Password { get; set; }
 
+        [DataMember]
         public string AuthenticationHash { get; set; }
 
+        [DataMember]
         public bool IsApproved { get; set; }
 
+        [DataMember]
         public int SchoolID { get; set; }
 
+        [DataMember]
         public virtual School School { get; set; }
 
+        [DataMember]
         public string FirstName { get; set; }
 
+        [DataMember]
         public string LastName { get; set; }
 
+        [DataMember]
         public string Identification { get; set; }
 
+        [DataMember]
         public bool IsAdmin { get; set; }
 
+        [DataMember]
         public bool CanCreateCourses { get; set; }
 
+        [DataMember]
         public int DefaultCourse { get; set; }
 
         // User E-mail Notification Settings
 
+        [DataMember]
         public bool EmailAllNotifications { get; set; }
 
         /// <summary>
         /// If set, will email all activity feed posts to the users
         /// </summary>
+        [DataMember]
         public bool EmailAllActivityPosts { get; set; }
 
         public enum sortEmailBy
@@ -60,6 +74,7 @@ namespace OSBLE.Models.Users
             SUBJECT = 3
         }
 
+        [DataMember]
         public int SortBy { get; set; }
 
         public UserProfile()
