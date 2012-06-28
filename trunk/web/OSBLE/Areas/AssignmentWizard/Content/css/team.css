@@ -8,6 +8,15 @@
     opacity:0.0;
 }
 
+#AvailableModeratorList
+{
+    float:left;
+    width:200px;
+    padding-top:15px;
+    padding-right:15px;
+    border-right:1px solid #CFCFCF;
+}
+
 #AvailableStudentList
 {
     float:left;
@@ -61,6 +70,22 @@
     list-style:none;
     padding:0;
     margin:0;
+}
+
+.ModeratorsDraggable
+{
+    min-height:25px;
+    cursor:pointer;
+    list-style:none;
+    padding:0;
+    margin:0;
+}
+
+.Moderator
+{
+    list-style-type:none;
+    background:#51809E;
+    color:White;
 }
     
 .TeamNameTextBox

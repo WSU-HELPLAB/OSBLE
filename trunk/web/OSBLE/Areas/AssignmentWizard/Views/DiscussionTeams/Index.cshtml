@@ -99,7 +99,17 @@ else
     <ul id="AvailableModerators" class="ModeratorsDraggable">
         @foreach (CourseUser cu in moderators)
         {
-            <li data-id="cu_@(cu.ID)" id="cu_@(cu.ID)" class="ui-state-default TaListItem" style="list-style-type:none">@cu.UserProfile.LastName, @cu.UserProfile.FirstName (@cu.AbstractRole.Name)</li>
+            string displayName = cu.DisplayName((int)CourseRole.CourseRoles.Instructor);
+            if (cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+            {
+                displayName = "(TA) " + displayName;
+            }
+            else
+            {
+                displayName = "(M) " + displayName;
+            }
+            
+            <li data-id="cu_@(cu.ID)" id="cu_@(cu.ID)" class="ui-state-default Moderator">@displayName</li>
         }
     </ul>
 </div>
@@ -120,7 +130,19 @@ else
             <ul id="team_@(counter)_@(@aTeam.TeamID)" class="TeamSortable">
                 @foreach (TeamMember member in aTeam.Team.TeamMembers)
                 {
-                    <li id="cu_@(member.CourseUserID)" class="ui-state-default Student">@member.CourseUser.UserProfile.LastName, @member.CourseUser.UserProfile.FirstName</li>
+                    string displayName = member.CourseUser.DisplayName((int)CourseRole.CourseRoles.Instructor);
+                    string roleClass = "Student";
+                    if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+                    {
+                        displayName = "(TA) " + displayName;
+                        roleClass = "Moderator";
+                    }
+                    else if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
+                    {
+                        displayName = "(M) " + displayName;
+                        roleClass = "Moderator";
+                    }
+                    <li id="cu_@(member.CourseUserID)" data-id="cu_@(member.CourseUserID)" class="ui-state-default @roleClass">@displayName</li>
                 }
             </ul>
         </div>
@@ -135,6 +157,10 @@ else
 @foreach (CourseUser cu in allUsers)
 {
     <input type="hidden" id="student_@(cu.ID)" name="student_@(cu.ID)" value="@(cu.UserProfile.FirstName) @(cu.UserProfile.LastName)" />
+}
+@foreach (CourseUser cu in moderators)
+{
+    <input type="hidden" id="moderator_@(cu.ID)" name="moderator_@(cu.ID)" value="" />
 }
 @foreach (IAssignmentTeam team in teams)
 {

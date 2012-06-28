@@ -3,21 +3,39 @@
 //Called when the document has finished loading and is safe to make DOM calls
 function documentReady() {
 
+    $(".Moderator").draggable(
+    {
+        connectToSortable: ".TeamSortable",
+        forcePlaceholderSize: true,
+        helper: "clone",
+        start: hideErrors,
+        stop: moderatorDragComplete
+    }).disableSelection();
+
+    
+    //version 1: can drag from teams to student list, causing the ability to drag from the student list back to the team and cause duplication
     //set up sortable lists
     $(".TeamSortable").sortable(
+    {
+    connectWith: ".TeamSortable",
+    forcePlaceholderSize: true
+    }).disableSelection();
+
+    
+/* version 2: no longer can drag from teams to student list. This is goodish, but sitll have problems. (note: to make it work, remove TeamSortable class from AvailableStudent)
+    //set up sortable lists
+    $("#AvailableStudent").sortable(
             {
                 connectWith: ".TeamSortable",
                 forcePlaceholderSize: true
             }).disableSelection();
 
-    $(".TaListItem").draggable(
-    {
-        connectToSortable: ".TeamSortable",
-        forcePlaceholderSize: true,
-        helper: "clone",
-        /*start: hideErrors*/
-        stop: moderatorDragComplete
-    }).disableSelection();
+        $(".TeamSortable").sortable(
+        {
+            connectWith: ".TeamSortable",
+            forcePlaceholderSize: true
+        }).disableSelection();
+        */
 
     //various event listeners
     $("#WizardForm").submit(processForm);
@@ -27,6 +45,8 @@ function documentReady() {
     $("#AvailableStudentList").disableSelection();
     $("#TeamsDiv").disableSelection();
 }
+
+
 
 function hideErrors() {
     $('#ErrorBox').promise().done(function () {
@@ -48,12 +68,21 @@ function moderatorDragComplete(evt, ui) {
     var counter = 0;
     $.each($(".TeamSortable"), function () {    //look through all TeamSortables (since we cannot know which TeamSortable our item will end up in)
         counter = 0;                            //reset counter for each new list 
-        var parent = $(this);
-        $.each($(this).find('.TaListItem[data-id=\"' + myDataId + '\"]'), function () {
+        var currentTeamSortableUL = $(this);
+        $.each($(this).find('[data-id=\"' + myDataId + '\"]'), function () {
             counter++;                          //look for all the items with the same data-id. Increment counter when one is found
             if (counter > 1) {
-                $(this).remove();               //remove duplicates found
-                alreadyOnTeamError($(this).text(), parent.text());
+                var teamInputBox = currentTeamSortableUL    //teamSortable that we found a duplicate in
+                                    .parent()               //look at the parent whos a div
+                                    .contents()             //grab all contents
+                                    .filter(function () {   //find html element that has the TeamName class
+                                        if ($(this).attr("class") == "TeamNameTextBox") {
+                                            return this.defaultValue;
+                                        }
+                                });
+                var teamName = teamInputBox[0].defaultValue; //Access the first element in our list (of 1 item) and get its text value
+                alreadyOnTeamError($(this).text(), teamName);
+                $(this).remove();               //remove duplicate
             }
         });
     });
@@ -91,6 +120,19 @@ function processForm(evt) {
 
             //set the form value
             $("#student_" + studentId).val(teamName);
+        });
+
+        //find all moderators on this team
+        $(teams[i]).find(".Moderator").each(function (index) {
+            //find the moderators course user id
+            var myLi = $(this).context;
+            var rawId = $(myLi).attr("data-id");
+            var courseUserId = rawId.split("_")[1];
+
+            //append the team to form value (this is different than how students are handled, as moderators can be on multiple teams)
+            var oldVal = $("#moderator_" + courseUserId).val();
+            var newVal = oldVal + teamName + ",";
+            $("#moderator_" + courseUserId).val(newVal);
         });
     }
 }

@@ -53,16 +53,5 @@
 }
 
 <div>
-@Model.DisplayNameFirstLast(client.AbstractRole)  is a member of the following teams:
-<ul>
-    @foreach (TeamMember member in Model.TeamMemberships)
-    {
-        <li>@member.Team.Name</li>
-    }
-</ul>
-
-</div>
-
-<div>
     @Html.ActionLink("Back to Users", "Index")
 </div>

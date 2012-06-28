@@ -114,7 +114,7 @@ namespace OSBLE.Models.Users
         /// <param name="LastThenFirst">This is an optional boolean parameter that should be sent in as true when you want names displayed in "LastName, FirstName" format.</param>
         /// <param name="AssignmentHasAnonymousPosts">This is an optional boolean parameter that should be sent in when DisplayName is used within a specific assignment scenario (to mask users if anonymous settings turned on) Simply pass in <see cref="Assignment.DiscussionSettings.HasAnonymousPosts"/></param>
         /// <returns></returns>
-        public string DisplayName(int AbstractRoleId, bool? LastThenFirst = null, bool? AssignmentHasAnonymousPosts = null)
+        public string DisplayName(int AbstractRoleId, bool? FirstThenLast = null, bool? AssignmentHasAnonymousPosts = null)
         {
             string returnValue = "";
             if ((AssignmentHasAnonymousPosts != null && AssignmentHasAnonymousPosts == true)
@@ -122,13 +122,13 @@ namespace OSBLE.Models.Users
             {
                 returnValue = string.Format("Anonymous {0}", this.ID);
             }
-            else if (LastThenFirst != null && LastThenFirst == true)
+            else if (FirstThenLast != null && FirstThenLast == true)
             {
-                returnValue = this.LastAndFirst();
+                returnValue = this.ToString();
             }
             else
             {
-                returnValue = this.ToString();
+                returnValue = this.LastAndFirst();
             }
             return returnValue;
         }

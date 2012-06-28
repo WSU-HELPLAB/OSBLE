@@ -66,6 +66,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             List<CourseUser> users = (from cu in db.CourseUsers
                                        where cu.AbstractCourseID == ActiveCourse.AbstractCourseID
                                        && cu.AbstractRole.CanSubmit
+                                       orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
                                        select cu).ToList();
             List<CourseUser> allUsers = users.ToList();
 
