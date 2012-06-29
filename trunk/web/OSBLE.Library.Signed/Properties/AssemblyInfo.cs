@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("OSBLE.Library")]
+[assembly: AssemblyTitle("OSBLE.Library.Signed")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HELP Lab @ Washington State University")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("cfd84316-b4f1-485b-8b5c-c7cb06d214c7")]
+[assembly: Guid("c7e7aba1-ed5d-4bf2-98dd-fc7cd85b051b")]
 
 // Version information for an assembly consists of the following four values:
 //
