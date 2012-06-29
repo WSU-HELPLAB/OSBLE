@@ -63,16 +63,7 @@
     padding-left:15px;
 }
     
-.TeamSortable
-{
-    min-height:25px;
-    cursor:pointer;
-    list-style:none;
-    padding:0;
-    margin:0;
-}
-
-.ModeratorsDraggable
+.TeamSortable, .ModeratorsDraggable, #AvailableStudent
 {
     min-height:25px;
     cursor:pointer;

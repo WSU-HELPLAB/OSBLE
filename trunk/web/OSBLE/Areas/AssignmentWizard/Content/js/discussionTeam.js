@@ -3,40 +3,31 @@
 //Called when the document has finished loading and is safe to make DOM calls
 function documentReady() {
 
+    //Setting up TeamSortables (teams) sorting between each other. Note: Other TeamSortables are created below in createTeam(). Modifications here should also
+    //be upkept in that function
+    $(".TeamSortable").sortable(
+    {
+        connectWith: ".TeamSortable",
+        forcePlaceholderSize: true,
+        receive: teamSortableComplete,
+    }).disableSelection();
+
+    //Setting up AvilableStudent (unassigned students) sorting into TeamSortable (teams)
+    $("#AvailableStudent").sortable(
+    {
+        connectWith: ".TeamSortable",
+        forcePlaceholderSize: true
+    }).disableSelection();
+
+    //Setting up Moderators (the list items of Moderators/TAs) as draggable. Note: This property is not carried to the cloned moderators (intentional)
     $(".Moderator").draggable(
     {
         connectToSortable: ".TeamSortable",
         forcePlaceholderSize: true,
         helper: "clone",
         start: hideErrors,
-        stop: moderatorDragComplete
     }).disableSelection();
-
     
-    //version 1: can drag from teams to student list, causing the ability to drag from the student list back to the team and cause duplication
-    //set up sortable lists
-    $(".TeamSortable").sortable(
-    {
-    connectWith: ".TeamSortable",
-    forcePlaceholderSize: true
-    }).disableSelection();
-
-    
-/* version 2: no longer can drag from teams to student list. This is goodish, but sitll have problems. (note: to make it work, remove TeamSortable class from AvailableStudent)
-    //set up sortable lists
-    $("#AvailableStudent").sortable(
-            {
-                connectWith: ".TeamSortable",
-                forcePlaceholderSize: true
-            }).disableSelection();
-
-        $(".TeamSortable").sortable(
-        {
-            connectWith: ".TeamSortable",
-            forcePlaceholderSize: true
-        }).disableSelection();
-        */
-
     //various event listeners
     $("#WizardForm").submit(processForm);
     $("#CreateTeamLink").click(createTeam);
@@ -44,6 +35,27 @@ function documentReady() {
     //turn off selection as it ruins the UI experience
     $("#AvailableStudentList").disableSelection();
     $("#TeamsDiv").disableSelection();
+}
+
+function teamSortableComplete(event, ui) {
+    var OrigLIElement = ui.item.context;
+    var myDataId = $(OrigLIElement).attr('data-id');
+    var ULElement = $(this);
+    if(typeof myDataId != 'undefined')
+    {
+        var counter = 0;
+        $.each($(this).find('[data-id=\"' + myDataId + '\"]'), function () {
+            counter++;
+            if(counter > 1)
+            {
+                var parentDiv = $(ULElement).parent().find('.TeamNameTextBox');
+                var teamName = $(parentDiv).attr("value");
+                var duplicateMemberName = $(OrigLIElement).attr('text');
+                alreadyOnTeamError($(this).text(), teamName);
+                $(this).remove();
+            }
+        });
+    }
 }
 
 
@@ -59,32 +71,6 @@ function displayError(text) {
     $('#ErrorBox').promise().done(function () {
         $('#ErrorBox').text(text);
         $('#ErrorBox').animate({ opacity: 1.0 }, 800, "easeOutExpo");
-    });
-}
-
-function moderatorDragComplete(evt, ui) {
-    var myDataId = $(this).attr('data-id');
-
-    var counter = 0;
-    $.each($(".TeamSortable"), function () {    //look through all TeamSortables (since we cannot know which TeamSortable our item will end up in)
-        counter = 0;                            //reset counter for each new list 
-        var currentTeamSortableUL = $(this);
-        $.each($(this).find('[data-id=\"' + myDataId + '\"]'), function () {
-            counter++;                          //look for all the items with the same data-id. Increment counter when one is found
-            if (counter > 1) {
-                var teamInputBox = currentTeamSortableUL    //teamSortable that we found a duplicate in
-                                    .parent()               //look at the parent whos a div
-                                    .contents()             //grab all contents
-                                    .filter(function () {   //find html element that has the TeamName class
-                                        if ($(this).attr("class") == "TeamNameTextBox") {
-                                            return this.defaultValue;
-                                        }
-                                });
-                var teamName = teamInputBox[0].defaultValue; //Access the first element in our list (of 1 item) and get its text value
-                alreadyOnTeamError($(this).text(), teamName);
-                $(this).remove();               //remove duplicate
-            }
-        });
     });
 }
 
@@ -164,7 +150,9 @@ function createTeam(evt, teamName) {
         newContent += '<div style="clear:both;"></div>';
     }
     $("#TeamsDiv").append(newContent);
-    $("#" + listId).sortable({ connectWith: ".TeamSortable" }).disableSelection();
+    $("#" + listId).sortable({ connectWith: ".TeamSortable", forcePlaceholderSize: true,
+        receive: teamSortableComplete
+    }).disableSelection();
     $("#" + divId).fadeIn('slow');
     teamCounter++;
     return divId;

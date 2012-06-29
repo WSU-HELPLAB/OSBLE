@@ -79,7 +79,7 @@ else
 
 <h3>Create Teams Manually</h3>
 <div id="TeamCreationOptions">
-    <a id="CreateTeamLink" class="NoDecoration">
+    <a id="CreateTeamLink">
         <img src="@Url.Content("~/Content/images/add_up.png")" alt="Create New Team" title="Create New Team" />
         Create New Team </a>
 </div>
@@ -87,7 +87,7 @@ else
 <div id="AvailableStudentList">
     <h3>
         Unassigned Students/Teams</h3>
-    <ul id="AvailableStudent" class="TeamSortable">
+    <ul id="AvailableStudent">
         @foreach (CourseUser cu in unassignedUsers)
         {
             <li id="cu_@(cu.ID)" class="ui-state-default Student" style="list-style-type:none">@cu.UserProfile.LastName, @cu.UserProfile.FirstName</li>
