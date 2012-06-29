@@ -76,8 +76,10 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             ViewBag.rubricSelection = rubricSelectionViewModel;
             List<List<string>> rubricTable = new List<List<string>>();
             IList<Level> levels = new List<Level>();
+            string rubricDescription;
             if (assignment.HasRubric)
             {
+                rubricDescription = assignment.Rubric.Description;
                 levels = assignment.Rubric.Levels;
                 foreach (Criterion criterion in assignment.Rubric.Criteria)
                 {
@@ -97,6 +99,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
             else
             {
+                rubricDescription = null;
                 //create empty rubric
                 ViewBag.hasRubric = true;
                 List<string> row = new List<string>();
@@ -107,10 +110,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 levels.Add(new Level());
             }
 
+            ViewBag.rubricDescription = rubricDescription;
             ViewBag.levels = levels;
             ViewBag.ActiveCourse = ActiveCourseUser;
             ViewBag.rubricTable = rubricTable;
-
+            
             return View(assignment);
         }
 
@@ -214,10 +218,13 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 hasCriteriaComments = false;
             }
 
+            string rubricDescription = Request.Params["rubricDescription"];
+
             return CreateRubricModel(rubricTable,
                 levelTitles,
                 hasGlobalComments,
-                hasCriteriaComments);
+                hasCriteriaComments,
+                rubricDescription);
         }
 
         /// <summary>
@@ -238,13 +245,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         private int CreateRubricModel(List<List<string>> rubricTable, 
             List<string> levelTitles,
             bool hasGlobalComments,
-            bool hasCriteriaComments)
+            bool hasCriteriaComments,
+            string rubricDescription)
         {
             Rubric rubric = new Rubric();
 
             rubric.HasGlobalComments = hasGlobalComments;
             rubric.HasCriteriaComments = hasCriteriaComments;
-            rubric.Description = "what is the rubric description";
+            rubric.Description = rubricDescription;
 
             db.Rubrics.Add(rubric);
             db.SaveChanges();
