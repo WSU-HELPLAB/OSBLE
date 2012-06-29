@@ -13,49 +13,74 @@ namespace OSBLE.Areas.AssignmentWizard.ViewModels
     {
         //KEY = Course title
         //VALUE = list of <rubricName, rubricID> pairs
-        public Dictionary<string, List<AssignmentRubricInfo>> rubricSelection;
+        public Dictionary<int, CourseViewModel> rubricSelection;
 
-        
         public RubricSelectionViewModel()
         {
-            rubricSelection = new Dictionary<string, List<AssignmentRubricInfo>>();
+            rubricSelection = new Dictionary<int, CourseViewModel>();
         }
 
-        //return list of the course titles
-        public List<string> Courses()
+        //return list of the course names
+        public List<string> CourseNames()
+        {
+            return rubricSelection.Values.Select(r => r.CourseName).ToList();
+        }
+
+        public List<int> CourseIds()
         {
             return rubricSelection.Keys.ToList();
         }
 
+        public string GetCourseName(int courseId)
+        {
+            return rubricSelection[courseId].CourseName;
+        }
+
         public void AddCourse(Course course)
         {
-            List<AssignmentRubricInfo> ari = new List<AssignmentRubricInfo>();
-            if (course != null)
+            if (course != null && course.Assignments.Where(a => a.HasRubric).Count() > 1)
             {
-                foreach (Assignment assignment in course.Assignments)
-                {
-                    ari.Add(new AssignmentRubricInfo(
-                        assignment.Rubric.Description,
-                        assignment.AssignmentName,
-                        assignment.Rubric.ID
-                        ));
-                }
-                rubricSelection.Add(course.Name, ari);
+                rubricSelection.Add(course.ID, new CourseViewModel(course));
             }
         }
     }
 
-    public class AssignmentRubricInfo
+    public class CourseViewModel
+    {
+        public List<RubricViewModel> rubricViewModel;
+        public string CourseName;
+
+        public CourseViewModel(Course course)
+        {
+            rubricViewModel = new List<RubricViewModel>();
+           
+            foreach (Assignment assignment in course.Assignments)
+            {
+                if (assignment.HasRubric)
+                {
+                    rubricViewModel.Add(new RubricViewModel(
+                        assignment.Rubric.Description,
+                        assignment.AssignmentName,
+                        assignment.ID
+                        ));
+                }
+            }
+
+            CourseName = course.Name;
+        }
+    }
+
+    public class RubricViewModel
     {
         public string RubricDescription { get; set; }
         public string AssignmentName { get; set; }
-        public int RubricID { get; set; }
+        public int AssignmentID { get; set; }
 
-        public AssignmentRubricInfo(string rubricDescription, string assignmentName, int rubricID)
+        public RubricViewModel(string rubricDescription, string assignmentName, int assignmentID)
         {
             RubricDescription = rubricDescription;
             AssignmentName = assignmentName;
-            RubricID = rubricID;
+            AssignmentID = assignmentID;
         }
     }
 }

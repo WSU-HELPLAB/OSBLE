@@ -45,10 +45,20 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public override ActionResult Index()
         {
             base.Index();
+            return LoadRubric(Assignment);
+        }
 
-            //get all courses associated with current user
-            //List<Course> courses = db.Courses.Where(
+        [HttpPost]
+        public ActionResult LoadExistingRubric(int assingmentId)
+        {
+            base.Index();
+            Assignment assignment = db.Assignments.Find(assingmentId);
+            return LoadRubric(assignment);
+        }
 
+        private ActionResult LoadRubric(Assignment assignment)
+        { 
+            
             List<CourseUser> myCourseUsers = (from cu in db.CourseUsers
                                               where cu.UserProfileID == ActiveCourseUser.UserProfileID
                                               select cu).ToList();
@@ -64,26 +74,19 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
 
             ViewBag.rubricSelection = rubricSelectionViewModel;
-
-            return LoadRubric(Assignment);
-        }
-
-
-        private ActionResult LoadRubric(Assignment assignment)
-        {
             List<List<string>> rubricTable = new List<List<string>>();
             IList<Level> levels = new List<Level>();
             if (assignment.HasRubric)
             {
                 levels = assignment.Rubric.Levels;
-                foreach (Criterion criterion in Assignment.Rubric.Criteria)
+                foreach (Criterion criterion in assignment.Rubric.Criteria)
                 {
                     List<string> row = new List<string>();
 
                     row.Add(criterion.CriterionTitle);
                     row.Add(criterion.Weight.ToString());
 
-                    foreach (CellDescription cd in (from cd in Assignment.Rubric.CellDescriptions
+                    foreach (CellDescription cd in (from cd in assignment.Rubric.CellDescriptions
                                                     where cd.CriterionID == criterion.ID
                                                     select cd).ToList())
                     {
@@ -101,19 +104,26 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 row.Add("");
                 row.Add("");
                 rubricTable.Add(row);
+                levels.Add(new Level());
             }
 
             ViewBag.levels = levels;
             ViewBag.ActiveCourse = ActiveCourseUser;
             ViewBag.rubricTable = rubricTable;
 
-            return View(Assignment);
+            return View(assignment);
         }
 
 
         [HttpPost]
         public ActionResult Index(Assignment model)
         {
+            int assId;
+            string aaa = Request.Params["AssignmentOption"];
+            if (Int32.TryParse(Request.Params["AssignmentOption"], out assId))
+            {
+                return LoadExistingRubric(assId);
+            }
             string a = Request.Params["rubric:0:S"];
             
             //reset our assignment

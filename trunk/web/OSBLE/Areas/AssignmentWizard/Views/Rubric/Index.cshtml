@@ -6,8 +6,9 @@
     Html.HiddenFor(m => m.ID);
     bool hasRubric = Model.HasRubric;
     string test;
-    OSBLE.Areas.AssignmentWizard.ViewModels.RubricSelectionViewModel rubricSelection = ViewBag.rubricSelection; 
-}
+    RubricSelectionViewModel rubricSelection = ViewBag.rubricSelection;
+
+    } 
 
 
 <style media="screen" type="text/css">
@@ -46,6 +47,11 @@ td.top
     margin:0;
 }
 
+.RubricSelect
+{
+    display:none;
+}
+
 </style>
 
 <html> <body>
@@ -56,15 +62,28 @@ td.top
     <tr>
         <td>
         <select>
-            @foreach(string course in rubricSelection.Courses())
+            @foreach(int courseId in rubricSelection.CourseIds())
             {
-                    <option class ="CourseSelector">@course</option>
+                    <option id="@courseId" class ="CourseOption">@rubricSelection.GetCourseName(courseId)</option>
             }
         </select>
 
-        <select id="AssignmentSelector">
-        </select>
-         [Rubric Description]
+        @*Create a hidden dropdown of assignment for each course
+        When the user selects a course from the first select, the corresonding
+        one here will become visible*@
+            <form id="set_rubric" method="post" action="/AssignmentWizard/Rubric/LoadExistingRubric">
+                @foreach(int courseId in rubricSelection.CourseIds())
+                {
+                    <select  id="Assignment_@(courseId)" class="RubricSelect">
+                        @foreach (RubricViewModel rvm in rubricSelection.rubricSelection[courseId].rubricViewModel)
+                        {                                                                                                                        
+                            <option class="AssignmentOption" value="@rvm.AssignmentID">@rvm.AssignmentName</option>
+                        }
+                    </select>
+                }
+            </form>
+            
+                [Rubric Description]
           </td>
     </tr>
         <tr>
@@ -176,10 +195,19 @@ td.top
 
 <script type="text/javascript">
 
-    $('.CourseSelector').click(function () {
-        alert("populate selector for assignments");
-
+    $('.CourseOption').click(function () {
+        $('.RubricSelect').hide();
+        $('#Assignment_' + this.id).show();
     });
+
+
+
+    $('.AssignmentOption').click(function () {
+        this.parentNode.name = "AssignmentOption";
+        $('#WizardForm').submit();
+    });
+
+
 
     function addRow(tableID) {
         var table = document.getElementById(tableID);
@@ -268,7 +296,7 @@ td.top
             row.insertBefore(row.prev())
         }
 
-        //swap the names back to keep them in order
+        //swap the names in each cell to preserve order
         row = table.rows[rowIndex];
         row2 = table.rows[rowIndex - 1];
         for (var i = 0; i < table.rows[0].cells.length; i++) {
@@ -286,7 +314,7 @@ td.top
         var row = $(table.rows[rowIndex]);
         row.insertAfter(row.next());
 
-        //swap the names to preserve order
+        //swap the names in each cell to preserve order
         row = table.rows[rowIndex];
         row2 = table.rows[rowIndex + 1];
         for (var i = 0; i < table.rows[0].cells.length; i++) {
