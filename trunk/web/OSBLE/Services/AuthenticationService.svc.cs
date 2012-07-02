@@ -12,6 +12,7 @@ using System.Security.Cryptography;
 using OSBLE.Utility;
 using System.Runtime.Caching;
 using System.Text;
+using System.Web;
 
 namespace OSBLE.Services
 {
@@ -22,11 +23,26 @@ namespace OSBLE.Services
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
     public class AuthenticationService
     {
-        private const double SESSION_TIMEOUT_IN_MINUTES = -15.0;
         private FileCache _cache;
         private OSBLEContext _db = new OSBLEContext();
 
+        private FileCache Cache
+        {
+            get
+            {
+                if (_cache == null)
+                {
+                    SetUpCache();
+                }
+                return _cache;
+            }
+        }
+
         public AuthenticationService()
+        {
+        }
+
+        private void SetUpCache()
         {
             _cache = FileCacheHelper.GetGlobalCacheInstance();
             _cache.DefaultRegion = "AuthenticationService";
@@ -42,7 +58,7 @@ namespace OSBLE.Services
         /// <returns></returns>
         public bool IsValidKey(string authToken)
         {
-            UserProfile profile = _cache[authToken] as UserProfile;
+            UserProfile profile = Cache[authToken] as UserProfile;
             if (profile == null)
             {
                 return false;
@@ -59,7 +75,7 @@ namespace OSBLE.Services
         [OperationContract]
         public UserProfile GetActiveUser(string authToken)
         {
-            UserProfile profile = _cache[authToken] as UserProfile;
+            UserProfile profile = Cache[authToken] as UserProfile;
             if (profile == null)
             {
                 return new UserProfile();
@@ -97,7 +113,7 @@ namespace OSBLE.Services
                     string hashText = BitConverter.ToString(hashBytes);
 
                     //save the hash for validating later calls
-                    _cache[hashText] = profile;
+                    Cache[hashText] = profile;
 
                     //return the hash to the caller
                     return hashText;

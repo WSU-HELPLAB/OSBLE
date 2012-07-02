@@ -125,7 +125,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 string TeamName = Request.Form[key];
                 int courseUserId = 0;
-                if(!Int32.TryParse(key.Split('_')[1], out courseUserId))
+                if (!Int32.TryParse(key.Split('_')[1], out courseUserId))
                 {
                     continue;
                 }
@@ -140,8 +140,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     teams.Add(newTeam);
                 }
                 Team team = teams.Find(t => t.Name.CompareTo(TeamName) == 0);
-                TeamMember tm = new TeamMember() 
-                { 
+                TeamMember tm = new TeamMember()
+                {
                     CourseUserID = courseUserId,
                     Team = team
                 };
@@ -159,10 +159,10 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 {
                     continue;
                 }
-                
+
                 for (int i = 0; i < TeamList.Count(); i++)
                 {
-                    
+
                     //Here, unlike for students, we will only add the moderators to preexisting teams. 
                     if (TeamList[i] != "")
                     {
@@ -199,11 +199,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             foreach (Team team in teams)
             {
                 previousTeams.Add(new AssignmentTeam()
-                { 
-                        Assignment = Assignment, 
-                        AssignmentID = Assignment.ID, 
-                        Team = team,
-                        TeamID = team.ID
+                {
+                    Assignment = Assignment,
+                    AssignmentID = Assignment.ID,
+                    Team = team,
+                    TeamID = team.ID
                 });
             }
         }
@@ -230,6 +230,15 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
             else
             {
+                //clear out old teams.  AC: Not sure why EF isn't handling this automaticaly
+                DiscussionTeam[] oldTeams = Assignment.DiscussionTeams.ToArray();
+                for (int i = 0; i < oldTeams.Length; i++)
+                {
+                    db.Entry(oldTeams[i]).State = System.Data.EntityState.Deleted;
+                }
+                db.SaveChanges();
+                Assignment.DiscussionTeams = new List<DiscussionTeam>();
+                db.SaveChanges();
                 List<IAssignmentTeam> teams = Assignment.DiscussionTeams.Cast<IAssignmentTeam>().ToList();
                 ParseFormValues(teams);
                 IList<IAssignmentTeam> castedTeams = CastTeamAsConcreteType(teams, typeof(DiscussionTeam));
