@@ -219,6 +219,11 @@ namespace OSBLE.Models
                 .WithOptional(a => a.DiscussionSettings)
                 .WillCascadeOnDelete(false);
 
+            modelBuilder.Entity<DiscussionTeam>()
+                .HasRequired(dt => dt.Team)
+                .WithMany()
+                .WillCascadeOnDelete(true);
+
             modelBuilder.Entity<Mail>()
                 .HasRequired(n => n.ToUserProfile)
                 .WithMany()
