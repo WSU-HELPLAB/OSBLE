@@ -8,7 +8,7 @@
     opacity:0.0;
 }
 
-#AvailableModeratorList
+#AvailableModeratorList, #AvailableStudentList
 {
     float:left;
     width:200px;
@@ -17,14 +17,29 @@
     border-right:1px solid #CFCFCF;
 }
 
-#AvailableStudentList
+
+#AvailableStudent li img
 {
-    float:left;
-    width:200px;
-    padding-top:15px;
-    padding-right:15px;
-    border-right:1px solid #CFCFCF;
+    display:none;
 }
+
+#AvailableModerators li img
+{
+    display:none;
+}
+
+.Student img, .Moderator img
+{
+    display:none;
+}
+
+.Student:hover img, .Moderator:hover img
+{
+    display:block;
+}
+
+
+
     
 .NoDecoration
 {

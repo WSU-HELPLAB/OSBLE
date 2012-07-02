@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models.Assignments;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -83,6 +84,25 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
                 //...and then re-add it.
                 Assignment.DiscussionSettings = model;
+
+                //If TAs are allowed to post to all discussion, 
+                //remove them from any discussion teams they may have already been assigned to
+                if (model.TAsCanPostToAll == true)      
+                {
+                    foreach (DiscussionTeam dt in Assignment.DiscussionTeams)
+                    {
+                        List<TeamMember> tmsToRemove = new List<TeamMember>();
+                        foreach (TeamMember tm in dt.Team.TeamMembers.Where(tm => tm.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA))
+                        {
+                            tmsToRemove.Add(tm);
+                        }
+                        foreach (TeamMember tm in tmsToRemove)
+                        {
+                            dt.Team.TeamMembers.Remove(tm);
+                        }
+                    }
+
+                }
                 db.SaveChanges();
                 WasUpdateSuccessful = true;
             }

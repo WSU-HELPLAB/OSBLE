@@ -10,13 +10,15 @@ function documentReady() {
         connectWith: ".TeamSortable",
         forcePlaceholderSize: true,
         receive: teamSortableComplete,
+        start: hideErrors
     }).disableSelection();
 
     //Setting up AvilableStudent (unassigned students) sorting into TeamSortable (teams)
     $("#AvailableStudent").sortable(
     {
         connectWith: ".TeamSortable",
-        forcePlaceholderSize: true
+        forcePlaceholderSize: true,
+        start: hideErrors
     }).disableSelection();
 
     //Setting up Moderators (the list items of Moderators/TAs) as draggable. Note: This property is not carried to the cloned moderators (intentional)
@@ -151,7 +153,7 @@ function createTeam(evt, teamName) {
     }
     $("#TeamsDiv").append(newContent);
     $("#" + listId).sortable({ connectWith: ".TeamSortable", forcePlaceholderSize: true,
-        receive: teamSortableComplete
+        receive: teamSortableComplete, start: hideErrors
     }).disableSelection();
     $("#" + divId).fadeIn('slow');
     teamCounter++;
@@ -274,6 +276,29 @@ function generateTeamsByNumberOfTeams() {
     buildTeams(totalTeams);
 }
 
+//removes the selected item from the review team
+function removeFromTeam(element) {
+    var liElement = $(element).parent();
+    if($(liElement).hasClass('Student'))
+    {
+        $(liElement).slideUp('slow', removeStudentFromTeamComplete);
+        
+    }
+    else
+    {
+        $(liElement).fadeOut('slow', removeModeratorFromTeamComplete);
+    }
+}
+
+function removeStudentFromTeamComplete()
+{
+    $("#AvailableStudent").append($(this));
+    $(this).slideDown('slow');
+}
+function removeModeratorFromTeamComplete() {
+    $(this).remove();
+}
+
 //Adds a student (li element's ID, ex: "cu_1") 
 //to the supplied team list (ul element's ID, ex "team_1_0")
 function addStudentToTeam(studentId, teamId) {
@@ -288,11 +313,14 @@ function removeTeam(teamId) {
     $('#' + teamId).fadeOut('slow', hideTeamComplete);
 }
 
-//Called after removeTeam().  Places any students that were on the removed team
-//back into the pool of available students.
+//Called after removeTeam().  Removes all TA/moderators from the team
+//and places any students that were on the removed team
+//back into the pool of available students. 
 function hideTeamComplete() {
+    
+    jQuery(this).find(".Moderator").remove();
     jQuery(this).find("li").css("display", "none");
     $("#AvailableStudent").append(jQuery(this).find("li"));
-    $("#AvailableStudent").find(':hidden').slideDown('slow');
+    $("#AvailableStudent").find(':hidden').not('img').slideDown('slow');
     $(this).remove();
 }

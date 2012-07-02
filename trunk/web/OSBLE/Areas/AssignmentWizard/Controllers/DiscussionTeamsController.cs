@@ -119,7 +119,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
                 db.Entry(team).State = System.Data.EntityState.Modified;
             }
-
             //get all relevant form keys
             string[] keys = Request.Form.AllKeys.Where(k => k.Contains("student_")).ToArray();
             foreach (string key in keys)
@@ -148,7 +147,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 };
                 team.TeamMembers.Add(tm);
             }
-
             //get all moderator form keys
             string[] modKeys = Request.Form.AllKeys.Where(k => k.Contains("moderator_")).ToArray();
             foreach (string key in modKeys)
@@ -182,7 +180,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 }
 
             }
-
             //Remove any empty teams.  This is a possibility when a team was loaded from
             //the database and then removed using the team creation tool.  Because we
             //retrieved it from the DB and added it to our list of teams, it will exist
@@ -198,7 +195,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     db.Teams.Remove(team);
                 }
             }
-
             //attach the new teams to the assignment
             foreach (Team team in teams)
             {
@@ -219,7 +215,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             Assignment = db.Assignments.Find(model.ID);
 
             //two postback options: 
-            //   Load a prior team configuraiton.  This will be donoted by the presence of the
+            //   Load a prior team configuraiton.  This will be denoted by the presence of the
             //      "AutoGenFromPastButton" key in postback.
             //   Save team configuration.  If we don't have the above key, then we must be
             //      wanting to do that.

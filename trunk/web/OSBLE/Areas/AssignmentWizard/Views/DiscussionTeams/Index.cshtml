@@ -90,7 +90,10 @@ else
     <ul id="AvailableStudent">
         @foreach (CourseUser cu in unassignedUsers)
         {
-            <li id="cu_@(cu.ID)" class="ui-state-default Student" style="list-style-type:none">@cu.UserProfile.LastName, @cu.UserProfile.FirstName</li>
+            string displayName = cu.DisplayName((int)CourseRole.CourseRoles.Instructor);
+            <li id="cu_@(cu.ID)" class="ui-state-default Student" style="list-style-type:none">@displayName
+                <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @displayName" title="remove @displayName" onclick="removeFromTeam(this)" />
+            </li>
         }
     </ul>
     <div id="AvailableModeratorList">
@@ -109,7 +112,9 @@ else
                 displayName = "(M) " + displayName;
             }
             
-            <li data-id="cu_@(cu.ID)" id="cu_@(cu.ID)" class="ui-state-default Moderator">@displayName</li>
+            <li data-id="cu_@(cu.ID)" id="cu_@(cu.ID)" class="ui-state-default Moderator">@displayName
+                <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @displayName" title="remove @displayName" onclick="removeFromTeam(this)" />
+            </li>
         }
     </ul>
 </div>
@@ -142,7 +147,9 @@ else
                         displayName = "(M) " + displayName;
                         roleClass = "Moderator";
                     }
-                    <li id="cu_@(member.CourseUserID)" data-id="cu_@(member.CourseUserID)" class="ui-state-default @roleClass">@displayName</li>
+                    <li id="cu_@(member.CourseUserID)" data-id="cu_@(member.CourseUserID)" class="ui-state-default @roleClass">@displayName
+                        <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @displayName" title="remove @displayName" onclick="removeFromTeam(this)" />
+                    </li>
                 }
             </ul>
         </div>
