@@ -37,7 +37,7 @@ textarea.center
 
 td.top
 {
-    vertical-align:top;
+   vertical-align:top;
 }
 
 ul
@@ -167,12 +167,13 @@ ul
                         <tr>
                             @*Performance Criterion*@
                             <td>
-                                <ul class="ul" style="float:left;">
-                                <li><input type="button" value="^" onclick="moveRowUp('dataTable', this.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
-                                <li><input type="button" value="-" onclick="deleteRow('dataTable', this.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
-                                <li><input type="button" value="v" onclick="moveRowDown('dataTable', this.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                                <ul style="float:left;vertical-align:middle">
+                                    <li><input type="button" value="^" onclick="moveRowUp('dataTable', this.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                                    <li><input type="button" value="-" onclick="deleteRow('dataTable', this.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                                    <li><input type="button" value="v" onclick="moveRowDown('dataTable', this.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
                                 </ul>
-                                <textarea class="Input center" name="rubric:0:@n" rows="5" cols="20">@row[0]</textarea>
+      
+                                <textarea style="float:left"  class="Input center" name="rubric:0:@n" rows="5" cols="20">@row[0]</textarea>
                             </td>
 
                             @*Criterion Weight*@
@@ -243,7 +244,8 @@ ul
             $(newRow.cells[i]).find(".Input").attr("name", spl[0] + ":" + spl[1] + ":" + (parseInt(spl[2]) + 1));
 
             //don't copy the values (inputs) from the old cells
-            $(newRow.cells[i]).find('.Input').attr("value", ""); 
+            $(newRow.cells[i]).find(".Input").attr('value', "");
+            $(newRow.cells[i]).find(".Input").text("");
         }
     }
 
@@ -255,7 +257,12 @@ ul
 
         //loop over each row and append a copy of the last cell in that row to the end
         for (var i = 0; i < rowCount; i++) {
-            var element = document.createElement("th");
+            if (i == 0) {
+                var element = document.createElement("th");
+            }
+            else {
+                var element = document.createElement("td");
+            }
 
             // assign the class from the cells in the previous column to the corresponding
             // cells in the new column
@@ -271,7 +278,8 @@ ul
             $(element).find('.Input').attr("name", spl[0] + ":" + (parseInt(spl[1]) + 1) + ":" + spl[2]);
 
             //don't copy the values (inputs) from the old cells
-            $(element).find('.Input').attr("value", ""); 
+            $(element).find('.Input').attr("value", "");
+            $(element).find('.Input').text("");
 
             //special case to handle level point spread
             if (i == 0) {
@@ -307,102 +315,85 @@ ul
         var table = document.getElementById(tableID);
         var row = $(table.rows[rowIndex]);
 
-        //prevent moving the title row
-        if (rowIndex > 1) {
-            row.insertBefore(row.prev())
-        }
-
+        
         //swap the names in each cell to preserve order
-        row = table.rows[rowIndex];
-        row2 = table.rows[rowIndex - 1];
+        if (rowIndex > 1) {
+            var row2 = table.rows[rowIndex];
+            var row = table.rows[rowIndex - 1];
 
-        for (var i = 0; i < table.rows[0].cells.length; i++) {
-            var name = $(row.cells[i]).find('.Input').attr('name');
-            var name2 = $(row2.cells[i]).find('.Input').attr('name');
-
-            $(row2.cells[i]).find('.Input').attr('name', name);
-            $(row.cells[i]).find('.Input').attr('name', name2);
+            animateSwap(row, row2, table);
         }
     }
 
-    function moveRowDown(tableID, rowIndex, table) {
+    function moveRowDown(tableID, rowIndex) {
         var table = document.getElementById(tableID);
 
-        var row = $(table.rows[rowIndex]);
-        row.insertAfter(row.next());
+        if (rowIndex < table.rows.length - 1) {
+            var row = table.rows[rowIndex];
+            var row2 = table.rows[rowIndex + 1];
 
-        //swap the names in each cell to preserve order
-        row = table.rows[rowIndex];
-        row2 = table.rows[rowIndex + 1];
-
-        animate(row, row2, table);
-
-
+            animateSwap(row, row2, table);
+        }
     }
 
-    //animate the bottom row swapping places with the top row
-    function animate(topRow, bottomRow, table) {
-        //wrap each td in the row in a div
-        $(topRow).find('td').wrapInner('<div  />');
-        $(bottomRow).find('td').wrapInner('<div  />');
+    function animateSwap(topRow, bottomRow, table) {
+        swapped = false;
+        var animationTime = 100000;
+        var i = 0;
+        $.each($(topRow).find('td'), function () {
 
-        var $old = $(topRow);
-        var $new = $old.clone();
+            var oldOffset = $(this).position();
+            var newOffset = $(bottomRow.cells[i]).position();
 
-        var oldOffset = $old.offset();
+            var $tempTop = $(this).clone().appendTo(table);
+            $tempTop
+                .css('position', 'absolute')
+                .css('left', oldOffset.left - 1)
+                .css('top', oldOffset.top)
+                .css('zIndex', 1000)
+                .css('border-style', 'none')
+                .css('vertical-align', 'middle');
+            //.css('padding', $(this).attr('padding'));
 
-        var $temp = $old.clone().appendTo('body');
+            var $tempBottom = $(bottomRow.cells[i]).clone().appendTo(table);
+            $tempBottom
+                .css('position', 'absolute')
+                .css('left', newOffset.left - 1)
+                .css('top', newOffset.top)
+                .css('zIndex', 1001)
+                .css('border-style', 'none')
+                .css('vertical-align', 'middle');
+            //.css('padding', $(this).attr('padding'));
 
-        $temp
-            .css('position', 'absolute')
-            .css('left', oldOffset.left)
-            .css('top', oldOffset.top)
-            .css('zIndex', 1000);
+            $(this).css('visibility', 'hidden');
+            $(bottomRow.cells[i]).css('visibility', 'hidden');
 
-        $new.hide();
-        //$old.hide();
+            $tempBottom.animate({ 'top': oldOffset.top}, animationTime, function () {
+                $tempBottom.remove();
+                $(table).find('td').css('visibility', 'visible');
+            });
 
-        $temp.animate({ 'top': 50 }, 5000, function () {
+            //'top': newOffset.top
+            $tempTop.animate({
+                'top': newOffset.top
+            }, animationTime, function () {
+                $tempTop.remove();
+                //if this is the last td, perform the actual swap
+                if (!swapped) {
+                    $(topRow).insertAfter($(topRow).next());
+                    for (var n = 0; i < table.rows[0].cells.length; n++) {
+                        var name = $(row.cells[n]).find('.Input').attr('name');
+                        var name2 = $(row2.cells[n]).find('.Input').attr('name');
 
-            $temp.remove();
-
-            for (var i = 0; i < table.rows[0].cells.length; i++) {
-                var name = $(row.cells[i]).find('.Input').attr('name');
-                var name2 = $(row2.cells[i]).find('.Input').attr('name');
-
-                $(bottomRow.cells[i]).find('.Input').attr('name', name);
-                $(topRow.cells[i]).find('.Input').attr('name', name2);
-            }
-
+                        $(bottomRow.cells[n]).find('.Input').attr('name', name);
+                        $(topRow.cells[n]).find('.Input').attr('name', name2);
+                    }
+                    swapped = true;
+                }
+            });
+            i++;
         });
-
-        //perform the row swapping animation on each row
-            //'queue: false' to do both at the same time
-        $(topRow).find('td > div')
-        .animate({ height: '0px' }, t);
     }
-
-    // Not currently used:
-//    function moveColumnLeft(tableID, cellIndex) {
-//        var table = document.getElementById(tableID);
-
-//        if (cellIndex > 2) {
-//            for (var i = 0; i < table.rows.length; i++) {
-//                var temp = table.rows[i].cells[cellIndex].innerHTML;
-//                table.rows[i].cells[cellIndex].innerHTML = table.rows[i].cells[cellIndex - 1].innerHTML;
-//                table.rows[i].cells[cellIndex - 1].innerHTML = temp;
-//            }
-//        }
-//    }
-
-//    function moveColumnRight(tableID, cellIndex) {
-
-//        var n = cellIndex + 1;
-//       $('td:nth-child(' + n + '), th:nth-child(' + n + ')').hide();
-//       // var temp = table.rows[i].cells[cellIndex].innerHTML;
-//       // table.rows[i].cells[cellIndex].innerHTML = table.rows[i].cells[cellIndex + 1].innerHTML;
-//       // table.rows[i].cells[cellIndex + 1].innerHTML = temp;
-//    }
 
 </script>
 
