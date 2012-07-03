@@ -90,9 +90,9 @@ else
     <ul id="AvailableStudent">
         @foreach (CourseUser cu in unassignedUsers)
         {
-            string displayName = cu.DisplayName((int)CourseRole.CourseRoles.Instructor);
-            <li id="cu_@(cu.ID)" class="ui-state-default Student" style="list-style-type:none">@displayName
-                <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @displayName" title="remove @displayName" onclick="removeFromTeam(this)" />
+            string studentDisplayName = cu.DisplayName((int)CourseRole.CourseRoles.Instructor);
+            <li id="cu_@(cu.ID)" class="ui-state-default Student" style="list-style-type:none">@studentDisplayName
+                <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @studentDisplayName" title="remove @studentDisplayName" onclick="removeFromTeam(this)" />
             </li>
         }
     </ul>
@@ -102,18 +102,10 @@ else
     <ul id="AvailableModerators" class="ModeratorsDraggable">
         @foreach (CourseUser cu in moderators)
         {
-            string displayName = cu.DisplayName((int)CourseRole.CourseRoles.Instructor);
-            if (cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
-            {
-                displayName = "(TA) " + displayName;
-            }
-            else
-            {
-                displayName = "(M) " + displayName;
-            }
+            string modDisplayName = cu.DisplayNameWithRole((int)CourseRole.CourseRoles.Instructor);
             
-            <li data-id="cu_@(cu.ID)" id="cu_@(cu.ID)" class="ui-state-default Moderator">@displayName
-                <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @displayName" title="remove @displayName" onclick="removeFromTeam(this)" />
+            <li data-id="cu_@(cu.ID)" id="cu_@(cu.ID)" class="ui-state-default Moderator">@modDisplayName
+                <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @modDisplayName" title="remove @modDisplayName" onclick="removeFromTeam(this)" />
             </li>
         }
     </ul>
@@ -125,7 +117,9 @@ else
 <div id="TeamsDiv">
     <h3>Discussion Teams</h3>
 
-    @{int counter = 0;}
+    @{int counter = 0;
+      string displayName = "";
+      string roleClass = "";}
     @foreach (IAssignmentTeam aTeam in teams.OrderBy(t => t.Team.Name))
     {
         counter++;
@@ -135,17 +129,16 @@ else
             <ul id="team_@(counter)_@(@aTeam.TeamID)" class="TeamSortable">
                 @foreach (TeamMember member in aTeam.Team.TeamMembers)
                 {
-                    string displayName = member.CourseUser.DisplayName((int)CourseRole.CourseRoles.Instructor);
-                    string roleClass = "Student";
-                    if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+                    
+                    if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA || member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
                     {
-                        displayName = "(TA) " + displayName;
+                        displayName = "(TA) " + member.CourseUser.DisplayNameWithRole((int)CourseRole.CourseRoles.Instructor);
                         roleClass = "Moderator";
                     }
-                    else if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
+                    else
                     {
-                        displayName = "(M) " + displayName;
-                        roleClass = "Moderator";
+                        displayName = member.CourseUser.DisplayName((int)CourseRole.CourseRoles.Instructor);
+                        roleClass = "Student";
                     }
                     <li id="cu_@(member.CourseUserID)" data-id="cu_@(member.CourseUserID)" class="ui-state-default @roleClass">@displayName
                         <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @displayName" title="remove @displayName" onclick="removeFromTeam(this)" />

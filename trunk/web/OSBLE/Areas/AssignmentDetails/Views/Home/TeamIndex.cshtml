@@ -44,14 +44,14 @@
                 <tr>
                     <th class="StudentName">
                         <lu>
-                            @foreach (TeamMember tm in assignmentTeam.Team.TeamMembers.OrderBy(t => t.CourseUser.DisplayName()).ToList())
+                            @foreach (TeamMember tm in assignmentTeam.Team.TeamMembers.OrderBy(t => t.CourseUser.DisplayName(Model.Client.AbstractRoleID, false)).ToList())
                             {
                                 <li id="ReviewsItems">
                                     @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", courseUserId = tm.CourseUser.ID });
                                       }
                                     <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
                         
-                                    @tm.CourseUser.DisplayNameFirstLast(tm.CourseUser.AbstractRole)
+                                    @tm.CourseUser.DisplayName(Model.Client.AbstractRoleID, false)
                                 </li>
                             }
                         </lu>

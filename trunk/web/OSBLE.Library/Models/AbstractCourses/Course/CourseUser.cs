@@ -97,15 +97,46 @@ namespace OSBLE.Models.Courses
 
 
         /// <summary>
-        /// This is the only function that should be used to display a courseusers name. By default it displays the name as "FirstName LastName" 
+        /// This is the only function that should be used to display a courseusers name (with the exception of those that use this). By default it displays the name as "LastName, FirstName" 
         /// </summary>
         /// <param name="AbstractRoleId">The AbstroleRoleId of the current user who will see this name</param>
-        /// <param name="LastThenFirst">This is an optional boolean parameter that should be sent in as true when you want names displayed in "LastName, FirstName" format.</param>
+        /// <param name="LastThenFirst">This is an optional boolean parameter that should be sent in as true when you want names displayed in "FirstName, LastName" format.</param>
         /// <param name="AssignmentHasAnonymousPosts">This is an optional boolean parameter that should be sent in when DisplayName is used within a specific assignment scenario (to mask users if anonymous settings turned on) Simply pass in <see cref="Assignment.DiscussionSettings.HasAnonymousPosts"/></param>
         /// <returns></returns>
         public string DisplayName(int AbstractRoleId, bool? FirstThenLast = null, bool? AssignmentHasAnonymousPosts = null)
         {
             return UserProfile.DisplayName(AbstractRoleId, FirstThenLast, AssignmentHasAnonymousPosts);
+        }
+
+        /// <summary>
+        /// This function displays the users name as "(RoleAbbreviation) LastName, FirstName" i.e. "(TA) Morgan, John"
+        /// </summary>
+        /// <param name="AbstractRoleId">The AbstroleRoleId of the current user who will see this name</param>
+        /// <param name="LastThenFirst">This is an optional boolean parameter that should be sent in as true when you want names displayed in "FirstName, LastName" format.</param>
+        /// <param name="AssignmentHasAnonymousPosts">This is an optional boolean parameter that should be sent in when DisplayName is used within a specific assignment scenario (to mask users if anonymous settings turned on) Simply pass in <see cref="Assignment.DiscussionSettings.HasAnonymousPosts"/></param>
+        /// <returns></returns>
+        public string DisplayNameWithRole(int AbstractRoleId, bool? FirstThenLast = null, bool? AssignmentHasAnonymousPosts = null)
+        {
+            string roleAbbreviation = "";
+            switch (AbstractRoleID)
+            {
+                case (int)CourseRole.CourseRoles.Instructor:
+                    roleAbbreviation = "I";
+                    break;
+                case (int)CourseRole.CourseRoles.Moderator:
+                    roleAbbreviation = "M";
+                    break;
+                case (int)CourseRole.CourseRoles.Observer:
+                    roleAbbreviation = "O";
+                    break;
+                case (int)CourseRole.CourseRoles.Student:
+                    roleAbbreviation = "S";
+                    break;
+                case (int)CourseRole.CourseRoles.TA:
+                    roleAbbreviation = "TA";
+                    break;
+            }
+            return string.Format("({0}) {1}", roleAbbreviation, UserProfile.DisplayName(AbstractRoleId, FirstThenLast, AssignmentHasAnonymousPosts));
         }
     }
 }

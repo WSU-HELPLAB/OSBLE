@@ -46,13 +46,15 @@
                     </th>
                 </tr>
             }
-
-            foreach (TeamMember member in (assignmentTeam as DiscussionTeam).GetAllTeamMembers().OrderBy(t => t.CourseUser.DisplayName()).ToList())
+            
+            foreach (TeamMember member in (assignmentTeam as DiscussionTeam).GetAllTeamMembers()
+                .OrderBy(t => t.CourseUser.AbstractRoleID, new OSBLE.Models.Courses.CourseRole.CourseRolesInOrder())
+                .ThenBy(t => t.CourseUser.DisplayName((int)CourseRole.CourseRoles.Instructor)))
             {
                 DiscussionTeam singleUserAssignmentTeam = new DiscussionTeam();
                 singleUserAssignmentTeam.Team = new Team();
                 singleUserAssignmentTeam.Team.TeamMembers.Add(member);
-                singleUserAssignmentTeam.Team.Name = member.CourseUser.DisplayName(Model.Client.AbstractRole);
+                singleUserAssignmentTeam.Team.Name = member.CourseUser.DisplayName(Model.Client.AbstractRoleID, false);
                 singleUserAssignmentTeam.TeamID = member.TeamID;
                 singleUserAssignmentTeam.Assignment = assignmentTeam.Assignment;
                 singleUserAssignmentTeam.AssignmentID = assignmentTeam.AssignmentID;
@@ -63,7 +65,14 @@
                         @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", courseUserId = member.CourseUser.ID });
                         }
                         <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
-                        @member.CourseUser.DisplayNameFirstLast(Model.Client.AbstractRole)
+                        @if(member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA || member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
+                        {
+                            @:<text class="TitleText">@member.CourseUser.DisplayNameWithRole(Model.Client.AbstractRoleID, false)</text>
+                        }
+                        else
+                        {
+                            @:<text>@member.CourseUser.DisplayName(Model.Client.AbstractRoleID, false)</text>
+                        }
                     </td>
                     @foreach (string view in Model.TableColumnHeaders.Keys)
                     {

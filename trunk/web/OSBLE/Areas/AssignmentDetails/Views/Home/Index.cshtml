@@ -29,7 +29,7 @@
         bool altRow = false;
 
         var teams = from pair in Model.TeamTableBuilders
-                    orderby pair.Key.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName() ascending
+                    orderby pair.Key.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(Model.Client.AbstractRoleID, false) ascending
                     select pair.Key;
         
         foreach (IAssignmentTeam assignmentTeam in teams)
@@ -46,7 +46,7 @@
                           courseUserId = assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUserID });
                     }
                     <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
-                    @assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayNameFirstLast(assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.AbstractRole)
+                    @assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(Model.Client.AbstractRoleID, false)
                 </th>
                 @foreach (string view in Model.TableColumnHeaders.Keys)
                 {

@@ -168,7 +168,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         //and a team's name changing.
         protected void ParseFormValues()
         {
-            //Extracting all teams from discusison teams
+            //collecting list of TeamMembers from the assignment that are Moderators or TAs
+            List<TeamMember> ModeratorAndTATeamMembers = Assignment.DiscussionTeams.SelectMany(dt => dt.Team.TeamMembers)
+                                                            .Where(tm => (tm.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA) 
+                                                                    || (tm.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)).ToList();
+            foreach(TeamMember tm in ModeratorAndTATeamMembers)
+            {
+                db.TeamMembers.Remove(tm);
+            }
 
             //Setting team names
             string[] teamKeys = Request.Form.AllKeys.Where(k => k.Contains("discussionTeamName_")).ToArray();
@@ -194,8 +201,40 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 currentDt.Team.Name = TeamName;
             }
 
+            //grabbing all hidden moderator keys
+            string[] moderatorKeys = Request.Form.AllKeys.Where(k => k.Contains("moderator_")).ToArray();
+            foreach (string key in moderatorKeys)
+            {
 
+                int courseUserId = 0;
+                if (!Int32.TryParse(key.Split('_')[1], out courseUserId)) 
+                {
+                    //if we fail to get a courseUserId, move on.
+                    continue;
+                }
 
+                string[] discussionTeamIDList = Request.Form[key].Split(',');
+                foreach (string discussionTeamId in discussionTeamIDList)
+                {
+                    int discTeamID = 0;
+                    if (!Int32.TryParse(discussionTeamId, out discTeamID))
+                    {
+                        //Should never get here, but skip in case
+                        continue;
+                    }
+
+                    Team TeamForNewTM = Assignment.DiscussionTeams.Where(dt => dt.ID == discTeamID).Select(dt=>dt.Team).FirstOrDefault();
+
+                    //Can safely add the new TM to the team without fear of duplication because TA/moderators are removed from all teams initially
+                    TeamMember newTM = new TeamMember()
+                    {
+                        Team = TeamForNewTM,
+                        CourseUserID = courseUserId
+                    };
+
+                    TeamForNewTM.TeamMembers.Add(newTM);
+                }
+            }
             db.SaveChanges();
         }
 

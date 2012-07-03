@@ -40,7 +40,7 @@
                 </tr>
             }
 
-            foreach (TeamMember member in assignmentTeam.Team.TeamMembers.OrderBy(t => t.CourseUser.DisplayName()).ToList())
+            foreach (TeamMember member in assignmentTeam.Team.TeamMembers.OrderBy(t => t.CourseUser.DisplayName(Model.Client.AbstractRoleID, false)).ToList())
             {
                 AssignmentTeam singleUserAssignmentTeam = new AssignmentTeam();
                 singleUserAssignmentTeam.Team = new Team();
@@ -54,7 +54,7 @@
                 @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", courseUserId = member.CourseUser.ID });
                 }
                 <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
-                @member.CourseUser.DisplayNameFirstLast(Model.Client.AbstractRole)
+                @member.CourseUser.DisplayName(Model.Client.AbstractRoleID, false)
             </td>
             @foreach (string view in Model.TableColumnHeaders.Keys)
             {

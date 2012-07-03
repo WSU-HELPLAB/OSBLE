@@ -1809,3 +1809,14 @@ tbody #awesome
     display:inline-block;
     padding-right:7px;
 }
+
+.TitleText
+{
+    font-weight:bold;
+    color:#074974;
+}
+
+.OsbleColor
+{
+    color:#074974;
+}
