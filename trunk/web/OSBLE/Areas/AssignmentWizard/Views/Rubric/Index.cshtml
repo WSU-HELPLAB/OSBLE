@@ -30,11 +30,6 @@
 	border-style: inset;
 }
 
-textarea.center
-{
-    vertical-align:middle;
-}
-
 td.top
 {
    vertical-align:top;
@@ -57,6 +52,7 @@ ul
     float:left;
 }
 
+
 </style>
 
 <html> <body>
@@ -65,14 +61,17 @@ ul
 <table>
     <tr>
         <td>
+            @if (rubricSelection.CourseIds().Count > 0)
+            {
             <text>Load Rubric from</text>
             <select class="CourseSelect">
                 <option selected>Select Course</option>
-                @foreach(int courseId in rubricSelection.CourseIds())
+                @foreach (int courseId in rubricSelection.CourseIds())
                 {
                     <option id="@courseId" class ="CourseOption">@rubricSelection.GetCourseName(courseId)</option>
                 }
             </select>
+            }
         </td>
 
         <td>
@@ -85,7 +84,7 @@ ul
                     <select  id="Assignment_@(courseId)" class="RubricSelect">
                         <option>Select Assignment</option>
                         @foreach (RubricViewModel rvm in rubricSelection.rubricSelection[courseId].rubricViewModel)
-                        {                                                                                                                        
+                        {
                             <option class="AssignmentOption" value="@rvm.AssignmentID">@rvm.AssignmentName</option>
                         }
                     </select>
@@ -138,7 +137,7 @@ ul
                                             @*<input type="button" value=">" onclick="moveColumnRight('dataTable', this.parentNode.parentNode.parentNode.cellIndex)" /> *@
                                         </li>
                                         <li>Level Point Spread
-                                        <select class="SpreadInput" name="rubric:@n:S">
+                                            <select class="SpreadInput" name="rubric:@n:S">
                                                 @for (int i = 1; i <= 10; i++)
                                                 {
                                                     if (i == 5)
@@ -150,7 +149,7 @@ ul
                                                         <option value="@i">@i</option>
                                                     }
                                                 }
-                                        </select>
+                                            </select>
                                         </li>
                                         <li>Level Title<input class="Input" name="rubric:@n:L" type="text" value="@level.LevelTitle"/></li>
                                     </ul>
@@ -177,19 +176,18 @@ ul
                             </td>
 
                             @*Criterion Weight*@
-                            <td>
+                            <td style="vertical-align:top">
                                 <input class="Input" type="text" name="rubric:1:@n"  size="1" value="@row[1]"/>
                             </td>
 
-                                
                             @*Level Description*@
-                                @for(int d = 2; d < row.Count; d++)
-                                {
-                                    <td>
-                                        @* Name=X:Y *@
-                                        <textarea class="Input" name="rubric:@d:@n" rows="5" cols="30">@row[d]</textarea>
-                                    </td>
-                                }
+                            @for(int d = 2; d < row.Count; d++)
+                            {
+                                <td>
+                                    @* Name=X:Y *@
+                                    <textarea class="Input" name="rubric:@d:@n" rows="5" cols="30">@row[d]</textarea>
+                                </td>
+                            }
                         </tr>
                         n++;
                     }
@@ -338,7 +336,7 @@ ul
 
     function animateSwap(topRow, bottomRow, table) {
         swapped = false;
-        var animationTime = 100000;
+        var animationTime = 200;
         var i = 0;
         $.each($(topRow).find('td'), function () {
 
@@ -348,27 +346,38 @@ ul
             var $tempTop = $(this).clone().appendTo(table);
             $tempTop
                 .css('position', 'absolute')
-                .css('left', oldOffset.left - 1)
+                .css('left', oldOffset.left)
                 .css('top', oldOffset.top)
                 .css('zIndex', 1000)
                 .css('border-style', 'none')
                 .css('vertical-align', 'middle');
-            //.css('padding', $(this).attr('padding'));
+
+            $tempTop.height($(this).height());
+            //$tempTop.width($(this).width())
+           // alert($tempTop.height());
+            //alert($tempTop.find('.Input').val());
+            $tempTop.find('.Input').css('vertical-align', 'middle');
 
             var $tempBottom = $(bottomRow.cells[i]).clone().appendTo(table);
             $tempBottom
                 .css('position', 'absolute')
-                .css('left', newOffset.left - 1)
+                .css('left', newOffset.left)
                 .css('top', newOffset.top)
                 .css('zIndex', 1001)
                 .css('border-style', 'none')
                 .css('vertical-align', 'middle');
-            //.css('padding', $(this).attr('padding'));
+
+            $tempBottom.height($(bottomRow.cells[i]).height());
+
+            $tempTop.find('textarea').text($(this).find('textarea').val());
+            $tempBottom.find('textarea').text($(bottomRow.cells[i]).find('textarea').val());
 
             $(this).css('visibility', 'hidden');
             $(bottomRow.cells[i]).css('visibility', 'hidden');
 
-            $tempBottom.animate({ 'top': oldOffset.top}, animationTime, function () {
+            $tempBottom.animate({
+                'top': oldOffset.top
+            }, animationTime, function () {
                 $tempBottom.remove();
                 $(table).find('td').css('visibility', 'visible');
             });

@@ -123,12 +123,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public ActionResult Index(Assignment model)
         {
             int assId;
-            string aaa = Request.Params["AssignmentOption"];
+           
             if (Int32.TryParse(Request.Params["AssignmentOption"], out assId))
             {
                 return LoadExistingRubric(assId);
             }
-            string a = Request.Params["rubric:0:S"];
+            
             
             //reset our assignment
             Assignment = db.Assignments.Find(model.ID);
@@ -219,6 +219,10 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
 
             string rubricDescription = Request.Params["rubricDescription"];
+            if (rubricDescription == null || rubricDescription == "")
+            {
+                rubricDescription = "Rubric for " + Assignment.AssignmentName;
+            }
 
             return CreateRubricModel(rubricTable,
                 levelTitles,
