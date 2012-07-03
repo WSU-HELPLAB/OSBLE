@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models.Assignments;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -53,11 +54,34 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
+        public void SetUpModeratorViewBag()
+        {
+            //Grabbing a list of moderators (and potentially TAs) that will be used to
+            //allow instructors to assign to Moderators/TAs to discussion teams
+            if (Assignment.DiscussionSettings != null && Assignment.DiscussionSettings.TAsCanPostToAll)
+            {
+                ViewBag.Moderators = (from cu in db.CourseUsers
+                                      where cu.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator
+                                      && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                                      orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
+                                      select cu).ToList();
+            }
+            else
+            {
+                ViewBag.Moderators = (from cu in db.CourseUsers
+                                      where (cu.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator
+                                      || cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+                                      && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                                      orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
+                                      select cu).ToList();
+            }
+        }
+
         public override ActionResult Index()
         {
             base.Index();
 
-            //Only creating the discussion teams for the assignment if DiscussionTeams does not exist. 
+            //Only creating the discussion teams for the assignment if DiscussionTeams do not exist. 
             if (Assignment.DiscussionTeams == null || Assignment.DiscussionTeams.Count == 0)
             {
 
@@ -134,14 +158,54 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
 
             ViewBag.criticalReviewDiscussionTeams = Assignment.DiscussionTeams;
-
+            SetUpModeratorViewBag();
             return View(Assignment);
+        }
+
+
+        //For Critical Review Discussions, teams are never added. They are all built prior to the view.
+        //Because of this assumption, we only have to watch for Moderators/TAs being added to an existing team
+        //and a team's name changing.
+        protected void ParseFormValues()
+        {
+            //Extracting all teams from discusison teams
+
+            //Setting team names
+            string[] teamKeys = Request.Form.AllKeys.Where(k => k.Contains("discussionTeamName_")).ToArray();
+            foreach (string key in teamKeys)
+            {
+                string TeamName = Request.Form[key];
+                int discTeamID = 0;
+
+                if (!Int32.TryParse(key.Split('_')[1], out discTeamID))
+                {
+                    //Should never get here, but skip in case
+                    continue;
+                }
+
+                DiscussionTeam currentDt = Assignment.DiscussionTeams.Where(dt => dt.ID == discTeamID).FirstOrDefault();
+                if (currentDt == null)
+                {
+                    //Should never get here, but skip in case
+                    continue;
+                }
+
+                //Assigning name
+                currentDt.Team.Name = TeamName;
+            }
+
+
+
+            db.SaveChanges();
         }
 
         [HttpPost]
         public ActionResult Index(Assignment model)
         {
             Assignment = db.Assignments.Find(model.ID);
+
+            ParseFormValues();
+
             return base.PostBack(Assignment);
         }
     }

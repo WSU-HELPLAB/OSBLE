@@ -6,12 +6,13 @@ function documentReady() {
     //set up sortable lists
     $(".TeamSortable").sortable(
             {
-                connectWith: ".StudentListItem",
+                connectWith: ".TeamSortable",
                 forcePlaceholderSize: true,
                 update: dragComplete
             }).disableSelection();
 
-    $(".StudentListItem").draggable(
+    //$(".StudentListItem").draggable(
+    $("#AvailableStudent li").draggable(
     {
         connectToSortable: ".TeamSortable",
         forcePlaceholderSize: true,

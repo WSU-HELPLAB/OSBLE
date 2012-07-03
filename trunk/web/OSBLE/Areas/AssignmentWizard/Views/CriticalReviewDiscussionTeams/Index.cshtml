@@ -1,31 +1,161 @@
 ﻿@using OSBLE.Models.Assignments;
+@using OSBLE.Models.Courses;
 @model Assignment
-@Html.HiddenFor(m => m.ID)
+
+@{
+    Html.HiddenFor(m => m.ID);
+    List<CourseUser> moderators = ViewBag.Moderators;   
+}
 
 @section Header{
     <link href="@Url.Content("~/AssignmentWizard/Content/css/team.css")" type="text/css" rel="Stylesheet" />
     
 }
 
+<script type="text/javascript">
+
+    $(document).ready(documentReady);
+
+    function documentReady() {
+
+        $("#AvailableModerators li").draggable(
+        {
+            connectToSortable: ".TeamSortable",
+            forcePlaceholderSize: true,
+            helper: "clone",
+            start: hideErrors
+        }).disableSelection();
+
+        //Setting up TeamSortables (teams) sorting between each other. Note: Other TeamSortables are created below in createTeam(). Modifications here should also
+        //be upkept in that function
+        $(".TeamSortable").sortable(
+        {
+            connectWith: ".NothingHAHAHAH",
+            forcePlaceholderSize: true,
+            receive: teamSortableComplete,
+            start: hideErrors
+        }).disableSelection();
+        
+
+    }
+
+    function teamSortableComplete(event, ui) {
+        var OrigLIElement = ui.item.context;
+        var myDataId = $(OrigLIElement).attr('data-id');
+        var ULElement = $(this);
+
+        if(typeof myDataId != 'undefined')
+        {
+            var counter = 0;
+            $.each($(this).find('[data-id=\"' + myDataId + '\"]'), function () {
+                counter++;
+                if(counter > 1)
+                {
+                    var parentDiv = $(ULElement).parent().find('.TeamNameTextBox');
+                    var teamName = $(parentDiv).attr("value");
+                    var duplicateMemberName = $(OrigLIElement).attr('text');
+                    alreadyOnTeamError($(this).text(), teamName);
+                    $(this).remove();
+                }
+            });
+        }
+    }
+
+    function hideErrors() {
+        $('#ErrorBox').promise().done(function () {
+            $('#ErrorBox').animate({ opacity: 0.0 }, 60, "easeOutExpo");
+        });
+    }
+
+    //changes the error box text
+    function displayError(text) {
+        $('#ErrorBox').promise().done(function () {
+            $('#ErrorBox').text(text);
+            $('#ErrorBox').animate({ opacity: 1.0 }, 80, "easeOutExpo");
+        });
+    }
+
+    function alreadyOnTeamError(reviewer, reviewItem) {
+        var text = reviewer + " is already reviewing " + reviewItem + ".";
+        displayError(text);
+    }
+
+    //removes the selected item from the review team
+    function removeFromTeam(element) {
+        var liElement = $(element).parent();
+        $(liElement).slideUp('slow', removeModeratorFromTeamComplete);
+
+    }
+
+    function removeModeratorFromTeamComplete() {
+        $(this).remove();
+    }
+
+    //Before we can postback, we need to set up teamNames/moderators
+    function processForm(evt) {
+
+    }
+
+
+
+    //setting processForm event before going to post
+    $("#WizardForm").submit(processForm);
+
+</script>
+
+<div id="AvailableModeratorList">
+    <h3>
+        Moderators/TAs</h3>
+    <ul id="AvailableModerators" class="ModeratorsDraggable">
+        @foreach (CourseUser cu in moderators)
+        {
+            string displayName = cu.DisplayName((int)CourseRole.CourseRoles.Instructor);
+            if (cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+            {
+                displayName = "(TA) " + displayName;
+            }
+            else
+            {
+                displayName = "(M) " + displayName;
+            }
+            
+            <li data-id="cu_@(cu.ID)" id="cu_@(cu.ID)" class="ui-state-default Moderator">@displayName
+                <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @displayName" title="remove @displayName" onclick="removeFromTeam(this)" />
+            </li>
+        }
+    </ul>
+</div>
+
 <div id="TeamsDiv">
+    <div id="ErrorBox">
+        This is the error box</div>
+
     <h3>Teams</h3>
 
     @{int counter = 0;}
     @foreach (DiscussionTeam dt in ViewBag.criticalReviewDiscussionTeams)
     {
         counter++;
-        <div id="teamDiv_@(counter)_@(dt.TeamID)" class="TeamDiv">
-            <input type="text" class="TeamNameTextBox" value="@dt.Team.Name" />
-            <ul id="team_@(counter)_@(@dt.TeamID)" class="TeamSortable">
+        <div class="TeamDiv">
+            <input name="discussionTeamName_@(dt.ID)" type="text" class="TeamNameTextBox" value="@dt.Team.Name" />
+            <ul id="discussionTeam_@(dt.ID)" class="TeamSortable">
                 @foreach (TeamMember member in dt.GetAllTeamMembers())
                 {
-                    <li id="cu_@(member.CourseUserID)" class="ui-state-default Student">@member.CourseUser.UserProfile.LastName, @member.CourseUser.UserProfile.FirstName</li>
+                    string displayName = member.CourseUser.DisplayName((int)CourseRole.CourseRoles.Instructor);
+                    <li id="cu_@(member.CourseUserID)" class="ui-state-default Student">@displayName</li>
                 }
             </ul>
         </div>
                 if (counter % 3 == 0)
                 {
-            <div style="clear:both;"></div>
+                    <div style="clear:both;"></div>
                 }
     }
 </div>
+
+
+<!--hidden inputs for keep track of moderators-->
+@foreach (CourseUser cu in moderators)
+{
+    <input type="hidden" id="moderator_@(cu.ID)" name="moderator_@(cu.ID)" value="" />
+}

@@ -62,10 +62,16 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             List<Assignment> assignments = (from
                                              assignment in db.Assignments
                                             where
-                                             assignment.Category.CourseID == ActiveCourse.AbstractCourseID
+                                             assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID
                                              &&
                                              assignment.ID != Assignment.ID //ignore the current assignment
                                             select assignment).ToList();
+
+            if (Assignment.PrecededingAssignmentID != null)
+            {
+                ViewBag.PrecedingAssignmentID = Assignment.PrecededingAssignmentID;
+            }
+
             ViewBag.PreviousAssignments = assignments;
             return View(Assignment);
         }

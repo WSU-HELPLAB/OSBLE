@@ -32,6 +32,16 @@
 {
     cursor:pointer;
 }
+
+.StudentListItem img
+{
+    display:none;
+}
+
+.StudentListItem:hover img
+{
+    display:block;
+}
     
 #TeamCreationOptions
 {

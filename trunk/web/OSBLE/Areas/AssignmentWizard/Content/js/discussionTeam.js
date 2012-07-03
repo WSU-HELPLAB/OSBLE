@@ -3,6 +3,16 @@
 //Called when the document has finished loading and is safe to make DOM calls
 function documentReady() {
 
+    //Setting up Moderators (the list items of Moderators/TAs) as draggable. Note: This property is not carried to the cloned moderators (intentional)
+    //$(".Moderator").draggable(
+    $("#AvailableModerators li").draggable(
+    {
+        connectToSortable: ".TeamSortable",
+        forcePlaceholderSize: true,
+        helper: "clone",
+        start: hideErrors,
+    }).disableSelection();
+
     //Setting up TeamSortables (teams) sorting between each other. Note: Other TeamSortables are created below in createTeam(). Modifications here should also
     //be upkept in that function
     $(".TeamSortable").sortable(
@@ -21,14 +31,8 @@ function documentReady() {
         start: hideErrors
     }).disableSelection();
 
-    //Setting up Moderators (the list items of Moderators/TAs) as draggable. Note: This property is not carried to the cloned moderators (intentional)
-    $(".Moderator").draggable(
-    {
-        connectToSortable: ".TeamSortable",
-        forcePlaceholderSize: true,
-        helper: "clone",
-        start: hideErrors,
-    }).disableSelection();
+    
+    
     
     //various event listeners
     $("#WizardForm").submit(processForm);
@@ -43,6 +47,7 @@ function teamSortableComplete(event, ui) {
     var OrigLIElement = ui.item.context;
     var myDataId = $(OrigLIElement).attr('data-id');
     var ULElement = $(this);
+
     if(typeof myDataId != 'undefined')
     {
         var counter = 0;
@@ -55,6 +60,8 @@ function teamSortableComplete(event, ui) {
                 var duplicateMemberName = $(OrigLIElement).attr('text');
                 alreadyOnTeamError($(this).text(), teamName);
                 $(this).remove();
+                
+                
             }
         });
     }
@@ -64,7 +71,7 @@ function teamSortableComplete(event, ui) {
 
 function hideErrors() {
     $('#ErrorBox').promise().done(function () {
-        $('#ErrorBox').animate({ opacity: 0.0 }, 600, "easeOutExpo");
+        $('#ErrorBox').animate({ opacity: 0.0 }, 60, "easeOutExpo");
     });
 }
 
@@ -72,7 +79,7 @@ function hideErrors() {
 function displayError(text) {
     $('#ErrorBox').promise().done(function () {
         $('#ErrorBox').text(text);
-        $('#ErrorBox').animate({ opacity: 1.0 }, 800, "easeOutExpo");
+        $('#ErrorBox').animate({ opacity: 1.0 }, 80, "easeOutExpo");
     });
 }
 
@@ -286,7 +293,7 @@ function removeFromTeam(element) {
     }
     else
     {
-        $(liElement).fadeOut('slow', removeModeratorFromTeamComplete);
+        $(liElement).slideUp('slow', removeModeratorFromTeamComplete);
     }
 }
 

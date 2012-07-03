@@ -52,11 +52,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
-        public override ActionResult Index()
+        public void SetUpModeratorViewBag()
         {
-            base.Index();
-            SetUpViewBag(Assignment.DiscussionTeams.Cast<IAssignmentTeam>().ToList());
-
             //Grabbing a list of moderators (and potentially TAs) that will be used to
             //allow instructors to assign to Moderators/TAs to discussion teams
             if (Assignment.DiscussionSettings != null && Assignment.DiscussionSettings.TAsCanPostToAll)
@@ -76,6 +73,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                                       orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
                                       select cu).ToList();
             }
+        }
+
+        public override ActionResult Index()
+        {
+            base.Index();
+            SetUpViewBag(Assignment.DiscussionTeams.Cast<IAssignmentTeam>().ToList());
+            SetUpModeratorViewBag();
+
             return View(Assignment);
         }
 
