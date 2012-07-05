@@ -1,0 +1,27 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;               
+}
+
+<tr>
+<th>Grading Progress:</th>
+<td>
+    @dataModel.GradingProgress.publishedCount of @dataModel.GradingProgress.totalAssignments have been published
+    <br/>
+    @if (dataModel.GradingProgress.draftCount > 0)
+    {
+        //Todo: make this button work
+        @dataModel.GradingProgress.draftCount 
+        if(dataModel.GradingProgress.draftCount == 1)
+        {
+        @:has
+        }
+        else{
+        @:have
+        }
+        @:been saved as draft&nbsp<a style="cursor:pointer" onclick="publishAllGrades(dataModel.GradingProgress.AssignmentID);">[Publish All]</a
+    }
+</td>
+</tr>

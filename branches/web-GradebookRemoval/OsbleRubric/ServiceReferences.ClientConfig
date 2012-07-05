@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <system.serviceModel>
+        <bindings>
+            <basicHttpBinding>
+                <binding name="BasicHttpBinding_UploaderWebService" maxBufferSize="2147483647"
+                    maxReceivedMessageSize="2147483647">
+                    <security mode="None" />
+                </binding>
+                <binding name="BasicHttpBinding_UploaderWebService1" maxBufferSize="2147483647"
+                    maxReceivedMessageSize="2147483647">
+                    <security mode="None" />
+                </binding>
+            </basicHttpBinding>
+            <customBinding>
+                <binding name="CustomBinding_RubricService">
+                    <binaryMessageEncoding />
+                    <httpTransport maxReceivedMessageSize="2147483647" maxBufferSize="2147483647" />
+                </binding>
+            </customBinding>
+        </bindings>
+        <client>
+            <endpoint address="http://localhost:17532/Services/RubricService.svc"
+                binding="customBinding" bindingConfiguration="CustomBinding_RubricService"
+                contract="ServiceReference.OSBLE.Services.RubricService.RubricService"
+                name="CustomBinding_RubricService" />
+            <endpoint address="http://localhost:17532/Services/UploaderWebService.svc"
+                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_UploaderWebService"
+                contract="ServiceReference.OSBLE.Services.UploaderWebService.UploaderWebService"
+                name="BasicHttpBinding_UploaderWebService" />
+            <endpoint address="http://localhost:17532/Services/UploaderWebService.svc"
+                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_UploaderWebService1"
+                contract="ServiceReference.OSBLE.Services.UploaderWebService.UploaderWebService"
+                name="BasicHttpBinding_UploaderWebService1" />
+        </client>
+    </system.serviceModel>
+</configuration>

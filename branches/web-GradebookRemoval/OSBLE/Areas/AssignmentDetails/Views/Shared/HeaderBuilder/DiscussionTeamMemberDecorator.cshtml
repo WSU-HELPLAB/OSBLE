@@ -1,0 +1,85 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Courses
+@using OSBLE.Models.Assignments
+@using OSBLE.Models.Users;
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    List<List<CourseUser>> ListOfListOfMembers = dataModel.DiscussionTeam.ListOfListOfMembers;
+    List<string> ListOfTeamNames = dataModel.DiscussionTeam.ListOfTeamNames;
+    List<int> ListOfTeamIDs = dataModel.DiscussionTeam.ListOfTeamIDs;
+}
+<tr>
+    <!--Team members row-->
+    <th>
+        @if(ListOfListOfMembers.Count > 1)
+        {
+            @:Your Teams
+        }
+        else
+        {
+            @:Your Team
+        }
+    </th>
+    <td>
+
+        <table class="UserList">
+            @*Row 1: Iterate over names, display in first row, each in own cell*@
+            @*Row 2: Iterate over list of lists. For each list create an UL with its team members*@
+                <tr>
+                    @for (int i = 0; i < ListOfTeamNames.Count;i++ )
+                    {
+                        <th style="border:none">@ListOfTeamNames[i]
+                            <a title="Email whole team" href="@Url.Action("CreateDiscussionTeam", "Mail", new { discussionTeamId = ListOfTeamIDs[i], area = "" })">@Helpers.MailButton()</a>
+                        </th>
+                    }
+                </tr>
+                <tr>
+                    @foreach (List<CourseUser> cuList in ListOfListOfMembers)
+                    {
+                        <td style="vertical-align:top;border:none">
+                            @foreach (CourseUser cu in cuList)
+                            {
+                                <li>
+                                    <div class="UserControls">
+                                        <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { courseUserId = cu.ID, area = "" })">@Helpers.MailButton()</a>
+                                    </div>
+                                    @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", "Roster", new { userProfile = cu.UserProfileID, area = "" }))
+                                    <span class="roster_name">@Helpers.DisplayFullNameOrPending(cu)</span>
+                                </li>  
+                            }
+                        </td>
+                    }
+                </tr>
+        </table>
+    </td>
+</tr>
+ @*
+    @for (int i = 0; i < ListOfListOfMembers.Count; i++)
+    {
+
+     
+            <strong>@ListOfTeamNames[i]</strong>
+            <ul class="UserList"> give this class to table perhaps
+            
+            
+                @foreach (CourseUser cu in ListOfListOfMembers[i])
+                {
+                  <li>
+                    <div class="UserControls">
+                        <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { courseUserId = cu.ID, area = "" })">@Helpers.MailButton()</a>
+                    </div>
+                    @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", "Roster", new { userProfile = cu.UserProfileID, area = "" }))
+                    <span class="roster_name">@Helpers.DisplayFullNameOrPending(cu)</span>
+                        </li>  
+                }
+
+                <br />
+                <a title="Email whole team" href="@Url.Action("CreateDiscussionTeam", "Mail", new { discussionTeamId = ListOfTeamIDs[i], area = "" })">
+                    Email the whole team</a>
+            </ul>
+        </li>
+    }
+    </ul>
+        *@
+    
