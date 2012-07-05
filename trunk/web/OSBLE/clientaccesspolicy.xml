@@ -3,7 +3,8 @@
   <cross-domain-access>
     <policy>
       <allow-from http-request-headers="SOAPAction">
-        <domain uri="*"/>
+        <domain uri="http://*" />
+        <domain uri="https://*" />
       </allow-from>
       <grant-to>
         <resource path="/" include-subpaths="true"/>
