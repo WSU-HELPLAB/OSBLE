@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace OSBLE.Models.Assignments
 {
-    public class Score
+    /*public class Score
     {
         [Required]
         [Key]
@@ -102,5 +102,5 @@ namespace OSBLE.Models.Assignments
                 return false;
             }
         }
-    }
+    }*/
 }

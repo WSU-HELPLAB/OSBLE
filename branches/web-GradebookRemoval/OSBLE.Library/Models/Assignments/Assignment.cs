@@ -16,15 +16,11 @@ namespace OSBLE.Models.Assignments
         {
             ReleaseDate = DateTime.Now;
             DueDate = DateTime.Now.AddDays(7.0);
-            ColumnOrder = 0;
             Deliverables = new List<Deliverable>();
             AssignmentTeams = new List<AssignmentTeam>();
             DiscussionTeams = new List<DiscussionTeam>();
             ReviewTeams = new List<ReviewTeam>();
             IsDraft = true;
-            addedPoints = 0;
-            IsWizardAssignment = true;
-            Scores = new List<Score>();
             Type = AssignmentTypes.Basic;
             CriticalReviewPublishDate = null;
         }
@@ -60,17 +56,8 @@ namespace OSBLE.Models.Assignments
         [Display(Name = "Assignment Description")]
         public string AssignmentDescription { get; set; }
 
-        [Required(ErrorMessage = "Please select the category to which this assignment will belong")]
-        [Display(Name = "Assignment Category")]
-        public int CategoryID { get; set; }
-        public virtual Category Category { get; set; }
-
         public int? CourseID { get; set; }
         public virtual Course Course {get; set; }
-
-        [Required(ErrorMessage = "Please specify the total number of points that this assignment will be worth")]
-        [Display(Name = "Total Points Possible")]
-        public int PointsPossible { get; set; }
 
         [Required(ErrorMessage = "Please specify when this assignment should be released")]
         [Display(Name = "Release Date")]
@@ -172,18 +159,6 @@ namespace OSBLE.Models.Assignments
         }
 
         /// <summary>
-        /// Returns true if the assignment has comment categories
-        /// </summary>
-        [NotMapped]
-        public bool HasCommentCategories
-        {
-            get
-            {
-                return CommentCategory != null;
-            }
-        }
-
-        /// <summary>
         /// Returns true if the assignment has one or more deliverables
         /// </summary>
         [NotMapped]
@@ -195,30 +170,12 @@ namespace OSBLE.Models.Assignments
             }
         }
 
-        [Required(ErrorMessage = "Please specify for how long OSBLE should accept late submissions")]
-        [Display(Name = "Late Submission Window")]
-        public int HoursLateWindow { get; set; }
-
-        [Required(ErrorMessage = "Please specify the percent that should be deducted per hour late")]
-        [Display(Name = "Penalty of")]
-        public double DeductionPerUnit { get; set; }
-
-        [Required(ErrorMessage = "Please specify the hours per percent deduction.")]
-        [Display(Name = "hour(s) late")]
-        public double HoursPerDeduction { get; set; }
-
-        [Required]
-        public int ColumnOrder { get; set; }
-
         [Required(ErrorMessage = "Please specify whether or not this assignment is a draft")]
         [Display(Name = "Safe As Draft")]
         public bool IsDraft { get; set; }
 
         public int? RubricID { get; set; }
         public virtual Rubric Rubric { get; set; }
-
-        public int? CommentCategoryID { get; set; }
-        public virtual CommentCategoryConfiguration CommentCategory { get; set; }
 
         public int? PrecededingAssignmentID { get; set; }
 
@@ -237,24 +194,11 @@ namespace OSBLE.Models.Assignments
         [Association("AssignmentReviewTeam_Assignment", "ID", "AssignmentID")]
         public virtual IList<ReviewTeam> ReviewTeams { get; set; }
 
-        [Association("Score_Assignment", "ID", "AssignmentID")]
-        public virtual IList<Score> Scores { get; set; }
-
         [Association("DiscussionSetting_Assignment", "ID", "AssignmentID")]
         public virtual DiscussionSetting DiscussionSettings { get; set; }
 
         [Association("TeamEvaluationSettings_Assignment", "ID", "AssignmentID")]
         public virtual TeamEvaluationSettings TeamEvaluationSettings { get; set; }
-
-        public double addedPoints { get; set; }
-
-        public static IList<AssignmentTypes> AllAssignmentTypes
-        {
-            get
-            {
-                return Enum.GetValues(typeof(AssignmentTypes)).Cast<AssignmentTypes>().ToList();
-            }
-        }
 
         public int? AssociatedEventID { get; set; }
 
@@ -262,10 +206,8 @@ namespace OSBLE.Models.Assignments
         public virtual Event AssociatedEvent { get; set; }
 
         /// <summary>
-        /// used to distinguish wizard created assignments versus gradebook created assignments
+        /// Returns true if an assignment has had its reviewed documents published back to their original author(s)
         /// </summary>
-        public bool IsWizardAssignment { get; set; }
-
         [NotMapped]
         public bool IsCriticalReviewPublished
         {
@@ -274,6 +216,10 @@ namespace OSBLE.Models.Assignments
                 return (CriticalReviewPublishDate != null);
             }
         }
+
+        /// <summary>
+        /// Returns the date of when a critical review assignment had its reviewed documents published back to their original author(s)
+        /// </summary>
         public DateTime? CriticalReviewPublishDate { get; set; }
 
         #endregion
@@ -332,6 +278,14 @@ namespace OSBLE.Models.Assignments
         #endregion
 
         #region static methods
+
+        public static IList<AssignmentTypes> AllAssignmentTypes
+        {
+            get
+            {
+                return Enum.GetValues(typeof(AssignmentTypes)).Cast<AssignmentTypes>().ToList();
+            }
+        }
 
         public static void ToggleDraft(int assignmentId, int posterId)
         {
