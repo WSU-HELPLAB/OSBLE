@@ -28,72 +28,6 @@ namespace OSBLE.Controllers
             bool reverse = false;
             //setting up the sort order for email default is by posted date
             UserProfile cu = db.UserProfiles.Where(u => u.ID == CurrentUser.ID).FirstOrDefault();
-            if (sortBy != null)
-            {
-                if (cu.SortBy == sortBy)
-                {
-                    reverse = true;
-                }
-                cu.SortBy = (int)sortBy;
-                db.SaveChanges();
-            }
-            else
-            {
-                cu.SortBy = (int)UserProfile.sortEmailBy.POSTED;
-                db.SaveChanges();
-            }
-
-            switch ((UserProfile.sortEmailBy)CurrentUser.SortBy)
-            {
-                case UserProfile.sortEmailBy.POSTED:
-                    if (!reverse)
-                    {
-                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && !m.DeleteFromInbox).OrderByDescending(m => m.Posted).ToList();
-                    }
-                    else // reverse
-                    {
-                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && !m.DeleteFromInbox).OrderBy(m => m.Posted).ToList();
-                    }
-                    break;
-                case UserProfile.sortEmailBy.CONTEXT:
-                    if (!reverse)
-                    {
-                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && !m.DeleteFromInbox).OrderBy(m => m.Context.Name).ToList();
-                    }
-                    else // reverse
-                    {
-                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && !m.DeleteFromInbox).OrderByDescending(m => m.Context.Name).ToList();
-                    }
-                    break;
-                case UserProfile.sortEmailBy.FROM:
-                    if (!reverse)
-                    {
-                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && !m.DeleteFromInbox).OrderBy(m => m.FromUserProfile.FirstName).ToList();
-                    }
-                    else // reverse
-                    {
-                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && !m.DeleteFromInbox).OrderByDescending(m => m.FromUserProfile.FirstName).ToList();
-                    }
-                    break;
-                case UserProfile.sortEmailBy.SUBJECT:
-                    if (!reverse)
-                    {
-                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && !m.DeleteFromInbox).OrderBy(m => m.Subject).ToList();
-                    }
-                    else // reverse
-                    {
-                        mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && !m.DeleteFromInbox).OrderByDescending(m => m.Subject).ToList();
-                    }
-                    break;
-                default:
-                    break;
-            }
-            // hackish way to handle the second reverse  couldn't think of a better way to do it. (KD) might look into it later.
-            if (reverse)
-            {
-                cu.SortBy = -1;
-                db.SaveChanges();
-            }
             return View(mails.ToList());
         }
 
@@ -108,72 +42,7 @@ namespace OSBLE.Controllers
             bool reverse = false;
             //setting up the sort order for email default is by posted date
             UserProfile cu = db.UserProfiles.Where(u => u.ID == CurrentUser.ID).FirstOrDefault();
-            if (sortBy != null)
-            {
-                if (cu.SortBy == sortBy)
-                {
-                    reverse = true;
-                }
-                cu.SortBy = (int)sortBy;
-                db.SaveChanges();
-            }
-            else
-            {
-                cu.SortBy = (int)UserProfile.sortEmailBy.POSTED;
-                db.SaveChanges();
-            }
-
-            switch ((UserProfile.sortEmailBy)CurrentUser.SortBy)
-            {
-                case UserProfile.sortEmailBy.POSTED:
-                    if (!reverse)
-                    {
-                        mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderByDescending(m => m.Posted).ToList();
-                    }
-                    else // reverse
-                    {
-                        mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderBy(m => m.Posted).ToList();
-                    }
-                    break;
-                case UserProfile.sortEmailBy.CONTEXT:
-                    if (!reverse)
-                    {
-                        mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderBy(m => m.Context.Name).ToList();
-                    }
-                    else // reverse
-                    {
-                        mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderByDescending(m => m.Context.Name).ToList();
-                    }
-                    break;
-                case UserProfile.sortEmailBy.FROM:
-                    if (!reverse)
-                    {
-                        mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderBy(m => m.FromUserProfile.FirstName).ToList();
-                    }
-                    else // reverse
-                    {
-                        mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderByDescending(m => m.FromUserProfile.FirstName).ToList();
-                    }
-                    break;
-                case UserProfile.sortEmailBy.SUBJECT:
-                    if (!reverse)
-                    {
-                        mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderBy(m => m.Subject).ToList();
-                    }
-                    else // reverse
-                    {
-                        mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderByDescending(m => m.Subject).ToList();
-                    }
-                    break;
-                default:
-                    break;
-            }
-            // hackish way to handle the second reverse  couldn't think of a better way to do it. (KD) might look into it later.
-            if (reverse)
-            {
-                cu.SortBy = -1;
-                db.SaveChanges();
-            }
+            
             return View("Index", mails.ToList());
         }
 

@@ -74,9 +74,6 @@ namespace OSBLE.Models.Users
             SUBJECT = 3
         }
 
-        [DataMember]
-        public int SortBy { get; set; }
-
         public UserProfile()
             : base()
         {
@@ -109,7 +106,6 @@ namespace OSBLE.Models.Users
             this.School = up.School;
             this.SchoolID = up.SchoolID;
             this.UserName = up.UserName;
-            this.SortBy = up.SortBy;
         }
 
         public override string ToString()
