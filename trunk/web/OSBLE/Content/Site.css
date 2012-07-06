@@ -1820,3 +1820,27 @@ tbody #awesome
 {
     color:#074974;
 }
+
+.MailMenu
+{
+    padding-right: 10px;
+}
+
+.MailMenu button, .MailMenu input
+{
+    width:100px;
+    border-style:groove;
+    cursor: pointer;
+}
+
+.MailMenu .buttonAnchor
+{
+    text-decoration: none;
+}
+
+.MailInput
+{
+    width:100px;
+    border-style:groove;
+    cursor: pointer;
+}

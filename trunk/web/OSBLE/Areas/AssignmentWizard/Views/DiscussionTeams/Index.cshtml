@@ -132,7 +132,7 @@ else
                     
                     if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA || member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
                     {
-                        displayName = "(TA) " + member.CourseUser.DisplayNameWithRole((int)CourseRole.CourseRoles.Instructor);
+                        displayName = member.CourseUser.DisplayNameWithRole((int)CourseRole.CourseRoles.Instructor);
                         roleClass = "Moderator";
                     }
                     else

@@ -164,8 +164,7 @@ namespace OSBLE.Controllers
                                     }
                                     else
                                     {
-                                        bool HasAnonPosting = (assignment.DiscussionSettings != null && assignment.DiscussionSettings.HasAnonymousPosts);
-                                        folderName = currentTeam.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ActiveCourseUser.AbstractRoleID, true, HasAnonPosting);
+                                        folderName = currentTeam.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ActiveCourseUser.AbstractRoleID);
                                     }
 
                                     zipfile.AddDirectory(submissionDirectory.FullName, folderName);

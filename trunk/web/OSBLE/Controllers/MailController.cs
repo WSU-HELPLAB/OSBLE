@@ -19,36 +19,92 @@ namespace OSBLE.Controllers
             ViewBag.Cache = Cache;
         }
 
-        //
-        // GET: /Mail/
-        public ViewResult Index(int? sortBy)
+        public enum MailSort
         {
-            ViewBag.BoxHeader = "Inbox";
-            List<Mail> mails = new List<Mail>();
-            bool reverse = false;
-            //setting up the sort order for email default is by posted date
-            UserProfile cu = db.UserProfiles.Where(u => u.ID == CurrentUser.ID).FirstOrDefault();
-            return View(mails.ToList());
+            LatestDate = 1, 
+            EarliestDate,
+            Context,
+            ReverseContext,
+            From,
+            ReverseFrom,
+            Subject,
+            ReverseSubject
         }
 
-        public ViewResult Outbox(int? sortBy)
+        public ViewResult Index(MailSort sortBy = MailSort.LatestDate)
         {
-            //ViewBag.BoxHeader = "Outbox";
-            //var mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && !m.DeleteFromOutbox).OrderByDescending(m => m.Posted);
-            //return View("Index", mails.ToList());
+            ViewBag.BoxHeader = "Inbox";   
+            List<Mail> mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && m.DeleteFromInbox == false).ToList();
+            OrderMailAndSetViewBag(sortBy, ref mails);
+            return View(mails);
+        }
 
+        public ViewResult Outbox(MailSort sortBy = MailSort.LatestDate)
+        {
             ViewBag.BoxHeader = "Outbox";
-            List<Mail> mails = new List<Mail>();
-            bool reverse = false;
-            //setting up the sort order for email default is by posted date
-            UserProfile cu = db.UserProfiles.Where(u => u.ID == CurrentUser.ID).FirstOrDefault();
-            
-            return View("Index", mails.ToList());
+            List<Mail> mails = db.Mails.Where(m => m.FromUserProfileID == CurrentUser.ID && m.DeleteFromOutbox == false).ToList();
+            OrderMailAndSetViewBag(sortBy, ref mails);
+            return View("Index", mails);
         }
 
-        //
-        // GET: /Mail/Details/5
+        /// <summary>
+        /// This function will take a list of mails, order them by the appropriate <see cref="MailSort"/>. Additionally, it will set up the viewbags
+        /// needed for the index view, based on the sortby parameter.
+        /// </summary>
+        /// <param name="sortBy">A MailSort that determines how the mail will be sorted</param>
+        /// <param name="mails">A reference list in which to sort by sortBy</param>
+        /// <returns></returns>
+        private List<Mail> OrderMailAndSetViewBag(MailSort sortBy, ref List<Mail> mails)
+        {
+            ViewBag.DateSortByValue = MailSort.LatestDate;
+            ViewBag.ContextSortByValue = MailSort.Context;
+            ViewBag.FromSortByValue = MailSort.From;
+            ViewBag.SubjectSortByValue = MailSort.Subject;
 
+            if (sortBy == MailSort.LatestDate)
+            {
+                mails = mails.OrderByDescending(m => m.Posted).ToList();
+                ViewBag.DateSortByValue = MailSort.EarliestDate;
+            }
+            else if (sortBy == MailSort.EarliestDate)
+            {
+                mails = mails.OrderBy(m => m.Posted).ToList();
+            }
+            else if (sortBy == MailSort.Context)
+            {
+                mails = mails.OrderBy(m => m.Context).ToList();
+                ViewBag.ContextSortByValue = MailSort.ReverseContext;
+            }
+            else if (sortBy == MailSort.ReverseContext)
+            {
+                mails = mails.OrderByDescending(m => m.Context).ToList();
+            }
+            else if (sortBy == MailSort.From)
+            {
+                mails = mails.OrderBy(m => m.FromUserProfile.FirstName).ThenBy(m => m.FromUserProfile.LastName).ToList();
+                ViewBag.FromSortByValue = MailSort.ReverseFrom;
+            }
+            else if (sortBy == MailSort.ReverseFrom)
+            {
+                mails = mails.OrderByDescending(m => m.FromUserProfile.FirstName).ThenBy(m => m.FromUserProfile.LastName).ToList();
+            }
+            else if (sortBy == MailSort.Subject)
+            {
+                mails = mails.OrderBy(m => m.Subject).ToList();
+                ViewBag.SubjectSortByValue = MailSort.ReverseSubject;
+            }
+            else if (sortBy == MailSort.ReverseSubject)
+            {
+                mails = mails.OrderByDescending(m => m.Subject).ToList();
+            }
+            return mails;
+        }
+        
+        /// <summary>
+        /// View for a specific mail item. 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public ActionResult View(int id)
         {
             Mail mail = db.Mails.Find(id);
@@ -91,43 +147,34 @@ namespace OSBLE.Controllers
 
             var next = id;
             var prev = id;
-
+            List<Mail> mailItems = null;
             if (mail.ToUserProfileID == CurrentUser.ID)
             {
-                var inboxMail = (from m in db.Mails
+                mailItems = (from m in db.Mails
                                  where m.ToUserProfileID == CurrentUser.ID &&
                                  !m.DeleteFromInbox 
                                  orderby m.ID ascending
                                  select m).ToList();
-
-
-                //MG&KD:Loops through the mail (that is sorted ascending). Continues to set and replace "prev" while the ID is lower than the current mails ID
-                //Eventually if there is an ID that is higher than the current, it will be the set to "next" and break. Setting both prev and next if there are valid values.
-                foreach (Mail m in inboxMail)
-                {
-                    if (m.ID < id)
-                    {
-                        prev = m.ID;
-                    }
-                    if (m.ID > id)
-                    {
-                        next = m.ID;
-                        break;
-                    }
-                }
             }
             else if (mail.FromUserProfileID == CurrentUser.ID)
             {
-                var outboxMail = (from m in db.Mails
+                mailItems = (from m in db.Mails
                                  where m.FromUserProfileID == CurrentUser.ID &&
                                  !m.DeleteFromOutbox
                                  orderby m.ID ascending
                                  select m).ToList();
+            }
+            else //Mail is not to or from them, should not be viewing it!
+            {
+                return RedirectToAction("Index");
+            }
 
 
-                //MG&KD:Loops through the mail (that is sorted ascending). Continues to set and replace "prev" while the ID is lower than the current mails ID
-                //Eventually if there is an ID that is higher than the current, it will be the set to "next" and break. Setting both prev and next if there are valid values.
-                foreach (Mail m in outboxMail)
+            //MG&KD:Loops through the mail (that is sorted ascending). Continues to set and replace "prev" while the ID is lower than the current mails ID
+            //Eventually if there is an ID that is higher than the current, it will be the set to "next" and break. Setting both prev and next if there are valid values.
+            if (mailItems != null)
+            {
+                foreach (Mail m in mailItems)
                 {
                     if (m.ID < id)
                     {
@@ -139,10 +186,6 @@ namespace OSBLE.Controllers
                         break;
                     }
                 }
-            }
-            else //Mail is not to or from them, should not be viewing it!
-            {
-                return RedirectToAction("Index");
             }
 
             ViewBag.Next = next;
@@ -317,8 +360,6 @@ namespace OSBLE.Controllers
 
         public ActionResult CreateTeam(int teamID)
         {
-            ViewBag.MailHeader = "New Team Message";
-
             List<UserProfile> recipientList = new List<UserProfile>();
 
             Team team = db.Teams.Find(teamID);
@@ -336,7 +377,6 @@ namespace OSBLE.Controllers
 
         public ActionResult CreateDiscussionTeam(int discussionTeamId)
         {
-            ViewBag.MailHeader = "New Message";
             List<UserProfile> recipientList = new List<UserProfile>();
 
             DiscussionTeam discussionTeam = db.DiscussionTeams.Find(discussionTeamId);
@@ -357,7 +397,6 @@ namespace OSBLE.Controllers
             int replyto;
             Mail mail = new Mail();
             List<UserProfile> recipientList = new List<UserProfile>();
-            string mailHeader = "";
             if (Int32.TryParse(Request.Params["replyAll"], out replyto) == true)
             {
                 if ((mail = db.Mails.Find(replyto)) != null)
@@ -370,7 +409,7 @@ namespace OSBLE.Controllers
                     {
                         recipientList.Add(mail.FromUserProfile); //Adds the sender to the reply list
                     }
-                    mailHeader = mail.Subject = "RE: " + mail.Subject;
+                    mail.Subject = "RE: " + mail.Subject;
                     // Prefix each line with a '> '
                     mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
                                     mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
@@ -380,8 +419,7 @@ namespace OSBLE.Controllers
             }
 
             setUpMailViewBags(recipientList);
-            ViewBag.MailHeader = mailHeader;
-            return View("Create", new Mail());
+            return View("Create", mail);
         }
 
 
@@ -390,13 +428,12 @@ namespace OSBLE.Controllers
             int replyto;
             List<UserProfile> recipientList = new List<UserProfile>();
             Mail mail = new Mail();
-            string mailHeader = "";
             if (Int32.TryParse(Request.Params["replyTo"], out replyto) == true)
             {
                 if ((mail = db.Mails.Find(replyto)) != null)
                 {
                     recipientList.Add(mail.FromUserProfile); //Adds the sender to the reply list
-                    mailHeader = mail.Subject = "RE: " + mail.Subject;
+                    mail.Subject = "RE: " + mail.Subject;
                     // Prefix each line with a '> '
                     mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
                                     mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
@@ -406,21 +443,19 @@ namespace OSBLE.Controllers
             }
 
             setUpMailViewBags(recipientList);
-            ViewBag.MailHeader = mailHeader;
-            return View("Create", new Mail());
+            return View("Create", mail);
         }
 
         public ActionResult CreateForward()
         {
             int forwardto;
             Mail mail = new Mail();
-            string maiHeader = "";
             List<UserProfile> recipientList = new List<UserProfile>();
             if (Int32.TryParse(Request.Params["forwardTo"], out forwardto) == true)
             {
                 if ((mail = db.Mails.Find(forwardto)) != null)
                 {
-                    maiHeader = mail.Subject = "FW: " + mail.Subject;
+                    mail.Subject = "FW: " + mail.Subject;
                     // Prefix each line with a '> '
                     mail.Message = "\n\nOriginal Message \nFrom: " + mail.FromUserProfile.FirstName + " " +
                                     mail.FromUserProfile.LastName + "\nSent at: " + mail.Posted.ToString() + "\n\n" +
@@ -430,8 +465,7 @@ namespace OSBLE.Controllers
             }
 
             setUpMailViewBags();
-            ViewBag.MailHeader = maiHeader;
-            return View("Create", new Mail());
+            return View("Create", mail);
         }
 
         protected override void Dispose(bool disposing)
@@ -513,110 +547,71 @@ namespace OSBLE.Controllers
                 return new FileStreamResult(FileSystem.GetDefaultProfilePicture(), "image/jpeg");
             }
         }
-        [HttpPost]
-        public ActionResult DeleteFromInbox(int id)
-        {
-            Mail mail = db.Mails.Find(id);
 
-            if (mail.ToUserProfile.ID == CurrentUser.ID)
+        /// <summary>
+        /// This is the delete used for the inbox/outbox form.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult Delete()
+        {
+            bool fromOutbox = Request.UrlReferrer.ToString().Contains("Outbox");
+            string[] keys = Request.Params.AllKeys.Where(s => s.Contains("mailItem_")).ToArray();
+            List<int> mailIdsToDelete = new List<int>();
+            string value = "";
+            int mailId = 0;
+            foreach (string key in keys)
             {
-                if (mail.DeleteFromOutbox == true)
+                value= Request.Params[key];
+                if (value == "on") //Checkbox was checked...delete item
                 {
-                    db.Mails.Remove(mail);
-                    db.SaveChanges();
+                    if (int.TryParse(key.Split('_')[1], out mailId) == false) //couldnt get an id, bad apple - continue.
+                    {
+                        continue;
+                    }
+                    Mail mailToDelete = db.Mails.Find(mailId);
+                    DeleteMail(mailToDelete, fromOutbox);
                 }
-                else
-                {
-                    mail.DeleteFromInbox = true;
-                    db.SaveChanges();
-                }
+            }
+            return Redirect(Request.UrlReferrer.ToString());
+        }
+
+        public ActionResult DeleteSingle(Mail mail)
+        {
+            mail = db.Mails.Find(mail.ID);
+            bool fromOutbox = (Request.Params["deleteFrom"] == "outbox");
+            DeleteMail(mail, fromOutbox);
+            if (fromOutbox)
+            {
+                return RedirectToAction("Outbox");
             }
             else
             {
-                Response.StatusCode = 403;
-                return View("_AjaxEmpty");
+                return RedirectToAction("Index");
             }
-
-            return RedirectToAction("Index");
         }
 
-        [HttpPost]
-        public ActionResult DeleteFromOutbox(int id)
+        /// <summary>
+        /// This function handles the "deleting" of mail. Which mostly consists of switching booleans
+        /// </summary>
+        /// <param name="mail"></param>
+        /// <param name="fromOutbox"></param>
+        public void DeleteMail(Mail mail, bool fromOutbox)
         {
-            Mail mail = db.Mails.Find(id);
-
-            if (mail.FromUserProfile.ID == CurrentUser.ID)
+            if (fromOutbox)
             {
-                if (mail.DeleteFromInbox == true)
-                {
-                    db.Mails.Remove(mail);
-                    db.SaveChanges();
-                }
-                else
-                {
-                    mail.DeleteFromOutbox = true;
-                    db.SaveChanges();
-                }
+                mail.DeleteFromOutbox = true;
             }
             else
             {
-                Response.StatusCode = 403;
-                return View("_AjaxEmpty");
+                mail.DeleteFromInbox = true;
             }
-
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        public ActionResult DeleteSelectedInbox(string deleteIds)
-        {
-            string[] idsToDelete = deleteIds.Split(',');
-            foreach (string s in idsToDelete)
+            
+            if (mail.DeleteFromInbox == true && mail.DeleteFromOutbox == true)
             {
-                Mail m = db.Mails.Find(Convert.ToInt32(s));
-                if (m != null)
-                {
-                    if (m.ToUserProfileID == CurrentUser.ID)
-                    {
-                        if (m.DeleteFromOutbox == true)
-                        {
-                            db.Mails.Remove(m);
-                        }
-                        else
-                        {
-                            m.DeleteFromInbox = true;
-                        }
-                        db.SaveChanges();
-                    }
-                }
+                db.Mails.Remove(mail);
             }
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        public ActionResult DeleteSelectedOutbox(string deleteIds)
-        {
-            string[] idsToDelete = deleteIds.Split(',');
-            foreach (string s in idsToDelete)
-            {
-                Mail m = db.Mails.Find(Convert.ToInt32(s));
-                if (m != null)
-                {
-                    if (m.FromUserProfileID == CurrentUser.ID)
-                    {
-                        if (m.DeleteFromInbox == true)
-                        {
-                            db.Mails.Remove(m);
-                        }
-                        else
-                        {
-                            m.DeleteFromOutbox = true;
-                        }
-                        db.SaveChanges();
-                    }
-                }
-            }
-            return RedirectToAction("Outbox");
+            db.SaveChanges();
         }
     }
 }

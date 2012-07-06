@@ -96,6 +96,8 @@ namespace OSBLE.Models.Courses
         }
 
 
+
+
         /// <summary>
         /// This is the only function that should be used to display a courseusers name (with the exception of those that use this). By default it displays the name as "LastName, FirstName" 
         /// </summary>
@@ -103,9 +105,19 @@ namespace OSBLE.Models.Courses
         /// <param name="LastThenFirst">This is an optional boolean parameter that should be sent in as true when you want names displayed in "FirstName, LastName" format.</param>
         /// <param name="AssignmentHasAnonymousPosts">This is an optional boolean parameter that should be sent in when DisplayName is used within a specific assignment scenario (to mask users if anonymous settings turned on) Simply pass in <see cref="Assignment.DiscussionSettings.HasAnonymousPosts"/></param>
         /// <returns></returns>
-        public string DisplayName(int AbstractRoleId, bool? FirstThenLast = null, bool? AssignmentHasAnonymousPosts = null)
+        public string DisplayName(int AbstractRoleId, bool? FirstThenLast = false)
         {
-            return UserProfile.DisplayName(AbstractRoleId, FirstThenLast, AssignmentHasAnonymousPosts);
+            return UserProfile.DisplayName(AbstractRoleId, FirstThenLast, false);
+        }
+
+        public string DisplayName(int AbstractRoleId, DiscussionSetting discussionSetting, bool? FirstThenLast = false)
+        {
+            bool anonName = false;
+            if (discussionSetting != null && discussionSetting.HasAnonymousPosts)
+            {
+                anonName = true;
+            }
+            return UserProfile.DisplayName(AbstractRoleId, FirstThenLast, anonName);
         }
 
         /// <summary>
@@ -115,7 +127,7 @@ namespace OSBLE.Models.Courses
         /// <param name="LastThenFirst">This is an optional boolean parameter that should be sent in as true when you want names displayed in "FirstName, LastName" format.</param>
         /// <param name="AssignmentHasAnonymousPosts">This is an optional boolean parameter that should be sent in when DisplayName is used within a specific assignment scenario (to mask users if anonymous settings turned on) Simply pass in <see cref="Assignment.DiscussionSettings.HasAnonymousPosts"/></param>
         /// <returns></returns>
-        public string DisplayNameWithRole(int AbstractRoleId, bool? FirstThenLast = null, bool? AssignmentHasAnonymousPosts = null)
+        public string DisplayNameWithRole(int AbstractRoleId, bool? FirstThenLast = false)
         {
             string roleAbbreviation = "";
             switch (AbstractRoleID)
@@ -136,7 +148,46 @@ namespace OSBLE.Models.Courses
                     roleAbbreviation = "TA";
                     break;
             }
-            return string.Format("({0}) {1}", roleAbbreviation, UserProfile.DisplayName(AbstractRoleId, FirstThenLast, AssignmentHasAnonymousPosts));
+            return string.Format("({0}) {1}", roleAbbreviation, UserProfile.DisplayName(AbstractRoleId, FirstThenLast, false));
+        }
+
+
+        public string DisplayNameWithRole(int AbstractRoleId, DiscussionSetting discussionSetting, bool? FirstThenLast = null)
+        {
+            string returnValue = "";
+            bool anonName = false;
+            if (discussionSetting != null && discussionSetting.HasAnonymousPosts)
+            {
+                anonName = true;
+            }
+            if (discussionSetting != null && discussionSetting.HasAnonymousRoles)
+            {
+                returnValue = UserProfile.DisplayName(AbstractRoleId, FirstThenLast, anonName);
+            }
+            else
+            {
+                string roleAbbreviation = "";
+                switch (AbstractRoleID)
+                {
+                    case (int)CourseRole.CourseRoles.Instructor:
+                        roleAbbreviation = "I";
+                        break;
+                    case (int)CourseRole.CourseRoles.Moderator:
+                        roleAbbreviation = "M";
+                        break;
+                    case (int)CourseRole.CourseRoles.Observer:
+                        roleAbbreviation = "O";
+                        break;
+                    case (int)CourseRole.CourseRoles.Student:
+                        roleAbbreviation = "S";
+                        break;
+                    case (int)CourseRole.CourseRoles.TA:
+                        roleAbbreviation = "TA";
+                        break;
+                }
+                returnValue = string.Format("({0}) {1}", roleAbbreviation, UserProfile.DisplayName(AbstractRoleId, FirstThenLast, anonName));
+            }
+            return returnValue;
         }
     }
 }

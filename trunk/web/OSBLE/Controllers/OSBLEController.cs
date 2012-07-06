@@ -345,7 +345,7 @@ namespace OSBLE.Controllers
 
         public void SetUnreadMessageCount()
         {
-            ViewBag.UnreadMessageCount = (int)db.Mails.Where(m => (m.ToUserProfileID == CurrentUser.ID) && (m.Read == false)).Count();
+            ViewBag.UnreadMessageCount = (int)db.Mails.Where(m => (m.ToUserProfileID == CurrentUser.ID) && (m.Read == false) && (m.DeleteFromInbox == false)).Count();
         }
 
         public static List<UserProfile> GetAllUsers(AssignmentTeam team)
