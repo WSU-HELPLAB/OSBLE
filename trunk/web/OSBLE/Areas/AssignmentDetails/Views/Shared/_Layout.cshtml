@@ -49,17 +49,16 @@
                     <select id="changeAssignment">
                         @foreach (Assignment assignment in assignmentList)
                         {
-                            if (!assignment.IsDraft)
+                            
+                            @*generating select box*@
+                            string optionText = "<option value=\"{0}\"{1}>{2}</option>";
+                            string selectValue = "";
+                            if (Model.CurrentAssignment.ID == assignment.ID)
                             {
-                                @*generating select box*@
-                                string optionText = "<option value=\"{0}\"{1}>{2}</option>";
-                                string selectValue = "";
-                                if (Model.CurrentAssignment.ID == assignment.ID)
-                                {
-                                    selectValue = "selected=\"selected\"";
-                                }
-                                @Html.Raw(String.Format(optionText, assignment.ID, selectValue, assignment.AssignmentName));
+                                selectValue = "selected=\"selected\"";
                             }
+                            @Html.Raw(String.Format(optionText, assignment.ID, selectValue, assignment.AssignmentName));
+                            
                         }
                     </select>
                 </td>

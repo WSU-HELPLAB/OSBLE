@@ -17,6 +17,12 @@
     border-right:1px solid #CFCFCF;
 }
 
+.ui-draggable-dragging
+{
+    width:185px;
+}
+
+
 
 #AvailableStudent li img
 {

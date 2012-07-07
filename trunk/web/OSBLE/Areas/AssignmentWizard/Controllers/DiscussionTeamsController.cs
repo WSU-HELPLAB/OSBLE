@@ -56,23 +56,32 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             //Grabbing a list of moderators (and potentially TAs) that will be used to
             //allow instructors to assign to Moderators/TAs to discussion teams
+            List<CourseUser> Moderators;
             if (Assignment.DiscussionSettings != null && Assignment.DiscussionSettings.TAsCanPostToAll)
             {
-                ViewBag.Moderators = (from cu in db.CourseUsers
+                Moderators = (from cu in db.CourseUsers
                                       where cu.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator
                                       && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
                                       orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
                                       select cu).ToList();
+                ViewBag.ModeratorListTitle = "Moderators";
             }
             else
             {
-                ViewBag.Moderators = (from cu in db.CourseUsers
+                Moderators = (from cu in db.CourseUsers
                                       where (cu.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator
                                       || cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
                                       && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
                                       orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
                                       select cu).ToList();
+                ViewBag.ModeratorListTitle = "Moderators/TAs";
             }
+            ViewBag.DisplayModeratorList = "inline";
+            if (Moderators.Count == 0)
+            {
+                ViewBag.DisplayModeratorList = "none";
+            }
+            ViewBag.Moderators = Moderators;
         }
 
         public override ActionResult Index()
