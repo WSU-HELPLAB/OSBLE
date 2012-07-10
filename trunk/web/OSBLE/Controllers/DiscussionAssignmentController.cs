@@ -8,6 +8,7 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.DiscussionAssignment;
 using OSBLE.Models.Users;
+using OSBLE.Models.ViewModels;
 
 namespace OSBLE.Controllers
 {
@@ -51,6 +52,7 @@ namespace OSBLE.Controllers
                 //Only filter by discussionTeamID if the assignment HasDiscussionTeams
                 if (assignment.HasDiscussionTeams)
                 {
+
                     posts = (from post in db.DiscussionPosts
                              .Include("Replies")
                              where post.AssignmentID == assignment.ID &&
@@ -58,6 +60,35 @@ namespace OSBLE.Controllers
                              post.ParentPostID == null
                              orderby post.Posted
                              select post).ToList();
+
+
+                    //If this works, eventually seperate it into queries that run conditionally on permission settings/who the user is
+                    //additioanlly you'll need one for authors and one for reviewers.
+
+                    var AuthorTeamPosts = from p in db.DiscussionPosts
+                                    .Include("Replies")
+                                    join t in db.Teams
+                                    on p.DiscussionTeam.AuthorTeamID equals t.ID
+                                    where p.AssignmentID == assignment.ID &&
+                                    p.DiscussionTeamID == discussionTeamId &&
+                                    p.ParentPostID == null
+                                    select new { replies = p.Replies, courseUser = p.CourseUser, discussionPostId = p.ID, content = p.Content, displayName = p.CourseUser.UserProfile.FirstName + " " + p.CourseUser.UserProfile.LastName};
+
+
+                    List<DiscussionPostViewModel> dpvmList = new List<DiscussionPostViewModel>();
+                    foreach (var testPost in AuthorTeamPosts)
+                    {
+                        DiscussionPostViewModel dpvm = new DiscussionPostViewModel();
+                        dpvm.Content = testPost.content;
+                        dpvm.DisplayName = testPost.displayName;
+                        dpvm.CourseUser = testPost.courseUser;
+                        dpvm.DiscussionPostId = testPost.discussionPostId;
+                        dpvm.SetReplies(testPost.replies.ToList());
+                    }
+                    //Use by going: AuthorPosts[x].ID or AuthorPosts[x].DiscussionTeamID
+
+
+                                    
                 }
                 else
                 {
@@ -111,6 +142,7 @@ namespace OSBLE.Controllers
                     ViewBag.DiscussionTeamList = DiscussionTeamList.OrderBy(dt => dt.TeamName).ToList();
                 }
 
+                setUpViewPermissionViewBag(discussionTeam, ViewBag.IsFirstPost);
                 ViewBag.Posts = posts.OrderBy(p => p.Posted);
                 ViewBag.ActiveCourse = ActiveCourseUser;
                 ViewBag.Assignment = assignment;
@@ -121,6 +153,41 @@ namespace OSBLE.Controllers
             {
                 return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentId });
             }    
+        }
+
+        
+        
+        /// <summary>
+        /// This function will set up viewbag variables related to viewing permissions for non-instructor/ta for a discussion assignment
+        /// <param name="assignment"></param>
+        /// </summary>
+        /// <param name="assignment"></param>
+        /// <param name="hasMadeFirstPost"></param>
+        public void setUpViewPermissionViewBag(DiscussionTeam discussionTeam, bool hasMadeFirstPost)
+        {
+            Assignment assignment = discussionTeam.Assignment;
+            bool isAnonymizedModerator = (assignment.DiscussionSettings.HasAnonymizationforModerators 
+                    && (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator ));
+
+            //Base values, determined by a combination of discussion settings, user role, and sent in parameters.
+            ViewBag.CanSeeReplies = (assignment.DiscussionSettings.RequiresPostBeforeView == false) || hasMadeFirstPost;
+            ViewBag.CanSeeAuthors = assignment.DiscussionSettings.HasAnonymousAuthors == false 
+                                        && assignment.DiscussionSettings.HasAnonymousPosts == false 
+                                        && isAnonymizedModerator == false;
+            ViewBag.CanSeeReviewers = assignment.DiscussionSettings.HasAnonymousReviewers == false 
+                                        && assignment.DiscussionSettings.HasAnonymousPosts == false 
+                                        && isAnonymizedModerator == false;
+        }
+
+        /// <summary>
+        /// This function will set up viewbag variables related to viewing permissions for an instructor/ta for a discussion assignment. 
+        /// </summary>
+        public void setUpInstructorViewingPermissionsViewBag()
+        {
+            //Instructors/TAs can view everything.
+            ViewBag.CanSeeReplies = true;
+            ViewBag.CanSeeAuthors = true;
+            ViewBag.CanSeeReviewers = true;
         }
 
         /// <summary>
@@ -186,6 +253,8 @@ namespace OSBLE.Controllers
                     ViewBag.DiscussionHeader = assignment.AssignmentName;
                 }
 
+
+                setUpInstructorViewingPermissionsViewBag();
                 ViewBag.PostOrReply = postOrReply;
                 ViewBag.Posts = posts;
                 ViewBag.Student = student;

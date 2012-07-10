@@ -13,11 +13,16 @@ namespace OSBLE.Models.Assignments
     /// </summary>
     [Flags]
     public enum DiscussionSettings : byte
-    { 
-        AnonymousPosts = 1,
-        AnonymousRoles = 2,
-        RequiresPostBeforeView = 4,
-        TAsCanPostToAll = 8
+    {
+
+
+        AnonymizePosts = 1,
+        RequiresPostBeforeView = 2,
+        TAsCanPostToAllDiscussions = 4,
+        AnonymizeAuthors = 8,
+        AnonymizeReviewers = 16,
+        AnonymizeForModerators = 32
+
     };
 
     public class DiscussionSetting
@@ -90,41 +95,17 @@ namespace OSBLE.Models.Assignments
         {
             get
             {
-                return HasAnonymityLevel(DiscussionSettings.AnonymousPosts);
+                return HasAnonymityLevel(DiscussionSettings.AnonymizePosts);
             }
             set
             {
                 if (value == true)
                 {
-                    AddAnonymityLevel(DiscussionSettings.AnonymousPosts);
+                    AddAnonymityLevel(DiscussionSettings.AnonymizePosts);
                 }
                 else
                 {
-                    RemoveAnonymityLevel(DiscussionSettings.AnonymousPosts);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Returns true if user roles are hidden in discussions
-        /// </summary>
-        [NotMapped]
-        [Display(Name = "Hide roles of discussion participants")]
-        public bool HasAnonymousRoles
-        {
-            get
-            {
-                return HasAnonymityLevel(DiscussionSettings.AnonymousRoles);
-            }
-            set
-            {
-                if (value == true)
-                {
-                    AddAnonymityLevel(DiscussionSettings.AnonymousRoles);
-                }
-                else
-                {
-                    RemoveAnonymityLevel(DiscussionSettings.AnonymousRoles);
+                    RemoveAnonymityLevel(DiscussionSettings.AnonymizePosts);
                 }
             }
         }
@@ -155,29 +136,102 @@ namespace OSBLE.Models.Assignments
         }
 
         /// <summary>
-        /// Returns true if the assignment requires that students must first submit a post before
-        /// they can view the posts of others
+        ///Returns true if TAs are allowed to post to all discussion assignments
         /// </summary>
         [NotMapped]
         [Display(Name = "TAs can participate in all discussions")]
-        public bool TAsCanPostToAll
+        public bool TAsCanPostToAllDiscussions
         {
             get
             {
-                return HasAnonymityLevel(DiscussionSettings.TAsCanPostToAll);
+                return HasAnonymityLevel(DiscussionSettings.TAsCanPostToAllDiscussions);
             }
             set
             {
                 if (value == true)
                 {
-                    AddAnonymityLevel(DiscussionSettings.TAsCanPostToAll);
+                    AddAnonymityLevel(DiscussionSettings.TAsCanPostToAllDiscussions);
                 }
                 else
                 {
-                    RemoveAnonymityLevel(DiscussionSettings.TAsCanPostToAll);
+                    RemoveAnonymityLevel(DiscussionSettings.TAsCanPostToAllDiscussions);
                 }
             }
         }
+
+        /// <summary>
+        ///Returns true if the discussion assignment should anonymize the authors
+        /// </summary>
+        [NotMapped]
+        [Display(Name = "Anonymize authors")]
+        public bool HasAnonymousAuthors
+        {
+            get
+            {
+                return HasAnonymityLevel(DiscussionSettings.AnonymizeAuthors);
+            }
+            set
+            {
+                if (value == true)
+                {
+                    AddAnonymityLevel(DiscussionSettings.AnonymizeAuthors);
+                }
+                else
+                {
+                    RemoveAnonymityLevel(DiscussionSettings.AnonymizeAuthors);
+                }
+            }
+        }
+
+        /// <summary>
+        ///Returns true if the discussion assignment should anonymize the authors
+        /// </summary>
+        [NotMapped]
+        [Display(Name = "Anonymize reviewers")]
+        public bool HasAnonymousReviewers
+        {
+            get
+            {
+                return HasAnonymityLevel(DiscussionSettings.AnonymizeReviewers);
+            }
+            set
+            {
+                if (value == true)
+                {
+                    AddAnonymityLevel(DiscussionSettings.AnonymizeReviewers);
+                }
+                else
+                {
+                    RemoveAnonymityLevel(DiscussionSettings.AnonymizeReviewers);
+                }
+            }
+        }
+
+        /// <summary>
+        ///Returns true if the discussion assignment should anonymize the authors
+        /// </summary>
+        [NotMapped]
+        [Display(Name = "Anonymize reviewers and authors to moderators (for FERPA compliance)")]
+        public bool HasAnonymizationforModerators
+        {
+            get
+            {
+                return HasAnonymityLevel(DiscussionSettings.AnonymizeForModerators);
+            }
+            set
+            {
+                if (value == true)
+                {
+                    AddAnonymityLevel(DiscussionSettings.AnonymizeForModerators);
+                }
+                else
+                {
+                    RemoveAnonymityLevel(DiscussionSettings.AnonymizeForModerators);
+                }
+            }
+        }
+
+
 
         /// <summary>
         /// Returns true if the discussion has the specified anonymity setting

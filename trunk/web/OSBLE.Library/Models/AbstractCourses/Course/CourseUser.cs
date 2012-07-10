@@ -150,44 +150,5 @@ namespace OSBLE.Models.Courses
             }
             return string.Format("({0}) {1}", roleAbbreviation, UserProfile.DisplayName(AbstractRoleId, FirstThenLast, false));
         }
-
-
-        public string DisplayNameWithRole(int AbstractRoleId, DiscussionSetting discussionSetting, bool? FirstThenLast = null)
-        {
-            string returnValue = "";
-            bool anonName = false;
-            if (discussionSetting != null && discussionSetting.HasAnonymousPosts)
-            {
-                anonName = true;
-            }
-            if (discussionSetting != null && discussionSetting.HasAnonymousRoles)
-            {
-                returnValue = UserProfile.DisplayName(AbstractRoleId, FirstThenLast, anonName);
-            }
-            else
-            {
-                string roleAbbreviation = "";
-                switch (AbstractRoleID)
-                {
-                    case (int)CourseRole.CourseRoles.Instructor:
-                        roleAbbreviation = "I";
-                        break;
-                    case (int)CourseRole.CourseRoles.Moderator:
-                        roleAbbreviation = "M";
-                        break;
-                    case (int)CourseRole.CourseRoles.Observer:
-                        roleAbbreviation = "O";
-                        break;
-                    case (int)CourseRole.CourseRoles.Student:
-                        roleAbbreviation = "S";
-                        break;
-                    case (int)CourseRole.CourseRoles.TA:
-                        roleAbbreviation = "TA";
-                        break;
-                }
-                returnValue = string.Format("({0}) {1}", roleAbbreviation, UserProfile.DisplayName(AbstractRoleId, FirstThenLast, anonName));
-            }
-            return returnValue;
-        }
     }
 }

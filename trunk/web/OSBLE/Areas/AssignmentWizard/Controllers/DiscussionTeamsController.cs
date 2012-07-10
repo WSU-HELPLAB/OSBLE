@@ -57,7 +57,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             //Grabbing a list of moderators (and potentially TAs) that will be used to
             //allow instructors to assign to Moderators/TAs to discussion teams
             List<CourseUser> Moderators;
-            if (Assignment.DiscussionSettings != null && Assignment.DiscussionSettings.TAsCanPostToAll)
+            if (Assignment.DiscussionSettings != null && Assignment.DiscussionSettings.TAsCanPostToAllDiscussions)
             {
                 Moderators = (from cu in db.CourseUsers
                                       where cu.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator
