@@ -5,11 +5,8 @@
 @{
     Html.HiddenFor(m => m.ID);
     bool hasRubric = Model.HasRubric;
-    string test;
     RubricSelectionViewModel rubricSelection = ViewBag.rubricSelection;
-
 } 
-
 
 <style media="screen" type="text/css">
 
@@ -18,6 +15,7 @@
 	border-spacing: 2px;
 	border-style: outset;
 	border-collapse: collapse;
+	border-color: Black;
 }
 .rubric th {
 	border-width: 1px;
@@ -28,6 +26,11 @@
 	border-width: 1px;
 	padding: 10px;
 	border-style: inset;
+}
+
+td th
+{
+    border-color:Black;
 }
 
 td.top
@@ -52,12 +55,28 @@ ul
     float:left;
 }
 
+#import_rubric_from_csv
+{
+	border: 1px solid #eeeeff;
+	border-bottom: 5px solid #eeeeff;
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-bottom: 8px;
+	width: 400px;
+	display: none;
+}
+
 
 </style>
 
 <html> <body>
 
 @Html.HiddenFor(m => m.ID)
+
+
+
+
+
 <table>
     <tr>
         <td>
@@ -65,10 +84,10 @@ ul
             {
             <text>Load Rubric from</text>
             <select class="CourseSelect">
-                <option selected>Select Course</option>
+                <option>Select Course</option>
                 @foreach (int courseId in rubricSelection.CourseIds())
                 {
-                    <option id="@courseId" class ="CourseOption">@rubricSelection.GetCourseName(courseId)</option>
+                    <option value="@courseId" class ="CourseOption">@rubricSelection.GetCourseName(courseId)</option>
                 }
             </select>
             }
@@ -91,6 +110,10 @@ ul
                 }
             </form>
         </td>
+    </tr>
+
+    <tr>
+        <a href="javascript:void(0)" onclick="displayUploadRubric()">Upload Rubric From File</a>
     </tr>
 
     <tr>
@@ -204,17 +227,38 @@ ul
         </td>
     </tr>
 </table>
+
+@*Modal box for uploading rubrics to CSVs*@
+<div id='import_rubric_from_csv'  title="Import file">Upload a comma-separated values (CSV) file representing the rubric<br /><br />
+    @using (Html.BeginForm("LoadRubricFromCsv", "Rubric", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <input type="hidden" name="assignmentColumnId" id="column_assignment_id" />
+        <fieldset>
+            <legend>Select Files To Submit</legend>
+            <table>
+                <tr>
+                    <td><input type="file" id="file" name="file"/> </td>
+                </tr>
+                <tr>
+                    <td><input type="submit" value="Submit"/></td>
+                </tr>
+            </table>
+        </fieldset>
+    }
+</div>
+
 </body> </html>
 
-<script type="text/javascript">
+<script type="text/javascript" src="@Url.Content("~/AssignmentWizard/Content/js/jquery.path.js")"></script>
+<script type="text/javascript" language="javascript">
 
-    $('.CourseOption').click(function () {
+    $('.CourseSelect').change(function () {
         $('.RubricSelect').hide();
-        $('#Assignment_' + this.id).show();
+        $('#Assignment_' + $(this).children(":selected").val()).show();
     });
 
-    $('.AssignmentOption').click(function () {
-        this.parentNode.name = "AssignmentOption";
+    $('.RubricSelect').change(function () {
+        this.name = "AssignmentOption";
 
         var ok = window.confirm("This rubric will be replaced with a new one\n" +
                                 "and all progress will be lost\n\n" +
@@ -223,6 +267,20 @@ ul
             $('#WizardForm').submit();
         }
     });
+
+    $('.file').click(function () {
+        
+    });
+
+    function displayUploadRubric() {
+        $("#import_rubric_from_csv").dialog({
+            modal: true,
+            resizable: false,
+            width: 500,
+            height: 225,
+            closeOnEscape: false
+        });
+    }
 
     function addRow(tableID) {
         var table = document.getElementById(tableID);
@@ -331,20 +389,34 @@ ul
             var row2 = table.rows[rowIndex + 1];
 
             animateSwap(row, row2, table);
+
         }
     }
 
     function animateSwap(topRow, bottomRow, table) {
         swapped = false;
-        var animationTime = 200;
+        var animationTime = 250;
         var i = 0;
-        $.each($(topRow).find('td'), function () {
 
-            var oldOffset = $(this).position();
-            var newOffset = $(bottomRow.cells[i]).position();
+        //animations don't work well in firefox, so just perform the swap with no animation
+        if ($.browser.mozilla) {
+            $(topRow).insertAfter($(topRow).next());
+            for (var n = 0; i < table.rows[0].cells.length; n++) {
+                var name = $(row.cells[n]).find('.Input').attr('name');
+                var name2 = $(row2.cells[n]).find('.Input').attr('name');
 
-            var $tempTop = $(this).clone().appendTo(table);
-            $tempTop
+                $(bottomRow.cells[n]).find('.Input').attr('name', name);
+                $(topRow.cells[n]).find('.Input').attr('name', name2);
+            }
+        }
+        else {
+            $.each($(topRow).find('td'), function () {
+
+                var oldOffset = $(this).position();
+                var newOffset = $(bottomRow.cells[i]).position();
+
+                var $tempTop = $(this).clone().appendTo(table);
+                $tempTop
                 .css('position', 'absolute')
                 .css('left', oldOffset.left)
                 .css('top', oldOffset.top)
@@ -352,14 +424,12 @@ ul
                 .css('border-style', 'none')
                 .css('vertical-align', 'middle');
 
-            $tempTop.height($(this).height());
-            //$tempTop.width($(this).width())
-           // alert($tempTop.height());
-            //alert($tempTop.find('.Input').val());
-            $tempTop.find('.Input').css('vertical-align', 'middle');
+                $tempTop.height($(this).height());
 
-            var $tempBottom = $(bottomRow.cells[i]).clone().appendTo(table);
-            $tempBottom
+                $tempTop.find('.Input').css('vertical-align', 'middle');
+
+                var $tempBottom = $(bottomRow.cells[i]).clone().appendTo(table);
+                $tempBottom
                 .css('position', 'absolute')
                 .css('left', newOffset.left)
                 .css('top', newOffset.top)
@@ -367,41 +437,53 @@ ul
                 .css('border-style', 'none')
                 .css('vertical-align', 'middle');
 
-            $tempBottom.height($(bottomRow.cells[i]).height());
+                $tempBottom.height($(bottomRow.cells[i]).height());
 
-            $tempTop.find('textarea').text($(this).find('textarea').val());
-            $tempBottom.find('textarea').text($(bottomRow.cells[i]).find('textarea').val());
+                $tempTop.find('textarea').text($(this).find('textarea').val());
+                $tempBottom.find('textarea').text($(bottomRow.cells[i]).find('textarea').val());
 
-            $(this).css('visibility', 'hidden');
-            $(bottomRow.cells[i]).css('visibility', 'hidden');
+                $(this).css('visibility', 'hidden');
+                $(bottomRow.cells[i]).css('visibility', 'hidden');
 
-            $tempBottom.animate({
-                'top': oldOffset.top
-            }, animationTime, function () {
-                $tempBottom.remove();
-                $(table).find('td').css('visibility', 'visible');
-            });
+                //  Curve animation implementation
+                //            var arc_params = {
+                //                center: [285, 185],
+                //                radius: 100,
+                //                start: 30,
+                //                end: 200,
+                //                dir: -1
+                //            };
 
-            //'top': newOffset.top
-            $tempTop.animate({
-                'top': newOffset.top
-            }, animationTime, function () {
-                $tempTop.remove();
-                //if this is the last td, perform the actual swap
-                if (!swapped) {
-                    $(topRow).insertAfter($(topRow).next());
-                    for (var n = 0; i < table.rows[0].cells.length; n++) {
-                        var name = $(row.cells[n]).find('.Input').attr('name');
-                        var name2 = $(row2.cells[n]).find('.Input').attr('name');
+                $tempBottom.animate({
+                    'top': oldOffset.top
+                    //path: new $.path.arc(arc_params)
+                }, animationTime, function () {
+                    $tempBottom.remove();
+                    $(table).find('td').css('visibility', 'visible');
+                });
 
-                        $(bottomRow.cells[n]).find('.Input').attr('name', name);
-                        $(topRow.cells[n]).find('.Input').attr('name', name2);
+                //'top': newOffset.top
+                $tempTop.animate({
+
+                    'top': newOffset.top
+                }, animationTime, function () {
+                    $tempTop.remove();
+                    //if this is the last td, perform the actual swap
+                    if (!swapped) {
+                        $(topRow).insertAfter($(topRow).next());
+                        for (var n = 0; i < table.rows[0].cells.length; n++) {
+                            var name = $(row.cells[n]).find('.Input').attr('name');
+                            var name2 = $(row2.cells[n]).find('.Input').attr('name');
+
+                            $(bottomRow.cells[n]).find('.Input').attr('name', name);
+                            $(topRow.cells[n]).find('.Input').attr('name', name2);
+                        }
+                        swapped = true;
                     }
-                    swapped = true;
-                }
+                });
+                i++;
             });
-            i++;
-        });
+        }
     }
 
 </script>

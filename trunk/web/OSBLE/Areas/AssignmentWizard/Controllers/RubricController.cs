@@ -118,6 +118,17 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             return View(assignment);
         }
 
+        [HttpPost]
+        public ActionResult LoadRubricFromCsv()
+        {
+            //get the file stream
+
+            //parse it
+
+            //create rubric ViewModel
+
+            return View(Assignment);
+        }
 
         [HttpPost]
         public ActionResult Index(Assignment model)
@@ -128,7 +139,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 return LoadExistingRubric(assId);
             }
-            
             
             //reset our assignment
             Assignment = db.Assignments.Find(model.ID);
