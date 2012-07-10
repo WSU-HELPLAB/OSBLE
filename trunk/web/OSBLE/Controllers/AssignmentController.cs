@@ -499,7 +499,7 @@ namespace OSBLE.Controllers
                         CourseUserID = tm.CourseUserID,
                         AssignmentID = assignment.PreceedingAssignment.ID,
                         Published = false,
-                        AddedPoints = assignment.PreceedingAssignment.addedPoints,
+                        AddedPoints = assignment.PreceedingAssignment.AddedPoints,
                         Points = -1,
                         TeamID = precTeam.ID
                     };
@@ -559,7 +559,7 @@ namespace OSBLE.Controllers
 
                     currentAssignScore = new Score()
                     {
-                        AddedPoints = assignment.addedPoints,
+                        AddedPoints = assignment.AddedPoints,
                         AssignmentID = assignment.ID,
                         CourseUserID = tm.CourseUserID,
                         RawPoints = myPoints,

@@ -1093,7 +1093,7 @@ namespace OSBLE.Controllers
                         }
                         int pointsPossibleTemp = assignment.PointsPossible;
                         assignment.PointsPossible = value;
-                        assignment.addedPoints = assignment.addedPoints * ((double)value / pointsPossibleTemp);
+                        assignment.AddedPoints = assignment.AddedPoints * ((double)value / pointsPossibleTemp);
                         db.SaveChanges();
 
                         if (assignment.Category.dropX > 0)
@@ -1278,12 +1278,12 @@ namespace OSBLE.Controllers
                         {
                             if (item.AddedPoints > 0)
                             {
-                                item.Points -= assignment.addedPoints;
+                                item.Points -= assignment.AddedPoints;
                             }
                             item.Points += number;
                             item.AddedPoints = number;
                         }
-                        assignment.addedPoints = number;
+                        assignment.AddedPoints = number;
                         db.SaveChanges();
                     }
                 }
@@ -1779,9 +1779,9 @@ namespace OSBLE.Controllers
                             db.SaveChanges();
                         }
                     }
-                    if (currentAssignment.addedPoints > 0)
+                    if (currentAssignment.AddedPoints > 0)
                     {
-                        DoAddPoints(assignmentId, currentAssignment.addedPoints);
+                        DoAddPoints(assignmentId, currentAssignment.AddedPoints);
                     }
 
                     if (currentAssignment.Category.dropX > 0)

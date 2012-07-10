@@ -21,12 +21,45 @@ namespace OSBLE.Models.Assignments
             AssignmentTeams = new List<AssignmentTeam>();
             DiscussionTeams = new List<DiscussionTeam>();
             ReviewTeams = new List<ReviewTeam>();
+            Deliverables = new List<Deliverable>();
             IsDraft = true;
-            addedPoints = 0;
+            AddedPoints = 0;
             IsWizardAssignment = true;
             Scores = new List<Score>();
             Type = AssignmentTypes.Basic;
             CriticalReviewPublishDate = null;
+        }
+
+        public Assignment(Assignment other)
+            : this()
+        {
+            this.AddedPoints = other.AddedPoints;
+            this.AssignmentDescription = other.AssignmentDescription;
+            this.AssignmentName = other.AssignmentName;
+            this.AssignmentTypeID = other.AssignmentTypeID;
+            this.AssociatedEventID = other.AssociatedEventID;
+            this.CategoryID = other.CategoryID;
+            this.ColumnOrder = other.ColumnOrder;
+            this.CommentCategoryID = other.CommentCategoryID;
+            this.CourseID = other.CourseID;
+            this.CriticalReviewPublishDate = other.CriticalReviewPublishDate;
+            this.DeductionPerUnit = other.DeductionPerUnit;
+            foreach (Deliverable d in other.Deliverables)
+            {
+                Deliverables.Add(new Deliverable(d));
+            }
+            this.DiscussionSettings = new DiscussionSetting(other.DiscussionSettings);
+            this.DueDate = other.DueDate;
+            this.HoursLateWindow = other.HoursLateWindow;
+            this.HoursPerDeduction = other.HoursPerDeduction;
+            this.ID = other.ID;
+            this.IsDraft = other.IsDraft;
+            this.IsWizardAssignment = other.IsWizardAssignment;
+            this.PrecededingAssignmentID = other.PrecededingAssignmentID;
+            this.ReleaseDate = other.ReleaseDate;
+            this.RubricID = other.RubricID;
+            this.TeamEvaluationSettings = new TeamEvaluationSettings(other.TeamEvaluationSettings);
+            this.Type = other.Type;
         }
 
         #region public properties
@@ -66,7 +99,7 @@ namespace OSBLE.Models.Assignments
         public virtual Category Category { get; set; }
 
         public int? CourseID { get; set; }
-        public virtual Course Course {get; set; }
+        public virtual Course Course { get; set; }
 
         [Required(ErrorMessage = "Please specify the total number of points that this assignment will be worth")]
         [Display(Name = "Total Points Possible")]
@@ -79,7 +112,7 @@ namespace OSBLE.Models.Assignments
 
         [NotMapped]
         [DataType(DataType.Time)]
-        public DateTime ReleaseTime 
+        public DateTime ReleaseTime
         {
             get
             {
@@ -101,7 +134,7 @@ namespace OSBLE.Models.Assignments
 
         [NotMapped]
         [DataType(DataType.Time)]
-        public DateTime DueTime 
+        public DateTime DueTime
         {
             get
             {
@@ -111,7 +144,7 @@ namespace OSBLE.Models.Assignments
             {
                 //first, zero out the date's time component
                 DueDate = DateTime.Parse(DueDate.ToShortDateString());
-                
+
                 DueDate = DueDate.AddHours(value.Hour);
                 DueDate = DueDate.AddMinutes(value.Minute);
             }
@@ -246,7 +279,7 @@ namespace OSBLE.Models.Assignments
         [Association("TeamEvaluationSettings_Assignment", "ID", "AssignmentID")]
         public virtual TeamEvaluationSettings TeamEvaluationSettings { get; set; }
 
-        public double addedPoints { get; set; }
+        public double AddedPoints { get; set; }
 
         public static IList<AssignmentTypes> AllAssignmentTypes
         {
@@ -305,9 +338,9 @@ namespace OSBLE.Models.Assignments
             using (OSBLEContext db = new OSBLEContext())
             {
                 draftRubricEvals = (from a in db.RubricEvaluations
-                                        where a.AssignmentID == this.ID &&
-                                        !a.IsPublished
-                                        select a).Count();
+                                    where a.AssignmentID == this.ID &&
+                                    !a.IsPublished
+                                    select a).Count();
             }
             return draftRubricEvals;
         }
@@ -322,9 +355,9 @@ namespace OSBLE.Models.Assignments
             using (ContextBase db = new SimpleContext())
             {
                 draftRubricEvals = (from a in db.RubricEvaluations
-                                        where a.AssignmentID == this.ID &&
-                                        a.IsPublished
-                                        select a).Count();
+                                    where a.AssignmentID == this.ID &&
+                                    a.IsPublished
+                                    select a).Count();
             }
             return draftRubricEvals;
         }
@@ -372,6 +405,6 @@ namespace OSBLE.Models.Assignments
             }
         }
 
-        #endregion 
+        #endregion
     }
 }

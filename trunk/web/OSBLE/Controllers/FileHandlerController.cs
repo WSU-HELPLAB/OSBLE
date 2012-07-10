@@ -8,6 +8,8 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using System.Collections.Generic;
 using OSBLE.Models.Users;
+using System.Net;
+using System.Configuration;
 
 namespace OSBLE.Controllers
 {
@@ -154,7 +156,7 @@ namespace OSBLE.Controllers
                             foreach (DirectoryInfo submissionDirectory in acitvityDirectory.GetDirectories())
                             {
                                 Team currentTeam = (from c in assignment.AssignmentTeams where c.TeamID.ToString() == submissionDirectory.Name select c.Team).FirstOrDefault();
-                                
+
                                 if (currentTeam != null)
                                 {
                                     string folderName = "";
@@ -246,6 +248,25 @@ namespace OSBLE.Controllers
             return GetSubmissionZipHelper(assignmentId, teamId);
         }
 
+        public ActionResult GetAnnotateDocument(int userID, int assignmentID, int teamID, string apiKey)
+        {
+            if (apiKey != ConfigurationManager.AppSettings["AnnotateApiKey"])
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            UserProfile profile = db.UserProfiles.Find(userID);
+            Assignment assignment = db.Assignments.Find(assignmentID);
+            AssignmentTeam team = db.AssignmentTeams.Find(assignmentID, teamID);
+            TeamMember member = (from teamMembers in team.Team.TeamMembers
+                                 where teamMembers.CourseUser.UserProfileID == profile.ID
+                                 select teamMembers).FirstOrDefault();
+
+            string path = FileSystem.GetDeliverable(assignment.Course as Course, assignmentID, team, assignment.Deliverables[0].ToString());
+            string fileName = string.Format("{0}-{1}-{2}-{3}", assignment.CourseID, assignment.ID, profile.ID, assignment.Deliverables[0].ToString());
+            return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = fileName };
+        }
+
         /// <summary>
         /// Get deliverables from the reviewee's assignment (previous assignment) for the current user, 
         /// needed for a critical review assignment (current user)
@@ -263,7 +284,59 @@ namespace OSBLE.Controllers
                                      select rt.AuthorTeamID).ToList();
             if (authorTeams.Contains(authorTeamId) && CRassignment.Type == AssignmentTypes.CriticalReview)
             {
-                return GetSubmissionZipHelper((int)CRassignment.PrecededingAssignmentID, authorTeamId);
+                //Send off to Annotate if we have exactly one deliverable and that deliverable is a PDF document
+                if (CRassignment.PreceedingAssignment.Deliverables.Count == 1 && CRassignment.PreceedingAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
+                {
+                    double epoch = (DateTime.UtcNow - new DateTime(1970,1,1,0,0,0)).TotalSeconds;
+                    WebRequest request = null;
+                    WebResponse response = null;
+
+                    //Submit document to annotate
+                    string documentUrl = "https://osble.org/content/icer%202012%20short.pdf";
+
+                    string uploadString = "http://helplab.org/annotate/php/uploadDocument.php?" +
+                                          "api-user={0}" +           //Annotate admin user name (see web config)
+                                          "&api-requesttime={1}" +   //UNIX timestamp
+                                          "&api-annotateuser={2}" +  //the current user (reviewer)
+                                          "&api-auth={3}" +          //Annotate admin auth key (see web config)
+                                          "&url={4}";                //URL of the document to upload
+                    uploadString = string.Format(uploadString,
+                                                 ConfigurationManager.AppSettings["AnnotateUserName"],
+                                                epoch,
+                                                CurrentUser.UserName,
+                                                ConfigurationManager.AppSettings["AnnotateApiKey"],
+                                                documentUrl
+                                                 );
+                    request = WebRequest.Create(uploadString);
+                    response = request.GetResponse();
+
+                    //log user into annotate
+                    string loginString = "http://helplab.org/annotate/php/loginAs.php?" +
+                                         "api-user={0}" +           //Annotate admin user name (see web config)
+                                         "&api-requesttime={1}" +   //UNIX timestamp
+                                         "&api-annotateuser={2}" +  //the current user (reviewer)
+                                         "&api-auth={3}" +          //Annotate admin auth key (see web config)
+                                         "&create=1" +              //Create user if they don't exist
+                                         "&firstname={4}" +         //User's first name
+                                         "&lastname={5}";           //User's last name
+                    
+                    loginString = string.Format(loginString,
+                                                ConfigurationManager.AppSettings["AnnotateUserName"],
+                                                epoch,
+                                                CurrentUser.UserName,
+                                                ConfigurationManager.AppSettings["AnnotateApiKey"],
+                                                CurrentUser.FirstName,
+                                                CurrentUser.LastName
+                                                );
+                    request = WebRequest.Create(loginString);
+                    response = request.GetResponse();
+
+                    //2: Redirect to annotation page on success
+                }
+                else
+                {
+                    return GetSubmissionZipHelper((int)CRassignment.PrecededingAssignmentID, authorTeamId);
+                }
             }
 
             return RedirectToAction("Index", "Home");
@@ -336,7 +409,7 @@ namespace OSBLE.Controllers
             // note: these contraints do not apply to instructors
             bool belongsToDT = false;
             belongsToDT = true;
-            
+
             foreach (TeamMember tm in dt.GetAllTeamMembers())
             {
                 if (tm.CourseUserID == ActiveCourseUser.ID)

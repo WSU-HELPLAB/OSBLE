@@ -78,7 +78,13 @@ namespace OSBLE.Services
                         &&
                         assignment.CourseID == courseId
                         select assignment;
-            return query.ToArray();
+            List<Assignment> efAssignments = query.ToList();
+            List<Assignment> nonEfAssignments = new List<Assignment>(efAssignments.Count);
+            foreach (Assignment assignment in efAssignments)
+            {
+                nonEfAssignments.Add(new Assignment(assignment));
+            }
+            return nonEfAssignments.ToArray();
         }
 
         /// <summary>

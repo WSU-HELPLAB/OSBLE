@@ -73,6 +73,14 @@ namespace OSBLE.Models.Assignments
             MinimumFirstPostLength = 0;
         }
 
+        public DiscussionSetting(DiscussionSetting other)
+        {
+            this.AnonymitySettings = other.AnonymitySettings;
+            this.AssignmentID = other.AssignmentID;
+            this.InitialPostDueDate = other.InitialPostDueDate;
+            this.MinimumFirstPostLength = other.MinimumFirstPostLength;
+        }
+
         #region anonymity settings
         
         /// <summary>

@@ -63,6 +63,17 @@ namespace OSBLE.Models.Assignments
 
     public class Deliverable
     {
+        public Deliverable()
+        {
+        }
+
+        public Deliverable(Deliverable other)
+        {
+            this.AssignmentID = other.AssignmentID;
+            this.Type = other.Type;
+            this.Name = other.Name;
+        }
+
         [Key]
         [Required]
         [Column(Order = 0)]
@@ -100,6 +111,11 @@ namespace OSBLE.Models.Assignments
             {
                 return Deliverable.GetFileExtensions(this.DeliverableType);
             }
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}.{1}", Name, DeliverableType.ToString());
         }
 
         public static string[] GetFileExtensions(DeliverableType deliverableType)
