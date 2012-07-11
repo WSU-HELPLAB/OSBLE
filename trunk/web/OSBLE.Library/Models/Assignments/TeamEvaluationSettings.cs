@@ -46,6 +46,10 @@ namespace OSBLE.Models.Assignments
         public TeamEvaluationSettings(TeamEvaluationSettings other)
             : this()
         {
+            if (other == null)
+            {
+                return;
+            }
             this.AssignmentID = other.AssignmentID;
             this.DiscrepancyCheckSize = other.DiscrepancyCheckSize;
             this.MaximumMultiplier = other.MaximumMultiplier;

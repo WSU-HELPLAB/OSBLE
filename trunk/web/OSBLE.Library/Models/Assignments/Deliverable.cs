@@ -69,6 +69,10 @@ namespace OSBLE.Models.Assignments
 
         public Deliverable(Deliverable other)
         {
+            if (other == null)
+            {
+                return;
+            }
             this.AssignmentID = other.AssignmentID;
             this.Type = other.Type;
             this.Name = other.Name;

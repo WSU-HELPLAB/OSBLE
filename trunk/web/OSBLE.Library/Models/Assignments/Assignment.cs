@@ -21,7 +21,6 @@ namespace OSBLE.Models.Assignments
             AssignmentTeams = new List<AssignmentTeam>();
             DiscussionTeams = new List<DiscussionTeam>();
             ReviewTeams = new List<ReviewTeam>();
-            Deliverables = new List<Deliverable>();
             IsDraft = true;
             AddedPoints = 0;
             IsWizardAssignment = true;
