@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using OSBLE.Models.Users;
 using System.Net;
 using System.Configuration;
+using OSBLE.Utility;
 
 namespace OSBLE.Controllers
 {
@@ -284,54 +285,121 @@ namespace OSBLE.Controllers
                                      select rt.AuthorTeamID).ToList();
             if (authorTeams.Contains(authorTeamId) && CRassignment.Type == AssignmentTypes.CriticalReview)
             {
+                //AC TODO: Error checking!
+
                 //Send off to Annotate if we have exactly one deliverable and that deliverable is a PDF document
                 if (CRassignment.PreceedingAssignment.Deliverables.Count == 1 && CRassignment.PreceedingAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
                 {
-                    double epoch = (DateTime.UtcNow - new DateTime(1970,1,1,0,0,0)).TotalSeconds;
-                    WebRequest request = null;
-                    WebResponse response = null;
+                    long epoch = (int)(DateTime.UtcNow - new DateTime(1970,1,1,0,0,0)).TotalSeconds;
+                    WebClient client = new WebClient();
+                    string result = "";
 
                     //Submit document to annotate
                     string documentUrl = "https://osble.org/content/icer%202012%20short.pdf";
 
+                    string apiKey = OsbleAuthentication.GenerateAnnotateKey("uploadDocument.php", ConfigurationManager.AppSettings["AnnotateUserName"], epoch);
                     string uploadString = "http://helplab.org/annotate/php/uploadDocument.php?" +
                                           "api-user={0}" +           //Annotate admin user name (see web config)
                                           "&api-requesttime={1}" +   //UNIX timestamp
                                           "&api-annotateuser={2}" +  //the current user (reviewer)
-                                          "&api-auth={3}" +          //Annotate admin auth key (see web config)
+                                          "&api-auth={3}" +          //Annotate admin auth key
                                           "&url={4}";                //URL of the document to upload
                     uploadString = string.Format(uploadString,
                                                  ConfigurationManager.AppSettings["AnnotateUserName"],
                                                 epoch,
-                                                CurrentUser.UserName,
-                                                ConfigurationManager.AppSettings["AnnotateApiKey"],
+                                                ConfigurationManager.AppSettings["AnnotateUserName"],
+                                                apiKey,
                                                 documentUrl
                                                  );
-                    request = WebRequest.Create(uploadString);
-                    response = request.GetResponse();
+                    result = client.DownloadString(uploadString);
+                    string documentCode = "";
+                    string documentDate = "";
 
-                    //log user into annotate
-                    string loginString = "http://helplab.org/annotate/php/loginAs.php?" +
+                    if(result.Substring(0, 2) == "OK")
+                    {
+                        string[] pieces = result.Split(' ');
+                        documentDate = pieces[1];
+                        documentCode = pieces[2];
+                    }
+
+                    //create annotate account for user
+                    apiKey = OsbleAuthentication.GenerateAnnotateKey("createAccount.php", CurrentUser.UserName, epoch);
+                    string createString = "http://helplab.org/annotate/php/createAccount.php?" +
                                          "api-user={0}" +           //Annotate admin user name (see web config)
                                          "&api-requesttime={1}" +   //UNIX timestamp
                                          "&api-annotateuser={2}" +  //the current user (reviewer)
-                                         "&api-auth={3}" +          //Annotate admin auth key (see web config)
-                                         "&create=1" +              //Create user if they don't exist
+                                         "&api-auth={3}" +          //Annotate admin auth key
+                                         "&licensed=0 " + 
                                          "&firstname={4}" +         //User's first name
                                          "&lastname={5}";           //User's last name
+                    createString = string.Format(createString,
+                                                ConfigurationManager.AppSettings["AnnotateUserName"],
+                                                epoch,
+                                                CurrentUser.UserName,
+                                                apiKey,
+                                                CurrentUser.FirstName,
+                                                CurrentUser.LastName
+                                                );
+                    result = client.DownloadString(createString);
+
+                    //give user access to the new document
+                    apiKey = OsbleAuthentication.GenerateAnnotateKey("authorizeReader.php", CurrentUser.UserName, epoch);
+                    string authorizeString = "http://helplab.org/annotate/php/authorizeReader.php?" +
+                                         "api-user={0}" +           //Annotate admin user name (see web config)
+                                         "&api-requesttime={1}" +   //UNIX timestamp
+                                         "&api-annotateuser={2}" +  //the current user (reviewer)
+                                         "&api-auth={3}" +          //Annotate admin auth key
+                                         "&d={4}" +                 //document upload date
+                                         "&c={5}";                  //document code
+                    authorizeString = string.Format(authorizeString,
+                                                ConfigurationManager.AppSettings["AnnotateUserName"],
+                                                epoch,
+                                                CurrentUser.UserName,
+                                                apiKey,
+                                                documentDate,
+                                                documentCode
+                                                );
+                    result = client.DownloadString(authorizeString);
+
+                    //downgrade user to unlicensed
+                    apiKey = OsbleAuthentication.GenerateAnnotateKey("updateAccount.php", CurrentUser.UserName, epoch);
+                    string updateString = "http://helplab.org/annotate/php/updateAccount.php?" +
+                                         "api-user={0}" +           //Annotate admin user name (see web config)
+                                         "&api-requesttime={1}" +   //UNIX timestamp
+                                         "&api-annotateuser={2}" +  //the current user (reviewer)
+                                         "&api-auth={3}" +          //Annotate admin auth key
+                                         "&licensed=0 ";
+                    updateString = string.Format(updateString,
+                                                ConfigurationManager.AppSettings["AnnotateUserName"],
+                                                epoch,
+                                                CurrentUser.UserName,
+                                                apiKey
+                                                );
+                    result = client.DownloadString(updateString);
+
+                    //log user into annotate
+                    apiKey = OsbleAuthentication.GenerateAnnotateKey("loginAs.php", CurrentUser.UserName, epoch);
+                    string loginString = "http://helplab.org/annotate/php/loginAs.php?" +
+                                         "api-user={0}" +           //Annotate admin user name (see web config)
+                                         "&api-requesttime={1}" +   //UNIX timestamp
+                                         "&loc=documents.php" +     //doesn't matter where we go
+                                         "&remember = 1" +          //store user info in cookie
+                                         "&errloc=http://helplab.org/annotate/php/error.php" +
+                                         "&api-annotateuser={2}" +  //the current user (reviewer)
+                                         "&api-auth={3}";           //Annotate admin auth key (see web config)
                     
                     loginString = string.Format(loginString,
                                                 ConfigurationManager.AppSettings["AnnotateUserName"],
                                                 epoch,
                                                 CurrentUser.UserName,
-                                                ConfigurationManager.AppSettings["AnnotateApiKey"],
-                                                CurrentUser.FirstName,
-                                                CurrentUser.LastName
+                                                apiKey
                                                 );
-                    request = WebRequest.Create(loginString);
-                    response = request.GetResponse();
+                    result = client.DownloadString(loginString);
 
-                    //2: Redirect to annotation page on success
+                    //Redirect to annotation page
+                    string finalDestination = "http://helplab.org/annotate/php/pdfnotate.php?d={0}&c={1}";
+                    finalDestination = string.Format(finalDestination, documentDate, documentCode);
+                    Response.Redirect(finalDestination);
                 }
                 else
                 {
