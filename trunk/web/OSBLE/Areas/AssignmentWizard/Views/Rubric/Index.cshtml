@@ -71,12 +71,6 @@ ul
 
 <html> <body>
 
-@Html.HiddenFor(m => m.ID)
-
-
-
-
-
 <table>
     <tr>
         <td>
@@ -229,9 +223,9 @@ ul
 </table>
 
 @*Modal box for uploading rubrics to CSVs*@
-<div id='import_rubric_from_csv'  title="Import file">Upload a comma-separated values (CSV) file representing the rubric<br /><br />
-    @using (Html.BeginForm("LoadRubricFromCsv", "Rubric", FormMethod.Post, new { enctype = "multipart/form-data" }))
-    {
+<div id='import_rubric_from_csv'  title="Import file">Upload a rubric definition file (CSV).<br /><br />
+
+    <form id="set_rubric" enctype="multipart/form-data" method="post" action="/AssignmentWizard/Rubric/LoadRubricFromCsv">
         <input type="hidden" name="assignmentColumnId" id="column_assignment_id" />
         <fieldset>
             <legend>Select Files To Submit</legend>
@@ -244,7 +238,7 @@ ul
                 </tr>
             </table>
         </fieldset>
-    }
+    </form>
 </div>
 
 </body> </html>
@@ -266,10 +260,6 @@ ul
         if (ok) {
             $('#WizardForm').submit();
         }
-    });
-
-    $('.file').click(function () {
-        
     });
 
     function displayUploadRubric() {

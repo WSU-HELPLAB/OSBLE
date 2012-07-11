@@ -8,6 +8,8 @@ using OSBLE.Models.Assignments;
 using System.Text.RegularExpressions;
 using OSBLE.Models.Courses;
 using OSBLE.Areas.AssignmentWizard.ViewModels;
+using System.IO;
+using OSBLE.Resources;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -56,9 +58,33 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             return LoadRubric(assignment);
         }
 
-        private ActionResult LoadRubric(Assignment assignment)
-        { 
+        [HttpPost]
+        public ActionResult LoadRubricFromCsv(HttpPostedFileBase file)
+        {
+            base.Index();
+            Assignment assignment = new Assignment();
+            Rubric rubric = new Rubric();
+
+            //fill out the rubric from the csv file
+            MemoryStream rubricStream = new MemoryStream();
+            file.InputStream.CopyTo(rubricStream);
+            CsvParser csv = new CsvParser(rubricStream);
             
+            List<string> row = csv.getNextRow();
+
+            while (row != null)
+            {
+
+                row = csv.getNextRow();
+            }
+
+            assignment.Rubric = rubric;
+
+            return LoadRubric(assignment);
+        }
+
+        private ActionResult LoadRubric(Assignment assignment)
+        {
             List<CourseUser> myCourseUsers = (from cu in db.CourseUsers
                                               where cu.UserProfileID == ActiveCourseUser.UserProfileID
                                               select cu).ToList();
@@ -115,19 +141,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             ViewBag.ActiveCourse = ActiveCourseUser;
             ViewBag.rubricTable = rubricTable;
             
-            return View(assignment);
-        }
-
-        [HttpPost]
-        public ActionResult LoadRubricFromCsv()
-        {
-            //get the file stream
-
-            //parse it
-
-            //create rubric ViewModel
-
-            return View(Assignment);
+            return View("Index", assignment);
         }
 
         [HttpPost]
