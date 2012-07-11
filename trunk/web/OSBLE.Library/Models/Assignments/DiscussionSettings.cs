@@ -75,6 +75,10 @@ namespace OSBLE.Models.Assignments
 
         public DiscussionSetting(DiscussionSetting other)
         {
+            if (other == null)
+            {
+                return;
+            }
             this.AnonymitySettings = other.AnonymitySettings;
             this.AssignmentID = other.AssignmentID;
             this.InitialPostDueDate = other.InitialPostDueDate;
