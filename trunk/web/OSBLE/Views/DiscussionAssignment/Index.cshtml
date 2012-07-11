@@ -3,11 +3,14 @@
 @using OSBLE.Models.HomePage
 @using OSBLE.Models.DiscussionAssignment
 @using OSBLE.Models.Assignments
+@using OSBLE.Models.ViewModels
 @{
 
     Assignment assignment = ViewBag.Assignment;
     ViewBag.Title = "Discussion Assignment: " + assignment.AssignmentName;
+    List<DiscussionPostViewModel> DiscussionPostViewModelList = ViewBag.DiscussionPostViewModelList; 
     int discussionTeamID = ViewBag.DiscussionTeamID;
+    
     string selectBoxID = "dtStudentSelect";
     if (ViewBag.ActiveCourse.AbstractRole.CanModify)
     {
@@ -99,8 +102,7 @@
     </fieldset>
     <br />
 
-    @if (!ViewBag.ActiveCourse.AbstractRole.Anonymized)
-    {
+    @{
         <!--div for post character counter-->
         if (assignment.DiscussionSettings.MinimumFirstPostLength > 0 && ViewBag.IsFirstPost && assignment.DueDate > DateTime.Now)
         {
@@ -139,73 +141,71 @@
             @:This assignment is closed.<br /><br />
         }
     }
-    @if (ViewBag.Posts != null && (ViewBag.IsFirstPost == false || assignment.DiscussionSettings.RequiresPostBeforeView == false))
+    @if (DiscussionPostViewModelList != null && (ViewBag.IsFirstPost == false || assignment.DiscussionSettings.RequiresPostBeforeView == false))
     {
         HelperResult DefaultProfilePicture = Helpers.DefaultProfilePicture();
         HelperResult displayPicture;
         string displayName = "";
 
         <!--Generating posts-->
-        foreach (DiscussionPost dp in ViewBag.Posts)
+        foreach (DiscussionPostViewModel dpvm in DiscussionPostViewModelList)
         {
-            if (displayAsAnonymous == false || dp.CourseUserID == ViewBag.ActiveCourse.ID)
+            displayName = dpvm.DisplayName;
+            if (dpvm.Anonymize == false)
             {
-                displayPicture = Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = dp.CourseUser.AbstractCourseID, userprofile = dp.CourseUser.UserProfileID }));
-                displayName = dp.CourseUser.UserProfile.FirstName + " " + dp.CourseUser.UserProfile.LastName;
+                displayPicture = Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = dpvm.CourseUser.AbstractCourseID, userprofile = dpvm.CourseUser.UserProfileID }));
             }
             else
             {
-                displayName = "Anonymous " + dp.CourseUserID.ToString();//dp.DisplayName;
                 displayPicture = DefaultProfilePicture;
             }
-            <div class="dp_post" id="dp_post_@(dp.ID)" style="background:white;">
+            <div class="dp_post" id="dp_post_@(dpvm.DiscussionPostId)" style="background:white;">
             @if (ViewBag.Student != null
-                && ViewBag.Student.ID == dp.CourseUserID
+                && ViewBag.Student.ID == dpvm.CourseUser.ID
                 && (ViewBag.PostOrReply == 0 || ViewBag.PostOrReply == 2)
-                && (ViewBag.ActiveCourse.AbstractRole.CanModify || ViewBag.ActiveCourse.AbstractRole.Anonymized))
+                && (ViewBag.ActiveCourse.AbstractRole.CanModify))
             {
                     <!--display as highlighted if there is a student selected, and this is that student-->
                     <script type="text/javascript">
-                        $('#dp_post_@(dp.ID)').css("background", "#FFF8C6");
+                        $('#dp_post_@(dpvm.DiscussionPostId))').css("background", "#FFF8C6");
                     </script>
             }
                 <div class="dp_post_header">
                     @displayPicture
                     @displayName <br />
-                    @dp.Posted <br /> <br /> 
+                    @dpvm.Posted <br /> <br /> 
                 </div>
                 <div class="dp_content">
                     @{
-            string content = Helpers.Linkify(dp.Content).ToHtmlString();
-            content = content.Replace("\n", "<br />");
+                        string content = Helpers.Linkify(dpvm.Content).ToHtmlString();
+                        content = content.Replace("\n", "<br />");
                     }
                     @Html.Raw(content)
                 </div>
                 <div class="dp_replies">
-                    <div id="dp_replies_for_@(dp.ID)">
+                    <div id="dp_replies_for_@(dpvm.DiscussionPostId)">
                         <!--Generating replies under each post-->
-                        @foreach (DiscussionPost dr in dp.Replies)
+                        @foreach (ReplyViewModel reply in dpvm.Replies)
                         {
-                            if (displayAsAnonymous == false || dr.CourseUserID == ViewBag.ActiveCourse.ID)
+                            displayName = reply.DisplayName; //reusing displayName/displayPicture as theyre not used further down the post
+                            if (reply.Anonymize == false)
                             {
-                                displayPicture = Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = dr.CourseUser.AbstractCourseID, userprofile = dr.CourseUser.UserProfileID }));
-                                displayName = dr.CourseUser.UserProfile.FirstName + " " + dr.CourseUser.UserProfile.LastName;
+                                displayPicture = Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = reply.CourseUser.AbstractCourseID, userprofile = reply.CourseUser.UserProfileID }));
                             }
                             else
-                            {
-                                displayName = "Anonymous " + dr.CourseUserID.ToString();
+                            {;
                                 displayPicture = DefaultProfilePicture;
                             }
                         
-                            <div class="dp_post" id="dp_post_@(dr.ID)" style="background:white;">
+                            <div class="dp_post" id="dp_post_@(reply.DiscussionPostId)" style="background:white;">
                                 <div class="dp_post_header">
                                     @displayPicture
                                     @displayName<br />
-                                    @dr.Posted <br /> <br /> 
+                                    @reply.Posted <br /> <br /> 
                                 </div>
                                 <div class="dp_content">
                                     @{
-                            content = Helpers.Linkify(dr.Content).ToHtmlString();
+                            content = Helpers.Linkify(reply.Content).ToHtmlString();
                             content = content.Replace("\n", "<br />");
                                     }
                                     @Html.Raw(content)
@@ -213,13 +213,13 @@
                             </div>
                         
                             if (ViewBag.Student != null
-                                && ViewBag.Student.ID == dr.CourseUserID
+                                && ViewBag.Student.ID == reply.CourseUser.ID
                                 && (ViewBag.PostOrReply == 1 || ViewBag.PostOrReply == 2)
                                 && (ViewBag.ActiveCourse.AbstractRole.CanModify || ViewBag.ActiveCourse.AbstractRole.Anonymized))
                             {
                                 <!--display as highlighted if there is a student selected, and this is that student-->
                                 <script type="text/javascript">
-                                    $('#dp_post_@(dr.ID)').css("background", "#FFF8C6");
+                                    $('#dp_post_@(reply.DiscussionPostId)').css("background", "#FFF8C6");
                                 </script>
                             }
                         }
@@ -227,28 +227,28 @@
                 </div>
                         @if (assignment.DueDate > DateTime.Now)
                         {
-                            <div class="dp_replylink"> <a href="#" id="reply_@(dp.ID)">Reply</a></div>
+                            <div class="dp_replylink"> <a href="#" id="reply_@(dpvm.DiscussionPostId)">Reply</a></div>
                         }
-                <div class="dp_replybox" id="replybox_@(dp.ID)" style="padding-left:23px;">
+                <div class="dp_replybox" id="replybox_@(dpvm.DiscussionPostId)" style="padding-left:23px;">
                     @using (Html.BeginForm("NewReply", "DiscussionAssignment", FormMethod.Post))
                     {
                         <input type="hidden" name="DiscussionTeamID" value="@discussionTeamID" />
                         <input type="hidden" name="AssignmentID" value="@ViewBag.Assignment.ID" />
-                        <input type="hidden" name="ParentPostID" value="@dp.ID" />
+                        <input type="hidden" name="ParentPostID" value="@dpvm.DiscussionPostId" />
                         <span id="remCharsReply" name="remainingCharsReply" readonly="true" value="(@ViewBag.MaxActivityFeedLength) Characters left"></span><br />
-                        <textarea name="Content" rows="5" cols="40" id="dp_replybox_content_@(dp.ID)" placeholder="Enter reply here..."></textarea><br />
-                        <input id="reply @(dp.ID) button" type="submit" name="post_reply" value="Post Reply" onclick="refreshCount()" />
+                        <textarea name="Content" rows="5" cols="40" id="dp_replybox_content_@(dpvm.DiscussionPostId)" placeholder="Enter reply here..."></textarea><br />
+                        <input id="reply @(dpvm.DiscussionPostId) button" type="submit" name="post_reply" value="Post Reply" onclick="refreshCount()" />
                     }
                     <br /> 
-                    <div class="dp_replylink"> <a href="#" id="replycancel_@(dp.ID)">Cancel</a></div>
+                    <div class="dp_replylink"> <a href="#" id="replycancel_@(dpvm.DiscussionPostId)">Cancel</a></div>
                 </div>
                 <script type="text/javascript">
-                    $("#reply_@(dp.ID)").click(function () {
-                        $("#reply_@(dp.ID)").hide();
-                        $("#replybox_@(dp.ID)").show('blind'); return false;
+                    $("#reply_@(dpvm.DiscussionPostId)").click(function () {
+                        $("#reply_@(dpvm.DiscussionPostId)").hide();
+                        $("#replybox_@(dpvm.DiscussionPostId)").show('blind'); return false;
                     });
-                    $("#replycancel_@(dp.ID)").click(function () {
-                        $("#reply_@(dp.ID)").show('highlight'); $("#replybox_@(dp.ID)").hide('blind');
+                    $("#replycancel_@(dpvm.DiscussionPostId)").click(function () {
+                        $("#reply_@(dpvm.DiscussionPostId)").show('highlight'); $("#replybox_@(dpvm.DiscussionPostId)").hide('blind');
                         return false;
                     }); 
                 </script>
