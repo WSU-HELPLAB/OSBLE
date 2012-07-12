@@ -87,6 +87,7 @@
     <Compile Include="Models\Assignments\CommentCategory.cs" />
     <Compile Include="Models\Assignments\CommentCategoryConfiguration.cs" />
     <Compile Include="Models\Assignments\CommentCategoryOption.cs" />
+    <Compile Include="Models\Assignments\CriticalReviewSettings.cs" />
     <Compile Include="Models\Assignments\Deliverable.cs" />
     <Compile Include="Models\Assignments\DiscussionSettings.cs" />
     <Compile Include="Models\Assignments\DiscussionTeam.cs" />

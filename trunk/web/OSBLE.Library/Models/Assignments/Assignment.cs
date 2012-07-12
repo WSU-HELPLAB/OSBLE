@@ -275,6 +275,9 @@ namespace OSBLE.Models.Assignments
         [Association("DiscussionSetting_Assignment", "ID", "AssignmentID")]
         public virtual DiscussionSetting DiscussionSettings { get; set; }
 
+        [Association("CriticalReviewSettings_Assignment", "ID", "AssignmentID")]
+        public virtual CriticalReviewSettings CriticalReviewSettings { get; set; }
+
         [Association("TeamEvaluationSettings_Assignment", "ID", "AssignmentID")]
         public virtual TeamEvaluationSettings TeamEvaluationSettings { get; set; }
 

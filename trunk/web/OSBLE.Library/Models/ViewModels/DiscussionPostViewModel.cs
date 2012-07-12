@@ -41,10 +41,15 @@ namespace OSBLE.Models.ViewModels
     {
         public DiscussionPostViewModel()
         {
-            Replies = new List<ReplyViewModel>();
+            replies = new List<ReplyViewModel>();
         }
 
-        public List<ReplyViewModel> Replies { get; set; }
+        private List<ReplyViewModel> replies;
+
+        public List<ReplyViewModel> Replies { 
+            get { return replies.OrderBy(r => r.Posted).ToList(); } 
+            set { replies = value; } 
+        }
 
     }
 }
