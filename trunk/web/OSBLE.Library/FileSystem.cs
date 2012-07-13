@@ -44,8 +44,10 @@ using OSBLE.Models.Assignments;
 
 namespace OSBLE
 {
-    public static class FileSystem
-    {
+    public class FileSystem
+    { 
+
+        #region old FileSystem Code (deprecated)
         private static string getRootPath()
         {
             return HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
@@ -793,4 +795,5 @@ namespace OSBLE
 #endif
         }
     }
+        #endregion
 }

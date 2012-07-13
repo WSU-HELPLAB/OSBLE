@@ -26,6 +26,7 @@ namespace OSBLE.Controllers
 
             if (course != null)
             {
+                
                 string rootPath = FileSystem.GetCourseDocumentsPath(courseId);
 
                 //AC: At some point, it might be a good idea to document these hacks
