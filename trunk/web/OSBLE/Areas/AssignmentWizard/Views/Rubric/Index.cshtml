@@ -3,10 +3,11 @@
 @using OSBLE.Areas.AssignmentWizard.ViewModels;
 @model Assignment
 @{
-    Html.HiddenFor(m => m.ID);
     bool hasRubric = Model.HasRubric;
     RubricSelectionViewModel rubricSelection = ViewBag.rubricSelection;
 } 
+
+@Html.HiddenFor(m => m.ID)
 
 <style media="screen" type="text/css">
 
@@ -21,15 +22,12 @@
 	border-width: 1px;
 	padding: 10px;
 	border-style: inset;
+    border-color:Black;
 }
 .rubric td {
 	border-width: 1px;
 	padding: 10px;
 	border-style: inset;
-}
-
-td th
-{
     border-color:Black;
 }
 
@@ -38,9 +36,10 @@ td.top
    vertical-align:top;
 }
 
-ul
+ul.RubricList
 {
     list-style-type: none;
+    float:left;
     padding:0;
     margin:0;
 }
@@ -55,6 +54,24 @@ ul
     float:left;
 }
 
+.Input
+{
+    border:0;
+    width:100%;
+    height:100%;
+}
+
+.Level
+{
+    min-width:215px;
+}
+
+.PerformanceCriterionCell
+{
+    display:inline-block;
+    vertical-align:top;
+}
+
 #import_rubric_from_csv
 {
 	border: 1px solid #eeeeff;
@@ -62,10 +79,9 @@ ul
 	padding-left: 8px;
 	padding-right: 8px;
 	padding-bottom: 8px;
-	width: 400px;
+	width: 250px;
 	display: none;
 }
-
 
 </style>
 
@@ -112,7 +128,7 @@ ul
 
     <tr>
         <td>
-            <ul>
+            <ul class="RubricList">
                 <li>
                     <input type="checkbox" name="globalComments" value="globalComments" />Overall Comments
                 </li>
@@ -123,7 +139,7 @@ ul
         </td>
 
         <td>
-            <textarea name="rubricDescription" rows="2" cols="40">@ViewBag.rubricDescription</textarea>
+            <textarea  name="rubricDescription" rows="2" cols="40">@ViewBag.rubricDescription</textarea>
         </td>
     </tr>
 </table>
@@ -135,41 +151,39 @@ ul
             <table id="dataTable" class="rubric">
                 @*Row for column titles*@
                 <tr>
-                    <th>
+                    <th style="min-width:185px">
                         Performance Criterion
                     </th>
                         
-                    <th>Criterion<br />Weight</th>
+                    <th style="min-width:85px">Criterion<br />Weight</th>
                         
                     @* Level Title *@
                     @{
                         int n = 0;
                         foreach (Level level in ViewBag.levels)
                         {
-                            <th class="level">
-                                    <ul>
-                                        <li>
-                                        @*<input type="button" value="<" onclick="moveColumnLeft('dataTable', this.parentNode.parentNode.parentNode.cellIndex)" /> *@
-                                            <input type="button" value="-" onclick="deleteColumn('dataTable', this.parentNode.parentNode.parentNode.cellIndex)" />
-                                            @*<input type="button" value=">" onclick="moveColumnRight('dataTable', this.parentNode.parentNode.parentNode.cellIndex)" /> *@
-                                        </li>
-                                        <li>Level Point Spread
-                                            <select class="SpreadInput" name="rubric:@n:S">
-                                                @for (int i = 1; i <= 10; i++)
+                            <th class="Level">
+                                <ul class="RubricList">
+                                    <li>
+                                        <img src="/Content/images/delete_up.png" alt="Delete Row" onclick="deleteColumn('dataTable', this.parentNode.parentNode.parentNode.cellIndex)" />
+                                    </li>
+                                    <li>Level Point Spread
+                                        <select class="SpreadInput" name="rubric:@n:S">
+                                            @for (int i = 1; i <= 10; i++)
+                                            {
+                                                if (i == level.PointSpread)
                                                 {
-                                                    if (i == 5)
-                                                    {
-                                                        <option selected value="@i">@i</option>
-                                                    }
-                                                    else
-                                                    {
-                                                        <option value="@i">@i</option>
-                                                    }
+                                                    <option selected="true" value="@i">@i</option>
                                                 }
-                                            </select>
-                                        </li>
-                                        <li>Level Title<input class="Input" name="rubric:@n:L" type="text" value="@level.LevelTitle"/></li>
-                                    </ul>
+                                                else
+                                                {
+                                                    <option value="@i">@i</option>
+                                                }
+                                            }
+                                        </select>
+                                    </li>
+                                    <li>Level Title<input class="Input" name="rubric:@n:L" type="text" value="@level.LevelTitle"/></li>
+                                </ul>
                             </th>
                             n++;
                         }
@@ -183,17 +197,24 @@ ul
                         <tr>
                             @*Performance Criterion*@
                             <td>
-                                <ul style="float:left;vertical-align:middle">
-                                    <li><input type="button" value="^" onclick="moveRowUp('dataTable', this.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
-                                    <li><input type="button" value="-" onclick="deleteRow('dataTable', this.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
-                                    <li><input type="button" value="v" onclick="moveRowDown('dataTable', this.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                            
+                                <ul class="RubricList">
+                                    <li class="PerformanceCriterionCell">
+                                        <ul class="RubricList" style="float:left">
+                                            <li><img src="/Content/images/move_up.png" alt="Move Row Up" onclick="moveRowUp('dataTable', this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                                            <li><img src="/Content/images/delete_up.png" alt="Delete Row" onclick="deleteRow('dataTable', this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                                            <li><img src="/Content/images/move_down.png" alt="Move Row Down" onclick="moveRowDown('dataTable', this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                                        </ul>
+                                   </li>
+
+                                    <li class="PerformanceCriterionCell">     
+                                        <textarea class="Input" style="max-width:140px" name="rubric:0:@n" rows="5" cols="20">@row[0]</textarea>
+                                   </li> 
                                 </ul>
-      
-                                <textarea style="float:left"  class="Input center" name="rubric:0:@n" rows="5" cols="20">@row[0]</textarea>
                             </td>
 
                             @*Criterion Weight*@
-                            <td style="vertical-align:top">
+                            <td>
                                 <input class="Input" type="text" name="rubric:1:@n"  size="1" value="@row[1]"/>
                             </td>
 
@@ -212,18 +233,20 @@ ul
             </table>
         </td>
         <td class ="top">
-            <input type="button" value="+" onclick="addColumn('dataTable')" />
+            <img src="/Content/images/add_up.png" alt="Add Column" onclick="addColumn('dataTable')"/>
         </td>
     </tr>
     <tr>
         <td>
-            <input type="button" value="+" onclick="addRow('dataTable')" />
+            <img  src="/Content/images/add_up.png" alt="Add Row" onclick="addRow('dataTable')" />
         </td>
     </tr>
 </table>
 
 @*Modal box for uploading rubrics to CSVs*@
-<div id='import_rubric_from_csv'  title="Import file">Upload a rubric definition file (CSV).<br /><br />
+<div id='import_rubric_from_csv'  title="Import file">Upload a rubric definition file (CSV).<br />
+The current rubric will be replaced with a new one and all progress will be lost.
+<br />
 
     <form id="set_rubric" enctype="multipart/form-data" method="post" action="/AssignmentWizard/Rubric/LoadRubricFromCsv">
         <input type="hidden" name="assignmentColumnId" id="column_assignment_id" />
@@ -385,7 +408,7 @@ ul
 
     function animateSwap(topRow, bottomRow, table) {
         swapped = false;
-        var animationTime = 250;
+        var animationTime = 300;
         var i = 0;
 
         //animations don't work well in firefox, so just perform the swap with no animation
@@ -430,7 +453,10 @@ ul
                 $tempBottom.height($(bottomRow.cells[i]).height());
 
                 $tempTop.find('textarea').text($(this).find('textarea').val());
+                $tempTop.find('textarea').css('width', $(this).find('textarea').css('width'));
+
                 $tempBottom.find('textarea').text($(bottomRow.cells[i]).find('textarea').val());
+                $tempBottom.find('textarea').css('width', $(bottomRow.cells[i]).find('textarea').css('width'));
 
                 $(this).css('visibility', 'hidden');
                 $(bottomRow.cells[i]).css('visibility', 'hidden');

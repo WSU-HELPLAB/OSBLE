@@ -271,7 +271,7 @@ namespace OSBLE.Controllers
 
                     //figure out the normalized final score.
                     double maxLevelScore = (from c in vm.Rubric.Levels
-                                            select c.RangeEnd).Sum();
+                                            select c.PointSpread).Sum();
                     double totalRubricPoints = (from c in vm.Rubric.Criteria
                                                 select c.Weight).Sum();
                     double studentScore = 0.0;
@@ -603,7 +603,7 @@ namespace OSBLE.Controllers
                                select c.Comment).FirstOrDefault().ToString();
                 }
                 criterions += "*** " + criterion.CriterionTitle + " (Weight: " + criterion.Weight + ")\n";
-                criterions += "*** Points (0 - " + curAssignment.Rubric.Levels.Sum(s => s.RangeEnd) + "):\n";
+                criterions += "*** Points (0 - " + curAssignment.Rubric.Levels.Sum(s => s.PointSpread) + "):\n";
                 criterions += points + "\n";
                 criterions += "*** Comments: \n";
                 criterions += comment + "\n\n";

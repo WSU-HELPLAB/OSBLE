@@ -38,7 +38,7 @@ namespace OSBLE.Areas.AssignmentWizard.ViewModels
 
         public void AddCourse(Course course)
         {
-            if (course != null && course.Assignments.Where(a => a.HasRubric).Count() > 1)
+            if (course != null && course.Assignments.Where(a => a.HasRubric).Count() > 0)
             {
                 rubricSelection.Add(course.ID, new CourseViewModel(course));
             }

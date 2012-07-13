@@ -196,7 +196,7 @@ namespace OSBLE.Controllers
 
                     //figure out the normalized final score.
                     double maxLevelScore = (from c in assignment.Rubric.Levels
-                                            select c.RangeEnd).Sum();
+                                            select c.PointSpread).Sum();
                     double totalRubricPoints = (from c in assignment.Rubric.Criteria
                                                 select c.Weight).Sum();
                     double studentScore = 0.0;

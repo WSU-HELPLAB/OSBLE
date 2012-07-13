@@ -62,8 +62,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public ActionResult LoadRubricFromCsv(HttpPostedFileBase file)
         {
             base.Index();
-            Assignment assignment = new Assignment();
-            Rubric rubric = new Rubric();
+            CreateRubricSelectionViewModel();
 
             //fill out the rubric from the csv file
             MemoryStream rubricStream = new MemoryStream();
@@ -72,34 +71,58 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             
             List<string> row = csv.getNextRow();
 
-            while (row != null)
-            {
+            IList<Level> levels = new List<Level>();
 
-                row = csv.getNextRow();
+            Regex rgx = new Regex (@"\(\d+-\d+ pts\)");
+
+            for(int i = 2; i < row.Count; i++)
+            {
+                Level l = new Level();
+                Match match = rgx.Match(row[i]);
+
+                //if level piont spread was specified:
+                if (match.Success)
+                {
+                    row[i] = rgx.Replace(row[i], "");
+                    
+                    //get the numbers out of the match and add them to the level point spread fields
+                    MatchCollection spread = Regex.Matches(match.ToString(), @"\d+");
+                    if(spread.Count == 2)
+                    {
+                        //set the point range:
+                        l.PointSpread = Int32.Parse(spread[1].ToString());
+                    }
+                     
+                }
+
+                l.LevelTitle = row[i];
+                levels.Add(l);
             }
 
-            assignment.Rubric = rubric;
+            List<List<string>> rubricTable = new List<List<string>>();
+            while (row != null)
+            {
+                row = csv.getNextRow();
+                if (row != null)
+                {
+                    rubricTable.Add(row);
+                }
+            }
 
-            return LoadRubric(assignment);
+            string rubricDescription = file.FileName;
+
+            ViewBag.rubricDescription = rubricDescription;
+            ViewBag.levels = levels;
+            ViewBag.ActiveCourse = ActiveCourseUser;
+            ViewBag.rubricTable = rubricTable;
+
+            return View("Index", Assignment);
         }
 
         private ActionResult LoadRubric(Assignment assignment)
         {
-            List<CourseUser> myCourseUsers = (from cu in db.CourseUsers
-                                              where cu.UserProfileID == ActiveCourseUser.UserProfileID
-                                              select cu).ToList();
+            CreateRubricSelectionViewModel();
 
-            List<Course> myCourses = (from cu in myCourseUsers
-                                      select cu.AbstractCourse as Course).ToList();
-
-            RubricSelectionViewModel rubricSelectionViewModel = new RubricSelectionViewModel();
-
-            foreach (Course course in myCourses)
-            {
-                rubricSelectionViewModel.AddCourse(course);
-            }
-
-            ViewBag.rubricSelection = rubricSelectionViewModel;
             List<List<string>> rubricTable = new List<List<string>>();
             IList<Level> levels = new List<Level>();
             string rubricDescription;
@@ -125,8 +148,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
             else
             {
-                rubricDescription = null;
                 //create empty rubric
+                rubricDescription = null;
                 ViewBag.hasRubric = true;
                 List<string> row = new List<string>();
                 row.Add("");
@@ -144,8 +167,27 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             return View("Index", assignment);
         }
 
+        private void CreateRubricSelectionViewModel()
+        {
+            List<CourseUser> myCourseUsers = (from cu in db.CourseUsers
+                                              where cu.UserProfileID == ActiveCourseUser.UserProfileID
+                                              select cu).ToList();
+
+            List<Course> myCourses = (from cu in myCourseUsers
+                                      select cu.AbstractCourse as Course).ToList();
+
+            RubricSelectionViewModel rubricSelectionViewModel = new RubricSelectionViewModel();
+
+            foreach (Course course in myCourses)
+            {
+                rubricSelectionViewModel.AddCourse(course);
+            }
+
+            ViewBag.rubricSelection = rubricSelectionViewModel;
+        }
+
         [HttpPost]
-        public ActionResult Index(Assignment model)
+        public virtual ActionResult Index(Assignment model)
         {
             int assId;
            
@@ -157,20 +199,26 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             //reset our assignment
             Assignment = db.Assignments.Find(model.ID);
 
-            if (Assignment.HasRubric)
+            if (Assignment != null)
             {
-                //delete the old rubric (to be replaced with the one in the HTML)
-               db.Rubrics.Remove(Assignment.Rubric);
-               db.SaveChanges();
+                if (Assignment.HasRubric)
+                {
+                    //delete the old rubric (to be replaced with the one in the HTML)
+                    db.Rubrics.Remove(Assignment.Rubric);
+                    db.SaveChanges();
+                }
+
+                //Load the rubric from the view
+                int rubricID = LoadRubricFromHTML();
+
+                Assignment.RubricID = rubricID;
+                db.Entry(Assignment).State = System.Data.EntityState.Modified;
+                db.SaveChanges();
             }
-
-            //Load the rubric from the view
-            int rubricID = LoadRubricFromHTML();
-
-            Assignment.RubricID = rubricID;
-            db.Entry(Assignment).State = System.Data.EntityState.Modified;
-            db.SaveChanges();
-
+            else
+            {
+                //fail gracefully
+            }
             return base.PostBack(Assignment);
         }
 
@@ -193,12 +241,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             List<List<string>> rubricTable = new List<List<string>>(); // store the entire table, excluding the top row
             //store the level title values
             List<string> levelTitles = new List<string>();
+            List<int> pointSpreads = new List<int>();
 
             List<string> Keys = new List<string>();
             //acquire a list of all relevant keys for the rubric
             foreach (string key in Request.Params.Keys)
             {
-
                 if (Regex.Match(key, "rubric:").Success)
                 {
                     Keys.Add(key);
@@ -210,6 +258,11 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                            where Regex.Match(k, @"rubric:\d+:L").Success
                            orderby k
                            select Request.Params[k]).ToList();
+
+            pointSpreads = (from k in Keys
+                           where Regex.Match(k, @"rubric:\d+:S").Success
+                           orderby k
+                           select Int32.Parse(Request.Params[k])).ToList();
 
             List<string> RowStrings = (from k in Keys
                                        where Regex.Match(k, @"rubric:0:\d+").Success
@@ -250,6 +303,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
             return CreateRubricModel(rubricTable,
                 levelTitles,
+                pointSpreads,
                 hasGlobalComments,
                 hasCriteriaComments,
                 rubricDescription);
@@ -272,6 +326,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         /// <returns>RubricID of the new rubric</returns>
         private int CreateRubricModel(List<List<string>> rubricTable, 
             List<string> levelTitles,
+            List<int> pointSpreads,
             bool hasGlobalComments,
             bool hasCriteriaComments,
             string rubricDescription)
@@ -301,8 +356,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 {
                     level.LevelTitle = levelTitle;
                 }
-                level.RangeStart = 0;
-                level.RangeEnd = 4;
+                level.PointSpread = pointSpreads[p-1];
                 level.RubricID = rubric.ID;
                 db.Levels.Add(level);
                 p++;
