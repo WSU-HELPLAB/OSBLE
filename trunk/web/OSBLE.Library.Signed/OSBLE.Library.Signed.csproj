@@ -148,6 +148,9 @@
     <Compile Include="..\OSBLE.Library\Models\Assignments\CommentCategoryOption.cs">
       <Link>Models\Assignments\CommentCategoryOption.cs</Link>
     </Compile>
+    <Compile Include="..\OSBLE.Library\Models\Assignments\CriticalReviewSettings.cs">
+      <Link>Models\Assignments\CriticalReviewSettings.cs</Link>
+    </Compile>
     <Compile Include="..\OSBLE.Library\Models\Assignments\Deliverable.cs">
       <Link>Models\Assignments\Deliverable.cs</Link>
     </Compile>

@@ -57,18 +57,38 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public override ActionResult Index()
         {
             base.Index();
-            if (Assignment.CriticalReviewSettings == null)
+            /*if (Assignment.CriticalReviewSettings == null)
             {
                 Assignment.CriticalReviewSettings = new CriticalReviewSettings();
             }
-            return View(Assignment.CriticalReviewSettings);
+            return View(Assignment.CriticalReviewSettings);*/
+            return View();
         }
 
         [HttpPost]
-        public ActionResult Index(DiscussionSetting model)
+        public ActionResult Index(CriticalReviewSettings model)
         {
             Assignment = db.Assignments.Find(model.AssignmentID);
-            return View();
+            if (ModelState.IsValid)
+            {
+                //delete preexisting settings to prevent an FK relation issue
+                CriticalReviewSettings setting = null;// = db.CriticalReviewSettings.Find(model.AssignmentID);
+                if (setting != null)
+                {
+                    //db.CriticalReviewSettings.Remove(setting);
+                }
+                db.SaveChanges();
+
+                //...and then re-add it.
+                Assignment.CriticalReviewSettings = model;
+                db.SaveChanges();
+                WasUpdateSuccessful = true;
+            }
+            else
+            {
+                WasUpdateSuccessful = false;
+            }
+            return base.PostBack(Assignment.CriticalReviewSettings);
         }
     }
 }

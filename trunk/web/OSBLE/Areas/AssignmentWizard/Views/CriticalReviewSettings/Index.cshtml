@@ -5,13 +5,29 @@
 {
 
 }
-@Html.ValidationSummary() 
 @Html.HiddenFor(m => m.AssignmentID)
-<table class="wizard_entry_table">
+<script type="text/javascript">
+    var enableCB = false;
+    $(document).ready(function () {
+        handleAllowReviewersToDownloadCB($("#DownloadCB"));
 
+    });
+
+    function handleAllowReviewersToDownloadCB(incValue) {
+        if (incValue.checked) {
+            $("#AnonymizeReviewersCB").removeAttr('disabled');
+        }
+        else {
+            $("#AnonymizeReviewersCB").attr("disabled", "disabled");
+        }
+    }
+    
+
+</script>
+<table class="wizard_entry_table">
     <tr>
         <th>@Html.LabelFor(m => m.AllowReviewersToDownload)</th>
-        <td>@Html.CheckBoxFor(m => m.AllowReviewersToDownload)</td>
+        <td>@Html.CheckBoxFor(m => m.AllowReviewersToDownload, new { id = "DownloadCB",  onclick = "handleAllowReviewersToDownloadCB(this)" })</td>
     </tr>
     <tr>
         <th>@Html.LabelFor(m => m.AnonymizeAuthorToReviewer)</th>
@@ -22,7 +38,7 @@
         <td>@Html.CheckBoxFor(m => m.AnonymizeReviewerToAuthor)</td>
     </tr>
     <tr>
-        <th>@Html.LabelFor(m => m.AnonymizeReviewerToReviewers)</th>
-        <td disabled="disabled">@Html.CheckBoxFor(m => m.AnonymizeReviewerToReviewers)</td>
+        <th >@Html.LabelFor(m => m.AnonymizeReviewerToReviewers)</th>
+        <td>@Html.CheckBoxFor(m => m.AnonymizeReviewerToReviewers, new { id = "AnonymizeReviewersCB" })</td>
     </tr>
 </table>

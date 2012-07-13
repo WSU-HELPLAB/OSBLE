@@ -291,6 +291,12 @@ namespace OSBLE.Models
                 .WithOptional(a => a.TeamEvaluationSettings)
                 .WillCascadeOnDelete(true);
 
+
+            modelBuilder.Entity<CriticalReviewSettings>()
+                .HasRequired(crs => crs.Assignment)
+                .WithOptional(a => a.CriticalReviewSettings)
+                .WillCascadeOnDelete(true);
+
             modelBuilder.Entity<TeamEvaluation>()
                 .HasRequired(tm => tm.Evaluator)
                 .WithMany()

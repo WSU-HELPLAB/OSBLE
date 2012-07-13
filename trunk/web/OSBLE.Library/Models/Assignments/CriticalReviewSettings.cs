@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Web;
 using System.ComponentModel.DataAnnotations;
-
 namespace OSBLE.Models.Assignments
 {
     public class CriticalReviewSettings
@@ -18,18 +17,19 @@ namespace OSBLE.Models.Assignments
             AnonymizeAuthorToReviewer = false;
             AnonymizeReviewerToAuthor = false;
             AnonymizeReviewerToReviewers = false;
+            AllowReviewersToDownload = false;
         }
-        [Display(Name="Anonymize Author to Reviewers")]
-        public bool AnonymizeAuthorToReviewer;
+        [Display(Name = "Anonymize Author to Reviewers")]
+        public bool AnonymizeAuthorToReviewer { get; set; }
 
         [Display(Name = "Anonymize Reviewers to Author")]
-        public bool AnonymizeReviewerToAuthor;
+        public bool AnonymizeReviewerToAuthor { get; set; }
 
         [Display(Name = "Anonymize Reviewers to other Reviewers for merged document")]
-        public bool AnonymizeReviewerToReviewers;
+        public bool AnonymizeReviewerToReviewers { get; set; }
 
         [Display(Name = "Allow reviewers to download the reviewed document after publish")]
-        public bool AllowReviewersToDownload;
+        public bool AllowReviewersToDownload { get; set; }
         
 
     }
