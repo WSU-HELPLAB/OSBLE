@@ -16,13 +16,6 @@
     {
         selectBoxID = "dtInstructorSelect";
     }
-
-    bool displayAsAnonymous = true;
-    if (ViewBag.ActiveCourse.AbstractRole.CanModify || (assignment.DiscussionSettings.HasAnonymousPosts == false && !ViewBag.ActiveCourse.AbstractRole.Anonymized))
-    {
-        displayAsAnonymous = false;
-    }
-    
 }
 <script type="text/javascript">
 

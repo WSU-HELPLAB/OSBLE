@@ -122,7 +122,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
             else if (vm.Client.AbstractRole.CanSubmit) //students
             {
                 //has discussion teams?
-                if (assignment.HasDiscussionTeams && assignment.DiscussionSettings!= null && !assignment.DiscussionSettings.HasAnonymousPosts)
+                if (assignment.HasDiscussionTeams && assignment.DiscussionSettings!= null && !assignment.DiscussionSettings.HasAnonymousStudentsToStudents)
                 {
                     vm.HeaderBuilder = new DiscussionTeamMemberDecorator(vm.HeaderBuilder, vm.Client);
                     vm.HeaderViews.Add("DiscussionTeamMemberDecorator");

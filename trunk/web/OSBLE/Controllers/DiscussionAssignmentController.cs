@@ -14,6 +14,85 @@ namespace OSBLE.Controllers
 {
     public class DiscussionAssignmentController : OSBLEController
     {
+        /// <summary>
+        /// Returns true if the posters name should be Anonymized for a discussion assignment
+        /// </summary>
+        /// <param name="currentUserRoleId">The current users AbstractRoleID</param>
+        /// <param name="postersUserRoleId">The posters AbstractRoleID</param>
+        /// <param name="discussionSetting">The assignments discussion settings</param>
+        /// <returns></returns>
+        public bool AnonymizeNameForDiscussion(int currentUserRoleId, int postersUserRoleId, DiscussionSetting discussionSetting)
+        {
+            bool Anonymous = false;
+
+            int studentRoleId = (int)CourseRole.CourseRoles.Student;
+            int moderatorRoleId = (int)CourseRole.CourseRoles.Moderator;
+            int instructorRoleId = (int)CourseRole.CourseRoles.Instructor;
+            int taRoleId = (int)CourseRole.CourseRoles.TA;
+
+            //If TAsCanPostToAllDiscussions, treat them as instructors to students. Otherwise treat them as moderators to students. 
+            if (postersUserRoleId == taRoleId)
+            {
+                if (discussionSetting.TAsCanPostToAllDiscussions)
+                {
+                    postersUserRoleId = instructorRoleId;
+                }
+                else
+                {
+                    postersUserRoleId = moderatorRoleId;
+                }
+            }
+
+            if (discussionSetting.HasAnonymousStudentsToStudents && currentUserRoleId == studentRoleId && postersUserRoleId == studentRoleId)
+            {
+                Anonymous = true;
+            }
+            else if (discussionSetting.HasAnonymousInstructorsToStudents && currentUserRoleId == studentRoleId && postersUserRoleId == instructorRoleId)
+            {
+                Anonymous = true;
+            }
+            else if (discussionSetting.HasAnonymousModeratorsToStudents && currentUserRoleId == studentRoleId && postersUserRoleId == moderatorRoleId)
+            {
+                Anonymous = true;
+            }
+            else if (discussionSetting.HasAnonymousStudentsToModerators && currentUserRoleId == moderatorRoleId && postersUserRoleId == studentRoleId)
+            {
+                Anonymous = true;
+            }
+
+            return Anonymous;
+        }
+
+        /// <summary>
+        /// Returns true if the user should be anonymized for a critical review discussion
+        /// </summary>
+        /// <param name="currentUserRoleId">Current users AbstractRoleId</param>
+        /// <param name="targetUserRoleId">Poster's AbstractRoleId</param>
+        /// <param name="assignment">The Critical Review Discussion assignment</param>
+        /// <param name="isAuthor">This value should be true if the poster if an author of the reviewed document</param>
+        /// <param name="isReviewer">This value should be true if the poster if a reviewer of the document.</param>
+        /// <returns></returns>
+        public bool AnonymizeNameForCriticalReviewDiscussion(int currentUserRoleId, int targetUserRoleId, 
+            Assignment assignment, bool posterIsAuthor, bool posterIsReviewer, bool currentUserIsAuthor, bool currentUserIsReviewer)
+        {
+            bool Anonymous = false;
+
+            CriticalReviewSettings crSettings = assignment.PreceedingAssignment.CriticalReviewSettings;
+            if(crSettings.AnonymizeAuthorToReviewer && currentUserIsReviewer && posterIsAuthor)
+            {
+                Anonymous = true;
+            }
+            else if(crSettings.AnonymizeReviewerToAuthor && currentUserIsAuthor && posterIsReviewer)
+            {
+                Anonymous = true;
+            }
+            //Purposefully not handling crSettings.AnonymizeReviewerToReviewers as this is property is used for the reviewed document not discussions. There is another
+            //setting in place to anonmize reviewers to reviewers in discussion settins.
+
+
+            //Anonymize if Anonymous is true or AnonymizeNameForDiscussion (anonymize based on discussion settings) is true.
+            return (Anonymous || AnonymizeNameForDiscussion(currentUserRoleId, targetUserRoleId, assignment.DiscussionSettings));
+        }
 
         // GET: /DiscussionAssignment/
         public ActionResult Index(int assignmentId, int discussionTeamId)
@@ -25,17 +104,17 @@ namespace OSBLE.Controllers
             if (discussionTeamId > 0 && assignmentId > 0)
             {
 
-                assignment= db.Assignments.Find(assignmentId);
+                assignment = db.Assignments.Find(assignmentId);
                 discussionTeam = (from dt in assignment.DiscussionTeams
-                                     where dt.ID == discussionTeamId
-                                     select dt).FirstOrDefault();
+                                  where dt.ID == discussionTeamId
+                                  select dt).FirstOrDefault();
             }
 
             //if ids are good and returned values, then confirm ActiveCourseUser belongs to that discussion team
             bool isInDiscussionTeam = false;
             if (assignment != null && discussionTeam != null)
             {
-                
+
                 foreach (TeamMember tm in discussionTeam.GetAllTeamMembers())
                 {
                     if (tm.CourseUserID == ActiveCourseUser.ID)
@@ -49,61 +128,53 @@ namespace OSBLE.Controllers
 
 
             //if ActiveCourseUser belongs to the discussionTeam, continue. Otherwise kick them out.
-            if(isInDiscussionTeam)
+            if (isInDiscussionTeam)
             {
                 List<DiscussionPostViewModel> DiscussionPostViewModelList = new List<DiscussionPostViewModel>();
                 List<ReplyViewModel> ReplyViewModelList = new List<ReplyViewModel>();
-
-                //A boolean to determine if we should automatically anonymize certain names because the current user is a moderator
-                bool AnonymizeForModerator = (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator 
-                                                && assignment.DiscussionSettings.HasAnonymizationforModerators);
 
 
                 if (assignment.HasDiscussionTeams) //If there are discusison teams, we must filter our post queries by discussionTeamId
                 {
                     if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion) //CRDs have special permissions that must be checked.
-                    {       
+                    {
+                        bool currentUserIsAuthor = discussionTeam.AuthorTeam.TeamMembers.Where(tm => tm.CourseUserID == ActiveCourseUser.ID).ToList().Count > 0;
+                        bool currentUserIsReviewer = discussionTeam.Team.TeamMembers.Where(tm => tm.CourseUserID == ActiveCourseUser.ID).ToList().Count > 0;
 
-                        //For critical reviews
-                            //get posts/replies by authors for this discussionTeamId
-                            //get posts/replies by reviewers for this discussionTeamId
-                            //get posts/replies byeveryone that is a non author/reviewer for this discussionTeamId
-                            //Create DiscussionPostViewModel for each post. Avoid duplicates on reviewers (as they can sometimes also be authors)
-                            //Create ReplyViewModel for each reply. Avoid duplicates on reviewers (as they can sometimes also be authors)
 
                         List<DiscussionPost> AuthorDiscussionPosts = (from Team authorTeam in db.Teams
-                                  join TeamMember member in db.TeamMembers on authorTeam.ID equals member.TeamID
-                                  join DiscussionPost post in db.DiscussionPosts on member.CourseUserID equals post.CourseUserID
-                                  where authorTeam.ID == discussionTeam.AuthorTeamID &&
-                                  post.DiscussionTeamID == discussionTeamId
-                                  select post).ToList();
+                                                                      join TeamMember member in db.TeamMembers on authorTeam.ID equals member.TeamID
+                                                                      join DiscussionPost post in db.DiscussionPosts on member.CourseUserID equals post.CourseUserID
+                                                                      where authorTeam.ID == discussionTeam.AuthorTeamID &&
+                                                                      post.DiscussionTeamID == discussionTeamId
+                                                                      select post).ToList();
 
-                        List<DiscussionPost> ReviewerPosts = 
+                        List<DiscussionPost> ReviewerPosts =
                                  (from Team reviewTeam in db.Teams
                                   join TeamMember member in db.TeamMembers on reviewTeam.ID equals member.TeamID
                                   join DiscussionPost post in db.DiscussionPosts on member.CourseUserID equals post.CourseUserID
                                   where reviewTeam.ID == discussionTeam.TeamID &&
                                   post.DiscussionTeamID == discussionTeamId
                                   select post).ToList();
-                        
+
                         //We want a list of all posts made by NonTeamMembers (Meaning they are not TeamMembers of AuthorTeam or Team) for this disucssionTeamId
                         //Goal: get all posts that's not written by the document author OR document reviewer (e.g. must be a non-student)
                         var NonTeamQuery = from post in db.DiscussionPosts
-                                  where post.DiscussionTeamID == discussionTeamId 
-                                  && post.CourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.Student
-                                  select post;
+                                           where post.DiscussionTeamID == discussionTeamId
+                                           && post.CourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.Student
+                                           select post;
 
                         //if TAs cannot post to all discussions, filter out TA's posts as they will be duplicate posts from ReviewerPosts 
                         if (!assignment.DiscussionSettings.TAsCanPostToAllDiscussions)
                         {
                             NonTeamQuery = from f in NonTeamQuery
-                                  where f.CourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.TA &&
-                                  f.CourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.Moderator
-                                  select f;
+                                           where f.CourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.TA &&
+                                           f.CourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.Moderator
+                                           select f;
                         }
 
-                        List<DiscussionPost> NonTeamPosts = NonTeamQuery.ToList(); //foo.To
-                        
+                        List<DiscussionPost> NonTeamPosts = NonTeamQuery.ToList();
+
 
 
 
@@ -114,7 +185,8 @@ namespace OSBLE.Controllers
                             if (dp.ParentPostID == null) //adding parent posts
                             {
                                 DiscussionPostViewModel dpvm = new DiscussionPostViewModel();
-                                dpvm.Anonymize = AnonymizeForModerator || assignment.DiscussionSettings.HasAnonymousAuthors || assignment.DiscussionSettings.HasAnonymousPosts;
+                                dpvm.Anonymize = AnonymizeNameForCriticalReviewDiscussion(ActiveCourseUser.AbstractRoleID, dp.CourseUser.AbstractRoleID, assignment, true, false,
+                                                                                            currentUserIsAuthor, currentUserIsReviewer);
                                 dpvm.Content = dp.Content;
                                 dpvm.CourseUser = dp.CourseUser;
                                 dpvm.DiscussionPostId = dp.ID;
@@ -124,12 +196,13 @@ namespace OSBLE.Controllers
                             else //adding replies
                             {
                                 ReplyViewModel reply = new ReplyViewModel();
-                                reply.Anonymize = AnonymizeForModerator || assignment.DiscussionSettings.HasAnonymousAuthors || assignment.DiscussionSettings.HasAnonymousPosts;
+                                reply.Anonymize = AnonymizeNameForCriticalReviewDiscussion(ActiveCourseUser.AbstractRoleID, dp.CourseUser.AbstractRoleID, assignment, true, false,
+                                                                                            currentUserIsAuthor, currentUserIsReviewer);
                                 reply.Content = dp.Content;
                                 reply.CourseUser = dp.CourseUser;
                                 reply.DiscussionPostId = dp.ID;
                                 reply.ParentPostID = (int)dp.ParentPostID;
-                                reply.Posted = dp.Posted;   
+                                reply.Posted = dp.Posted;
                                 ReplyViewModelList.Add(reply);
                             }
                         }
@@ -139,26 +212,26 @@ namespace OSBLE.Controllers
                             //Checking to see if post is already in list to avoid duplicate posts. (Duplicate posts are
                             //caused my some members being part of both "DiscussionTeam.Team" & "DiscussionTeam.AuthorTeam"
                             DiscussionPostViewModel existingAuthorPost = DiscussionPostViewModelList.Where(dpvm => dpvm.DiscussionPostId == dp.ID).FirstOrDefault();
-                            bool reviewerAnonSetting = (dp.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student) &&
-                                                    (assignment.DiscussionSettings.HasAnonymousReviewers || assignment.DiscussionSettings.HasAnonymousPosts || AnonymizeForModerator);
                             if (dp.ParentPostID == null && existingAuthorPost == null) //adding parent posts if existingAuthorPost is not found.
                             {
                                 DiscussionPostViewModel dpvm = new DiscussionPostViewModel();
                                 //Reviewers can potentially be TA/Moderators. We do not want to anonymize TA/Moderators
-                                dpvm.Anonymize = reviewerAnonSetting;
+                                dpvm.Anonymize = AnonymizeNameForCriticalReviewDiscussion(ActiveCourseUser.AbstractRoleID, dp.CourseUser.AbstractRoleID, assignment, false, true,
+                                                                                            currentUserIsAuthor, currentUserIsReviewer);
                                 dpvm.Content = dp.Content;
                                 dpvm.CourseUser = dp.CourseUser;
                                 dpvm.DiscussionPostId = dp.ID;
                                 dpvm.Posted = dp.Posted;
-                                DiscussionPostViewModelList.Add(dpvm);   
+                                DiscussionPostViewModelList.Add(dpvm);
                             }
                             else if (dp.ParentPostID == null && existingAuthorPost != null)
                             {
-                                //change value of Anonymize by ||ing dpvm.Anonymize with the reviewerAnonSetting. That way the user is masked for author
-                                //or for reviewer, if they are both.
+                                //change value of Anonymize because the current poster is a reviewer and author. So or'ing previous value with new anon value.
                                 int indexer = DiscussionPostViewModelList.IndexOf(existingAuthorPost);
-                                DiscussionPostViewModelList[indexer].Anonymize = DiscussionPostViewModelList[indexer].Anonymize || reviewerAnonSetting;
-                                
+                                DiscussionPostViewModelList[indexer].Anonymize = DiscussionPostViewModelList[indexer].Anonymize ||
+                                                                                    AnonymizeNameForCriticalReviewDiscussion(ActiveCourseUser.AbstractRoleID, dp.CourseUser.AbstractRoleID,
+                                                                                            assignment, false, true, currentUserIsAuthor, currentUserIsReviewer);
+
                             }
                             else //dp.ParentPostID != null (its a reply)
                             {
@@ -166,7 +239,8 @@ namespace OSBLE.Controllers
                                 if (existingAuthorReply == null)//adding replies
                                 {
                                     ReplyViewModel reply = new ReplyViewModel();
-                                    reply.Anonymize = reviewerAnonSetting;
+                                    reply.Anonymize = AnonymizeNameForCriticalReviewDiscussion(ActiveCourseUser.AbstractRoleID, dp.CourseUser.AbstractRoleID, assignment, false, true,
+                                                                                            currentUserIsAuthor, currentUserIsReviewer);
                                     reply.Content = dp.Content;
                                     reply.CourseUser = dp.CourseUser;
                                     reply.DiscussionPostId = dp.ID;
@@ -179,10 +253,12 @@ namespace OSBLE.Controllers
                                     //change value of Anonymize by ||ing dpvm.Anonymize with the reviewerAnonSetting. That way the user is masked for author
                                     //or for reviewer, if they are both.
                                     int indexer = ReplyViewModelList.IndexOf(existingAuthorReply);
-                                    ReplyViewModelList[indexer].Anonymize = ReplyViewModelList[indexer].Anonymize || reviewerAnonSetting;
+                                    ReplyViewModelList[indexer].Anonymize = ReplyViewModelList[indexer].Anonymize ||
+                                                                                AnonymizeNameForCriticalReviewDiscussion(ActiveCourseUser.AbstractRoleID, dp.CourseUser.AbstractRoleID,
+                                                                                     assignment, false, true, currentUserIsAuthor, currentUserIsReviewer);
                                 }
                             }
-                            
+
 
                         }
 
@@ -191,7 +267,7 @@ namespace OSBLE.Controllers
                             if (dp.ParentPostID == null) //adding parent posts
                             {
                                 DiscussionPostViewModel dpvm = new DiscussionPostViewModel();
-                                dpvm.Anonymize = false; //These are instructors/tas/observers, etc. Do not anonymize, even if current user is moderator
+                                dpvm.Anonymize = AnonymizeNameForDiscussion(ActiveCourseUser.AbstractRoleID, dp.CourseUser.AbstractRoleID, assignment.DiscussionSettings);
                                 dpvm.Content = dp.Content;
                                 dpvm.CourseUser = dp.CourseUser;
                                 dpvm.DiscussionPostId = dp.ID;
@@ -201,7 +277,7 @@ namespace OSBLE.Controllers
                             else
                             {
                                 ReplyViewModel reply = new ReplyViewModel();
-                                reply.Anonymize = false;
+                                reply.Anonymize = AnonymizeNameForDiscussion(ActiveCourseUser.AbstractRoleID, dp.CourseUser.AbstractRoleID, assignment.DiscussionSettings);
                                 reply.Content = dp.Content;
                                 reply.CourseUser = dp.CourseUser;
                                 reply.DiscussionPostId = dp.ID;
@@ -209,7 +285,7 @@ namespace OSBLE.Controllers
                                 reply.Posted = dp.Posted;
                                 ReplyViewModelList.Add(reply);
                             }
-                            
+
                         }
                     }
                     else //normal discussion assignment with teams. 
@@ -224,8 +300,7 @@ namespace OSBLE.Controllers
                             if (dp.ParentPostID == null) //adding parent posts
                             {
                                 DiscussionPostViewModel dpvm = new DiscussionPostViewModel();
-                                dpvm.Anonymize = (assignment.DiscussionSettings.HasAnonymousPosts || AnonymizeForModerator) &&
-                                                    (dp.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student); //Only anonymize students when it applies
+                                dpvm.Anonymize = AnonymizeNameForDiscussion(ActiveCourseUser.AbstractRoleID, dp.CourseUser.AbstractRoleID, assignment.DiscussionSettings);
                                 dpvm.Content = dp.Content;
                                 dpvm.CourseUser = dp.CourseUser;
                                 dpvm.DiscussionPostId = dp.ID;
@@ -235,8 +310,7 @@ namespace OSBLE.Controllers
                             else //adding replies
                             {
                                 ReplyViewModel reply = new ReplyViewModel();
-                                reply.Anonymize = (assignment.DiscussionSettings.HasAnonymousPosts || AnonymizeForModerator) &&
-                                                    (dp.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student); //Only anonymize students when it applies;
+                                reply.Anonymize = AnonymizeNameForDiscussion(ActiveCourseUser.AbstractRoleID, dp.CourseUser.AbstractRoleID, assignment.DiscussionSettings);
                                 reply.Content = dp.Content;
                                 reply.CourseUser = dp.CourseUser;
                                 reply.DiscussionPostId = dp.ID;
@@ -259,8 +333,7 @@ namespace OSBLE.Controllers
                         if (dp.ParentPostID == null) //adding parent posts
                         {
                             DiscussionPostViewModel dpvm = new DiscussionPostViewModel();
-                            dpvm.Anonymize = (assignment.DiscussionSettings.HasAnonymousPosts || AnonymizeForModerator) &&
-                                                    (dp.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student); //Only anonymize students when it applies
+                            dpvm.Anonymize = AnonymizeNameForDiscussion(ActiveCourseUser.AbstractRoleID, dp.CourseUser.AbstractRoleID, assignment.DiscussionSettings);
                             dpvm.Content = dp.Content;
                             dpvm.CourseUser = dp.CourseUser;
                             dpvm.DiscussionPostId = dp.ID;
@@ -270,8 +343,7 @@ namespace OSBLE.Controllers
                         else //adding replies
                         {
                             ReplyViewModel reply = new ReplyViewModel();
-                            reply.Anonymize = (assignment.DiscussionSettings.HasAnonymousPosts || AnonymizeForModerator) &&
-                                                (dp.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student); //Only anonymize students when it applies;
+                            reply.Anonymize = AnonymizeNameForDiscussion(ActiveCourseUser.AbstractRoleID, dp.CourseUser.AbstractRoleID, assignment.DiscussionSettings);
                             reply.Content = dp.Content;
                             reply.CourseUser = dp.CourseUser;
                             reply.DiscussionPostId = dp.ID;
@@ -326,7 +398,6 @@ namespace OSBLE.Controllers
                     ViewBag.DiscussionTeamList = DiscussionTeamList.OrderBy(dt => dt.TeamName).ToList();
                 }
 
-                setUpViewPermissionViewBag(discussionTeam, ViewBag.IsFirstPost);
                 ViewBag.DiscussionPostViewModelList = DiscussionPostViewModelList.OrderBy(dpvm => dpvm.Posted).ToList();
                 ViewBag.ActiveCourse = ActiveCourseUser;
                 ViewBag.Assignment = assignment;
@@ -336,44 +407,8 @@ namespace OSBLE.Controllers
             else
             {
                 return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentId });
-            }    
+            }
         }
-
-        
-        
-        /// <summary>
-        /// This function will set up viewbag variables related to viewing permissions for non-instructor/ta for a discussion assignment
-        /// <param name="assignment"></param>
-        /// </summary>
-        /// <param name="assignment"></param>
-        /// <param name="hasMadeFirstPost"></param>
-        public void setUpViewPermissionViewBag(DiscussionTeam discussionTeam, bool hasMadeFirstPost)
-        {
-            Assignment assignment = discussionTeam.Assignment;
-            bool isAnonymizedModerator = (assignment.DiscussionSettings.HasAnonymizationforModerators 
-                    && (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator ));
-
-            //Base values, determined by a combination of discussion settings, user role, and sent in parameters.
-            ViewBag.CanSeeReplies = (assignment.DiscussionSettings.RequiresPostBeforeView == false) || hasMadeFirstPost;
-            ViewBag.CanSeeAuthors = assignment.DiscussionSettings.HasAnonymousAuthors == false 
-                                        && assignment.DiscussionSettings.HasAnonymousPosts == false 
-                                        && isAnonymizedModerator == false;
-            ViewBag.CanSeeReviewers = assignment.DiscussionSettings.HasAnonymousReviewers == false 
-                                        && assignment.DiscussionSettings.HasAnonymousPosts == false 
-                                        && isAnonymizedModerator == false;
-        }
-
-        /// <summary>
-        /// This function will set up viewbag variables related to viewing permissions for an instructor/ta for a discussion assignment. 
-        /// </summary>
-        public void setUpInstructorViewingPermissionsViewBag()
-        {
-            //Instructors/TAs can view everything.
-            ViewBag.CanSeeReplies = true;
-            ViewBag.CanSeeAuthors = true;
-            ViewBag.CanSeeReviewers = true;
-        }
-
         /// <summary>
         /// Displays the Discussion view for Teachers
         /// </summary>
@@ -394,6 +429,9 @@ namespace OSBLE.Controllers
                                                  where dt.ID == discussionTeamID
                                                  select dt).FirstOrDefault();
 
+                List<DiscussionPostViewModel> DiscussionPostViewModelList = new List<DiscussionPostViewModel>();
+                List<ReplyViewModel> ReplyViewModelList = new List<ReplyViewModel>();
+
                 //Collecting posts and setting up DiscussionTeamList.
                 if (assignment.HasDiscussionTeams)
                 {
@@ -402,21 +440,20 @@ namespace OSBLE.Controllers
 
                     posts = (from post in db.DiscussionPosts
                                  .Include("Replies")
+                                 .Include("CourseUser")
                                  where post.AssignmentID == assignment.ID &&
-                                 post.DiscussionTeamID == discussionTeamID &&
-                                 post.ParentPostID == null
-                                 orderby post.Posted
+                                 post.DiscussionTeamID == discussionTeamID
                                  select post).ToList();
                 }
                 else
                 {
                     //want all posts associated with assignmentId
                     posts = (from post in db.DiscussionPosts
-                             .Include("Replies")
-                             where post.AssignmentID == assignment.ID &&
-                             post.ParentPostID == null
-                             orderby post.Posted
-                             select post).ToList();
+                                .Include("Replies")
+                                .Include("CourseUser")
+                                where post.AssignmentID == assignment.ID
+                                orderby post.Posted
+                                select post).ToList();
                 }
 
                 if (postOrReply == 3 || courseUserId <= 0)  //If postOrReply is 3, we want no selections - so setting student to null.
@@ -437,8 +474,41 @@ namespace OSBLE.Controllers
                     ViewBag.DiscussionHeader = assignment.AssignmentName;
                 }
 
+                //creating a view mode for each discussionpost
+                foreach(DiscussionPost dp in posts)
+                {
+                    if(dp.ParentPostID == null)
+                    {
+                        DiscussionPostViewModel dpvm = new DiscussionPostViewModel();
+                        dpvm.Anonymize = false; //never anonymize for instructors/TA
+                        dpvm.Content = dp.Content;
+                        dpvm.CourseUser = dp.CourseUser;
+                        dpvm.DiscussionPostId = dp.ID;
+                        dpvm.Posted = dp.Posted;
+                        DiscussionPostViewModelList.Add(dpvm);
+                    }
+                    else
+                    {
+                        ReplyViewModel reply = new ReplyViewModel();
+                        reply.Anonymize = false;
+                        reply.Content = dp.Content;
+                        reply.CourseUser = dp.CourseUser;
+                        reply.DiscussionPostId = dp.ID;
+                        reply.Posted = dp.Posted;
+                        reply.ParentPostID = (int)dp.ParentPostID;
+                        ReplyViewModelList.Add(reply);
+                    }
+                }
 
-                setUpInstructorViewingPermissionsViewBag();
+                //associating each replyviewmodel with its parent post
+                foreach (DiscussionPostViewModel dpvm in DiscussionPostViewModelList)
+                {
+                    dpvm.Replies = (from replies in ReplyViewModelList
+                                    where replies.ParentPostID == dpvm.DiscussionPostId
+                                    select replies).ToList();
+                }
+
+                ViewBag.DiscussionPostViewModelList = DiscussionPostViewModelList.OrderBy(dpvm => dpvm.Posted).ToList();
                 ViewBag.PostOrReply = postOrReply;
                 ViewBag.Posts = posts;
                 ViewBag.Student = student;

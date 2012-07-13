@@ -110,16 +110,6 @@ namespace OSBLE.Models.Courses
             return UserProfile.DisplayName(AbstractRoleId, FirstThenLast, false);
         }
 
-        public string DisplayName(int AbstractRoleId, DiscussionSetting discussionSetting, bool? FirstThenLast = false)
-        {
-            bool anonName = false;
-            if (discussionSetting != null && discussionSetting.HasAnonymousPosts)
-            {
-                anonName = true;
-            }
-            return UserProfile.DisplayName(AbstractRoleId, FirstThenLast, anonName);
-        }
-
         /// <summary>
         /// This function displays the users name as "(RoleAbbreviation) LastName, FirstName" i.e. "(TA) Morgan, John"
         /// </summary>

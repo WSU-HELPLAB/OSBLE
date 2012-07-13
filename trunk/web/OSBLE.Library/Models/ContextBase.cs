@@ -116,6 +116,8 @@ namespace OSBLE.Models
 
         public DbSet<DiscussionSetting> DiscussionSettings { get; set; }
 
+        public DbSet<CriticalReviewSettings> CriticalReviewSettings { get; set; }
+
         public DbSet<TeamEvaluation> TeamEvaluations { get; set; }
 
         public DbSet<TeamEvaluationComment> TeamEvaluationComments { get; set; }

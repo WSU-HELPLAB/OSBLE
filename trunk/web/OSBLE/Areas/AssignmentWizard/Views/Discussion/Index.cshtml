@@ -35,23 +35,29 @@
         <th>Anonymization Settings:</th>
     </tr>
     <tr>
-        <th>@Html.LabelFor(m => m.HasAnonymousPosts)</th>
-        <td>@Html.CheckBoxFor(m => m.HasAnonymousPosts)</td>
+        <th>@Html.LabelFor(m => m.HasAnonymousInstructorsToStudents)</th>
+        <td>@Html.CheckBoxFor(m => m.HasAnonymousInstructorsToStudents)</td>
         <td></td>
     </tr>
     <tr>
-        <th>@Html.LabelFor(m => m.HasAnonymousAuthors)</th>
-        <td>@Html.CheckBoxFor(m => m.HasAnonymousAuthors)</td>
+        <th>@Html.LabelFor(m => m.HasAnonymousModeratorsToStudents)</th>
+        <td>@Html.CheckBoxFor(m => m.HasAnonymousModeratorsToStudents)</td>
         <td></td>
     </tr>
     <tr>
-        <th>@Html.LabelFor(m => m.HasAnonymousReviewers)</th>
-        <td>@Html.CheckBoxFor(m => m.HasAnonymousReviewers)</td>
+        <th>@Html.LabelFor(m => m.HasAnonymousStudentsToStudents)</th>
+        <td>@Html.CheckBoxFor(m => m.HasAnonymousStudentsToStudents)</td>
         <td></td>
     </tr>
     <tr>
-        <th>@Html.LabelFor(m => m.HasAnonymizationforModerators)</th>
-        <td>@Html.CheckBoxFor(m => m.HasAnonymizationforModerators)</td>
+        <th>@Html.LabelFor(m => m.HasAnonymousStudentsToModerators)</th>
+        <td>@Html.CheckBoxFor(m => m.HasAnonymousStudentsToModerators)</td>
+        <td></td>
+    </tr>
+
+    <tr>
+        <th>@Html.LabelFor(m => m.HasHiddenRoles)</th>
+        <td>@Html.CheckBoxFor(m => m.HasHiddenRoles)</td>
         <td></td>
     </tr>
 
