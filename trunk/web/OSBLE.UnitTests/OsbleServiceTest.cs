@@ -74,5 +74,13 @@ namespace OSBLE.UnitTests
                 Assert.AreEqual(assignmentCount, serviceAssignments.Length);
             }
         }
+
+        [TestMethod]
+        public void OsbleService_GetAssignmentSubmissionTest()
+        {
+            AuthenticationServiceClient authClient = new AuthenticationServiceClient();
+            OsbleServiceClient osbleClient = new OsbleServiceClient();
+            string token = authClient.ValidateUser("bob@smith.com", "123123");
+        }
     }
 }

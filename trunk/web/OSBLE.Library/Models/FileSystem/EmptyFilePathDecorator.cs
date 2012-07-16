@@ -12,17 +12,18 @@ namespace OSBLE.Models.FileSystem
             return "";
         }
 
-        public IEnumerable<string> AllFiles()
+
+        public FileCollection AllFiles()
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<string> File(string name)
+        public FileCollection File(string name)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<string> File(Func<string, bool> predicate)
+        public FileCollection File(Func<string, bool> predicate)
         {
             throw new NotImplementedException();
         }
