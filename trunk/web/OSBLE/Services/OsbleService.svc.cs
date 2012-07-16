@@ -8,6 +8,7 @@ using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Models;
 using OSBLE.Models.Assignments;
+using System.IO;
 
 namespace OSBLE.Services
 {
@@ -87,6 +88,61 @@ namespace OSBLE.Services
             return nonEfAssignments.ToArray();
         }
 
+        [OperationContract]
+        public byte[] GetAssignmentSubmission(int assignmentId, string authToken)
+        {
+            if (!_authService.IsValidKey(authToken))
+            {
+                return new byte[0];
+            }
+            UserProfile profile = _authService.GetActiveUser(authToken);
+            Assignment assignment = _db.Assignments.Find(assignmentId);
+
+            //make sure that the user is enrolled in the course
+            CourseUser courseUser = (from cu in _db.CourseUsers
+                                    where cu.AbstractCourseID == assignment.CourseID
+                                    &&
+                                    cu.UserProfileID == profile.ID
+                                    select cu).FirstOrDefault();
+            if (courseUser == null)
+            {
+                return new byte[0];
+            }
+
+            //users are attached to assignments through teams, so we have to find the correct team
+            Team team = (from tm in _db.TeamMembers
+                        join at in _db.AssignmentTeams on tm.TeamID equals at.TeamID
+                        where tm.CourseUserID == courseUser.ID
+                        && at.AssignmentID == assignmentId
+                        select tm.Team).FirstOrDefault();
+
+            if(team == null)
+            {
+                return new byte[0];
+            }
+                        
+
+            OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
+            Stream stream = fs.Course(courseUser.AbstractCourseID)
+                              .Assignment(assignmentId)
+                              .Submission(team.ID)
+                              .AllFiles()
+                              .ToZipStream();
+            MemoryStream ms = new MemoryStream();
+            try
+            {
+                stream.CopyTo(ms);
+            }
+            catch (Exception)
+            {
+            }
+            byte[] bytes = ms.ToArray();
+            stream.Close();
+            ms.Close();
+            return bytes;
+            
+        }
+
         /// <summary>
         /// Returns role information for the given course and authToken
         /// </summary>
@@ -111,7 +167,7 @@ namespace OSBLE.Services
             {
                 return new CourseRole();
             }
-            
+
             return new CourseRole(courseUser.AbstractRole);
         }
     }

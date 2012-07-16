@@ -104,6 +104,7 @@
     <Compile Include="Models\FileSystem\AssignmentFilePath.cs" />
     <Compile Include="Models\FileSystem\CourseFilePath.cs" />
     <Compile Include="Models\FileSystem\EmptyFilePathDecorator.cs" />
+    <Compile Include="Models\FileSystem\FileCollection.cs" />
     <Compile Include="Models\FileSystem\FileSystemBase.cs" />
     <Compile Include="Models\FileSystem\FileSystem.cs" />
     <Compile Include="Models\FileSystem\IFileSystem.cs" />

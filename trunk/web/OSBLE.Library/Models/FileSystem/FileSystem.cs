@@ -33,10 +33,8 @@ using OSBLE.Models.Users;
  *                     |          [CourseUserId]
  *                     |                 |
  *                  [TeamID]             |
- *               /        \           {reviews}
- *    {team submissions}  [AuthorTeamID*]                       *This is only for critical review assignments
- *                          |
- *                         {team submissions}
+ *                   /          {critical reviews}
+ *       {team submissions}  
  * */
 namespace OSBLE.Models.FileSystem
 {

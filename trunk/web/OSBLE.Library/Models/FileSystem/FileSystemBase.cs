@@ -18,26 +18,62 @@ namespace OSBLE.Models.FileSystem
 
         public abstract string GetPath();
 
-        public IEnumerable<string> AllFiles()
+        /// <summary>
+        /// Adds a file to file system
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public bool AddFile(string fileName, byte[] data)
+        {
+            MemoryStream ms = new MemoryStream();
+            ms.Write(data, 0, data.Length);
+            ms.Position = 0;
+            return AddFile(fileName, ms);
+        }
+
+        public bool AddFile(string fileName, Stream data)
+        {
+            string filePath = Path.Combine(GetPath(), fileName);
+            bool retVal = true;
+            try
+            {
+                FileStream output = System.IO.File.Open(filePath, FileMode.Create);
+                data.CopyTo(output);
+                output.Close();
+            }
+            catch (Exception)
+            {
+                retVal = false;
+            }
+            return retVal;
+        }
+
+        public FileCollection AllFiles()
         {
             string path = GetPath();
+            FileCollection collection = new FileCollection(path);
             List<string> files = new List<string>();
             if (System.IO.Directory.Exists(path))
             {
                 files = System.IO.Directory.GetFiles(path).ToList();
+                foreach (string file in files)
+                {
+                    collection.Add(file);
+                }
             }
-            return files;
+            return collection;
         }
 
-        public IEnumerable<string> File(string name)
+        public FileCollection File(string name)
         {
             return File(s => s == name);
         }
 
-        public IEnumerable<string> File(Func<string, bool> predicate)
+        public FileCollection File(Func<string, bool> predicate)
         {
             string path = GetPath();
-            List<string> files = new List<string>();
+            FileCollection collection = new FileCollection(path);
             if (System.IO.Directory.Exists(path))
             {
                 string[] allFiles = System.IO.Directory.GetFiles(path);
@@ -46,12 +82,12 @@ namespace OSBLE.Models.FileSystem
                     string fileName = Path.GetFileName(file);
                     if (predicate(fileName) == true)
                     {
-                        files.Add(file);
+                        collection.Add(file);
                     }
                 }
                 
             }
-            return files;
+            return collection;
         }
 
         public IFileSystem Directory(string name)
