@@ -80,7 +80,8 @@ namespace OSBLE.UnitTests
         {
             AuthenticationServiceClient authClient = new AuthenticationServiceClient();
             OsbleServiceClient osbleClient = new OsbleServiceClient();
-            string token = authClient.ValidateUser("bob@smith.com", "123123");
+            string token = authClient.ValidateUser("betty@rogers.com", "123123");
+            byte[] data = osbleClient.GetAssignmentSubmission(1, token);
         }
     }
 }

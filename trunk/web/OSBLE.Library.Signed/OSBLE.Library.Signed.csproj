@@ -190,6 +190,36 @@
     <Compile Include="..\OSBLE.Library\Models\DiscussionAssignment\DiscussionPost.cs">
       <Link>Models\DiscussionAssignment\DiscussionPost.cs</Link>
     </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\AssignmentFilePath.cs">
+      <Link>Models\FilesSystem\AssignmentFilePath.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\CourseFilePath.cs">
+      <Link>Models\FilesSystem\CourseFilePath.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\EmptyFilePathDecorator.cs">
+      <Link>Models\FilesSystem\EmptyFilePathDecorator.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\FileCollection.cs">
+      <Link>Models\FilesSystem\FileCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\FileSystem.cs">
+      <Link>Models\FilesSystem\FileSystem.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\FileSystemBase.cs">
+      <Link>Models\FilesSystem\FileSystemBase.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\IFileSystem.cs">
+      <Link>Models\FilesSystem\IFileSystem.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\ReviewFilePath.cs">
+      <Link>Models\FilesSystem\ReviewFilePath.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\SubmissionFilePath.cs">
+      <Link>Models\FilesSystem\SubmissionFilePath.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\UserFilePath.cs">
+      <Link>Models\FilesSystem\UserFilePath.cs</Link>
+    </Compile>
     <Compile Include="..\OSBLE.Library\Models\HomePage\AbstractDashboard.cs">
       <Link>Models\HomePage\AbstractDashboard.cs</Link>
     </Compile>

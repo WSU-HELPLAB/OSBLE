@@ -21,11 +21,11 @@ namespace OSBLE.UnitTests.OsbleService {
         [System.ServiceModel.OperationContractAttribute(Action="urn:OsbleService/GetCourseAssignments", ReplyAction="urn:OsbleService/GetCourseAssignmentsResponse")]
         OSBLE.Models.Assignments.Assignment[] GetCourseAssignments(int courseId, string authToken);
         
+        [System.ServiceModel.OperationContractAttribute(Action="urn:OsbleService/GetAssignmentSubmission", ReplyAction="urn:OsbleService/GetAssignmentSubmissionResponse")]
+        byte[] GetAssignmentSubmission(int assignmentId, string authToken);
+        
         [System.ServiceModel.OperationContractAttribute(Action="urn:OsbleService/GetCourseRole", ReplyAction="urn:OsbleService/GetCourseRoleResponse")]
         OSBLE.Models.Courses.CourseRole GetCourseRole(int courseId, string authToken);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="urn:OsbleService/GetCouresUsers", ReplyAction="urn:OsbleService/GetCouresUsersResponse")]
-        OSBLE.Models.Courses.CourseUser[] GetCouresUsers(string authToken);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -63,12 +63,12 @@ namespace OSBLE.UnitTests.OsbleService {
             return base.Channel.GetCourseAssignments(courseId, authToken);
         }
         
-        public OSBLE.Models.Courses.CourseRole GetCourseRole(int courseId, string authToken) {
-            return base.Channel.GetCourseRole(courseId, authToken);
+        public byte[] GetAssignmentSubmission(int assignmentId, string authToken) {
+            return base.Channel.GetAssignmentSubmission(assignmentId, authToken);
         }
         
-        public OSBLE.Models.Courses.CourseUser[] GetCouresUsers(string authToken) {
-            return base.Channel.GetCouresUsers(authToken);
+        public OSBLE.Models.Courses.CourseRole GetCourseRole(int courseId, string authToken) {
+            return base.Channel.GetCourseRole(courseId, authToken);
         }
     }
 }

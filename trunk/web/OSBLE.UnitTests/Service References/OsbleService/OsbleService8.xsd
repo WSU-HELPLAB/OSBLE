@@ -31,6 +31,21 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="GetAssignmentSubmission">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="assignmentId" type="xs:int" />
+        <xs:element minOccurs="0" name="authToken" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAssignmentSubmissionResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetAssignmentSubmissionResult" nillable="true" type="xs:base64Binary" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="GetCourseRole">
     <xs:complexType>
       <xs:sequence>
@@ -43,20 +58,6 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" minOccurs="0" name="GetCourseRoleResult" nillable="true" type="q3:CourseRole" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetCouresUsers">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="authToken" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetCouresUsersResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" minOccurs="0" name="GetCouresUsersResult" nillable="true" type="q4:ArrayOfCourseUser" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

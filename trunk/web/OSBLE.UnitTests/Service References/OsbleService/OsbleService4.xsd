@@ -25,6 +25,8 @@
       <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="Level" nillable="true" type="tns:Level" />
       <xs:element minOccurs="0" name="LevelID" type="xs:int" />
+      <xs:element minOccurs="0" name="Rubric" nillable="true" type="tns:Rubric" />
+      <xs:element minOccurs="0" name="RubricID" type="xs:int" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="CellDescription" nillable="true" type="tns:CellDescription" />

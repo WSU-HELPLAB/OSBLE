@@ -25,17 +25,17 @@
   <wsdl:message name="OsbleService_GetCourseAssignments_OutputMessage">
     <wsdl:part name="parameters" element="GetCourseAssignmentsResponse" />
   </wsdl:message>
+  <wsdl:message name="OsbleService_GetAssignmentSubmission_InputMessage">
+    <wsdl:part name="parameters" element="GetAssignmentSubmission" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_GetAssignmentSubmission_OutputMessage">
+    <wsdl:part name="parameters" element="GetAssignmentSubmissionResponse" />
+  </wsdl:message>
   <wsdl:message name="OsbleService_GetCourseRole_InputMessage">
     <wsdl:part name="parameters" element="GetCourseRole" />
   </wsdl:message>
   <wsdl:message name="OsbleService_GetCourseRole_OutputMessage">
     <wsdl:part name="parameters" element="GetCourseRoleResponse" />
-  </wsdl:message>
-  <wsdl:message name="OsbleService_GetCouresUsers_InputMessage">
-    <wsdl:part name="parameters" element="GetCouresUsers" />
-  </wsdl:message>
-  <wsdl:message name="OsbleService_GetCouresUsers_OutputMessage">
-    <wsdl:part name="parameters" element="GetCouresUsersResponse" />
   </wsdl:message>
   <wsdl:portType name="OsbleService">
     <wsdl:operation name="GetCourses">
@@ -46,13 +46,13 @@
       <wsdl:input wsaw:Action="urn:OsbleService/GetCourseAssignments" message="OsbleService_GetCourseAssignments_InputMessage" />
       <wsdl:output wsaw:Action="urn:OsbleService/GetCourseAssignmentsResponse" message="OsbleService_GetCourseAssignments_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="GetAssignmentSubmission">
+      <wsdl:input wsaw:Action="urn:OsbleService/GetAssignmentSubmission" message="OsbleService_GetAssignmentSubmission_InputMessage" />
+      <wsdl:output wsaw:Action="urn:OsbleService/GetAssignmentSubmissionResponse" message="OsbleService_GetAssignmentSubmission_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="GetCourseRole">
       <wsdl:input wsaw:Action="urn:OsbleService/GetCourseRole" message="OsbleService_GetCourseRole_InputMessage" />
       <wsdl:output wsaw:Action="urn:OsbleService/GetCourseRoleResponse" message="OsbleService_GetCourseRole_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="GetCouresUsers">
-      <wsdl:input wsaw:Action="urn:OsbleService/GetCouresUsers" message="OsbleService_GetCouresUsers_InputMessage" />
-      <wsdl:output wsaw:Action="urn:OsbleService/GetCouresUsersResponse" message="OsbleService_GetCouresUsers_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
 </wsdl:definitions>

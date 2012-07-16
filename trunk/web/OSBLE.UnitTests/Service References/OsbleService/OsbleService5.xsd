@@ -13,6 +13,7 @@
   <xs:element name="ArrayOfAssignment" nillable="true" type="tns:ArrayOfAssignment" />
   <xs:complexType name="Assignment">
     <xs:sequence>
+      <xs:element minOccurs="0" name="AddedPoints" type="xs:double" />
       <xs:element minOccurs="0" name="AssignmentDescription" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="AssignmentName" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="AssignmentTeams" nillable="true" type="tns:ArrayOfAssignmentTeam" />
@@ -49,7 +50,6 @@
       <xs:element minOccurs="0" name="Scores" nillable="true" type="tns:ArrayOfScore" />
       <xs:element minOccurs="0" name="TeamEvaluationSettings" nillable="true" type="tns:TeamEvaluationSettings" />
       <xs:element minOccurs="0" name="Type" type="tns:AssignmentTypes" />
-      <xs:element minOccurs="0" name="addedPoints" type="xs:double" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Assignment" nillable="true" type="tns:Assignment" />
@@ -203,12 +203,15 @@
       <xs:element minOccurs="0" name="AnonymitySettings" type="xs:unsignedByte" />
       <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
       <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
+      <xs:element minOccurs="0" name="HasAnonymizationforModerators" type="xs:boolean" />
+      <xs:element minOccurs="0" name="HasAnonymousAuthors" type="xs:boolean" />
       <xs:element minOccurs="0" name="HasAnonymousPosts" type="xs:boolean" />
-      <xs:element minOccurs="0" name="HasAnonymousRoles" type="xs:boolean" />
+      <xs:element minOccurs="0" name="HasAnonymousReviewers" type="xs:boolean" />
       <xs:element minOccurs="0" name="InitialPostDueDate" type="xs:dateTime" />
       <xs:element minOccurs="0" name="InitialPostDueDueTime" type="xs:dateTime" />
       <xs:element minOccurs="0" name="MinimumFirstPostLength" type="xs:int" />
       <xs:element minOccurs="0" name="RequiresPostBeforeView" type="xs:boolean" />
+      <xs:element minOccurs="0" name="TAsCanPostToAllDiscussions" type="xs:boolean" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="DiscussionSetting" nillable="true" type="tns:DiscussionSetting" />

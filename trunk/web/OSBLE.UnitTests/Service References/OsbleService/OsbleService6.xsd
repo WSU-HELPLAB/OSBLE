@@ -169,10 +169,4 @@
     </xs:complexContent>
   </xs:complexType>
   <xs:element name="CourseRole" nillable="true" type="tns:CourseRole" />
-  <xs:complexType name="ArrayOfCourseUser">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="CourseUser" nillable="true" type="tns:CourseUser" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfCourseUser" nillable="true" type="tns:ArrayOfCourseUser" />
 </xs:schema>
