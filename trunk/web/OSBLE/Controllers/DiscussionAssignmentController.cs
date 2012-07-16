@@ -191,6 +191,7 @@ namespace OSBLE.Controllers
                                 dpvm.CourseUser = dp.CourseUser;
                                 dpvm.DiscussionPostId = dp.ID;
                                 dpvm.Posted = dp.Posted;
+                                dpvm.HideName = assignment.DiscussionSettings.HasHiddenRoles;
                                 DiscussionPostViewModelList.Add(dpvm);
                             }
                             else //adding replies
@@ -203,6 +204,7 @@ namespace OSBLE.Controllers
                                 reply.DiscussionPostId = dp.ID;
                                 reply.ParentPostID = (int)dp.ParentPostID;
                                 reply.Posted = dp.Posted;
+                                reply.HideName = assignment.DiscussionSettings.HasHiddenRoles;
                                 ReplyViewModelList.Add(reply);
                             }
                         }
@@ -222,6 +224,7 @@ namespace OSBLE.Controllers
                                 dpvm.CourseUser = dp.CourseUser;
                                 dpvm.DiscussionPostId = dp.ID;
                                 dpvm.Posted = dp.Posted;
+                                dpvm.HideName = assignment.DiscussionSettings.HasHiddenRoles;
                                 DiscussionPostViewModelList.Add(dpvm);
                             }
                             else if (dp.ParentPostID == null && existingAuthorPost != null)
@@ -246,6 +249,7 @@ namespace OSBLE.Controllers
                                     reply.DiscussionPostId = dp.ID;
                                     reply.ParentPostID = (int)dp.ParentPostID;
                                     reply.Posted = dp.Posted;
+                                    reply.HideName = assignment.DiscussionSettings.HasHiddenRoles;
                                     ReplyViewModelList.Add(reply);
                                 }
                                 else if (existingAuthorReply != null)
@@ -272,6 +276,7 @@ namespace OSBLE.Controllers
                                 dpvm.CourseUser = dp.CourseUser;
                                 dpvm.DiscussionPostId = dp.ID;
                                 dpvm.Posted = dp.Posted;
+                                dpvm.HideName = assignment.DiscussionSettings.HasHiddenRoles;
                                 DiscussionPostViewModelList.Add(dpvm);
                             }
                             else
@@ -283,6 +288,7 @@ namespace OSBLE.Controllers
                                 reply.DiscussionPostId = dp.ID;
                                 reply.ParentPostID = (int)dp.ParentPostID;
                                 reply.Posted = dp.Posted;
+                                reply.HideName = assignment.DiscussionSettings.HasHiddenRoles;
                                 ReplyViewModelList.Add(reply);
                             }
 
@@ -291,8 +297,7 @@ namespace OSBLE.Controllers
                     else //normal discussion assignment with teams. 
                     {
                         List<DiscussionPost> AllPosts = (from post in db.DiscussionPosts
-                                                         where post.ParentPostID == null &&
-                                                         post.DiscussionTeamID == discussionTeamId
+                                                         where post.DiscussionTeamID == discussionTeamId
                                                          select post).ToList();
 
                         foreach (DiscussionPost dp in AllPosts)
@@ -305,6 +310,7 @@ namespace OSBLE.Controllers
                                 dpvm.CourseUser = dp.CourseUser;
                                 dpvm.DiscussionPostId = dp.ID;
                                 dpvm.Posted = dp.Posted;
+                                dpvm.HideName = assignment.DiscussionSettings.HasHiddenRoles;
                                 DiscussionPostViewModelList.Add(dpvm);
                             }
                             else //adding replies
@@ -316,6 +322,7 @@ namespace OSBLE.Controllers
                                 reply.DiscussionPostId = dp.ID;
                                 reply.ParentPostID = (int)dp.ParentPostID;
                                 reply.Posted = dp.Posted;
+                                reply.HideName = assignment.DiscussionSettings.HasHiddenRoles;
                                 ReplyViewModelList.Add(reply);
                             }
                         }
@@ -338,6 +345,7 @@ namespace OSBLE.Controllers
                             dpvm.CourseUser = dp.CourseUser;
                             dpvm.DiscussionPostId = dp.ID;
                             dpvm.Posted = dp.Posted;
+                            dpvm.HideName = assignment.DiscussionSettings.HasHiddenRoles;
                             DiscussionPostViewModelList.Add(dpvm);
                         }
                         else //adding replies
@@ -349,6 +357,7 @@ namespace OSBLE.Controllers
                             reply.DiscussionPostId = dp.ID;
                             reply.ParentPostID = (int)dp.ParentPostID;
                             reply.Posted = dp.Posted;
+                            reply.HideName = assignment.DiscussionSettings.HasHiddenRoles;
                             ReplyViewModelList.Add(reply);
                         }
                     }
@@ -398,6 +407,10 @@ namespace OSBLE.Controllers
                     ViewBag.DiscussionTeamList = DiscussionTeamList.OrderBy(dt => dt.TeamName).ToList();
                 }
 
+
+
+                ViewBag.PostLengthRequired = (assignment.DiscussionSettings.MinimumFirstPostLength > 0) && ViewBag.IsFirstPost;
+                ViewBag.CanPost = assignment.DueDate > DateTime.Now;
                 ViewBag.DiscussionPostViewModelList = DiscussionPostViewModelList.OrderBy(dpvm => dpvm.Posted).ToList();
                 ViewBag.ActiveCourse = ActiveCourseUser;
                 ViewBag.Assignment = assignment;
@@ -423,11 +436,15 @@ namespace OSBLE.Controllers
             Assignment assignment = db.Assignments.Find(assignmentId);
             if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && ActiveCourseUser.AbstractRole.CanGrade)
             {
+
+
                 List<DiscussionPost> posts = null;
                 CourseUser student;
                 DiscussionTeam discussionTeam = (from dt in assignment.DiscussionTeams
                                                  where dt.ID == discussionTeamID
                                                  select dt).FirstOrDefault();
+
+
 
                 List<DiscussionPostViewModel> DiscussionPostViewModelList = new List<DiscussionPostViewModel>();
                 List<ReplyViewModel> ReplyViewModelList = new List<ReplyViewModel>();
@@ -485,6 +502,7 @@ namespace OSBLE.Controllers
                         dpvm.CourseUser = dp.CourseUser;
                         dpvm.DiscussionPostId = dp.ID;
                         dpvm.Posted = dp.Posted;
+                        dpvm.HideName = assignment.DiscussionSettings.HasHiddenRoles;
                         DiscussionPostViewModelList.Add(dpvm);
                     }
                     else
@@ -496,6 +514,7 @@ namespace OSBLE.Controllers
                         reply.DiscussionPostId = dp.ID;
                         reply.Posted = dp.Posted;
                         reply.ParentPostID = (int)dp.ParentPostID;
+                        reply.HideName = assignment.DiscussionSettings.HasHiddenRoles;
                         ReplyViewModelList.Add(reply);
                     }
                 }
@@ -508,6 +527,20 @@ namespace OSBLE.Controllers
                                     select replies).ToList();
                 }
 
+
+                bool canPost = assignment.DueDate > DateTime.Now;
+                //If the user is a TA and TAs can only participate in some discussions, then we must confirm the TA
+                //is in the team (meaning they have permission to post)
+                if (canPost && ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA && !assignment.DiscussionSettings.TAsCanPostToAllDiscussions)
+                {
+                    if (discussionTeam.Team.TeamMembers.Where(tm => tm.CourseUserID == ActiveCourseUser.ID).ToList().Count == 0)
+                    {
+                        canPost = false;
+                    }
+                }
+
+                ViewBag.PostLengthRequired = 0;
+                ViewBag.CanPost = canPost;
                 ViewBag.DiscussionPostViewModelList = DiscussionPostViewModelList.OrderBy(dpvm => dpvm.Posted).ToList();
                 ViewBag.PostOrReply = postOrReply;
                 ViewBag.Posts = posts;

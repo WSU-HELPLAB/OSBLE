@@ -16,19 +16,27 @@ namespace OSBLE.Models.ViewModels
         public CourseUser CourseUser;
         public int DiscussionPostId;
         public DateTime Posted;
+        public bool HideName;
 
         public string DisplayName {
 
             get
             {
+                string returnValue = "";
                 if (Anonymize)
                 {
-                    return "Anonymous " + CourseUser.ID;
+                    returnValue = "Anonymous " + CourseUser.ID;
                 }
                 else
                 {
-                    return CourseUser.UserProfile.FirstName + " " + CourseUser.UserProfile.LastName;
+                    returnValue = CourseUser.UserProfile.FirstName + " " + CourseUser.UserProfile.LastName;
                 }
+
+                if (!HideName)
+                {
+                    returnValue = "(" + CourseUser.AbstractRole.Name[0] +") " + returnValue;
+                }
+                return returnValue;
             }
         }
     }

@@ -97,7 +97,7 @@
 
     @{
         <!--div for post character counter-->
-        if (assignment.DiscussionSettings.MinimumFirstPostLength > 0 && ViewBag.IsFirstPost && assignment.DueDate > DateTime.Now)
+        if (ViewBag.CanPost && assignment.DiscussionSettings.MinimumFirstPostLength > 0 && ViewBag.IsFirstPost)
         {
             <div>
                 A minimum of @assignment.DiscussionSettings.MinimumFirstPostLength characters required
@@ -106,10 +106,10 @@
                 (@assignment.DiscussionSettings.MinimumFirstPostLength) additional characters needed.</div>
             
         }
-        <input id="firstPostLength" type="hidden" value="@assignment.DiscussionSettings.MinimumFirstPostLength" />
+        <input id="firstPostLength" type="hidden" value="@ViewBag.PostLengthRequired" />
         
         <!--div for new post-->
-        if (assignment.DueDate > DateTime.Now)
+        if (ViewBag.CanPost)
         {
             <div>
                 <input type="hidden" id="MaxContentChars" value="@ViewBag.MaxActivityFeedLength"/>
@@ -131,7 +131,7 @@
         }
         else
         {
-            @:This assignment is closed.<br /><br />
+            @:You cannot post in this discussion.<br /><br />
         }
     }
     @if (DiscussionPostViewModelList != null && (ViewBag.IsFirstPost == false || assignment.DiscussionSettings.RequiresPostBeforeView == false))
