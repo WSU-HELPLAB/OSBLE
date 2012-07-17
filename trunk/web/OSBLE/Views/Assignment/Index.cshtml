@@ -29,9 +29,9 @@ else
     {
         @Html.Partial("_StudentIndex");
     }
-    else
+    else if( ViewBag.ActiveCourse.AbstractRoleID == (int)OSBLE.Models.Courses.CourseRole.CourseRoles.Moderator)
     {
-        // should never happen but should prob handle some exception
+        @Html.Partial("_ModeratorIndex");
     }
 }
 <script type="text/javascript">

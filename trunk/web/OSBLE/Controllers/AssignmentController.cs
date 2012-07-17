@@ -64,25 +64,27 @@ namespace OSBLE.Controllers
 
             List<Assignment> Assignments = new List<Assignment>();
             //Getting the assginment list, without draft assignments.
-            Assignments = (from assignment in db.Assignments
-                           where !assignment.IsDraft &&
-                           assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID &&
-                           assignment.IsWizardAssignment
-                           orderby assignment.DueDate
-                           select assignment).ToList();
 
-            if (ActiveCourseUser.AbstractRole.CanGrade || ActiveCourseUser.AbstractRole.Anonymized)
+
+            if (ActiveCourseUser.AbstractRole.CanGrade)
             {
-                // Draft assignments (viewable by instructor only) are assignments that have not yet been published to students. Appending to list here.
-                Assignments.AddRange((from assignment in db.Assignments
-                                      where assignment.IsDraft &&
-                                      assignment.IsWizardAssignment &&
-                                      assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID
-                                      orderby assignment.ReleaseDate
-                                      select assignment).ToList());
+                //For CanGrade roles, show all assignments
+                Assignments = (from assignment in db.Assignments
+                               where assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID &&
+                               assignment.IsWizardAssignment
+                               orderby assignment.DueDate
+                               select assignment).ToList();
             }
             else if (ActiveCourseUser.AbstractRole.CanSubmit)
             {
+                //for CanSubmit, show all assignments except draft assignment
+                Assignments = (from assignment in db.Assignments
+                               where !assignment.IsDraft &&
+                               assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID &&
+                               assignment.IsWizardAssignment
+                               orderby assignment.DueDate
+                               select assignment).ToList();
+
                 //MG: creating a dictionary<assignmentID, submissionTime>
                 // to be used in the view. This is only done for the students view.
 
@@ -122,6 +124,18 @@ namespace OSBLE.Controllers
                 ViewBag.TeamEvaluations = teamEvaluations;
                 ViewBag.CourseUser = ActiveCourseUser;
                 ViewBag.SubmissionInfoDictionary = submissionInfo;
+            }
+            else if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
+            {
+                //for moderators, grab only discussion/Critical review assignment types.
+                Assignments = (from assignment in db.Assignments
+                               where !assignment.IsDraft &&
+                               assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID &&
+                               assignment.IsWizardAssignment &&
+                               (assignment.AssignmentTypeID == (int)AssignmentTypes.CriticalReviewDiscussion ||
+                               assignment.AssignmentTypeID == (int)AssignmentTypes.DiscussionAssignment)
+                               orderby assignment.DueDate
+                               select assignment).ToList();
             }
 
             ViewBag.PastCount = (from a in Assignments

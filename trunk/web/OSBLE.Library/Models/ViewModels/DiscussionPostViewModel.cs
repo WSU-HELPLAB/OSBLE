@@ -9,16 +9,14 @@ using OSBLE.Models.Assignments;
 
 namespace OSBLE.Models.ViewModels
 {
-    public class GeneralPost
+    public class Poster
     {
         public bool Anonymize;
-        public string Content;
         public CourseUser CourseUser;
-        public int DiscussionPostId;
-        public DateTime Posted;
-        public bool HideName;
-
-        public string DisplayName {
+        public bool HideRole;
+        public string RoleName;
+        public string DisplayName
+        {
 
             get
             {
@@ -32,12 +30,34 @@ namespace OSBLE.Models.ViewModels
                     returnValue = CourseUser.UserProfile.FirstName + " " + CourseUser.UserProfile.LastName;
                 }
 
-                if (!HideName)
+                if (!HideRole)
                 {
-                    returnValue = "(" + CourseUser.AbstractRole.Name[0] +") " + returnValue;
+                    if (RoleName != null && RoleName != "")
+                    {
+                        returnValue = "(" + RoleName + ")" + returnValue;
+                    }
+                    else
+                    {
+                        if (CourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.Student) //Don't display student roles, they are obvious.
+                        {
+                            returnValue = "(" + CourseUser.AbstractRole.Name + ") " + returnValue;
+                        }
+                    }
                 }
                 return returnValue;
             }
+        }
+    }
+
+    public class GeneralPost
+    {
+        public string Content;  
+        public int DiscussionPostId;
+        public DateTime Posted;
+        public Poster poster;
+        public GeneralPost()
+        {
+            poster = new Poster();
         }
     }
 

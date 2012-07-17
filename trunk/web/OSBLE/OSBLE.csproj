@@ -814,6 +814,7 @@
     <Content Include="Views\Rubric\ExportIndividualToCSV.cshtml" />
     <Content Include="Views\Rubric\ExportAllToCSV.cshtml" />
     <Content Include="Views\DiscussionAssignment\Index.cshtml" />
+    <Content Include="Views\Assignment\_ModeratorIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

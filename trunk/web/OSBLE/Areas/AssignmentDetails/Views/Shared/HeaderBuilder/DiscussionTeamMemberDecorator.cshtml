@@ -54,32 +54,3 @@
         </table>
     </td>
 </tr>
- @*
-    @for (int i = 0; i < ListOfListOfMembers.Count; i++)
-    {
-
-     
-            <strong>@ListOfTeamNames[i]</strong>
-            <ul class="UserList"> give this class to table perhaps
-            
-            
-                @foreach (CourseUser cu in ListOfListOfMembers[i])
-                {
-                  <li>
-                    <div class="UserControls">
-                        <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { courseUserId = cu.ID, area = "" })">@Helpers.MailButton()</a>
-                    </div>
-                    @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", "Roster", new { userProfile = cu.UserProfileID, area = "" }))
-                    <span class="roster_name">@Helpers.DisplayFullNameOrPending(cu)</span>
-                        </li>  
-                }
-
-                <br />
-                <a title="Email whole team" href="@Url.Action("CreateDiscussionTeam", "Mail", new { discussionTeamId = ListOfTeamIDs[i], area = "" })">
-                    Email the whole team</a>
-            </ul>
-        </li>
-    }
-    </ul>
-        *@
-    

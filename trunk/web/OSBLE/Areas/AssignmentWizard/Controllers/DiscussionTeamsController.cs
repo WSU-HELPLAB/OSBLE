@@ -76,12 +76,15 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                                       select cu).ToList();
                 ViewBag.ModeratorListTitle = "Moderators/TAs";
             }
+            ViewBag.Moderators = Moderators;
+
+            //Setting up css for displaying moderators
             ViewBag.DisplayModeratorList = "inline";
             if (Moderators.Count == 0)
             {
                 ViewBag.DisplayModeratorList = "none";
             }
-            ViewBag.Moderators = Moderators;
+
         }
 
         public override ActionResult Index()

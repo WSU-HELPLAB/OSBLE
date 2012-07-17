@@ -11,9 +11,9 @@
 }
 
 <input type="hidden" value="@Html.AttributeEncode(Model.ID)" name="ID" />
-<div id="AvailableModeratorList">
+<div id="AvailableModeratorList" style="display:@(ViewBag.DisplayModeratorList)">
     <h3>
-        Moderators/TAs</h3>
+        @ViewBag.ModeratorListTitle</h3>
     <ul id="AvailableModerators" class="ModeratorsDraggable">
         @foreach (CourseUser cu in moderators)
         {

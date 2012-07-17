@@ -8,14 +8,15 @@
 
     Assignment assignment = ViewBag.Assignment;
     ViewBag.Title = "Discussion Assignment: " + assignment.AssignmentName;
-    List<DiscussionPostViewModel> DiscussionPostViewModelList = ViewBag.DiscussionPostViewModelList; 
+    List<DiscussionPostViewModel> DiscussionPostViewModelList = ViewBag.DiscussionPostViewModelList;
     int discussionTeamID = ViewBag.DiscussionTeamID;
-    
     string selectBoxID = "dtStudentSelect";
     if (ViewBag.ActiveCourse.AbstractRole.CanModify)
     {
         selectBoxID = "dtInstructorSelect";
     }
+
+    List<Poster> DiscussionMembers = ViewBag.Posters;
 }
 <script type="text/javascript">
 
@@ -51,36 +52,80 @@
 </script>
 
 
-<div id="activity_feed">
-    <h2>@ViewBag.DiscussionHeader</h2>
 
-    <!--Select Discussion Dropdown-->
-    @if (ViewBag.DiscussionTeamList != null && ViewBag.DiscussionTeamList.Count > 1)
-    {
+<div>
+        
         <table>
-            <tr>
-                <th>Select Discussion:</th>
-                <td>
-                <select id="@selectBoxID">
-                    @foreach (DiscussionTeam dt in ViewBag.DiscussionTeamList)
-                    {
-                        @*generating select box*@
-                        string optionText = "<option value=\"{0}\"{1}>{2}</option>";
-                        string selectValue = "";
-                        if (dt.ID == ViewBag.DiscussionTeamID)
-                        {
-                            selectValue = "selected=\"selected\"";
-                        }
-                        @Html.Raw(String.Format(optionText, dt.ID, selectValue, dt.TeamName));
-                    }
-                    </select>
-                </td>
-            </tr>
-        </table>
-    }
+        <tr><td><h2>@ViewBag.DiscussionHeader</h2></td>
 
+                <!--Select Discussion Dropdown-->
+        @if (ViewBag.DiscussionTeamList != null && ViewBag.DiscussionTeamList.Count > 1)
+        {
+          
+            
+            <td><h2> - Select Discussion:</h2></td>
+            <td>
+            <select id="@selectBoxID">
+                @foreach (DiscussionTeam dt in ViewBag.DiscussionTeamList)
+                {
+                    @*generating select box*@
+                    string optionText = "<option value=\"{0}\"{1}>{2}</option>";
+                    string selectValue = "";
+                    if (dt.ID == ViewBag.DiscussionTeamID)
+                    {
+                        selectValue = "selected=\"selected\"";
+                    }
+                    @Html.Raw(String.Format(optionText, dt.ID, selectValue, dt.TeamName));
+                }
+                </select>
+            </td>
+               
+          
+        }
+         </tr>
+        </table>
+
+    <div class="UserList" style="margin-top: -25px">
+        @if (DiscussionMembers != null)   
+        {
+            <table>
+            <tr><td><h2>Discussion Members: </h2></td></tr>
+        
+            @{int i = 1;}
+            @foreach (Poster poster in DiscussionMembers)
+            {
+                if(i % 3 == 1) 
+                {
+                    @:<tr>
+                }
+                <td>
+                <li>    
+                    <div class="UserControls">
+                    @if (poster.Anonymize == false && poster.CourseUser.UserProfile.UserName != null)
+                    {
+                        <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { courseUserId = poster.CourseUser.ID, area = "" })">@Helpers.MailButton()</a>
+                    }
+                    </div>
+                    @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", "Roster", new { userProfile = poster.CourseUser.UserProfile.ID, area = "" }))
+                    <span class="roster_name">@poster.DisplayName</span>
+                </li> 
+                </td>
+                if(i % 3 == 0)
+                {
+                    @:</tr>
+                }
+                i++;
+            }
+            </table>
+        }
+    </div>
+    <div style="clear:both;"></div>
+    <p />
+</div>
+
+<div id="activity_feed" style="max-width: 1200px">
     <!--Fielddset for prompt & Critical Review Discussion prompt-->
-    <fieldset style="border-color:White;">
+    <div class="promptText">
         @Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(assignment.AssignmentDescription).ToString()))
         <br />
 
@@ -92,8 +137,8 @@
                 new { area = "", discussionTeamID = discussionTeamID },
                 new { onclick = "create_and_open_downloading_submission_dialog()" })
         }
-    </fieldset>
-    <br />
+    </div>
+<br />
 
     @{
         <!--div for post character counter-->
@@ -111,13 +156,13 @@
         <!--div for new post-->
         if (ViewBag.CanPost)
         {
-            <div>
+            
                 <input type="hidden" id="MaxContentChars" value="@ViewBag.MaxActivityFeedLength"/>
-                @using (Html.BeginForm("NewPost", "DiscussionAssignment", FormMethod.Post))
+                using (Html.BeginForm("NewPost", "DiscussionAssignment", FormMethod.Post))
                 {
                     <input type="hidden" name="DiscussionTeamID" value="@discussionTeamID" />
                     <input type="hidden" name="AssignmentID" value="@ViewBag.Assignment.ID" />
-                    <textarea id="ActivityFeed" name="Content" rows="10" style="width: 100%" placeholder="Enter new discussion post here..." onkeydown="RemainingCharsReply()" onkeyup="RemainingCharsReply()"></textarea><br />
+                    <textarea id="ActivityFeed" name="Content" rows="10" style="width: 100%; height: 100px" placeholder="Enter new discussion post here..." onkeydown="RemainingCharsReply()" onkeyup="RemainingCharsReply()"></textarea><br />
                     if (assignment.DiscussionSettings.MinimumFirstPostLength > 0 && ViewBag.IsFirstPost)
                     {
                         <input id="postNewDiscussion" type="submit" name="post_active" value="Post" disabled="disabled" />   
@@ -127,7 +172,6 @@
                         <input id="postNewDiscussion" type="submit" name="post_active" value="Post" />
                     }
                 }
-            </div>
         }
         else
         {
@@ -143,10 +187,10 @@
         <!--Generating posts-->
         foreach (DiscussionPostViewModel dpvm in DiscussionPostViewModelList)
         {
-            displayName = dpvm.DisplayName;
-            if (dpvm.Anonymize == false)
+            displayName = dpvm.poster.DisplayName;
+            if (dpvm.poster.Anonymize == false)
             {
-                displayPicture = Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = dpvm.CourseUser.AbstractCourseID, userprofile = dpvm.CourseUser.UserProfileID }));
+                displayPicture = Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = dpvm.poster.CourseUser.AbstractCourseID, userprofile = dpvm.poster.CourseUser.UserProfileID }));
             }
             else
             {
@@ -154,13 +198,13 @@
             }
             <div class="dp_post" id="dp_post_@(dpvm.DiscussionPostId)" style="background:white;">
             @if (ViewBag.Student != null
-                && ViewBag.Student.ID == dpvm.CourseUser.ID
+                && ViewBag.Student.ID == dpvm.poster.CourseUser.ID
                 && (ViewBag.PostOrReply == 0 || ViewBag.PostOrReply == 2)
                 && (ViewBag.ActiveCourse.AbstractRole.CanModify))
             {
                     <!--display as highlighted if there is a student selected, and this is that student-->
                     <script type="text/javascript">
-                        $('#dp_post_@(dpvm.DiscussionPostId))').css("background", "#FFF8C6");
+                        $('#dp_post_@(dpvm.DiscussionPostId)').css("background", "#FFF8C6");
                     </script>
             }
                 <div class="dp_post_header">
@@ -170,8 +214,8 @@
                 </div>
                 <div class="dp_content">
                     @{
-                        string content = Helpers.Linkify(dpvm.Content).ToHtmlString();
-                        content = content.Replace("\n", "<br />");
+            string content = Helpers.Linkify(dpvm.Content).ToHtmlString();
+            content = content.Replace("\n", "<br />");
                     }
                     @Html.Raw(content)
                 </div>
@@ -180,13 +224,14 @@
                         <!--Generating replies under each post-->
                         @foreach (ReplyViewModel reply in dpvm.Replies)
                         {
-                            displayName = reply.DisplayName; //reusing displayName/displayPicture as theyre not used further down the post
-                            if (reply.Anonymize == false)
+                            displayName = reply.poster.DisplayName; //reusing displayName/displayPicture as theyre not used further down the post
+                            if (reply.poster.Anonymize == false)
                             {
-                                displayPicture = Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = reply.CourseUser.AbstractCourseID, userprofile = reply.CourseUser.UserProfileID }));
+                                displayPicture = Helpers.ProfilePicture(Url.Action("ProfilePictureForDiscussion", new { course = reply.poster.CourseUser.AbstractCourseID, userprofile = reply.poster.CourseUser.UserProfileID }));
                             }
                             else
-                            {;
+                            {
+                                ;
                                 displayPicture = DefaultProfilePicture;
                             }
                         
@@ -206,9 +251,9 @@
                             </div>
                         
                             if (ViewBag.Student != null
-                                && ViewBag.Student.ID == reply.CourseUser.ID
+                                && ViewBag.Student.ID == reply.poster.CourseUser.ID
                                 && (ViewBag.PostOrReply == 1 || ViewBag.PostOrReply == 2)
-                                && (ViewBag.ActiveCourse.AbstractRole.CanModify || ViewBag.ActiveCourse.AbstractRole.Anonymized))
+                                && (ViewBag.ActiveCourse.AbstractRole.CanModify))
                             {
                                 <!--display as highlighted if there is a student selected, and this is that student-->
                                 <script type="text/javascript">
