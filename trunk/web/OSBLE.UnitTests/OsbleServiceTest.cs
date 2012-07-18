@@ -9,6 +9,7 @@ using OSBLE.Models.Users;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Assignments;
 using OSBLE.Models;
+using Ionic.Zip;
 
 namespace OSBLE.UnitTests
 {
@@ -78,10 +79,15 @@ namespace OSBLE.UnitTests
         [TestMethod]
         public void OsbleService_GetAssignmentSubmissionTest()
         {
+            //AC Note: This requires OSBLE to be set up properly
             AuthenticationServiceClient authClient = new AuthenticationServiceClient();
             OsbleServiceClient osbleClient = new OsbleServiceClient();
             string token = authClient.ValidateUser("betty@rogers.com", "123123");
             byte[] data = osbleClient.GetAssignmentSubmission(1, token);
+            using (ZipFile zip = ZipFile.Read(data))
+            {
+                Assert.AreEqual(1, zip.Entries.Count);
+            }
         }
     }
 }
