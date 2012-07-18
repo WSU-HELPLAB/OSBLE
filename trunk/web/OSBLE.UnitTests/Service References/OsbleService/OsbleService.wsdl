@@ -37,6 +37,12 @@
   <wsdl:message name="OsbleService_GetCourseRole_OutputMessage">
     <wsdl:part name="parameters" element="GetCourseRoleResponse" />
   </wsdl:message>
+  <wsdl:message name="OsbleService_SubmitAssignment_InputMessage">
+    <wsdl:part name="parameters" element="SubmitAssignment" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_SubmitAssignment_OutputMessage">
+    <wsdl:part name="parameters" element="SubmitAssignmentResponse" />
+  </wsdl:message>
   <wsdl:portType name="OsbleService">
     <wsdl:operation name="GetCourses">
       <wsdl:input wsaw:Action="urn:OsbleService/GetCourses" message="OsbleService_GetCourses_InputMessage" />
@@ -53,6 +59,10 @@
     <wsdl:operation name="GetCourseRole">
       <wsdl:input wsaw:Action="urn:OsbleService/GetCourseRole" message="OsbleService_GetCourseRole_InputMessage" />
       <wsdl:output wsaw:Action="urn:OsbleService/GetCourseRoleResponse" message="OsbleService_GetCourseRole_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SubmitAssignment">
+      <wsdl:input wsaw:Action="urn:OsbleService/SubmitAssignment" message="OsbleService_SubmitAssignment_InputMessage" />
+      <wsdl:output wsaw:Action="urn:OsbleService/SubmitAssignmentResponse" message="OsbleService_SubmitAssignment_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
 </wsdl:definitions>

@@ -40,6 +40,15 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="SubmitAssignment">
+      <soap:operation soapAction="urn:OsbleService/SubmitAssignment" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="OsbleService">
     <wsdl:port name="BasicHttpBinding_OsbleService" binding="tns:BasicHttpBinding_OsbleService">

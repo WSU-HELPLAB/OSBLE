@@ -12,7 +12,6 @@ namespace OSBLE.Models.FileSystem
             return "";
         }
 
-
         public FileCollection AllFiles()
         {
             throw new NotImplementedException();
@@ -29,6 +28,16 @@ namespace OSBLE.Models.FileSystem
         }
 
         public IFileSystem Directory(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool AddFile(string fileName, byte[] data)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool AddFile(string fileName, System.IO.Stream data)
         {
             throw new NotImplementedException();
         }

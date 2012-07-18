@@ -26,6 +26,9 @@ namespace OSBLE.UnitTests.OsbleService {
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:OsbleService/GetCourseRole", ReplyAction="urn:OsbleService/GetCourseRoleResponse")]
         OSBLE.Models.Courses.CourseRole GetCourseRole(int courseId, string authToken);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:OsbleService/SubmitAssignment", ReplyAction="urn:OsbleService/SubmitAssignmentResponse")]
+        bool SubmitAssignment(int assignmentId, byte[] zipData, string authToken);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -69,6 +72,10 @@ namespace OSBLE.UnitTests.OsbleService {
         
         public OSBLE.Models.Courses.CourseRole GetCourseRole(int courseId, string authToken) {
             return base.Channel.GetCourseRole(courseId, authToken);
+        }
+        
+        public bool SubmitAssignment(int assignmentId, byte[] zipData, string authToken) {
+            return base.Channel.SubmitAssignment(assignmentId, zipData, authToken);
         }
     }
 }

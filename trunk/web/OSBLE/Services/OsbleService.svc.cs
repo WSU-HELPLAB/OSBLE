@@ -9,6 +9,7 @@ using OSBLE.Models.Users;
 using OSBLE.Models;
 using OSBLE.Models.Assignments;
 using System.IO;
+using Ionic.Zip;
 
 namespace OSBLE.Services
 {
@@ -100,10 +101,10 @@ namespace OSBLE.Services
 
             //make sure that the user is enrolled in the course
             CourseUser courseUser = (from cu in _db.CourseUsers
-                                    where cu.AbstractCourseID == assignment.CourseID
-                                    &&
-                                    cu.UserProfileID == profile.ID
-                                    select cu).FirstOrDefault();
+                                     where cu.AbstractCourseID == assignment.CourseID
+                                     &&
+                                     cu.UserProfileID == profile.ID
+                                     select cu).FirstOrDefault();
             if (courseUser == null)
             {
                 return new byte[0];
@@ -111,16 +112,16 @@ namespace OSBLE.Services
 
             //users are attached to assignments through teams, so we have to find the correct team
             Team team = (from tm in _db.TeamMembers
-                        join at in _db.AssignmentTeams on tm.TeamID equals at.TeamID
-                        where tm.CourseUserID == courseUser.ID
-                        && at.AssignmentID == assignmentId
-                        select tm.Team).FirstOrDefault();
+                         join at in _db.AssignmentTeams on tm.TeamID equals at.TeamID
+                         where tm.CourseUserID == courseUser.ID
+                         && at.AssignmentID == assignmentId
+                         select tm.Team).FirstOrDefault();
 
-            if(team == null)
+            if (team == null)
             {
                 return new byte[0];
             }
-                        
+
 
             OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
             Stream stream = fs.Course(courseUser.AbstractCourseID)
@@ -140,7 +141,7 @@ namespace OSBLE.Services
             stream.Close();
             ms.Close();
             return bytes;
-            
+
         }
 
         /// <summary>
@@ -169,6 +170,52 @@ namespace OSBLE.Services
             }
 
             return new CourseRole(courseUser.AbstractRole);
+        }
+
+        [OperationContract]
+        public bool SubmitAssignment(int assignmentId, byte[] zipData, string authToken)
+        {
+            if (!_authService.IsValidKey(authToken))
+            {
+                return false;
+            }
+            try
+            {
+                Assignment assignment = _db.Assignments.Find(assignmentId);
+                UserProfile user = _authService.GetActiveUser(authToken);
+                CourseUser courseUser = _db.CourseUsers
+                                    .Where(cu => cu.AbstractCourseID == assignment.CourseID)
+                                    .Where(cu => cu.UserProfileID == user.ID)
+                                    .FirstOrDefault();
+                Team team = (from tm in _db.TeamMembers
+                             join at in _db.AssignmentTeams on tm.TeamID equals at.TeamID
+                             where tm.CourseUserID == courseUser.ID
+                             && at.AssignmentID == assignmentId
+                             select tm.Team).FirstOrDefault();
+                OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
+                MemoryStream ms = new MemoryStream(zipData);
+                ms.Position = 0;
+                using (ZipFile file = ZipFile.Read(ms))
+                {
+                    foreach (ZipEntry entry in file.Entries)
+                    {
+                        MemoryStream extractStream = new MemoryStream();
+                        entry.Extract(extractStream);
+                        extractStream.Position = 0;
+
+                        //add the extracted file to the file system
+                        fs.Course((int)assignment.CourseID)
+                        .Assignment(assignmentId)
+                        .Submission(team.ID)
+                        .AddFile(entry.FileName, extractStream);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
