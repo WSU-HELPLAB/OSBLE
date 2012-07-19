@@ -51,6 +51,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                 }
             }
 
+            header.DiscussionTeam.AssignmentID = assignment.ID;
             header.DiscussionTeam.ListOfListOfMembers = ListOfListOfMembers;
             header.DiscussionTeam.ListOfTeamNames = ListOfTeamNames;
             header.DiscussionTeam.ListOfTeamIDs = ListOfTeamIDs;

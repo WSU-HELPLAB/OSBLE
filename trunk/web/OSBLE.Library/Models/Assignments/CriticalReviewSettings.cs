@@ -25,10 +25,10 @@ namespace OSBLE.Models.Assignments
         [Display(Name = "Anonymize Reviewers to Author")]
         public bool AnonymizeReviewerToAuthor { get; set; }
 
-        [Display(Name = "Anonymize Reviewers to other Reviewers for merged document")]
+        [Display(Name = "Anonymize Reviewers to other Reviewers in reviewed document")]
         public bool AnonymizeReviewerToReviewers { get; set; }
 
-        [Display(Name = "Allow reviewers to download the reviewed document after publish")]
+        [Display(Name = "Allow reviewers to access the reviewed document after publish")]
         public bool AllowReviewersToDownload { get; set; }
         
 

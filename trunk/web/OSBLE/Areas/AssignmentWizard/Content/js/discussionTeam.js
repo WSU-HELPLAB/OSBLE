@@ -30,8 +30,6 @@ function documentReady() {
         forcePlaceholderSize: true,
         start: hideErrors
     }).disableSelection();
-
-    
     
     
     //various event listeners
@@ -42,8 +40,8 @@ function documentReady() {
     $("#AvailableStudentList").disableSelection();
     $("#TeamsDiv").disableSelection();
 }
-
 function teamSortableComplete(event, ui) {
+
     var OrigLIElement = ui.item.context;
     var myDataId = $(OrigLIElement).attr('data-id');
     var ULElement = $(this);

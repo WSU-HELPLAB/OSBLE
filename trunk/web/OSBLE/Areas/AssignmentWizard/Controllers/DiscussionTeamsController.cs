@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
+using OSBLE.Models.DiscussionAssignment;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -92,6 +93,10 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             base.Index();
             SetUpViewBag(Assignment.DiscussionTeams.Cast<IAssignmentTeam>().ToList());
             SetUpModeratorViewBag();
+
+
+            //Counting all discussion posts made for any discussion team that currently exists
+            ViewBag.PostCount = db.DiscussionPosts.Where(dp => Assignment.DiscussionTeams.Select(dt => dt.ID).ToList().Contains(dp.DiscussionTeamID)).Count();
 
             return View(Assignment);
         }
@@ -247,8 +252,15 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
             else
             {
-                //clear out old teams.  AC: Not sure why EF isn't handling this automaticaly
+                //clear out old posts and then old teams.  AC: Not sure why EF isn't handling this automaticaly
                 DiscussionTeam[] oldTeams = Assignment.DiscussionTeams.ToArray();
+                DiscussionPost[] oldPosts = db.DiscussionPosts.Where(dp => oldTeams.Select(dt => dt.ID).ToList().Contains(dp.DiscussionTeamID)).ToArray();
+
+                for (int i = 0; i < oldPosts.Length; i++)
+                {
+                    db.Entry(oldPosts[i]).State = System.Data.EntityState.Deleted;
+                }
+
                 for (int i = 0; i < oldTeams.Length; i++)
                 {
                     db.Entry(oldTeams[i]).State = System.Data.EntityState.Deleted;

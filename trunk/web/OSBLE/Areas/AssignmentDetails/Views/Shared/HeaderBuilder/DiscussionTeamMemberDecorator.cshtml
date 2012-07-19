@@ -8,6 +8,7 @@
     List<List<CourseUser>> ListOfListOfMembers = dataModel.DiscussionTeam.ListOfListOfMembers;
     List<string> ListOfTeamNames = dataModel.DiscussionTeam.ListOfTeamNames;
     List<int> ListOfTeamIDs = dataModel.DiscussionTeam.ListOfTeamIDs;
+    int assignmentId = dataModel.DiscussionTeam.AssignmentID;
 }
 <tr>
     <!--Team members row-->
@@ -22,6 +23,12 @@
         }
     </th>
     <td>
+    @*
+    @Html.ActionLink(displayValue, 
+                         "Index", "DiscussionAssignment",
+                         new { assignmentId = assignment.ID, discussionTeamId = dt.ID, area = "" }, 
+                         new { })
+    *@
 
         <table class="UserList">
             @*Row 1: Iterate over names, display in first row, each in own cell*@
@@ -29,9 +36,18 @@
                 <tr>
                     @for (int i = 0; i < ListOfTeamNames.Count;i++ )
                     {
+                        @*
                         <th style="border:none">@ListOfTeamNames[i]
                             <a title="Email whole team" href="@Url.Action("CreateDiscussionTeam", "Mail", new { discussionTeamId = ListOfTeamIDs[i], area = "" })">@Helpers.MailButton()</a>
                         </th>
+                        *@
+                        <td style="border:none">
+                            @Html.ActionLink("Discussion for " + ListOfTeamNames[i],
+                                            "Index", "DiscussionAssignment",
+                                             new { assignmentId = assignmentId, discussionTeamId = ListOfTeamIDs[i], area = "" },
+                                             new { })
+                            <a title="Email whole team" href="@Url.Action("CreateDiscussionTeam", "Mail", new { discussionTeamId = ListOfTeamIDs[i], area = "" })">@Helpers.MailButton()</a>
+                        </td>
                     }
                 </tr>
                 <tr>

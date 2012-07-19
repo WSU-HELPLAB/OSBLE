@@ -54,73 +54,32 @@
 
 
 <div>
-        
         <table>
-        <tr><td><h2>@ViewBag.DiscussionHeader</h2></td>
-
-                <!--Select Discussion Dropdown-->
+        <tr><td><h2>@ViewBag.DiscussionHeader</h2></td></tr>
+        <!--Select Discussion Dropdown-->
         @if (ViewBag.DiscussionTeamList != null && ViewBag.DiscussionTeamList.Count > 1)
         {
           
-            
-            <td><h2> - Select Discussion:</h2></td>
-            <td>
-            <select id="@selectBoxID">
-                @foreach (DiscussionTeam dt in ViewBag.DiscussionTeamList)
-                {
-                    @*generating select box*@
-                    string optionText = "<option value=\"{0}\"{1}>{2}</option>";
-                    string selectValue = "";
-                    if (dt.ID == ViewBag.DiscussionTeamID)
+            <tr>
+                <td><text style="font-weight:bold" >Select Discussion: </text>
+                
+                <select id="@selectBoxID">
+                    @foreach (DiscussionTeam dt in ViewBag.DiscussionTeamList)
                     {
-                        selectValue = "selected=\"selected\"";
+                        @*generating select box*@
+                        string optionText = "<option value=\"{0}\"{1}>{2}</option>";
+                        string selectValue = "";
+                        if (dt.ID == ViewBag.DiscussionTeamID)
+                        {
+                            selectValue = "selected=\"selected\"";
+                        }
+                        @Html.Raw(String.Format(optionText, dt.ID, selectValue, dt.TeamName));
                     }
-                    @Html.Raw(String.Format(optionText, dt.ID, selectValue, dt.TeamName));
-                }
-                </select>
-            </td>
-               
-          
-        }
-         </tr>
-        </table>
-
-    <div class="UserList" style="margin-top: -25px">
-        @if (DiscussionMembers != null)   
-        {
-            <table>
-            <tr><td><h2>Discussion Members: </h2></td></tr>
-        
-            @{int i = 1;}
-            @foreach (Poster poster in DiscussionMembers)
-            {
-                if(i % 3 == 1) 
-                {
-                    @:<tr>
-                }
-                <td>
-                <li>    
-                    <div class="UserControls">
-                    @if (poster.Anonymize == false && poster.CourseUser.UserProfile.UserName != null)
-                    {
-                        <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { courseUserId = poster.CourseUser.ID, area = "" })">@Helpers.MailButton()</a>
-                    }
-                    </div>
-                    @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", "Roster", new { userProfile = poster.CourseUser.UserProfile.ID, area = "" }))
-                    <span class="roster_name">@poster.DisplayName</span>
-                </li> 
+                    </select>
                 </td>
-                if(i % 3 == 0)
-                {
-                    @:</tr>
-                }
-                i++;
-            }
-            </table>
+            </tr>       
         }
-    </div>
-    <div style="clear:both;"></div>
-    <p />
+        </table>
 </div>
 
 <div id="activity_feed" style="max-width: 1200px">
@@ -131,7 +90,7 @@
 
         @if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
         {
-            @Html.ActionLink("Download Discussion Items",
+            @Html.ActionLink("Access reviewed items to discuss.",
                 "GetCriticalReviewDiscussionItems",
                 "FileHandler",
                 new { area = "", discussionTeamID = discussionTeamID },

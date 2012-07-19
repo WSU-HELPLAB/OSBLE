@@ -144,43 +144,11 @@ namespace OSBLE.Controllers
 
                 if (assignment.HasDiscussionTeams) //If there are discusison teams, we must filter our post queries by discussionTeamId
                 {
-                    List<Poster> posters = new List<Poster>();
                     if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion) //CRDs have special permissions that must be checked.
                     {
-                        List<int> AuthorCourseUserIds = discussionTeam.AuthorTeam.TeamMembers.Select(tm => tm.CourseUserID).ToList();
-                        List<int> ReviewerCourseUserIds = discussionTeam.Team.TeamMembers.Select(tm => tm.CourseUserID).ToList();
+
                         bool currentUserIsAuthor = discussionTeam.AuthorTeam.TeamMembers.Where(tm => tm.CourseUserID == ActiveCourseUser.ID).ToList().Count > 0;
                         bool currentUserIsReviewer = discussionTeam.Team.TeamMembers.Where(tm => tm.CourseUserID == ActiveCourseUser.ID).ToList().Count > 0;
-                        
-                        //generating list of DiscussionMembers with proper anonymization.
-                        foreach (CourseUser cu in discussionTeam.GetAllTeamMembers().Select(tm => tm.CourseUser).ToList())
-                        {
-                            bool isAuthor = AuthorCourseUserIds.Contains(cu.ID);
-                            bool isReviewer = ReviewerCourseUserIds.Contains(cu.ID);
-                            string RoleName = "";
-                            if(isAuthor && isReviewer)
-                            {
-                                RoleName = "Author/Reviewer";
-                            }
-                            else if(isReviewer)
-                            {
-                                RoleName = "Reviewer";
-                            }
-                            else if(isAuthor)
-                            {
-                                RoleName = "Author";
-                            }
-                            Poster poster = new Poster()
-                            {
-                                Anonymize = AnonymizeNameForCriticalReviewDiscussion(cu, assignment, isAuthor, isReviewer, currentUserIsAuthor, currentUserIsReviewer),
-                                CourseUser = cu,
-                                HideRole = assignment.DiscussionSettings.HasHiddenRoles,
-                                RoleName = RoleName,
-                                
-                            };
-                            posters.Add(poster);
-                        }
-                        
                         
 
 
@@ -345,20 +313,6 @@ namespace OSBLE.Controllers
                     }
                     else //normal discussion assignment with teams. 
                     {
-
-                        //generating list of DiscussionMembers with proper anonymization
-                        
-                        foreach (CourseUser cu in discussionTeam.GetAllTeamMembers().Select(tm => tm.CourseUser).ToList())
-                        {
-                            Poster poster = new Poster()
-                            {
-                                Anonymize = AnonymizeNameForDiscussion(cu, assignment.DiscussionSettings),
-                                CourseUser = cu,
-                                HideRole = assignment.DiscussionSettings.HasHiddenRoles
-                            };
-                            posters.Add(poster);
-                        }
-
                         List<DiscussionPost> AllPosts = (from post in db.DiscussionPosts
                                                          where post.DiscussionTeamID == discussionTeamId
                                                          select post).ToList();
@@ -390,7 +344,6 @@ namespace OSBLE.Controllers
                             }
                         }
                     }
-                    ViewBag.Posters = posters;
                 }
                 else //Any discussion that does not have dsicussion teams is a classwide discussion, so filter posts on AssignmentID rather than DiscussionTeamID
                 {
@@ -530,59 +483,6 @@ namespace OSBLE.Controllers
                                  where post.AssignmentID == assignment.ID &&
                                  post.DiscussionTeamID == discussionTeamID
                                  select post).ToList();
-
-                    //if we have discussionTeams, we want a list of the discussionMembers
-                    List<Poster> posters = new List<Poster>();
-
-                    //if the assignment is a CRD, we must also determine RoleName of author and/or reviewer
-                    if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
-                    {
-                        List<int> AuthorCourseUserIds = discussionTeam.AuthorTeam.TeamMembers.Select(tm => tm.CourseUserID).ToList();
-                        List<int> ReviewerCourseUserIds = discussionTeam.Team.TeamMembers.Select(tm => tm.CourseUserID).ToList();
-
-                        foreach (CourseUser cu in discussionTeam.GetAllTeamMembers().Select(tm => tm.CourseUser).ToList())
-                        {
-                            bool isAuthor = AuthorCourseUserIds.Contains(cu.ID);
-                            bool isReviewer = ReviewerCourseUserIds.Contains(cu.ID);
-                            string RoleName = "";
-                            if (isAuthor && isReviewer)
-                            {
-                                RoleName = "Author/Reviewer";
-                            }
-                            else if (isReviewer)
-                            {
-                                RoleName = "Reviewer";
-                            }
-                            else if (isAuthor)
-                            {
-                                RoleName = "Author";
-                            }
-                            Poster poster = new Poster()
-                            {
-                                Anonymize = false,
-                                CourseUser = cu,
-                                HideRole = assignment.DiscussionSettings.HasHiddenRoles,
-                                RoleName = RoleName,
-
-                            };
-                            posters.Add(poster);
-                        }
-                    }
-                    else //non-CRD, not adding RoleNames
-                    {
-                        foreach (CourseUser cu in discussionTeam.GetAllTeamMembers().Select(tm => tm.CourseUser).ToList())
-                        {
-                            Poster poster = new Poster()
-                            {
-                                Anonymize = false,
-                                CourseUser = cu,
-                                HideRole = assignment.DiscussionSettings.HasHiddenRoles
-
-                            };
-                            posters.Add(poster);
-                        }
-                    }
-                    ViewBag.Posters = posters;
                 }
                 else
                 {

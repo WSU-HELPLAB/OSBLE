@@ -32,16 +32,15 @@ namespace OSBLE.Models.ViewModels
 
                 if (!HideRole)
                 {
-                    if (RoleName != null && RoleName != "")
+                    //Display RoleName only for students if there is one availble.
+                    if (RoleName != null && RoleName != "" && CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student) 
                     {
-                        returnValue = "(" + RoleName + ")" + returnValue;
+                        returnValue = returnValue + " (" + RoleName + ")";
                     }
-                    else
+                    //We want to display the CourseRole for nonstudents if roles are to be shown. We never want to show (Student) as no-role indicates that.
+                    else if (CourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.Student) 
                     {
-                        if (CourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.Student) //Don't display student roles, they are obvious.
-                        {
-                            returnValue = "(" + CourseUser.AbstractRole.Name + ") " + returnValue;
-                        }
+                        returnValue = returnValue + " (" + CourseUser.AbstractRole.Name + ")";
                     }
                 }
                 return returnValue;
