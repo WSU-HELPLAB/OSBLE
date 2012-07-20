@@ -8,18 +8,25 @@ namespace OSBLE.Models.FileSystem
 {
     public class ReviewFilePath : FileSystemBase
     {
-        private int _courseUserID;
+        private int _authorTeamID;
+        private int _reviewerTeamID;
         private string _reviewPrefix = "Reviews";
 
-        public ReviewFilePath(IFileSystem pathBuilder, int cuID)
+        public ReviewFilePath(IFileSystem pathBuilder, int authorTeamID, int reviewerTeamID)
             : base(pathBuilder)
         {
-            _courseUserID = cuID;
+            _authorTeamID = authorTeamID;
+            _reviewerTeamID = reviewerTeamID;
         }
 
         public override string GetPath()
         {
-            string returnPath = Path.Combine(PathBuilder.GetPath(), _reviewPrefix, _courseUserID.ToString());
+            string returnPath = Path.Combine(
+                                            PathBuilder.GetPath(), 
+                                            _reviewPrefix, 
+                                            _authorTeamID.ToString(),
+                                            _reviewerTeamID.ToString()
+                                            );
             return returnPath;
         }
     }

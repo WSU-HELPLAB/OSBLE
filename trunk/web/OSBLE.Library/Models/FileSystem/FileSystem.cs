@@ -30,11 +30,12 @@ using OSBLE.Models.Users;
  *                     |        \
  *                Submissions   Reviews
  *                     |             \
- *                     |          [CourseUserId]
+ *                     |          [AuthorTeamId]
  *                     |                 |
- *                  [TeamID]             |
- *                   /          {critical reviews}
- *       {team submissions}  
+ *                  [TeamID]      [ReviewTeamId]
+ *                   /                   |
+ *       {team submissions}      {critical reviews}
+ *                                     
  * */
 namespace OSBLE.Models.FileSystem
 {

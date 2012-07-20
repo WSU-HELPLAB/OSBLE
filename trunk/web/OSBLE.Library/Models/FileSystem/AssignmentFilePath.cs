@@ -30,15 +30,15 @@ namespace OSBLE.Models.FileSystem
             return Submission(team.ID);
         }
 
-        public IFileSystem Review(int courseUserId)
+        public IFileSystem Review(int authorTeamID, int reviewerTeamID)
         {
-            ReviewFilePath review = new ReviewFilePath(this, courseUserId);
+            ReviewFilePath review = new ReviewFilePath(this, authorTeamID, reviewerTeamID);
             return review;
         }
 
-        public IFileSystem Reivew(CourseUser cu)
+        public IFileSystem Reivew(Team authorTeam, Team reviewerTeam)
         {
-            return Review(cu.ID);
+            return Review(authorTeam.ID, reviewerTeam.ID);
         }
 
         public override string GetPath()

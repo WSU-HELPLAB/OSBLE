@@ -31,6 +31,12 @@
   <wsdl:message name="OsbleService_GetReviewItems_OutputMessage">
     <wsdl:part name="parameters" element="GetReviewItemsResponse" />
   </wsdl:message>
+  <wsdl:message name="OsbleService_SubmitReview_InputMessage">
+    <wsdl:part name="parameters" element="SubmitReview" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_SubmitReview_OutputMessage">
+    <wsdl:part name="parameters" element="SubmitReviewResponse" />
+  </wsdl:message>
   <wsdl:message name="OsbleService_GetAssignmentSubmission_InputMessage">
     <wsdl:part name="parameters" element="GetAssignmentSubmission" />
   </wsdl:message>
@@ -61,6 +67,10 @@
     <wsdl:operation name="GetReviewItems">
       <wsdl:input wsaw:Action="urn:OsbleService/GetReviewItems" message="OsbleService_GetReviewItems_InputMessage" />
       <wsdl:output wsaw:Action="urn:OsbleService/GetReviewItemsResponse" message="OsbleService_GetReviewItems_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SubmitReview">
+      <wsdl:input wsaw:Action="urn:OsbleService/SubmitReview" message="OsbleService_SubmitReview_InputMessage" />
+      <wsdl:output wsaw:Action="urn:OsbleService/SubmitReviewResponse" message="OsbleService_SubmitReview_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetAssignmentSubmission">
       <wsdl:input wsaw:Action="urn:OsbleService/GetAssignmentSubmission" message="OsbleService_GetAssignmentSubmission_InputMessage" />

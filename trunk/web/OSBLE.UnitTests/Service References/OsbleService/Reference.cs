@@ -24,6 +24,9 @@ namespace OSBLE.UnitTests.OsbleService {
         [System.ServiceModel.OperationContractAttribute(Action="urn:OsbleService/GetReviewItems", ReplyAction="urn:OsbleService/GetReviewItemsResponse")]
         byte[] GetReviewItems(int assignmentId, string authToken);
         
+        [System.ServiceModel.OperationContractAttribute(Action="urn:OsbleService/SubmitReview", ReplyAction="urn:OsbleService/SubmitReviewResponse")]
+        bool SubmitReview(int authorId, int assignmentId, byte[] zippedReviewData, string authToken);
+        
         [System.ServiceModel.OperationContractAttribute(Action="urn:OsbleService/GetAssignmentSubmission", ReplyAction="urn:OsbleService/GetAssignmentSubmissionResponse")]
         byte[] GetAssignmentSubmission(int assignmentId, string authToken);
         
@@ -71,6 +74,10 @@ namespace OSBLE.UnitTests.OsbleService {
         
         public byte[] GetReviewItems(int assignmentId, string authToken) {
             return base.Channel.GetReviewItems(assignmentId, authToken);
+        }
+        
+        public bool SubmitReview(int authorId, int assignmentId, byte[] zippedReviewData, string authToken) {
+            return base.Channel.SubmitReview(authorId, assignmentId, zippedReviewData, authToken);
         }
         
         public byte[] GetAssignmentSubmission(int assignmentId, string authToken) {

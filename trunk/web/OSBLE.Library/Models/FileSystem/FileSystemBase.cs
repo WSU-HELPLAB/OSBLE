@@ -34,7 +34,12 @@ namespace OSBLE.Models.FileSystem
 
         public bool AddFile(string fileName, Stream data)
         {
-            string filePath = Path.Combine(GetPath(), fileName);
+            string path = GetPath();
+            string filePath = Path.Combine(path, fileName);
+            if (System.IO.Directory.Exists(path) == false)
+            {
+                System.IO.Directory.CreateDirectory(path);
+            }
             bool retVal = true;
             try
             {

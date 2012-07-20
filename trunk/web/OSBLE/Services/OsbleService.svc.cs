@@ -181,6 +181,60 @@ namespace OSBLE.Services
         }
 
         [OperationContract]
+        public bool SubmitReview(int authorId, int assignmentId, byte[] zippedReviewData, string authToken)
+        {
+            if (!_authService.IsValidKey(authToken))
+            {
+                return false;
+            }
+
+            try
+            {
+                UserProfile profile = _authService.GetActiveUser(authToken);
+                Assignment assignment = _db.Assignments.Find(assignmentId);
+                CourseUser courseUser = (from cu in _db.CourseUsers
+                                         where cu.AbstractCourseID == assignment.CourseID
+                                         &&
+                                         cu.UserProfileID == profile.ID
+                                         select cu).FirstOrDefault();
+                Team reviewTeam = (from tm in _db.TeamMembers
+                                   join rt in _db.ReviewTeams on tm.TeamID equals rt.ReviewTeamID
+                                   where tm.CourseUserID == courseUser.ID
+                                   && rt.AssignmentID == assignmentId
+                                   select tm.Team).FirstOrDefault();
+                OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
+                MemoryStream ms = new MemoryStream(zippedReviewData);
+                ms.Position = 0;
+                using (ZipFile file = ZipFile.Read(ms))
+                {
+                    foreach (ZipEntry entry in file.Entries)
+                    {
+                        using (MemoryStream extractStream = new MemoryStream())
+                        {
+                            entry.Extract(extractStream);
+                            extractStream.Position = 0;
+
+                            //add the extracted file to the file system
+                            bool result = fs.Course((int)assignment.CourseID)
+                                            .Assignment(assignmentId)
+                                            .Review(authorId, reviewTeam.ID)
+                                            .AddFile(entry.FileName, extractStream);
+                            if (result == false)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        [OperationContract]
         public byte[] GetAssignmentSubmission(int assignmentId, string authToken)
         {
             if (!_authService.IsValidKey(authToken))
@@ -295,10 +349,14 @@ namespace OSBLE.Services
                         extractStream.Position = 0;
 
                         //add the extracted file to the file system
-                        fs.Course((int)assignment.CourseID)
-                        .Assignment(assignmentId)
-                        .Submission(team.ID)
-                        .AddFile(entry.FileName, extractStream);
+                        bool result = fs.Course((int)assignment.CourseID)
+                                        .Assignment(assignmentId)
+                                        .Submission(team.ID)
+                                        .AddFile(entry.FileName, extractStream);
+                        if (result == false)
+                        {
+                            return false;
+                        }
                     }
                 }
             }

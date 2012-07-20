@@ -31,6 +31,15 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="SubmitReview">
+      <soap:operation soapAction="urn:OsbleService/SubmitReview" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="GetAssignmentSubmission">
       <soap:operation soapAction="urn:OsbleService/GetAssignmentSubmission" style="document" />
       <wsdl:input>
