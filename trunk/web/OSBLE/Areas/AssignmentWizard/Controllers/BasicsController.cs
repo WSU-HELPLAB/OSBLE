@@ -86,6 +86,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         [HttpPost]
         public ActionResult Index(Assignment model)
         {
+            
             Assignment = model;
             if (ModelState.IsValid)
             {

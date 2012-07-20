@@ -18,7 +18,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get
             {
-                return "Critcal Review Settings";
+                return "Critical Review Settings";
             }
         }
 

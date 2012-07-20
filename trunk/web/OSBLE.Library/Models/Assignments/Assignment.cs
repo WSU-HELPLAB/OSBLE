@@ -57,6 +57,7 @@ namespace OSBLE.Models.Assignments
             this.PrecededingAssignmentID = other.PrecededingAssignmentID;
             this.ReleaseDate = other.ReleaseDate;
             this.RubricID = other.RubricID;
+            this.StudentRubricID = other.StudentRubricID;
             this.TeamEvaluationSettings = new TeamEvaluationSettings(other.TeamEvaluationSettings);
             this.Type = other.Type;
         }
@@ -162,6 +163,18 @@ namespace OSBLE.Models.Assignments
         }
 
         /// <summary>
+        /// Returns true if the Assignment has an associated Student Rubric
+        /// </summary>
+        [NotMapped]
+        public bool HasStudentRubric
+        {
+            get
+            {
+                return StudentRubricID != null;
+            }
+        }
+
+        /// <summary>
         /// Returns true if the assignment is team-based
         /// </summary>
         [NotMapped]
@@ -248,6 +261,9 @@ namespace OSBLE.Models.Assignments
 
         public int? RubricID { get; set; }
         public virtual Rubric Rubric { get; set; }
+
+        public int? StudentRubricID { get; set; }
+        public virtual Rubric StudentRubric { get; set; }
 
         public int? CommentCategoryID { get; set; }
         public virtual CommentCategoryConfiguration CommentCategory { get; set; }

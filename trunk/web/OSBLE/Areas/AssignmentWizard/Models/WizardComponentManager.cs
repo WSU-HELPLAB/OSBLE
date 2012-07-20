@@ -420,6 +420,8 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                                            where
                                            type.IsSubclassOf(typeof(WizardBaseController))
                                            &&
+                                           !type.IsAbstract
+                                           &&
                                            type.Namespace.CompareTo(componentNamespace) == 0
                                            select type).ToList();
 

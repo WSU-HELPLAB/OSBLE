@@ -121,7 +121,7 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="assignmentId"></param>
         /// <returns></returns>
-        private RubricViewModel GetUneditableRubricViewModel(int assignmentId)
+        private RubricViewModel GetUneditableRubricViewModel(int assignmentId, bool student = false)
         {
             RubricViewModel viewModel = new RubricViewModel();
             Assignment assignment = db.Assignments.Find(assignmentId);
@@ -130,9 +130,16 @@ namespace OSBLE.Controllers
             {
                 return viewModel;
             }
-
+            Rubric rubric;
             //assigns the rubric to our view model
-            Rubric rubric = assignment.Rubric;
+            if (student)
+            {
+                rubric = assignment.StudentRubric;
+            }
+            else
+            {
+                rubric = assignment.Rubric;
+            }
             viewModel.Rubric = rubric;
             viewModel.SelectedAssignment = assignment;
 
@@ -157,7 +164,7 @@ namespace OSBLE.Controllers
         /// <param name="abstractAssignmentActivityId"></param>
         /// <param name="teamUserId"></param>
         /// <returns></returns>
-        private RubricViewModel GetRubricViewModel(int assignmentId, int cuId)
+        private RubricViewModel GetRubricViewModel(int assignmentId, int cuId, bool student = false)
         {
             CourseUser cu = db.CourseUsers.Find(cuId);
             RubricViewModel viewModel = new RubricViewModel();
@@ -172,7 +179,15 @@ namespace OSBLE.Controllers
             }
 
             //assigns the rubric to our view model
-            Rubric rubric = assignment.Rubric;
+            Rubric rubric;
+            if (student)
+            {
+                rubric = assignment.StudentRubric;
+            }
+            else
+            {
+                rubric = assignment.Rubric;
+            }
             viewModel.Rubric = rubric;
             viewModel.SelectedAssignment = assignment;
             viewModel.SelectedTeam = assignmentTeam;
@@ -293,7 +308,12 @@ namespace OSBLE.Controllers
         [CanGradeCourse]
         public ActionResult Index(int assignmentId, int cuId)
         {
-            RubricViewModel viewModel = GetRubricViewModel(assignmentId, cuId);
+            return TeacherIndex(assignmentId, cuId);
+        }
+
+        public ActionResult TeacherIndex(int assignmentId, int cuId)
+        {
+            RubricViewModel viewModel = GetRubricViewModel(assignmentId, cuId, true);
 
             if (!HasValidViewModel(viewModel))
             {
@@ -313,6 +333,29 @@ namespace OSBLE.Controllers
             return View(viewModel);
         }
 
+        [CanSubmitAssignments]
+        public ActionResult StudentIndex(int assignmentId, int cuId)
+        {
+            RubricViewModel viewModel = GetRubricViewModel(assignmentId, cuId, true);
+
+            if (!HasValidViewModel(viewModel))
+            {
+                return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
+            }
+
+            CourseUser cu = db.CourseUsers.Find(cuId);
+            if (cu.AbstractRole.Anonymized)
+            {
+                ViewBag.ObserverCU = db.CourseUsers.Where(c => c.AbstractCourseID == cu.AbstractCourseID).ToList();
+                ViewBag.isEditable = false;
+            }
+            else
+            {
+                ViewBag.isEditable = true;
+            }
+            return View("Index", viewModel);
+        }
+
         public ActionResult View(int assignmentId, int cuId)
         {
             RubricViewModel viewModel = GetRubricViewModel(assignmentId, cuId);
@@ -321,7 +364,7 @@ namespace OSBLE.Controllers
             {
                 bool isOwnAssignment = false;
 
-                if (ActiveCourse.AbstractRole.CanSubmit && ActiveCourse.ID == cuId)
+                if (ActiveCourseUser.AbstractRole.CanSubmit && ActiveCourseUser.ID == cuId)
                 {
                     Assignment assignment = db.Assignments.Find(assignmentId);
                     AssignmentTeam team = GetAssignmentTeam(assignment, ActiveCourseUser);
@@ -331,7 +374,7 @@ namespace OSBLE.Controllers
                     }
                 }
 
-                if (ActiveCourse.AbstractRole.CanGrade || isOwnAssignment || ActiveCourse.AbstractRole.Anonymized)
+                if (ActiveCourseUser.AbstractRole.CanGrade || isOwnAssignment || ActiveCourseUser.AbstractRole.Anonymized)
                 {
                     Assignment assignment = db.Assignments.Find(assignmentId);
                     CourseUser cu = db.CourseUsers.Find(cuId);

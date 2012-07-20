@@ -5,7 +5,7 @@
 @using OSBLE.Models.Courses;
 @{ViewBag.Title = "Rubric Evaluation";
   int maxLevelScore = (from c in Model.Rubric.Levels
-                       select c.RangeEnd).Sum();
+                       select c.PointSpread).Sum();
   double totalRubricPoints = (from c in Model.Rubric.Criteria
                               select c.Weight).Sum();
   string critInputPrefix = ViewBag.CritInputPrefix;

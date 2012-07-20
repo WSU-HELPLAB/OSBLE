@@ -7,7 +7,8 @@
     ViewBag.Title = "Assignment Details";
     DynamicDictionary headerData = Model.HeaderBuilder.BuildHeader(Model.CurrentAssignment);
     Layout = "~/Views/Shared/_Layout.cshtml";
-    List<Assignment> assignmentList = (Model.Client.AbstractCourse as Course).Assignments.OrderBy(a => a.AssignmentName).ToList();
+    List<Assignment> assignmentList = new List<Assignment>();
+        
 }
 @section Header
 {
@@ -36,8 +37,11 @@
 @*If student, then remove all assignments that have not been published from the assignment list*@
 @if (Model.Client.AbstractRole.CanSubmit)
 {
-    
     assignmentList = assignmentList.Where(a => a.IsDraft == false).ToList();
+}
+else
+{
+    assignmentList = (Model.Client.AbstractCourse as Course).Assignments.OrderBy(a => a.AssignmentName).ToList();
 }
 
 @if (assignmentList.Count > 1)

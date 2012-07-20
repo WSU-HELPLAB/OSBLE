@@ -217,6 +217,8 @@
     <Compile Include="Areas\AssignmentWizard\Controllers\CriticalReviewDiscussionTeamsController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CriticalReviewSettingsController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\DiscussionTeamsController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\RubricBaseController.cs" />
+    <Compile Include="Areas\AssignmentWizard\Controllers\StudentRubricController.cs" />
     <Compile Include="Areas\AssignmentWizard\ViewModels\RubricSelectionViewModel.cs" />
     <Compile Include="Resources\CsvParser.cs" />
     <Compile Include="Resources\DynamicDictionary.cs" />
@@ -738,8 +740,10 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\DiscussionTeamMemberDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\StudentTeamEvalSubmissionDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Home\TeamEvaluationIndex.cshtml" />
-    <Content Include="Areas\AssignmentWizard\Views\Rubric\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Rubric\_RubricCreationTool.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\CriticalReviewSettings\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\Rubric\Index.cshtml" />
+    <Content Include="Areas\AssignmentWizard\Views\StudentRubric\Index.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />
@@ -800,7 +804,6 @@
     <Content Include="Views\School\Delete.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Home\SelectComponent.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Basics\Index.cshtml" />
-    <Content Include="Areas\AssignmentWizard\Views\Rubric\_Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Team\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Deliverables\Index.cshtml" />
     <Content Include="Views\Gradebook\ExportToCSV.cshtml" />

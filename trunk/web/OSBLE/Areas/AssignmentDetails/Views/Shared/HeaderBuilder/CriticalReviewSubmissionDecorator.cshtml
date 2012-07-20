@@ -66,14 +66,27 @@
                                 </tr>
                                 @if (dataModel.CRSubmission.submissionTimes[i] == null)
                                 {
+                                    if(dataModel.CRSubmission.authorSubmissionTimes[i] != null)
+                                    {
                                     <tr>
                                         <td>
-                                        @if(dataModel.CRSubmission.authorSubmissionTimes[i] != null)
-                                        {
                                             @Ajax.ActionLink("Upload your review", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area = "" }, options, new object())
-                                        }
                                         </td>
                                     </tr>
+                                    if (dataModel.CRSubmission.hasStudentRubric == true)
+                                    {
+                                        <tr>
+                                            <td> 
+                                                @Html.ActionLink("Rubric Link", 
+                                                "StudentIndex", 
+                                                "Rubric", 
+                                                new { assignmentId = rt.AssignmentID, 
+                                                    cuId = rt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUserID, area = "" }, 
+                                                new { })
+                                            </td>
+                                        </tr>
+                                    }
+                                    }
                                 }
                                 
                                 else
@@ -97,7 +110,7 @@
                                                 </li>
                                                 @if (dataModel.CRSubmission.SubmissionReceived && rt.AuthorTeamID ==dataModel.CRSubmission.AuthorTeamId)
                                                 {
-                                                    <li id="SubmissionReceivedText">Submission received</li>   
+                                                    <li id="SubmissionReceivedText">Submission received</li>
                                                 }
                                             </ul>
                                         </td>

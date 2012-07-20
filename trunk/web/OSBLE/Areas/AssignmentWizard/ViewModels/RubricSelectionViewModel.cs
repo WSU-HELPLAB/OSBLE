@@ -61,7 +61,9 @@ namespace OSBLE.Areas.AssignmentWizard.ViewModels
                     rubricViewModel.Add(new RubricViewModel(
                         assignment.Rubric.Description,
                         assignment.AssignmentName,
-                        assignment.ID
+                        assignment.ID,
+                        assignment.RubricID,
+                        assignment.StudentRubricID
                         ));
                 }
             }
@@ -75,12 +77,20 @@ namespace OSBLE.Areas.AssignmentWizard.ViewModels
         public string RubricDescription { get; set; }
         public string AssignmentName { get; set; }
         public int AssignmentID { get; set; }
+        public int? RubricID { get; set; }
+        public int? StudentRubricID { get; set; }
 
-        public RubricViewModel(string rubricDescription, string assignmentName, int assignmentID)
+        public RubricViewModel(string rubricDescription, 
+                string assignmentName, 
+                int assignmentID, 
+                int? rubricID,
+                int? studentRubricID)
         {
             RubricDescription = rubricDescription;
             AssignmentName = assignmentName;
             AssignmentID = assignmentID;
+            RubricID = rubricID;
+            StudentRubricID = studentRubricID;
         }
     }
 }
