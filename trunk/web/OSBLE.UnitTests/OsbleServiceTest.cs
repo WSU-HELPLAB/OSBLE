@@ -114,5 +114,19 @@ namespace OSBLE.UnitTests
             bool result = osbleClient.SubmitAssignment(1, zipStream.ToArray(), token);
             Assert.AreEqual(true, result);
         }
+
+        [TestMethod]
+        public void OsbleService_GetReviewItemsTest()
+        {
+            //AC Note: This requires OSBLE to be set up properly
+            AuthenticationServiceClient authClient = new AuthenticationServiceClient();
+            OsbleServiceClient osbleClient = new OsbleServiceClient();
+            string token = authClient.ValidateUser("betty@rogers.com", "123123");
+            byte[] data = osbleClient.GetReviewItems(3, token);
+            using (ZipFile zip = ZipFile.Read(data))
+            {
+                Assert.AreEqual(3, zip.Entries.Count);
+            }
+        }
     }
 }

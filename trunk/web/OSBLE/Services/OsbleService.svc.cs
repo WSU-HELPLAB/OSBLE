@@ -89,6 +89,96 @@ namespace OSBLE.Services
             return nonEfAssignments.ToArray();
         }
 
+        /// <summary>
+        /// Will return all items needing to be reviewed by the user for the given
+        /// assignment.
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        /// <param name="authToken"></param>
+        /// <returns></returns>
+        [OperationContract]
+        public byte[] GetReviewItems(int assignmentId, string authToken)
+        {
+            if (!_authService.IsValidKey(authToken))
+            {
+                return new byte[0];
+            }
+            UserProfile profile = _authService.GetActiveUser(authToken);
+            Assignment criticalReviewAssignment = _db.Assignments.Find(assignmentId);
+
+            //because the user is doing a critical review, the actual review items
+            //are stored on the current assignment's "preceeding assignment".  Therefore,
+            //we must use this preceeding assignment to find all of the review items
+            Assignment submissionAssignment = criticalReviewAssignment.PreceedingAssignment;
+
+            //no submission assignment = something isn't right
+            if (submissionAssignment == null)
+            {
+                return new byte[0];
+            }
+
+            //make sure that the user is enrolled in the course
+            CourseUser courseUser = (from cu in _db.CourseUsers
+                                     where cu.AbstractCourseID == criticalReviewAssignment.CourseID
+                                     &&
+                                     cu.UserProfileID == profile.ID
+                                     select cu).FirstOrDefault();
+            if (courseUser == null)
+            {
+                return new byte[0];
+            }
+
+            //users are attached to assignments through teams, so we have to find the correct team
+            //that is doing the critical review
+            List<ReviewTeam> teamsToReview = (from rt in _db.ReviewTeams
+                                              join team in _db.Teams on rt.ReviewTeamID equals team.ID
+                                              join member in _db.TeamMembers on team.ID equals member.TeamID
+                                              where member.CourseUserID == courseUser.ID
+                                              select rt).ToList();
+
+            if (teamsToReview == null)
+            {
+                return new byte[0];
+            }
+
+            //Find all review documents
+            OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
+            Dictionary<string, Stream> zipStreams = new Dictionary<string, Stream>();
+            foreach (ReviewTeam teamToReview in teamsToReview)
+            {
+                Stream zipStream = fs.Course(courseUser.AbstractCourseID)
+                                    .Assignment(submissionAssignment.ID)
+                                    .Submission(teamToReview.AuthorTeamID)
+                                    .AllFiles()
+                                    .ToZipStream();
+                MemoryStream ms = new MemoryStream();
+                zipStream.CopyTo(ms);
+                ms.Position = 0;
+                zipStreams[teamToReview.AuthorTeam.Name] = ms;
+            }
+
+            try
+            {
+                //combine the zip files into a single zip
+                ZipFile zip = new ZipFile();
+                foreach (string key in zipStreams.Keys)
+                {
+                    zip.AddEntry(key, zipStreams[key]);
+                }
+
+                MemoryStream finalZipStream = new MemoryStream();
+                zip.Save(finalZipStream);
+                finalZipStream.Position = 0;
+                byte[] bytes = finalZipStream.ToArray();
+                finalZipStream.Close();
+                return bytes;
+            }
+            catch (Exception)
+            {
+                return new byte[0];
+            }
+        }
+
         [OperationContract]
         public byte[] GetAssignmentSubmission(int assignmentId, string authToken)
         {

@@ -44,8 +44,7 @@
     <xs:sequence>
       <xs:element minOccurs="0" name="ID" type="xs:int" />
       <xs:element minOccurs="0" name="LevelTitle" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="RangeEnd" type="xs:int" />
-      <xs:element minOccurs="0" name="RangeStart" type="xs:int" />
+      <xs:element minOccurs="0" name="PointSpread" type="xs:int" />
       <xs:element minOccurs="0" name="Rubric" nillable="true" type="tns:Rubric" />
       <xs:element minOccurs="0" name="RubricID" type="xs:int" />
     </xs:sequence>

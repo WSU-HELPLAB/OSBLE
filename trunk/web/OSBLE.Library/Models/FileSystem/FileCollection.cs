@@ -62,13 +62,14 @@ namespace OSBLE.Models.FileSystem
         /// Returns a byte[] for each individual file.
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<byte[]> ToBytes()
+        public IDictionary<string, byte[]> ToBytes()
         {
-            List<byte[]> bytes = new List<byte[]>();
+            Dictionary<string, byte[]> bytes = new Dictionary<string, byte[]>();
             foreach (string name in _fileNames)
             {
                 byte[] fileBytes = File.ReadAllBytes(name);
-                bytes.Add(fileBytes);
+                string rootName = Path.GetFileName(name);
+                bytes[rootName] = fileBytes;
             }
             return bytes;
         }
