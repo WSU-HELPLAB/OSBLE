@@ -140,17 +140,13 @@ namespace OSBLE.Controllers
                                             //MG&MK: file system for critical review assignments is laid out a bit differently, so 
                                             //critical review assignments must use different file system functions
 
-                                            //If a submission of any extension exists delete it.  This is needed because they could submit a .c file and then a .cs file and the teacher would not know which one is the real one.
-                                            string submission = FileSystem.GetCriticalReviewDeliverable(ActiveCourseUser.AbstractCourse as Course, assignment.ID, assignmentTeam, deliverables[i].Name, allowFileExtensions, authorTeam);
-                                            if (submission != null)
-                                            {
-                                                FileInfo oldSubmission = new FileInfo(submission);
-
-                                                if (oldSubmission.Exists)
-                                                {
-                                                    oldSubmission.Delete();
-                                                }
-                                            }
+                                            //remove all prior files
+                                            OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
+                                            fs.Course(ActiveCourseUser.AbstractCourseID)
+                                                .Assignment(assignment.ID)
+                                                .Review(authorTeam.TeamID, authorTeam.TeamID)
+                                                .File(fileName)
+                                                .Delete();
 
                                             //We need to remove the zipfile corrisponding to the authorTeamId being sent in as well as the regularly cached zip. 
                                             AssignmentTeam precedingAuthorAssignmentTeam = (from at in assignment.PreceedingAssignment.AssignmentTeams
@@ -158,12 +154,23 @@ namespace OSBLE.Controllers
                                                                                             select at).FirstOrDefault();
                                             FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, precedingAuthorAssignmentTeam );
                                             FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, assignmentTeam);
-                                            string path = Path.Combine(FileSystem.GetTeamUserSubmissionFolderForAuthorID(true, ActiveCourseUser.AbstractCourse as Course, (int)id, assignmentTeam, authorTeam.Team), deliverables[i].Name + extension);
-                                            file.SaveAs(path);
+
+                                            //add in the new file
+                                            fs.Course(ActiveCourseUser.AbstractCourseID)
+                                                .Assignment(assignment.ID)
+                                                .Review(authorTeam.TeamID, authorTeam.TeamID)
+                                                .AddFile(fileName, file.InputStream);
 
                                             //unzip and rezip xps files because some XPS generators don't do it right
                                             if (extension.ToLower().CompareTo(".xps") == 0)
                                             {
+                                                //XPS documents require the actual file path, so get that.
+                                                OSBLE.Models.FileSystem.FileCollection fileCollection = fs.Course(ActiveCourseUser.AbstractCourseID)
+                                                    .Assignment(assignment.ID)
+                                                    .Review(authorTeam.TeamID, authorTeam.TeamID)
+                                                    .File(deliverables[i].Name);
+                                                string path = fileCollection.FirstOrDefault();
+
                                                 string extractPath = Path.Combine(FileSystem.GetTeamUserSubmissionFolderForAuthorID(true, ActiveCourseUser.AbstractCourse as Course, (int)id, assignmentTeam, authorTeam.Team), "extract");
                                                 using (ZipFile oldZip = ZipFile.Read(path))
                                                 {

@@ -214,6 +214,13 @@ namespace OSBLE.Services
                             entry.Extract(extractStream);
                             extractStream.Position = 0;
 
+                            //delete existing
+                            fs.Course((int)assignment.CourseID)
+                                            .Assignment(assignmentId)
+                                            .Review(authorId, reviewTeam.ID)
+                                            .File(entry.FileName)
+                                            .Delete();
+
                             //add the extracted file to the file system
                             bool result = fs.Course((int)assignment.CourseID)
                                             .Assignment(assignmentId)
@@ -338,6 +345,7 @@ namespace OSBLE.Services
                              && at.AssignmentID == assignmentId
                              select tm.Team).FirstOrDefault();
                 OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
+
                 MemoryStream ms = new MemoryStream(zipData);
                 ms.Position = 0;
                 using (ZipFile file = ZipFile.Read(ms))
@@ -347,6 +355,13 @@ namespace OSBLE.Services
                         MemoryStream extractStream = new MemoryStream();
                         entry.Extract(extractStream);
                         extractStream.Position = 0;
+
+                        //delete existing
+                        fs.Course((int)assignment.CourseID)
+                            .Assignment(assignmentId)
+                            .Submission(team.ID)
+                            .File(entry.FileName)
+                            .Delete();
 
                         //add the extracted file to the file system
                         bool result = fs.Course((int)assignment.CourseID)
