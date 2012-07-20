@@ -154,7 +154,8 @@ namespace OSBLE.Services
                 MemoryStream ms = new MemoryStream();
                 zipStream.CopyTo(ms);
                 ms.Position = 0;
-                zipStreams[teamToReview.AuthorTeam.Name] = ms;
+                string key = string.Format("{0};{1}", teamToReview.AuthorTeamID, teamToReview.AuthorTeam.Name);
+                zipStreams[key] = ms;
             }
 
             try
