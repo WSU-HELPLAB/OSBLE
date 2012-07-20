@@ -251,6 +251,7 @@ namespace OSBLE.Controllers
         }
 
         [CanGradeCourse]
+        [CanSubmitAssignments]
         [HttpPost]
         public ActionResult Index(RubricViewModel viewModel)
         {
@@ -305,54 +306,42 @@ namespace OSBLE.Controllers
             return View(vm);
         }
 
+        // This creates an instructor's version of the rubric view
         [CanGradeCourse]
         public ActionResult Index(int assignmentId, int cuId)
         {
-            return TeacherIndex(assignmentId, cuId);
+            ViewBag.Student = false;
+            return IndexHelper(GetRubricViewModel(assignmentId, cuId));
         }
 
-        public ActionResult TeacherIndex(int assignmentId, int cuId)
-        {
-            RubricViewModel viewModel = GetRubricViewModel(assignmentId, cuId, true);
-
-            if (!HasValidViewModel(viewModel))
-            {
-                return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
-            }
-
-            CourseUser cu = db.CourseUsers.Find(cuId);
-            if (cu.AbstractRole.Anonymized)
-            {
-                ViewBag.ObserverCU = db.CourseUsers.Where(c => c.AbstractCourseID == cu.AbstractCourseID).ToList();
-                ViewBag.isEditable = false;
-            }
-            else
-            {
-                ViewBag.isEditable = true;
-            }
-            return View(viewModel);
-        }
-
+        // this creates the student's version of the rubric view
         [CanSubmitAssignments]
         public ActionResult StudentIndex(int assignmentId, int cuId)
         {
-            RubricViewModel viewModel = GetRubricViewModel(assignmentId, cuId, true);
+            ViewBag.Student = true;
+            return IndexHelper(GetRubricViewModel(assignmentId, cuId, true));
+        }
 
+        // Perform actions that are the same for both Index and StudentIndex
+        private ActionResult IndexHelper(RubricViewModel viewModel)
+        {
             if (!HasValidViewModel(viewModel))
             {
                 return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
             }
 
-            CourseUser cu = db.CourseUsers.Find(cuId);
-            if (cu.AbstractRole.Anonymized)
-            {
-                ViewBag.ObserverCU = db.CourseUsers.Where(c => c.AbstractCourseID == cu.AbstractCourseID).ToList();
-                ViewBag.isEditable = false;
-            }
-            else
-            {
+            //MK NOTE: commenting out the observer stuff because it doesn't look like it's set up correctly or fully implemented
+
+            //CourseUser cu = db.CourseUsers.Find(cuId);
+            //if (cu.AbstractRole.Anonymized)
+            //{
+            //    ViewBag.ObserverCU = db.CourseUsers.Where(c => c.AbstractCourseID == cu.AbstractCourseID).ToList();
+            //    ViewBag.isEditable = false;
+            //}
+            //else
+            //{
                 ViewBag.isEditable = true;
-            }
+            //}
             return View("Index", viewModel);
         }
 
@@ -373,7 +362,7 @@ namespace OSBLE.Controllers
                         isOwnAssignment = true;
                     }
                 }
-
+                 
                 if (ActiveCourseUser.AbstractRole.CanGrade || isOwnAssignment || ActiveCourseUser.AbstractRole.Anonymized)
                 {
                     Assignment assignment = db.Assignments.Find(assignmentId);
@@ -441,7 +430,7 @@ namespace OSBLE.Controllers
                 courseName = parsedData.ElementAt(0).Split(':')[1].Split('(')[0].Trim();
                 parsedData.RemoveAt(0);
 
-                if(ActiveCourse.AbstractCourse.Name == courseName)
+                if(ActiveCourseUser.AbstractCourse.Name == courseName)
                 {
                     studentNames = parsedData.ElementAt(0).Split(':')[1].Trim();
                     parsedData.RemoveAt(0);
@@ -467,7 +456,7 @@ namespace OSBLE.Controllers
                             Rubric rubric = db.Rubrics.Find(curAssignment.Rubric.ID);
 
                             rubricEvaluation.AssignmentID = curAssignment.ID;
-                            rubricEvaluation.EvaluatorID = ActiveCourse.UserProfileID;
+                            rubricEvaluation.EvaluatorID = ActiveCourseUser.UserProfileID;
                             rubricEvaluation.RecipientID = team.ID;
 
                             foreach(Criterion c in rubric.Criteria)

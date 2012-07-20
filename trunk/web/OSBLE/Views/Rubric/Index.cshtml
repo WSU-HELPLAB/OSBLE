@@ -19,6 +19,7 @@
   int sliderTableLength = 880;
   int textInputLenght = 25;
   int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;
+  bool student = ViewBag.Student;
   DateTime? publishTime = Model.Evaluation.DatePublished;
 
   Boolean editable = ViewBag.isEditable;
@@ -174,146 +175,152 @@ function create_and_open_downloading_submission_dialog() {
 <div id="rubric_evaluator">
     <h1>Rubric Evaluation of @Model.SelectedAssignment.AssignmentName for @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole)</h1>
     <div class="dashboard">
-        <table style="border-collapse: collapse; border-spacing: 0;">
-            <tr>
-                <th>
-                    Assignments:
-                </th>
-                <td>
-                    <select id="@selectedAssignment" name="@selectedAssignment">
-                        @{foreach (Assignment assignment in Model.AssignmentList)
-                          {
-                              string optionText = "<option value=\"{0}\" {1}>{2}</option>";
-                              string selectedValue = "";
-                              if (assignment.ID == Model.SelectedAssignment.ID)
+            @if (!student)
+            {
+            <table style="border-collapse: collapse; border-spacing: 0;">
+
+                <tr>
+                    <th>
+                        Assignments:
+                    </th>
+                    <td>
+                        <select id="@selectedAssignment" name="@selectedAssignment">
+                            @{foreach (Assignment assignment in Model.AssignmentList)
                               {
-                                  selectedValue = "selected=\"selected\"";
-                              }
-                            @Html.Raw(String.Format(optionText, assignment.ID, selectedValue, assignment.AssignmentName));
-                          }
-                        }
-                    </select>
-                </td>
-            </tr>
-            </table>
-            <table>
-            <tr>
-                <th>
-                    Student/Team:
-                </th>
-                
-                    @{
-                        int prevUserId;
-                        int userCount;
-                        AssignmentTeam at;
-
-                        List<AssignmentTeam> atList = (from t in @Model.TeamList as IEnumerable<AssignmentTeam>
-                                                       select t).Reverse().ToList();
-
-                        //We reversed the list so the last person is our first person
-                        if (atList.LastOrDefault().TeamID == @Model.SelectedTeam.TeamID)
-                        {
-                            prevUserId = atList.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
-                            userCount = 1;
-                        }
-                        else
-                        {
-                            at = atList.SkipWhile(item => item.TeamID != @Model.SelectedTeam.TeamID).Skip(1).FirstOrDefault();
-                            prevUserId = at.Team.TeamMembers.FirstOrDefault().CourseUserID;
-                            userCount = atList.Count() - (atList.IndexOf(at) - 1);
-                        }
-                    }
-                
-                <td style="padding:0;margin:0;border:0">
-                    <input type="button" value="<" onclick="switchEvalButton(@Model.SelectedAssignment.ID, @prevUserId);" style="margin:0" />
-                    <select id="@selectedTeam" name="@selectedTeam" style="margin:0">
-                        @{foreach (AssignmentTeam team in Model.TeamList)
-                          {
-                              string optionTextPublished = "<option style=\"background:#43D58C;\" value=\"{0}\" {1}>{2}</option>";
-                              string optionTextDraft = "<option style=\"background:#9AFF9A;\" value=\"{0}\" {1}>{2}</option>";
-                              string optionText = "<option value=\"{0}\" {1}>{2}</option>";
-
-                              string selectedValue = "";
-                              if (team.TeamID == Model.SelectedTeam.TeamID)
-                              {
-                                  selectedValue = "selected=\"selected\"";
-                              }
-
-                              RubricEvaluation re = (from r in Model.RubricEvaluationList as IEnumerable<RubricEvaluation>
-                                                     where r.RecipientID == team.TeamID
-                                                     select r).FirstOrDefault();
-
-                              if (editable == true)
-                              {
-                                  if (team.Assignment.HasTeams)
+                                  string optionText = "<option value=\"{0}\" {1}>{2}</option>";
+                                  string selectedValue = "";
+                                  if (assignment.ID == Model.SelectedAssignment.ID)
                                   {
+                                      selectedValue = "selected=\"selected\"";
+                                  }
+                                @Html.Raw(String.Format(optionText, assignment.ID, selectedValue, assignment.AssignmentName));
+                              }
+                            }
+                        </select>
+                    </td>
+                </tr>
+                </table>
+                <table>
+                <tr>
+                    <th>
+                        Student/Team:
+                    </th>
+                
+                        @{
+                              int prevUserId;
+                              int userCount;
+                              AssignmentTeam at;
 
-                                      if (re != null)
+                              List<AssignmentTeam> atList = (from t in @Model.TeamList as IEnumerable<AssignmentTeam>
+                                                             select t).Reverse().ToList();
+
+                              //We reversed the list so the last person is our first person
+                              if (atList.LastOrDefault().TeamID == @Model.SelectedTeam.TeamID)
+                              {
+                                  prevUserId = atList.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
+                                  userCount = 1;
+                              }
+                              else
+                              {
+                                  at = atList.SkipWhile(item => item.TeamID != @Model.SelectedTeam.TeamID).Skip(1).FirstOrDefault();
+                                  prevUserId = at.Team.TeamMembers.FirstOrDefault().CourseUserID;
+                                  userCount = atList.Count() - (atList.IndexOf(at) - 1);
+                              }
+                        }
+                
+                    <td style="padding:0;margin:0;border:0">
+                        <input type="button" value="<" onclick="switchEvalButton(@Model.SelectedAssignment.ID, @prevUserId);" style="margin:0" />
+                        <select id="@selectedTeam" name="@selectedTeam" style="margin:0">
+                            @{foreach (AssignmentTeam team in Model.TeamList)
+                              {
+                                  string optionTextPublished = "<option style=\"background:#43D58C;\" value=\"{0}\" {1}>{2}</option>";
+                                  string optionTextDraft = "<option style=\"background:#9AFF9A;\" value=\"{0}\" {1}>{2}</option>";
+                                  string optionText = "<option value=\"{0}\" {1}>{2}</option>";
+
+                                  string selectedValue = "";
+                                  if (team.TeamID == Model.SelectedTeam.TeamID)
+                                  {
+                                      selectedValue = "selected=\"selected\"";
+                                  }
+
+                                  RubricEvaluation re = (from r in Model.RubricEvaluationList as IEnumerable<RubricEvaluation>
+                                                         where r.RecipientID == team.TeamID
+                                                         select r).FirstOrDefault();
+
+                                  if (editable == true)
+                                  {
+                                      if (team.Assignment.HasTeams)
                                       {
-                                          if (re.IsPublished == true)
+
+                                          if (re != null)
                                           {
-                            @Html.Raw(String.Format(optionTextPublished, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
+                                              if (re.IsPublished == true)
+                                              {
+                                @Html.Raw(String.Format(optionTextPublished, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
+                                              }
+                                              else
+                                              {
+                                @Html.Raw(String.Format(optionTextDraft, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
+                                              }
+
                                           }
                                           else
                                           {
-                            @Html.Raw(String.Format(optionTextDraft, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
+                                @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
                                           }
-
                                       }
                                       else
                                       {
-                            @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.Name));
+
+                                          if (re != null)
+                                          {
+                                              if (re.IsPublished == true)
+                                              {
+                                @Html.Raw(String.Format(optionTextPublished, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)));
+                                              }
+                                              else
+                                              {
+                                @Html.Raw(String.Format(optionTextDraft, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)));
+                                              }
+                                          }
+                                          else
+                                          {
+                                @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)));
+                                          }
                                       }
                                   }
                                   else
                                   {
-
-                                      if (re != null)
-                                      {
-                                          if (re.IsPublished == true)
-                                          {
-                            @Html.Raw(String.Format(optionTextPublished, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)));
-                                          }
-                                          else
-                                          {
-                            @Html.Raw(String.Format(optionTextDraft, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)));
-                                          }
-                                      }
-                                      else
-                                      {
-                            @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, team.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ViewBag.ActiveCourse.AbstractRole)));
-                                      }
+                                      string name = "Anonymous " + @cuList.IndexOf(team.Team.TeamMembers.FirstOrDefault().CourseUser);
+                                @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, name));
                                   }
+                              }
+                              int userId;
+
+                              atList = (from t in @Model.TeamList as IEnumerable<AssignmentTeam>
+                                        select t).ToList();
+
+                              if (atList.LastOrDefault().TeamID == @Model.SelectedTeam.TeamID)
+                              {
+                                  userId = atList.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
                               }
                               else
                               {
-                                  string name = "Anonymous " + @cuList.IndexOf(team.Team.TeamMembers.FirstOrDefault().CourseUser);
-                            @Html.Raw(String.Format(optionText, team.Team.TeamMembers.FirstOrDefault().CourseUserID, selectedValue, name));
+                                  userId = atList.SkipWhile(item => item.TeamID != @Model.SelectedTeam.TeamID).Skip(1).FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
                               }
-                          }
-                          int userId;
-
-                          atList = (from t in @Model.TeamList as IEnumerable<AssignmentTeam>
-                                    select t).ToList();
-
-                          if (atList.LastOrDefault().TeamID == @Model.SelectedTeam.TeamID)
-                          {
-                              userId = atList.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
-                          }
-                          else
-                          {
-                              userId = atList.SkipWhile(item => item.TeamID != @Model.SelectedTeam.TeamID).Skip(1).FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID;
-                          }
                     
-                        <input type="button" value=">" onclick="switchEvalButton(@Model.SelectedAssignment.ID, @userId);"/>
-                    }
-                    </select>
-                </td>
-                <td style="text-align: center">
-                    @userCount/@atList.Count()
-                </td>
-            </tr>
-            </table>
+                            <input type="button" value=">" onclick="switchEvalButton(@Model.SelectedAssignment.ID, @userId);"/>
+                        }
+                        </select>
+                    </td>
+                    <td style="text-align: center">
+                        @userCount/@atList.Count()
+                    </td>
+                </tr>
+            
+                </table>
+            } @* End instructor only components *@
+                
             <table>
             <tr>
                 @if (Model.SelectedAssignment.HasDeliverables)
@@ -415,7 +422,7 @@ function create_and_open_downloading_submission_dialog() {
                 @if (editable == true)
                 {
                     <td>
-                        <input type="submit" name="@publishButton" value="Publish to Student" />
+                        <input type="submit" name="@publishButton" value="Publish" />
                     </td>
                 }
             </tr>
