@@ -152,41 +152,32 @@ namespace OSBLE.Controllers
                         
 
 
-                        List<DiscussionPost> AuthorDiscussionPosts = (from Team authorTeam in db.Teams
-                                                                      join TeamMember member in db.TeamMembers on authorTeam.ID equals member.TeamID
-                                                                      join DiscussionPost post in db.DiscussionPosts on member.CourseUserID equals post.CourseUserID
-                                                                      where authorTeam.ID == discussionTeam.AuthorTeamID &&
-                                                                      post.DiscussionTeamID == discussionTeamId
-                                                                      select post).ToList();
+                        List<DiscussionPost> AuthorDiscussionPosts = 
+                                                                    (from Team authorTeam in db.Teams
+                                                                    join TeamMember member in db.TeamMembers on authorTeam.ID equals member.TeamID
+                                                                    join DiscussionPost post in db.DiscussionPosts on member.CourseUserID equals post.CourseUserID
+                                                                    where authorTeam.ID == discussionTeam.AuthorTeamID &&
+                                                                    post.DiscussionTeamID == discussionTeamId
+                                                                    select post).ToList();
 
                         List<DiscussionPost> ReviewerPosts =
-                                 (from Team reviewTeam in db.Teams
-                                  join TeamMember member in db.TeamMembers on reviewTeam.ID equals member.TeamID
-                                  join DiscussionPost post in db.DiscussionPosts on member.CourseUserID equals post.CourseUserID
-                                  where reviewTeam.ID == discussionTeam.TeamID &&
-                                  post.DiscussionTeamID == discussionTeamId
-                                  select post).ToList();
+                                                             (from Team reviewTeam in db.Teams
+                                                              join TeamMember member in db.TeamMembers on reviewTeam.ID equals member.TeamID
+                                                              join DiscussionPost post in db.DiscussionPosts on member.CourseUserID equals post.CourseUserID
+                                                              where reviewTeam.ID == discussionTeam.TeamID &&
+                                                              post.DiscussionTeamID == discussionTeamId &&
+                                                              post.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student
+                                                              select post).ToList();
 
-                        //We want a list of all posts made by NonTeamMembers (Meaning they are not TeamMembers of AuthorTeam or Team) for this disucssionTeamId
-                        //Goal: get all posts that's not written by the document author OR document reviewer (e.g. must be a non-student)
-                        var NonTeamQuery = from post in db.DiscussionPosts
-                                           where post.DiscussionTeamID == discussionTeamId
+                        //We want a list of all posts made by non-students here.
+                        List<DiscussionPost> NonStudentPosts = (from post in db.DiscussionPosts
+                                           where post.DiscussionTeamID == discussionTeamId 
                                            && post.CourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.Student
-                                           select post;
+                                           select post).ToList();
 
-                        //if TAs cannot post to all discussions, filter out TA's posts as they will be duplicate posts from ReviewerPosts 
-                        if (!assignment.DiscussionSettings.TAsCanPostToAllDiscussions)
-                        {
-                            NonTeamQuery = from f in NonTeamQuery
-                                           where f.CourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.TA &&
-                                           f.CourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.Moderator
-                                           select f;
-                        }
+                        DiscussionPostViewModel.ParseCriticalReviewPosts(AuthorDiscussionPosts, ReviewerPosts, NonStudentPosts);
 
-                        List<DiscussionPost> NonTeamPosts = NonTeamQuery.ToList();
-
-
-
+                        
 
 
                         //Adding all the posts into dpvms. 
@@ -283,7 +274,7 @@ namespace OSBLE.Controllers
 
                         }
 
-                        foreach (DiscussionPost dp in NonTeamPosts)
+                        foreach (DiscussionPost dp in NonStudentPosts)
                         {
                             if (dp.ParentPostID == null) //adding parent posts
                             {

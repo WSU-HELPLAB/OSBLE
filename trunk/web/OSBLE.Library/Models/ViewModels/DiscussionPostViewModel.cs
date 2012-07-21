@@ -64,13 +64,255 @@ namespace OSBLE.Models.ViewModels
     {
         public int ParentPostID;
     }
+
+    public class DiscussionTeamViewModel
+    {
+        public List<DiscussionPostViewModel> DiscussionPostViewModels;
+
+        private DiscussionTeam discussionTeam;
+        private CourseUser currentUser;
+        private List<ReplyViewModel> ReplyViewModels;
+
+        public DiscussionTeamViewModel(DiscussionTeam DiscussionTeam, CourseUser CurrentUser)
+        {
+            currentUser = CurrentUser;
+            discussionTeam = DiscussionTeam;
+
+            if (discussionTeam.Assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
+            {
+                InitializeViewModelForCriticalReviewDiscussion();
+            }
+            else
+            {
+                InitializeViewModelForDiscussionAssignment();
+            }
+        }
+
+        private void InitializeViewModelForCriticalReviewDiscussion()
+        {
+            
+
+            bool currentUserIsAuthor = discussionTeam.AuthorTeam.TeamMembers.Where(tm => tm.CourseUserID == currentUser.ID).ToList().Count > 0;
+            bool currentUserIsReviewer = discussionTeam.Team.TeamMembers.Where(tm => tm.CourseUserID == currentUser.ID).ToList().Count > 0;
+
+            using (OSBLEContext db = new OSBLEContext())
+            {
+                //Gathering all posts made by students on discussionTeam.AuthorTeam.
+                IEnumerable<DiscussionPost> AuthorPosts =
+                                                    (from Team authorTeam in db.Teams
+                                                     join TeamMember member in db.TeamMembers on authorTeam.ID equals member.TeamID
+                                                     join DiscussionPost post in db.DiscussionPosts on member.CourseUserID equals post.CourseUserID
+                                                     where authorTeam.ID == discussionTeam.AuthorTeamID &&
+                                                     post.DiscussionTeamID == discussionTeam.ID
+                                                     select post);
+
+                //Gathering  all posts made by students on discussionTeam.Team. Note: (Some of these will be duplcates from AuthorDiscussionPosts. Handle later)
+                IEnumerable<DiscussionPost> ReviewerPosts =
+                                                     (from Team reviewTeam in db.Teams
+                                                      join TeamMember member in db.TeamMembers on reviewTeam.ID equals member.TeamID
+                                                      join DiscussionPost post in db.DiscussionPosts on member.CourseUserID equals post.CourseUserID
+                                                      where reviewTeam.ID == discussionTeam.TeamID &&
+                                                      post.DiscussionTeamID == discussionTeam.ID &&
+                                                      post.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student
+                                                      select post);
+
+                //Gathering  all non-student posts. (TAs, moderators, instructors)
+                IEnumerable<DiscussionPost> NonStudentPosts = (from post in db.DiscussionPosts
+                                                               where post.DiscussionTeamID == discussionTeam.ID
+                                                               && post.CourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.Student
+                                                               select post);
+
+
+                //Now that we have our lists, we will remove duplicates and convert each lists based off Author, Reviewers, Author/Reviewers, and finally NonStudent
+                IEnumerable<DiscussionPost> AuthorReviewers = AuthorPosts.Intersect(ReviewerPosts, new DiscussionPostComparer());
+
+                //bool AuthorAnon =;
+                ConvertPostsToViewModel(AuthorPosts.Except(AuthorReviewers, new DiscussionPostComparer()), "Author", currentUserIsAuthor, currentUserIsReviewer);
+                ConvertPostsToViewModel(ReviewerPosts.Except(AuthorReviewers, new DiscussionPostComparer()), "Reviewer", currentUserIsAuthor, currentUserIsReviewer);
+                ConvertPostsToViewModel(AuthorReviewers, "Author/Reviewer", currentUserIsAuthor, currentUserIsReviewer);
+                ConvertPostsToViewModel(NonStudentPosts, null, currentUserIsAuthor, currentUserIsReviewer);
+                OrganizeReplies();
+            }
+
+        }
+
+        /// <summary>
+        /// This method organizes the list of reply view models and correctly associates them with their DiscussionPost
+        /// </summary>
+        private void OrganizeReplies()
+        {
+            foreach (DiscussionPostViewModel dpvm in DiscussionPostViewModels)
+            {
+                dpvm.Replies = (from reply in ReplyViewModels
+                                where reply.ParentPostID == dpvm.DiscussionPostId
+                                select reply).ToList();
+            }
+        }
+
+        private void ConverTPostsToViewmodel(IEnumerable<DiscussionPost> discussionPosts)
+        {
+            //Same functionality, but send in dummy values that will not be used.
+            ConvertPostsToViewModel(discussionPosts, null, false, false);
+        }
+        private void ConvertPostsToViewModel(IEnumerable<DiscussionPost> discussionPosts, string RoleName, bool currentUserisAuthor, bool currentUserIsReviewer)
+        {
+            bool posterIsAuthor = RoleName != null && RoleName.Contains("Author");
+            bool posterIsReviewer = RoleName != null && RoleName.Contains("Reviewer");
+            foreach (DiscussionPost dp in discussionPosts)
+            {
+                bool anonymizePost = false;
+                if (discussionTeam.Assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
+                {
+                    anonymizePost = AnonymizeNameForCriticalReviewDiscussion(dp.CourseUser, posterIsAuthor, posterIsReviewer, currentUserisAuthor, currentUserIsReviewer);                          
+                }
+                else //Regular discussion
+                {
+                    anonymizePost = AnonymizeNameForDiscussion(dp.CourseUser);
+                }
+
+                if (dp.ParentPostID == null) //post
+                {
+                    DiscussionPostViewModel dpvm = new DiscussionPostViewModel();
+                    dpvm.poster.Anonymize = anonymizePost;
+                    dpvm.poster.HideRole = discussionTeam.Assignment.DiscussionSettings.HasHiddenRoles;
+                    dpvm.poster.RoleName = RoleName;
+                    dpvm.poster.CourseUser = dp.CourseUser;
+                    dpvm.Content = dp.Content;
+                    dpvm.DiscussionPostId = dp.ID;
+                    dpvm.Posted = dp.Posted;
+                    DiscussionPostViewModels.Add(dpvm);
+                }
+                else //reply
+                {
+                    ReplyViewModel reply = new ReplyViewModel();
+                    reply.poster.Anonymize = anonymizePost;
+                    reply.poster.CourseUser = dp.CourseUser;
+                    reply.Posted = dp.Posted;
+                    reply.poster.HideRole = discussionTeam.Assignment.DiscussionSettings.HasHiddenRoles;
+                    reply.poster.RoleName = RoleName;
+                    reply.Content = dp.Content;
+                    reply.DiscussionPostId = dp.ID;
+                    reply.ParentPostID = (int)dp.ParentPostID;
+                    ReplyViewModels.Add(reply);
+                }
+            }
+        }
+
+        private void InitializeViewModelForDiscussionAssignment()
+        {
+            IEnumerable<DiscussionPost> AllPosts;
+            using (OSBLEContext db = new OSBLEContext())
+            {
+                
+                if (discussionTeam.Assignment.HasDiscussionTeams)
+                {
+                    AllPosts = (from post in db.DiscussionPosts
+                                where post.DiscussionTeamID == discussionTeam.TeamID
+                                select post);
+                }
+                else
+                {
+                    AllPosts = (from post in db.DiscussionPosts
+                                where post.AssignmentID == discussionTeam.AssignmentID
+                                select post);
+                }
+            }
+
+            ConverTPostsToViewmodel(AllPosts);
+            OrganizeReplies();
+        }
+
+
+        /// <summary>
+        /// Returns true if the posters name should be Anonymized for a discussion assignment
+        /// </summary>
+        /// <param name="currentUser">The current users</param>
+        /// <param name="poster">The posters courseuser</param>
+        /// <param name="discussionSetting">The assignments discussion settings</param>
+        /// <returns></returns>
+        private bool AnonymizeNameForDiscussion(CourseUser poster)
+        {
+            bool Anonymous = false;
+            if (poster.ID != currentUser.ID)   //Don't want to set anonymous permissions if the poster is the current user, so users own posts arent anonymous
+            {
+
+                //Checking role of currentUser
+                bool currentUserIsStudent = currentUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student;
+                bool currentUserIsModerator = currentUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator;
+
+                //Checking role of poster. Note: If the poster is a TA, we treat them like a moderator or instructor depending on the value
+                //of TAsCanPostToAllDiscussions
+                bool posterIsStudent = poster.AbstractRoleID == (int)CourseRole.CourseRoles.Student;
+                bool posterIsModerator = poster.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator || 
+                        (!discussionTeam.Assignment.DiscussionSettings.TAsCanPostToAllDiscussions && poster.AbstractRoleID == (int)CourseRole.CourseRoles.TA);
+                bool posterIsInstructor = poster.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor ||
+                        (discussionTeam.Assignment.DiscussionSettings.TAsCanPostToAllDiscussions && poster.AbstractRoleID == (int)CourseRole.CourseRoles.TA); ;
+
+                DiscussionSetting discussionSettings = discussionTeam.Assignment.DiscussionSettings;
+
+                //if current user is a student, poster is a student, and student is anonymized to student
+                if (discussionSettings.HasAnonymousStudentsToStudents && currentUserIsStudent && posterIsStudent)
+                {
+                    Anonymous = true;
+                }
+                //if current user is a student, poster is an instructor, and instructor is anonymized to student 
+                else if (discussionSettings.HasAnonymousInstructorsToStudents && currentUserIsStudent && posterIsInstructor)
+                {
+                    Anonymous = true;
+                }
+                //if current user is a student, poster is an moderator, and moderator is anonymized to student 
+                else if (discussionSettings.HasAnonymousModeratorsToStudents && currentUserIsStudent && posterIsModerator)
+                {
+                    Anonymous = true;
+                }
+                //if current user is a moderator, poster is a student, and student is anonymized to moderator 
+                else if (discussionSettings.HasAnonymousStudentsToModerators && currentUserIsModerator && posterIsStudent)
+                {
+                    Anonymous = true;
+                }
+            }
+            return Anonymous;
+        }
+
+        /// <summary>
+        /// Returns true if the user should be anonymized for a critical review discussion
+        /// </summary>
+        /// <param name="currentUser">Current users</param>
+        /// <param name="poster">Poster's courseuser</param>
+        /// <param name="assignment">The Critical Review Discussion assignment</param>
+        /// <param name="isAuthor">This value should be true if the poster if an author of the reviewed document</param>
+        /// <param name="isReviewer">This value should be true if the poster if a reviewer of the document.</param>
+        /// <returns></returns>
+        private bool AnonymizeNameForCriticalReviewDiscussion(CourseUser poster,
+            bool posterIsAuthor, bool posterIsReviewer, bool currentUserIsAuthor, bool currentUserIsReviewer)
+        {
+            bool Anonymous = false;
+
+            CriticalReviewSettings crSettings = discussionTeam.Assignment.PreceedingAssignment.CriticalReviewSettings;
+            if (crSettings.AnonymizeAuthorToReviewer && currentUserIsReviewer && posterIsAuthor)
+            {
+                Anonymous = true;
+            }
+            else if (crSettings.AnonymizeReviewerToAuthor && currentUserIsAuthor && posterIsReviewer)
+            {
+                Anonymous = true;
+            }
+
+            //Anonymize if Anonymous is true or AnonymizeNameForDiscussion (anonymize based on discussion settings) is true.
+            return (Anonymous || AnonymizeNameForDiscussion(poster));
+        }
+    }
+
+
     public class DiscussionPostViewModel : GeneralPost
     {
+
+        
+
         public DiscussionPostViewModel()
         {
             replies = new List<ReplyViewModel>();
         }
-
         private List<ReplyViewModel> replies;
 
         public List<ReplyViewModel> Replies { 
@@ -79,4 +321,22 @@ namespace OSBLE.Models.ViewModels
         }
 
     }
+
+    //Icomparer used for discusisonPosts
+    public class DiscussionPostComparer : IEqualityComparer<DiscussionPost>
+    {
+        bool IEqualityComparer<DiscussionPost>.Equals(DiscussionPost x, DiscussionPost y)
+        {
+            // Check whether the compared objects reference the same data.        
+            if (x.ID == y.ID)
+                return true;
+            return false;
+        }
+
+        public int GetHashCode(DiscussionPost obj)
+        {
+            return obj.ID;
+        }
+    }
+
 }
