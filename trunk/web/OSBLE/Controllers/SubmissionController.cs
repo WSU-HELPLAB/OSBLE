@@ -125,7 +125,7 @@ namespace OSBLE.Controllers
                                         type = (DeliverableType)deliverables[i].Type;
                                     }
                                     string fileName = Path.GetFileName(file.FileName);
-                                    string extension = Path.GetExtension(file.FileName);
+                                    string extension = Path.GetExtension(file.FileName).ToLower();
 
                                     string[] allowFileExtensions = GetFileExtensions(type);
 
