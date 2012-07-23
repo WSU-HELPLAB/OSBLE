@@ -504,15 +504,34 @@ namespace OSBLE
             return path;
         }
 
-        public static string GetTeamUserSubmissionFolderForAuthorID(bool createPathIfNotExists, Course course, int assignmentID, IAssignmentTeam submitterTeam, Team authorTeam)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="createPathIfNotExists"></param>
+        /// <param name="course"></param>
+        /// <param name="assignmentID"></param>
+        /// <param name="submitterTeam"></param>
+        /// <param name="authorTeam"></param>
+        /// <returns></returns>
+        public static string GetTeamUserSubmissionFolderForAuthorID(bool createPathIfNotExists, 
+            Course course, 
+            int assignmentID, 
+            IAssignmentTeam submitterTeam, 
+            Team authorTeam)
         {
-            string path = GetTeamUserSubmissionFolder(false, course, assignmentID, submitterTeam);
-            path += "\\" + authorTeam.Name.ToString();
+            //string path = GetTeamUserSubmissionFolder(false, course, assignmentID, submitterTeam);
+            //path += "\\" + authorTeam.Name.ToString();
 
-            if (!Directory.Exists(path) && createPathIfNotExists)
-            {
-                Directory.CreateDirectory(path);
-            }
+            //if (!Directory.Exists(path) && createPathIfNotExists)
+            //{
+            //    Directory.CreateDirectory(path);
+            //}
+
+            OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
+            string path = fs.Course(course.ID)
+                .Assignment(assignmentID)
+                .Review(authorTeam.ID, submitterTeam.TeamID)
+                .GetPath();
 
             return path;
         }
@@ -717,6 +736,8 @@ namespace OSBLE
             DateTime? timeSubmitted = null;
             if (team != null)
             {
+                
+
                 DirectoryInfo submissionFolder;
                 if (team.Assignment.Type == AssignmentTypes.CriticalReview && authorTeam != null)
                 {

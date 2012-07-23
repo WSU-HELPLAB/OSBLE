@@ -38,7 +38,7 @@
                                         @{
                                             string name;
                                             
-                                            if (dataModel.CRSubmission.hasTeams)
+                                            if (rt.AuthorTeam.TeamMembers.Count > 1)
                                             {
                                                 name = rt.AuthorTeam.Name;
                                             }

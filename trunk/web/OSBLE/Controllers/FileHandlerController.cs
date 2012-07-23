@@ -411,37 +411,38 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
         /// <summary>
-        /// get a zip containing reviews that the author (authorTeamId) has performed
-        /// on any submission of the assignment specified by assignmentId
+        /// get a zip containing reviews that the review (current user) has performed on the 
+        /// author (authorTeamId) for a speicific assignment.
         /// </summary>
         /// <param name="assignmentId">get reviews of submissions of this assignment</param>
-        /// <param name="authorTeamId">get all reviews submitted by specified authorTeam</param>
+        /// <param name="authorTeamId">get the review of this authorTeam (that is submitted by the current user)</param>
         /// <returns></returns>
         [CanSubmitAssignments]
         public ActionResult GetReviewForAuthor(int assignmentId, int authorTeamId)
         {
             //get authorTeam
             Team authorTeam = db.Teams.Find(authorTeamId);
+            //Assignment
 
-            bool isOwnDocument = false;
-            foreach (TeamMember tm in authorTeam.TeamMembers)
-            {
-                if (tm.CourseUserID == ActiveCourseUser.ID)
-                {
-                    isOwnDocument = true;
-                    break;
-                }
-            }
+            //bool isOwnDocument = false;
+            //foreach (TeamMember tm in authorTeam.TeamMembers)
+            //{
+            //    if (tm.CourseUserID == ActiveCourseUser.ID)
+            //    {
+            //        isOwnDocument = true;
+            //        break;
+            //    }
+            //}
 
-            if (isOwnDocument)
-            {
+            //if (isOwnDocument)
+            //{
                 Assignment CRassignment = db.Assignments.Find(assignmentId);
                 AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourseUser);
 
                 return GetSubmissionZipHelper(assignmentId, at.TeamID, authorTeam);
-            }
+            //}
 
-            return RedirectToAction("Index", "Home");
+            //return RedirectToAction("Index", "Home");
         }
 
         /// <summary>

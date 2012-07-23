@@ -137,6 +137,14 @@ namespace OSBLE.Controllers
                                                                          where at.TeamID == authorTeamID &&
                                                                          at.AssignmentID == assignment.PrecededingAssignmentID
                                                                              select at).FirstOrDefault();
+
+                                            ReviewTeam reviewTeam = (from tm in db.TeamMembers
+                                                                     join t in db.Teams on tm.TeamID equals t.ID
+                                                                     join rt in db.ReviewTeams on t.ID equals rt.ReviewTeamID
+                                                                     where tm.CourseUserID == ActiveCourseUser.ID
+                                                                     && rt.AssignmentID == assignment.ID
+                                                                     select rt).FirstOrDefault();
+
                                             //MG&MK: file system for critical review assignments is laid out a bit differently, so 
                                             //critical review assignments must use different file system functions
 
@@ -144,7 +152,7 @@ namespace OSBLE.Controllers
                                             OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
                                             fs.Course(ActiveCourseUser.AbstractCourseID)
                                                 .Assignment(assignment.ID)
-                                                .Review(authorTeam.TeamID, authorTeam.TeamID)
+                                                .Review(authorTeam.TeamID, reviewTeam.ReviewTeamID)
                                                 .File(fileName)
                                                 .Delete();
 
@@ -158,7 +166,7 @@ namespace OSBLE.Controllers
                                             //add in the new file
                                             fs.Course(ActiveCourseUser.AbstractCourseID)
                                                 .Assignment(assignment.ID)
-                                                .Review(authorTeam.TeamID, authorTeam.TeamID)
+                                                .Review(authorTeam.TeamID, reviewTeam.ReviewTeamID)
                                                 .AddFile(fileName, file.InputStream);
 
                                             //unzip and rezip xps files because some XPS generators don't do it right
@@ -167,7 +175,7 @@ namespace OSBLE.Controllers
                                                 //XPS documents require the actual file path, so get that.
                                                 OSBLE.Models.FileSystem.FileCollection fileCollection = fs.Course(ActiveCourseUser.AbstractCourseID)
                                                     .Assignment(assignment.ID)
-                                                    .Review(authorTeam.TeamID, authorTeam.TeamID)
+                                                    .Review(authorTeam.TeamID, reviewTeam.ReviewTeamID)
                                                     .File(deliverables[i].Name);
                                                 string path = fileCollection.FirstOrDefault();
 
