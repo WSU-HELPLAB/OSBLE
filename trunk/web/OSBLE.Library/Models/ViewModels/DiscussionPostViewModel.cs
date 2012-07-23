@@ -65,18 +65,26 @@ namespace OSBLE.Models.ViewModels
         public int ParentPostID;
     }
 
-    public class DiscussionTeamViewModel
+    public class DiscussionViewModel
     {
-        public List<DiscussionPostViewModel> DiscussionPostViewModels;
-
         private DiscussionTeam discussionTeam;
         private CourseUser currentUser;
         private List<ReplyViewModel> ReplyViewModels;
+        private List<DiscussionPostViewModel> discussionPostViewModels;
+        public List<DiscussionPostViewModel> DiscussionPostViewModels
+        {
+            get
+            {
+                return discussionPostViewModels.OrderBy(dpvm => dpvm.Posted).ToList();
+            }
+        }
 
-        public DiscussionTeamViewModel(DiscussionTeam DiscussionTeam, CourseUser CurrentUser)
+
+        public DiscussionViewModel(DiscussionTeam DiscussionTeam, CourseUser CurrentUser)
         {
             currentUser = CurrentUser;
             discussionTeam = DiscussionTeam;
+            discussionPostViewModels = new List<DiscussionPostViewModel>();
 
             if (discussionTeam.Assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
             {
@@ -88,10 +96,13 @@ namespace OSBLE.Models.ViewModels
             }
         }
 
+
+        /// <summary>
+        /// This function prepares DiscussionPostViewModels for a Critical Review Discussion. 
+        /// </summary>
         private void InitializeViewModelForCriticalReviewDiscussion()
         {
             
-
             bool currentUserIsAuthor = discussionTeam.AuthorTeam.TeamMembers.Where(tm => tm.CourseUserID == currentUser.ID).ToList().Count > 0;
             bool currentUserIsReviewer = discussionTeam.Team.TeamMembers.Where(tm => tm.CourseUserID == currentUser.ID).ToList().Count > 0;
 
@@ -100,7 +111,10 @@ namespace OSBLE.Models.ViewModels
                 //Gathering all posts made by students on discussionTeam.AuthorTeam.
                 IEnumerable<DiscussionPost> AuthorPosts =
                                                     (from Team authorTeam in db.Teams
-                                                     join TeamMember member in db.TeamMembers on authorTeam.ID equals member.TeamID
+                                                     join TeamMember member in db.TeamMembers
+                                                        .Include("CourseUser")
+                                                        .Include("CourseUser.UserProfile")
+                                                        on authorTeam.ID equals member.TeamID
                                                      join DiscussionPost post in db.DiscussionPosts on member.CourseUserID equals post.CourseUserID
                                                      where authorTeam.ID == discussionTeam.AuthorTeamID &&
                                                      post.DiscussionTeamID == discussionTeam.ID
@@ -109,7 +123,10 @@ namespace OSBLE.Models.ViewModels
                 //Gathering  all posts made by students on discussionTeam.Team. Note: (Some of these will be duplcates from AuthorDiscussionPosts. Handle later)
                 IEnumerable<DiscussionPost> ReviewerPosts =
                                                      (from Team reviewTeam in db.Teams
-                                                      join TeamMember member in db.TeamMembers on reviewTeam.ID equals member.TeamID
+                                                      join TeamMember member in db.TeamMembers
+                                                        .Include("CourseUser")
+                                                        .Include("CourseUser.UserProfile")
+                                                        on reviewTeam.ID equals member.TeamID
                                                       join DiscussionPost post in db.DiscussionPosts on member.CourseUserID equals post.CourseUserID
                                                       where reviewTeam.ID == discussionTeam.TeamID &&
                                                       post.DiscussionTeamID == discussionTeam.ID &&
@@ -118,6 +135,8 @@ namespace OSBLE.Models.ViewModels
 
                 //Gathering  all non-student posts. (TAs, moderators, instructors)
                 IEnumerable<DiscussionPost> NonStudentPosts = (from post in db.DiscussionPosts
+                                                                .Include("CourseUser")
+                                                                .Include("CourseUser.UserProfile")
                                                                where post.DiscussionTeamID == discussionTeam.ID
                                                                && post.CourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.Student
                                                                select post);
@@ -126,18 +145,51 @@ namespace OSBLE.Models.ViewModels
                 //Now that we have our lists, we will remove duplicates and convert each lists based off Author, Reviewers, Author/Reviewers, and finally NonStudent
                 IEnumerable<DiscussionPost> AuthorReviewers = AuthorPosts.Intersect(ReviewerPosts, new DiscussionPostComparer());
 
-                //bool AuthorAnon =;
+                //Converting AuthorPosts to ViewModels, then authorReviewers, then Reviewers, and finally NonSTudent posts. 
                 ConvertPostsToViewModel(AuthorPosts.Except(AuthorReviewers, new DiscussionPostComparer()), "Author", currentUserIsAuthor, currentUserIsReviewer);
                 ConvertPostsToViewModel(ReviewerPosts.Except(AuthorReviewers, new DiscussionPostComparer()), "Reviewer", currentUserIsAuthor, currentUserIsReviewer);
                 ConvertPostsToViewModel(AuthorReviewers, "Author/Reviewer", currentUserIsAuthor, currentUserIsReviewer);
                 ConvertPostsToViewModel(NonStudentPosts, null, currentUserIsAuthor, currentUserIsReviewer);
+
+                //Now adding all the replies from ReplyListViewModels into their correct discussionPost
                 OrganizeReplies();
             }
+        }
 
+
+        /// <summary>
+        /// This function prepares DiscussionPostViewModels for a Discussion Assignment. 
+        /// </summary>
+        private void InitializeViewModelForDiscussionAssignment()
+        {
+            IEnumerable<DiscussionPost> AllPosts;
+            using (OSBLEContext db = new OSBLEContext())
+            {
+                //If the assignment has discussion teams, we want to grab only DiscussionPosts made by a specific DiscussionTeam.ID. 
+                //Otherwise, we want to grab all the posts for the entire class.
+                if (discussionTeam.Assignment.HasDiscussionTeams)
+                {
+                    AllPosts = (from post in db.DiscussionPosts
+                                .Include("CourseUser")
+                                .Include("CourseUser.UserProfile")
+                                where post.DiscussionTeamID == discussionTeam.ID
+                                select post);
+                }
+                else
+                {
+                    AllPosts = (from post in db.DiscussionPosts
+                                .Include("CourseUser")
+                                .Include("CourseUser.UserProfile")
+                                where post.AssignmentID == discussionTeam.AssignmentID
+                                select post);
+                }
+                ConvertPostsToViewmodel(AllPosts);
+                OrganizeReplies();
+            }
         }
 
         /// <summary>
-        /// This method organizes the list of reply view models and correctly associates them with their DiscussionPost
+        /// This method associates ReplyViewModels with their DiscussionPost in DiscussionPostViewModels
         /// </summary>
         private void OrganizeReplies()
         {
@@ -149,15 +201,34 @@ namespace OSBLE.Models.ViewModels
             }
         }
 
-        private void ConverTPostsToViewmodel(IEnumerable<DiscussionPost> discussionPosts)
+
+        /// <summary>
+        /// This function takes a list of DiscussionPost and converts them into DiscussionPostViewModels. (Handles all anonmization, roles, etc)
+        /// </summary>
+        /// <param name="discussionPosts">The list of discussionposts to convert</param>
+        private void ConvertPostsToViewmodel(IEnumerable<DiscussionPost> discussionPosts)
         {
             //Same functionality, but send in dummy values that will not be used.
             ConvertPostsToViewModel(discussionPosts, null, false, false);
         }
+
+
+        /// <summary>
+        /// This function takes a list of DiscussionPost and converts them into DiscussionPostViewModels. In order to appropriately handle anonmization,
+        /// other parameters are required.
+        /// </summary>
+        /// <param name="discussionPosts">The list of discussionposts to convert</param>
+        /// <param name="RoleName">The rolename for the group of discussionposts. Non-CourseRoles only. I.e. "Author" or "Reviewer"</param>
+        /// <param name="currentUserisAuthor">boolean value indicating whether current user is an author (used for anomization)</param>
+        /// <param name="currentUserIsReviewer">boolean value indicating whether current user is a reviewer (used for anomization)</param>
         private void ConvertPostsToViewModel(IEnumerable<DiscussionPost> discussionPosts, string RoleName, bool currentUserisAuthor, bool currentUserIsReviewer)
         {
+            //First, we check the rolename to see if poster is author and/or reviewer
             bool posterIsAuthor = RoleName != null && RoleName.Contains("Author");
             bool posterIsReviewer = RoleName != null && RoleName.Contains("Reviewer");
+
+            //Next, iterate over all discussion posts, and depending on the assignment type anonmize them correctly. Then, depending on the value of
+            //ParentPostID, assign them to a DiscussionPostViewModels or ReplyViewModels
             foreach (DiscussionPost dp in discussionPosts)
             {
                 bool anonymizePost = false;
@@ -165,7 +236,7 @@ namespace OSBLE.Models.ViewModels
                 {
                     anonymizePost = AnonymizeNameForCriticalReviewDiscussion(dp.CourseUser, posterIsAuthor, posterIsReviewer, currentUserisAuthor, currentUserIsReviewer);                          
                 }
-                else //Regular discussion
+                else //Regular discussion assignment.
                 {
                     anonymizePost = AnonymizeNameForDiscussion(dp.CourseUser);
                 }
@@ -198,29 +269,7 @@ namespace OSBLE.Models.ViewModels
             }
         }
 
-        private void InitializeViewModelForDiscussionAssignment()
-        {
-            IEnumerable<DiscussionPost> AllPosts;
-            using (OSBLEContext db = new OSBLEContext())
-            {
-                
-                if (discussionTeam.Assignment.HasDiscussionTeams)
-                {
-                    AllPosts = (from post in db.DiscussionPosts
-                                where post.DiscussionTeamID == discussionTeam.TeamID
-                                select post);
-                }
-                else
-                {
-                    AllPosts = (from post in db.DiscussionPosts
-                                where post.AssignmentID == discussionTeam.AssignmentID
-                                select post);
-                }
-            }
 
-            ConverTPostsToViewmodel(AllPosts);
-            OrganizeReplies();
-        }
 
 
         /// <summary>
@@ -233,7 +282,12 @@ namespace OSBLE.Models.ViewModels
         private bool AnonymizeNameForDiscussion(CourseUser poster)
         {
             bool Anonymous = false;
-            if (poster.ID != currentUser.ID)   //Don't want to set anonymous permissions if the poster is the current user, so users own posts arent anonymous
+            //Don't want to set anonymous permissions if the poster is the current user
+            //Additionally, we do not want to anonmize for TA or Instructors
+
+            if (poster.ID != currentUser.ID && 
+                currentUser.AbstractRoleID != (int)CourseRole.CourseRoles.Instructor && 
+                currentUser.AbstractRoleID != (int)CourseRole.CourseRoles.TA )   
             {
 
                 //Checking role of currentUser
@@ -288,17 +342,22 @@ namespace OSBLE.Models.ViewModels
         {
             bool Anonymous = false;
 
-            CriticalReviewSettings crSettings = discussionTeam.Assignment.PreceedingAssignment.CriticalReviewSettings;
-            if (crSettings.AnonymizeAuthorToReviewer && currentUserIsReviewer && posterIsAuthor)
+            //Only attempt to anomize if current user is NOT an instructor or TA
+            if (currentUser.AbstractRoleID != (int)CourseRole.CourseRoles.Instructor && currentUser.AbstractRoleID != (int)CourseRole.CourseRoles.TA)
             {
-                Anonymous = true;
-            }
-            else if (crSettings.AnonymizeReviewerToAuthor && currentUserIsAuthor && posterIsReviewer)
-            {
-                Anonymous = true;
+                CriticalReviewSettings crSettings = discussionTeam.Assignment.PreceedingAssignment.CriticalReviewSettings;
+                if (crSettings.AnonymizeAuthorToReviewer && currentUserIsReviewer && posterIsAuthor)
+                {
+                    Anonymous = true;
+                }
+                else if (crSettings.AnonymizeReviewerToAuthor && currentUserIsAuthor && posterIsReviewer)
+                {
+                    Anonymous = true;
+                }
             }
 
-            //Anonymize if Anonymous is true or AnonymizeNameForDiscussion (anonymize based on discussion settings) is true.
+            //For critical review discussions, we not only want to check the Assignment.PreceedingAssignment.CriticalReviewSettings 
+            //but additionally, apply any anonmization based off of Assignment.DiscussionSettings
             return (Anonymous || AnonymizeNameForDiscussion(poster));
         }
     }
@@ -306,9 +365,6 @@ namespace OSBLE.Models.ViewModels
 
     public class DiscussionPostViewModel : GeneralPost
     {
-
-        
-
         public DiscussionPostViewModel()
         {
             replies = new List<ReplyViewModel>();
