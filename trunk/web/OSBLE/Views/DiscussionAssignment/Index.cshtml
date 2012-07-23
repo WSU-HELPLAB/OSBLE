@@ -11,7 +11,7 @@
     List<DiscussionPostViewModel> DiscussionPostViewModelList = ViewBag.DiscussionPostViewModelList;
     int discussionTeamID = ViewBag.DiscussionTeamID;
     string selectBoxID = "dtStudentSelect";
-    if (ViewBag.ActiveCourse.AbstractRole.CanModify)
+    if (ViewBag.ActiveCourse.AbstractRole.CanGrade)
     {
         selectBoxID = "dtInstructorSelect";
     }
@@ -24,7 +24,7 @@
 
         $('#dtInstructorSelect').change(function () {
             var dtID = $('#dtInstructorSelect').val();
-            window.location.replace("/DiscussionAssignment/TeacherIndex?assignmentId=" + @assignment.ID + "&courseUserId=" + 0 + "&postOrReply=" + 3 + "&discussionTeamID=" + dtID);
+            window.location.replace("TeacherIndex?assignmentId=" + @assignment.ID + "&courseUserId=" + 0 + "&postOrReply=" + 3 + "&discussionTeamID=" + dtID);
 
         });
         $('#dtStudentSelect').change(function () {
@@ -159,7 +159,7 @@
             @if (ViewBag.Student != null
                 && ViewBag.Student.ID == dpvm.poster.CourseUser.ID
                 && (ViewBag.PostOrReply == 0 || ViewBag.PostOrReply == 2)
-                && (ViewBag.ActiveCourse.AbstractRole.CanModify))
+                && (ViewBag.ActiveCourse.AbstractRole.CanGrade))
             {
                     <!--display as highlighted if there is a student selected, and this is that student-->
                     <script type="text/javascript">
@@ -212,7 +212,7 @@
                             if (ViewBag.Student != null
                                 && ViewBag.Student.ID == reply.poster.CourseUser.ID
                                 && (ViewBag.PostOrReply == 1 || ViewBag.PostOrReply == 2)
-                                && (ViewBag.ActiveCourse.AbstractRole.CanModify))
+                                && (ViewBag.ActiveCourse.AbstractRole.CanGrade))
                             {
                                 <!--display as highlighted if there is a student selected, and this is that student-->
                                 <script type="text/javascript">

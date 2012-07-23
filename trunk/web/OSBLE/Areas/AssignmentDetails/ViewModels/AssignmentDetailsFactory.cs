@@ -122,7 +122,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
             else if (vm.Client.AbstractRole.CanSubmit) //students
             {
                 //has discussion teams?
-                if (assignment.HasDiscussionTeams && assignment.DiscussionSettings!= null && !assignment.DiscussionSettings.HasAnonymousStudentsToStudents)
+                if (assignment.HasDiscussionTeams)
                 {
                     vm.HeaderBuilder = new DiscussionTeamMemberDecorator(vm.HeaderBuilder, vm.Client);
                     vm.HeaderViews.Add("DiscussionTeamMemberDecorator");
@@ -151,9 +151,9 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderBuilder = new CriticalReviewStudentDownloadDecorator(vm.HeaderBuilder, vm.Client);
                     vm.HeaderViews.Add("CriticalReviewStudentDownloadDecorator");
                 }
-                else if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion || 
-                    assignment.Type == AssignmentTypes.DiscussionAssignment)
+                else if (assignment.Type == AssignmentTypes.DiscussionAssignment && !assignment.HasDiscussionTeams)
                 {
+                    //link to classwide discussion
                     vm.HeaderBuilder = new StudentDiscussionLinkDecorator(vm.HeaderBuilder, vm.Client);
                     vm.HeaderViews.Add("StudentDiscussionLinkDecorator");
                 }
@@ -174,6 +174,16 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     //add grade link
                     vm.HeaderBuilder = new StudentGradeDecorator(vm.HeaderBuilder, vm.Client);
                     vm.HeaderViews.Add("StudentGradeDecorator");
+            }
+
+            else if (vm.Client.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator) //Moderator decorators
+            {
+                //has discussion teams?
+                if (assignment.HasDiscussionTeams)
+                {
+                    vm.HeaderBuilder = new DiscussionTeamMemberDecorator(vm.HeaderBuilder, vm.Client);
+                    vm.HeaderViews.Add("DiscussionTeamMemberDecorator");
+                }
             }
 
             if (assignment.Type == AssignmentTypes.CriticalReview || 

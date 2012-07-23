@@ -72,7 +72,7 @@ namespace OSBLE.Controllers
                 Assignments = (from assignment in db.Assignments
                                where assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID &&
                                assignment.IsWizardAssignment
-                               orderby assignment.DueDate
+                               orderby assignment.IsDraft, assignment.DueDate
                                select assignment).ToList();
             }
             else if (ActiveCourseUser.AbstractRole.CanSubmit)
@@ -127,8 +127,8 @@ namespace OSBLE.Controllers
             }
             else if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
             {
-                //for moderators, grab only discussion/Critical review assignment types.
-                Assignments = (from assignment in db.Assignments
+                //for moderators, grab only discussion/Critical review assignment types that they are to partcipate in
+                var discussionBasedAssignment = (from assignment in db.Assignments
                                where !assignment.IsDraft &&
                                assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID &&
                                assignment.IsWizardAssignment &&
@@ -136,6 +136,30 @@ namespace OSBLE.Controllers
                                assignment.AssignmentTypeID == (int)AssignmentTypes.DiscussionAssignment)
                                orderby assignment.DueDate
                                select assignment).ToList();
+
+                //going through all the discussion assignment's discussion teams looking for a team member who is the current user.
+                foreach (Assignment assignment in discussionBasedAssignment)
+                {
+                    bool addedAssignment = false;
+                    foreach (DiscussionTeam dt in assignment.DiscussionTeams)
+                    {
+                        if (addedAssignment) //if the assignment has already been added, then break out of this foreach and go back to assignment foreach.
+                        {
+                            break;
+                        }
+                        foreach (TeamMember tm in dt.GetAllTeamMembers())
+                        {
+                            if (tm.CourseUserID == ActiveCourseUser.ID)
+                            {
+                                Assignments.Add(assignment);
+                                addedAssignment = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+
             }
 
             ViewBag.PastCount = (from a in Assignments

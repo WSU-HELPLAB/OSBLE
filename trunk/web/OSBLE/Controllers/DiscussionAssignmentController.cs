@@ -202,7 +202,7 @@ namespace OSBLE.Controllers
         /// <param name="assignmentId"></param>
         /// <param name="courseUserId">the CourseUser.ID of the student you want to "Highlight". 0 may be passed in highlighting is unnecessary</param>
         /// <param name="postOrReply">postOrReply is used as enumerable. 0 = Posts, 1 = Replies, 2 = Both, 3 = No Selector</param>
-        /// <param name="discussionTeamID">The discussion team id for discussion to beto viewed. If it is a classwide discussion, then any dt can be sent.</param>
+        /// <param name="discussionTeamID">The discussion team id for discussion to be viewed. If it is a classwide discussion, then any dt in that assignment can be sent.</param>
         /// <returns></returns>
         [CanGradeCourse]
         public ActionResult TeacherIndex(int assignmentId, int discussionTeamID, int courseUserId = 0, int postOrReply = 3)
@@ -218,34 +218,8 @@ namespace OSBLE.Controllers
                                                  where dt.ID == discussionTeamID
                                                  select dt).FirstOrDefault();
 
+                DiscussionViewModel dvm = new DiscussionViewModel(discussionTeam, ActiveCourseUser);
 
-
-                List<DiscussionPostViewModel> DiscussionPostViewModelList = new List<DiscussionPostViewModel>();
-                List<ReplyViewModel> ReplyViewModelList = new List<ReplyViewModel>();
-
-                //Collecting posts and setting up DiscussionTeamList.
-                if (assignment.HasDiscussionTeams)
-                {
-                    //Only want posts associated with discussionTeamID
-                    ViewBag.DiscussionTeamList = assignment.DiscussionTeams.OrderBy(dt => dt.TeamName).ToList();
-
-                    posts = (from post in db.DiscussionPosts
-                                 .Include("Replies")
-                                 .Include("CourseUser")
-                                 where post.AssignmentID == assignment.ID &&
-                                 post.DiscussionTeamID == discussionTeamID
-                                 select post).ToList();
-                }
-                else
-                {
-                    //want all posts associated with assignmentId
-                    posts = (from post in db.DiscussionPosts
-                                .Include("Replies")
-                                .Include("CourseUser")
-                                where post.AssignmentID == assignment.ID
-                                orderby post.Posted
-                                select post).ToList();
-                }
 
                 if (postOrReply == 3 || courseUserId <= 0)  //If postOrReply is 3, we want no selections - so setting student to null.
                 {
@@ -265,59 +239,26 @@ namespace OSBLE.Controllers
                     ViewBag.DiscussionHeader = assignment.AssignmentName;
                 }
 
-                //creating a view mode for each discussionpost
-                foreach(DiscussionPost dp in posts)
-                {
-                    if(dp.ParentPostID == null)
-                    {
-                        DiscussionPostViewModel dpvm = new DiscussionPostViewModel();
-                        dpvm.poster.Anonymize = false; //never anonymize for instructors/TA
-                        dpvm.Content = dp.Content;
-                        dpvm.poster.CourseUser = dp.CourseUser;
-                        dpvm.DiscussionPostId = dp.ID;
-                        dpvm.Posted = dp.Posted;
-                        dpvm.poster.HideRole = assignment.DiscussionSettings.HasHiddenRoles;
-                        DiscussionPostViewModelList.Add(dpvm);
-                    }
-                    else
-                    {
-                        ReplyViewModel reply = new ReplyViewModel();
-                        reply.poster.Anonymize = false;
-                        reply.Content = dp.Content;
-                        reply.poster.CourseUser = dp.CourseUser;
-                        reply.DiscussionPostId = dp.ID;
-                        reply.Posted = dp.Posted;
-                        reply.ParentPostID = (int)dp.ParentPostID;
-                        reply.poster.HideRole = assignment.DiscussionSettings.HasHiddenRoles;
-                        ReplyViewModelList.Add(reply);
-                    }
-                }
-
-                //associating each replyviewmodel with its parent post
-                foreach (DiscussionPostViewModel dpvm in DiscussionPostViewModelList)
-                {
-                    dpvm.Replies = (from replies in ReplyViewModelList
-                                    where replies.ParentPostID == dpvm.DiscussionPostId
-                                    select replies).ToList();
-                }
-
-
-                bool canPost = assignment.DueDate > DateTime.Now;
+                bool canPost = true;
                 //If the user is a TA and TAs can only participate in some discussions, then we must confirm the TA
-                //is in the team (meaning they have permission to post)
-                if (canPost && ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA && !assignment.DiscussionSettings.TAsCanPostToAllDiscussions)
+                //is in the team before we give them permission to post
+                if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA && !assignment.DiscussionSettings.TAsCanPostToAllDiscussions
+                    && discussionTeam.Team.TeamMembers.Where(tm => tm.CourseUserID == ActiveCourseUser.ID).ToList().Count == 0)
                 {
-                    if (discussionTeam.Team.TeamMembers.Where(tm => tm.CourseUserID == ActiveCourseUser.ID).ToList().Count == 0)
-                    {
-                        canPost = false;
-                    }
+                    canPost = false;
                 }
 
+                //for CRD assignment types we need a list of all discussions they can participate in for navigation.
+                //additionally for CRD assignments we want to display all teammates invovled in the discussion
+                if (assignment.HasDiscussionTeams)
+                {
+                    ViewBag.DiscussionTeamList = assignment.DiscussionTeams;
 
+                }
 
                 ViewBag.PostLengthRequired = 0;
                 ViewBag.CanPost = canPost;
-                ViewBag.DiscussionPostViewModelList = DiscussionPostViewModelList.OrderBy(dpvm => dpvm.Posted).ToList();
+                ViewBag.DiscussionPostViewModelList = dvm.DiscussionPostViewModels;
                 ViewBag.PostOrReply = postOrReply;
                 ViewBag.Posts = posts;
                 ViewBag.Student = student;

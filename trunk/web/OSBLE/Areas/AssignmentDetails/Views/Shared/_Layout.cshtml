@@ -34,17 +34,23 @@
     });
 </script>
 
-@*If student, then remove all assignments that have not been published from the assignment list*@
+@*If student, then remove all assignments that have not been published from the assignment list
+  If a moderator, remove all assignments as its hard to distinguish which should be available
+*@
 @if (Model.Client.AbstractRole.CanSubmit)
 {
     assignmentList = assignmentList.Where(a => a.IsDraft == false).ToList();
+}
+else if(Model.Client.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
+{
+    assignmentList = null;
 }
 else
 {
     assignmentList = (Model.Client.AbstractCourse as Course).Assignments.OrderBy(a => a.AssignmentName).ToList();
 }
 
-@if (assignmentList.Count > 1)
+@if (assignmentList != null && assignmentList.Count > 1)
 {
     <table>
             <tr>
