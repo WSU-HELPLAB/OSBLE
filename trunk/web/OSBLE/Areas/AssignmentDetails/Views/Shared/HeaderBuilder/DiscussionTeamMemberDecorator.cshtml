@@ -60,8 +60,6 @@
                         }
                     }
                 </tr>
-                
-
                 <tr>
                     
                         @foreach (List<Poster> posterList in ListOfListOfPosters)
@@ -71,12 +69,21 @@
                                 {
                                     <li>    
                                         <div class="UserControls">
-                                        @if (poster.Anonymize == false && poster.CourseUser.UserProfile.UserName != null)
+                                            @if (poster.Anonymize == false && poster.CourseUser.UserProfile.UserName != null)
+                                            {
+                                                <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { courseUserId = poster.CourseUser.ID, area = "" })">@Helpers.MailButton()</a>
+                                            }
+                                        </div>
+                                        <div>
+                                        @if (poster.Anonymize == false)
                                         {
-                                            <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { courseUserId = poster.CourseUser.ID, area = "" })">@Helpers.MailButton()</a>
+                                            @Helpers.SmallProfilePicture(Url.Action("ProfilePicture", "Roster", new { userProfile = poster.CourseUser.UserProfile.ID, area = "" }))
+                                        }
+                                        else
+                                        {
+                                            @Helpers.SmallDefaultProfilePicture();
                                         }
                                         </div>
-                                        @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", "Roster", new { userProfile = poster.CourseUser.UserProfile.ID, area = "" }))
                                         <span class="roster_name">@poster.DisplayName</span>
                                     </li> 
                                 }

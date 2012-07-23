@@ -137,6 +137,11 @@ Also runs content through nl2br to convert newlines to <br /> tags. *@
     {
     <img src="/Content/images/default.jpg" alt="Profile Picture" class="profile_picture" />
 }
+
+@helper SmallDefaultProfilePicture()
+    {
+    <img src="/Content/images/default.jpg" alt="Profile Picture" class="small_profile_picture" />
+}
 @* Converts new lines to html <br /> tags in a content area. *@
 @helper nl2br(string content)
     {
