@@ -130,6 +130,15 @@
     <Compile Include="..\OSBLE.Library\Models\ActivityLog.cs">
       <Link>Models\ActivityLog.cs</Link>
     </Compile>
+    <Compile Include="..\OSBLE.Library\Models\Annotate\AnnotateApi.cs">
+      <Link>Models\Annotate\AnnotateApi.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\Annotate\AnnotateDocumentReference.cs">
+      <Link>Models\Annotate\AnnotateDocumentReference.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\Annotate\AnnotateResult.cs">
+      <Link>Models\Annotate\AnnotateResult.cs</Link>
+    </Compile>
     <Compile Include="..\OSBLE.Library\Models\Assignments\Assignment.cs">
       <Link>Models\Assignments\Assignment.cs</Link>
     </Compile>

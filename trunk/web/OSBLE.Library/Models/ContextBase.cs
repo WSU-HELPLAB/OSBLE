@@ -13,6 +13,7 @@ using OSBLE.Models.AbstractCourses;
 using System.Data.Common;
 using System.Data.Entity.Infrastructure;
 using System.Data.Objects;
+using OSBLE.Models.Annotate;
 
 namespace OSBLE.Models
 {
@@ -100,8 +101,6 @@ namespace OSBLE.Models
 
         public DbSet<CommentCategoryOption> CommentCategoryOptions { get; set; }
 
-        // **NEW** Assignment Tables
-
         public DbSet<Assignment> Assignments { get; set; }
 
         public DbSet<AssignmentTeam> AssignmentTeams { get; set; }
@@ -123,6 +122,9 @@ namespace OSBLE.Models
         public DbSet<TeamEvaluationComment> TeamEvaluationComments { get; set; }
 
         public DbSet<TeamEvaluationSettings> TeamEvaluationSettings { get; set; }
+
+        // Annotate stuff
+        public DbSet<AnnotateDocumentReference> AnnotateDocumentReferences { get; set; }
 
         // Assignments
 

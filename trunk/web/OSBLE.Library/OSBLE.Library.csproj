@@ -81,6 +81,9 @@
     <Compile Include="Models\AbstractCourses\Course\Rubrics\RubricEvaluation.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\ActivityLog.cs" />
+    <Compile Include="Models\Annotate\AnnotateApi.cs" />
+    <Compile Include="Models\Annotate\AnnotateDocumentReference.cs" />
+    <Compile Include="Models\Annotate\AnnotateResult.cs" />
     <Compile Include="Models\Assignments\Assignment.cs" />
     <Compile Include="Models\Assignments\AssignmentTeam.cs" />
     <Compile Include="Models\Assignments\AssignmentTypes.cs" />
