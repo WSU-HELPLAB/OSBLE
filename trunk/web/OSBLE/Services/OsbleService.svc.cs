@@ -10,6 +10,7 @@ using OSBLE.Models;
 using OSBLE.Models.Assignments;
 using System.IO;
 using Ionic.Zip;
+using OSBLE.Models.FileSystem;
 
 namespace OSBLE.Services
 {
@@ -146,18 +147,22 @@ namespace OSBLE.Services
             Dictionary<string, Stream> zipStreams = new Dictionary<string, Stream>();
             foreach (ReviewTeam teamToReview in teamsToReview)
             {
-                Stream zipStream = fs.Course(courseUser.AbstractCourseID)
+                FileCollection fc = fs.Course(courseUser.AbstractCourseID)
                                     .Assignment(submissionAssignment.ID)
                                     .Submission(teamToReview.AuthorTeamID)
-                                    .AllFiles()
-                                    .ToZipStream();
-                MemoryStream ms = new MemoryStream();
-                zipStream.CopyTo(ms);
-                ms.Position = 0;
-                string key = string.Format("{0};{1}", teamToReview.AuthorTeamID, teamToReview.AuthorTeam.Name);
-                zipStreams[key] = ms;
+                                    .AllFiles();
+                
+                //don't create a zip if we have have nothing to zip.
+                if (fc.Count > 0)
+                {
+                    Stream zipStream = fc.ToZipStream();
+                    MemoryStream ms = new MemoryStream();
+                    zipStream.CopyTo(ms);
+                    ms.Position = 0;
+                    string key = string.Format("{0};{1}", teamToReview.AuthorTeamID, teamToReview.AuthorTeam.Name);
+                    zipStreams[key] = ms;
+                }
             }
-
             try
             {
                 //combine the zip files into a single zip
@@ -172,6 +177,7 @@ namespace OSBLE.Services
                 finalZipStream.Position = 0;
                 byte[] bytes = finalZipStream.ToArray();
                 finalZipStream.Close();
+                zip.Dispose();
                 return bytes;
             }
             catch (Exception)
