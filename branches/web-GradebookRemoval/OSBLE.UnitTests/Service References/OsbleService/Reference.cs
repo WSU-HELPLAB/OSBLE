@@ -21,11 +21,20 @@ namespace OSBLE.UnitTests.OsbleService {
         [System.ServiceModel.OperationContractAttribute(Action="urn:OsbleService/GetCourseAssignments", ReplyAction="urn:OsbleService/GetCourseAssignmentsResponse")]
         OSBLE.Models.Assignments.Assignment[] GetCourseAssignments(int courseId, string authToken);
         
+        [System.ServiceModel.OperationContractAttribute(Action="urn:OsbleService/GetReviewItems", ReplyAction="urn:OsbleService/GetReviewItemsResponse")]
+        byte[] GetReviewItems(int assignmentId, string authToken);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:OsbleService/SubmitReview", ReplyAction="urn:OsbleService/SubmitReviewResponse")]
+        bool SubmitReview(int authorId, int assignmentId, byte[] zippedReviewData, string authToken);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:OsbleService/GetAssignmentSubmission", ReplyAction="urn:OsbleService/GetAssignmentSubmissionResponse")]
+        byte[] GetAssignmentSubmission(int assignmentId, string authToken);
+        
         [System.ServiceModel.OperationContractAttribute(Action="urn:OsbleService/GetCourseRole", ReplyAction="urn:OsbleService/GetCourseRoleResponse")]
         OSBLE.Models.Courses.CourseRole GetCourseRole(int courseId, string authToken);
         
-        [System.ServiceModel.OperationContractAttribute(Action="urn:OsbleService/GetCouresUsers", ReplyAction="urn:OsbleService/GetCouresUsersResponse")]
-        OSBLE.Models.Courses.CourseUser[] GetCouresUsers(string authToken);
+        [System.ServiceModel.OperationContractAttribute(Action="urn:OsbleService/SubmitAssignment", ReplyAction="urn:OsbleService/SubmitAssignmentResponse")]
+        bool SubmitAssignment(int assignmentId, byte[] zipData, string authToken);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -63,12 +72,24 @@ namespace OSBLE.UnitTests.OsbleService {
             return base.Channel.GetCourseAssignments(courseId, authToken);
         }
         
+        public byte[] GetReviewItems(int assignmentId, string authToken) {
+            return base.Channel.GetReviewItems(assignmentId, authToken);
+        }
+        
+        public bool SubmitReview(int authorId, int assignmentId, byte[] zippedReviewData, string authToken) {
+            return base.Channel.SubmitReview(authorId, assignmentId, zippedReviewData, authToken);
+        }
+        
+        public byte[] GetAssignmentSubmission(int assignmentId, string authToken) {
+            return base.Channel.GetAssignmentSubmission(assignmentId, authToken);
+        }
+        
         public OSBLE.Models.Courses.CourseRole GetCourseRole(int courseId, string authToken) {
             return base.Channel.GetCourseRole(courseId, authToken);
         }
         
-        public OSBLE.Models.Courses.CourseUser[] GetCouresUsers(string authToken) {
-            return base.Channel.GetCouresUsers(authToken);
+        public bool SubmitAssignment(int assignmentId, byte[] zipData, string authToken) {
+            return base.Channel.SubmitAssignment(assignmentId, zipData, authToken);
         }
     }
 }

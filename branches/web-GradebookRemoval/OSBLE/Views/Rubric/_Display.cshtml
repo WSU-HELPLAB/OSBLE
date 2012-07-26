@@ -9,7 +9,7 @@
     string critCommentPrefix = ViewBag.CritCommentPrefix;
     int sliderTableLength = 880;
     int maxLevelScore = (from c in Model.Rubric.Levels
-                         select c.RangeEnd).Sum();
+                         select c.PointSpread).Sum();
     int textInputLenght = 25;
     int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;
     string selectedAssignment = ViewBag.AssignmentSelectId;
@@ -153,8 +153,8 @@
                         @{int previousMax = 1;}
                         @{foreach (CellDescription desc in descriptions)
                           {
-                            <li><span class="level_header"><em>@(desc.Level.LevelTitle)</em> (@previousMax - @(previousMax + desc.Level.RangeEnd - 1))</span>
-                                @{previousMax += desc.Level.RangeEnd;}
+                            <li><span class="level_header"><em>@(desc.Level.LevelTitle)</em> (@previousMax - @(previousMax + desc.Level.PointSpread - 1))</span>
+                                @{previousMax += desc.Level.PointSpread;}
                                 <br />
                                 @Html.Raw(desc.Description.Replace("\r\n", "\n").Replace("\r", "<br />").Replace("\n", "<br />"))
                             </li>
@@ -176,10 +176,10 @@
                                   {
                                       cssClass = "level_" + counter.ToString();
                                   } 
-                                <th class="@cssClass" style="width:@(sliderTableCellWidth * level.RangeEnd)px;">@level.LevelTitle
-                                    (@previousMax - @(previousMax + level.RangeEnd - 1))
+                                <th class="@cssClass" style="width:@(sliderTableCellWidth * level.PointSpread)px;">@level.LevelTitle
+                                    (@previousMax - @(previousMax + level.PointSpread - 1))
                                 </th>
-                                  previousMax += level.RangeEnd;
+                                  previousMax += level.PointSpread;
                               }
                             }
                             <th class="text_input_score">

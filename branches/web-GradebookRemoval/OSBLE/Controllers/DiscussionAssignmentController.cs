@@ -8,11 +8,98 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Models.DiscussionAssignment;
 using OSBLE.Models.Users;
+using OSBLE.Models.ViewModels;
 
 namespace OSBLE.Controllers
 {
     public class DiscussionAssignmentController : OSBLEController
     {
+        /// <summary>
+        /// Returns true if the posters name should be Anonymized for a discussion assignment
+        /// </summary>
+        /// <param name="currentUserRoleId">The current users AbstractRoleID</param>
+        /// <param name="postersUserRoleId">The posters AbstractRoleID</param>
+        /// <param name="discussionSetting">The assignments discussion settings</param>
+        /// <returns></returns>
+        public bool AnonymizeNameForDiscussion(CourseUser poster, DiscussionSetting discussionSetting)
+        {
+            bool Anonymous = false;
+            if (poster.ID != ActiveCourseUser.ID)   //Don't want to set anonymous permissions if the poster is the current user, so users own posts arent anonymous
+            {
+
+                int postersUserRoleId = poster.AbstractRoleID;
+                int currentUserRoleId = ActiveCourseUser.AbstractRoleID;
+
+                int studentRoleId = (int)CourseRole.CourseRoles.Student;
+                int moderatorRoleId = (int)CourseRole.CourseRoles.Moderator;
+                int instructorRoleId = (int)CourseRole.CourseRoles.Instructor;
+                int taRoleId = (int)CourseRole.CourseRoles.TA;
+
+                //If TAsCanPostToAllDiscussions, treat them as instructors to students. Otherwise treat them as moderators to students. 
+                if (postersUserRoleId == taRoleId)
+                {
+                    if (discussionSetting.TAsCanPostToAllDiscussions)
+                    {
+                        postersUserRoleId = instructorRoleId;
+                    }
+                    else
+                    {
+                        postersUserRoleId = moderatorRoleId;
+                    }
+                }
+
+                if (discussionSetting.HasAnonymousStudentsToStudents && currentUserRoleId == studentRoleId && postersUserRoleId == studentRoleId)
+                {
+                    Anonymous = true;
+                }
+                else if (discussionSetting.HasAnonymousInstructorsToStudents && currentUserRoleId == studentRoleId && postersUserRoleId == instructorRoleId)
+                {
+                    Anonymous = true;
+                }
+                else if (discussionSetting.HasAnonymousModeratorsToStudents && currentUserRoleId == studentRoleId && postersUserRoleId == moderatorRoleId)
+                {
+                    Anonymous = true;
+                }
+                else if (discussionSetting.HasAnonymousStudentsToModerators && currentUserRoleId == moderatorRoleId && postersUserRoleId == studentRoleId)
+                {
+                    Anonymous = true;
+                }
+            }
+
+            return Anonymous;
+        }
+
+        /// <summary>
+        /// Returns true if the user should be anonymized for a critical review discussion
+        /// </summary>
+        /// <param name="currentUserRoleId">Current users AbstractRoleId</param>
+        /// <param name="targetUserRoleId">Poster's AbstractRoleId</param>
+        /// <param name="assignment">The Critical Review Discussion assignment</param>
+        /// <param name="isAuthor">This value should be true if the poster if an author of the reviewed document</param>
+        /// <param name="isReviewer">This value should be true if the poster if a reviewer of the document.</param>
+        /// <returns></returns>
+        public bool AnonymizeNameForCriticalReviewDiscussion(CourseUser poster, 
+            Assignment assignment, bool posterIsAuthor, bool posterIsReviewer, bool currentUserIsAuthor, bool currentUserIsReviewer)
+        {
+            bool Anonymous = false;
+
+            CriticalReviewSettings crSettings = assignment.PreceedingAssignment.CriticalReviewSettings;
+            if(crSettings.AnonymizeAuthorToReviewer && currentUserIsReviewer && posterIsAuthor)
+            {
+                Anonymous = true;
+            }
+            else if(crSettings.AnonymizeReviewerToAuthor && currentUserIsAuthor && posterIsReviewer)
+            {
+                Anonymous = true;
+            }
+            //Purposefully not handling crSettings.AnonymizeReviewerToReviewers as this is property is used for the reviewed document not discussions. There is another
+            //setting in place to anonmize reviewers to reviewers in discussion settins.
+
+
+            //Anonymize if Anonymous is true or AnonymizeNameForDiscussion (anonymize based on discussion settings) is true.
+            return (Anonymous || AnonymizeNameForDiscussion(poster, assignment.DiscussionSettings));
+        }
+
         // GET: /DiscussionAssignment/
         public ActionResult Index(int assignmentId, int discussionTeamId)
         {
@@ -20,20 +107,22 @@ namespace OSBLE.Controllers
             //checking if ids are good
             Assignment assignment = null;
             DiscussionTeam discussionTeam = null;
+            
+
             if (discussionTeamId > 0 && assignmentId > 0)
             {
 
-                assignment= db.Assignments.Find(assignmentId);
+                assignment = db.Assignments.Find(assignmentId);
                 discussionTeam = (from dt in assignment.DiscussionTeams
-                                     where dt.ID == discussionTeamId
-                                     select dt).FirstOrDefault();
+                                  where dt.ID == discussionTeamId
+                                  select dt).FirstOrDefault();
             }
 
             //if ids are good and returned values, then confirm ActiveCourseUser belongs to that discussion team
             bool isInDiscussionTeam = false;
             if (assignment != null && discussionTeam != null)
             {
-                
+
                 foreach (TeamMember tm in discussionTeam.GetAllTeamMembers())
                 {
                     if (tm.CourseUserID == ActiveCourseUser.ID)
@@ -44,45 +133,21 @@ namespace OSBLE.Controllers
                 }
             }
 
-            //if ActiveCourseUser belongs to the discussionTeam, continue. Otherwise kick them out!!
-            if(isInDiscussionTeam)
+
+
+            //if ActiveCourseUser belongs to the discussionTeam, continue. Otherwise kick them out.
+            if (isInDiscussionTeam)
             {
-                List<DiscussionPost> posts;
-                //Only filter by discussionTeamID if the assignment HasDiscussionTeams
-                if (assignment.HasDiscussionTeams)
-                {
-                    posts = (from post in db.DiscussionPosts
-                             .Include("Replies")
-                             where post.AssignmentID == assignment.ID &&
-                             post.DiscussionTeamID == discussionTeamId &&
-                             post.ParentPostID == null
-                             orderby post.Posted
-                             select post).ToList();
-                }
-                else
-                {
-                    posts = (from post in db.DiscussionPosts
-                             .Include("Replies")
-                             where post.AssignmentID == assignment.ID &&
-                             post.ParentPostID == null
-                             orderby post.Posted
-                             select post).ToList();
-                }
+                DiscussionViewModel dvm = new DiscussionViewModel(discussionTeam, ActiveCourseUser);
 
-                    
 
-                ViewBag.IsFirstPost = true;
-                //Marking IsFirstPost as false if any posts are found that belong to that user.
-                foreach (DiscussionPost post in posts)
-                {
-                    if (post.CourseUserID == ActiveCourseUser.ID)
-                    {
-                        ViewBag.IsFirstPost = false;
-                        break;
-                    }
-                }
+                //Checking if its users first post
+                ViewBag.IsFirstPost = (from dpvm in dvm.DiscussionPostViewModels
+                                       where dpvm.poster.CourseUser.ID == ActiveCourseUser.ID
+                                       select dpvm).Count() == 0;
 
-                //assigning TeamName a value if teams exist.
+
+                //assigning a header value.
                 if (assignment.HasDiscussionTeams)
                 {
                     ViewBag.DiscussionHeader = assignment.AssignmentName + "- " + discussionTeam.TeamName;
@@ -93,6 +158,7 @@ namespace OSBLE.Controllers
                 }
 
                 //for CRD assignment types we need a list of all discussions they can participate in for navigation.
+                //additionally for CRD assignments we want to display all teammates invovled in the discussion
                 if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
                 {
                     List<DiscussionTeam> DiscussionTeamList = new List<DiscussionTeam>();
@@ -109,9 +175,17 @@ namespace OSBLE.Controllers
                         }
                     }
                     ViewBag.DiscussionTeamList = DiscussionTeamList.OrderBy(dt => dt.TeamName).ToList();
+
                 }
 
-                ViewBag.Posts = posts.OrderBy(p => p.Posted);
+                ViewBag.PostLengthRequired = 0;
+                if ((assignment.DiscussionSettings.MinimumFirstPostLength > 0) && ViewBag.IsFirstPost)
+                {
+                    ViewBag.PostLengthRequired = assignment.DiscussionSettings.MinimumFirstPostLength;
+                }
+
+                ViewBag.CanPost = assignment.DueDate > DateTime.Now;
+                ViewBag.DiscussionPostViewModelList = dvm.DiscussionPostViewModels.OrderBy(dpvm => dpvm.Posted).ToList();
                 ViewBag.ActiveCourse = ActiveCourseUser;
                 ViewBag.Assignment = assignment;
                 ViewBag.DiscussionTeamID = discussionTeam.ID;
@@ -120,16 +194,15 @@ namespace OSBLE.Controllers
             else
             {
                 return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentId });
-            }    
+            }
         }
-
         /// <summary>
         /// Displays the Discussion view for Teachers
         /// </summary>
         /// <param name="assignmentId"></param>
         /// <param name="courseUserId">the CourseUser.ID of the student you want to "Highlight". 0 may be passed in highlighting is unnecessary</param>
         /// <param name="postOrReply">postOrReply is used as enumerable. 0 = Posts, 1 = Replies, 2 = Both, 3 = No Selector</param>
-        /// <param name="discussionTeamID">The discussion team id for discussion to beto viewed. If it is a classwide discussion, then any dt can be sent.</param>
+        /// <param name="discussionTeamID">The discussion team id for discussion to be viewed. If it is a classwide discussion, then any dt in that assignment can be sent.</param>
         /// <returns></returns>
         [CanGradeCourse]
         public ActionResult TeacherIndex(int assignmentId, int discussionTeamID, int courseUserId = 0, int postOrReply = 3)
@@ -137,36 +210,16 @@ namespace OSBLE.Controllers
             Assignment assignment = db.Assignments.Find(assignmentId);
             if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && ActiveCourseUser.AbstractRole.CanGrade)
             {
+
+
                 List<DiscussionPost> posts = null;
                 CourseUser student;
                 DiscussionTeam discussionTeam = (from dt in assignment.DiscussionTeams
                                                  where dt.ID == discussionTeamID
                                                  select dt).FirstOrDefault();
 
-                //Collecting posts and setting up DiscussionTeamList.
-                if (assignment.HasDiscussionTeams)
-                {
-                    //Only want posts associated with discussionTeamID
-                    ViewBag.DiscussionTeamList = assignment.DiscussionTeams.OrderBy(dt => dt.TeamName).ToList();
+                DiscussionViewModel dvm = new DiscussionViewModel(discussionTeam, ActiveCourseUser);
 
-                    posts = (from post in db.DiscussionPosts
-                                 .Include("Replies")
-                                 where post.AssignmentID == assignment.ID &&
-                                 post.DiscussionTeamID == discussionTeamID &&
-                                 post.ParentPostID == null
-                                 orderby post.Posted
-                                 select post).ToList();
-                }
-                else
-                {
-                    //want all posts associated with assignmentId
-                    posts = (from post in db.DiscussionPosts
-                             .Include("Replies")
-                             where post.AssignmentID == assignment.ID &&
-                             post.ParentPostID == null
-                             orderby post.Posted
-                             select post).ToList();
-                }
 
                 if (postOrReply == 3 || courseUserId <= 0)  //If postOrReply is 3, we want no selections - so setting student to null.
                 {
@@ -186,6 +239,26 @@ namespace OSBLE.Controllers
                     ViewBag.DiscussionHeader = assignment.AssignmentName;
                 }
 
+                bool canPost = true;
+                //If the user is a TA and TAs can only participate in some discussions, then we must confirm the TA
+                //is in the team before we give them permission to post
+                if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA && !assignment.DiscussionSettings.TAsCanPostToAllDiscussions
+                    && discussionTeam.Team.TeamMembers.Where(tm => tm.CourseUserID == ActiveCourseUser.ID).ToList().Count == 0)
+                {
+                    canPost = false;
+                }
+
+                //for CRD assignment types we need a list of all discussions they can participate in for navigation.
+                //additionally for CRD assignments we want to display all teammates invovled in the discussion
+                if (assignment.HasDiscussionTeams)
+                {
+                    ViewBag.DiscussionTeamList = assignment.DiscussionTeams;
+
+                }
+
+                ViewBag.PostLengthRequired = 0;
+                ViewBag.CanPost = canPost;
+                ViewBag.DiscussionPostViewModelList = dvm.DiscussionPostViewModels;
                 ViewBag.PostOrReply = postOrReply;
                 ViewBag.Posts = posts;
                 ViewBag.Student = student;

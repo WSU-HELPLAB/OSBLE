@@ -4,7 +4,6 @@
 
 <table class="assignTable" cellspacing="0">
     <th colspan="2" style="font-size:larger">Assignment</th>
-    <!--<th  style="font-size:larger">Release Date</th>-->
     <th style="font-size:larger">Due Date</th>
     <th style="font-size:larger">Submissions</th>
     <th style="font-size:larger">Grading</th>
@@ -73,8 +72,10 @@
                 <td > <!--Cell for name-->
                     @Html.ActionLink(assignment.AssignmentName, "Index", "Home", new { area = "AssignmentDetails", assignmentId = assignment.ID }, null)
                 </td>
-                <!--<td>@assignment.ReleaseDate.ToShortDateString()</td>-->
-                <td>@assignment.DueDate.ToShortDateString() @assignment.DueTime.ToShortTimeString()</td>
+                <td > <!--Cell for DueDate-->
+                    @assignment.DueDate.ToShortDateString() @assignment.DueTime.ToShortTimeString()
+                </td>
+                <!--Cell for Submissions-->
                 @if (assignment.HasDeliverables)
                 {
                     if (draftFlag || pastFlag)
@@ -91,68 +92,18 @@
                     <td>No Deliverables</td>
                 }
                 
-                @if (assignment.HasRubric)
-                {
-                    if (futureFlag || draftFlag)
+                <td>
+                    <!--Cell for Grading. Only show if hasRubric and not a future/draft assignment-->
+                    @if (assignment.HasRubric && !(futureFlag || draftFlag))
                     {
-                        //MG&KD: If the assignment is future or draft, then show nothing
+                    
+                            @: @assignment.GetPublishedCount() of @assignment.AssignmentTeams.Count published.&nbsp @Html.ActionLink("Grade Now", "Index", "Rubric", new { assignmentId = assignment.ID, cuId = assignment.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })<br />
+                            @: @assignment.GetSavedAsDraftCount() saved as draft.&nbsp @Html.ActionLink("Publish All", "PublishAllRubrics", "Assignment", new { area = "", assignmentId = assignment.ID }, new { })
+                    
                     }
-                    else
-                    {
-                        <td>
-                            @assignment.GetPublishedCount() of @assignment.AssignmentTeams.Count published.&nbsp @Html.ActionLink("Grade Now", "Index", "Rubric", new { assignmentId = assignment.ID, cuId = assignment.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })<br />
-                            @assignment.GetSavedAsDraftCount() of @assignment.AssignmentTeams.Count saved as draft.&nbsp<a href="#" style="cursor:pointer" onclick="publishAllGrades(@assignment.ID);">Publish All</a>
-                        </td>
-                    }
-                }
-                else
-                {
-                    if (futureFlag || draftFlag)
-                    {
-                        //MG&KD: Displaying nothing if its a future/draft assignment with no rubric. Nothing to display.
-                        <td></td>
-                    }
-                    else
-                    {
-                        <td>
-                        @try
-                        {
-                            //AC Hack: for some reason something can be null.  Quick fix: try/catch block.
-                            <a href="#" onclick="goToCategoryTab(@assignment.CategoryID, @assignment.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID);" style="cursor:pointer;">Grade Now</a>
-                        }
-                        catch (Exception ex)
-                        {
-                            <text>&nbsp;</text>
-                        }
-                        </td>
-                    }
-                }
-                
+                </td>
             </tr>
                 
         }
     }
 </table>
-
-<script type="text/javascript">
-function publishAllGrades(aId) {
-        $.ajax({
-            async: false,
-            url: "/Assignment/PublishAllGrades",
-            data: { assignmentId: aId }
-        });
-        window.location.reload(true);
-    }
-
-    function goToCategoryTab(catID, stuID) {
-        $.ajax({
-            type: "POST",
-            url: "/Gradebook/SetTabStudent",
-            data: { studentId: stuID.toString() },
-            success: function () {
-                location.href = "/Gradebook/Tab/?categoryId=" + catID;
-            }
-        });
-        hideTabColors();
-    }
-</script>

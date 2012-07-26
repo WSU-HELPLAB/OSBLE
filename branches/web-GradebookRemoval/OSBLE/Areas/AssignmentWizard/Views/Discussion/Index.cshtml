@@ -13,24 +13,16 @@
         <td>@Html.EditorFor(m => m.MinimumFirstPostLength)</td>
         <td>@Html.ValidationMessageFor(m => m.MinimumFirstPostLength)</td>
     </tr>
-    <tr>
-        <th>@Html.LabelFor(m => m.HasAnonymousPosts)</th>
-        <td>@Html.CheckBoxFor(m => m.HasAnonymousPosts)</td>
-        <td></td>
-    </tr>
-    <tr>
-        <th>@Html.LabelFor(m => m.HasAnonymousRoles)</th>
-        <td>@Html.CheckBoxFor(m => m.HasAnonymousRoles)</td>
-        <td></td>
-    </tr>
+    
+    
     <tr>
         <th>@Html.LabelFor(m => m.RequiresPostBeforeView)</th>
         <td>@Html.CheckBoxFor(m => m.RequiresPostBeforeView)</td>
         <td></td>
     </tr>
     <tr>
-        <th>@Html.LabelFor(m => m.TAsCanPostToAll)</th>
-        <td>@Html.CheckBoxFor(m => m.TAsCanPostToAll)</td>
+        <th>@Html.LabelFor(m => m.TAsCanPostToAllDiscussions)</th>
+        <td>@Html.CheckBoxFor(m => m.TAsCanPostToAllDiscussions)</td>
         <td></td>
     </tr>
     <tr>
@@ -38,4 +30,35 @@
         <td>@Html.EditorFor(m => m.InitialPostDueDate) at @Html.EditorFor(m => m.InitialPostDueDueTime)</td>
         <td>@Html.ValidationMessageFor(m => m.InitialPostDueDate)</td>
     </tr>
+    <tr><td style="height:15px"></td></tr>
+    <tr>
+        <th>Anonymization Settings:</th>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.HasAnonymousInstructorsToStudents)</th>
+        <td>@Html.CheckBoxFor(m => m.HasAnonymousInstructorsToStudents)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.HasAnonymousModeratorsToStudents)</th>
+        <td>@Html.CheckBoxFor(m => m.HasAnonymousModeratorsToStudents)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.HasAnonymousStudentsToStudents)</th>
+        <td>@Html.CheckBoxFor(m => m.HasAnonymousStudentsToStudents)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.HasAnonymousStudentsToModerators)</th>
+        <td>@Html.CheckBoxFor(m => m.HasAnonymousStudentsToModerators)</td>
+        <td></td>
+    </tr>
+
+    <tr>
+        <th>@Html.LabelFor(m => m.HasHiddenRoles)</th>
+        <td>@Html.CheckBoxFor(m => m.HasHiddenRoles)</td>
+        <td></td>
+    </tr>
+
 </table>

@@ -8,6 +8,7 @@ using System.IO;
 using OSBLE.Models;
 using System.Security.Cryptography;
 using System.Configuration;
+using System.Text;
 
 namespace OSBLE.Utility
 {
@@ -24,6 +25,35 @@ namespace OSBLE.Utility
         private const string authKey = "AuthKey";
 
         private OSBLEContext db = new OSBLEContext();
+
+        /// <summary>
+        /// Generates an key for use with annotate
+        /// </summary>
+        /// <param name="phpFunction">The function that we're calling</param>
+        /// <param name="annotateUser">The user that is responsible for the call.  For example, if we want to log in as bob@smith.com, we'd send "bob@smith.com".</param>
+        /// <returns></returns>
+        public static string GenerateAnnotateKey(string phpFunction, string annotateUser, long unixEpoch)
+        {
+            if (annotateUser == null || annotateUser.Length == 0)
+            {
+                annotateUser = ConfigurationManager.AppSettings["AnnotateUserName"];
+            }
+            string apiUser = ConfigurationManager.AppSettings["AnnotateUserName"];
+            
+            //build our string, convert into bytes for sha1
+            string rawString = string.Format("{0}\n{1}\n{2}\n{3}", phpFunction, apiUser, unixEpoch, annotateUser);
+            byte[] rawBytes = Encoding.UTF8.GetBytes(rawString);
+            
+            //build our hasher
+            byte[] seed = Encoding.UTF8.GetBytes(ConfigurationManager.AppSettings["AnnotateApiKey"]);
+            HMACSHA1 sha1 = new HMACSHA1(seed);
+            
+            //hash our bytes
+            byte[] hashBytes = sha1.ComputeHash(rawBytes);
+
+            string hashString = Convert.ToBase64String(hashBytes).Replace("\n", "");
+            return hashString;
+        }
 
         public static string Encrypt(string content)
         {

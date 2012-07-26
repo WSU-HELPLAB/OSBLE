@@ -43,7 +43,7 @@ namespace OSBLE.Controllers
         {
             if (ModelState.IsValid)
             {
-                weight.CourseID = ActiveCourse.AbstractCourseID;
+                weight.CourseID = ActiveCourseUser.AbstractCourseID;
                 db.Categories.Add(weight);
                 db.SaveChanges();
                 return RedirectToAction("Index");

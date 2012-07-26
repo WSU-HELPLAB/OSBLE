@@ -4,6 +4,7 @@
 
 @{
     ViewBag.Title = "Mail";
+    string confirmMessage = "Are you sure you want to permanently delete this mail item?";
 }
 
 <style type="text/css">
@@ -49,48 +50,51 @@
     </div>
 
     
-    @if (ViewBag.CurrentUser.ID == Model.ToUserProfile.ID)
-    {
+    @{
         //Replying
         using (Html.BeginForm("CreateReply", "Mail", FormMethod.Get))
         {
             <input type="hidden" name="replyTo" value="@Model.ID" />
-            <input type="submit" value="Reply" />  
+            <input class="MailInput" type="submit" value="Reply" />  
         }
 
         //Reply all
         using (Html.BeginForm("CreateReplyAll", "Mail", FormMethod.Get))
         {
             <input type="hidden" name="replyAll" value="@Model.ThreadID" />
-            <input type="submit" value="Reply All" />  
+            <input class="MailInput" type="submit" value="Reply All" />  
         }
 
         //Forwarding
         using (Html.BeginForm("CreateForward", "Mail", FormMethod.Get))
         {
             <input type="hidden" name="forwardTo" value="@Model.ID" />
-            <input type="submit" value="Forward" />  
+            <input class="MailInput" type="submit" value="Forward" />  
         }
-
-        //Delete
-        using (Html.BeginForm("DeleteFromInbox", "Mail", FormMethod.Post))
-        {
-            <input type="hidden" name="ID" value="@Model.ID" />
-            <input type="submit" value="Delete" onclick="return confirm('Are you sure you want to delete this message?')" /> 
-        }
-        <br /><br />
-    }
-    else
-    {   //outbox
-            //Delete
-        using (Html.BeginForm("DeleteFromOutbox", "Mail", FormMethod.Post))
-        {
-            <input type="hidden" name="ID" value="@Model.ID" />
-            <input type="submit" value="Delete" onclick="return confirm('Are you sure you want to delete this message?')" /> 
-        }
-        <br /><br />
-    }
         
+        if (ViewBag.CurrentUser.ID == Model.ToUserProfile.ID)
+        {
+            //Delete
+            using (Html.BeginForm("DeleteSingle", "Mail", FormMethod.Post))
+            {
+                <input type="hidden" name="ID" value="@Model.ID" />
+                <input type="hidden" name="deleteFrom" value="inbox" />
+                <input class="MailInput" type="submit" value="Delete" onclick="return confirm(@(confirmMessage))" /> 
+            }
+            <br /><br />
+        }
+        else
+        {   //outbox
+                //Delete
+            using (Html.BeginForm("DeleteSingle", "Mail", FormMethod.Post))
+            {
+                <input type="hidden" name="ID" value="@Model.ID" />
+                <input type="hidden" name="deleteFrom" value="outbox" />
+                <input type="submit" value="Delete" onclick="return confirm("@(confirmMessage)")" /> 
+            }
+            <br /><br />
+        }
+    }
     <table>
         <tr>
             <td class="email_view_links">

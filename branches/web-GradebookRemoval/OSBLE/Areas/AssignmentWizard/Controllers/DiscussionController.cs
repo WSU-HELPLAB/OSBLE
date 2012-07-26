@@ -87,7 +87,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
                 //If TAs are allowed to post to all discussion, 
                 //remove them from any discussion teams they may have already been assigned to
-                if (model.TAsCanPostToAll == true)      
+                if (model.TAsCanPostToAllDiscussions == true)      
                 {
                     foreach (DiscussionTeam dt in Assignment.DiscussionTeams)
                     {

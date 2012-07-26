@@ -59,10 +59,10 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             IEnumerable<Category> categories = new List<Category>();
             //activeCourse should only be null when testing
-            if (ActiveCourse != null)
+            if (ActiveCourseUser != null)
             {
                 //SUBMISSION CATEGORIES
-                categories = from c in (ActiveCourse.AbstractCourse as Course).Categories
+                categories = from c in (ActiveCourseUser.AbstractCourse as Course).Categories
                              where c.Name != Constants.UnGradableCatagory
                              select c;
             }
@@ -76,9 +76,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             BuildViewBag();
             Assignment.Type = manager.ActiveAssignmentType;
 
-            Assignment.HoursPerDeduction = (ActiveCourse.AbstractCourse as Course).HoursLatePerPercentPenalty;
-            Assignment.DeductionPerUnit = (ActiveCourse.AbstractCourse as Course).PercentPenalty;
-            Assignment.HoursLateWindow = (ActiveCourse.AbstractCourse as Course).HoursLateUntilZero;
+            Assignment.HoursPerDeduction = (ActiveCourseUser.AbstractCourse as Course).HoursLatePerPercentPenalty;
+            Assignment.DeductionPerUnit = (ActiveCourseUser.AbstractCourse as Course).PercentPenalty;
+            Assignment.HoursLateWindow = (ActiveCourseUser.AbstractCourse as Course).HoursLateUntilZero;
 
             return View(Assignment);
         }
@@ -86,6 +86,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         [HttpPost]
         public ActionResult Index(Assignment model)
         {
+            
             Assignment = model;
             if (ModelState.IsValid)
             {
@@ -93,32 +94,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
                 Assignment.CourseID = ActiveCourseUser.AbstractCourseID;
 
-                double oldPointsPossible = (from a in db.Assignments
-                                            where a.ID == Assignment.ID
-                                            select a.PointsPossible).FirstOrDefault();
-
-                List<Score> assignmentScores = (from a in db.Scores
-                                                where a.AssignmentID == Assignment.ID
-                                                select a).ToList();
-
-                if (Assignment.PointsPossible != oldPointsPossible)
-                {
-                    foreach (Score s in assignmentScores)
-                    {
-                        s.RawPoints = s.RawPoints * ((double)Assignment.PointsPossible / oldPointsPossible);
-                        GradebookController gbc = new GradebookController();
-                        gbc.ModifyGrade(s.RawPoints, s.CourseUserID, s.AssignmentID);
-                    }
-                }
-
                 //update our DB
                 if (Assignment.ID == 0)
                 {
-                    //calcuate column order for gradebook organization
-                    int lastColumnNumber = (from assignments in db.Assignments
-                                            orderby assignments.ColumnOrder descending
-                                            select assignments.ColumnOrder).FirstOrDefault();
-                    Assignment.ColumnOrder = (lastColumnNumber + 1);
                     db.Assignments.Add(Assignment);
                 }
                 else

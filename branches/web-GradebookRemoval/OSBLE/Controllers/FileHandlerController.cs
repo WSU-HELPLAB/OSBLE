@@ -8,6 +8,9 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using System.Collections.Generic;
 using OSBLE.Models.Users;
+using System.Net;
+using System.Configuration;
+using OSBLE.Utility;
 
 namespace OSBLE.Controllers
 {
@@ -23,6 +26,7 @@ namespace OSBLE.Controllers
 
             if (course != null)
             {
+                
                 string rootPath = FileSystem.GetCourseDocumentsPath(courseId);
 
                 //AC: At some point, it might be a good idea to document these hacks
@@ -66,9 +70,9 @@ namespace OSBLE.Controllers
                                          where teamMembers.CourseUser.UserProfileID == CurrentUser.ID
                                          select teamMembers).FirstOrDefault();
                 //make sure assignmentActivity is part of the activeCourse and (the person can grade  or is allowed access to it)
-                if (assignment.Category.CourseID == ActiveCourse.AbstractCourseID && (ActiveCourse.AbstractRole.CanGrade || team.Team.TeamMembers.Contains(teamMember)))
+                if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && (ActiveCourseUser.AbstractRole.CanGrade || team.Team.TeamMembers.Contains(teamMember)))
                 {
-                    string path = FileSystem.GetDeliverable(ActiveCourse.AbstractCourse as Course, assignmentID, team, fileName);
+                    string path = FileSystem.GetDeliverable(ActiveCourseUser.AbstractCourse as Course, assignmentID, team, fileName);
                     return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
                 }
             }
@@ -100,11 +104,11 @@ namespace OSBLE.Controllers
             try
             {
                 //If u are looking at the activeCourse and you can either see all or looking at your own let it pass
-                if (ActiveCourse.AbstractCourseID == assignment.Category.CourseID && (ActiveCourse.AbstractRole.CanSeeAll || CurrentUser.ID == userProfileID))
+                if (ActiveCourseUser.AbstractCourseID == assignment.CourseID && (ActiveCourseUser.AbstractRole.CanSeeAll || CurrentUser.ID == userProfileID))
                 {
                     //var teamUser = (from c in activity.TeamUsers where c.Contains(db.UserProfiles.Find(userProfileID)) select c).FirstOrDefault();
 
-                    string path = FileSystem.GetDeliverable(ActiveCourse.AbstractCourse as Course, assignmentID, assignmentTeam, fileName, GetFileExtensions(type));
+                    string path = FileSystem.GetDeliverable(ActiveCourseUser.AbstractCourse as Course, assignmentID, assignmentTeam, fileName, GetFileExtensions(type));
 
                     if (path != null)
                     {
@@ -128,9 +132,9 @@ namespace OSBLE.Controllers
 
             try
             {
-                if (assignment.Category.CourseID == ActiveCourse.AbstractCourseID)
+                if (assignment.CourseID == ActiveCourseUser.AbstractCourseID)
                 {
-                    Stream stream = FileSystem.FindZipFile(ActiveCourse.AbstractCourse as Course, assignment);
+                    Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment);
 
                     string zipFileName = assignment.AssignmentName + ".zip";
 
@@ -139,7 +143,7 @@ namespace OSBLE.Controllers
                         return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
                     }
 
-                    string submissionfolder = FileSystem.GetAssignmentSubmissionFolder(assignment.Category.Course, assignment.ID);
+                    string submissionfolder = FileSystem.GetAssignmentSubmissionFolder(assignment.Course, assignment.ID);
 
                     using (ZipFile zipfile = new ZipFile())
                     {
@@ -147,14 +151,14 @@ namespace OSBLE.Controllers
 
                         if (!acitvityDirectory.Exists)
                         {
-                            FileSystem.CreateZipFolder(ActiveCourse.AbstractCourse as Course, zipfile, assignment);
+                            FileSystem.CreateZipFolder(ActiveCourseUser.AbstractCourse as Course, zipfile, assignment);
                         }
                         else
                         {
                             foreach (DirectoryInfo submissionDirectory in acitvityDirectory.GetDirectories())
                             {
                                 Team currentTeam = (from c in assignment.AssignmentTeams where c.TeamID.ToString() == submissionDirectory.Name select c.Team).FirstOrDefault();
-                                
+
                                 if (currentTeam != null)
                                 {
                                     string folderName = "";
@@ -164,8 +168,7 @@ namespace OSBLE.Controllers
                                     }
                                     else
                                     {
-                                        bool HasAnonPosting = (assignment.DiscussionSettings != null && assignment.DiscussionSettings.HasAnonymousPosts);
-                                        folderName = currentTeam.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ActiveCourseUser.AbstractRoleID, true, HasAnonPosting);
+                                        folderName = currentTeam.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ActiveCourseUser.AbstractRoleID);
                                     }
 
                                     zipfile.AddDirectory(submissionDirectory.FullName, folderName);
@@ -200,33 +203,33 @@ namespace OSBLE.Controllers
                                      a.AssignmentID == assignment.ID
                                      select a).FirstOrDefault();
 
-                if ((assignment.Category.CourseID == ActiveCourse.AbstractCourseID))
+                if ((assignment.CourseID == ActiveCourseUser.AbstractCourseID))
                 {
-                    if (ActiveCourse.AbstractRole.CanGrade)
+                    if (ActiveCourseUser.AbstractRole.CanGrade)
                     {
                         //if we are dealing with a teacher first give them the published but if it doesn't exists give them a draft if that doesn't exist give em nothing
-                        string path = FileSystem.GetTeamUserPeerReview(false, ActiveCourse.AbstractCourse as Course, assignment.ID, at.TeamID);
+                        string path = FileSystem.GetTeamUserPeerReview(false, ActiveCourseUser.AbstractCourse as Course, assignment.ID, at.TeamID);
                         if (new FileInfo(path).Exists)
                         {
                             return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
                         }
                         else
                         {
-                            path = FileSystem.GetTeamUserPeerReviewDraft(false, ActiveCourse.AbstractCourse as Course, assignment.ID, at.TeamID);
+                            path = FileSystem.GetTeamUserPeerReviewDraft(false, ActiveCourseUser.AbstractCourse as Course, assignment.ID, at.TeamID);
                             if (new FileInfo(path).Exists)
                             {
                                 return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
                             }
                         }
                     }
-                    else if (ActiveCourse.AbstractRole.CanSubmit)
+                    else if (ActiveCourseUser.AbstractRole.CanSubmit)
                     {
                         foreach (TeamMember tm in at.Team.TeamMembers)
                         {
                             if (tm.CourseUser.UserProfileID == CurrentUser.ID)
                             {
                                 //if we are dealing with student try to give them the published one but if that doesn't exist give them nothing
-                                string path = FileSystem.GetTeamUserPeerReview(false, ActiveCourse.AbstractCourse as Course, assignment.ID, at.TeamID);
+                                string path = FileSystem.GetTeamUserPeerReview(false, ActiveCourseUser.AbstractCourse as Course, assignment.ID, at.TeamID);
                                 return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
                             }
                         }
@@ -247,6 +250,25 @@ namespace OSBLE.Controllers
             return GetSubmissionZipHelper(assignmentId, teamId);
         }
 
+        public ActionResult GetAnnotateDocument(int userID, int assignmentID, int teamID, string apiKey)
+        {
+            if (apiKey != ConfigurationManager.AppSettings["AnnotateApiKey"])
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            UserProfile profile = db.UserProfiles.Find(userID);
+            Assignment assignment = db.Assignments.Find(assignmentID);
+            AssignmentTeam team = db.AssignmentTeams.Find(assignmentID, teamID);
+            TeamMember member = (from teamMembers in team.Team.TeamMembers
+                                 where teamMembers.CourseUser.UserProfileID == profile.ID
+                                 select teamMembers).FirstOrDefault();
+
+            string path = FileSystem.GetDeliverable(assignment.Course as Course, assignmentID, team, assignment.Deliverables[0].ToString());
+            string fileName = string.Format("{0}-{1}-{2}-{3}", assignment.CourseID, assignment.ID, profile.ID, assignment.Deliverables[0].ToString());
+            return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = fileName };
+        }
+
         /// <summary>
         /// Get deliverables from the reviewee's assignment (previous assignment) for the current user, 
         /// needed for a critical review assignment (current user)
@@ -264,43 +286,163 @@ namespace OSBLE.Controllers
                                      select rt.AuthorTeamID).ToList();
             if (authorTeams.Contains(authorTeamId) && CRassignment.Type == AssignmentTypes.CriticalReview)
             {
-                return GetSubmissionZipHelper((int)CRassignment.PrecededingAssignmentID, authorTeamId);
+                //AC TODO: Error checking!
+
+                //Send off to Annotate if we have exactly one deliverable and that deliverable is a PDF document
+                if (CRassignment.PreceedingAssignment.Deliverables.Count == 1 && CRassignment.PreceedingAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
+                {
+                    long epoch = (int)(DateTime.UtcNow - new DateTime(1970,1,1,0,0,0)).TotalSeconds;
+                    WebClient client = new WebClient();
+                    string result = "";
+
+                    //Submit document to annotate
+                    string documentUrl = "https://osble.org/content/icer%202012%20short.pdf";
+
+                    string apiKey = OsbleAuthentication.GenerateAnnotateKey("uploadDocument.php", ConfigurationManager.AppSettings["AnnotateUserName"], epoch);
+                    string uploadString = "http://helplab.org/annotate/php/uploadDocument.php?" +
+                                          "api-user={0}" +           //Annotate admin user name (see web config)
+                                          "&api-requesttime={1}" +   //UNIX timestamp
+                                          "&api-annotateuser={2}" +  //the current user (reviewer)
+                                          "&api-auth={3}" +          //Annotate admin auth key
+                                          "&url={4}";                //URL of the document to upload
+                    uploadString = string.Format(uploadString,
+                                                 ConfigurationManager.AppSettings["AnnotateUserName"],
+                                                epoch,
+                                                ConfigurationManager.AppSettings["AnnotateUserName"],
+                                                apiKey,
+                                                documentUrl
+                                                 );
+                    result = client.DownloadString(uploadString);
+                    string documentCode = "";
+                    string documentDate = "";
+
+                    if(result.Substring(0, 2) == "OK")
+                    {
+                        string[] pieces = result.Split(' ');
+                        documentDate = pieces[1];
+                        documentCode = pieces[2];
+                    }
+
+                    //create annotate account for user
+                    apiKey = OsbleAuthentication.GenerateAnnotateKey("createAccount.php", CurrentUser.UserName, epoch);
+                    string createString = "http://helplab.org/annotate/php/createAccount.php?" +
+                                         "api-user={0}" +           //Annotate admin user name (see web config)
+                                         "&api-requesttime={1}" +   //UNIX timestamp
+                                         "&api-annotateuser={2}" +  //the current user (reviewer)
+                                         "&api-auth={3}" +          //Annotate admin auth key
+                                         "&licensed=0 " + 
+                                         "&firstname={4}" +         //User's first name
+                                         "&lastname={5}";           //User's last name
+                    createString = string.Format(createString,
+                                                ConfigurationManager.AppSettings["AnnotateUserName"],
+                                                epoch,
+                                                CurrentUser.UserName,
+                                                apiKey,
+                                                CurrentUser.FirstName,
+                                                CurrentUser.LastName
+                                                );
+                    result = client.DownloadString(createString);
+
+                    //give user access to the new document
+                    apiKey = OsbleAuthentication.GenerateAnnotateKey("authorizeReader.php", CurrentUser.UserName, epoch);
+                    string authorizeString = "http://helplab.org/annotate/php/authorizeReader.php?" +
+                                         "api-user={0}" +           //Annotate admin user name (see web config)
+                                         "&api-requesttime={1}" +   //UNIX timestamp
+                                         "&api-annotateuser={2}" +  //the current user (reviewer)
+                                         "&api-auth={3}" +          //Annotate admin auth key
+                                         "&d={4}" +                 //document upload date
+                                         "&c={5}";                  //document code
+                    authorizeString = string.Format(authorizeString,
+                                                ConfigurationManager.AppSettings["AnnotateUserName"],
+                                                epoch,
+                                                CurrentUser.UserName,
+                                                apiKey,
+                                                documentDate,
+                                                documentCode
+                                                );
+                    result = client.DownloadString(authorizeString);
+
+                    //downgrade user to unlicensed
+                    apiKey = OsbleAuthentication.GenerateAnnotateKey("updateAccount.php", CurrentUser.UserName, epoch);
+                    string updateString = "http://helplab.org/annotate/php/updateAccount.php?" +
+                                         "api-user={0}" +           //Annotate admin user name (see web config)
+                                         "&api-requesttime={1}" +   //UNIX timestamp
+                                         "&api-annotateuser={2}" +  //the current user (reviewer)
+                                         "&api-auth={3}" +          //Annotate admin auth key
+                                         "&licensed=0 ";
+                    updateString = string.Format(updateString,
+                                                ConfigurationManager.AppSettings["AnnotateUserName"],
+                                                epoch,
+                                                CurrentUser.UserName,
+                                                apiKey
+                                                );
+                    result = client.DownloadString(updateString);
+
+                    //log user into annotate
+                    apiKey = OsbleAuthentication.GenerateAnnotateKey("loginAs.php", CurrentUser.UserName, epoch);
+                    string loginString = "http://helplab.org/annotate/php/loginAs.php?" +
+                                         "api-user={0}" +           //Annotate admin user name (see web config)
+                                         "&api-requesttime={1}" +   //UNIX timestamp
+                                         "&loc=documents.php" +     //doesn't matter where we go
+                                         "&remember = 1" +          //store user info in cookie
+                                         "&errloc=http://helplab.org/annotate/php/error.php" +
+                                         "&api-annotateuser={2}" +  //the current user (reviewer)
+                                         "&api-auth={3}";           //Annotate admin auth key (see web config)
+                    
+                    loginString = string.Format(loginString,
+                                                ConfigurationManager.AppSettings["AnnotateUserName"],
+                                                epoch,
+                                                CurrentUser.UserName,
+                                                apiKey
+                                                );
+                    result = client.DownloadString(loginString);
+
+                    //Redirect to annotation page
+                    string finalDestination = "http://helplab.org/annotate/php/pdfnotate.php?d={0}&c={1}";
+                    finalDestination = string.Format(finalDestination, documentDate, documentCode);
+                    Response.Redirect(finalDestination);
+                }
+                else
+                {
+                    return GetSubmissionZipHelper((int)CRassignment.PrecededingAssignmentID, authorTeamId);
+                }
             }
 
             return RedirectToAction("Index", "Home");
         }
         /// <summary>
-        /// get a zip containing reviews that the author (authorTeamId) has performed
-        /// on any submission of the assignment specified by assignmentId
+        /// get a zip containing reviews that the review (current user) has performed on the 
+        /// author (authorTeamId) for a speicific assignment.
         /// </summary>
         /// <param name="assignmentId">get reviews of submissions of this assignment</param>
-        /// <param name="authorTeamId">get all reviews submitted by specified authorTeam</param>
+        /// <param name="authorTeamId">get the review of this authorTeam (that is submitted by the current user)</param>
         /// <returns></returns>
         [CanSubmitAssignments]
         public ActionResult GetReviewForAuthor(int assignmentId, int authorTeamId)
         {
             //get authorTeam
             Team authorTeam = db.Teams.Find(authorTeamId);
+            //Assignment
 
-            bool isOwnDocument = false;
-            foreach (TeamMember tm in authorTeam.TeamMembers)
-            {
-                if (tm.CourseUserID == ActiveCourseUser.ID)
-                {
-                    isOwnDocument = true;
-                    break;
-                }
-            }
+            //bool isOwnDocument = false;
+            //foreach (TeamMember tm in authorTeam.TeamMembers)
+            //{
+            //    if (tm.CourseUserID == ActiveCourseUser.ID)
+            //    {
+            //        isOwnDocument = true;
+            //        break;
+            //    }
+            //}
 
-            if (isOwnDocument)
-            {
+            //if (isOwnDocument)
+            //{
                 Assignment CRassignment = db.Assignments.Find(assignmentId);
                 AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourseUser);
 
                 return GetSubmissionZipHelper(assignmentId, at.TeamID, authorTeam);
-            }
+            //}
 
-            return RedirectToAction("Index", "Home");
+            //return RedirectToAction("Index", "Home");
         }
 
         /// <summary>
@@ -337,7 +479,7 @@ namespace OSBLE.Controllers
             // note: these contraints do not apply to instructors
             bool belongsToDT = false;
             belongsToDT = true;
-            
+
             foreach (TeamMember tm in dt.GetAllTeamMembers())
             {
                 if (tm.CourseUserID == ActiveCourseUser.ID)
@@ -465,7 +607,7 @@ namespace OSBLE.Controllers
                                                  a.AssignmentID == assignment.ID
                                                  select a).FirstOrDefault();//db.AssignmentTeams.Find(teamID);
 
-                if (assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID && assignment.AssignmentTeams.Contains(assignmentTeam))
+                if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && assignment.AssignmentTeams.Contains(assignmentTeam))
                 {
                     Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, assignmentTeam);
 
@@ -521,9 +663,9 @@ namespace OSBLE.Controllers
                                                  where a.TeamID == at.TeamID &&
                                                  a.AssignmentID == assignment.ID
                                                  select a).FirstOrDefault();//db.AssignmentTeams.Find(teamID);
-                if (assignment.Category.CourseID == ActiveCourse.AbstractCourseID && assignment.AssignmentTeams.Contains(assignmentTeam))
+                if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && assignment.AssignmentTeams.Contains(assignmentTeam))
                 {
-                    Stream stream = FileSystem.FindZipFile(ActiveCourse.AbstractCourse as Course, assignment, assignmentTeam);
+                    Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, assignmentTeam);
 
                     string zipFileName = assignment.AssignmentName + " by " + assignmentTeam.Team.Name + ".zip";
 
@@ -532,7 +674,7 @@ namespace OSBLE.Controllers
                         return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
                     }
 
-                    string submissionfolder = FileSystem.GetTeamUserSubmissionFolder(false, (ActiveCourse.AbstractCourse as Course), assignmentID, assignmentTeam);
+                    string submissionfolder = FileSystem.GetTeamUserSubmissionFolder(false, (ActiveCourseUser.AbstractCourse as Course), assignmentID, assignmentTeam);
 
                     using (ZipFile zipfile = new ZipFile())
                     {
@@ -540,7 +682,7 @@ namespace OSBLE.Controllers
                         {
                             zipfile.AddDirectory(submissionfolder);
                         }
-                        FileSystem.CreateZipFolder(ActiveCourse.AbstractCourse as Course, zipfile, assignment, assignmentTeam);
+                        FileSystem.CreateZipFolder(ActiveCourseUser.AbstractCourse as Course, zipfile, assignment, assignmentTeam);
 
                         stream = FileSystem.GetDocumentForRead(zipfile.Name);
 

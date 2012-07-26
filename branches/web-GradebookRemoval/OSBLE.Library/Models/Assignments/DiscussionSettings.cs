@@ -13,11 +13,15 @@ namespace OSBLE.Models.Assignments
     /// </summary>
     [Flags]
     public enum DiscussionSettings : byte
-    { 
-        AnonymousPosts = 1,
-        AnonymousRoles = 2,
-        RequiresPostBeforeView = 4,
-        TAsCanPostToAll = 8
+    {
+        AnonymizeStudentsToStudents = 1,
+        AnonymizeModeratorsToStudents = 2,
+        AnonymizeInstructorsToStudents = 4,
+        AnonymizeStudentsToModerators = 8,
+        HideCourseRoles = 16,
+        RequiresPostBeforeView = 32,
+        TAsCanPostToAllDiscussions = 64
+
     };
 
     public class DiscussionSetting
@@ -68,6 +72,18 @@ namespace OSBLE.Models.Assignments
             MinimumFirstPostLength = 0;
         }
 
+        public DiscussionSetting(DiscussionSetting other)
+        {
+            if (other == null)
+            {
+                return;
+            }
+            this.AnonymitySettings = other.AnonymitySettings;
+            this.AssignmentID = other.AssignmentID;
+            this.InitialPostDueDate = other.InitialPostDueDate;
+            this.MinimumFirstPostLength = other.MinimumFirstPostLength;
+        }
+
         #region anonymity settings
         
         /// <summary>
@@ -82,49 +98,121 @@ namespace OSBLE.Models.Assignments
         }
 
         /// <summary>
-        /// Returns true if posts in the discussion are anonymous
+        /// Returns true if roles are to be hidden
         /// </summary>
         [NotMapped]
-        [Display(Name = "Anonymize names of participants in the discussion")]
-        public bool HasAnonymousPosts
+        [Display(Name = "Hide roles in discussion")]
+        public bool HasHiddenRoles
         {
             get
             {
-                return HasAnonymityLevel(DiscussionSettings.AnonymousPosts);
+                return HasAnonymityLevel(DiscussionSettings.HideCourseRoles);
             }
             set
             {
                 if (value == true)
                 {
-                    AddAnonymityLevel(DiscussionSettings.AnonymousPosts);
+                    AddAnonymityLevel(DiscussionSettings.HideCourseRoles);
                 }
                 else
                 {
-                    RemoveAnonymityLevel(DiscussionSettings.AnonymousPosts);
+                    RemoveAnonymityLevel(DiscussionSettings.HideCourseRoles);
                 }
             }
         }
 
         /// <summary>
-        /// Returns true if user roles are hidden in discussions
+        /// Returns true if students posts in the discussion are to be anonymous to other students
         /// </summary>
         [NotMapped]
-        [Display(Name = "Hide roles of discussion participants")]
-        public bool HasAnonymousRoles
+        [Display(Name = "Anonymize names of students in the discussion to other students")]
+        public bool HasAnonymousStudentsToStudents
         {
             get
             {
-                return HasAnonymityLevel(DiscussionSettings.AnonymousRoles);
+                return HasAnonymityLevel(DiscussionSettings.AnonymizeStudentsToStudents);
             }
             set
             {
                 if (value == true)
                 {
-                    AddAnonymityLevel(DiscussionSettings.AnonymousRoles);
+                    AddAnonymityLevel(DiscussionSettings.AnonymizeStudentsToStudents);
                 }
                 else
                 {
-                    RemoveAnonymityLevel(DiscussionSettings.AnonymousRoles);
+                    RemoveAnonymityLevel(DiscussionSettings.AnonymizeStudentsToStudents);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns true if Moderators posts in the discussion are to be anonymous to students
+        /// </summary>
+        [NotMapped]
+        [Display(Name = "Anonymize names of moderators in the discussion to other students")]
+        public bool HasAnonymousModeratorsToStudents
+        {
+            get
+            {
+                return HasAnonymityLevel(DiscussionSettings.AnonymizeModeratorsToStudents);
+            }
+            set
+            {
+                if (value == true)
+                {
+                    AddAnonymityLevel(DiscussionSettings.AnonymizeModeratorsToStudents);
+                }
+                else
+                {
+                    RemoveAnonymityLevel(DiscussionSettings.AnonymizeModeratorsToStudents);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns true if instructor posts in the discussion are to be anonymous to students
+        /// </summary>
+        [NotMapped]
+        [Display(Name = "Anonymize names of instructors in the discussion to students")]
+        public bool HasAnonymousInstructorsToStudents
+        {
+            get
+            {
+                return HasAnonymityLevel(DiscussionSettings.AnonymizeInstructorsToStudents);
+            }
+            set
+            {
+                if (value == true)
+                {
+                    AddAnonymityLevel(DiscussionSettings.AnonymizeInstructorsToStudents);
+                }
+                else
+                {
+                    RemoveAnonymityLevel(DiscussionSettings.AnonymizeInstructorsToStudents);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns true if student posts in the discussion are to be anonymous to moderators
+        /// </summary>
+        [NotMapped]
+        [Display(Name = "Anonymize names of students in the discussion to moderators")]
+        public bool HasAnonymousStudentsToModerators
+        {
+            get
+            {
+                return HasAnonymityLevel(DiscussionSettings.AnonymizeStudentsToModerators);
+            }
+            set
+            {
+                if (value == true)
+                {
+                    AddAnonymityLevel(DiscussionSettings.AnonymizeStudentsToModerators);
+                }
+                else
+                {
+                    RemoveAnonymityLevel(DiscussionSettings.AnonymizeStudentsToModerators);
                 }
             }
         }
@@ -155,29 +243,29 @@ namespace OSBLE.Models.Assignments
         }
 
         /// <summary>
-        /// Returns true if the assignment requires that students must first submit a post before
-        /// they can view the posts of others
+        ///Returns true if TAs are allowed to post to all discussion assignments
         /// </summary>
         [NotMapped]
         [Display(Name = "TAs can participate in all discussions")]
-        public bool TAsCanPostToAll
+        public bool TAsCanPostToAllDiscussions
         {
             get
             {
-                return HasAnonymityLevel(DiscussionSettings.TAsCanPostToAll);
+                return HasAnonymityLevel(DiscussionSettings.TAsCanPostToAllDiscussions);
             }
             set
             {
                 if (value == true)
                 {
-                    AddAnonymityLevel(DiscussionSettings.TAsCanPostToAll);
+                    AddAnonymityLevel(DiscussionSettings.TAsCanPostToAllDiscussions);
                 }
                 else
                 {
-                    RemoveAnonymityLevel(DiscussionSettings.TAsCanPostToAll);
+                    RemoveAnonymityLevel(DiscussionSettings.TAsCanPostToAllDiscussions);
                 }
             }
         }
+
 
         /// <summary>
         /// Returns true if the discussion has the specified anonymity setting

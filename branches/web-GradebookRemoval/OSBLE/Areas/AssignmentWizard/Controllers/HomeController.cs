@@ -139,6 +139,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 manager.GetComponentByType(typeof(RubricController)).IsSelected = true;
             }
+
+            //STUDENT RUBRICS
+            if (assignment.HasStudentRubric)
+            {
+                manager.GetComponentByType(typeof(StudentRubricController)).IsSelected = true;
+            }
             
             //COMMENT CATEGORIES
             if (assignment.HasCommentCategories)
@@ -181,8 +187,24 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 //RUBRICS
                 if (manager.UnselectedComponents.Contains(manager.GetComponentByType(typeof(RubricController))))
                 {
+                    if (assignment.HasRubric)
+                    {
+                        db.Rubrics.Remove(assignment.Rubric);
+                    }
                     assignment.Rubric = null;
                     assignment.RubricID = null;
+                    
+                }
+
+                //STUDENT RUBRICS
+                if (manager.UnselectedComponents.Contains(manager.GetComponentByType(typeof(StudentRubricController))))
+                {
+                    if (assignment.HasStudentRubric)
+                    {
+                        db.Rubrics.Remove(assignment.StudentRubric);
+                    }
+                    assignment.StudentRubric = null;
+                    assignment.StudentRubricID = null;
                 }
 
                 //COMMENT CATEGORIES

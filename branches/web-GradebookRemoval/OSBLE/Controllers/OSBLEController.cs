@@ -40,19 +40,6 @@ namespace OSBLE.Controllers
 
         private CourseUser activeCourseUser = null;
 
-        [Obsolete("Use ActiveCourseUser instead")]
-        public CourseUser ActiveCourse
-        {
-            get 
-            {
-                return ActiveCourseUser; 
-            }
-            protected set
-            {
-                ActiveCourseUser = value;
-            }
-        }
-
         public CourseUser ActiveCourseUser
         {
             get
@@ -320,15 +307,15 @@ namespace OSBLE.Controllers
 
                 // Load currently selected course, as long as user is actually a member of said course.
                 // Otherwise, load first course.
-                if ((ActiveCourse = activeCoursePool.Where(cu => cu.AbstractCourseID == activeCourseID).FirstOrDefault()) == null)
+                if ((ActiveCourseUser = activeCoursePool.Where(cu => cu.AbstractCourseID == activeCourseID).FirstOrDefault()) == null)
                 {
-                    ActiveCourse = activeCoursePool.FirstOrDefault();
+                    ActiveCourseUser = activeCoursePool.FirstOrDefault();
                 }
 
-                if (ActiveCourse != null)
+                if (ActiveCourseUser != null)
                 {
-                    Cache["ActiveCourse"] = ActiveCourse.AbstractCourseID;
-                    ViewBag.ActiveCourse = ActiveCourse;
+                    Cache["ActiveCourse"] = ActiveCourseUser.AbstractCourseID;
+                    ViewBag.ActiveCourse = ActiveCourseUser;
                 }
             }
             else // User invalid. Logout.
@@ -345,7 +332,7 @@ namespace OSBLE.Controllers
 
         public void SetUnreadMessageCount()
         {
-            ViewBag.UnreadMessageCount = (int)db.Mails.Where(m => (m.ToUserProfileID == CurrentUser.ID) && (m.Read == false)).Count();
+            ViewBag.UnreadMessageCount = (int)db.Mails.Where(m => (m.ToUserProfileID == CurrentUser.ID) && (m.Read == false) && (m.DeleteFromInbox == false)).Count();
         }
 
         public static List<UserProfile> GetAllUsers(AssignmentTeam team)
@@ -569,7 +556,7 @@ namespace OSBLE.Controllers
         public void RemoveUserFromCourse(UserProfile user)
         {
             CourseUser cu =  (from c in db.CourseUsers
-                    where c.AbstractCourseID == ActiveCourse.AbstractCourseID
+                    where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID
                     && c.UserProfileID == user.ID
                     select c).FirstOrDefault();
             if (cu != null)

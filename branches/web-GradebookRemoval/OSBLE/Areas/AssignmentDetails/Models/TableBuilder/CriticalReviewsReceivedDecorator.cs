@@ -43,7 +43,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
             
                 foreach (AssignmentTeam at in assignment.AssignmentTeams)
                 {
-                    submissionFolder = FileSystem.GetTeamUserSubmissionFolderForAuthorID(false, assignment.Category.Course, assignment.ID, at, previousAssignmentTeam.Team);
+                    submissionFolder = FileSystem.GetTeamUserSubmissionFolderForAuthorID(false, assignment.Course, assignment.ID, at, previousAssignmentTeam.Team);
                     DirectoryInfo DI = new DirectoryInfo(submissionFolder);
                     if (DI.Exists)
                     {

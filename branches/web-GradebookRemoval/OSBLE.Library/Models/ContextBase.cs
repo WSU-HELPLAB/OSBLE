@@ -116,15 +116,13 @@ namespace OSBLE.Models
 
         public DbSet<DiscussionSetting> DiscussionSettings { get; set; }
 
+        public DbSet<CriticalReviewSettings> CriticalReviewSettings { get; set; }
+
         public DbSet<TeamEvaluation> TeamEvaluations { get; set; }
 
         public DbSet<TeamEvaluationComment> TeamEvaluationComments { get; set; }
 
         public DbSet<TeamEvaluationSettings> TeamEvaluationSettings { get; set; }
-
-        // Assignments
-
-        public DbSet<Score> Scores { get; set; }
 
         // DiscussionAssignments
 
@@ -239,11 +237,6 @@ namespace OSBLE.Models
                 .WithMany()
                 .WillCascadeOnDelete(false);
 
-            modelBuilder.Entity<Score>()
-                .HasRequired(s => s.Assignment)
-                .WithMany(a => a.Scores)
-                .WillCascadeOnDelete(false);
-
             //In a critical review, students will be reviewing an existing assignment.
             //Therefore, AuthorTeams are fixed while the reviewing team might still change.
             modelBuilder.Entity<ReviewTeam>()
@@ -289,6 +282,12 @@ namespace OSBLE.Models
             modelBuilder.Entity<TeamEvaluationSettings>()
                 .HasRequired(tes => tes.Assignment)
                 .WithOptional(a => a.TeamEvaluationSettings)
+                .WillCascadeOnDelete(true);
+
+
+            modelBuilder.Entity<CriticalReviewSettings>()
+                .HasRequired(crs => crs.Assignment)
+                .WithOptional(a => a.CriticalReviewSettings)
                 .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<TeamEvaluation>()

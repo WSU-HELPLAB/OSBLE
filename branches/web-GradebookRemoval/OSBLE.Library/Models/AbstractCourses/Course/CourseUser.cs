@@ -96,6 +96,8 @@ namespace OSBLE.Models.Courses
         }
 
 
+
+
         /// <summary>
         /// This is the only function that should be used to display a courseusers name (with the exception of those that use this). By default it displays the name as "LastName, FirstName" 
         /// </summary>
@@ -103,9 +105,9 @@ namespace OSBLE.Models.Courses
         /// <param name="LastThenFirst">This is an optional boolean parameter that should be sent in as true when you want names displayed in "FirstName, LastName" format.</param>
         /// <param name="AssignmentHasAnonymousPosts">This is an optional boolean parameter that should be sent in when DisplayName is used within a specific assignment scenario (to mask users if anonymous settings turned on) Simply pass in <see cref="Assignment.DiscussionSettings.HasAnonymousPosts"/></param>
         /// <returns></returns>
-        public string DisplayName(int AbstractRoleId, bool? FirstThenLast = null, bool? AssignmentHasAnonymousPosts = null)
+        public string DisplayName(int AbstractRoleId, bool? FirstThenLast = false)
         {
-            return UserProfile.DisplayName(AbstractRoleId, FirstThenLast, AssignmentHasAnonymousPosts);
+            return UserProfile.DisplayName(AbstractRoleId, FirstThenLast, false);
         }
 
         /// <summary>
@@ -115,7 +117,7 @@ namespace OSBLE.Models.Courses
         /// <param name="LastThenFirst">This is an optional boolean parameter that should be sent in as true when you want names displayed in "FirstName, LastName" format.</param>
         /// <param name="AssignmentHasAnonymousPosts">This is an optional boolean parameter that should be sent in when DisplayName is used within a specific assignment scenario (to mask users if anonymous settings turned on) Simply pass in <see cref="Assignment.DiscussionSettings.HasAnonymousPosts"/></param>
         /// <returns></returns>
-        public string DisplayNameWithRole(int AbstractRoleId, bool? FirstThenLast = null, bool? AssignmentHasAnonymousPosts = null)
+        public string DisplayNameWithRole(int AbstractRoleId, bool? FirstThenLast = false)
         {
             string roleAbbreviation = "";
             switch (AbstractRoleID)
@@ -136,7 +138,7 @@ namespace OSBLE.Models.Courses
                     roleAbbreviation = "TA";
                     break;
             }
-            return string.Format("({0}) {1}", roleAbbreviation, UserProfile.DisplayName(AbstractRoleId, FirstThenLast, AssignmentHasAnonymousPosts));
+            return string.Format("({0}) {1}", roleAbbreviation, UserProfile.DisplayName(AbstractRoleId, FirstThenLast, false));
         }
     }
 }

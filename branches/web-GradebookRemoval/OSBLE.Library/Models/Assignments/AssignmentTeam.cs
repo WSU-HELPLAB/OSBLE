@@ -38,7 +38,7 @@ namespace OSBLE.Models.Assignments
             if (renew == true || _submissionTimeAccessed == false)
             {
                 _submissionTimeAccessed = true;
-                _submissionTime = FileSystem.GetSubmissionTime(this);
+                _submissionTime = OSBLE.FileSystem.GetSubmissionTime(this);
             }
             return _submissionTime;
         }

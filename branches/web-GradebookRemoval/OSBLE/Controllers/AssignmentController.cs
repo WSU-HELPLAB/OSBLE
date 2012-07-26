@@ -28,7 +28,7 @@ namespace OSBLE.Controllers
         public ActionResult Delete(int id)
         {
             //verify that the user attempting a delete owns this course and that the id is valid
-            if (!ActiveCourse.AbstractRole.CanModify)
+            if (!ActiveCourseUser.AbstractRole.CanModify)
             {
                 return RedirectToAction("Index");
             }
@@ -64,54 +64,43 @@ namespace OSBLE.Controllers
 
             List<Assignment> Assignments = new List<Assignment>();
             //Getting the assginment list, without draft assignments.
-            Assignments = (from assignment in db.Assignments
-                           where !assignment.IsDraft &&
-                           assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID &&
-                           assignment.IsWizardAssignment
-                           orderby assignment.DueDate
-                           select assignment).ToList();
 
-            if (ActiveCourseUser.AbstractRole.CanGrade || ActiveCourseUser.AbstractRole.Anonymized)
+
+            if (ActiveCourseUser.AbstractRole.CanGrade)
             {
-                // Draft assignments (viewable by instructor only) are assignments that have not yet been published to students. Appending to list here.
-                Assignments.AddRange((from assignment in db.Assignments
-                                      where assignment.IsDraft &&
-                                      assignment.IsWizardAssignment &&
-                                      assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID
-                                      orderby assignment.ReleaseDate
-                                      select assignment).ToList());
+                //For CanGrade roles, show all assignments
+                Assignments = (from assignment in db.Assignments
+                               where assignment.CourseID == ActiveCourseUser.AbstractCourseID
+                               orderby assignment.IsDraft, assignment.DueDate
+                               select assignment).ToList();
             }
             else if (ActiveCourseUser.AbstractRole.CanSubmit)
             {
-                //MG: creating a dictionary<assignmentID, submissionTime>
-                // to be used in the view. This is only done for the students view.
+                //for CanSubmit, show all assignments except draft assignment
+                Assignments = (from assignment in db.Assignments
+                               where !assignment.IsDraft &&
+                               assignment.CourseID == ActiveCourseUser.AbstractCourseID
+                               orderby assignment.DueDate
+                               select assignment).ToList();
 
-                //This will hold the assignment ID, the date submitted in string format:, the grade in string format, and the team ID
-                //submission time
-                //score as string (or "No Grade" if there is not one)
-                //assignmentTeam for that submission
-                Dictionary<int, Tuple<string, string, AssignmentTeam>> submissionInfo = new Dictionary<int, Tuple<string, string, AssignmentTeam>>();
+                
+
+                //This Dictionary contains:
+                    //Key: AssignmentID
+                    //Value: submissionTime (as string)
+                Dictionary<int, string> submissionInfo = new Dictionary<int,string>();
+                
                 foreach (Assignment a in Assignments)
                 {
-                    //populating tuple to add to dictionary by collecting the information described in the above commentblock.
                     AssignmentTeam at = GetAssignmentTeam(a, ActiveCourseUser);
                     DateTime? subTime = FileSystem.GetSubmissionTime(at);
                     string submissionTime = "No Submission";
-                    string scoreString = "No Grade";
                     if (subTime != null) //found a submission time, Reassign submissionTime
                     {
                         submissionTime = subTime.Value.ToString();
                     }
 
-                    //Finding score match based off UserPrfileID rather than courseUserID to avoid grabbing another team members grade (as they are potentially different)
-                    var score = (from assScore in a.Scores
-                                 where assScore.CourseUser.UserProfileID == CurrentUser.ID
-                                 select assScore).FirstOrDefault();
-                    if (score != null) //found matching score. Reassign scoreString
-                    {
-                        scoreString = (score as Score).getGradeAsPercent(a.PointsPossible);
-                    }
-                    submissionInfo.Add(a.ID, new Tuple<string, string, AssignmentTeam>(submissionTime, scoreString, at));
+                    submissionInfo.Add(a.ID, submissionTime);
                 }
 
                 //Gathering the Team Evaluations for the current user's teams.
@@ -123,27 +112,58 @@ namespace OSBLE.Controllers
                 ViewBag.CourseUser = ActiveCourseUser;
                 ViewBag.SubmissionInfoDictionary = submissionInfo;
             }
+            else if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
+            {
+                //for moderators, grab only discussion/Critical review assignment types that they are to partcipate in
+                var discussionBasedAssignment = (from assignment in db.Assignments
+                               where !assignment.IsDraft &&
+                               assignment.CourseID == ActiveCourseUser.AbstractCourseID &&
+                               (assignment.AssignmentTypeID == (int)AssignmentTypes.CriticalReviewDiscussion ||
+                               assignment.AssignmentTypeID == (int)AssignmentTypes.DiscussionAssignment)
+                               orderby assignment.DueDate
+                               select assignment).ToList();
+
+                //going through all the discussion assignment's discussion teams looking for a team member who is the current user.
+                foreach (Assignment assignment in discussionBasedAssignment)
+                {
+                    bool addedAssignment = false;
+                    foreach (DiscussionTeam dt in assignment.DiscussionTeams)
+                    {
+                        if (addedAssignment) //if the assignment has already been added, then break out of this foreach and go back to assignment foreach.
+                        {
+                            break;
+                        }
+                        foreach (TeamMember tm in dt.GetAllTeamMembers())
+                        {
+                            if (tm.CourseUserID == ActiveCourseUser.ID)
+                            {
+                                Assignments.Add(assignment);
+                                addedAssignment = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+
+            }
 
             ViewBag.PastCount = (from a in Assignments
                                  where a.DueDate < DateTime.Now &&
-                                 !a.IsDraft &&
-                                 a.IsWizardAssignment
+                                 !a.IsDraft
                                  select a).Count();
             ViewBag.PresentCount = (from a in Assignments
                                     where a.ReleaseDate < DateTime.Now &&
                                     a.DueDate > DateTime.Now &&
-                                    !a.IsDraft &&
-                                    a.IsWizardAssignment
+                                    !a.IsDraft
                                     select a).Count();
             ViewBag.FutureCount = (from a in Assignments
                                    where a.DueDate >= DateTime.Now &&
                                    a.ReleaseDate >= DateTime.Now &&
-                                   !a.IsDraft &&
-                                   a.IsWizardAssignment
+                                   !a.IsDraft
                                    select a).Count();
             ViewBag.DraftCount = (from a in Assignments
-                                  where a.IsDraft &&
-                                  a.IsWizardAssignment
+                                  where a.IsDraft
                                   select a).Count();
             ViewBag.Assignments = Assignments;
             ViewBag.CurrentDate = DateTime.Now;
@@ -162,7 +182,7 @@ namespace OSBLE.Controllers
             Assignment assignment = db.Assignments.Find(assignmentID);
 
             //Confirm assignment belongs to the current users course before proceeding
-            if (assignment.Category.CourseID == ActiveCourseUser.AbstractCourse.ID) 
+            if (assignment.CourseID == ActiveCourseUser.AbstractCourse.ID) 
             {
                 Assignment.ToggleDraft(assignmentID, ActiveCourseUser.ID);
             }
@@ -170,84 +190,31 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// Takes any grade that is currently saved as a draft for the specified assignment and
-        /// publishes the grade to the students.
+        /// This function will publish all the non-student-evaluated rubrics for the given assignment, and return the user to their original page.
         /// </summary>
         /// <param name="assignmentId"></param>
-        [CanModifyCourse]
-        public void PublishAllGrades(int assignmentId)
+        [CanGradeCourse]
+        public ActionResult PublishAllRubrics(int assignmentId)
         {
             if (assignmentId > 0)
             {
                 Assignment assignment = db.Assignments.Find(assignmentId);
 
-                //Getting the list of evaluations that have been saved as draft
+                //Getting the list of evaluations that have been saved as draft from a "CanGrade" role, to avoid grabbing student-evaluated rubrics.
                 List<RubricEvaluation> evaluations = (from e in db.RubricEvaluations
                                                       where e.AssignmentID == assignment.ID &&
-                                                      e.IsPublished == false
+                                                      e.IsPublished == false &&
+                                                      e.Evaluator.AbstractRole.CanGrade
                                                       select e).ToList();
 
                 foreach (RubricEvaluation re in evaluations)
                 {
                     re.IsPublished = true;
-
                     (new NotificationController()).SendRubricEvaluationCompletedNotification(assignment, re.Recipient);
-                    GradebookController gradebook = new GradebookController();
-
-                    //figure out the normalized final score.
-                    double maxLevelScore = (from c in assignment.Rubric.Levels
-                                            select c.RangeEnd).Sum();
-                    double totalRubricPoints = (from c in assignment.Rubric.Criteria
-                                                select c.Weight).Sum();
-                    double studentScore = 0.0;
-
-                    foreach (CriterionEvaluation critEval in re.CriterionEvaluations)
-                    {
-                        studentScore += (double)critEval.Score / maxLevelScore * (critEval.Criterion.Weight / totalRubricPoints);
-                    }
-
-                    //normalize the score with the abstract assignment score
-                    studentScore *= re.Assignment.PointsPossible;
-
-                    gradebook.ModifyTeamGrade(studentScore, assignment.ID, re.Recipient.ID);
                 }
                 db.SaveChanges();
             }
-        }
-
-        /// <summary>
-        /// Modifies a students custom late penalty. If scoreId == 0, we are assuming there is no score
-        /// for the student.
-        /// </summary>
-        /// <param name="assignmentId"></param>
-        [CanModifyCourse]
-        public void ModifyLatePenalty(int scoreId, int courseUserId, double latePenalty, int assignmentId)
-        {
-            if (scoreId > 0)
-            {
-                Score score = db.Scores.Find(scoreId);
-                score.CustomLatePenaltyPercent = latePenalty;
-                db.SaveChanges();
-                new GradebookController().ModifyGrade(score.RawPoints, courseUserId, score.AssignmentID);
-            }
-            else if (scoreId == 0)
-            {
-                new GradebookController().ModifyGrade(-1, courseUserId, assignmentId);
-                Score score = (from s in db.Scores
-                               where s.CourseUser.ID == courseUserId &&
-                               s.AssignmentID == assignmentId
-                               select s).FirstOrDefault();
-
-                if (score != null)
-                {
-                    score.CustomLatePenaltyPercent = latePenalty;
-                    db.SaveChanges();
-                }
-            }
-            else
-            {
-                //If we got here there was a mistake, don't do anything
-            }
+            return Redirect(Request.UrlReferrer.ToString());
         }
 
 
@@ -261,15 +228,16 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         public ActionResult TeacherTeamEvaluation(int precedingTeamId, int TeamEvaluationAssignmentId)
         {
+            //For the code below, order is important. The order is UserProfile.LastName, thenby UserProfile.Firstname
+
             Assignment assignment = db.Assignments.Find(TeamEvaluationAssignmentId);
             Team precTeam = db.Teams.Find(precedingTeamId);
 
             var cuIDs = (from tm in precTeam.TeamMembers
                          select tm.CourseUserID).ToList();
-            var query = db.TeamEvaluations.Where(te => cuIDs.Contains(te.RecipientID) && te.TeamEvaluationAssignmentID == assignment.ID);
+
             List<TeamEvaluation> OurTeamEvals = db.TeamEvaluations.Where(te => cuIDs.Contains(te.RecipientID) && te.TeamEvaluationAssignmentID == assignment.ID).ToList();
             List<double> MultipliersInOrder = new List<double>();
-            List<Score> ScoresInOrder = new List<Score>();
             List<CourseUser> CourseUsersInOrder = (from tm in precTeam.TeamMembers
                                                    orderby tm.CourseUser.UserProfile.LastName, tm.CourseUser.UserProfile.FirstName
                                                    select tm.CourseUser).ToList();
@@ -286,18 +254,8 @@ namespace OSBLE.Controllers
                                  where te.EvaluatorID == cu.ID
                                  select te).ToList().OrderBy(te => te.Recipient.UserProfile.LastName).ThenBy(te => te.Recipient.UserProfile.FirstName).ToList();
 
-                Score myScore = (from s in assignment.PreceedingAssignment.Scores
-                                 where s.CourseUserID == cu.ID
-                                 select s).FirstOrDefault();
-                ScoresInOrder.Add(myScore);
-
-                //Adding Multiplier. Use Score's multiplier if its value is non-null. Otherwise, calculate the multiplier from the evals. If there are no
-                //evaluations, then their multiplier is 1.
-                if (myScore != null && myScore.Multiplier != null)
-                {
-                    MultipliersInOrder.Add((double)myScore.Multiplier);
-                }
-                else if (OurTeamEvals.Count > 0) //Only calculate multiplier if there are evaluations
+                //If there are evaluations then calculate multipler from them, otherwise they get a default multiplier of 1.0
+                if (OurTeamEvals.Count > 0) //Only calculate multiplier if there are evaluations
                 {
                     double myPoints = (from te in OurTeamEvals
                                        where te.RecipientID == cu.ID
@@ -331,7 +289,6 @@ namespace OSBLE.Controllers
                 i++;
             }
 
-            ViewBag.ScoresInOrder = ScoresInOrder;
             ViewBag.CourseUsersInOrder = CourseUsersInOrder;
             ViewBag.MultipliersInOrder = MultipliersInOrder;
             ViewBag.Table = table;
@@ -360,7 +317,7 @@ namespace OSBLE.Controllers
                 List<TeamEvaluation> teamEvals = (from te in db.TeamEvaluations
                                            where
                                                te.TeamEvaluationAssignmentID == assignmentId &&
-                                               te.EvaluatorID == ActiveCourse.ID
+                                               te.EvaluatorID == ActiveCourseUser.ID
                                            orderby te.Recipient.UserProfile.LastName
                                            select te).ToList();
                 //MG: evaluator (currentuser) must have completed at as many evaluations as team members from the previous assignment. 
@@ -446,7 +403,7 @@ namespace OSBLE.Controllers
                     TeamEvaluation newTE = new TeamEvaluation();
                     newTE.TeamEvaluationAssignmentID = assignmentId;
                     newTE.AssignmentUnderReviewID = (int)assignment.PrecededingAssignmentID;
-                    newTE.EvaluatorID = ActiveCourse.ID;
+                    newTE.EvaluatorID = ActiveCourseUser.ID;
                     newTE.RecipientID = tm.CourseUserID;
                     newTE.Points = paramPoints;
                     newTE.CommentID = tec.ID;
@@ -463,139 +420,6 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index");
         }
 
-        [CanModifyCourse]
-        private void PublishTeamMultiplierHelper(int precedingAssignmentTeamID, int assignmentId)
-        {
-            //MG: publishTeamMultipliers - Handles scores for the assignment and the previous assignment.
-            //The following steps need to be run for each user in the team
-            //Step 0: Score for previous assignment. Pull it, if it does not exist, create it with points == -1. 
-            //Step 1: Find multiplier. First try grabbing the scores multiplier, if its non-null use that. If it is null,
-            //calculate the multiplier using team evaluations. If there are NO team evaluations for the whole team - use 1 as the multiplier. Save Multiplier into score and do a DB save
-            //Step 2: Once the multiplier has been applied to the score - recalculate the grade using GBC.ModifyGrade(rawpoints,yada,yada). 
-            //In order for ModifyGrade to use the multiplier, set Published to true for the score. Additionally, set PublishDate at this point.
-            //Step 3: Now that the previous assignment grades are updated, scores must be created/updated for the Team Evaluation assignment
-            //Start by pulling the score for the user. If it does not exist, create it. Users will get 0 points if they did 0 evals. Otherwise, full points.
-
-            Team precTeam = db.Teams.Find(precedingAssignmentTeamID);
-            Assignment assignment = db.Assignments.Find(assignmentId);
-
-            List<int> cuIDs = (from tm in precTeam.TeamMembers
-                         select tm.CourseUserID).ToList();  
-            List<TeamEvaluation> OurTeamEvals = db.TeamEvaluations.Where(te => cuIDs.Contains(te.RecipientID) 
-                && te.TeamEvaluationAssignmentID == assignment.ID).ToList();
-            GradebookController GBC =  new GradebookController();
-
-            foreach (TeamMember tm in precTeam.TeamMembers)
-            {
-                //Step 0
-                Score prevAssignScore = (from s in assignment.PreceedingAssignment.Scores
-                                         where s.CourseUserID == tm.CourseUserID
-                                         select s).FirstOrDefault();
-
-                if (prevAssignScore == null)
-                {
-                    prevAssignScore = new Score()
-                    {
-                        CourseUserID = tm.CourseUserID,
-                        AssignmentID = assignment.PreceedingAssignment.ID,
-                        Published = false,
-                        AddedPoints = assignment.PreceedingAssignment.addedPoints,
-                        Points = -1,
-                        TeamID = precTeam.ID
-                    };
-                    db.Scores.Add(prevAssignScore);
-                }
-
-                //Step 1
-                if (prevAssignScore.Multiplier == null)
-                {
-                    double multiplier = 1.0;
-                    if (OurTeamEvals.Count > 0)
-                    {
-                        //Score.Multiplier wasn't set up, and there are more than 0 team evals, so calculate multiplier.
-                        double myEvalPoints = (from e in OurTeamEvals
-                                               where e.RecipientID == tm.CourseUserID
-                                               select e.Points).Sum();
-
-                        multiplier = myEvalPoints / ((OurTeamEvals.Count / precTeam.TeamMembers.Count) * 100);
-                    }
-                    prevAssignScore.Multiplier = multiplier;
-                    db.SaveChanges();
-                }
-
-                //Step 2
-                prevAssignScore.Published = true;
-                prevAssignScore.PublishedDate = DateTime.Now;
-                if(prevAssignScore.RawPoints > 0) //Only recalculating grade if they have raw points.
-                {
-                    GBC.ModifyGrade(prevAssignScore.RawPoints, tm.CourseUserID, (int)assignment.PrecededingAssignmentID);
-                }
-                
-                //Step 3
-                Score currentAssignScore = (from s in assignment.Scores
-                                            where s.CourseUserID == tm.CourseUserID
-                                            select s).FirstOrDefault();
-
-                int myCompletedEvalsCount = (from e in OurTeamEvals
-                                             where e.EvaluatorID == tm.CourseUserID
-                                             select e).Count();
-
-                double myPoints = 0.0;
-                if(myCompletedEvalsCount > 0)
-                {
-                    myPoints = assignment.PointsPossible;
-                }
-
-
-                if (currentAssignScore != null)
-                {
-                    currentAssignScore.RawPoints = myPoints;
-                }
-                else
-                {
-                    int teamId = (from at in assignment.AssignmentTeams
-                                  where at.Team.TeamMembers.FirstOrDefault().CourseUserID == tm.CourseUserID
-                                  select at.TeamID).FirstOrDefault();
-
-                    currentAssignScore = new Score()
-                    {
-                        AddedPoints = assignment.addedPoints,
-                        AssignmentID = assignment.ID,
-                        CourseUserID = tm.CourseUserID,
-                        RawPoints = myPoints,
-                        TeamID = teamId
-                    };
-                    db.Scores.Add(currentAssignScore);
-                }
-                db.SaveChanges();
-                GBC.ModifyGrade(currentAssignScore.RawPoints, tm.CourseUserID, assignment.ID);
-            }
-        }
-
-        /// <summary>
-        /// This function publishes the Team Evaluation multipliers to the preceding assignment, as well as creates grades for the team evaluation assignment
-        /// </summary>
-        /// <param name="precedingAssignmentTeamID"> the teamId for the preceding assignment (NOT the Team Evaluation assignment) </param>
-        /// <param name="assignmentId">the assignment Id for the Team Evaluation assignment. </param>
-        /// <returns></returns>
-        [CanModifyCourse]
-        public ActionResult PublishTeamMultiplier(int precedingAssignmentTeamID, int assignmentId)
-        {
-            //MG: PublishTeamMultiplier
-            //Step 0: publishTeamMultiplier
-            //Step 1: Redirect to original location. 
-            PublishTeamMultiplierHelper(precedingAssignmentTeamID, assignmentId);
-
-            return RedirectToAction("AssignmentDetails", new { id = assignmentId });
-        }
-
-        [CanModifyCourse]
-        [Obsolete]
-        public void PublishAllMultipliers(int assignmentId)
-        {
-        }
-
-
         /// <summary>
         /// This function will publish all the critical reviews for a critical review assignment. Allowing students to download their evaluated 
         /// documents.
@@ -609,37 +433,6 @@ namespace OSBLE.Controllers
             assignment.CriticalReviewPublishDate = DateTime.Now;
             db.SaveChanges();
             return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentID });
-        }
-
-
-        /// <summary>
-        /// Returns true if it successfully modifies the user's score's value.
-        /// </summary>
-        /// <param name="teamId"></param>
-        /// <param name="cuID"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        [CanModifyCourse]
-        public bool ModifyMultiplier(int teamId, int cuID, double? value)
-        {
-            bool returnVal = false;
-            if (teamId > 0 && cuID > 0 && (value > 0 || value == null))
-            {
-                Score usersScore = (from s in db.Scores
-                                    where s.TeamID == teamId &&
-                                    s.CourseUserID == cuID
-                                    select s).FirstOrDefault();
-
-                if (usersScore != null)
-                {
-                    usersScore.Multiplier = value;
-                    db.SaveChanges();
-                    GradebookController GBC = new GradebookController();
-                    GBC.ModifyGrade(usersScore.RawPoints, cuID, usersScore.AssignmentID);
-                    returnVal = true;
-                }
-            }
-            return returnVal;
         }
     }
 }

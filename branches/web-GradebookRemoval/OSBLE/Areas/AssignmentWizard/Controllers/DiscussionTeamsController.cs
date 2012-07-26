@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
+using OSBLE.Models.DiscussionAssignment;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -56,23 +57,35 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             //Grabbing a list of moderators (and potentially TAs) that will be used to
             //allow instructors to assign to Moderators/TAs to discussion teams
-            if (Assignment.DiscussionSettings != null && Assignment.DiscussionSettings.TAsCanPostToAll)
+            List<CourseUser> Moderators;
+            if (Assignment.DiscussionSettings != null && Assignment.DiscussionSettings.TAsCanPostToAllDiscussions)
             {
-                ViewBag.Moderators = (from cu in db.CourseUsers
+                Moderators = (from cu in db.CourseUsers
                                       where cu.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator
                                       && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
                                       orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
                                       select cu).ToList();
+                ViewBag.ModeratorListTitle = "Moderators";
             }
             else
             {
-                ViewBag.Moderators = (from cu in db.CourseUsers
+                Moderators = (from cu in db.CourseUsers
                                       where (cu.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator
                                       || cu.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
                                       && cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
                                       orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
                                       select cu).ToList();
+                ViewBag.ModeratorListTitle = "Moderators/TAs";
             }
+            ViewBag.Moderators = Moderators;
+
+            //Setting up css for displaying moderators
+            ViewBag.DisplayModeratorList = "inline";
+            if (Moderators.Count == 0)
+            {
+                ViewBag.DisplayModeratorList = "none";
+            }
+
         }
 
         public override ActionResult Index()
@@ -80,7 +93,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             base.Index();
             SetUpViewBag(Assignment.DiscussionTeams.Cast<IAssignmentTeam>().ToList());
             SetUpModeratorViewBag();
-
             return View(Assignment);
         }
 
@@ -235,8 +247,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
             else
             {
-                //clear out old teams.  AC: Not sure why EF isn't handling this automaticaly
+                //clear out old posts and then old teams.  AC: Not sure why EF isn't handling this automaticaly
                 DiscussionTeam[] oldTeams = Assignment.DiscussionTeams.ToArray();
+
                 for (int i = 0; i < oldTeams.Length; i++)
                 {
                     db.Entry(oldTeams[i]).State = System.Data.EntityState.Deleted;

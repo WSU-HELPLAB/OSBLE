@@ -87,12 +87,12 @@
     <Compile Include="Models\Assignments\CommentCategory.cs" />
     <Compile Include="Models\Assignments\CommentCategoryConfiguration.cs" />
     <Compile Include="Models\Assignments\CommentCategoryOption.cs" />
+    <Compile Include="Models\Assignments\CriticalReviewSettings.cs" />
     <Compile Include="Models\Assignments\Deliverable.cs" />
     <Compile Include="Models\Assignments\DiscussionSettings.cs" />
     <Compile Include="Models\Assignments\DiscussionTeam.cs" />
     <Compile Include="Models\Assignments\IAssignmentTeam.cs" />
     <Compile Include="Models\Assignments\ReviewTeam.cs" />
-    <Compile Include="Models\Assignments\Score.cs" />
     <Compile Include="Models\Assignments\Team.cs" />
     <Compile Include="Models\Assignments\TeamEvaluation.cs" />
     <Compile Include="Models\Assignments\TeamEvaluationComment.cs" />
@@ -100,6 +100,16 @@
     <Compile Include="Models\Assignments\TeamMember.cs" />
     <Compile Include="Models\ContextBase.cs" />
     <Compile Include="Models\DiscussionAssignment\DiscussionPost.cs" />
+    <Compile Include="Models\FileSystem\AssignmentFilePath.cs" />
+    <Compile Include="Models\FileSystem\CourseFilePath.cs" />
+    <Compile Include="Models\FileSystem\EmptyFilePathDecorator.cs" />
+    <Compile Include="Models\FileSystem\FileCollection.cs" />
+    <Compile Include="Models\FileSystem\FileSystemBase.cs" />
+    <Compile Include="Models\FileSystem\FileSystem.cs" />
+    <Compile Include="Models\FileSystem\IFileSystem.cs" />
+    <Compile Include="Models\FileSystem\ReviewFilePath.cs" />
+    <Compile Include="Models\FileSystem\SubmissionFilePath.cs" />
+    <Compile Include="Models\FileSystem\UserFilePath.cs" />
     <Compile Include="Models\HomePage\AbstractDashboard.cs" />
     <Compile Include="Models\HomePage\DashboardPost.cs" />
     <Compile Include="Models\HomePage\DashboardReply.cs" />
@@ -117,13 +127,12 @@
     <Compile Include="Models\ToolTips.cs" />
     <Compile Include="Models\Users\Mail.cs" />
     <Compile Include="Models\Users\UserProfile.cs" />
-    <Compile Include="Models\ViewModels\AssignmentDetailsViewModel.cs" />
+    <Compile Include="Models\ViewModels\DiscussionViewModel.cs" />
     <Compile Include="Models\ViewModels\ReviewInterfaceModels.cs" />
     <Compile Include="Models\ViewModels\RubricViewModel.cs" />
     <Compile Include="Models\ViewModels\SerializableTeamMembers.cs" />
     <Compile Include="Models\ViewModels\StudioAssignmentViewModel.cs" />
     <Compile Include="Models\ViewModels\TeamCreationViewModel.cs" />
-    <Compile Include="Models\ViewModels\TeamEvaluationViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

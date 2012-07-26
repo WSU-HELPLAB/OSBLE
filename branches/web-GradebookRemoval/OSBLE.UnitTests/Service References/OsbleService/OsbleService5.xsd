@@ -13,6 +13,7 @@
   <xs:element name="ArrayOfAssignment" nillable="true" type="tns:ArrayOfAssignment" />
   <xs:complexType name="Assignment">
     <xs:sequence>
+      <xs:element minOccurs="0" name="AddedPoints" type="xs:double" />
       <xs:element minOccurs="0" name="AssignmentDescription" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="AssignmentName" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="AssignmentTeams" nillable="true" type="tns:ArrayOfAssignmentTeam" />
@@ -27,6 +28,7 @@
       <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" minOccurs="0" name="Course" nillable="true" type="q3:Course" />
       <xs:element minOccurs="0" name="CourseID" nillable="true" type="xs:int" />
       <xs:element minOccurs="0" name="CriticalReviewPublishDate" nillable="true" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="CriticalReviewSettings" nillable="true" type="tns:CriticalReviewSettings" />
       <xs:element minOccurs="0" name="DeductionPerUnit" type="xs:double" />
       <xs:element minOccurs="0" name="Deliverables" nillable="true" type="tns:ArrayOfDeliverable" />
       <xs:element minOccurs="0" name="DiscussionSettings" nillable="true" type="tns:DiscussionSetting" />
@@ -49,7 +51,6 @@
       <xs:element minOccurs="0" name="Scores" nillable="true" type="tns:ArrayOfScore" />
       <xs:element minOccurs="0" name="TeamEvaluationSettings" nillable="true" type="tns:TeamEvaluationSettings" />
       <xs:element minOccurs="0" name="Type" type="tns:AssignmentTypes" />
-      <xs:element minOccurs="0" name="addedPoints" type="xs:double" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Assignment" nillable="true" type="tns:Assignment" />
@@ -165,6 +166,17 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="CommentCategoryOption" nillable="true" type="tns:CommentCategoryOption" />
+  <xs:complexType name="CriticalReviewSettings">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AllowReviewersToDownload" type="xs:boolean" />
+      <xs:element minOccurs="0" name="AnonymizeAuthorToReviewer" type="xs:boolean" />
+      <xs:element minOccurs="0" name="AnonymizeReviewerToAuthor" type="xs:boolean" />
+      <xs:element minOccurs="0" name="AnonymizeReviewerToReviewers" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
+      <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CriticalReviewSettings" nillable="true" type="tns:CriticalReviewSettings" />
   <xs:complexType name="ArrayOfDeliverable">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="Deliverable" nillable="true" type="tns:Deliverable" />
@@ -203,12 +215,16 @@
       <xs:element minOccurs="0" name="AnonymitySettings" type="xs:unsignedByte" />
       <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
       <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
-      <xs:element minOccurs="0" name="HasAnonymousPosts" type="xs:boolean" />
-      <xs:element minOccurs="0" name="HasAnonymousRoles" type="xs:boolean" />
+      <xs:element minOccurs="0" name="HasAnonymousInstructorsToStudents" type="xs:boolean" />
+      <xs:element minOccurs="0" name="HasAnonymousModeratorsToStudents" type="xs:boolean" />
+      <xs:element minOccurs="0" name="HasAnonymousStudentsToModerators" type="xs:boolean" />
+      <xs:element minOccurs="0" name="HasAnonymousStudentsToStudents" type="xs:boolean" />
+      <xs:element minOccurs="0" name="HasHiddenRoles" type="xs:boolean" />
       <xs:element minOccurs="0" name="InitialPostDueDate" type="xs:dateTime" />
       <xs:element minOccurs="0" name="InitialPostDueDueTime" type="xs:dateTime" />
       <xs:element minOccurs="0" name="MinimumFirstPostLength" type="xs:int" />
       <xs:element minOccurs="0" name="RequiresPostBeforeView" type="xs:boolean" />
+      <xs:element minOccurs="0" name="TAsCanPostToAllDiscussions" type="xs:boolean" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="DiscussionSetting" nillable="true" type="tns:DiscussionSetting" />

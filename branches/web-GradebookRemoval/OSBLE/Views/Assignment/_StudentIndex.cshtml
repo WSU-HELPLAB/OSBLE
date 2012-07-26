@@ -1,14 +1,11 @@
 ﻿@using OSBLE.Models
 @using OSBLE.Models.Assignments
 <table class="assignTable" cellspacing="0">
-    <th style="font-size: larger">
+    <th style="font-size: larger; padding-right:20px;">
         Assignment
     </th>
     <th style="font-size: larger">
         Due Date
-    </th>
-    <th style="font-size: larger">
-        Grade
     </th>
     <th style="font-size: larger">
         Latest Submission
@@ -81,31 +78,19 @@
             </td>
             <td>@assignment.DueDate.ToShortDateString() @assignment.DueDate.ToShortTimeString()
             </td>
-            <td>
-                <!--Td for grade-->
-                @if (futureFlag)
-                {
-                    /*show nothing if future assignment*/
-                }
-                else if (assignment.HasRubric && ViewBag.SubmissionInfoDictionary[assignment.ID].Item2 != "No Grade")
-                {
-                    string gradeToDisplay = ViewBag.SubmissionInfoDictionary[assignment.ID].Item2;
-                    @Html.ActionLink(gradeToDisplay, "View", "Rubric", new { assignmentId = assignment.ID, cuId = ViewBag.CourseUser.ID }, new { });
-                }
-                else
-                {
-                    @ViewBag.SubmissionInfoDictionary[assignment.ID].Item2
-                }
-            </td>
-            @*if a student, allow to view last submission*@
+            @*TD for submission. If its a future assignment, display nothing.
+                                 If the assignment has deliverables
+                                    If thhe submission has already been receieved, display submission time and allow resubmit
+                                    else allow inital submission
+                                 If its a Team Evaluation, give them a link for team evaluation
+                                 *@
             @if (futureFlag)
             {
                 <td>
                 </td>
             }
-            else if (ViewBag.SubmissionInfoDictionary[assignment.ID].Item1 != "No Submission" && assignment.HasDeliverables)
+            else if (assignment.HasDeliverables)
             {
-                String display = ViewBag.SubmissionInfoDictionary[assignment.ID].Item1;
                 AjaxOptions options = new AjaxOptions()
                 {
                     LoadingElementId = "Loading",
@@ -113,69 +98,51 @@
                     UpdateTargetId = "submitFiles",
                     OnComplete = "SubmissionLoaded"
                 };
-                <td>
-                    <ul id="SubmissionItems">
-                        <li>
-                            @(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
-                        </li>
-                        <li>
-                            @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = assignment.ID }, options, new object())
-                        </li>
-                        @if (ViewBag.SubmissionReceived && assignment.ID == ViewBag.SubmissionReceivedAssignmentID)
-                        {
-                            <li id="SubmissionReceivedText">Submission received</li>   
-                        }
-                    </ul>
-
-                    @*
-                    <!--TD for displaying latest submission and resubmit-->
-                    @(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
-                    @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = assignment.ID }, options, new object())
-                    @if (assignment.ID == ViewBag.SubmissionReceivedAssignmentID)
-                    {
-                        
-                    }
-                    *@
-                </td>
-            }
-            else if (assignment.HasDeliverables || assignment.AssignmentTypeID == 4)
-            {
-                if (assignment.AssignmentTypeID == 4)
-                {
-                    bool found = false;
-                    foreach (TeamEvaluation te in teamEvals)
-                    {
-                        if (te.TeamEvaluationAssignmentID == assignment.ID)
-                        {
-                            found = true;
-                <td>
-                    @Html.ActionLink("View/Edit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignment.ID }, new { })
-                </td>
-                            break;
-                        }
-
-                    }
-                    if (found == false)
-                    {
-                <td>
-                    @Html.ActionLink("Submit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignment.ID }, new { })
-                </td>
-                    }
+                if (ViewBag.SubmissionInfoDictionary[assignment.ID] != "No Submission")
+                {  
+                    <!--td for resubmit-->
+                    String display = ViewBag.SubmissionInfoDictionary[assignment.ID];
+                    <td>
+                        <ul id="SubmissionItems">
+                            <li>
+                                @(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
+                            </li>
+                            <li>
+                                @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = assignment.ID }, options, new object())
+                            </li>
+                            @if (ViewBag.SubmissionReceived && assignment.ID == ViewBag.SubmissionReceivedAssignmentID)
+                            {
+                                <li id="SubmissionReceivedText">Submission received</li>   
+                            }
+                        </ul>
+                    </td>
                 }
                 else
                 {
-                    AjaxOptions options = new AjaxOptions()
-                    {
-                        LoadingElementId = "Loading",
-                        HttpMethod = "Get",
-                        UpdateTargetId = "submitFiles",
-                        OnComplete = "SubmissionLoaded"
-                    };
-                <!--TD for first submission-->
-                <td>
-                    None.
-                    @Ajax.ActionLink("Submit Here", "Create", "Submission", new { id = assignment.ID }, options, new object())
-                </td>
+                    <!--TD for first submission-->
+                    <td>
+                        None.
+                        @Ajax.ActionLink("Submit Here", "Create", "Submission", new { id = assignment.ID }, options, new object())
+                    </td>
+                }
+            }
+            else if (assignment.AssignmentTypeID == 4)
+            {
+                bool found = (from te in teamEvals
+                               where te.TeamEvaluationAssignmentID == assignment.ID
+                               select te).Count() > 0;
+                    
+                if (found == false)
+                {
+                    <td>
+                        @Html.ActionLink("Submit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignment.ID }, new { })
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        @Html.ActionLink("View/Edit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignment.ID }, new { })
+                    </td>
                 }
             }
             else

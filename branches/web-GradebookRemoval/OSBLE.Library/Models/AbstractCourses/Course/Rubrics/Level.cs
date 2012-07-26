@@ -19,10 +19,7 @@ namespace OSBLE.Models.Courses.Rubrics
         public virtual Rubric Rubric { get; set; }
 
         [Required]
-        public int RangeStart { get; set; }
-
-        [Required]
-        public int RangeEnd { get; set; }
+        public int PointSpread { get; set; }
 
         [Required]
         public string LevelTitle { get; set; }
@@ -30,7 +27,7 @@ namespace OSBLE.Models.Courses.Rubrics
         public Level()
             : base()
         {
-            RangeStart = 0;
+            PointSpread = 5;
         }
 
     }

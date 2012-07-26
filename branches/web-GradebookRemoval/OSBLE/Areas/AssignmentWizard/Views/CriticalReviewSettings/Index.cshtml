@@ -1,0 +1,46 @@
+﻿@using OSBLE.Models.Assignments;
+@using OSBLE.Models;
+@model CriticalReviewSettings
+@section Header
+{
+
+}
+@Html.HiddenFor(m => m.AssignmentID)
+<script type="text/javascript">
+    function handleAllowReviewersToDownloadCB(incValue) {
+        if (incValue.checked) {
+            $("#AnonymizeReviewersCB").removeAttr('disabled');
+        }
+        else {
+            $("#AnonymizeReviewersCB").attr("disabled", "disabled");
+            $("#AnonymizeReviewersCB").removeAttr("checked");
+        }
+    }
+    
+
+</script>
+<table class="wizard_entry_table">
+    <tr>
+        <th>@Html.LabelFor(m => m.AllowReviewersToDownload)</th>
+        <td>@Html.CheckBoxFor(m => m.AllowReviewersToDownload, new { id = "DownloadCB",  onclick = "handleAllowReviewersToDownloadCB(this)" })</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.AnonymizeAuthorToReviewer)</th>
+        <td>@Html.CheckBoxFor(m => m.AnonymizeAuthorToReviewer)</td>
+    </tr>
+    <tr>
+        <th>@Html.LabelFor(m => m.AnonymizeReviewerToAuthor)</th>
+        <td>@Html.CheckBoxFor(m => m.AnonymizeReviewerToAuthor)</td>
+    </tr>
+    <tr>
+        <th >@Html.LabelFor(m => m.AnonymizeReviewerToReviewers)</th>
+    @if(Model.AllowReviewersToDownload)
+    {
+        <td>@Html.CheckBoxFor(m => m.AnonymizeReviewerToReviewers, new { id = "AnonymizeReviewersCB" })</td>
+    }
+    else
+    {
+        <td>@Html.CheckBoxFor(m => m.AnonymizeReviewerToReviewers, new { id = "AnonymizeReviewersCB", disabled="disabled" })</td>
+    }
+    </tr>
+</table>

@@ -38,5 +38,22 @@ namespace OSBLE.Models.Assignments
         [Display(Name="Notify instructor if evaluation is more/less than the following amount")]
         [Required(AllowEmptyStrings = true, ErrorMessage = "Please enter a notification amount (use 0 if not necessary).")]
         public int DiscrepancyCheckSize { get; set; }
+
+        public TeamEvaluationSettings()
+        {
+        }
+
+        public TeamEvaluationSettings(TeamEvaluationSettings other)
+            : this()
+        {
+            if (other == null)
+            {
+                return;
+            }
+            this.AssignmentID = other.AssignmentID;
+            this.DiscrepancyCheckSize = other.DiscrepancyCheckSize;
+            this.MaximumMultiplier = other.MaximumMultiplier;
+            this.RequiredCommentLength = other.RequiredCommentLength;
+        }
     }
 }

@@ -9,6 +9,8 @@ using OSBLE.Models.Users;
 using OSBLE.Models.Courses;
 using OSBLE.Models.Assignments;
 using OSBLE.Models;
+using Ionic.Zip;
+using System.IO;
 
 namespace OSBLE.UnitTests
 {
@@ -73,6 +75,82 @@ namespace OSBLE.UnitTests
                 int assignmentCount = (courseUser.AbstractCourse as Course).Assignments.Count;
                 Assert.AreEqual(assignmentCount, serviceAssignments.Length);
             }
+        }
+
+        [TestMethod]
+        public void OsbleService_GetAssignmentSubmissionTest()
+        {
+            //AC Note: This requires OSBLE to be set up properly
+            AuthenticationServiceClient authClient = new AuthenticationServiceClient();
+            OsbleServiceClient osbleClient = new OsbleServiceClient();
+            string token = authClient.ValidateUser("betty@rogers.com", "123123");
+            byte[] data = osbleClient.GetAssignmentSubmission(1, token);
+            using (ZipFile zip = ZipFile.Read(data))
+            {
+                Assert.AreEqual(1, zip.Entries.Count);
+            }
+        }
+
+        [TestMethod]
+        public void OsbleService_SubmitAssignmentTest()
+        {
+            //AC Note: again, this requires OSBLE to be set up property.  May need
+            //to change values accordingly
+            AuthenticationServiceClient authClient = new AuthenticationServiceClient();
+            OsbleServiceClient osbleClient = new OsbleServiceClient();
+            string token = authClient.ValidateUser("betty@rogers.com", "123123");
+            
+            ZipFile file = new ZipFile();
+
+            //AC note: may need to change document location
+            FileStream stream = File.OpenRead("D:\\acarter\\temp\\address.pdf");
+
+            //AC Note: may need to change name of file
+            file.AddEntry("hw1.pdf", stream);
+            MemoryStream zipStream = new MemoryStream();
+            file.Save(zipStream);
+
+            //AC note: may need to change assignment ID (first parameter)
+            bool result = osbleClient.SubmitAssignment(1, zipStream.ToArray(), token);
+            Assert.AreEqual(true, result);
+        }
+
+        [TestMethod]
+        public void OsbleService_GetReviewItemsTest()
+        {
+            //AC Note: This requires OSBLE to be set up properly
+            AuthenticationServiceClient authClient = new AuthenticationServiceClient();
+            OsbleServiceClient osbleClient = new OsbleServiceClient();
+            string token = authClient.ValidateUser("betty@rogers.com", "123123");
+            byte[] data = osbleClient.GetReviewItems(3, token);
+            using (ZipFile zip = ZipFile.Read(data))
+            {
+                Assert.AreEqual(3, zip.Entries.Count);
+            }
+        }
+
+        [TestMethod]
+        public void OsbleService_SubmitReviewTest()
+        {
+            //AC Note: again, this requires OSBLE to be set up property.  May need
+            //to change values accordingly
+            AuthenticationServiceClient authClient = new AuthenticationServiceClient();
+            OsbleServiceClient osbleClient = new OsbleServiceClient();
+            string token = authClient.ValidateUser("betty@rogers.com", "123123");
+
+            ZipFile file = new ZipFile();
+
+            //AC note: may need to change document location
+            FileStream stream = File.OpenRead("D:\\acarter\\temp\\address.pdf");
+
+            //AC Note: may need to change name of file
+            file.AddEntry("hw1.pdf", stream);
+            MemoryStream zipStream = new MemoryStream();
+            file.Save(zipStream);
+
+            //AC note: may need to change assignment ID (first parameter)
+            bool result = osbleClient.SubmitReview(17, 3, zipStream.ToArray(), token);
+            Assert.AreEqual(true, result);
         }
     }
 }

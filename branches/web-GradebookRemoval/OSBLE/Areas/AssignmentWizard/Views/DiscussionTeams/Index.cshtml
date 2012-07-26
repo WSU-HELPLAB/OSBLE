@@ -96,20 +96,20 @@ else
             </li>
         }
     </ul>
-    <div id="AvailableModeratorList">
-    <h3>
-        Moderators/TAs</h3>
-    <ul id="AvailableModerators" class="ModeratorsDraggable">
-        @foreach (CourseUser cu in moderators)
-        {
-            string modDisplayName = cu.DisplayNameWithRole((int)CourseRole.CourseRoles.Instructor);
+    <div id="AvailableModeratorList" style="display:@(ViewBag.DisplayModeratorList)">
+        <h3>
+            @ViewBag.ModeratorListTitle</h3>
+        <ul id="AvailableModerators" class="ModeratorsDraggable">
+            @foreach (CourseUser cu in moderators)
+            {
+                string modDisplayName = cu.DisplayNameWithRole((int)CourseRole.CourseRoles.Instructor);
             
-            <li data-id="cu_@(cu.ID)" id="cu_@(cu.ID)" class="ui-state-default Moderator">@modDisplayName
-                <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @modDisplayName" title="remove @modDisplayName" onclick="removeFromTeam(this)" />
-            </li>
-        }
-    </ul>
-</div>
+                <li data-id="cu_@(cu.ID)" id="cu_@(cu.ID)" class="ui-state-default Moderator">@modDisplayName
+                    <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @modDisplayName" title="remove @modDisplayName" onclick="removeFromTeam(this)" />
+                </li>
+            }
+        </ul>
+    </div>
 </div>
 
 
@@ -132,7 +132,7 @@ else
                     
                     if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA || member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
                     {
-                        displayName = "(TA) " + member.CourseUser.DisplayNameWithRole((int)CourseRole.CourseRoles.Instructor);
+                        displayName = member.CourseUser.DisplayNameWithRole((int)CourseRole.CourseRoles.Instructor);
                         roleClass = "Moderator";
                     }
                     else

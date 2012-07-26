@@ -44,8 +44,10 @@ using OSBLE.Models.Assignments;
 
 namespace OSBLE
 {
-    public static class FileSystem
-    {
+    public class FileSystem
+    { 
+
+        #region old FileSystem Code (deprecated)
         private static string getRootPath()
         {
             return HttpContext.Current.Server.MapPath("~\\App_Data\\FileSystem\\");
@@ -502,15 +504,34 @@ namespace OSBLE
             return path;
         }
 
-        public static string GetTeamUserSubmissionFolderForAuthorID(bool createPathIfNotExists, Course course, int assignmentID, IAssignmentTeam submitterTeam, Team authorTeam)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="createPathIfNotExists"></param>
+        /// <param name="course"></param>
+        /// <param name="assignmentID"></param>
+        /// <param name="submitterTeam"></param>
+        /// <param name="authorTeam"></param>
+        /// <returns></returns>
+        public static string GetTeamUserSubmissionFolderForAuthorID(bool createPathIfNotExists, 
+            Course course, 
+            int assignmentID, 
+            IAssignmentTeam submitterTeam, 
+            Team authorTeam)
         {
-            string path = GetTeamUserSubmissionFolder(false, course, assignmentID, submitterTeam);
-            path += "\\" + authorTeam.Name.ToString();
+            //string path = GetTeamUserSubmissionFolder(false, course, assignmentID, submitterTeam);
+            //path += "\\" + authorTeam.Name.ToString();
 
-            if (!Directory.Exists(path) && createPathIfNotExists)
-            {
-                Directory.CreateDirectory(path);
-            }
+            //if (!Directory.Exists(path) && createPathIfNotExists)
+            //{
+            //    Directory.CreateDirectory(path);
+            //}
+
+            OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
+            string path = fs.Course(course.ID)
+                .Assignment(assignmentID)
+                .Review(authorTeam.ID, submitterTeam.TeamID)
+                .GetPath();
 
             return path;
         }
@@ -715,12 +736,14 @@ namespace OSBLE
             DateTime? timeSubmitted = null;
             if (team != null)
             {
+                
+
                 DirectoryInfo submissionFolder;
                 if (team.Assignment.Type == AssignmentTypes.CriticalReview && authorTeam != null)
                 {
                     submissionFolder = new DirectoryInfo
                                                 (FileSystem.GetTeamUserSubmissionFolderForAuthorID
-                                                    (false, team.Assignment.Category.Course, team.AssignmentID, team, authorTeam)
+                                                    (false, team.Assignment.Course, team.AssignmentID, team, authorTeam)
                                                 );
                 }
                 else
@@ -729,7 +752,7 @@ namespace OSBLE
                                             (FileSystem.GetTeamUserSubmissionFolder
                                                 (
                                                     false,
-                                                    team.Assignment.Category.Course,
+                                                    team.Assignment.Course,
                                                     team.Assignment.ID,
                                                     team
                                                 )
@@ -793,4 +816,5 @@ namespace OSBLE
 #endif
         }
     }
+        #endregion
 }

@@ -17,15 +17,39 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
         public override DynamicDictionary BuildTableForTeam(IAssignmentTeam assignmentTeam)
         {
             dynamic data = Builder.BuildTableForTeam(assignmentTeam);
-            data.AssignmentTeam = assignmentTeam;
-            Score score = data.Score;
 
-            //don't pull if we already have it from somewhere else
-            if (score == null)
+            double deductionPercent = 0;
+            DateTime? SubmissionTime = FileSystem.GetSubmissionTime(assignmentTeam);
+            TimeSpan lateness;
+            if (SubmissionTime != null)
             {
-                score = assignmentTeam.Assignment.Scores.Where(s => s.TeamID == assignmentTeam.TeamID).FirstOrDefault();
-                data.Score = score;
+                lateness = assignmentTeam.Assignment.DueDate - (DateTime)SubmissionTime;
             }
+            else //if the assignment has not been submitted, use the current time to calculate late penalty.
+            {
+                lateness = assignmentTeam.Assignment.DueDate - DateTime.Now;
+            }
+
+            //The document is too late to be accepted. Therefor 100% deduction
+            if (lateness.TotalHours >= assignmentTeam.Assignment.HoursLateWindow)
+            {
+                deductionPercent = 100;
+            }
+            else if (lateness.TotalHours <= 0) //The document wasnt late at all
+            {
+                deductionPercent = 0;
+            }
+            else //The document was late, but less than HoursLateWindow
+            {
+                int numberOfDeductions = lateness.Hours / (int)assignmentTeam.Assignment.HoursPerDeduction;
+                deductionPercent = numberOfDeductions * assignmentTeam.Assignment.DeductionPerUnit;
+                if (deductionPercent > 100)
+                {
+                    deductionPercent = 100;
+                }
+            }
+
+            data.LatePenaltyPercent = (deductionPercent/100.0).ToString("P");
             return data;
         }
     }

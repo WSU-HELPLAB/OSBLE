@@ -148,6 +148,9 @@
     <Compile Include="..\OSBLE.Library\Models\Assignments\CommentCategoryOption.cs">
       <Link>Models\Assignments\CommentCategoryOption.cs</Link>
     </Compile>
+    <Compile Include="..\OSBLE.Library\Models\Assignments\CriticalReviewSettings.cs">
+      <Link>Models\Assignments\CriticalReviewSettings.cs</Link>
+    </Compile>
     <Compile Include="..\OSBLE.Library\Models\Assignments\Deliverable.cs">
       <Link>Models\Assignments\Deliverable.cs</Link>
     </Compile>
@@ -162,9 +165,6 @@
     </Compile>
     <Compile Include="..\OSBLE.Library\Models\Assignments\ReviewTeam.cs">
       <Link>Models\Assignments\ReviewTeam.cs</Link>
-    </Compile>
-    <Compile Include="..\OSBLE.Library\Models\Assignments\Score.cs">
-      <Link>Models\Assignments\Score.cs</Link>
     </Compile>
     <Compile Include="..\OSBLE.Library\Models\Assignments\Team.cs">
       <Link>Models\Assignments\Team.cs</Link>
@@ -186,6 +186,36 @@
     </Compile>
     <Compile Include="..\OSBLE.Library\Models\DiscussionAssignment\DiscussionPost.cs">
       <Link>Models\DiscussionAssignment\DiscussionPost.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\AssignmentFilePath.cs">
+      <Link>Models\FilesSystem\AssignmentFilePath.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\CourseFilePath.cs">
+      <Link>Models\FilesSystem\CourseFilePath.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\EmptyFilePathDecorator.cs">
+      <Link>Models\FilesSystem\EmptyFilePathDecorator.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\FileCollection.cs">
+      <Link>Models\FilesSystem\FileCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\FileSystem.cs">
+      <Link>Models\FilesSystem\FileSystem.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\FileSystemBase.cs">
+      <Link>Models\FilesSystem\FileSystemBase.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\IFileSystem.cs">
+      <Link>Models\FilesSystem\IFileSystem.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\ReviewFilePath.cs">
+      <Link>Models\FilesSystem\ReviewFilePath.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\SubmissionFilePath.cs">
+      <Link>Models\FilesSystem\SubmissionFilePath.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\UserFilePath.cs">
+      <Link>Models\FilesSystem\UserFilePath.cs</Link>
     </Compile>
     <Compile Include="..\OSBLE.Library\Models\HomePage\AbstractDashboard.cs">
       <Link>Models\HomePage\AbstractDashboard.cs</Link>
@@ -238,14 +268,12 @@
     <Compile Include="..\OSBLE.Library\Models\Users\UserProfile.cs">
       <Link>Models\Users\UserProfile.cs</Link>
     </Compile>
-    <Compile Include="Models\ViewModels\AssignmentDetailsViewModel.cs" />
     <Compile Include="Models\ViewModels\AssignmentListViewModel.cs" />
     <Compile Include="Models\ViewModels\ReviewInterfaceModels.cs" />
     <Compile Include="Models\ViewModels\RubricViewModel.cs" />
     <Compile Include="Models\ViewModels\SerializableTeamMembers.cs" />
     <Compile Include="Models\ViewModels\StudioAssignmentViewModel.cs" />
     <Compile Include="Models\ViewModels\TeamCreationViewModel.cs" />
-    <Compile Include="Models\ViewModels\TeamEvaluationViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

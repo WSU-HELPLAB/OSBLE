@@ -1820,3 +1820,87 @@ tbody #awesome
 {
     color:#074974;
 }
+
+.MailMenu
+{
+    padding-right: 10px;
+}
+
+.MailMenu button, .MailMenu input
+{
+    width:100px;
+    border-style:groove;
+    cursor: pointer;
+}
+
+.MailMenu .buttonAnchor
+{
+    text-decoration: none;
+}
+
+.MailInput
+{
+    width:100px;
+    border-style:groove;
+    cursor: pointer;
+}
+
+
+/* Users Page */
+.UserList li
+{
+	list-style: none;
+	width: 230px;
+	border-bottom: 1px solid #aaccff;
+	border: 1px solid #eeeeff;
+	border-bottom: 3px solid #eeeeff;
+	min-height: 43px;
+	padding-top: 4px;
+	margin-bottom: 7px;
+	font-size: 10pt;
+}
+
+.UserList li form
+{
+	display: none;
+	margin: 0;
+	padding: 0;
+}
+
+.UserList input
+{
+	position: relative;
+}
+
+.UserList li:hover
+{
+	background-color: #fafaff;
+	border: 1px solid #aaaadd;
+	border-bottom: 3px solid #aaaadd;
+}
+
+.UserList li:hover div.UserControls
+{
+	display: block;
+}
+
+.UserList li div.UserControls
+{
+	display: none;
+	float: right;
+	padding-right: 3px;
+}
+
+.UserControls img:hover
+{
+	cursor: pointer;
+}
+
+.promptText
+{
+    border: 2px;
+    border-style: groove;
+    border-color: White;
+    padding: 2px;
+    width: 100%;
+}

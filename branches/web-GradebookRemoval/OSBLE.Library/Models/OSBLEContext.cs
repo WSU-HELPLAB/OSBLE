@@ -67,8 +67,8 @@ namespace OSBLE.Models
         public void SeedTestData()
         {
             FormsAuthentication.SignOut();
-
-            FileSystem.WipeOutFileSystem();
+            
+            OSBLE.FileSystem.WipeOutFileSystem();
 
             // Sample Schools
             School s1 = new School();

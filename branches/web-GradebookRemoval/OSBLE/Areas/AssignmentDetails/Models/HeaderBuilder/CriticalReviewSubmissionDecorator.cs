@@ -8,6 +8,7 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using System.Runtime.Caching;
 using OSBLE.Utility;
+using OSBLE.Controllers;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 {
@@ -98,6 +99,12 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                 header.CRSubmission.SubmissionReceived = false;
                 Cache["SubmissionReceived"] = false;
             }
+
+            //rubric stuff:
+            header.CRSubmission.hasStudentRubric = assignment.HasStudentRubric;
+            header.CRSubmission.studentRubricID = assignment.StudentRubricID;
+
+            //RubricController rc = new RubricController();   
 
             return header;
         }

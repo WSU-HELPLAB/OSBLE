@@ -76,14 +76,14 @@ namespace OSBLE.Controllers
             if (DashboardSingleCourseMode)
             {
                 viewedCourses = new List<int>();
-                viewedCourses.Add(ActiveCourse.AbstractCourseID);
+                viewedCourses.Add(ActiveCourseUser.AbstractCourseID);
             }
             else // All course mode. Display posts for all non-hidden courses the user is attached to.
             {
                 viewedCourses = currentCourses.Where(cu => !cu.Hidden).Select(cu => cu.AbstractCourseID).ToList();
             }
 
-            if (ActiveCourse.AbstractCourse is Course && ActiveCourse.AbstractRole.CanModify)
+            if (ActiveCourseUser.AbstractCourse is Course && ActiveCourseUser.AbstractRole.CanModify)
             {
                 ViewBag.IsInstructor = true;
             }
@@ -92,7 +92,7 @@ namespace OSBLE.Controllers
                 ViewBag.IsInstructor = false;
             }
 
-            if (ActiveCourse.AbstractCourse is Community && ActiveCourse.AbstractRole.CanModify)
+            if (ActiveCourseUser.AbstractCourse is Community && ActiveCourseUser.AbstractRole.CanModify)
             {
                 ViewBag.IsLeader = true;
             }
@@ -133,7 +133,7 @@ namespace OSBLE.Controllers
 
         private void setupCourseLinks()
         {
-            DirectoryListing listing = FileSystem.GetCourseDocumentsFileList(ActiveCourse.AbstractCourse, false);
+            DirectoryListing listing = FileSystem.GetCourseDocumentsFileList(ActiveCourseUser.AbstractCourse, false);
             SilverlightObject fileUploader = new SilverlightObject
             {
                 CSSId = "file_uploader",
@@ -149,7 +149,7 @@ namespace OSBLE.Controllers
             //AC: I don't think that this is the best way to restrict access.  Might be worth
             //revisiting at a later date.
             ViewBag.CanEditCourseLinks = false;
-            if (ActiveCourse.AbstractRole.CanModify)
+            if (ActiveCourseUser.AbstractRole.CanModify)
             {
                 ViewBag.CanEditCourseLinks = true;
             }
@@ -160,13 +160,13 @@ namespace OSBLE.Controllers
         private void setupNotifications()
         {
             // Load all unread notifications for the current user to display on the dashboard.
-            ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == ActiveCourse.ID) && (n.Read == false)).OrderByDescending(n => n.Posted).ToList();
+            ViewBag.Notifications = db.Notifications.Where(n => (n.RecipientID == ActiveCourseUser.ID) && (n.Read == false)).OrderByDescending(n => n.Posted).ToList();
         }
 
         private void setupEvents()
         {
             // Set start and end dates of event viewing to current viewing settings for the course
-            int eventDays = 7 * ActiveCourse.AbstractCourse.CalendarWindowOfTime;
+            int eventDays = 7 * ActiveCourseUser.AbstractCourse.CalendarWindowOfTime;
 
             DateTime today = DateTime.Now.Date;
             DateTime upto = today.AddDays(eventDays);
@@ -243,7 +243,7 @@ namespace OSBLE.Controllers
             else // Display anonymous name.
             {
                 // Anonymous number is currently the number of the student in the course list.
-                post.DisplayName = posterCu.DisplayName(ActiveCourse.AbstractRole);
+                post.DisplayName = posterCu.DisplayName(ActiveCourseUser.AbstractRole);
 
                 // Profile picture will display default picture.
                 post.ShowProfilePicture = false;
@@ -380,7 +380,7 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult NewPost(DashboardPost dp)
         {
-            dp.CourseUser = ActiveCourse;
+            dp.CourseUser = ActiveCourseUser;
             dp.Posted = DateTime.Now;
 
             List<CourseUser> CoursesToPost = new List<CourseUser>();
@@ -389,7 +389,7 @@ namespace OSBLE.Controllers
 
             if (Request.Form["post_active"] != null)
             { // Post to active course only.
-                CoursesToPost.Add(ActiveCourse);
+                CoursesToPost.Add(ActiveCourseUser);
             }
             else if (Request.Form["post_all"] != null)
             { // Post to all courses.
@@ -482,7 +482,7 @@ namespace OSBLE.Controllers
         {
             if (ModelState.IsValid)
             {
-                dr.CourseUser = ActiveCourse;
+                dr.CourseUser = ActiveCourseUser;
                 dr.Posted = DateTime.Now;
 
                 int replyTo = 0;
@@ -604,7 +604,7 @@ namespace OSBLE.Controllers
             if (dp != null)
             {
                 CourseUser cu = currentCourses.Where(c => c.AbstractCourseID == dp.CourseUser.AbstractCourseID).FirstOrDefault();
-                if ((dp.CourseUserID == ActiveCourse.ID) || ((cu != null) && (cu.AbstractRole.CanGrade)))
+                if ((dp.CourseUserID == ActiveCourseUser.ID) || ((cu != null) && (cu.AbstractRole.CanGrade)))
                 {
                     dp.Replies.Clear();
                     db.SaveChanges();
@@ -637,7 +637,7 @@ namespace OSBLE.Controllers
             if (dr != null)
             {
                 CourseUser cu = currentCourses.Where(c => c.AbstractCourse == dr.Parent.CourseUser.AbstractCourse).FirstOrDefault();
-                if ((dr.CourseUserID == ActiveCourse.ID) || ((cu != null) && (cu.AbstractRole.CanGrade)))
+                if ((dr.CourseUserID == ActiveCourseUser.ID) || ((cu != null) && (cu.AbstractRole.CanGrade)))
                 {
                     db.DashboardReplies.Remove(dr);
                     db.SaveChanges();

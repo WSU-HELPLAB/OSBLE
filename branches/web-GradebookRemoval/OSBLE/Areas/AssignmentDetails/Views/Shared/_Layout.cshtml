@@ -7,7 +7,8 @@
     ViewBag.Title = "Assignment Details";
     DynamicDictionary headerData = Model.HeaderBuilder.BuildHeader(Model.CurrentAssignment);
     Layout = "~/Views/Shared/_Layout.cshtml";
-    List<Assignment> assignmentList = (Model.Client.AbstractCourse as Course).Assignments.OrderBy(a => a.AssignmentName).ToList();
+    List<Assignment> assignmentList = new List<Assignment>();
+        
 }
 @section Header
 {
@@ -33,14 +34,23 @@
     });
 </script>
 
-@*If student, then remove all assignments that have not been published from the assignment list*@
+@*If student, then remove all assignments that have not been published from the assignment list
+  If a moderator, remove all assignments as its hard to distinguish which should be available
+*@
 @if (Model.Client.AbstractRole.CanSubmit)
 {
-    
     assignmentList = assignmentList.Where(a => a.IsDraft == false).ToList();
 }
+else if(Model.Client.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
+{
+    assignmentList = null;
+}
+else
+{
+    assignmentList = (Model.Client.AbstractCourse as Course).Assignments.OrderBy(a => a.AssignmentName).ToList();
+}
 
-@if (assignmentList.Count > 1)
+@if (assignmentList != null && assignmentList.Count > 1)
 {
     <table>
             <tr>
@@ -49,17 +59,16 @@
                     <select id="changeAssignment">
                         @foreach (Assignment assignment in assignmentList)
                         {
-                            if (!assignment.IsDraft)
+                            
+                            @*generating select box*@
+                            string optionText = "<option value=\"{0}\"{1}>{2}</option>";
+                            string selectValue = "";
+                            if (Model.CurrentAssignment.ID == assignment.ID)
                             {
-                                @*generating select box*@
-                                string optionText = "<option value=\"{0}\"{1}>{2}</option>";
-                                string selectValue = "";
-                                if (Model.CurrentAssignment.ID == assignment.ID)
-                                {
-                                    selectValue = "selected=\"selected\"";
-                                }
-                                @Html.Raw(String.Format(optionText, assignment.ID, selectValue, assignment.AssignmentName));
+                                selectValue = "selected=\"selected\"";
                             }
+                            @Html.Raw(String.Format(optionText, assignment.ID, selectValue, assignment.AssignmentName));
+                            
                         }
                     </select>
                 </td>
@@ -105,15 +114,6 @@
 }
 <table id="AssignmentDetailsTable">
     <tr id="AssignmentDetailsTableFirstRow">
-        <th>
-            Grading:
-        </th>
-        <td>
-            Worth @Model.CurrentAssignment.PointsPossible in &quot;@Model.CurrentAssignment.Category.Name&quot;
-            category
-        </td>
-    </tr>
-    <tr>
         <th>
             Description:
         </th>
@@ -168,22 +168,6 @@
         </div>
     </div>
     
-    <!-- Pop-up window for editing late percentage -->
-    <div id="EditLatePercentWindowID" style="display: none;" title="Edit Score">
-        <input type="radio" id="radioBtn1" name="group1" />
-        Use default late penalty<br />
-        <input type="radio" id="radioBtn2" name="group1" />
-        Use a custom late penalty of
-        <input size="5" id="manualLatePen" />%<br />
-        <td>
-            <text id="latePenErrorText" style="color: Red; float: left; font-size: smaller"></text>
-            <br />
-            <div style="float: right">
-                <input type="button" onclick="setManualLatePen();" value="Apply Changes" />
-                <input type="button" onclick="closeManualLatePenWindow();" value="Cancel" />
-            </div>
-        </td>
-    </div>
 }
 else
 {

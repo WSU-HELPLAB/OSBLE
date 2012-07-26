@@ -17,7 +17,7 @@ namespace OSBLE.Attributes
             {
                 OSBLEController controller = filterContext.Controller as OSBLEController;
 
-                CourseUser cu = controller.ActiveCourse;
+                CourseUser cu = controller.ActiveCourseUser;
 
                 // Course allows Instructors to post events, community allows Leaders to post events.
                 if (!(cu.AbstractRole.CanModify || cu.AbstractCourse.AllowEventPosting))
