@@ -13,12 +13,10 @@
 <a href="/Rubric/ImportAllToCSV">Import Rubric For Each Student</a>
 <div><br /></div>
 
-
-@if (ViewBag.Score != null)
+@if (ViewBag.DisplayGrade)
 {
-    <h3>Grade: @(Math.Round((ViewBag.Score as Score).Points / ViewBag.PossiblePoints * 100, 2))%</h3>
+    <h3>Grade: @ViewBag.Grade</h3>
 }
-
           
 @Html.Partial("_Display", Model)
           
