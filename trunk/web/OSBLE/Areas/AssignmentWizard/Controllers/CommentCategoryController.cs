@@ -52,7 +52,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         private void BuildViewBag()
         {
             ViewBag.PreviousAssignments = (from assignment in db.Assignments
-                                          where assignment.Category.CourseID == ActiveCourse.AbstractCourseID
+                                          where assignment.CourseID == ActiveCourseUser.AbstractCourseID
                                           select assignment).ToList();
             ViewBag.PreviousAssignmentButton = previousButtonText;
             ViewBag.PreviousSelectName = previousSelect;

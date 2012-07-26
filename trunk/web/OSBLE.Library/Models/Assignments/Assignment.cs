@@ -16,15 +16,11 @@ namespace OSBLE.Models.Assignments
         {
             ReleaseDate = DateTime.Now;
             DueDate = DateTime.Now.AddDays(7.0);
-            ColumnOrder = 0;
             Deliverables = new List<Deliverable>();
             AssignmentTeams = new List<AssignmentTeam>();
             DiscussionTeams = new List<DiscussionTeam>();
             ReviewTeams = new List<ReviewTeam>();
             IsDraft = true;
-            AddedPoints = 0;
-            IsWizardAssignment = true;
-            Scores = new List<Score>();
             Type = AssignmentTypes.Basic;
             CriticalReviewPublishDate = null;
         }
@@ -32,13 +28,10 @@ namespace OSBLE.Models.Assignments
         public Assignment(Assignment other)
             : this()
         {
-            this.AddedPoints = other.AddedPoints;
             this.AssignmentDescription = other.AssignmentDescription;
             this.AssignmentName = other.AssignmentName;
             this.AssignmentTypeID = other.AssignmentTypeID;
             this.AssociatedEventID = other.AssociatedEventID;
-            this.CategoryID = other.CategoryID;
-            this.ColumnOrder = other.ColumnOrder;
             this.CommentCategoryID = other.CommentCategoryID;
             this.CourseID = other.CourseID;
             this.CriticalReviewPublishDate = other.CriticalReviewPublishDate;
@@ -48,12 +41,12 @@ namespace OSBLE.Models.Assignments
                 Deliverables.Add(new Deliverable(d));
             }
             this.DiscussionSettings = new DiscussionSetting(other.DiscussionSettings);
+            this.CriticalReviewSettings = new CriticalReviewSettings(other.CriticalReviewSettings);
             this.DueDate = other.DueDate;
             this.HoursLateWindow = other.HoursLateWindow;
             this.HoursPerDeduction = other.HoursPerDeduction;
             this.ID = other.ID;
             this.IsDraft = other.IsDraft;
-            this.IsWizardAssignment = other.IsWizardAssignment;
             this.PrecededingAssignmentID = other.PrecededingAssignmentID;
             this.ReleaseDate = other.ReleaseDate;
             this.RubricID = other.RubricID;
@@ -93,17 +86,8 @@ namespace OSBLE.Models.Assignments
         [Display(Name = "Assignment Description")]
         public string AssignmentDescription { get; set; }
 
-        [Required(ErrorMessage = "Please select the category to which this assignment will belong")]
-        [Display(Name = "Assignment Category")]
-        public int CategoryID { get; set; }
-        public virtual Category Category { get; set; }
-
         public int? CourseID { get; set; }
         public virtual Course Course { get; set; }
-
-        [Required(ErrorMessage = "Please specify the total number of points that this assignment will be worth")]
-        [Display(Name = "Total Points Possible")]
-        public int PointsPossible { get; set; }
 
         [Required(ErrorMessage = "Please specify when this assignment should be released")]
         [Display(Name = "Release Date")]
@@ -217,18 +201,6 @@ namespace OSBLE.Models.Assignments
         }
 
         /// <summary>
-        /// Returns true if the assignment has comment categories
-        /// </summary>
-        [NotMapped]
-        public bool HasCommentCategories
-        {
-            get
-            {
-                return CommentCategory != null;
-            }
-        }
-
-        /// <summary>
         /// Returns true if the assignment has one or more deliverables
         /// </summary>
         [NotMapped]
@@ -239,6 +211,7 @@ namespace OSBLE.Models.Assignments
                 return Deliverables.Count > 0;
             }
         }
+
 
         [Required(ErrorMessage = "Please specify for how long OSBLE should accept late submissions")]
         [Display(Name = "Late Submission Window")]
@@ -251,9 +224,6 @@ namespace OSBLE.Models.Assignments
         [Required(ErrorMessage = "Please specify the hours per percent deduction.")]
         [Display(Name = "hour(s) late")]
         public double HoursPerDeduction { get; set; }
-
-        [Required]
-        public int ColumnOrder { get; set; }
 
         [Required(ErrorMessage = "Please specify whether or not this assignment is a draft")]
         [Display(Name = "Safe As Draft")]
@@ -285,9 +255,6 @@ namespace OSBLE.Models.Assignments
         [Association("AssignmentReviewTeam_Assignment", "ID", "AssignmentID")]
         public virtual IList<ReviewTeam> ReviewTeams { get; set; }
 
-        [Association("Score_Assignment", "ID", "AssignmentID")]
-        public virtual IList<Score> Scores { get; set; }
-
         [Association("DiscussionSetting_Assignment", "ID", "AssignmentID")]
         public virtual DiscussionSetting DiscussionSettings { get; set; }
 
@@ -297,26 +264,14 @@ namespace OSBLE.Models.Assignments
         [Association("TeamEvaluationSettings_Assignment", "ID", "AssignmentID")]
         public virtual TeamEvaluationSettings TeamEvaluationSettings { get; set; }
 
-        public double AddedPoints { get; set; }
-
-        public static IList<AssignmentTypes> AllAssignmentTypes
-        {
-            get
-            {
-                return Enum.GetValues(typeof(AssignmentTypes)).Cast<AssignmentTypes>().ToList();
-            }
-        }
-
         public int? AssociatedEventID { get; set; }
 
         [ForeignKey("AssociatedEventID")]
         public virtual Event AssociatedEvent { get; set; }
 
         /// <summary>
-        /// used to distinguish wizard created assignments versus gradebook created assignments
+        /// Returns true if an assignment has had its reviewed documents published back to their original author(s)
         /// </summary>
-        public bool IsWizardAssignment { get; set; }
-
         [NotMapped]
         public bool IsCriticalReviewPublished
         {
@@ -325,6 +280,10 @@ namespace OSBLE.Models.Assignments
                 return (CriticalReviewPublishDate != null);
             }
         }
+
+        /// <summary>
+        /// Returns the date of when a critical review assignment had its reviewed documents published back to their original author(s)
+        /// </summary>
         public DateTime? CriticalReviewPublishDate { get; set; }
 
         #endregion
@@ -348,7 +307,19 @@ namespace OSBLE.Models.Assignments
         }
 
         /// <summary>
-        /// Returns an int with the amount of scores that are currently saved as draft
+        /// Returns true if the assignment has comment categories
+        /// </summary>
+        [NotMapped]
+        public bool HasCommentCategories
+        {
+            get
+            {
+                return CommentCategory != null;
+            }
+        }
+
+        /// <summary>
+        /// Returns an int with the amount of instructor evaluated rubrics that are currently saved as draft
         /// </summary>
         public int GetSavedAsDraftCount()
         {
@@ -357,24 +328,28 @@ namespace OSBLE.Models.Assignments
             {
                 draftRubricEvals = (from a in db.RubricEvaluations
                                     where a.AssignmentID == this.ID &&
-                                    !a.IsPublished
+                                    !a.IsPublished &&
+                                    a.Evaluator.AbstractRole.CanGrade
                                     select a).Count();
             }
             return draftRubricEvals;
         }
 
         /// <summary>
-        /// Returns an int with the amount of scores that are currently Published
+        /// Returns an int with the amount of instructor evaluated rubrics that are currently Published
         /// </summary>
         /// <returns></returns>
         public int GetPublishedCount()
         {
+            //get number of items graded
+
             int draftRubricEvals = 0;
             using (ContextBase db = new SimpleContext())
             {
                 draftRubricEvals = (from a in db.RubricEvaluations
                                     where a.AssignmentID == this.ID &&
-                                    a.IsPublished
+                                    a.IsPublished &&
+                                    a.Evaluator.AbstractRole.CanGrade
                                     select a).Count();
             }
             return draftRubricEvals;
@@ -383,6 +358,14 @@ namespace OSBLE.Models.Assignments
         #endregion
 
         #region static methods
+
+        public static IList<AssignmentTypes> AllAssignmentTypes
+        {
+            get
+            {
+                return Enum.GetValues(typeof(AssignmentTypes)).Cast<AssignmentTypes>().ToList();
+            }
+        }
 
         public static void ToggleDraft(int assignmentId, int posterId)
         {

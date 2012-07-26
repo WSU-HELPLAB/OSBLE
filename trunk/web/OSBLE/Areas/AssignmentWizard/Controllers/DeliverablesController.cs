@@ -66,7 +66,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
              * */
 
             ViewBag.DeliverableTypes = new SelectList(allItems, "Value", "Text");
-            ViewBag.AllowedFileNames = from c in FileSystem.GetCourseDocumentsFileList(ActiveCourse.AbstractCourse, includeParentLink: false).Files select c.Name;
+            ViewBag.AllowedFileNames = from c in FileSystem.GetCourseDocumentsFileList(ActiveCourseUser.AbstractCourse, includeParentLink: false).Files select c.Name;
         }
 
         public override ActionResult Index()

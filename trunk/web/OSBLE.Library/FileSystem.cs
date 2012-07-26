@@ -743,7 +743,7 @@ namespace OSBLE
                 {
                     submissionFolder = new DirectoryInfo
                                                 (FileSystem.GetTeamUserSubmissionFolderForAuthorID
-                                                    (false, team.Assignment.Category.Course, team.AssignmentID, team, authorTeam)
+                                                    (false, team.Assignment.Course, team.AssignmentID, team, authorTeam)
                                                 );
                 }
                 else
@@ -752,7 +752,7 @@ namespace OSBLE
                                             (FileSystem.GetTeamUserSubmissionFolder
                                                 (
                                                     false,
-                                                    team.Assignment.Category.Course,
+                                                    team.Assignment.Course,
                                                     team.Assignment.ID,
                                                     team
                                                 )

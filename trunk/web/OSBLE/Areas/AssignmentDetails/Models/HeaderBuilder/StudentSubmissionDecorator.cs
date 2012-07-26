@@ -32,16 +32,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             List<TeamMember> allMembers = assignment.AssignmentTeams.SelectMany(at => at.Team.TeamMembers).ToList();
             TeamMember member = allMembers.Where(m => m.CourseUserID == Student.ID).FirstOrDefault();
 
-            //get users score
-            Score score = assignment.Scores.Where(s => s.CourseUserID == Student.ID).FirstOrDefault();
             header.Submission.allowSubmit = true;
-            if (score != null)
-            {
-                if (score.HasGrade())
-                {
-                    header.Submission.allowSubmit = false;
-                }
-            }
 
             //get submission time:
             foreach (AssignmentTeam team in assignment.AssignmentTeams)

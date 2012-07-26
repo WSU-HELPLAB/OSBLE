@@ -40,19 +40,6 @@ namespace OSBLE.Controllers
 
         private CourseUser activeCourseUser = null;
 
-        [Obsolete("Use ActiveCourseUser instead")]
-        public CourseUser ActiveCourse
-        {
-            get 
-            {
-                return ActiveCourseUser; 
-            }
-            protected set
-            {
-                ActiveCourseUser = value;
-            }
-        }
-
         public CourseUser ActiveCourseUser
         {
             get
@@ -320,15 +307,15 @@ namespace OSBLE.Controllers
 
                 // Load currently selected course, as long as user is actually a member of said course.
                 // Otherwise, load first course.
-                if ((ActiveCourse = activeCoursePool.Where(cu => cu.AbstractCourseID == activeCourseID).FirstOrDefault()) == null)
+                if ((ActiveCourseUser = activeCoursePool.Where(cu => cu.AbstractCourseID == activeCourseID).FirstOrDefault()) == null)
                 {
-                    ActiveCourse = activeCoursePool.FirstOrDefault();
+                    ActiveCourseUser = activeCoursePool.FirstOrDefault();
                 }
 
-                if (ActiveCourse != null)
+                if (ActiveCourseUser != null)
                 {
-                    Cache["ActiveCourse"] = ActiveCourse.AbstractCourseID;
-                    ViewBag.ActiveCourse = ActiveCourse;
+                    Cache["ActiveCourse"] = ActiveCourseUser.AbstractCourseID;
+                    ViewBag.ActiveCourse = ActiveCourseUser;
                 }
             }
             else // User invalid. Logout.

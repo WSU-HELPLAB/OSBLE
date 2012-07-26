@@ -12,6 +12,20 @@ namespace OSBLE.Models.Assignments
         public int AssignmentID { get; set; }
         public virtual Assignment Assignment { get; set; }
 
+        public CriticalReviewSettings(CriticalReviewSettings other)
+        {
+            if (other == null)
+            {
+                return;
+            }
+
+            this.AssignmentID = other.AssignmentID;
+            this.AnonymizeAuthorToReviewer = other.AnonymizeAuthorToReviewer;
+            this.AnonymizeReviewerToAuthor = other.AnonymizeReviewerToAuthor;
+            this.AnonymizeReviewerToReviewers = other.AnonymizeReviewerToReviewers;
+            this.AllowReviewersToDownload = other.AllowReviewersToDownload;
+        }
+
         public CriticalReviewSettings()
         {
             AnonymizeAuthorToReviewer = false;

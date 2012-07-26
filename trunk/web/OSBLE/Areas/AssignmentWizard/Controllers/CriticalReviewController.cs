@@ -55,7 +55,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             //pull previous team configurations
             List<Assignment> previousTeamAssignments = (from assignment in db.Assignments
-                                                        where assignment.Category.Course.ID == ActiveCourseUser.AbstractCourseID
+                                                        where assignment.Course.ID == ActiveCourseUser.AbstractCourseID
                                                         where assignment.AssignmentTeams.Count > 0
                                                         select assignment).ToList();
 

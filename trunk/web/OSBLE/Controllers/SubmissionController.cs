@@ -28,7 +28,7 @@ namespace OSBLE.Controllers
 
                 if (assignment != null)
                 {
-                    if (assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID && ActiveCourseUser.AbstractRole.CanSubmit == true)
+                    if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && ActiveCourseUser.AbstractRole.CanSubmit == true)
                     {
 
                         if (assignment.Type == AssignmentTypes.CriticalReview)
@@ -75,20 +75,6 @@ namespace OSBLE.Controllers
             if (id != null)
             {
                 Assignment assignment = db.Assignments.Find(id);
-                TeamMember teamMember = GetTeamUser(assignment, CurrentUser);
-
-                var score = (from c in assignment.Scores where c.CourseUserID == teamMember.CourseUserID select c).FirstOrDefault();
-
-                if (score != null)
-                {
-                    if (score.HasGrade())
-                    {
-                        //MG: Users will not be able to open the submission window if they already have a grade, but in the rare case that a user gets here and has a grade
-                        //we will ineloquent redirect them to to the index without any feedback. (Chances of this occuring are slim)
-                        Cache["SubmissionReceived"] = false;
-                        return RedirectToAction("Index", "Assignment");
-                    }
-                }
 
                 if (assignment != null && (assignment.HasDeliverables == true || assignment.Type == AssignmentTypes.CriticalReview))
                 {
@@ -103,7 +89,7 @@ namespace OSBLE.Controllers
                     }
 
 
-                    if (assignment.Category.CourseID == ActiveCourseUser.AbstractCourseID && ActiveCourseUser.AbstractRole.CanSubmit == true)
+                    if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && ActiveCourseUser.AbstractRole.CanSubmit == true)
                     {
                         AssignmentTeam assignmentTeam = GetAssignmentTeam(assignment, ActiveCourseUser);
                         
@@ -205,13 +191,13 @@ namespace OSBLE.Controllers
                                                 }
                                             }
                                             FileSystem.RemoveZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, assignmentTeam);
-                                            string path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam), deliverables[i].Name + extension);
+                                            string path = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, ActiveCourseUser.AbstractCourse as Course, (int)id, assignmentTeam), deliverables[i].Name + extension);
                                             file.SaveAs(path);
 
                                             //unzip and rezip xps files because some XPS generators don't do it right
                                             if (extension.ToLower().CompareTo(".xps") == 0)
                                             {
-                                                string extractPath = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, ActiveCourse.AbstractCourse as Course, (int)id, assignmentTeam), "extract");
+                                                string extractPath = Path.Combine(FileSystem.GetTeamUserSubmissionFolder(true, ActiveCourseUser.AbstractCourse as Course, (int)id, assignmentTeam), "extract");
                                                 using (ZipFile oldZip = ZipFile.Read(path))
                                                 {
                                                     oldZip.ExtractAll(extractPath, ExtractExistingFileAction.OverwriteSilently);

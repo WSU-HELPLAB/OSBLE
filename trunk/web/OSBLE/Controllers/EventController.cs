@@ -23,19 +23,19 @@ namespace OSBLE.Controllers
             DateTime StartDate = new DateTime();
             DateTime EndDate = new DateTime();
 
-            if (ActiveCourse.AbstractCourse is Course)
+            if (ActiveCourseUser.AbstractCourse is Course)
             {
-                StartDate = (ActiveCourse.AbstractCourse as Course).StartDate;
+                StartDate = (ActiveCourseUser.AbstractCourse as Course).StartDate;
 
                 //AC: ticket #435 asks that events that go beyond the end of the class be displayed.
                 //This is important for displaying final exam notices.
-                EndDate = (ActiveCourse.AbstractCourse as Course).EndDate.Add(new TimeSpan(30, 0, 0, 0, 0));
+                EndDate = (ActiveCourseUser.AbstractCourse as Course).EndDate.Add(new TimeSpan(30, 0, 0, 0, 0));
             }
-            else if (ActiveCourse.AbstractCourse is Community)
+            else if (ActiveCourseUser.AbstractCourse is Community)
             {
                 // For communities there are no start/end dates, so get earliest and latest events
-                Event firstEvent = db.Events.Where(e => e.Poster.AbstractCourseID == ActiveCourse.AbstractCourseID).OrderBy(e => e.StartDate).FirstOrDefault();
-                Event lastEvent = db.Events.Where(e => e.Poster.AbstractCourseID == ActiveCourse.AbstractCourseID).OrderByDescending(e => e.StartDate).FirstOrDefault();
+                Event firstEvent = db.Events.Where(e => e.Poster.AbstractCourseID == ActiveCourseUser.AbstractCourseID).OrderBy(e => e.StartDate).FirstOrDefault();
+                Event lastEvent = db.Events.Where(e => e.Poster.AbstractCourseID == ActiveCourseUser.AbstractCourseID).OrderByDescending(e => e.StartDate).FirstOrDefault();
 
                 // If either event is null, return an empty list to the view.
                 if ((firstEvent == null) || (lastEvent == null))
@@ -85,7 +85,7 @@ namespace OSBLE.Controllers
         {
 
             // Set to current user and poster
-            e.Poster = ActiveCourse;
+            e.Poster = ActiveCourseUser;
 
             // Default to not Approved.
             e.Approved = false;
@@ -113,10 +113,10 @@ namespace OSBLE.Controllers
             }
 
             // Approve if instructor/leader, course is community, or approval is not required.
-            if (ActiveCourse.AbstractRole.CanModify ||
-                ((ActiveCourse.AbstractCourse is Course) &&
-                !(ActiveCourse.AbstractCourse as Course).RequireInstructorApprovalForEventPosting) ||
-                (ActiveCourse.AbstractCourse is Community)
+            if (ActiveCourseUser.AbstractRole.CanModify ||
+                ((ActiveCourseUser.AbstractCourse is Course) &&
+                !(ActiveCourseUser.AbstractCourse as Course).RequireInstructorApprovalForEventPosting) ||
+                (ActiveCourseUser.AbstractCourse is Community)
                 )
             {
                 e.Approved = true;
@@ -158,7 +158,7 @@ namespace OSBLE.Controllers
                 return View("AlreadyApproved");
             }
 
-            if (e.Poster.AbstractCourse != ActiveCourse.AbstractCourse)
+            if (e.Poster.AbstractCourse != ActiveCourseUser.AbstractCourse)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -172,7 +172,7 @@ namespace OSBLE.Controllers
         {
             Event e = db.Events.Find(id);
 
-            if (e.Poster.AbstractCourseID != ActiveCourse.AbstractCourseID)
+            if (e.Poster.AbstractCourseID != ActiveCourseUser.AbstractCourseID)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -190,7 +190,7 @@ namespace OSBLE.Controllers
         {
             Event e = db.Events.Find(id);
 
-            if (e.Poster.AbstractCourse != ActiveCourse.AbstractCourse)
+            if (e.Poster.AbstractCourse != ActiveCourseUser.AbstractCourse)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -211,7 +211,7 @@ namespace OSBLE.Controllers
             Event e = db.Events.Find(id);
 
             // Event not part of this course
-            if (e.Poster.AbstractCourseID != ActiveCourse.AbstractCourseID)
+            if (e.Poster.AbstractCourseID != ActiveCourseUser.AbstractCourseID)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -270,7 +270,7 @@ namespace OSBLE.Controllers
 
             }
 
-            if ((originalEvent == null) || (originalEvent.Poster.AbstractCourseID != ActiveCourse.AbstractCourseID))
+            if ((originalEvent == null) || (originalEvent.Poster.AbstractCourseID != ActiveCourseUser.AbstractCourseID))
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -324,16 +324,16 @@ namespace OSBLE.Controllers
             //MG:Pulling all events for this course that approved and have a startdate that 
             //lies within the StartDate and EndDate parameters. 
             List<Event> events = (from e in db.Events
-                                   where e.Poster.AbstractCourseID == ActiveCourse.AbstractCourseID
+                                   where e.Poster.AbstractCourseID == ActiveCourseUser.AbstractCourseID
                                    && e.StartDate >= StartDate
                                    && e.StartDate <= EndDate
                                    && e.Approved
                                    select e).ToList();
 
             // Add course meeting times and breaks.
-            if (ActiveCourse.AbstractCourse is Course && ((ActiveCourse.AbstractCourse as Course).ShowMeetings == true))
+            if (ActiveCourseUser.AbstractCourse is Course && ((ActiveCourseUser.AbstractCourse as Course).ShowMeetings == true))
             {
-                Course course = (Course)ActiveCourse.AbstractCourse;
+                Course course = (Course)ActiveCourseUser.AbstractCourse;
 
                 // Add breaks within window to events
                 foreach (CourseBreak cb in course.CourseBreaks)

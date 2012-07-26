@@ -175,9 +175,6 @@
     <Compile Include="..\OSBLE.Library\Models\Assignments\ReviewTeam.cs">
       <Link>Models\Assignments\ReviewTeam.cs</Link>
     </Compile>
-    <Compile Include="..\OSBLE.Library\Models\Assignments\Score.cs">
-      <Link>Models\Assignments\Score.cs</Link>
-    </Compile>
     <Compile Include="..\OSBLE.Library\Models\Assignments\Team.cs">
       <Link>Models\Assignments\Team.cs</Link>
     </Compile>
@@ -280,14 +277,12 @@
     <Compile Include="..\OSBLE.Library\Models\Users\UserProfile.cs">
       <Link>Models\Users\UserProfile.cs</Link>
     </Compile>
-    <Compile Include="Models\ViewModels\AssignmentDetailsViewModel.cs" />
     <Compile Include="Models\ViewModels\AssignmentListViewModel.cs" />
     <Compile Include="Models\ViewModels\ReviewInterfaceModels.cs" />
     <Compile Include="Models\ViewModels\RubricViewModel.cs" />
     <Compile Include="Models\ViewModels\SerializableTeamMembers.cs" />
     <Compile Include="Models\ViewModels\StudioAssignmentViewModel.cs" />
     <Compile Include="Models\ViewModels\TeamCreationViewModel.cs" />
-    <Compile Include="Models\ViewModels\TeamEvaluationViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

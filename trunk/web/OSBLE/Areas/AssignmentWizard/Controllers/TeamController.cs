@@ -64,7 +64,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             //Guaranteed to pull all people enrolled in the course that can submit files
             //(probably students).
             List<CourseUser> users = (from cu in db.CourseUsers
-                                       where cu.AbstractCourseID == ActiveCourse.AbstractCourseID
+                                       where cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
                                        && cu.AbstractRole.CanSubmit
                                        orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
                                        select cu).ToList();
@@ -87,7 +87,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
             //pull previous team configurations
             List<Assignment> previousTeamAssignments = (from assignment in db.Assignments
-                                                        where assignment.Category.Course.ID == ActiveCourse.AbstractCourseID
+                                                        where assignment.Course.ID == ActiveCourseUser.AbstractCourseID
                                                         where assignment.AssignmentTeams.Count > 0
                                                         select assignment).ToList();
 

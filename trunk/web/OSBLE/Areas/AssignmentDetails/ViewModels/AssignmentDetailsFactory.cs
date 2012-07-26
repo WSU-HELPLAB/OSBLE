@@ -41,12 +41,17 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
             vm.HeaderBuilder = new DefaultBuilder();
 
             List<TeamEvaluation> teamEvaluations = null;
+            List<RubricEvaluation> rubricEvaluations = null;
             using (OSBLEContext db = new OSBLEContext())
             {
                 //only need get these when they are needed
                 if (assignment.Type == AssignmentTypes.TeamEvaluation)
                 {
                     teamEvaluations = db.TeamEvaluations.Where(te => te.TeamEvaluationAssignmentID == assignment.ID).ToList();
+                }
+                if (assignment.HasRubric)
+                {
+                    rubricEvaluations = db.RubricEvaluations.Where(re => re.AssignmentID == assignment.ID).ToList();
                 }
             }
 
@@ -95,26 +100,22 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     //add link to rubric ViewAsUneditable mode
                     vm.HeaderBuilder = new RubricDecorator(vm.HeaderBuilder);
                     vm.HeaderViews.Add("RubricDecorator");
+
+                    //Show rubric grading progress for assignments with rubrics
+                    vm.HeaderBuilder = new RubricGradingProgressDecorator(vm.HeaderBuilder, rubricEvaluations);
+                    vm.HeaderViews.Add("RubricGradingProgressDecorator");
                 }
 
                 if (assignment.Type == AssignmentTypes.TeamEvaluation)
                 {
-                    //add publish all multipliers button
-                    vm.HeaderBuilder = new TeamEvalGradingProgressDecorator(vm.HeaderBuilder);
-                    vm.HeaderViews.Add("TeamEvalGradingProgressDecorator");
+                    //Show progress of TeamEvaluation, such as "X of Y Team Evaluations completed"
+                    vm.HeaderBuilder = new TeamEvalProgressDecorator(vm.HeaderBuilder, teamEvaluations);
+                    vm.HeaderViews.Add("TeamEvalProgressDecorator");
                 }
                 else if (assignment.Type == AssignmentTypes.CriticalReview)
                 {
                     vm.HeaderBuilder = new PublishCriticalReviewDecorator(vm.HeaderBuilder);
                     vm.HeaderViews.Add("PublishCriticalReviewDecorator");
-                }
-                else
-                {
-                    //Show grading progress for all teacher views
-                    //add "x of y" have been published
-                    //if drafts exist: add "z saved as draft (publish all)
-                    vm.HeaderBuilder = new TeacherGradingProgressDecorator(vm.HeaderBuilder);
-                    vm.HeaderViews.Add("TeacherGradingProgressDecorator");
                 }
 
 
@@ -170,10 +171,13 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     //add rubric link
                     vm.HeaderBuilder = new RubricDecorator(vm.HeaderBuilder);
                     vm.HeaderViews.Add("RubricDecorator");
+
+                    //add link to graded rubric link
+                    vm.HeaderBuilder = new RubricGradeDecorator(vm.HeaderBuilder, vm.Client, rubricEvaluations);
+                    vm.HeaderViews.Add("RubricGradeDecorator");
                 }
-                    //add grade link
-                    vm.HeaderBuilder = new StudentGradeDecorator(vm.HeaderBuilder, vm.Client);
-                    vm.HeaderViews.Add("StudentGradeDecorator");
+                
+                    
             }
 
             else if (vm.Client.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator) //Moderator decorators
@@ -297,11 +301,11 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 else
                 {
                     //add grade info
-                    vm.TeamTableBuilders[assignmentTeam] = new GradeTableDecorator(
+                    vm.TeamTableBuilders[assignmentTeam] = new RubricTableDecorator(
                                                                 vm.TeamTableBuilders[assignmentTeam],
                                                                 rubricEvaluations
                                                                 );
-                    vm.TableColumnHeaders["GradeTableDecorator"] = "Grade";
+                    vm.TableColumnHeaders["RubricTableDecorator"] = "Rubric Grade";
 
                     //add late penalty info
                     vm.TeamTableBuilders[assignmentTeam] = new LatePenaltyTableDecorator(

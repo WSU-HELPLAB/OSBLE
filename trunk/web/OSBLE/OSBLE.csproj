@@ -188,17 +188,17 @@
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\LatePolicyHeaderDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\PublishCriticalReviewDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\RubricDecorator.cs" />
-    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\StudentGradeDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\RubricGradeDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\StudentSubmissionDecorator.cs" />
-    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\TeacherGradingProgressDecorator.cs" />
-    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\TeamEvalGradingProgressDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\RubricGradingProgressDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\TeamEvalProgressDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\HeaderBuilder\TeamMembersDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\CriticalReviewsReceivedDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\DeliverablesTableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\DiscussionPostsTableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\DiscussionRepliesTableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\DiscussionTotalTableDecorator.cs" />
-    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\GradeTableDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\RubricTableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\InlineReviewTableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\LatePenaltyTableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\TableDecorator.cs" />
@@ -249,7 +249,6 @@
     <Compile Include="Controllers\DiscussionAssignmentController.cs" />
     <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\FileHandlerController.cs" />
-    <Compile Include="Controllers\GradebookController.cs" />
     <Compile Include="Controllers\SubmissionController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\RubricController.cs" />
@@ -681,9 +680,6 @@
     <Content Include="Views\Mail\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Gradebook\Index.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Views\Home\_DashboardPost.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -712,16 +708,16 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\InitialFinalDueDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\TeacherDiscussionLinkDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\RubricDecorator.cshtml" />
-    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\TeacherGradingProgressDecorator.cshtml" />
-    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\TeamEvalGradingProgressDecorator.cshtml" />
-    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\GradeTableDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\RubricGradingProgressDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\TeamEvalProgressDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\RubricTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\LatePenaltyTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\TeamEvaluationProgressTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\TeamEvaluationDiscrepancyTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\InlineReviewTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\_Layout.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\TeamMembersDecorator.cshtml" />
-    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\StudentGradeDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\RubricGradeDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\StudentSubmissionDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\DiscussionPostsTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Home\DiscussionAssignmentIndex.cshtml" />
@@ -766,7 +762,6 @@
     <Content Include="Views\Deliverable\Delete.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\Time.cshtml" />
     <Content Include="Views\Shared\_Events.cshtml" />
-    <Content Include="Views\Gradebook\_Gradebook.cshtml" />
     <Content Include="Views\Event\Index.cshtml" />
     <Content Include="Views\Event\Details.cshtml" />
     <Content Include="Views\Event\Create.cshtml" />
@@ -777,8 +772,6 @@
     <Content Include="Views\Mail\NotFound.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\SilverlightObject.cshtml" />
     <Content Include="Views\Shared\_ReCaptcha.cshtml" />
-    <Content Include="Views\Gradebook\_Tabs.cshtml" />
-    <Content Include="Views\Gradebook\Tab.cshtml" />
     <Content Include="Views\Account\ResetPasswordSuccess.cshtml" />
     <Content Include="Views\Account\ResetPasswordFailure.cshtml" />
     <Content Include="Views\Notification\Index.cshtml" />
@@ -790,15 +783,10 @@
     <Content Include="Views\Account\ProfessionalRegister.cshtml" />
     <Content Include="Views\Submission\Create.cshtml" />
     <Content Include="Views\Submission\SubmittedSuccessfully.cshtml" />
-    <Content Include="Views\Gradebook\ImportColumnsFromCSV.cshtml" />
     <Content Include="Views\Rubric\Index.cshtml" />
     <Content Include="Views\Submission\_Submit.cshtml" />
     <Content Include="Views\Rubric\_Display.cshtml" />
     <Content Include="Views\Rubric\View.cshtml" />
-    <Content Include="Views\Gradebook\_StudentGradebook.cshtml" />
-    <Content Include="Views\Gradebook\_StudentTab.cshtml" />
-    <Content Include="Views\Gradebook\_TeacherGradebook.cshtml" />
-    <Content Include="Views\Gradebook\_TeacherTab.cshtml" />
     <Content Include="Views\Account\AccountCreated.cshtml" />
     <Content Include="Views\Account\ActivateAccount.cshtml" />
     <Content Include="Views\School\Delete.cshtml" />
@@ -806,13 +794,10 @@
     <Content Include="Areas\AssignmentWizard\Views\Basics\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Team\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Deliverables\Index.cshtml" />
-    <Content Include="Views\Gradebook\ExportToCSV.cshtml" />
     <Content Include="Views\Home\Time.cshtml" />
     <Content Include="Views\Assignment\_TeacherIndex.cshtml" />
     <Content Include="Views\Assignment\_TeacherTeamEvaluationView.cshtml" />
     <Content Include="Views\Assignment\_StudentTeamEvaluationView.cshtml" />
-    <Content Include="Views\Gradebook\_ObserverGradebook.cshtml" />
-    <Content Include="Views\Gradebook\_ObserverTab.cshtml" />
     <Content Include="Views\CookieTest\Index.cshtml" />
     <Content Include="Views\Rubric\ExportIndividualToCSV.cshtml" />
     <Content Include="Views\Rubric\ExportAllToCSV.cshtml" />
@@ -840,7 +825,9 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Views\Gradebook\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

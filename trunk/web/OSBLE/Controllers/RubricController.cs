@@ -125,7 +125,7 @@ namespace OSBLE.Controllers
             }
 
             //Make sure that the current activity is attached to the active course
-            if (viewModel.SelectedAssignment.Category.CourseID != ActiveCourse.AbstractCourseID)
+            if (viewModel.SelectedAssignment.CourseID != ActiveCourseUser.AbstractCourseID)
             {
                 return false;
             }
@@ -227,7 +227,7 @@ namespace OSBLE.Controllers
             //assignments are storied within categories, which are found within
             //the active course.
             List<Assignment> rubricAssignmentList = (from a in db.Assignments
-                                                     where a.Category.CourseID == assignment.Category.CourseID &&
+                                                     where a.CourseID == assignment.CourseID &&
                                                      a.Rubric != null
                                                      select a).ToList();
 
@@ -249,7 +249,7 @@ namespace OSBLE.Controllers
             }
             else
             {
-                viewModel.TeamList = assignment.AssignmentTeams.OrderBy(t => t.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ActiveCourse.AbstractRole)).ToList();
+                viewModel.TeamList = assignment.AssignmentTeams.OrderBy(t => t.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(ActiveCourseUser.AbstractRole)).ToList();
             }
             viewModel.RubricEvaluationList = (from r in db.RubricEvaluations
                                               where r.AssignmentID == assignment.ID
@@ -351,28 +351,10 @@ namespace OSBLE.Controllers
                 }
                 db.SaveChanges();
 
-                //if the evaluation has been published, update the scores in the gradebook
+                //if the evaluation has been published, send notification to student
                 if (vm.Evaluation.IsPublished)
                 {
-                    //(new NotificationController()).SendRubricEvaluationCompletedNotification(vm.Evaluation.Assignment, vm.Evaluation.Recipient);
-                   // GradebookController gradebook = new GradebookController();
-
-                    //figure out the normalized final score.
-                    double maxLevelScore = (from c in vm.Rubric.Levels
-                                            select c.PointSpread).Sum();
-                    double totalRubricPoints = (from c in vm.Rubric.Criteria
-                                                select c.Weight).Sum();
-                    double studentScore = 0.0;
-
-                    foreach (CriterionEvaluation critEval in vm.Evaluation.CriterionEvaluations)
-                    {
-                        studentScore += (double)critEval.Score / maxLevelScore * (critEval.Criterion.Weight / totalRubricPoints);
-                    }
-
-                    //normalize the score with the assignment score
-                    studentScore *= vm.Evaluation.Assignment.PointsPossible;
-
-                    //gradebook.ModifyTeamGrade(studentScore, vm.SelectedAssignment.ID, vm.Evaluation.Recipient.ID);
+                   (new NotificationController()).SendRubricEvaluationCompletedNotification(vm.Evaluation.Assignment, vm.Evaluation.Recipient);
                 }
             }
             return View(vm);
@@ -458,10 +440,12 @@ namespace OSBLE.Controllers
                     CourseUser cu = db.CourseUsers.Find(cuId);
                     AssignmentTeam at = GetAssignmentTeam(assignment, cu);
                     ViewBag.AssignmentName = assignment.AssignmentName;
-                    ViewBag.PossiblePoints = assignment.PointsPossible;
-                    ViewBag.Score = (from c in assignment.Scores where c.CourseUserID == cuId select c).FirstOrDefault();
-                    if (ViewBag.Score != null && ViewBag.Score.Points == -1) //If the score is currently a NG, dont display score (doing this by giving score a null value, handled by view)
-                        ViewBag.Score = null;
+                    ViewBag.DisplayGrade = false;
+                    if (viewModel.Evaluation.CriterionEvaluations.Count > 0)
+                    {
+                        ViewBag.DisplayGrade = true;
+                        ViewBag.Grade = viewModel.Evaluation.GetGradeAsPercent();
+                    }
                     ViewBag.isEditable = false;
 
                     return View(viewModel);
@@ -473,7 +457,7 @@ namespace OSBLE.Controllers
         public ActionResult ViewAsUneditable(int assignmentId)
         {
             RubricViewModel viewModel = GetUneditableRubricViewModel(assignmentId);
-            if (!(viewModel.Rubric == null || viewModel.SelectedAssignment.Category.CourseID != ActiveCourseUser.AbstractCourseID))
+            if (!(viewModel.Rubric == null || viewModel.SelectedAssignment.CourseID != ActiveCourseUser.AbstractCourseID))
             {
                 Assignment assignment = db.Assignments.Find(assignmentId);
                 ViewBag.Score = null;
@@ -626,7 +610,7 @@ namespace OSBLE.Controllers
         public ActionResult ExportIndividualToCSV(int teamID, int assignID)
         {
             string completeRubricString = "";
-            AbstractCourse currentCourse = ActiveCourse.AbstractCourse;
+            AbstractCourse currentCourse = ActiveCourseUser.AbstractCourse;
             Team team = db.Teams.Find(teamID);
             Assignment curAssignment = (from a in db.Assignments
                                         where a.ID == assignID
@@ -644,7 +628,7 @@ namespace OSBLE.Controllers
             ViewBag.CompleteRubricString = completeRubricString;
 
 
-            context.Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + currentCourse.Name + "_" + curAssignment.AssignmentName + "_" + team.DisplayName(ActiveCourse.AbstractRole) + " rubric.txt\"");
+            context.Response.AppendHeader("Content-Disposition", "attachment; filename=\"" + currentCourse.Name + "_" + curAssignment.AssignmentName + "_" + team.DisplayName(ActiveCourseUser.AbstractRole) + " rubric.txt\"");
             Response.ContentType = "application/octet-stream";
 
             return View();
@@ -654,7 +638,7 @@ namespace OSBLE.Controllers
         public ActionResult ExportAllToCSV(int assignID)
         {
             string completeRubricString = "";
-            AbstractCourse currentCourse = ActiveCourse.AbstractCourse;
+            AbstractCourse currentCourse = ActiveCourseUser.AbstractCourse;
             Assignment curAssignment = (from a in db.Assignments
                                         where a.ID == assignID
                                         select a).FirstOrDefault();
@@ -697,7 +681,7 @@ namespace OSBLE.Controllers
             string globalComments = "";
 
             header = "------------------------------------------------\n";
-            header += "*** STUDENT/TEAM: " + team.DisplayName(ActiveCourse.AbstractRole) + "\n";
+            header += "*** STUDENT/TEAM: " + team.DisplayName(ActiveCourseUser.AbstractRole) + "\n";
 
             // Criterion rows set up
             RubricEvaluation rubricEvaluation = new RubricEvaluation();

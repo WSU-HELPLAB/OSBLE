@@ -3,8 +3,6 @@
 @{
     dynamic dataModel = Model;   
     string linkText = dataModel.Grade.LinkText;
-    string controller = dataModel.Grade.Controller;
-    string action = dataModel.Grade.Action;
     object values = dataModel.Grade.ActionValues;
 }
-<td>@Html.ActionLink(linkText, action, controller, values, new { })</td>
+<td>@Html.ActionLink(linkText, "Index", "Rubric", values, new { })</td>

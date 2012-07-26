@@ -115,15 +115,6 @@ else
 <table id="AssignmentDetailsTable">
     <tr id="AssignmentDetailsTableFirstRow">
         <th>
-            Grading:
-        </th>
-        <td>
-            Worth @Model.CurrentAssignment.PointsPossible in &quot;@Model.CurrentAssignment.Category.Name&quot;
-            category
-        </td>
-    </tr>
-    <tr>
-        <th>
             Description:
         </th>
         <td>
@@ -177,22 +168,6 @@ else
         </div>
     </div>
     
-    <!-- Pop-up window for editing late percentage -->
-    <div id="EditLatePercentWindowID" style="display: none;" title="Edit Score">
-        <input type="radio" id="radioBtn1" name="group1" />
-        Use default late penalty<br />
-        <input type="radio" id="radioBtn2" name="group1" />
-        Use a custom late penalty of
-        <input size="5" id="manualLatePen" />%<br />
-        <td>
-            <text id="latePenErrorText" style="color: Red; float: left; font-size: smaller"></text>
-            <br />
-            <div style="float: right">
-                <input type="button" onclick="setManualLatePen();" value="Apply Changes" />
-                <input type="button" onclick="closeManualLatePenWindow();" value="Cancel" />
-            </div>
-        </td>
-    </div>
 }
 else
 {

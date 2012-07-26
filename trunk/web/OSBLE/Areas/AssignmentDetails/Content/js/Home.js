@@ -55,45 +55,4 @@ function remove_downloading_submission_dialog() {
 
 function SubmissionLoaded() {
     $('#submit_files_dialog').dialog('open');
-
-}
-
-function openManualLatePenWindow(sId, uId, aId) {
-    scoreId = sId;
-    userId = uId;
-    assId = aId;
-
-    //$("#EditLatePercentWindowID").dialog("open");
-
-    $("#EditLatePercentWindowID").dialog({
-        autoOpen: true,
-        modal: true,
-        resizable: false,
-        width: 370,
-        height: 170,
-        closeOnEscape: false
-    });
-}
-
-function closeManualLatePenWindow() {
-    $("#EditLatePercentWindowID").dialog("close");
-}
-
-function setManualLatePen() {
-    if ($("#radioBtn1").attr('checked') == "checked") {
-        $.ajax({
-            async: false,
-            url: "/Assignment/ModifyLatePenalty",
-            data: { scoreId: scoreId, courseUserId: userId, latePenalty: -1, assignmentId: assId }
-        });
-    }
-    else {
-        var lp = $("#manualLatePen").val();
-        $.ajax({
-            async: false,
-            url: "/Assignment/ModifyLatePenalty",
-            data: { scoreId: scoreId, courseUserId: userId, latePenalty: lp, assignmentId: assId }
-        });
-    }
-    window.location.reload(true);
 }

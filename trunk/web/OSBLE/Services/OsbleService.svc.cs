@@ -77,9 +77,7 @@ namespace OSBLE.Services
                 return new Assignment[0];
             }
             var query = from assignment in _db.Assignments
-                        where assignment.IsWizardAssignment == true
-                        &&
-                        assignment.CourseID == courseId
+                        where assignment.CourseID == courseId
                         select assignment;
             List<Assignment> efAssignments = query.ToList();
             List<Assignment> nonEfAssignments = new List<Assignment>(efAssignments.Count);

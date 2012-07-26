@@ -126,10 +126,6 @@ namespace OSBLE.Models
         // Annotate stuff
         public DbSet<AnnotateDocumentReference> AnnotateDocumentReferences { get; set; }
 
-        // Assignments
-
-        public DbSet<Score> Scores { get; set; }
-
         // DiscussionAssignments
 
         public DbSet<DiscussionPost> DiscussionPosts { get; set; }
@@ -241,11 +237,6 @@ namespace OSBLE.Models
             modelBuilder.Entity<Notification>()
                 .HasRequired(n => n.Sender)
                 .WithMany()
-                .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<Score>()
-                .HasRequired(s => s.Assignment)
-                .WithMany(a => a.Scores)
                 .WillCascadeOnDelete(false);
 
             //In a critical review, students will be reviewing an existing assignment.
