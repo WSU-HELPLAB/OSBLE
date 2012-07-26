@@ -8,6 +8,8 @@
                        select c.PointSpread).Sum();
   double totalRubricPoints = (from c in Model.Rubric.Criteria
                               select c.Weight).Sum();
+  bool student = Model.Student;
+  
   string critInputPrefix = ViewBag.CritInputPrefix;
   string critSliderPrefix = ViewBag.CritSliderPrefix;
   string critCommentPrefix = ViewBag.CritCommentPrefix;
@@ -19,7 +21,7 @@
   int sliderTableLength = 880;
   int textInputLenght = 25;
   int sliderTableCellWidth = (sliderTableLength / maxLevelScore) - textInputLenght;
-  bool student = ViewBag.Student;
+  
   DateTime? publishTime = Model.Evaluation.DatePublished;
 
   Boolean editable = ViewBag.isEditable;
@@ -164,6 +166,9 @@ function create_and_open_downloading_submission_dialog() {
         width: 1200px;
     }
 </style>
+
+
+
 <div id='import_rubric_from_csv'  title="Import file" style="display:none;">Upload a text file containing this students rubric:<br /><br />
     @using (Html.BeginForm("ImportIndividualToCSV", "Rubric",  FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
@@ -437,5 +442,6 @@ function create_and_open_downloading_submission_dialog() {
         <input type="hidden" name="@ViewBag.AssignmentId" value="@Model.SelectedAssignment.ID" />
         <input type="hidden" name="@ViewBag.CourseUserId" value="@Model.SelectedTeam.Team.TeamMembers.FirstOrDefault().CourseUserID" />
         <input type="hidden" name="@ViewBag.TeamId" value="@Model.SelectedTeam.TeamID" />
+        <input type="hidden" name="@ViewBag.StudentStatusName" value="@Model.Student"/>
     }
 </div>

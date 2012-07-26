@@ -38,7 +38,7 @@
                                         @{
                                             string name;
                                             
-                                            if (rt.AuthorTeam.TeamMembers.Count > 1)
+                                            if (rt.AuthorTeam.TeamMembers.Count > 1) 
                                             {
                                                 name = rt.AuthorTeam.Name;
                                             }
@@ -73,19 +73,7 @@
                                             @Ajax.ActionLink("Upload your review", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area = "" }, options, new object())
                                         </td>
                                     </tr>
-                                    if (dataModel.CRSubmission.hasStudentRubric == true)
-                                    {
-                                        <tr>
-                                            <td> 
-                                                @Html.ActionLink("Rubric Link", 
-                                                "StudentIndex", 
-                                                "Rubric", 
-                                                new { assignmentId = rt.AssignmentID, 
-                                                    cuId = rt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUserID, area = "" }, 
-                                                new { })
-                                            </td>
-                                        </tr>
-                                    }
+                                   
                                     }
                                 }
                                 
@@ -122,6 +110,21 @@
                                     *@
                                     
                                 }
+
+                                 @if (dataModel.CRSubmission.hasStudentRubric == true)
+                                    {
+                                        <tr>
+                                            <td> 
+                                                @Html.ActionLink("Rubric Link", 
+                                                "StudentIndex", 
+                                                "Rubric", 
+                                                new { assignmentId = rt.AssignmentID, 
+                                                    cuId = rt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUserID, 
+                                                    area = "" }, 
+                                                new { })
+                                            </td>
+                                        </tr>
+                                    }
                             </table>
                         </td>
                     </tr>

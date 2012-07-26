@@ -12,7 +12,13 @@
         @if (dataModel.AssignmentDetails.hasRubric && dataModel.AssignmentDetails.hasGrade)
         {
             String grade = dataModel.AssignmentDetails.grade;
-            @Html.ActionLink(grade, "View", "Rubric", new { assignmentId = dataModel.AssignmentDetails.AssignmentID, cuId = dataModel.AssignmentDetails.cuID, area = "" }, new { })
+            @Html.ActionLink(grade, 
+            "View", 
+            "Rubric",
+            new { assignmentId = dataModel.AssignmentDetails.AssignmentID, 
+                cuId = dataModel.AssignmentDetails.cuID, 
+                area = "" },
+            new { })
         }
         else
         {

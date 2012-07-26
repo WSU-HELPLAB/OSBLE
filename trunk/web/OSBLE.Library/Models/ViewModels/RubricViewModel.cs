@@ -31,5 +31,7 @@ namespace OSBLE.Models.ViewModels
         public SelectList Sections { get; set; }
 
         public int SelectedSection { get; set; }
+
+        public bool Student { get; set; }
     }
 }

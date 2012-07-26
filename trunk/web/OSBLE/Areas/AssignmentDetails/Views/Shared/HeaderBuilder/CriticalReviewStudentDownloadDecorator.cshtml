@@ -17,7 +17,13 @@
         @(Html.ActionLink("Download your reviewed submission", "GetReviewsOfAuthor", "FileHandler",
         new { area = "", assignmentId = dataModel.CRdownload.assignmentID, receiverId = cu.ID },
         new { onclick = "create_and_open_downloading_submission_dialog()" }))
-        
+    
+    <br />
+        @Html.ActionLink("Rubric", 
+        "ViewForCriticalReview",
+        "Rubric",
+        new { assignmentId = dataModel.CRdownload.assignmentID, area = ""},
+        new {})
     }
     else
     {

@@ -32,6 +32,7 @@ namespace OSBLE.Controllers
             ViewBag.GlobalCommentId = ViewBag.CritCommentPrefix + "_global";
             ViewBag.DraftButtonId = "save_as_draft";
             ViewBag.PublishButtonId = "publish_to_student";
+            ViewBag.StudentStatusName = "StudentStatus";
         }
 
         /// <summary>
@@ -48,14 +49,25 @@ namespace OSBLE.Controllers
             Int32.TryParse(Request.Form[ViewBag.CourseUserId].ToString(), out courseUserId);
             Int32.TryParse(Request.Form[ViewBag.TeamId].ToString(), out teamId);
 
+            bool student;
+            bool.TryParse(Request.Form[ViewBag.StudentStatusName].ToString(), out student);
+            viewModel.Student = student;
+
             //before we populate with FORM values, fill in the basic stuff
             if (assignmentId > 0 && courseUserId > 0 && teamId > 0)
             {
-                viewModel = GetRubricViewModel(assignmentId, courseUserId);
+                if (student)
+                {
+                    viewModel = GetStudentRubricViewModel(assignmentId, courseUserId);
+                }
+                else
+                {
+                    viewModel = GetRubricViewModel(assignmentId, courseUserId);
+                    //now, change the view model based on what we were passed through the form
+                    viewModel.Evaluation.RecipientID = teamId;
+                }
             }
 
-            //now, change the view model based on what we were passed through the form
-            viewModel.Evaluation.RecipientID = teamId;
             foreach (CriterionEvaluation critEval in viewModel.Evaluation.CriterionEvaluations)
             {
                 string critScoreKey = String.Format("{0}_{1}", ViewBag.CritInputPrefix, critEval.CriterionID);
@@ -102,6 +114,10 @@ namespace OSBLE.Controllers
 
         private bool HasValidViewModel(RubricViewModel viewModel)
         {
+            if (viewModel.Student)
+            {
+                return true;
+            }
             //make sure that we found a rubric and that we have an activity to grade
             if (viewModel.Rubric == null || viewModel.AssignmentList == null || viewModel.AssignmentList.Count == 0)
             {
@@ -140,12 +156,13 @@ namespace OSBLE.Controllers
             {
                 rubric = assignment.Rubric;
             }
+            viewModel.Student = student;
             viewModel.Rubric = rubric;
             viewModel.SelectedAssignment = assignment;
 
             //if nothing exists, we need to build a dummy eval for the view to process
             viewModel.Evaluation.AssignmentID = assignment.ID;
-            viewModel.Evaluation.EvaluatorID = CurrentUser.ID;
+            viewModel.Evaluation.EvaluatorID = ActiveCourseUser.ID;
             foreach (Criterion crit in rubric.Criteria)
             {
                 CriterionEvaluation critEval = new CriterionEvaluation();
@@ -158,54 +175,44 @@ namespace OSBLE.Controllers
             return viewModel;
         }
 
-        /// <summary>
-        /// Populates a generic RubricViewModel based on the supplied parameters
-        /// </summary>
-        /// <param name="abstractAssignmentActivityId"></param>
-        /// <param name="teamUserId"></param>
-        /// <returns></returns>
-        private RubricViewModel GetRubricViewModel(int assignmentId, int cuId, bool student = false)
+        private RubricViewModel GetRubricViewModel(int assignmentId, int cuId)
         {
             CourseUser cu = db.CourseUsers.Find(cuId);
             RubricViewModel viewModel = new RubricViewModel();
 
             Assignment assignment = db.Assignments.Find(assignmentId);
 
-            AssignmentTeam assignmentTeam = GetAssignmentTeam(assignment, cu);
+            AssignmentTeam assignmentTeam;
+            viewModel.Student = false;
+
+            viewModel.SelectedAssignment = assignment;
+
+            assignmentTeam = GetAssignmentTeam(assignment, cu);
+            Rubric rubric = assignment.Rubric;
 
             if (assignment == null || assignmentTeam == null)
             {
                 return viewModel;
             }
-
-            //assigns the rubric to our view model
-            Rubric rubric;
-            if (student)
-            {
-                rubric = assignment.StudentRubric;
-            }
-            else
-            {
-                rubric = assignment.Rubric;
-            }
             viewModel.Rubric = rubric;
-            viewModel.SelectedAssignment = assignment;
+
             viewModel.SelectedTeam = assignmentTeam;
 
             //pull a prior evaluation if it exists
             RubricEvaluation eval = (from e in db.RubricEvaluations
-                                     where e.RecipientID == assignmentTeam.TeamID
-                                     select e).FirstOrDefault();
+                    where e.RecipientID == assignmentTeam.TeamID
+                    select e).FirstOrDefault();
+            
             if (eval != null)
             {
                 viewModel.Evaluation = eval;
             }
-            else
+            else //if nothing exists, we need to build a dummy eval for the view to process
             {
-                //if nothing exists, we need to build a dummy eval for the view to process
                 viewModel.Evaluation.Recipient = assignmentTeam.Team;
+                
                 viewModel.Evaluation.AssignmentID = assignment.ID;
-                viewModel.Evaluation.EvaluatorID = CurrentUser.ID;
+                viewModel.Evaluation.EvaluatorID = ActiveCourseUser.ID;
                 foreach (Criterion crit in rubric.Criteria)
                 {
                     CriterionEvaluation critEval = new CriterionEvaluation();
@@ -250,12 +257,77 @@ namespace OSBLE.Controllers
             return viewModel;
         }
 
-        [CanGradeCourse]
-        [CanSubmitAssignments]
-        [HttpPost]
-        public ActionResult Index(RubricViewModel viewModel)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        /// <param name="cuId">ID of the author (person being reviewed) Note: if it's a team, this is the ID
+        /// of the person who submitted the assignment</param>
+        /// <returns></returns>
+        private RubricViewModel GetStudentRubricViewModel(int assignmentId, int cuId)
         {
-            double latePenalty = 0.0;
+            CourseUser cu = db.CourseUsers.Find(cuId);
+            RubricViewModel viewModel = new RubricViewModel();
+
+            Assignment assignment = db.Assignments.Find(assignmentId);
+            if (assignment == null)
+            {
+                return viewModel;
+            }
+
+            viewModel.SelectedAssignment = assignment;
+
+            int authorTeamId;
+            viewModel.Student = true;
+
+            authorTeamId = GetAssignmentTeam(assignment.PreceedingAssignment, cu).TeamID;
+            Rubric rubric = assignment.StudentRubric;
+
+
+            viewModel.Rubric = rubric;
+
+            viewModel.SelectedTeam = GetAssignmentTeam(assignment.PreceedingAssignment, cu);
+
+            AssignmentTeam reviewingTeam = GetAssignmentTeam(assignment, ActiveCourseUser);
+
+            //get Ids of all members of the team doing the review. Use this list to make sure that the current 
+            //user is on this team
+            List<int> ReviewingTeamCUIDs = reviewingTeam.Team.TeamMembers.Select(tm => tm.CourseUserID).ToList();
+
+            //get the rubric evaluation where 
+                //the recipientID matches the the author team and
+                //the evaluator ID (CourseUserID) exists in the team that is doing the review
+            RubricEvaluation eval = (from e in db.RubricEvaluations
+                    where e.RecipientID == authorTeamId &&
+                    ReviewingTeamCUIDs.Contains(e.EvaluatorID)
+                    select e).FirstOrDefault();
+
+            if (eval != null)
+            {
+                viewModel.Evaluation = eval;
+            }
+            else
+            {
+                viewModel.Evaluation.Recipient = db.Teams.Find(authorTeamId);
+                viewModel.Evaluation.AssignmentID = assignment.ID;
+                viewModel.Evaluation.EvaluatorID = ActiveCourseUser.ID;
+                foreach (Criterion crit in rubric.Criteria)
+                {
+                    CriterionEvaluation critEval = new CriterionEvaluation();
+                    critEval.Criterion = crit;
+                    critEval.CriterionID = crit.ID;
+                    critEval.Score = 0;
+                    critEval.Comment = "";
+                    viewModel.Evaluation.CriterionEvaluations.Add(critEval);
+                }
+            }
+
+            return viewModel;
+        }
+
+        [HttpPost]
+        public ActionResult Index()
+        {
             RubricViewModel vm = BuildViewModelFromForm();
 
             ViewBag.isEditable = true;
@@ -282,8 +354,8 @@ namespace OSBLE.Controllers
                 //if the evaluation has been published, update the scores in the gradebook
                 if (vm.Evaluation.IsPublished)
                 {
-                    (new NotificationController()).SendRubricEvaluationCompletedNotification(vm.Evaluation.Assignment, vm.Evaluation.Recipient);
-                    GradebookController gradebook = new GradebookController();
+                    //(new NotificationController()).SendRubricEvaluationCompletedNotification(vm.Evaluation.Assignment, vm.Evaluation.Recipient);
+                   // GradebookController gradebook = new GradebookController();
 
                     //figure out the normalized final score.
                     double maxLevelScore = (from c in vm.Rubric.Levels
@@ -300,7 +372,7 @@ namespace OSBLE.Controllers
                     //normalize the score with the assignment score
                     studentScore *= vm.Evaluation.Assignment.PointsPossible;
 
-                    gradebook.ModifyTeamGrade(studentScore, vm.SelectedAssignment.ID, vm.Evaluation.Recipient.ID);
+                    //gradebook.ModifyTeamGrade(studentScore, vm.SelectedAssignment.ID, vm.Evaluation.Recipient.ID);
                 }
             }
             return View(vm);
@@ -310,16 +382,20 @@ namespace OSBLE.Controllers
         [CanGradeCourse]
         public ActionResult Index(int assignmentId, int cuId)
         {
-            ViewBag.Student = false;
             return IndexHelper(GetRubricViewModel(assignmentId, cuId));
         }
 
-        // this creates the student's version of the rubric view
+        /// <summary>
+        /// this creates the student's version of the rubric view
+        /// get the rubric that current user (cuId) performed on the authorTeam
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        /// <param name="cuId">ID of the author (person being reviewed) Note: if it's a team, this is the ID
+        /// of the person who submitted the assignment</param>
         [CanSubmitAssignments]
         public ActionResult StudentIndex(int assignmentId, int cuId)
         {
-            ViewBag.Student = true;
-            return IndexHelper(GetRubricViewModel(assignmentId, cuId, true));
+            return IndexHelper(GetStudentRubricViewModel(assignmentId, cuId));
         }
 
         // Perform actions that are the same for both Index and StudentIndex
@@ -330,20 +406,33 @@ namespace OSBLE.Controllers
                 return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
             }
 
-            //MK NOTE: commenting out the observer stuff because it doesn't look like it's set up correctly or fully implemented
+            ViewBag.isEditable = true;
 
-            //CourseUser cu = db.CourseUsers.Find(cuId);
-            //if (cu.AbstractRole.Anonymized)
-            //{
-            //    ViewBag.ObserverCU = db.CourseUsers.Where(c => c.AbstractCourseID == cu.AbstractCourseID).ToList();
-            //    ViewBag.isEditable = false;
-            //}
-            //else
-            //{
-                ViewBag.isEditable = true;
-            //}
             return View("Index", viewModel);
         }
+
+        //public ActionResult ViewForCriticalReview(int assignmentId, int authorTeamId)
+        //{
+        //    //Get a view model for each rubric in the assignment that was done on the author
+        //    List<RubricViewModel> rubricViewModels;
+        //  !!viewModel = GetStudentRubricViewModel(assignmentId, courseUserId,  teamId);
+        //    List<int> authorIds = (from at in db.ReviewTeams
+        //                                    where at.AuthorTeamID == authorTeamId
+        //                                    select at.AuthorTeamID).ToList();
+        //        //get list of cuIDs where each cuID represents a review team that reviewed the author team
+        //   //List<int> ids = (from 
+        //        //then call getstudentrubricviewmodel for each id
+
+        //    //merge all of the view models
+
+        //    //Return the view for the new merged view model
+
+        //}
+
+        //private RubricViewModel MergeRubrics(List<RubricViewModel> originals)
+        //{
+
+        //}
 
         public ActionResult View(int assignmentId, int cuId)
         {
@@ -384,7 +473,7 @@ namespace OSBLE.Controllers
         public ActionResult ViewAsUneditable(int assignmentId)
         {
             RubricViewModel viewModel = GetUneditableRubricViewModel(assignmentId);
-            if (!(viewModel.Rubric == null || viewModel.SelectedAssignment.Category.CourseID != ActiveCourse.AbstractCourseID))
+            if (!(viewModel.Rubric == null || viewModel.SelectedAssignment.Category.CourseID != ActiveCourseUser.AbstractCourseID))
             {
                 Assignment assignment = db.Assignments.Find(assignmentId);
                 ViewBag.Score = null;
@@ -456,7 +545,7 @@ namespace OSBLE.Controllers
                             Rubric rubric = db.Rubrics.Find(curAssignment.Rubric.ID);
 
                             rubricEvaluation.AssignmentID = curAssignment.ID;
-                            rubricEvaluation.EvaluatorID = ActiveCourseUser.UserProfileID;
+                            rubricEvaluation.EvaluatorID = ActiveCourseUser.ID;
                             rubricEvaluation.RecipientID = team.ID;
 
                             foreach(Criterion c in rubric.Criteria)

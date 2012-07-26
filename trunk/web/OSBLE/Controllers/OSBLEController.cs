@@ -569,7 +569,7 @@ namespace OSBLE.Controllers
         public void RemoveUserFromCourse(UserProfile user)
         {
             CourseUser cu =  (from c in db.CourseUsers
-                    where c.AbstractCourseID == ActiveCourse.AbstractCourseID
+                    where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID
                     && c.UserProfileID == user.ID
                     select c).FirstOrDefault();
             if (cu != null)

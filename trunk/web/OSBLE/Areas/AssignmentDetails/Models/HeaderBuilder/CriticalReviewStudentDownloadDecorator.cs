@@ -32,7 +32,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 
                         
             AssignmentTeam assignmentTeam = null;
-            assignmentTeam = OSBLEController.GetAssignmentTeam(assignment, Student);
+            assignmentTeam = OSBLEController.GetAssignmentTeam(assignment.PreceedingAssignment, Student);
            
             header.CRdownload.hasRecievedReview = false;
 
@@ -47,7 +47,8 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                 //check each team for a submission
                 foreach (AssignmentTeam at in reviewersOfStudent)
                 {
-                    if(at.GetSubmissionTime() != null)
+                    //if(at.GetSubmissionTime() != null)
+                    if(FileSystem.GetSubmissionTime(at, assignmentTeam.Team) != null)
                     {
                         header.CRdownload.hasRecievedReview = true;
                         break;

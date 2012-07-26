@@ -21,7 +21,7 @@ namespace OSBLE.Models.Courses.Rubrics
         [Required]
         public int EvaluatorID { get; set; }
 
-        public virtual UserProfile Evaluator { get; set; }
+        public virtual CourseUser Evaluator { get; set; }
 
         [Required]
         public int RecipientID { get; set; }

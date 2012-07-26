@@ -326,6 +326,11 @@ namespace OSBLE.Models
                 .WithMany(cu => cu.TeamMemberships)
                 .WillCascadeOnDelete(true);
 
+            modelBuilder.Entity<RubricEvaluation>()
+                .HasRequired(re => re.Assignment)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
         }
     }
 }
