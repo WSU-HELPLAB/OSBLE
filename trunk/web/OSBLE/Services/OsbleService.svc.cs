@@ -76,8 +76,11 @@ namespace OSBLE.Services
             {
                 return new Assignment[0];
             }
+
+            //get all non-draft assignments
             var query = from assignment in _db.Assignments
                         where assignment.CourseID == courseId
+                        && assignment.IsDraft == false
                         select assignment;
             List<Assignment> efAssignments = query.ToList();
             List<Assignment> nonEfAssignments = new List<Assignment>(efAssignments.Count);
