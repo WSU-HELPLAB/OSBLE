@@ -50,23 +50,24 @@ namespace OSBLE.Models.Courses.Rubrics
         /// Returns a string that is ("XX.X %") where XX.X is the rubric grade percent.
         /// </summary>
         /// <returns></returns>
-        public string GetGradeAsPercent()
+        public static string GetGradeAsPercent(int rubricEvaluationId)
         {
             double gradeOnRubric = 0.0;
 
             using (OSBLEContext db = new OSBLEContext())
             {
+                RubricEvaluation re = db.RubricEvaluations.Find(rubricEvaluationId);
                 //Calculate the rubric grade as a percent to display
-                if (this.CriterionEvaluations.Count > 0)
+                if (re.CriterionEvaluations.Count > 0)
                 {
                     //Below we are calculating the percent received on the rubric. 
-                    int sumOfPointSpreads = (from level in this.Assignment.Rubric.Levels
+                    int sumOfPointSpreads = (from level in re.Assignment.Rubric.Levels
                                              select level.PointSpread).Sum();
 
                     double sumOfWeights = 0;
                     double sumOfWeightedScores = 0;
 
-                    foreach (CriterionEvaluation critEval in this.CriterionEvaluations)
+                    foreach (CriterionEvaluation critEval in re.CriterionEvaluations)
                     {
                         double currentWeight = critEval.Criterion.Weight;
                         sumOfWeights += currentWeight;
@@ -86,9 +87,8 @@ namespace OSBLE.Models.Courses.Rubrics
                 }
             }
 
-            //ToString("P") multiplies the value by 100, and the value for gradeOnRubric is already a percent here
-            //so dividing by 100.0 before it gets multiplied by 100.0 to preserve value.
-            return (gradeOnRubric / 100.0).ToString("P");
+            //ToString("P") will add a percent for us
+            return (gradeOnRubric).ToString("P");
         }
     }
 }

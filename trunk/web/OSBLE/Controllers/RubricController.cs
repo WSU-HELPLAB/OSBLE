@@ -444,7 +444,7 @@ namespace OSBLE.Controllers
                     if (viewModel.Evaluation.CriterionEvaluations.Count > 0)
                     {
                         ViewBag.DisplayGrade = true;
-                        ViewBag.Grade = viewModel.Evaluation.GetGradeAsPercent();
+                        ViewBag.Grade = RubricEvaluation.GetGradeAsPercent(viewModel.Evaluation.ID);
                     }
                     ViewBag.isEditable = false;
 
@@ -463,6 +463,7 @@ namespace OSBLE.Controllers
                 ViewBag.Score = null;
                 ViewBag.AssignmentName = assignment.AssignmentName;
                 ViewBag.isEditable = false;
+                ViewBag.DisplayGrade = false;
                 return View("View", viewModel);
             }
             return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));

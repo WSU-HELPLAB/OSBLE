@@ -5,17 +5,22 @@ using System.Web;
 using OSBLE.Resources;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses.Rubrics;
+using OSBLE.Models;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
 {
     public class RubricTableDecorator : TableDecorator
     {
-        public List<RubricEvaluation> RubricEvaluations { get; set; }
 
-        public RubricTableDecorator(ITableBuilder builder, List<RubricEvaluation> evaluations)
+        /// <summary>
+        /// This function will be used to create a column for the instructor table that shows
+        /// "Not Graded", "Saved as Draft", or a grade % for a rubric based assingment
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="evaluations"></param>
+        public RubricTableDecorator(ITableBuilder builder)
             : base(builder)
         {
-            RubricEvaluations = evaluations;
         }
 
         /// <summary>
@@ -36,8 +41,16 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
                 area = ""
             };
 
-            RubricEvaluation rubricEvaluation = RubricEvaluations.Where(re => re.RecipientID == assignmentTeam.TeamID
-                                                                        && re.Evaluator.AbstractRole.CanGrade).FirstOrDefault();
+            RubricEvaluation rubricEvaluation = null;
+
+            using (OSBLEContext db = new OSBLEContext())
+            {
+                rubricEvaluation = db.RubricEvaluations.Where(re => re.RecipientID == assignmentTeam.TeamID
+                                                                && re.Evaluator.AbstractRole.CanGrade &&
+                                                                re.AssignmentID == assignment.ID
+                                                            ).FirstOrDefault();
+            }
+            
             data.Grade.LinkText = "Not Graded";
             if (rubricEvaluation != null)
             {
@@ -49,7 +62,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
                 }
                 else
                 {
-                    data.Grade.LinkText = rubricEvaluation.GetGradeAsPercent();
+                    data.Grade.LinkText = RubricEvaluation.GetGradeAsPercent(rubricEvaluation.ID);
                 }
             }
 

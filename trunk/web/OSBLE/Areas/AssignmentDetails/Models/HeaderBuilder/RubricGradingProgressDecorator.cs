@@ -13,11 +13,16 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 {
     public class RubricGradingProgressDecorator : HeaderDecorator
     {
-        public List<RubricEvaluation> RubricEvaluations;
-        public RubricGradingProgressDecorator(IHeaderBuilder builder, List<RubricEvaluation> rubricEvaluations)
+        /// <summary>
+        /// This method builds the row in the AssignmentDetails header related to showing instructors
+        /// the grading progress of rubrics. I.e:
+        /// "X of Y Published"
+        /// "Z saved as Draft [Publish All]"
+        /// </summary>
+        /// <param name="builder"></param>
+        public RubricGradingProgressDecorator(IHeaderBuilder builder)
             : base(builder)
         {
-            RubricEvaluations = rubricEvaluations;
         }
 
         public override DynamicDictionary BuildHeader(Assignment assignment)
