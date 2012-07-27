@@ -111,7 +111,8 @@
                                     
                                 }
 
-                                 @if (dataModel.CRSubmission.hasStudentRubric == true)
+                                 @if (dataModel.CRSubmission.hasStudentRubric == true &&
+                                     dataModel.CRSubmission.authorSubmissionTimes[i] != null)
                                     {
                                         <tr>
                                             <td> 

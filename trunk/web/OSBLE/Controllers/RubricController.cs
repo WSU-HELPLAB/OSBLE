@@ -58,7 +58,7 @@ namespace OSBLE.Controllers
             {
                 if (student)
                 {
-                    viewModel = GetStudentRubricViewModel(assignmentId, courseUserId);
+                    viewModel = GetStudentRubricViewModel(assignmentId, courseUserId, ActiveCourseUser.ID);
                 }
                 else
                 {
@@ -261,12 +261,15 @@ namespace OSBLE.Controllers
         /// 
         /// </summary>
         /// <param name="assignmentId"></param>
-        /// <param name="cuId">ID of the author (person being reviewed) Note: if it's a team, this is the ID
+        /// <param name="authorCuId">ID of the author (person being reviewed) Note: if it's a team, this is the ID
         /// of the person who submitted the assignment</param>
+        /// <param name="reviewerCuId">CourseUser ID of the reviewer</param>
         /// <returns></returns>
-        private RubricViewModel GetStudentRubricViewModel(int assignmentId, int cuId)
+        private RubricViewModel GetStudentRubricViewModel(int assignmentId, int authorCuId, int reviewerCuId)
         {
-            CourseUser cu = db.CourseUsers.Find(cuId);
+            //Id of author
+            CourseUser author = db.CourseUsers.Find(authorCuId);
+            CourseUser reviewer = db.CourseUsers.Find(reviewerCuId);
             RubricViewModel viewModel = new RubricViewModel();
 
             Assignment assignment = db.Assignments.Find(assignmentId);
@@ -280,13 +283,13 @@ namespace OSBLE.Controllers
             int authorTeamId;
             viewModel.Student = true;
 
-            authorTeamId = GetAssignmentTeam(assignment.PreceedingAssignment, cu).TeamID;
+            authorTeamId = GetAssignmentTeam(assignment.PreceedingAssignment, author).TeamID;
             Rubric rubric = assignment.StudentRubric;
 
 
             viewModel.Rubric = rubric;
 
-            viewModel.SelectedTeam = GetAssignmentTeam(assignment.PreceedingAssignment, cu);
+            viewModel.SelectedTeam = GetAssignmentTeam(assignment.PreceedingAssignment, author);
 
             AssignmentTeam reviewingTeam = GetAssignmentTeam(assignment, ActiveCourseUser);
 
@@ -377,7 +380,7 @@ namespace OSBLE.Controllers
         [CanSubmitAssignments]
         public ActionResult StudentIndex(int assignmentId, int cuId)
         {
-            return IndexHelper(GetStudentRubricViewModel(assignmentId, cuId));
+            return IndexHelper(GetStudentRubricViewModel(assignmentId, cuId, ActiveCourseUser.ID));
         }
 
         // Perform actions that are the same for both Index and StudentIndex
@@ -393,28 +396,34 @@ namespace OSBLE.Controllers
             return View("Index", viewModel);
         }
 
-        //public ActionResult ViewForCriticalReview(int assignmentId, int authorTeamId)
-        //{
-        //    //Get a view model for each rubric in the assignment that was done on the author
-        //    List<RubricViewModel> rubricViewModels;
+        public ActionResult ViewForCriticalReview(int assignmentId, int reviewerCourseUserId)
+        {
+            RubricViewModel mergedRubric = new RubricViewModel();
+
+
+            //Get a view model for each rubric in the assignment that was done on the author
+            List<RubricViewModel> rubricViewModels;
+
         //  !!viewModel = GetStudentRubricViewModel(assignmentId, courseUserId,  teamId);
-        //    List<int> authorIds = (from at in db.ReviewTeams
-        //                                    where at.AuthorTeamID == authorTeamId
-        //                                    select at.AuthorTeamID).ToList();
+
+            //compile a list of all of the authorTeamIds that were reviewed by Current user
+            List<int> authorIds = (from rt in db.ReviewTeams
+                                   where rt.ReviewTeamID == reviewerCourseUserId
+                                   select rt.AuthorTeamID).ToList();
         //        //get list of cuIDs where each cuID represents a review team that reviewed the author team
         //   //List<int> ids = (from 
         //        //then call getstudentrubricviewmodel for each id
 
         //    //merge all of the view models
 
-        //    //Return the view for the new merged view model
+        //Return the view for the new merged view model
 
         //}
 
         //private RubricViewModel MergeRubrics(List<RubricViewModel> originals)
         //{
-
-        //}
+            return View("Index", mergedRubric);
+        }
 
         public ActionResult View(int assignmentId, int cuId)
         {

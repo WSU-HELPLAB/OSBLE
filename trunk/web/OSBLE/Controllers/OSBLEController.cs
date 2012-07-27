@@ -316,6 +316,7 @@ namespace OSBLE.Controllers
                 {
                     Cache["ActiveCourse"] = ActiveCourseUser.AbstractCourseID;
                     ViewBag.ActiveCourse = ActiveCourseUser;
+                    ViewBag.ActiveCourseUser = ActiveCourseUser;
                 }
             }
             else // User invalid. Logout.

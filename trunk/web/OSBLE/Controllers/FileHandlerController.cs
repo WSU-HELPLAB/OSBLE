@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Web.Mvc;
 using Ionic.Zip;
@@ -527,14 +528,8 @@ namespace OSBLE.Controllers
 
                 if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && assignment.AssignmentTeams.Contains(assignmentTeam))
                 {
-                    Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, assignmentTeam);
 
                     string zipFileName = assignment.AssignmentName + " by " + assignmentTeam.Team.Name + ".zip";
-
-                    if (stream != null)
-                    {
-                        return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
-                    }
 
                     string submissionfolder;
                     if (assignment.Type == AssignmentTypes.CriticalReview && authorTeam != null)
@@ -552,9 +547,10 @@ namespace OSBLE.Controllers
                         {
                             zipfile.AddDirectory(submissionfolder);
                         }
-                        FileSystem.CreateZipFolder(ActiveCourseUser.AbstractCourse as Course, zipfile, assignment, assignmentTeam);
 
-                        stream = FileSystem.GetDocumentForRead(zipfile.Name);
+                        MemoryStream stream = new MemoryStream();
+                        zipfile.Save(stream);
+                        stream.Position = 0;
 
                         return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
                     }

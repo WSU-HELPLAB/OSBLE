@@ -22,7 +22,10 @@
         @Html.ActionLink("Rubric", 
         "ViewForCriticalReview",
         "Rubric",
-        new { assignmentId = dataModel.CRdownload.assignmentID, area = ""},
+        new { assignmentId = dataModel.CRdownload.assignmentID,
+              
+              area = ""
+        },
         new {})
     }
     else

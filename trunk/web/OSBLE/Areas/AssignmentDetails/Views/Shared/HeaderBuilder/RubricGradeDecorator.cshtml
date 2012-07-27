@@ -3,7 +3,7 @@
 @model DynamicDictionary
 @{
     dynamic dataModel = Model;
-    string displayValue = header.AssignmentDetails.DisplayValue;      
+    string displayValue = dataModel.AssignmentDetails.DisplayValue;      
 }
 <tr>
     <th>
@@ -12,7 +12,7 @@
     <td>
         @if (dataModel.AssignmentDetails.hasGrade)
         {
-            @Html.ActionLink(displayValue, "View", "Rubric", new { assignmentId = header.AssignmentDetails.assignmentID, cuId = dataModel.AssignmentDetails.cuID, area = "" }, new { })
+            @Html.ActionLink(displayValue, "View", "Rubric", new { assignmentId = dataModel.AssignmentDetails.assignmentID, cuId = dataModel.AssignmentDetails.cuID, area = "" }, new { })
         }
         else
         {
