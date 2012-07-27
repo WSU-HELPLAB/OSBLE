@@ -446,44 +446,11 @@ namespace OSBLE.Controllers
             }
         }
 
-        public TimeSpan? calculateLateness(Course course, Assignment assignment, AssignmentTeam team)
+        public double GetLatePenalty(AssignmentTeam team)
         {
-            DateTime? dueDate = assignment.DueDate;
-            
-            DateTime? submissionTime = GetSubmissionTime(course, assignment, team);
+            double returnValue = 0.0;
+            return returnValue;
 
-            if (submissionTime == null)
-            {
-                return null;
-            }
-
-            TimeSpan? lateness = submissionTime - dueDate;
-            if (lateness.Value.TotalMinutes <= 0)
-            {
-                return null;
-            }
-            return lateness;
-        }
-
-        //Returns the positive percentage to deduct from the students grade.
-        public double CalcualateLatePenaltyPercent(Assignment assignment, TimeSpan lateness)
-        {
-            double returnVal;
-            if (lateness.TotalHours < assignment.HoursLateWindow)
-            {
-                returnVal = ((int)(lateness.TotalHours / assignment.HoursPerDeduction) + 1) * assignment.DeductionPerUnit;
-
-                if (returnVal > 100)
-                {
-                    returnVal = 100;
-                }
-                return returnVal;
-            }
-            //The assignment is automatic 0.
-            else
-            {
-                return 100;
-            }            
         }
 
         public static string[] GetFileExtensions(DeliverableType deliverableType)
