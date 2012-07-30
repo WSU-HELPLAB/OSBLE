@@ -7,10 +7,10 @@ using OSBLE.Models.Assignments;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
 {
-    public class TeamEvaluationDiscrepancyTableDecorator : TableDecorator
+    public class TeamEvaluationMultiplierTableDecorator : TableDecorator
     {
         public List<TeamEvaluation> TeamEvaluations { get; set; }
-        public TeamEvaluationDiscrepancyTableDecorator(ITableBuilder builder, List<TeamEvaluation> evaluations)
+        public TeamEvaluationMultiplierTableDecorator(ITableBuilder builder, List<TeamEvaluation> evaluations)
             : base(builder)
         {
             TeamEvaluations = evaluations;

@@ -14,20 +14,20 @@ using OSBLE.Models.Assignments;
 //the intended use of the folder
 /*
  *
- *                          FileSystem  
- *                         /          \  
- *                        /            \  
- *                    Courses          Users                                 
- *                     /                  \                                 
- *                [courseID]            [userId]
- *               /     |    \                \
- *              /      |     \         {global user content}
- *     CourseDocs      |      ZipFolder
- *          |    Assignments        \
- *          |          |             \
- *  {course docs}      |              \
- *                     |       Records.txt { %random number%.zip}
- *                     |
+ *                                 FileSystem  
+ *                         /                    \  
+ *                        /                      \  
+ *                    Courses                    Users                                 
+ *                     /                            \                                 
+ *                [courseID]                        [userId]
+ *               /     |  \ \                           \
+ *              /      |   \ \__________              {global user content}
+ *     CourseDocs      |    ZipFolder   \
+ *          |    Assignments     \     Gradebook
+ *          |          |          \        |
+ *  {course docs}      |           \    {gradebook.zip}
+ *                     |            \
+ *                     |          Records.txt { %random number%.zip}
  *               [AssignmentId]
  *           /       \          \
  *          /         \          \

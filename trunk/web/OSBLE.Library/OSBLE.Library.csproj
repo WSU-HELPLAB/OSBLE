@@ -68,7 +68,6 @@
     <Compile Include="Models\AbstractCourses\Community\Community.cs" />
     <Compile Include="Models\AbstractCourses\Community\CommunityRole.cs" />
     <Compile Include="Models\AbstractCourses\CourseRubric.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Category.cs" />
     <Compile Include="Models\AbstractCourses\Course\Course.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseBreak.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseMeeting.cs" />

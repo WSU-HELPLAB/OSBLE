@@ -26,7 +26,7 @@ namespace OSBLE.Resources
         ///         List<string> l = getNextRow();
         ///     } while( l != null);
         /// </summary>
-        /// <returns>List of strings, representing a row in the CSV. Returns null of the end has been reached.</returns>
+        /// <returns>List of strings, representing a row in the CSV. Returns null if the end has been reached.</returns>
         public List<string> getNextRow()
         {
             if (CSV.EndOfStream)

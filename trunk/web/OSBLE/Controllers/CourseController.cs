@@ -154,20 +154,6 @@ namespace OSBLE.Controllers
                 cu.UserProfileID = CurrentUser.ID;
                 cu.AbstractRoleID = (int)CourseRole.CourseRoles.Instructor;
 
-                //Add new Categories to the course
-                Category category = new Category();
-                category.Name = Constants.UnGradableCatagory;
-                category.Points = 0;
-
-                course.Categories.Add(category);
-                db.Categories.Add(category);
-
-                category = new Category();
-                category.Name = "Assignments";
-                category.Points = 100;
-
-                course.Categories.Add(category);
-                db.Categories.Add(category);
 
                 db.CourseUsers.Add(cu);
                 db.SaveChanges();

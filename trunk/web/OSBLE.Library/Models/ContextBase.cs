@@ -150,8 +150,6 @@ namespace OSBLE.Models
 
         public DbSet<CourseUser> CourseUsers { get; set; }
 
-        public DbSet<Category> Categories { get; set; }
-
         public DbSet<LetterGrade> LetterGrades { get; set; }
 
         // HomePage

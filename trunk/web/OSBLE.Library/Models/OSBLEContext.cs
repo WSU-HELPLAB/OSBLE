@@ -116,56 +116,6 @@ namespace OSBLE.Models
 
             this.SaveChanges();
 
-            Category w1 = new Category();
-            w1.Name = "Homework";
-            w1.Points = 40;
-
-            Category w2 = new Category();
-            w2.Name = "Exams";
-            w2.Points = 60;
-
-            Category w3 = new Category();
-            w3.Name = UnGradableCatagory;
-            w3.Points = 0;
-
-            c1.Categories.Add(w3);
-            c1.Categories.Add(w1);
-            c1.Categories.Add(w2);
-
-            w1 = new Category();
-            w1.Name = "Homework";
-            w1.Points = 40;
-
-            w2 = new Category();
-            w2.Name = "Exams";
-            w2.Points = 60;
-
-            w3 = new Category();
-            w3.Name = UnGradableCatagory;
-            w3.Points = 0;
-
-            c2.Categories.Add(w3);
-            c2.Categories.Add(w1);
-            c2.Categories.Add(w2);
-
-            w1 = new Category();
-            w1.Name = "Homework";
-            w1.Points = 40;
-
-            w2 = new Category();
-            w2.Name = "Exams";
-            w2.Points = 60;
-
-            w3 = new Category();
-            w3.Name = UnGradableCatagory;
-            w3.Points = 0;
-
-            c4.Categories.Add(w3);
-            c4.Categories.Add(w1);
-            c4.Categories.Add(w2);
-
-            this.SaveChanges();
-
             createSampleUser("bob@smith.com", "123123", "Bob", "Smith", "1", 1, true, true);
             createSampleUser("stu@dent.com", "123123", "Stu", "Dent", "2", 1, false, false);
             createSampleUser("me@me.com", "123123", "Ad", "Min", "3", 1, true, true);

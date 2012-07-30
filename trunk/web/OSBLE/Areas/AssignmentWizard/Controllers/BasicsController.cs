@@ -55,30 +55,20 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
-        private void BuildViewBag()
-        {
-            IEnumerable<Category> categories = new List<Category>();
-            //activeCourse should only be null when testing
-            if (ActiveCourseUser != null)
-            {
-                //SUBMISSION CATEGORIES
-                categories = from c in (ActiveCourseUser.AbstractCourse as Course).Categories
-                             where c.Name != Constants.UnGradableCatagory
-                             select c;
-            }
-            ViewBag.Categories = new SelectList(categories, "ID", "Name");
-        }
-
         public override ActionResult Index()
         {
             base.Index();
             ModelState.Clear();
-            BuildViewBag();
             Assignment.Type = manager.ActiveAssignmentType;
 
-            Assignment.HoursPerDeduction = (ActiveCourseUser.AbstractCourse as Course).HoursLatePerPercentPenalty;
-            Assignment.DeductionPerUnit = (ActiveCourseUser.AbstractCourse as Course).PercentPenalty;
-            Assignment.HoursLateWindow = (ActiveCourseUser.AbstractCourse as Course).HoursLateUntilZero;
+            //If the assignment is new and has default zero values, overwrite them with Course default late penalty values
+            if (Assignment.HoursLateWindow == 0 && Assignment.DeductionPerUnit == 0 && Assignment.HoursPerDeduction == 0)
+            {
+                Assignment.HoursPerDeduction = (ActiveCourseUser.AbstractCourse as Course).HoursLatePerPercentPenalty;
+                Assignment.DeductionPerUnit = (ActiveCourseUser.AbstractCourse as Course).PercentPenalty;
+                Assignment.HoursLateWindow = (ActiveCourseUser.AbstractCourse as Course).HoursLateUntilZero;
+            }
+            
 
             return View(Assignment);
         }
@@ -122,7 +112,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 WasUpdateSuccessful = false;
             }
-            BuildViewBag();
             return base.PostBack(Assignment);
         }
     }

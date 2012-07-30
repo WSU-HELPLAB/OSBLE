@@ -203,7 +203,7 @@
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\LatePenaltyTableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\TableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\CriticalReviewsPerformedDecorator.cs" />
-    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\TeamEvaluationDiscrepancyTableDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\TeamEvaluationMultiplierTableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\TeamEvaluationProgressTableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\ViewModels\AssignmentDetailsFactory.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\DefaultBuilder.cs" />
@@ -254,7 +254,6 @@
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\RubricController.cs" />
     <Compile Include="Controllers\StudioAssignmentController.cs" />
-    <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="EntityFramework\OsbleViewEngine.cs" />
     <Compile Include="Areas\AssignmentWizard\Models\WizardComponentManager.cs" />
     <Compile Include="Resources\StringExtensions.cs" />
@@ -714,7 +713,7 @@
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\RubricTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\LatePenaltyTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\TeamEvaluationProgressTableDecorator.cshtml" />
-    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\TeamEvaluationDiscrepancyTableDecorator.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\TeamEvaluationMultiplierTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\InlineReviewTableDecorator.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\_Layout.cshtml" />
     <Content Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\TeamMembersDecorator.cshtml" />

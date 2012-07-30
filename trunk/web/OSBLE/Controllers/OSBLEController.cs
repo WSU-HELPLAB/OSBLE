@@ -446,11 +446,75 @@ namespace OSBLE.Controllers
             }
         }
 
-        public double GetLatePenalty(AssignmentTeam team)
-        {
-            double returnValue = 0.0;
-            return returnValue;
 
+        /// <summary>
+        /// Returns the late penalty as a string. I.e. an assignmentTeam with 80% late penalty will yield the string
+        /// "80.00 %"
+        /// </summary>
+        /// <param name="team"></param>
+        /// <returns></returns>
+        public static string GetLatePenaltyAsString(IAssignmentTeam team)
+        {
+            return (GetLatePenalty(team) / 100.0).ToString("P");
+        }
+
+        /// <summary>
+        /// This gets the late penalty for a regular assignment. Will not currently work for Critical Review assignments
+        /// Returns the late penalty as a percentage. I.e. 80% late penalty will return as 80.0
+        /// </summary>
+        /// <param name="team"></param>
+        /// <returns></returns>
+        public static double GetLatePenalty(IAssignmentTeam team)
+        {
+            double latePenalty = 0.0;
+
+            DateTime? submissionTime = FileSystem.GetSubmissionTime(team);
+
+            //Adding 1 minute to dueDate. This is to keep submissions turned in at 12:00am for an assignment with a due date of 12:00am as non-late.
+            DateTime dueDate = team.Assignment.DueDate + TimeSpan.FromMinutes(1); 
+
+            TimeSpan lateness;
+
+            if (submissionTime != null)
+            {
+                lateness = (DateTime)submissionTime - dueDate;
+            }
+            else //if the assignment has not been submitted, use the current time to calculate late penalty.
+            {
+                lateness = DateTime.Now - dueDate;
+            }
+
+            if (lateness.TotalHours >= team.Assignment.HoursLateWindow)
+            {
+                //The document is too late to be accepted. Therefor 100% late penalty
+                latePenalty = 100;
+            }
+            else if (lateness.TotalHours <= 0) 
+            {
+                //The document wasnt late at all, no late penalty
+                latePenalty = 0;
+            }
+            else 
+            {
+                //The document was late, but less than HoursLateWindow
+
+                //So, to calculate the late penalty,we want integer division here to keep units whole. 
+                //Example of applying late penalty: A submission is 25hours late, HoursPerDeduction is 24
+                //gets 2 deductions. 1 for the (0,24] hour late range, and then another for the (24,48] hour late range.
+                //Notice begining of ranges are non-inclusive. This was handled by adding 1 minute to dueDate above.
+
+                int numberOfDeductions = 1;
+                numberOfDeductions += ((int)lateness.TotalHours / (int)team.Assignment.HoursPerDeduction);
+                latePenalty = numberOfDeductions * team.Assignment.DeductionPerUnit;
+
+                //cannot have higher than 100% late penalty
+                if (latePenalty > 100)
+                {
+                    latePenalty = 100;
+                }
+            }  
+
+            return latePenalty;
         }
 
         public static string[] GetFileExtensions(DeliverableType deliverableType)

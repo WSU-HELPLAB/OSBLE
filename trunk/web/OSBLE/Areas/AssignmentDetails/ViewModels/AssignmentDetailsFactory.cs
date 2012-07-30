@@ -283,12 +283,12 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                                                                 );
                     vm.TableColumnHeaders["TeamEvaluationProgressTableDecorator"] = "Evaluation Status";
                     
-                    //add largest discrepency info
-                    vm.TeamTableBuilders[assignmentTeam] = new TeamEvaluationDiscrepancyTableDecorator(
+                    //add team evaluation multiplier 
+                    vm.TeamTableBuilders[assignmentTeam] = new TeamEvaluationMultiplierTableDecorator(
                                                                 vm.TeamTableBuilders[assignmentTeam],
                                                                 evaluations
                                                                 );
-                    vm.TableColumnHeaders["TeamEvaluationDiscrepancyTableDecorator"] = "Multiplier";
+                    vm.TableColumnHeaders["TeamEvaluationMultiplierTableDecorator"] = "Multiplier";
                    
                 }
                 else

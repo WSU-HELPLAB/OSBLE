@@ -11,6 +11,13 @@
 
 @section AssignmentDetails
 {
+    <tr>
+        <th>
+            Due:
+        </th>
+        <td>@Model.CurrentAssignment.DueDate
+        </td>
+    </tr>
     @foreach (string view in Model.HeaderViews)
     {
         string viewLocation = string.Format("HeaderBuilder/{0}", view);

@@ -10,6 +10,8 @@
 }
 @section AssignmentDetails
 {
+    <!--No need to pust due date here like other Indexes, as its covered in partial views as InitialFinalPostDueDate-->
+
     @foreach (string view in Model.HeaderViews)
     {
         string viewLocation = string.Format("HeaderBuilder/{0}", view);

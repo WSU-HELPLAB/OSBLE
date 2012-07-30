@@ -73,9 +73,6 @@ namespace OSBLE.Models.Courses
 
         // References
 
-        [Display(Name = "Course Categories")]
-        public virtual ICollection<Category> Categories { get; set; }
-
         [Display(Name = "Course Meeting Times")]
         public virtual ICollection<CourseMeeting> CourseMeetings { get; set; }
 
@@ -93,7 +90,6 @@ namespace OSBLE.Models.Courses
         public Course()
             : base()
         {
-            Categories = new List<Category>();
 
             Assignments = new List<Assignment>();
 
@@ -112,7 +108,6 @@ namespace OSBLE.Models.Courses
 
             StartDate = DateTime.Now.Date;
             EndDate = DateTime.Now.Date.AddDays(112); // Add 16 weeks.
-            Categories = new List<Category>();
         }
 
         /// <summary>

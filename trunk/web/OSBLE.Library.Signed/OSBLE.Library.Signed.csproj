@@ -87,9 +87,6 @@
     <Compile Include="..\OSBLE.Library\Models\AbstractCourses\CourseRubric.cs">
       <Link>Models\AbstractCourses\CourseRubric.cs</Link>
     </Compile>
-    <Compile Include="..\OSBLE.Library\Models\AbstractCourses\Course\Category.cs">
-      <Link>Models\AbstractCourses\Course\Category.cs</Link>
-    </Compile>
     <Compile Include="..\OSBLE.Library\Models\AbstractCourses\Course\Course.cs">
       <Link>Models\AbstractCourses\Course\Course.cs</Link>
     </Compile>
