@@ -122,10 +122,10 @@ namespace OSBLE.UnitTests
             AuthenticationServiceClient authClient = new AuthenticationServiceClient();
             OsbleServiceClient osbleClient = new OsbleServiceClient();
             string token = authClient.ValidateUser("betty@rogers.com", "123123");
-            byte[] data = osbleClient.GetReviewItems(3, token);
+            byte[] data = osbleClient.GetReviewItems(2, token);
             using (ZipFile zip = ZipFile.Read(data))
             {
-                Assert.AreEqual(3, zip.Entries.Count);
+                Assert.AreEqual(1, zip.Entries.Count);
             }
         }
 
@@ -144,12 +144,12 @@ namespace OSBLE.UnitTests
             FileStream stream = File.OpenRead("D:\\acarter\\temp\\address.pdf");
 
             //AC Note: may need to change name of file
-            file.AddEntry("hw1.pdf", stream);
+            file.AddEntry("sub.pdf", stream);
             MemoryStream zipStream = new MemoryStream();
             file.Save(zipStream);
 
             //AC note: may need to change assignment ID (first parameter)
-            bool result = osbleClient.SubmitReview(17, 3, zipStream.ToArray(), token);
+            bool result = osbleClient.SubmitReview(17, 2, zipStream.ToArray(), token);
             Assert.AreEqual(true, result);
         }
     }

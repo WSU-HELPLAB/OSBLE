@@ -307,19 +307,7 @@ namespace OSBLE.Controllers
                 //Send off to Annotate if we have exactly one deliverable and that deliverable is a PDF document
                 if (CRassignment.PreceedingAssignment.Deliverables.Count == 1 && CRassignment.PreceedingAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
                 {
-                    AnnotateApi api = new AnnotateApi(ConfigurationManager.AppSettings["AnnotateUserName"], ConfigurationManager.AppSettings["AnnotateApiKey"]);
-
-                    AnnotateResult uploadResult = api.UploadDocument((int)CRassignment.PrecededingAssignmentID, authorTeamId);
-                    if (uploadResult.Result == ResultCode.OK)
-                    {
-                        AnnotateResult createResult = api.CreateAccount(CurrentUser);
-                        if (createResult.Result == ResultCode.OK)
-                        {
-                            api.GiveAccessToDocument(CurrentUser, uploadResult.DocumentCode, uploadResult.DocumentDate);
-                            string loginString = api.GetAnnotateLoginUrl(CurrentUser, uploadResult.DocumentCode, uploadResult.DocumentDate);
-                            Response.Redirect(loginString);
-                        }
-                    }
+                    return RedirectToRoute(new { controller = "PdfCriticalReview", action = "Review", assignmentID = assignmentId, authorTeamID = authorTeamId });
                 }
                 else
                 {

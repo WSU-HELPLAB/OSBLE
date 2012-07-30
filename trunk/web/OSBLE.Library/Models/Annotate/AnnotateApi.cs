@@ -6,6 +6,8 @@ using System.Net;
 using System.Security.Cryptography;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Users;
+using System.Web.Helpers;
+using System.Web.Script.Serialization;
 
 namespace OSBLE.Models.Annotate
 {
@@ -33,6 +35,7 @@ namespace OSBLE.Models.Annotate
         {
             bool needsUpload = true;
             AnnotateResult result = new AnnotateResult();
+            result.Result = ResultCode.ERROR;
 
             //By default, we only upload documents to annotate if they haven't been uploaded 
             //already.  This can be overridden by setting forceUpload = true.
@@ -104,6 +107,7 @@ namespace OSBLE.Models.Annotate
                 result.RawMessage = sendResult;
                 if (sendResult.Substring(0, 2) == "OK")
                 {
+                    result.Result = ResultCode.OK;
                     string[] pieces = sendResult.Split(' ');
                     documentDate = pieces[1];
                     documentCode = pieces[2];
@@ -275,6 +279,20 @@ namespace OSBLE.Models.Annotate
         }
 
         /// <summary>
+        /// Returns the PdfNodate URL for the given document code and document date
+        /// </summary>
+        /// <param name="docCode"></param>
+        /// <param name="docDate"></param>
+        /// <returns></returns>
+        public string GetAnnotateDocumentUrl(string docCode, string docDate)
+        {
+            return string.Format("http://helplab.org/annotate/php/pdfnotate.php?d={0}&c={1}",
+                docDate,
+                docCode
+                );
+        }
+
+        /// <summary>
         /// Generates an key for use with annotate
         /// </summary>
         /// <param name="phpFunction">The function that we're calling</param>
@@ -329,6 +347,64 @@ namespace OSBLE.Models.Annotate
                     );
                 return fileName;
             }
+        }
+
+        /// <summary>
+        /// Sets the anonymity settings for the given document.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="docCode"></param>
+        /// <param name="docDate"></param>
+        /// <param name="isAnonymous"></param>
+        /// <param name="anonName"></param>
+        /// <returns></returns>
+        public AnnotateResult SetDocumentAnonymity(UserProfile user, string docCode, string docDate, CriticalReviewSettings settings, string anonName = "anonymous")
+        {
+            AnnotateResult result = new AnnotateResult();
+            result.Result = ResultCode.ERROR;
+            WebClient client = new WebClient();
+            string webResult = "";
+            long epoch = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
+            string apiKey = GenerateAnnotateKey("apiAddUserMapping.php", user.UserName, epoch);
+
+            Dictionary<string, string> mapping = new Dictionary<string, string>();
+            mapping["other"] = "anonymous";
+            mapping[user.UserName] = anonName;
+            string jsonMapping = (new JavaScriptSerializer()).Serialize(mapping);
+            int enable = 1;
+            if (settings.AnonymizeReviewerToReviewers == false)
+            {
+                enable = 0;
+            }
+            string anonString = "http://helplab.org/annotate/php/apiAddUserMapping.php?" +
+                                 "api-user={0}" +           //Annotate admin user name (see web config)
+                                 "&api-auth={1}" +          //Annotate admin auth key
+                                 "&api-requesttime={2}" +   //UNIX timestamp
+                                 "&api-annotateuser={3}" +  //current user (not used?)
+                                 "&date={4}" +              //date for document
+                                 "&code={5}" +              //code for document
+                                 "&mapping={6}" +           //anonymous mapping
+                                 "&enable={7}";             //enable or disable mapping
+                                 //"&rm={8}";                //add or remove mapping
+
+            anonString = string.Format(anonString,
+                                        ApiUser,
+                                        apiKey,
+                                        epoch,
+                                        user.UserName,
+                                        docDate,
+                                        docCode,
+                                        jsonMapping,
+                                        enable
+                                        //""
+                                        );
+            webResult = client.DownloadString(anonString);
+            result.RawMessage = webResult;
+            if (webResult.Substring(0, 2) == "OK")
+            {
+                result.Result = ResultCode.OK;
+            }
+            return result;
         }
     }
 }
