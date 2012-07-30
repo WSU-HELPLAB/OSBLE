@@ -263,7 +263,7 @@ namespace OSBLE.Models.Annotate
                                  "api-user={0}" +           //Annotate admin user name (see web config)
                                  "&api-requesttime={1}" +   //UNIX timestamp
                                  "&loc=pdfnotate.php?{2}" + //redirect to annotate server
-                                 "&remember = 1" +          //store user info in cookie
+                                 "&remember=1" +          //store user info in cookie
                                  "&errloc=http://helplab.org/annotate/php/error.php" +
                                  "&api-annotateuser={3}" +  //the current user (reviewer)
                                  "&api-auth={4}";           //Annotate admin auth key (see web config)
@@ -271,25 +271,11 @@ namespace OSBLE.Models.Annotate
             loginString = string.Format(loginString,
                                         ApiUser,
                                         epoch,
-                                        System.Web.HttpUtility.UrlEncode(string.Format("d={0}&c={1}", docDate, docCode)),
+                                        System.Web.HttpUtility.UrlEncode(string.Format("d={0}&c={1}&nobanner=1", docDate, docCode)),
                                         osbleUser.UserName,
                                         apiKey
                                         );
             return loginString;
-        }
-
-        /// <summary>
-        /// Returns the PdfNodate URL for the given document code and document date
-        /// </summary>
-        /// <param name="docCode"></param>
-        /// <param name="docDate"></param>
-        /// <returns></returns>
-        public string GetAnnotateDocumentUrl(string docCode, string docDate)
-        {
-            return string.Format("http://helplab.org/annotate/php/pdfnotate.php?d={0}&c={1}",
-                docDate,
-                docCode
-                );
         }
 
         /// <summary>

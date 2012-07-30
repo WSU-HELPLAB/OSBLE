@@ -31,12 +31,17 @@ namespace OSBLE.Controllers
             WebClient client = new WebClient();
             Assignment CRassignment = db.Assignments.Find(assignmentID);
             AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourseUser);
-            ReviewTeam reviewTeam = (from rt in CRassignment.ReviewTeams
-                                     where rt.ReviewTeamID == at.TeamID
-                                     &&
-                                     rt.AuthorTeamID == authorTeamID
-                                     select rt).FirstOrDefault();
-            if (reviewTeam != null && CRassignment.Type == AssignmentTypes.CriticalReview)
+            ReviewTeam reviewTeam = null;
+            if (at != null)
+            {
+                reviewTeam = (from rt in CRassignment.ReviewTeams
+                              where rt.ReviewTeamID == at.TeamID
+                              &&
+                              rt.AuthorTeamID == authorTeamID
+                              select rt).FirstOrDefault();
+            }
+            if ((reviewTeam != null || ActiveCourseUser.AbstractRole.CanGrade)  //must be on the review team or an instructor
+                && CRassignment.Type == AssignmentTypes.CriticalReview)
             {
                 //Send off to Annotate if we have exactly one deliverable and that deliverable is a PDF document
                 if (CRassignment.PreceedingAssignment.Deliverables.Count == 1 && CRassignment.PreceedingAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
@@ -54,10 +59,9 @@ namespace OSBLE.Controllers
 
                             //log the user in to annotate
                             string loginString = api.GetAnnotateLoginUrl(CurrentUser, uploadResult.DocumentCode, uploadResult.DocumentDate);
-                            string loginResult = client.DownloadString(loginString);
-
+                            
                             //load the annotate url for the view
-                            ViewBag.AnnotateUrl = api.GetAnnotateDocumentUrl(uploadResult.DocumentCode, uploadResult.DocumentDate);
+                            ViewBag.AnnotateUrl = loginString;
                         }
                     }
                 }

@@ -362,9 +362,22 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public ActionResult GetReviewsOfAuthor(int assignmentId, int receiverId)
         {
+
             Assignment assignment = db.Assignments.Find(assignmentId);
             CourseUser receiver = db.CourseUsers.Find(receiverId);
             AssignmentTeam previousAssignmentTeam = GetAssignmentTeam(assignment.PreceedingAssignment, receiver);
+
+            //critical reviews of PDF documents aren't zipped.  Instead,
+            //they are sent to annotate.  In this case, we need to redirect
+            //to a different location
+            if (assignment.Type == AssignmentTypes.CriticalReview)
+            {
+                Assignment previousAssignment = assignment.PreceedingAssignment;
+                if (previousAssignment.HasDeliverables && previousAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
+                {
+                    return RedirectToRoute(new { controller = "PdfCriticalReview", action = "Review", assignmentID = assignmentId, authorTeamID = previousAssignmentTeam.TeamID });
+                }
+            }
 
             if (ActiveCourseUser.AbstractRole.CanModify || (receiverId == ActiveCourseUser.ID && assignment.IsCriticalReviewPublished))
             {

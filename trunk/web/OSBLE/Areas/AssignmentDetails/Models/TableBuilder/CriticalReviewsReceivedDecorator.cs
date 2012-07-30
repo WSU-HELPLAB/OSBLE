@@ -27,6 +27,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
 
             AssignmentTeam assignTeam = assignmentTeam as AssignmentTeam;
             Assignment assignment = assignTeam.Assignment;
+            Assignment previousAssignment = assignment.PreceedingAssignment;
 
             List<CourseUser> CourseUsersInReviewTeam = (from tm in assignTeam.Team.TeamMembers
                                             orderby tm.CourseUser.UserProfile.LastName, tm.CourseUser.UserProfile.FirstName
@@ -48,6 +49,12 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
                     if (DI.Exists)
                     {
                         timeStamp.Add(DI.LastAccessTime);
+                        addedTimeStamp = true;
+                        break;
+                    }
+                    else if (previousAssignment.HasDeliverables && previousAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
+                    {
+                        timeStamp.Add(DateTime.Now);
                         addedTimeStamp = true;
                         break;
                     }
