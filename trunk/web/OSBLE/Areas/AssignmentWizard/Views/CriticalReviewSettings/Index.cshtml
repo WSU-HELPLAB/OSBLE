@@ -6,41 +6,21 @@
 
 }
 @Html.HiddenFor(m => m.AssignmentID)
-<script type="text/javascript">
-    function handleAllowReviewersToDownloadCB(incValue) {
-        if (incValue.checked) {
-            $("#AnonymizeReviewersCB").removeAttr('disabled');
-        }
-        else {
-            $("#AnonymizeReviewersCB").attr("disabled", "disabled");
-            $("#AnonymizeReviewersCB").removeAttr("checked");
-        }
-    }
-    
-
-</script>
 <table class="wizard_entry_table">
     <tr>
-        <th>@Html.LabelFor(m => m.AllowReviewersToDownload)</th>
-        <td>@Html.CheckBoxFor(m => m.AllowReviewersToDownload, new { id = "DownloadCB",  onclick = "handleAllowReviewersToDownloadCB(this)" })</td>
+        <th>@Html.LabelFor(m => m.AnonymizeAuthor)</th>
+        <td>@Html.CheckBoxFor(m => m.AnonymizeAuthor)</td>
     </tr>
     <tr>
-        <th>@Html.LabelFor(m => m.AnonymizeAuthorToReviewer)</th>
-        <td>@Html.CheckBoxFor(m => m.AnonymizeAuthorToReviewer)</td>
+        <th>@Html.LabelFor(m => m.AllowDownloadAfterPublish)</th>
+        <td>@Html.CheckBoxFor(m => m.AllowDownloadAfterPublish)</td>
     </tr>
     <tr>
-        <th>@Html.LabelFor(m => m.AnonymizeReviewerToAuthor)</th>
-        <td>@Html.CheckBoxFor(m => m.AnonymizeReviewerToAuthor)</td>
+        <th>@Html.LabelFor(m => m.AnonymizeComments)</th>
+        <td>@Html.CheckBoxFor(m => m.AnonymizeComments)</td>
     </tr>
     <tr>
-        <th >@Html.LabelFor(m => m.AnonymizeReviewerToReviewers)</th>
-    @if(Model.AllowReviewersToDownload)
-    {
-        <td>@Html.CheckBoxFor(m => m.AnonymizeReviewerToReviewers, new { id = "AnonymizeReviewersCB" })</td>
-    }
-    else
-    {
-        <td>@Html.CheckBoxFor(m => m.AnonymizeReviewerToReviewers, new { id = "AnonymizeReviewersCB", disabled="disabled" })</td>
-    }
+        <th>@Html.LabelFor(m => m.AnonymizeCommentsAfterPublish)</th>
+        <td>@Html.CheckBoxFor(m => m.AnonymizeCommentsAfterPublish)</td>
     </tr>
 </table>

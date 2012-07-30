@@ -23,6 +23,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
         public override DynamicDictionary BuildHeader(Assignment assignment)
         {
             dynamic header = Builder.BuildHeader(assignment);
+            header.Assignment = assignment;
             header.CRdownload = new DynamicDictionary();
 
             header.CRdownload.hasPublished = assignment.IsCriticalReviewPublished;
@@ -36,22 +37,36 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
            
             header.CRdownload.hasRecievedReview = false;
 
-            if(assignmentTeam != null)
+            //PDF reviews don't get sent to the file system (they get sent to annotate)
+            //so we can't check the file system for review items.
+            Assignment previousAssignment = assignment.PreceedingAssignment;
+            if (
+                previousAssignment.HasDeliverables
+                && previousAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF
+                && previousAssignment.Deliverables.Count == 1
+                )
             {
-                //get list of all teams reviewing student
-                List<AssignmentTeam> reviewersOfStudent = (from rt in assignment.ReviewTeams
-                                                       join at in assignment.AssignmentTeams
-                                                       on rt.ReviewTeamID equals at.TeamID
-                                                       where rt.AuthorTeamID == assignmentTeam.TeamID
-                                                       select at).ToList();
-                //check each team for a submission
-                foreach (AssignmentTeam at in reviewersOfStudent)
+                header.CRdownload.hasRecievedReview = true;
+            }
+            else
+            {
+                if (assignmentTeam != null)
                 {
-                    //if(at.GetSubmissionTime() != null)
-                    if(FileSystem.GetSubmissionTime(at, assignmentTeam.Team) != null)
+                    //get list of all teams reviewing student
+                    List<AssignmentTeam> reviewersOfStudent = (from rt in assignment.ReviewTeams
+                                                               join at in assignment.AssignmentTeams
+                                                               on rt.ReviewTeamID equals at.TeamID
+                                                               where rt.AuthorTeamID == assignmentTeam.TeamID
+                                                               select at).ToList();
+                    //check each team for a submission
+                    foreach (AssignmentTeam at in reviewersOfStudent)
                     {
-                        header.CRdownload.hasRecievedReview = true;
-                        break;
+                        //if(at.GetSubmissionTime() != null)
+                        if (FileSystem.GetSubmissionTime(at, assignmentTeam.Team) != null)
+                        {
+                            header.CRdownload.hasRecievedReview = true;
+                            break;
+                        }
                     }
                 }
             }

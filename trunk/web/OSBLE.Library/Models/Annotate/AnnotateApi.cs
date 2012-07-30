@@ -358,7 +358,7 @@ namespace OSBLE.Models.Annotate
             mapping[user.UserName] = anonName;
             string jsonMapping = (new JavaScriptSerializer()).Serialize(mapping);
             int enable = 1;
-            if (settings.AnonymizeReviewerToReviewers == false)
+            if (settings.AnonymizeComments == false)
             {
                 enable = 0;
             }

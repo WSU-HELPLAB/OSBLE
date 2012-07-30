@@ -36,16 +36,24 @@
                                 <tr>
                                     <td>
                                         @{
-                                            string name;
+                                            string name = "";
                                             
-                                            if (rt.AuthorTeam.TeamMembers.Count > 1) 
+                                            //anonymize names?
+                                            if(dataModel.Assignment.CriticalReviewSettings.AnonymizeAuthorToReviewer == true)
                                             {
-                                                name = rt.AuthorTeam.Name;
+                                                name = string.Format("Anonymous {0}", rt.AuthorTeamID);
                                             }
                                             else
                                             {
-                                                name = rt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName + " " +
-                                                    rt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName;
+                                                if (rt.AuthorTeam.TeamMembers.Count > 1) 
+                                                {
+                                                    name = rt.AuthorTeam.Name;
+                                                }
+                                                else
+                                                {
+                                                    name = rt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUser.UserProfile.FirstName + " " +
+                                                        rt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUser.UserProfile.LastName;
+                                                }
                                             }
 
                                             if (dataModel.CRSubmission.authorSubmissionTimes[i] == null)

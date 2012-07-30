@@ -84,11 +84,11 @@ namespace OSBLE.Controllers
             bool Anonymous = false;
 
             CriticalReviewSettings crSettings = assignment.PreceedingAssignment.CriticalReviewSettings;
-            if(crSettings.AnonymizeAuthorToReviewer && currentUserIsReviewer && posterIsAuthor)
+            if(crSettings.AnonymizeAuthor && currentUserIsReviewer && posterIsAuthor)
             {
                 Anonymous = true;
             }
-            else if(crSettings.AnonymizeReviewerToAuthor && currentUserIsAuthor && posterIsReviewer)
+            else if(crSettings.AnonymizeComments && currentUserIsAuthor && posterIsReviewer)
             {
                 Anonymous = true;
             }

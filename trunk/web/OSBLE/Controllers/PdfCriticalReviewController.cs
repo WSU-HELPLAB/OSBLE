@@ -7,6 +7,7 @@ using OSBLE.Models.Assignments;
 using OSBLE.Models.Annotate;
 using System.Configuration;
 using System.Net;
+using OSBLE.Models.Courses;
 
 namespace OSBLE.Controllers
 {
@@ -54,7 +55,13 @@ namespace OSBLE.Controllers
                         AnnotateResult createResult = api.CreateAccount(CurrentUser);
                         if (createResult.Result == ResultCode.OK)
                         {
-                            api.SetDocumentAnonymity(CurrentUser, uploadResult.DocumentCode, uploadResult.DocumentDate, CRassignment.CriticalReviewSettings);
+                            //instructors get to see everyone, regardless of CR settings
+                            CriticalReviewSettings settings = CRassignment.CriticalReviewSettings;
+                            if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
+                            {
+                                settings.AnonymizeComments = false;
+                            }
+                            api.SetDocumentAnonymity(CurrentUser, uploadResult.DocumentCode, uploadResult.DocumentDate, settings);
                             api.GiveAccessToDocument(CurrentUser, uploadResult.DocumentCode, uploadResult.DocumentDate);
 
                             //log the user in to annotate

@@ -352,11 +352,11 @@ namespace OSBLE.Models.ViewModels
             if (currentUser.AbstractRoleID != (int)CourseRole.CourseRoles.Instructor && currentUser.AbstractRoleID != (int)CourseRole.CourseRoles.TA)
             {
                 CriticalReviewSettings criticalReviewSettings = assignment.PreceedingAssignment.CriticalReviewSettings;
-                if (criticalReviewSettings.AnonymizeAuthorToReviewer && currentUserIsReviewer && posterIsAuthor)
+                if (criticalReviewSettings.AnonymizeAuthor && currentUserIsReviewer && posterIsAuthor)
                 {
                     Anonymous = true;
                 }
-                else if (criticalReviewSettings.AnonymizeReviewerToAuthor && currentUserIsAuthor && posterIsReviewer)
+                else if (criticalReviewSettings.AnonymizeComments)
                 {
                     Anonymous = true;
                 }

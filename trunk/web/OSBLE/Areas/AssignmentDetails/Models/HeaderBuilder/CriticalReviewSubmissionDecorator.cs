@@ -26,6 +26,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
         {
             dynamic header = Builder.BuildHeader(assignment);
             header.CRSubmission = new DynamicDictionary();
+            header.Assignment = assignment;
 
             // get the assignment team ( team doing the review )
             AssignmentTeam assignmentTeam = null;
