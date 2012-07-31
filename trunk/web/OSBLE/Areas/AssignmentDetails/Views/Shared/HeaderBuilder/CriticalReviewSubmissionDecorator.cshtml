@@ -39,7 +39,8 @@
                                             string name = "";
                                             
                                             //anonymize names?
-                                            if(dataModel.Assignment.CriticalReviewSettings.AnonymizeAuthorToReviewer == true)
+                                            CriticalReviewSettings reviewSettings = dataModel.Assignment.CriticalReviewSettings;
+                                            if (reviewSettings.AnonymizeAuthor == true)
                                             {
                                                 name = string.Format("Anonymous {0}", rt.AuthorTeamID);
                                             }
