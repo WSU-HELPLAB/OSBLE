@@ -15,9 +15,6 @@ namespace OSBLE.Models.Assignments
         [FileExtensions(new string[] { ".cpml" })]
         ChemProV,
 
-        [FileExtensions(new string[] { ".xps" })]
-        XPS,
-
         [FileExtensions(new string[] { ".wmv", ".mp4" })]
         Video,
 

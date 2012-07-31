@@ -78,14 +78,14 @@ namespace OSBLE.Controllers
 
                 if (assignment != null && (assignment.HasDeliverables == true || assignment.Type == AssignmentTypes.CriticalReview))
                 {
-                    List<dynamic> deliverables;
+                    List<Deliverable> deliverables;
                     if(assignment.Type == AssignmentTypes.CriticalReview)
                     {
-                        deliverables = new List<dynamic>((assignment.PreceedingAssignment).Deliverables);
+                        deliverables = new List<Deliverable>((assignment.PreceedingAssignment).Deliverables);
                     }
                     else
                     {
-                        deliverables = new List<dynamic>((assignment).Deliverables);
+                        deliverables = new List<Deliverable>((assignment).Deliverables);
                     }
 
 
@@ -112,6 +112,7 @@ namespace OSBLE.Controllers
                                     }
                                     string fileName = Path.GetFileName(file.FileName);
                                     string extension = Path.GetExtension(file.FileName).ToLower();
+                                    string deliverableName = string.Format("{0}{1}", deliverables[i].Name, extension);
 
                                     string[] allowFileExtensions = GetFileExtensions(type);
 
@@ -139,7 +140,7 @@ namespace OSBLE.Controllers
                                             fs.Course(ActiveCourseUser.AbstractCourseID)
                                                 .Assignment(assignment.ID)
                                                 .Review(authorTeam.TeamID, reviewTeam.ReviewTeamID)
-                                                .File(fileName)
+                                                .File(deliverableName)
                                                 .Delete();
 
                                             //We need to remove the zipfile corrisponding to the authorTeamId being sent in as well as the regularly cached zip. 
@@ -153,7 +154,7 @@ namespace OSBLE.Controllers
                                             fs.Course(ActiveCourseUser.AbstractCourseID)
                                                 .Assignment(assignment.ID)
                                                 .Review(authorTeam.TeamID, reviewTeam.ReviewTeamID)
-                                                .AddFile(fileName, file.InputStream);
+                                                .AddFile(deliverableName, file.InputStream);
 
                                             //unzip and rezip xps files because some XPS generators don't do it right
                                             if (extension.ToLower().CompareTo(".xps") == 0)
