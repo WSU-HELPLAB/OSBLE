@@ -156,7 +156,7 @@ namespace OSBLE.Services
                 {
                     zipName = string.Format("Anonymous {0}", teamToReview.AuthorTeamID);
                 }
-                string key = string.Format("{0}|{1}.zip", teamToReview.AuthorTeamID, zipName);
+                string key = string.Format("{0};{1}.zip", teamToReview.AuthorTeamID, zipName);
 
                 //get the original, unedited document
                 FileCollection fc = fs.Course(courseUser.AbstractCourseID)
