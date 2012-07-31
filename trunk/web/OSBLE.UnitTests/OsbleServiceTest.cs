@@ -125,7 +125,7 @@ namespace OSBLE.UnitTests
             byte[] data = osbleClient.GetReviewItems(2, token);
             using (ZipFile zip = ZipFile.Read(data))
             {
-                Assert.AreEqual(1, zip.Entries.Count);
+                zip.Save("D:\\acarter\\temp\\GetReviewItemsTest.zip");
             }
         }
 
@@ -147,7 +147,7 @@ namespace OSBLE.UnitTests
             file.AddEntry("sdfsdf.pdf", stream);
             MemoryStream zipStream = new MemoryStream();
             file.Save(zipStream);
-
+            
             //AC note: may need to change assignment ID (first parameter)
             bool result = osbleClient.SubmitReview(7, 2, zipStream.ToArray(), token);
             Assert.AreEqual(true, result);

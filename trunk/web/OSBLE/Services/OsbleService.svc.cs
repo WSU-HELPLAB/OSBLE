@@ -93,7 +93,7 @@ namespace OSBLE.Services
 
         /// <summary>
         /// Will return all items needing to be reviewed by the user for the given
-        /// assignment.
+        /// critical review assignment.
         /// </summary>
         /// <param name="assignmentId"></param>
         /// <param name="authToken"></param>
@@ -145,9 +145,11 @@ namespace OSBLE.Services
 
             //Find all review documents
             OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
-            Dictionary<string, Stream> zipStreams = new Dictionary<string, Stream>();
+            Dictionary<string, Stream> originalStreams = new Dictionary<string, Stream>();
+            Dictionary<string, Stream> reviewStreams = new Dictionary<string, Stream>();
             foreach (ReviewTeam teamToReview in teamsToReview)
             {
+                //get the original, unedited document
                 FileCollection fc = fs.Course(courseUser.AbstractCourseID)
                                     .Assignment(submissionAssignment.ID)
                                     .Submission(teamToReview.AuthorTeamID)
@@ -160,25 +162,61 @@ namespace OSBLE.Services
                     MemoryStream ms = new MemoryStream();
                     zipStream.CopyTo(ms);
                     ms.Position = 0;
-                    string key = string.Format("{0};{1}", teamToReview.AuthorTeamID, teamToReview.AuthorTeam.Name);
-                    zipStreams[key] = ms;
+                    string key = string.Format("{0}|{1}.zip", teamToReview.AuthorTeamID, teamToReview.AuthorTeam.Name);
+                    originalStreams[key] = ms;
+                }
+
+                //get any user modified document
+                fc = fs.Course(courseUser.AbstractCourseID)
+                       .Assignment(criticalReviewAssignment.ID)
+                       .Review(teamToReview.AuthorTeamID, teamToReview.ReviewTeamID)
+                       .AllFiles();
+
+                //don't create a zip if we have have nothing to zip.
+                if (fc.Count > 0)
+                {
+                    Stream zipStream = fc.ToZipStream();
+                    MemoryStream ms = new MemoryStream();
+                    zipStream.CopyTo(ms);
+                    ms.Position = 0;
+                    string key = string.Format("{0}|{1}.zip", teamToReview.AuthorTeamID, teamToReview.AuthorTeam.Name);
+                    reviewStreams[key] = ms;
                 }
             }
             try
             {
                 //combine the zip files into a single zip
-                ZipFile zip = new ZipFile();
-                foreach (string key in zipStreams.Keys)
+                ZipFile originals = new ZipFile();
+                foreach (string key in originalStreams.Keys)
                 {
-                    zip.AddEntry(key, zipStreams[key]);
+                    originals.AddEntry(key, originalStreams[key]);
                 }
 
+                //do the same with the review streams.
+                ZipFile reviews = new ZipFile();
+                foreach (string key in reviewStreams.Keys)
+                {
+                    reviews.AddEntry(key, reviewStreams[key]);
+                }
+
+                //put the two zip files into one master zip file
+                ZipFile final = new ZipFile();
+                MemoryStream originalStream = new MemoryStream();
+                originals.Save(originalStream);
+                originalStream.Position = 0;
+                final.AddEntry("originals.zip", originalStream);
+
+                MemoryStream reviewsZipStream = new MemoryStream();
+                reviews.Save(reviewsZipStream);
+                reviewsZipStream.Position = 0;
+                final.AddEntry("reviews.zip", reviewsZipStream);
+
                 MemoryStream finalZipStream = new MemoryStream();
-                zip.Save(finalZipStream);
+                final.Save(finalZipStream);
                 finalZipStream.Position = 0;
                 byte[] bytes = finalZipStream.ToArray();
                 finalZipStream.Close();
-                zip.Dispose();
+                originals.Dispose();
                 return bytes;
             }
             catch (Exception)
@@ -187,6 +225,14 @@ namespace OSBLE.Services
             }
         }
 
+        /// <summary>
+        /// Submits a review of the provided author.
+        /// </summary>
+        /// <param name="authorId"></param>
+        /// <param name="assignmentId"></param>
+        /// <param name="zippedReviewData"></param>
+        /// <param name="authToken"></param>
+        /// <returns></returns>
         [OperationContract]
         public bool SubmitReview(int authorId, int assignmentId, byte[] zippedReviewData, string authToken)
         {
@@ -248,6 +294,12 @@ namespace OSBLE.Services
             return true;
         }
 
+        /// <summary>
+        /// Returns any documents submitted by the current user for the supplied assignment.
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        /// <param name="authToken"></param>
+        /// <returns></returns>
         [OperationContract]
         public byte[] GetAssignmentSubmission(int assignmentId, string authToken)
         {

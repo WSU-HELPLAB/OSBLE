@@ -37,7 +37,7 @@ namespace OSBLE.Models.FileSystem
                     {
                         try
                         {
-                            zip.AddFile(name);
+                            zip.AddFile(name, "");
                         }
                         catch (Exception)
                         {
