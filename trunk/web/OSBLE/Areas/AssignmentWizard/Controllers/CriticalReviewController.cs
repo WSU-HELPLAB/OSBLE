@@ -68,6 +68,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             base.Index();
             SetUpViewBag();
+            if (Assignment.CriticalReviewSettings == null)
+            {
+                Assignment.CriticalReviewSettings = new CriticalReviewSettings();
+                Assignment.CriticalReviewSettings.AssignmentID = Assignment.ID;
+                Assignment.CriticalReviewSettings.Assignment = Assignment;
+            }
             return View(Assignment.CriticalReviewSettings);
         }
 
