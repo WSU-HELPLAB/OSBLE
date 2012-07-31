@@ -149,6 +149,15 @@ namespace OSBLE.Services
             Dictionary<string, Stream> reviewStreams = new Dictionary<string, Stream>();
             foreach (ReviewTeam teamToReview in teamsToReview)
             {
+                string zipName = teamToReview.AuthorTeam.Name;
+
+                //check anonymity settings
+                if (criticalReviewAssignment.CriticalReviewSettings.AnonymizeAuthor)
+                {
+                    zipName = string.Format("Anonymous {0}", teamToReview.AuthorTeamID);
+                }
+                string key = string.Format("{0}|{1}.zip", teamToReview.AuthorTeamID, zipName);
+
                 //get the original, unedited document
                 FileCollection fc = fs.Course(courseUser.AbstractCourseID)
                                     .Assignment(submissionAssignment.ID)
@@ -162,7 +171,6 @@ namespace OSBLE.Services
                     MemoryStream ms = new MemoryStream();
                     zipStream.CopyTo(ms);
                     ms.Position = 0;
-                    string key = string.Format("{0}|{1}.zip", teamToReview.AuthorTeamID, teamToReview.AuthorTeam.Name);
                     originalStreams[key] = ms;
                 }
 
@@ -179,7 +187,6 @@ namespace OSBLE.Services
                     MemoryStream ms = new MemoryStream();
                     zipStream.CopyTo(ms);
                     ms.Position = 0;
-                    string key = string.Format("{0}|{1}.zip", teamToReview.AuthorTeamID, teamToReview.AuthorTeam.Name);
                     reviewStreams[key] = ms;
                 }
             }
