@@ -45,4 +45,9 @@
     <td>@Html.ValidationMessageFor(m => m.DeductionPerUnit)</td>
     <td>@Html.ValidationMessageFor(m => m.HoursPerDeduction)</td>
 </tr>
+<tr>
+    <th>@Html.LabelFor(m => m.IsAnnotatable):</th>
+    <td>@Html.EditorFor(m => m.IsAnnotatable)</td>
+    <td>@Html.ValidationMessageFor(m => m.IsAnnotatable)</td>
+</tr>
 </table>

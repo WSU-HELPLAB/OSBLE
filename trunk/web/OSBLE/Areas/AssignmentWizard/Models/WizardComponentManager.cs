@@ -367,7 +367,10 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             foreach (string item in items)
             {
                 WizardBaseController component = AllComponents.Find(c => c.ControllerName == item);
-                components.Add(component);
+                if (component != null)
+                {
+                    components.Add(component);
+                }
             }
             return components;
         }
@@ -462,7 +465,11 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                     WizardBaseController[] tempComponentList = new WizardBaseController[sorted.Length];
                     for (int i = 0; i < sorted.Length; i++)
                     {
-                        tempComponentList[i] = AllComponents.Find(c => c.ControllerName == sorted[i]);
+                        WizardBaseController component = AllComponents.Find(c => c.ControllerName == sorted[i]);
+                        if (component != null)
+                        {
+                            tempComponentList[i] = component;
+                        }
                     }
 
                     //reassign the sorted list

@@ -53,6 +53,7 @@ namespace OSBLE.Models.Assignments
             this.StudentRubricID = other.StudentRubricID;
             this.TeamEvaluationSettings = new TeamEvaluationSettings(other.TeamEvaluationSettings);
             this.Type = other.Type;
+            this.CriticalReviewSettings = other.CriticalReviewSettings;
         }
 
         #region public properties
@@ -133,6 +134,10 @@ namespace OSBLE.Models.Assignments
                 DueDate = DueDate.AddMinutes(value.Minute);
             }
         }
+
+        [Required(ErrorMessage="Please indicate whether or not submission can be annotated.")]
+        [Display(Name= "The instructor will annotate submissions (PDF only)")]
+        public bool IsAnnotatable { get; set; }
 
         /// <summary>
         /// Returns true if the Assignment has an associated Rubric

@@ -15,7 +15,7 @@ namespace OSBLE.UnitTests
         {
             OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem("d:\\");
             IFileSystem subDirectory = fs.Directory("acarter").Directory("temp");
-            IEnumerable<string> files = subDirectory.File(n => n.StartsWith("test") == true);
+            FileCollection fc = subDirectory.AllFiles();
         }
     }
 }

@@ -68,8 +68,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 Assignment.DeductionPerUnit = (ActiveCourseUser.AbstractCourse as Course).PercentPenalty;
                 Assignment.HoursLateWindow = (ActiveCourseUser.AbstractCourse as Course).HoursLateUntilZero;
             }
-            
-
             return View(Assignment);
         }
 

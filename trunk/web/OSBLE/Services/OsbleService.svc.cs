@@ -145,8 +145,8 @@ namespace OSBLE.Services
 
             //Find all review documents
             OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
-            Dictionary<string, Stream> originalStreams = new Dictionary<string, Stream>();
-            Dictionary<string, Stream> reviewStreams = new Dictionary<string, Stream>();
+            Dictionary<string, dynamic> originalStreams = new Dictionary<string, dynamic>();
+            Dictionary<string, dynamic> reviewStreams = new Dictionary<string, dynamic>();
             foreach (ReviewTeam teamToReview in teamsToReview)
             {
                 string zipName = teamToReview.AuthorTeam.Name;
@@ -156,7 +156,7 @@ namespace OSBLE.Services
                 {
                     zipName = string.Format("Anonymous {0}", teamToReview.AuthorTeamID);
                 }
-                string key = string.Format("{0};{1}.zip", teamToReview.AuthorTeamID, zipName);
+                string key = string.Format("{0};{1}", teamToReview.AuthorTeamID, zipName);
 
                 //get the original, unedited document
                 FileCollection fc = fs.Course(courseUser.AbstractCourseID)
@@ -167,11 +167,8 @@ namespace OSBLE.Services
                 //don't create a zip if we have have nothing to zip.
                 if (fc.Count > 0)
                 {
-                    Stream zipStream = fc.ToZipStream();
-                    MemoryStream ms = new MemoryStream();
-                    zipStream.CopyTo(ms);
-                    ms.Position = 0;
-                    originalStreams[key] = ms;
+                    var bytes = fc.ToBytes();
+                    originalStreams[key] = bytes;
                 }
 
                 //get any user modified document
@@ -183,47 +180,38 @@ namespace OSBLE.Services
                 //don't create a zip if we have have nothing to zip.
                 if (fc.Count > 0)
                 {
-                    Stream zipStream = fc.ToZipStream();
-                    MemoryStream ms = new MemoryStream();
-                    zipStream.CopyTo(ms);
-                    ms.Position = 0;
-                    reviewStreams[key] = ms;
+                    var bytes = fc.ToBytes();
+                    reviewStreams[key] = bytes;
                 }
             }
             try
             {
-                //combine the zip files into a single zip
-                ZipFile originals = new ZipFile();
-                foreach (string key in originalStreams.Keys)
-                {
-                    originals.AddEntry(key, originalStreams[key]);
-                }
-
-                //do the same with the review streams.
-                ZipFile reviews = new ZipFile();
-                foreach (string key in reviewStreams.Keys)
-                {
-                    reviews.AddEntry(key, reviewStreams[key]);
-                }
-
-                //put the two zip files into one master zip file
+                //put everything into a zip file
                 ZipFile final = new ZipFile();
-                MemoryStream originalStream = new MemoryStream();
-                originals.Save(originalStream);
-                originalStream.Position = 0;
-                final.AddEntry("originals.zip", originalStream);
 
-                MemoryStream reviewsZipStream = new MemoryStream();
-                reviews.Save(reviewsZipStream);
-                reviewsZipStream.Position = 0;
-                final.AddEntry("reviews.zip", reviewsZipStream);
+                foreach (string author in originalStreams.Keys)
+                {
+                    foreach (string file in originalStreams[author].Keys)
+                    {
+                        string location = string.Format("{0}/{1}/{2}", "originals", author, file);
+                        final.AddEntry(location, originalStreams[author][file]);
+                    }
+                }
+
+                foreach (string author in reviewStreams.Keys)
+                {
+                    foreach (string file in reviewStreams[author].Keys)
+                    {
+                        string location = string.Format("{0}/{1}/{2}", "reviews", author, file);
+                        final.AddEntry(location, reviewStreams[author][file]);
+                    }
+                }
 
                 MemoryStream finalZipStream = new MemoryStream();
                 final.Save(finalZipStream);
                 finalZipStream.Position = 0;
                 byte[] bytes = finalZipStream.ToArray();
                 finalZipStream.Close();
-                originals.Dispose();
                 return bytes;
             }
             catch (Exception)

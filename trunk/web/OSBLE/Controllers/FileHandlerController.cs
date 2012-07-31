@@ -249,6 +249,17 @@ namespace OSBLE.Controllers
         [NotForCommunity]
         public ActionResult GetSubmissionZip(int assignmentId, int teamId)
         {
+            //basic assignments have the option of being annotatable.  In this case,
+            //send off to annotate rather than creating a zip file.
+            Assignment assignment = db.Assignments.Find(assignmentId);
+            if (assignment.Type == AssignmentTypes.Basic && assignment.IsAnnotatable == true)
+            {
+                if (assignment.HasDeliverables && assignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
+                {
+                    return RedirectToRoute(new { controller = "PdfCriticalReview", action = "Grade", assignmentID = assignmentId, authorTeamID = teamId });
+                }
+            }
+
             return GetSubmissionZipHelper(assignmentId, teamId);
         }
 
