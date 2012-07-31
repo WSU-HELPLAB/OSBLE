@@ -2,11 +2,12 @@
 @using OSBLE.Models.Assignments;
 @using System.Collections.Generic;
 @using OSBLE.Models;
-@model Assignment          
+@model CriticalReviewSettings          
 @{
     List<Team> teams = ViewBag.Teams;
     List<CourseUser> allUsers = ViewBag.AllUsers;
     List<Assignment> previousTeamAssignments = ViewBag.PreviousTeamAssignments;
+    Assignment assignment = Model.Assignment;
 }
 @section Header
 {
@@ -16,7 +17,28 @@
 <div id="teamDiv">
     <p>
     </p>
-    @Html.HiddenFor(m => m.ID)
+    @Html.HiddenFor(m => m.AssignmentID)
+    <div>
+        <h3>Review Settings</h3>
+        <table class="wizard_entry_table">
+            <tr>
+                <th>@Html.LabelFor(m => m.AnonymizeAuthor)</th>
+                <td>@Html.CheckBoxFor(m => m.AnonymizeAuthor)</td>
+            </tr>
+            <tr>
+                <th>@Html.LabelFor(m => m.AllowDownloadAfterPublish)</th>
+                <td>@Html.CheckBoxFor(m => m.AllowDownloadAfterPublish)</td>
+            </tr>
+            <tr>
+                <th>@Html.LabelFor(m => m.AnonymizeComments)</th>
+                <td>@Html.CheckBoxFor(m => m.AnonymizeComments)</td>
+            </tr>
+            <tr>
+                <th>@Html.LabelFor(m => m.AnonymizeCommentsAfterPublish)</th>
+                <td>@Html.CheckBoxFor(m => m.AnonymizeCommentsAfterPublish)</td>
+            </tr>
+        </table>
+    </div>
     <div>
         <h3>
             Auto Generation Options</h3>
@@ -46,15 +68,15 @@
     </div>
     <div id="TeamsDiv">
         <h3>
-            Items to be Reviewed from &quot;@Model.PreceedingAssignment.AssignmentName&quot;</h3>
+            Items to be Reviewed from &quot;@assignment.PreceedingAssignment.AssignmentName&quot;</h3>
         @{int counter = 0;}
-        @foreach (AssignmentTeam aTeam in Model.PreceedingAssignment.AssignmentTeams.OrderBy(t => t.Team.Name))
+        @foreach (AssignmentTeam aTeam in assignment.PreceedingAssignment.AssignmentTeams.OrderBy(t => t.Team.Name))
         {
             counter++;
             <div id="teamDiv_@(aTeam.TeamID)" class="TeamDiv">
                 @aTeam.Team.Name
                 <ul id="team_@(@aTeam.TeamID)" class="TeamSortable">
-                    @foreach (ReviewTeam reviewTeam in Model.ReviewTeams.Where(rt => rt.AuthorTeamID == aTeam.TeamID))
+                    @foreach (ReviewTeam reviewTeam in assignment.ReviewTeams.Where(rt => rt.AuthorTeamID == aTeam.TeamID))
                     {
                         <li data-id="reviewTeam_@(reviewTeam.ReviewingTeam.ID)" class="ui-state-default StudentListItem">@reviewTeam.ReviewingTeam.Name
                         <img class="RemoveTeamIcon" src="/Content/images/delete_up.png" style="float:right;" alt="remove @reviewTeam.ReviewingTeam.Name" title="remove @reviewTeam.ReviewingTeam.Name" onclick="removeFromTeam(this)" />

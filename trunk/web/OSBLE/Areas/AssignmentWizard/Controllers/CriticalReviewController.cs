@@ -18,7 +18,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get
             {
-                return "Critical Review Teams";
+                return "Critical Review";
             }
         }
 
@@ -68,13 +68,25 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             base.Index();
             SetUpViewBag();
-            return View(Assignment);
+            return View(Assignment.CriticalReviewSettings);
         }
 
         [HttpPost]
-        public virtual ActionResult Index(Assignment model)
+        public virtual ActionResult Index(CriticalReviewSettings model)
         {
-            Assignment = db.Assignments.Find(model.ID);
+            Assignment = db.Assignments.Find(model.AssignmentID);
+
+            //delete preexisting settings to prevent an FK relation issue
+            CriticalReviewSettings setting = db.CriticalReviewSettings.Find(model.AssignmentID);
+            if (setting != null)
+            {
+                db.CriticalReviewSettings.Remove(setting);
+            }
+            db.SaveChanges();
+
+            //...and then re-add it.
+            Assignment.CriticalReviewSettings = model;
+            db.SaveChanges();
 
             //Blow out all previous review teams and readd the ones we get from the view.
             //AC Note: This may have to be changed depending on how we implement the new 
