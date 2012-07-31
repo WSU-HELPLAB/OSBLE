@@ -73,51 +73,55 @@
                                         
                                     </td>
                                 </tr>
-                                @if (dataModel.CRSubmission.submissionTimes[i] == null)
+                                @if(rt.Assignment.PreceedingAssignment.Deliverables[0].DeliverableType != DeliverableType.PDF)
                                 {
-                                    if(dataModel.CRSubmission.authorSubmissionTimes[i] != null)
+                                    //PDF reviews don't have upload options (they use annotate)
+                                    if (dataModel.CRSubmission.submissionTimes[i] == null)
                                     {
-                                    <tr>
-                                        <td>
-                                            @Ajax.ActionLink("Upload your review", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area = "" }, options, new object())
-                                        </td>
-                                    </tr>
+                                        if(dataModel.CRSubmission.authorSubmissionTimes[i] != null)
+                                        {
+                                        <tr>
+                                            <td>
+                                                @Ajax.ActionLink("Upload your review", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area = "" }, options, new object())
+                                            </td>
+                                        </tr>
                                    
+                                        }
                                     }
-                                }
                                 
-                                else
-                                {
-                                    String submissionTime = dataModel.CRSubmission.submissionTimes[i].ToString();
-                                    <tr>
+                                    else
+                                    {
+                                        String submissionTime = dataModel.CRSubmission.submissionTimes[i].ToString();
+                                        <tr>
 
-                                        <td> 
-                                            <ul id="SubmissionItems">
-                                                <li>
-                                                    @Html.ActionLink("Download your review", 
-                                                    "GetReviewForAuthor", 
-                                                    "FileHandler", 
-                                                    new { assignmentId = dataModel.CRSubmission.assignmentId, authorTeamId = rt.AuthorTeamID, area = "" }, 
-                                                    new { onclick = "create_and_open_downloading_submission_dialog()",
-                                                          title = "Last submitted: " + submissionTime})
-                                                </li>
+                                            <td> 
+                                                <ul id="SubmissionItems">
+                                                    <li>
+                                                        @Html.ActionLink("Download your review", 
+                                                        "GetReviewForAuthor", 
+                                                        "FileHandler", 
+                                                        new { assignmentId = dataModel.CRSubmission.assignmentId, authorTeamId = rt.AuthorTeamID, area = "" }, 
+                                                        new { onclick = "create_and_open_downloading_submission_dialog()",
+                                                              title = "Last submitted: " + submissionTime})
+                                                    </li>
 
-                                                <li>
-                                                    @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area = "" }, options, new object())
-                                                </li>
-                                                @if (dataModel.CRSubmission.SubmissionReceived && rt.AuthorTeamID ==dataModel.CRSubmission.AuthorTeamId)
-                                                {
-                                                    <li id="SubmissionReceivedText">Submission received</li>
-                                                }
-                                            </ul>
-                                        </td>
-                                    </tr>
+                                                    <li>
+                                                        @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = dataModel.CRSubmission.assignmentId, authorTeamID = rt.AuthorTeamID, area = "" }, options, new object())
+                                                    </li>
+                                                    @if (dataModel.CRSubmission.SubmissionReceived && rt.AuthorTeamID ==dataModel.CRSubmission.AuthorTeamId)
+                                                    {
+                                                        <li id="SubmissionReceivedText">Submission received</li>
+                                                    }
+                                                </ul>
+                                            </td>
+                                        </tr>
                                     
-                                    @*
-                                        header.CRSubmission.SubmissionReceived = true;
-                                        header.CRSubmission.AuthorTeamId
-                                    *@
+                                        @*
+                                            header.CRSubmission.SubmissionReceived = true;
+                                            header.CRSubmission.AuthorTeamId
+                                        *@
                                     
+                                    }
                                 }
 
                                  @if (dataModel.CRSubmission.hasStudentRubric == true &&

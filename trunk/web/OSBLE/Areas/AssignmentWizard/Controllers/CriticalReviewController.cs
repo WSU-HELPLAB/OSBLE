@@ -31,7 +31,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             get
             {
-                return new CriticalReviewSettingsController();
+                return new PreviousAssignmentController();
             }
         }
 
