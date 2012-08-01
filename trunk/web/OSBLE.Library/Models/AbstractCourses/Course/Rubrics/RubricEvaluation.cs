@@ -45,12 +45,32 @@ namespace OSBLE.Models.Courses.Rubrics
         [Required]
         public virtual ICollection<CriterionEvaluation> CriterionEvaluations { get; set; }
 
+        public static double GetStudentGradeAsDouble(int rubricEvaluationId)
+        {
+            return GetGradeHelper(rubricEvaluationId, true);
+        }
+
+        public static double GetGradeAsDouble(int rubricEvaluationId)
+        {
+            return GetGradeHelper(rubricEvaluationId, false);
+        }
+
+        public static string GetStudentGradeAsPercent(int rubricEvaluationId)
+        {
+            return GetGradeHelper(rubricEvaluationId, true).ToString("P");
+        }
 
         /// <summary>
         /// Returns a string that is ("XX.X %") where XX.X is the rubric grade percent.
         /// </summary>
         /// <returns></returns>
         public static string GetGradeAsPercent(int rubricEvaluationId)
+        {
+            //ToString("P") will add a percent for us
+            return GetGradeHelper(rubricEvaluationId, false).ToString("P");
+        }
+
+        private static double GetGradeHelper(int rubricEvaluationId, bool isStudent)
         {
             double gradeOnRubric = 0.0;
 
@@ -60,9 +80,20 @@ namespace OSBLE.Models.Courses.Rubrics
                 //Calculate the rubric grade as a percent to display
                 if (re.CriterionEvaluations.Count > 0)
                 {
+
+                    int sumOfPointSpreads;
+
                     //Below we are calculating the percent received on the rubric. 
-                    int sumOfPointSpreads = (from level in re.Assignment.Rubric.Levels
-                                             select level.PointSpread).Sum();
+                    if (isStudent)
+                    {
+                        sumOfPointSpreads = (from level in re.Assignment.StudentRubric.Levels
+                                                 select level.PointSpread).Sum();
+                    }
+                    else
+                    {
+                        sumOfPointSpreads = (from level in re.Assignment.Rubric.Levels
+                                                 select level.PointSpread).Sum();
+                    }
 
                     double sumOfWeights = 0;
                     double sumOfWeightedScores = 0;
@@ -87,8 +118,8 @@ namespace OSBLE.Models.Courses.Rubrics
                 }
             }
 
-            //ToString("P") will add a percent for us
-            return (gradeOnRubric).ToString("P");
+            return gradeOnRubric;
         }
+
     }
 }

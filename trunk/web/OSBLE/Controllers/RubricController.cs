@@ -224,7 +224,7 @@ namespace OSBLE.Controllers
                 }
             }
 
-            //assignments are storied within categories, which are found within
+            //assignments are stored within categories, which are found within
             //the active course.
             List<Assignment> rubricAssignmentList = (from a in db.Assignments
                                                      where a.CourseID == assignment.CourseID &&
@@ -232,7 +232,7 @@ namespace OSBLE.Controllers
                                                      select a).ToList();
 
             viewModel.AssignmentList = rubricAssignmentList;
-            viewModel.RubricEvaluationList = (from re in db.RubricEvaluations where re.AssignmentID == assignment.ID select re).ToList();
+            //viewModel.RubricEvaluationList = (from re in db.RubricEvaluations where re.AssignmentID == assignment.ID select re).ToList();
             if (assignment.HasTeams)
             {
                 viewModel.TeamList = assignment.AssignmentTeams.OrderBy(t => t.Team.Name).ToList();
@@ -261,9 +261,10 @@ namespace OSBLE.Controllers
         /// 
         /// </summary>
         /// <param name="assignmentId"></param>
-        /// <param name="authorCuId">ID of the author (person being reviewed) Note: if it's a team, this is the ID
-        /// of the person who submitted the assignment</param>
-        /// <param name="reviewerCuId">CourseUser ID of the reviewer</param>
+        /// <param name="authorCuId">ID of the author (person being reviewed) Note: if it's a team, this can be the
+        /// ID of any member of the team</param>
+        /// <param name="reviewerCuId">CourseUser ID of the reviewer Note: if it's a team, this can be the
+        /// ID of any member of the team</param>
         /// <returns></returns>
         private RubricViewModel GetStudentRubricViewModel(int assignmentId, int authorCuId, int reviewerCuId)
         {
@@ -279,19 +280,16 @@ namespace OSBLE.Controllers
             }
 
             viewModel.SelectedAssignment = assignment;
-
-            int authorTeamId;
             viewModel.Student = true;
 
-            authorTeamId = GetAssignmentTeam(assignment.PreceedingAssignment, author).TeamID;
-            Rubric rubric = assignment.StudentRubric;
-
-
-            viewModel.Rubric = rubric;
-
+            //author team
             viewModel.SelectedTeam = GetAssignmentTeam(assignment.PreceedingAssignment, author);
+            int authorTeamId = viewModel.SelectedTeam.TeamID;
 
-            AssignmentTeam reviewingTeam = GetAssignmentTeam(assignment, ActiveCourseUser);
+            AssignmentTeam reviewingTeam = GetAssignmentTeam(assignment, reviewer);
+
+            Rubric rubric = assignment.StudentRubric;
+            viewModel.Rubric = rubric;
 
             //get Ids of all members of the team doing the review. Use this list to make sure that the current 
             //user is on this team
@@ -307,6 +305,7 @@ namespace OSBLE.Controllers
 
             if (eval != null)
             {
+                viewModel.Completed = true;
                 viewModel.Evaluation = eval;
             }
             else
@@ -396,33 +395,122 @@ namespace OSBLE.Controllers
             return View("Index", viewModel);
         }
 
-        public ActionResult ViewForCriticalReview(int assignmentId, int reviewerCourseUserId)
+        /// <summary>
+        /// Called from CriticalReviewStudentDownloadDecorator. This function compiles a list of rubricViewModels
+        /// of rubrics from all students in who reviewed the author
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        /// <param name="authorTeamId"></param>
+        /// <returns></returns>
+        public ActionResult ViewForCriticalReview(int assignmentId, int authorTeamId)
         {
             RubricViewModel mergedRubric = new RubricViewModel();
-
+            Team authorTeam = db.Teams.Find(authorTeamId);
 
             //Get a view model for each rubric in the assignment that was done on the author
-            List<RubricViewModel> rubricViewModels;
+            List<RubricViewModel> rubricViewModels = new List<RubricViewModel>();
 
-        //  !!viewModel = GetStudentRubricViewModel(assignmentId, courseUserId,  teamId);
+            //compile a list of all of the reviewerIDs (Course User IDs) who were assigned to review authorTeam's assignment. 
+            //some of these may not have actually submitted their review.
+            List<Team> reviewingTeams = (from rt in db.ReviewTeams
+                                     where rt.AuthorTeamID == authorTeamId
+                                     && rt.AssignmentID == assignmentId
+                                   select rt.ReviewingTeam).ToList();
 
-            //compile a list of all of the authorTeamIds that were reviewed by Current user
-            List<int> authorIds = (from rt in db.ReviewTeams
-                                   where rt.ReviewTeamID == reviewerCourseUserId
-                                   select rt.AuthorTeamID).ToList();
-        //        //get list of cuIDs where each cuID represents a review team that reviewed the author team
-        //   //List<int> ids = (from 
-        //        //then call getstudentrubricviewmodel for each id
+            List<int> reviewerIds = reviewingTeams.Select(rt => rt.TeamMembers.FirstOrDefault().CourseUserID).ToList();
 
-        //    //merge all of the view models
 
-        //Return the view for the new merged view model
+            foreach (int reviewId in reviewerIds)
+            {
+                RubricViewModel rvm = GetStudentRubricViewModel(assignmentId,
+                    authorTeam.TeamMembers.FirstOrDefault().CourseUserID,
+                    reviewId);
+                if (rvm.Completed)
+                {
+                    rubricViewModels.Add(rvm);
+                }
+            }
 
-        //}
+            if (rubricViewModels.Count > 0)
+            {
+                mergedRubric = MergeRubricViewModels(rubricViewModels);
+            }
 
-        //private RubricViewModel MergeRubrics(List<RubricViewModel> originals)
-        //{
-            return View("Index", mergedRubric);
+            if (HasValidViewModel(mergedRubric))
+            {
+                bool isOwnAssignment = false;
+
+                if (ActiveCourseUser.AbstractRole.CanSubmit)
+                {
+                    Assignment assignment = db.Assignments.Find(assignmentId);
+                    AssignmentTeam team = GetAssignmentTeam(assignment, ActiveCourseUser);
+                    if (team != null)
+                    {
+                        isOwnAssignment = true;
+                    }
+                }
+
+                if (ActiveCourseUser.AbstractRole.CanGrade || isOwnAssignment || ActiveCourseUser.AbstractRole.Anonymized)
+                {
+                    Assignment assignment = db.Assignments.Find(assignmentId);
+                    CourseUser cu = db.CourseUsers.Find(authorTeamId);
+                    AssignmentTeam at = GetAssignmentTeam(assignment, cu);
+                    ViewBag.AssignmentName = assignment.AssignmentName;
+                    ViewBag.DisplayGrade = false;
+                    if (mergedRubric.Evaluation.CriterionEvaluations.Count > 0)
+                    {
+                        ViewBag.DisplayGrade = true;
+                        //ViewBag.Grade = RubricEvaluation.GetGradeAsPercent(mergedRubric.Evaluation.ID);
+
+                        List<double> grades = rubricViewModels.Select(rvm => RubricEvaluation.GetStudentGradeAsDouble(rvm.Evaluation.ID)).ToList();
+                        ViewBag.Grade = (grades.Sum() / rubricViewModels.Count).ToString("P");
+                    }
+                    ViewBag.isEditable = false;
+
+                    return View(mergedRubric);
+                }
+            }
+            return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
+        }
+
+        private RubricViewModel MergeRubricViewModels(List<RubricViewModel> rubricViewModels)
+        {
+            RubricViewModel mergedViewModel = new RubricViewModel();
+
+            if (rubricViewModels.Count < 1)
+            {
+                //need to create a nice empty one here to handle this case
+            }
+
+            mergedViewModel.isMerged = true;
+            mergedViewModel.Student = true;
+
+            //assign things that are the same between rubrics 
+            RubricViewModel temp = rubricViewModels.FirstOrDefault();
+            mergedViewModel.Rubric = temp.Rubric;
+            mergedViewModel.SelectedTeam = temp.SelectedTeam;
+            mergedViewModel.Evaluation = new RubricEvaluation();
+            //mergedViewModel.Evaluation.Recipient = temp.Evaluation.Recipient;
+            mergedViewModel.Evaluation.AssignmentID = temp.Evaluation.AssignmentID;
+            mergedViewModel.Evaluation.EvaluatorID = temp.Evaluation.EvaluatorID;
+            
+
+            foreach (RubricViewModel rvm in rubricViewModels)
+            {
+                foreach (CriterionEvaluation ce in rvm.Evaluation.CriterionEvaluations)
+                {
+                    mergedViewModel.Evaluation.CriterionEvaluations.Add(ce);
+                }
+
+                mergedViewModel.Evaluation.GlobalComment += rvm.Evaluation.Evaluator.UserProfile.FirstName + 
+                    " " +
+                    rvm.Evaluation.Evaluator.UserProfile.LastName + 
+                    ": " +
+                    rvm.Evaluation.GlobalComment + 
+                    "\n\n";
+            }
+
+            return mergedViewModel;
         }
 
         public ActionResult View(int assignmentId, int cuId)

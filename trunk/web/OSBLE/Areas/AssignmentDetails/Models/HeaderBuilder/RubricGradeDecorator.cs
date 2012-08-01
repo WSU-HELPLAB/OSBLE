@@ -58,6 +58,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                 header.AssignmentDetails.hasGrade = true;
                 header.AssignmentDetails.assignmentID = assignment.ID;
                 header.AssignmentDetails.cuID = Student.ID;
+
                 header.AssignmentDetails.DisplayValue = RubricEvaluation.GetGradeAsPercent(rubricEvaluation.ID);
             }
             else

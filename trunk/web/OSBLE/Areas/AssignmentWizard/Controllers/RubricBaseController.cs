@@ -328,7 +328,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 }
                 else
                 {
-                    criterion.Weight = 0;
+                    criterion.Weight = 1;
                 }
                 criterion.RubricID = rubric.ID;
                 db.Criteria.Add(criterion);

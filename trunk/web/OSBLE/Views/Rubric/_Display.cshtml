@@ -191,7 +191,13 @@
                                 </div>
                             </td>
                             <td class="text_input_score">
-                                <input class="text_input_score" id="@(String.Format("{0}_{1}", critInputPrefix, critEval.Criterion.ID))" name="@(String.Format("{0}_{1}", critInputPrefix, critEval.Criterion.ID))" type="text" value="@critEval.Score" style="border:0; padding-left:7px;" size="1" @textBoxDisabled />
+                                <input class="text_input_score" 
+                                    id="@(String.Format("{0}_{1}", critInputPrefix, critEval.Criterion.ID))" 
+                                    name="@(String.Format("{0}_{1}", critInputPrefix, critEval.Criterion.ID))" 
+                                    type="text" value="@critEval.Score"
+                                    style="border:0; 
+                                    padding-left:7px;" 
+                                    size="1" disabled="disabled" />
                             </td>
                         </tr>
                         @{if (Model.Rubric.HasCriteriaComments)

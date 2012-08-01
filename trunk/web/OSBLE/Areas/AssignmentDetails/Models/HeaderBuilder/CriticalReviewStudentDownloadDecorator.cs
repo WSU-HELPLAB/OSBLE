@@ -7,6 +7,7 @@ using OSBLE.Resources;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Controllers;
+using OSBLE.Models;
 
 namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 {
@@ -30,11 +31,10 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             header.CRdownload.publishedDate = assignment.CriticalReviewPublishDate;
 
             //get student's team
-
                         
             AssignmentTeam assignmentTeam = null;
             assignmentTeam = OSBLEController.GetAssignmentTeam(assignment.PreceedingAssignment, Student);
-           
+            header.CRdownload.teamID = assignmentTeam.TeamID;
             header.CRdownload.hasRecievedReview = false;
 
             //PDF reviews don't get sent to the file system (they get sent to annotate)
@@ -67,6 +67,21 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                             header.CRdownload.hasRecievedReview = true;
                             break;
                         }
+                    }
+                }
+
+                //check if there is at one student rubric that has been filled out for the current user
+                if (assignment.HasStudentRubric)
+                {
+                    using (OSBLEContext db = new OSBLEContext())
+                    {
+                        header.CRdownload.hasRubricToView = (from e in db.RubricEvaluations
+                                                   where e.AssignmentID == assignment.ID &&
+                                                   e.RecipientID == assignmentTeam.TeamID &&
+                                                   e.Evaluator.AbstractRoleID == (int)CourseRole.CourseRoles.Student &&
+                                                   e.DatePublished != null
+                                                                 select e.ID).Count() > 0;
+                                                   
                     }
                 }
             }

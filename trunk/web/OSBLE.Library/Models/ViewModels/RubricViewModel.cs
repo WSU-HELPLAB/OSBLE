@@ -12,6 +12,8 @@ namespace OSBLE.Models.ViewModels
             Rubric = new Rubric();
             Evaluation = new RubricEvaluation();
             SelectedSection = 0;
+            Completed = false;
+            isMerged = false;
         }
 
         public Rubric Rubric { get; set; }
@@ -33,5 +35,9 @@ namespace OSBLE.Models.ViewModels
         public int SelectedSection { get; set; }
 
         public bool Student { get; set; }
+
+        public bool Completed { get; set; }
+
+        public bool isMerged { get; set; }
     }
 }

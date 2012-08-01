@@ -17,20 +17,18 @@
         @(Html.ActionLink("Download your reviewed submission", "GetReviewsOfAuthor", "FileHandler",
         new { area = "", assignmentId = dataModel.CRdownload.assignmentID, receiverId = cu.ID },
         new { onclick = "create_and_open_downloading_submission_dialog()" }))
-        if (dataModel.Assignment.HasRubric)
-        {
+    }
+    if(dataModel.CRdownload.hasRubricToView)
+    {
         <br />
-            @Html.ActionLink("Rubric",
-            "ViewForCriticalReview",
-            "Rubric",
-            new
-            {
-                assignmentId = dataModel.CRdownload.assignmentID,
-
-                area = ""
-            },
-            new { })
-        }
+        @Html.ActionLink("Rubric", 
+        "ViewForCriticalReview",
+        "Rubric",
+        new { assignmentId = dataModel.CRdownload.assignmentID,
+              authorTeamId = dataModel.CRdownload.teamID,
+              area = ""
+        },
+        new {})
     }
     else
     {
