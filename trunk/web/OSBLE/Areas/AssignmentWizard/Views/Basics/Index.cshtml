@@ -8,6 +8,7 @@
 @Html.HiddenFor(m => m.CommentCategoryID)
 @Html.HiddenFor(m => m.IsDraft)
 @Html.HiddenFor(m => m.Type)
+@Html.HiddenFor(m => m.IsAnnotatable)
 <table class="wizard_entry_table">
 <tr>
     <th>@Html.LabelFor(m => m.AssignmentName):</th>
@@ -44,10 +45,5 @@
     <td>@Html.EditorFor(m => m.DeductionPerUnit)% per @Html.EditorFor(m => m.HoursPerDeduction) @Html.LabelFor(m => m.HoursPerDeduction)</td>
     <td>@Html.ValidationMessageFor(m => m.DeductionPerUnit)</td>
     <td>@Html.ValidationMessageFor(m => m.HoursPerDeduction)</td>
-</tr>
-<tr>
-    <th>@Html.LabelFor(m => m.IsAnnotatable):</th>
-    <td>@Html.EditorFor(m => m.IsAnnotatable)</td>
-    <td>@Html.ValidationMessageFor(m => m.IsAnnotatable)</td>
 </tr>
 </table>

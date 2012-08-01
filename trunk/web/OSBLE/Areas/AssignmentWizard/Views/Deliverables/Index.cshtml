@@ -8,6 +8,13 @@
 <p>@ToolTips.BasicAssignmentDeliverables</p>
 @Html.ValidationSummary() 
 @Html.HiddenFor(m => m.ID)
+<table class="wizard_entry_table">
+<tr>
+    <th>@Html.LabelFor(m => m.IsAnnotatable):</th>
+    <td>@Html.EditorFor(m => m.IsAnnotatable)</td>
+    <td>@Html.ValidationMessageFor(m => m.IsAnnotatable)</td>
+</tr>
+</table>
 <table id="deliverables_table" cellspacing="6px">
     <tr>
         <td>

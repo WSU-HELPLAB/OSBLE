@@ -81,6 +81,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public ActionResult Index(Assignment model)
         {
             Assignment = db.Assignments.Find(model.ID);
+            Assignment.IsAnnotatable = model.IsAnnotatable;
             ParseFormValues();
             WasUpdateSuccessful = true;
 

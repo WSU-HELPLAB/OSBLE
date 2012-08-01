@@ -22,6 +22,63 @@ namespace OSBLE.Models.Annotate
             ApiUser = apiUser;
         }
 
+        public AnnotateResult ToggleCommentVisibility(int criticalReviewAssignmentID, int authorTeamID, bool makeVisible)
+        {
+            AnnotateResult result = new AnnotateResult();
+            Assignment criticalReview;
+            result.Result = ResultCode.ERROR;
+
+            string webResult = "";
+            long epoch = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
+            string apiKey = GenerateAnnotateKey("listNotes.php", ApiUser, epoch);
+            WebClient client = new WebClient();
+
+            using(OSBLEContext db = new OSBLEContext())
+            {
+                criticalReview = db.Assignments.Find(criticalReviewAssignmentID);
+
+                //step 1: find all people reviewing the document
+                var query = (from rt in db.ReviewTeams
+                                               .Include("CourseUser")
+                                               .Include("CourseUser.UserProfile")
+                             where rt.AssignmentID == criticalReviewAssignmentID
+                             && rt.AuthorTeamID == authorTeamID
+                             select rt.ReviewingTeam)
+                             .SelectMany(t => t.TeamMembers)
+                             .Distinct();
+                List<TeamMember> reviewers = query.ToList();
+
+                //step 2: get all comments for each reviewer on the team
+                AnnotateResult documentResult = UploadDocument((int)criticalReview.PrecededingAssignmentID, authorTeamID);
+                string rawNoteUrl = "http://helplab.org/annotate/php/listNotes.php?" +
+                                 "api-user={0}" +           //Annotate admin user name (see web config)
+                                 "&api-requesttime={1}" +   //UNIX timestamp
+                                 "&api-annotateuser={2}" +  //the current user (reviewer)
+                                 "&api-auth={3}" +          //Annotate admin auth key
+                                 "&d={4}" +                 //document date
+                                 "&c={5}";                  //document code
+                string noteUrl = "";
+                foreach (TeamMember reviewer in reviewers)
+                {
+                    //always refresh our epoch and api key
+                    epoch = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
+                    apiKey = GenerateAnnotateKey("listNotes.php", reviewer.CourseUser.UserProfile.UserName, epoch);
+                    noteUrl = string.Format(rawNoteUrl,
+                                               ApiUser,
+                                               epoch,
+                                               reviewer.CourseUser.UserProfile.UserName,
+                                               apiKey,
+                                               documentResult.DocumentDate,
+                                               documentResult.DocumentCode
+                                               );
+                    webResult = client.DownloadString(noteUrl);
+                    dynamic jsonResult = Json.Decode(webResult);
+                }
+
+            }
+            return result;
+        }
+
         /// <summary>
         /// Sends a document that resides on OSBLE to the Annotate server.
         /// If the document already exists on annotate's servers, this function will not resubmit

@@ -107,7 +107,6 @@ namespace OSBLE.Controllers
                 if (CRassignment.PreceedingAssignment.Deliverables.Count == 1 && CRassignment.PreceedingAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
                 {
                     AnnotateApi api = new AnnotateApi(ConfigurationManager.AppSettings["AnnotateUserName"], ConfigurationManager.AppSettings["AnnotateApiKey"]);
-
                     AnnotateResult uploadResult = api.UploadDocument((int)CRassignment.PrecededingAssignmentID, authorTeamID);
                     if (uploadResult.Result == ResultCode.OK)
                     {

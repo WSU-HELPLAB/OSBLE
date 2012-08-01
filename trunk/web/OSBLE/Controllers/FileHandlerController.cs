@@ -378,18 +378,6 @@ namespace OSBLE.Controllers
             CourseUser receiver = db.CourseUsers.Find(receiverId);
             AssignmentTeam previousAssignmentTeam = GetAssignmentTeam(assignment.PreceedingAssignment, receiver);
 
-            //critical reviews of PDF documents aren't zipped.  Instead,
-            //they are sent to annotate.  In this case, we need to redirect
-            //to a different location
-            if (assignment.Type == AssignmentTypes.CriticalReview)
-            {
-                Assignment previousAssignment = assignment.PreceedingAssignment;
-                if (previousAssignment.HasDeliverables && previousAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
-                {
-                    return RedirectToRoute(new { controller = "PdfCriticalReview", action = "Review", assignmentID = assignmentId, authorTeamID = previousAssignmentTeam.TeamID });
-                }
-            }
-
             if (ActiveCourseUser.AbstractRole.CanModify || (receiverId == ActiveCourseUser.ID && assignment.IsCriticalReviewPublished))
             {
                 return GetReviewsOfAuthorHelper(assignment, receiverId);
@@ -439,6 +427,18 @@ namespace OSBLE.Controllers
         {
             CourseUser receiver = db.CourseUsers.Find(receiverId);
             AssignmentTeam previousAssignmentTeam = GetAssignmentTeam(assignment.PreceedingAssignment, receiver);
+
+            //critical reviews of PDF documents aren't zipped.  Instead,
+            //they are sent to annotate.  In this case, we need to redirect
+            //to a different location
+            if (assignment.Type == AssignmentTypes.CriticalReview)
+            {
+                Assignment previousAssignment = assignment.PreceedingAssignment;
+                if (previousAssignment.HasDeliverables && previousAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
+                {
+                    return RedirectToRoute(new { controller = "PdfCriticalReview", action = "Review", assignmentID = assignment.ID, authorTeamID = previousAssignmentTeam.TeamID });
+                }
+            }
 
             //REVIEW TODO: Explain the hack that you're using below.
             Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, previousAssignmentTeam);

@@ -107,6 +107,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnnotateApiTest.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\BasicsControllerTest.cs" />
     <Compile Include="FileSystemTest.cs" />
     <Compile Include="OsbleServiceTest.cs" />
