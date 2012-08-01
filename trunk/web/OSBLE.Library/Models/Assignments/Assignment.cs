@@ -53,7 +53,6 @@ namespace OSBLE.Models.Assignments
             this.StudentRubricID = other.StudentRubricID;
             this.TeamEvaluationSettings = new TeamEvaluationSettings(other.TeamEvaluationSettings);
             this.Type = other.Type;
-            this.CriticalReviewSettings = other.CriticalReviewSettings;
         }
 
         #region public properties
