@@ -514,8 +514,9 @@ namespace OSBLE.Controllers
 #if !DEBUG
                     string body = "Your OSBLE password has been reset.\n Your new password is: " + newPass + "\n\nPlease change this password as soon as possible.";
 
-                    MailMessage mm = new MailMessage(new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE"),
-                                new MailAddress(model.EmailAddress));
+                    MailMessage mm = new MailMessage(
+                        new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE"),
+                        new MailAddress(model.EmailAddress));
 
                     mm.Subject = "[OSBLE] Password Reset Request";
                     mm.Body = body;

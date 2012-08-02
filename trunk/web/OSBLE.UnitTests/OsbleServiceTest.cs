@@ -152,5 +152,20 @@ namespace OSBLE.UnitTests
             bool result = osbleClient.SubmitReview(7, 2, zipStream.ToArray(), token);
             Assert.AreEqual(true, result);
         }
+
+        [TestMethod]
+        public void OsbleService_GetMergedReviewDocumentTest()
+        {
+            //AC Note: again, this requires OSBLE to be set up property.  May need
+            //to change values accordingly
+            AuthenticationServiceClient authClient = new AuthenticationServiceClient();
+            OsbleServiceClient osbleClient = new OsbleServiceClient();
+            string token = authClient.ValidateUser("betty@rogers.com", "123123");
+            byte[] data = osbleClient.GetMergedReviewDocument(34, 4, token);
+            using (ZipFile zip = ZipFile.Read(data))
+            {
+                zip.Save("D:\\acarter\\temp\\GetMergedReviewDocumentTest.zip");
+            }
+        }
     }
 }

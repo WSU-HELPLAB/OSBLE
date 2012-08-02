@@ -13,19 +13,15 @@
   <xs:element name="ArrayOfAssignment" nillable="true" type="tns:ArrayOfAssignment" />
   <xs:complexType name="Assignment">
     <xs:sequence>
-      <xs:element minOccurs="0" name="AddedPoints" type="xs:double" />
       <xs:element minOccurs="0" name="AssignmentDescription" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="AssignmentName" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="AssignmentTeams" nillable="true" type="tns:ArrayOfAssignmentTeam" />
       <xs:element minOccurs="0" name="AssignmentTypeID" type="xs:int" />
       <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/OSBLE.Models.HomePage" minOccurs="0" name="AssociatedEvent" nillable="true" type="q1:Event" />
       <xs:element minOccurs="0" name="AssociatedEventID" nillable="true" type="xs:int" />
-      <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" minOccurs="0" name="Category" nillable="true" type="q2:Category" />
-      <xs:element minOccurs="0" name="CategoryID" type="xs:int" />
-      <xs:element minOccurs="0" name="ColumnOrder" type="xs:int" />
       <xs:element minOccurs="0" name="CommentCategory" nillable="true" type="tns:CommentCategoryConfiguration" />
       <xs:element minOccurs="0" name="CommentCategoryID" nillable="true" type="xs:int" />
-      <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" minOccurs="0" name="Course" nillable="true" type="q3:Course" />
+      <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" minOccurs="0" name="Course" nillable="true" type="q2:Course" />
       <xs:element minOccurs="0" name="CourseID" nillable="true" type="xs:int" />
       <xs:element minOccurs="0" name="CriticalReviewPublishDate" nillable="true" type="xs:dateTime" />
       <xs:element minOccurs="0" name="CriticalReviewSettings" nillable="true" type="tns:CriticalReviewSettings" />
@@ -38,17 +34,17 @@
       <xs:element minOccurs="0" name="HoursLateWindow" type="xs:int" />
       <xs:element minOccurs="0" name="HoursPerDeduction" type="xs:double" />
       <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="IsAnnotatable" type="xs:boolean" />
       <xs:element minOccurs="0" name="IsDraft" type="xs:boolean" />
-      <xs:element minOccurs="0" name="IsWizardAssignment" type="xs:boolean" />
-      <xs:element minOccurs="0" name="PointsPossible" type="xs:int" />
       <xs:element minOccurs="0" name="PrecededingAssignmentID" nillable="true" type="xs:int" />
       <xs:element minOccurs="0" name="PreceedingAssignment" nillable="true" type="tns:Assignment" />
       <xs:element minOccurs="0" name="ReleaseDate" type="xs:dateTime" />
       <xs:element minOccurs="0" name="ReleaseTime" type="xs:dateTime" />
       <xs:element minOccurs="0" name="ReviewTeams" nillable="true" type="tns:ArrayOfReviewTeam" />
-      <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="Rubric" nillable="true" type="q4:Rubric" />
+      <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="Rubric" nillable="true" type="q3:Rubric" />
       <xs:element minOccurs="0" name="RubricID" nillable="true" type="xs:int" />
-      <xs:element minOccurs="0" name="Scores" nillable="true" type="tns:ArrayOfScore" />
+      <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="StudentRubric" nillable="true" type="q4:Rubric" />
+      <xs:element minOccurs="0" name="StudentRubricID" nillable="true" type="xs:int" />
       <xs:element minOccurs="0" name="TeamEvaluationSettings" nillable="true" type="tns:TeamEvaluationSettings" />
       <xs:element minOccurs="0" name="Type" type="tns:AssignmentTypes" />
     </xs:sequence>
@@ -168,12 +164,13 @@
   <xs:element name="CommentCategoryOption" nillable="true" type="tns:CommentCategoryOption" />
   <xs:complexType name="CriticalReviewSettings">
     <xs:sequence>
-      <xs:element minOccurs="0" name="AllowReviewersToDownload" type="xs:boolean" />
-      <xs:element minOccurs="0" name="AnonymizeAuthorToReviewer" type="xs:boolean" />
-      <xs:element minOccurs="0" name="AnonymizeReviewerToAuthor" type="xs:boolean" />
-      <xs:element minOccurs="0" name="AnonymizeReviewerToReviewers" type="xs:boolean" />
+      <xs:element minOccurs="0" name="AllowDownloadAfterPublish" type="xs:boolean" />
+      <xs:element minOccurs="0" name="AnonymizeAuthor" type="xs:boolean" />
+      <xs:element minOccurs="0" name="AnonymizeComments" type="xs:boolean" />
+      <xs:element minOccurs="0" name="AnonymizeCommentsAfterPublish" type="xs:boolean" />
       <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
       <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
+      <xs:element minOccurs="0" name="ReviewSettings" type="xs:unsignedByte" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="CriticalReviewSettings" nillable="true" type="tns:CriticalReviewSettings" />
@@ -199,7 +196,6 @@
       <xs:enumeration value="Code" />
       <xs:enumeration value="Text" />
       <xs:enumeration value="ChemProV" />
-      <xs:enumeration value="XPS" />
       <xs:enumeration value="Video" />
       <xs:enumeration value="Zip" />
       <xs:enumeration value="InBrowserText" />
@@ -228,34 +224,6 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="DiscussionSetting" nillable="true" type="tns:DiscussionSetting" />
-  <xs:complexType name="ArrayOfScore">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="Score" nillable="true" type="tns:Score" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfScore" nillable="true" type="tns:ArrayOfScore" />
-  <xs:complexType name="Score">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="AddedPoints" type="xs:double" />
-      <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
-      <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
-      <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" minOccurs="0" name="CourseUser" nillable="true" type="q7:CourseUser" />
-      <xs:element minOccurs="0" name="CourseUserID" type="xs:int" />
-      <xs:element minOccurs="0" name="CustomLatePenaltyPercent" type="xs:double" />
-      <xs:element minOccurs="0" name="ID" type="xs:int" />
-      <xs:element minOccurs="0" name="LatePenaltyPercent" type="xs:double" />
-      <xs:element minOccurs="0" name="Multiplier" nillable="true" type="xs:double" />
-      <xs:element minOccurs="0" name="Points" type="xs:double" />
-      <xs:element minOccurs="0" name="Published" type="xs:boolean" />
-      <xs:element minOccurs="0" name="PublishedDate" nillable="true" type="xs:dateTime" />
-      <xs:element minOccurs="0" name="RawPoints" type="xs:double" />
-      <xs:element minOccurs="0" name="StudentPoints" type="xs:double" />
-      <xs:element minOccurs="0" name="Team" nillable="true" type="tns:Team" />
-      <xs:element minOccurs="0" name="TeamID" type="xs:int" />
-      <xs:element minOccurs="0" name="isDropped" type="xs:boolean" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="Score" nillable="true" type="tns:Score" />
   <xs:complexType name="TeamEvaluationSettings">
     <xs:sequence>
       <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />

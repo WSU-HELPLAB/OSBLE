@@ -108,11 +108,11 @@
     <Compile Include="..\OSBLE.Library\Models\AbstractCourses\Course\Rubrics\CellDescription.cs">
       <Link>Models\AbstractCourses\Course\Rubrics\CellDescription.cs</Link>
     </Compile>
-    <Compile Include="..\OSBLE.Library\Models\AbstractCourses\Course\Rubrics\CriteriaEvaluation.cs">
-      <Link>Models\AbstractCourses\Course\Rubrics\CriteriaEvaluation.cs</Link>
-    </Compile>
     <Compile Include="..\OSBLE.Library\Models\AbstractCourses\Course\Rubrics\Criterion.cs">
       <Link>Models\AbstractCourses\Course\Rubrics\Criterion.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\AbstractCourses\Course\Rubrics\CriterionEvaluation.cs">
+      <Link>Models\AbstractCourses\Course\Rubrics\CriterionEvaluation.cs</Link>
     </Compile>
     <Compile Include="..\OSBLE.Library\Models\AbstractCourses\Course\Rubrics\Level.cs">
       <Link>Models\AbstractCourses\Course\Rubrics\Level.cs</Link>
@@ -279,6 +279,7 @@
     <Compile Include="..\OSBLE.Library\Models\Users\UserProfile.cs">
       <Link>Models\Users\UserProfile.cs</Link>
     </Compile>
+    <Compile Include="Models\IModelBuilderExtender.cs" />
     <Compile Include="Models\ViewModels\AssignmentListViewModel.cs" />
     <Compile Include="Models\ViewModels\ReviewInterfaceModels.cs" />
     <Compile Include="Models\ViewModels\RubricViewModel.cs" />

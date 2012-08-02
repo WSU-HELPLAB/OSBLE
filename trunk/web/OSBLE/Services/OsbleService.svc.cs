@@ -81,6 +81,7 @@ namespace OSBLE.Services
             var query = from assignment in _db.Assignments
                         where assignment.CourseID == courseId
                         && assignment.IsDraft == false
+                        orderby assignment.DueDate ascending
                         select assignment;
             List<Assignment> efAssignments = query.ToList();
             List<Assignment> nonEfAssignments = new List<Assignment>(efAssignments.Count);
@@ -89,6 +90,121 @@ namespace OSBLE.Services
                 nonEfAssignments.Add(new Assignment(assignment));
             }
             return nonEfAssignments.ToArray();
+        }
+
+        /// <summary>
+        /// For getting merged ChemProV documents
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        /// <param name="authorId"></param>
+        /// <param name="authToken"></param>
+        /// <returns></returns>
+        [OperationContract]
+        public byte[] GetMergedReviewDocument(int authorId, int assignmentId, string authToken)
+        {
+            if (!_authService.IsValidKey(authToken))
+            {
+                return new byte[0];
+            }
+            UserProfile profile = _authService.GetActiveUser(authToken);
+            Assignment criticalReviewAssignment = _db.Assignments.Find(assignmentId);
+
+            //only continue if:
+            // a: the assignment's due date has passed
+            // b: the assignment is set up to release critical reviews to students after
+            //    the due date.
+            if (criticalReviewAssignment.DueDate > DateTime.Now
+                && criticalReviewAssignment.CriticalReviewSettings != null
+                && criticalReviewAssignment.CriticalReviewSettings.AllowDownloadAfterPublish == false
+                )
+            {
+                return new byte[0];
+            }
+
+            //make sure that the user is enrolled in the course
+            CourseUser courseUser = (from cu in _db.CourseUsers
+                                     where cu.AbstractCourseID == criticalReviewAssignment.CourseID
+                                     &&
+                                     cu.UserProfileID == profile.ID
+                                     select cu).FirstOrDefault();
+            if (courseUser == null)
+            {
+                return new byte[0];
+            }
+
+            //pull the author team specific to the given assignment and current user
+            ReviewTeam authorTeam = (from rt in _db.ReviewTeams
+                                     join team in _db.Teams on rt.ReviewTeamID equals team.ID
+                                     join member in _db.TeamMembers on team.ID equals member.TeamID
+                                     where member.CourseUserID == courseUser.ID
+                                     && rt.AuthorTeamID == authorId
+                                     select rt).FirstOrDefault();
+
+            //no author team means that the current user isn't assigned to review the author
+            if (authorTeam == null)
+            {
+                return new byte[0];
+            }
+
+            //get all reviewers (not just the current user's review team)
+            List<ReviewTeam> reviewers = (from rt in _db.ReviewTeams
+                                          where rt.AuthorTeamID == authorId
+                                          select rt).ToList();
+
+            //get original document
+            MemoryStream finalStream = new MemoryStream();
+            OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
+            string originalFile = fs.Course((int)criticalReviewAssignment.CourseID)
+                                    .Assignment((int)criticalReviewAssignment.PrecededingAssignmentID)
+                                    .Submission(authorId)
+                                    .AllFiles()
+                                    .FirstOrDefault();
+            FileStream originalFileStream = File.OpenRead(originalFile);
+            originalFileStream.CopyTo(finalStream);
+            originalFileStream.Close();
+            finalStream.Position = 0;
+
+            //loop through each review team, merging documents
+            foreach (ReviewTeam reviewer in reviewers)
+            {
+                string teamName = reviewer.ReviewingTeam.Name;
+                if(criticalReviewAssignment.CriticalReviewSettings.AnonymizeCommentsAfterPublish == true)
+                {
+                    teamName = string.Format("Anonymous {0}", reviewer.ReviewTeamID);
+                }
+                FileCollection allFiles = fs.Course((int)criticalReviewAssignment.CourseID)
+                                            .Assignment(assignmentId)
+                                            .Review(authorTeam.AuthorTeamID, reviewer.ReviewTeamID)
+                                            .AllFiles();
+                foreach (string file in allFiles)
+                {
+                    MemoryStream mergedStream = new MemoryStream();
+                    FileStream studentReview = System.IO.File.OpenRead(file);
+                    
+                    //merge
+                    ChemProV.Core.CommentMerger.Merge(finalStream, "", studentReview, teamName, mergedStream);
+
+                    //rewind merged stream and copy over to final stream
+                    mergedStream.Position = 0;
+                    finalStream = new MemoryStream();
+                    mergedStream.CopyTo(finalStream);
+                    finalStream.Position = 0;
+                    mergedStream.Close();
+                    studentReview.Close();
+                }
+            }
+
+            //finally, zip up and send over the wire
+            string documentName = Path.GetFileName(originalFile);
+            MemoryStream zipStream = new MemoryStream();
+            using (ZipFile zip = new ZipFile())
+            {
+                zip.AddEntry(documentName, finalStream);
+                zip.Save(zipStream);
+            }
+            byte[] zipBytes = zipStream.ToArray();
+            zipStream.Close();
+            return zipBytes;
         }
 
         /// <summary>
@@ -347,7 +463,6 @@ namespace OSBLE.Services
             stream.Close();
             ms.Close();
             return bytes;
-
         }
 
         /// <summary>
@@ -378,6 +493,13 @@ namespace OSBLE.Services
             return new CourseRole(courseUser.AbstractRole);
         }
 
+        /// <summary>
+        /// Allows users to submit homework assignments.
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        /// <param name="zipData"></param>
+        /// <param name="authToken"></param>
+        /// <returns></returns>
         [OperationContract]
         public bool SubmitAssignment(int assignmentId, byte[] zipData, string authToken)
         {

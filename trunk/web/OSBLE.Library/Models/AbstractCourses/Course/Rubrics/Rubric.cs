@@ -3,10 +3,11 @@ using System.ComponentModel.DataAnnotations;
 using System.ServiceModel.DomainServices.Server;
 using System.ComponentModel;
 using System.Linq;
+using System.Data.Entity;
 
 namespace OSBLE.Models.Courses.Rubrics
 {
-    public class Rubric
+    public class Rubric : IModelBuilderExtender
     {
         [Required]
         [Key]
@@ -35,6 +36,11 @@ namespace OSBLE.Models.Courses.Rubrics
         {
            Levels = new List<Level>();
            Criteria = new List<Criterion>();
+        }
+
+        public void BuildRelationship(DbModelBuilder modelBuilder)
+        {
+            
         }
     }
 }

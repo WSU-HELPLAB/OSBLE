@@ -31,6 +31,22 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="GetMergedReviewDocument">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="authorId" type="xs:int" />
+        <xs:element minOccurs="0" name="assignmentId" type="xs:int" />
+        <xs:element minOccurs="0" name="authToken" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetMergedReviewDocumentResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetMergedReviewDocumentResult" nillable="true" type="xs:base64Binary" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="GetReviewItems">
     <xs:complexType>
       <xs:sequence>

@@ -14,6 +14,7 @@ using System.Data.Common;
 using System.Data.Entity.Infrastructure;
 using System.Data.Objects;
 using OSBLE.Models.Annotate;
+using System.Reflection;
 
 namespace OSBLE.Models
 {
@@ -196,6 +197,20 @@ namespace OSBLE.Models
 #if !DEBUG
             modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
 #endif
+            List<Type> componentObjects = (from type in Assembly.GetExecutingAssembly().GetTypes()
+                                           where
+                                           type.GetInterface("IModelBuilderExtender") != null
+                                           &&
+                                           type.IsInterface == false
+                                           &&
+                                           type.IsAbstract == false
+                                           select type).ToList();
+            foreach (Type component in componentObjects)
+            {
+                IModelBuilderExtender builder = Activator.CreateInstance(component) as IModelBuilderExtender;
+                builder.BuildRelationship(modelBuilder);
+            }
+
             //try to keep modelbuilder stuff in alphabetical order
             modelBuilder.Entity<Deliverable>()
                 .HasRequired(d => d.Assignment)

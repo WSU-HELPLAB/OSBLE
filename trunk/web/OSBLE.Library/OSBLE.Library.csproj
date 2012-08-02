@@ -75,7 +75,7 @@
     <Compile Include="Models\AbstractCourses\Course\CourseUser.cs" />
     <Compile Include="Models\AbstractCourses\Course\GradebookOptions\LetterGrade.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\CellDescription.cs" />
-    <Compile Include="Models\AbstractCourses\Course\Rubrics\CriteriaEvaluation.cs" />
+    <Compile Include="Models\AbstractCourses\Course\Rubrics\CriterionEvaluation.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Criterion.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Level.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Rubric.cs" />
@@ -120,6 +120,7 @@
     <Compile Include="Models\HomePage\DashboardReply.cs" />
     <Compile Include="Models\HomePage\Event.cs" />
     <Compile Include="Models\HomePage\Notification.cs" />
+    <Compile Include="Models\IModelBuilderExtender.cs" />
     <Compile Include="Models\OSBLEContext.cs" />
     <Compile Include="Models\School.cs" />
     <Compile Include="Models\Services\Uploader\AbstractListing.cs" />

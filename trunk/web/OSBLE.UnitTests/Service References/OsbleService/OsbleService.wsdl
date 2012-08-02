@@ -25,6 +25,12 @@
   <wsdl:message name="OsbleService_GetCourseAssignments_OutputMessage">
     <wsdl:part name="parameters" element="GetCourseAssignmentsResponse" />
   </wsdl:message>
+  <wsdl:message name="OsbleService_GetMergedReviewDocument_InputMessage">
+    <wsdl:part name="parameters" element="GetMergedReviewDocument" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_GetMergedReviewDocument_OutputMessage">
+    <wsdl:part name="parameters" element="GetMergedReviewDocumentResponse" />
+  </wsdl:message>
   <wsdl:message name="OsbleService_GetReviewItems_InputMessage">
     <wsdl:part name="parameters" element="GetReviewItems" />
   </wsdl:message>
@@ -63,6 +69,10 @@
     <wsdl:operation name="GetCourseAssignments">
       <wsdl:input wsaw:Action="urn:OsbleService/GetCourseAssignments" message="OsbleService_GetCourseAssignments_InputMessage" />
       <wsdl:output wsaw:Action="urn:OsbleService/GetCourseAssignmentsResponse" message="OsbleService_GetCourseAssignments_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetMergedReviewDocument">
+      <wsdl:input wsaw:Action="urn:OsbleService/GetMergedReviewDocument" message="OsbleService_GetMergedReviewDocument_InputMessage" />
+      <wsdl:output wsaw:Action="urn:OsbleService/GetMergedReviewDocumentResponse" message="OsbleService_GetMergedReviewDocument_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetReviewItems">
       <wsdl:input wsaw:Action="urn:OsbleService/GetReviewItems" message="OsbleService_GetReviewItems_InputMessage" />

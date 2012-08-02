@@ -36,7 +36,7 @@ namespace OSBLE.Models.FileSystem
             return review;
         }
 
-        public IFileSystem Reivew(Team authorTeam, Team reviewerTeam)
+        public IFileSystem Review(Team authorTeam, Team reviewerTeam)
         {
             return Review(authorTeam.ID, reviewerTeam.ID);
         }
