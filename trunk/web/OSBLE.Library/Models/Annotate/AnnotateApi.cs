@@ -130,7 +130,7 @@ namespace OSBLE.Models.Annotate
 #if DEBUG
                 string documentUrl = "https://osble.org/content/icershort.pdf";
 #else
-                string documentUrl = "https://osble.org/FileHandler/GetAnnotateDocument?assignmentID={0}&authorTeamID={1}&apiKey={2}";";
+                string documentUrl = "https://osble.org/FileHandler/GetAnnotateDocument?assignmentID={0}&authorTeamID={1}&apiKey={2}";
                 documentUrl = string.Format(documentUrl, assignmentID, authorTeamID, ApiKey);
 #endif
 
