@@ -20,6 +20,7 @@ using OSBLE.Models.Courses;
 using OSBLE.Models.Users;
 using OSBLE.Utility;
 using OSBLE.Attributes;
+using OSBLE.Services;
 
 namespace OSBLE.Controllers
 {
@@ -129,6 +130,27 @@ namespace OSBLE.Controllers
 
             // If we got this far, something failed, redisplay form
             return View(model);
+        }
+
+        /// <summary>
+        /// Translates a webservice-based authentication key into an actual OSBLE web
+        /// login.  Will redirect the user to the specified location.
+        /// </summary>
+        /// <param name="authToken">The auth token provided to you by the OSBLE web service</param>
+        /// <param name="destinationUrl">The path in OSBLE that you'd like to visit.
+        /// E.g. to get to the assignments page, you would pass in "/Assignment"
+        /// </param>
+        /// <returns></returns>
+        public ActionResult TokenLogin(string authToken, string destinationUrl = "/")
+        {
+            AuthenticationService auth = new AuthenticationService();
+            UserProfile profile = auth.GetActiveUser(authToken);
+            if (profile == null || profile.UserName == null)
+            {
+                return RedirectToAction("LogOn", "Account");
+            }
+            OsbleAuthentication.LogIn(profile);
+            return Redirect(destinationUrl);
         }
 
         //
