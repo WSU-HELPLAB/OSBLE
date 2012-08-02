@@ -412,40 +412,6 @@ namespace OSBLE.Controllers
             return null;
         }
 
-        [Obsolete("Use FileSystem.GetSubmissionTime")]
-        protected DateTime? GetSubmissionTime(Course course, Assignment assignment, AssignmentTeam team)
-        {
-            DirectoryInfo submissionFolder = new DirectoryInfo(FileSystem.GetTeamUserSubmissionFolder(false, course, assignment.ID, team));
-
-            DateTime? timeSubmitted;
-
-            if (submissionFolder.Exists)
-            {
-                //unfortunately LastWriteTime for a directory does not take into account it's file or
-                //sub directories and these we need to check to see when the last file was written too.
-                timeSubmitted = submissionFolder.LastWriteTime;
-                foreach (FileInfo file in submissionFolder.GetFiles())
-                {
-                    if (file.LastWriteTime > timeSubmitted)
-                    {
-                        timeSubmitted = file.LastWriteTime;
-                    }
-                }
-
-                //if no files, return null
-                if (submissionFolder.GetFiles().Count() == 0)
-                {
-                    timeSubmitted = null;
-                }
-
-                return timeSubmitted;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
 
         /// <summary>
         /// Returns the late penalty as a string. I.e. an assignmentTeam with 80% late penalty will yield the string

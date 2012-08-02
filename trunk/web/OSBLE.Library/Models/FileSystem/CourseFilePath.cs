@@ -31,6 +31,12 @@ namespace OSBLE.Models.FileSystem
             return afp;
         }
 
+        public GradebookFilePath Gradebook()
+        {
+            GradebookFilePath gfp = new GradebookFilePath(this);
+            return gfp;
+        }
+
         public override string GetPath()
         {
             string returnPath = Path.Combine(PathBuilder.GetPath(), _coursePathPrefix, _courseID.ToString());

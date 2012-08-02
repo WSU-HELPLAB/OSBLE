@@ -110,6 +110,7 @@
     <Compile Include="Models\FileSystem\FileCollection.cs" />
     <Compile Include="Models\FileSystem\FileSystemBase.cs" />
     <Compile Include="Models\FileSystem\FileSystem.cs" />
+    <Compile Include="Models\FileSystem\GradebookFilePath.cs" />
     <Compile Include="Models\FileSystem\IFileSystem.cs" />
     <Compile Include="Models\FileSystem\ReviewFilePath.cs" />
     <Compile Include="Models\FileSystem\SubmissionFilePath.cs" />

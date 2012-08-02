@@ -220,8 +220,16 @@
     <Compile Include="Areas\AssignmentWizard\Controllers\RubricBaseController.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\StudentRubricController.cs" />
     <Compile Include="Areas\AssignmentWizard\ViewModels\RubricSelectionViewModel.cs" />
+    <Compile Include="Controllers\GradebookController.cs" />
     <Compile Include="Controllers\PdfCriticalReviewController.cs" />
     <Compile Include="Resources\CsvParser.cs" />
+    <Compile Include="Resources\CSVReader\CSVDriver.cs" />
+    <Compile Include="Resources\CSVReader\CSVReader.cs" />
+    <Compile Include="Resources\CSVReader\CSVState.cs" />
+    <Compile Include="Resources\CSVReader\DefaultState.cs" />
+    <Compile Include="Resources\CSVReader\EndState.cs" />
+    <Compile Include="Resources\CSVReader\QuoteState.cs" />
+    <Compile Include="Resources\CSVReader\SecondQuoteState.cs" />
     <Compile Include="Resources\DynamicDictionary.cs" />
     <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
@@ -492,6 +500,7 @@
     <Content Include="Content\themes\base\minified\jquery.ui.slider.min.css" />
     <Content Include="Content\themes\base\minified\jquery.ui.tabs.min.css" />
     <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
+    <Content Include="Resources\CSVReader\CSVCellReaderStateMachine.png" />
     <Content Include="Scripts\jquery-1.7.2-vsdoc.js" />
     <Content Include="Scripts\jquery-1.7.2.js" />
     <Content Include="Scripts\jquery-1.7.2.min.js" />
@@ -805,6 +814,7 @@
     <Content Include="Views\Assignment\_ModeratorIndex.cshtml" />
     <Content Include="Views\PdfCriticalReview\Index.cshtml" />
     <Content Include="Views\PdfCriticalReview\Review.cshtml" />
+    <Content Include="Views\Gradebook\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />
@@ -827,9 +837,7 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Views\Event\Gradebook\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

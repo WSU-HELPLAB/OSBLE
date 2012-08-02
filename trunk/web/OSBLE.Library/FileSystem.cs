@@ -25,7 +25,7 @@ using OSBLE.Models.Assignments;
  *     CourseDocs      |    ZipFolder   \
  *          |    Assignments     \     Gradebook
  *          |          |          \        |
- *  {course docs}      |           \    {gradebook.zip}
+ *  {course docs}      |           \    {gradebook.zip/gradebook file}
  *                     |            \
  *                     |          Records.txt { %random number%.zip}
  *               [AssignmentId]

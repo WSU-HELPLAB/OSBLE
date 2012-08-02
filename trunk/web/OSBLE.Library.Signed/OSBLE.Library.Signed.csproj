@@ -213,6 +213,9 @@
     <Compile Include="..\OSBLE.Library\Models\FileSystem\FileSystemBase.cs">
       <Link>Models\FilesSystem\FileSystemBase.cs</Link>
     </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\GradebookFilePath.cs">
+      <Link>Models\FilesSystem\GradebookFilePath.cs</Link>
+    </Compile>
     <Compile Include="..\OSBLE.Library\Models\FileSystem\IFileSystem.cs">
       <Link>Models\FilesSystem\IFileSystem.cs</Link>
     </Compile>

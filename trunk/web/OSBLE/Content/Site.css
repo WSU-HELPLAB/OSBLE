@@ -1681,6 +1681,7 @@ ul.assignment_deliverables, .assignment_deliverables ul
 {
     text-align:left;
     color: #074974;
+    border-collapse: collapse;
 }
 
 .assignTable td
@@ -1903,4 +1904,93 @@ tbody #awesome
     border-color: White;
     padding: 2px;
     width: 100%;
+}
+
+
+#errorMsg
+{
+    color: Red;
+}
+
+/*gradebook css below*/
+#upload_gradebook
+{
+    float:right
+}
+
+#GradebookNav
+{
+    list-style:none;
+    margin:0;
+    padding:2px 10px 0px 10px;
+    border-bottom:2px solid #074974;
+}
+
+.GradebookNavItem
+{
+    display:inline;
+    padding: 3px 15px 1px 15px;
+    border-top:2px solid #074974;
+    border-left:2px solid #074974;
+    border-right:2px solid #074974;
+    background:#DFDFDF;
+}
+
+.GradebookNavItem a
+{
+    text-decoration:none;
+}
+
+.GradebookNavNotActive a
+{
+    font-size:80%;
+    color:#2D2D2D;
+    cursor:pointer;
+}
+
+.GradebookNavActive
+{
+    border-bottom: 3px solid white;
+    background: white;
+}
+
+.GradebookNavActive text
+{
+    font-weight:bold;
+    cursor:default;
+}
+
+
+
+
+#Gradebook td, #Gradebook th
+{
+    border-width: 1px;
+    padding: 1px;
+    border-style:inset;
+    border-color:Gray;
+    
+}
+
+#Gradebook
+{
+	font-family:"Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size:12px;
+	width:480px;
+	text-align:left;border-collapse:collapse;margin:20px;
+}
+#Gradebook th
+{
+	font-size:14px;
+	font-weight:normal;
+	color:#039;
+	padding:10px 8px;
+}
+#Gradebook td
+{
+	color:#669;padding:8px;
+}
+#Gradebook tr:nth-child(2n+2)
+{
+	background:#e8edff;
 }

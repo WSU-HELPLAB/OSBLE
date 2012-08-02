@@ -11,19 +11,19 @@ using OSBLE.Models.Users;
 //the intended use of the folder
 /*
  *
- *                          FileSystem  
- *                         /          \  
- *                        /            \  
- *                    Courses          Users                                 
- *                     /                  \                                 
- *                [courseID]            [userId]
- *               /     |    \                \
- *              /      |     \         {global user content}
- *     CourseDocs      |      ZipFolder
- *          |    Assignments        \
- *          |          |             \
- *  {course docs}      |              \
- *                     |       Records.txt { %random number%.zip}
+ *                          ____FileSystem_____
+ *                         /                   \  
+ *                        /                     \  
+ *                    Courses                  Users                                 
+ *                     /                          \                                 
+ *                [courseID]                    [userId]
+ *               /     |  \ \_________               \
+ *              /      |   \          \             {global user content}
+ *     CourseDocs      |    ZipFolder  \ 
+ *          |    Assignments     \      Gradebook
+ *          |          |          \         |
+ *  {course docs}      |           \     {gradebook.zip / gradebook file}
+ *                     |  Records.txt { %random number%.zip}
  *                     |
  *               [AssignmentId]
  *                     |       \
