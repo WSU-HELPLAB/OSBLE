@@ -42,5 +42,10 @@ namespace OSBLE.Models.Assignments
             }
             return _submissionTime;
         }
+
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+            
+        }
     }
 }

@@ -24,7 +24,7 @@ namespace OSBLE.Models.Assignments
 
     };
 
-    public class DiscussionSetting
+    public class DiscussionSetting : IModelBuilderExtender
     {
         [Key]
         [Required]
@@ -291,5 +291,13 @@ namespace OSBLE.Models.Assignments
         }
 
         #endregion
+
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<DiscussionSetting>()
+                .HasRequired(ds => ds.Assignment)
+                .WithOptional(a => a.DiscussionSettings)
+                .WillCascadeOnDelete(true);
+        }
     }
 }

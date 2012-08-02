@@ -60,5 +60,19 @@ namespace OSBLE.Models.Assignments
                 return Team.Name;
             }
         }
+
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<DiscussionTeam>()
+                .HasRequired(dt => dt.Team)
+                .WithMany()
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<DiscussionTeam>()
+                .HasRequired(dt => dt.Assignment)
+                .WithMany(a => a.DiscussionTeams)
+                .WillCascadeOnDelete(true);
+
+        }
     }
 }

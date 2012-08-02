@@ -7,7 +7,7 @@ using OSBLE.Models.Courses;
 
 namespace OSBLE.Models.Assignments
 {
-    public class TeamMember
+    public class TeamMember : IModelBuilderExtender
     {
         [Key]
         [Column(Order=0)]
@@ -18,5 +18,14 @@ namespace OSBLE.Models.Assignments
         [Column(Order=1)]
         public int CourseUserID { get; set; }
         public virtual CourseUser CourseUser { get; set; }
+
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TeamMember>()
+                .HasRequired(tm => tm.CourseUser)
+                .WithMany(cu => cu.TeamMemberships)
+                .WillCascadeOnDelete(true);
+
+        }
     }
 }

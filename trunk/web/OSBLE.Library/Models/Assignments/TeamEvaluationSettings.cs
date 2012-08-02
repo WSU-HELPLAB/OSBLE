@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models.Assignments
 {
-    public class TeamEvaluationSettings
+    public class TeamEvaluationSettings : IModelBuilderExtender
     {
         [Key]
         [Required]
@@ -55,6 +55,14 @@ namespace OSBLE.Models.Assignments
             this.DiscrepancyCheckSize = other.DiscrepancyCheckSize;
             this.MaximumMultiplier = other.MaximumMultiplier;
             this.RequiredCommentLength = other.RequiredCommentLength;
+        }
+
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TeamEvaluationSettings>()
+                .HasRequired(tes => tes.Assignment)
+                .WithOptional(a => a.TeamEvaluationSettings)
+                .WillCascadeOnDelete(true);
         }
     }
 }

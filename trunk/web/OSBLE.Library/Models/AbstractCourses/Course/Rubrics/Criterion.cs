@@ -28,6 +28,10 @@ namespace OSBLE.Models.Courses.Rubrics
 
         public void BuildRelationship(DbModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Criterion>()
+                .HasRequired(c => c.Rubric)
+                .WithMany(r => r.Criteria)
+                .WillCascadeOnDelete(true);
         }
     }
 }

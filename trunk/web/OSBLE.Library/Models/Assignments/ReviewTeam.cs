@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models.Assignments
 {
-    public class ReviewTeam
+    public class ReviewTeam : IModelBuilderExtender
     {
         [Key]
         [Column(Order = 0)]
@@ -23,6 +23,22 @@ namespace OSBLE.Models.Assignments
         public int ReviewTeamID { get; set; }
 
         [ForeignKey("ReviewTeamID")]
-        public virtual Team ReviewingTeam { get; set; }        
+        public virtual Team ReviewingTeam { get; set; }
+
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+            //In a critical review, students will be reviewing an existing assignment.
+            //Therefore, AuthorTeams are fixed while the reviewing team might still change.
+            modelBuilder.Entity<ReviewTeam>()
+                .HasRequired(rt => rt.ReviewingTeam)
+                .WithMany()
+                .WillCascadeOnDelete(true);
+
+
+            modelBuilder.Entity<ReviewTeam>()
+                .HasRequired(rt => rt.AuthorTeam)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+        }
     }
 }

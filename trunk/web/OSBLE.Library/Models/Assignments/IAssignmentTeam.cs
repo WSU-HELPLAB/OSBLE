@@ -5,7 +5,7 @@ using System.Web;
 
 namespace OSBLE.Models.Assignments
 {
-    public interface IAssignmentTeam
+    public interface IAssignmentTeam : IModelBuilderExtender
     {
         int AssignmentID { get; set; }
         Assignment Assignment { get; set; }

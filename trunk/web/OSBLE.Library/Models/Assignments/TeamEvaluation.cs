@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models.Assignments
 {
-    public class TeamEvaluation
+    public class TeamEvaluation : IModelBuilderExtender
     {
         [Key]
         public int ID { get; set; }
@@ -51,6 +51,29 @@ namespace OSBLE.Models.Assignments
             {
                 
             }
+        }
+
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TeamEvaluation>()
+                .HasRequired(tm => tm.Evaluator)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<TeamEvaluation>()
+                .HasRequired(tm => tm.Recipient)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<TeamEvaluation>()
+                .HasRequired(tm => tm.AssignmentUnderReview)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<TeamEvaluation>()
+                .HasRequired(tm => tm.TeamEvaluationAssignment)
+                .WithMany()
+                .WillCascadeOnDelete(false);
         }
     }
 }

@@ -5,7 +5,7 @@ using OSBLE.Models.Users;
 
 namespace OSBLE.Models.HomePage
 {
-    public class Notification
+    public class Notification : IModelBuilderExtender
     {
         [Required]
         [Key]
@@ -63,6 +63,14 @@ namespace OSBLE.Models.HomePage
             public const string RubricEvaluationCompleted = "RubricEvaluationCompleted";
             public const string FileSubmitted = "FileSubmitted";
             public const string TeamEvaluationDiscrepancy = "TeamEvaluationDiscrepancy";
+        }
+
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Notification>()
+                .HasRequired(n => n.Sender)
+                .WithMany()
+                .WillCascadeOnDelete(false);
         }
     }
 }

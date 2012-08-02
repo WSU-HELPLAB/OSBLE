@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace OSBLE.Models.Courses.Rubrics
 {
-    public class RubricEvaluation
+    public class RubricEvaluation : IModelBuilderExtender
     {
         public RubricEvaluation()
         {
@@ -125,5 +125,18 @@ namespace OSBLE.Models.Courses.Rubrics
             return gradeOnRubric;
         }
 
+
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<RubricEvaluation>()
+               .HasRequired(re => re.Recipient)
+               .WithMany()
+               .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<RubricEvaluation>()
+                .HasRequired(re => re.Assignment)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+        }
     }
 }

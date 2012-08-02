@@ -20,7 +20,7 @@ namespace OSBLE.Models.Assignments
         AnonymizeCommentsAfterPublish = 16
     }
 
-    public class CriticalReviewSettings
+    public class CriticalReviewSettings : IModelBuilderExtender
     {
         [Key]
         [Required]
@@ -162,5 +162,13 @@ namespace OSBLE.Models.Assignments
             ReviewSettings = (byte)(ReviewSettings & (~(byte)level));
         }
 
+
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CriticalReviewSettings>()
+                .HasRequired(crs => crs.Assignment)
+                .WithOptional(a => a.CriticalReviewSettings)
+                .WillCascadeOnDelete(true);
+        }
     }
 }

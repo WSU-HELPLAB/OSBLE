@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 namespace OSBLE.Models.Courses.Rubrics
 {
     
-    public class CellDescription
+    public class CellDescription : IModelBuilderExtender
     {
         [Required]
         [Key]
@@ -33,5 +33,23 @@ namespace OSBLE.Models.Courses.Rubrics
 
         [Required]
         public string Description { get; set; }
+
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CellDescription>()
+               .HasRequired(cd => cd.Criterion)
+               .WithMany()
+               .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<CellDescription>()
+                .HasRequired(cd => cd.Level)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<CellDescription>()
+                .HasRequired(cd => cd.Rubric)
+                .WithMany(r => r.CellDescriptions)
+                .WillCascadeOnDelete(true);
+        }
     }
 }

@@ -8,7 +8,7 @@ using OSBLE.Models.Assignments;
 
 namespace OSBLE.Models.DiscussionAssignment
 {
-    public class DiscussionPost
+    public class DiscussionPost : IModelBuilderExtender
     {
         [Key]
         public int ID { get; set; }
@@ -50,6 +50,19 @@ namespace OSBLE.Models.DiscussionAssignment
         {
             ParentPostID = null;
             Posted = DateTime.Now;
+        }
+
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<DiscussionPost>()
+                .HasRequired(cu => cu.CourseUser)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<DiscussionPost>()
+                .HasRequired(n => n.DiscussionTeam)
+                .WithMany()
+                .WillCascadeOnDelete(false);
         }
     }
 }

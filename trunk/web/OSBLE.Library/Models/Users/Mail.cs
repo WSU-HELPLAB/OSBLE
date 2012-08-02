@@ -5,7 +5,7 @@ using OSBLE.Models.Courses;
 
 namespace OSBLE.Models.Users
 {
-    public class Mail
+    public class Mail : IModelBuilderExtender
     {
         [Required]
         [Key]
@@ -53,5 +53,13 @@ namespace OSBLE.Models.Users
 
         public bool DeleteFromOutbox { get; set; }
         public bool DeleteFromInbox { get; set; }
+
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Mail>()
+                .HasRequired(n => n.ToUserProfile)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+        }
     }
 }

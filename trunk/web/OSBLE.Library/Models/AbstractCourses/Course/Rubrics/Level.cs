@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models.Courses.Rubrics
 {
-    public class Level
+    public class Level : IModelBuilderExtender
     {
         [Required]
         [Key]
@@ -30,6 +30,14 @@ namespace OSBLE.Models.Courses.Rubrics
             PointSpread = 5;
         }
 
+
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Level>()
+                .HasRequired(l => l.Rubric)
+                .WithMany(r => r.Levels)
+                .WillCascadeOnDelete(true);
+        }
     }
 
 }
