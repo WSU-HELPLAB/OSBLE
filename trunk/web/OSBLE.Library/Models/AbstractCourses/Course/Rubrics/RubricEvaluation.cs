@@ -37,6 +37,10 @@ namespace OSBLE.Models.Courses.Rubrics
         [Required]
         public bool IsPublished { get; set; }
 
+        /// <summary>
+        /// This stores the date the Evaluation was published OR daved as draft.
+        /// Use IsPublished to check published status.
+        /// </summary>
         public DateTime? DatePublished { get; set; }
 
         [StringLength(4000)]

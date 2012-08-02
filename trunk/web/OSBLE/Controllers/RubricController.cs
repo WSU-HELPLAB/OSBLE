@@ -176,6 +176,12 @@ namespace OSBLE.Controllers
             return viewModel;
         }
 
+        /// <summary>
+        /// Note: for student rubrics, use getStudentRubricViewModel
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        /// <param name="cuId">Course User ID of the author</param>
+        /// <returns></returns>
         private RubricViewModel GetRubricViewModel(int assignmentId, int cuId)
         {
             CourseUser cu = db.CourseUsers.Find(cuId);
@@ -259,7 +265,7 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Only used for student rubrics. 
         /// </summary>
         /// <param name="assignmentId"></param>
         /// <param name="authorCuId">ID of the author (person being reviewed) Note: if it's a team, this can be the
@@ -363,7 +369,12 @@ namespace OSBLE.Controllers
             return View(vm);
         }
 
-        // This creates an instructor's version of the rubric view
+        /// <summary>
+        /// This index is only used for the instructor's version of the rubric view.
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        /// <param name="cuId">Course User ID of the author</param>
+        /// <returns></returns>
         [CanGradeCourse]
         public ActionResult Index(int assignmentId, int cuId)
         {
@@ -372,7 +383,8 @@ namespace OSBLE.Controllers
 
         /// <summary>
         /// this creates the student's version of the rubric view
-        /// get the rubric that current user (cuId) performed on the authorTeam
+        /// get the rubric that current user (cuId) performed on the authorTeam. This passed activeCourseUserID
+        /// as the reviewID since the active course user should only ever fill out a rubric as themselves.
         /// </summary>
         /// <param name="assignmentId"></param>
         /// <param name="cuId">ID of the author (person being reviewed) Note: if it's a team, this is the ID
@@ -397,8 +409,8 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// Called from CriticalReviewStudentDownloadDecorator. This function compiles a list of rubricViewModels
-        /// of rubrics from all students in who reviewed the author
+        /// Called from CriticalReviewStudentDownloadDecorator. This function creates a merged RubricViewModel
+        /// that consists of all rubric evaluations that have been done at 
         /// </summary>
         /// <param name="assignmentId"></param>
         /// <param name="authorTeamId"></param>
@@ -454,7 +466,8 @@ namespace OSBLE.Controllers
                 if (ActiveCourseUser.AbstractRole.CanGrade || isOwnAssignment || ActiveCourseUser.AbstractRole.Anonymized)
                 {
                     Assignment assignment = db.Assignments.Find(assignmentId);
-                    CourseUser cu = db.CourseUsers.Find(authorTeamId);
+                    
+                    CourseUser cu = db.CourseUsers.Find(authorTeam.TeamMembers.FirstOrDefault().CourseUserID);
                     AssignmentTeam at = GetAssignmentTeam(assignment, cu);
                     ViewBag.AssignmentName = assignment.AssignmentName;
                     ViewBag.DisplayGrade = false;
@@ -474,6 +487,13 @@ namespace OSBLE.Controllers
             return RedirectToRoute(new RouteValueDictionary(new { controller = "Home", action = "Index" }));
         }
 
+        /// <summary>
+        /// Helper function that merges a list of rubric viewmodels into one. The merged RubricViewModel
+        /// contains a list of rubricEvaluations (one for each original) stored in MergedEvaluations. the IsMerged
+        /// Property will also be true.
+        /// </summary>
+        /// <param name="rubricViewModels">List of viewModels to be merged</param>
+        /// <returns>Returns the merged result.</returns>
         private RubricViewModel MergeRubricViewModels(List<RubricViewModel> rubricViewModels)
         {
             RubricViewModel mergedViewModel = new RubricViewModel();

@@ -254,7 +254,6 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     //add total count
                     vm.TeamTableBuilders[assignmentTeam] = new DiscussionTotalTableDecorator(vm.TeamTableBuilders[assignmentTeam], allUserPosts);
                     vm.TableColumnHeaders["DiscussionTotalTableDecorator"] = "Total";
-                 
                 }
 
                 if (assignment.Type == AssignmentTypes.CriticalReview)
@@ -262,14 +261,14 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.TeamTableBuilders[assignmentTeam] = new CriticalReviewsReceivedDecorator(vm.TeamTableBuilders[assignmentTeam]);
                     vm.TableColumnHeaders["CriticalReviewsReceivedDecorator"] = "Reviews Received";
 
-                    vm.TeamTableBuilders[assignmentTeam] = new CriticalReviewsPerformedDecorator(vm.TeamTableBuilders[assignmentTeam]);
-                    vm.TableColumnHeaders["CriticalReviewsPerformedDecorator"] = "Reviews Performed";
-
                     if (assignment.HasStudentRubric)
                     {
                         vm.TeamTableBuilders[assignmentTeam] = new StudentRubricsReceivedDecorator(vm.TeamTableBuilders[assignmentTeam]);
                         vm.TableColumnHeaders["StudentRubricsReceivedDecorator"] = "Rubrics Received";
                     }
+
+                    vm.TeamTableBuilders[assignmentTeam] = new CriticalReviewsPerformedDecorator(vm.TeamTableBuilders[assignmentTeam]);
+                    vm.TableColumnHeaders["CriticalReviewsPerformedDecorator"] = "Reviews Performed";
                 }
 
                 if (assignment.Type == AssignmentTypes.TeamEvaluation)

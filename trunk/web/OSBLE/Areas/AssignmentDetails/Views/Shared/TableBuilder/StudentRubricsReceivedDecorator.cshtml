@@ -4,13 +4,30 @@
 @model DynamicDictionary
 @{
     dynamic dataModel = Model;
-    Assignment assignment = dataModel.TeacherReceivedCritical.Assignment;
-    List<CourseUser> CourseUsers = dataModel.TeacherReceivedCritical.CourseUsers;
-    List<DateTime?> TimeStampList = dataModel.TeacherReceivedCritical.TimeStampList;
+    int i = 0;
 }
     <td>
-
-           <text>non receieved</text>
-
+    @foreach (int authorTeamId in dataModel.studentRubricsReceived.authorTeamIds)
+    {
+        if (dataModel.studentRubricsReceived.hasRubricList[i])
+        {
+            @Html.ActionLink("View",
+            "ViewForCriticalReview",
+            "Rubric",
+            new
+            {
+                assignmentId = dataModel.studentRubricsReceived.assignmentID,
+                authorTeamId = authorTeamId,
+                area = ""
+            },
+            new { })
+        }
+        else
+        {
+            @:<text>None Received</text>
+        }
+        <br />
+        i++;
+    }
     </td>
 

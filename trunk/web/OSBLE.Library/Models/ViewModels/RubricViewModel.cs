@@ -24,6 +24,9 @@ namespace OSBLE.Models.ViewModels
         private List<RubricEvaluation> _MergedEvaluations;
 
         /// <summary>
+        /// This is used to generalize the view to work with a merged rubric evaluation
+        /// and a normal one. If MergedEvaluations is not set, then it will return the 
+        /// RubricEvaluation property.
         /// </summary>
         public List<RubricEvaluation> MergedEvaluations
         {

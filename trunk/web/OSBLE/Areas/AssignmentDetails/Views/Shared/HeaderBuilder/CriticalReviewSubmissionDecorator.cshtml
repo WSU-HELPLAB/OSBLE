@@ -73,7 +73,8 @@
                                         
                                     </td>
                                 </tr>
-                                @if(rt.Assignment.PreceedingAssignment.Deliverables[0].DeliverableType != DeliverableType.PDF)
+                                @if(rt.Assignment.PreceedingAssignment.HasDeliverables &&
+                                    rt.Assignment.PreceedingAssignment.Deliverables[0].DeliverableType != DeliverableType.PDF)
                                 {
                                     //PDF reviews don't have upload options (they use annotate)
                                     if (dataModel.CRSubmission.submissionTimes[i] == null)
