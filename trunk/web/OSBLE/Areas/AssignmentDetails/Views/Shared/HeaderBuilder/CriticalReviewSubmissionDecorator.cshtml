@@ -59,12 +59,12 @@
 
                                             if (dataModel.CRSubmission.authorSubmissionTimes[i] == null)
                                             {
-                                                @name@: has not submitted anything to review
+                                                @name@: has not submitted anything to review.
                                             }
                                             else
                                             {
-                                                    @Html.ActionLink("Download " + name
-                                                + "'s submission to review",
+                                                    @Html.ActionLink("Review " + name
+                                                + ".",
                                                 "GetPrecedingSubmissionForCriticalReview", "FileHandler",
                                                 new { assignmentId = dataModel.CRSubmission.assignmentId, authorTeamId = rt.AuthorTeamID, area = "" },
                                                 new { onclick = "create_and_open_downloading_submission_dialog()" })

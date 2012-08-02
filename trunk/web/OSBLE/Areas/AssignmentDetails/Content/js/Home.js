@@ -25,7 +25,7 @@ function create_and_open_downloading_submission_dialog() {
     //create the div that we will then make into a dialog
     $('body').append(
       '<div id="downloading_submission_dialog" title="Download Submission"> \
-       <p>The zip is being generated and will automatically start downloading when it is ready, please do not leave the page or click the link again</p> \
+       <p>Please wait while we prepare your download.</p> \
    </div>');
 
     //make the div we just created into a dialog box
