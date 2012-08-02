@@ -265,7 +265,11 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.TeamTableBuilders[assignmentTeam] = new CriticalReviewsPerformedDecorator(vm.TeamTableBuilders[assignmentTeam]);
                     vm.TableColumnHeaders["CriticalReviewsPerformedDecorator"] = "Reviews Performed";
 
-                    
+                    if (assignment.HasStudentRubric)
+                    {
+                        vm.TeamTableBuilders[assignmentTeam] = new StudentRubricsReceivedDecorator(vm.TeamTableBuilders[assignmentTeam]);
+                        vm.TableColumnHeaders["StudentRubricsReceivedDecorator"] = "Rubrics Received";
+                    }
                 }
 
                 if (assignment.Type == AssignmentTypes.TeamEvaluation)

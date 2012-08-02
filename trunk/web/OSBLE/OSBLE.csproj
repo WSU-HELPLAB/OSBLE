@@ -201,6 +201,7 @@
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\RubricTableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\InlineReviewTableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\LatePenaltyTableDecorator.cs" />
+    <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\StudentRubricsReceivedDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Views\Shared\HeaderBuilder\TableDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\CriticalReviewsPerformedDecorator.cs" />
     <Compile Include="Areas\AssignmentDetails\Models\TableBuilder\TeamEvaluationMultiplierTableDecorator.cs" />
@@ -738,6 +739,7 @@
     <Content Include="Areas\AssignmentWizard\Views\Rubric\_RubricCreationTool.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\Rubric\Index.cshtml" />
     <Content Include="Areas\AssignmentWizard\Views\StudentRubric\Index.cshtml" />
+    <Content Include="Areas\AssignmentDetails\Views\Shared\TableBuilder\StudentRubricsReceivedDecorator.cshtml" />
     <None Include="Content\images\fileextimages\.DS_Store" />
     <None Include="Content\images\fileextimages\Thumbs.db" />
     <Content Include="Views\Home\_SubDashboardReply.cshtml" />
@@ -826,7 +828,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Views\Gradebook\" />
+    <Folder Include="Views\Event\Gradebook\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

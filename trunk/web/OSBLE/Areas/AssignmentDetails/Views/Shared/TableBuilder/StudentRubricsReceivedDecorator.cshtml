@@ -1,0 +1,16 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@using OSBLE.Models.Courses;
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    Assignment assignment = dataModel.TeacherReceivedCritical.Assignment;
+    List<CourseUser> CourseUsers = dataModel.TeacherReceivedCritical.CourseUsers;
+    List<DateTime?> TimeStampList = dataModel.TeacherReceivedCritical.TimeStampList;
+}
+    <td>
+
+           <text>non receieved</text>
+
+    </td>
+

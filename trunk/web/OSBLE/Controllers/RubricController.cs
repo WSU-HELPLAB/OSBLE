@@ -12,6 +12,7 @@ using OSBLE.Models.Courses.Rubrics;
 using OSBLE.Models.ViewModels;
 using System.Web;
 using System.IO;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Controllers
 {
@@ -457,7 +458,7 @@ namespace OSBLE.Controllers
                     AssignmentTeam at = GetAssignmentTeam(assignment, cu);
                     ViewBag.AssignmentName = assignment.AssignmentName;
                     ViewBag.DisplayGrade = false;
-                    if (mergedRubric.Evaluation.CriterionEvaluations.Count > 0)
+                    if (mergedRubric.MergedEvaluations.Count > 0)
                     {
                         ViewBag.DisplayGrade = true;
                         //ViewBag.Grade = RubricEvaluation.GetGradeAsPercent(mergedRubric.Evaluation.ID);
@@ -489,25 +490,26 @@ namespace OSBLE.Controllers
             RubricViewModel temp = rubricViewModels.FirstOrDefault();
             mergedViewModel.Rubric = temp.Rubric;
             mergedViewModel.SelectedTeam = temp.SelectedTeam;
-            mergedViewModel.Evaluation = new RubricEvaluation();
             //mergedViewModel.Evaluation.Recipient = temp.Evaluation.Recipient;
             mergedViewModel.Evaluation.AssignmentID = temp.Evaluation.AssignmentID;
             mergedViewModel.Evaluation.EvaluatorID = temp.Evaluation.EvaluatorID;
-            
 
             foreach (RubricViewModel rvm in rubricViewModels)
             {
-                foreach (CriterionEvaluation ce in rvm.Evaluation.CriterionEvaluations)
+                mergedViewModel.MergedEvaluations.Add(rvm.Evaluation);
+            }
+
+            if (mergedViewModel.MergedEvaluations.Count > 1)
+            {
+                List<double?> averageScores = new List<double?>();
+                for (int i = 0; i < mergedViewModel.MergedEvaluations.FirstOrDefault().CriterionEvaluations.Count; i++)
                 {
-                    mergedViewModel.Evaluation.CriterionEvaluations.Add(ce);
+                    List<int?> scoreList = mergedViewModel.MergedEvaluations.Select(e => e.CriterionEvaluations.ElementAt(i).Score).ToList();
+                    double? average = scoreList.Sum() / (double)scoreList.Count;
+                    averageScores.Add(average);
                 }
 
-                mergedViewModel.Evaluation.GlobalComment += rvm.Evaluation.Evaluator.UserProfile.FirstName + 
-                    " " +
-                    rvm.Evaluation.Evaluator.UserProfile.LastName + 
-                    ": " +
-                    rvm.Evaluation.GlobalComment + 
-                    "\n\n";
+                ViewBag.averageScores = averageScores;
             }
 
             return mergedViewModel;
