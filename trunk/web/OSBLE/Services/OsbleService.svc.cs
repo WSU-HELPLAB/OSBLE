@@ -113,8 +113,11 @@ namespace OSBLE.Services
             // a: the assignment's due date has passed
             // b: the assignment is set up to release critical reviews to students after
             //    the due date.
+            // c: the instructor has clicked the "Publish All Reviews" link on the 
+            //    assignment details page.
             if (criticalReviewAssignment.DueDate > DateTime.Now
                 && criticalReviewAssignment.CriticalReviewSettings != null
+                && criticalReviewAssignment.CriticalReviewPublishDate != null
                 && criticalReviewAssignment.CriticalReviewSettings.AllowDownloadAfterPublish == false
                 )
             {
