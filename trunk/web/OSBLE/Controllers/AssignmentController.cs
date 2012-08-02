@@ -238,6 +238,7 @@ namespace OSBLE.Controllers
 
             List<TeamEvaluation> OurTeamEvals = db.TeamEvaluations.Where(te => cuIDs.Contains(te.RecipientID) && te.TeamEvaluationAssignmentID == assignment.ID).ToList();
             List<double> MultipliersInOrder = new List<double>();
+            List<string> CommentsInOrder = new List<string>();
             List<CourseUser> CourseUsersInOrder = (from tm in precTeam.TeamMembers
                                                    orderby tm.CourseUser.UserProfile.LastName, tm.CourseUser.UserProfile.FirstName
                                                    select tm.CourseUser).ToList();
@@ -272,6 +273,7 @@ namespace OSBLE.Controllers
 
                 if (myEvals != null && myEvals.Count > 0)
                 {
+                    CommentsInOrder.Add(myEvals.FirstOrDefault().Comment);
                     foreach (TeamEvaluation te in myEvals)
                     {
                         table[i,j] = te.Points;
@@ -280,6 +282,7 @@ namespace OSBLE.Controllers
                 }
                 else
                 {
+                    CommentsInOrder.Add("");
                     foreach (TeamMember tm2 in precTeam.TeamMembers)
                     {
                         table[i, j] = 0;
@@ -289,6 +292,7 @@ namespace OSBLE.Controllers
                 i++;
             }
 
+            ViewBag.CommentsInOrder = CommentsInOrder;
             ViewBag.CourseUsersInOrder = CourseUsersInOrder;
             ViewBag.MultipliersInOrder = MultipliersInOrder;
             ViewBag.Table = table;
@@ -358,7 +362,6 @@ namespace OSBLE.Controllers
         {
 
              Assignment assignment = db.Assignments.Find(assignmentId);
-             AssignmentTeam at = GetAssignmentTeam(assignment, ActiveCourseUser);
              AssignmentTeam pAt = GetAssignmentTeam(assignment.PreceedingAssignment, ActiveCourseUser);
             List<TeamEvaluation> existingTeamEvaluations = (from te in db.TeamEvaluations
                                                             where te.TeamEvaluationAssignmentID == assignmentId &&
@@ -388,6 +391,8 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
             }
 
+            List<int> TeamEvalPoints = new List<int>();
+
             //Creating or editing TeamEvaluations for each team member from the previous assignment assignment team
             foreach (TeamMember tm in pAt.Team.TeamMembers)
             {
@@ -397,6 +402,7 @@ namespace OSBLE.Controllers
 
                 string param = "points-" + tm.CourseUserID;
                 int paramPoints = Convert.ToInt32(Request.Params[param]);
+                TeamEvalPoints.Add(paramPoints);
 
                 if (te == null) //No TE exists, create one
                 {
@@ -416,6 +422,12 @@ namespace OSBLE.Controllers
                     te.Points = paramPoints;
                 }
             }
+
+            if ((TeamEvalPoints.Max() - TeamEvalPoints.Min()) > assignment.TeamEvaluationSettings.DiscrepancyCheckSize)
+            {
+                (new NotificationController()).SendTeamEvaluationDiscrepancyNotification(pAt.TeamID, assignment);
+            }
+
             db.SaveChanges();
             return RedirectToAction("Index");
         }

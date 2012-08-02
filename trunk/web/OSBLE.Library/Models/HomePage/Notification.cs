@@ -62,6 +62,7 @@ namespace OSBLE.Models.HomePage
             public const string InlineReviewCompleted = "InlineReviewCompleted";
             public const string RubricEvaluationCompleted = "RubricEvaluationCompleted";
             public const string FileSubmitted = "FileSubmitted";
+            public const string TeamEvaluationDiscrepancy = "TeamEvaluationDiscrepancy";
         }
     }
 }

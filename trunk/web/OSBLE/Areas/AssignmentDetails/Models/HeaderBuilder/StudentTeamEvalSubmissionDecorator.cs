@@ -28,7 +28,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 
             if ((from te in TeamEvals
                  where te.EvaluatorID == Student.ID
-                 select te).Count() > 1)
+                 select te).Count() >= 1)
             {
                 header.TeamEval.displayValue = "View/Edit Team Evaluation";
             }

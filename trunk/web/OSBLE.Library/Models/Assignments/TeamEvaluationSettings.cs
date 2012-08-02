@@ -32,10 +32,11 @@ namespace OSBLE.Models.Assignments
         public int RequiredCommentLength { get; set; }
 
         /// <summary>
-        /// If not zero, instructors will be notified if an evaluation exceeds the specified amount.
-        /// Example: Stu giving Bob a 75% when this is set to 20 would set a flag.
+        /// If not zero, instructors will be notified if a set of evaluations from a student 
+        /// has a maximum difference greater than the specified amount.
+        /// Example: Stu giving Bob a 90%  and himself a 110% when this is set to 19 would set a flag.
         /// </summary>
-        [Display(Name="Notify instructor if evaluation is more/less than the following amount")]
+        [Display(Name = "Notify instructor if a student performs an evaluation with a percent spread larger than the following amount")]
         [Required(AllowEmptyStrings = true, ErrorMessage = "Please enter a notification amount (use 0 if not necessary).")]
         public int DiscrepancyCheckSize { get; set; }
 

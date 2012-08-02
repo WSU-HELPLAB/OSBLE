@@ -114,14 +114,13 @@
     function checkForErrors(e) {
 
         if (parseInt($("#pointsPossibleId").text()) == 0) {
-            /*go through .points-CUid for each member and see if a grade a descrepency*/
+            /*go through .points-CUid for each member and see if a grade is a descrepency*/
 
             var maxValue =  -1;
-            var minValue = @ViewBag.PreviousAssignmentTeam.Team.TeamMembers.Count * 100 + 1;
+            var minValue = 10000;
             var currentValue = 0;
-            @foreach (TeamMember tm in pAt.Team.TeamMembers.OrderBy(u => u.CourseUser.UserProfile.LastName))
+            @foreach (TeamMember tm in pAt.Team.TeamMembers)
             {
-                
                @:currentValue= parseInt($("#points-@(tm.CourseUserID)").val());
                @:if(currentValue > maxValue)
                {

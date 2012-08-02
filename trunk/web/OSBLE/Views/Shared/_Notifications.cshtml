@@ -62,6 +62,15 @@
                             @Html.ActionLink("here", "GetSubmissionZip", "FileHandler", new { assignmentID = args2[0], teamID = args2[1] }, new { })</text>
                             break;
                         }
+                    case Notification.Types.TeamEvaluationDiscrepancy:
+                        {
+                            string[] args = n.Data.Split(new char[] { ';' });
+                            <text><em>@n.Sender.DisplayName(ViewBag.ActiveCourse.AbstractRole)</em> submitted a 
+                            @Html.ActionLink("team evaluation", "TeacherTeamEvaluation", "Assignment", new { precedingTeamId = args[0], TeamEvaluationAssignmentId = args[1] }, new { })
+                            with a large percent spread</text>
+                            break;
+                        }
+                        
                 }
             </div>
         </li>

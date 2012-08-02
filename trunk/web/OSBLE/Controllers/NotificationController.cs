@@ -195,6 +195,32 @@ namespace OSBLE.Controllers
             }
         }
 
+        /// <summary>
+        /// Sends a notification saying that the ActiveCourseUser submitted a Team Evaluation with a large percent spread.
+        /// </summary>
+        /// <param name="TeamEvaluationAssignmentId"></param>
+        /// <param name="PrecedingTeamId"></param>
+        [NonAction]
+        public void SendTeamEvaluationDiscrepancyNotification(int PrecedingTeamId, Assignment TeamEvaluationAssignment)
+        {
+            //Sender has completed a [url]Team Evaluation with a large percent spread.
+
+            List<int> InstructorIDs = (from cu in db.CourseUsers
+                                     where cu.AbstractCourseID == TeamEvaluationAssignment.Course.ID &&
+                                     cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor
+                                     select cu.ID).ToList();
+
+            foreach (int cuID in InstructorIDs)
+            {
+                Notification n = new Notification();
+                n.ItemType = Notification.Types.TeamEvaluationDiscrepancy;
+                n.Data = PrecedingTeamId + ";" + TeamEvaluationAssignment.ID;
+                n.RecipientID = cuID;
+                n.SenderID = ActiveCourseUser.ID;
+                addNotification(n);
+            }
+        }
+
         [NonAction]
         public void SendFilesSubmittedNotification(Assignment assignment, AssignmentTeam team, string fileName)
         {

@@ -21,7 +21,9 @@
     <table id="TeamEvaluationTable">
         <tr>
         <td id="topLeftCell">&nbsp;</td>
-        <th colspan="@(team.TeamMembers.Count+2)">Evaluators</th>
+        <th colspan="@(team.TeamMembers.Count)">Evaluators</th>
+        <th>Multipliers</th>
+        <th>Comment</th>
         </tr>
         <tr>
         <th>Recipient</th>
@@ -29,7 +31,8 @@
         {
             <th class="nonBoldTH">@cu.UserProfile.LastAndFirst()</th>
         }
-        <th class="nonBoldTH">Multipliers</th>
+        <td></td>
+        <td></td>
         </tr>
 
         @{
@@ -41,8 +44,11 @@
                     {
                         <td>@ViewBag.table[j,i]</td>
                     }
-                    <td class="multiplierTD" style="vertical-align: bottom;">
+                    <td style="vertical-align: bottom;">
                         @ViewBag.MultipliersInOrder[i]
+                    </td>
+                    <td style="vertical-align: bottom;">
+                        @ViewBag.CommentsInOrder[i]
                     </td>
                 </tr>
             }
