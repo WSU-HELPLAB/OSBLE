@@ -32,7 +32,7 @@ namespace OSBLE.Models.Assignments
             modelBuilder.Entity<ReviewTeam>()
                 .HasRequired(rt => rt.ReviewingTeam)
                 .WithMany()
-                .WillCascadeOnDelete(true);
+                .WillCascadeOnDelete(false);
 
 
             modelBuilder.Entity<ReviewTeam>()

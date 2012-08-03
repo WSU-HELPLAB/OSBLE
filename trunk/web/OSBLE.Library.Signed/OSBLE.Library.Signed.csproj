@@ -264,6 +264,9 @@
     <Compile Include="..\OSBLE.Library\Models\Services\Uploader\UserSession.cs">
       <Link>Models\Services\Uploader\UserSession.cs</Link>
     </Compile>
+    <Compile Include="..\OSBLE.Library\Models\Setting.cs">
+      <Link>Models\Setting.cs</Link>
+    </Compile>
     <Compile Include="..\OSBLE.Library\Models\SilverlightObject.cs">
       <Link>Models\SilverlightObject.cs</Link>
     </Compile>
@@ -272,6 +275,12 @@
     </Compile>
     <Compile Include="..\OSBLE.Library\Models\ToolTips.cs">
       <Link>Models\ToolTips.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\Triggers\ModelTrigger.cs">
+      <Link>Models\Triggers\ModelTrigger.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\Triggers\TeamDeleteTrigger.cs">
+      <Link>Models\Triggers\TeamDeleteTrigger.cs</Link>
     </Compile>
     <Compile Include="..\OSBLE.Library\Models\Users\Mail.cs">
       <Link>Models\Users\Mail.cs</Link>

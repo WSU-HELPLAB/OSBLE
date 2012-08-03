@@ -15,6 +15,7 @@ using System.Data.Entity.Infrastructure;
 using System.Data.Objects;
 using OSBLE.Models.Annotate;
 using System.Reflection;
+using OSBLE.Models.Triggers;
 
 namespace OSBLE.Models
 {
@@ -26,36 +27,82 @@ namespace OSBLE.Models
         public ContextBase()
             : base()
         {
+            init();
         }
 
         public ContextBase(DbConnection existingConnection, DbCompiledModel model, bool contextOwnsConnection)
             : base(existingConnection, model, contextOwnsConnection)
         {
+            init();
         }
 
         public ContextBase(string nameOrConnectionString, DbCompiledModel model)
             : base(nameOrConnectionString, model)
         {
+            init();
         }
 
         public ContextBase(ObjectContext objectContext, bool dbContextOwnsObjectContext)
             : base(objectContext, dbContextOwnsObjectContext)
         {
+            init();
         }
 
         public ContextBase(DbConnection existingConnection, bool contextOwnsConnection)
             : base(existingConnection, contextOwnsConnection)
         {
+            init();
         }
 
         public ContextBase(string nameOrConnectionString)
             : base(nameOrConnectionString)
         {
+            init();
         }
 
         public ContextBase(DbCompiledModel model)
             : base(model)
         {
+            init();
+        }
+
+        private void init()
+        {
+            //AC: Not sure if the best method to accomplish this, but I'd like to 
+            //set up database triggers automatically.  As I couldn't find any
+            //EF-based event handler that I could hook into, my solution is to 
+            //create a trigger-based setting to track whether or not triggers
+            //have been set up.
+            Setting setting = this.Settings.Where(s => s.Key == "TriggerInit").FirstOrDefault();
+            if (setting == null)
+            {
+                setting = new Setting();
+                setting.Value = "0";
+                setting.Key = "TriggerInit";
+            }
+            if (setting.Value == "0")
+            {
+                try
+                {
+                    //load all triggers using reflection
+                    List<Type> componentObjects = (from type in Assembly.GetExecutingAssembly().GetTypes()
+                                                   where
+                                                   type.IsSubclassOf(typeof(ModelTrigger)) == true
+                                                   &&
+                                                   type.IsAbstract == false
+                                                   select type).ToList();
+                    foreach (Type component in componentObjects)
+                    {
+                        ModelTrigger trigger = Activator.CreateInstance(component) as ModelTrigger;
+                        trigger.CreateTrigger(this);
+                    }
+                    setting.Value = "1";
+                }
+                catch (Exception)
+                {
+                }
+            }
+            this.SaveChanges();
         }
 
         /// <summary>
@@ -91,6 +138,8 @@ namespace OSBLE.Models
             //trusted communityt member: same as participant, but can upload files to the server
             this.CommunityRoles.Add(new CommunityRole(CommunityRole.OSBLERoles.TrustedCommunityMember.ToString(), false, true, true, true));
         }
+
+        public DbSet<Setting> Settings { get; set; }
 
         public DbSet<School> Schools { get; set; }
 
@@ -197,6 +246,9 @@ namespace OSBLE.Models
 #if !DEBUG
             modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
 #endif
+
+            //load in any model builder extensions (usually foreign key relationships)
+            //from the models
             List<Type> componentObjects = (from type in Assembly.GetExecutingAssembly().GetTypes()
                                            where
                                            type.GetInterface("IModelBuilderExtender") != null
