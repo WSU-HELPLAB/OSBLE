@@ -161,7 +161,7 @@ namespace OSBLE.UnitTests
             AuthenticationServiceClient authClient = new AuthenticationServiceClient();
             OsbleServiceClient osbleClient = new OsbleServiceClient();
             string token = authClient.ValidateUser("betty@rogers.com", "123123");
-            byte[] data = osbleClient.GetMergedReviewDocument(34, 4, token);
+            byte[] data = osbleClient.GetMergedReviewDocument(4, token);
             using (ZipFile zip = ZipFile.Read(data))
             {
                 zip.Save("D:\\acarter\\temp\\GetMergedReviewDocumentTest.zip");

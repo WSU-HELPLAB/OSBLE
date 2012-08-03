@@ -22,7 +22,7 @@ namespace OSBLE.UnitTests.OsbleService {
         OSBLE.Models.Assignments.Assignment[] GetCourseAssignments(int courseId, string authToken);
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:OsbleService/GetMergedReviewDocument", ReplyAction="urn:OsbleService/GetMergedReviewDocumentResponse")]
-        byte[] GetMergedReviewDocument(int authorId, int assignmentId, string authToken);
+        byte[] GetMergedReviewDocument(int criticalReviewAssignmentId, string authToken);
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:OsbleService/GetReviewItems", ReplyAction="urn:OsbleService/GetReviewItemsResponse")]
         byte[] GetReviewItems(int assignmentId, string authToken);
@@ -75,8 +75,8 @@ namespace OSBLE.UnitTests.OsbleService {
             return base.Channel.GetCourseAssignments(courseId, authToken);
         }
         
-        public byte[] GetMergedReviewDocument(int authorId, int assignmentId, string authToken) {
-            return base.Channel.GetMergedReviewDocument(authorId, assignmentId, authToken);
+        public byte[] GetMergedReviewDocument(int criticalReviewAssignmentId, string authToken) {
+            return base.Channel.GetMergedReviewDocument(criticalReviewAssignmentId, authToken);
         }
         
         public byte[] GetReviewItems(int assignmentId, string authToken) {

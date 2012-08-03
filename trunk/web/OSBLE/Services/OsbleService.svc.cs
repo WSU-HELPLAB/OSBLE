@@ -95,19 +95,23 @@ namespace OSBLE.Services
         /// <summary>
         /// For getting merged ChemProV documents
         /// </summary>
-        /// <param name="assignmentId"></param>
+        /// <param name="criticalReviewAssignmentId"></param>
         /// <param name="authorId"></param>
         /// <param name="authToken"></param>
         /// <returns></returns>
         [OperationContract]
-        public byte[] GetMergedReviewDocument(int authorId, int assignmentId, string authToken)
+        public byte[] GetMergedReviewDocument(int criticalReviewAssignmentId, string authToken)
         {
             if (!_authService.IsValidKey(authToken))
             {
                 return new byte[0];
             }
             UserProfile profile = _authService.GetActiveUser(authToken);
-            Assignment criticalReviewAssignment = _db.Assignments.Find(assignmentId);
+            Assignment criticalReviewAssignment = _db.Assignments.Find(criticalReviewAssignmentId);
+            if (criticalReviewAssignment == null)
+            {
+                return new byte[0];
+            }
 
             //only continue if:
             // a: the assignment's due date has passed
@@ -136,78 +140,98 @@ namespace OSBLE.Services
             }
 
             //pull the author team specific to the given assignment and current user
-            ReviewTeam authorTeam = (from rt in _db.ReviewTeams
-                                     join team in _db.Teams on rt.ReviewTeamID equals team.ID
-                                     join member in _db.TeamMembers on team.ID equals member.TeamID
-                                     where member.CourseUserID == courseUser.ID
-                                     && rt.AuthorTeamID == authorId
-                                     select rt).FirstOrDefault();
+            List<ReviewTeam> authorTeams = (from rt in _db.ReviewTeams
+                                            join team in _db.Teams on rt.ReviewTeamID equals team.ID
+                                            join member in _db.TeamMembers on team.ID equals member.TeamID
+                                            where member.CourseUserID == courseUser.ID
+                                            && rt.AssignmentID == criticalReviewAssignmentId
+                                            select rt).ToList();
 
-            //no author team means that the current user isn't assigned to review the author
-            if (authorTeam == null)
+            //no author team means that the current user isn't assigned to review anyone
+            if (authorTeams.Count == 0)
             {
                 return new byte[0];
             }
 
-            //get all reviewers (not just the current user's review team)
-            List<ReviewTeam> reviewers = (from rt in _db.ReviewTeams
-                                          where rt.AuthorTeamID == authorId
-                                          select rt).ToList();
-
-            //get original document
-            MemoryStream finalStream = new MemoryStream();
-            OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
-            string originalFile = fs.Course((int)criticalReviewAssignment.CourseID)
-                                    .Assignment((int)criticalReviewAssignment.PrecededingAssignmentID)
-                                    .Submission(authorId)
-                                    .AllFiles()
-                                    .FirstOrDefault();
-            FileStream originalFileStream = File.OpenRead(originalFile);
-            originalFileStream.CopyTo(finalStream);
-            originalFileStream.Close();
-            finalStream.Position = 0;
-
-            //loop through each review team, merging documents
-            foreach (ReviewTeam reviewer in reviewers)
+            using (ZipFile finalZip = new ZipFile())
             {
-                string teamName = reviewer.ReviewingTeam.Name;
-                if(criticalReviewAssignment.CriticalReviewSettings.AnonymizeCommentsAfterPublish == true)
+                foreach (ReviewTeam authorTeam in authorTeams)
                 {
-                    teamName = string.Format("Anonymous {0}", reviewer.ReviewTeamID);
-                }
-                FileCollection allFiles = fs.Course((int)criticalReviewAssignment.CourseID)
-                                            .Assignment(assignmentId)
-                                            .Review(authorTeam.AuthorTeamID, reviewer.ReviewTeamID)
-                                            .AllFiles();
-                foreach (string file in allFiles)
-                {
-                    MemoryStream mergedStream = new MemoryStream();
-                    FileStream studentReview = System.IO.File.OpenRead(file);
-                    
-                    //merge
-                    ChemProV.Core.CommentMerger.Merge(finalStream, "", studentReview, teamName, mergedStream);
 
-                    //rewind merged stream and copy over to final stream
-                    mergedStream.Position = 0;
-                    finalStream = new MemoryStream();
-                    mergedStream.CopyTo(finalStream);
+                    //get all reviewers (not just the current user's review team)
+                    List<ReviewTeam> reviewers = (from rt in _db.ReviewTeams
+                                                  where rt.AuthorTeamID == authorTeam.AuthorTeamID
+                                                  select rt).ToList();
+
+                    //get original document
+                    MemoryStream finalStream = new MemoryStream();
+                    OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
+                    string originalFile = fs.Course((int)criticalReviewAssignment.CourseID)
+                                            .Assignment((int)criticalReviewAssignment.PrecededingAssignmentID)
+                                            .Submission(authorTeam.AuthorTeamID)
+                                            .AllFiles()
+                                            .FirstOrDefault();
+                    if (originalFile == null)
+                    {
+                        //author didn't submit a document to be reviewed.  Skip the rest.
+                        continue;
+                    }
+                    FileStream originalFileStream = File.OpenRead(originalFile);
+                    originalFileStream.CopyTo(finalStream);
+                    originalFileStream.Close();
                     finalStream.Position = 0;
-                    mergedStream.Close();
-                    studentReview.Close();
-                }
-            }
 
-            //finally, zip up and send over the wire
-            string documentName = Path.GetFileName(originalFile);
-            MemoryStream zipStream = new MemoryStream();
-            using (ZipFile zip = new ZipFile())
-            {
-                zip.AddEntry(documentName, finalStream);
-                zip.Save(zipStream);
+                    //loop through each review team, merging documents
+                    foreach (ReviewTeam reviewer in reviewers)
+                    {
+                        string teamName = reviewer.ReviewingTeam.Name;
+                        if (criticalReviewAssignment.CriticalReviewSettings.AnonymizeCommentsAfterPublish == true)
+                        {
+                            teamName = string.Format("Anonymous {0}", reviewer.ReviewTeamID);
+                        }
+                        FileCollection allFiles = fs.Course((int)criticalReviewAssignment.CourseID)
+                                                    .Assignment(criticalReviewAssignmentId)
+                                                    .Review(authorTeam.AuthorTeamID, reviewer.ReviewTeamID)
+                                                    .AllFiles();
+                        foreach (string file in allFiles)
+                        {
+                            MemoryStream mergedStream = new MemoryStream();
+                            FileStream studentReview = System.IO.File.OpenRead(file);
+
+                            //merge
+                            ChemProV.Core.CommentMerger.Merge(finalStream, "", studentReview, teamName, mergedStream);
+
+                            //rewind merged stream and copy over to final stream
+                            mergedStream.Position = 0;
+                            finalStream = new MemoryStream();
+                            mergedStream.CopyTo(finalStream);
+                            finalStream.Position = 0;
+                            mergedStream.Close();
+                            studentReview.Close();
+                        }
+                    }
+
+                    //finally, zip up and add to our list
+                    string documentName = Path.GetFileName(originalFile);
+                    string authorTeamName = authorTeam.AuthorTeam.Name;
+                    if (criticalReviewAssignment.CriticalReviewSettings.AnonymizeAuthor == true)
+                    {
+                        authorTeamName = string.Format("Anonymous {0}", authorTeam.ReviewTeamID);
+                    }
+                    string filePath = string.Format("{0};{1}/{2}",
+                                                    authorTeam.AuthorTeamID,
+                                                    authorTeamName,
+                                                    documentName
+                                                    );
+                    finalZip.AddEntry(filePath, finalStream);
+                }
+                MemoryStream zipStream = new MemoryStream();
+                finalZip.Save(zipStream);
+                zipStream.Position = 0;
+                byte[] zipBytes = zipStream.ToArray();
+                zipStream.Close();
+                return zipBytes;
             }
-            byte[] zipBytes = zipStream.ToArray();
-            zipStream.Close();
-            return zipBytes;
         }
 
         /// <summary>
@@ -255,6 +279,7 @@ namespace OSBLE.Services
                                               join team in _db.Teams on rt.ReviewTeamID equals team.ID
                                               join member in _db.TeamMembers on team.ID equals member.TeamID
                                               where member.CourseUserID == courseUser.ID
+                                              && rt.AssignmentID == assignmentId
                                               select rt).ToList();
 
             if (teamsToReview == null)
