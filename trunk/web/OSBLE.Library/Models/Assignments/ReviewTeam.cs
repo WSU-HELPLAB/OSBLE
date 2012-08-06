@@ -27,8 +27,6 @@ namespace OSBLE.Models.Assignments
 
         public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
         {
-            //In a critical review, students will be reviewing an existing assignment.
-            //Therefore, AuthorTeams are fixed while the reviewing team might still change.
             modelBuilder.Entity<ReviewTeam>()
                 .HasRequired(rt => rt.ReviewingTeam)
                 .WithMany()
