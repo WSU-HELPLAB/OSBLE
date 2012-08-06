@@ -36,7 +36,7 @@ namespace OSBLE.Controllers
 
             setupCourseLinks(); // Quickly accessible course files
 
-            return View();
+            return View("Index");
         }
 
         /// <summary>
@@ -314,6 +314,21 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index");
         }
 
+
+        /// <summary>
+        /// Same as SetCourse() below, but gets the course from the GET instead of
+        /// the POST.  Created to allow auto-navigating to specific dashboard posts.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public string Course(int courseId, int? postId)
+        {
+            Cache["ActiveCourse"] = courseId;
+            string url = string.Format("/#dp_post_{0}", postId);
+            Response.Redirect(url);
+            return "Redirecting...";
+        }
+
         /// <summary>
         /// Sets active course and redirects back to where we came from.
         /// </summary>
@@ -413,6 +428,7 @@ namespace OSBLE.Controllers
                     if (ModelState.IsValid)
                     {
                         db.DashboardPosts.Add(newDp);
+                        db.SaveChanges();
 
                         //construct the subject & body
                         string subject = "";
@@ -440,6 +456,10 @@ namespace OSBLE.Controllers
                         }
                         body += "<br /><br />";
                         body += dp.Content.Replace("\n", "<br />");
+                        body += string.Format("<br /><br /><a href=\"http://osble.org/Home/Course?courseId={0}&postId={1}\">View post.</a>",
+                            newDp.CourseUser.AbstractCourseID,
+                            newDp.ID
+                            );
 
                         List<CourseUser> CourseUser = db.CourseUsers.Where(couseuser => couseuser.AbstractCourseID == c.ID).ToList();
 
@@ -544,6 +564,10 @@ namespace OSBLE.Controllers
                         }
                         body += "<br /><br />";
                         body += dr.Content.Replace("\n", "<br />");
+                        body += string.Format("<br /><br /><a href=\"http://osble.org/Home/Course?courseId={0}&postId={1}\">View post.</a>",
+                            dr.CourseUser.AbstractCourseID,
+                            dr.ID
+                            );
 
                         //List<CoursesUsers> courseUsers = db.CoursesUsers.Where(c => (c.AbstractCourseID == ac.ID && c.UserProfile.EmailAllActivityPosts)).ToList();
                         List<CourseUser> courseUsers = (from c in db.CourseUsers
