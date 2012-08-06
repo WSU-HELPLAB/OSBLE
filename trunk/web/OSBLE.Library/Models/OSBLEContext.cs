@@ -48,7 +48,6 @@ namespace OSBLE.Models
             up.Identification = ident;
             up.SchoolID = school;
             up.UserName = username;
-            up.AspNetUserName = username;
             up.Password = UserProfile.GetPasswordHash(password);
             up.IsApproved = true;
             up.CanCreateCourses = canCreateCourses;

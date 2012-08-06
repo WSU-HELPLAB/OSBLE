@@ -65,24 +65,6 @@ namespace OSBLE.Controllers
 
                 if (localUser != null)
                 {
-                    //they have a user name, but not a .net user name.  This is an oddity.  Correct and continue.
-                    if (localUser.AspNetUserName == null)
-                    {
-                        localUser.AspNetUserName = localUser.UserName;
-                        db.SaveChanges();
-                    }
-
-                    //AC: if the user doesn't have a password, it's probably because they have an old .NET account.  
-                    //find this information and then update their profile with their password
-                    if (localUser.Password == null || localUser.Password.Length == 0)
-                    {
-                        if (Membership.ValidateUser(localUser.AspNetUserName, model.Password))
-                        {
-                            localUser.Password = UserProfile.GetPasswordHash(model.Password);
-                            db.SaveChanges();
-                        }
-                    }
-
                     //do we have a valid password
                     if (UserProfile.ValidateUser(model.UserName, model.Password))
                     {

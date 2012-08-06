@@ -21,8 +21,6 @@ namespace OSBLE.Models.Users
         [DataMember]
         public string UserName { get; set; }
 
-        public string AspNetUserName { get; set; }
-
         public string Password { get; set; }
 
         [DataMember]
@@ -92,7 +90,6 @@ namespace OSBLE.Models.Users
         public UserProfile(UserProfile up)
             : base()
         {
-            this.AspNetUserName = up.AspNetUserName;
             this.CanCreateCourses = up.CanCreateCourses;
             this.DefaultCourse = up.DefaultCourse;
             this.EmailAllNotifications = up.EmailAllNotifications;

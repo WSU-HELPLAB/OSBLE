@@ -97,7 +97,7 @@ namespace OSBLE.Services
             if (UserProfile.ValidateUser(userName, password))
             {
                 UserProfile profile = (from p in _db.UserProfiles
-                                       where p.AspNetUserName == userName
+                                       where p.UserName == userName
                                        select p).First();
 
                 //build our string to hash
