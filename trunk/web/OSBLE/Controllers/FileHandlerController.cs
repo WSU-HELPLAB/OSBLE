@@ -16,10 +16,10 @@ using OSBLE.Models.Annotate;
 
 namespace OSBLE.Controllers
 {
-    [OsbleAuthorize]
-    [RequireActiveCourse]
     public class FileHandlerController : OSBLEController
     {
+        [OsbleAuthorize]
+        [RequireActiveCourse]
         public ActionResult CourseDocument(int courseId, string filePath)
         {
             var course = (from c in db.CourseUsers
@@ -60,6 +60,8 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [OsbleAuthorize]
+        [RequireActiveCourse]
         [NotForCommunity]
         public ActionResult GetSubmissionDeliverable(int assignmentID, int teamID, string fileName)
         {
@@ -84,6 +86,8 @@ namespace OSBLE.Controllers
             throw new Exception();
         }
 
+        [OsbleAuthorize]
+        [RequireActiveCourse]
         [NotForCommunity]
         public ActionResult GetSubmissionDeliverableByType(int assignmentID, int userProfileID, string fileName, DeliverableType type)
         {
@@ -126,6 +130,8 @@ namespace OSBLE.Controllers
             throw new Exception("File Not Found");
         }
 
+        [OsbleAuthorize]
+        [RequireActiveCourse]
         [CanGradeCourse]
         [NotForCommunity]
         public ActionResult GetAllSubmissionsForActivity(int assignmentID)
@@ -192,6 +198,8 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [OsbleAuthorize]
+        [RequireActiveCourse]
         [NotForCommunity]
         public ActionResult GetTeamUserPeerReview(int assignmentID, int teamID)
         {
@@ -244,7 +252,8 @@ namespace OSBLE.Controllers
             throw new Exception();
         }
 
-
+        [OsbleAuthorize]
+        [RequireActiveCourse]
         [CanGradeCourse]
         [NotForCommunity]
         public ActionResult GetSubmissionZip(int assignmentId, int teamId)
@@ -304,6 +313,8 @@ namespace OSBLE.Controllers
         /// <param name="authorTeamId">reviewee team ID</param>
         /// <returns></returns>
         [CanSubmitAssignments]
+        [OsbleAuthorize]
+        [RequireActiveCourse]
         public ActionResult GetPrecedingSubmissionForCriticalReview(int assignmentId, int authorTeamId)
         {
             Assignment CRassignment = db.Assignments.Find(assignmentId);
@@ -336,6 +347,8 @@ namespace OSBLE.Controllers
         /// <param name="authorTeamId">get the review of this authorTeam (that is submitted by the current user)</param>
         /// <returns></returns>
         [CanSubmitAssignments]
+        [OsbleAuthorize]
+        [RequireActiveCourse]
         public ActionResult GetReviewForAuthor(int assignmentId, int authorTeamId)
         {
             //get authorTeam
@@ -371,6 +384,8 @@ namespace OSBLE.Controllers
         /// <param name="receiverId">This is the CourseUser you want to download received reviews for. 
         /// If it is team based, any course user in the preceding assignment team will yield the same results</param>
         /// <returns></returns>
+        [OsbleAuthorize]
+        [RequireActiveCourse]
         public ActionResult GetReviewsOfAuthor(int assignmentId, int receiverId)
         {
 
@@ -385,7 +400,8 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-
+        [OsbleAuthorize]
+        [RequireActiveCourse]
         public ActionResult GetCriticalReviewDiscussionItems(int discussionTeamID)
         {
             DiscussionTeam dt = db.DiscussionTeams.Find(discussionTeamID);
@@ -577,6 +593,8 @@ namespace OSBLE.Controllers
 
 
         [NotForCommunity]
+        [OsbleAuthorize]
+        [RequireActiveCourse]
         public ActionResult getCurrentUsersZip(int assignmentID)
         {
             Assignment assignment = db.Assignments.Find(assignmentID);
