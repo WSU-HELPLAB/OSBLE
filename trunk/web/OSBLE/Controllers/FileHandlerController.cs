@@ -292,7 +292,7 @@ namespace OSBLE.Controllers
                 assignmentTeam, 
                 assignment.Deliverables[0].ToString()
                 );
-            string fileName = AnnotateApi.GetAnnotateDocumentName(assignmentID, authorTeamID);
+            string fileName = AnnotateApi.GetAnnotateDocumentName(assignment.ID, authorTeamID);
             return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = fileName };
         }
 
