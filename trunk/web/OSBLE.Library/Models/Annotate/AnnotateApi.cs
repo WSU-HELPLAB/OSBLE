@@ -146,7 +146,7 @@ namespace OSBLE.Models.Annotate
                                             epoch,
                                             ApiUser,
                                             apiKey,
-                                            documentUrl
+                                            System.Web.HttpUtility.UrlEncode(documentUrl)
                                              );
                 try
                 {
