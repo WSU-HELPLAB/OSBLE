@@ -814,6 +814,8 @@
     <Content Include="Views\Assignment\_ModeratorIndex.cshtml" />
     <Content Include="Views\PdfCriticalReview\Index.cshtml" />
     <Content Include="Views\PdfCriticalReview\Review.cshtml" />
+    <Content Include="Views\Rubric\ImportIndividualToCSV.cshtml" />
+    <Content Include="Views\Rubric\ViewForCriticalReview.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />
