@@ -234,21 +234,25 @@ namespace OSBLE.Models.Annotate
                                         );
             webResult = client.DownloadString(createString);
 
-            //downgrade user to unlicensed
-            apiKey = GenerateAnnotateKey("updateAccount.php", osbleUser.UserName, epoch);
-            string updateString = "http://helplab.org/annotate/php/updateAccount.php?" +
-                                 "api-user={0}" +           //Annotate admin user name (see web config)
-                                 "&api-requesttime={1}" +   //UNIX timestamp
-                                 "&api-annotateuser={2}" +  //the current user (reviewer)
-                                 "&api-auth={3}" +          //Annotate admin auth key
-                                 "&licensed=0 ";
-            updateString = string.Format(updateString,
-                                        ApiUser,
-                                        epoch,
-                                        osbleUser.UserName,
-                                        apiKey
-                                        );
-            webResult = client.DownloadString(updateString);
+            //downgrade user to unlicensed if not OSBLE admin
+            if (osbleUser.IsAdmin == false)
+            {
+                apiKey = GenerateAnnotateKey("updateAccount.php", osbleUser.UserName, epoch);
+                string updateString = "http://helplab.org/annotate/php/updateAccount.php?" +
+                                     "api-user={0}" +           //Annotate admin user name (see web config)
+                                     "&api-requesttime={1}" +   //UNIX timestamp
+                                     "&api-annotateuser={2}" +  //the current user (reviewer)
+                                     "&api-auth={3}" +          //Annotate admin auth key
+                                     "&licensed=0 ";
+                updateString = string.Format(updateString,
+                                            ApiUser,
+                                            epoch,
+                                            osbleUser.UserName,
+                                            apiKey
+                                            );
+                webResult = client.DownloadString(updateString);
+                result.RawMessage = webResult;
+            }
             result.RawMessage = webResult;
             if (webResult.Substring(0, 2) == "OK")
             {
