@@ -82,6 +82,8 @@ namespace OSBLE.Controllers
                             }
                             else
                             {
+                                base.UpdateCacheInstance(localUser);
+                                Cache["ActiveCourse"] = localUser.DefaultCourse;
                                 return RedirectToAction("Index", "Home");
                             }
                         }

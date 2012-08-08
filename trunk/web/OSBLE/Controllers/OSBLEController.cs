@@ -165,6 +165,11 @@ namespace OSBLE.Controllers
             }
         }
 
+        public void UpdateCacheInstance(UserProfile user)
+        {
+            Cache = FileCacheHelper.GetCacheInstance(user);
+        }
+
         /// <summary>
         /// Checks to see if the Course/Community roles have been populated.
         /// Also adds WSU to schools if none exist.

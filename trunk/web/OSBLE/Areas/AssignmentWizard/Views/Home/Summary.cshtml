@@ -3,9 +3,19 @@
 @{
     ViewBag.Title = "Wizard Complete";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    string publishText = "Publish Assignment";
+    if(Model.IsDraft == false)
+    {
+        publishText = "Unpublish Assignment";
+    }
 }
 
 <h2>Wizard Complete!</h2>
 <p>
-You have finished creating your assignment.  At any time, you may <a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = @Model.ID})" class="add_link" id="assignment_create_button">go back</a> and edit the assignment's details.
+You have finished creating your assignment.  At any time, you may <a href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = Model.ID})" class="add_link" id="assignment_create_button">go back</a> and edit the assignment's details.
 </p>
+<h3>Options</h3>
+<ul>
+    <li><a href="@Url.Action("ToggleDraft", "Assignment", new { area = "", assignmentId = Model.ID})">@publishText</a></li>
+    <li><a href="@Url.Action("Index", "Assignment", new { area = "" })">Return to assignment listing</a></li>
+</ul>

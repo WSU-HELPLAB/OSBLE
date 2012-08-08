@@ -413,7 +413,6 @@ namespace OSBLE.Controllers
             // and confirm that the critical review to be downloaded has been published
             // note: these contraints do not apply to instructors
             bool belongsToDT = false;
-            belongsToDT = true;
 
             foreach (TeamMember tm in dt.GetAllTeamMembers())
             {
