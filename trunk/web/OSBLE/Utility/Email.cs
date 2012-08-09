@@ -16,7 +16,6 @@ namespace OSBLE.Utility
             }
 
             SmtpClient mailClient = new SmtpClient();
-            mailClient.UseDefaultCredentials = true;
 
             MailAddress fromAddress = new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE");
 

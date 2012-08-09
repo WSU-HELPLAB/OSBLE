@@ -21,6 +21,7 @@ using OSBLE.Models.Users;
 using OSBLE.Utility;
 using OSBLE.Attributes;
 using OSBLE.Services;
+using System.Net;
 
 namespace OSBLE.Controllers
 {
@@ -507,8 +508,6 @@ namespace OSBLE.Controllers
 
                     //This will need to fixed whenever we get a Server that can send mail
                     SmtpClient sc = new SmtpClient();
-                    sc.UseDefaultCredentials = true;
-
                     sc.Send(mm);
 #endif
 

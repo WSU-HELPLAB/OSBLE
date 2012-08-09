@@ -28,7 +28,7 @@ namespace OSBLE.Controllers
 
             if (course != null)
             {
-                
+
                 string rootPath = FileSystem.GetCourseDocumentsPath(courseId);
 
                 //AC: At some point, it might be a good idea to document these hacks
@@ -280,10 +280,10 @@ namespace OSBLE.Controllers
             }
 
             Assignment assignment = db.Assignments.Find(assignmentID);
-            
+
             //add in some robustness.  If we were passed in a critical review,
             //get the preceeding assignment.  Otherwise, just use the current assignment.
-            if(assignment.Type == AssignmentTypes.CriticalReview)
+            if (assignment.Type == AssignmentTypes.CriticalReview)
             {
                 assignment = assignment.PreceedingAssignment;
             }
@@ -296,9 +296,9 @@ namespace OSBLE.Controllers
                                              ).FirstOrDefault();
 
             string path = FileSystem.GetDeliverable(
-                assignment.Course as Course, 
-                assignment.ID, 
-                assignmentTeam, 
+                assignment.Course as Course,
+                assignment.ID,
+                assignmentTeam,
                 assignment.Deliverables[0].ToString()
                 );
             string fileName = AnnotateApi.GetAnnotateDocumentName(assignment.ID, authorTeamID);
@@ -367,10 +367,10 @@ namespace OSBLE.Controllers
 
             //if (isOwnDocument)
             //{
-                Assignment CRassignment = db.Assignments.Find(assignmentId);
-                AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourseUser);
+            Assignment CRassignment = db.Assignments.Find(assignmentId);
+            AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourseUser);
 
-                return GetSubmissionZipHelper(assignmentId, at.TeamID, authorTeam);
+            return GetSubmissionZipHelper(assignmentId, at.TeamID, authorTeam);
             //}
 
             //return RedirectToAction("Index", "Home");
@@ -559,27 +559,53 @@ namespace OSBLE.Controllers
                     string zipFileName = assignment.AssignmentName + " by " + assignmentTeam.Team.Name + ".zip";
 
                     string submissionfolder;
-                    if (assignment.Type == AssignmentTypes.CriticalReview && authorTeam != null)
-                    {
-                        submissionfolder = FileSystem.GetTeamUserSubmissionFolderForAuthorID(false, (ActiveCourseUser.AbstractCourse as Course), assignmentID, assignmentTeam, authorTeam);
-                    }
-                    else
-                    {
-                        submissionfolder = FileSystem.GetTeamUserSubmissionFolder(false, (ActiveCourseUser.AbstractCourse as Course), assignmentID, assignmentTeam);
-                    }
-
                     using (ZipFile zipfile = new ZipFile())
                     {
-                        if (new DirectoryInfo(submissionfolder).Exists)
+                        if (assignment.Type == AssignmentTypes.CriticalReview && authorTeam != null)
                         {
-                            zipfile.AddDirectory(submissionfolder);
+                            submissionfolder = FileSystem.GetTeamUserSubmissionFolderForAuthorID(false, (ActiveCourseUser.AbstractCourse as Course), assignmentID, assignmentTeam, authorTeam);
+
+                            if (new DirectoryInfo(submissionfolder).Exists)
+                            {
+                                zipfile.AddDirectory(submissionfolder);
+                            }
+                        }
+                        else
+                        {
+                            //AC Note: work in progress
+                            List<ReviewTeam> reviewTeams = (from rt in db.ReviewTeams
+                                                            where rt.AssignmentID == assignmentID
+                                                            && rt.ReviewTeamID == assignmentTeam.TeamID
+                                                            select rt).ToList();
+                            Dictionary<string, dynamic> reviewStreams = new Dictionary<string, dynamic>();
+                            foreach (ReviewTeam reviewTeam in reviewTeams)
+                            {
+                                string key = reviewTeam.ReviewingTeam.Name;
+                                OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
+                                OSBLE.Models.FileSystem.FileCollection fc = fs.Course(ActiveCourseUser.AbstractCourseID)
+                                                                            .Assignment(assignmentID)
+                                                                            .Review(reviewTeam.AuthorTeam, reviewTeam.ReviewingTeam)
+                                                                            .AllFiles();
+                                
+                                //don't create a zip if we have have nothing to zip.
+                                if (fc.Count > 0)
+                                {
+                                    var bytes = fc.ToBytes();
+                                    reviewStreams[key] = bytes;
+                                }
+                            }
+                            /*
+                            
+                             * */
+                            submissionfolder = FileSystem.GetTeamUserSubmissionFolder(false, (ActiveCourseUser.AbstractCourse as Course), assignmentID, assignmentTeam);
                         }
 
-                        MemoryStream stream = new MemoryStream();
-                        zipfile.Save(stream);
-                        stream.Position = 0;
-
-                        return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
+                        using (MemoryStream stream = new MemoryStream())
+                        {
+                            zipfile.Save(stream);
+                            stream.Position = 0;
+                            return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
+                        }
                     }
                 }
             }
