@@ -456,7 +456,7 @@ namespace OSBLE.Controllers
                         }
                         body += "<br /><br />";
                         body += dp.Content.Replace("\n", "<br />");
-                        body += string.Format("<br /><br /><a href=\"http://osble.org/Home/Course?courseId={0}&postId={1}\">View post.</a>",
+                        body += string.Format("<br /><br /><a href=\"http://osble.org/Home/Course?courseId={0}&postId={1}\">View and reply to post in OSBLE</a>",
                             newDp.CourseUser.AbstractCourseID,
                             newDp.ID
                             );
@@ -564,7 +564,7 @@ namespace OSBLE.Controllers
                         }
                         body += "<br /><br />";
                         body += dr.Content.Replace("\n", "<br />");
-                        body += string.Format("<br /><br /><a href=\"http://osble.org/Home/Course?courseId={0}&postId={1}\">View post.</a>",
+                        body += string.Format("<br /><br /><a href=\"http://osble.org/Home/Course?courseId={0}&postId={1}\">View and reply to post in OSBLE</a>",
                             dr.CourseUser.AbstractCourseID,
                             dr.ID
                             );
