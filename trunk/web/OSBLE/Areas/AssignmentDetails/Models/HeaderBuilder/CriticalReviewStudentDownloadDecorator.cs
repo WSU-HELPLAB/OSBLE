@@ -29,6 +29,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
 
             header.CRdownload.hasPublished = assignment.IsCriticalReviewPublished;
             header.CRdownload.publishedDate = assignment.CriticalReviewPublishDate;
+            header.CRdownload.hasRubricToView = false;
 
             //get student's team
                         
