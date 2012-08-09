@@ -498,20 +498,11 @@ namespace OSBLE.Controllers
                     db.SaveChanges();
 #if !DEBUG
                     string body = "Your OSBLE password has been reset.\n Your new password is: " + newPass + "\n\nPlease change this password as soon as possible.";
+                    List<MailAddress> to = new List<MailAddress>();
+                    to.Add(new MailAddress(osbleProfile.UserName));
 
-                    MailMessage mm = new MailMessage(
-                        new MailAddress(ConfigurationManager.AppSettings["OSBLEFromEmail"], "OSBLE"),
-                        new MailAddress(model.EmailAddress));
-
-                    mm.Subject = "[OSBLE] Password Reset Request";
-                    mm.Body = body;
-
-                    //This will need to fixed whenever we get a Server that can send mail
-                    SmtpClient sc = new SmtpClient();
-                    sc.Send(mm);
+                    Email.Send("[OSBLE] Password Reset Request", body, to);
 #endif
-
-                    
                     return View("ResetPasswordSuccess");
 
                 }
