@@ -572,7 +572,6 @@ namespace OSBLE.Controllers
                         }
                         else
                         {
-                            //AC Note: work in progress
                             List<ReviewTeam> reviewTeams = (from rt in db.ReviewTeams
                                                             where rt.AssignmentID == assignmentID
                                                             && rt.ReviewTeamID == assignmentTeam.TeamID
@@ -580,32 +579,35 @@ namespace OSBLE.Controllers
                             Dictionary<string, dynamic> reviewStreams = new Dictionary<string, dynamic>();
                             foreach (ReviewTeam reviewTeam in reviewTeams)
                             {
-                                string key = reviewTeam.ReviewingTeam.Name;
+                                string key = reviewTeam.AuthorTeam.Name;
                                 OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
                                 OSBLE.Models.FileSystem.FileCollection fc = fs.Course(ActiveCourseUser.AbstractCourseID)
                                                                             .Assignment(assignmentID)
                                                                             .Review(reviewTeam.AuthorTeam, reviewTeam.ReviewingTeam)
                                                                             .AllFiles();
-                                
-                                //don't create a zip if we have have nothing to zip.
+
+                                //don't create a zip if we don't have have anything to zip.
                                 if (fc.Count > 0)
                                 {
                                     var bytes = fc.ToBytes();
                                     reviewStreams[key] = bytes;
                                 }
                             }
-                            /*
-                            
-                             * */
-                            submissionfolder = FileSystem.GetTeamUserSubmissionFolder(false, (ActiveCourseUser.AbstractCourse as Course), assignmentID, assignmentTeam);
+
+                            foreach (string author in reviewStreams.Keys)
+                            {
+                                foreach (string file in reviewStreams[author].Keys)
+                                {
+                                    string location = string.Format("{0}/{1}", author, file);
+                                    zipfile.AddEntry(location, reviewStreams[author][file]);
+                                }
+                            }
                         }
 
-                        using (MemoryStream stream = new MemoryStream())
-                        {
-                            zipfile.Save(stream);
-                            stream.Position = 0;
-                            return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
-                        }
+                        MemoryStream stream = new MemoryStream();
+                        zipfile.Save(stream);
+                        stream.Position = 0;
+                        return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
                     }
                 }
             }
