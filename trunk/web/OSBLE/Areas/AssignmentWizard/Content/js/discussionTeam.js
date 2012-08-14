@@ -3,6 +3,17 @@
 //Called when the document has finished loading and is safe to make DOM calls
 function documentReady() {
 
+    //radio button event
+    $('input[name=teamRadio]').change(function () {
+        if ($('#radioNo').attr('checked')) {
+            $('#teamDiv').show();
+        }
+        else {
+            $('#teamDiv').hide();
+        }
+    });
+
+
     //Setting up Moderators (the list items of Moderators/TAs) as draggable. Note: This property is not carried to the cloned moderators (intentional)
     //$(".Moderator").draggable(
     $("#AvailableModerators li").draggable(
@@ -64,8 +75,6 @@ function teamSortableComplete(event, ui) {
         });
     }
 }
-
-
 
 function hideErrors() {
     $('#ErrorBox').promise().done(function () {

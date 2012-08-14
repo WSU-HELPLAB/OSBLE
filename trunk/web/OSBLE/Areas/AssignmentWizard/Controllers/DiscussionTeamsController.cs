@@ -96,6 +96,99 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             return View(Assignment);
         }
 
+        protected void ParseFormValues2()
+        {
+            //Wiping all DiscussionTeam.TeamMembers.
+            foreach (DiscussionTeam dt in Assignment.DiscussionTeams)
+            {
+                dt.Team.TeamMembers.Clear();
+            }
+            db.SaveChanges();
+
+            string[] studentKeys = Request.Form.AllKeys.Where(k => k.Contains("student_")).ToArray();
+            List<string> TeamNames = new List<string>(); ; //This will be a list of the TeamNames from the form. These can be pre-existing teams or new teams.
+
+            foreach (string studentKey in studentKeys)
+            {
+                TeamNames.Add(Request.Form[studentKey]);
+            }
+
+            string[] PreExistingTeamKeys = Request.Form.AllKeys.Where(k => k.Contains("team_")).ToArray(); //These are keys for teams that  already existed
+            foreach (string preExistingTeamKey in PreExistingTeamKeys) //Determining if each preexisting team should be kept or deleted
+            {
+                string TeamName = Request.Form[preExistingTeamKey];
+                int TeamID;
+                Int32.TryParse(preExistingTeamKey.Split('_')[1], out TeamID);
+
+                Team team = Assignment.DiscussionTeams.Where(dt => dt.TeamID == TeamID).Select(dt => dt.Team).FirstOrDefault();
+
+                if (TeamNames.Contains(TeamName)) //The TeamName corrisponds to a team that a student is on.
+                {
+                    //If the team has the same ID, then its safe to keep. If it does not, we must delete it, as it
+                    //has been deleted by the user and recreated with the same name. Meaning a complete different team.
+                    
+                    bool TeamHasSameID = Assignment.DiscussionTeams.Where(dt => dt.TeamID == TeamID).Count() > 0;
+                    if (TeamHasSameID == false)
+                    {
+                        //Team has a new ID, but a pre-existing name. Team must have been delete/recreated. So we must 
+                        //do the same
+                        if (team != null)
+                        {
+                            db.Teams.Remove(team);
+                            db.SaveChanges();
+                        }
+                    }
+                }
+                else //The TeamName does not corrispond with any Team a student is associated with. So delete it
+                {
+                    if (team != null)
+                    {
+                        DiscussionTeam temp = (from dt in db.DiscussionTeams
+                                               where dt.TeamID == team.ID
+                                               select dt).FirstOrDefault();
+                        db.DiscussionTeams.Remove(temp);
+                        db.SaveChanges();
+                                            
+
+                        db.Teams.Remove(team);
+                        db.SaveChanges();
+                    }
+                }
+            }
+
+
+
+            //At this point, all old teams have been purged. So any team from the studentKeys values are either
+            //new teams, or preexisting teams.
+            foreach (string studentKey in studentKeys)
+            {
+                Team team = Assignment.DiscussionTeams.Where(dt => dt.TeamName == Request.Form[studentKey]).Select(dt => dt.Team).FirstOrDefault();
+
+                if(team == null) //a new team. Create the team and discussion team before continuing.
+                {
+                    team = new Team();
+                    team.Name = Request.Form[studentKey];
+                    db.Teams.Add(team);
+                    db.SaveChanges();
+
+                    DiscussionTeam dt = new DiscussionTeam();
+                    dt.TeamID = team.ID;
+                    dt.AssignmentID = Assignment.ID;
+                    db.DiscussionTeams.Add(dt);
+                    db.SaveChanges();
+                }
+
+                int courseUserId = 0;
+                Int32.TryParse(studentKey.Split('_')[1], out courseUserId);
+
+                TeamMember tm = new TeamMember();
+                tm.TeamID = team.ID;
+                tm.CourseUserID = courseUserId;
+                db.TeamMembers.Add(tm);
+                db.SaveChanges();
+            }
+        }
+
         protected void ParseFormValues(IList<IAssignmentTeam> previousTeams)
         {
             //our new list of teams
@@ -230,7 +323,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         {
             //reset our assignment
             Assignment = db.Assignments.Find(model.ID);
-
+            ParseFormValues2();
+            /*
             //two postback options: 
             //   Load a prior team configuraiton.  This will be denoted by the presence of the
             //      "AutoGenFromPastButton" key in postback.
@@ -267,7 +361,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 //we're not guaranteeing that the Assignment will be fully represented in our view.
                 WasUpdateSuccessful = true;
                 SetUpViewBag();
+            
             }
+            */
             return base.PostBack(Assignment);
         }
     }

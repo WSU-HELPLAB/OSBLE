@@ -39,7 +39,7 @@
     </tr>
 </table>
 
-@if(Model.HasTeams)
+@if (Model.HasDiscussionTeams)
 {
     @:<div id="teamDiv" >
 }
@@ -175,16 +175,3 @@ else
 </div>
 <br />
 <br />
-
-<script type="text/javascript">
-
-    $('input[name=teamRadio]').change(function () {
-        if ($('#radioNo').attr('checked')) {
-            $('#teamDiv').show();
-        }
-        else {
-            $('#teamDiv').hide();
-        }
-    });
-
-</script>
