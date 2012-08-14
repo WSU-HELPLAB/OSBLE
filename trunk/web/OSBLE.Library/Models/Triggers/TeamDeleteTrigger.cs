@@ -23,6 +23,7 @@ namespace OSBLE.Models.Triggers
 	                                + "     DELETE FROM ReviewTeams WHERE ReviewTeamID IN (SELECT ID FROM DELETED);\n"
 	                                + "     DELETE FROM RubricEvaluations WHERE RecipientID IN (SELECT ID FROM DELETED);\n"
 	                                + "     DELETE FROM TeamMembers WHERE TeamID IN (SELECT ID FROM DELETED);\n"
+                                    + "     DELETE FROM Teams WHERE ID IN (SELECT ID FROM DELETED);\n"
                                     + " END;";
                 return queryString;
             }
