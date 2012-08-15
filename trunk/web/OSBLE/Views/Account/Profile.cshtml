@@ -94,7 +94,8 @@
 
 <p>Hidden courses/communities will not appear in your course list or your activity feed and must be unchecked to access again.</p>
 <p>Your default course will be the active course each time you log on to OSBLE.</p>
-
+@{
+    }
 @using (Html.BeginForm("UpdateMenu", "Account"))
 {
     @Html.ValidationSummary()
@@ -121,17 +122,18 @@
             </td>
 
             <td>
-                <small>
+                
                 @if (cu.AbstractCourse is Course)
                 {
-                    <text>Course</text>
+                    Course c = cu.AbstractCourse as Course;
+                    <small>Course [@c.Semester @c.Year]</small>
                 }
                 else
                 {
-                    <text>Community</text>
+                    <small>Community</small>
                 }
-                </small>
-                @Helpers.CourseTag(cu.AbstractCourse) &mdash; @cu.AbstractCourse.Name (@cu.AbstractRole.Name)
+                
+                 @Helpers.CourseTag(cu.AbstractCourse) &mdash; @cu.AbstractCourse.Name (@cu.AbstractRole.Name)
             </td>
             <td class="coursemenu_option">
             <input type="checkbox" value="True" name="cu_hidden_@(cu.AbstractCourseID)" @if (cu.Hidden)
