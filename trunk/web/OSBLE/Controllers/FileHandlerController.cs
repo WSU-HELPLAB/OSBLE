@@ -13,6 +13,7 @@ using System.Net;
 using System.Configuration;
 using OSBLE.Utility;
 using OSBLE.Models.Annotate;
+using OSBLE.Services;
 
 namespace OSBLE.Controllers
 {
@@ -494,7 +495,8 @@ namespace OSBLE.Controllers
                             string originalFile = FileSystem.GetDeliverable((ActiveCourseUser.AbstractCourse as Course),
                                 (int)assignment.PrecededingAssignmentID,
                                 previousAssignmentTeam,
-                                Path.GetFileName(filePath));
+                                previousAssignmentTeam.Assignment.Deliverables[0].Name + ".cpml"
+                                );
 
                             if (!parentStreams.ContainsKey(originalFile))
                             {

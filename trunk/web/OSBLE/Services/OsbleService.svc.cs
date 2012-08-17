@@ -93,20 +93,15 @@ namespace OSBLE.Services
         }
 
         /// <summary>
-        /// For getting merged ChemProV documents
+        /// For internal OSBLE use.  Do not expose directly as a web service.  Instead, use
+        /// GetMergedReviewDocument(int criticalReviewAssignmentId, string authToken) for
+        /// that purpose.
         /// </summary>
         /// <param name="criticalReviewAssignmentId"></param>
-        /// <param name="authorId"></param>
-        /// <param name="authToken"></param>
         /// <returns></returns>
-        [OperationContract]
-        public byte[] GetMergedReviewDocument(int criticalReviewAssignmentId, string authToken)
+        public byte[] GetMergedReviewDocument(int criticalReviewAssignmentId, int userProfileId)
         {
-            if (!_authService.IsValidKey(authToken))
-            {
-                return new byte[0];
-            }
-            UserProfile profile = _authService.GetActiveUser(authToken);
+            UserProfile profile = _db.UserProfiles.Find(userProfileId);
             Assignment criticalReviewAssignment = _db.Assignments.Find(criticalReviewAssignmentId);
             if (criticalReviewAssignment == null)
             {
@@ -232,6 +227,24 @@ namespace OSBLE.Services
                 zipStream.Close();
                 return zipBytes;
             }
+        }
+
+        /// <summary>
+        /// For getting merged ChemProV documents
+        /// </summary>
+        /// <param name="criticalReviewAssignmentId"></param>
+        /// <param name="authorId"></param>
+        /// <param name="authToken"></param>
+        /// <returns></returns>
+        [OperationContract]
+        public byte[] GetMergedReviewDocument(int criticalReviewAssignmentId, string authToken)
+        {
+            if (!_authService.IsValidKey(authToken))
+            {
+                return new byte[0];
+            }
+            UserProfile profile = _authService.GetActiveUser(authToken);
+            return GetMergedReviewDocument(criticalReviewAssignmentId, profile.ID);
         }
 
         /// <summary>
