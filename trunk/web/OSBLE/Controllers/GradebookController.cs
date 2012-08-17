@@ -135,7 +135,7 @@ namespace OSBLE.Controllers
                     int nameColumn = -1;
                     for (int i = 0; i < table[0].Count; i++)
                     {
-                        if (table[0][i] == Constants.StudentNameColumnName)
+                        if (table[0][i] == Constants.StudentNameColumnName || table[0][i] == '#' + Constants.StudentNameColumnName)
                         {
                             nameColumn = i;
                             break;
@@ -153,7 +153,9 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// Takes a full gradebook table and parses the table down to just the header column and the student's row.
+        /// Takes a full gradebook table and parses the table down to rows that have a leading "#" (indicating they are "global" rows)
+        /// and columns that do not have a leading "!" (indiciating they are not to be shown). Additionally, the row that corrisponds to the current user
+        /// (indicated by identification number in the StudentID column) will be included.
         /// </summary>
         /// <param name="gradebookTable"></param>
         /// <returns></returns>
@@ -165,37 +167,58 @@ namespace OSBLE.Controllers
             {
 
                 int IdColumn = -1;
-                int RowToDisplay = -1;
 
-                //Find which column has Student ID's
-                for (int i = 0; i < gradebookTable[0].Count; i++)
+                //Find which column has Student ID's \
+                //TODO: fix this, as it might be not exclusive to the first row anymore
+                for (int i = 0; i < gradebookTable.Count; i++)
                 {
-                    if (gradebookTable[0][i] == Constants.StudentIDColumnName)
+                    for (int j = 0; j < gradebookTable[i].Count; j++)
                     {
-                        IdColumn = i;
-                        break;
-                    }
-                }
-
-
-                //Find which row has the Student's grade. If there was a column for IDs
-                if (IdColumn >= 0)
-                {
-                    for (int i = 0; i < gradebookTable.Count; i++)
-                    {
-                        if (gradebookTable[i][IdColumn] == ActiveCourseUser.UserProfile.Identification)
+                        if (gradebookTable[i][j] == Constants.StudentIDColumnName)
                         {
-                            RowToDisplay = i;
+                            IdColumn = j;
                             break;
                         }
                     }
                 }
 
-                //If there is a row that matches the student, generate a new table and replace table with that.
-                if (RowToDisplay >= 0)
+                //find which rows should be displayed
+                for (int i = 0; i < gradebookTable.Count; i++)
                 {
-                    studentTable.Add(gradebookTable[0].ToList());
-                    studentTable.Add(gradebookTable[RowToDisplay].ToList());
+                    //Add student's grade row, if there was a column for IDs
+                    if (IdColumn >= 0 && gradebookTable[i][IdColumn] == ActiveCourseUser.UserProfile.Identification)
+                    {
+                        studentTable.Add(gradebookTable[i].ToList());
+                    }
+
+                    //Add global rows (denoted by a leading '#').
+                    else if (gradebookTable[i][0].Length > 0 && gradebookTable[i][0][0] == '#')
+                    {
+                        studentTable.Add(gradebookTable[i].ToList());
+                    }
+                }
+
+                //Iterating over studentTable to find columns that should not be displayed (denoted by leading '#')
+                List<int> columnsToRemove = new List<int>();
+                for(int i = 0; i < studentTable.Count; i++)
+                {
+                    for (int j = 0; j < studentTable[i].Count; j++)
+                    {
+                        if (studentTable[i][j].Length > 0 && studentTable[i][j][0] == '!')
+                        {
+                            columnsToRemove.Add(j);
+                        }
+                    }
+                }
+
+                //removing columns that were marked with a '!'. 
+                for (int i = columnsToRemove.Count() - 1 ; i >= 0; i--)
+                {
+                    int currentStudentTableLength = studentTable.Count;
+                    for (int j = 0; j < currentStudentTableLength; j++)
+                    {
+                        studentTable[j].RemoveAt(columnsToRemove[i]);
+                    }
                 }
             }
 
