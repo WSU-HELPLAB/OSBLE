@@ -25,6 +25,7 @@ namespace OSBLE.Models.Triggers
             }
             catch(Exception)
             {
+                dbConn.Close();
                 return false;
             }
 
@@ -36,8 +37,11 @@ namespace OSBLE.Models.Triggers
             }
             catch(Exception)
             {
+                dbConn.Close();
                 return false;
             }
+
+            dbConn.Close();
             return true;
         }
     }

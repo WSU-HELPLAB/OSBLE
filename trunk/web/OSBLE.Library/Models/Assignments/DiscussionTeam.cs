@@ -71,8 +71,7 @@ namespace OSBLE.Models.Assignments
             modelBuilder.Entity<DiscussionTeam>()
                 .HasRequired(dt => dt.Assignment)
                 .WithMany(a => a.DiscussionTeams)
-                .WillCascadeOnDelete(true);
-
+                .WillCascadeOnDelete(false);
         }
     }
 }

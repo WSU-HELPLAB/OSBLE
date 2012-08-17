@@ -214,6 +214,7 @@ namespace OSBLE.Controllers
 
                 //removing columns that were marked with a '!'.  
                 //Removing them in from highest index to lowest index so that indicies are not messed up upon first removal
+                columnsToRemove.Sort();
                 for (int i = columnsToRemove.Count() - 1 ; i >= 0; i--)
                 {
                     int currentStudentTableLength = studentTable.Count;

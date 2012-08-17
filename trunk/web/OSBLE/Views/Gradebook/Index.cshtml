@@ -22,7 +22,7 @@
         <form id="upload_gradebook" enctype="multipart/form-data" method="post" action="/Gradebook/UploadGradebook">
             <legend>@ViewBag.LastUploadMessage</legend>
             <input type="file" id="file" name="file"/ onchange="check_extension(this.value)"><br />
-            <input id="upload" type="submit" value="Upload" disabled="disabled"/>
+            <input id="upload" type="submit" value="Upload" disabled="disabled"/> <a style="font-size:small; text-decoration:none" href="#">Learn More...</a>
             <br />
             <text id="errorMsg">@ViewBag.UploadErrorMsg</text>
         </form>
@@ -60,11 +60,6 @@
             }
         </ul>
         <br />
-        
-
-        
-        
-
         <div>
                 @if (DisplaySearch)
                 {
