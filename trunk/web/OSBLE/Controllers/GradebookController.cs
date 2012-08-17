@@ -130,26 +130,41 @@ namespace OSBLE.Controllers
             else
             {
                 //for instructors, we want to know which column has the student names (used for searching in vieW)
-                if (table.Count > 0)
-                {
-                    int nameColumn = -1;
-                    for (int i = 0; i < table[0].Count; i++)
-                    {
-                        if (table[0][i] == Constants.StudentNameColumnName || table[0][i] == '#' + Constants.StudentNameColumnName)
-                        {
-                            nameColumn = i;
-                            break;
-                        }
-                    }
-                    if (nameColumn >= 0)
-                    {
-                        ViewBag.NameColumnIndex = nameColumn;
-                    }
-                         
-                }
+                ViewBag.NameColumnIndex = FindMatchingColumnFromTable(table, Constants.StudentNameColumnName);
             }
 
             ViewBag.TableData = table;
+        }
+
+        /// <summary>
+        /// This function takes a table from an uploaded gradebook and a value to match, and returns the the first column it finds with a match.
+        /// Note: Mark up characters do not interfere with a match, i.e. a match is anything matching "#matchValue", "!matchValue", or "matchValue". 
+        /// </summary>
+        /// <param name="table">Table to find the matching value</param>
+        /// <param name="matchValue">Value to find (without mark up characters)</param>
+        /// <returns>The column of the first match, or null if no match is found.</returns>
+        private int? FindMatchingColumnFromTable(List<List<string>> table, string matchValue)
+        {
+            int? nameColumn = null;
+
+            if (table != null)
+            {
+                for (int i = 0; i < table.Count; i++)
+                {
+                    for (int j = 0; j < table[i].Count; j++)
+                    {
+                        //Match if we find "matchValue","#matchValue", or "!matchValue"
+                        if (table[i][j] == matchValue
+                            || table[i][j] == '#' + matchValue
+                            || table[i][j] == '!' + matchValue)
+                        {
+                            nameColumn = j;
+                            return nameColumn;
+                        }
+                    }
+                }
+            }
+            return nameColumn;
         }
 
         /// <summary>
@@ -166,27 +181,13 @@ namespace OSBLE.Controllers
             if (gradebookTable.Count > 0)
             {
 
-                int IdColumn = -1;
-
-                //Find which column has Student ID's \
-                //TODO: fix this, as it might be not exclusive to the first row anymore
-                for (int i = 0; i < gradebookTable.Count; i++)
-                {
-                    for (int j = 0; j < gradebookTable[i].Count; j++)
-                    {
-                        if (gradebookTable[i][j] == Constants.StudentIDColumnName)
-                        {
-                            IdColumn = j;
-                            break;
-                        }
-                    }
-                }
+                int? IdColumn = FindMatchingColumnFromTable(gradebookTable, Constants.StudentIDColumnName); 
 
                 //find which rows should be displayed
                 for (int i = 0; i < gradebookTable.Count; i++)
                 {
-                    //Add student's grade row, if there was a column for IDs
-                    if (IdColumn >= 0 && gradebookTable[i][IdColumn] == ActiveCourseUser.UserProfile.Identification)
+                    //If its student's grade row, add it.
+                    if (IdColumn.HasValue && gradebookTable[i][IdColumn.Value] == ActiveCourseUser.UserProfile.Identification)
                     {
                         studentTable.Add(gradebookTable[i].ToList());
                     }
@@ -198,7 +199,7 @@ namespace OSBLE.Controllers
                     }
                 }
 
-                //Iterating over studentTable to find columns that should not be displayed (denoted by leading '#')
+                //Iterating over studentTable to find columns that should not be displayed (denoted by leading '!')
                 List<int> columnsToRemove = new List<int>();
                 for(int i = 0; i < studentTable.Count; i++)
                 {
@@ -211,7 +212,8 @@ namespace OSBLE.Controllers
                     }
                 }
 
-                //removing columns that were marked with a '!'. 
+                //removing columns that were marked with a '!'.  
+                //Removing them in from highest index to lowest index so that indicies are not messed up upon first removal
                 for (int i = columnsToRemove.Count() - 1 ; i >= 0; i--)
                 {
                     int currentStudentTableLength = studentTable.Count;
@@ -221,7 +223,6 @@ namespace OSBLE.Controllers
                     }
                 }
             }
-
             return studentTable;
         }
 

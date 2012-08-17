@@ -1982,15 +1982,21 @@ tbody #awesome
 #Gradebook th
 {
 	font-size:14px;
-	font-weight:normal;
-	color:#039;
+	font-weight:bold;
+	color: #074974;
 	padding:10px 8px;
 }
 #Gradebook td
 {
-	color:#669;padding:8px;
+	color: Black;
+	padding:8px;
 }
 #Gradebook tr:nth-child(2n+2)
 {
-	background:#e8edff;
+	background:#DFDFDF;
+}
+
+.HeaderRow
+{
+    background-color: White;
 }

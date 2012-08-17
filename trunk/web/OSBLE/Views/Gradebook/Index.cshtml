@@ -77,9 +77,12 @@
                 <table id="Gradebook">
                 @for (int i = 0; i < Table.Count; i++)
                 {
-                    
-                    
-                    <tr>
+                    string rowClass = "";
+                    if (i == 0)
+                    {
+                        rowClass = "HeaderRow";
+                    }
+                    <tr class="@rowClass">
                         
                         @for (int j = 0; j < Table[i].Count; j++)
                         {
@@ -90,14 +93,20 @@
                                 tdId = Table[i][j];
                                 tdClass = "searchableName";
                             }
+                            
+                            string displayValue = Table[i][j];
+                            if(displayValue.Length > 0 && (displayValue[0] == '!' || displayValue[0] == '#' ))
+                            {
+                                displayValue = displayValue.Substring(1,displayValue.Length - 1);
+                            }
 
                             if (i != 0)
                             {
-                                <td class="@tdClass" id="@tdId">@Table[i][j]</td>
+                                <td class="@tdClass" id="@tdId">@displayValue</td>
                             }
                             else
                             {
-                                <th>@Table[i][j]</th>
+                                <th>@displayValue</th>
                             }
 
                         }
