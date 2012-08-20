@@ -19,6 +19,79 @@ namespace OSBLE.Controllers
 {
     public class GradebookController : OSBLEController
     {
+        public ActionResult Index(string gradebookName = null)
+        {
+            //Get the GradebookFilePath for current course
+            GradebookFilePath gfp = new Models.FileSystem.FileSystem().Course(ActiveCourseUser.AbstractCourseID).Gradebook();
+
+            //Generating list of Gradebook tabs
+            List<string> TabNames = new List<string>();
+            foreach (string temp in gfp.AllFiles())
+            {
+                TabNames.Add(Path.GetFileNameWithoutExtension(temp));
+            }
+
+            //Selecting which gradebook will be loaded. If gradebookName is null, then select the first tab
+            bool gradeBookExists = true;
+            if (gradebookName == null)
+            {
+                if (TabNames.Count > 0)
+                {
+                    gradebookName = TabNames[0];
+                }
+                else
+                {
+                    gradeBookExists = false;
+                }
+            }
+
+            //If gradebook exists, set up certain viewbags
+            ViewBag.GradeBookExists = gradeBookExists;
+            if (gradeBookExists)
+            {
+                SetUpViewBagForGradebook(gradebookName);
+                ViewBag.SelectedTab = gradebookName;
+                ViewBag.TabNames = TabNames;
+            }
+
+
+            //Setup viewbags based on usertype
+            if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor || ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+            {
+                //Setting instructor/Ta specific viewbags
+                ViewBag.CanUpload = true;
+
+                //Grabbing error message then wiping it.
+                if (Cache["UploadErrorMessage"] != null)
+                {
+                    ViewBag.UploadErrorMsg = Cache["UploadErrorMessage"];
+                    Cache["UploadErrorMessage"] = "";
+                }
+            }
+            else
+            {
+                //Setting student specific ViewBags
+                ViewBag.CanUpload = false;
+            }
+
+            DirectoryInfo directoryInfo = new DirectoryInfo(gfp.GetPath());
+            DateTime lastUpload = directoryInfo.LastWriteTime;
+
+            if (gradeBookExists)
+            {
+                ViewBag.LastUploadMessage = "Last updated " + lastUpload.ToShortDateString().ToString() + " " + lastUpload.ToShortTimeString().ToString();
+            }
+            else if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor || ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+            {
+                //If user is an instructor and there is currnetly no gradebook, then change upload message
+                ViewBag.LastUploadMessage = "Upload Gradebook File";
+
+                //Generate additional upload fail messages. 
+
+            }
+
+            return View();
+        }
         
         /// <summary>
         /// This function takes a .csv or .zip. It then takes the .csv or collection of .csv files (from the zip) and adds them into the Gradebook folder
@@ -99,12 +172,13 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index");
         }
 
+
         /// <summary>
         /// Sets up ViewBags for the given gradebookName. The assumption made in this function is that the StudentID number is in
         /// the column matching the string in  <see cref="Constants.StudentIDColumnName"/>.
         /// </summary>
         /// <param name="gradebookName"></param>
-        public void SetUpViewBagForGradebook(string gradebookName)
+        private void SetUpViewBagForGradebook(string gradebookName)
         {
 
             //Get the GradebookFilePath for current course
@@ -129,8 +203,21 @@ namespace OSBLE.Controllers
             }
             else
             {
-                //for instructors, we want to know which column has the student names (used for searching in vieW)
+                //for instructors, we want to know which column has the student names (used for searching in view)
                 ViewBag.NameColumnIndex = FindMatchingColumnFromTable(table, Constants.StudentNameColumnName);
+
+                List<int> globalRows = new List<int>();
+                //find which rows should be displayed as "globals"
+                for (int i = 0; i < table.Count; i++)
+                {
+                    //Add global rows (denoted by a leading '#').
+                    if (table[i][0].Length > 0 && table[i][0][0] == '#')
+                    {
+                        globalRows.Add(i);
+                    }
+                }
+
+                ViewBag.GlobalRows = globalRows;
             }
 
             ViewBag.TableData = table;
@@ -225,77 +312,6 @@ namespace OSBLE.Controllers
                 }
             }
             return studentTable;
-        }
-
-        public ActionResult Index(string gradebookName = null)
-        {
-            //Get the GradebookFilePath for current course
-            GradebookFilePath gfp = new Models.FileSystem.FileSystem().Course(ActiveCourseUser.AbstractCourseID).Gradebook();
-
-            //Generating list of Gradebook tabs
-            List<string> TabNames = new List<string>();
-            foreach (string temp in gfp.AllFiles())
-            {
-                TabNames.Add(Path.GetFileNameWithoutExtension(temp));
-            }
-             
-            //Selecting which gradebook will be loaded. If gradebookName is null, then select the first tab
-            bool gradeBookExists = true;
-            if (gradebookName == null)
-            {
-                if (TabNames.Count > 0)
-                {
-                    gradebookName = TabNames[0];
-                }
-                else
-                {
-                    gradeBookExists = false;
-                }
-            }
-
-            //If gradebook exists, set up certain viewbags
-            ViewBag.GradeBookExists = gradeBookExists;
-            if (gradeBookExists)
-            {
-                SetUpViewBagForGradebook(gradebookName);
-                ViewBag.SelectedTab = gradebookName;
-                ViewBag.TabNames = TabNames;
-            }
-
-
-            //Setup viewbags based on usertype
-            if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor || ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
-            {
-                //Setting instructor/Ta specific viewbags
-                ViewBag.CanUpload = true;
-
-                //Grabbing error message then wiping it.
-                if (Cache["UploadErrorMessage"] != null)
-                {
-                    ViewBag.UploadErrorMsg = Cache["UploadErrorMessage"];
-                    Cache["UploadErrorMessage"] = "";
-                }
-            }
-            else
-            {
-                //Setting student specific ViewBags
-                ViewBag.CanUpload = false;
-            }
-
-            DirectoryInfo directoryInfo = new DirectoryInfo(gfp.GetPath());
-            DateTime lastUpload = directoryInfo.LastWriteTime;
-
-            if (gradeBookExists)
-            {
-                ViewBag.LastUploadMessage = "Last updated " + lastUpload.ToShortDateString().ToString() + " " + lastUpload.ToShortTimeString().ToString();
-            }
-            else if(ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor || ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
-            {
-                //If user is an instructor and there is currnetly no gradebook, then change upload message
-                ViewBag.LastUploadMessage = "Upload Gradebook File";
-            }
-
-            return View();
         }
     }
 }

@@ -11,8 +11,8 @@
     {
         DisplaySearch = true;
         NameColumnIndex = ViewBag.NameColumnIndex;
-        
     }
+    List<int> globalRowIndicies = ViewBag.GlobalRows;
 }
 
 
@@ -77,6 +77,11 @@
                     {
                         rowClass = "HeaderRow";
                     }
+
+                    if (globalRowIndicies != null && globalRowIndicies.Contains(i))
+                    {
+                        rowClass += " GlobalRow";
+                    }
                     <tr class="@rowClass">
                         
                         @for (int j = 0; j < Table[i].Count; j++)
@@ -124,7 +129,10 @@
     function filterTable(input) {
         $('.searchableName').each(function () {
             var parentRow = this.parentElement;
-            $(parentRow).hide();
+            if ($(parentRow).hasClass("GlobalRow") == false) {
+                $(parentRow).hide();
+            }
+            
         });
 
         var selector = ".searchableName[id*=\"" + input + "\"]'";
