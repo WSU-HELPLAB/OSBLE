@@ -238,9 +238,11 @@ namespace OSBLE.Controllers
                         {
                             if (!at.Assignment.HasTeams)
                             {
-                                if (at.Team.TeamMembers.FirstOrDefault().CourseUser.UserProfile.UserName == user.UserName)
+                                //AC: be careful about null references
+                                if (at.Team.TeamMembers != null && at.Team.TeamMembers.Count > 0)
                                 {
-                                    at.Team.Name = up.LastAndFirst();
+                                    TeamMember member = at.Team.TeamMembers.FirstOrDefault();
+                                    member.CourseUser.UserProfile.UserName = user.UserName;
                                 }
                             }
                         }
