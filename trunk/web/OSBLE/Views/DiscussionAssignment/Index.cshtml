@@ -7,6 +7,8 @@
 @{
 
     Assignment assignment = ViewBag.Assignment;
+    int maxWordCount = assignment.DiscussionSettings.MaximumFirstPostLength;
+    int minWordCount = assignment.DiscussionSettings.MinimumFirstPostLength;
     ViewBag.Title = "Discussion Assignment: " + assignment.AssignmentName;
     List<DiscussionPostViewModel> DiscussionPostViewModelList = ViewBag.DiscussionPostViewModelList;
     int discussionTeamID = ViewBag.DiscussionTeamID;
@@ -47,7 +49,31 @@
     //refreshes the count of how many charecters you can input
     function refreshCount() {
             $('body').css('cursor', 'wait'); $('#remCharsReply').val("(" + $('#MaxContentChars').val() + ") Characters left");
-        } 
+        }
+        
+    function wordCount(){
+        
+        //match regex is finding non-apostrophe punctuation (including new line) to find end of words.
+            //It does a look ahead "(?![a-zA-Z][ .,!\n])" to avoid picking up abbreviations as words. So "I.e.", "A.A.A." counts as 0 words.
+        var wordCount = $('#ActivityFeed').val().match(/[ .,!\n]+(?![a-zA-Z][ .,!\n])/g).length;
+        $('#wordCount').html(wordCount);
+
+        if(@maxWordCount != 0 && wordCount > @maxWordCount)
+        {
+            $('#maxWords').css('background-color', 'red');
+        }
+        else
+        {
+            $('#maxWords').css('background-color', 'white');
+        }
+        if(@minWordCount != 0 && wordCount < @minWordCount)
+        {
+            $('#minWords').css('background-color', 'red');
+        }
+        {
+            $('#minWords').css('background-color', 'white');
+        }
+    }
 
 </script>
 
@@ -117,20 +143,42 @@
         {
             
                 <input type="hidden" id="MaxContentChars" value="@ViewBag.MaxActivityFeedLength"/>
-                using (Html.BeginForm("NewPost", "DiscussionAssignment", FormMethod.Post))
-                {
+            using (Html.BeginForm("NewPost", "DiscussionAssignment", FormMethod.Post))
+            {
                     <input type="hidden" name="DiscussionTeamID" value="@discussionTeamID" />
                     <input type="hidden" name="AssignmentID" value="@ViewBag.Assignment.ID" />
-                    <textarea id="ActivityFeed" name="Content" rows="10" style="width: 100%; height: 100px" placeholder="Enter new discussion post here..." onkeydown="RemainingCharsReply()" onkeyup="RemainingCharsReply()"></textarea><br />
-                    if (assignment.DiscussionSettings.MinimumFirstPostLength > 0 && ViewBag.IsFirstPost)
-                    {
+                    <textarea id="ActivityFeed" name="Content" rows="10" style="width: 100%; height: 100px" placeholder="Enter new discussion post here..." onkeyup="wordCount()"></textarea><br />
+                    
+                    <table style="float:right">
+                        <tr>
+                            <td>Word Count:</td>
+                            <td><span id="wordCount">0</span><br /></td> 
+                        </tr>
+                        @if (minWordCount > 0)
+                        {
+                            <tr id="minWords">
+                                <td>Min Words:</td>
+                                <td>@minWordCount</td>
+                            </tr>
+                        }
+                        @if (maxWordCount > 0)
+                        {
+                            <tr id="maxWords">
+                                <td>Max Words:</td>
+                                <td>@maxWordCount</td>
+                            </tr>
+                        }
+                        
+                    </table>
+                        if (assignment.DiscussionSettings.MinimumFirstPostLength > 0 && ViewBag.IsFirstPost)
+                        {
                         <input id="postNewDiscussion" type="submit" name="post_active" value="Post" disabled="disabled" />   
-                    }
-                    else
-                    {
+                        }
+                        else
+                        {
                         <input id="postNewDiscussion" type="submit" name="post_active" value="Post" />
-                    }
-                }
+                        }
+            }
         }
         else
         {

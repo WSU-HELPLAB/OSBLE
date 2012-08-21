@@ -61,9 +61,13 @@ namespace OSBLE.Models.Assignments
             }
         }
 
-        [Required]
-        [Display(Name = "Minimum length for first post (in characters)")]
+        [Required(ErrorMessage = "Please specify the minimum first post length, enter 0 if you do not want to require a min length")]
+        [Display(Name = "Minimum length for first post (in words)")]
         public int MinimumFirstPostLength { get; set; }
+
+        [Required(ErrorMessage = "Please specify the maximum first post length, enter 0 if you do not want to require a max length")]
+        [Display(Name = "Maximum length for first post (in words)")]
+        public int MaximumFirstPostLength { get; set; }
 
         public DiscussionSetting()
         {
