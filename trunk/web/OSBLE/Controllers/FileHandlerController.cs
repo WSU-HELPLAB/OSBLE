@@ -55,7 +55,14 @@ namespace OSBLE.Controllers
                 else
                 {
                     //else just return the file
-                    return new FileStreamResult(FileSystem.GetDocumentForRead(rootPath), "application/octet-stream");
+                    if(Path.GetExtension(rootPath).ToLower() == "pdf")
+                    {
+                        return new FileStreamResult(FileSystem.GetDocumentForRead(rootPath), "application/pdf");
+                    }
+                    else
+                    {
+                        return new FileStreamResult(FileSystem.GetDocumentForRead(rootPath), "application/octet-stream");
+                    }
                 }
             }
             return RedirectToAction("Index", "Home");
