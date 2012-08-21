@@ -226,26 +226,6 @@ namespace OSBLE.Controllers
                         user.IsApproved = true;
                         db.SaveChanges();
                         OsbleAuthentication.LogIn(user);
-
-                        //AC: Who wrote this?  I think that it updates pending assignment teams.
-                        List<AssignmentTeam> atList = (from at in db.AssignmentTeams
-                                                       select at).ToList();
-                        UserProfile up = (from users in db.UserProfiles
-                                          where users.UserName == user.UserName
-                                          select users).FirstOrDefault();
-
-                        foreach (AssignmentTeam at in atList)
-                        {
-                            if (!at.Assignment.HasTeams)
-                            {
-                                //AC: be careful about null references
-                                if (at.Team.TeamMembers != null && at.Team.TeamMembers.Count > 0)
-                                {
-                                    TeamMember member = at.Team.TeamMembers.FirstOrDefault();
-                                    member.CourseUser.UserProfile.UserName = user.UserName;
-                                }
-                            }
-                        }
                         db.SaveChanges();
 
                         return RedirectToAction("Index", "Home");
