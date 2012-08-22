@@ -336,9 +336,10 @@ namespace OSBLE.Controllers
                     }
 
                     //try creating the account
+                    UserProfile profile = new UserProfile();
                     try
                     {
-                        UserProfile profile = new UserProfile();
+                        
 
                         profile.UserName = model.Email;
                         profile.Password = UserProfile.GetPasswordHash(model.Password);
@@ -377,8 +378,7 @@ namespace OSBLE.Controllers
                         return AcademiaRegister();
                     }
 
-                    string url = string.Format("https://osble.org{0}", Url.Action("ActivateAccount", new { hash = randomHash }));
-                    sendVerificationEmail(true, url, model.FirstName, model.Email);
+                    sendVerificationEmail(true, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), profile.FirstName, profile.UserName);
 
                     return RedirectToAction("AccountCreated");
                 }
