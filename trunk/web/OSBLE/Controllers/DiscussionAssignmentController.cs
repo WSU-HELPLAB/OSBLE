@@ -178,12 +178,6 @@ namespace OSBLE.Controllers
 
                 }
 
-                ViewBag.PostLengthRequired = 0;
-                if ((assignment.DiscussionSettings.MinimumFirstPostLength > 0) && ViewBag.IsFirstPost)
-                {
-                    ViewBag.PostLengthRequired = assignment.DiscussionSettings.MinimumFirstPostLength;
-                }
-
                 ViewBag.CanPost = assignment.DueDate > DateTime.Now;
                 ViewBag.DiscussionPostViewModelList = dvm.DiscussionPostViewModels.OrderBy(dpvm => dpvm.Posted).ToList();
                 ViewBag.ActiveCourse = ActiveCourseUser;
@@ -256,7 +250,6 @@ namespace OSBLE.Controllers
 
                 }
 
-                ViewBag.PostLengthRequired = 0;
                 ViewBag.CanPost = canPost;
                 ViewBag.DiscussionPostViewModelList = dvm.DiscussionPostViewModels;
                 ViewBag.PostOrReply = postOrReply;

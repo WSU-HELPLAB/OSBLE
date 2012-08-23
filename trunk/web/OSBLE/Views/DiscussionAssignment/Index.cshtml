@@ -7,8 +7,14 @@
 @{
 
     Assignment assignment = ViewBag.Assignment;
-    int maxWordCount = assignment.DiscussionSettings.MaximumFirstPostLength;
-    int minWordCount = assignment.DiscussionSettings.MinimumFirstPostLength;
+    int minWordCount = 0;
+    int maxWordCount = 0;
+    if (ViewBag.IsFirstPost && ViewBag.CanPost)
+    {    
+        //Only give a value if its their first post. 
+        maxWordCount = assignment.DiscussionSettings.MaximumFirstPostLength;
+        minWordCount = assignment.DiscussionSettings.MinimumFirstPostLength;
+    }
     ViewBag.Title = "Discussion Assignment: " + assignment.AssignmentName;
     List<DiscussionPostViewModel> DiscussionPostViewModelList = ViewBag.DiscussionPostViewModelList;
     int discussionTeamID = ViewBag.DiscussionTeamID;
@@ -34,44 +40,56 @@
             window.location.replace("DiscussionAssignment?assignmentId=" + @assignment.ID + "&discussionTeamId=" + dtID);
 
         });
+
+        wordCount();
     });
 
-    function RemainingCharsReply() 
-    { 
-        var remainingReply = $('#firstPostLength').val() - $('#ActivityFeed').val().length; 
-        if (parseInt(remainingReply)<= 0) 
-        { 
-            $("#postNewDiscussion").removeAttr("disabled"); $('#firstPostLengthDiv').html("(0) characters remaining for the first post."); } else { $("#postNewDiscussion").attr("disabled","disabled");
-            $('#firstPostLengthDiv').html("(" + remainingReply + ") additional characters needed.");
-        } 
-    } 
-
-    //refreshes the count of how many charecters you can input
-    function refreshCount() {
-            $('body').css('cursor', 'wait'); $('#remCharsReply').val("(" + $('#MaxContentChars').val() + ") Characters left");
-        }
-        
     function wordCount(){
         
         //match regex is finding non-apostrophe punctuation (including new line) to find end of words.
             //It does a look ahead "(?![a-zA-Z][ .,!\n])" to avoid picking up abbreviations as words. So "I.e.", "A.A.A." counts as 0 words.
-        var wordCount = $('#ActivityFeed').val().match(/[ .,!\n]+(?![a-zA-Z][ .,!\n])/g).length;
-        $('#wordCount').html(wordCount);
+        var wordArray = $('#ActivityFeed').val().match(/[ .,!\n]+(?![a-zA-Z][ .,!\n])/g)
+        var wordCount = null;
+        if(wordArray != null)
+        {
+            wordCount = wordArray.length
+        }
+        else
+        {
+            wordCount = 0;
+        }   
+
+        $('#wordCount').html(wordCount);     
 
         if(@maxWordCount != 0 && wordCount > @maxWordCount)
         {
-            $('#maxWords').css('background-color', 'red');
+            $('#maxWords').css('background-color', '#FC5151');
         }
         else
         {
             $('#maxWords').css('background-color', 'white');
         }
+
         if(@minWordCount != 0 && wordCount < @minWordCount)
         {
-            $('#minWords').css('background-color', 'red');
+            $('#minWords').css('background-color', '#FC5151');
         }
+        else
         {
             $('#minWords').css('background-color', 'white');
+        }
+
+        if(@maxWordCount > 0 || @minWordCount > 0)
+        {
+            if((@minWordCount == 0 || wordCount >= @minWordCount) && (@maxWordCount == 0 || wordCount <= @maxWordCount))
+            {
+                //valid
+                $("#postNewDiscussion").removeAttr("disabled")
+            }
+            else
+            {
+                $("#postNewDiscussion").attr("disabled", "disabled")
+            }
         }
     }
 
@@ -126,37 +144,23 @@
 <br />
 
     @{
-        <!--div for post character counter-->
-        if (ViewBag.CanPost && assignment.DiscussionSettings.MinimumFirstPostLength > 0 && ViewBag.IsFirstPost)
-        {
-            <div>
-                A minimum of @assignment.DiscussionSettings.MinimumFirstPostLength characters required
-                for first post. You may not see the discussion until you make your first post.</div>
-            <div id="firstPostLengthDiv">
-                (@assignment.DiscussionSettings.MinimumFirstPostLength) additional characters needed.</div>
-            
-        }
-        <input id="firstPostLength" type="hidden" value="@ViewBag.PostLengthRequired" />
-        
         <!--div for new post-->
         if (ViewBag.CanPost)
         {
-            
-                <input type="hidden" id="MaxContentChars" value="@ViewBag.MaxActivityFeedLength"/>
             using (Html.BeginForm("NewPost", "DiscussionAssignment", FormMethod.Post))
             {
                     <input type="hidden" name="DiscussionTeamID" value="@discussionTeamID" />
                     <input type="hidden" name="AssignmentID" value="@ViewBag.Assignment.ID" />
                     <textarea id="ActivityFeed" name="Content" rows="10" style="width: 100%; height: 100px" placeholder="Enter new discussion post here..." onkeyup="wordCount()"></textarea><br />
                     
-                    <table style="float:right">
+                    <table style="float:right"  cellspacing="0">
                         <tr>
                             <td>Word Count:</td>
                             <td><span id="wordCount">0</span><br /></td> 
                         </tr>
                         @if (minWordCount > 0)
                         {
-                            <tr id="minWords">
+                            <tr id="minWords" style="border-collapse: collapse; padding: ">
                                 <td>Min Words:</td>
                                 <td>@minWordCount</td>
                             </tr>
@@ -170,14 +174,7 @@
                         }
                         
                     </table>
-                        if (assignment.DiscussionSettings.MinimumFirstPostLength > 0 && ViewBag.IsFirstPost)
-                        {
-                        <input id="postNewDiscussion" type="submit" name="post_active" value="Post" disabled="disabled" />   
-                        }
-                        else
-                        {
-                        <input id="postNewDiscussion" type="submit" name="post_active" value="Post" />
-                        }
+                    <input id="postNewDiscussion" type="submit" name="post_active" value="Post" />
             }
         }
         else
@@ -280,7 +277,6 @@
                         <input type="hidden" name="DiscussionTeamID" value="@discussionTeamID" />
                         <input type="hidden" name="AssignmentID" value="@ViewBag.Assignment.ID" />
                         <input type="hidden" name="ParentPostID" value="@dpvm.DiscussionPostId" />
-                        <span id="remCharsReply" name="remainingCharsReply" readonly="true" value="(@ViewBag.MaxActivityFeedLength) Characters left"></span><br />
                         <textarea name="Content" rows="5" cols="40" id="dp_replybox_content_@(dpvm.DiscussionPostId)" placeholder="Enter reply here..."></textarea><br />
                         <input id="reply @(dpvm.DiscussionPostId) button" type="submit" name="post_reply" value="Post Reply" onclick="refreshCount()" />
                     }
