@@ -58,7 +58,7 @@
                 singleUserAssignmentTeam.AssignmentID = assignmentTeam.AssignmentID;             
         <tr>
             <td>
-                @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", courseUserId = member.CourseUser.ID });
+                @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", id = member.CourseUser.ID });
                 }
                 <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
                 @member.CourseUser.DisplayName(Model.Client.AbstractRoleID, false)

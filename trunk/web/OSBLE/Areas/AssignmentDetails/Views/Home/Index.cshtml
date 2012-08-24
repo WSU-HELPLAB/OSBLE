@@ -43,7 +43,7 @@
             <tr @Html.Raw(rowText)>
                 <th class="StudentName">
                     @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", 
-                          courseUserId = assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUserID });
+                          id = assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUserID });
                     }
                     <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
                     @assignmentTeam.Team.TeamMembers.FirstOrDefault().CourseUser.DisplayName(Model.Client.AbstractRoleID, false)
