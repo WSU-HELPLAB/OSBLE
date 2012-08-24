@@ -438,36 +438,55 @@ namespace OSBLE.Controllers
         public static double GetLatePenalty(IAssignmentTeam team)
         {
             double latePenalty = 0.0;
+            DateTime? submissionTime = null;
+            DateTime dueDate = team.Assignment.DueDate + TimeSpan.FromMinutes(1); //Need initial value to get compiler to be quiet.
+            if (team.Assignment.HasDeliverables)
+            {
+                //Handle late penaly based off deliverable submission time
+                submissionTime = FileSystem.GetSubmissionTime(team);
 
-            DateTime? submissionTime = FileSystem.GetSubmissionTime(team);
+                //Adding 1 minute to dueDate. This is to keep submissions turned in at 12:00am for an assignment with a due date of 12:00am as non-late.
+                dueDate = team.Assignment.DueDate + TimeSpan.FromMinutes(1);
+            }
+            else if (team.Assignment.Type == AssignmentTypes.DiscussionAssignment || team.Assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
+            {
+                //Handle late penalty based off of initial post due date.
+                //submissionTime = get post time of current teams first post. Issues here: Which member of the team? Oh wait, were not passing in discussion team, are we? Should be okay.
+                    //Problem: IAssignmentTeam here is sent in from the IAssignmentTeam in LatePenaltyTableDecorator.cs. Which is sent in from the factory
+                        //which gets the teams from a function GetTeams, which pulls discussion teams instead of assignment teams for a DA or CRD
+                    //Solution: How do other discussion based decoraters work?
+                dueDate = team.Assignment.DiscussionSettings.InitialPostDueDate + TimeSpan.FromMinutes(1);
+            }
 
-            //Adding 1 minute to dueDate. This is to keep submissions turned in at 12:00am for an assignment with a due date of 12:00am as non-late.
-            DateTime dueDate = team.Assignment.DueDate + TimeSpan.FromMinutes(1); 
+            
+
+                
+                
 
             TimeSpan lateness;
 
             if (submissionTime != null)
             {
-                lateness = (DateTime)submissionTime - dueDate;
+                lateness = (DateTime)submissionTime - (DateTime)dueDate;
             }
             else //if the assignment has not been submitted, use the current time to calculate late penalty.
             {
-                lateness = DateTime.Now - dueDate;
+                lateness = DateTime.Now - (DateTime)dueDate;
             }
 
             if (lateness.TotalHours >= team.Assignment.HoursLateWindow)
             {
-                //The document is too late to be accepted. Therefor 100% late penalty
+                //The document (or post) is too late to be accepted. Therefor 100% late penalty
                 latePenalty = 100;
             }
-            else if (lateness.TotalHours <= 0) 
+            else if (lateness.TotalHours <= 0)
             {
-                //The document wasnt late at all, no late penalty
+                //The document (or post) wasnt late at all, no late penalty
                 latePenalty = 0;
             }
-            else 
+            else
             {
-                //The document was late, but less than HoursLateWindow
+                //The document (or post) was late, but less than HoursLateWindow
 
                 //So, to calculate the late penalty,we want integer division here to keep units whole. 
                 //Example of applying late penalty: A submission is 25hours late, HoursPerDeduction is 24
@@ -483,9 +502,10 @@ namespace OSBLE.Controllers
                 {
                     latePenalty = 100;
                 }
-            }  
+            }
 
             return latePenalty;
+            
         }
 
         public static string[] GetFileExtensions(DeliverableType deliverableType)

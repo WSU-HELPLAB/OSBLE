@@ -439,13 +439,13 @@ namespace OSBLE.Controllers
                         if (c is Course)
                         {
                             Course course = c as Course;
-                            subject = "[" + course.Prefix + " " + course.Number + "] Notice from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
+                            subject = "[" + course.Prefix + " " + course.Number + "] New Activity Post from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
                             body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message to the class at " + dp.Posted.ToString() + ":";
                         }
                         else if (c is Community)
                         {
                             Community community = c as Community;
-                            subject = "[" + community.Nickname + "] Notice from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
+                            subject = "[" + community.Nickname + "] New Activity Post from " + CurrentUser.FirstName + " " + CurrentUser.LastName;
                             body = CurrentUser.FirstName + " " + CurrentUser.LastName + " sent the following message to the community at " + dp.Posted.ToString() + ":";
                         }
                         else
