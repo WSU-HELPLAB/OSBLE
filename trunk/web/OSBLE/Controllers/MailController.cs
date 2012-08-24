@@ -344,11 +344,11 @@ namespace OSBLE.Controllers
             return View(mail);
         }
         
-        public ActionResult CreateUser(int courseUserId)
+        public ActionResult CreateUser(int id)
         {
             List<UserProfile> recipientList = new List<UserProfile>();
 
-            CourseUser studentRec = db.CourseUsers.Find(courseUserId);
+            CourseUser studentRec = db.CourseUsers.Find(id);
             if (studentRec != null)
             {
                 recipientList.Add(studentRec.UserProfile);
