@@ -28,5 +28,5 @@ using System.Runtime.InteropServices;
 //      Minor
 //      Patch
 //      Codeplex Check-in Number
-[assembly: AssemblyVersion("1.2.6.18730")]
-[assembly: AssemblyFileVersion("1.2.6.18730")]
+[assembly: AssemblyVersion("1.2.7.18754")]
+[assembly: AssemblyFileVersion("1.2.7.18754")]

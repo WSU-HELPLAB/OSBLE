@@ -21,7 +21,7 @@
             <div class="UserControls">
                 @if (member.CourseUser.UserProfile.UserName != null)
                 {
-                    <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { courseUserId = member.CourseUserID, area = "" })">@Helpers.MailButton()</a>
+                    <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = member.CourseUserID, area = "" })">@Helpers.MailButton()</a>
                 }
             </div>
             @Helpers.SmallProfilePicture(@Url.Action("ProfilePicture", "Roster", new { userProfile = member.CourseUser.UserProfile.ID, area = "" }))

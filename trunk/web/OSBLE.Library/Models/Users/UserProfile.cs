@@ -148,6 +148,8 @@ namespace OSBLE.Models.Users
         /// <returns></returns>
         public static string GetPasswordHash(string rawPassword)
         {
+            SHA256Managed algorithm = new SHA256Managed();
+
             SHA1 sha = new SHA1CryptoServiceProvider();
             byte[] unhashedPassword = System.Text.Encoding.UTF8.GetBytes(rawPassword);
             byte[] hashedBytes = sha.ComputeHash(unhashedPassword);

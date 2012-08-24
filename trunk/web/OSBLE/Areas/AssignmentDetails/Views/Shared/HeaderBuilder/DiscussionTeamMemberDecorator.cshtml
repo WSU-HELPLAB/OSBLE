@@ -71,7 +71,7 @@
                                         <div class="UserControls">
                                             @if (poster.Anonymize == false && poster.CourseUser.UserProfile.UserName != null)
                                             {
-                                                <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { courseUserId = poster.CourseUser.ID, area = "" })">@Helpers.MailButton()</a>
+                                                <a title="Mail This User" href="@Url.Action("CreateUser", "Mail", new { id = poster.CourseUser.ID, area = "" })">@Helpers.MailButton()</a>
                                             }
                                         </div>
                                         <div>

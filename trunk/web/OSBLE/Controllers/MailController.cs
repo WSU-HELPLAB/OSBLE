@@ -343,7 +343,19 @@ namespace OSBLE.Controllers
             }
             return View(mail);
         }
-        
+
+        public ActionResult CreateUserProfileId(int id)
+        {
+            UserProfile profile = db.UserProfiles.Find(id);
+            List<UserProfile> recipientList = new List<UserProfile>();
+            if (profile != null)
+            {
+                recipientList.Add(profile);
+            }
+            setUpMailViewBags(recipientList);
+            return View("Create", new Mail());
+        }
+
         public ActionResult CreateUser(int id)
         {
             List<UserProfile> recipientList = new List<UserProfile>();
