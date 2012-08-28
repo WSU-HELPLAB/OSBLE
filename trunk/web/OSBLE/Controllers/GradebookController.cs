@@ -13,6 +13,7 @@ using OSBLE.Resources;
 using OSBLE.Models.Courses;
 using OSBLE.Attributes;
 using OSBLE.Resources.CSVReader;
+using System.Threading;
 
 
 namespace OSBLE.Controllers
@@ -23,6 +24,10 @@ namespace OSBLE.Controllers
         {
             //Get the GradebookFilePath for current course
             GradebookFilePath gfp = new Models.FileSystem.FileSystem().Course(ActiveCourseUser.AbstractCourseID).Gradebook();
+
+            //get last upload time
+            DirectoryInfo directoryInfo = new DirectoryInfo(gfp.GetPath());
+            DateTime lastUpload = directoryInfo.LastWriteTime;
 
             //Generating list of Gradebook tabs
             List<string> TabNames = new List<string>();
@@ -74,8 +79,7 @@ namespace OSBLE.Controllers
                 ViewBag.CanUpload = false;
             }
 
-            DirectoryInfo directoryInfo = new DirectoryInfo(gfp.GetPath());
-            DateTime lastUpload = directoryInfo.LastWriteTime;
+
 
             if (gradeBookExists)
             {
@@ -180,12 +184,32 @@ namespace OSBLE.Controllers
         /// <param name="gradebookName"></param>
         private void SetUpViewBagForGradebook(string gradebookName)
         {
-
             //Get the GradebookFilePath for current course
-            GradebookFilePath gfp = new Models.FileSystem.FileSystem().Course(ActiveCourseUser.AbstractCourseID).Gradebook();
+            GradebookFilePath gfp = gfp = new Models.FileSystem.FileSystem().Course(ActiveCourseUser.AbstractCourseID).Gradebook();
+            TimeSpan interval = new TimeSpan(0, 0, 0, 0, 50);
+            TimeSpan totalTime = new TimeSpan();
+            TimeSpan maxTime = new TimeSpan(0, 0, 0, 4, 0); //4second max wait before giving up
+            
+            FileCollection gradebook = null;
+            while (gradebook == null)
+            {
+                try
+                {
+                    //Get the gradebook related to gradebookName
+                    gradebook = gfp.File(gradebookName + ".csv");
+                }
+                catch(IOException ex)
+                {
+                    Thread.Sleep(interval);
+                    totalTime += interval;
 
-            //Get the gradebook related to gradebookName
-            FileCollection gradebook = gfp.File(gradebookName + ".csv");
+                    //if we've waited longer than maxTime, throw the original exception
+                    if (totalTime > maxTime)
+                    {
+                        throw ex;
+                    }
+                }
+            }
 
             //Getting the filePath, which is the filename in the file collction
             string filePath = gradebook.FirstOrDefault();
