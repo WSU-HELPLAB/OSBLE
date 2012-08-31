@@ -305,7 +305,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                         vm.TableColumnHeaders["RubricTableDecorator"] = "Rubric Grade";
                     }
 
-                    if (assignment.HasDeliverables)
+                    if (assignment.HasDeliverables || (assignment.Type == AssignmentTypes.DiscussionAssignment || (assignment.Type == AssignmentTypes.CriticalReviewDiscussion)))
                     {
                         //add late penalty info
                         vm.TeamTableBuilders[assignmentTeam] = new LatePenaltyTableDecorator(

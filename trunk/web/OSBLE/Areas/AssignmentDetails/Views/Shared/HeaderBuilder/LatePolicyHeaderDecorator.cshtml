@@ -7,13 +7,6 @@
 <tr>
     <th>Late Policy:</th>
     <td>
-    @if (dataModel.Assignment.HoursLateWindow == 0)
-    {
-        @:No late assignments accepted.
-    }
-    else
-    {
-        @:Assignments accepted up to  @dataModel.Assignment.HoursLateWindow hours late, docking @dataModel.Assignment.DeductionPerUnit% per @dataModel.Assignment.HoursPerDeduction hours.
-    }
+        @dataModel.LatePolicy.Message
     </td>
 </tr>

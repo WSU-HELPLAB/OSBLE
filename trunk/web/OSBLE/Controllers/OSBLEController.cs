@@ -407,17 +407,6 @@ namespace OSBLE.Controllers
             return returnValue;
         }
 
-        public DateTime? GetDueDate(Assignment assignment)
-        {
-            //var nextActivity = GetNextActivity(activity);
-            //if (nextActivity != null)
-            //{
-            //    return nextActivity.ReleaseDate;
-            //}
-            return null;
-        }
-
-
         /// <summary>
         /// Returns the late penalty as a string. I.e. an assignmentTeam with 80% late penalty will yield the string
         /// "80.00 %"
@@ -451,21 +440,27 @@ namespace OSBLE.Controllers
             else if (team.Assignment.Type == AssignmentTypes.DiscussionAssignment || team.Assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
             {
                 //Handle late penalty based off of initial post due date.
-                //submissionTime = get post time of current teams first post. Issues here: Which member of the team? Oh wait, were not passing in discussion team, are we? Should be okay.
-                    //Problem: IAssignmentTeam here is sent in from the IAssignmentTeam in LatePenaltyTableDecorator.cs. Which is sent in from the factory
-                        //which gets the teams from a function GetTeams, which pulls discussion teams instead of assignment teams for a DA or CRD
-                    //Solution: How do other discussion based decoraters work?
+
+                //Note that the team sent in is a non-db saved, forged team. The teamID corrisponds to the correct team, but there is only one teammember
+                    //and that is the user we want the late penaly for.
+
+                int cuID = team.Team.TeamMembers.FirstOrDefault().CourseUserID;
+
+                using (OSBLEContext db = new OSBLEContext())
+                {
+                    submissionTime = (from dp in db.DiscussionPosts
+                                      where dp.AssignmentID == team.AssignmentID &&
+                                      dp.CourseUserID == cuID
+                                      orderby dp.Posted
+                                      select dp.Posted).FirstOrDefault();
+                }
+                
                 dueDate = team.Assignment.DiscussionSettings.InitialPostDueDate + TimeSpan.FromMinutes(1);
             }
 
-            
-
-                
-                
-
             TimeSpan lateness;
 
-            if (submissionTime != null)
+            if (submissionTime != null && submissionTime != DateTime.MinValue)
             {
                 lateness = (DateTime)submissionTime - (DateTime)dueDate;
             }

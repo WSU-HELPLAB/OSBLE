@@ -44,6 +44,17 @@
         wordCount();
     });
 
+    
+    var SubmittedPost = false;
+    function postBtnClick(){
+        //This function stops the "Post" button from being spammed, which causes duplicate messages.
+        if(SubmittedPost == false)
+        {
+            SubmittedPost = true;
+            $("#Postform").submit();
+        }
+    }
+
     function wordCount(){
         
         //match regex is finding non-apostrophe punctuation (including new line) to find end of words.
@@ -147,7 +158,7 @@
         <!--div for new post-->
         if (ViewBag.CanPost)
         {
-            using (Html.BeginForm("NewPost", "DiscussionAssignment", FormMethod.Post))
+            using (Html.BeginForm("NewPost", "DiscussionAssignment", FormMethod.Post, new { id = "Postform" } ))
             {
                     <input type="hidden" name="DiscussionTeamID" value="@discussionTeamID" />
                     <input type="hidden" name="AssignmentID" value="@ViewBag.Assignment.ID" />
@@ -174,7 +185,7 @@
                         }
                         
                     </table>
-                    <input id="postNewDiscussion" type="submit" name="post_active" value="Post" />
+                    <input id="postNewDiscussion" type="button" onclick="postBtnClick()" name="post_active" value="Post" />
             }
         }
         else
