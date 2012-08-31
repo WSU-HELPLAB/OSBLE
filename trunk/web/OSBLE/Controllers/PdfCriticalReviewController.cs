@@ -55,12 +55,6 @@ namespace OSBLE.Controllers
                     AnnotateResult createResult = api.CreateAccount(CurrentUser);
                     if (createResult.Result == ResultCode.OK)
                     {
-                        //instructors get to see everyone, regardless of CR settings
-                        CriticalReviewSettings settings = assignment.CriticalReviewSettings;
-                        if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor)
-                        {
-                            settings.AnonymizeComments = false;
-                        }
                         api.SetDocumentAnonymity(CurrentUser, uploadResult.DocumentCode, uploadResult.DocumentDate, settings);
                         api.GiveAccessToDocument(CurrentUser, uploadResult.DocumentCode, uploadResult.DocumentDate);
 
