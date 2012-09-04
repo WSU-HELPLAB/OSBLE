@@ -93,13 +93,16 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     {
                         //If the assignment is being edited, update it's associated event.
                         OSBLE.Models.HomePage.Event assignmentsEvent = db.Events.Find(Assignment.AssociatedEventID);
-                        assignmentsEvent.Description = Assignment.AssignmentDescription;
-                        assignmentsEvent.EndDate = Assignment.DueDate;
-                        assignmentsEvent.EndTime = Assignment.DueTime;
-                        assignmentsEvent.StartDate = Assignment.ReleaseDate;
-                        assignmentsEvent.StartTime = Assignment.ReleaseTime;
-                        assignmentsEvent.Title = Assignment.AssignmentName;
-                        db.Entry(assignmentsEvent).State = System.Data.EntityState.Modified;
+                        if (assignmentsEvent != null)
+                        {
+                            assignmentsEvent.Description = Assignment.AssignmentDescription;
+                            assignmentsEvent.EndDate = Assignment.DueDate;
+                            assignmentsEvent.EndTime = Assignment.DueTime;
+                            assignmentsEvent.StartDate = Assignment.ReleaseDate;
+                            assignmentsEvent.StartTime = Assignment.ReleaseTime;
+                            assignmentsEvent.Title = Assignment.AssignmentName;
+                            db.Entry(assignmentsEvent).State = System.Data.EntityState.Modified;
+                        }
                     }
                     db.Entry(Assignment).State = System.Data.EntityState.Modified;
                 }

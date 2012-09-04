@@ -198,7 +198,7 @@ namespace OSBLE.Controllers
 
         /// <summary>
         /// Sets up ViewBags for the given gradebookName. The assumption made in this function is that the StudentID number is in
-        /// the column matching the string in  <see cref="Constants.StudentIDColumnName"/>.
+        /// column 0.
         /// </summary>
         /// <param name="gradebookName"></param>
         private void SetUpViewBagForGradebook(string gradebookName)
@@ -250,8 +250,7 @@ namespace OSBLE.Controllers
             }
             else
             {
-                //for instructors, we want to know which column has the student names (used for searching in view)
-                ViewBag.NameColumnIndex = FindMatchingColumnFromTable(table, Constants.StudentNameColumnName);
+                
 
                 List<int> globalRows = new List<int>();
                 //find which rows should be displayed as "globals"
@@ -264,9 +263,11 @@ namespace OSBLE.Controllers
                     }
                 }
 
+                ViewBag.NameColumnIndex = Constants.StudentNameColumnIndex; //Used to 
                 ViewBag.GlobalRows = globalRows;
             }
 
+            
             ViewBag.TableData = table;
         }
 
@@ -315,13 +316,13 @@ namespace OSBLE.Controllers
             if (gradebookTable.Count > 0)
             {
 
-                int? IdColumn = FindMatchingColumnFromTable(gradebookTable, Constants.StudentIDColumnName); 
+                int IdColumn = Constants.StudentIDColumnIndex; 
 
                 //find which rows should be displayed
                 for (int i = 0; i < gradebookTable.Count; i++)
                 {
                     //If its student's grade row, add it.
-                    if (IdColumn.HasValue && gradebookTable[i][IdColumn.Value] == ActiveCourseUser.UserProfile.Identification)
+                    if (gradebookTable[i][IdColumn] == ActiveCourseUser.UserProfile.Identification)
                     {
                         studentTable.Add(gradebookTable[i].ToList());
                     }

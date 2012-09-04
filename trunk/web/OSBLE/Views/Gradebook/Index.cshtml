@@ -90,7 +90,7 @@
                             string tdClass = "";
                             if (DisplaySearch && j == NameColumnIndex)
                             {
-                                tdId = Table[i][j];
+                                tdId = Table[i][j].ToLower();
                                 tdClass = "searchableName";
                             }
                             
@@ -121,7 +121,7 @@
 
     $('#search').keyup(function (event) {
         if (event.keyCode == 13) {
-            filterTable($('#search').val());
+            filterTable($('#search').val().toLowerCase());
         }
         
     });

@@ -4,7 +4,7 @@
     {
         public const string UnGradableCatagory = "Un-Graded Assignments";
         public const string ProfessionalSchool = "Professional";
-        public const string StudentIDColumnName = "StudentID";
-        public const string StudentNameColumnName = "Student Name";
+        public const int StudentIDColumnIndex = 0;
+        public const int StudentNameColumnIndex = 1;
     }
 }
