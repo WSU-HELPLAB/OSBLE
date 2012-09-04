@@ -297,19 +297,19 @@ namespace OSBLE.Controllers
 
             if (e != null)
             {
-                CourseUser cu = currentCourses.Where(c => c.AbstractCourse.ID == e.Poster.AbstractCourseID).FirstOrDefault();
                 Assignment assignment = (from a in db.Assignments where a.AssociatedEventID == e.ID select a).FirstOrDefault();
-                if (((cu != null) && (cu.AbstractRole.CanModify)))
+                if (assignment != null)
                 {
-                    assignment.AssociatedEvent = null;
                     assignment.AssociatedEventID = null;
                     db.Events.Remove(e);
                     db.SaveChanges();
                 }
                 else
                 {
-                    Response.StatusCode = 403;
+                    db.Events.Remove(e);
+                    db.SaveChanges();
                 }
+
             }
             else
             {

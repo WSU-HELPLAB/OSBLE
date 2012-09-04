@@ -110,7 +110,26 @@ namespace OSBLE.Controllers
             GradebookFilePath gfp = new Models.FileSystem.FileSystem().Course(ActiveCourseUser.AbstractCourseID).Gradebook();
 
             //delete old items in gradebook
-            gfp.AllFiles().Delete();
+            int filesInGradebookFolder = gfp.AllFiles().Count;
+            int filesDeleted = 0;
+            TimeSpan interval = new TimeSpan(0, 0, 0, 0, 50);
+            TimeSpan totalTime = new TimeSpan();
+            TimeSpan maxTime = new TimeSpan(0, 0, 0, 6, 0); //4second max wait before giving up
+
+            while(filesInGradebookFolder != filesDeleted)
+            {
+                filesDeleted += gfp.AllFiles().Delete();
+                if (filesInGradebookFolder != filesDeleted)
+                {
+                    Thread.Sleep(interval);
+                    totalTime += interval;
+                }
+                if (totalTime > maxTime)
+                {
+                    throw new Exception("Failed to delete all gradebook files, try again later"); ;
+                }
+            }
+            
 
             int filesFailedToLoadCount = 0; //integer used for error message
 
@@ -184,21 +203,28 @@ namespace OSBLE.Controllers
         /// <param name="gradebookName"></param>
         private void SetUpViewBagForGradebook(string gradebookName)
         {
-            //Get the GradebookFilePath for current course
+            //Get the GradebookFilePath for current course, then the FileCollection for the given gradebookName
             GradebookFilePath gfp = gfp = new Models.FileSystem.FileSystem().Course(ActiveCourseUser.AbstractCourseID).Gradebook();
+            FileCollection gradebook = gfp.File(gradebookName + ".csv"); ;
+
+            //Getting the filePath, which is the filename in the file collction
+            string filePath = gradebook.FirstOrDefault();
+
+            //Open the file as a FileStream. For this, we want to wrap it in a try/catch block, as others might be attempting to use this stream
+            //at the same time. We'll allow it attempt to open the stream for up to maxTime.
+            FileStream stream = null;
             TimeSpan interval = new TimeSpan(0, 0, 0, 0, 50);
             TimeSpan totalTime = new TimeSpan();
             TimeSpan maxTime = new TimeSpan(0, 0, 0, 4, 0); //4second max wait before giving up
-            
-            FileCollection gradebook = null;
-            while (gradebook == null)
+            while (stream == null)
             {
                 try
                 {
-                    //Get the gradebook related to gradebookName
-                    gradebook = gfp.File(gradebookName + ".csv");
+                    //Get the stream related to the current file
+                    stream = new FileStream(filePath, FileMode.Open);
+                    
                 }
-                catch(IOException ex)
+                catch (IOException ex)
                 {
                     Thread.Sleep(interval);
                     totalTime += interval;
@@ -211,14 +237,11 @@ namespace OSBLE.Controllers
                 }
             }
 
-            //Getting the filePath, which is the filename in the file collction
-            string filePath = gradebook.FirstOrDefault();
-
-            //Open the file as a FileStream, then reading the file into a List of List of strings called table using CSVReader.
-            FileStream stream = new FileStream(filePath, FileMode.Open);
+            //reading the file into a List of List of strings using CSVReader.
             List<List<string>> table = new List<List<string>>();
             CSVReader csvReader = new CSVReader(stream);
             table = csvReader.Parse();
+            stream.Close(); //close the stream to allow others to access it. 
 
             //If the user is NOT an instructor or TA, then only display them rows that match their UserProfileID.
             if (ActiveCourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.TA && ActiveCourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.Instructor)
