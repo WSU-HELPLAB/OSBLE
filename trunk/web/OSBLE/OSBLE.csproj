@@ -334,6 +334,7 @@
     <Content Include="Content\favicon.ico" />
     <Content Include="Content\images\arrow_left.png" />
     <Content Include="Content\images\helplab_logo.png" />
+    <Content Include="Content\images\light-bulb-pencil.png" />
     <Content Include="Content\images\move_down.png" />
     <Content Include="Content\images\move_up.png" />
     <Content Include="Content\images\publish.png" />

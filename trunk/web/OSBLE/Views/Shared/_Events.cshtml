@@ -68,10 +68,12 @@
             {
                 <div class="event_description">
                     @{
-                string description = Helpers.Linkify(e.Description).ToHtmlString();
-                description = description.Replace("\n", "<br />");
+                        //@Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(e.Description.Replace("\n", "<br />").ToString()))
+                        
+                        string description = e.Description;
+                        description = description.Replace("\n", "<br />");
                     }
-                    <small>@Html.Raw(description)</small>
+                    <small>@Html.Raw(HttpUtility.HtmlDecode(Helpers.WikiUrlLinking(description).ToString()))</small>
                 </div>
             }
         </li>

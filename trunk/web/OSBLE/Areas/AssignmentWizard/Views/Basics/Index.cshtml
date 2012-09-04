@@ -9,15 +9,16 @@
 @Html.HiddenFor(m => m.IsDraft)
 @Html.HiddenFor(m => m.Type)
 @Html.HiddenFor(m => m.IsAnnotatable)
+@Html.HiddenFor(m => m.AssociatedEventID)
 <table class="wizard_entry_table">
 <tr>
     <th>@Html.LabelFor(m => m.AssignmentName):</th>
-    <td>@Html.EditorFor(m => m.AssignmentName)</td>
+    <td class="entryField">@Html.EditorFor(m => m.AssignmentName)</td>
     <td>@Html.ValidationMessageFor(m => m.AssignmentName)</td>
 </tr>
 <tr>
     <th>@Html.LabelFor(m => m.AssignmentDescription):</th>
-    <td>@Html.TextAreaFor(m => m.AssignmentDescription, new {cols = 50, rows =  4})</td>
+    <td>@Html.TextAreaFor(m => m.AssignmentDescription, new {cols = 50, rows =  4, style="width: 30em"})<img style="vertical-align:top" src="/Content/images/light-bulb-pencil.png" title="Tip: To add links to the description, encapsulate them in wiki-linking format. Example: &quot[url:Click Here|http://www.google.com]&quot" alt="Tip: To add links to the description, encapsulate them in wiki-linking format. Example: &quot[url:Click Here|http://www.google.com]&quot"/></td>
     <td>@Html.ValidationMessageFor(m => m.AssignmentDescription)</td>
 </tr>
 <tr>
