@@ -1,0 +1,22 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    int assignmentId = dataModel.PublishCR.assignmentID;
+    string linkDisplayValue = dataModel.PublishCR.PublishButtonDisplayValue;
+    
+}
+
+<tr>
+    <th>Critical Review</br>Publish Status</th>
+    <td>
+        <text>@dataModel.PublishCR.PublishStatus</text>
+        @Html.ActionLink(linkDisplayValue,
+                    "PublishAllCriticalReviews",
+                    "Assignment",
+                    new { area = "", assignmentID = assignmentId },
+                    new { })
+    </td>
+</tr>
+
