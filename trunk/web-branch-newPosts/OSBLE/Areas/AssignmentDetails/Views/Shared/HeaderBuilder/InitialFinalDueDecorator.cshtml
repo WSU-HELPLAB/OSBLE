@@ -1,0 +1,19 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;               
+}
+<tr>
+    <th>Initial Post Due:</th>
+    <td>
+        @dataModel.InitialPostDue
+    </td>
+</tr>
+
+<tr>
+    <th>Final Post Due:</th>
+    <td>
+        @dataModel.DueDate
+    </td>
+</tr>

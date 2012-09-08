@@ -1,0 +1,33 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    IAssignmentTeam currentTeam = dataModel.TeacherCritical.AssignmentTeam as IAssignmentTeam;  
+        AssignmentTeam at = currentTeam as AssignmentTeam;
+    
+}
+
+    @if (dataModel.TeacherCritical.hasSubmission)
+    {
+        string download = dataModel.TeacherCritical.fractionReviewed;
+        <td>
+            
+            @(Html.ActionLink(
+                        download, 
+                        "GetSubmissionZip", 
+                        "FileHandler", 
+                        new { area = "", assignmentID = currentTeam.Assignment.ID, teamId = currentTeam.Team.ID }, 
+                        new { 
+                            onclick = "create_and_open_downloading_submission_dialog()",
+                            title = dataModel.TeacherCritical.altText
+                        })
+                        )
+        </td>
+    }
+    else
+    {
+        <td title ="@dataModel.TeacherCritical.altText">
+            None Submitted
+        </td>
+    }

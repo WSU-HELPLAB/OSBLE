@@ -1,0 +1,41 @@
+﻿@using OSBLE.Resources
+@using OSBLE.Models.Assignments
+@using OSBLE.Models.Courses;
+@model DynamicDictionary
+@{
+    dynamic dataModel = Model;
+    Assignment assignment = dataModel.TeacherReceivedCritical.Assignment;
+    List<CourseUser> CourseUsers = dataModel.TeacherReceivedCritical.CourseUsers;
+    List<DateTime?> TimeStampList = dataModel.TeacherReceivedCritical.TimeStampList;
+}
+
+
+
+    <td>
+        <ul id="ReviewsItems">
+            @{
+                int i = 0;
+                foreach (CourseUser cu in CourseUsers)
+                {
+                    if(TimeStampList[i] == null)
+                    {
+                        <li>
+                            None Received
+                        </li>    
+                    }
+                    else
+                    {
+                        <li>
+                            @(Html.ActionLink(cu.DisplayNameFirstLast(cu.AbstractRole).ToString(), "GetReviewsOfAuthor", "FileHandler", 
+                            new { area = "", assignmentId = assignment.ID, receiverId = cu.ID }, 
+                            new { onclick = "create_and_open_downloading_submission_dialog()",
+                                  title = string.Format("Download all reviews of {1}'s previous submission\nLatest Review Received: {0}", 
+                                  TimeStampList[i], cu.DisplayNameFirstLast(cu.AbstractRole))}))
+                        </li>
+                    }
+                    i++;
+                }
+            }
+        </ul>
+    </td>
+
