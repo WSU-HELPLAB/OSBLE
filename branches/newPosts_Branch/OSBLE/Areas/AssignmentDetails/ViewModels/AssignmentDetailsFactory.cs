@@ -86,7 +86,7 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 if (assignment.Type == AssignmentTypes.DiscussionAssignment &&  !assignment.HasDiscussionTeams)
                 {
                     //link to classwide discussion
-                    vm.HeaderBuilder = new TeacherDiscussionLinkDecorator(vm.HeaderBuilder);
+                    vm.HeaderBuilder = new TeacherDiscussionLinkDecorator(vm.HeaderBuilder, vm.Client);
                     vm.HeaderViews.Add("TeacherDiscussionLinkDecorator");
                 }
 

@@ -93,6 +93,7 @@
     <Compile Include="Models\Assignments\CommentCategoryOption.cs" />
     <Compile Include="Models\Assignments\CriticalReviewSettings.cs" />
     <Compile Include="Models\Assignments\Deliverable.cs" />
+    <Compile Include="Models\Assignments\DiscussionAssignmentMetaInfo.cs" />
     <Compile Include="Models\Assignments\DiscussionSettings.cs" />
     <Compile Include="Models\Assignments\DiscussionTeam.cs" />
     <Compile Include="Models\Assignments\IAssignmentTeam.cs" />

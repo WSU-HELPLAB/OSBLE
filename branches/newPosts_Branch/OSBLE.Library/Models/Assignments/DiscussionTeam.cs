@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.DiscussionAssignment;
 
 namespace OSBLE.Models.Assignments
 {
@@ -59,6 +60,54 @@ namespace OSBLE.Models.Assignments
             {
                 return Team.Name;
             }
+        }
+
+        public int GetNewPostsCount(int currentCourseUserID)
+        {
+            int returnVal = 0;
+            using (OSBLEContext db = new OSBLEContext())
+            {
+                if (Assignment.HasDiscussionTeams) //Filter by discussionTeamID
+                {
+                    DiscussionAssignmentMetaInfo dtmi = (from mi in db.DiscussionAssignmentMetaTable
+                                                     where mi.CourseUserID == currentCourseUserID &&
+                                                     mi.DiscussionTeamID == this.ID
+                                                     select mi).FirstOrDefault();
+
+                    //if dtmi is null, set LastVisit to MinValue so all posts look new
+                    if(dtmi == null) 
+                    {
+                        dtmi = new DiscussionAssignmentMetaInfo();
+                        dtmi.LastVisit = DateTime.MinValue;
+                    }
+
+                    returnVal = (from dp in db.DiscussionPosts
+                                 where dp.Posted > dtmi.LastVisit &&
+                                 dp.DiscussionTeamID == this.ID
+                                 select dp).Count();
+                }
+                else //Discussion team ID could be any discussion team in the class. So, queries are a little different
+                {
+                    List<int> possibleDiscussionIDs = Assignment.DiscussionTeams.Select(dt => dt.ID).ToList();
+                    DiscussionAssignmentMetaInfo dtmi = (from mi in db.DiscussionAssignmentMetaTable
+                                                     where mi.CourseUserID == currentCourseUserID &&
+                                                     possibleDiscussionIDs.Contains(mi.DiscussionTeamID)
+                                                     select mi).FirstOrDefault();
+
+                    //if dtmi is null, set LastVisit to MinValue so all posts look new
+                    if (dtmi == null)
+                    {
+                        dtmi = new DiscussionAssignmentMetaInfo();
+                        dtmi.LastVisit = DateTime.MinValue;
+                    }
+
+                    returnVal = (from dp in db.DiscussionPosts
+                                 where dp.Posted > dtmi.LastVisit &&
+                                 dp.AssignmentID == AssignmentID
+                                 select dp).Count();
+                }
+            }
+            return returnVal;
         }
 
         public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
