@@ -213,7 +213,7 @@
             }
             <div class="dp_post" id="dp_post_@(dpvm.DiscussionPostId)" style="background:white;">
             @if ((ViewBag.LastVisit !=null && ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.NewPosts 
-                    && dpvm.Posted >= ViewBag.LastVisit)                     
+                    && dpvm.Posted >= ViewBag.LastVisit && ViewBag.ActiveCourseUser.ID != dpvm.poster.CourseUser.ID)                     
                 || (ViewBag.Student != null
                     && ViewBag.Student.ID == dpvm.poster.CourseUser.ID
                     && (ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.Posts 
@@ -270,7 +270,7 @@
                             </div>
                         
                             if ((ViewBag.LastVisit != null && ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.NewPosts
-                                    && reply.Posted >= ViewBag.LastVisit)
+                                    && reply.Posted >= ViewBag.LastVisit && ViewBag.ActiveCourseUser.ID != reply.poster.CourseUser.ID)
                                 || (ViewBag.Student != null
                                     && ViewBag.Student.ID == reply.poster.CourseUser.ID
                                     && (ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.Replies
