@@ -73,6 +73,12 @@ namespace OSBLE.Controllers
                                where assignment.CourseID == ActiveCourseUser.AbstractCourseID
                                orderby assignment.IsDraft, assignment.DueDate
                                select assignment).ToList();
+
+                //We want the number of Posters who's initial posts should be tracked. So students in this course.
+                ViewBag.TotalDiscussionPosters = (from cu in db.CourseUsers
+                                                  where cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                                  cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student
+                                                  select cu).Count();
             }
             else if (ActiveCourseUser.AbstractRole.CanSubmit)
             {
@@ -82,8 +88,6 @@ namespace OSBLE.Controllers
                                assignment.CourseID == ActiveCourseUser.AbstractCourseID
                                orderby assignment.DueDate
                                select assignment).ToList();
-
-                
 
                 //This Dictionary contains:
                     //Key: AssignmentID
@@ -144,8 +148,6 @@ namespace OSBLE.Controllers
                         }
                     }
                 }
-
-
             }
 
             ViewBag.PastCount = (from a in Assignments

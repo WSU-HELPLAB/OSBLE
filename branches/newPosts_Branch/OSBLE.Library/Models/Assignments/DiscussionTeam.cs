@@ -62,7 +62,12 @@ namespace OSBLE.Models.Assignments
             }
         }
 
-        public int GetNewPostsCount(int currentCourseUserID)
+        /// <summary>
+        /// Returns the number of new posts for currentCourseUserID for this discussion
+        /// </summary>
+        /// <param name="currentCourseUserID"></param>
+        /// <returns></returns>
+        public int GetNewPostsCount(int currentCourseUserId)
         {
             int returnVal = 0;
             using (OSBLEContext db = new OSBLEContext())
@@ -70,7 +75,7 @@ namespace OSBLE.Models.Assignments
                 if (Assignment.HasDiscussionTeams) //Filter by discussionTeamID
                 {
                     DiscussionAssignmentMetaInfo dtmi = (from mi in db.DiscussionAssignmentMetaTable
-                                                     where mi.CourseUserID == currentCourseUserID &&
+                                                         where mi.CourseUserID == currentCourseUserId &&
                                                      mi.DiscussionTeamID == this.ID
                                                      select mi).FirstOrDefault();
 
@@ -90,7 +95,7 @@ namespace OSBLE.Models.Assignments
                 {
                     List<int> possibleDiscussionIDs = Assignment.DiscussionTeams.Select(dt => dt.ID).ToList();
                     DiscussionAssignmentMetaInfo dtmi = (from mi in db.DiscussionAssignmentMetaTable
-                                                     where mi.CourseUserID == currentCourseUserID &&
+                                                         where mi.CourseUserID == currentCourseUserId &&
                                                      possibleDiscussionIDs.Contains(mi.DiscussionTeamID)
                                                      select mi).FirstOrDefault();
 

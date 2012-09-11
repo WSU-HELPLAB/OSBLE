@@ -5,8 +5,7 @@
 <table class="assignTable" cellspacing="0">
     <th colspan="2" style="font-size:larger">Assignment</th>
     <th style="font-size:larger">Due Date</th>
-    <th style="font-size:larger">Submissions</th>
-    <th style="font-size:larger">Grading</th>
+    <th style="font-size:larger">Student Activity</th>
 
     @{
         //MG & KD: Assignments are in order based on:: past & present -> future -> draft. The flags below are used to avoid duplicate headers for each category
@@ -75,12 +74,34 @@
                 <td > <!--Cell for DueDate-->
                     @assignment.DueDate.ToShortDateString() @assignment.DueTime.ToShortTimeString()
                 </td>
-                <!--Cell for Submissions-->
+
+                <!--Cell for Student Activity-->
+                <td>                    
+                    @if (draftFlag || pastFlag)
+                    {
+                        
+                    }
+                    else if(assignment.Type == AssignmentTypes.CriticalReviewDiscussion || assignment.Type ==  AssignmentTypes.DiscussionAssignment)
+                    {
+                        @:@assignment.GetInitialPostsCount() of @ViewBag.TotalDiscussionPosters initial posts made.<br />
+                        @:@assignment.GetPostsCount() total posts. @assignment.GetNewPostsCount(ViewBag.ActiveCourseUser.ID) new posts.
+                    }
+                    else if (assignment.Type == AssignmentTypes.TeamEvaluation)
+                    {
+                        @:@assignment.GetCompletedTeamEvaluationsCount() of @assignment.GetTotalTeamEvaluationCount() evaluations completed.
+                    }
+                    else if (assignment.HasDeliverables)
+                    {
+                        @:@assignment.GetSubmissionCount() of @assignment.AssignmentTeams.Count submissions received.<br />
+                        @:@Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+                    }
+                </td>
+                <!--Cell for Submissions
                 @if (assignment.HasDeliverables)
                 {
                     if (draftFlag || pastFlag)
                     {
-                        <td>@Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })</td>
+                        
                     }
                     else
                     {
@@ -91,9 +112,12 @@
                 {
                     <td>No Deliverables</td>
                 }
-                
+-->
+
+
+           <!--Cell for Grading. Only show if hasRubric and not a future/draft assignment
                 <td>
-                    <!--Cell for Grading. Only show if hasRubric and not a future/draft assignment-->
+                    
                     @if (assignment.HasRubric && !(futureFlag || draftFlag))
                     {
                     
@@ -102,6 +126,7 @@
                     
                     }
                 </td>
+            -->
             </tr>
                 
         }

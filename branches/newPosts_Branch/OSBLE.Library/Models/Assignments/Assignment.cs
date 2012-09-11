@@ -359,6 +359,125 @@ namespace OSBLE.Models.Assignments
             return draftRubricEvals;
         }
 
+
+        /// <summary>
+        /// Returns how many students completed their team evaluations
+        /// </summary>
+        /// <returns></returns>
+        public int GetCompletedTeamEvaluationsCount()
+        {
+            
+            int returnVal = 0;
+            using (ContextBase db = new SimpleContext())
+            {
+                //X teamevaluations are completed from a user Y, where user Y's team from the preceding assignment was of size X.
+                //But, we want to consider one group of teamevaluations submitted by user Y as 1 team evaluation complete. 
+                returnVal = (from te in db.TeamEvaluations
+                                         where te.TeamEvaluationAssignmentID == this.ID
+                                         select te.EvaluatorID).Distinct().Count();
+            }
+            return returnVal;
+        }
+
+        /// <summary>
+        /// Returns how many total team evaluations there are.
+        /// </summary>
+        /// <returns></returns>
+        public int GetTotalTeamEvaluationCount()
+        {
+            int returnVal = 0;
+            if (this.PrecededingAssignmentID.HasValue && this.PrecededingAssignmentID.Value > 0)
+            {
+                switch (this.PreceedingAssignment.Type)
+                {
+                    case AssignmentTypes.DiscussionAssignment:
+                    case AssignmentTypes.CriticalReviewDiscussion:
+                        returnVal = this.PreceedingAssignment.DiscussionTeams.Count();
+                        break;
+                    default:    //all other assignments
+                        returnVal = this.PreceedingAssignment.AssignmentTeams.Count();
+                        break;
+                }
+            }
+            return returnVal;
+        }
+
+
+        /// <summary>
+        /// Returns how many total initial posts have been made by students for this assignment.
+        /// </summary>
+        /// <returns></returns>
+        public int GetInitialPostsCount()
+        {
+            int returnVal = 0;
+            if (this.Type == AssignmentTypes.CriticalReviewDiscussion || this.Type == AssignmentTypes.DiscussionAssignment)
+            {
+                using (ContextBase db = new SimpleContext())
+                {
+                    //Initial posts are posts that have no ParentPost, 
+                    //in addition, we only want to count each CourseUser once
+                        //and only want to count students (as initial posts by non-students are not important)
+                    returnVal = (from p in db.DiscussionPosts
+                                 where p.ParentPostID == null &&
+                                 p.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student
+                                 select p.CourseUserID).Distinct().Count();
+
+                }
+            }
+            return returnVal;
+        }
+
+        /// <summary>
+        /// Returns the number of new posts across all discussion teams for the given user, for this assignment.
+        /// </summary>
+        /// <returns></returns>
+        public int GetNewPostsCount(int currentCourseUserId)
+        {
+            int returnVal = 0;
+
+            if (this.Type == AssignmentTypes.CriticalReviewDiscussion || this.Type == AssignmentTypes.DiscussionAssignment)
+            {
+                using (ContextBase db = new SimpleContext())
+                {
+                    //for each discussion we want to know how many new posts there are
+                        //to get new posts, we want to cross reference DiscussionASsignmentMetaInfo to see when the user last visited the discussion page
+                    if (this.HasDiscussionTeams)
+                    {
+                        //Sum new posts across all teams
+                        foreach (DiscussionTeam dt in this.DiscussionTeams)
+                        {
+                            returnVal += dt.GetNewPostsCount(currentCourseUserId);
+                        }
+                    }
+                    else //Class wide discussion
+                    {
+                        //Get new posts for any discussion team, since the whole class is posting together.
+                        returnVal = this.DiscussionTeams.FirstOrDefault().GetNewPostsCount(currentCourseUserId);
+                    }
+                }
+            }
+            return returnVal;
+        }
+
+        /// <summary>
+        /// Returns the number of posts across all discussion teams for this assignment
+        /// </summary>
+        /// <returns></returns>
+        public int GetPostsCount()
+        {
+            int returnVal = 0;
+            if (this.Type == AssignmentTypes.CriticalReviewDiscussion || this.Type == AssignmentTypes.DiscussionAssignment)
+            {
+                using (ContextBase db = new SimpleContext())
+                {
+                    returnVal = (from dp in db.DiscussionPosts
+                                  where dp.AssignmentID == this.ID
+                                  select dp).Count();
+                }
+            }
+            return returnVal;
+        }
+
         #endregion
 
         #region static methods
