@@ -419,7 +419,8 @@ namespace OSBLE.Models.Assignments
                         //and only want to count students (as initial posts by non-students are not important)
                     returnVal = (from p in db.DiscussionPosts
                                  where p.ParentPostID == null &&
-                                 p.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student
+                                 p.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student &&
+                                 p.AssignmentID == this.ID
                                  select p.CourseUserID).Distinct().Count();
 
                 }
