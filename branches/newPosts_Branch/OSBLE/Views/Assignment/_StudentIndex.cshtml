@@ -8,9 +8,20 @@
         Due Date
     </th>
     <th style="font-size: larger">
-        Latest Submission
+        Available Actions
+    </th>
+    <th style="font-size: larger">
+        Latest Activity
     </th>
     @{
+        AjaxOptions options = new AjaxOptions()
+        {
+            LoadingElementId = "Loading",
+            HttpMethod = "Get",
+            UpdateTargetId = "submitFiles",
+            OnComplete = "SubmissionLoaded"
+        };
+        
         List<TeamEvaluation> teamEvals = (from te in ViewBag.TeamEvaluations as IEnumerable<TeamEvaluation>
                                           select te).ToList();
 
@@ -65,8 +76,8 @@
             }
 
         <tr class="checkeredRow">
+            <!--Cell for name-->
             <td>
-                <!--Cell for name-->
                 @if (futureFlag)
                 {
                     @assignment.AssignmentName
@@ -76,81 +87,89 @@
                     @Html.ActionLink(assignment.AssignmentName, "Index", "Home", new { area = "AssignmentDetails", assignmentId = assignment.ID }, null)
                 }
             </td>
-            <td>@assignment.DueDate.ToShortDateString() @assignment.DueDate.ToShortTimeString()
+
+            <!--Cell for duedate-->
+            <td>
+                @assignment.DueDate.ToShortDateString() @assignment.DueDate.ToShortTimeString()
             </td>
-            @*TD for submission. If its a future assignment, display nothing.
-                                 If the assignment has deliverables
-                                    If thhe submission has already been receieved, display submission time and allow resubmit
-                                    else allow inital submission
-                                 If its a Team Evaluation, give them a link for team evaluation
-                                 *@
-            @if (futureFlag)
-            {
-                <td>
-                </td>
+
+            @{
+                DiscussionTeam dt = ViewBag.dtInfo[assignment.ID];
             }
-            else if (assignment.HasDeliverables)
-            {
-                AjaxOptions options = new AjaxOptions()
+
+            <!--Cell for Available Actions-->
+            <td>
+                @if (assignment.Type == AssignmentTypes.DiscussionAssignment || assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
                 {
-                    LoadingElementId = "Loading",
-                    HttpMethod = "Get",
-                    UpdateTargetId = "submitFiles",
-                    OnComplete = "SubmissionLoaded"
-                };
-                if (ViewBag.SubmissionInfoDictionary[assignment.ID] != "No Submission")
-                {  
-                    <!--td for resubmit-->
-                    String display = ViewBag.SubmissionInfoDictionary[assignment.ID];
-                    <td>
-                        <ul id="SubmissionItems">
-                            <li>
-                                @(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
-                            </li>
-                            <li>
-                                @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = assignment.ID }, options, new object())
-                            </li>
-                            @if (ViewBag.SubmissionReceived && assignment.ID == ViewBag.SubmissionReceivedAssignmentID)
-                            {
-                                <li id="SubmissionReceivedText">Submission received</li>   
-                            }
-                        </ul>
-                    </td>
+                    //Display "View Discussion" or  "Makew Initial Post" depending on users current initial status.
+                    if(dt != null)
+                    {
+                        @:@Html.ActionLink("View Discussion",
+                                        "Index", 
+                                        "DiscussionAssignment",
+                                           new { assignmentId = assignment.ID, discussionTeamId = dt.ID, area = "" },
+                                        new { }
+                                    )
+                    }
                 }
-                else
+                else if (assignment.HasDeliverables)
                 {
-                    <!--TD for first submission-->
-                    <td>
-                        None.
-                        @Ajax.ActionLink("Submit Here", "Create", "Submission", new { id = assignment.ID }, options, new object())
-                    </td>
-                }
-            }
-            else if (assignment.AssignmentTypeID == 4)
-            {
-                bool found = (from te in teamEvals
-                               where te.TeamEvaluationAssignmentID == assignment.ID
-                               select te).Count() > 0;
+                    //Display "Resubmit"  or "Submit" depending on current submission status
+                    string submissionString = "Submit";
+                    if (ViewBag.SubmissionInfoDictionary[assignment.ID] != "No Submission")
+                    {
+                        submissionString = "Resubmit";
+                    }
+                    @Ajax.ActionLink(submissionString, "Create", "Submission", new { id = assignment.ID }, options, new object())
                     
-                if (found == false)
-                {
-                    <td>
-                        @Html.ActionLink("Submit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignment.ID }, new { })
-                    </td>
                 }
-                else
+                else if (assignment.Type == AssignmentTypes.TeamEvaluation)
                 {
-                    <td>
+                    if (teamEvals.Any(te => te.TeamEvaluationAssignmentID == assignment.ID))
+                    {
                         @Html.ActionLink("View/Edit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignment.ID }, new { })
-                    </td>
+                    }
+                    else
+                    {
+                        @Html.ActionLink("Submit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignment.ID }, new { })
+                    }
                 }
-            }
-            else
-            {
-                <td>
-                    No Deliverables
-                </td>
-            }
+            </td>
+
+            <!--Cell for Latest Activity-->
+            <td>
+                @if (assignment.Type == AssignmentTypes.DiscussionAssignment || assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
+                {
+                    //Display "View Discussion" or  "Makew Initial Post" depending on users current initial status.
+                    if (dt != null)
+                    {
+                        int newPosts = dt.GetNewPostsCount(ViewBag.ActiveCourseUser.ID);
+                        if (newPosts > 0)
+                        {
+                            @:@Html.ActionLink(newPosts.ToString() + " New Posts",
+                                        "Index",
+                                        "DiscussionAssignment",
+                                           new { assignmentId = assignment.ID, discussionTeamId = dt.ID, displayNewPosts = true, area = "" },
+                                        new { }
+                                    )
+                        }
+                        else
+                        {
+                            @:No New Posts
+                        }
+                    }
+                }
+                else if (assignment.HasDeliverables)
+                {
+                    //Display "Resubmit"  or "Submit" depending on current submission status
+                    if (ViewBag.SubmissionInfoDictionary[assignment.ID] != "No Submission")
+                    {
+                        string displayValue = "Submitted " + ViewBag.SubmissionInfoDictionary[assignment.ID];
+                        @(Html.ActionLink(displayValue, "getCurrentUsersZip", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
+                    }
+                }
+                
+            </td>
         </tr>
         }
     }

@@ -429,7 +429,7 @@ namespace OSBLE.Models.Assignments
         }
 
         /// <summary>
-        /// Returns the number of new posts across all discussion teams for the given user, for this assignment.
+        /// Returns the number of new posts across all teams for the given user, for this assignment
         /// </summary>
         /// <returns></returns>
         public int GetNewPostsCount(int currentCourseUserId)
@@ -440,8 +440,6 @@ namespace OSBLE.Models.Assignments
             {
                 using (ContextBase db = new SimpleContext())
                 {
-                    //for each discussion we want to know how many new posts there are
-                        //to get new posts, we want to cross reference DiscussionASsignmentMetaInfo to see when the user last visited the discussion page
                     if (this.HasDiscussionTeams)
                     {
                         //Sum new posts across all teams

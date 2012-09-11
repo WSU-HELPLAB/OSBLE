@@ -89,22 +89,51 @@ namespace OSBLE.Controllers
                                orderby assignment.DueDate
                                select assignment).ToList();
 
+                
                 //This Dictionary contains:
                     //Key: AssignmentID
-                    //Value: submissionTime (as string)
+                    //Value: tuple(submissionTime (as string), discussion team ID as int or null)
                 Dictionary<int, string> submissionInfo = new Dictionary<int,string>();
-                
+                Dictionary<int, DiscussionTeam> dtInfo = new Dictionary<int, DiscussionTeam>();
                 foreach (Assignment a in Assignments)
                 {
-                    AssignmentTeam at = GetAssignmentTeam(a, ActiveCourseUser);
-                    DateTime? subTime = FileSystem.GetSubmissionTime(at);
-                    string submissionTime = "No Submission";
-                    if (subTime != null) //found a submission time, Reassign submissionTime
+                    if (a.HasDeliverables)
                     {
-                        submissionTime = subTime.Value.ToString();
+                        AssignmentTeam at = GetAssignmentTeam(a, ActiveCourseUser);
+                        DateTime? subTime = FileSystem.GetSubmissionTime(at);
+                        string submissionTime = "No Submission";
+                        if (subTime != null) //found a submission time, Reassign submissionTime
+                        {
+                            submissionTime = subTime.Value.ToString();
+                        }
+
+                        submissionInfo.Add(a.ID, submissionTime);
+                    }
+                    else
+                    {
+                        submissionInfo.Add(a.ID, "No Submission");
                     }
 
-                    submissionInfo.Add(a.ID, submissionTime);
+                    if (a.Type == AssignmentTypes.DiscussionAssignment || a.Type == AssignmentTypes.CriticalReviewDiscussion)
+                    {
+                        foreach (DiscussionTeam dt in a.DiscussionTeams)
+                        {
+                            foreach (TeamMember tm in dt.GetAllTeamMembers())
+                            {
+                                if (tm.CourseUserID == ActiveCourseUser.ID) //Checking if Client is a member within the DiscussionTeam
+                                {
+                                    dtInfo.Add(a.ID, dt);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        dtInfo.Add(a.ID, null);
+                    }
+                    ViewBag.dtInfo = dtInfo;
+                    
                 }
 
                 //Gathering the Team Evaluations for the current user's teams.
