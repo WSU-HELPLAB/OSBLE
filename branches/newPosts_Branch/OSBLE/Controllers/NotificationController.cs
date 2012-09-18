@@ -76,6 +76,24 @@ namespace OSBLE.Controllers
             return View("_AjaxEmpty");
         }
 
+        [HttpPost]
+        public ActionResult MarkAllAsRead()
+        {
+            List<Notification> allUnreadNotifications = (from n in db.Notifications
+                                                         where n.RecipientID == ActiveCourseUser.ID &&
+                                                         !n.Read
+                                                         select n).ToList();
+
+            foreach (Notification n in allUnreadNotifications)
+            {
+                // Mark notification as read.
+                n.Read = true;
+                db.SaveChanges();
+            }
+
+            return View("_AjaxEmpty");
+        }
+
         /// <summary>
         /// Creates and posts a new mail message notification to its recipient
         /// </summary>

@@ -27,14 +27,14 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// This function will return the DateTime of the last visit to the discussion assignment. If the user has not visited this discussion assignment, the value will be null.
+        /// This function will return the DateTime of the last visit to the discussion assignment. If the user has not visited this discussion assignment, the value will be DateTime.Min.
         /// In addition to returning the last visit time, this function will update the last visit time to the current time. Note: The returned dateTime will not have the new assigned value.
         /// </summary>
         /// <param name="discussionTeamId"></param>
         /// <returns></returns>
         private DateTime? GetAndUpdateLastVisit(int discussionTeamId)
         {
-            DateTime? returnVal = null;
+            DateTime? returnVal = DateTime.MinValue;
             DiscussionAssignmentMetaInfo lastVisited = (from metaInfo in db.DiscussionAssignmentMetaTable
                                                         where metaInfo.DiscussionTeamID == discussionTeamId &&
                                                         metaInfo.CourseUserID == ActiveCourseUser.ID

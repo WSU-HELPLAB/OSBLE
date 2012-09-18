@@ -71,7 +71,7 @@ namespace OSBLE.Controllers
                 //For CanGrade roles, show all assignments
                 Assignments = (from assignment in db.Assignments
                                where assignment.CourseID == ActiveCourseUser.AbstractCourseID
-                               orderby assignment.IsDraft, assignment.DueDate
+                               orderby assignment.IsDraft, assignment.ReleaseDate
                                select assignment).ToList();
 
                 //We want the number of Posters who's initial posts should be tracked. So students in this course.
@@ -86,7 +86,7 @@ namespace OSBLE.Controllers
                 Assignments = (from assignment in db.Assignments
                                where !assignment.IsDraft &&
                                assignment.CourseID == ActiveCourseUser.AbstractCourseID
-                               orderby assignment.DueDate
+                               orderby assignment.ReleaseDate
                                select assignment).ToList();
 
                 
