@@ -14,7 +14,8 @@
         List<TeamEvaluation> teamEvals = (from te in ViewBag.TeamEvaluations as IEnumerable<TeamEvaluation>
                                           select te).ToList();
 
-        //MG & KD: Assignments are in order based on:: past & present -> future -> draft. The flags below are used to avoid duplicate headers for each category
+        //MG & KD: Assignments are in order based on:: past & present -> future -> draft. The flags below are used to: a)avoid duplicate headers for each category
+        //and b) allow the logic below the headers determine how to treat the assignment
         bool futureFlag = false, presentFlag = false, pastFlag = false;
         foreach (Assignment assignment in ViewBag.Assignments)
         {
@@ -22,11 +23,11 @@
             {
                 //PAST
                 pastFlag = true;
-        <tr>
-            <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
-                Past (@ViewBag.PastCount)
-            </td>
-        </tr>
+                <tr>
+                    <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
+                        Past (@ViewBag.PastCount)
+                    </td>
+                </tr>
             }
             else if (assignment.ReleaseDate > ViewBag.CurrentDate && !futureFlag)
             {
@@ -34,16 +35,16 @@
                 futureFlag = true;
                 if (pastFlag || presentFlag)
                 {
-        <tr>
-            <td style="padding-bottom: 10px">
-            </td>
-        </tr>
+                    <tr>
+                        <td style="padding-bottom: 10px">
+                        </td>
+                    </tr>
                 }
-        <tr>
-            <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
-                Future (@ViewBag.FutureCount)
-            </td>
-        </tr>
+                <tr>
+                    <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
+                        Future (@ViewBag.FutureCount)
+                    </td>
+                </tr>
 
             }
             else if (assignment.DueDate >= ViewBag.CurrentDate && !presentFlag)
@@ -52,16 +53,16 @@
                 presentFlag = true;
                 if (pastFlag)
                 {
-        <tr>
-            <td style="padding-bottom: 10px">
-            </td>
-        </tr>
+                    <tr>
+                        <td style="padding-bottom: 10px">
+                        </td>
+                    </tr>
                 }
-        <tr>
-            <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
-                Present (@ViewBag.PresentCount)
-            </td>
-        </tr>
+                <tr>
+                    <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
+                        Present (@ViewBag.PresentCount)
+                    </td>
+                </tr>
             }
 
         <tr class="checkeredRow">
@@ -78,12 +79,6 @@
             </td>
             <td>@assignment.DueDate.ToShortDateString() @assignment.DueDate.ToShortTimeString()
             </td>
-            @*TD for submission. If its a future assignment, display nothing.
-                                 If the assignment has deliverables
-                                    If thhe submission has already been receieved, display submission time and allow resubmit
-                                    else allow inital submission
-                                 If its a Team Evaluation, give them a link for team evaluation
-                                 *@
             @if (futureFlag)
             {
                 <td>
@@ -126,7 +121,7 @@
                     </td>
                 }
             }
-            else if (assignment.AssignmentTypeID == 4)
+            else if (assignment.Type == AssignmentTypes.TeamEvaluation)
             {
                 bool found = (from te in teamEvals
                                where te.TeamEvaluationAssignmentID == assignment.ID

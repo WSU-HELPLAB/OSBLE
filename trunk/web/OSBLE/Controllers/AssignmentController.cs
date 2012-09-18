@@ -71,7 +71,7 @@ namespace OSBLE.Controllers
                 //For CanGrade roles, show all assignments
                 Assignments = (from assignment in db.Assignments
                                where assignment.CourseID == ActiveCourseUser.AbstractCourseID
-                               orderby assignment.IsDraft, assignment.DueDate
+                               orderby assignment.IsDraft, assignment.ReleaseDate
                                select assignment).ToList();
             }
             else if (ActiveCourseUser.AbstractRole.CanSubmit)
@@ -80,7 +80,7 @@ namespace OSBLE.Controllers
                 Assignments = (from assignment in db.Assignments
                                where !assignment.IsDraft &&
                                assignment.CourseID == ActiveCourseUser.AbstractCourseID
-                               orderby assignment.DueDate
+                               orderby assignment.ReleaseDate
                                select assignment).ToList();
 
                 
