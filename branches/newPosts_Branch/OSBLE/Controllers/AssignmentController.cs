@@ -215,7 +215,29 @@ namespace OSBLE.Controllers
             //Confirm assignment belongs to the current users course before proceeding
             if (assignment.CourseID == ActiveCourseUser.AbstractCourse.ID) 
             {
-                Assignment.ToggleDraft(assignmentID, ActiveCourseUser.ID);
+                assignment.IsDraft = !assignment.IsDraft;
+                db.SaveChanges();
+                if (assignment.IsDraft) //assignment has been changed to draft, remove associated events
+                {
+                    if (assignment.AssociatedEvent != null)
+                    {
+                        db.Events.Remove(assignment.AssociatedEvent);
+                        assignment.AssociatedEventID = null;
+                        db.SaveChanges();
+                    }
+
+                    if (assignment.DiscussionSettings != null && assignment.DiscussionSettings.AssociatedEventID != null)
+                    {
+                        //Remove the event, then set the AssociatedEventID to null (EF should handle this for us, but just in case)
+                        db.Events.Remove(assignment.DiscussionSettings.AssociatedEvent);
+                        assignment.DiscussionSettings.AssociatedEventID = null;
+                        db.SaveChanges();
+                    }
+                }
+                else //Published, add an event
+                {
+                    EventController.CreateAssignmentEvent(assignment, ActiveCourseUser.ID, db);
+                } 
             }
             return RedirectToRoute(new { action = "Index" });
         }

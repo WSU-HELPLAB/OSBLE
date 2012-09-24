@@ -5,6 +5,8 @@ using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
+using OSBLE.Controllers;
+using OSBLE.Models.HomePage;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -71,6 +73,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         [HttpPost]
         public ActionResult Index(DiscussionSetting model)
         {
+            bool isEdit = model.AssociatedEventID != null; //If there is an associated event, its an edit.
             Assignment = db.Assignments.Find(model.AssignmentID);
             if (ModelState.IsValid)
             {
@@ -104,6 +107,13 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
                 }
                 db.SaveChanges();
+
+                if (isEdit && Assignment.AssociatedEventID != null) //update discussion event
+                {
+                    Event dEvent = db.Events.Find(Assignment.AssociatedEventID);
+                    EventController.UpdateDiscussionEvent(Assignment.DiscussionSettings, dEvent, ActiveCourseUser.ID, db);
+                }
+
                 WasUpdateSuccessful = true;
             }
             else

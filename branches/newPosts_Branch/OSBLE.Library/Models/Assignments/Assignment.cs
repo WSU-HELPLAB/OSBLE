@@ -489,44 +489,7 @@ namespace OSBLE.Models.Assignments
             }
         }
 
-        public static void ToggleDraft(int assignmentId, int posterId)
-        {
-            using (ContextBase db = new SimpleContext())
-            {
-                //MG: Pulling the assignment from the DB, toggling its IsDraft parameter. and saving it back to the DB.
-                Assignment assignment = db.Assignments.Find(assignmentId);
-                assignment.IsDraft = !assignment.IsDraft;
-                db.SaveChanges();
 
-                if (assignment.IsDraft)
-                {
-                    if (assignment.AssociatedEvent != null)
-                    {
-                        Event e = db.Events.Find(assignment.AssociatedEventID);
-                        db.Events.Remove(e);
-                        db.SaveChanges();
-                    }
-                }
-                else
-                {
-                    Event e = new Event()
-                    {
-                        Description = assignment.AssignmentDescription,
-                        EndDate = assignment.DueDate,
-                        EndTime = assignment.DueTime,
-                        Approved = true,
-                        PosterID = posterId,
-                        StartDate = assignment.ReleaseDate,
-                        StartTime = assignment.ReleaseTime,
-                        Title = assignment.AssignmentName
-                    };
-                    db.Events.Add(e);
-                    db.SaveChanges();
-                    assignment.AssociatedEventID = e.ID;
-                    db.SaveChanges();
-                }
-            }
-        }
 
         #endregion
     }

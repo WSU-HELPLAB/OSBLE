@@ -48,7 +48,7 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
         [CanModifyCourse]
         public ActionResult ToggleDraft(int assignmentId)
         {
-            Assignment.ToggleDraft(assignmentId, ActiveCourseUser.ID);
+            new AssignmentController().ToggleDraft(assignmentId);
             return Index(assignmentId);
         }
 

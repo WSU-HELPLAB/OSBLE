@@ -7,6 +7,8 @@ using OSBLE.Controllers;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
 using OSBLE.Utility;
+using System;
+using OSBLE.Models.HomePage;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -86,36 +88,16 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 if (Assignment.ID == 0)
                 {
                     //Add default assignment teams
-                    SetUpDefaultAssignmentTeams(Assignment);
-
+                    SetUpDefaultAssignmentTeams();
                     db.Assignments.Add(Assignment);
                 }
                 else //editing preexisting assingment
                 {
-
                     if (Assignment.AssociatedEventID.HasValue)
                     {
                         //If the assignment is being edited, update it's associated event.
-                        OSBLE.Models.HomePage.Event assignmentsEvent = db.Events.Find(Assignment.AssociatedEventID);
-                        if (assignmentsEvent != null)
-                        {
-                            assignmentsEvent.Description = Assignment.AssignmentDescription;
-                            assignmentsEvent.EndDate = Assignment.DueDate;
-                            assignmentsEvent.EndTime = Assignment.DueTime;
-                            assignmentsEvent.StartDate = Assignment.ReleaseDate;
-                            assignmentsEvent.StartTime = Assignment.ReleaseTime;
-                            assignmentsEvent.Title = Assignment.AssignmentName;
-                            db.Entry(assignmentsEvent).State = System.Data.EntityState.Modified;
-                        }
-
-                        bool assignmentTeamsExist = (from at in db.AssignmentTeams
-                                                     where at.AssignmentID == Assignment.ID
-                                                     select at).Count() > 0;
-                        if (!assignmentTeamsExist)
-                        {
-                            //No teams, so add default assignment teams
-                            SetUpDefaultAssignmentTeams(Assignment);
-                        }
+                        Event assignmentsEvent = db.Events.Find(Assignment.AssociatedEventID.Value);
+                        EventController.UpdateAssignmentEvent(Assignment, assignmentsEvent, ActiveCourseUser.ID, db);
                     }
                     db.Entry(Assignment).State = System.Data.EntityState.Modified;
                 }
@@ -144,37 +126,49 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         /// <summary>
         /// By design, all students must be part of their own individual assignment team. 
         /// But, some assignments (I.e. Discussion type assignments, or team evaluations) should not be taken the TeamController to set up the asisngment teams. 
+        /// 
         /// This will set the teams to the default individual assignment teams.
+        /// If teams already exist, it does nothing.
         /// </summary>
-        void SetUpDefaultAssignmentTeams(Assignment assignment)
+        void SetUpDefaultAssignmentTeams()
         {
-            List<CourseUser> users = (from cu in db.CourseUsers
-                            where cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
-                            && cu.AbstractRole.CanSubmit
-                            orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
-                            select cu).ToList();
 
-            //Creates an assignment team for each CourseUser who can submit documents (students)
-            //The team name will be "FirstName LastName"
-            foreach (CourseUser cu in users)
+            bool assignmentTeamsExist = (from at in db.AssignmentTeams
+                                                     where at.AssignmentID == Assignment.ID
+                                                     select at).Count() > 0;
+            //Only set up default teams if teams don't already exist
+            if (Assignment.ID == 0 || !assignmentTeamsExist)
             {
-                //Creating team
-                Team team = new Team();
-                team.Name = cu.UserProfile.FirstName + " " + cu.UserProfile.LastName;
 
-                //Creating Tm and adding them to team
-                TeamMember tm = new TeamMember(){
-                    CourseUserID = cu.ID
-                };
-                team.TeamMembers.Add(tm);
+                List<CourseUser> users = (from cu in db.CourseUsers
+                                          where cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                                          && cu.AbstractRole.CanSubmit
+                                          orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
+                                          select cu).ToList();
 
-                //Creating the assignment team and adding it to the assignment
-                AssignmentTeam at = new AssignmentTeam()
+                //Creates an assignment team for each CourseUser who can submit documents (students)
+                //The team name will be "FirstName LastName"
+                foreach (CourseUser cu in users)
                 {
-                    Team = team,
-                    Assignment = assignment
-                };
-                Assignment.AssignmentTeams.Add(at);
+                    //Creating team
+                    Team team = new Team();
+                    team.Name = cu.UserProfile.FirstName + " " + cu.UserProfile.LastName;
+
+                    //Creating Tm and adding them to team
+                    TeamMember tm = new TeamMember()
+                    {
+                        CourseUserID = cu.ID
+                    };
+                    team.TeamMembers.Add(tm);
+
+                    //Creating the assignment team and adding it to the assignment
+                    AssignmentTeam at = new AssignmentTeam()
+                    {
+                        Team = team,
+                        Assignment = Assignment
+                    };
+                    Assignment.AssignmentTeams.Add(at);
+                }
             }
         }
     }
