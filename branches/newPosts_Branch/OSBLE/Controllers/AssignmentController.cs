@@ -228,7 +228,7 @@ namespace OSBLE.Controllers
 
                     if (assignment.DiscussionSettings != null && assignment.DiscussionSettings.AssociatedEventID != null)
                     {
-                        //Remove the event, then set the AssociatedEventID to null (EF should handle this for us, but just in case)
+                        //remove event manually
                         db.Events.Remove(assignment.DiscussionSettings.AssociatedEvent);
                         assignment.DiscussionSettings.AssociatedEventID = null;
                         db.SaveChanges();

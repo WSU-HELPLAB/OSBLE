@@ -73,20 +73,31 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         [HttpPost]
         public ActionResult Index(DiscussionSetting model)
         {
-            bool isEdit = model.AssociatedEventID != null; //If there is an associated event, its an edit.
             Assignment = db.Assignments.Find(model.AssignmentID);
             if (ModelState.IsValid)
             {
                 //delete preexisting settings to prevent an FK relation issue
                 DiscussionSetting setting = db.DiscussionSettings.Find(model.AssignmentID);
+                Event eventToUpdate = null;
                 if (setting != null)
                 {
+                    eventToUpdate = setting.AssociatedEvent;
                     db.DiscussionSettings.Remove(setting);
                 }
                 db.SaveChanges();
 
                 //...and then re-add it.
                 Assignment.DiscussionSettings = model;
+                db.SaveChanges();
+
+                
+                if (Assignment.IsDraft == false)
+                {
+                    //If the assignment is published, that means there was an associted event, but was deleted when DiscussionSettings was removed
+                    //Re-adding event
+                    EventController.UpdateDiscussionEvent(Assignment.DiscussionSettings, eventToUpdate, ActiveCourseUser.ID, db);
+                }
+                
 
                 //If TAs are allowed to post to all discussion, 
                 //remove them from any discussion teams they may have already been assigned to
@@ -107,13 +118,6 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
                 }
                 db.SaveChanges();
-
-                if (isEdit && Assignment.AssociatedEventID != null) //update discussion event
-                {
-                    Event dEvent = db.Events.Find(Assignment.AssociatedEventID);
-                    EventController.UpdateDiscussionEvent(Assignment.DiscussionSettings, dEvent, ActiveCourseUser.ID, db);
-                }
-
                 WasUpdateSuccessful = true;
             }
             else

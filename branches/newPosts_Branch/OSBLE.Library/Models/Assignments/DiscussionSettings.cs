@@ -39,7 +39,20 @@ namespace OSBLE.Models.Assignments
         [Required]
         public byte AnonymitySettings { get; set; }
 
-        public int? AssociatedEventID { get; set; }
+        private int? associatedEventID;
+
+        public int? AssociatedEventID
+        {
+            get
+            {
+                return associatedEventID;
+            }
+            set
+            {
+                associatedEventID = value;
+            }
+            
+        }
 
         [ForeignKey("AssociatedEventID")]
         public virtual Event AssociatedEvent { get; set; }
@@ -92,6 +105,7 @@ namespace OSBLE.Models.Assignments
             this.AssignmentID = other.AssignmentID;
             this.InitialPostDueDate = other.InitialPostDueDate;
             this.MinimumFirstPostLength = other.MinimumFirstPostLength;
+            this.associatedEventID = null;
         }
 
         #region anonymity settings

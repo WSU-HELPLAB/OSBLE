@@ -209,15 +209,12 @@ namespace OSBLE.Controllers
             {
                 db.Events.Add(dEvent);
                 db.SaveChanges();
-                ds.AssociatedEventID = dEvent.ID;
-                db.Entry(ds).State = System.Data.EntityState.Modified;
-                db.SaveChanges();
+
             }
-            else
-            {
-                db.Entry(dEvent).State = System.Data.EntityState.Modified;
-                db.SaveChanges();
-            }
+            ds.AssociatedEventID = dEvent.ID;
+            db.Entry(ds).State = System.Data.EntityState.Modified;
+            db.Entry(dEvent).State = System.Data.EntityState.Modified;
+            db.SaveChanges();
 
         }
 
