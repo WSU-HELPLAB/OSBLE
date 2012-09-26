@@ -36,6 +36,13 @@
             @Html.ValidationMessageFor(m => m.Email)
         </div>
         <div class="editor-label">
+            @Html.LabelFor(m => m.ConfirmEmail)
+        </div>
+        <div class="editor-field">
+            @Html.TextBoxFor(m => m.ConfirmEmail)<br />
+            @Html.ValidationMessageFor(m => m.ConfirmEmail)
+        </div>
+        <div class="editor-label">
             @Html.LabelFor(m => m.Password)
         </div>
         <div class="editor-field">
