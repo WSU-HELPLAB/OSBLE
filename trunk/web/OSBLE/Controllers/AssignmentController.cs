@@ -148,24 +148,46 @@ namespace OSBLE.Controllers
 
             }
 
-            ViewBag.PastCount = (from a in Assignments
-                                 where a.DueDate < DateTime.Now &&
-                                 !a.IsDraft
-                                 select a).Count();
-            ViewBag.PresentCount = (from a in Assignments
-                                    where a.ReleaseDate < DateTime.Now &&
-                                    a.DueDate > DateTime.Now &&
-                                    !a.IsDraft
-                                    select a).Count();
-            ViewBag.FutureCount = (from a in Assignments
-                                   where a.DueDate >= DateTime.Now &&
-                                   a.ReleaseDate >= DateTime.Now &&
-                                   !a.IsDraft
-                                   select a).Count();
-            ViewBag.DraftCount = (from a in Assignments
-                                  where a.IsDraft
-                                  select a).Count();
-            ViewBag.Assignments = Assignments;
+            //Seperate all assignments for organizing into one list
+            List<Assignment> Past = (from a in Assignments
+                                     where a.DueDate < DateTime.Now &&
+                                     !a.IsDraft
+                                     orderby a.DueDate
+                                     select a).ToList();
+
+            List<Assignment> Present = (from a in Assignments
+                                        where a.ReleaseDate < DateTime.Now &&
+                                        a.DueDate > DateTime.Now &&
+                                        !a.IsDraft
+                                        orderby a.DueDate
+                                        select a).ToList();
+
+            List<Assignment> Future = (from a in Assignments
+                                       where a.DueDate >= DateTime.Now &&
+                                       a.ReleaseDate >= DateTime.Now &&
+                                       !a.IsDraft
+                                       orderby a.DueDate
+                                       select a).ToList();
+
+            List<Assignment> Draft = (from a in Assignments
+                                      where a.IsDraft
+                                      orderby a.DueDate
+                                      select a).ToList();
+
+            //Count them
+            ViewBag.PastCount = Past.Count();
+            ViewBag.PresentCount = Present.Count();
+            ViewBag.FutureCount = Future.Count();
+            ViewBag.DraftCount = Draft.Count();
+
+            //Combine back into one list.
+            Past.AddRange(Present);
+            Past.AddRange(Future);
+            Past.AddRange(Draft);
+            List<Assignment> AllAssignments = Past;
+
+
+            ViewBag.Assignments = AllAssignments;
             ViewBag.CurrentDate = DateTime.Now;
             ViewBag.Submitted = false;
             return View("Index");

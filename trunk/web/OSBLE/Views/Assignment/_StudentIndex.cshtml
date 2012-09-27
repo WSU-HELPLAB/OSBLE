@@ -1,5 +1,14 @@
 ﻿@using OSBLE.Models
 @using OSBLE.Models.Assignments
+@{
+    List<Assignment> assignments = ViewBag.Assignments;
+    List<TeamEvaluation> teamEvals = ViewBag.TeamEvaluations;
+    int PastCount = ViewBag.PastCount;
+    int PresentCount = ViewBag.PresentCount;
+    int FutureCount = ViewBag.FutureCount;
+    bool isFutureAssignment = false;
+    
+}
 <table class="assignTable" cellspacing="0">
     <th style="font-size: larger; padding-right:20px;">
         Assignment
@@ -11,30 +20,26 @@
         Latest Submission
     </th>
     @{
-        List<TeamEvaluation> teamEvals = (from te in ViewBag.TeamEvaluations as IEnumerable<TeamEvaluation>
-                                          select te).ToList();
-
-        //MG & KD: Assignments are in order based on:: past & present -> future -> draft. The flags below are used to: a)avoid duplicate headers for each category
-        //and b) allow the logic below the headers determine how to treat the assignment
-        bool futureFlag = false, presentFlag = false, pastFlag = false;
-        foreach (Assignment assignment in ViewBag.Assignments)
+        
+        
+        for (int i = 0; i < assignments.Count; i++)
         {
-            if (assignment.DueDate < ViewBag.CurrentDate && !pastFlag)
+            //if/else blocks used to for adding rows as headers between Past, Present, Future
+            if (i == 0 && PastCount > 0)
             {
-                //PAST
-                pastFlag = true;
                 <tr>
                     <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
-                        Past (@ViewBag.PastCount)
+                        Past (@PastCount)
                     </td>
                 </tr>
             }
-            else if (assignment.ReleaseDate > ViewBag.CurrentDate && !futureFlag)
+            
+            else if (i == (PastCount) && PresentCount > 0)
             {
-                //FUTURE
-                futureFlag = true;
-                if (pastFlag || presentFlag)
+                
+                if (PastCount > 0)
                 {
+                    //Only put a an empty row if there is something above this category
                     <tr>
                         <td style="padding-bottom: 10px">
                         </td>
@@ -42,17 +47,16 @@
                 }
                 <tr>
                     <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
-                        Future (@ViewBag.FutureCount)
+                        Present (@PresentCount)
                     </td>
                 </tr>
-
             }
-            else if (assignment.DueDate >= ViewBag.CurrentDate && !presentFlag)
+            else if (i == (PastCount + PresentCount) && FutureCount > 0)
             {
-                //PRESENT
-                presentFlag = true;
-                if (pastFlag)
+                isFutureAssignment = true;
+                if ((PastCount + PresentCount) > 0)
                 {
+                    //Only put a an empty row if there is something above this category
                     <tr>
                         <td style="padding-bottom: 10px">
                         </td>
@@ -60,7 +64,7 @@
                 }
                 <tr>
                     <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
-                        Present (@ViewBag.PresentCount)
+                        Future (@FutureCount)
                     </td>
                 </tr>
             }
@@ -68,23 +72,23 @@
         <tr class="checkeredRow">
             <td>
                 <!--Cell for name-->
-                @if (futureFlag)
+                @if (isFutureAssignment)
                 {
-                    @assignment.AssignmentName
+                    @assignments[i].AssignmentName
                 }
                 else
                 {
-                    @Html.ActionLink(assignment.AssignmentName, "Index", "Home", new { area = "AssignmentDetails", assignmentId = assignment.ID }, null)
+                    @Html.ActionLink(assignments[i].AssignmentName, "Index", "Home", new { area = "AssignmentDetails", assignmentId = assignments[i].ID }, null)
                 }
             </td>
-            <td>@assignment.DueDate.ToShortDateString() @assignment.DueDate.ToShortTimeString()
+            <td>@assignments[i].DueDate.ToShortDateString() @assignments[i].DueDate.ToShortTimeString()
             </td>
-            @if (futureFlag)
+            @if (isFutureAssignment)
             {
                 <td>
                 </td>
             }
-            else if (assignment.HasDeliverables)
+            else if (assignments[i].HasDeliverables)
             {
                 AjaxOptions options = new AjaxOptions()
                 {
@@ -93,19 +97,19 @@
                     UpdateTargetId = "submitFiles",
                     OnComplete = "SubmissionLoaded"
                 };
-                if (ViewBag.SubmissionInfoDictionary[assignment.ID] != "No Submission")
+                if (ViewBag.SubmissionInfoDictionary[assignments[i].ID] != "No Submission")
                 {  
                     <!--td for resubmit-->
-                    String display = ViewBag.SubmissionInfoDictionary[assignment.ID];
+                    String display = ViewBag.SubmissionInfoDictionary[assignments[i].ID];
                     <td>
                         <ul id="SubmissionItems">
                             <li>
-                                @(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
+                                @(Html.ActionLink(display, "getCurrentUsersZip", "FileHandler", new { assignmentID = assignments[i].ID }, new { onclick = "create_and_open_downloading_submission_dialog()" }))
                             </li>
                             <li>
-                                @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = assignment.ID }, options, new object())
+                                @Ajax.ActionLink("Resubmit", "Create", "Submission", new { id = assignments[i].ID }, options, new object())
                             </li>
-                            @if (ViewBag.SubmissionReceived && assignment.ID == ViewBag.SubmissionReceivedAssignmentID)
+                            @if (ViewBag.SubmissionReceived && assignments[i].ID == ViewBag.SubmissionReceivedAssignmentID)
                             {
                                 <li id="SubmissionReceivedText">Submission received</li>   
                             }
@@ -117,26 +121,26 @@
                     <!--TD for first submission-->
                     <td>
                         None.
-                        @Ajax.ActionLink("Submit Here", "Create", "Submission", new { id = assignment.ID }, options, new object())
+                        @Ajax.ActionLink("Submit Here", "Create", "Submission", new { id = assignments[i].ID }, options, new object())
                     </td>
                 }
             }
-            else if (assignment.Type == AssignmentTypes.TeamEvaluation)
+            else if (assignments[i].Type == AssignmentTypes.TeamEvaluation)
             {
                 bool found = (from te in teamEvals
-                               where te.TeamEvaluationAssignmentID == assignment.ID
+                              where te.TeamEvaluationAssignmentID == assignments[i].ID
                                select te).Count() > 0;
                     
                 if (found == false)
                 {
                     <td>
-                        @Html.ActionLink("Submit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignment.ID }, new { })
+                        @Html.ActionLink("Submit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignments[i].ID }, new { })
                     </td>
                 }
                 else
                 {
                     <td>
-                        @Html.ActionLink("View/Edit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignment.ID }, new { })
+                        @Html.ActionLink("View/Edit Team Evaluation", "StudentTeamEvaluation", "Assignment", new { assignmentId = assignments[i].ID }, new { })
                     </td>
                 }
             }
