@@ -47,6 +47,11 @@ namespace OSBLE.Models
         [Display(Name = "Email address")]
         public string Email { get; set; }
 
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm email address")]
+        [Compare("Email", ErrorMessage = "Email address do not match.")]
+        public string ConfirmEmail { get; set; }
+
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]

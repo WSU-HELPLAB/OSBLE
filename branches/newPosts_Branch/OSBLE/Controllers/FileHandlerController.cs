@@ -579,6 +579,11 @@ namespace OSBLE.Controllers
                                 zipfile.AddDirectory(submissionfolder);
                             }
                         }
+                        else if (assignment.Type == AssignmentTypes.Basic)
+                        {
+                            OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
+                            zipfile.AddItem(fs.Course(ActiveCourseUser.AbstractCourseID).Assignment(assignment).Submission(assignmentTeam.Team).GetPath());
+                        }
                         else
                         {
                             List<ReviewTeam> reviewTeams = (from rt in db.ReviewTeams

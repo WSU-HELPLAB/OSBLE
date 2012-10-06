@@ -179,24 +179,46 @@ namespace OSBLE.Controllers
                 }
             }
 
-            ViewBag.PastCount = (from a in Assignments
-                                 where a.DueDate < DateTime.Now &&
-                                 !a.IsDraft
-                                 select a).Count();
-            ViewBag.PresentCount = (from a in Assignments
-                                    where a.ReleaseDate < DateTime.Now &&
-                                    a.DueDate > DateTime.Now &&
-                                    !a.IsDraft
-                                    select a).Count();
-            ViewBag.FutureCount = (from a in Assignments
-                                   where a.DueDate >= DateTime.Now &&
-                                   a.ReleaseDate >= DateTime.Now &&
-                                   !a.IsDraft
-                                   select a).Count();
-            ViewBag.DraftCount = (from a in Assignments
-                                  where a.IsDraft
-                                  select a).Count();
-            ViewBag.Assignments = Assignments;
+            //Seperate all assignments for organizing into one list
+            List<Assignment> Past = (from a in Assignments
+                                     where a.DueDate < DateTime.Now &&
+                                     !a.IsDraft
+                                     orderby a.DueDate
+                                     select a).ToList();
+
+            List<Assignment> Present = (from a in Assignments
+                                        where a.ReleaseDate < DateTime.Now &&
+                                        a.DueDate > DateTime.Now &&
+                                        !a.IsDraft
+                                        orderby a.DueDate
+                                        select a).ToList();
+
+            List<Assignment> Future = (from a in Assignments
+                                       where a.DueDate >= DateTime.Now &&
+                                       a.ReleaseDate >= DateTime.Now &&
+                                       !a.IsDraft
+                                       orderby a.DueDate
+                                       select a).ToList();
+
+            List<Assignment> Draft = (from a in Assignments
+                                      where a.IsDraft
+                                      orderby a.DueDate
+                                      select a).ToList();
+
+            //Count them
+            ViewBag.PastCount = Past.Count();
+            ViewBag.PresentCount = Present.Count();
+            ViewBag.FutureCount = Future.Count();
+            ViewBag.DraftCount = Draft.Count();
+
+            //Combine back into one list.
+            Past.AddRange(Present);
+            Past.AddRange(Future);
+            Past.AddRange(Draft);
+            List<Assignment> AllAssignments = Past;
+
+
+            ViewBag.Assignments = AllAssignments;
             ViewBag.CurrentDate = DateTime.Now;
             ViewBag.Submitted = false;
             return View("Index");
@@ -364,12 +386,23 @@ namespace OSBLE.Controllers
         public ActionResult StudentTeamEvaluation(int assignmentId)
         {
             Assignment a = db.Assignments.Find(assignmentId);
-            AssignmentTeam pAt = GetAssignmentTeam(a.PreceedingAssignment, ActiveCourseUser);
+            Team previousTeam;
+            if (a.PreceedingAssignment.Type == AssignmentTypes.DiscussionAssignment)
+            {
+                //Note: This could have non-student types on the team, such as moderators or TAs
+                DiscussionTeam dt = GetDiscussionTeam(a.PreceedingAssignment, ActiveCourseUser);
+                previousTeam = new Team();
+                previousTeam.TeamMembers = dt.Team.TeamMembers.Where(tm => tm.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student).ToList();
+            }
+            else
+            {
+                previousTeam = GetAssignmentTeam(a.PreceedingAssignment, ActiveCourseUser).Team;
+            }
             AssignmentTeam at = GetAssignmentTeam(a, ActiveCourseUser);
             if (at != null && a.Type == AssignmentTypes.TeamEvaluation)
             {
                 ViewBag.AssignmentTeam = at;
-                ViewBag.PreviousAssignmentTeam = pAt;
+                ViewBag.PreviousTeam = previousTeam;
                 
                 List<TeamEvaluation> teamEvals = (from te in db.TeamEvaluations
                                            where
@@ -379,11 +412,11 @@ namespace OSBLE.Controllers
                                            select te).ToList();
                 //MG: evaluator (currentuser) must have completed at as many evaluations as team members from the previous assignment. 
                 //Otherwise, use artificial team evals for view
-                if (teamEvals.Count < pAt.Team.TeamMembers.Count)
+                if (teamEvals.Count < previousTeam.TeamMembers.Count) //Creating new team eval
                 {
                     List<TeamEvaluation> artificialTeamEvals = new List<TeamEvaluation>();
 
-                    foreach (TeamMember tm in pAt.Team.TeamMembers.OrderBy(tm2 => tm2.CourseUser.UserProfile.LastName))
+                    foreach (TeamMember tm in previousTeam.TeamMembers.OrderBy(tm2 => tm2.CourseUser.UserProfile.LastName))
                     {
                         TeamEvaluation te = new TeamEvaluation();
                         te.Points = 0;
@@ -392,9 +425,9 @@ namespace OSBLE.Controllers
                     }
                     ViewBag.SubmitButtonValue = "Submit";
                     ViewBag.TeamEvaluations = artificialTeamEvals;
-                    ViewBag.InitialPointsPossible = pAt.Team.TeamMembers.Count * 100;
+                    ViewBag.InitialPointsPossible = previousTeam.TeamMembers.Count * 100;
                 }
-                else
+                else //using existing team evals 
                 {
                     ViewBag.InitialPointsPossible = 0; //Must be 0 as we are reloading old TEs, and requirements for submitting initially are that points possible must be 0
                     ViewBag.Comment = teamEvals.FirstOrDefault().Comment;
@@ -415,7 +448,16 @@ namespace OSBLE.Controllers
         {
 
              Assignment assignment = db.Assignments.Find(assignmentId);
-             AssignmentTeam pAt = GetAssignmentTeam(assignment.PreceedingAssignment, ActiveCourseUser);
+             IAssignmentTeam pAt;
+             if (assignment.PreceedingAssignment.Type == AssignmentTypes.DiscussionAssignment)
+             {
+                 pAt = GetDiscussionTeam(assignment.PreceedingAssignment, ActiveCourseUser);
+             }
+             else
+             {
+                 pAt = GetAssignmentTeam(assignment.PreceedingAssignment, ActiveCourseUser);
+             }
+
             List<TeamEvaluation> existingTeamEvaluations = (from te in db.TeamEvaluations
                                                             where te.TeamEvaluationAssignmentID == assignmentId &&
                                                             te.EvaluatorID == ActiveCourseUser.ID
@@ -447,7 +489,8 @@ namespace OSBLE.Controllers
             List<int> TeamEvalPoints = new List<int>();
 
             //Creating or editing TeamEvaluations for each team member from the previous assignment assignment team
-            foreach (TeamMember tm in pAt.Team.TeamMembers)
+            //since the team could be a discussion team, only select team members who are students.
+            foreach (TeamMember tm in pAt.Team.TeamMembers.Where(tm => tm.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student))
             {
                 TeamEvaluation te = (from eval in existingTeamEvaluations
                                      where eval.RecipientID == tm.CourseUserID

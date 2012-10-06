@@ -96,7 +96,13 @@ namespace OSBLE.Controllers
                             string randomHash = GenerateRandomString(40);
                             localUser.AuthenticationHash = randomHash;
                             db.SaveChanges();
-                            sendVerificationEmail(true, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), localUser.FirstName, localUser.UserName);
+                            sendVerificationEmail(true, 
+                                "https://osble.org" + Url.Action("ActivateAccount", 
+                                new { hash = randomHash }), 
+                                localUser.FirstName, 
+                                localUser.UserName,
+                                randomHash
+                                );
                         }
 
                     }
@@ -198,12 +204,8 @@ namespace OSBLE.Controllers
             return View();
         }
 
-        public ActionResult ActivateAccount(string hash)
+        public ActionResult ActivateAccount(string hash = "")
         {
-            if (hash == null)
-            {
-                throw new Exception("Hash cannot be null");
-            }
             ViewBag.Hash = hash;
             LogOnModel model = new LogOnModel();
             model.Password = "foo";
@@ -214,31 +216,67 @@ namespace OSBLE.Controllers
         public ActionResult ActivateAccount(LogOnModel model)
         {
             string hash = Request.Params["hash"];
+            UserProfile user = db.UserProfiles.Where(up => up.UserName == model.UserName).FirstOrDefault();
 
-            if (hash != null && hash != "")
+            if (user != null)
             {
-                UserProfile user = db.UserProfiles.Where(up => up.UserName == model.UserName).FirstOrDefault();
-                if (user != null)
-                {
-                    if ((user.AuthenticationHash as string) == hash)
-                    {
-                        user.AuthenticationHash = null;
-                        user.IsApproved = true;
-                        db.SaveChanges();
-                        OsbleAuthentication.LogIn(user);
-                        db.SaveChanges();
 
-                        return RedirectToAction("Index", "Home");
+                if (user.IsApproved == false)
+                {
+                    //did the user request a new key?
+                    if (Request.Form.AllKeys.Contains("newCode"))
+                    {
+                        //...send an additional email verification
+                        setLogOnCaptcha();
+                        ModelState.AddModelError("", "An additional verification letter has been sent to your email address.");
+                        string randomHash = GenerateRandomString(40);
+                        user.AuthenticationHash = randomHash;
+                        db.SaveChanges();
+                        sendVerificationEmail(true,
+                            "https://osble.org" + Url.Action("ActivateAccount",
+                            new { hash = randomHash }),
+                            user.FirstName,
+                            user.UserName,
+                            randomHash
+                            );
                     }
                     else
                     {
-                        ModelState.AddModelError("", "Either the e-mail address or the link used to access this page is no longer valid");
+                        if (hash != null && hash != "")
+                        {
+                            if (user != null)
+                            {
+                                if ((user.AuthenticationHash as string) == hash)
+                                {
+                                    user.IsApproved = true;
+                                    db.SaveChanges();
+                                    OsbleAuthentication.LogIn(user);
+                                    db.SaveChanges();
+
+                                    return RedirectToAction("Index", "Home");
+                                }
+                                else
+                                {
+                                    ModelState.AddModelError("", "Either the e-mail address or the link used to access this page is no longer valid");
+                                }
+                            }
+                            else
+                            {
+                                ModelState.AddModelError("", "Either the e-mail address or the link used to access this page is no longer valid");
+                            }
+                        }
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Either the e-mail address or the link used to access this page is no longer valid");
+                    //user is already authenticated
+                    ModelState.AddModelError("", "This account has already been activated.");
                 }
+            }
+            else
+            {
+                //user is not valid
+                ModelState.AddModelError("", "A user with the specified email address does not exist the system.");
             }
             return View();
         }
@@ -280,7 +318,13 @@ namespace OSBLE.Controllers
                         return ProfessionalRegister();
                     }
 
-                    sendVerificationEmail(false, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), model.FirstName, model.Email);
+                    sendVerificationEmail(
+                        false, 
+                        "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), 
+                        model.FirstName, 
+                        model.Email,
+                        randomHash
+                        );
                     return RedirectToAction("AccountCreated");
                 }
                 else
@@ -378,7 +422,13 @@ namespace OSBLE.Controllers
                         return AcademiaRegister();
                     }
 
-                    sendVerificationEmail(true, "https://osble.org" + Url.Action("ActivateAccount", new { hash = randomHash }), profile.FirstName, profile.UserName);
+                    sendVerificationEmail(
+                        true, "https://osble.org" + 
+                        Url.Action("ActivateAccount", new { hash = randomHash }), 
+                        profile.FirstName, 
+                        profile.UserName,
+                        randomHash
+                        );
 
                     return RedirectToAction("AccountCreated");
                 }
@@ -703,13 +753,16 @@ namespace OSBLE.Controllers
             return false;
         }
 
-        private void sendVerificationEmail(bool acedemia, string link, string firstName, string to)
+        private void sendVerificationEmail(bool acedemia, string link, string firstName, string to, string hashCode)
         {
             string subject = "Welcome to OSBLE";
 
             string message = "Dear " + firstName + @",<br/>
             <br/>
-            Thank you for creating an account at osble.org. Please go <a href='" + link + @"'>here</a> in order to activate your account.<br/>
+            Thank you for creating an account at osble.org. Before you can log in, you must activate your 
+            account by <a href='" + link + @"'>visiting this link</a>.  Alternatively, you can visit the url: " + link + @"
+            and enter the code &quot;" + hashCode + @"&quot;. 
+            <br/>
             <br/>
             ";
             if (acedemia)

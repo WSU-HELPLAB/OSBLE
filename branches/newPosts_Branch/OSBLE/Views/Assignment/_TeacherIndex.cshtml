@@ -1,6 +1,13 @@
 ﻿@using OSBLE.Models
 @using OSBLE.Models.Assignments
-
+@{
+    List<Assignment> assignments = ViewBag.Assignments;
+    int PastCount = ViewBag.PastCount;
+    int PresentCount = ViewBag.PresentCount;
+    int FutureCount = ViewBag.FutureCount;
+    int DraftCount = ViewBag.DraftCount;
+    bool isDraftAssignment = false, isFutureAssignment = false;
+}
 
 <table class="assignTable" cellspacing="0">
     <th colspan="2" style="font-size:larger">Assignment</th>
@@ -8,121 +15,123 @@
     <th style="font-size:larger">Student Activity</th>
 
     @{
-        //MG & KD: Assignments are in order based on:: past & present -> future -> draft. The flags below are used to avoid duplicate headers for each category
-        bool draftFlag = false, futureFlag = false, presentFlag = false, pastFlag = false;
-        foreach (Assignment assignment in ViewBag.Assignments)
+        for(int i = 0; i < assignments.Count; i++)
         {
-            //Order of if checks is important as these if/else ifs are using short-circuiting.
-            if (assignment.IsDraft)
+            if (i == 0 && PastCount > 0)
             {
-                //DRAFT
-                if(!draftFlag)
-                {
-                    draftFlag = true;
-                    if (pastFlag || presentFlag || futureFlag)
-                    {
-                         <tr><td style="padding-bottom:10px"></td></tr>
-                    }
-                    <tr><td colspan="100%" style="padding-right:0; font-size:large" class="osbleColorBold">Draft (@ViewBag.DraftCount)</td></tr>
-                }
+                <tr>
+                    <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
+                        Past (@PastCount)
+                    </td>
+                </tr>
             }
-            else if (assignment.DueDate < ViewBag.CurrentDate && !pastFlag)
+            
+            else if (i == (PastCount) && PresentCount > 0)
             {
-                //PAST
-                pastFlag = true;
-                <tr><td colspan="100%" style="padding-right:0; font-size:large" class="osbleColorBold">Past (@ViewBag.PastCount)</td></tr>
-            }
-            else if (assignment.ReleaseDate > ViewBag.CurrentDate && !futureFlag)
-            {
-                //FUTURE
-                futureFlag = true;
-                if (pastFlag || presentFlag)
-                {
-                    <tr><td style="padding-bottom:10px"></td></tr>
-                }
-                <tr><td colspan="100%" style="padding-right:0; font-size:large" class="osbleColorBold">Future (@ViewBag.FutureCount)</td></tr>
                 
-            }
-            else if (assignment.DueDate >= ViewBag.CurrentDate && !presentFlag)
-            {
-                //PRESENT
-                presentFlag = true;
-                if (pastFlag)
+                if (PastCount > 0)
                 {
-                    <tr><td style="padding-bottom:10px"></td></tr>
+                    //Only put a an empty row if there is something above this category
+                    <tr>
+                        <td style="padding-bottom: 10px">
+                        </td>
+                    </tr>
                 }
-                <tr><td colspan="100%" style="padding-right:0; font-size:large" class="osbleColorBold">Present (@ViewBag.PresentCount)</td></tr>
+                <tr>
+                    <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
+                        Present (@PresentCount)
+                    </td>
+                </tr>
+            }
+            else if (i == (PastCount + PresentCount) && FutureCount > 0)
+            {
+                isFutureAssignment = true;
+                if ((PastCount + PresentCount) > 0)
+                {
+                    //Only put a an empty row if there is something above this category
+                    <tr>
+                        <td style="padding-bottom: 10px">
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
+                        Future (@FutureCount)
+                    </td>
+                </tr>
+            }
+            else if (i == (PastCount + PresentCount + FutureCount) && DraftCount > 0)
+            {
+                isFutureAssignment = false;
+                isDraftAssignment = true;
+                if ((PastCount + PresentCount) > 0)
+                {
+                    //Only put a an empty row if there is something above this category
+                    <tr>
+                        <td style="padding-bottom: 10px">
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td colspan="100%" style="padding-right: 0; font-size: large" class="osbleColorBold">
+                        Draft (@DraftCount)
+                    </td>
+                </tr>
             }
 
             //Now that headers are in place, inserting a assignment
             <tr class="checkeredRow"  >
                 <td style="padding-right:0; white-space:nowrap"><!--Cell for icons-->
-                    @if (assignment.IsDraft)
+                    @if (assignments[i].IsDraft)
                     {
-                        <a title="Click to Publish"  class="pointerOnMouseOver" href="/Assignment/ToggleDraft?assignmentID=@assignment.ID" >@Helpers.PublishButton()</a>
+                        <a title="Click to Publish"  class="pointerOnMouseOver" href="/Assignment/ToggleDraft?assignmentID=@assignments[i].ID" >@Helpers.PublishButton()</a>
                     }
                     else
                     {
-                        <a title="Click to Unpublish"  class="pointerOnMouseOver" href="/Assignment/ToggleDraft?assignmentID=@assignment.ID">@Helpers.UnPublishButton()</a>
+                        <a title="Click to Unpublish"  class="pointerOnMouseOver" href="/Assignment/ToggleDraft?assignmentID=@assignments[i].ID">@Helpers.UnPublishButton()</a>
                     }
-                    <a title="Click to Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = assignment.ID })">@Helpers.EditButton()</a>
-                    <a title="Click to Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@assignment.ID)">@Helpers.DeleteButton()</a>
+                    <a title="Click to Edit" href="@Url.Action("Index", "Home", new { area = "AssignmentWizard", assignmentId = assignments[i].ID })">@Helpers.EditButton()</a>
+                    <a title="Click to Delete" class="pointerOnMouseOver" onclick="openConfirmDeleteWindow(@assignments[i].ID)">@Helpers.DeleteButton()</a>
                 </td>
                 <td > <!--Cell for name-->
-                    @Html.ActionLink(assignment.AssignmentName, "Index", "Home", new { area = "AssignmentDetails", assignmentId = assignment.ID }, null)
+                    @Html.ActionLink(assignments[i].AssignmentName, "Index", "Home", new { area = "AssignmentDetails", assignmentId = assignments[i].ID }, null)
                 </td>
                 <td > <!--Cell for DueDate-->
-                    @assignment.DueDate.ToShortDateString() @assignment.DueTime.ToShortTimeString()
+                    @assignments[i].DueDate.ToShortDateString() @assignments[i].DueTime.ToShortTimeString()
                 </td>
 
                 <!--Cell for Student Activity-->
                 <td>                    
-                    @if (draftFlag || pastFlag)
+                    @if (isDraftAssignment)
                     {
                         
                     }
-                    else if(assignment.Type == AssignmentTypes.CriticalReviewDiscussion || assignment.Type ==  AssignmentTypes.DiscussionAssignment)
+                    else if(assignments[i].Type == AssignmentTypes.CriticalReviewDiscussion || assignments[i].Type ==  AssignmentTypes.DiscussionAssignment)
                     {
-                        @:@assignment.GetInitialPostsCount() of @ViewBag.TotalDiscussionPosters initial posts made.<br />
-                        @:@assignment.GetPostsCount() total posts. @assignment.GetNewPostsCount(ViewBag.ActiveCourseUser.ID) new posts.
+                        @:@assignments[i].GetInitialPostsCount() of @ViewBag.TotalDiscussionPosters initial posts made.<br />
+                        @:@assignments[i].GetPostsCount() total posts. @assignments[i].GetNewPostsCount(ViewBag.ActiveCourseUser.ID) new posts.
                     }
-                    else if (assignment.Type == AssignmentTypes.TeamEvaluation)
+                    else if (assignments[i].Type == AssignmentTypes.TeamEvaluation)
                     {
-                        @:@assignment.GetCompletedTeamEvaluationsCount() of @assignment.GetTotalTeamEvaluationCount() evaluations completed.
+                        @:@assignments[i].GetCompletedTeamEvaluationsCount() of @assignments[i].GetTotalTeamEvaluationCount() evaluations completed.
                     }
-                    else if (assignment.HasDeliverables)
+                    else if (assignments[i].HasDeliverables)
                     {
-                        @:@assignment.GetSubmissionCount() of @assignment.AssignmentTeams.Count submissions received.<br />
-                        @:@Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+                        @:@assignments[i].GetSubmissionCount() of @assignments[i].AssignmentTeams.Count submissions received.<br />
+                        @:@Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignments[i].ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
                     }
                 </td>
-                <!--Cell for Submissions
-                @if (assignment.HasDeliverables)
-                {
-                    if (draftFlag || pastFlag)
-                    {
-                        
-                    }
-                    else
-                    {
-                        <td>@assignment.GetSubmissionCount() of @assignment.AssignmentTeams.Count received. <br /> @Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignment.ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })</td>
-                    }
-                }
-                else
-                {
-                    <td>No Deliverables</td>
-                }
--->
 
 
            <!--Cell for Grading. Only show if hasRubric and not a future/draft assignment
+            Might still need this. Leaving here to toggle until its fate is decided. If anyone besides MG is looking at this, its safe to assume its good to delete
                 <td>
                     
-                    @if (assignment.HasRubric && !(futureFlag || draftFlag))
+                    @if (assignments[i].HasRubric && !(isFutureAssignment || isDraftAssignment))
                     {
                     
-                            @: @assignment.GetPublishedCount() of @assignment.AssignmentTeams.Count published.&nbsp @Html.ActionLink("Grade Now", "Index", "Rubric", new { assignmentId = assignment.ID, cuId = assignment.AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })<br />
-                            @: @assignment.GetSavedAsDraftCount() saved as draft.&nbsp @Html.ActionLink("Publish All", "PublishAllRubrics", "Assignment", new { area = "", assignmentId = assignment.ID }, new { })
+                            @: @assignments[i].GetPublishedCount() of @assignments[i].AssignmentTeams.Count published.&nbsp @Html.ActionLink("Grade Now", "Index", "Rubric", new { assignmentId = assignments[i].ID, cuId = assignments[i].AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })<br />
+                            @: @assignments[i].GetSavedAsDraftCount() saved as draft.&nbsp @Html.ActionLink("Publish All", "PublishAllRubrics", "Assignment", new { area = "", assignmentId = assignments[i].ID }, new { })
                     
                     }
                 </td>
