@@ -272,37 +272,6 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// This function takes a table from an uploaded gradebook and a value to match, and returns the the first column it finds with a match.
-        /// Note: Mark up characters do not interfere with a match, i.e. a match is anything matching "#matchValue", "!matchValue", or "matchValue". 
-        /// </summary>
-        /// <param name="table">Table to find the matching value</param>
-        /// <param name="matchValue">Value to find (without mark up characters)</param>
-        /// <returns>The column of the first match, or null if no match is found.</returns>
-        private int? FindMatchingColumnFromTable(List<List<string>> table, string matchValue)
-        {
-            int? nameColumn = null;
-
-            if (table != null)
-            {
-                for (int i = 0; i < table.Count; i++)
-                {
-                    for (int j = 0; j < table[i].Count; j++)
-                    {
-                        //Match if we find "matchValue","#matchValue", or "!matchValue"
-                        if (table[i][j] == matchValue
-                            || table[i][j] == '#' + matchValue
-                            || table[i][j] == '!' + matchValue)
-                        {
-                            nameColumn = j;
-                            return nameColumn;
-                        }
-                    }
-                }
-            }
-            return nameColumn;
-        }
-
-        /// <summary>
         /// Takes a full gradebook table and parses the table down to rows that have a leading "#" (indicating they are "global" rows)
         /// and columns that do not have a leading "!" (indiciating they are not to be shown). Additionally, the row that corrisponds to the current user
         /// (indicated by identification number in the StudentID column) will be included.

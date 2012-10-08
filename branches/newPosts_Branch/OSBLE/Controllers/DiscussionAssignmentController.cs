@@ -59,7 +59,7 @@ namespace OSBLE.Controllers
         }
 
         /// <summary>
-        /// This is the discussion view used by non-Instructor/TA users. It displays a discussion assignment for discussionTeamId. 
+        /// This is the discussion view used by non-Instructor/non-TA users. It displays a discussion assignment for discussionTeamId. 
         /// </summary>
         /// <param name="assignmentId"></param>
         /// <param name="discussionTeamId"></param>
@@ -81,25 +81,33 @@ namespace OSBLE.Controllers
                                   select dt).FirstOrDefault();
             }
 
-            //if ids are good and returned values, then confirm ActiveCourseUser belongs to that discussion team
-            bool isInDiscussionTeam = false;
-            if (assignment != null && discussionTeam != null)
+            //Make sure ActiveCourseUser is a valid discussion member
+                //Valid discussion members are in the discussion team, or in the class of a classwide discussion assignment
+            bool allowedInDiscussion = false;
+            if (assignment != null && assignment.HasDiscussionTeams == false)
             {
-
+                //Classwide discussion, make sure user is in course
+                if (ActiveCourseUser.AbstractCourseID == assignment.CourseID)
+                {
+                    allowedInDiscussion = true;
+                }
+            }
+            else if (assignment != null && discussionTeam != null)
+            {
+                //Assignment has discussion teams, make sure user is part of team.
                 foreach (TeamMember tm in discussionTeam.GetAllTeamMembers())
                 {
                     if (tm.CourseUserID == ActiveCourseUser.ID)
                     {
-                        isInDiscussionTeam = true;
+                        allowedInDiscussion = true;
                         break;
                     }
                 }
             }
 
 
-
             //if ActiveCourseUser belongs to the discussionTeam, continue. Otherwise kick them out.
-            if (isInDiscussionTeam)
+            if (allowedInDiscussion)
             {
                 DiscussionViewModel dvm = new DiscussionViewModel(discussionTeam, ActiveCourseUser);
 
@@ -143,6 +151,13 @@ namespace OSBLE.Controllers
                 {
                     ViewBag.HighlightValue = HighlightValue.NewPosts;
                 }
+
+                //Allow Moderators to post w/o word count restriction
+                if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
+                {
+                    ViewBag.IsFirstPost = false;
+                }
+
                 ViewBag.LastVisit = GetAndUpdateLastVisit(discussionTeamId);
                 ViewBag.CanPost = assignment.DueDate > DateTime.Now;
                 ViewBag.DiscussionPostViewModelList = dvm.DiscussionPostViewModels.OrderBy(dpvm => dpvm.Posted).ToList();

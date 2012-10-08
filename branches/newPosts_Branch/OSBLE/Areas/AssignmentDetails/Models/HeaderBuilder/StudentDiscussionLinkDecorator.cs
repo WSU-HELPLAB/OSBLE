@@ -31,12 +31,14 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             dynamic header = Builder.BuildHeader(assignment);
             header.StudentDiscussion = new DynamicDictionary();
 
-            //build a list of all discussionTeams that the current student is on
+            //Finding discussion team user is on. Despite the assingment being classwide, we want
+            //the user to always have the same DiscussionTeamID when posting
             bool breakout = false;
             foreach(DiscussionTeam dt in assignment.DiscussionTeams)
             {
                 foreach (TeamMember tm in dt.GetAllTeamMembers())
                 {
+                    //Found team user is on
                     if (tm.CourseUserID == Student.ID)
                     {
                         header.StudentDiscussion.DiscussionTeam = dt;
@@ -48,6 +50,14 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                 if(breakout)
                     break;
             }
+
+            //Moderators are not part of a team. Allow them to view the discussion with any discussionTeam
+            if (header.StudentDiscussion.DiscussionTeam == null)
+            {
+                header.StudentDiscussion.DiscussionTeam = assignment.DiscussionTeams.FirstOrDefault();
+                header.StudentDiscussion.NewPosts = 0;
+            }
+            
 
             return header;
         }

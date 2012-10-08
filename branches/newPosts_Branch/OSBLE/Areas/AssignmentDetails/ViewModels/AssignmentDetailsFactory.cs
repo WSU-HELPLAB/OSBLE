@@ -183,6 +183,12 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                     vm.HeaderBuilder = new DiscussionTeamMemberDecorator(vm.HeaderBuilder, vm.Client);
                     vm.HeaderViews.Add("DiscussionTeamMemberDecorator");
                 }
+                else if (assignment.Type == AssignmentTypes.DiscussionAssignment && !assignment.HasDiscussionTeams)
+                {
+                    //link to classwide discussion
+                    vm.HeaderBuilder = new StudentDiscussionLinkDecorator(vm.HeaderBuilder, vm.Client);
+                    vm.HeaderViews.Add("StudentDiscussionLinkDecorator");
+                }
             }
 
             if (assignment.Type == AssignmentTypes.CriticalReview || 

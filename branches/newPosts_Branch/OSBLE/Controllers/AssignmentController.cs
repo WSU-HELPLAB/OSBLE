@@ -148,6 +148,7 @@ namespace OSBLE.Controllers
             else if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
             {
                 //for moderators, grab only discussion/Critical review assignment types that they are to partcipate in
+                    //Or any discussions that are classwide
                 var discussionBasedAssignment = (from assignment in db.Assignments
                                where !assignment.IsDraft &&
                                assignment.CourseID == ActiveCourseUser.AbstractCourseID &&
@@ -159,6 +160,14 @@ namespace OSBLE.Controllers
                 //going through all the discussion assignment's discussion teams looking for a team member who is the current user.
                 foreach (Assignment assignment in discussionBasedAssignment)
                 {
+                    //Checking if classwide
+                    if (assignment.HasDiscussionTeams == false)
+                    {
+                        Assignments.Add(assignment);
+                        continue;
+                    }
+
+                    //checking if user is on team
                     bool addedAssignment = false;
                     foreach (DiscussionTeam dt in assignment.DiscussionTeams)
                     {
