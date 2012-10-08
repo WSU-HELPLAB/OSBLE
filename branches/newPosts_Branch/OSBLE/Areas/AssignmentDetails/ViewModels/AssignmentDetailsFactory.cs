@@ -322,21 +322,30 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
         {
             List<IAssignmentTeam> teams = new List<IAssignmentTeam>();
 
-            switch (assignment.Type)
+            //TeamEvaluation assignments with Discussion Assignments as preceding assignments 
+            //cannot use this simple switch to determine which teams to return. so adding a preceding if check
+            if (assignment.Type == AssignmentTypes.TeamEvaluation && assignment.PreceedingAssignment.Type == AssignmentTypes.DiscussionAssignment)
             {
-                case AssignmentTypes.TeamEvaluation:
-                    teams = assignment.PreceedingAssignment.AssignmentTeams.Cast<IAssignmentTeam>().ToList();
-                    break;
+                teams = assignment.PreceedingAssignment.DiscussionTeams.Cast<IAssignmentTeam>().ToList();
+            }
+            else
+            {
+                switch (assignment.Type)
+                {
+                    case AssignmentTypes.TeamEvaluation:
+                        teams = assignment.PreceedingAssignment.AssignmentTeams.Cast<IAssignmentTeam>().ToList();
+                        break;
 
-                case AssignmentTypes.Basic:
-                case AssignmentTypes.CriticalReview:
-                    teams = assignment.AssignmentTeams.Cast<IAssignmentTeam>().ToList();
-                    break;
+                    case AssignmentTypes.Basic:
+                    case AssignmentTypes.CriticalReview:
+                        teams = assignment.AssignmentTeams.Cast<IAssignmentTeam>().ToList();
+                        break;
 
-                case AssignmentTypes.CriticalReviewDiscussion:
-                case AssignmentTypes.DiscussionAssignment:
-                    teams = assignment.DiscussionTeams.Cast<IAssignmentTeam>().ToList();
-                    break;
+                    case AssignmentTypes.CriticalReviewDiscussion:
+                    case AssignmentTypes.DiscussionAssignment:
+                        teams = assignment.DiscussionTeams.Cast<IAssignmentTeam>().ToList();
+                        break;
+                }
             }
             return teams;
         }

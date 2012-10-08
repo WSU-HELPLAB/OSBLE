@@ -46,7 +46,7 @@
                             @if (ListOfNewPostCounts[i] > 0)
                             {
                                 <br />
-                                @Html.ActionLink("View " + ListOfNewPostCounts[i] + " New Posts",
+                                @Html.ActionLink("View " + ListOfNewPostCounts[i] + " Unread Posts",
                                             "Index", "DiscussionAssignment",
                                                 new { assignmentId = assignment.ID, discussionTeamId = ListOfTeamIDs[i], displayNewPosts=true, area = "" },
                                                 new { }) 

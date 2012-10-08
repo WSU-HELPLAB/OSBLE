@@ -315,11 +315,12 @@ namespace OSBLE.Controllers
             List<double> MultipliersInOrder = new List<double>();
             List<string> CommentsInOrder = new List<string>();
             List<CourseUser> CourseUsersInOrder = (from tm in precTeam.TeamMembers
+                                                   where tm.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student
                                                    orderby tm.CourseUser.UserProfile.LastName, tm.CourseUser.UserProfile.FirstName
                                                    select tm.CourseUser).ToList();
             double[,] table;
 
-            table = new double[precTeam.TeamMembers.Count, precTeam.TeamMembers.Count+1];
+            table = new double[CourseUsersInOrder.Count, CourseUsersInOrder.Count + 1];
             int i = 0;
             int j = 0;
 
@@ -337,7 +338,7 @@ namespace OSBLE.Controllers
                                        where te.RecipientID == cu.ID
                                        select te.Points).Sum();
 
-                    double myMulti = myPoints / ((OurTeamEvals.Count / precTeam.TeamMembers.Count) * 100);
+                    double myMulti = myPoints / ((OurTeamEvals.Count / CourseUsersInOrder.Count) * 100);
                     MultipliersInOrder.Add(myMulti);
                 }
                 else
@@ -346,7 +347,7 @@ namespace OSBLE.Controllers
                 }
                 
 
-                if (myEvals != null && myEvals.Count > 0)
+                if (myEvals != null && myEvals.Count > 0) //Using existing evaluation
                 {
                     CommentsInOrder.Add(myEvals.FirstOrDefault().Comment);
                     foreach (TeamEvaluation te in myEvals)
@@ -355,10 +356,10 @@ namespace OSBLE.Controllers
                         j++;
                     }
                 }
-                else
+                else //Creating Evlauations as they did not exist
                 {
                     CommentsInOrder.Add("");
-                    foreach (TeamMember tm2 in precTeam.TeamMembers)
+                    foreach (CourseUser cu2 in CourseUsersInOrder)
                     {
                         table[i, j] = 0;
                         j++;
@@ -519,7 +520,7 @@ namespace OSBLE.Controllers
                 }
             }
 
-            if ((TeamEvalPoints.Max() - TeamEvalPoints.Min()) > assignment.TeamEvaluationSettings.DiscrepancyCheckSize)
+            if (assignment.TeamEvaluationSettings.DiscrepancyCheckSize > 0 && (TeamEvalPoints.Max() - TeamEvalPoints.Min()) > assignment.TeamEvaluationSettings.DiscrepancyCheckSize)
             {
                 (new NotificationController()).SendTeamEvaluationDiscrepancyNotification(pAt.TeamID, assignment);
             }

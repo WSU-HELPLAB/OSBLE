@@ -19,7 +19,7 @@
         @if (newPosts > 0)
         {
             @:&nbsp-&nbsp
-            @:@Html.ActionLink("View " + newPosts.ToString() + " New Posts", "TeacherIndex", "DiscussionAssignment",
+            @:@Html.ActionLink("View " + newPosts.ToString() + " Unread Posts", "TeacherIndex", "DiscussionAssignment",
             new { 
                 assignmentId = dataModel.ID,
                 courseUserId = 0, 

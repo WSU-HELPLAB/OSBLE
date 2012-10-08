@@ -109,7 +109,7 @@
                     else if(assignments[i].Type == AssignmentTypes.CriticalReviewDiscussion || assignments[i].Type ==  AssignmentTypes.DiscussionAssignment)
                     {
                         @:@assignments[i].GetInitialPostsCount() of @ViewBag.TotalDiscussionPosters initial posts made.<br />
-                        @:@assignments[i].GetPostsCount() total posts. @assignments[i].GetNewPostsCount(ViewBag.ActiveCourseUser.ID) new posts.
+                        @:@assignments[i].GetPostsCount() total posts. @assignments[i].GetNewPostsCount(ViewBag.ActiveCourseUser.ID) undread posts.
                     }
                     else if (assignments[i].Type == AssignmentTypes.TeamEvaluation)
                     {

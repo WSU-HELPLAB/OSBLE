@@ -163,8 +163,8 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         static public void UpdateAssignmentEvent(Assignment assignment, Event aEvent, int ActiveCourseUserId, ContextBase db)
         {
-
-            aEvent.Description = assignment.AssignmentDescription; //This should actually be a link to the assignment
+            //Link to assignment details. Note, since this is hardcoded to osble.org, it will not work locally.
+            aEvent.Description = "[url:Assignment Page|www.osble.org/AssignmentDetails/" + assignment.ID + "]"; 
             aEvent.EndDate = assignment.DueDate;
             aEvent.EndTime = assignment.DueTime;
             aEvent.StartDate = assignment.DueDate;
@@ -196,7 +196,8 @@ namespace OSBLE.Controllers
         [CanModifyCourse]
         static public void UpdateDiscussionEvent(DiscussionSetting ds, Event dEvent, int ActiveCourseUserId, ContextBase db)
         {
-            dEvent.Description = "PlaceholdeR"; //Link to assignment details
+            //Link to assignment details. Note, since this is hardcoded to osble.org, it will not work locally.
+            dEvent.Description = "[url:Assignment Page|www.osble.org/AssignmentDetails/" + ds.AssignmentID + "]"; 
             dEvent.EndDate = ds.InitialPostDueDate;
             dEvent.EndTime = ds.InitialPostDueDueTime;
             dEvent.StartDate = ds.InitialPostDueDate;

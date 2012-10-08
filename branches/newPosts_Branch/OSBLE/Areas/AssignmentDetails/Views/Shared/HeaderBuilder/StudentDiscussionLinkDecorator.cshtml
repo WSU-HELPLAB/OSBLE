@@ -20,7 +20,7 @@
         @if (newPosts > 0)
         {
             @:&nbsp-&nbsp
-            @:@Html.ActionLink("View " + newPosts.ToString() + " New Posts", 
+            @:@Html.ActionLink("View " + newPosts.ToString() + " Unread Posts", 
             "Index", "DiscussionAssignment",
             new { assignmentId = discussionTeam.AssignmentID, discussionTeamId = discussionTeam.ID, displayNewPosts=true, area = "" }, 
             new { })
