@@ -215,7 +215,7 @@ namespace OSBLE.Controllers
         [HttpPost]
         public ActionResult ActivateAccount(LogOnModel model)
         {
-            string hash = Request.Params["hash"];
+            string hash = Request.Form["hash"];
             UserProfile user = db.UserProfiles.Where(up => up.UserName == model.UserName).FirstOrDefault();
 
             if (user != null)
@@ -257,12 +257,12 @@ namespace OSBLE.Controllers
                                 }
                                 else
                                 {
-                                    ModelState.AddModelError("", "Either the e-mail address or the link used to access this page is no longer valid");
+                                    ModelState.AddModelError("", "The authentication code \""+ hash +"\"");
                                 }
                             }
                             else
                             {
-                                ModelState.AddModelError("", "Either the e-mail address or the link used to access this page is no longer valid");
+                                ModelState.AddModelError("", "A user with the specified email address does not exist the system.");
                             }
                         }
                     }

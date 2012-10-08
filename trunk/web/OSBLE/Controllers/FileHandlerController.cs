@@ -565,7 +565,8 @@ namespace OSBLE.Controllers
                 if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && assignment.AssignmentTeams.Contains(assignmentTeam))
                 {
 
-                    string zipFileName = assignment.AssignmentName + " by " + assignmentTeam.Team.Name + ".zip";
+                    //AC TODO: use some sort of logic to determine an appropriate file name.
+                    string zipFileName = "document" + ".zip";
 
                     string submissionfolder;
                     using (ZipFile zipfile = new ZipFile())

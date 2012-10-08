@@ -108,6 +108,21 @@ namespace OSBLE.Services
                 return new byte[0];
             }
 
+            //were we handed a discussion assignment ID by accident?
+            if (criticalReviewAssignment.Type == AssignmentTypes.CriticalReviewDiscussion)
+            {
+                if (criticalReviewAssignment.PreceedingAssignment.Type == AssignmentTypes.CriticalReview)
+                {
+                    criticalReviewAssignment = criticalReviewAssignment.PreceedingAssignment;
+                    criticalReviewAssignmentId = criticalReviewAssignment.ID;
+                }
+                else
+                {
+                    return new byte[0];
+                }
+            }
+
+
             //only continue if:
             // a: the assignment's due date has passed
             // b: the assignment is set up to release critical reviews to students after
