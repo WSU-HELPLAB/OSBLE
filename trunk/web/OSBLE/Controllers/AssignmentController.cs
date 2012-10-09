@@ -73,6 +73,12 @@ namespace OSBLE.Controllers
                                where assignment.CourseID == ActiveCourseUser.AbstractCourseID
                                orderby assignment.IsDraft, assignment.ReleaseDate
                                select assignment).ToList();
+
+                //We want the number of Posters who's initial posts should be tracked. So students in this course.
+                ViewBag.TotalDiscussionPosters = (from cu in db.CourseUsers
+                                                  where cu.AbstractCourseID == ActiveCourseUser.AbstractCourseID &&
+                                                  cu.AbstractRoleID == (int)CourseRole.CourseRoles.Student
+                                                  select cu).Count();
             }
             else if (ActiveCourseUser.AbstractRole.CanSubmit)
             {
@@ -84,23 +90,50 @@ namespace OSBLE.Controllers
                                select assignment).ToList();
 
                 
-
                 //This Dictionary contains:
                     //Key: AssignmentID
-                    //Value: submissionTime (as string)
+                    //Value: tuple(submissionTime (as string), discussion team ID as int or null)
                 Dictionary<int, string> submissionInfo = new Dictionary<int,string>();
-                
+                Dictionary<int, DiscussionTeam> dtInfo = new Dictionary<int, DiscussionTeam>();
                 foreach (Assignment a in Assignments)
                 {
-                    AssignmentTeam at = GetAssignmentTeam(a, ActiveCourseUser);
-                    DateTime? subTime = FileSystem.GetSubmissionTime(at);
-                    string submissionTime = "No Submission";
-                    if (subTime != null) //found a submission time, Reassign submissionTime
+                    if (a.HasDeliverables)
                     {
-                        submissionTime = subTime.Value.ToString();
+                        AssignmentTeam at = GetAssignmentTeam(a, ActiveCourseUser);
+                        DateTime? subTime = FileSystem.GetSubmissionTime(at);
+                        string submissionTime = "No Submission";
+                        if (subTime != null) //found a submission time, Reassign submissionTime
+                        {
+                            submissionTime = subTime.Value.ToString();
+                        }
+
+                        submissionInfo.Add(a.ID, submissionTime);
+                    }
+                    else
+                    {
+                        submissionInfo.Add(a.ID, "No Submission");
                     }
 
-                    submissionInfo.Add(a.ID, submissionTime);
+                    if (a.Type == AssignmentTypes.DiscussionAssignment || a.Type == AssignmentTypes.CriticalReviewDiscussion)
+                    {
+                        foreach (DiscussionTeam dt in a.DiscussionTeams)
+                        {
+                            foreach (TeamMember tm in dt.GetAllTeamMembers())
+                            {
+                                if (tm.CourseUserID == ActiveCourseUser.ID) //Checking if Client is a member within the DiscussionTeam
+                                {
+                                    dtInfo.Add(a.ID, dt);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        dtInfo.Add(a.ID, null);
+                    }
+                    ViewBag.dtInfo = dtInfo;
+                    
                 }
 
                 //Gathering the Team Evaluations for the current user's teams.
@@ -115,6 +148,7 @@ namespace OSBLE.Controllers
             else if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
             {
                 //for moderators, grab only discussion/Critical review assignment types that they are to partcipate in
+                    //Or any discussions that are classwide
                 var discussionBasedAssignment = (from assignment in db.Assignments
                                where !assignment.IsDraft &&
                                assignment.CourseID == ActiveCourseUser.AbstractCourseID &&
@@ -126,6 +160,14 @@ namespace OSBLE.Controllers
                 //going through all the discussion assignment's discussion teams looking for a team member who is the current user.
                 foreach (Assignment assignment in discussionBasedAssignment)
                 {
+                    //Checking if classwide
+                    if (assignment.HasDiscussionTeams == false)
+                    {
+                        Assignments.Add(assignment);
+                        continue;
+                    }
+
+                    //checking if user is on team
                     bool addedAssignment = false;
                     foreach (DiscussionTeam dt in assignment.DiscussionTeams)
                     {
@@ -144,8 +186,6 @@ namespace OSBLE.Controllers
                         }
                     }
                 }
-
-
             }
 
             //Seperate all assignments for organizing into one list
@@ -206,7 +246,29 @@ namespace OSBLE.Controllers
             //Confirm assignment belongs to the current users course before proceeding
             if (assignment.CourseID == ActiveCourseUser.AbstractCourse.ID) 
             {
-                Assignment.ToggleDraft(assignmentID, ActiveCourseUser.ID);
+                assignment.IsDraft = !assignment.IsDraft;
+                db.SaveChanges();
+                if (assignment.IsDraft) //assignment has been changed to draft, remove associated events
+                {
+                    if (assignment.AssociatedEvent != null)
+                    {
+                        db.Events.Remove(assignment.AssociatedEvent);
+                        assignment.AssociatedEventID = null;
+                        db.SaveChanges();
+                    }
+
+                    if (assignment.DiscussionSettings != null && assignment.DiscussionSettings.AssociatedEventID != null)
+                    {
+                        //remove event manually
+                        db.Events.Remove(assignment.DiscussionSettings.AssociatedEvent);
+                        assignment.DiscussionSettings.AssociatedEventID = null;
+                        db.SaveChanges();
+                    }
+                }
+                else //Published, add an event
+                {
+                    EventController.CreateAssignmentEvent(assignment, ActiveCourseUser.ID, db);
+                } 
             }
             return RedirectToRoute(new { action = "Index" });
         }
@@ -262,11 +324,12 @@ namespace OSBLE.Controllers
             List<double> MultipliersInOrder = new List<double>();
             List<string> CommentsInOrder = new List<string>();
             List<CourseUser> CourseUsersInOrder = (from tm in precTeam.TeamMembers
+                                                   where tm.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student
                                                    orderby tm.CourseUser.UserProfile.LastName, tm.CourseUser.UserProfile.FirstName
                                                    select tm.CourseUser).ToList();
             double[,] table;
 
-            table = new double[precTeam.TeamMembers.Count, precTeam.TeamMembers.Count+1];
+            table = new double[CourseUsersInOrder.Count, CourseUsersInOrder.Count + 1];
             int i = 0;
             int j = 0;
 
@@ -284,7 +347,7 @@ namespace OSBLE.Controllers
                                        where te.RecipientID == cu.ID
                                        select te.Points).Sum();
 
-                    double myMulti = myPoints / ((OurTeamEvals.Count / precTeam.TeamMembers.Count) * 100);
+                    double myMulti = myPoints / ((OurTeamEvals.Count / CourseUsersInOrder.Count) * 100);
                     MultipliersInOrder.Add(myMulti);
                 }
                 else
@@ -293,7 +356,7 @@ namespace OSBLE.Controllers
                 }
                 
 
-                if (myEvals != null && myEvals.Count > 0)
+                if (myEvals != null && myEvals.Count > 0) //Using existing evaluation
                 {
                     CommentsInOrder.Add(myEvals.FirstOrDefault().Comment);
                     foreach (TeamEvaluation te in myEvals)
@@ -302,10 +365,10 @@ namespace OSBLE.Controllers
                         j++;
                     }
                 }
-                else
+                else //Creating Evlauations as they did not exist
                 {
                     CommentsInOrder.Add("");
-                    foreach (TeamMember tm2 in precTeam.TeamMembers)
+                    foreach (CourseUser cu2 in CourseUsersInOrder)
                     {
                         table[i, j] = 0;
                         j++;
@@ -333,12 +396,23 @@ namespace OSBLE.Controllers
         public ActionResult StudentTeamEvaluation(int assignmentId)
         {
             Assignment a = db.Assignments.Find(assignmentId);
-            AssignmentTeam pAt = GetAssignmentTeam(a.PreceedingAssignment, ActiveCourseUser);
+            Team previousTeam;
+            if (a.PreceedingAssignment.Type == AssignmentTypes.DiscussionAssignment)
+            {
+                //Note: This could have non-student types on the team, such as moderators or TAs
+                DiscussionTeam dt = GetDiscussionTeam(a.PreceedingAssignment, ActiveCourseUser);
+                previousTeam = new Team();
+                previousTeam.TeamMembers = dt.Team.TeamMembers.Where(tm => tm.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student).ToList();
+            }
+            else
+            {
+                previousTeam = GetAssignmentTeam(a.PreceedingAssignment, ActiveCourseUser).Team;
+            }
             AssignmentTeam at = GetAssignmentTeam(a, ActiveCourseUser);
             if (at != null && a.Type == AssignmentTypes.TeamEvaluation)
             {
                 ViewBag.AssignmentTeam = at;
-                ViewBag.PreviousAssignmentTeam = pAt;
+                ViewBag.PreviousTeam = previousTeam;
                 
                 List<TeamEvaluation> teamEvals = (from te in db.TeamEvaluations
                                            where
@@ -348,11 +422,11 @@ namespace OSBLE.Controllers
                                            select te).ToList();
                 //MG: evaluator (currentuser) must have completed at as many evaluations as team members from the previous assignment. 
                 //Otherwise, use artificial team evals for view
-                if (teamEvals.Count < pAt.Team.TeamMembers.Count)
+                if (teamEvals.Count < previousTeam.TeamMembers.Count) //Creating new team eval
                 {
                     List<TeamEvaluation> artificialTeamEvals = new List<TeamEvaluation>();
 
-                    foreach (TeamMember tm in pAt.Team.TeamMembers.OrderBy(tm2 => tm2.CourseUser.UserProfile.LastName))
+                    foreach (TeamMember tm in previousTeam.TeamMembers.OrderBy(tm2 => tm2.CourseUser.UserProfile.LastName))
                     {
                         TeamEvaluation te = new TeamEvaluation();
                         te.Points = 0;
@@ -361,9 +435,9 @@ namespace OSBLE.Controllers
                     }
                     ViewBag.SubmitButtonValue = "Submit";
                     ViewBag.TeamEvaluations = artificialTeamEvals;
-                    ViewBag.InitialPointsPossible = pAt.Team.TeamMembers.Count * 100;
+                    ViewBag.InitialPointsPossible = previousTeam.TeamMembers.Count * 100;
                 }
-                else
+                else //using existing team evals 
                 {
                     ViewBag.InitialPointsPossible = 0; //Must be 0 as we are reloading old TEs, and requirements for submitting initially are that points possible must be 0
                     ViewBag.Comment = teamEvals.FirstOrDefault().Comment;
@@ -384,7 +458,16 @@ namespace OSBLE.Controllers
         {
 
              Assignment assignment = db.Assignments.Find(assignmentId);
-             AssignmentTeam pAt = GetAssignmentTeam(assignment.PreceedingAssignment, ActiveCourseUser);
+             IAssignmentTeam pAt;
+             if (assignment.PreceedingAssignment.Type == AssignmentTypes.DiscussionAssignment)
+             {
+                 pAt = GetDiscussionTeam(assignment.PreceedingAssignment, ActiveCourseUser);
+             }
+             else
+             {
+                 pAt = GetAssignmentTeam(assignment.PreceedingAssignment, ActiveCourseUser);
+             }
+
             List<TeamEvaluation> existingTeamEvaluations = (from te in db.TeamEvaluations
                                                             where te.TeamEvaluationAssignmentID == assignmentId &&
                                                             te.EvaluatorID == ActiveCourseUser.ID
@@ -416,7 +499,8 @@ namespace OSBLE.Controllers
             List<int> TeamEvalPoints = new List<int>();
 
             //Creating or editing TeamEvaluations for each team member from the previous assignment assignment team
-            foreach (TeamMember tm in pAt.Team.TeamMembers)
+            //since the team could be a discussion team, only select team members who are students.
+            foreach (TeamMember tm in pAt.Team.TeamMembers.Where(tm => tm.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student))
             {
                 TeamEvaluation te = (from eval in existingTeamEvaluations
                                      where eval.RecipientID == tm.CourseUserID
@@ -445,7 +529,7 @@ namespace OSBLE.Controllers
                 }
             }
 
-            if ((TeamEvalPoints.Max() - TeamEvalPoints.Min()) > assignment.TeamEvaluationSettings.DiscrepancyCheckSize)
+            if (assignment.TeamEvaluationSettings.DiscrepancyCheckSize > 0 && (TeamEvalPoints.Max() - TeamEvalPoints.Min()) > assignment.TeamEvaluationSettings.DiscrepancyCheckSize)
             {
                 (new NotificationController()).SendTeamEvaluationDiscrepancyNotification(pAt.TeamID, assignment);
             }

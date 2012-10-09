@@ -6,15 +6,13 @@
     Team Evaluations</h2>
 @{
     List<TeamEvaluation> teamEvalList = ViewBag.TeamEvaluations;
-
     AssignmentTeam at = ViewBag.AssignmentTeam;
-    AssignmentTeam pAt = ViewBag.PreviousAssignmentTeam;
-
-    <input id="requiredCommentLength" type="hidden" value="@at.Assignment.TeamEvaluationSettings.RequiredCommentLength" />
-
-    //Assignment assign = ViewBag.AssignmentTeam.Assignment;
-    int pointsRemaining = ViewBag.PreviousAssignmentTeam.Team.TeamMembers.Count * 100;
+    Team previousTeam = ViewBag.PreviousTeam;
+    int pointsRemaining = previousTeam.TeamMembers.Count * 100;
     int assignId = ViewBag.AssignmentTeam.AssignmentID;
+    
+    <input id="requiredCommentLength" type="hidden" value="@at.Assignment.TeamEvaluationSettings.RequiredCommentLength" />
+    
     using (Html.BeginForm("SubmitTeamEvaluation", "Assignment", new { assignmentId = assignId }, FormMethod.Post))
     {
         <fieldset style="width: 400px;">
@@ -119,7 +117,7 @@
             var maxValue =  -1;
             var minValue = 10000;
             var currentValue = 0;
-            @foreach (TeamMember tm in pAt.Team.TeamMembers)
+            @foreach (TeamMember tm in previousTeam.TeamMembers)
             {
                @:currentValue= parseInt($("#points-@(tm.CourseUserID)").val());
                @:if(currentValue > maxValue)

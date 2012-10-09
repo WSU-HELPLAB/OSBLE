@@ -32,7 +32,7 @@
 
         $('#dtInstructorSelect').change(function () {
             var dtID = $('#dtInstructorSelect').val();
-            window.location.replace("TeacherIndex?assignmentId=" + @assignment.ID + "&courseUserId=" + 0 + "&postOrReply=" + 3 + "&discussionTeamID=" + dtID);
+            window.location.replace("TeacherIndex?assignmentId=" + @assignment.ID + "&courseUserId=" + 0 + "&discussionTeamID=" + dtID + "&hightlightValue=None");
 
         });
         $('#dtStudentSelect').change(function () {
@@ -212,12 +212,16 @@
                 displayPicture = DefaultProfilePicture;
             }
             <div class="dp_post" id="dp_post_@(dpvm.DiscussionPostId)" style="background:white;">
-            @if (ViewBag.Student != null
-                && ViewBag.Student.ID == dpvm.poster.CourseUser.ID
-                && (ViewBag.PostOrReply == 0 || ViewBag.PostOrReply == 2)
-                && (ViewBag.ActiveCourse.AbstractRole.CanGrade))
+            @if ((ViewBag.LastVisit !=null && ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.NewPosts 
+                    && dpvm.Posted >= ViewBag.LastVisit && ViewBag.ActiveCourseUser.ID != dpvm.poster.CourseUser.ID)                     
+                || (ViewBag.Student != null
+                    && ViewBag.Student.ID == dpvm.poster.CourseUser.ID
+                    && (ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.Posts 
+                        || ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.PostsAndReplies)
+                    && (ViewBag.ActiveCourse.AbstractRole.CanGrade)))
             {
-                    <!--display as highlighted if there is a student selected, and this is that student-->
+                    <!--display as highlighted if there is a student selected, and this is that student. 
+                        OR the post is new and highlight value is set to new posts-->
                     <script type="text/javascript">
                         $('#dp_post_@(dpvm.DiscussionPostId)').css("background", "#FFF8C6");
                     </script>
@@ -265,12 +269,16 @@
                                 </div>
                             </div>
                         
-                            if (ViewBag.Student != null
-                                && ViewBag.Student.ID == reply.poster.CourseUser.ID
-                                && (ViewBag.PostOrReply == 1 || ViewBag.PostOrReply == 2)
-                                && (ViewBag.ActiveCourse.AbstractRole.CanGrade))
+                            if ((ViewBag.LastVisit != null && ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.NewPosts
+                                    && reply.Posted >= ViewBag.LastVisit && ViewBag.ActiveCourseUser.ID != reply.poster.CourseUser.ID)
+                                || (ViewBag.Student != null
+                                    && ViewBag.Student.ID == reply.poster.CourseUser.ID
+                                    && (ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.Replies
+                                        || ViewBag.HighlightValue == OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.PostsAndReplies)
+                                    && (ViewBag.ActiveCourse.AbstractRole.CanGrade)))
                             {
-                                <!--display as highlighted if there is a student selected, and this is that student-->
+                                <!--display as highlighted if there is a student selected, and this is that student
+                                    OR the post is new and highlight value is set to new posts-->
                                 <script type="text/javascript">
                                     $('#dp_post_@(reply.DiscussionPostId)').css("background", "#FFF8C6");
                                 </script>

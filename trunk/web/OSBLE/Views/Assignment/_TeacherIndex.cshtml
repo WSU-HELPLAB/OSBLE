@@ -12,11 +12,9 @@
 <table class="assignTable" cellspacing="0">
     <th colspan="2" style="font-size:larger">Assignment</th>
     <th style="font-size:larger">Due Date</th>
-    <th style="font-size:larger">Submissions</th>
-    <th style="font-size:larger">Grading</th>
+    <th style="font-size:larger">Student Activity</th>
 
     @{
-        
         for(int i = 0; i < assignments.Count; i++)
         {
             if (i == 0 && PastCount > 0)
@@ -80,8 +78,6 @@
                     </td>
                 </tr>
             }
-            
-
 
             //Now that headers are in place, inserting a assignment
             <tr class="checkeredRow"  >
@@ -103,18 +99,34 @@
                 <td > <!--Cell for DueDate-->
                     @assignments[i].DueDate.ToShortDateString() @assignments[i].DueTime.ToShortTimeString()
                 </td>
-                <!--Cell for Submissions-->
-                @if (assignments[i].HasDeliverables)
-                {
-                    <td>@assignments[i].GetSubmissionCount() of @assignments[i].AssignmentTeams.Count received. <br /> @Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignments[i].ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })</td>   
-                }
-                else
-                {
-                    <td>No Deliverables</td>
-                }
-                
+
+                <!--Cell for Student Activity-->
+                <td>                    
+                    @if (isDraftAssignment)
+                    {
+                        
+                    }
+                    else if(assignments[i].Type == AssignmentTypes.CriticalReviewDiscussion || assignments[i].Type ==  AssignmentTypes.DiscussionAssignment)
+                    {
+                        @:@assignments[i].GetInitialPostsCount() of @ViewBag.TotalDiscussionPosters initial posts made.<br />
+                        @:@assignments[i].GetPostsCount() total posts. @assignments[i].GetNewPostsCount(ViewBag.ActiveCourseUser.ID) unread posts.
+                    }
+                    else if (assignments[i].Type == AssignmentTypes.TeamEvaluation)
+                    {
+                        @:@assignments[i].GetCompletedTeamEvaluationsCount() of @assignments[i].GetTotalTeamEvaluationCount() evaluations completed.
+                    }
+                    else if (assignments[i].HasDeliverables)
+                    {
+                        @:@assignments[i].GetSubmissionCount() of @assignments[i].AssignmentTeams.Count submissions received.<br />
+                        @:@Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignments[i].ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+                    }
+                </td>
+
+
+           <!--Cell for Grading. Only show if hasRubric and not a future/draft assignment
+            Might still need this. Leaving here to toggle until its fate is decided. If anyone besides MG is looking at this, its safe to assume its good to delete
                 <td>
-                    <!--Cell for Grading. Only show if hasRubric and not a future/draft assignment-->
+                    
                     @if (assignments[i].HasRubric && !(isFutureAssignment || isDraftAssignment))
                     {
                     
@@ -123,6 +135,7 @@
                     
                     }
                 </td>
+            -->
             </tr>
                 
         }

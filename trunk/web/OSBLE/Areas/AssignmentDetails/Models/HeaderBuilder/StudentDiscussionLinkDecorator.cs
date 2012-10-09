@@ -13,6 +13,13 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
     {
         public CourseUser Student { get; set; }
 
+
+        /// <summary>
+        /// This Decorater is used to link to classwide discussions for student's. Discussion assignments with discussion teams link 
+        /// to the discussions with the DiscussionTeamMEmberDecorator.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="student"></param>
         public StudentDiscussionLinkDecorator(IHeaderBuilder builder, CourseUser student)
             : base(builder)
         {
@@ -24,23 +31,34 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             dynamic header = Builder.BuildHeader(assignment);
             header.StudentDiscussion = new DynamicDictionary();
 
-            List<DiscussionTeam> usersTeams = new List<DiscussionTeam>();
-
-            //build a list of all discussionTeams that the current student is on
+            //Finding discussion team user is on. Despite the assingment being classwide, we want
+            //the user to always have the same DiscussionTeamID when posting
+            bool breakout = false;
             foreach(DiscussionTeam dt in assignment.DiscussionTeams)
             {
                 foreach (TeamMember tm in dt.GetAllTeamMembers())
                 {
+                    //Found team user is on
                     if (tm.CourseUserID == Student.ID)
                     {
-                        usersTeams.Add(dt);
+                        header.StudentDiscussion.DiscussionTeam = dt;
+                        header.StudentDiscussion.NewPosts = dt.GetNewPostsCount(Student.ID);
+                        breakout = true;
                         break;
                     }
                 }
+                if(breakout)
+                    break;
             }
 
-            header.StudentDiscussion.DiscussionTeams = usersTeams;
-            header.StudentDiscussion.assignment = assignment;
+            //Moderators are not part of a team. Allow them to view the discussion with any discussionTeam
+            if (header.StudentDiscussion.DiscussionTeam == null)
+            {
+                header.StudentDiscussion.DiscussionTeam = assignment.DiscussionTeams.FirstOrDefault();
+                header.StudentDiscussion.NewPosts = 0;
+            }
+            
+
             return header;
         }
     }

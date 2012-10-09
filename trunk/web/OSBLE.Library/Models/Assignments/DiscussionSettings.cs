@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
+using OSBLE.Models.HomePage;
 
 namespace OSBLE.Models.Assignments
 {
@@ -37,6 +38,24 @@ namespace OSBLE.Models.Assignments
         /// </summary>
         [Required]
         public byte AnonymitySettings { get; set; }
+
+        private int? associatedEventID;
+
+        public int? AssociatedEventID
+        {
+            get
+            {
+                return associatedEventID;
+            }
+            set
+            {
+                associatedEventID = value;
+            }
+            
+        }
+
+        [ForeignKey("AssociatedEventID")]
+        public virtual Event AssociatedEvent { get; set; }
 
         [Required(ErrorMessage = "Please specify when the first post should be due")]
         [Display(Name = "Due date for initial post")]
@@ -86,6 +105,7 @@ namespace OSBLE.Models.Assignments
             this.AssignmentID = other.AssignmentID;
             this.InitialPostDueDate = other.InitialPostDueDate;
             this.MinimumFirstPostLength = other.MinimumFirstPostLength;
+            this.associatedEventID = null;
         }
 
         #region anonymity settings
@@ -303,5 +323,6 @@ namespace OSBLE.Models.Assignments
                 .WithOptional(a => a.DiscussionSettings)
                 .WillCascadeOnDelete(true);
         }
+
     }
 }

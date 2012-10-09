@@ -37,19 +37,24 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             }
         }
 
-        public override ICollection<AssignmentTypes> ValidAssignmentTypes
-        {
-            get
-            {
-                return base.AllAssignmentTypes;
-            }
-        }
-
         public override bool IsRequired
         {
             get
             {
-                return true;
+                return false;
+            }
+        }
+
+        public override ICollection<AssignmentTypes> ValidAssignmentTypes
+        {
+            get
+            {
+                //Team Evaluations, DiscussionAssignments, and CriticalReviewDiscussions should not have assignment teams
+                List<AssignmentTypes> types = base.AllAssignmentTypes.ToList();
+                types.Remove(AssignmentTypes.TeamEvaluation);
+                types.Remove(AssignmentTypes.DiscussionAssignment);
+                types.Remove(AssignmentTypes.CriticalReviewDiscussion);
+                return types;
             }
         }
 
@@ -69,20 +74,35 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                                        orderby cu.UserProfile.LastName, cu.UserProfile.FirstName
                                        select cu).ToList();
             List<CourseUser> allUsers = users.ToList();
+            List<IAssignmentTeam> teamsToDisplay = new List<IAssignmentTeam>();
 
             //remove students currently on the team list from our complete user list
             foreach (IAssignmentTeam team in teams)
             {
+                //We want to leave any users that are in a default team (Team of size 1, with the name "StudentsFirst StudentsLast") 
+                //in the unassigned list.
+                if (team.Team.TeamMembers.Count == 1)
+                {
+                    CourseUser onlyMember = team.Team.TeamMembers.FirstOrDefault().CourseUser;
+                    string defaultName = onlyMember.UserProfile.FirstName + " " + onlyMember.UserProfile.LastName;
+                    if (team.Team.Name == defaultName)
+                    {
+                        //don't want to remove them from UnassignedUser, rather, we want to remove them from the team list
+                        continue;
+                    }
+                }
+
                 foreach (TeamMember member in team.Team.TeamMembers)
                 {
                     //If we're in a postback condition, our list of teams will include little more than the CourseUserId
                     //As such, we can't access member.CourseUser
                     CourseUser user = users.Find(u => u.ID == member.CourseUserID);
                     users.Remove(user);
-
                     //add the more detailed CourseUser info to the member
                     member.CourseUser = user;
                 }
+                teamsToDisplay.Add(team);
+                
             }
 
             //pull previous team configurations
@@ -94,7 +114,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             //place items into the viewbag
             ViewBag.AllUsers = allUsers;
             ViewBag.UnassignedUsers = users;
-            ViewBag.Teams = teams;
+            ViewBag.Teams = teamsToDisplay;
             ViewBag.PreviousTeamAssignments = previousTeamAssignments;
         }
 
@@ -107,6 +127,10 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             SetUpViewBag(Assignment.AssignmentTeams.Cast<IAssignmentTeam>().ToList());
         }
 
+        /// <summary>
+        /// Sets up the view for the Assignment Team view. Note: Teams are initially set up in BasicController.
+        /// </summary>
+        /// <returns></returns>
         public override ActionResult Index() 
         {
             base.Index();

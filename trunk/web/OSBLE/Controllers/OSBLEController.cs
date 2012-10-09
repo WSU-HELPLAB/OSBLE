@@ -407,6 +407,28 @@ namespace OSBLE.Controllers
             return returnValue;
         }
 
+        
+        /// <summary>
+        /// Returns a discussion team for a discussion assignment. 
+        /// Note: this isn't reliable for Critical Review Discussions as a user can be on multiple discussion teams
+        /// </summary>
+        /// <param name="assignment">Discussion Assignment</param>
+        /// <returns>discussionteam user is on</returns>
+        public static DiscussionTeam GetDiscussionTeam(Assignment assignment, CourseUser user)
+        {
+            foreach(DiscussionTeam dt in assignment.DiscussionTeams)
+            {
+                foreach(TeamMember tm in dt.Team.TeamMembers)
+                {
+                    if(user.ID == tm.CourseUserID)
+                    {
+                        return dt;
+                    }
+                }
+            }
+            return null;
+        }
+
         /// <summary>
         /// Returns the late penalty as a string. I.e. an assignmentTeam with 80% late penalty will yield the string
         /// "80.00 %"

@@ -25,6 +25,7 @@
         var teams = from t in Model.CurrentAssignment.DiscussionTeams
                     orderby t.Team.Name ascending
                     select t;
+        
 
         foreach (DiscussionTeam assignmentTeam in teams)
         {
@@ -45,6 +46,25 @@
                                  discussionTeamID = assignmentTeam.ID,
                                  area = ""
                              }, new { }))
+
+                            @{
+                                int newPosts = assignmentTeam.GetNewPostsCount(Model.Client.ID);
+                              }
+                            @if(newPosts > 0)
+                            {
+                                @:&nbsp-&nbsp
+                                @:@Html.ActionLink("View " + newPosts.ToString() + " Unread Posts",
+                                "TeacherIndex", "DiscussionAssignment",
+                                 new
+                                 {
+                                     assignmentId = Model.CurrentAssignment.ID,
+                                     courseUserId = 0,
+                                     discussionTeamID = assignmentTeam.ID,
+                                     hightlightValue = OSBLE.Controllers.DiscussionAssignmentController.HighlightValue.NewPosts,
+                                     area = ""
+                                 }, new { })
+                            }
+                        
                     </th>
                 </tr>
             }

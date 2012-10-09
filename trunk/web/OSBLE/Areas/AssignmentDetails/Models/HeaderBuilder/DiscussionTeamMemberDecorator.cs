@@ -30,6 +30,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
             List<string> ListOfTeamNames = new List<string>();
             List<int> ListOfTeamIDs = new List<int>();
             List<bool> ListOfHideMailIcon = new List<bool>();
+            List<int> ListOfNewPostCounts = new List<int>();
 
             //Finding "Client's" Discussion Team(s). In some assignment types (CRD) users can be part of multiple DiscussionTeams
             foreach (DiscussionTeam dt in assignment.DiscussionTeams.OrderBy(dt => dt.TeamName).ToList())
@@ -97,6 +98,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                             }
                         }
 
+                        ListOfNewPostCounts.Add(dt.GetNewPostsCount(Client.ID));
                         ListOfHideMailIcon.Add(hideMail);
                         ListOfListOfPosters.Add(posters);
                         ListOfTeamNames.Add(dt.TeamName);
@@ -106,6 +108,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                 }
             }
 
+            header.DiscussionTeam.ListOfNewPostCounts = ListOfNewPostCounts;
             header.DiscussionTeam.ListOfHideMailIcon = ListOfHideMailIcon; 
             header.DiscussionTeam.Assignment = assignment;
             header.DiscussionTeam.ListOfListOfPosters = ListOfListOfPosters;

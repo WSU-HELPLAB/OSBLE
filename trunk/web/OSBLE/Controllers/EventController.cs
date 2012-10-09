@@ -7,6 +7,7 @@ using OSBLE.Attributes;
 using OSBLE.Models.Courses;
 using OSBLE.Models.HomePage;
 using OSBLE.Models.Assignments;
+using OSBLE.Models;
 
 namespace OSBLE.Controllers
 {
@@ -89,11 +90,6 @@ namespace OSBLE.Controllers
 
             // Default to not Approved.
             e.Approved = false;
-            //e.AbstractCourseID = activeCourse.AbstractCourse.ID;
-
-            // Combine start date and time fields into one field
-            e.StartDate = e.StartDate.Date;
-            e.StartDate = e.StartDate.AddHours(e.StartTime.Hour).AddMinutes(e.StartTime.Minute);
 
             if (!Request.Form.AllKeys.Contains("IncludeEndDate"))
             {
@@ -101,10 +97,6 @@ namespace OSBLE.Controllers
             }
             else
             {
-                DateTime endDate = (DateTime)e.EndDate;
-                e.EndDate = endDate.Date;
-                e.EndDate = endDate.AddHours(e.EndTime.Hour).AddMinutes(e.EndTime.Minute);
-
                 //make sure that the end date happens after the start
                 if ((DateTime)e.EndDate < e.StartDate)
                 {
@@ -140,6 +132,91 @@ namespace OSBLE.Controllers
             }
 
             return View(e);
+        }
+
+        /// <summary>
+        /// This function will create an event that will start at the DueDate of the assignment, at Midnight. The event ends at the DueTime of the assignment.
+        /// This event will be titled "AssignmentName Due"
+        /// 
+        /// In addition, if the assignment a discussion assignment, it will generate an additional event for "AssignmentName Initial Post Due". 
+        /// It will also start at the InitialPostDueDate at midnight, and end at the InitialPostDueTime
+        /// </summary>
+        /// <param name="assignment">The assignment to make the event for</param>
+        /// <param name="existingEvent">If an event already exists, it can be updated rather than adding a new one</param>
+        [CanModifyCourse]
+        static public void CreateAssignmentEvent(Assignment assignment, int ActiveCourseUserId, ContextBase db)
+        {
+            Event assignmentEvent = new Event();
+            UpdateAssignmentEvent(assignment, assignmentEvent, ActiveCourseUserId, db);
+            if (assignment.DiscussionSettings != null)
+            {
+                Event discussionEvent = new Event();
+                UpdateDiscussionEvent(assignment.DiscussionSettings, discussionEvent, ActiveCourseUserId, db);
+            }
+        }
+
+        /// <summary>
+        /// This function will update an event with all assignment details.
+        /// </summary>
+        /// <param name="assignment"></param>
+        /// <param name="dEvent"></param>
+        [CanModifyCourse]
+        static public void UpdateAssignmentEvent(Assignment assignment, Event aEvent, int ActiveCourseUserId, ContextBase db)
+        {
+            //Link to assignment details. Note, since this is hardcoded to osble.org, it will not work locally.
+            aEvent.Description = "[url:Assignment Page|www.osble.org/AssignmentDetails/" + assignment.ID + "]"; 
+            aEvent.EndDate = assignment.DueDate;
+            aEvent.EndTime = assignment.DueTime;
+            aEvent.StartDate = assignment.DueDate;
+            aEvent.StartTime = DateTime.MinValue;
+            aEvent.PosterID = ActiveCourseUserId;
+            aEvent.Title = assignment.AssignmentName + " Due";
+            aEvent.Approved = true;
+           
+            if (aEvent.ID == 0)
+            {
+                db.Events.Add(aEvent);
+                db.SaveChanges();
+                assignment.AssociatedEventID = aEvent.ID;
+                db.Entry(assignment).State = System.Data.EntityState.Modified;
+                db.SaveChanges();
+            }
+            else
+            {
+                db.Entry(aEvent).State = System.Data.EntityState.Modified;
+                db.SaveChanges();
+            }
+        }
+
+        /// <summary>
+        /// This function will update an event with all discussion setting details.
+        /// </summary>
+        /// <param name="assignment"></param>
+        /// <param name="dEvent"></param>
+        [CanModifyCourse]
+        static public void UpdateDiscussionEvent(DiscussionSetting ds, Event dEvent, int ActiveCourseUserId, ContextBase db)
+        {
+            //Link to assignment details. Note, since this is hardcoded to osble.org, it will not work locally.
+            dEvent.Description = "[url:Assignment Page|www.osble.org/AssignmentDetails/" + ds.AssignmentID + "]"; 
+            dEvent.EndDate = ds.InitialPostDueDate;
+            dEvent.EndTime = ds.InitialPostDueDueTime;
+            dEvent.StartDate = ds.InitialPostDueDate;
+            dEvent.StartTime = DateTime.MinValue;
+            dEvent.PosterID = ActiveCourseUserId;
+            dEvent.Title = ds.Assignment.AssignmentName + " Initial Post(s) Due";
+            dEvent.Approved = true;
+
+            if (dEvent.ID == 0)
+            {
+                db.Events.Add(dEvent);
+                db.SaveChanges();
+
+            }
+            ds.AssociatedEventID = dEvent.ID;
+            db.Entry(ds).State = System.Data.EntityState.Modified;
+            db.Entry(dEvent).State = System.Data.EntityState.Modified;
+            db.SaveChanges();
+
         }
 
         public ViewResult NeedsApproval()
@@ -246,11 +323,10 @@ namespace OSBLE.Controllers
         {
             // Validate original event. make sure it exists and is part of the active course.
             Event originalEvent = db.Events.Find(e.ID);
-
-            originalEvent.StartDate = e.StartDate.Date;
-            originalEvent.StartDate = originalEvent.StartDate.AddHours(e.StartTime.Hour).AddMinutes(e.StartTime.Minute);
             originalEvent.Title = e.Title;
             originalEvent.Description = e.Description;
+            originalEvent.StartDate = e.StartDate;
+            originalEvent.StartTime = e.StartTime;
 
             if (!Request.Form.AllKeys.Contains("IncludeEndDate"))
             {
@@ -258,9 +334,8 @@ namespace OSBLE.Controllers
             }
             else
             {
-                DateTime endDate = (DateTime)e.EndDate;
-                originalEvent.EndDate = endDate.Date.AddHours(e.EndTime.Hour).AddMinutes(e.EndTime.Minute);
-
+                originalEvent.EndDate = e.EndDate;
+                originalEvent.EndDate = e.EndTime;
                 //make sure that the end date happens after the start
                 if ((DateTime)originalEvent.EndDate < originalEvent.StartDate)
                 {

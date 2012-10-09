@@ -5,6 +5,8 @@ using System.Web;
 using System.Web.Mvc;
 using OSBLE.Models.Assignments;
 using OSBLE.Models.Courses;
+using OSBLE.Controllers;
+using OSBLE.Models.HomePage;
 
 namespace OSBLE.Areas.AssignmentWizard.Controllers
 {
@@ -76,14 +78,26 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             {
                 //delete preexisting settings to prevent an FK relation issue
                 DiscussionSetting setting = db.DiscussionSettings.Find(model.AssignmentID);
+                Event eventToUpdate = null;
                 if (setting != null)
                 {
+                    eventToUpdate = setting.AssociatedEvent;
                     db.DiscussionSettings.Remove(setting);
                 }
                 db.SaveChanges();
 
                 //...and then re-add it.
                 Assignment.DiscussionSettings = model;
+                db.SaveChanges();
+
+                
+                if (Assignment.IsDraft == false)
+                {
+                    //If the assignment is published, that means there was an associted event, but was deleted when DiscussionSettings was removed
+                    //Re-adding event
+                    EventController.UpdateDiscussionEvent(Assignment.DiscussionSettings, eventToUpdate, ActiveCourseUser.ID, db);
+                }
+                
 
                 //If TAs are allowed to post to all discussion, 
                 //remove them from any discussion teams they may have already been assigned to

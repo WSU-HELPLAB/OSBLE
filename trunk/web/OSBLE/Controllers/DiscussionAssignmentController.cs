@@ -14,96 +14,59 @@ namespace OSBLE.Controllers
 {
     public class DiscussionAssignmentController : OSBLEController
     {
-        /// <summary>
-        /// Returns true if the posters name should be Anonymized for a discussion assignment
-        /// </summary>
-        /// <param name="currentUserRoleId">The current users AbstractRoleID</param>
-        /// <param name="postersUserRoleId">The posters AbstractRoleID</param>
-        /// <param name="discussionSetting">The assignments discussion settings</param>
-        /// <returns></returns>
-        public bool AnonymizeNameForDiscussion(CourseUser poster, DiscussionSetting discussionSetting)
+        //This enum will be used to organize the parameter for TeacherIndex related to which posts should be highlighted.
+        //The following is from TeacherIndexFunction, for refernce. Remove later
+        //<param name="postOrReply">postOrReply is used as enumerable. 0 = Posts, 1 = Replies, 2 = Both, 3 = No Selector</param>
+        public enum HighlightValue
         {
-            bool Anonymous = false;
-            if (poster.ID != ActiveCourseUser.ID)   //Don't want to set anonymous permissions if the poster is the current user, so users own posts arent anonymous
-            {
-
-                int postersUserRoleId = poster.AbstractRoleID;
-                int currentUserRoleId = ActiveCourseUser.AbstractRoleID;
-
-                int studentRoleId = (int)CourseRole.CourseRoles.Student;
-                int moderatorRoleId = (int)CourseRole.CourseRoles.Moderator;
-                int instructorRoleId = (int)CourseRole.CourseRoles.Instructor;
-                int taRoleId = (int)CourseRole.CourseRoles.TA;
-
-                //If TAsCanPostToAllDiscussions, treat them as instructors to students. Otherwise treat them as moderators to students. 
-                if (postersUserRoleId == taRoleId)
-                {
-                    if (discussionSetting.TAsCanPostToAllDiscussions)
-                    {
-                        postersUserRoleId = instructorRoleId;
-                    }
-                    else
-                    {
-                        postersUserRoleId = moderatorRoleId;
-                    }
-                }
-
-                if (discussionSetting.HasAnonymousStudentsToStudents && currentUserRoleId == studentRoleId && postersUserRoleId == studentRoleId)
-                {
-                    Anonymous = true;
-                }
-                else if (discussionSetting.HasAnonymousInstructorsToStudents && currentUserRoleId == studentRoleId && postersUserRoleId == instructorRoleId)
-                {
-                    Anonymous = true;
-                }
-                else if (discussionSetting.HasAnonymousModeratorsToStudents && currentUserRoleId == studentRoleId && postersUserRoleId == moderatorRoleId)
-                {
-                    Anonymous = true;
-                }
-                else if (discussionSetting.HasAnonymousStudentsToModerators && currentUserRoleId == moderatorRoleId && postersUserRoleId == studentRoleId)
-                {
-                    Anonymous = true;
-                }
-            }
-
-            return Anonymous;
+            Posts = 0,
+            Replies,
+            PostsAndReplies,
+            None,
+            NewPosts
         }
 
         /// <summary>
-        /// Returns true if the user should be anonymized for a critical review discussion
+        /// This function will return the DateTime of the last visit to the discussion assignment. If the user has not visited this discussion assignment, the value will be DateTime.Min.
+        /// In addition to returning the last visit time, this function will update the last visit time to the current time. Note: The returned dateTime will not have the new assigned value.
         /// </summary>
-        /// <param name="currentUserRoleId">Current users AbstractRoleId</param>
-        /// <param name="targetUserRoleId">Poster's AbstractRoleId</param>
-        /// <param name="assignment">The Critical Review Discussion assignment</param>
-        /// <param name="isAuthor">This value should be true if the poster if an author of the reviewed document</param>
-        /// <param name="isReviewer">This value should be true if the poster if a reviewer of the document.</param>
+        /// <param name="discussionTeamId"></param>
         /// <returns></returns>
-        public bool AnonymizeNameForCriticalReviewDiscussion(CourseUser poster, 
-            Assignment assignment, bool posterIsAuthor, bool posterIsReviewer, bool currentUserIsAuthor, bool currentUserIsReviewer)
+        private DateTime? GetAndUpdateLastVisit(int discussionTeamId)
         {
-            bool Anonymous = false;
-
-            CriticalReviewSettings crSettings = assignment.PreceedingAssignment.CriticalReviewSettings;
-            if(crSettings.AnonymizeAuthor && currentUserIsReviewer && posterIsAuthor)
+            DateTime? returnVal = DateTime.MinValue;
+            DiscussionAssignmentMetaInfo lastVisited = (from metaInfo in db.DiscussionAssignmentMetaTable
+                                                        where metaInfo.DiscussionTeamID == discussionTeamId &&
+                                                        metaInfo.CourseUserID == ActiveCourseUser.ID
+                                                        select metaInfo).FirstOrDefault();
+            if (lastVisited == null) //create new table entry if it does not exist
             {
-                Anonymous = true;
+                lastVisited = new DiscussionAssignmentMetaInfo();
+                lastVisited.DiscussionTeamID = discussionTeamId;
+                lastVisited.CourseUserID = ActiveCourseUser.ID;
+                db.DiscussionAssignmentMetaTable.Add(lastVisited);
             }
-            else if(crSettings.AnonymizeComments && currentUserIsAuthor && posterIsReviewer)
+            else //set return value since one exists
             {
-                Anonymous = true;
+                returnVal = lastVisited.LastVisit;
+                
             }
-            //Purposefully not handling crSettings.AnonymizeReviewerToReviewers as this is property is used for the reviewed document not discussions. There is another
-            //setting in place to anonmize reviewers to reviewers in discussion settins.
+            lastVisited.LastVisit = DateTime.Now; //update LastVisit time & save changes
+            db.SaveChanges();
 
+            return returnVal;
 
-            //Anonymize if Anonymous is true or AnonymizeNameForDiscussion (anonymize based on discussion settings) is true.
-            return (Anonymous || AnonymizeNameForDiscussion(poster, assignment.DiscussionSettings));
         }
 
-        // GET: /DiscussionAssignment/
-        public ActionResult Index(int assignmentId, int discussionTeamId)
+        /// <summary>
+        /// This is the discussion view used by non-Instructor/non-TA users. It displays a discussion assignment for discussionTeamId. 
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        /// <param name="discussionTeamId"></param>
+        /// <param name="displayNewPosts">If true, any new posts made since the current users last visit will be highlighted.</param>
+        /// <returns></returns>
+        public ActionResult Index(int assignmentId, int discussionTeamId, bool? displayNewPosts = false)
         {
-
             //checking if ids are good
             Assignment assignment = null;
             DiscussionTeam discussionTeam = null;
@@ -118,25 +81,33 @@ namespace OSBLE.Controllers
                                   select dt).FirstOrDefault();
             }
 
-            //if ids are good and returned values, then confirm ActiveCourseUser belongs to that discussion team
-            bool isInDiscussionTeam = false;
-            if (assignment != null && discussionTeam != null)
+            //Make sure ActiveCourseUser is a valid discussion member
+                //Valid discussion members are in the discussion team, or in the class of a classwide discussion assignment
+            bool allowedInDiscussion = false;
+            if (assignment != null && assignment.HasDiscussionTeams == false)
             {
-
+                //Classwide discussion, make sure user is in course
+                if (ActiveCourseUser.AbstractCourseID == assignment.CourseID)
+                {
+                    allowedInDiscussion = true;
+                }
+            }
+            else if (assignment != null && discussionTeam != null)
+            {
+                //Assignment has discussion teams, make sure user is part of team.
                 foreach (TeamMember tm in discussionTeam.GetAllTeamMembers())
                 {
                     if (tm.CourseUserID == ActiveCourseUser.ID)
                     {
-                        isInDiscussionTeam = true;
+                        allowedInDiscussion = true;
                         break;
                     }
                 }
             }
 
 
-
             //if ActiveCourseUser belongs to the discussionTeam, continue. Otherwise kick them out.
-            if (isInDiscussionTeam)
+            if (allowedInDiscussion)
             {
                 DiscussionViewModel dvm = new DiscussionViewModel(discussionTeam, ActiveCourseUser);
 
@@ -175,9 +146,19 @@ namespace OSBLE.Controllers
                         }
                     }
                     ViewBag.DiscussionTeamList = DiscussionTeamList.OrderBy(dt => dt.TeamName).ToList();
-
+                }
+                if (displayNewPosts.HasValue && displayNewPosts.Value)
+                {
+                    ViewBag.HighlightValue = HighlightValue.NewPosts;
                 }
 
+                //Allow Moderators to post w/o word count restriction
+                if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
+                {
+                    ViewBag.IsFirstPost = false;
+                }
+
+                ViewBag.LastVisit = GetAndUpdateLastVisit(discussionTeamId);
                 ViewBag.CanPost = assignment.DueDate > DateTime.Now;
                 ViewBag.DiscussionPostViewModelList = dvm.DiscussionPostViewModels.OrderBy(dpvm => dpvm.Posted).ToList();
                 ViewBag.ActiveCourse = ActiveCourseUser;
@@ -185,7 +166,7 @@ namespace OSBLE.Controllers
                 ViewBag.DiscussionTeamID = discussionTeam.ID;
                 return View();
             }
-            else
+            else //User is not part of discussion, kick them to assignment details.
             {
                 return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentId });
             }
@@ -195,11 +176,11 @@ namespace OSBLE.Controllers
         /// </summary>
         /// <param name="assignmentId"></param>
         /// <param name="courseUserId">the CourseUser.ID of the student you want to "Highlight". 0 may be passed in highlighting is unnecessary</param>
-        /// <param name="postOrReply">postOrReply is used as enumerable. 0 = Posts, 1 = Replies, 2 = Both, 3 = No Selector</param>
+
         /// <param name="discussionTeamID">The discussion team id for discussion to be viewed. If it is a classwide discussion, then any dt in that assignment can be sent.</param>
         /// <returns></returns>
         [CanGradeCourse]
-        public ActionResult TeacherIndex(int assignmentId, int discussionTeamID, int courseUserId = 0, int postOrReply = 3)
+        public ActionResult TeacherIndex(int assignmentId, int discussionTeamID, int courseUserId = 0, HighlightValue hightlightValue = HighlightValue.None)
         {
             Assignment assignment = db.Assignments.Find(assignmentId);
             if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && ActiveCourseUser.AbstractRole.CanGrade)
@@ -215,7 +196,7 @@ namespace OSBLE.Controllers
                 DiscussionViewModel dvm = new DiscussionViewModel(discussionTeam, ActiveCourseUser);
 
 
-                if (postOrReply == 3 || courseUserId <= 0)  //If postOrReply is 3, we want no selections - so setting student to null.
+                if (hightlightValue == HighlightValue.None || courseUserId <= 0)  //If hightlightValue == None, we want no selections - so setting student to null.
                 {
                     student = null;
                 }
@@ -250,9 +231,10 @@ namespace OSBLE.Controllers
 
                 }
 
+                ViewBag.LastVisit = GetAndUpdateLastVisit(discussionTeamID);
                 ViewBag.CanPost = canPost;
                 ViewBag.DiscussionPostViewModelList = dvm.DiscussionPostViewModels;
-                ViewBag.PostOrReply = postOrReply;
+                ViewBag.HighlightValue = hightlightValue;
                 ViewBag.Posts = posts;
                 ViewBag.Student = student;
                 ViewBag.Assignment = assignment;

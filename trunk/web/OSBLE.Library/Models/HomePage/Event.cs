@@ -24,7 +24,20 @@ namespace OSBLE.Models.HomePage
         [NotMapped]
         [Display(Name = "Starting time")]
         [DataType(DataType.Time)]
-        public DateTime StartTime { get; set; }
+        public DateTime StartTime
+        {
+            get
+            {
+                return StartDate;
+            }
+            set
+            {
+                //first, zero out the release date's time component
+                this.StartDate = DateTime.Parse(StartDate.ToShortDateString());
+                StartDate = StartDate.AddHours(value.Hour);
+                StartDate = StartDate.AddMinutes(value.Minute);
+            }
+        }
 
         [Display(Name="Ending date")]
         [DataType(DataType.Date)]
@@ -33,7 +46,23 @@ namespace OSBLE.Models.HomePage
         [NotMapped]
         [Display(Name = "Ending time")]
         [DataType(DataType.Time)]
-        public DateTime EndTime { get; set; }
+        public DateTime? EndTime
+        {
+            get
+            {
+                return EndDate;
+            }
+            set
+            {
+                if (EndDate.HasValue) //Only handle if EndDate is set
+                {
+                    //first, zero out the release date's time component
+                    this.EndDate = DateTime.Parse(EndDate.Value.ToShortDateString());
+                    EndDate = EndDate.Value.AddHours(value.Value.Hour);
+                    EndDate = EndDate.Value.AddMinutes(value.Value.Minute);
+                }
+            }
+        }
 
         [Required]
         [Display(Name = "Event Title")]

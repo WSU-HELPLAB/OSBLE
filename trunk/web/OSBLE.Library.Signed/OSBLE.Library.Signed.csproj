@@ -162,6 +162,9 @@
     <Compile Include="..\OSBLE.Library\Models\Assignments\Deliverable.cs">
       <Link>Models\Assignments\Deliverable.cs</Link>
     </Compile>
+    <Compile Include="..\OSBLE.Library\Models\Assignments\DiscussionAssignmentMetaInfo.cs">
+      <Link>Models\Assignments\DiscussionAssignmentMetaInfo.cs</Link>
+    </Compile>
     <Compile Include="..\OSBLE.Library\Models\Assignments\DiscussionSettings.cs">
       <Link>Models\Assignments\DiscussionSettings.cs</Link>
     </Compile>

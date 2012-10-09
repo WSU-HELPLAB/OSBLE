@@ -180,6 +180,8 @@ namespace OSBLE.Models
 
         public DbSet<DiscussionPost> DiscussionPosts { get; set; }
 
+        public DbSet<DiscussionAssignmentMetaInfo> DiscussionAssignmentMetaTable { get; set; }
+
         // Courses
 
         public DbSet<AbstractCourse> AbstractCourses { get; set; }

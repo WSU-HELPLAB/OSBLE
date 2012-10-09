@@ -97,7 +97,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         }
 
         /// <summary>
-        /// Moderators are
+        /// Updates discussion teams based off any name changes or team member changes. Creates new teams if needed and purges empty teams.
         /// </summary>
         protected void ParseFormValues()
         {
@@ -230,7 +230,14 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     }
                 }
             }
-            
+
+            //Checking for empty teams one last time to be sure
+            List<DiscussionTeam> dtsToRemove = Assignment.DiscussionTeams.Where(dt => dt.Team.TeamMembers.Count == 0).ToList();
+            for(int i = dtsToRemove.Count - 1; i >= 0; i--)
+            {
+                db.DiscussionTeams.Remove(dtsToRemove[i]);
+            }
+            db.SaveChanges();
         }
 
        

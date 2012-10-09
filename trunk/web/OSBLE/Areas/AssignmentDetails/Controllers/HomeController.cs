@@ -15,7 +15,10 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
         public ActionResult Index(int assignmentId)
         {
             Assignment assignment = db.Assignments.Find(assignmentId);
-            if (assignment == null)
+
+            //If the assignment does not exist, or the assignment has not been released and the user is a student: kick them out
+            if (assignment == null 
+                || (assignment.ReleaseDate > DateTime.Now && ActiveCourseUser.AbstractRoleID == (int)OSBLE.Models.Courses.CourseRole.CourseRoles.Student))
             {
                 return RedirectToRoute(new { action = "Index", controller = "Assignment", area = "" });
             }
@@ -48,7 +51,7 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
         [CanModifyCourse]
         public ActionResult ToggleDraft(int assignmentId)
         {
-            Assignment.ToggleDraft(assignmentId, ActiveCourseUser.ID);
+            new AssignmentController().ToggleDraft(assignmentId);
             return Index(assignmentId);
         }
 
