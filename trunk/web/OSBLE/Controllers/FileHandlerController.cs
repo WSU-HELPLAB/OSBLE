@@ -465,7 +465,7 @@ namespace OSBLE.Controllers
 
             //REVIEW TODO: Explain the hack that you're using below.
             Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, previousAssignmentTeam);
-            string zipFileName = "Critical Review of " + previousAssignmentTeam.Team.Name + ".zip";
+            string zipFileName = "Critical Review.zip"; // of " + previousAssignmentTeam.Team.Name + ".zip";
 
             //zip file already exists, no need to create a new one
             if (stream != null)
@@ -492,7 +492,7 @@ namespace OSBLE.Controllers
                 submissionFolder = FileSystem.GetTeamUserSubmissionFolderForAuthorID(false, (ActiveCourseUser.AbstractCourse as Course), assignment.ID, at, previousAssignmentTeam.Team);
                 if (new DirectoryInfo(submissionFolder).Exists)
                 {
-                    zipfile.AddDirectory(submissionFolder, at.Team.Name);
+                    zipfile.AddDirectory(submissionFolder, at.Team.ID.ToString());
 
                     foreach (string filePath in Directory.EnumerateFiles(submissionFolder))
                     {
