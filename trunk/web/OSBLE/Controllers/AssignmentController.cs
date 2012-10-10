@@ -122,8 +122,11 @@ namespace OSBLE.Controllers
                             {
                                 if (tm.CourseUserID == ActiveCourseUser.ID) //Checking if Client is a member within the DiscussionTeam
                                 {
-                                    dtInfo.Add(a.ID, dt);
-                                    break;
+                                    if (dtInfo.ContainsKey(a.ID) == false)
+                                    {
+                                        dtInfo.Add(a.ID, dt);
+                                        break;
+                                    }
                                 }
                             }
                         }
