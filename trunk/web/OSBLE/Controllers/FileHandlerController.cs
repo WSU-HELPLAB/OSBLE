@@ -401,7 +401,8 @@ namespace OSBLE.Controllers
             CourseUser receiver = db.CourseUsers.Find(receiverId);
             AssignmentTeam previousAssignmentTeam = GetAssignmentTeam(assignment.PreceedingAssignment, receiver);
 
-            if (ActiveCourseUser.AbstractRole.CanModify || (receiverId == ActiveCourseUser.ID && assignment.IsCriticalReviewPublished))
+            if (ActiveCourseUser.AbstractRole.CanModify || (receiverId == ActiveCourseUser.ID))
+            //AC turned off for now as it seems to be broken -- && assignment.IsCriticalReviewPublished))
             {
                 return GetReviewsOfAuthorHelper(assignment, receiverId);
             }
@@ -431,7 +432,8 @@ namespace OSBLE.Controllers
                 }
             }
 
-            if (ActiveCourseUser.AbstractRole.CanModify || (belongsToDT && precedingAssignment.IsCriticalReviewPublished))
+            if (ActiveCourseUser.AbstractRole.CanModify || (belongsToDT)) 
+            //AC: not working for some reason.  Fix at some point. -- && precedingAssignment.IsCriticalReviewPublished))
             {
                 return GetReviewsOfAuthorHelper(precedingAssignment, dt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUserID);
             }
