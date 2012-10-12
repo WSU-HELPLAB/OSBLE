@@ -472,7 +472,7 @@ namespace OSBLE.Controllers
             //zip file already exists, no need to create a new one
             if (stream != null)
             {
-                return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
+                //return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
             }
 
             ZipFile zipfile = new ZipFile();
