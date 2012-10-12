@@ -130,9 +130,9 @@ namespace OSBLE.Services
             // c: the instructor has clicked the "Publish All Reviews" link on the 
             //    assignment details page. (turned off for now)
             if (criticalReviewAssignment.DueDate > DateTime.Now
-                && criticalReviewAssignment.CriticalReviewSettings != null
+                || 
+                (criticalReviewAssignment.CriticalReviewSettings != null && criticalReviewAssignment.CriticalReviewSettings.AllowDownloadAfterPublish == false)
                 //&& criticalReviewAssignment.CriticalReviewPublishDate != null
-                && criticalReviewAssignment.CriticalReviewSettings.AllowDownloadAfterPublish == false
                 )
             {
                 return new byte[0];
@@ -149,13 +149,45 @@ namespace OSBLE.Services
                 return new byte[0];
             }
 
-            //pull the author team specific to the given assignment and current user
-            List<ReviewTeam> authorTeams = (from rt in _db.ReviewTeams
-                                            join team in _db.Teams on rt.ReviewTeamID equals team.ID
-                                            join member in _db.TeamMembers on team.ID equals member.TeamID
-                                            where member.CourseUserID == courseUser.ID
-                                            && rt.AssignmentID == criticalReviewAssignmentId
-                                            select rt).ToList();
+            //Two possible scenarios:
+            //1: we're dealing with a non-discussion based critical review.  In this case, pull all
+            //   teams from the "review team" table
+            //2: we're dealing with a discussion-based critical review.  In this case, pull from the 
+            //   "discussion team" table.  Note that discussion teams are a superset of review teams 
+            //   so that everything in a review team will also be inside a discussion team.  Pulling 
+            //   from discussion teams allows us to capture moderators and other observer-type
+            //   people that have been attached to the review process.
+            
+            //step 1: check to see if the critical review assignment has any discussion assignments attached
+            Assignment discussionAssignment = (from a in _db.Assignments
+                                              where a.PrecededingAssignmentID == criticalReviewAssignmentId
+                                              && a.AssignmentTypeID == (int)AssignmentTypes.CriticalReviewDiscussion
+                                              select a
+                                              ).FirstOrDefault();
+
+            IList<IReviewTeam> authorTeams = new List<IReviewTeam>();
+            if (discussionAssignment != null)
+            {
+                //pull the more inclusive discussion teams
+                List<DiscussionTeam> discussionTeams = (from dt in _db.DiscussionTeams
+                                                        join team in _db.Teams on dt.TeamID equals team.ID
+                                                        join member in _db.TeamMembers on team.ID equals member.TeamID
+                                                        where member.CourseUserID == courseUser.ID
+                                                        && dt.AssignmentID == discussionAssignment.ID
+                                                        select dt).ToList();
+                authorTeams = TeamConverter.DiscussionToReviewTeam(discussionTeams);
+            }
+            else
+            {
+                //pull critical review teams
+                authorTeams = (from rt in _db.ReviewTeams
+                               join team in _db.Teams on rt.ReviewTeamID equals team.ID
+                               join member in _db.TeamMembers on team.ID equals member.TeamID
+                               where member.CourseUserID == courseUser.ID
+                               && rt.AssignmentID == criticalReviewAssignmentId
+                               select rt).ToList().Cast<IReviewTeam>().ToList();
+            }
+
 
             //no author team means that the current user isn't assigned to review anyone
             if (authorTeams.Count == 0)

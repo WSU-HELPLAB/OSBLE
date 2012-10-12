@@ -97,8 +97,10 @@
     <Compile Include="Models\Assignments\DiscussionSettings.cs" />
     <Compile Include="Models\Assignments\DiscussionTeam.cs" />
     <Compile Include="Models\Assignments\IAssignmentTeam.cs" />
+    <Compile Include="Models\Assignments\IReviewTeam.cs" />
     <Compile Include="Models\Assignments\ReviewTeam.cs" />
     <Compile Include="Models\Assignments\Team.cs" />
+    <Compile Include="Models\Assignments\TeamConverter.cs" />
     <Compile Include="Models\Assignments\TeamEvaluation.cs" />
     <Compile Include="Models\Assignments\TeamEvaluationComment.cs" />
     <Compile Include="Models\Assignments\TeamEvaluationSettings.cs" />

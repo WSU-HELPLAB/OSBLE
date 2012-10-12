@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OSBLE.Models.Assignments
 {
-    public class ReviewTeam : IModelBuilderExtender
+    public class ReviewTeam : IReviewTeam, IModelBuilderExtender
     {
         [Key]
         [Column(Order = 0)]
