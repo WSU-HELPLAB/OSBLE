@@ -465,16 +465,7 @@ namespace OSBLE.Controllers
                 }
             }
 
-            //REVIEW TODO: Explain the hack that you're using below.
-            Stream stream = FileSystem.FindZipFile(ActiveCourseUser.AbstractCourse as Course, assignment, previousAssignmentTeam);
             string zipFileName = "Critical Review.zip"; // of " + previousAssignmentTeam.Team.Name + ".zip";
-
-            //zip file already exists, no need to create a new one
-            if (stream != null)
-            {
-                //return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
-            }
-
             ZipFile zipfile = new ZipFile();
             string submissionFolder;
 
@@ -521,8 +512,15 @@ namespace OSBLE.Controllers
                             //open student's review file
                             FileStream studentReview = System.IO.File.OpenRead(filePath);
 
+                            //check anonymity settings
+                            string authorName = previousAssignmentTeam.Team.Name;
+                            if (assignment.CriticalReviewSettings != null && assignment.CriticalReviewSettings.AnonymizeAuthor == true)
+                            {
+                                authorName = "Anonymous " + previousAssignmentTeam.TeamID;
+                            }
+
                             //merge the file
-                            ChemProV.Core.CommentMerger.Merge(parentStreams[originalFile], previousAssignmentTeam.Team.Name, studentReview, at.Team.Name, outputStreams[originalFile]);
+                            ChemProV.Core.CommentMerger.Merge(parentStreams[originalFile], authorName, studentReview, at.Team.Name, outputStreams[originalFile]);
 
                             //merge output back into the parent
                             parentStreams[originalFile] = new MemoryStream();
@@ -542,15 +540,14 @@ namespace OSBLE.Controllers
                 zipfile.AddEntry(Path.GetFileNameWithoutExtension(file) + "_MergedReview.cpml", parentStreams[file]);
             }
 
+
             FileSystem.CreateZipFolder((ActiveCourseUser.AbstractCourse as Course),
                                 zipfile,
                                 assignment,
                                 previousAssignmentTeam);
 
-            stream = FileSystem.GetDocumentForRead(zipfile.Name);
+            FileStream stream = FileSystem.GetDocumentForRead(zipfile.Name);
             return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
-
-            return RedirectToAction("Index", "Home");
         }
 
         private ActionResult GetSubmissionZipHelper(int assignmentID, int teamID, Team authorTeam = null)
