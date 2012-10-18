@@ -513,14 +513,19 @@ namespace OSBLE.Controllers
                             FileStream studentReview = System.IO.File.OpenRead(filePath);
 
                             //check anonymity settings
-                            string authorName = previousAssignmentTeam.Team.Name;
+                            string originalAuthorName = previousAssignmentTeam.Team.Name;
+                            string reviewerName = at.Team.Name;
                             if (assignment.CriticalReviewSettings != null && assignment.CriticalReviewSettings.AnonymizeAuthor == true)
                             {
-                                authorName = "Anonymous " + previousAssignmentTeam.TeamID;
+                                if (ActiveCourseUser.AbstractRole.CanGrade == false)
+                                {
+                                    originalAuthorName = "Anonymous " + previousAssignmentTeam.TeamID;
+                                    reviewerName = "Anonymous " + at.Team.ID;
+                                }
                             }
 
                             //merge the file
-                            ChemProV.Core.CommentMerger.Merge(parentStreams[originalFile], authorName, studentReview, at.Team.Name, outputStreams[originalFile]);
+                            ChemProV.Core.CommentMerger.Merge(parentStreams[originalFile], originalAuthorName, studentReview, reviewerName, outputStreams[originalFile]);
 
                             //merge output back into the parent
                             parentStreams[originalFile] = new MemoryStream();
