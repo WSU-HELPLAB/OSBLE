@@ -96,7 +96,14 @@
 
             @{
                 //Used in two areas.
-                DiscussionTeam dt = ViewBag.dtInfo[assignments[i].ID];
+                DiscussionTeam dt = null;
+                try
+                {
+                    dt = ViewBag.dtInfo[assignments[i].ID];
+                }
+                catch (Exception)
+                {
+                }
             }
 
             <!--Cell for Available Actions-->
