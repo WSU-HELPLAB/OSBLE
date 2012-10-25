@@ -48,6 +48,7 @@
                 items to each reviewer.
                 <button type="button" id="AutoAssignReviewTeamsButton" onclick="buildTeams();">
                     Go</button>
+                <button type="button" onclick="clearReviewTeams()">Clear All Teams</button>
             </li>
         </ul>
     </div>
@@ -74,7 +75,8 @@
         {
             counter++;
             <div id="teamDiv_@(aTeam.TeamID)" class="TeamDiv">
-                @aTeam.Team.Name
+                <input class="selectorCheckBox" type="checkbox" id="teamDiv_checkbox_@(aTeam.TeamID)" name="teamDiv_checkbox_@(aTeam.TeamID)" checked="checked" />
+                <label for="teamDiv_checkbox_@(aTeam.TeamID)">@aTeam.Team.Name</label>
                 <ul id="team_@(@aTeam.TeamID)" class="TeamSortable">
                     @foreach (ReviewTeam reviewTeam in assignment.ReviewTeams.Where(rt => rt.AuthorTeamID == aTeam.TeamID))
                     {

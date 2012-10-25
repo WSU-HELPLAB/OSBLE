@@ -56,14 +56,17 @@ function buildTeams() {
     var activeReviewers = Array();
 
     var reviewers = $('#AvailableStudent').children('li');
-    var reviewItems = $('.TeamSortable');
+    var reviewItems = $('.selectorCheckBox:checked');
 
     var numReviewTeams = reviewItems.length;
     var numReviewers = reviewers.length;
 
     //prime arrays
     for (var i = 0; i < numReviewTeams; i++) {
-        reviewTeams[i] = { id: reviewItems[i].id, count: 0, members: Array() };
+
+        //we need the ID of the div that contains the ID in the format of "team_ID".  This belongs to the 
+        //UL with the class 'TeamSortable'.
+        reviewTeams[i] = { id: $(reviewItems[i]).parent().children('.TeamSortable')[0].id, count: 0, members: Array() };
     }
     for (var i = 0; i < numReviewers; i++) {
         activeReviewers[i] = { id: $(reviewers[i]).attr("data-id"), count: 0 };
