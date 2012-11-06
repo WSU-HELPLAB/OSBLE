@@ -683,9 +683,9 @@ namespace OSBLE.Controllers
                 courseuser.UserProfileID = up.ID;
                 courseuser.AbstractCourseID = ActiveCourseUser.AbstractCourseID;
             }
-            else
+            else //If the CourseUser already has a UserProfile..
             {
-                if (courseuser.UserProfile.FirstName != null)
+                if (courseuser.UserProfile.FirstName != null) 
                 {
                     user.FirstName = courseuser.UserProfile.FirstName;
                     user.LastName = courseuser.UserProfile.LastName;
@@ -696,7 +696,7 @@ namespace OSBLE.Controllers
                 db.SaveChanges();
             }
             courseuser.AbstractCourseID = ActiveCourseUser.AbstractCourseID;
-            //Check uniqueness
+            //Check uniqueness before adding the CourseUser and adding them to the Teams
             if ((from c in db.CourseUsers
                  where c.AbstractCourseID == courseuser.AbstractCourseID && c.UserProfileID == courseuser.UserProfileID
                  select c).Count() == 0)
@@ -704,7 +704,20 @@ namespace OSBLE.Controllers
                 db.CourseUsers.Add(courseuser);
                 db.SaveChanges();
 
-                //If we already have assignments in the course, we need to add the new student into the class
+                addNewStudentToTeams(courseuser);
+            }
+        }
+
+        /// <summary>
+        /// This method will add the new courseUser to all the various types of teams they need to be on for each assignment type.
+        /// </summary>
+        /// <param name="courseUser">A newly added courseUser, must of be role student</param>
+        private void addNewStudentToTeams(CourseUser courseUser)
+        {
+
+            if (courseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student)
+            {
+                //If we already have assignments in the course, we need to add the new student into these assignments
                 int currentCourseId = ActiveCourseUser.AbstractCourseID;
                 List<Assignment> assignments = (from a in db.Assignments
                                                 where a.CourseID == currentCourseId
@@ -715,11 +728,11 @@ namespace OSBLE.Controllers
                 {
                     TeamMember userMember = new TeamMember()
                     {
-                        CourseUserID = courseuser.ID
+                        CourseUserID = courseUser.ID
                     };
 
                     Team team = new Team();
-                    team.Name = courseuser.UserProfile.LastName + "," + courseuser.UserProfile.FirstName;
+                    team.Name = courseUser.UserProfile.LastName + "," + courseUser.UserProfile.FirstName;
                     team.TeamMembers.Add(userMember);
 
                     db.Teams.Add(team);
@@ -734,6 +747,26 @@ namespace OSBLE.Controllers
 
                     db.AssignmentTeams.Add(assignmentTeam);
                     db.SaveChanges();
+
+                    //If the assignment is a discussion assignment they must be on a discussion team.
+                    if (a.Type == AssignmentTypes.DiscussionAssignment || a.Type == AssignmentTypes.CriticalReviewDiscussion)
+                    {
+                        DiscussionTeam dt = new DiscussionTeam();
+                        dt.AssignmentID = a.ID;
+                        dt.TeamID = assignmentTeam.TeamID;
+                        a.DiscussionTeams.Add(dt);
+
+                        //If the assignment is a CRD, the discussion team must also have an author team\
+                        //Since this CRD will already be completely invalid for use (as its a CRD with only 1 member..) 
+                        //we will do a small hack and have them be the author team and review team.
+                        if(a.Type == AssignmentTypes.CriticalReviewDiscussion)
+                        {
+                            dt.AuthorTeamID = assignmentTeam.TeamID;
+                        }
+                        db.SaveChanges();
+                    }
+
+                    
                 }
             }
         }
@@ -764,6 +797,9 @@ namespace OSBLE.Controllers
             {
                 db.CourseUsers.Add(courseuser);
                 db.SaveChanges();
+
+                //Adding the course user to teams so that they can access assignments
+                addNewStudentToTeams(courseuser);
             }
             else
             {
