@@ -118,24 +118,9 @@
                     else if (assignments[i].HasDeliverables)
                     {
                         @:@assignments[i].GetSubmissionCount() of @assignments[i].AssignmentTeams.Count submissions received.<br />
-                        @:@Html.ActionLink("Download all", "GetAllSubmissionsForActivity", "FileHandler", new { assignmentID = assignments[i].ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+                        @:@Html.ActionLink("Download all", "GetAllSubmissionsForAssignment", "FileHandler", new { assignmentID = assignments[i].ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
                     }
                 </td>
-
-
-           <!--Cell for Grading. Only show if hasRubric and not a future/draft assignment
-            Might still need this. Leaving here to toggle until its fate is decided. If anyone besides MG is looking at this, its safe to assume its good to delete
-                <td>
-                    
-                    @if (assignments[i].HasRubric && !(isFutureAssignment || isDraftAssignment))
-                    {
-                    
-                            @: @assignments[i].GetPublishedCount() of @assignments[i].AssignmentTeams.Count published.&nbsp @Html.ActionLink("Grade Now", "Index", "Rubric", new { assignmentId = assignments[i].ID, cuId = assignments[i].AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })<br />
-                            @: @assignments[i].GetSavedAsDraftCount() saved as draft.&nbsp @Html.ActionLink("Publish All", "PublishAllRubrics", "Assignment", new { area = "", assignmentId = assignments[i].ID }, new { })
-                    
-                    }
-                </td>
-            -->
             </tr>
                 
         }

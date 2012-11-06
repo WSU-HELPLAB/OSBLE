@@ -146,7 +146,7 @@
         @if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
         {
             @Html.ActionLink("Access reviewed items to discuss.",
-                "GetCriticalReviewDiscussionItems",
+                     "GetDocumentsForCriticalReviewDiscussion",
                 "FileHandler",
                 new { area = "", discussionTeamID = discussionTeamID },
                 new { onclick = "create_and_open_downloading_submission_dialog()" })

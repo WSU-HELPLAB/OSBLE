@@ -614,5 +614,24 @@ namespace OSBLE.Controllers
             }
             db.SaveChanges();
         }
+
+
+       
+        //Give the Target's AssignmentTeam, this returns True if TargetTeam should be anonymized for current user based off assignment settings.
+        public bool AnonymizeBasedOnCriticalReviewSettings(AssignmentTeam TargetTeam, CourseUser Target = null)
+        {
+            bool Anon = false;
+
+            Assignment CRAssignment = TargetTeam.Assignment;
+
+            if (CRAssignment.Type == AssignmentTypes.CriticalReview)
+            {
+                
+            }
+
+            return Anon;
+            
+        }
+
     }
 }

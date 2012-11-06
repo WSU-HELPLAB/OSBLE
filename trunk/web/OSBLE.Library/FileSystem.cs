@@ -63,6 +63,7 @@ namespace OSBLE
             return getRootPath() + "Courses\\" + course.ID + "\\";
         }
 
+
         private static string getUserPath(UserProfile userprofile)
         {
             return getRootPath() + "Users\\" + userprofile.ID + "\\";

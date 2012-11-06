@@ -14,6 +14,7 @@ using System.Configuration;
 using OSBLE.Utility;
 using OSBLE.Models.Annotate;
 using OSBLE.Services;
+using OSBLE.Models.FileSystem;
 
 namespace OSBLE.Controllers
 {
@@ -68,81 +69,17 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        [OsbleAuthorize]
-        [RequireActiveCourse]
-        [NotForCommunity]
-        public ActionResult GetSubmissionDeliverable(int assignmentID, int teamID, string fileName)
-        {
-            try
-            {
-                int currentUserID = CurrentUser.ID;
-                Assignment assignment = db.Assignments.Find(assignmentID);
-                AssignmentTeam team = db.AssignmentTeams.Find(assignmentID, teamID);
-                TeamMember teamMember = (from teamMembers in team.Team.TeamMembers
-                                         where teamMembers.CourseUser.UserProfileID == CurrentUser.ID
-                                         select teamMembers).FirstOrDefault();
-                //make sure assignmentActivity is part of the activeCourse and (the person can grade  or is allowed access to it)
-                if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && (ActiveCourseUser.AbstractRole.CanGrade || team.Team.TeamMembers.Contains(teamMember)))
-                {
-                    string path = FileSystem.GetDeliverable(ActiveCourseUser.AbstractCourse as Course, assignmentID, team, fileName);
-                    return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
-                }
-            }
-            catch
-            { }
-            //either not authorized or bad parameters were passed in
-            throw new Exception();
-        }
 
-        [OsbleAuthorize]
-        [RequireActiveCourse]
-        [NotForCommunity]
-        public ActionResult GetSubmissionDeliverableByType(int assignmentID, int userProfileID, string fileName, DeliverableType type)
-        {
-            Assignment assignment = db.Assignments.Find(assignmentID);
-            AssignmentTeam assignmentTeam = new AssignmentTeam();
-            TeamMember teamMember = new TeamMember();
-            foreach (AssignmentTeam at in assignment.AssignmentTeams)
-            {
-                foreach (TeamMember tm in at.Team.TeamMembers)
-                {
-                    if (tm.CourseUser.UserProfileID == userProfileID)
-                    {
-                        assignmentTeam = at;
-                        teamMember = tm;
-                    }
-                }
-            }
-
-            //rather then checking every step try catch will take care of it
-            try
-            {
-                //If u are looking at the activeCourse and you can either see all or looking at your own let it pass
-                if (ActiveCourseUser.AbstractCourseID == assignment.CourseID && (ActiveCourseUser.AbstractRole.CanSeeAll || CurrentUser.ID == userProfileID))
-                {
-                    //var teamUser = (from c in activity.TeamUsers where c.Contains(db.UserProfiles.Find(userProfileID)) select c).FirstOrDefault();
-
-                    string path = FileSystem.GetDeliverable(ActiveCourseUser.AbstractCourse as Course, assignmentID, assignmentTeam, fileName, GetFileExtensions(type));
-
-                    if (path != null)
-                    {
-                        return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception("Error in GetSubmission", e);
-            }
-
-            throw new Exception("File Not Found");
-        }
-
+        /// <summary>
+        /// Returns all the submissions for the given assignmentId
+        /// </summary>
+        /// <param name="assignmentID"></param>
+        /// <returns></returns>
         [OsbleAuthorize]
         [RequireActiveCourse]
         [CanGradeCourse]
         [NotForCommunity]
-        public ActionResult GetAllSubmissionsForActivity(int assignmentID)
+        public ActionResult GetAllSubmissionsForAssignment(int assignmentID)
         {
             Assignment assignment = db.Assignments.Find(assignmentID);
 
@@ -206,69 +143,23 @@ namespace OSBLE.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        [OsbleAuthorize]
-        [RequireActiveCourse]
-        [NotForCommunity]
-        public ActionResult GetTeamUserPeerReview(int assignmentID, int teamID)
-        {
-            try
-            {
-                //AbstractAssignmentActivity activity = db.AbstractAssignmentActivities.Find(assignmentActivityID);
-                Assignment assignment = db.Assignments.Find(assignmentID);
-                //TeamUserMember teamUser = db.TeamUsers.Find(teamUserID);
-                AssignmentTeam at = (from a in db.AssignmentTeams
-                                     where a.TeamID == teamID &&
-                                     a.AssignmentID == assignment.ID
-                                     select a).FirstOrDefault();
-
-                if ((assignment.CourseID == ActiveCourseUser.AbstractCourseID))
-                {
-                    if (ActiveCourseUser.AbstractRole.CanGrade)
-                    {
-                        //if we are dealing with a teacher first give them the published but if it doesn't exists give them a draft if that doesn't exist give em nothing
-                        string path = FileSystem.GetTeamUserPeerReview(false, ActiveCourseUser.AbstractCourse as Course, assignment.ID, at.TeamID);
-                        if (new FileInfo(path).Exists)
-                        {
-                            return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
-                        }
-                        else
-                        {
-                            path = FileSystem.GetTeamUserPeerReviewDraft(false, ActiveCourseUser.AbstractCourse as Course, assignment.ID, at.TeamID);
-                            if (new FileInfo(path).Exists)
-                            {
-                                return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
-                            }
-                        }
-                    }
-                    else if (ActiveCourseUser.AbstractRole.CanSubmit)
-                    {
-                        foreach (TeamMember tm in at.Team.TeamMembers)
-                        {
-                            if (tm.CourseUser.UserProfileID == CurrentUser.ID)
-                            {
-                                //if we are dealing with student try to give them the published one but if that doesn't exist give them nothing
-                                string path = FileSystem.GetTeamUserPeerReview(false, ActiveCourseUser.AbstractCourse as Course, assignment.ID, at.TeamID);
-                                return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = new FileInfo(path).Name };
-                            }
-                        }
-                    }
-                }
-            }
-            catch
-            { }
-            //either not authorized or bad parameters were passed in
-            throw new Exception();
-        }
-
+        /// <summary>
+        /// For the given team id and assignment id, it returns the submission. (Including critical reviews performed)
+        /// </summary>
+        /// <param name="assignmentId"></param>
+        /// <param name="teamId"></param>
+        /// <returns></returns>
         [OsbleAuthorize]
         [RequireActiveCourse]
         [CanGradeCourse]
         [NotForCommunity]
         public ActionResult GetSubmissionZip(int assignmentId, int teamId)
         {
+
             //basic assignments have the option of being annotatable.  In this case,
             //send off to annotate rather than creating a zip file.
             Assignment assignment = db.Assignments.Find(assignmentId);
+            Team team = db.Teams.Find(teamId);
             if (assignment.Type == AssignmentTypes.Basic && assignment.IsAnnotatable == true)
             {
                 if (assignment.HasDeliverables && assignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
@@ -277,7 +168,62 @@ namespace OSBLE.Controllers
                 }
             }
 
-            return GetSubmissionZipHelper(assignmentId, teamId);
+            Stream submission = null;
+            if (assignment.Type == AssignmentTypes.CriticalReview)
+            {
+                //Critical Review: We want all the reviews this team was set to do. 
+
+                ZipFile zipfile = new ZipFile();
+
+                //List of all the teams who the current team was set to review
+                List<ReviewTeam> reviewTeams = (from rt in db.ReviewTeams
+                                                where rt.AssignmentID == assignmentId
+                                                && rt.ReviewTeamID == teamId
+                                                select rt).ToList();
+
+                //Add each review into the zip
+                Dictionary<string, dynamic> reviewStreams = new Dictionary<string, dynamic>();
+                foreach (ReviewTeam reviewTeam in reviewTeams)
+                {
+                    string key = reviewTeam.AuthorTeam.Name;
+                    OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
+                    OSBLE.Models.FileSystem.FileCollection fc = fs.Course(ActiveCourseUser.AbstractCourseID)
+                                                                .Assignment(assignmentId)
+                                                                .Review(reviewTeam.AuthorTeam, reviewTeam.ReviewingTeam)
+                                                                .AllFiles();
+
+                    //don't create a zip if we don't have have anything to zip.
+                    if (fc.Count > 0)
+                    {
+                        var bytes = fc.ToBytes();
+                        reviewStreams[key] = bytes;
+                    }
+                }
+
+                foreach (string author in reviewStreams.Keys)
+                {
+                    foreach (string file in reviewStreams[author].Keys)
+                    {
+                        string location = string.Format("{0}/{1}", "Review of " + author, file);
+                        zipfile.AddEntry(location, reviewStreams[author][file]);
+                    }
+                }
+
+                submission = new MemoryStream();
+                zipfile.Save(submission);
+                submission.Position = 0;
+            }
+            else //Basic Assigment, only need to get submissions
+            {
+                submission = (new OSBLE.Models.FileSystem.FileSystem()).Course(ActiveCourseUser.AbstractCourseID)
+                                                                 .Assignment(assignmentId)
+                                                                 .Submission(teamId)
+                                                                 .AllFiles()
+                                                                 .ToZipStream();
+            }
+
+            string ZipName = assignment.AssignmentName + " by " +  team.Name + ".zip";
+            return new FileStreamResult(submission , "application/octet-stream") { FileDownloadName = ZipName};
         }
 
         public ActionResult GetAnnotateDocument(int assignmentID, int authorTeamID, string apiKey)
@@ -313,80 +259,365 @@ namespace OSBLE.Controllers
             return new FileStreamResult(FileSystem.GetDocumentForRead(path), "application/octet-stream") { FileDownloadName = fileName };
         }
 
+
+
         /// <summary>
-        /// Get deliverables from the reviewee's assignment (previous assignment) for the current user, 
-        /// needed for a critical review assignment (current user)
+        /// Gets the documents for a critical review. (The author team's submission from the preceding assignment)
+        /// Note: Based off Critical Review Settings, may return an anonymously named folder.
         /// </summary>
-        /// <param name="assignmentId">critical review assignment ID</param>
-        /// <param name="authorTeamId">reviewee team ID</param>
+        /// <param name="assignmentId">The Critical Review Assignment.ID</param>
+        /// <param name="authorTeamId">The AuthorTeam's TeamID</param>
         /// <returns></returns>
         [CanSubmitAssignments]
         [OsbleAuthorize]
         [RequireActiveCourse]
-        public ActionResult GetPrecedingSubmissionForCriticalReview(int assignmentId, int authorTeamId)
+        public ActionResult GetDocumentsForCriticalReview(int assignmentId, int authorTeamId)
         {
-            Assignment CRassignment = db.Assignments.Find(assignmentId);
-            AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourseUser);
-            List<int> authorTeams = (from rt in CRassignment.ReviewTeams
-                                     where rt.ReviewTeamID == at.TeamID
-                                     select rt.AuthorTeamID).ToList();
-            if (authorTeams.Contains(authorTeamId) && CRassignment.Type == AssignmentTypes.CriticalReview)
-            {
-                //AC TODO: Error checking!
+            Assignment CRAssignment = db.Assignments.Find(assignmentId);
+            AssignmentTeam CurrentUsersTeam = GetAssignmentTeam(CRAssignment, ActiveCourseUser);
+            Team authorTeam = db.Teams.Find(authorTeamId);
 
+            //Getting a list of all the Team Ids for the current user to review. 
+            List<int> AllTeamsToReview = (from rt in CRAssignment.ReviewTeams       
+                                     where rt.ReviewTeamID == CurrentUsersTeam.TeamID
+                                     select rt.AuthorTeamID).ToList();
+
+            //If authorTeamId is not in the list of author teams being reviewed by current user, then permission is denied.
+            if(AllTeamsToReview.Contains(authorTeamId))
+            {
                 //Send off to Annotate if we have exactly one deliverable and that deliverable is a PDF document
-                if (CRassignment.PreceedingAssignment.Deliverables.Count == 1 && CRassignment.PreceedingAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
+                if (CRAssignment.PreceedingAssignment.Deliverables.Count == 1 && CRAssignment.PreceedingAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
                 {
                     return RedirectToRoute(new { controller = "PdfCriticalReview", action = "Review", assignmentID = assignmentId, authorTeamID = authorTeamId });
                 }
-                else
+
+                //Document not handled by Annotate, must collect author teams preceding assignment's submission
+                OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
+                OSBLE.Models.FileSystem.FileCollection AuthorTeamSubmission = fs.Course(ActiveCourseUser.AbstractCourseID)
+                                                                                .Assignment(CRAssignment.PrecededingAssignmentID.Value)
+                                                                                .Submission(authorTeamId)
+                                                                                .AllFiles();
+
+                //Checking if author should be anonymized. 
+                string displayName = authorTeam.Name;
+                if (AnonymizeAuthor(CRAssignment, authorTeam))
                 {
-                    return GetSubmissionZipHelper((int)CRassignment.PrecededingAssignmentID, authorTeamId);
+                    displayName = "Anonymous " + authorTeamId;
+                }
+                string zipFileName = string.Format("{0}'s submission for {1}.zip", displayName, CRAssignment.PreceedingAssignment.AssignmentName);
+
+                return new FileStreamResult(AuthorTeamSubmission.ToZipStream(), "application/octet-stream") { FileDownloadName = zipFileName };
+            }
+            return RedirectToAction("Index", "Home");
+        }
+
+
+
+        /// <summary>
+        /// This gets all the documents for a critical review discussion. This is used by students and instructors
+        ///     This could be all the marked up documents, or it could be a link to annotate, or it could be a merged .cpml file.
+        /// </summary>
+        /// <param name="discussionTeamId">DiscussionTeam that needs the documents</param>
+        /// <returns></returns>
+        [OsbleAuthorize]
+        [RequireActiveCourse]
+        public ActionResult GetDocumentsForCriticalReviewDiscussion(int discussionTeamId)
+        {
+            DiscussionTeam dt = db.DiscussionTeams.Find(discussionTeamId);
+            Assignment CRAssignment = dt.Assignment.PreceedingAssignment;
+            Assignment CRDAssignment = dt.Assignment;
+            Assignment BasicAssignment = CRAssignment.PreceedingAssignment;
+            Team AuthorTeam = dt.AuthorTeam;
+            //Permission checking:
+            // assert that the activeCourseUser is a member of the discussion team of discussionTeamID
+            bool belongsToDiscussionTeam = false;
+            foreach (TeamMember tm in dt.GetAllTeamMembers())
+            {
+                if (tm.CourseUserID == ActiveCourseUser.ID)
+                {
+                    belongsToDiscussionTeam = true;
+                    break;
                 }
             }
 
+            //If user does not belong to DiscussionTeam and is not an instructor, do not let them get the documents
+            if (belongsToDiscussionTeam || ActiveCourseUser.AbstractRole.CanModify)
+            {
+                string zipFileName = "Critical Review Discussion Items for " + dt.TeamName + ".zip";
+                return GetAllReviewedDocuments(CRAssignment, AuthorTeam, zipFileName, CRDAssignment.DiscussionSettings);
+            }
             return RedirectToAction("Index", "Home");
         }
+
+
         /// <summary>
-        /// get a zip containing reviews that the review (current user) has performed on the 
+        /// Returns a boolean indicating if an Author's name should be anonymized. 
+        /// </summary>
+        /// <param name="CRAssignment">Critical Review Assignment</param>
+        /// <param name="authorTeam">The Team of authors</param>
+        /// <param name="discussionSettings">Critical Review Discussion's discussion settings. (if applicable)</param>
+        /// <returns></returns>
+        private bool AnonymizeAuthor(Assignment CRAssignment, Team authorTeam, DiscussionSetting discussionSettings = null)
+        {
+            //MG:authors are to be anonymous if any of the criteria are met:
+                //From DiscsussionSettings:
+                    //ActiveCurrentUser is a Moderator and Students are anonymous to Moderators. (Could occur when a moderator is downloading files from a CRD)
+                    //ActiveCurrentUser is a Student and Students are anonymous to Students. 
+                //From CriticalReviewSettings:
+                    //AnonymizeAuthor && ActiveCourseUser is not on Author team
+
+            bool anonymize = false;
+
+            //Instructors and TAs should never have anonymous authors.
+            if(ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor || ActiveCourseUser.AbstractRoleID ==  (int)CourseRole.CourseRoles.TA)
+            {
+                return false;
+            }
+
+            //Discussion Settings check
+            if (discussionSettings != null)
+            {
+                if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student && discussionSettings.HasAnonymousStudentsToStudents)
+                {
+                    anonymize = true;
+                }
+                else if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator && discussionSettings.HasAnonymousStudentsToModerators)
+                {
+                    anonymize = true;
+                }
+            }
+
+            //Critical Review settings check
+            if (CRAssignment.CriticalReviewSettings != null && CRAssignment.CriticalReviewSettings.AnonymizeAuthor)
+            {
+                //Check if ActiveCourseUser is part of AuthorTeam. If not, anonymize.
+                bool onTeam = authorTeam.TeamMembers.Where(tm => tm.CourseUserID == ActiveCourseUser.ID).Count() > 0;
+                if (onTeam == false)
+                {
+                    anonymize = true;
+                }
+            }
+
+            return anonymize;
+        }
+
+        /// <summary>
+        /// Returns a boolean indicating if an Reviewer's name should be anonymized. 
+        /// </summary>
+        /// <param name="CRAssignment">Critical Review Assignment</param>
+        /// <param name="authorTeam">The Team of reviewers</param>
+        /// <param name="discussionSettings">Critical Review Discussion's discussion settings. (if applicable)</param>
+        /// <returns></returns>
+        private bool AnonymizeReviewer(Assignment CRAssignment, Team reviewTeam, DiscussionSetting discussionSettings = null)
+        {
+            //MG: reviewers are to be anonymous if any of the criteria are met:
+                //From DiscsussionSettings:
+                    //ActiveCurrentUser is a Moderator and Students are anonymous to Moderators. (Could occur when a moderator is downloading files from a CRD)
+                    //ActiveCurrentUser is a Student and Students are anonymous to Students. 
+                //From CriticalReviewSettings:
+                    //AnonymizeCommentsCommentsAfterPublish && Critical Review Assignment is published && AcitveCourseUser is not on Review Team
+                    //Anonymizecomments && Critical REview Assignment is not published && AcitveCourseUser is not on Review Team
+
+            bool anonymize = false;
+
+            //Instructors and TAs should never have anonymous reviewers.
+            if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor || ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
+            {
+                return false;
+            }
+
+            //Discussion Settings check
+            if (discussionSettings != null)
+            {
+                if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student && discussionSettings.HasAnonymousStudentsToStudents)
+                {
+                    anonymize = true;
+                }
+                else if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator && discussionSettings.HasAnonymousStudentsToModerators)
+                {
+                    anonymize = true;
+                }
+            }
+
+            //Critical Review settings check
+            if (CRAssignment.CriticalReviewSettings != null)
+            {
+                bool onTeam = reviewTeam.TeamMembers.Where(tm => tm.CourseUserID == ActiveCourseUser.ID).Count() > 0;
+
+                //comments are made by reviewers, so anonymize comments translates to anonymizing reviewers. 
+                //Only considering anonymization if user is not on the review team.
+                if (onTeam == false && CRAssignment.CriticalReviewSettings.AnonymizeCommentsAfterPublish && CRAssignment.IsCriticalReviewPublished == true)
+                {
+                    anonymize = true;
+                }
+                else if (onTeam == false && CRAssignment.CriticalReviewSettings.AnonymizeComments && CRAssignment.IsCriticalReviewPublished == false)
+                {
+                    anonymize = true;
+                }
+            }
+
+            return anonymize;
+        }
+        
+        /// <summary>
+        /// Gets all the reviewed documents that belong to AuthorTeam. This function is used by other FileHandler function
+        /// </summary>
+        /// <param name="CRAssignment">The critical review assignment to fetch documents from</param>
+        /// <param name="authorTeam">The Team that was reviewed</param>
+        /// <param name="zipFileName">The Team that was reviewed</param>
+        /// <param name="discussionSetting"></param>
+        /// <returns></returns>
+        private ActionResult GetAllReviewedDocuments(Assignment CRAssignment, Team authorTeam, string zipFileName, DiscussionSetting discussionSetting = null)
+        {
+            Assignment basicAssignment = CRAssignment.PreceedingAssignment;
+            //If the BasicAssignment was a PDF, then use annotate to view discussion items
+            if (basicAssignment.HasDeliverables && basicAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
+            {
+                return RedirectToRoute(new { controller = "PdfCriticalReview", action = "Review", assignmentID = CRAssignment.ID, authorTeamID = authorTeam.ID });
+            }
+
+            //Gathering list of all TeamIDs who reviewed this Author
+            List<int> reviewingTeamIds = (from rt in CRAssignment.ReviewTeams
+                                          where rt.AuthorTeamID == authorTeam.ID
+                                          select rt.ReviewTeamID).ToList();
+
+            //Gathering all the assignment teams who reviewed DiscussionTeam's Author
+            List<AssignmentTeam> reviewingTeams = (from at in CRAssignment.AssignmentTeams
+                                                   where reviewingTeamIds.Contains(at.TeamID)
+                                                   select at).ToList();
+
+            //Streams used for ".cpml" Merging.
+            MemoryStream parentStream = new MemoryStream();
+            MemoryStream outputStream = new MemoryStream();
+            bool FirstTime = true;  //Bool used to determine if original file was added to stream
+
+            //ZipFile for all Reviews
+            ZipFile zipFile = new ZipFile();
+
+            //Determining displayname for the author team. 
+            string authorDisplayName = authorTeam.Name;
+            if (AnonymizeAuthor(CRAssignment, authorTeam, discussionSetting))
+            {
+                authorDisplayName = "Anonymous " + authorTeam.ID;
+            }
+
+            //Potentially multiple review teams are merged onto 1 team for the Critical Review Discussion
+            //so each Review Teams documents must be within the Critical Review Discussion Documents.
+            foreach (AssignmentTeam reviewTeam in reviewingTeams) 
+            {
+                //Get Reviews for AutuhorTeam from ReviewTeam.
+                OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
+                string reviewTeamSubmissionPath = fs.Course(ActiveCourseUser.AbstractCourseID)
+                                                                .Assignment(CRAssignment)
+                                                                .Review(authorTeam.ID, reviewTeam.TeamID)
+                                                                .GetPath();
+                
+
+                //Directory might not exist, check to avoid runtime error.
+                if (new DirectoryInfo(reviewTeamSubmissionPath).Exists)
+                {
+
+                    //Checking anonmous settings to determine name of folder
+                    string reviewerDisplayName = reviewTeam.Team.Name;
+                    if(AnonymizeReviewer(CRAssignment, reviewTeam.Team, discussionSetting))
+                    {
+                        //Change displayName if Reviewer is to be anonymized
+                        reviewerDisplayName = "Anonymous " + reviewTeam.Team.ID;
+                    }
+                    string folderName = "Review from " + reviewerDisplayName;
+
+                    zipFile.AddDirectory(reviewTeamSubmissionPath, folderName);
+
+                    //Check each file to see it s a .cpml. If it is, handle merging them into one .cpml
+                    foreach (string filename in Directory.EnumerateFiles(reviewTeamSubmissionPath))
+                    {
+                        if (Path.GetExtension(filename) == ".cpml")
+                        {
+                            //Only want to add the original file to the stream once.
+                            if (FirstTime == true)
+                            {
+                                string originalFile = fs.Course(ActiveCourseUser.AbstractCourseID)
+                                    .Assignment(basicAssignment)
+                                    .Submission(authorTeam)
+                                    .GetPath();
+                                FileStream filestream = System.IO.File.OpenRead(originalFile + "\\" + basicAssignment.Deliverables[0].Name + ".cpml");
+                                filestream.CopyTo(parentStream);
+                                FirstTime = false;
+                            }
+
+
+                            
+
+                            //Merge the FileStream from filename + parentStream into outputStream.
+                            ChemProV.Core.CommentMerger.Merge(parentStream, authorDisplayName, System.IO.File.OpenRead(filename), reviewerDisplayName, outputStream);
+
+                            //close old parent stream before writing over it
+                            parentStream.Close();
+
+                            //Copy outputStream to parentStream, creating new outputStream
+                            parentStream = new MemoryStream();
+                            outputStream.Seek(0, SeekOrigin.Begin);
+                            outputStream.CopyTo(parentStream);
+                            outputStream = new MemoryStream();
+                        }
+                    }
+                }
+
+            }
+
+            //Adding merged document to Zip if there was every a .cpml
+            if (FirstTime == false)
+            {
+                parentStream.Seek(0, SeekOrigin.Begin);
+                zipFile.AddEntry("MergedReview.cpml", parentStream);
+            }
+
+            //Saving zip to a stream
+            MemoryStream returnValue = new MemoryStream();
+            zipFile.Save(returnValue);
+            returnValue.Position = 0;
+
+            //Returning zip
+            return new FileStreamResult(returnValue, "application/octet-stream") { FileDownloadName = zipFileName };
+        }
+
+
+        /// <summary>
+        /// get a zip containing reviews that the current user has performed on the 
         /// author (authorTeamId) for a speicific assignment.
         /// </summary>
-        /// <param name="assignmentId">get reviews of submissions of this assignment</param>
-        /// <param name="authorTeamId">get the review of this authorTeam (that is submitted by the current user)</param>
+        /// <param name="assignmentId">Assignment to fetch reviews from</param>
+        /// <param name="authorTeamId">Authorteam that was reviewed</param>
         /// <returns></returns>
         [CanSubmitAssignments]
         [OsbleAuthorize]
         [RequireActiveCourse]
         public ActionResult GetReviewForAuthor(int assignmentId, int authorTeamId)
         {
-            //get authorTeam
+            Assignment CRAssignment = db.Assignments.Find(assignmentId);
             Team authorTeam = db.Teams.Find(authorTeamId);
-            //Assignment
+            Team currentUsersTeam = GetAssignmentTeam(CRAssignment, ActiveCourseUser).Team;
 
-            //bool isOwnDocument = false;
-            //foreach (TeamMember tm in authorTeam.TeamMembers)
-            //{
-            //    if (tm.CourseUserID == ActiveCourseUser.ID)
-            //    {
-            //        isOwnDocument = true;
-            //        break;
-            //    }
-            //}
+            Stream returnValue = (new OSBLE.Models.FileSystem.FileSystem()).Course(ActiveCourseUser.AbstractCourseID)
+                                                                .Assignment(CRAssignment)
+                                                                .Review(authorTeam, currentUsersTeam)
+                                                                .AllFiles()
+                                                                .ToZipStream();
 
-            //if (isOwnDocument)
-            //{
-            Assignment CRassignment = db.Assignments.Find(assignmentId);
-            AssignmentTeam at = GetAssignmentTeam(CRassignment, ActiveCourseUser);
+            //Checking if author should be anonymized. 
+            string displayName = authorTeam.Name;
+            if (AnonymizeAuthor(CRAssignment, authorTeam))
+            {
+                displayName = "Anonymous " + authorTeamId;
+            }
+            string zipFileName = string.Format("Review of {0}.zip", displayName);
 
-            return GetSubmissionZipHelper(assignmentId, at.TeamID, authorTeam);
-            //}
-
-            //return RedirectToAction("Index", "Home");
+            return new FileStreamResult(returnValue, "application/octet-stream") { FileDownloadName = zipFileName };
         }
 
         /// <summary>
         /// get a zip containing reviews that have been done 
-        /// to the the author's (receiverId) preceding assignment 
+        /// to the the author's (receiverId) preceding assignment.
         /// </summary>
         /// <param name="assignmentId">assignment ID of the critical review</param>
         /// <param name="receiverId">This is the CourseUser you want to download received reviews for. 
@@ -396,248 +627,23 @@ namespace OSBLE.Controllers
         [RequireActiveCourse]
         public ActionResult GetReviewsOfAuthor(int assignmentId, int receiverId)
         {
-
-            Assignment assignment = db.Assignments.Find(assignmentId);
+            Assignment CRAssignment = db.Assignments.Find(assignmentId);
             CourseUser receiver = db.CourseUsers.Find(receiverId);
-            AssignmentTeam previousAssignmentTeam = GetAssignmentTeam(assignment.PreceedingAssignment, receiver);
+            AssignmentTeam AuthorTeam = GetAssignmentTeam(CRAssignment.PreceedingAssignment, receiver);
 
             if (ActiveCourseUser.AbstractRole.CanModify || (receiverId == ActiveCourseUser.ID))
-            //AC turned off for now as it seems to be broken -- && assignment.IsCriticalReviewPublished))
             {
-                return GetReviewsOfAuthorHelper(assignment, receiverId);
-            }
-            return RedirectToAction("Index", "Home");
-        }
-
-        [OsbleAuthorize]
-        [RequireActiveCourse]
-        public ActionResult GetCriticalReviewDiscussionItems(int discussionTeamID)
-        {
-            DiscussionTeam dt = db.DiscussionTeams.Find(discussionTeamID);
-
-            Assignment precedingAssignment = dt.Assignment.PreceedingAssignment;
-
-            //Permission checking:
-            // assert that the activeCourseUser is a member of the discussion team of discussionTeamID
-            // and confirm that the critical review to be downloaded has been published
-            // note: these contraints do not apply to instructors
-            bool belongsToDT = false;
-
-            foreach (TeamMember tm in dt.GetAllTeamMembers())
-            {
-                if (tm.CourseUserID == ActiveCourseUser.ID)
-                {
-                    belongsToDT = true;
-                    break;
-                }
-            }
-
-            if (ActiveCourseUser.AbstractRole.CanModify || (belongsToDT)) 
-            //AC: not working for some reason.  Fix at some point. -- && precedingAssignment.IsCriticalReviewPublished))
-            {
-                return GetReviewsOfAuthorHelper(precedingAssignment, dt.AuthorTeam.TeamMembers.FirstOrDefault().CourseUserID);
+                //No need to anonymize name AuthorTeam here as this function call is only made by Instructors and the author team.
+                return GetAllReviewedDocuments(CRAssignment, AuthorTeam.Team, "Critical Reviews for " + AuthorTeam.Team.Name + ".zip");
             }
             return RedirectToAction("Index", "Home");
         }
 
         /// <summary>
-        /// get a zip containing reviews that have been done 
-        /// to the the author's (receiverId) preceding assignment
+        /// Returns all the submissions from the ActiveCourseUser for the given assignmentID
         /// </summary>
-        /// <param name="assignment">assignment of the critical review</param>
-        /// <param name="receiverId">This is the CourseUser you want to download received reviews for. 
-        /// If it is team based, any course user in the preceding assignment team will yield the same results</param>
+        /// <param name="assignmentID"></param>
         /// <returns></returns>
-        private ActionResult GetReviewsOfAuthorHelper(Assignment assignment, int receiverId)
-        {
-            CourseUser receiver = db.CourseUsers.Find(receiverId);
-            AssignmentTeam previousAssignmentTeam = GetAssignmentTeam(assignment.PreceedingAssignment, receiver);
-
-            //critical reviews of PDF documents aren't zipped.  Instead,
-            //they are sent to annotate.  In this case, we need to redirect
-            //to a different location
-            if (assignment.Type == AssignmentTypes.CriticalReview)
-            {
-                Assignment previousAssignment = assignment.PreceedingAssignment;
-                if (previousAssignment.HasDeliverables && previousAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
-                {
-                    return RedirectToRoute(new { controller = "PdfCriticalReview", action = "Review", assignmentID = assignment.ID, authorTeamID = previousAssignmentTeam.TeamID });
-                }
-            }
-
-            string zipFileName = "Critical Review.zip"; // of " + previousAssignmentTeam.Team.Name + ".zip";
-            ZipFile zipfile = new ZipFile();
-            string submissionFolder;
-
-            List<int> teamsReviewingIds = (from rt in assignment.ReviewTeams
-                                           where rt.AuthorTeamID == previousAssignmentTeam.TeamID
-                                           select rt.ReviewTeamID).ToList();
-
-            List<AssignmentTeam> ReviewingAssignmentTeams = (from at in assignment.AssignmentTeams
-                                                             where teamsReviewingIds.Contains(at.TeamID)
-                                                             select at).ToList();
-
-            Dictionary<string, MemoryStream> parentStreams = new Dictionary<string, MemoryStream>();
-            Dictionary<string, MemoryStream> outputStreams = new Dictionary<string, MemoryStream>();
-
-            foreach (AssignmentTeam at in ReviewingAssignmentTeams)
-            {
-                submissionFolder = FileSystem.GetTeamUserSubmissionFolderForAuthorID(false, (ActiveCourseUser.AbstractCourse as Course), assignment.ID, at, previousAssignmentTeam.Team);
-                if (new DirectoryInfo(submissionFolder).Exists)
-                {
-                    zipfile.AddDirectory(submissionFolder, at.Team.ID.ToString());
-
-                    foreach (string filePath in Directory.EnumerateFiles(submissionFolder))
-                    {
-                        if (Path.GetExtension(filePath) == ".cpml")
-                        {
-                            //Step 1: Get original document as file stream
-                            string originalFile = FileSystem.GetDeliverable((ActiveCourseUser.AbstractCourse as Course),
-                                (int)assignment.PrecededingAssignmentID,
-                                previousAssignmentTeam,
-                                previousAssignmentTeam.Assignment.Deliverables[0].Name + ".cpml"
-                                );
-
-                            if (!parentStreams.ContainsKey(originalFile))
-                            {
-                                FileStream fs = System.IO.File.OpenRead(originalFile);
-                                parentStreams[originalFile] = new MemoryStream();
-                                fs.CopyTo(parentStreams[originalFile]);
-                                fs.Close();
-                            }
-
-                            outputStreams[originalFile] = new MemoryStream();
-
-
-                            //open student's review file
-                            FileStream studentReview = System.IO.File.OpenRead(filePath);
-
-                            //check anonymity settings
-                            string originalAuthorName = previousAssignmentTeam.Team.Name;
-                            string reviewerName = at.Team.Name;
-                            if (assignment.CriticalReviewSettings != null && assignment.CriticalReviewSettings.AnonymizeAuthor == true)
-                            {
-                                if (ActiveCourseUser.AbstractRole.CanGrade == false)
-                                {
-                                    originalAuthorName = "Anonymous " + previousAssignmentTeam.TeamID;
-                                    reviewerName = "Anonymous " + at.Team.ID;
-                                }
-                            }
-
-                            //merge the file
-                            ChemProV.Core.CommentMerger.Merge(parentStreams[originalFile], originalAuthorName, studentReview, reviewerName, outputStreams[originalFile]);
-
-                            //merge output back into the parent
-                            parentStreams[originalFile] = new MemoryStream();
-                            outputStreams[originalFile].Seek(0, SeekOrigin.Begin);
-                            outputStreams[originalFile].CopyTo(parentStreams[originalFile]);
-                            outputStreams[originalFile].Close();
-
-
-                        }
-                    }
-                }
-            }
-
-            foreach (string file in parentStreams.Keys.ToList())
-            {
-                parentStreams[file].Seek(0, SeekOrigin.Begin);
-                zipfile.AddEntry(Path.GetFileNameWithoutExtension(file) + "_MergedReview.cpml", parentStreams[file]);
-            }
-
-
-            FileSystem.CreateZipFolder((ActiveCourseUser.AbstractCourse as Course),
-                                zipfile,
-                                assignment,
-                                previousAssignmentTeam);
-
-            FileStream stream = FileSystem.GetDocumentForRead(zipfile.Name);
-            return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
-        }
-
-        private ActionResult GetSubmissionZipHelper(int assignmentID, int teamID, Team authorTeam = null)
-        {
-            Assignment assignment = db.Assignments.Find(assignmentID);
-
-            try
-            {
-                AssignmentTeam assignmentTeam = (from a in db.AssignmentTeams
-                                                 where a.TeamID == teamID &&
-                                                 a.AssignmentID == assignment.ID
-                                                 select a).FirstOrDefault();//db.AssignmentTeams.Find(teamID);
-
-                if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && assignment.AssignmentTeams.Contains(assignmentTeam))
-                {
-
-                    //AC TODO: use some sort of logic to determine an appropriate file name.
-                    string zipFileName = "document" + ".zip";
-
-                    string submissionfolder;
-                    using (ZipFile zipfile = new ZipFile())
-                    {
-                        if (assignment.Type == AssignmentTypes.CriticalReview && authorTeam != null)
-                        {
-                            submissionfolder = FileSystem.GetTeamUserSubmissionFolderForAuthorID(false, (ActiveCourseUser.AbstractCourse as Course), assignmentID, assignmentTeam, authorTeam);
-
-                            if (new DirectoryInfo(submissionfolder).Exists)
-                            {
-                                zipfile.AddDirectory(submissionfolder);
-                            }
-                        }
-                        else if (assignment.Type == AssignmentTypes.Basic)
-                        {
-                            OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
-                            zipfile.AddItem(fs.Course(ActiveCourseUser.AbstractCourseID).Assignment(assignment).Submission(assignmentTeam.Team).GetPath());
-                        }
-                        else
-                        {
-                            List<ReviewTeam> reviewTeams = (from rt in db.ReviewTeams
-                                                            where rt.AssignmentID == assignmentID
-                                                            && rt.ReviewTeamID == assignmentTeam.TeamID
-                                                            select rt).ToList();
-                            Dictionary<string, dynamic> reviewStreams = new Dictionary<string, dynamic>();
-                            foreach (ReviewTeam reviewTeam in reviewTeams)
-                            {
-                                string key = reviewTeam.AuthorTeam.Name;
-                                OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
-                                OSBLE.Models.FileSystem.FileCollection fc = fs.Course(ActiveCourseUser.AbstractCourseID)
-                                                                            .Assignment(assignmentID)
-                                                                            .Review(reviewTeam.AuthorTeam, reviewTeam.ReviewingTeam)
-                                                                            .AllFiles();
-
-                                //don't create a zip if we don't have have anything to zip.
-                                if (fc.Count > 0)
-                                {
-                                    var bytes = fc.ToBytes();
-                                    reviewStreams[key] = bytes;
-                                }
-                            }
-
-                            foreach (string author in reviewStreams.Keys)
-                            {
-                                foreach (string file in reviewStreams[author].Keys)
-                                {
-                                    string location = string.Format("{0}/{1}", author, file);
-                                    zipfile.AddEntry(location, reviewStreams[author][file]);
-                                }
-                            }
-                        }
-
-                        MemoryStream stream = new MemoryStream();
-                        zipfile.Save(stream);
-                        stream.Position = 0;
-                        return new FileStreamResult(stream, "application/octet-stream") { FileDownloadName = zipFileName };
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception("Error in GetSubmissionZip", e);
-            }
-            return RedirectToAction("Index", "Home");
-        }
-
-
         [NotForCommunity]
         [OsbleAuthorize]
         [RequireActiveCourse]
