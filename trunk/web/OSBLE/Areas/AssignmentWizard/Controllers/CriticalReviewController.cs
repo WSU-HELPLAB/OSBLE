@@ -108,8 +108,100 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             Assignment.ReviewTeams = ParseReviewTeams();
             db.SaveChanges();
             WasUpdateSuccessful = true;
+
+            //This could have been an edit of the CR, and as a reuslt any CRDs associated with the assignment should be updated.
+            UpdateCriticalReviewDiscussions();
+
             SetUpViewBag();
+
+            
+
             return base.PostBack(Assignment);
+        }
+
+        private void UpdateCriticalReviewDiscussions()
+        {
+            //Getting a list of CRDs that used this Critical Review
+            List<Assignment> relatedCriticalReviewDiscussions = (from a in db.Assignments
+                                                                 where a.AssignmentTypeID == (int)AssignmentTypes.CriticalReviewDiscussion &&
+                                                                 a.PrecededingAssignmentID == Assignment.ID
+                                                                 select a).ToList();
+
+            foreach (Assignment CRDassignment in relatedCriticalReviewDiscussions)
+            {
+                //The discussion teams from the CRD are potentially orphans, at the end of this iteration, any teams that are still orphans will be deleted.
+                List<DiscussionTeam> orphanTeams = CRDassignment.DiscussionTeams.ToList();
+
+                List<int> authorTeamIds = Assignment.ReviewTeams.Select(rt => rt.AuthorTeamID).Distinct().ToList();
+
+                //There will be at most 1 DiscussionTeam for each AuthorTeam. So, looking for existing
+                //discussion teams to edit.
+                int i = 1;
+                foreach (int authorTeamId in authorTeamIds)
+                {
+                    DiscussionTeam existingDiscussionTeam = orphanTeams.Where(dt => dt.AuthorTeamID == authorTeamId).FirstOrDefault();
+                    if (existingDiscussionTeam == null) //There was no team. This could occur if Team X had no reviewers before the edit, and now has reviewers.
+                    {
+                        //Create new DiscussionTeam and Team for existingDiscussionTeam
+                        existingDiscussionTeam = new DiscussionTeam();
+                        existingDiscussionTeam.AuthorTeamID = authorTeamId;
+                        existingDiscussionTeam.AssignmentID = CRDassignment.ID;
+
+                        Team newTeam = new Team();
+                        //Keep trying to generate unique name
+                        do
+                        {
+                            newTeam.Name = "Discussion Team 0" + i;
+                            i++;
+                        } while (CRDassignment.DiscussionTeams.Where(dt => dt.TeamName == newTeam.Name).Count() > 0);
+
+                        existingDiscussionTeam.Team = newTeam;
+                        db.DiscussionTeams.Add(existingDiscussionTeam);
+                        db.SaveChanges();
+                    }
+                    else //Team still exists, remove from orphan list.
+                    {
+                        orphanTeams.Remove(existingDiscussionTeam);
+                    }
+
+                    //ExistingDiscussionTeam.Team.TeamMembers need to be wiped and refreshed with those who exist in the review team
+                    existingDiscussionTeam.Team.TeamMembers.Clear();
+
+                    //Add each reviewer to existingDiscussionTeam.Team, only once.
+                    //MG: Note, the reason the team Ids are collected and then a db query for the teams is because assignment's aren't properly doing a virtual call
+                    //to collect their review teams, as all review teams are null.
+                    List<int> reviewTeamIds = Assignment.ReviewTeams.Where(rt => rt.AuthorTeamID == authorTeamId).Select(rt => rt.ReviewTeamID).ToList();
+                    List<Team> reviewTeams = (from team in db.Teams
+                                             where reviewTeamIds.Contains(team.ID)
+                                             select team).ToList();
+                    foreach (Team reviewTeam in reviewTeams)
+                    {
+                        foreach (TeamMember reviewer in reviewTeam.TeamMembers)
+                        {
+                            //Checking if reviewer is already on team
+                            bool alreadyOnTeam = (from tm in existingDiscussionTeam.Team.TeamMembers
+                                                  where tm.CourseUserID == reviewer.CourseUserID
+                                                  select tm).Count() > 0;
+
+                            //If not on team, Create a new team member for them, and add to existingDiscussionTeam.Team
+                            if (alreadyOnTeam == false)
+                            {
+                                TeamMember newMember = new TeamMember();
+                                newMember.CourseUserID = reviewer.CourseUserID;
+                                newMember.TeamID = existingDiscussionTeam.TeamID;
+                                existingDiscussionTeam.Team.TeamMembers.Add(newMember);
+                            }
+                        }
+                    }
+                }
+
+                //Remove any remainig orphanTeams
+                foreach (DiscussionTeam orphan in orphanTeams)
+                {
+                    db.DiscussionTeams.Remove(orphan);
+                }
+                db.SaveChanges();
+            }
         }
 
         private List<ReviewTeam> ParseReviewTeams()

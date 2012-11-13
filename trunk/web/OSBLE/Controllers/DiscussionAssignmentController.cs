@@ -67,11 +67,11 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public ActionResult Index(int assignmentId, int discussionTeamId, bool? displayNewPosts = false)
         {
-            //checking if ids are good
+            
             Assignment assignment = null;
             DiscussionTeam discussionTeam = null;
-            
 
+            //checking if ids are good
             if (discussionTeamId > 0 && assignmentId > 0)
             {
 
@@ -84,17 +84,17 @@ namespace OSBLE.Controllers
             //Make sure ActiveCourseUser is a valid discussion member
                 //Valid discussion members are in the discussion team, or in the class of a classwide discussion assignment
             bool allowedInDiscussion = false;
-            if (assignment != null && assignment.HasDiscussionTeams == false)
+            if (assignment != null && assignment.HasDiscussionTeams == false)//Classwide discussion
             {
-                //Classwide discussion, make sure user is in course
+                //make sure user is in course
                 if (ActiveCourseUser.AbstractCourseID == assignment.CourseID)
                 {
                     allowedInDiscussion = true;
                 }
             }
-            else if (assignment != null && discussionTeam != null)
+            else if (assignment != null && discussionTeam != null)//Assignment has discussion teams
             {
-                //Assignment has discussion teams, make sure user is part of team.
+                //make sure user is part of team.
                 foreach (TeamMember tm in discussionTeam.GetAllTeamMembers())
                 {
                     if (tm.CourseUserID == ActiveCourseUser.ID)
@@ -129,7 +129,6 @@ namespace OSBLE.Controllers
                 }
 
                 //for CRD assignment types we need a list of all discussions they can participate in for navigation.
-                //additionally for CRD assignments we want to display all teammates invovled in the discussion
                 if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion)
                 {
                     List<DiscussionTeam> DiscussionTeamList = new List<DiscussionTeam>();

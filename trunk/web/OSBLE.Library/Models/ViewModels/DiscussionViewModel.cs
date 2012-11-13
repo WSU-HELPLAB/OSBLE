@@ -109,7 +109,7 @@ namespace OSBLE.Models.ViewModels
         /// </summary>
         private void InitializeViewModelForCriticalReviewDiscussion()
         {
-
+            //booleans used for anonymization checks
             bool currentUserIsAuthor = discussionTeam.AuthorTeam.TeamMembers.Where(tm => tm.CourseUserID == currentUser.ID).ToList().Count > 0;
             bool currentUserIsReviewer = discussionTeam.Team.TeamMembers.Where(tm => tm.CourseUserID == currentUser.ID).ToList().Count > 0;
 
@@ -148,15 +148,26 @@ namespace OSBLE.Models.ViewModels
                                                         && post.CourseUser.AbstractRoleID != (int)CourseRole.CourseRoles.Student
                                                         select post).ToList();
 
-
+                //Gathering all posts made by students no longer in the discusison. First gathering all student posts...
+                List<DiscussionPost> OldReviewerPosts = (from DiscussionPost post in db.DiscussionPosts
+                                                                .Include("CourseUser")
+                                                                .Include("CourseUser.AbstractRole")
+                                                         where post.DiscussionTeamID == discussionTeam.ID &&
+                                                         post.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Student
+                                                         select post).ToList();
+                //...then removing Author and reviewer posts
+                OldReviewerPosts = OldReviewerPosts.Except(AuthorPosts).Except(ReviewerPosts).ToList();
+                
                 //Now that we have our lists, we will remove duplicates and convert each lists based off Author, Reviewers, Author/Reviewers, and finally NonStudent
                 List<DiscussionPost> AuthorReviewers = AuthorPosts.Intersect(ReviewerPosts, new DiscussionPostComparer()).ToList();
 
                 //Converting AuthorPosts to ViewModels, then authorReviewers, then Reviewers, and finally NonSTudent posts. 
                 ConvertPostsToViewModel(AuthorPosts.Except(AuthorReviewers, new DiscussionPostComparer()).ToList(), "Author", currentUserIsAuthor, currentUserIsReviewer);
                 ConvertPostsToViewModel(ReviewerPosts.Except(AuthorReviewers, new DiscussionPostComparer()).ToList(), "Reviewer", currentUserIsAuthor, currentUserIsReviewer);
+                ConvertPostsToViewModel(OldReviewerPosts, "Reviewer", currentUserIsAuthor, currentUserIsReviewer);
                 ConvertPostsToViewModel(AuthorReviewers.ToList(), "Author/Reviewer", currentUserIsAuthor, currentUserIsReviewer);
                 ConvertPostsToViewModel(NonStudentPosts.ToList(), null, currentUserIsAuthor, currentUserIsReviewer);
+
 
                 //Now adding all the replies from ReplyListViewModels into their correct discussionPost
                 OrganizeReplies();

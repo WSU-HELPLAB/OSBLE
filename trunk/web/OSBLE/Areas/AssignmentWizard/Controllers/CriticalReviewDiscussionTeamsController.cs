@@ -138,7 +138,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                                     alreadyInTeam = true;
                                 }
                             }
-                            if (!alreadyInTeam)
+                            if (alreadyInTeam == false)
                             {
                                 team.TeamMembers.Add(newTm);
                             }
