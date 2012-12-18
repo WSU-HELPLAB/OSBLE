@@ -79,9 +79,6 @@ namespace OSBLE.Models.Courses
         [Display(Name = "Course Breaks")]
         public virtual ICollection<CourseBreak> CourseBreaks { get; set; }
 
-        [Display(Name = "Course Letter Grades")]
-        public virtual ICollection<LetterGrade> LetterGrades { get; set; }
-
         [Display(Name = "Include course meetings and breaks in course calendar")]
         public bool ShowMeetings { get; set; }
 

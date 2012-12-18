@@ -102,9 +102,6 @@
     <Compile Include="..\OSBLE.Library\Models\AbstractCourses\Course\CourseUser.cs">
       <Link>Models\AbstractCourses\Course\CourseUser.cs</Link>
     </Compile>
-    <Compile Include="..\OSBLE.Library\Models\AbstractCourses\Course\GradebookOptions\LetterGrade.cs">
-      <Link>Models\AbstractCourses\Course\GradebookOptions\LetterGrade.cs</Link>
-    </Compile>
     <Compile Include="..\OSBLE.Library\Models\AbstractCourses\Course\Rubrics\CellDescription.cs">
       <Link>Models\AbstractCourses\Course\Rubrics\CellDescription.cs</Link>
     </Compile>
@@ -311,7 +308,9 @@
     <None Include="osble.library.signed.snk" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Models\AbstractCourses\Course\GradebookOptions\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

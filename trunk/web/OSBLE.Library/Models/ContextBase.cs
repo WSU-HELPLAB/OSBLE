@@ -202,8 +202,6 @@ namespace OSBLE.Models
 
         public DbSet<CourseUser> CourseUsers { get; set; }
 
-        public DbSet<LetterGrade> LetterGrades { get; set; }
-
         // HomePage
 
         public DbSet<AbstractDashboard> AbstractDashboards { get; set; }

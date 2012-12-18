@@ -143,24 +143,6 @@ function addMeetingTime(mt) {
     $('#meetings_max').val(count + 1);
 }
 
-function addTableRow() {
-    var count = parseInt($("#max_table").val());   
-
-    $("#letterGradesTableID tr:last").after('<tr id="values"><td><input name="letter-' + count + '" value="" /></td><td><input name="min-' + count + '" value="" /></td></tr>');
-    count += 1;
-
-    $("#max_table").val(count);
-}
-
-function removeTableRow() {
-    var count = parseInt($("#max_table").val());
-    count -= 1;
-
-    $("#letterGradesTableID #values:last").remove();
-
-    $("#max_table").val(count);
-}
-
 function addBreak(b) {
     var count = parseInt($('#breaks_max').val());
 

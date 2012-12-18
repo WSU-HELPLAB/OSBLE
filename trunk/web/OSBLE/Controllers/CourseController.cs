@@ -103,35 +103,6 @@ namespace OSBLE.Controllers
             db.SaveChanges();
         }
 
-        private void saveLetterGrades(Course course)
-        {
-            var count = Convert.ToInt32(Request.Params["max_table"]);
-
-            if (course.LetterGrades == null)
-            {
-                course.LetterGrades = new List<LetterGrade>();
-            }
-            else
-            {
-                course.LetterGrades.Clear();
-            }
-
-            for (int i = 0; i < count; i++)
-            {
-                if (Request.Params["letter-" + i.ToString()] != null && Request.Params["min-" + i.ToString()] != null)
-                {
-                    LetterGrade lg = new LetterGrade();
-
-                    lg.Grade = Request.Params["letter-" + i.ToString()];
-                    lg.MinimumRequired = Convert.ToInt32(Request.Params["min-" + i]);
-
-                    course.LetterGrades.Add(lg);
-                }
-            }
-
-            db.SaveChanges();
-        }
-
         //
         // POST: /Course/Create
 
@@ -146,7 +117,6 @@ namespace OSBLE.Controllers
 
                 createMeetingTimes(course);
                 createBreaks(course);
-                saveLetterGrades(course);
 
                 // Make current user an instructor on new course.
                 CourseUser cu = new CourseUser();
@@ -222,7 +192,6 @@ namespace OSBLE.Controllers
 
             createMeetingTimes(updateCourse);
             createBreaks(updateCourse);
-            saveLetterGrades(updateCourse);
 
             if (ModelState.IsValid)
             {

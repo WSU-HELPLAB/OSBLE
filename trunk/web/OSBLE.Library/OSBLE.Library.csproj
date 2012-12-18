@@ -73,7 +73,6 @@
     <Compile Include="Models\AbstractCourses\Course\CourseMeeting.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseRole.cs" />
     <Compile Include="Models\AbstractCourses\Course\CourseUser.cs" />
-    <Compile Include="Models\AbstractCourses\Course\GradebookOptions\LetterGrade.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\CellDescription.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\CriterionEvaluation.cs" />
     <Compile Include="Models\AbstractCourses\Course\Rubrics\Criterion.cs" />

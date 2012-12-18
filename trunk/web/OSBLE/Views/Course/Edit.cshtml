@@ -208,30 +208,6 @@
             @Helpers.CreateToolTip(ToolTips.CourseCalendarEvents) 
         </div>
     
-    <h3>Default Grading Scheme @Helpers.CreateToolTip(ToolTips.CourseGradingScheme) </h3>
-    
-    
-    
-    <table id="letterGradesTableID">
-        <tr>
-            <th>Letter Grade</th>
-            <th>Minimum % Required</th>
-        </tr>
-        @{var i = 0;}
-        @foreach (LetterGrade lg in Model.LetterGrades)
-        {
-            
-            <tr id="values">
-                <td><input name="letter-@i" value="@lg.Grade" /></td>
-                <td><input name="min-@i" value="@lg.MinimumRequired" /></td>
-            </tr>
-            i += 1;
-        }
-    </table>
-    <input type="hidden" id="max_table" name="max_table" value="@i"/>  
-    <a href="#" onclick="addTableRow(); return false;" title="Add New Letter Grade">@Helpers.AddButton()</a>
-    <a href="#" onclick="removeTableRow(); return false;" title="Remove Last Letter Grade">@Helpers.DeleteButton()</a>
-    
     <h3>Default Late Policy @Helpers.CreateToolTip(ToolTips.CourseLatePolicy) </h3>
     
     <p>
