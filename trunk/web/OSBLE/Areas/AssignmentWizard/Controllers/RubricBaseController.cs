@@ -102,7 +102,8 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             string rubricDescription;
 
             Rubric rubric = db.Rubrics.Find(rubricID);
-
+            bool globalCommentsChecked = false;
+            bool criteriaCommentsChecked = false;
             if (rubric != null)
             {
                 rubricDescription = rubric.Description;
@@ -122,6 +123,9 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     }
                     rubricTable.Add(row);
                 }
+                globalCommentsChecked = rubric.HasGlobalComments;
+                criteriaCommentsChecked = rubric.HasCriteriaComments;
+
             }
 
             else
@@ -137,11 +141,17 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 levels.Add(new Level());
             }
 
+            ViewBag.EvalsExist = (from re in db.RubricEvaluations
+                                    where re.AssignmentID == Assignment.ID
+                                    select re).Count() > 0;
+
+            ViewBag.globalCommentsCheckedValue = globalCommentsChecked ? "checked" : "";
+            ViewBag.criteriaCommentsCheckedValue = criteriaCommentsChecked ? "checked" : "";
             ViewBag.rubricDescription = rubricDescription;
             ViewBag.levels = levels;
             ViewBag.ActiveCourse = ActiveCourseUser;
             ViewBag.rubricTable = rubricTable;
-
+            
             return View("Index", Assignment);
         }
 
@@ -164,7 +174,249 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             ViewBag.rubricSelection = rubricSelectionViewModel;
         }
 
+        /// <summary>
+        /// This function will create a rubric if one does not exist, 
+        /// If a rubric already exists, this function will update a rubric after an edit if no rows or columns have been added, otherwise it will delete the rubric and recreate it.
+        /// </summary>
+        protected void UpdateRubric()
+        {
 
+            //Grabbing all needed information to create or update the rubric
+            List<string> keys = getFormKeys();
+            List<List<string>> rubricTable = getRubricTable(keys);
+            List<string> levelTitles = getLevelTitles(keys);
+            List<int> pointSpreads = getPointSpreads(keys);
+            bool globalComments = hasGlobalComments();
+            bool criteriaComments = hasCriteriaComments();
+            string rubricDescription = getRubricName();
+
+            if (Assignment.Rubric != null) //A rubric already exists
+            {
+                //Grabbing current rubric's row/column count
+                int currentRowCount = Assignment.Rubric.Criteria.Count;
+                int currentColumnCount = Assignment.Rubric.Levels.Count;
+
+                //getting the new rubric's row/column count
+                int updatedRubricRowCount = rubricTable.Count;
+                int updatedRubricColumnCount = rubricTable[0].Count - 2;    //Minus 2 to so Criterion weight/performance criterion columns are not counted
+
+                //If there are equal row/columns, update the rubric without deleting the rubric. 
+                if (currentColumnCount == updatedRubricColumnCount && currentRowCount == updatedRubricRowCount)
+                {
+                    //Updating a rubric equates to 
+                        //updating Rubric: updating HasCriteriaCOmments, HasGlobalComments, and DEscription (for name) of the rubirc
+                        //updating Rubric's Crition(s): weight and criteriontitle
+                        //updating Rubric's CellDescriptions: only Description needs to be modified
+                        //updating Rubric's Level(s): pointspread (if modified, must modify existing REs' (RubricEvaluations) scores), and leveltitle
+                        
+
+                    //Updating Rubric
+                    Assignment.Rubric.Description = rubricDescription;
+                    Assignment.Rubric.HasCriteriaComments = criteriaComments;
+                    Assignment.Rubric.HasGlobalComments = globalComments;
+
+                    //Updating Criteria and CellDescriptions
+                    int outVal = 0;
+                    for(int i = 0; i < Assignment.Rubric.Criteria.Count; i++)
+                    {
+                        //Criteria Titles are in the first column, weights are in the second column
+                        Assignment.Rubric.Criteria[i].CriterionTitle = rubricTable[i][0];
+                        int.TryParse(rubricTable[i][1], out outVal);
+                        Assignment.Rubric.Criteria[i].Weight= outVal;
+
+                        //Grabbing all CellDescriptions for that Criterion (based off the ID)
+                        List<CellDescription> currentRowCells = Assignment.Rubric.CellDescriptions.Where(cd => cd.CriterionID == Assignment.Rubric.Criteria[i].ID).ToList();
+                        for(int j = 0; j < currentRowCells.Count; j++)
+                        {
+                            currentRowCells[j].Description = rubricTable[i][j + 2]; //j + 2 to offset from weight/performacne crit columns
+                        }
+                    }
+
+                    //Updating Levels, must know sum of old and new point spreads to recalculate RubricEvaluation scores.
+                    double oldLevelPointSpreadSum = 0;
+                    double newLevelPointSpreadSum = 0;
+                    for (int i = 0; i < Assignment.Rubric.Levels.Count; i++)
+                    {
+                        oldLevelPointSpreadSum += Assignment.Rubric.Levels[i].PointSpread;
+                        newLevelPointSpreadSum += pointSpreads[i];
+                        Assignment.Rubric.Levels[i].PointSpread = pointSpreads[i];
+                        Assignment.Rubric.Levels[i].LevelTitle = levelTitles[i];
+                    }
+
+                    //Recalculating any existing RubricEvaluations' CriteronEvaluations' scores as the pointSpread may have changed
+                    List<RubricEvaluation> rubricEvals = (from re in db.RubricEvaluations
+                                                          where re.AssignmentID == Assignment.ID
+                                                          select re).ToList();
+
+                    foreach (RubricEvaluation re in rubricEvals)
+                    {
+                        List<CriterionEvaluation> critEvals = re.CriterionEvaluations.ToList();
+                        //Might need to rearrange critEvals depending on row swaps performed on rubric.
+
+                        for (int i = 0; i < critEvals.Count; i++)
+                        {
+                            if (critEvals[i].Score.HasValue)
+                            {
+                                //To adjust scores, we must multiply their score by the ratio of Pointsread change. 
+                                //(i.e. if the spread goes from 5 to 10, their scores must be doubled)
+                                double multiplier = newLevelPointSpreadSum / oldLevelPointSpreadSum;
+                                int newScore = (int)Math.Round(critEvals[i].Score.Value * multiplier);
+                                if (newScore > newLevelPointSpreadSum) //If rounding up leads them to a higher grade than possible, set it to max.
+                                {
+                                    newScore = (int)newLevelPointSpreadSum;
+                                }
+                                critEvals[i].Score = newScore;
+                                db.Entry(critEvals[i]).State = System.Data.EntityState.Modified;
+                            }
+                        }
+                    }
+                    db.SaveChanges();
+                }
+                else //Rows and columns were not equal, delete and recreate rubric.
+                {
+                    int rubricID = CreateRubricModel(rubricTable,
+                                        levelTitles,
+                                        pointSpreads,
+                                        globalComments,
+                                        criteriaComments,
+                                        rubricDescription);
+                    Assignment.RubricID = rubricID;
+                    db.Entry(Assignment).State = System.Data.EntityState.Modified;
+                    db.SaveChanges();
+                }
+            }
+            else //No rubric exists, create a new one
+            {
+                int rubricID = CreateRubricModel(rubricTable,
+                                        levelTitles,
+                                        pointSpreads,
+                                        globalComments,
+                                        criteriaComments,
+                                        rubricDescription);
+                Assignment.RubricID = rubricID;
+                db.Entry(Assignment).State = System.Data.EntityState.Modified;
+                db.SaveChanges();
+            }
+        }
+
+        private List<int> getSwapList()
+        {
+            List<int> joedirt = new List<int>();
+            return joedirt;
+        }
+    
+        /// <summary>
+        /// Returns a list of keys from the HttpPost
+        /// </summary>
+        /// <returns></returns>
+        private List<string> getFormKeys()
+        {
+            List<string> Keys = new List<string>();
+            //acquire a list of all relevant keys for the rubric
+            foreach (string key in Request.Params.Keys)
+            {
+                if (Regex.Match(key, "rubric:").Success)
+                {
+                    Keys.Add(key);
+                }
+            }
+            return Keys;
+        }
+
+        /// <summary>
+        /// Returns a list of level titles from the HttpPost
+        /// </summary>
+        /// <param name="keys">Keys received from getKeysFromHtml()</param>
+        /// <returns></returns>
+        private List<string> getLevelTitles(List<string> keys)
+        {
+            List<string> levelTitles = new List<string>();
+
+            levelTitles = (from k in keys
+                           where Regex.Match(k, @"rubric:\d+:L").Success
+                           orderby k
+                           select Request.Params[k]).ToList();
+
+            return levelTitles;
+        }
+
+        /// <summary>
+        /// Returns a list of integers representing the point spreads for the levels of a rubric from an HttpPost
+        /// </summary>
+        /// <param name="keys">Keys received from getKeysFromHtml()</param>
+        /// <returns></returns>
+        private List<int> getPointSpreads(List<string> keys)
+        {
+            List<int> pointSpreads = new List<int>();
+
+            pointSpreads = (from k in keys
+                where Regex.Match(k, @"rubric:\d+:S").Success
+                orderby k
+                select Int32.Parse(Request.Params[k])).ToList();
+
+            return pointSpreads;
+        }
+
+        /// <summary>
+        /// Returns a list of strings representing all but the first first row (Level row) of a rubric from the HttpPost
+        /// </summary>
+        /// <param name="keys">Keys received from getKeysFromHtml()</param>
+        /// <returns></returns>
+        private List<List<string>> getRubricTable(List<string> keys)
+        {
+
+            List<List<string>> rubricTable = new List<List<string>>(); // store the entire table, excluding the top row
+            List<string> RowStrings = (from k in keys
+                                       where Regex.Match(k, @"rubric:0:\d+").Success
+                                       select k).ToList();
+            foreach (string rowstring in RowStrings)
+            {
+                //splitkey = {rubric, X, Y}
+                string[] splitKey = rowstring.Split(':');
+
+                Regex r = new Regex(@"rubric:\d+:" + splitKey[2]);
+
+                List<string> rowValues = (from k in keys
+                                          where r.Match(k).Success
+                                          orderby k
+                                          select Request.Params[k]).ToList();
+
+                rubricTable.Add(rowValues);
+            }
+            return rubricTable;
+        }
+
+        /// <summary>
+        /// Returns true if the rubric from the HttpPost has global comments enabled
+        /// </summary>
+        /// <returns></returns>
+        private bool hasGlobalComments()
+        {
+            return Request.Params["globalComments"] != null;
+        }
+
+        /// <summary>
+        /// Returns true if the rubric from the HttpPost has criteria comments enabled
+        /// </summary>
+        /// <returns></returns>
+        private bool hasCriteriaComments()
+        {
+            return Request.Params["criterionComments"] != null;
+        }
+
+        /// <summary>
+        /// Returns the name of the rubric from the HttpPost
+        /// </summary>
+        /// <returns></returns>
+        private string getRubricName()
+        {
+            string rubricDescription = Request.Params["rubricDescription"];
+            if (rubricDescription == null || rubricDescription == "")   //Automatically assign name if one is not given
+            {
+                rubricDescription = "Rubric for " + Assignment.AssignmentName;
+            }
+            return rubricDescription;
+        }
 
         /// <summary>
         /// Called by the HttpPost. Parses the rubric information from the view

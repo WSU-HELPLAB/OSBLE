@@ -70,7 +70,6 @@ namespace OSBLE.Models.Courses.Rubrics
         /// <returns></returns>
         public static string GetGradeAsPercent(int rubricEvaluationId)
         {
-            //ToString("P") will add a percent for us
             return GetGradeHelper(rubricEvaluationId, false).ToString("P");
         }
 

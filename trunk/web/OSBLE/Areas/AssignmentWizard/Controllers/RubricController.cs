@@ -65,19 +65,29 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
 
             if (Assignment != null)
             {
-                if (Assignment.HasRubric)
+                bool CriticalEditOccured = bool.Parse(Request.Params["CriticalEditStatus"]); 
+                if(Assignment.HasRubric && CriticalEditOccured) 
                 {
-                    //delete the old rubric (to be replaced with the one in the HTML)
+                    //If there is an existing rubric, but the assignment creator agreed 
+                    //to a critical edit (adding/removing colummns or rows while evaluations exist), 
+                    //then delete the rubric & any associated evaluations and allow UpdateRubric() to recreate the rubirc.
+                    //Note: This would be handled by UpdateRubric() but deleting a rubric from there causes a crash for some reason...
                     db.Rubrics.Remove(Assignment.Rubric);
+
+                    //Finding and removing associated rubric evaluations
+                    List<RubricEvaluation> associatedRubricEvals = (from re in db.RubricEvaluations
+                                                       where re.AssignmentID == Assignment.ID
+                                                       select re).ToList();
+
+                    foreach(RubricEvaluation re in associatedRubricEvals)
+                    {
+                        db.RubricEvaluations.Remove(re);
+                    }
                     db.SaveChanges();
                 }
+                UpdateRubric();
 
-                //Load the rubric from the view
-                int rubricID = LoadRubricFromHTML();
 
-                Assignment.RubricID = rubricID;
-                db.Entry(Assignment).State = System.Data.EntityState.Modified;
-                db.SaveChanges();
             }
             else
             {

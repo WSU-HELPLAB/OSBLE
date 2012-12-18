@@ -5,6 +5,7 @@
 @{
     bool hasRubric = Model.HasRubric;
     RubricSelectionViewModel rubricSelection = ViewBag.rubricSelection;
+    bool EvalsExist = ViewBag.EvalsExist;
     string dropDownKey = "/AssignmentWizard/Rubric/LoadExistingRubric";
     if(ViewBag.Student)
     {
@@ -90,8 +91,8 @@ ul.RubricList
 
 </style>
 
-<html> <body>
-
+<html>
+<body>
 <table>
     <tr>
         <td>
@@ -143,10 +144,10 @@ ul.RubricList
         <td>
             <ul class="RubricList">
                 <li>
-                    <input type="checkbox" name="globalComments" value="globalComments" />Overall Comments
+                    <input type="checkbox" name="globalComments" @ViewBag.globalCommentsCheckedValue/>Overall Comments
                 </li>
                 <li>
-                    <input type="checkbox" name="criterionComments" value="criterionComments" />Comments for each criterion
+                    <input type="checkbox" name="criterionComments" @ViewBag.criteriaCommentsCheckedValue/>Comments for each criterion
                 </li>
             </ul>
         </td>
@@ -178,10 +179,10 @@ ul.RubricList
                             <th class="Level">
                                 <ul class="RubricList">
                                     <li>
-                                        <img src="/Content/images/delete_up.png" alt="Delete Row" onclick="deleteColumn('dataTable', this.parentNode.parentNode.parentNode.cellIndex)" />
+                                        <img src="/Content/images/delete_up.png" alt="Delete Column" onclick="openConfirmEditWindow(3, 'dataTable',this.parentNode.parentNode.parentNode.cellIndex)" />
                                     </li>
                                     <li>Level Point Spread
-                                        <select class="SpreadInput" name="rubric:@n:S">
+                                        <select class="SpreadInput" name="rubric:@n:S" onclick="openConfirmEditSpreadWindow()">
                                             @for (int i = 1; i <= 10; i++)
                                             {
                                                 if (i == level.PointSpread)
@@ -207,16 +208,18 @@ ul.RubricList
                     foreach (List<string> row in ViewBag.rubricTable)
                     {
                         @*Default first row of rubric*@
-                        <tr>
+                        string name = "row" + n.ToString();
+                        <tr name="@name">
                             @*Performance Criterion*@
                             <td>
                             
                                 <ul class="RubricList">
                                     <li class="PerformanceCriterionCell">
                                         <ul class="RubricList" style="float:left">
-                                            <li><img src="/Content/images/move_up.png" alt="Move Row Up" onclick="moveRowUp('dataTable', this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
-                                            <li><img src="/Content/images/delete_up.png" alt="Delete Row" onclick="deleteRow('dataTable', this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
-                                            <li><img src="/Content/images/move_down.png" alt="Move Row Down" onclick="moveRowDown('dataTable', this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                                            <li><input class="hiddenRow" type="hidden" /></li> <!--Hidden input used to keep track of swapping used during rubric editing-->
+                                            <li><img src="/Content/images/move_up.png" alt="Move Row Up" onclick="openConfirmEditWindow(4, 'dataTable', this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                                            <li><img src="/Content/images/delete_up.png" alt="Delete Row" onclick="openConfirmEditWindow(2, 'dataTable', this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
+                                            <li><img src="/Content/images/move_down.png" alt="Move Row Down" onclick="openConfirmEditWindow(5, 'dataTable', this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.rowIndex)" /></li>
                                         </ul>
                                    </li>
 
@@ -246,12 +249,12 @@ ul.RubricList
             </table>
         </td>
         <td class ="top">
-            <img src="/Content/images/add_up.png" alt="Add Column" onclick="addColumn('dataTable')"/>
+            <img src="/Content/images/add_up.png" alt="Add Column" onclick="openConfirmEditWindow(1, 'dataTable', 0)"/>
         </td>
     </tr>
     <tr>
         <td>
-            <img  src="/Content/images/add_up.png" alt="Add Row" onclick="addRow('dataTable')" />
+            <img  src="/Content/images/add_up.png" alt="Add Row" onclick="openConfirmEditWindow(0, 'dataTable', 0)" />
         </td>
     </tr>
 </table>
@@ -278,8 +281,129 @@ The current rubric will be replaced with a new one and all progress will be lost
 
 </body> </html>
 
+<!--Element for modal confirmation box-->
+<div id="confirmEditWindow" style="display:none;" title="Warning">
+    Adding/removing existing columns or rows or swapping rows will cause existing rubric evaluations associated with this rubric to be deleted. Are you sure you want to continue?
+</div>
+
+<!--Element for modal confirmation box-->
+<div id="confirmEditSpreadWindow" style="display:none;" title="Warning">
+    Editing the level spread can lead to grade changes due to rounding. Are you sure you want to continue?
+</div>
+
+<input name="CriticalEditStatus" id="CriticalEditStatus" type="hidden" value="False"/>
+<input id="EvalsExistStatus" type="hidden" value="@EvalsExist" />
+<input id="LevelSpreadEditStatus" type="hidden" value="False" />
 <script type="text/javascript" src="@Url.Content("~/AssignmentWizard/Content/js/jquery.path.js")"></script>
 <script type="text/javascript" language="javascript">
+    $("#confirmEditSpreadWindow").dialog({
+        modal: true,
+        resizable: false,
+        width: 310,
+        height: 200,
+        closeOnEscape: false,
+        autoOpen: false,
+        buttons: {
+            'Continue': function () {
+                $("#LevelSpreadEditStatus").val("True")
+                $("#confirmEditSpreadWindow").dialog('close');
+            },
+            'Cancel': function () {
+                $("#confirmEditSpreadWindow").dialog('close');
+            }
+        }
+    });
+
+    function openConfirmEditSpreadWindow(event) {
+        var evalsExist = $("#EvalsExistStatus").val();
+        var levelEditsConfirmed = $("#LevelSpreadEditStatus").val();
+        if (evalsExist == "True" && levelEditsConfirmed == "False") {
+            //If there exist evaluations and edits have not been confirmed yet, then open confirmation dialog 
+            $("#confirmEditSpreadWindow").dialog("open");
+        }
+    }
+
+    $("#confirmEditWindow").dialog({
+        modal: true,
+        resizable: false,
+        width: 310,
+        height: 240,
+        closeOnEscape: false,
+        autoOpen: false,
+        buttons: {
+            'Continue': function () {
+                editConfirmed()
+                hideConfirmEditWindow()
+                handleAddOrDelete();
+            },
+            'Cancel': function () {
+                hideConfirmEditWindow()
+            }
+        }
+    });
+    //controlValue represents which function to call after the modalbox's callback function
+    //the value willbe 0 for "addRow", 1 for "addColumn", 2 for "deleteRow", 3 for "deleteColumn", 4 for "moveRowUp", and 5 for "moveRowDown"
+    //In addition, parameters to be routed to the functions being called need to be saved.
+    controlValue = 0;   
+    tableIdValue = 0;
+    indexValue = 0;
+    function openConfirmEditWindow(controlInput,tableIdInput, indexInput ){
+        //if "EvaluationsExist" is true && "CriticalEdit" is false (error only occurs if evaluations exist and they havent agreed to this yet)
+        controlValue = controlInput;
+        tableIdValue = tableIdInput;
+        indexValue = indexInput;
+
+        var evalsExist = $("#EvalsExistStatus").val();
+        var editsConfirmed = $("#CriticalEditStatus").val();
+
+
+        if (evalsExist == "True" && editsConfirmed == "False") {
+            //If there exist evaluations and edits have not been confirmed yet, then open confirmation dialog 
+            $("#confirmEditWindow").dialog("open");
+        }
+        else {
+            //Otherwise just handle the input
+            handleAddOrDelete()
+        }
+
+        //if editsConfirmed == False && EvalsExist, then open the confirm window
+        //if EvalsExist == False, just handle then input
+        //if editsConfirmed == True && EvalsExist, then just handle the logic
+    }
+
+    function handleAddOrDelete(){
+
+        //Handle event
+        if (controlValue == 0) {
+            addRow(tableIdValue)
+        }
+        else if (controlValue == 1) {
+            addColumn(tableIdValue)
+        }
+        else if (controlValue == 2) {
+            deleteRow(tableIdValue, indexValue)
+        }
+        else if (controlValue == 3) {
+            deleteColumn(tableIdValue, indexValue)
+        }
+        else if (controlValue == 4) {
+            moveRowUp(tableIdValue, indexValue)
+        }
+        else if (controlValue == 5) {
+            moveRowDown(tableIdValue, indexValue)
+        }
+        
+    }
+
+    function editConfirmed() {
+        //Set "CriticalEdit" value to "On" by giving it a non-0 value
+        $("#CriticalEditStatus").val("True")
+        var editsConfirmed = $("#CriticalEditStatus").val();
+    }
+
+   function hideConfirmEditWindow() {
+        $("#confirmEditWindow").dialog('close');
+    }
 
     $('.CourseSelect').change(function () {
         $('.RubricSelect').hide();
@@ -308,6 +432,7 @@ The current rubric will be replaced with a new one and all progress will be lost
     }
 
     function addRow(tableID) {
+        
         var table = document.getElementById(tableID);
 
         var rowCount = table.rows.length;
@@ -320,7 +445,7 @@ The current rubric will be replaced with a new one and all progress will be lost
         //note: rowCount is now the index of the last row (because a row was added)
         //Modify the Y value of the name (name="rubric:X:Y") for the new rubric
         for (var i = 0; i < columnCount; i++) {
-            var name = $(table.rows[rowCount-1].cells[i]).find('.Input').attr("name");
+            var name = $(table.rows[rowCount - 1].cells[i]).find('.Input').attr("name");
             var spl = name.split(':');
             $(newRow.cells[i]).find(".Input").attr("name", spl[0] + ":" + spl[1] + ":" + (parseInt(spl[2]) + 1));
 
@@ -328,9 +453,11 @@ The current rubric will be replaced with a new one and all progress will be lost
             $(newRow.cells[i]).find(".Input").attr('value', "");
             $(newRow.cells[i]).find(".Input").text("");
         }
+        
     }
 
     function addColumn(tableID) {
+
         var table = document.getElementById(tableID);
 
         var rowCount = table.rows.length;
@@ -368,7 +495,7 @@ The current rubric will be replaced with a new one and all progress will be lost
                 spl = name.split(':');
                 $(element).find('.SpreadInput').attr("name", spl[0] + ":" + (parseInt(spl[1]) + 1) + ":" + spl[2]);
             }
-        }   
+        }    
     }
 
     function deleteColumn(tableID, columnIndex) {
@@ -394,13 +521,11 @@ The current rubric will be replaced with a new one and all progress will be lost
 
     function moveRowUp(tableID, rowIndex) {
         var table = document.getElementById(tableID);
-        var row = $(table.rows[rowIndex]);
-
-        
         //swap the names in each cell to preserve order
         if (rowIndex > 1) {
             var row2 = table.rows[rowIndex];
             var row = table.rows[rowIndex - 1];
+
 
             animateSwap(row, row2, table);
         }
@@ -408,11 +533,9 @@ The current rubric will be replaced with a new one and all progress will be lost
 
     function moveRowDown(tableID, rowIndex) {
         var table = document.getElementById(tableID);
-
         if (rowIndex < table.rows.length - 1) {
             var row = table.rows[rowIndex];
             var row2 = table.rows[rowIndex + 1];
-
             animateSwap(row, row2, table);
 
         }
