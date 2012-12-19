@@ -297,7 +297,7 @@ namespace OSBLE.Controllers
         /// <param name="n">Notification to be emailed</param>
         private void emailNotification(Notification n)
         {
-//#if !DEBUG
+#if !DEBUG
             SmtpClient mailClient = new SmtpClient();
             mailClient.UseDefaultCredentials = true;
 
@@ -391,7 +391,7 @@ namespace OSBLE.Controllers
             List<MailAddress> recipients = new List<MailAddress>();
             recipients.Add(to);
             Email.Send(subject, body, recipients);
-//#endif
+#endif
         }
 
         /// <summary>
