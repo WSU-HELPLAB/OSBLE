@@ -49,6 +49,13 @@ namespace OSBLE.Controllers
                         return RedirectToAction("Details", "PeerReview", new { ID = n.ItemID });
                     case Notification.Types.RubricEvaluationCompleted:
                         return RedirectToAction("View", "Rubric", new { assignmentId = n.ItemID, teamId = n.SenderID });
+                    case Notification.Types.TeamEvaluationDiscrepancy:
+                        //n.Data = PrecedingTeamId + ";" + TeamEvaluationAssignment.ID;
+                        int precteamId = 0;
+                        int teamEvalAssignmnetID = 0;
+                        int.TryParse(n.Data.Split(';')[0], out precteamId);
+                        int.TryParse(n.Data.Split(';')[1], out teamEvalAssignmnetID);
+                        return RedirectToAction("TeacherTeamEvaluation", "Assignment", new { precedingTeamId = precteamId, TeamEvaluationAssignmentId = teamEvalAssignmnetID });
                 }
             }
 
@@ -290,7 +297,7 @@ namespace OSBLE.Controllers
         /// <param name="n">Notification to be emailed</param>
         private void emailNotification(Notification n)
         {
-#if !DEBUG
+//#if !DEBUG
             SmtpClient mailClient = new SmtpClient();
             mailClient.UseDefaultCredentials = true;
 
@@ -364,6 +371,14 @@ namespace OSBLE.Controllers
                     action = "view this assignment submission.";
 
                     break;
+                case Notification.Types.TeamEvaluationDiscrepancy:
+                    subject += sender.FirstName + " " + sender.LastName + "has submitted a Team Evaluation that has raised a discrepancy flag";
+
+                    body = sender.FirstName + " " + sender.LastName + " has submitted a Team Evaluation that has raised a discrepancy flag."; //Can we get name of assignment?
+
+                    action = "view team evaluation discrepancy.";
+
+                    break;
                 default:
                     subject += "No Email set up for this type of notification";
 
@@ -376,7 +391,7 @@ namespace OSBLE.Controllers
             List<MailAddress> recipients = new List<MailAddress>();
             recipients.Add(to);
             Email.Send(subject, body, recipients);
-#endif
+//#endif
         }
 
         /// <summary>
