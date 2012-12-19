@@ -165,14 +165,13 @@ namespace OSBLE.Controllers
         {
             //Link to assignment details. Note, since this is hardcoded to osble.org, it will not work locally.
             aEvent.Description = "[url:Assignment Page|www.osble.org/AssignmentDetails/" + assignment.ID + "]"; 
-            aEvent.EndDate = assignment.DueDate;
-            aEvent.EndTime = assignment.DueTime;
+            aEvent.EndDate = null;
             aEvent.StartDate = assignment.DueDate;
-            aEvent.StartTime = DateTime.MinValue;
+            aEvent.StartTime = assignment.DueTime;
             aEvent.PosterID = ActiveCourseUserId;
             aEvent.Title = assignment.AssignmentName + " Due";
             aEvent.Approved = true;
-           
+            //aEvent.HideTime
             if (aEvent.ID == 0)
             {
                 db.Events.Add(aEvent);
