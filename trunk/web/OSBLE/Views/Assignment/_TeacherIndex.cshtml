@@ -13,6 +13,7 @@
     <th colspan="2" style="font-size:larger">Assignment</th>
     <th style="font-size:larger">Due Date</th>
     <th style="font-size:larger">Student Activity</th>
+    <th style="font-size:larger; padding-left: 20px">Grading Progress</th>
 
     @{
         for(int i = 0; i < assignments.Count; i++)
@@ -119,6 +120,15 @@
                     {
                         @:@assignments[i].GetSubmissionCount() of @assignments[i].AssignmentTeams.Count submissions received.<br />
                         @:@Html.ActionLink("Download all", "GetAllSubmissionsForAssignment", "FileHandler", new { assignmentID = assignments[i].ID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+                    }
+                </td>
+                <td style="padding-left: 20px">
+                    @if (assignments[i].HasRubric && !(isFutureAssignment || isDraftAssignment))
+                    {
+                    
+                            @: @assignments[i].GetPublishedCount() of @assignments[i].AssignmentTeams.Count published.&nbsp @Html.ActionLink("Grade Now", "Index", "Rubric", new { assignmentId = assignments[i].ID, cuId = assignments[i].AssignmentTeams.FirstOrDefault().Team.TeamMembers.FirstOrDefault().CourseUserID }, new { })<br />
+                            @: @assignments[i].GetSavedAsDraftCount() saved as draft.&nbsp @Html.ActionLink("Publish All", "PublishAllRubrics", "Assignment", new { area = "", assignmentId = assignments[i].ID }, new { })
+                    
                     }
                 </td>
             </tr>
