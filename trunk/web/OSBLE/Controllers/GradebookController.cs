@@ -96,6 +96,12 @@ namespace OSBLE.Controllers
 
             return View();
         }
+
+        [HttpGet]
+        public ActionResult GradebookHelp()
+        {
+            return View();
+        }
         
         /// <summary>
         /// This function takes a .csv or .zip. It then takes the .csv or collection of .csv files (from the zip) and adds them into the Gradebook folder
@@ -253,6 +259,7 @@ namespace OSBLE.Controllers
                 
 
                 List<int> globalRows = new List<int>();
+                List<int> hiddenColumns = new List<int>();
                 //find which rows should be displayed as "globals"
                 for (int i = 0; i < table.Count; i++)
                 {
@@ -260,9 +267,19 @@ namespace OSBLE.Controllers
                     if (table[i][0].Length > 0 && table[i][0][0] == '#')
                     {
                         globalRows.Add(i);
+                        for (int j = 0; j < table[i].Count; j++) //go through each cell in global row and check for hidden column values
+                        {
+                            if (table[i][j].Length > 2 && table[i][j][0] == '!' && table[i][j][1] == '!')
+                            {
+                                hiddenColumns.Add(j);
+                            }
+                        }
                     }
                 }
 
+
+
+                ViewBag.Instructor_ColumnsToHide = hiddenColumns;
                 ViewBag.NameColumnIndex = Constants.StudentNameColumnIndex; //Used to 
                 ViewBag.GlobalRows = globalRows;
             }
@@ -282,6 +299,7 @@ namespace OSBLE.Controllers
         {
 
             List<List<string>> studentTable = new List<List<string>>();
+            List<int> studentGlobalRows = new List<int>();
             if (gradebookTable.Count > 0)
             {
 
@@ -300,8 +318,10 @@ namespace OSBLE.Controllers
                     else if (gradebookTable[i][0].Length > 0 && gradebookTable[i][0][0] == '#')
                     {
                         studentTable.Add(gradebookTable[i].ToList());
+                        studentGlobalRows.Add(studentTable.Count - 1);
                     }
                 }
+                ViewBag.GlobalRows = studentGlobalRows;
 
                 //Iterating over studentTable to find columns that should not be displayed (denoted by leading '!')
                 List<int> columnsToRemove = new List<int>();

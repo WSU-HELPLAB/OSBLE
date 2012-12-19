@@ -7,6 +7,7 @@
     bool IsInstructorOrTa = ViewBag.CanUpload;
     bool DisplaySearch = false;
     int NameColumnIndex = -1;
+    List<int> hiddenColumnIndicies = ViewBag.Instructor_ColumnsToHide;
     if(ViewBag.NameColumnIndex != null)
     {
         DisplaySearch = true;
@@ -22,7 +23,9 @@
         <form id="upload_gradebook" enctype="multipart/form-data" method="post" action="/Gradebook/UploadGradebook">
             <legend>@ViewBag.LastUploadMessage</legend>
             <input type="file" id="file" name="file"/ onchange="check_extension(this.value)"><br />
-            <input id="upload" type="submit" value="Upload" disabled="disabled"/> <a style="font-size:small; text-decoration:none" href="#">Learn More...</a>
+            <input id="upload" type="submit" value="Upload" disabled="disabled"/> 
+            @{string helpLink = Url.Action("GradebookHelp", "Gradebook", new { area = "" });}
+            <a style="font-size:small; text-decoration:none" href="@helpLink">Learn More...</a>
             <br />
             <text id="errorMsg">@ViewBag.UploadErrorMsg</text>
         </form>
@@ -86,27 +89,31 @@
                         
                         @for (int j = 0; j < Table[i].Count; j++)
                         {
-                            string tdId = "";
-                            string tdClass = "";
-                            if (DisplaySearch && j == NameColumnIndex)
+                            if (hiddenColumnIndicies == null || hiddenColumnIndicies.Contains(j) == false)
                             {
-                                tdId = Table[i][j].ToLower();
-                                tdClass = "searchableName";
-                            }
-                            
-                            string displayValue = Table[i][j];
-                            if(displayValue.Length > 0 && (displayValue[0] == '!' || displayValue[0] == '#' ))
-                            {
-                                displayValue = displayValue.Substring(1,displayValue.Length - 1);
-                            }
+                                string tdId = "";
+                                string tdClass = "";
+                                if (DisplaySearch && j == NameColumnIndex)
+                                {
+                                    tdId = Table[i][j].ToLower();
+                                    tdClass = "searchableName";
+                                }
 
-                            if (i != 0)
-                            {
-                                <td class="@tdClass" id="@tdId">@displayValue</td>
-                            }
-                            else
-                            {
+                                string displayValue = Table[i][j];
+                                if (displayValue.Length > 0 && (displayValue[0] == '!' || displayValue[0] == '#'))
+                                {
+                                    displayValue = displayValue.Substring(1, displayValue.Length - 1);
+                                }
+
+                                if (globalRowIndicies.Contains(i) || i == 0)
+                                {
                                 <th>@displayValue</th>
+                                }
+                                else
+                                {
+                                <td class="@tdClass" id="@tdId">@displayValue</td>
+                                
+                                }
                             }
 
                         }
