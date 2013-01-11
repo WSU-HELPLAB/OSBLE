@@ -9,6 +9,8 @@ using OSBLE.Models.Courses;
 using OSBLE.Models.DiscussionAssignment;
 using OSBLE.Models.Users;
 using OSBLE.Models.ViewModels;
+using OSBLE.Models.FileSystem;
+using Ionic.Zip;
 
 namespace OSBLE.Controllers
 {
@@ -56,6 +58,103 @@ namespace OSBLE.Controllers
 
             return returnVal;
 
+        }
+
+        [CanGradeCourse]
+        public ActionResult GetAllDiscussionItems(int assignmentId)
+        {
+            Assignment currentAssignment = db.Assignments.Find(assignmentId);
+            if (currentAssignment == null)
+            {
+                //bad assignment: redirect to home page
+                return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentId });
+            }
+
+            //we are assuming that we're working with a CRD assignment
+            if (currentAssignment.Type != AssignmentTypes.CriticalReviewDiscussion)
+            {
+                return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentId });
+            }
+
+            Assignment criticalReviewAssignment = currentAssignment.PreceedingAssignment;
+            Assignment basicAssignment = criticalReviewAssignment.PreceedingAssignment;
+            OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
+
+            ZipFile zipFile = new ZipFile();
+
+            Dictionary<int, MemoryStream> parentStreams = new Dictionary<int, MemoryStream>();
+            Dictionary<int, string> parentStreamNames = new Dictionary<int,string>();
+
+            //loop through all review teams
+            foreach (ReviewTeam reviewTeam in criticalReviewAssignment.ReviewTeams)
+            {
+                string zipPath = string.Format("{0}/{1}", reviewTeam.AuthorTeam.Name, reviewTeam.ReviewingTeam.Name);
+                string reviewerDisplayName = reviewTeam.ReviewingTeam.Name;
+                string authorDisplayName = reviewTeam.AuthorTeam.Name;
+
+                //get all files
+                FileCollection files =  fs.Course((int)currentAssignment.CourseID)
+                                        .Assignment(criticalReviewAssignment)
+                                        .Review(reviewTeam.AuthorTeam, reviewTeam.ReviewingTeam)
+                                        .AllFiles();
+                foreach (string file in files)
+                {
+                    //cpml files need to be merged and not added individually
+                    if (Path.GetExtension(file) == ".cpml")
+                    {
+                        //temporary stream used for ".cpml" Merging.
+                        MemoryStream outputStream = new MemoryStream();
+
+                        //Only want to add the original file to the stream once.
+                        if(parentStreams.ContainsKey(reviewTeam.AuthorTeamID) == false)
+                        {
+                            string originalFile = fs.Course(ActiveCourseUser.AbstractCourseID)
+                                .Assignment(basicAssignment)
+                                .Submission(reviewTeam.AuthorTeam)
+                                .GetPath();
+                            FileStream filestream = System.IO.File.OpenRead(originalFile + "\\" + basicAssignment.Deliverables[0].Name + ".cpml");
+                            parentStreams.Add(reviewTeam.AuthorTeamID, new MemoryStream());
+                            parentStreamNames.Add(reviewTeam.AuthorTeamID, reviewTeam.AuthorTeam.Name);
+                            filestream.CopyTo(parentStreams[reviewTeam.AuthorTeamID]);
+                        }
+
+                        //Merge the FileStream from filename + parentStream into outputStream.
+                        ChemProV.Core.CommentMerger.Merge(parentStreams[reviewTeam.AuthorTeamID], authorDisplayName, System.IO.File.OpenRead(file), reviewerDisplayName, outputStream);
+
+                        //close old parent stream before writing over it
+                        parentStreams[reviewTeam.AuthorTeamID].Close();
+
+                        //Copy outputStream to parentStream, creating new outputStream
+                        parentStreams[reviewTeam.AuthorTeamID] = new MemoryStream();
+                        outputStream.Seek(0, SeekOrigin.Begin);
+                        outputStream.CopyTo(parentStreams[reviewTeam.AuthorTeamID]);
+                        outputStream = new MemoryStream();
+                    }
+                    else
+                    {
+                        zipFile.AddFile(file, zipPath);
+                    }
+                }
+            }
+
+            //if we had a cpml document
+            if (parentStreams.Count > 0)
+            {
+                foreach (int key in parentStreams.Keys)
+                {
+                    string mergedPath = string.Format("{0}/{0}_merged.cpml", parentStreamNames[key]);
+                    parentStreams[key].Seek(0, SeekOrigin.Begin);
+                    zipFile.AddEntry(mergedPath, parentStreams[key]);
+                }
+            }
+
+            MemoryStream returnValue = new MemoryStream();
+            zipFile.Save(returnValue);
+            returnValue.Position = 0;
+
+            //Returning zip
+            string zipName = string.Format("{0}.zip", currentAssignment.AssignmentName);
+            return new FileStreamResult(returnValue, "application/octet-stream") { FileDownloadName = zipName };
         }
 
         /// <summary>

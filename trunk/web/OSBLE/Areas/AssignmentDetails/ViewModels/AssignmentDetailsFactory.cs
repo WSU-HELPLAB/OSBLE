@@ -199,6 +199,12 @@ namespace OSBLE.Areas.AssignmentDetails.ViewModels
                 vm.HeaderViews.Add("PreviousAssignmentDecorator");
             }
 
+            if (assignment.Type == AssignmentTypes.CriticalReviewDiscussion && vm.Client.AbstractRole.CanGrade)
+            {
+                vm.HeaderBuilder = new DownloadDiscussionItemsDecorator(vm.HeaderBuilder);
+                vm.HeaderViews.Add("DownloadDiscussionItemsDecorator");
+            }
+
             return vm;
         }
 

@@ -25,7 +25,6 @@
         var teams = from t in Model.CurrentAssignment.DiscussionTeams
                     orderby t.Team.Name ascending
                     select t;
-        
 
         foreach (DiscussionTeam assignmentTeam in teams)
         {
@@ -48,9 +47,9 @@
                              }, new { }))
 
                             @{
-                                int newPosts = assignmentTeam.GetNewPostsCount(Model.Client.ID);
+                          int newPosts = assignmentTeam.GetNewPostsCount(Model.Client.ID);
                               }
-                            @if(newPosts > 0)
+                            @if (newPosts > 0)
                             {
                                 @:&nbsp-&nbsp
                                 @:@Html.ActionLink("View " + newPosts.ToString() + " Unread Posts",
@@ -68,7 +67,7 @@
                     </th>
                 </tr>
             }
-            
+
             foreach (TeamMember member in (assignmentTeam as DiscussionTeam).GetAllTeamMembers()
                 .OrderBy(t => t.CourseUser.AbstractRoleID, new OSBLE.Models.Courses.CourseRole.CourseRolesInOrder())
                 .ThenBy(t => t.CourseUser.DisplayName((int)CourseRole.CourseRoles.Instructor)))
@@ -87,13 +86,13 @@
                         @{string actionLink = Url.Action("CreateUser", "Mail", new { area = "", id = member.CourseUser.ID });
                         }
                         <a href="@actionLink" title="Email this user">@Helpers.MailButton()</a>
-                        @if(member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA || member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
+                        @if (member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA || member.CourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Moderator)
                         {
                             @:<span class="TitleText">@member.CourseUser.DisplayNameWithRole(Model.Client.AbstractRoleID, false)</span>
                         }
                         else
                         {
-                            if(assignmentTeam.AuthorTeamID == member.TeamID)
+                            if (assignmentTeam.AuthorTeamID == member.TeamID)
                             {
                                 @:(A)
                             }

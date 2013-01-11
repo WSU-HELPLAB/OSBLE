@@ -545,9 +545,6 @@ namespace OSBLE.Controllers
                                 FirstTime = false;
                             }
 
-
-                            
-
                             //Merge the FileStream from filename + parentStream into outputStream.
                             ChemProV.Core.CommentMerger.Merge(parentStream, authorDisplayName, System.IO.File.OpenRead(filename), reviewerDisplayName, outputStream);
 
