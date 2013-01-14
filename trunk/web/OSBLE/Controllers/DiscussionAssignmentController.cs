@@ -142,7 +142,7 @@ namespace OSBLE.Controllers
             {
                 foreach (int key in parentStreams.Keys)
                 {
-                    string mergedPath = string.Format("{0}/{0}_merged.cpml", parentStreamNames[key]);
+                    string mergedPath = string.Format("{0}_merged.cpml", parentStreamNames[key]);
                     parentStreams[key].Seek(0, SeekOrigin.Begin);
                     zipFile.AddEntry(mergedPath, parentStreams[key]);
                 }
