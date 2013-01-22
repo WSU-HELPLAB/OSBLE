@@ -57,7 +57,7 @@ namespace OSBLE.Models.DiscussionAssignment
             modelBuilder.Entity<DiscussionPost>()
                 .HasRequired(cu => cu.CourseUser)
                 .WithMany()
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<DiscussionPost>()
                 .HasRequired(n => n.DiscussionTeam)
