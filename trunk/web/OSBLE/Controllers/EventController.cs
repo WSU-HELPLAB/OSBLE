@@ -196,11 +196,10 @@ namespace OSBLE.Controllers
         static public void UpdateDiscussionEvent(DiscussionSetting ds, Event dEvent, int ActiveCourseUserId, ContextBase db)
         {
             //Link to assignment details. Note, since this is hardcoded to osble.org, it will not work locally.
-            dEvent.Description = "[url:Assignment Page|www.osble.org/AssignmentDetails/" + ds.AssignmentID + "]"; 
-            dEvent.EndDate = ds.InitialPostDueDate;
-            dEvent.EndTime = ds.InitialPostDueDueTime;
+            dEvent.Description = "[url:Assignment Page|www.osble.org/AssignmentDetails/" + ds.AssignmentID + "]";
+            dEvent.EndDate = null;
             dEvent.StartDate = ds.InitialPostDueDate;
-            dEvent.StartTime = DateTime.MinValue;
+            dEvent.StartTime = ds.InitialPostDueDueTime;
             dEvent.PosterID = ActiveCourseUserId;
             dEvent.Title = ds.Assignment.AssignmentName + " Initial Post(s) Due";
             dEvent.Approved = true;
