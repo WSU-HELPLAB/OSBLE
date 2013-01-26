@@ -102,7 +102,32 @@ namespace OSBLE.Controllers
         {
             return View();
         }
-        
+
+        public int UploadGradebookZip(byte[] zipData, GradebookFilePath gfp)
+        {
+            int filesFailedToLoadCount = 0;
+            MemoryStream ms = new MemoryStream(zipData);
+            ms.Position = 0;
+            using (ZipFile zip = ZipFile.Read(ms))
+            {
+                //for each entry in zip, rename it to its FileName  and then extract it.(We rename it because zip files are named ZipFolder\Filename, 
+                //and this makes the file get added into a new folder named Zipfolder)
+                for (int i = 0; i < zip.Count; i++)
+                {
+                    if (Path.GetExtension(zip[i].FileName) != ".csv")
+                    {
+                        filesFailedToLoadCount++;
+                    }
+                    else
+                    {
+                        zip[i].FileName = Path.GetFileName(zip[i].FileName);
+                        zip[i].Extract(gfp.GetPath());
+                    }
+                }
+            }
+            return filesFailedToLoadCount;
+        }
+
         /// <summary>
         /// This function takes a .csv or .zip. It then takes the .csv or collection of .csv files (from the zip) and adds them into the Gradebook folder
         /// </summary>
@@ -147,30 +172,12 @@ namespace OSBLE.Controllers
             }
             else if (Path.GetExtension(file.FileName) == ".zip")
             {
-                //We have a zip file. To get the individual files out and onto the filesystem, we must first save the zip onto the filesystem.
-                gfp.AddFile(file.FileName, file.InputStream);
-                
-                //Grab the ZipFile that was just uploaded
-                ZipFile zip = ZipFile.Read(Path.Combine(gfp.GetPath(), file.FileName));
-
-                //for each entry in zip, rename it to its FileName  and then extract it.(We rename it because zip files are named ZipFolder\Filename, 
-                //and this makes the file get added into a new folder named Zipfolder)
-                for (int i = 0; i < zip.Count; i++)
+                using (MemoryStream zipStream = new MemoryStream())
                 {
-                    if (Path.GetExtension(zip[i].FileName) != ".csv")
-                    {
-                        filesFailedToLoadCount++;
-                    }
-                    else
-                    {
-                        zip[i].FileName = Path.GetFileName(zip[i].FileName);
-                        zip[i].Extract(gfp.GetPath());
-                    }
+                    file.InputStream.CopyTo(zipStream);
+                    zipStream.Position = 0;
+                    filesFailedToLoadCount += UploadGradebookZip(zipStream.ToArray(), gfp);
                 }
-                
-                //Close the ZipFile, and remove it
-                zip.Dispose();
-                gfp.File(file.FileName).Delete();
             }
             else if (Path.GetExtension(file.FileName) == ".csv")
             {

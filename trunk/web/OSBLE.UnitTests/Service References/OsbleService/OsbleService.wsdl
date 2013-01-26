@@ -19,6 +19,18 @@
   <wsdl:message name="OsbleService_GetCourses_OutputMessage">
     <wsdl:part name="parameters" element="GetCoursesResponse" />
   </wsdl:message>
+  <wsdl:message name="OsbleService_GetCoursesTaught_InputMessage">
+    <wsdl:part name="parameters" element="GetCoursesTaught" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_GetCoursesTaught_OutputMessage">
+    <wsdl:part name="parameters" element="GetCoursesTaughtResponse" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_UploadCourseGradebook_InputMessage">
+    <wsdl:part name="parameters" element="UploadCourseGradebook" />
+  </wsdl:message>
+  <wsdl:message name="OsbleService_UploadCourseGradebook_OutputMessage">
+    <wsdl:part name="parameters" element="UploadCourseGradebookResponse" />
+  </wsdl:message>
   <wsdl:message name="OsbleService_GetCourseAssignments_InputMessage">
     <wsdl:part name="parameters" element="GetCourseAssignments" />
   </wsdl:message>
@@ -65,6 +77,14 @@
     <wsdl:operation name="GetCourses">
       <wsdl:input wsaw:Action="urn:OsbleService/GetCourses" message="OsbleService_GetCourses_InputMessage" />
       <wsdl:output wsaw:Action="urn:OsbleService/GetCoursesResponse" message="OsbleService_GetCourses_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCoursesTaught">
+      <wsdl:input wsaw:Action="urn:OsbleService/GetCoursesTaught" message="OsbleService_GetCoursesTaught_InputMessage" />
+      <wsdl:output wsaw:Action="urn:OsbleService/GetCoursesTaughtResponse" message="OsbleService_GetCoursesTaught_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UploadCourseGradebook">
+      <wsdl:input wsaw:Action="urn:OsbleService/UploadCourseGradebook" message="OsbleService_UploadCourseGradebook_InputMessage" />
+      <wsdl:output wsaw:Action="urn:OsbleService/UploadCourseGradebookResponse" message="OsbleService_UploadCourseGradebook_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetCourseAssignments">
       <wsdl:input wsaw:Action="urn:OsbleService/GetCourseAssignments" message="OsbleService_GetCourseAssignments_InputMessage" />

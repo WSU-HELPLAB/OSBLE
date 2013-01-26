@@ -13,6 +13,24 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="GetCoursesTaught">
+      <soap:operation soapAction="urn:OsbleService/GetCoursesTaught" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UploadCourseGradebook">
+      <soap:operation soapAction="urn:OsbleService/UploadCourseGradebook" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="GetCourseAssignments">
       <soap:operation soapAction="urn:OsbleService/GetCourseAssignments" style="document" />
       <wsdl:input>

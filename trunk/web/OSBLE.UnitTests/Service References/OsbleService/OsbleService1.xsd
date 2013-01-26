@@ -6,7 +6,7 @@
       <xs:element minOccurs="0" name="Approved" type="xs:boolean" />
       <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="EndDate" nillable="true" type="xs:dateTime" />
-      <xs:element minOccurs="0" name="EndTime" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="EndTime" nillable="true" type="xs:dateTime" />
       <xs:element minOccurs="0" name="HideDelete" type="xs:boolean" />
       <xs:element minOccurs="0" name="HideTime" type="xs:boolean" />
       <xs:element minOccurs="0" name="ID" type="xs:int" />

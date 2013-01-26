@@ -715,7 +715,6 @@ namespace OSBLE.Controllers
                 ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65)));
                 builder.Append(ch);
             }
-
             return builder.ToString();
         }
 

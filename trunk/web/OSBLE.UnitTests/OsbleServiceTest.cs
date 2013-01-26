@@ -167,5 +167,28 @@ namespace OSBLE.UnitTests
                 zip.Save("D:\\temp\\GetMergedReviewDocumentTest.zip");
             }
         }
+
+        [TestMethod]
+        public void OsbleService_UploadCourseGradebookTest()
+        {
+            //AC Note: again, this requires OSBLE to be set up property.  May need
+            //to change values accordingly
+            AuthenticationServiceClient authClient = new AuthenticationServiceClient();
+            OsbleServiceClient osbleClient = new OsbleServiceClient();
+            string token = authClient.ValidateUser("user", "password");
+
+            ZipFile file = new ZipFile();
+
+            //AC note: may need to change document location
+            FileStream stream = File.OpenRead("D:\\temp\\CSVFiles.zip");
+
+            MemoryStream zipStream = new MemoryStream();
+            stream.CopyTo(zipStream);
+            zipStream.Position = 0;
+
+            //AC note: may need to change assignment ID (first parameter)
+            int result = osbleClient.UploadCourseGradebook(56, zipStream.ToArray(), token);
+            Assert.IsTrue(result == 0);
+        }
     }
 }

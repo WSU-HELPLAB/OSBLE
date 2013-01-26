@@ -16,6 +16,36 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="GetCoursesTaught">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="authToken" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCoursesTaughtResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" minOccurs="0" name="GetCoursesTaughtResult" nillable="true" type="q2:ArrayOfCourse" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UploadCourseGradebook">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="courseID" type="xs:int" />
+        <xs:element minOccurs="0" name="zipData" nillable="true" type="xs:base64Binary" />
+        <xs:element minOccurs="0" name="authToken" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UploadCourseGradebookResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="UploadCourseGradebookResult" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="GetCourseAssignments">
     <xs:complexType>
       <xs:sequence>
@@ -27,7 +57,7 @@
   <xs:element name="GetCourseAssignmentsResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments" minOccurs="0" name="GetCourseAssignmentsResult" nillable="true" type="q2:ArrayOfAssignment" />
+        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments" minOccurs="0" name="GetCourseAssignmentsResult" nillable="true" type="q3:ArrayOfAssignment" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -104,7 +134,7 @@
   <xs:element name="GetCourseRoleResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" minOccurs="0" name="GetCourseRoleResult" nillable="true" type="q3:CourseRole" />
+        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" minOccurs="0" name="GetCourseRoleResult" nillable="true" type="q4:CourseRole" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

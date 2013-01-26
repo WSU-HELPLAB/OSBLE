@@ -11,6 +11,7 @@ using OSBLE.Models.Assignments;
 using System.IO;
 using Ionic.Zip;
 using OSBLE.Models.FileSystem;
+using OSBLE.Controllers;
 
 namespace OSBLE.Services
 {
@@ -50,6 +51,81 @@ namespace OSBLE.Services
                 nonEfCourses.Add(new Course(course));
             }
             return nonEfCourses.ToArray();
+        }
+
+        /// <summary>
+        /// Returns a list of courses that the supplied user can grade
+        /// </summary>
+        /// <param name="authToken"></param>
+        /// <returns></returns>
+        [OperationContract]
+        public Course[] GetCoursesTaught(string authToken)
+        {
+            if (!_authService.IsValidKey(authToken))
+            {
+                return new Course[0];
+            }
+            UserProfile profile = _authService.GetActiveUser(authToken);
+            List<Course> efCourses = (
+                                      from cu in _db.CourseUsers
+                                      where cu.UserProfileID == profile.ID
+                                      &&
+                                      cu.AbstractCourse is Course
+                                      &&
+                                      cu.AbstractRole.CanGrade == true
+                                      select cu.AbstractCourse as Course
+                                      ).ToList();
+
+            //convert entity framework-based course to normal course for easier wire
+            //transfer
+            List<Course> nonEfCourses = new List<Course>(efCourses.Count);
+            foreach (Course course in efCourses)
+            {
+                //use copy constructor to remove crud
+                nonEfCourses.Add(new Course(course));
+            }
+            return nonEfCourses.ToArray();
+        }
+
+        [OperationContract]
+        public int UploadCourseGradebook(int courseID, byte[] zipData, string authToken)
+        {
+            int serviceResult = -1;
+
+            //validate key
+            if (!_authService.IsValidKey(authToken))
+            {
+                return serviceResult;
+            }
+
+            //make sure the supplied user can modify the desired course
+            UserProfile profile = _authService.GetActiveUser(authToken);
+            CourseUser courseUser = (
+                                      from cu in _db.CourseUsers
+                                      where cu.UserProfileID == profile.ID
+                                      &&
+                                      cu.AbstractCourse is Course
+                                      &&
+                                      cu.AbstractCourseID == courseID
+                                      select cu
+                                      ).FirstOrDefault();
+            if (courseUser == null || courseUser.AbstractRole.CanGrade == false)
+            {
+                //user can't grade that course
+                return serviceResult;
+            }
+
+            //upload the gradebook zip and return the result
+            GradebookFilePath gfp = new Models.FileSystem.FileSystem().Course(courseUser.AbstractCourseID).Gradebook();
+            GradebookController gc = new GradebookController();
+            try
+            {
+                serviceResult = gc.UploadGradebookZip(zipData, gfp);
+            }
+            catch (Exception)
+            {
+            }
+            return serviceResult;
         }
 
         /// <summary>

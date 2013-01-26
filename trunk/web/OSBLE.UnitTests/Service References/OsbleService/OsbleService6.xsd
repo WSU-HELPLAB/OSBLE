@@ -20,7 +20,6 @@
           <xs:element minOccurs="0" name="HoursLatePerPercentPenalty" type="xs:int" />
           <xs:element minOccurs="0" name="HoursLateUntilZero" type="xs:int" />
           <xs:element minOccurs="0" name="Inactive" type="xs:boolean" />
-          <xs:element minOccurs="0" name="LetterGrades" nillable="true" type="tns:ArrayOfLetterGrade" />
           <xs:element minOccurs="0" name="MinutesLateWithNoPenalty" type="xs:int" />
           <xs:element minOccurs="0" name="Number" nillable="true" type="xs:string" />
           <xs:element minOccurs="0" name="PercentPenalty" type="xs:int" />
@@ -122,22 +121,6 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="CourseMeeting" nillable="true" type="tns:CourseMeeting" />
-  <xs:complexType name="ArrayOfLetterGrade">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="LetterGrade" nillable="true" type="tns:LetterGrade" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfLetterGrade" nillable="true" type="tns:ArrayOfLetterGrade" />
-  <xs:complexType name="LetterGrade">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="Course" nillable="true" type="tns:Course" />
-      <xs:element minOccurs="0" name="CourseID" type="xs:int" />
-      <xs:element minOccurs="0" name="Grade" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="ID" type="xs:int" />
-      <xs:element minOccurs="0" name="MinimumRequired" type="xs:int" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="LetterGrade" nillable="true" type="tns:LetterGrade" />
   <xs:complexType name="CourseRole">
     <xs:complexContent mixed="false">
       <xs:extension base="tns:AbstractRole">
