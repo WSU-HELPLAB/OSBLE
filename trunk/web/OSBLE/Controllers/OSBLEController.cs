@@ -396,10 +396,6 @@ namespace OSBLE.Controllers
         /// <returns></returns>
         public static AssignmentTeam GetAssignmentTeam(Assignment assignment, CourseUser user)
         {
-            var basic = user.TeamMemberships
-                                             .SelectMany(t => t.Team.UsedAsAssignmentTeam);
-            var query = basic
-                                             .Where(a => a.AssignmentID == assignment.ID);
             AssignmentTeam returnValue = user.TeamMemberships
                                              .SelectMany(t => t.Team.UsedAsAssignmentTeam)
                                              .Where(a => a.AssignmentID == assignment.ID)

@@ -11,16 +11,19 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
 {
     public class CriticalReviewsPerformedDecorator : TableDecorator
     {
+        public List<ReviewTeam> ReviewTeams { get; set; }
+
         public CriticalReviewsPerformedDecorator(ITableBuilder builder)
             :base(builder)
         {
+            ReviewTeams = new List<ReviewTeam>();
         }
 
         public override DynamicDictionary BuildTableForTeam(IAssignmentTeam assignmentTeam)
         {
             dynamic data = Builder.BuildTableForTeam(assignmentTeam);
             data.TeacherCritical = new DynamicDictionary();
-
+            data.TeacherCritical.ReviewTeams = ReviewTeams;
 
                 AssignmentTeam assignTeam = assignmentTeam as AssignmentTeam;
                 Assignment assignment = assignTeam.Assignment;
@@ -50,6 +53,15 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
                     }
                 }
             string altText = string.Format("Download {0}'s reviews of:\n{1}", assignmentTeam.Team.Name, reviewedTeams);
+
+            if (assignment.PreceedingAssignment.HasDeliverables && assignment.PreceedingAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
+            {
+                data.TeacherCritical.IsPdfReviewAssignment = true;
+            }
+            else
+            {
+                data.TeacherCritical.IsPdfReviewAssignment = false;
+            }
 
             data.TeacherCritical.fractionReviewed = string.Format("{0}/{1} submitted", submittedCount.ToString(), authorTeams.Count.ToString());
             data.TeacherCritical.altText = altText;

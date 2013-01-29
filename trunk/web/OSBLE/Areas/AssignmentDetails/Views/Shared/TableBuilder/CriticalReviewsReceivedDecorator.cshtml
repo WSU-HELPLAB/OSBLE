@@ -1,41 +1,66 @@
 ﻿@using OSBLE.Resources
 @using OSBLE.Models.Assignments
 @using OSBLE.Models.Courses;
+@using OSBLE.Areas.AssignmentDetails.ViewModels;
 @model DynamicDictionary
 @{
     dynamic dataModel = Model;
     Assignment assignment = dataModel.TeacherReceivedCritical.Assignment;
     List<CourseUser> CourseUsers = dataModel.TeacherReceivedCritical.CourseUsers;
     List<DateTime?> TimeStampList = dataModel.TeacherReceivedCritical.TimeStampList;
+    bool isPdfReviewAssignment = dataModel.TeacherReceivedCritical.IsPdfReviewAssignment;
+    List<CriticalReviewsReceivedTeam> reviewers = dataModel.TeacherReceivedCritical.Reviewers;
 }
-
-
-
-    <td>
-        <ul id="ReviewsItems">
-            @{
-                int i = 0;
-                foreach (CourseUser cu in CourseUsers)
+<td>
+    <ul id="ReviewsItems">
+        @{
+            int i = 0;
+            foreach (CourseUser cu in CourseUsers)
+            {
+                if (TimeStampList[i] == null)
                 {
-                    if(TimeStampList[i] == null)
+            <li>None Received </li>    
+                }
+                else if (isPdfReviewAssignment == true)
+                {
+                    foreach (CriticalReviewsReceivedTeam reviewer in reviewers)
                     {
+                        string reviewerName = reviewer.CourseUser.DisplayName(reviewer.CourseUser.AbstractRoleID, true).ToString();
+                        if(reviewerName.StartsWith("Anon") == true)
+                        {
+                            reviewerName = "Anonymous";
+                        }
+                        else
+                        {
+                            reviewerName = reviewer.TeamName;
+                        }
                         <li>
-                            None Received
-                        </li>    
-                    }
-                    else
-                    {
-                        <li>
-                            @(Html.ActionLink(cu.DisplayNameFirstLast(cu.AbstractRole).ToString(), "GetReviewsOfAuthor", "FileHandler", 
-                            new { area = "", assignmentId = assignment.ID, receiverId = cu.ID }, 
-                            new { onclick = "create_and_open_downloading_submission_dialog()",
-                                  title = string.Format("Download all reviews of {1}'s previous submission\nLatest Review Received: {0}", 
-                                  TimeStampList[i], cu.DisplayNameFirstLast(cu.AbstractRole))}))
+                        @(Html.ActionLink(reviewerName.ToString(), "GetReviewsOfAuthor", "FileHandler",
+                            new { area = "", assignmentId = assignment.ID, receiverId = cu.ID },
+                            new
+                            {
+                                onclick = "create_and_open_downloading_submission_dialog()",
+                                title = string.Format("Download all reviews of {1}'s previous submission\nLatest Review Received: {0}",
+                                TimeStampList[i], reviewerName)
+                            }))
                         </li>
                     }
-                    i++;
                 }
-            }
-        </ul>
-    </td>
-
+                else
+                {
+            <li>
+                @(Html.ActionLink(cu.DisplayName(cu.AbstractRoleID, true).ToString(), "GetReviewsOfAuthor", "FileHandler",
+                            new { area = "", assignmentId = assignment.ID, receiverId = cu.ID },
+                            new
+                            {
+                                onclick = "create_and_open_downloading_submission_dialog()",
+                                title = string.Format("Download all reviews of {1}'s previous submission\nLatest Review Received: {0}",
+                                TimeStampList[i], cu.DisplayName(cu.AbstractRoleID, true))
+                            }))
+            </li>
+                }
+                i++;
+            }   
+        }
+    </ul>
+</td>
