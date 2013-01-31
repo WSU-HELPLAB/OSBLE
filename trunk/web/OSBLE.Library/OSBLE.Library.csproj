@@ -136,6 +136,7 @@
     <Compile Include="Models\ToolTips.cs" />
     <Compile Include="Models\Triggers\DiscussionTeamDeleteTrigger.cs" />
     <Compile Include="Models\Triggers\ModelTrigger.cs" />
+    <Compile Include="Models\Triggers\NotificationDeleteTrigger.cs" />
     <Compile Include="Models\Triggers\TeamDeleteTrigger.cs" />
     <Compile Include="Models\Users\Mail.cs" />
     <Compile Include="Models\Users\UserProfile.cs" />

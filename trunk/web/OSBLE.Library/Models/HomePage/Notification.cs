@@ -71,6 +71,11 @@ namespace OSBLE.Models.HomePage
                 .HasRequired(n => n.Sender)
                 .WithMany()
                 .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Notification>()
+                .HasRequired(n => n.Recipient)
+                .WithMany()
+                .WillCascadeOnDelete(false);
         }
     }
 }
