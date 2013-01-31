@@ -5,7 +5,11 @@
     dynamic dataModel = Model;
     IAssignmentTeam currentTeam = dataModel.TeacherCritical.AssignmentTeam as IAssignmentTeam;
     AssignmentTeam at = currentTeam as AssignmentTeam;
-    bool isPdfReviewAssignment = dataModel.TeacherCritical.IsPdfReviewAssignment;
+    bool isPdfReviewAssignment = false;
+    if(dataModel.TeacherCritical.IsPdfReviewAssignment != null)
+    {
+        isPdfReviewAssignment = dataModel.TeacherCritical.IsPdfReviewAssignment;
+    }
     List<ReviewTeam> reviewTeams = dataModel.TeacherCritical.ReviewTeams;
     List<ReviewTeam> userReviews = reviewTeams.Where(rt => rt.ReviewTeamID == at.TeamID).ToList();
 }

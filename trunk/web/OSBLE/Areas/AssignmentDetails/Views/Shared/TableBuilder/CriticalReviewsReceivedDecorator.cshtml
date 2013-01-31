@@ -8,7 +8,11 @@
     Assignment assignment = dataModel.TeacherReceivedCritical.Assignment;
     List<CourseUser> CourseUsers = dataModel.TeacherReceivedCritical.CourseUsers;
     List<DateTime?> TimeStampList = dataModel.TeacherReceivedCritical.TimeStampList;
-    bool isPdfReviewAssignment = dataModel.TeacherReceivedCritical.IsPdfReviewAssignment;
+    bool isPdfReviewAssignment = false;
+    if (dataModel.TeacherCritical.IsPdfReviewAssignment != null)
+    {
+        isPdfReviewAssignment = dataModel.TeacherCritical.IsPdfReviewAssignment;
+    }
     List<CriticalReviewsReceivedTeam> reviewers = dataModel.TeacherReceivedCritical.Reviewers;
 }
 <td>
