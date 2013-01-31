@@ -97,8 +97,42 @@ namespace OSBLE.Controllers
                               rt.AuthorTeamID == authorTeamID
                               select rt).FirstOrDefault();
             }
-            if ((reviewTeam != null || ActiveCourseUser.AbstractRole.CanGrade)  //must be on the review team or an instructor
-                && CRassignment.Type == AssignmentTypes.CriticalReview)
+            bool canAccessReview = false;
+
+            //Determine whether or not the current user can access the document
+            if (CRassignment.Type == AssignmentTypes.CriticalReview)
+            {
+                //is the user a reviewer?
+                if (reviewTeam != null)
+                {
+                    canAccessReview = true;
+                }
+
+                //or, is the user an instructor?
+                else if (ActiveCourseUser.AbstractRole.CanGrade)
+                {
+                    canAccessReview = true;
+                }
+
+                //or, has the review been published and the current user is the author of the docment?
+                else if (CRassignment.IsCriticalReviewPublished == true)
+                {
+                    reviewTeam = (from rt in CRassignment.ReviewTeams
+                                  where rt.AuthorTeamID == authorTeamID
+                                  select rt
+                                ).FirstOrDefault();
+                    if (reviewTeam != null)
+                    {
+                        TeamMember tm = reviewTeam.AuthorTeam.TeamMembers.Where(t => t.CourseUserID == ActiveCourseUser.ID).FirstOrDefault();
+                        if (tm != null)
+                        {
+                            canAccessReview = true;
+                        }
+                    }
+                }
+            }
+
+            if (canAccessReview)
             {
                 //Send off to Annotate if we have exactly one deliverable and that deliverable is a PDF document
                 if (CRassignment.PreceedingAssignment.Deliverables.Count == 1 && CRassignment.PreceedingAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
