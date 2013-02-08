@@ -178,7 +178,16 @@ function create_and_open_downloading_submission_dialog() {
 </div>
 
 <div id="rubric_evaluator">
-    <h1>Rubric Evaluation of @Model.SelectedAssignment.AssignmentName for @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole)</h1>
+    <h1>Rubric Evaluation of @Model.SelectedAssignment.AssignmentName for @Model.Evaluation.Recipient.DisplayName(ViewBag.ActiveCourse.AbstractRole)
+    @if (!student)
+    {
+        if (Model.Evaluation.Recipient.TeamMembers.Count > 1)
+        {
+            List<dynamic> names = Model.Evaluation.Recipient.TeamMembers.Select(tm => tm.CourseUser.UserProfile.DisplayName(ViewBag.ActiveCourse.AbstractRoleID)).ToList();
+            <text>(@string.Join("; ", names.ToArray()))</text>
+        }
+    }
+    </h1>
     <div class="dashboard">
             @if (!student)
             {
