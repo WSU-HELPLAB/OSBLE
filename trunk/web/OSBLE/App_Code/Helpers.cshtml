@@ -117,20 +117,24 @@
 Also runs content through nl2br to convert newlines to <br /> tags. *@
 @helper Linkify(string text)
     {
-        List<string> links = LinkifyHelper(text);
-        bool isLink = false;
-        foreach (string s in links)
+        string[] punctuation = { "!", ".", ",", ";", ":" };
+        string pattern = @"(http:\/\/|https:\/\/)([^ \r\n\t\[\]]+)";
+        MatchCollection matches = Regex.Matches(text, pattern);
+        foreach(Match match in matches)
         {
-            if (isLink)
-            {<a href="@s">@s</a>
-                isLink = !isLink;
-            }
-            else
+            string rawUrl = match.Groups[0].Value;
+            
+            //trim off any ending punctuation
+            if(punctuation.Contains(rawUrl.Substring(rawUrl.Length - 1)))
             {
-    <text>@Helpers.nl2br(@s)</text>
-                isLink = !isLink;
+                rawUrl = rawUrl.Substring(0, rawUrl.Length - 1);
             }
+            string anchorFormat = "<a href=\"{0}\">{1}</a>";
+            string anchor = string.Format(anchorFormat, rawUrl, rawUrl);
+            text = text.Replace(rawUrl, anchor);
         }
+        text = text.Replace("\n", "<br />");
+        <text>@text</text>
 }
 @* Returns default profile picture (saves lookups to the controller for profile pic) *@
 @helper DefaultProfilePicture()
@@ -178,30 +182,29 @@ Also runs content through nl2br to convert newlines to <br /> tags. *@
  Note: it must be wrapped in Html.Raw(HttpUtility.HtmlDecode(WikiUrlLinking(str))) *@
 @helper WikiUrlLinking(string strToLink)
     {
-        string description = strToLink;
-        Match match = Regex.Match(description, @"\[url:[^\|]*\|[^\]]*\]");
-
-        while (match.Success)
+        string pattern = @"\[url:([^\|]+)\|(http:\/\/|https:\/\/)?([^\|]+)\]";
+        MatchCollection matches = Regex.Matches(strToLink, pattern);
+        foreach(Match match in matches)
         {
-            string parsedDescription = description.Remove(match.Index, match.Length);
-            Match match2 = Regex.Match(match.Value, @"\|[\W\w]*]"); //Pulling off the url
-            string url = match2.Value;
-            url = url.Substring(1, match2.Length - 2);
-            if ((url.StartsWith("http://") || url.StartsWith("https://") || url.StartsWith("https:\\") || url.StartsWith("http:\\")) == false)
+            //match.Groups[0] = whole link
+            //match.Groups[1] = link title
+            //match.Groups[2] = http/https (optional)
+            //match.Groups[3] = url
+            
+            string anchorFormat = "<a href=\"{0}\">{1}</a>";
+            string urlFormat = "{0}{1}";
+            string protocol = "http://";
+            if (match.Groups[2].Value.Length > 0)
             {
-                url = "http://" + url; //http:// is requred for the links to be absolute urls vs relative url
+                protocol = match.Groups[2].Value;
             }
-            match2 = Regex.Match(match.Value, @"\:[\W\w]*\|"); //pulling off the label for the url
-            string label = match2.Value;
-            label = label.Substring(1, match2.Length - 2);
-            string rawHtml = "<a href=\"" + url + "\">" + label + "</a>";
-            parsedDescription = parsedDescription.Insert(match.Index, rawHtml);
-            description = parsedDescription;
-            match = Regex.Match(description, @"\[url:[^\|]*\|[^\]]*\]");
+            string url = string.Format(urlFormat, protocol, match.Groups[3].Value);
+            string anchor = string.Format(anchorFormat, url, match.Groups[1].Value);
+            strToLink = strToLink.Replace(match.Groups[0].Value, anchor);            
         }
-        description = description.Replace("\n", "<br />"); //changing new lines to breaks
+        strToLink = strToLink.Replace("\n", "<br />"); //changing new lines to breaks
 
-    <text>@description</text>
+    <text>@strToLink</text>
 }
 @helper CreateToolTip(string tooltip)
     {
@@ -247,27 +250,6 @@ Also runs content through nl2br to convert newlines to <br /> tags. *@
 @functions{
     #region C# functions
 
-    /// <summary>
-    /// This takes a string and splits it where a link is detected.
-    /// It will insert a blank string at the front
-    /// </summary>
-    /// <param name="text"></param>
-    /// <returns></returns>
-    static List<string> LinkifyHelper(string text)
-    {
-        int offset = 0;
-
-        Regex reg = new Regex(@"(https?://[\w\.]+[/.*]?.*)");
-
-        List<string> textSplit = reg.Split(text).ToList();
-
-        if (reg.IsMatch(textSplit[0]))
-        {
-            textSplit.Insert(0, "");
-        }
-
-        return textSplit;
-    }
 
 #endregion
     }
