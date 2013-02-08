@@ -19,7 +19,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         public HomeController()
         {
             ViewBag.AssignmentTypeRadioName = "AssignmentType";
-            manager = new WizardComponentManager();
+            manager = new WizardComponentManager(CurrentUser);
         }
 
         #region action results

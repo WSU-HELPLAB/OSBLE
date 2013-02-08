@@ -11,9 +11,15 @@ using OSBLE.Utility;
 using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 using System.IO;
+using OSBLE.Models.Users;
 
 namespace OSBLE.Areas.AssignmentWizard.Models
 {
+    //TODO: Properly evaluate the change to FileCache (see note below)
+    //AC: We were having issues with the selected assignment type randomly defaulting to "Basic."  Previously,
+    //    I had been using JS cookies to track component settings.  I think that this might have been part of
+    //    the problem so I converted the WCM over fo the FileCache.  However, the conversion was mostly a
+    //    replacement of Cookie[value] to Cache[value].  This might need to be revisited in a future date.
     [Serializable]
     public class WizardComponentManager
     {
@@ -28,9 +34,10 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         private const string allComponentsKey = "_wcm_allComponents";
         private const string selectedComponentsKey = "_wcm_selectedComponents";
         private const string unselectedComponentsKey = "_wcm_unselectedComponents";
+        private const string cacheIdKey = "_wcm_cacheIdString";
 
         [NonSerialized]
-        private HttpCookie managerCookie;
+        private FileCache managerCache;
 
         [NonSerialized]
         private ObservableCollection<WizardBaseController> _selectedComponents = new ObservableCollection<WizardBaseController>();
@@ -40,30 +47,24 @@ namespace OSBLE.Areas.AssignmentWizard.Models
 
         #region constructor
 
-        public WizardComponentManager()
+        public WizardComponentManager(UserProfile profile)
         {
+            managerCache = FileCacheHelper.GetCacheInstance(profile);
+            managerCache.DefaultRegion = Path.Combine(managerCache.DefaultRegion, "assignmentWizard");
             AllComponents = new List<WizardBaseController>();
             SelectedComponents = new ObservableCollection<WizardBaseController>();
             UnselectedComponents = new ObservableCollection<WizardBaseController>();
             RegisterComponents();
-
-            //Load in cookie values if possible. Create new one if not.
-            if (HttpContext.Current != null)
+            if (managerCache[selectedComponentsKey] != null)
             {
-                managerCookie = HttpContext.Current.Request.Cookies.Get(managerCookieString);
-                if (managerCookie == null || managerCookie[selectedComponentsKey] == null)
-                {
-                    managerCookie = new HttpCookie(managerCookieString);
-                    managerCookie.Expires = DateTime.Now.AddHours(24.0);
-                }
-                else
-                {
-                    //load in selected / unselected components
-                    SelectedComponents = new ObservableCollection<WizardBaseController>(ComponentsFromString(managerCookie[selectedComponentsKey], "|"));
-                    UnselectedComponents = new ObservableCollection<WizardBaseController>(ComponentsFromString(managerCookie[unselectedComponentsKey], "|"));
-                }
-                HttpContext.Current.Response.SetCookie(managerCookie);
+                SelectedComponents = new ObservableCollection<WizardBaseController>(ComponentsFromString(managerCache[selectedComponentsKey].ToString(), "|"));
             }
+            if (managerCache[unselectedComponentsKey] != null)
+            {
+                UnselectedComponents = new ObservableCollection<WizardBaseController>(ComponentsFromString(managerCache[unselectedComponentsKey].ToString(), "|"));
+            }
+
+
         }
 
         #endregion
@@ -120,10 +121,8 @@ namespace OSBLE.Areas.AssignmentWizard.Models
                 string selectedComponentPieces = string.Join("|", _selectedComponents);
                 string unselectedComponentsPieces = string.Join("|", _unselectedComponents);
 
-                managerCookie.Values[selectedComponentsKey] = selectedComponentPieces;
-                managerCookie.Values[unselectedComponentsKey] = unselectedComponentsPieces;
-
-                HttpContext.Current.Response.SetCookie(managerCookie);
+                managerCache[selectedComponentsKey] = selectedComponentPieces;
+                managerCache[unselectedComponentsKey] = unselectedComponentsPieces;
             }
         }
 
@@ -131,13 +130,13 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         {
             get
             {
-                if (managerCookie.Values[isNewAssignmentKey] != null)
+                if (managerCache[isNewAssignmentKey] != null)
                 {
-                    return Convert.ToBoolean(managerCookie.Values[isNewAssignmentKey]);
+                    return Convert.ToBoolean(managerCache[isNewAssignmentKey]);
                 }
                 else
                 {
-                    managerCookie.Values[isNewAssignmentKey] = true.ToString();
+                    managerCache[isNewAssignmentKey] = true.ToString();
                     return true;
                 }
             }
@@ -145,8 +144,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             {
                 if (HttpContext.Current != null)
                 {
-                    managerCookie.Values[isNewAssignmentKey] = value.ToString();
-                    HttpContext.Current.Response.SetCookie(managerCookie);
+                    managerCache[isNewAssignmentKey] = value.ToString();
                 }
             }
         }
@@ -155,13 +153,13 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         {
             get
             {
-                if (managerCookie.Values[assignmentKey] != null)
+                if (managerCache[assignmentKey] != null)
                 {
-                    return Convert.ToInt32(managerCookie.Values[assignmentKey]);
+                    return Convert.ToInt32(managerCache[assignmentKey]);
                 }
                 else
                 {
-                    managerCookie.Values[assignmentKey] = "0";
+                    managerCache[assignmentKey] = "0";
                     return 0;
                 }
             }
@@ -169,8 +167,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             {
                 if (HttpContext.Current != null)
                 {
-                    managerCookie.Values[assignmentKey] = value.ToString();
-                    HttpContext.Current.Response.SetCookie(managerCookie);
+                    managerCache[assignmentKey] = value.ToString();
                 }
             }
         }
@@ -179,13 +176,13 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         {
             get
             {
-                if (managerCookie.Values[activeAssignmentTypeKey] != null)
+                if (managerCache[activeAssignmentTypeKey] != null)
                 {
-                    return (AssignmentTypes)Convert.ToInt32(managerCookie.Values[activeAssignmentTypeKey]);
+                    return (AssignmentTypes)Convert.ToInt32(managerCache[activeAssignmentTypeKey]);
                 }
                 else
                 {
-                    managerCookie.Values[activeAssignmentTypeKey] = ((int)AssignmentTypes.Basic).ToString();
+                    managerCache[activeAssignmentTypeKey] = ((int)AssignmentTypes.Basic).ToString();
                     return AssignmentTypes.Basic;
                 }
             }
@@ -193,8 +190,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             {
                 if (HttpContext.Current != null)
                 {
-                    managerCookie.Values[activeAssignmentTypeKey] = ((int)value).ToString();
-                    HttpContext.Current.Response.SetCookie(managerCookie);
+                    managerCache[activeAssignmentTypeKey] = ((int)value).ToString();
                 }
             }
         }
@@ -203,13 +199,13 @@ namespace OSBLE.Areas.AssignmentWizard.Models
         {
             get
             {
-                if (managerCookie.Values[activeComponentIndexKey] != null)
+                if (managerCache[activeComponentIndexKey] != null)
                 {
-                    return Convert.ToInt32(managerCookie.Values[activeComponentIndexKey]);
+                    return Convert.ToInt32(managerCache[activeComponentIndexKey]);
                 }
                 else
                 {
-                    managerCookie.Values[activeComponentIndexKey] = "0";
+                    managerCache[activeComponentIndexKey] = "0";
                     return 0;
                 }
             }
@@ -217,8 +213,7 @@ namespace OSBLE.Areas.AssignmentWizard.Models
             {
                 if (HttpContext.Current != null)
                 {
-                    managerCookie.Values[activeComponentIndexKey] = value.ToString();
-                    HttpContext.Current.Response.SetCookie(managerCookie);
+                    managerCache[activeComponentIndexKey] = value.ToString();
                 }
             }
         }
