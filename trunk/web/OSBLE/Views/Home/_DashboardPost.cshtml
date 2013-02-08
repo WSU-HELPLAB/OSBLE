@@ -106,7 +106,7 @@
             @* Post Content *@
             <div class="dp_content">
              @{
-                 string content = Helpers.Linkify(Model.Content).ToHtmlString();
+                 string content = HttpUtility.HtmlDecode(Helpers.Linkify(Model.Content).ToHtmlString());
                  content = content.Replace("\n", "<br />");
                     }
                     @Html.Raw(content)

@@ -233,7 +233,7 @@
                 </div>
                 <div class="dp_content">
                     @{
-            string content = Helpers.Linkify(dpvm.Content).ToHtmlString();
+            string content = HttpUtility.HtmlDecode(Helpers.Linkify(dpvm.Content).ToHtmlString());
             content = content.Replace("\n", "<br />");
                     }
                     @Html.Raw(content)
@@ -262,7 +262,7 @@
                                 </div>
                                 <div class="dp_content">
                                     @{
-                            content = Helpers.Linkify(reply.Content).ToHtmlString();
+                            content = HttpUtility.HtmlDecode(Helpers.Linkify(reply.Content).ToHtmlString());
                             content = content.Replace("\n", "<br />");
                                     }
                                     @Html.Raw(content)

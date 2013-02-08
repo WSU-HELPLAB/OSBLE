@@ -46,7 +46,7 @@
         }
     </div>
     <div id="mail_message">
-        @Helpers.Linkify(Model.Message)
+        @Html.Raw(HttpUtility.HtmlDecode(Helpers.Linkify(Model.Message).ToHtmlString()))
     </div>
 
     
