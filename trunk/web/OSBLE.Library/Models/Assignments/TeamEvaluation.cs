@@ -74,6 +74,16 @@ namespace OSBLE.Models.Assignments
                 .HasRequired(tm => tm.TeamEvaluationAssignment)
                 .WithMany()
                 .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<TeamEvaluation>()
+                .HasRequired(tm => tm.Evaluator)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<TeamEvaluation>()
+                .HasRequired(tm => tm.Recipient)
+                .WithMany()
+                .WillCascadeOnDelete(false);
         }
     }
 }

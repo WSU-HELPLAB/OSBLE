@@ -134,12 +134,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             if (manager.IsNewAssignment)
             {
                 ViewBag.IsNewAssignment = true;
-                ViewBag.Title = "Create New Assignment";
+                ViewBag.Title = string.Format("Create New {0} Assignment: {1}", manager.ActiveAssignmentType.Explode(), manager.ActiveComponent.PrettyName);
             }
             else
             {
                 ViewBag.IsNewAssignment = false;
-                ViewBag.Title = "Edit Assignment";
+                ViewBag.Title = string.Format("Edit {0} Assignment: {1}", manager.ActiveAssignmentType.Explode(), manager.ActiveComponent.PrettyName);
             }
         }
 

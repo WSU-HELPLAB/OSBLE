@@ -7,7 +7,7 @@ using System;
 
 namespace OSBLE.Models.Courses
 {
-    public class CourseUser
+    public class CourseUser : IModelBuilderExtender
     {
         [Key]
         [Required]
@@ -139,6 +139,26 @@ namespace OSBLE.Models.Courses
                     break;
             }
             return string.Format("({0}) {1}", roleAbbreviation, UserProfile.DisplayName(AbstractRoleId, FirstThenLast, false));
+        }
+
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+            //The CourseUser class utilizes a custom trigger to handle the intricices of deleting users from courses.  As 
+            //a SQL Server requirement, all FK relations must not cascade on delete.
+            modelBuilder.Entity<CourseUser>()
+                .HasRequired(m => m.AbstractCourse)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<CourseUser>()
+                .HasRequired(m => m.AbstractRole)
+                .WithMany()
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<CourseUser>()
+                .HasRequired(m => m.UserProfile)
+                .WithMany()
+                .WillCascadeOnDelete(false);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace OSBLE.Models.Assignments
             modelBuilder.Entity<TeamMember>()
                 .HasRequired(tm => tm.CourseUser)
                 .WithMany(cu => cu.TeamMemberships)
-                .WillCascadeOnDelete(true);
+                .WillCascadeOnDelete(false);
         }
     }
 }

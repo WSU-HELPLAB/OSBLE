@@ -385,21 +385,9 @@ namespace OSBLE.Models.Assignments
         /// <returns></returns>
         public int GetTotalTeamEvaluationCount()
         {
-            int returnVal = 0;
-            if (this.PrecededingAssignmentID.HasValue && this.PrecededingAssignmentID.Value > 0)
-            {
-                switch (this.PreceedingAssignment.Type)
-                {
-                    case AssignmentTypes.DiscussionAssignment:
-                    case AssignmentTypes.CriticalReviewDiscussion:
-                        returnVal = this.PreceedingAssignment.DiscussionTeams.Count();
-                        break;
-                    default:    //all other assignments
-                        returnVal = this.PreceedingAssignment.AssignmentTeams.Count();
-                        break;
-                }
-            }
-            return returnVal;
+            //get the number of all team members for this assignment. 
+            int totalEvals = this.PreceedingAssignment.AssignmentTeams.Select(at => at.Team.TeamMembers.Count).Sum();
+            return totalEvals;
         }
 
 

@@ -5,7 +5,7 @@ using OSBLE.Models.Users;
 
 namespace OSBLE.Models.HomePage
 {
-    public class Event
+    public class Event : IModelBuilderExtender
     {
         [Required]
         [Key]
@@ -39,7 +39,7 @@ namespace OSBLE.Models.HomePage
             }
         }
 
-        [Display(Name="Ending date")]
+        [Display(Name = "Ending date")]
         [DataType(DataType.Date)]
         public DateTime? EndDate { get; set; }
 
@@ -93,6 +93,14 @@ namespace OSBLE.Models.HomePage
 
             HideDelete = false;
             HideTime = false;
+        }
+
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Event>()
+                .HasRequired(m => m.Poster)
+                .WithMany()
+                .WillCascadeOnDelete(false);
         }
     }
 }

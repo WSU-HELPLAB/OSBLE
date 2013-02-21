@@ -93,6 +93,7 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 manager.DeactivateAllComponents();
             }
             ViewBag.BeginWizardButton = beginWizardButton;
+            ViewBag.AssignmentType = manager.ActiveAssignmentType.Explode();
             return View(manager.GetComponentsForAssignmentType(manager.ActiveAssignmentType));
         }
 

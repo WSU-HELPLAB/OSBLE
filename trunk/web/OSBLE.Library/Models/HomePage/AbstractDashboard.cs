@@ -7,7 +7,7 @@ using OSBLE.Models.Courses;
 namespace OSBLE.Models.HomePage
 {
     
-    public abstract class AbstractDashboard 
+    public abstract class AbstractDashboard : IModelBuilderExtender
     {
         [Required]
         [Key]
@@ -72,6 +72,14 @@ namespace OSBLE.Models.HomePage
             ShowProfilePicture = false;
             DisplayTitle = "";
             DisplayName = "";
+        }
+
+        public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AbstractDashboard>()
+                .HasRequired(ad => ad.CourseUser)
+                .WithMany()
+                .WillCascadeOnDelete(false);
         }
     }
 }

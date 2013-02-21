@@ -24,7 +24,10 @@ namespace OSBLE.Models.Assignments
 
         public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)
         {
-            
+            modelBuilder.Entity<DiscussionAssignmentMetaInfo>()
+                .HasRequired(m => m.CourseUser)
+                .WithMany()
+                .WillCascadeOnDelete(false);
         }
     }
 }

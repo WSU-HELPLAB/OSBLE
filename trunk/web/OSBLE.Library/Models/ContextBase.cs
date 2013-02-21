@@ -127,6 +127,9 @@ namespace OSBLE.Models
             // Observer: Can See All, All Anonymized
             this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.Observer.ToString(), false, true, false, false, false, true));
 
+            // Withdrawn: The student has withdrawn from the course
+            this.CourseRoles.Add(new CourseRole(CourseRole.CourseRoles.Withdrawn.ToString(), false, false, false, false, false, false));
+
             // Community Roles
 
             // Leader: Can Modify Community

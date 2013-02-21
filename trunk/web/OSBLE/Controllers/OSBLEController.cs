@@ -278,6 +278,7 @@ namespace OSBLE.Controllers
                     (((cu.AbstractCourse as Course).Inactive == false) ||
                     (cu.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor) ||
                     (cu.AbstractRoleID == (int)CourseRole.CourseRoles.Observer)))
+                    .Where(cu => cu.AbstractRoleID != (int)CourseRole.CourseRoles.Withdrawn)
                     // Order first by descending start date (newest first)
                         .OrderByDescending(cu => (cu.AbstractCourse as Course).StartDate)
                     // Order next by whether the course is inactive, placing inactive courses underneath active.
@@ -611,6 +612,23 @@ namespace OSBLE.Controllers
             db.SaveChanges();
         }
 
+        /// <summary>
+        /// Sets a user's status to "withdrawn" for the current course
+        /// </summary>
+        /// <param name="user"></param>
+        public void WithdrawUserFromCourse(UserProfile user)
+        {
+            CourseUser cu = (from c in db.CourseUsers
+                             where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID
+                             && c.UserProfileID == user.ID
+                             select c).FirstOrDefault();
+            if (cu != null)
+            {
+                cu.AbstractRoleID = (int)CourseRole.CourseRoles.Withdrawn;
+                db.Entry(cu).State = System.Data.EntityState.Modified;
+            }
+            db.SaveChanges();
+        }
 
        
         //Give the Target's AssignmentTeam, this returns True if TargetTeam should be anonymized for current user based off assignment settings.

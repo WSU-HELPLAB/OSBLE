@@ -279,6 +279,9 @@
     <Compile Include="..\OSBLE.Library\Models\ToolTips.cs">
       <Link>Models\ToolTips.cs</Link>
     </Compile>
+    <Compile Include="..\OSBLE.Library\Models\Triggers\CourseUserDeleteTrigger.cs">
+      <Link>Models\Triggers\CourseUserDeleteTrigger.cs</Link>
+    </Compile>
     <Compile Include="..\OSBLE.Library\Models\Triggers\DiscussionTeamDeleteTrigger.cs">
       <Link>Models\Triggers\DiscussionTeamDeleteTrigger.cs</Link>
     </Compile>

@@ -36,7 +36,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.HeaderBuilder
                                   select new { id = te.EvaluatorID }).Distinct().Count();
 
             //get the number of all team members for this assignment. 
-            int totalEvals = assignment.PreceedingAssignment.AssignmentTeams.Select(at => at.Team.TeamMembers.Count).Sum();
+            int totalEvals = assignment.GetTotalTeamEvaluationCount();
 
             //set header information
             header.GradingProgress.completedEvals = completedEvals;

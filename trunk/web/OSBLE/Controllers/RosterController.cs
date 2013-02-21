@@ -109,11 +109,9 @@ namespace OSBLE.Controllers
                     // Set custom role order for display
                     List<CourseRole.CourseRoles> rolesOrder = new List<CourseRole.CourseRoles>();
 
-                    int i = (int)CourseRole.CourseRoles.Instructor;
-                    while (Enum.IsDefined(typeof(CourseRole.CourseRoles), i))
+                    foreach (CourseRole.CourseRoles role in Enum.GetValues(typeof(CourseRole.CourseRoles)).Cast<CourseRole.CourseRoles>())
                     {
-                        rolesOrder.Add((CourseRole.CourseRoles)i);
-                        i++;
+                        rolesOrder.Add(role);
                     }
 
                     foreach (CourseRole.CourseRoles r in rolesOrder)
@@ -293,7 +291,7 @@ namespace OSBLE.Controllers
 
                     //Use the list of our old students to track changes between the current and new class roster.
                     //Students that exist on the old roster but do not appear on the new roster will
-                    //be removed from the course
+                    //be given the "withdrawn" status
                     var oldRoster = from c in db.CourseUsers
                                     where c.AbstractCourseID == ActiveCourseUser.AbstractCourseID
                                     &&
@@ -352,10 +350,10 @@ namespace OSBLE.Controllers
                     }
                     db.SaveChanges();
 
-                    //remove all orphans
+                    //withdraw all orphans
                     foreach (UserProfile orphan in orphans)
                     {
-                        RemoveUserFromCourse(orphan);
+                        WithdrawUserFromCourse(orphan);
                     }
                 }
             }

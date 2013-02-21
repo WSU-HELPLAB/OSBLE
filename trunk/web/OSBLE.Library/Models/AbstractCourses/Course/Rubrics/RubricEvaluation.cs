@@ -136,6 +136,11 @@ namespace OSBLE.Models.Courses.Rubrics
                 .HasRequired(re => re.Assignment)
                 .WithMany()
                 .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<RubricEvaluation>()
+                .HasRequired(r => r.Evaluator)
+                .WithMany()
+                .WillCascadeOnDelete(true);
         }
     }
 }
