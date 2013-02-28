@@ -66,10 +66,19 @@ function buildTeams() {
 
         //we need the ID of the div that contains the ID in the format of "team_ID".  This belongs to the 
         //UL with the class 'TeamSortable'.
-        reviewTeams[i] = { id: $(reviewItems[i]).parent().children('.TeamSortable')[0].id, count: 0, members: Array() };
+        reviewTeams[i] = {
+            id: $(reviewItems[i]).parent().children('.TeamSortable')[0].id,
+            count: 0,
+            members: Array(),
+            author: $(reviewItems[i]).parent().children('.TeamSortable').first().prev().text()
+            };
     }
     for (var i = 0; i < numReviewers; i++) {
-        activeReviewers[i] = { id: $(reviewers[i]).attr("data-id"), count: 0 };
+        activeReviewers[i] = {
+            id: $(reviewers[i]).attr("data-id"),
+            count: 0,
+            name: $(reviewers[i]).text().trim()
+            };
     }
 
     //hide any visible errors
@@ -111,11 +120,17 @@ function buildTeams() {
             var smallestTeamSize = numReviewers + 1;
             var smallestTeamIndex = 0;
             for (var i = 0; i < reviewTeams.length; i++) {
+
+                //make sure that the reviewer isn't already in the team
                 if ($.inArray(reviewer.id, reviewTeams[i].members) == -1) {
-                    if (reviewTeams[i].count <= smallestTeamSize) {
-                        smallestTeamSize = reviewTeams[i].count;
-                        smallestTeamId = reviewTeams[i].id;
-                        smallestTeamIndex = i;
+
+                    //make sure that the reviewer isn't the author
+                    if (reviewTeams[i].author != reviewer.name) {
+                        if (reviewTeams[i].count <= smallestTeamSize) {
+                            smallestTeamSize = reviewTeams[i].count;
+                            smallestTeamId = reviewTeams[i].id;
+                            smallestTeamIndex = i;
+                        }
                     }
                 }
             }
