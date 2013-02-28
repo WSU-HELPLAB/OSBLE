@@ -54,9 +54,20 @@ namespace OSBLE.Controllers
             ViewBag.GradeBookExists = gradeBookExists;
             if (gradeBookExists)
             {
-                SetUpViewBagForGradebook(gradebookName);
-                ViewBag.SelectedTab = gradebookName;
-                ViewBag.TabNames = TabNames;
+                try
+                {
+                    SetUpViewBagForGradebook(gradebookName);
+                    ViewBag.SelectedTab = gradebookName;
+                    ViewBag.TabNames = TabNames;
+                }
+                catch (Exception)
+                {
+                    gradeBookExists = false;
+                    ViewBag.TabNames = new List<string>();
+                    ViewBag.SelectedTab = "";
+                    ViewBag.TableData = new List<List<string>>();
+                    ViewBag.GradeBookExists = false;
+                }
             }
 
 
