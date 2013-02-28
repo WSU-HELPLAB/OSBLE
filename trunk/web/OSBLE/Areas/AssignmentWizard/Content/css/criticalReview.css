@@ -28,6 +28,11 @@
     text-decoration: none;
 }
 
+.noDeliverable
+{
+    background-color:#FFCCCC;
+}
+
 .StudentListItem
 {
     cursor:pointer;
