@@ -16,37 +16,7 @@
     <link href="@Url.Content("~/AssignmentWizard/Content/css/team.css")" type="text/css" rel="Stylesheet" />
     <script src="@Url.Content("~/AssignmentWizard/Content/js/team.js")" type="text/javascript"></script>
 }
-
-<table>
-    <tr>
-        <td>
-            Will students complete this assignment in teams? <br />
-            (All team members will receive the same grade)
-        </td>
-        <td style="padding-left:15px;">
-            @if (Model.HasTeams)
-            {
-                @:Yes<input id="radioYes" name="teamRadio" type="radio" checked="checked"/>
-                @:No <input id="radioNo"  name="teamRadio" type="radio" />
-            }
-            else
-            {
-                @:Yes<input id="radioYes" name="teamRadio" type="radio" />
-                @:No <input id="radioNo"  name="teamRadio" type="radio" checked="checked" />
-            }
-                
-        </td>
-    </tr>
-</table>
-
-@if(Model.HasTeams)
-{
-    @:<div id="teamDiv" >
-}
-else
-{
-    @:<div id="teamDiv" style="display:none;">
-}
+<div id="teamDiv" >
 <p>
     @Html.Raw(ToolTips.BasicAssignmentIsTeam)
 </p> 

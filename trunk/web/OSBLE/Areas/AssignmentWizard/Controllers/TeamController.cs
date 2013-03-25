@@ -156,7 +156,19 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 int assignmentId = Assignment.ID;
                 Int32.TryParse(Request.Form["AutoGenFromPastSelect"].ToString(), out assignmentId);
                 Assignment otherAssignment = db.Assignments.Find(assignmentId);
-                SetUpViewBag(otherAssignment.AssignmentTeams.Cast<IAssignmentTeam>().ToList());
+                List<IAssignmentTeam> otherTeams = null;
+                switch (otherAssignment.Type)
+                {
+                    case AssignmentTypes.DiscussionAssignment:
+                    case AssignmentTypes.CriticalReviewDiscussion:
+                        otherTeams = otherAssignment.DiscussionTeams.Cast<IAssignmentTeam>().ToList();
+                        break;
+
+                    default:
+                        otherTeams = otherAssignment.AssignmentTeams.Cast<IAssignmentTeam>().ToList();
+                        break;
+                }
+                SetUpViewBag(otherTeams);
             }
             else
             {
