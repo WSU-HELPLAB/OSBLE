@@ -87,7 +87,7 @@ namespace OSBLE.Models
 
         [Required]
         [Compare("Identification", ErrorMessage = "The school ID number and confirmation school ID number do not match.")]
-        [Display(Name = "Confirm school ID number")]
+        [Display(Name = "Confirm Student, Faculty, or Staff ID Number")]
         public string ConfirmIdentification { get; set; }
     }
 
