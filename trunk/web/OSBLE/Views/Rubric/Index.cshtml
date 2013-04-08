@@ -339,8 +339,13 @@ function create_and_open_downloading_submission_dialog() {
             <tr>
                 @if (Model.SelectedAssignment.HasDeliverables)
                 {
+                    string downloadText = "Download submission files";
+                    if (Model.SelectedAssignment.Deliverables.First().DeliverableType == DeliverableType.PDF)
+                    {
+                        downloadText = "View and annotate PDF submission";
+                    }
                     <td>
-                        @Html.ActionLink("Download Submission Files", "GetSubmissionZip", "FileHandler", new { assignmentID = Model.SelectedAssignment.ID, teamID = Model.SelectedTeam.TeamID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
+                        @Html.ActionLink(downloadText, "GetSubmissionZip", "FileHandler", new { assignmentID = Model.SelectedAssignment.ID, teamID = Model.SelectedTeam.TeamID }, new { onclick = "create_and_open_downloading_submission_dialog()" })
                     </td>
                 }
                 @if (Model.SelectedAssignment.HasCommentCategories)
