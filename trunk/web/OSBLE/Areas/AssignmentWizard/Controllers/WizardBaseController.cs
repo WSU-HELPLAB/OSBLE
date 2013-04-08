@@ -144,12 +144,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     }
                     else
                     {
-                        ViewBag.Title = string.Format(@"Create New {0} Assignment: {2}", manager.ActiveAssignmentType.Explode(), manager.ActiveComponent.PrettyName);
+                        ViewBag.Title = string.Format(@"Create New {0} Assignment: {1}", manager.ActiveAssignmentType.Explode(), manager.ActiveComponent.PrettyName);
                     }
                 }
                 else
                 {
-                    ViewBag.Title = string.Format(@"Create New {0} Assignment: {2}", manager.ActiveAssignmentType.Explode(), manager.ActiveComponent.PrettyName);
+                    ViewBag.Title = string.Format(@"Create New {0} Assignment: {1}", manager.ActiveAssignmentType.Explode(), manager.ActiveComponent.PrettyName);
                 }
             }
             else
@@ -162,12 +162,12 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                     }
                     else
                     {
-                        ViewBag.Title = string.Format(@"Edit {0} Assignment: {2}", manager.ActiveAssignmentType.Explode(), manager.ActiveComponent.PrettyName);
+                        ViewBag.Title = string.Format(@"Edit {0} Assignment: {1}", manager.ActiveAssignmentType.Explode(), manager.ActiveComponent.PrettyName);
                     }
                 }
                 else
                 {
-                    ViewBag.Title = string.Format(@"Edit {0} Assignment: {2}", manager.ActiveAssignmentType.Explode(), manager.ActiveComponent.PrettyName);
+                    ViewBag.Title = string.Format(@"Edit {0} Assignment: {1}", manager.ActiveAssignmentType.Explode(), manager.ActiveComponent.PrettyName);
                 }
                 ViewBag.IsNewAssignment = false;
             }
