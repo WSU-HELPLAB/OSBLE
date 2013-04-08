@@ -826,6 +826,7 @@
     <Content Include="Views\Rubric\ViewForCriticalReview.cshtml" />
     <Content Include="Views\Gradebook\Index.cshtml" />
     <Content Include="Views\Gradebook\GradebookHelp.cshtml" />
+    <Content Include="Views\Mail\NoCourses.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

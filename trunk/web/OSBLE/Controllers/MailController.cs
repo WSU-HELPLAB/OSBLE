@@ -21,7 +21,7 @@ namespace OSBLE.Controllers
 
         public enum MailSort
         {
-            LatestDate = 1, 
+            LatestDate = 1,
             EarliestDate,
             Context,
             ReverseContext,
@@ -33,7 +33,7 @@ namespace OSBLE.Controllers
 
         public ViewResult Index(MailSort sortBy = MailSort.LatestDate)
         {
-            ViewBag.BoxHeader = "Inbox";   
+            ViewBag.BoxHeader = "Inbox";
             List<Mail> mails = db.Mails.Where(m => m.ToUserProfileID == CurrentUser.ID && m.DeleteFromInbox == false).ToList();
             OrderMailAndSetViewBag(sortBy, ref mails);
             return View(mails);
@@ -99,7 +99,7 @@ namespace OSBLE.Controllers
             }
             return mails;
         }
-        
+
         /// <summary>
         /// View for a specific mail item. 
         /// </summary>
@@ -151,18 +151,18 @@ namespace OSBLE.Controllers
             if (mail.ToUserProfileID == CurrentUser.ID)
             {
                 mailItems = (from m in db.Mails
-                                 where m.ToUserProfileID == CurrentUser.ID &&
-                                 !m.DeleteFromInbox 
-                                 orderby m.ID ascending
-                                 select m).ToList();
+                             where m.ToUserProfileID == CurrentUser.ID &&
+                             !m.DeleteFromInbox
+                             orderby m.ID ascending
+                             select m).ToList();
             }
             else if (mail.FromUserProfileID == CurrentUser.ID)
             {
                 mailItems = (from m in db.Mails
-                                 where m.FromUserProfileID == CurrentUser.ID &&
-                                 !m.DeleteFromOutbox
-                                 orderby m.ID ascending
-                                 select m).ToList();
+                             where m.FromUserProfileID == CurrentUser.ID &&
+                             !m.DeleteFromOutbox
+                             orderby m.ID ascending
+                             select m).ToList();
             }
             else //Mail is not to or from them, should not be viewing it!
             {
@@ -273,12 +273,24 @@ namespace OSBLE.Controllers
             ViewBag.TaIdList = string.Join(",", TaIdList);
             ViewBag.InstructorNameList = string.Join(",", InstructorNameList);
             ViewBag.InstructorIdList = string.Join(",", InstructorIdList);
-            
+
+        }
+
+        public ActionResult NoCourses()
+        {
+            return View();
         }
 
         public ActionResult Create()
         {
-            setUpMailViewBags();
+            try
+            {
+                setUpMailViewBags();
+            }
+            catch (Exception)
+            {
+                return RedirectToAction("NoCourses");
+            }
             return View("Create", new Mail());
         }
 
@@ -574,7 +586,7 @@ namespace OSBLE.Controllers
             int mailId = 0;
             foreach (string key in keys)
             {
-                value= Request.Params[key];
+                value = Request.Params[key];
                 if (value == "on") //Checkbox was checked...delete item
                 {
                     if (int.TryParse(key.Split('_')[1], out mailId) == false) //couldnt get an id, bad apple - continue.
@@ -618,7 +630,7 @@ namespace OSBLE.Controllers
             {
                 mail.DeleteFromInbox = true;
             }
-            
+
             if (mail.DeleteFromInbox == true && mail.DeleteFromOutbox == true)
             {
                 db.Mails.Remove(mail);
