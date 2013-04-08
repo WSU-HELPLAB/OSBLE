@@ -134,12 +134,42 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
             if (manager.IsNewAssignment)
             {
                 ViewBag.IsNewAssignment = true;
-                ViewBag.Title = string.Format("Create New {0} Assignment: {1}", manager.ActiveAssignmentType.Explode(), manager.ActiveComponent.PrettyName);
+
+                //AC Note: clean this up.
+                if (Assignment != null)
+                {
+                    if (string.IsNullOrEmpty(Assignment.AssignmentName) == false)
+                    {
+                        ViewBag.Title = string.Format(@"Create New {0} Assignment ""{1}"": {2}", manager.ActiveAssignmentType.Explode(), Assignment.AssignmentName, manager.ActiveComponent.PrettyName);
+                    }
+                    else
+                    {
+                        ViewBag.Title = string.Format(@"Create New {0} Assignment: {2}", manager.ActiveAssignmentType.Explode(), manager.ActiveComponent.PrettyName);
+                    }
+                }
+                else
+                {
+                    ViewBag.Title = string.Format(@"Create New {0} Assignment: {2}", manager.ActiveAssignmentType.Explode(), manager.ActiveComponent.PrettyName);
+                }
             }
             else
             {
+                if (Assignment != null)
+                {
+                    if (string.IsNullOrEmpty(Assignment.AssignmentName) == false)
+                    {
+                        ViewBag.Title = string.Format(@"Edit {0} Assignment ""{1}"": {2}", manager.ActiveAssignmentType.Explode(), Assignment.AssignmentName, manager.ActiveComponent.PrettyName);
+                    }
+                    else
+                    {
+                        ViewBag.Title = string.Format(@"Edit {0} Assignment: {2}", manager.ActiveAssignmentType.Explode(), manager.ActiveComponent.PrettyName);
+                    }
+                }
+                else
+                {
+                    ViewBag.Title = string.Format(@"Edit {0} Assignment: {2}", manager.ActiveAssignmentType.Explode(), manager.ActiveComponent.PrettyName);
+                }
                 ViewBag.IsNewAssignment = false;
-                ViewBag.Title = string.Format("Edit {0} Assignment: {1}", manager.ActiveAssignmentType.Explode(), manager.ActiveComponent.PrettyName);
             }
         }
 
