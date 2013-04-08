@@ -549,13 +549,16 @@ The current rubric will be replaced with a new one and all progress will be lost
         //animations don't work well in firefox, so just perform the swap with no animation
         if ($.browser.mozilla) {
             $(topRow).insertAfter($(topRow).next());
-            for (var n = 0; i < table.rows[0].cells.length; n++) {
-                var name = $(row.cells[n]).find('.Input').attr('name');
-                var name2 = $(row2.cells[n]).find('.Input').attr('name');
+            var counter = 0;
+            var cellLength = table.rows[0].cells.length;
+            for (counter = 0; counter < cellLength; counter++) {
+                var name = $(topRow.cells[counter]).find('.Input').attr('name');
+                var name2 = $(bottomRow.cells[counter]).find('.Input').attr('name');
 
-                $(bottomRow.cells[n]).find('.Input').attr('name', name);
-                $(topRow.cells[n]).find('.Input').attr('name', name2);
+                $(bottomRow.cells[counter]).find('.Input').attr('name', name);
+                $(topRow.cells[counter]).find('.Input').attr('name', name2);
             }
+            swapped = true;
         }
         else {
             $.each($(topRow).find('td'), function () {
@@ -622,12 +625,14 @@ The current rubric will be replaced with a new one and all progress will be lost
                     //if this is the last td, perform the actual swap
                     if (!swapped) {
                         $(topRow).insertAfter($(topRow).next());
-                        for (var n = 0; i < table.rows[0].cells.length; n++) {
-                            var name = $(row.cells[n]).find('.Input').attr('name');
-                            var name2 = $(row2.cells[n]).find('.Input').attr('name');
+                        var counter = 0;
+                        var cellLength = table.rows[0].cells.length;
+                        for (counter = 0; counter < cellLength; counter++) {
+                            var name = $(topRow.cells[counter]).find('.Input').attr('name');
+                            var name2 = $(bottomRow.cells[counter]).find('.Input').attr('name');
 
-                            $(bottomRow.cells[n]).find('.Input').attr('name', name);
-                            $(topRow.cells[n]).find('.Input').attr('name', name2);
+                            $(bottomRow.cells[counter]).find('.Input').attr('name', name);
+                            $(topRow.cells[counter]).find('.Input').attr('name', name2);
                         }
                         swapped = true;
                     }

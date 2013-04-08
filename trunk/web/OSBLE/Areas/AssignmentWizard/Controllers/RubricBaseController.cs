@@ -374,12 +374,24 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
                 //splitkey = {rubric, X, Y}
                 string[] splitKey = rowstring.Split(':');
 
+                //AC: This regex won't work quite right with rubrics having more than 9 rows.
+                //  example: rubrics:0:1 and rubrics:0:10 will both match the following regular
+                //  expression.  To get around this, I'm doing a secondary loop which checks to
+                //  make sure that we're only grabbing the correct row.
                 Regex r = new Regex(@"rubric:\d+:" + splitKey[2]);
-
-                List<string> rowValues = (from k in keys
-                                          where r.Match(k).Success
-                                          orderby k
-                                          select Request.Params[k]).ToList();
+                List<string> potentialKeys = (from k in keys
+                                              where r.Match(k).Success == true
+                                              select k).ToList();
+                List<string> rowValues = new List<string>();
+                int keyLength = splitKey[2].Length;
+                string endPattern = string.Format(":{0}", splitKey[2]);
+                foreach (string potentialKey in potentialKeys)
+                {
+                    if (potentialKey.EndsWith(endPattern) == true)
+                    {
+                        rowValues.Add(Request.Params[potentialKey]);
+                    }
+                }
 
                 rubricTable.Add(rowValues);
             }
