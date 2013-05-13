@@ -11,7 +11,7 @@ This assignment type depends on a previously created assignment.  Please select 
 <select name="PreviousAssignmentSelect">
     @foreach (Assignment previousAssignment in previousAssignments)
     {
-        if (Model.PrecededingAssignmentID == ViewBag.PrecedingAssignmentID)
+        if (ViewBag.PrecedingAssignmentID == previousAssignment.ID)
         {
             <option selected="selected" value="@previousAssignment.ID">@previousAssignment.AssignmentName</option>
         }
