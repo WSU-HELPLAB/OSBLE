@@ -117,6 +117,10 @@ namespace OSBLE.Controllers
         public int UploadGradebookZip(byte[] zipData, GradebookFilePath gfp)
         {
             int filesFailedToLoadCount = 0;
+
+            //clear existing data
+            gfp.AllFiles().Delete();
+
             MemoryStream ms = new MemoryStream(zipData);
             ms.Position = 0;
             using (ZipFile zip = ZipFile.Read(ms))
