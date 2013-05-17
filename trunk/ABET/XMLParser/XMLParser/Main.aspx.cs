@@ -4,12 +4,10 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Xml;
-using System.Net;
-using System.IO;
-using System.Text.RegularExpressions;
+using HtmlAgilityPack;
 
-namespace XMLParser
+
+namespace EvalApp
 {
     public partial class _Default : System.Web.UI.Page
     {
@@ -18,35 +16,40 @@ namespace XMLParser
 
         }
 
-        protected void Button1_Click(object sender, EventArgs e)
+        protected void BuildCourses(object sender, EventArgs e)
         {
-            string url = Text1.Value;
-          /*  WebRequest request = System.Net.HttpWebRequest.Create(url);
-            WebResponse response = request.GetResponse();
-            StreamReader reader = new StreamReader(response.GetResponseStream());
-            string result = reader.ReadToEnd();
-            reader.Close();
+            //Create new plan
+            EvalApp.Model.EvalPeriod newEvalPlan = new EvalApp.Model.EvalPeriod();
 
-            
-            result = Regex.Replace(result, "<script. *? </script>", "", RegexOptions.Singleline | RegexOptions.IgnoreCase);
-            result = Regex.Replace(result, "<style.*? </style>", "", RegexOptions.Singleline | RegexOptions.IgnoreCase);
-            result = Regex.Replace(result, "</?[a-z][a-z0-9]*[^<>]*>", "");
-            result = Regex.Replace(result, "<!--(.|\\s)*?-->", "");
-            result = Regex.Replace(result, "<!(.|\\s)*?>", "");
-            result = Regex.Replace(result, "[\t\r\n]", " ");
+            //Create new HtmlWeb item
+            HtmlWeb hw = new HtmlWeb();
 
-            Label1.Text = result;
-            */
+            //Create html doc from url provided
+            HtmlDocument doc = hw.Load(webPage_Courses.Value.ToString());
 
-            XmlDocument xdoc = new XmlDocument();//xml doc used for xml parsing
+            //Parse the course titles
+            foreach (HtmlNode course in doc.DocumentNode.SelectNodes("//span[@class='course_header']"))
+            {
+                //Get text
+                EvalApp.Model.Course newCourse = new EvalApp.Model.Course();
+                string courseTitle = course.InnerText;
 
-            xdoc.Load(
-                url
-                );//loading XML in xml doc
+                //Set new course to the text and add to eval plan
+                newCourse.setTitle(courseTitle);
+                newEvalPlan.addCourse(newCourse);
+            }
 
-            XmlNodeList xNodelst = xdoc.DocumentElement.SelectNodes("entry");//reading node so that we can traverse thorugh the XML
+            //Index counter
+            int evalPlanIndex = 0;
 
-      
+            //Parse the course descriptions
+            foreach (HtmlNode courseDiscrip in doc.DocumentNode.SelectNodes("//span[@class='course_data']"))
+            {
+                //Get the descriptions
+                string courseDescrip = courseDiscrip.InnerText;
+                newEvalPlan.editCourse(evalPlanIndex, "descrip", courseDescrip);
+                evalPlanIndex++;
+            }
 
 
         }

@@ -11,9 +11,11 @@
     </style>
 </asp:Content>
 <asp:Content ID="BodyContent" runat="server" ContentPlaceHolderID="MainContent">
-    <input id="Text1" type="text" runat="server" />
+    <input id="CoursePlanTitle" type="text" runat="server" />
     <br />
-    <asp:Button ID="Button1" Text="Go" runat="server" OnClick="Button1_Click" />
+    <input id="webPage_Courses" type="text" runat="server" />
+    <br />
+    <asp:Button ID="Build" Text="Build" runat="server" OnClick="BuildCourses" />
     <br />
     <asp:Label ID="Label1" runat="server" Text=""></asp:Label>
 </asp:Content>

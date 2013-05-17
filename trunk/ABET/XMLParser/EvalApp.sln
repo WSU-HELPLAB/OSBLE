@@ -1,17 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XMLParser", "XMLParser\XMLParser.csproj", "{76337832-1362-426A-9F67-DA9DF4C34AD5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EvalApp", "XMLParser\EvalApp.csproj", "{76337832-1362-426A-9F67-DA9DF4C34AD5}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
 		SccNumberOfProjects = 2
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = XMLParser\\XMLParser.csproj
-		SccProjectName1 = XMLParser
-		SccLocalPath1 = XMLParser
+		SccProjectUniqueName0 = XMLParser\\EvalApp.csproj
+		SccProjectName0 = XMLParser
+		SccLocalPath0 = XMLParser
+		SccLocalPath1 = .
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
