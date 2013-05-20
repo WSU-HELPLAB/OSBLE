@@ -32,7 +32,7 @@ namespace OSBLE.Models.FileSystem
             return AddFile(fileName, ms);
         }
 
-        public bool AddFile(string fileName, Stream data)
+        public virtual bool AddFile(string fileName, Stream data)
         {
             string path = GetPath();
             string filePath = Path.Combine(path, fileName);
@@ -54,7 +54,7 @@ namespace OSBLE.Models.FileSystem
             return retVal;
         }
 
-        public FileCollection AllFiles()
+        public virtual FileCollection AllFiles()
         {
             string path = GetPath();
             FileCollection collection = new FileCollection(path);
@@ -75,7 +75,7 @@ namespace OSBLE.Models.FileSystem
             return File(s => s == name);
         }
 
-        public FileCollection File(Func<string, bool> predicate)
+        public virtual FileCollection File(Func<string, bool> predicate)
         {
             string path = GetPath();
             FileCollection collection = new FileCollection(path);

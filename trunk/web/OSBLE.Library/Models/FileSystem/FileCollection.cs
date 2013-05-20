@@ -10,7 +10,12 @@ namespace OSBLE.Models.FileSystem
 {
     public class FileCollection : IEnumerable<string>, ICollection<string>
     {
-        private List<string> _fileNames = new List<string>();
+        // 5-15-13 E.O.
+        // Changed this from private to protected. If another developer has a 
+        // convincing reason why this shouldn't be done then they need to 
+        // contact me.
+        protected List<string> _fileNames = new List<string>();
+        
         public string Directory { get; private set; }
 
 
@@ -77,8 +82,8 @@ namespace OSBLE.Models.FileSystem
         /// <summary>
         /// Deletes the collection of files from the file system.
         /// </summary>
-        /// <returns></returns>
-        public int Delete()
+        /// <returns>The number of files deleted</returns>
+        public virtual int Delete()
         {
             int removeCounter = 0;
             foreach (string name in _fileNames)
