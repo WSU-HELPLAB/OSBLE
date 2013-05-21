@@ -135,6 +135,12 @@
     <Compile Include="..\OSBLE.Library\Models\Annotate\AnnotateResult.cs">
       <Link>Models\Annotate\AnnotateResult.cs</Link>
     </Compile>
+    <Compile Include="..\OSBLE.Library\Models\Assignments\AbetAssignmentOutcome.cs">
+      <Link>Models\Assignments\AbetAssignmentOutcome.cs</Link>
+    </Compile>
+    <Compile Include="..\OSBLE.Library\Models\Assignments\AbetSubmissionTag.cs">
+      <Link>Models\Assignments\AbetSubmissionTag.cs</Link>
+    </Compile>
     <Compile Include="..\OSBLE.Library\Models\Assignments\Assignment.cs">
       <Link>Models\Assignments\Assignment.cs</Link>
     </Compile>

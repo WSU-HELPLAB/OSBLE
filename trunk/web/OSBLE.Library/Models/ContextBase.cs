@@ -176,6 +176,10 @@ namespace OSBLE.Models
 
         public DbSet<TeamEvaluationSettings> TeamEvaluationSettings { get; set; }
 
+        public DbSet<AbetSubmissionTag> AbetSubmissionLevels { get; set; }
+
+        public DbSet<AbetAssignmentOutcome> AbetSubmissionOutcomes { get; set; }
+
         // Annotate stuff
         public DbSet<AnnotateDocumentReference> AnnotateDocumentReferences { get; set; }
 
