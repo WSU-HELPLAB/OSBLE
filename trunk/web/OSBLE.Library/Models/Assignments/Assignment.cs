@@ -23,6 +23,7 @@ namespace OSBLE.Models.Assignments
             IsDraft = true;
             Type = AssignmentTypes.Basic;
             CriticalReviewPublishDate = null;
+            AbetOutcomes = new List<AbetAssignmentOutcome>();
         }
 
         public Assignment(Assignment other)
