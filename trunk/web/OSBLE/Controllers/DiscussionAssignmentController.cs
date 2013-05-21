@@ -278,7 +278,7 @@ namespace OSBLE.Controllers
         /// <param name="discussionTeamID">The discussion team id for discussion to be viewed. If it is a classwide discussion, then any dt in that assignment can be sent.</param>
         /// <returns></returns>
         [CanGradeCourse]
-        public ActionResult TeacherIndex(int assignmentId, int discussionTeamID, int courseUserId = 0, HighlightValue hightlightValue = HighlightValue.None)
+        public ActionResult TeacherIndex(int assignmentId, int discussionTeamID, int courseUserId = 0, HighlightValue hightlightValue = HighlightValue.None, bool anonymous = false)
         {
             Assignment assignment = db.Assignments.Find(assignmentId);
             if (assignment.CourseID == ActiveCourseUser.AbstractCourseID && ActiveCourseUser.AbstractRole.CanGrade)
@@ -292,7 +292,19 @@ namespace OSBLE.Controllers
                                                  select dt).FirstOrDefault();
 
                 DiscussionViewModel dvm = new DiscussionViewModel(discussionTeam, ActiveCourseUser);
-
+                
+                //anonymize if requested
+                if (anonymous == true)
+                {
+                    foreach (DiscussionPostViewModel vm in dvm.DiscussionPostViewModels)
+                    {
+                        vm.poster.Anonymize = true;
+                        foreach (ReplyViewModel rvm in vm.Replies)
+                        {
+                            rvm.poster.Anonymize = true;
+                        }
+                    }
+                }
 
                 if (hightlightValue == HighlightValue.None || courseUserId <= 0)  //If hightlightValue == None, we want no selections - so setting student to null.
                 {
@@ -339,6 +351,7 @@ namespace OSBLE.Controllers
                 ViewBag.IsFirstPost = false;
                 ViewBag.ActiveCourse = ActiveCourseUser;
                 ViewBag.DiscussionTeamID = discussionTeam.ID;
+                ViewBag.IsAnonymous = anonymous;
                 return View("Index");
             }
             return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentId });
