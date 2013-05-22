@@ -25,6 +25,10 @@
     </FileUpgradeFlags>
     <OldToolsVersion>4.0</OldToolsVersion>
     <UpgradeBackupLocation />
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -223,6 +227,7 @@
     <Compile Include="Areas\AssignmentWizard\Controllers\StudentRubricController.cs" />
     <Compile Include="Areas\AssignmentWizard\ViewModels\RubricSelectionViewModel.cs" />
     <Compile Include="Controllers\GradebookController.cs" />
+    <Compile Include="Controllers\HelpController.cs" />
     <Compile Include="Controllers\PdfCriticalReviewController.cs" />
     <Compile Include="Resources\CsvParser.cs" />
     <Compile Include="Resources\CSVReader\CSVDriver.cs" />
@@ -339,7 +344,53 @@
     <Content Include="Content\images\gradebookexamples\ExclimationExample.png" />
     <Content Include="Content\images\gradebookexamples\PoundExample.png" />
     <Content Include="Content\images\gradebookexamples\RequiredFormatingExample.PNG" />
+    <Content Include="Content\images\help.png" />
     <Content Include="Content\images\helplab_logo.png" />
+    <Content Include="Content\images\help\add_ta_1.png" />
+    <Content Include="Content\images\help\add_ta_2.png" />
+    <Content Include="Content\images\help\add_ta_3.png" />
+    <Content Include="Content\images\help\basic_1.png" />
+    <Content Include="Content\images\help\basic_2.png" />
+    <Content Include="Content\images\help\basic_3.png" />
+    <Content Include="Content\images\help\basic_4.png" />
+    <Content Include="Content\images\help\basic_5.png" />
+    <Content Include="Content\images\help\basic_6.png" />
+    <Content Include="Content\images\help\basic_7.png" />
+    <Content Include="Content\images\help\create_1.png" />
+    <Content Include="Content\images\help\create_2.png" />
+    <Content Include="Content\images\help\create_3.png" />
+    <Content Include="Content\images\help\create_4.png" />
+    <Content Include="Content\images\help\discussion_1.png" />
+    <Content Include="Content\images\help\discussion_2.png" />
+    <Content Include="Content\images\help\discussion_3.png" />
+    <Content Include="Content\images\help\discussion_4.png" />
+    <Content Include="Content\images\help\discussion_5.png" />
+    <Content Include="Content\images\help\discussion_6.png" />
+    <Content Include="Content\images\help\gradebook_1.png" />
+    <Content Include="Content\images\help\gradebook_2.png" />
+    <Content Include="Content\images\help\gradebook_3.png" />
+    <Content Include="Content\images\help\gradebook_4.png" />
+    <Content Include="Content\images\help\gradebook_5.png" />
+    <Content Include="Content\images\help\gradebook_6.png" />
+    <Content Include="Content\images\help\gradebook_7.png" />
+    <Content Include="Content\images\help\review_1.png" />
+    <Content Include="Content\images\help\review_2.png" />
+    <Content Include="Content\images\help\review_3.png" />
+    <Content Include="Content\images\help\review_4.png" />
+    <Content Include="Content\images\help\review_5.png" />
+    <Content Include="Content\images\help\review_6.png" />
+    <Content Include="Content\images\help\roster_1.png" />
+    <Content Include="Content\images\help\roster_2.png" />
+    <Content Include="Content\images\help\roster_3.png" />
+    <Content Include="Content\images\help\roster_4.png" />
+    <Content Include="Content\images\help\selected_course.png" />
+    <Content Include="Content\images\help\uploadfiles_1.png" />
+    <Content Include="Content\images\help\uploadfiles_2.png" />
+    <Content Include="Content\images\help\uploadfiles_3.png" />
+    <Content Include="Content\images\help\uploadfiles_4.png" />
+    <Content Include="Content\images\help\uploadfiles_5.png" />
+    <Content Include="Content\images\help\uploadfiles_6.png" />
+    <Content Include="Content\images\help_top_menu.png" />
     <Content Include="Content\images\light-bulb-pencil.png" />
     <Content Include="Content\images\move_down.png" />
     <Content Include="Content\images\move_up.png" />
@@ -827,6 +878,16 @@
     <Content Include="Views\Gradebook\Index.cshtml" />
     <Content Include="Views\Gradebook\GradebookHelp.cshtml" />
     <Content Include="Views\Mail\NoCourses.cshtml" />
+    <Content Include="Views\Help\Index.cshtml" />
+    <Content Include="Views\Help\CreateCourse.cshtml" />
+    <Content Include="Views\Help\AddingStudents.cshtml" />
+    <Content Include="Views\Help\AddingOthers.cshtml" />
+    <Content Include="Views\Help\CreateBasicAssignment.cshtml" />
+    <Content Include="Views\Help\CreateReviewAssignment.cshtml" />
+    <Content Include="Views\Help\CreateReviewDiscussion.cshtml" />
+    <Content Include="Views\Help\AddWebLinks.cshtml" />
+    <Content Include="Views\Help\Gradebook.cshtml" />
+    <Content Include="Views\Help\FileUploader.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Weight\Index.cshtml" />

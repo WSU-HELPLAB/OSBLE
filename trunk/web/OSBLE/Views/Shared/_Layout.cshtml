@@ -41,6 +41,7 @@
                         }</span>
                         <a href="@Url.Action("Index", "Mail", new { area="" })" title="Mail Messages" class="top_item"><img src="/Content/images/mail.png" alt="Mail" /> (@ViewBag.UnreadMessageCount)</a>
                         <a href="@Url.Action("Profile", "Account", new { area = "" })" title="View Personal Settings" class="top_item"><img src="/Content/images/account.png" alt="Account" /></a>
+                    <a href="@Url.Action("Index", "Help", new { area = "" })" title="Help" class="top_item"><img src="@Url.Content("~/Content/images/help_top_menu.png")" alt="Help" /></a>
                     <a href="@Url.Action("LogOff", "Account", new { area = "" })" title="Log Off" class="top_item"><img src="/Content/images/logoff.png" alt="Logoff" /></a>
                 </div>
             </div>
