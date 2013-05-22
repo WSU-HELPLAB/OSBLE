@@ -54,7 +54,7 @@ namespace OSBLE.Models.Assignments
                     description = "Students may submit one or more deliverables, which the instructor may evaluate with a rubric.";
                     break;
                 case AssignmentTypes.CriticalReview:
-                    description = "The instructor creates teams to review student work submitted in a previous assignments. Students perform reviews by directly annotating student work and/or completing evaluation rubrics. Instructor may optionally (a) evaluate students' reviews using a rubric. and (b) release students' reviews to authors. Critical review assignments require that a basic assignment already exists.";
+                    description = "The instructor creates teams to review student work submitted in a previous assignment. Students perform reviews by directly annotating student work and/or completing evaluation rubrics. Instructor may optionally (a) evaluate students' reviews using a rubric. and (b) release students' reviews to authors. Critical review assignments require that a basic assignment already exists.";
                     break;
                 case AssignmentTypes.DiscussionAssignment:
                     description = "Students are given a discussion prompt, and engage in an online discussion, either as an entire class, or in smaller discussion groups. The instructor can require students to make initial post prior to seeing the posts of others. Instructor can optionally grade students' discussion performance using a rubric.";
