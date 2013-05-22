@@ -1,0 +1,24 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+@model List<Course>
+@using AbetApp.Models
+
+<h2>Courses Added:</h2>
+<ul>
+    @foreach (Course course in Model)
+    {
+        <li>@course.Title
+            <br />@course.PreReq
+        </li>
+    }
+
+</ul>
+
+<h2>Index</h2>
+Enter URL to add courses:
+@using (Html.BeginForm())
+{
+    @Html.TextBox("url")
+    <input type="submit" value="Send" />
+}
