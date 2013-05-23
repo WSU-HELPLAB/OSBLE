@@ -207,6 +207,9 @@
     <Compile Include="..\OSBLE.Library\Models\FileSystem\AssignmentFilePath.cs">
       <Link>Models\FilesSystem\AssignmentFilePath.cs</Link>
     </Compile>
+    <Compile Include="..\OSBLE.Library\Models\FileSystem\CourseDocsFilePath.cs">
+      <Link>Models\FilesSystem\CourseDocsFilePath.cs</Link>
+    </Compile>
     <Compile Include="..\OSBLE.Library\Models\FileSystem\CourseFilePath.cs">
       <Link>Models\FilesSystem\CourseFilePath.cs</Link>
     </Compile>

@@ -80,6 +80,25 @@ namespace OSBLE.Models.FileSystem
         }
 
         /// <summary>
+        /// Returns a stream for each individual file
+        /// </summary>
+        /// <returns></returns>
+        public IDictionary<string, Stream> ToStreams()
+        {
+            Dictionary<string, Stream> streams = new Dictionary<string, Stream>();
+            foreach (string name in _fileNames)
+            {
+                FileStream fs = File.OpenRead(name);
+                MemoryStream ms = new MemoryStream();
+                fs.CopyTo(ms);
+                fs.Close();
+                ms.Position = 0;
+                streams[name] = ms;
+            }
+            return streams;
+        }
+
+        /// <summary>
         /// Deletes the collection of files from the file system.
         /// </summary>
         /// <returns>The number of files deleted</returns>

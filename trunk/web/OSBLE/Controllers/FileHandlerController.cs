@@ -30,21 +30,24 @@ namespace OSBLE.Controllers
 
             if (course != null)
             {
-
-                string rootPath = FileSystem.GetCourseDocumentsPath(courseId);
-
-                //AC: At some point, it might be a good idea to document these hacks
-
-                //assume that commas are used to denote directory hierarchy
-                rootPath += "\\" + filePath.Replace('@', '\\');
+                //build the file path
+                OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
+                string[] pathPieces = filePath.Split('/');
+                IFileSystem fsPath = fs.Course(courseId).CourseDocs();
+                for (int i = 0; i < pathPieces.Length - 1; i++)
+                {
+                    fsPath = fsPath.Directory(pathPieces[i]);
+                }
+                string fullPath = fsPath.File(pathPieces[pathPieces.Length - 1]).FirstOrDefault();
+                string fileName = Path.GetFileName(fullPath);
 
                 //if the file ends in a ".link", then we need to treat it as a web link
-                if (rootPath.Substring(rootPath.LastIndexOf('.') + 1).ToLower().CompareTo("link") == 0)
+                if (Path.GetExtension(fileName).ToLower().CompareTo(".link") == 0)
                 {
                     string url = "";
 
                     //open the file to get at the link stored inside
-                    using (TextReader tr = new StreamReader(rootPath))
+                    using (TextReader tr = new StreamReader(fullPath))
                     {
                         url = tr.ReadLine();
                     }
@@ -55,14 +58,28 @@ namespace OSBLE.Controllers
                 }
                 else
                 {
-                    //else just return the file
-                    if(Path.GetExtension(rootPath).ToLower() == "pdf")
+                    Stream fileStream = null;
+                    try
                     {
-                        return new FileStreamResult(FileSystem.GetDocumentForRead(rootPath), "application/pdf");
+                        fileStream = fsPath.File(pathPieces[pathPieces.Length - 1]).ToStreams().FirstOrDefault().Value;
+                    }
+                    catch (Exception)
+                    {
+                        //file not found
+                    }
+                    if (fileStream == null)
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+
+                    //else just return the file
+                    if (Path.GetExtension(filePath).ToLower() == "pdf")
+                    {
+                        return new FileStreamResult(fileStream, "application/pdf") { FileDownloadName = fileName };
                     }
                     else
                     {
-                        return new FileStreamResult(FileSystem.GetDocumentForRead(rootPath), "application/octet-stream");
+                        return new FileStreamResult(fileStream, "application/octet-stream") { FileDownloadName = fileName };
                     }
                 }
             }
@@ -222,8 +239,8 @@ namespace OSBLE.Controllers
                                                                  .ToZipStream();
             }
 
-            string ZipName = assignment.AssignmentName + " by " +  team.Name + ".zip";
-            return new FileStreamResult(submission , "application/octet-stream") { FileDownloadName = ZipName};
+            string ZipName = assignment.AssignmentName + " by " + team.Name + ".zip";
+            return new FileStreamResult(submission, "application/octet-stream") { FileDownloadName = ZipName };
         }
 
         public ActionResult GetAnnotateDocument(int assignmentID, int authorTeamID, string apiKey)
@@ -278,12 +295,12 @@ namespace OSBLE.Controllers
             Team authorTeam = db.Teams.Find(authorTeamId);
 
             //Getting a list of all the Team Ids for the current user to review. 
-            List<int> AllTeamsToReview = (from rt in CRAssignment.ReviewTeams       
-                                     where rt.ReviewTeamID == CurrentUsersTeam.TeamID
-                                     select rt.AuthorTeamID).ToList();
+            List<int> AllTeamsToReview = (from rt in CRAssignment.ReviewTeams
+                                          where rt.ReviewTeamID == CurrentUsersTeam.TeamID
+                                          select rt.AuthorTeamID).ToList();
 
             //If authorTeamId is not in the list of author teams being reviewed by current user, then permission is denied.
-            if(AllTeamsToReview.Contains(authorTeamId))
+            if (AllTeamsToReview.Contains(authorTeamId))
             {
                 //Send off to Annotate if we have exactly one deliverable and that deliverable is a PDF document
                 if (CRAssignment.PreceedingAssignment.Deliverables.Count == 1 && CRAssignment.PreceedingAssignment.Deliverables[0].DeliverableType == DeliverableType.PDF)
@@ -360,16 +377,16 @@ namespace OSBLE.Controllers
         private bool AnonymizeAuthor(Assignment CRAssignment, Team authorTeam, DiscussionSetting discussionSettings = null)
         {
             //MG:authors are to be anonymous if any of the criteria are met:
-                //From DiscsussionSettings:
-                    //ActiveCurrentUser is a Moderator and Students are anonymous to Moderators. (Could occur when a moderator is downloading files from a CRD)
-                    //ActiveCurrentUser is a Student and Students are anonymous to Students. 
-                //From CriticalReviewSettings:
-                    //AnonymizeAuthor && ActiveCourseUser is not on Author team
+            //From DiscsussionSettings:
+            //ActiveCurrentUser is a Moderator and Students are anonymous to Moderators. (Could occur when a moderator is downloading files from a CRD)
+            //ActiveCurrentUser is a Student and Students are anonymous to Students. 
+            //From CriticalReviewSettings:
+            //AnonymizeAuthor && ActiveCourseUser is not on Author team
 
             bool anonymize = false;
 
             //Instructors and TAs should never have anonymous authors.
-            if(ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor || ActiveCourseUser.AbstractRoleID ==  (int)CourseRole.CourseRoles.TA)
+            if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor || ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
             {
                 return false;
             }
@@ -411,12 +428,12 @@ namespace OSBLE.Controllers
         private bool AnonymizeReviewer(Assignment CRAssignment, Team reviewTeam, DiscussionSetting discussionSettings = null)
         {
             //MG: reviewers are to be anonymous if any of the criteria are met:
-                //From DiscsussionSettings:
-                    //ActiveCurrentUser is a Moderator and Students are anonymous to Moderators. (Could occur when a moderator is downloading files from a CRD)
-                    //ActiveCurrentUser is a Student and Students are anonymous to Students. 
-                //From CriticalReviewSettings:
-                    //AnonymizeCommentsCommentsAfterPublish && Critical Review Assignment is published && AcitveCourseUser is not on Review Team
-                    //Anonymizecomments && Critical REview Assignment is not published && AcitveCourseUser is not on Review Team
+            //From DiscsussionSettings:
+            //ActiveCurrentUser is a Moderator and Students are anonymous to Moderators. (Could occur when a moderator is downloading files from a CRD)
+            //ActiveCurrentUser is a Student and Students are anonymous to Students. 
+            //From CriticalReviewSettings:
+            //AnonymizeCommentsCommentsAfterPublish && Critical Review Assignment is published && AcitveCourseUser is not on Review Team
+            //Anonymizecomments && Critical REview Assignment is not published && AcitveCourseUser is not on Review Team
 
             bool anonymize = false;
 
@@ -458,7 +475,7 @@ namespace OSBLE.Controllers
 
             return anonymize;
         }
-        
+
         /// <summary>
         /// Gets all the reviewed documents that belong to AuthorTeam. This function is used by other FileHandler function
         /// </summary>
@@ -503,7 +520,7 @@ namespace OSBLE.Controllers
 
             //Potentially multiple review teams are merged onto 1 team for the Critical Review Discussion
             //so each Review Teams documents must be within the Critical Review Discussion Documents.
-            foreach (AssignmentTeam reviewTeam in reviewingTeams) 
+            foreach (AssignmentTeam reviewTeam in reviewingTeams)
             {
                 //Get Reviews for AutuhorTeam from ReviewTeam.
                 OSBLE.Models.FileSystem.FileSystem fs = new Models.FileSystem.FileSystem();
@@ -511,7 +528,7 @@ namespace OSBLE.Controllers
                                                                 .Assignment(CRAssignment)
                                                                 .Review(authorTeam.ID, reviewTeam.TeamID)
                                                                 .GetPath();
-                
+
 
                 //Directory might not exist, check to avoid runtime error.
                 if (new DirectoryInfo(reviewTeamSubmissionPath).Exists)
@@ -519,7 +536,7 @@ namespace OSBLE.Controllers
 
                     //Checking anonmous settings to determine name of folder
                     string reviewerDisplayName = reviewTeam.Team.Name;
-                    if(AnonymizeReviewer(CRAssignment, reviewTeam.Team, discussionSetting))
+                    if (AnonymizeReviewer(CRAssignment, reviewTeam.Team, discussionSetting))
                     {
                         //Change displayName if Reviewer is to be anonymized
                         reviewerDisplayName = "Anonymous " + reviewTeam.Team.ID;

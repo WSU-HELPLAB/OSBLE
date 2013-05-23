@@ -609,9 +609,11 @@ namespace OSBLE
             int courseId = Convert.ToInt32(rawPieces[3]);
             string[] docPath = new string[rawPieces.Length - 5];
             Array.Copy(rawPieces, 5, docPath, 0, rawPieces.Length - 5);
+            string path = string.Join("/", docPath);
+            path =  HttpUtility.UrlEncode(path);
 
             //finally, we can build a web-accessible url
-            string url = String.Format("/FileHandler/CourseDocument/{0}/{1}", courseId, string.Join("@", docPath));
+            string url = String.Format("/FileHandler/CourseDocument?courseId={0}&filePath={1}", courseId, path);
             return url;
         }
 

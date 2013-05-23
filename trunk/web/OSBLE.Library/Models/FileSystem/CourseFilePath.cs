@@ -37,6 +37,12 @@ namespace OSBLE.Models.FileSystem
             return gfp;
         }
 
+        public CourseDocsFilePath CourseDocs()
+        {
+            CourseDocsFilePath cfp = new CourseDocsFilePath(this);
+            return cfp;
+        }
+
         public override string GetPath()
         {
             string returnPath = Path.Combine(PathBuilder.GetPath(), _coursePathPrefix, _courseID.ToString());
