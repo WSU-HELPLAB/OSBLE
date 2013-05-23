@@ -8,8 +8,8 @@
 <ul>
     @foreach (Course course in Model)
     {
-        <li>@course.Title
-            <br />@course.PreReq
+        <li><b>@course.Title</b>
+            <br />@course.PreReq.ToString();
         </li>
     }
 

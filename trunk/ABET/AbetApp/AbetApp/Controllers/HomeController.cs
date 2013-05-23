@@ -18,7 +18,7 @@ namespace AbetApp.Controllers
             List<Course> courses = new List<Course>();
             using (LocalContext db = new LocalContext())
             {
-                courses = (from u in db.Courses select u).ToList();
+                 courses = (from u in db.Courses select u).ToList();
             }
             return View(courses);
         }
@@ -55,7 +55,8 @@ namespace AbetApp.Controllers
                 {
                     //Get the descriptions
                     string courseDescrip = courseDiscrip.InnerText;
-                    courseList[evalPlanIndex].PreReq = courseDescrip;
+                    courseList[evalPlanIndex].Description = courseDescrip;
+                    courseList[evalPlanIndex].ParsePreReq();
                     evalPlanIndex++;
                 }
 
@@ -63,6 +64,7 @@ namespace AbetApp.Controllers
                 {
                     foreach (Course course in courseList)
                     {
+                        
                         db.Courses.Add(course);
                     }
                     db.SaveChanges();
@@ -80,10 +82,20 @@ namespace AbetApp.Controllers
             return View();
         }
 
-        public ActionResult Course()
+        public ActionResult CoursesRemove()
         {
-            return View();
-        }
+            List<Course> courses = new List<Course>();
+            using (LocalContext db = new LocalContext())
+            {
+                courses = (from u in db.Courses select u).ToList();
+                foreach (Course course in courses)
+                {
+                    db.Courses.Remove(course);
+                }
+                db.SaveChanges();
+            }
 
+            return RedirectToAction("Index");
+        }
     }
 }
