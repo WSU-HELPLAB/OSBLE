@@ -48,6 +48,7 @@
 @Html.ValidationSummary(true, "Login was unsuccessful. Please correct the errors and try again.")
 
 @using (Html.BeginForm()) {
+    <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
     <div>
             <div class="editor-label">
                 @Html.LabelFor(m => m.UserName, "Email Address")

@@ -40,7 +40,7 @@ namespace OSBLE.Controllers
         //
         // GET: /Account/LogOn
 
-        public ActionResult LogOn()
+        public ActionResult LogOn(string returnUrl = "")
         {
             setLogOnCaptcha();
             Assembly asm = Assembly.GetExecutingAssembly();
@@ -49,6 +49,7 @@ namespace OSBLE.Controllers
                 AssemblyName assemblyName = new AssemblyName(asm.FullName);
                 ViewBag.VersionNumber = assemblyName.Version.ToString();
             }
+            ViewBag.ReturnUrl = returnUrl;
             return View();
         }
 
@@ -76,8 +77,7 @@ namespace OSBLE.Controllers
                             OsbleAuthentication.LogIn(localUser);
 
                             //..then send them on their way
-                            if (Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
-                            && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
+                            if (string.IsNullOrEmpty(returnUrl) == false)
                             {
                                 return Redirect(returnUrl);
                             }

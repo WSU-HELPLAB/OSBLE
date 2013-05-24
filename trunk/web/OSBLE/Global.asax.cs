@@ -46,6 +46,15 @@ namespace OSBLE
 #endif
 
             routes.MapRoute(
+                "User identities",
+                "user/{id}/{action}",
+                new { controller = "User", action = "Identity", id = string.Empty, anon = false });
+            routes.MapRoute(
+                "PPID identifiers",
+                "anon",
+                new { controller = "User", action = "Identity", id = string.Empty, anon = true });
+
+            routes.MapRoute(
                 "FileHandler-Course",
                 "FileHandler/CourseDocument/{courseId}/{filePath}",
                 new { controller = "FileHandler", action = "CourseDocument" }
