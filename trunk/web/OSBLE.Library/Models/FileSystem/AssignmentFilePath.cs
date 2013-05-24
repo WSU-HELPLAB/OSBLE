@@ -46,5 +46,19 @@ namespace OSBLE.Models.FileSystem
             string returnPath = Path.Combine(PathBuilder.GetPath(), _assignmentPathPrefix, _assignmentId.ToString());
             return returnPath;
         }
+
+        /// <summary>
+        /// E.O.
+        /// Gets the path for attributable files for this assignment. These can be things 
+        /// like files for detailed descriptions of the assignment requirements, files 
+        /// for assignment solutions, and so on.
+        /// </summary>
+        public AttributableFilesFilePath AttributableFiles
+        {
+            get
+            {
+                return new AttributableFilesFilePath(this);
+            }
+        }
     }
 }

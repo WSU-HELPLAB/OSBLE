@@ -16,12 +16,16 @@ using OSBLE.Models.Users;
  *                        /                     \  
  *                    Courses                  Users                                 
  *                     /                          \                                 
- *                [courseID]                    [userId]
- *               /     |  \ \_________               \
- *              /      |   \          \             {global user content}
- *     CourseDocs      |    ZipFolder  \ 
- *          |    Assignments     \      Gradebook
- *          |          |          \         |
+ *                     |                        [userId]
+ *                     |                           |
+ *                     |                    {global user content}
+ *                     |
+ *                [courseID]____________________________                    
+ *               /     |  \ \_________                  \
+ *              /      |   \          \                AttributableFiles
+ *     CourseDocs      |    ZipFolder  \                 /     \
+ *          |    Assignments     \      Gradebook      data    attr
+ *          |          |          \         |            
  *  {course docs}      |           \     {gradebook.zip / gradebook file}
  *                     |  Records.txt { %random number%.zip}
  *                     |
@@ -37,6 +41,18 @@ using OSBLE.Models.Users;
  *       {team submissions}      {critical reviews}
  *                                     
  * */
+
+// Added May 15, 2013 by Evan Olds
+// Description of contents in the "AttributableFiles" folder for a course:
+// This is a collection of files and accompanying attribute files. The idea is 
+// that this is just a collection of files with attributes. The attributes can then 
+// determine what the files will be used for, who can access them, etc.
+// It is intended for files to be put here only by instructor uploads (although there 
+// may be other priviledged roles that can upload here in the future).
+// data folder: the actual uploaded files go here
+// attr folder: XML attribute files go here, corresponding to the data files
+//  - The attribute files contain a list of system and user attributes.
+// See file: AttributableFilesFilePath.cs
 namespace OSBLE.Models.FileSystem
 {
     public class FileSystem : FileSystemBase

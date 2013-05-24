@@ -49,6 +49,8 @@
 
 <div id="dashboard_right">
 <h3>Files &amp; Links 
+<!-- Commenting out the Silverlight uploader for now. Hoping to do away with it entirely if possible. -->
+<!--
 @{if (ViewBag.CanEditCourseLinks)
   {
       <span id="file_upload_silverlight_span">
@@ -57,10 +59,22 @@
       </span>
   }
 }
+-->
 </h3>
 <div id="course_links">
 @Html.Partial("_CourseLinks")
 </div>
+
+@{
+    if (ViewBag.CanEditCourseLinks)
+    {
+        <!-- File uploader -->
+        <h3>Upload Files:</h3>
+        <div style="border: 1px solid #074974; background: linear-gradient( to bottom, white, #f0f0f0 50%, white);">
+            <script src="../../Scripts/CourseFilesUploader.js"></script>
+        </div>
+    }
+}
 
 </div>
 

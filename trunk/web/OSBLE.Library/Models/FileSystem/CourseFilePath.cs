@@ -48,5 +48,31 @@ namespace OSBLE.Models.FileSystem
             string returnPath = Path.Combine(PathBuilder.GetPath(), _coursePathPrefix, _courseID.ToString());
             return returnPath;
         }
+
+        /// <summary>
+        /// E.O.
+        /// Gets the path for attributable files for this course.
+        /// </summary>
+        public AttributableFilesFilePath AttributableFiles
+        {
+            get
+            {
+                return new AttributableFilesFilePath(this);
+            }
+        }
+
+        /// <summary>
+        /// E.O. - (don't know why this wasn't already here)
+        /// Gets the file system for the "course documents" for this course. As of 
+        /// now these are files that appear on the homepage and are accessible for 
+        /// all students in the course as well as the teacher.
+        /// </summary>
+        public FileSystemBase CourseDocs
+        {
+            get
+            {
+                return new FileSystem(Path.Combine(GetPath(), "CourseDocs"));
+            }
+        }
     }
 }
