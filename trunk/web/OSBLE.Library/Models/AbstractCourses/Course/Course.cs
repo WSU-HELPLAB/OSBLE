@@ -103,8 +103,8 @@ namespace OSBLE.Models.Courses
             HoursLatePerPercentPenalty = 24;
             HoursLateUntilZero = 48;
 
-            StartDate = DateTime.Now.Date;
-            EndDate = DateTime.Now.Date.AddDays(112); // Add 16 weeks.
+            StartDate = DateTime.UtcNow.Date;
+            EndDate = DateTime.UtcNow.Date.AddDays(112); // Add 16 weeks.
         }
 
         /// <summary>

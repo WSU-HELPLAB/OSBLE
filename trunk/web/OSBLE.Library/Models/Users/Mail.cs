@@ -47,7 +47,7 @@ namespace OSBLE.Models.Users
         public Mail()
             : base()
         {
-            Posted = DateTime.Now;
+            Posted = DateTime.UtcNow;
         }
 
 

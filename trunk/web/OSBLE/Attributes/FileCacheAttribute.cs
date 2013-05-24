@@ -28,9 +28,9 @@ namespace OSBLE.Attributes
             var request = filterContext.RequestContext.HttpContext.Request;
             var response = filterContext.RequestContext.HttpContext.Response;
             if (request.Headers["If-Modified-Since"] != null &&
-                TimeSpan.FromTicks(DateTime.Now.Ticks - DateTime.Parse(request.Headers["If-Modified-Since"]).Ticks).Seconds < Duration)
+                TimeSpan.FromTicks(DateTime.UtcNow.Ticks - DateTime.Parse(request.Headers["If-Modified-Since"]).Ticks).Seconds < Duration)
             {
-                response.Write(DateTime.Now);
+                response.Write(DateTime.UtcNow);
                 response.StatusCode = 304;
                 response.Headers.Add("Content-Encoding", "gzip");
                 response.StatusDescription = "Not Modified";

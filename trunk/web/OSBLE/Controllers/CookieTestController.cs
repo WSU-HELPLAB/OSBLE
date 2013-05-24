@@ -22,7 +22,7 @@ namespace OSBLE.Controllers
             HttpCookie cookie = new HttpCookie("CookieTest");
             cookie.Values["Name"] = model.Name;
             Session["CookieTestName"] = model.Name;
-            cookie.Expires = DateTime.Now.AddDays(300);
+            cookie.Expires = DateTime.UtcNow.AddDays(300);
             Response.Cookies.Set(cookie);
             return View(model);
         }
@@ -52,7 +52,7 @@ namespace OSBLE.Controllers
             {
                 Name = "";
                 SessionValue = "";
-                Time = DateTime.Now.ToLongTimeString();
+                Time = DateTime.UtcNow.ToLongTimeString();
             }
         }
     }

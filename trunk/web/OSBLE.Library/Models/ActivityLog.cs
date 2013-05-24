@@ -35,7 +35,7 @@ namespace OSBLE.Models
 
         public ActivityLog()
         {
-            Timestamp = DateTime.Now;
+            Timestamp = DateTime.UtcNow;
         }
     }
 }

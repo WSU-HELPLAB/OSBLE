@@ -18,7 +18,7 @@ namespace OSBLE.Areas.AssignmentDetails.Controllers
 
             //If the assignment does not exist, or the assignment has not been released and the user is a student: kick them out
             if (assignment == null 
-                || (assignment.ReleaseDate > DateTime.Now && ActiveCourseUser.AbstractRoleID == (int)OSBLE.Models.Courses.CourseRole.CourseRoles.Student))
+                || (assignment.ReleaseDate > DateTime.UtcNow && ActiveCourseUser.AbstractRoleID == (int)OSBLE.Models.Courses.CourseRole.CourseRoles.Student))
             {
                 return RedirectToRoute(new { action = "Index", controller = "Assignment", area = "" });
             }

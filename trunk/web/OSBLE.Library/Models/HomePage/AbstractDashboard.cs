@@ -65,7 +65,7 @@ namespace OSBLE.Models.HomePage
         public AbstractDashboard()
             : base()
         {
-            Posted = DateTime.Now;
+            Posted = DateTime.UtcNow;
 
             CanMail = false;
             CanDelete = false;

@@ -193,21 +193,21 @@ namespace OSBLE.Controllers
 
             //Seperate all assignments for organizing into one list
             List<Assignment> Past = (from a in Assignments
-                                     where a.DueDate < DateTime.Now &&
+                                     where a.DueDate < DateTime.UtcNow &&
                                      !a.IsDraft
                                      orderby a.DueDate
                                      select a).ToList();
 
             List<Assignment> Present = (from a in Assignments
-                                        where a.ReleaseDate < DateTime.Now &&
-                                        a.DueDate > DateTime.Now &&
+                                        where a.ReleaseDate < DateTime.UtcNow &&
+                                        a.DueDate > DateTime.UtcNow &&
                                         !a.IsDraft
                                         orderby a.DueDate
                                         select a).ToList();
 
             List<Assignment> Future = (from a in Assignments
-                                       where a.DueDate >= DateTime.Now &&
-                                       a.ReleaseDate >= DateTime.Now &&
+                                       where a.DueDate >= DateTime.UtcNow &&
+                                       a.ReleaseDate >= DateTime.UtcNow &&
                                        !a.IsDraft
                                        orderby a.DueDate
                                        select a).ToList();
@@ -231,7 +231,7 @@ namespace OSBLE.Controllers
 
 
             ViewBag.Assignments = AllAssignments;
-            ViewBag.CurrentDate = DateTime.Now;
+            ViewBag.CurrentDate = DateTime.UtcNow;
             ViewBag.Submitted = false;
             return View("Index");
         }
@@ -551,7 +551,7 @@ namespace OSBLE.Controllers
         public ActionResult PublishAllCriticalReviews(int assignmentID)
         {
             Assignment assignment = db.Assignments.Find(assignmentID);
-            assignment.CriticalReviewPublishDate = DateTime.Now;
+            assignment.CriticalReviewPublishDate = DateTime.UtcNow;
             db.SaveChanges();
             return RedirectToAction("Index", "Home", new { area = "AssignmentDetails", assignmentId = assignmentID });
         }

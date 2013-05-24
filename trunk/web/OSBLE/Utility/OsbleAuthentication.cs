@@ -149,7 +149,7 @@ namespace OSBLE.Utility
             cookie.Values[userNameKey] = Encrypt(profile.UserName);
 
             //set a really long expiration date
-            cookie.Expires = DateTime.Now.AddDays(300);
+            cookie.Expires = DateTime.UtcNow.AddDays(300);
 
             //and then store it in the next response
             if (HttpContext.Current != null)
@@ -204,7 +204,7 @@ namespace OSBLE.Utility
                 try
                 {
                     HttpCookie cookie = HttpContext.Current.Request.Cookies.Get(ProfileCookieKey);
-                    cookie.Expires = DateTime.Now.AddDays(-1d);
+                    cookie.Expires = DateTime.UtcNow.AddDays(-1d);
                     HttpContext.Current.Response.Cookies.Set(cookie);
                 }
                 catch (Exception ex)

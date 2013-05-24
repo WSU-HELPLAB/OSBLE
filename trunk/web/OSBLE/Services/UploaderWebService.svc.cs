@@ -48,7 +48,7 @@ namespace OSBLE.Services
             //update the current key
             if (activeSessions.Keys.Contains(authToken))
             {
-                activeSessions[authToken].LastAccessTime = DateTime.Now;
+                activeSessions[authToken].LastAccessTime = DateTime.UtcNow;
             }
 
             //call the normal clean function
@@ -61,7 +61,7 @@ namespace OSBLE.Services
         private void CleanActiveSessions()
         {
             //set an expiration time of 15 minutes ago
-            DateTime expirationDate = DateTime.Now.AddMinutes(sessionTimeoutInMinutes);
+            DateTime expirationDate = DateTime.UtcNow.AddMinutes(sessionTimeoutInMinutes);
             List<string> expiredKeys = new List<string>();
             foreach (string key in activeSessions.Keys)
             {
@@ -307,7 +307,7 @@ namespace OSBLE.Services
             if (activeSessions.Keys.Contains(authToken))
             {
                 //if the key exists, might as well update it as well
-                activeSessions[authToken].LastAccessTime = DateTime.Now;
+                activeSessions[authToken].LastAccessTime = DateTime.UtcNow;
                 return true;
             }
             else
@@ -368,7 +368,7 @@ namespace OSBLE.Services
             //use the data provided to create a new dashboard post
             DashboardPost newDp = new DashboardPost();
             newDp.Content = message;
-            newDp.Posted = DateTime.Now;
+            newDp.Posted = DateTime.UtcNow;
             newDp.CourseUser = courseUser;
 
             //add & save
@@ -484,7 +484,7 @@ namespace OSBLE.Services
 
                 //build our string to hash
                 string email = profile.UserName;
-                string date = DateTime.Now.ToLongTimeString();
+                string date = DateTime.UtcNow.ToLongTimeString();
                 string hashString = email + date;
 
                 //compute the hash

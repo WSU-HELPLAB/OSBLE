@@ -87,7 +87,7 @@ namespace OSBLE.Models.HomePage
         public Event()
             : base()
         {
-            StartDate = DateTime.Now.Date;
+            StartDate = DateTime.UtcNow.Date;
 
             NoDateTime = false;
 

@@ -65,7 +65,7 @@ namespace OSBLE.Areas.AssignmentDetails.Models.TableBuilder
                         reviewers = reviewers.Union(ReviewTeams.Where(rt => rt.CourseUser.ID == cu.ID)).ToList();
 
                         //AC: stuff that was here before
-                        timeStamp.Add(DateTime.Now);
+                        timeStamp.Add(DateTime.UtcNow);
                         addedTimeStamp = true;
                         break;
                     }

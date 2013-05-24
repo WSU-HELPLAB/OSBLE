@@ -261,7 +261,7 @@ namespace OSBLE.Controllers
             //    {
             //        Notification n = new Notification();
             //        n.ItemType = Notification.Types.FileSubmitted;
-            //        n.Data = assignment.ID.ToString() + ";" + team.TeamID.ToString() + ";" + assignment.AssignmentName + ";" + team.Team.Name + ";" + fileName + ";" + DateTime.Now;
+            //        n.Data = assignment.ID.ToString() + ";" + team.TeamID.ToString() + ";" + assignment.AssignmentName + ";" + team.Team.Name + ";" + fileName + ";" + DateTime.UtcNow;
             //        n.RecipientID = user.ID;
             //        n.SenderID = activeCourse.ID;
             //        addNotification(n);

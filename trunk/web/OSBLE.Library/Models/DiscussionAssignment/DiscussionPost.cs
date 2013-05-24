@@ -49,7 +49,7 @@ namespace OSBLE.Models.DiscussionAssignment
             : base()
         {
             ParentPostID = null;
-            Posted = DateTime.Now;
+            Posted = DateTime.UtcNow;
         }
 
         public void BuildRelationship(System.Data.Entity.DbModelBuilder modelBuilder)

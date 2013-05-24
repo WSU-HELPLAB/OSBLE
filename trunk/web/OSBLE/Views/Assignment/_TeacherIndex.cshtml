@@ -98,7 +98,14 @@
                     @Html.ActionLink(assignments[i].AssignmentName, "Index", "Home", new { area = "AssignmentDetails", assignmentId = assignments[i].ID }, null)
                 </td>
                 <td > <!--Cell for DueDate-->
-                    @assignments[i].DueDate.ToShortDateString() @assignments[i].DueTime.ToShortTimeString()
+                <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(assignments[i].DueDate)" 
+                data-original-date="@Helpers.RawDate(assignments[i].DueDate)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                    @assignments[i].DueDate.ToShortDateString() @assignments[i].DueDate.ToShortTimeString() (UTC)
+                </time>
+                    
                 </td>
 
                 <!--Cell for Student Activity-->

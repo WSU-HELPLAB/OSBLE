@@ -237,6 +237,7 @@
     <Compile Include="Resources\CSVReader\EndState.cs" />
     <Compile Include="Resources\CSVReader\QuoteState.cs" />
     <Compile Include="Resources\CSVReader\SecondQuoteState.cs" />
+    <Compile Include="Resources\DateTimeExtensions.cs" />
     <Compile Include="Resources\DynamicDictionary.cs" />
     <Compile Include="Areas\AssignmentWizard\AssignmentWizardAreaRegistration.cs" />
     <Compile Include="Areas\AssignmentWizard\Controllers\CommentCategoryController.cs" />
@@ -329,6 +330,7 @@
     <Content Include="Areas\AssignmentWizard\Content\js\criticalReview.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\deliverables.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\team.js" />
+    <Content Include="Areas\AssignmentWizard\Content\js\basics.js" />
     <Content Include="Areas\AssignmentWizard\Modifications.txt" />
     <Content Include="clientaccesspolicy.xml">
       <SubType>Designer</SubType>
@@ -565,6 +567,7 @@
     <Content Include="Scripts\jquery-ui-1.8.20.js" />
     <Content Include="Scripts\jquery-ui-1.8.20.min.js" />
     <Content Include="Areas\AssignmentWizard\Content\js\jquery.path.js" />
+    <Content Include="Scripts\moment.min.js" />
     <Content Include="Scripts\time.js" />
     <Content Include="crossdomain.xml" />
     <Content Include="EditPeerReviewTestPage.aspx" />

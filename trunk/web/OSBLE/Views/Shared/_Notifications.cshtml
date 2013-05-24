@@ -15,7 +15,13 @@
             classToAppend = "read";
         }
         <li class="notification @classToAppend" id="notification_@(n.ID)" >
-            <small>@n.Posted.ToShortDateString() @n.Posted.ToShortTimeString()</small>&nbsp;
+            <time class="utc-time"
+                style="font-size:small;"
+                datetime="@Helpers.DateAsUnixTime(n.Posted)" 
+                data-original-date="@Helpers.RawDate(n.Posted)" 
+                data-date-format="MM/DD/YYYY hh:mm A"
+                >
+                @n.Posted.ToShortDateString() @n.Posted.ToShortTimeString() (UTC)</time>&nbsp;
             
             @if (ViewBag.ShowNotificationDelete == true)
             {

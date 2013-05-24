@@ -102,7 +102,7 @@ namespace OSBLE.Services
 
                 //build our string to hash
                 string email = profile.UserName;
-                string date = DateTime.Now.ToLongTimeString();
+                string date = DateTime.UtcNow.ToLongTimeString();
                 string hashString = email + date;
 
                 //compute the hash

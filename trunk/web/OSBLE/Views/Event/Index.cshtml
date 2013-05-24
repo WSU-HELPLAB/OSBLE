@@ -21,7 +21,7 @@
 </p>
 
 @{
-    DateTime today = DateTime.Now.Date;
+    DateTime today = DateTime.UtcNow.Date;
 
     // First get events before today
     List<Event> pastEvents = Model.Where(e => e.StartDate < today).ToList();

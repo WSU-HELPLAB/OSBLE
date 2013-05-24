@@ -91,7 +91,7 @@ namespace OSBLE.Models.Assignments
         public DiscussionSetting()
         {
             AnonymitySettings = 0;
-            InitialPostDueDate = DateTime.Now;
+            InitialPostDueDate = DateTime.UtcNow;
             MinimumFirstPostLength = 0;
         }
 

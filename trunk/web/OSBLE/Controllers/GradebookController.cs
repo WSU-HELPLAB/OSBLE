@@ -94,7 +94,7 @@ namespace OSBLE.Controllers
 
             if (gradeBookExists)
             {
-                ViewBag.LastUploadMessage = "Last updated " + lastUpload.ToShortDateString().ToString() + " " + lastUpload.ToShortTimeString().ToString();
+                ViewBag.LastUploadMessage = "Last updated " + lastUpload.ToShortDateString().ToString() + " " + lastUpload.ToShortTimeString().ToString() + "(UTC)";
             }
             else if (ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.Instructor || ActiveCourseUser.AbstractRoleID == (int)CourseRole.CourseRoles.TA)
             {

@@ -214,7 +214,7 @@ namespace OSBLE
                                 dt = dt.AddDays(7);
 
                                 //if the file is more than 7 days old remove the file
-                                if (dt < DateTime.Now)
+                                if (dt < DateTime.UtcNow)
                                 {
                                     FileInfo zipFile = new FileInfo(getZipFolderLocation(course) + "\\" + lineSections[1]);
                                     zipFile.Delete();
@@ -439,7 +439,7 @@ namespace OSBLE
 
             zipFile.Save(zipFileName);
 
-            AddEntryToZipRecords(course, zipFileName, getRealFileZipName(assignment, team), DateTime.Now);
+            AddEntryToZipRecords(course, zipFileName, getRealFileZipName(assignment, team), DateTime.UtcNow);
 
             return true;
         }

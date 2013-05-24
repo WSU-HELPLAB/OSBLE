@@ -168,7 +168,7 @@ namespace OSBLE.Controllers
             // Set start and end dates of event viewing to current viewing settings for the course
             int eventDays = 7 * ActiveCourseUser.AbstractCourse.CalendarWindowOfTime;
 
-            DateTime today = DateTime.Now.Date;
+            DateTime today = DateTime.UtcNow.Date;
             DateTime upto = today.AddDays(eventDays);
 
             using (EventController ec = new EventController())
@@ -396,7 +396,7 @@ namespace OSBLE.Controllers
         public ActionResult NewPost(DashboardPost dp)
         {
             dp.CourseUser = ActiveCourseUser;
-            dp.Posted = DateTime.Now;
+            dp.Posted = DateTime.UtcNow;
 
             List<CourseUser> CoursesToPost = new List<CourseUser>();
 
@@ -503,7 +503,7 @@ namespace OSBLE.Controllers
             if (ModelState.IsValid)
             {
                 dr.CourseUser = ActiveCourseUser;
-                dr.Posted = DateTime.Now;
+                dr.Posted = DateTime.UtcNow;
 
                 int replyTo = 0;
                 if (Request.Form["reply_to"] != null)

@@ -41,7 +41,14 @@
                                                  {<text>inbox_unread</text>}">
                 <td><input id="@item.ID" class="mailCheckBoxClass" name="mailItem_@(item.ID)" type="checkbox" /></td>
                 <td class="inbox_time">
-                    <small>@item.Posted.ToShortDateString() @item.Posted.ToShortTimeString()</small>
+                <time 
+                class="utc-time"
+                style="font-size:small;"
+                datetime="@Helpers.DateAsUnixTime(item.Posted)" 
+                data-original-date="@Helpers.RawDate(item.Posted)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                    @item.Posted.ToShortDateString() @item.Posted.ToShortTimeString() (UTC)
+                </time>
                 </td>
                 <td class="inbox_context">
                     @if (item.Context != null)

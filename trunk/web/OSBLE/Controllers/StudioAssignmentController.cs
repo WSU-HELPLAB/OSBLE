@@ -41,25 +41,25 @@ namespace OSBLE.Controllers
 
             activities.Add(new SerializableActivity()
             {
-                DateTime = DateTime.Now,
+                DateTime = DateTime.UtcNow,
                 ActivityType = ActivityTypes.Submission
             });
 
             activities.Add(new SerializableActivity()
             {
-                DateTime = DateTime.Now.AddDays(3).AddHours(3),
+                DateTime = DateTime.UtcNow.AddDays(3).AddHours(3),
                 ActivityType = ActivityTypes.Rebuttal
             });
 
             activities.Add(new SerializableActivity()
             {
-                DateTime = DateTime.Now.AddDays(7),
+                DateTime = DateTime.UtcNow.AddDays(7),
                 ActivityType = ActivityTypes.PeerReview
             });
 
             activities.Add(new SerializableActivity()
             {
-                DateTime = DateTime.Now.AddDays(11),
+                DateTime = DateTime.UtcNow.AddDays(11),
                 ActivityType = ActivityTypes.Stop
             });
 

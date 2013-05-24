@@ -205,7 +205,7 @@ namespace OSBLE.Services
             //    the due date.
             // c: the instructor has clicked the "Publish All Reviews" link on the 
             //    assignment details page. (turned off for now)
-            if (criticalReviewAssignment.DueDate > DateTime.Now
+            if (criticalReviewAssignment.DueDate > DateTime.UtcNow
                 || 
                 (criticalReviewAssignment.CriticalReviewSettings != null && criticalReviewAssignment.CriticalReviewSettings.AllowDownloadAfterPublish == false)
                 //&& criticalReviewAssignment.CriticalReviewPublishDate != null

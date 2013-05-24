@@ -76,13 +76,24 @@ namespace OSBLE.Areas.AssignmentWizard.Controllers
         [HttpPost]
         public ActionResult Index(Assignment model)
         {
-            
             Assignment = model;
             if (ModelState.IsValid)
             {
                 WasUpdateSuccessful = true;
 
                 Assignment.CourseID = ActiveCourseUser.AbstractCourseID;
+
+                //account for local client time, reset to UTC
+                int utcOffset = 0;
+                try
+                {
+                    Int32.TryParse(Request.Form["utc-offset"].ToString(), out utcOffset);
+                }
+                catch (Exception)
+                {
+                }
+                Assignment.ReleaseDate = Assignment.ReleaseDate.AddMinutes(utcOffset);
+                Assignment.DueDate = Assignment.DueDate.AddMinutes(utcOffset);
 
                 //update our DB
                 if (Assignment.ID == 0)

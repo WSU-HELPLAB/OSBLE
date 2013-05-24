@@ -303,7 +303,7 @@
                     }
                 </div>
             </div>
-            @if (assignment.DueDate > DateTime.Now)
+            @if (assignment.DueDate > DateTime.UtcNow)
             {
                 <div class="dp_replylink"><a href="#" id="reply_@(dpvm.DiscussionPostId)">Reply</a></div>
             }

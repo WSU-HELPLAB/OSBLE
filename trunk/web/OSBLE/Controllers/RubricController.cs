@@ -94,14 +94,14 @@ namespace OSBLE.Controllers
             if (Request.Form.AllKeys.Contains(publishKey))
             {
                 viewModel.Evaluation.IsPublished = true;
-                viewModel.Evaluation.DatePublished = DateTime.Now;
+                viewModel.Evaluation.DatePublished = DateTime.UtcNow;
             }
             else
             {
                 //Even if the user has selected to save as draft,
                 //it should store the DatePublished to be displayed when the draft was last saved.
                 viewModel.Evaluation.IsPublished = false;
-                viewModel.Evaluation.DatePublished = DateTime.Now;
+                viewModel.Evaluation.DatePublished = DateTime.UtcNow;
             }
 
             string globalCommentKey = ViewBag.GlobalCommentId;

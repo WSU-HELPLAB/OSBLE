@@ -53,7 +53,7 @@ namespace OSBLE.Controllers
                 returnVal = lastVisited.LastVisit;
                 
             }
-            lastVisited.LastVisit = DateTime.Now; //update LastVisit time & save changes
+            lastVisited.LastVisit = DateTime.UtcNow; //update LastVisit time & save changes
             db.SaveChanges();
 
             return returnVal;
@@ -257,7 +257,7 @@ namespace OSBLE.Controllers
                 }
 
                 ViewBag.LastVisit = GetAndUpdateLastVisit(discussionTeamId);
-                ViewBag.CanPost = assignment.DueDate > DateTime.Now;
+                ViewBag.CanPost = assignment.DueDate > DateTime.UtcNow;
                 ViewBag.DiscussionPostViewModelList = dvm.DiscussionPostViewModels.OrderBy(dpvm => dpvm.Posted).ToList();
                 ViewBag.ActiveCourse = ActiveCourseUser;
                 ViewBag.Assignment = assignment;

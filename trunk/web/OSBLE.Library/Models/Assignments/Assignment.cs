@@ -14,8 +14,8 @@ namespace OSBLE.Models.Assignments
     {
         public Assignment()
         {
-            ReleaseDate = DateTime.Now;
-            DueDate = DateTime.Now.AddDays(7.0);
+            ReleaseDate = DateTime.UtcNow;
+            DueDate = DateTime.UtcNow.AddDays(7.0);
             Deliverables = new List<Deliverable>();
             AssignmentTeams = new List<AssignmentTeam>();
             DiscussionTeams = new List<DiscussionTeam>();

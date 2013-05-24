@@ -485,7 +485,7 @@ namespace OSBLE.Controllers
             }
             else //if the assignment has not been submitted, use the current time to calculate late penalty.
             {
-                lateness = DateTime.Now - (DateTime)dueDate;
+                lateness = DateTime.UtcNow - (DateTime)dueDate;
             }
 
             if (lateness.TotalHours >= team.Assignment.HoursLateWindow)

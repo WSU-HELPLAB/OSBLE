@@ -53,6 +53,17 @@
         }
     <text><small><em>@(text)</em></small></text>
 }
+
+@helper DateAsUnixTime(DateTime dt)
+{
+    @Convert.ToInt64((dt - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds);
+}
+
+@helper RawDate(DateTime dt)
+{
+    @dt.ToString("s")
+}
+
 @* Formats date consistently for display *@
 @helper DisplayDate(DateTime dt)
     {

@@ -91,7 +91,13 @@
 
             <!--Cell for duedate-->
             <td>
-                @assignments[i].DueDate.ToShortDateString() @assignments[i].DueDate.ToShortTimeString()
+                <time 
+                class="utc-time"
+                datetime="@Helpers.DateAsUnixTime(assignments[i].DueDate)" 
+                data-original-date="@Helpers.RawDate(assignments[i].DueDate)" 
+                data-date-format="MM/DD/YYYY hh:mm A">
+                    @assignments[i].DueDate.ToShortDateString() @assignments[i].DueDate.ToShortTimeString() (UTC)
+                </time>
             </td>
 
             @{
@@ -111,10 +117,10 @@
                 @if (assignments[i].Type == AssignmentTypes.DiscussionAssignment || assignments[i].Type == AssignmentTypes.CriticalReviewDiscussion)
                 {
                     //Discussion Based Assignment: Display "View Discussion" 
-                    if(dt != null)
+                    if (dt != null)
                     {
                         @:@Html.ActionLink("View Discussion",
-                                        "Index", 
+                                        "Index",
                                         "DiscussionAssignment",
                                               new { assignmentId = assignments[i].ID, discussionTeamId = dt.ID, area = "" },
                                         new { }

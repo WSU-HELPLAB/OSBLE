@@ -100,7 +100,7 @@
                 <br />
                 @* Posting Date *@
 
-                <span class="dp_posted">@Helpers.DisplayDate(Model.Posted)</span>
+                <time class="utc-time dp_posted" datetime="@Helpers.DateAsUnixTime(Model.Posted)" data-original-date="@Helpers.RawDate(Model.Posted)" data-date-format="dddd, MMMM DD, YYYY hh:mm A">@Helpers.DisplayDate(Model.Posted) (UTC)</time>
             </div>
 
             @* Post Content *@

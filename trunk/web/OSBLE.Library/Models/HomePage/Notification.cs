@@ -37,7 +37,7 @@ namespace OSBLE.Models.HomePage
         public Notification()
             : base()
         {
-            Posted = DateTime.Now;
+            Posted = DateTime.UtcNow;
             Read = false;
         }
 
